@@ -148,6 +148,7 @@ PRs are welcome. If it's a major change consider filing an issue first. If you c
 
 MIT
 
+[Latest Version]: https://img.shields.io/crates/v/interoptopus.svg
 [crates.io]: https://crates.io/crates/interoptopus
 [MIT]: https://img.shields.io/badge/license-MIT-blue.svg
 [docs]: https://docs.rs/interoptopus/badge.svg
