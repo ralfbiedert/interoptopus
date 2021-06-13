@@ -1,3 +1,6 @@
+[![Latest Version]][crates.io]
+[![docs]][docs.rs]
+![MIT]
 
 
 ## Interoptopus 
@@ -144,3 +147,8 @@ PRs are welcome. If it's a major change consider filing an issue first. If you c
 ## License
 
 MIT
+
+[crates.io]: https://crates.io/crates/interoptopus
+[MIT]: https://img.shields.io/badge/license-MIT-blue.svg
+[docs]: https://docs.rs/interoptopus/badge.svg
+[docs.rs]: https://docs.rs/interoptopus/
