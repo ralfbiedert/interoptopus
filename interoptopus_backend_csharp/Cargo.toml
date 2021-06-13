@@ -1,11 +1,13 @@
 [package]
 name = "interoptopus_backend_csharp"
+description = "Generates C# bindings."
 version = "0.1.0"
 edition = "2018"
+license = "MIT"
 
 
 [dependencies]
-interoptopus = { path = "../interoptopus" }
+interoptopus = { path = "../interoptopus", version = "0.1" }
 
-[dev-dependencies]
-interoptopus_reference_project = { path = "../interoptopus_reference_project" }
+#[dev-dependencies]
+#interoptopus_reference_project = { path = "../interoptopus_reference_project", version = "0.1" }

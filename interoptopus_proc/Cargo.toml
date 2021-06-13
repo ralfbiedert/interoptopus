@@ -1,7 +1,9 @@
 [package]
 name = "interoptopus_proc"
+description = "Macros to produce Interoptopus item info."
 version = "0.1.0"
 edition = "2018"
+license = "MIT"
 
 [lib]
 proc-macro = true
@@ -13,4 +15,4 @@ quote = "1.0"
 darling = "0.13.0"
 
 [dev-dependencies]
-interoptopus = { path = "../interoptopus" }
+interoptopus = { path = "../interoptopus", version = "0.1" }

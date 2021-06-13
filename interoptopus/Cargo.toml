@@ -1,13 +1,15 @@
 [package]
 name = "interoptopus"
+description = "Create FFI bindings to your favorite language. Composable. Escape hatches included."
 version = "0.1.0"
 edition = "2018"
+license = "MIT"
 
 [features]
 derive = ["interoptopus_proc"]
 
 [dependencies]
-interoptopus_proc = { path = "../interoptopus_proc", optional = true }
+interoptopus_proc = { path = "../interoptopus_proc", version = "0.1", optional = true }
 
-[dev-dependencies]
-interoptopus_backend_csharp = { path = "../interoptopus_backend_csharp" }
+#[dev-dependencies]
+#interoptopus_backend_csharp = { path = "../interoptopus_backend_csharp", version = "0.1" }

@@ -1,12 +1,13 @@
 [package]
 name = "interoptopus_backend_cpython_cffi"
+description = "Generates CPython CFFI bindings."
 version = "0.1.0"
 edition = "2018"
-
+license = "MIT"
 
 [dependencies]
-interoptopus = { path = "../interoptopus" }
-interoptopus_backend_c = { path = "../interoptopus_backend_c" }
+interoptopus = { path = "../interoptopus", version = "0.1" }
+interoptopus_backend_c = { path = "../interoptopus_backend_c", version = "0.1" }
 
-[dev-dependencies]
-interoptopus_reference_project = { path = "../interoptopus_reference_project" }
+#[dev-dependencies]
+#interoptopus_reference_project = { path = "../interoptopus_reference_project", version = "0.1" }
