@@ -11,4 +11,4 @@ cd "$PROJECT_ROOT"/interoptopus && cargo publish
 cd "$PROJECT_ROOT"/interoptopus_reference_project && cargo publish
 cd "$PROJECT_ROOT"/interoptopus_backend_csharp && cargo publish
 cd "$PROJECT_ROOT"/interoptopus_backend_c && cargo publish
-cd "$PROJECT_ROOT"/interoptopus_backend_cpython && cargo publish
+cd "$PROJECT_ROOT"/interoptopus_backend_cpython_cffi && cargo publish
