@@ -1,13 +1,15 @@
 [package]
 name = "interoptopus_backend_c"
 description = "Generates C bindings."
-version = "0.1.0"
+version = "0.1.2"
 edition = "2018"
 license = "MIT"
+documentation = "https://docs.rs/interoptopus_backend_c/"
+repository = "https://github.com/ralfbiedert/interoptopus"
 
 
 [dependencies]
 interoptopus = { path = "../interoptopus", version = "0.1" }
 
-#[dev-dependencies]
-#interoptopus_reference_project = { path = "../interoptopus_reference_project", version = "0.1" }
+[dev-dependencies]
+interoptopus_reference_project = { path = "../interoptopus_reference_project", version = "0.1" }

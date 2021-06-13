@@ -1,9 +1,11 @@
 [package]
 name = "interoptopus_reference_project"
 description = "A reference project for Interoptopus backends to test interop generation."
-version = "0.1.0"
+version = "0.1.1"
 edition = "2018"
 license = "MIT"
+documentation = "https://docs.rs/interoptopus_reference_project/"
+repository = "https://github.com/ralfbiedert/interoptopus"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

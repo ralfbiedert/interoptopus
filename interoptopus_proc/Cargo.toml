@@ -1,9 +1,11 @@
 [package]
 name = "interoptopus_proc"
 description = "Macros to produce Interoptopus item info."
-version = "0.1.0"
+version = "0.1.1"
 edition = "2018"
 license = "MIT"
+documentation = "https://docs.rs/interoptopus_proc/"
+repository = "https://github.com/ralfbiedert/interoptopus"
 
 [lib]
 proc-macro = true
