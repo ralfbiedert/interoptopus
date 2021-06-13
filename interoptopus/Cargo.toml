@@ -1,7 +1,7 @@
 [package]
 name = "interoptopus"
 description = "Create FFI bindings to your favorite language. Composable. Escape hatches included."
-version = "0.1.0"
+version = "0.1.1"
 edition = "2018"
 license = "MIT"
 
