@@ -1,0 +1,16 @@
+[package]
+name = "example_complex"
+version = "0.1.0"
+edition = "2018"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+interoptopus = { path = "../../interoptopus", features = ["derive"] }
+
+[dev-dependencies]
+interoptopus_backend_csharp = { path = "../../interoptopus_backend_csharp" }
+interoptopus_backend_c = { path = "../../interoptopus_backend_c" }
+interoptopus_backend_cpython_cffi = { path = "../../interoptopus_backend_cpython_cffi" }

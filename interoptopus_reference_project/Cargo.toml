@@ -1,0 +1,10 @@
+[package]
+name = "interoptopus_reference_project"
+version = "0.1.0"
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+interoptopus = { path = "../interoptopus", features = ["derive"] }

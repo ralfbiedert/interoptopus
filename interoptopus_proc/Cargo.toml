@@ -1,0 +1,16 @@
+[package]
+name = "interoptopus_proc"
+version = "0.1.0"
+edition = "2018"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1.0"
+syn = { version = "1.0", features = ["full"] }
+quote = "1.0"
+darling = "0.13.0"
+
+[dev-dependencies]
+interoptopus = { path = "../interoptopus" }

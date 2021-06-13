@@ -1,0 +1,11 @@
+[package]
+name = "interoptopus_backend_c"
+version = "0.1.0"
+edition = "2018"
+
+
+[dependencies]
+interoptopus = { path = "../interoptopus" }
+
+[dev-dependencies]
+interoptopus_reference_project = { path = "../interoptopus_reference_project" }

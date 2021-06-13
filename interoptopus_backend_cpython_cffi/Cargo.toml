@@ -1,0 +1,12 @@
+[package]
+name = "interoptopus_backend_cpython_cffi"
+version = "0.1.0"
+edition = "2018"
+
+
+[dependencies]
+interoptopus = { path = "../interoptopus" }
+interoptopus_backend_c = { path = "../interoptopus_backend_c" }
+
+[dev-dependencies]
+interoptopus_reference_project = { path = "../interoptopus_reference_project" }

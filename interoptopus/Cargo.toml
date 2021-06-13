@@ -1,0 +1,13 @@
+[package]
+name = "interoptopus"
+version = "0.1.0"
+edition = "2018"
+
+[features]
+derive = ["interoptopus_proc"]
+
+[dependencies]
+interoptopus_proc = { path = "../interoptopus_proc", optional = true }
+
+[dev-dependencies]
+interoptopus_backend_csharp = { path = "../interoptopus_backend_csharp" }
