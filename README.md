@@ -126,12 +126,12 @@ For other languages (Python, C, ...) see the `examples` folder.
 
 ## FAQ
 
-- Why do I get `error[E0658]: macro attributes in `#[derive]` output are unstable`?
+- **Why do I get `error[E0658]: macro attributes in `#[derive]` output are unstable`?**
   
   This happens when `#[ffi_type]` appears after `#derive[...]`. Just switch their order.
 
 
-- How do I support a new language?
+- **How do I support a new language?**
 
   1) create a new crate, like `my_language`
   1) check which existing backend comes closest, copy that code  
