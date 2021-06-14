@@ -28,6 +28,7 @@ macro_rules! impl_ctype_primitive {
     };
 }
 
+
 macro_rules! impl_const_value_primitive {
     (
         $rust_type:ty,
@@ -74,6 +75,14 @@ impl_ctype_primitive!(std::num::NonZeroI8, PrimitiveType::I8);
 impl_ctype_primitive!(std::num::NonZeroI16, PrimitiveType::I16);
 impl_ctype_primitive!(std::num::NonZeroI32, PrimitiveType::I32);
 impl_ctype_primitive!(std::num::NonZeroI64, PrimitiveType::I64);
+impl_ctype_primitive!(Option<std::num::NonZeroU8>, PrimitiveType::U8);
+impl_ctype_primitive!(Option<std::num::NonZeroU16>, PrimitiveType::U16);
+impl_ctype_primitive!(Option<std::num::NonZeroU32>, PrimitiveType::U32);
+impl_ctype_primitive!(Option<std::num::NonZeroU64>, PrimitiveType::U64);
+impl_ctype_primitive!(Option<std::num::NonZeroI8>, PrimitiveType::I8);
+impl_ctype_primitive!(Option<std::num::NonZeroI16>, PrimitiveType::I16);
+impl_ctype_primitive!(Option<std::num::NonZeroI32>, PrimitiveType::I32);
+impl_ctype_primitive!(Option<std::num::NonZeroI64>, PrimitiveType::I64);
 
 impl<T> CTypeInfo for NonNull<T>
 where
@@ -149,10 +158,35 @@ where
     }
 }
 
+impl<R> CTypeInfo for Option<extern "C" fn() -> R>
+    where
+        R: CTypeInfo,
+{
+    fn type_info() -> CType {
+        let mut sig = FunctionSignature::new();
+        sig.set_rval(R::type_info());
+        CType::FnPointer(FnPointerType::new(sig))
+    }
+}
+
+
 impl<T1, R> CTypeInfo for extern "C" fn(T1) -> R
 where
     T1: CTypeInfo,
     R: CTypeInfo,
+{
+    fn type_info() -> CType {
+        let mut sig = FunctionSignature::new();
+        sig.add_param(Parameter::new("x1".to_string(), T1::type_info()));
+        sig.set_rval(R::type_info());
+        CType::FnPointer(FnPointerType::new(sig))
+    }
+}
+
+impl<T1, R> CTypeInfo for Option<extern "C" fn(T1) -> R>
+    where
+        T1: CTypeInfo,
+        R: CTypeInfo,
 {
     fn type_info() -> CType {
         let mut sig = FunctionSignature::new();
@@ -177,12 +211,45 @@ where
     }
 }
 
+impl<T1, T2, R> CTypeInfo for Option<extern "C" fn(T1, T2) -> R>
+    where
+        T1: CTypeInfo,
+        T2: CTypeInfo,
+        R: CTypeInfo,
+{
+    fn type_info() -> CType {
+        let mut sig = FunctionSignature::new();
+        sig.add_param(Parameter::new("x1".to_string(), T1::type_info()));
+        sig.add_param(Parameter::new("x2".to_string(), T2::type_info()));
+        sig.set_rval(R::type_info());
+        CType::FnPointer(FnPointerType::new(sig))
+    }
+}
+
+
 impl<T1, T2, T3, R> CTypeInfo for extern "C" fn(T1, T2, T3) -> R
 where
     T1: CTypeInfo,
     T2: CTypeInfo,
     T3: CTypeInfo,
     R: CTypeInfo,
+{
+    fn type_info() -> CType {
+        let mut sig = FunctionSignature::new();
+        sig.add_param(Parameter::new("x1".to_string(), T1::type_info()));
+        sig.add_param(Parameter::new("x2".to_string(), T2::type_info()));
+        sig.add_param(Parameter::new("x3".to_string(), T3::type_info()));
+        sig.set_rval(R::type_info());
+        CType::FnPointer(FnPointerType::new(sig))
+    }
+}
+
+impl<T1, T2, T3, R> CTypeInfo for Option<extern "C" fn(T1, T2, T3) -> R>
+    where
+        T1: CTypeInfo,
+        T2: CTypeInfo,
+        T3: CTypeInfo,
+        R: CTypeInfo,
 {
     fn type_info() -> CType {
         let mut sig = FunctionSignature::new();

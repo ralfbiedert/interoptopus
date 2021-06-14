@@ -27,6 +27,11 @@ typedef struct Empty
     {
     } Empty;
 
+typedef struct Phantom
+    {
+    uint32_t x;
+    } Phantom;
+
 typedef struct SomeForeignType
     {
     uint32_t x;
@@ -41,10 +46,16 @@ typedef struct Vec3f32
 
 typedef uint8_t (*fptr_fn_u8_rval_u8)(uint8_t x0);
 
+typedef struct Generic
+    {
+    uint32_t* x;
+    } Generic;
+
 
 uint8_t callback(fptr_fn_u8_rval_u8 callback, uint8_t value);
 FFIError complex_1(Vec3f32 _a, Empty* _b);
 Opaque* complex_2(SomeForeignType _cmplx);
+uint8_t generic(Generic _x, Phantom _y);
 bool primitive_bool(bool x);
 int16_t primitive_i16(int16_t x);
 int32_t primitive_i32(int32_t x);

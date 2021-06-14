@@ -25,6 +25,9 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "complex_2")]
         public static extern IntPtr complex_2(SomeForeignType _cmplx);
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic")]
+        public static extern byte generic(Generic _x, Phantom _y);
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_bool")]
         public static extern bool primitive_bool(bool x);
 
@@ -91,6 +94,20 @@ namespace My.Company
     [StructLayout(LayoutKind.Sequential)]
     public partial struct Empty
     {
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct Generic
+    {
+        public IntPtr x;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct Phantom
+    {
+        public uint x;
     }
 
     [Serializable]

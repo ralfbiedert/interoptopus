@@ -1,5 +1,7 @@
 use interoptopus::ffi_type;
 use interoptopus::lang::c::{CType, CompositeType, Field, PrimitiveType};
+use interoptopus::lang::rust::CTypeInfo;
+use std::marker::PhantomData;
 
 // Let's assume we can't implement `CTypeInfo` for this.
 #[repr(C)]
@@ -22,6 +24,20 @@ pub struct Empty {}
 pub struct Opaque {
     _internal: *const Vec3f32,
 }
+
+#[ffi_type]
+#[repr(C)]
+pub struct Generic<'a, T> where T: 'static, T: CTypeInfo {
+    pub x: &'a T,
+}
+
+#[ffi_type(skip(p))]
+#[repr(C)]
+pub struct Phantom<'a, T> where T: 'static, T: CTypeInfo {
+    pub x: u32,
+    pub p: PhantomData<&'a T>
+}
+
 
 #[ffi_type]
 #[repr(C)]

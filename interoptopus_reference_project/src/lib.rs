@@ -26,6 +26,8 @@ interoptopus::inventory_function!(
         functions::ptr_option_mut,
         functions::complex_1,
         functions::complex_2,
-        functions::callback
+        functions::callback,
+        functions::generic
     ]
 );
+

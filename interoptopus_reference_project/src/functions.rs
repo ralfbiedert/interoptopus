@@ -1,4 +1,4 @@
-use crate::types::{some_foreign_type, Callback, Empty, FFIError, Opaque, SomeForeignType, Vec3f32};
+use crate::types::{some_foreign_type, Callback, Empty, FFIError, Opaque, SomeForeignType, Vec3f32, Generic, Phantom};
 use interoptopus::ffi_function;
 use std::ptr::null;
 
@@ -123,3 +123,8 @@ pub extern "C" fn complex_2(_cmplx: SomeForeignType) -> *const Opaque {
 pub extern "C" fn callback(callback: Callback, value: u8) -> u8 {
     callback(value)
 }
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn generic(_x: Generic<u32>, _y: Phantom<u8>) -> u8 { 0 }
+

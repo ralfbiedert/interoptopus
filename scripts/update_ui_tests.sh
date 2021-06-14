@@ -4,11 +4,6 @@
 
 PROJECT_ROOT="$( cd "$(dirname "$0")/.." ; pwd -P )" # this file
 
-cp "$PROJECT_ROOT"/README.md "$PROJECT_ROOT"/interoptopus
-
-cd "$PROJECT_ROOT"/interoptopus_proc && cargo publish
-cd "$PROJECT_ROOT"/interoptopus && cargo publish
-cd "$PROJECT_ROOT"/interoptopus_reference_project && cargo publish
-cd "$PROJECT_ROOT"/interoptopus_backend_csharp && cargo publish
-cd "$PROJECT_ROOT"/interoptopus_backend_c && cargo publish
-cd "$PROJECT_ROOT"/interoptopus_backend_cpython_cffi && cargo publish
+cp "$PROJECT_ROOT"/interoptopus_backend_c/tests/output/my_header.h.generated "$PROJECT_ROOT"/interoptopus_backend_c/tests/output/my_header.h
+cp "$PROJECT_ROOT"/interoptopus_backend_cpython_cffi/tests/output/reference_project.py.generated "$PROJECT_ROOT"/interoptopus_backend_cpython_cffi/tests/output/reference_project.py
+cp "$PROJECT_ROOT"/interoptopus_backend_csharp/tests/output/Interop.cs.generated "$PROJECT_ROOT"/interoptopus_backend_csharp/tests/output/Interop.cs

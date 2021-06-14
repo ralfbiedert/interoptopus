@@ -3,9 +3,21 @@ use darling::FromMeta;
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
 use std::collections::HashMap;
-use syn::{AttributeArgs, Expr, ItemEnum, ItemStruct, ItemType, Lit, Type};
+use syn::{AttributeArgs, Expr, ItemEnum, ItemStruct, ItemType, Lit, Type, GenericParam};
 
-pub fn ffi_type_enum(_attr: FFITypeAttributes, input: TokenStream, item: ItemEnum) -> TokenStream {
+#[derive(Debug, FromMeta)]
+pub struct FFITypeAttributes {
+    #[darling(default)]
+    opaque: bool,
+
+    #[darling(default)]
+    surrogates: HashMap<String, String>,
+
+    #[darling(default)]
+    skip: HashMap<String, ()>,
+}
+
+pub fn ffi_type_enum(attr: FFITypeAttributes, input: TokenStream, item: ItemEnum) -> TokenStream {
     let name = item.ident.to_string();
     let name_ident = syn::Ident::new(&name, item.ident.span());
 
@@ -43,9 +55,11 @@ pub fn ffi_type_enum(_attr: FFITypeAttributes, input: TokenStream, item: ItemEnu
             id
         };
 
-        variant_names.push(ident);
-        variant_values.push(this_id);
-        variant_docs.push(variant_doc_line);
+        if !attr.skip.contains_key(&ident) {
+            variant_names.push(ident);
+            variant_values.push(this_id);
+            variant_docs.push(variant_doc_line);
+        }
     }
 
     quote! {
@@ -74,14 +88,48 @@ pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemSt
     let name = item.ident.to_string();
     let name_ident = syn::Ident::new(&name, item.ident.span());
 
+    let mut generic_params = Vec::new();
     let mut field_names = Vec::new();
     let mut field_types = Vec::new();
     let mut field_docs = Vec::new();
+    let mut generic_params_needing_bounds = Vec::new();
+
+    let mut generics_params = quote! { };
+    let mut where_clause = quote! { };
 
     let doc_line = extract_doc_lines(&item.attrs).join("\n");
 
+    for generic in &item.generics.params {
+        generic_params.push(quote! { #generic });
+
+        match generic {
+            GenericParam::Type(ty) => {
+                let ident = ty.ident.clone();
+                generic_params_needing_bounds.push(ident);
+            }
+            _ => {}
+        }
+    }
+
+    if !generic_params.is_empty() {
+        generics_params = quote! { < #(#generic_params),* > };
+
+        if !generic_params_needing_bounds.is_empty() {
+            if let Some(x) =  item.generics.where_clause {
+                // where_clause = quote! { #x, #( #generic_params_needing_bounds: interoptopus::lang::rust::CTypeInfo)*, }
+                where_clause = quote! { #x }
+            } else {
+                // where_clause = quote! { where #( #generic_params_needing_bounds: interoptopus::lang::rust::CTypeInfo)*, }
+            }
+        }
+    }
+
     for field in &item.fields {
         let name = field.ident.as_ref().expect("Field must be named").to_string();
+
+        if attr.skip.contains_key(&name) {
+            continue;
+        }
 
         field_names.push(name.clone());
         field_docs.push(extract_doc_lines(&field.attrs).join("\n"));
@@ -94,8 +142,9 @@ pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemSt
             let token = match &field.ty {
                 Type::Path(x) => x.path.to_token_stream(),
                 Type::Ptr(x) => x.to_token_stream(),
+                Type::Reference(x) => x.to_token_stream(),
                 _ => {
-                    panic!("Unknown token")
+                    panic!("Unknown token: {:?}", field);
                 }
             };
 
@@ -106,7 +155,7 @@ pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemSt
     quote! {
         #input
 
-        impl interoptopus::lang::rust::CTypeInfo for #name_ident {
+        impl #generics_params interoptopus::lang::rust::CTypeInfo for #name_ident #generics_params #where_clause {
 
             fn type_info() -> interoptopus::lang::c::CType {
 
@@ -145,14 +194,6 @@ pub fn ffi_type_struct_opqaue(_attr: FFITypeAttributes, input: TokenStream, item
     }
 }
 
-#[derive(Debug, FromMeta)]
-pub struct FFITypeAttributes {
-    #[darling(default)]
-    opaque: bool,
-
-    #[darling(default)]
-    surrogates: HashMap<String, String>,
-}
 
 pub fn ffi_type(attr: AttributeArgs, input: TokenStream) -> TokenStream {
     let ffi_attributes: FFITypeAttributes = FFITypeAttributes::from_list(&attr).unwrap();
