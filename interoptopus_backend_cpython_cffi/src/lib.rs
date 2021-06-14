@@ -1,12 +1,16 @@
 use interoptopus::writer::IndentWriter;
 use interoptopus::{Error, Library};
+use interoptopus::lang::c::{ConstantValue, PrimitiveValue, CType, EnumType};
 
-#[derive(Debug)]
-pub struct Config {}
+#[derive(Clone, Debug)]
+pub struct Config {
+    init_api_function_name: String,
+    get_cffi_function_name: String,
+}
 
 impl Default for Config {
     fn default() -> Self {
-        Self {}
+        Self { init_api_function_name: "init_api".to_string(), get_cffi_function_name: "ffi".to_string() }
     }
 }
 
@@ -22,6 +26,7 @@ impl Generator {
             interoptopus_backend_c::Config {
                 directives: false,
                 imports: false,
+                file_header_comment: "".to_string(),
                 ..interoptopus_backend_c::Config::default()
             },
             library.clone(),
@@ -41,6 +46,24 @@ pub trait Interop {
     /// Returns the C-generator
     fn c_generator(&self) -> &interoptopus_backend_c::Generator;
 
+    fn constant_value_to_value(&self, value: &ConstantValue) -> String {
+        match value {
+            ConstantValue::Primitive(x) => match x {
+                PrimitiveValue::Bool(x) => format!("{}", x),
+                PrimitiveValue::U8(x) => format!("{}", x),
+                PrimitiveValue::U16(x) => format!("{}", x),
+                PrimitiveValue::U32(x) => format!("{}", x),
+                PrimitiveValue::U64(x) => format!("{}", x),
+                PrimitiveValue::I8(x) => format!("{}", x),
+                PrimitiveValue::I16(x) => format!("{}", x),
+                PrimitiveValue::I32(x) => format!("{}", x),
+                PrimitiveValue::I64(x) => format!("{}", x),
+                PrimitiveValue::F32(x) => format!("{}", x),
+                PrimitiveValue::F64(x) => format!("{}", x),
+            },
+        }
+    }
+
     fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.write_imports(w)?;
         w.newline()?;
@@ -50,6 +73,20 @@ pub trait Interop {
         w.newline()?;
 
         self.write_api_load_fuction(w)?;
+        w.newline()?;
+        w.newline()?;
+
+        self.write_constants(w)?;
+        w.newline()?;
+        w.newline()?;
+
+        self.write_types(w)?;
+        w.newline()?;
+        w.newline()?;
+
+        self.write_function_proxies(w)?;
+        w.newline()?;
+        w.newline()?;
 
         Ok(())
     }
@@ -60,16 +97,90 @@ pub trait Interop {
     }
 
     fn write_api_load_fuction(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        w.indented(|w| writeln!(w, r#"def api_from_dll(dll):"#))?;
+        w.indented(|w| writeln!(w, r#"_ffi = FFI()"#))?;
+        w.indented(|w| writeln!(w, r#"_ffi.cdef(api_definition)"#))?;
+        w.indented(|w| writeln!(w, r#"_api = None"#))?;
+        w.newline()?;
+        w.newline()?;
+
+        w.indented(|w| writeln!(w, r#"def {}(dll):"#, self.config().init_api_function_name))?;
         w.indent();
-
-        w.indented(|w| writeln!(w, r#"ffibuilder = FFI()"#))?;
-        w.indented(|w| writeln!(w, r#"ffibuilder.cdef(api_definition)"#))?;
-        w.indented(|w| writeln!(w, r#"return ffibuilder.dlopen(dll)"#))?;
-
+        w.indented(|w| writeln!(w, r#""""Initializes this library, call with path to DLL.""""#))?;
+        w.indented(|w| writeln!(w, r#"global _api"#))?;
+        w.indented(|w| writeln!(w, r#"_api = _ffi.dlopen(dll)"#))?;
         w.unindent();
+        w.newline()?;
+        w.newline()?;
+
+        w.indented(|w| writeln!(w, r#"def {}():"#, self.config().get_cffi_function_name))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#""""Returns the FFI object, e.g., to create types.""""#))?;
+        w.indented(|w| writeln!(w, r#"global _ffi"#))?;
+        w.indented(|w| writeln!(w, r#"return _ffi"#))?;
+        w.unindent();
+
         Ok(())
     }
+
+
+    fn write_constants(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        for constant in self.library().constants() {
+            let docs = constant.documentation().lines().iter().map(|x| format!("# {}", x)).collect::<Vec<_>>().join("\n");
+            w.indented(|w| writeln!(w, r#"{}"#, docs))?;
+            w.indented(|w| writeln!(w, r#"{} = {}"#, constant.name(), self.constant_value_to_value(constant.value())))?;
+        }
+
+        Ok(())
+    }
+
+    fn write_types(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        for the_type in self.library().types() {
+            match the_type {
+                CType::Enum(e) => self.write_enum(w, e)?,
+                _ => {}
+            }
+        }
+
+        Ok(())
+    }
+
+
+    fn write_enum(&self, w: &mut IndentWriter, e: &EnumType) -> Result<(), Error> {
+        let docs = e.documentation().lines().join("\n");
+
+        w.indented(|w| writeln!(w, r#"class {}:"#, e.name()))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
+        for v in e.variants() {
+            w.indented(|w| writeln!(w, r#"{} = {}"#, v.name(), v.value()))?;
+        }
+        w.unindent();
+        w.newline()?;
+        w.newline()?;
+
+        Ok(())
+    }
+
+
+
+    fn write_function_proxies(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        for function in self.library().functions() {
+            let args = function.signature().params().iter().map(|x| x.name().to_string()).collect::<Vec<_>>().join(", ");
+            let docs = function.documentation().lines().join("\n");
+
+            w.indented(|w| writeln!(w, r#"def {}({}):"#, function.name(), &args))?;
+            w.indent();
+            w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
+            w.indented(|w| writeln!(w, r#"return _api.{}({})"#, function.name(), &args))?;
+            w.unindent();
+
+            w.newline()?;
+            w.newline()?;
+        }
+
+        Ok(())
+    }
+
 
     fn write_c_header(&self, w: &mut IndentWriter) -> Result<(), Error> {
         use interoptopus_backend_c::Interop as _;

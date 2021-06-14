@@ -57,6 +57,7 @@ typedef struct WithForeignType
     } WithForeignType;
 
 
+__FUNCTION_ATTR FFIError example_always_fails();
 __FUNCTION_ATTR uint32_t example_api_version();
 __FUNCTION_ATTR FFIError example_create_context(Context** context_ptr);
 __FUNCTION_ATTR FFIError example_destroy_context(Context** context_ptr);

@@ -13,6 +13,10 @@ namespace My.Company
         public const uint THE_MAGIC_CONSTANT = 666;
 
 
+        /// A function that always fails.
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_always_fails")]
+        public static extern FFIError example_always_fails();
+
         /// Returns the version of this API.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_api_version")]
         public static extern uint example_api_version();

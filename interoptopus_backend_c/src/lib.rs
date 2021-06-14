@@ -3,7 +3,7 @@ use interoptopus::util::{safe_name, sort_types_by_dependencies};
 use interoptopus::writer::IndentWriter;
 use interoptopus::{Error, Library};
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Config {
     pub directives: bool,
     pub imports: bool,

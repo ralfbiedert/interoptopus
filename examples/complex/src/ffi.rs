@@ -47,6 +47,14 @@ pub extern "C" fn example_api_version() -> u32 {
     0x00_01_00_00
 }
 
+
+/// A function that always fails.
+#[no_mangle]
+#[ffi_function]
+pub extern "C" fn example_always_fails() -> FFIError {
+    FFIError::NullPointerPassed
+}
+
 /// Creates a new instance of this library.
 #[no_mangle]
 #[ffi_function]

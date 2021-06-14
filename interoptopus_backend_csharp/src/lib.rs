@@ -3,7 +3,7 @@ use interoptopus::util::safe_name;
 use interoptopus::writer::IndentWriter;
 use interoptopus::{Error, Library};
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Config {
     pub file_header_comment: String,
     pub namespace: String,
@@ -320,7 +320,7 @@ pub trait Interop {
     }
 
     fn write_type_definition_fn_pointer_annotation(&self, w: &mut IndentWriter, _the_type: &FnPointerType) -> Result<(), Error> {
-        w.indented(|w| writeln!(w, r#"[UnmanagedFunctionPointer(CallingConvention.StdCall)]"#))?;
+        w.indented(|w| writeln!(w, r#"[UnmanagedFunctionPointer(CallingConvention.Cdecl)]"#))?;
         Ok(())
     }
 
@@ -414,7 +414,7 @@ pub trait Interop {
     }
 
     fn write_class_context(&self, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) -> Result<(), Error> {
-        w.indented(|w| writeln!(w, r#"public static class {}"#, self.config().class))?;
+        w.indented(|w| writeln!(w, r#"public static partial class {}"#, self.config().class))?;
         w.indented(|w| writeln!(w, r#"{{"#))?;
         w.indent();
 

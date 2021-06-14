@@ -8,7 +8,7 @@ fn generated_matches_expected() -> Result<(), Error> {
 
     let library = interoptopus_reference_project::ffi_inventory();
 
-    let config = Config { ..Config::default() };
+    let config = Config {..Config::default() };
 
     let generator = Generator::new(config, library);
 

@@ -7,6 +7,7 @@ interoptopus::inventory_function!(
     [ffi::THE_MAGIC_CONSTANT],
     [
         ffi::example_api_version,
+        ffi::example_always_fails,
         ffi::example_create_context,
         ffi::example_destroy_context,
         ffi::example_print_score,

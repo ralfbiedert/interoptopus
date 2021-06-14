@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace My.Company
 {
-    public static class InteropClass
+    public static partial class InteropClass
     {
         public const string NativeLib = "example_complex";
 
@@ -126,7 +126,7 @@ namespace My.Company
         public float z;
     }
 
-    [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);
 
 }
