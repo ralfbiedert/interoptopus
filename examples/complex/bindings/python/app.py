@@ -6,9 +6,9 @@ assert (example_complex.THE_MAGIC_CONSTANT == 666)
 assert (example_complex.example_api_version() == 0x00_01_00_00)
 
 # Some data
-context = example_complex.ffi().new("Context**")
-complex_in = example_complex.ffi().new("SuperComplexEntity[]", 1)
-complex_out = example_complex.ffi().new("SuperComplexEntity[]", 1)
+context = example_complex.ffi.new("Context**")
+complex_in = example_complex.ffi.new("SuperComplexEntity[]", 1)
+complex_out = example_complex.ffi.new("SuperComplexEntity[]", 1)
 
 # Set value to observe later
 complex_in[0].ammo = 10

@@ -5,12 +5,12 @@ use interoptopus::lang::c::{ConstantValue, PrimitiveValue, CType, EnumType};
 #[derive(Clone, Debug)]
 pub struct Config {
     init_api_function_name: String,
-    get_cffi_function_name: String,
+    ffi_attribute: String,
 }
 
 impl Default for Config {
     fn default() -> Self {
-        Self { init_api_function_name: "init_api".to_string(), get_cffi_function_name: "ffi".to_string() }
+        Self { init_api_function_name: "init_api".to_string(), ffi_attribute: "ffi".to_string() }
     }
 }
 
@@ -97,27 +97,20 @@ pub trait Interop {
     }
 
     fn write_api_load_fuction(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        w.indented(|w| writeln!(w, r#"_ffi = FFI()"#))?;
-        w.indented(|w| writeln!(w, r#"_ffi.cdef(api_definition)"#))?;
-        w.indented(|w| writeln!(w, r#"_api = None"#))?;
+        w.indented(|w| writeln!(w, r#"{} = FFI()"#, self.config().ffi_attribute))?;
+        w.indented(|w| writeln!(w, r#"{}.cdef(api_definition)"#, self.config().ffi_attribute))?;
+        w.indented(|w| writeln!(w, r#"__api = None"#))?;
         w.newline()?;
         w.newline()?;
 
         w.indented(|w| writeln!(w, r#"def {}(dll):"#, self.config().init_api_function_name))?;
         w.indent();
         w.indented(|w| writeln!(w, r#""""Initializes this library, call with path to DLL.""""#))?;
-        w.indented(|w| writeln!(w, r#"global _api"#))?;
-        w.indented(|w| writeln!(w, r#"_api = _ffi.dlopen(dll)"#))?;
+        w.indented(|w| writeln!(w, r#"global __api"#))?;
+        w.indented(|w| writeln!(w, r#"__api = {}.dlopen(dll)"#, self.config().ffi_attribute))?;
         w.unindent();
         w.newline()?;
         w.newline()?;
-
-        w.indented(|w| writeln!(w, r#"def {}():"#, self.config().get_cffi_function_name))?;
-        w.indent();
-        w.indented(|w| writeln!(w, r#""""Returns the FFI object, e.g., to create types.""""#))?;
-        w.indented(|w| writeln!(w, r#"global _ffi"#))?;
-        w.indented(|w| writeln!(w, r#"return _ffi"#))?;
-        w.unindent();
 
         Ok(())
     }
@@ -171,7 +164,7 @@ pub trait Interop {
             w.indented(|w| writeln!(w, r#"def {}({}):"#, function.name(), &args))?;
             w.indent();
             w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
-            w.indented(|w| writeln!(w, r#"return _api.{}({})"#, function.name(), &args))?;
+            w.indented(|w| writeln!(w, r#"return __api.{}({})"#, function.name(), &args))?;
             w.unindent();
 
             w.newline()?;
