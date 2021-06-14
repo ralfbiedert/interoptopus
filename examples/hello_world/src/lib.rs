@@ -59,7 +59,5 @@ fn generate_bindings() -> Result<(), interoptopus::Error> {
 
     generator.write_to(&mut writer)?;
 
-    println!("{}", String::from_utf8(tmp).unwrap());
-
     Ok(())
 }
