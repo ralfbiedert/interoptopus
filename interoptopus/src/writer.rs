@@ -2,6 +2,8 @@
 use crate::Error;
 use std::io::Write;
 
+pub const FOUR_SPACES: &str = "    ";
+
 /// Convenience helper to allow backends to write code with indentation.
 pub struct IndentWriter<'a> {
     one_indent: String,
@@ -22,7 +24,15 @@ impl<'a> IndentWriter<'a> {
         self.current_level -= 1;
     }
 
-    pub fn new(writer: &'a mut dyn Write, one_indent: &str) -> Self {
+    pub fn new(writer: &'a mut dyn Write) -> Self {
+        Self {
+            one_indent: FOUR_SPACES.to_string(),
+            current_level: 0,
+            writer,
+        }
+    }
+
+    pub fn with_indent(writer: &'a mut dyn Write, one_indent: &str) -> Self {
         Self {
             one_indent: one_indent.to_string(),
             current_level: 0,

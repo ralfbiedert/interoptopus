@@ -2,6 +2,7 @@ use interoptopus::ffi_type;
 use interoptopus::lang::c::{CType, CompositeType, Field, PrimitiveType};
 use interoptopus::lang::rust::CTypeInfo;
 use std::marker::PhantomData;
+use interoptopus::patterns::ascii_pointer::AsciiPointer0In;
 
 // Let's assume we can't implement `CTypeInfo` for this.
 #[repr(C)]
@@ -79,6 +80,15 @@ pub struct StructDocumented {
     /// Documented field.
     pub x: f32,
 }
+
+
+#[ffi_type]
+#[repr(C)]
+pub struct UseAciiStringPattern<'a> {
+    pub asii_string: AsciiPointer0In<'a>
+}
+
+
 
 
 // Doesn't need annotations.

@@ -3,6 +3,7 @@
 
 use crate::util::types_from_type_recursive;
 use std::collections::HashSet;
+use crate::patterns::TypePattern;
 
 // /// If a name like `abc::XXX` is given, strips the `abc::` part.
 // fn strip_rust_path_prefix(name_with_path: &str) -> String {
@@ -83,6 +84,9 @@ pub enum CType {
     FnPointer(FnPointerType),
     ReadPointer(Box<CType>),
     ReadWritePointer(Box<CType>),
+    /// Special patterns with primitives existing on C-level but special semantics.
+    /// useful to higher level languages.
+    Pattern(TypePattern)
 }
 
 impl CType {
@@ -108,6 +112,7 @@ impl CType {
             CType::FnPointer(x) => x.internal_name(),
             CType::ReadPointer(x) => format!("*const {}", x.internal_name()),
             CType::ReadWritePointer(x) => format!("*mut {}", x.internal_name()),
+            CType::Pattern(x) => x.fallback_type().internal_name()
         }
     }
 
@@ -248,6 +253,11 @@ impl CompositeType {
 
     pub fn fields(&self) -> &[Field] {
         &self.fields
+    }
+
+    /// True if this struct has no contained fields (which happens to be illegal in C99).
+    pub fn is_empty(&self) -> bool {
+        self.fields.is_empty()
     }
 
     pub fn documentation(&self) -> &Documentation {

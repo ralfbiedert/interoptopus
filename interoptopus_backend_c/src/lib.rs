@@ -87,7 +87,7 @@ pub trait Interop {
 
     /// Converts the `u32` part in a Rust paramter `x: u32` to a C# equivalent. Might convert pointers to `out X` or `ref X`.
     fn type_to_typespecifier(&self, x: &CType) -> String {
-        match &x {
+        match x {
             CType::Primitive(x) => self.type_primitive_to_typename(x),
             CType::Enum(x) => self.type_enum_to_typename(x),
             CType::Opaque(x) => self.type_opaque_to_typename(x),
@@ -95,6 +95,7 @@ pub trait Interop {
             CType::ReadPointer(x) => format!("{}*", self.type_to_typespecifier(x)),
             CType::ReadWritePointer(x) => format!("{}*", self.type_to_typespecifier(x)),
             CType::FnPointer(x) => self.type_fnpointer_to_typename(x),
+            CType::Pattern(x) => self.type_to_typespecifier(&x.fallback_type())
         }
     }
 
@@ -167,6 +168,7 @@ pub trait Interop {
 
     fn write_imports(&self, w: &mut IndentWriter) -> Result<(), Error> {
         w.indented(|w| writeln!(w, r#"#include <stdint.h>"#))?;
+        w.indented(|w| writeln!(w, r#"#include <stdbool.h>"#))?;
 
         Ok(())
     }
@@ -264,6 +266,7 @@ pub trait Interop {
             }
             CType::ReadPointer(_) => {}
             CType::ReadWritePointer(_) => {}
+            CType::Pattern(_) => {}
         }
         Ok(())
     }
@@ -322,8 +325,13 @@ pub trait Interop {
     }
 
     fn write_type_definition_composite(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
-        self.write_type_definition_composite_body(w, the_type)?;
-        Ok(())
+        if the_type.is_empty() {
+            // C doesn't allow us writing empty structs.
+            w.indented(|w| writeln!(w, r#"typedef struct {} {};"#, the_type.name(), the_type.name()))?;
+            Ok(())
+        } else {
+            self.write_type_definition_composite_body(w, the_type)
+        }
     }
 
     fn write_type_definition_composite_body(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {

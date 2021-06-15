@@ -2,6 +2,7 @@ use interoptopus::lang::c::{CType, CompositeType, Constant, ConstantValue, EnumT
 use interoptopus::util::safe_name;
 use interoptopus::writer::IndentWriter;
 use interoptopus::{Error, Library};
+use interoptopus::patterns::TypePattern;
 
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -91,6 +92,11 @@ pub trait Interop {
             CType::ReadPointer(_) => "IntPtr".to_string(),
             CType::ReadWritePointer(_) => "IntPtr".to_string(),
             CType::FnPointer(x) => self.type_fnpointer_to_typename(x),
+            CType::Pattern(x) => {
+                match x {
+                    TypePattern::AsciiPointer => "string".to_string()
+                }
+            }
         }
     }
 
@@ -116,6 +122,11 @@ pub trait Interop {
                 _ => format!("out {}", self.type_to_typespecifier_in_param(z)),
             },
             CType::FnPointer(x) => self.type_fnpointer_to_typename(x),
+            CType::Pattern(x) => {
+                match x {
+                    TypePattern::AsciiPointer => "string".to_string()
+                }
+            }
         }
     }
 
@@ -128,6 +139,11 @@ pub trait Interop {
             CType::ReadPointer(_) => "IntPtr".to_string(),
             CType::ReadWritePointer(_) => "IntPtr".to_string(),
             CType::FnPointer(x) => self.type_fnpointer_to_typename(x),
+            CType::Pattern(x) => {
+                match x {
+                    TypePattern::AsciiPointer => "string".to_string()
+                }
+            }
         }
     }
 
@@ -309,6 +325,7 @@ pub trait Interop {
             }
             CType::ReadPointer(_) => {}
             CType::ReadWritePointer(_) => {}
+            CType::Pattern(_) => {}
         }
         Ok(())
     }

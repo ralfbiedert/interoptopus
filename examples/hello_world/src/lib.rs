@@ -55,7 +55,7 @@ fn generate_bindings() -> Result<(), interoptopus::Error> {
     let generator = Generator::new(config, library);
 
     let mut tmp: Vec<u8> = Vec::new();
-    let mut writer = IndentWriter::new(&mut tmp, "    ");
+    let mut writer = IndentWriter::new(&mut tmp);
 
     generator.write_to(&mut writer)?;
 

@@ -18,7 +18,7 @@ fn generate_csharp() -> Result<(), Error> {
     let generator = Generator::new(config, library);
 
     let mut file = File::create("bindings/csharp/Interop.cs")?;
-    let mut writer = IndentWriter::new(&mut file, "    ");
+    let mut writer = IndentWriter::new(&mut file);
 
     generator.write_to(&mut writer)?;
 
@@ -47,7 +47,7 @@ fn generate_c() -> Result<(), Error> {
     let generator = Generator::new(config, library);
 
     let mut file = File::create("bindings/c/example_complex.h")?;
-    let mut writer = IndentWriter::new(&mut file, "    ");
+    let mut writer = IndentWriter::new(&mut file);
 
     generator.write_to(&mut writer)?;
 
@@ -64,7 +64,7 @@ fn generate_cpython_cffi() -> Result<(), Error> {
     let generator = Generator::new(config, library);
 
     let mut file = File::create("bindings/python/example_complex.py")?;
-    let mut writer = IndentWriter::new(&mut file, "    ");
+    let mut writer = IndentWriter::new(&mut file);
 
     generator.write_to(&mut writer)?;
 

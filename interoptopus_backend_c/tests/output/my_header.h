@@ -8,6 +8,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <stdbool.h>
 
 
 
@@ -29,9 +30,7 @@ typedef enum FFIError
 
 typedef struct Opaque Opaque;
 
-typedef struct Empty
-    {
-    } Empty;
+typedef struct Empty Empty;
 
 typedef struct Phantom
     {
@@ -62,12 +61,18 @@ typedef struct Generic
     uint32_t* x;
     } Generic;
 
+typedef struct UseAciiStringPattern
+    {
+    uint8_t* asii_string;
+    } UseAciiStringPattern;
+
 
 uint8_t callback(fptr_fn_u8_rval_u8 callback, uint8_t value);
 FFIError complex_1(Vec3f32 _a, Empty* _b);
 Opaque* complex_2(SomeForeignType _cmplx);
 EnumDocumented documented(StructDocumented _x);
-uint8_t generic(Generic _x, Phantom _y);
+uint32_t generic(Generic x, Phantom _y);
+uint8_t pattern_simple(uint8_t* x, UseAciiStringPattern y);
 bool primitive_bool(bool x);
 int16_t primitive_i16(int16_t x);
 int32_t primitive_i32(int32_t x);
@@ -81,8 +86,8 @@ void primitive_void();
 void primitive_void2();
 int64_t* ptr(int64_t* x);
 int64_t* ptr_mut(int64_t* x);
-int64_t* ptr_option(int64_t* x);
-int64_t* ptr_option_mut(int64_t* x);
+bool ptr_option(int64_t* x);
+bool ptr_option_mut(int64_t* x);
 int64_t** ptr_ptr(int64_t** x);
 int64_t* ptr_simple(int64_t* x);
 int64_t* ptr_simple_mut(int64_t* x);

@@ -15,6 +15,9 @@ pub struct FFITypeAttributes {
 
     #[darling(default)]
     skip: HashMap<String, ()>,
+
+    #[darling(default)]
+    tags: HashMap<String, ()>,
 }
 
 pub fn ffi_type_enum(attr: FFITypeAttributes, input: TokenStream, item: ItemEnum) -> TokenStream {

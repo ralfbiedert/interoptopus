@@ -2,6 +2,7 @@
 
 use crate::lang::c::{CType, Function};
 use std::collections::HashSet;
+use crate::patterns::TypePattern;
 
 /// Converts an internal name like `fn() -> X` to a safe name like `fn_rval_x`
 pub fn safe_name(name: &str) -> String {
@@ -80,5 +81,6 @@ pub(crate) fn types_from_type_recursive(start: &CType, types: &mut HashSet<CType
         CType::Primitive(_) => {}
         CType::Enum(_) => {}
         CType::Opaque(_) => {}
+        CType::Pattern(x) => match x { TypePattern::AsciiPointer => types_from_type_recursive(&x.fallback_type(), types) }
     }
 }

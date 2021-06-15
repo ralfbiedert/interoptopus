@@ -1,3 +1,4 @@
+#![cfg_attr(docsrs, feature(doc_cfg))] // does this work?
 //!
 //! ## Interoptopus
 //!
@@ -117,6 +118,7 @@
 
 pub use error::Error;
 #[cfg(feature = "derive")]
+#[cfg_attr(docsrs, doc(cfg(feature = "derive")))] // does this work?
 pub use interoptopus_proc::{ffi_constant, ffi_function, ffi_type};
 
 pub use crate::core::Library;
@@ -126,6 +128,9 @@ mod error;
 pub mod util;
 pub mod writer;
 pub mod patterns;
+#[cfg(feature = "testing")]
+#[cfg_attr(docsrs, doc(cfg(feature = "testing")))] // does this work?
+pub mod testing;
 
 pub mod lang {
     //! Abstractions for authors of backends.
@@ -167,6 +172,7 @@ pub mod lang {
 /// produce bindings to your language.
 ///
 #[cfg(feature = "derive")]
+#[cfg_attr(docsrs, doc(cfg(feature = "derive")))] // does this work?
 #[macro_export]
 macro_rules! inventory_function {
     (
