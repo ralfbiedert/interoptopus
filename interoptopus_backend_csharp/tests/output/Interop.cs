@@ -25,6 +25,10 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "complex_2")]
         public static extern IntPtr complex_2(SomeForeignType _cmplx);
 
+        /// This function has documentation.
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "documented")]
+        public static extern EnumDocumented documented(StructDocumented _x);
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic")]
         public static extern byte generic(Generic _x, Phantom _y);
 
@@ -84,6 +88,15 @@ namespace My.Company
 
     }
 
+    /// Documented enum.
+    public enum EnumDocumented
+    {
+        /// Variant A.
+        A = 0,
+        /// Variant B.
+        B = 1,
+    }
+
     public enum FFIError
     {
         Ok = 0,
@@ -115,6 +128,15 @@ namespace My.Company
     public partial struct SomeForeignType
     {
         public uint x;
+    }
+
+    /// Documented struct.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct StructDocumented
+    {
+        /// Documented field.
+        public float x;
     }
 
     [Serializable]

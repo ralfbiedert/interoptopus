@@ -6,11 +6,12 @@ use interoptopus::lang::c::{ConstantValue, PrimitiveValue, CType, EnumType};
 pub struct Config {
     init_api_function_name: String,
     ffi_attribute: String,
+    raw_fn_namespace: String,
 }
 
 impl Default for Config {
     fn default() -> Self {
-        Self { init_api_function_name: "init_api".to_string(), ffi_attribute: "ffi".to_string() }
+        Self { init_api_function_name: "init_api".to_string(), ffi_attribute: "ffi".to_string(), raw_fn_namespace: "raw".to_string() }
     }
 }
 
@@ -99,15 +100,15 @@ pub trait Interop {
     fn write_api_load_fuction(&self, w: &mut IndentWriter) -> Result<(), Error> {
         w.indented(|w| writeln!(w, r#"{} = FFI()"#, self.config().ffi_attribute))?;
         w.indented(|w| writeln!(w, r#"{}.cdef(api_definition)"#, self.config().ffi_attribute))?;
-        w.indented(|w| writeln!(w, r#"__api = None"#))?;
+        w.indented(|w| writeln!(w, r#"_api = None"#))?;
         w.newline()?;
         w.newline()?;
 
         w.indented(|w| writeln!(w, r#"def {}(dll):"#, self.config().init_api_function_name))?;
         w.indent();
         w.indented(|w| writeln!(w, r#""""Initializes this library, call with path to DLL.""""#))?;
-        w.indented(|w| writeln!(w, r#"global __api"#))?;
-        w.indented(|w| writeln!(w, r#"__api = {}.dlopen(dll)"#, self.config().ffi_attribute))?;
+        w.indented(|w| writeln!(w, r#"global _api"#))?;
+        w.indented(|w| writeln!(w, r#"_api = {}.dlopen(dll)"#, self.config().ffi_attribute))?;
         w.unindent();
         w.newline()?;
         w.newline()?;
@@ -157,6 +158,10 @@ pub trait Interop {
 
 
     fn write_function_proxies(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        w.indented(|w| writeln!(w, r#"class {}:"#, self.config().raw_fn_namespace))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#""""Raw access to all exported functions.""""#))?;
+
         for function in self.library().functions() {
             let args = function.signature().params().iter().map(|x| x.name().to_string()).collect::<Vec<_>>().join(", ");
             let docs = function.documentation().lines().join("\n");
@@ -164,12 +169,17 @@ pub trait Interop {
             w.indented(|w| writeln!(w, r#"def {}({}):"#, function.name(), &args))?;
             w.indent();
             w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
-            w.indented(|w| writeln!(w, r#"return __api.{}({})"#, function.name(), &args))?;
+            w.indented(|w| writeln!(w, r#"global _api"#))?;
+            w.indented(|w| writeln!(w, r#"return _api.{}({})"#, function.name(), &args))?;
             w.unindent();
 
             w.newline()?;
             w.newline()?;
         }
+
+        w.unindent();
+        w.newline()?;
+        w.newline()?;
 
         Ok(())
     }

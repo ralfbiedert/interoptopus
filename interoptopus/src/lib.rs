@@ -35,7 +35,6 @@
 //!
 //! ```rust
 //! use interoptopus::{ffi_function, ffi_type};
-//! use interoptopus_backend_csharp::Interop;
 //!
 //! #[ffi_type]
 //! #[repr(C)]
@@ -57,6 +56,7 @@
 //!
 //! #[test]
 //! fn generate_csharp_bindings() {
+//!     use interoptopus_backend_csharp::Interop;
 //!     use interoptopus::writer::IndentWriter;
 //!
 //!     let library = ffi_inventory();
@@ -125,6 +125,7 @@ mod core;
 mod error;
 pub mod util;
 pub mod writer;
+pub mod patterns;
 
 pub mod lang {
     //! Abstractions for authors of backends.

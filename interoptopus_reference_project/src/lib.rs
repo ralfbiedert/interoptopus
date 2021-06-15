@@ -27,7 +27,8 @@ interoptopus::inventory_function!(
         functions::complex_1,
         functions::complex_2,
         functions::callback,
-        functions::generic
+        functions::generic,
+        functions::documented
     ]
 );
 

@@ -15,6 +15,12 @@ extern "C" {
 #define C2 1
 #define C3 -100
 
+typedef enum EnumDocumented
+    {
+    A = 0,
+    B = 1,
+    } EnumDocumented;
+
 typedef enum FFIError
     {
     Ok = 0,
@@ -37,6 +43,11 @@ typedef struct SomeForeignType
     uint32_t x;
     } SomeForeignType;
 
+typedef struct StructDocumented
+    {
+    float x;
+    } StructDocumented;
+
 typedef struct Vec3f32
     {
     float x;
@@ -55,6 +66,7 @@ typedef struct Generic
 uint8_t callback(fptr_fn_u8_rval_u8 callback, uint8_t value);
 FFIError complex_1(Vec3f32 _a, Empty* _b);
 Opaque* complex_2(SomeForeignType _cmplx);
+EnumDocumented documented(StructDocumented _x);
 uint8_t generic(Generic _x, Phantom _y);
 bool primitive_bool(bool x);
 int16_t primitive_i16(int16_t x);

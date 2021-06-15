@@ -61,5 +61,25 @@ pub enum FFIError {
     Fail = 200,
 }
 
-// Don't need annotations.
+
+/// Documented enum.
+#[ffi_type]
+#[repr(C)]
+pub enum EnumDocumented {
+    /// Variant A.
+    A,
+    /// Variant B.
+    B,
+}
+
+/// Documented struct.
+#[ffi_type]
+#[repr(C)]
+pub struct StructDocumented {
+    /// Documented field.
+    pub x: f32,
+}
+
+
+// Doesn't need annotations.
 pub type Callback = extern "C" fn(u8) -> u8;
