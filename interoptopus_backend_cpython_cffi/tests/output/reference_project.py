@@ -23,9 +23,7 @@ typedef enum FFIError
 
 typedef struct Opaque Opaque;
 
-typedef struct Empty
-    {
-    } Empty;
+typedef struct Empty Empty;
 
 typedef struct Phantom
     {
