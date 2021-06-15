@@ -1,7 +1,7 @@
 [package]
 name = "interoptopus_backend_c"
 description = "Generates C bindings."
-version = "0.1.3"
+version = "0.1.5"
 edition = "2018"
 license = "MIT"
 documentation = "https://docs.rs/interoptopus_backend_c/"
