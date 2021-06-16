@@ -1,20 +1,35 @@
-use std::os::raw::c_char;
-use std::marker::PhantomData;
+use crate::lang::c::CType;
 use crate::lang::rust::CTypeInfo;
-use crate::lang::c::{CType};
-use std::ffi::CStr;
-use crate::Error;
-use std::option::Option::None;
 use crate::patterns::TypePattern;
+use crate::Error;
+use std::ffi::CStr;
+use std::marker::PhantomData;
+use std::option::Option::None;
+use std::os::raw::c_char;
+use std::ptr::null;
 
 /// Represents a `*const char` on FFI level pointing to an `0x0` terminated ASCII string.
 #[repr(transparent)]
 pub struct AsciiPointer0In<'a> {
     ptr: *const c_char,
-    _phandom: PhantomData<&'a ()>
+    _phandom: PhantomData<&'a ()>,
+}
+
+impl<'a> Default for AsciiPointer0In<'a> {
+    fn default() -> Self {
+        Self {
+            ptr: null(),
+            _phandom: Default::default(),
+        }
+    }
 }
 
 impl<'a> AsciiPointer0In<'a> {
+    /// Create a new `null` ascii pointer.
+    pub fn null() -> Self {
+        Self::default()
+    }
+
     /// Create a [`CStr`] for the pointer.
     pub fn as_c_str(&self) -> Option<&'a CStr> {
         if self.ptr.is_null() {
