@@ -39,9 +39,9 @@ interoptopus::inventory_function!(ffi_inventory, [MY_CONST], [my_game_function])
 // to do that job.
 #[test]
 fn generate_bindings() -> Result<(), interoptopus::Error> {
-    use interoptopus_backend_csharp::{Config, Generator};
     use interoptopus::generators::Interop;
     use interoptopus::writer::IndentWriter;
+    use interoptopus_backend_csharp::{Config, Generator};
 
     let library = ffi_inventory();
 

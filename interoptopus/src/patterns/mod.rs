@@ -1,11 +1,11 @@
 use crate::lang::c::{CType, PrimitiveType};
 
-pub mod ffioption;
 pub mod ascii_pointer;
+pub mod ffioption;
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum TypePattern {
-    AsciiPointer
+    AsciiPointer,
 }
 
 impl TypePattern {
@@ -13,7 +13,7 @@ impl TypePattern {
     /// C-equivalent fallback type.
     pub fn fallback_type(&self) -> CType {
         match self {
-            TypePattern::AsciiPointer => CType::ReadPointer(Box::new(CType::Primitive(PrimitiveType::U8)))
+            TypePattern::AsciiPointer => CType::ReadPointer(Box::new(CType::Primitive(PrimitiveType::U8))),
         }
     }
 }
@@ -21,4 +21,3 @@ impl TypePattern {
 // pub struct PatternAsciiPointer {
 //     ptr_field: String
 // }
-

@@ -1,8 +1,8 @@
 use interoptopus::ffi_type;
 use interoptopus::lang::c::{CType, CompositeType, Field, PrimitiveType};
 use interoptopus::lang::rust::CTypeInfo;
-use std::marker::PhantomData;
 use interoptopus::patterns::ascii_pointer::AsciiPointer0In;
+use std::marker::PhantomData;
 
 // Let's assume we can't implement `CTypeInfo` for this.
 #[repr(C)]
@@ -28,17 +28,24 @@ pub struct Opaque {
 
 #[ffi_type]
 #[repr(C)]
-pub struct Generic<'a, T> where T: 'static, T: CTypeInfo {
+pub struct Generic<'a, T>
+where
+    T: 'static,
+    T: CTypeInfo,
+{
     pub x: &'a T,
 }
 
 #[ffi_type(skip(p))]
 #[repr(C)]
-pub struct Phantom<'a, T> where T: 'static, T: CTypeInfo {
+pub struct Phantom<'a, T>
+where
+    T: 'static,
+    T: CTypeInfo,
+{
     pub x: u32,
-    pub p: PhantomData<&'a T>
+    pub p: PhantomData<&'a T>,
 }
-
 
 #[ffi_type]
 #[repr(C)]
@@ -62,7 +69,6 @@ pub enum FFIError {
     Fail = 200,
 }
 
-
 /// Documented enum.
 #[ffi_type]
 #[repr(C)]
@@ -81,15 +87,11 @@ pub struct StructDocumented {
     pub x: f32,
 }
 
-
 #[ffi_type]
 #[repr(C)]
 pub struct UseAciiStringPattern<'a> {
-    pub asii_string: AsciiPointer0In<'a>
+    pub asii_string: AsciiPointer0In<'a>,
 }
-
-
-
 
 // Doesn't need annotations.
 pub type Callback = extern "C" fn(u8) -> u8;

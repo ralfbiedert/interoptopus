@@ -115,7 +115,6 @@
 //! For other languages (Python, C, ...) see `examples` folder.
 //!
 
-
 pub use error::Error;
 #[cfg(feature = "derive")]
 #[cfg_attr(docsrs, doc(cfg(feature = "derive")))] // does this work?
@@ -125,13 +124,13 @@ pub use crate::core::Library;
 
 mod core;
 mod error;
-pub mod util;
-pub mod writer;
-pub mod patterns;
 pub mod generators;
+pub mod patterns;
 #[cfg(feature = "testing")]
 #[cfg_attr(docsrs, doc(cfg(feature = "testing")))] // does this work?
 pub mod testing;
+pub mod util;
+pub mod writer;
 
 pub mod lang {
     //! Abstractions for authors of backends.

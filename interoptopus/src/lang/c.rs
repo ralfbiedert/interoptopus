@@ -1,9 +1,8 @@
 //! "Canonical" representation of our FFI boundary.
 
-
+use crate::patterns::TypePattern;
 use crate::util::types_from_type_recursive;
 use std::collections::HashSet;
-use crate::patterns::TypePattern;
 
 // /// If a name like `abc::XXX` is given, strips the `abc::` part.
 // fn strip_rust_path_prefix(name_with_path: &str) -> String {
@@ -86,7 +85,7 @@ pub enum CType {
     ReadWritePointer(Box<CType>),
     /// Special patterns with primitives existing on C-level but special semantics.
     /// useful to higher level languages.
-    Pattern(TypePattern)
+    Pattern(TypePattern),
 }
 
 impl CType {
@@ -112,7 +111,7 @@ impl CType {
             CType::FnPointer(x) => x.internal_name(),
             CType::ReadPointer(x) => format!("*const {}", x.internal_name()),
             CType::ReadWritePointer(x) => format!("*mut {}", x.internal_name()),
-            CType::Pattern(x) => x.fallback_type().internal_name()
+            CType::Pattern(x) => x.fallback_type().internal_name(),
         }
     }
 

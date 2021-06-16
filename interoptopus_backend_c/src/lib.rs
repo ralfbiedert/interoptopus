@@ -1,8 +1,10 @@
-use interoptopus::lang::c::{CType, CompositeType, Constant, ConstantValue, EnumType, Field, FnPointerType, Function, OpaqueType, Parameter, PrimitiveType, PrimitiveValue, Variant, Documentation};
+use interoptopus::generators::Interop;
+use interoptopus::lang::c::{
+    CType, CompositeType, Constant, ConstantValue, Documentation, EnumType, Field, FnPointerType, Function, OpaqueType, Parameter, PrimitiveType, PrimitiveValue, Variant,
+};
 use interoptopus::util::{safe_name, sort_types_by_dependencies};
 use interoptopus::writer::IndentWriter;
 use interoptopus::{Error, Library};
-use interoptopus::generators::Interop;
 
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -96,7 +98,7 @@ pub trait InteropC {
             CType::ReadPointer(x) => format!("{}*", self.type_to_typespecifier(x)),
             CType::ReadWritePointer(x) => format!("{}*", self.type_to_typespecifier(x)),
             CType::FnPointer(x) => self.type_fnpointer_to_typename(x),
-            CType::Pattern(x) => self.type_to_typespecifier(&x.fallback_type())
+            CType::Pattern(x) => self.type_to_typespecifier(&x.fallback_type()),
         }
     }
 
@@ -125,7 +127,6 @@ pub trait InteropC {
     fn function_name_to_csharp_name(&self, function: &Function) -> String {
         function.name().to_string()
     }
-
 
     fn write_custom_defines(&self, w: &mut IndentWriter) -> Result<(), Error> {
         writeln!(w.writer(), "{}", &self.config().custom_defines)?;

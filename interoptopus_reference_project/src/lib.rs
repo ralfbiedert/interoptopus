@@ -32,4 +32,3 @@ interoptopus::inventory_function!(
         functions::pattern_simple
     ]
 );
-

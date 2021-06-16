@@ -3,7 +3,7 @@ use darling::FromMeta;
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
 use std::collections::HashMap;
-use syn::{AttributeArgs, Expr, ItemEnum, ItemStruct, ItemType, Lit, Type, GenericParam};
+use syn::{AttributeArgs, Expr, GenericParam, ItemEnum, ItemStruct, ItemType, Lit, Type};
 
 #[derive(Debug, FromMeta)]
 pub struct FFITypeAttributes {
@@ -97,8 +97,8 @@ pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemSt
     let mut field_docs = Vec::new();
     let mut generic_params_needing_bounds = Vec::new();
 
-    let mut generics_params = quote! { };
-    let mut where_clause = quote! { };
+    let mut generics_params = quote! {};
+    let mut where_clause = quote! {};
 
     let doc_line = extract_doc_lines(&item.attrs).join("\n");
 
@@ -118,7 +118,7 @@ pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemSt
         generics_params = quote! { < #(#generic_params),* > };
 
         if !generic_params_needing_bounds.is_empty() {
-            if let Some(x) =  item.generics.where_clause {
+            if let Some(x) = item.generics.where_clause {
                 // where_clause = quote! { #x, #( #generic_params_needing_bounds: interoptopus::lang::rust::CTypeInfo)*, }
                 where_clause = quote! { #x }
             } else {
@@ -196,7 +196,6 @@ pub fn ffi_type_struct_opqaue(_attr: FFITypeAttributes, input: TokenStream, item
         }
     }
 }
-
 
 pub fn ffi_type(attr: AttributeArgs, input: TokenStream) -> TokenStream {
     let ffi_attributes: FFITypeAttributes = FFITypeAttributes::from_list(&attr).unwrap();

@@ -1,7 +1,7 @@
+use interoptopus::generators::Interop;
+use interoptopus::lang::c::{CType, ConstantValue, EnumType, PrimitiveValue};
 use interoptopus::writer::IndentWriter;
 use interoptopus::{Error, Library};
-use interoptopus::lang::c::{ConstantValue, PrimitiveValue, CType, EnumType};
-use interoptopus::generators::Interop;
 
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -12,7 +12,11 @@ pub struct Config {
 
 impl Default for Config {
     fn default() -> Self {
-        Self { init_api_function_name: "init_api".to_string(), ffi_attribute: "ffi".to_string(), raw_fn_namespace: "raw".to_string() }
+        Self {
+            init_api_function_name: "init_api".to_string(),
+            ffi_attribute: "ffi".to_string(),
+            raw_fn_namespace: "raw".to_string(),
+        }
     }
 }
 
@@ -37,7 +41,6 @@ impl Generator {
         Self { c_generator, config, library }
     }
 }
-
 
 pub trait InteropCPythonCFFI: Interop {
     /// Returns the user config.
@@ -67,7 +70,6 @@ pub trait InteropCPythonCFFI: Interop {
         }
     }
 
-
     fn write_imports(&self, w: &mut IndentWriter) -> Result<(), Error> {
         w.indented(|w| writeln!(w, r#"from cffi import FFI"#))?;
         Ok(())
@@ -92,7 +94,6 @@ pub trait InteropCPythonCFFI: Interop {
         Ok(())
     }
 
-
     fn write_constants(&self, w: &mut IndentWriter) -> Result<(), Error> {
         for constant in self.library().constants() {
             let docs = constant.documentation().lines().iter().map(|x| format!("# {}", x)).collect::<Vec<_>>().join("\n");
@@ -114,7 +115,6 @@ pub trait InteropCPythonCFFI: Interop {
         Ok(())
     }
 
-
     fn write_enum(&self, w: &mut IndentWriter, e: &EnumType) -> Result<(), Error> {
         let docs = e.documentation().lines().join("\n");
 
@@ -130,8 +130,6 @@ pub trait InteropCPythonCFFI: Interop {
 
         Ok(())
     }
-
-
 
     fn write_function_proxies(&self, w: &mut IndentWriter) -> Result<(), Error> {
         w.indented(|w| writeln!(w, r#"class {}:"#, self.config().raw_fn_namespace))?;
@@ -159,7 +157,6 @@ pub trait InteropCPythonCFFI: Interop {
 
         Ok(())
     }
-
 
     fn write_c_header(&self, w: &mut IndentWriter) -> Result<(), Error> {
         w.indented(|w| writeln!(w, r#"api_definition = """"#))?;

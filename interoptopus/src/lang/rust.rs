@@ -28,7 +28,6 @@ macro_rules! impl_ctype_primitive {
     };
 }
 
-
 macro_rules! impl_const_value_primitive {
     (
         $rust_type:ty,
@@ -159,8 +158,8 @@ where
 }
 
 impl<R> CTypeInfo for Option<extern "C" fn() -> R>
-    where
-        R: CTypeInfo,
+where
+    R: CTypeInfo,
 {
     fn type_info() -> CType {
         let mut sig = FunctionSignature::new();
@@ -168,7 +167,6 @@ impl<R> CTypeInfo for Option<extern "C" fn() -> R>
         CType::FnPointer(FnPointerType::new(sig))
     }
 }
-
 
 impl<T1, R> CTypeInfo for extern "C" fn(T1) -> R
 where
@@ -184,9 +182,9 @@ where
 }
 
 impl<T1, R> CTypeInfo for Option<extern "C" fn(T1) -> R>
-    where
-        T1: CTypeInfo,
-        R: CTypeInfo,
+where
+    T1: CTypeInfo,
+    R: CTypeInfo,
 {
     fn type_info() -> CType {
         let mut sig = FunctionSignature::new();
@@ -212,10 +210,10 @@ where
 }
 
 impl<T1, T2, R> CTypeInfo for Option<extern "C" fn(T1, T2) -> R>
-    where
-        T1: CTypeInfo,
-        T2: CTypeInfo,
-        R: CTypeInfo,
+where
+    T1: CTypeInfo,
+    T2: CTypeInfo,
+    R: CTypeInfo,
 {
     fn type_info() -> CType {
         let mut sig = FunctionSignature::new();
@@ -225,7 +223,6 @@ impl<T1, T2, R> CTypeInfo for Option<extern "C" fn(T1, T2) -> R>
         CType::FnPointer(FnPointerType::new(sig))
     }
 }
-
 
 impl<T1, T2, T3, R> CTypeInfo for extern "C" fn(T1, T2, T3) -> R
 where
@@ -245,11 +242,11 @@ where
 }
 
 impl<T1, T2, T3, R> CTypeInfo for Option<extern "C" fn(T1, T2, T3) -> R>
-    where
-        T1: CTypeInfo,
-        T2: CTypeInfo,
-        T3: CTypeInfo,
-        R: CTypeInfo,
+where
+    T1: CTypeInfo,
+    T2: CTypeInfo,
+    T3: CTypeInfo,
+    R: CTypeInfo,
 {
     fn type_info() -> CType {
         let mut sig = FunctionSignature::new();

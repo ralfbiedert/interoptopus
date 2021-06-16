@@ -1,9 +1,11 @@
-use interoptopus::lang::c::{CType, CompositeType, Constant, ConstantValue, EnumType, Field, FnPointerType, Function, OpaqueType, Parameter, PrimitiveType, PrimitiveValue, Variant, Documentation};
+use interoptopus::generators::Interop;
+use interoptopus::lang::c::{
+    CType, CompositeType, Constant, ConstantValue, Documentation, EnumType, Field, FnPointerType, Function, OpaqueType, Parameter, PrimitiveType, PrimitiveValue, Variant,
+};
+use interoptopus::patterns::TypePattern;
 use interoptopus::util::safe_name;
 use interoptopus::writer::IndentWriter;
 use interoptopus::{Error, Library};
-use interoptopus::patterns::TypePattern;
-use interoptopus::generators::Interop;
 
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -93,11 +95,9 @@ pub trait InteropCSharp {
             CType::ReadPointer(_) => "IntPtr".to_string(),
             CType::ReadWritePointer(_) => "IntPtr".to_string(),
             CType::FnPointer(x) => self.type_fnpointer_to_typename(x),
-            CType::Pattern(x) => {
-                match x {
-                    TypePattern::AsciiPointer => "string".to_string()
-                }
-            }
+            CType::Pattern(x) => match x {
+                TypePattern::AsciiPointer => "string".to_string(),
+            },
         }
     }
 
@@ -123,11 +123,9 @@ pub trait InteropCSharp {
                 _ => format!("out {}", self.type_to_typespecifier_in_param(z)),
             },
             CType::FnPointer(x) => self.type_fnpointer_to_typename(x),
-            CType::Pattern(x) => {
-                match x {
-                    TypePattern::AsciiPointer => "string".to_string()
-                }
-            }
+            CType::Pattern(x) => match x {
+                TypePattern::AsciiPointer => "string".to_string(),
+            },
         }
     }
 
@@ -140,11 +138,9 @@ pub trait InteropCSharp {
             CType::ReadPointer(_) => "IntPtr".to_string(),
             CType::ReadWritePointer(_) => "IntPtr".to_string(),
             CType::FnPointer(x) => self.type_fnpointer_to_typename(x),
-            CType::Pattern(x) => {
-                match x {
-                    TypePattern::AsciiPointer => "string".to_string()
-                }
-            }
+            CType::Pattern(x) => match x {
+                TypePattern::AsciiPointer => "string".to_string(),
+            },
         }
     }
 
@@ -177,7 +173,6 @@ pub trait InteropCSharp {
     fn function_name_to_csharp_name(&self, function: &Function) -> String {
         function.name().to_string()
     }
-
 
     fn write_file_header_comments(&self, w: &mut IndentWriter) -> Result<(), Error> {
         writeln!(w.writer(), "{}", &self.config().file_header_comment)?;

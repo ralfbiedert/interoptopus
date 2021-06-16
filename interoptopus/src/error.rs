@@ -49,7 +49,6 @@ impl From<std::string::FromUtf8Error> for Error {
     }
 }
 
-
 impl Display for Error {
     // TODO: This should be nicer.
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {

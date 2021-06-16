@@ -36,7 +36,6 @@ pub fn ffi_type(attr: TokenStream, item: TokenStream) -> TokenStream {
     rval.into()
 }
 
-
 /// Enable an `extern "C"` function to appear in generated bindings.
 ///
 /// # Example

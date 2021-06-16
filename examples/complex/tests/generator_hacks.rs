@@ -1,19 +1,23 @@
-use interoptopus::Error;
-use interoptopus::testing::csharp::run_dotnet_command_if_installed;
-use interoptopus::testing::c::compile_c_app_if_installed;
-use interoptopus::testing::python::run_python_if_installed;
 use interoptopus::generators::Interop;
+use interoptopus::testing::c::compile_c_app_if_installed;
+use interoptopus::testing::csharp::run_dotnet_command_if_installed;
+use interoptopus::testing::python::run_python_if_installed;
+use interoptopus::Error;
 
 #[test]
 fn bindings_csharp() -> Result<(), Error> {
     use interoptopus_backend_csharp::{Config, Generator};
 
-    Generator::new(Config {
-        namespace: "My.Company".to_string(),
-        class: "InteropClass".to_string(),
-        dll_name: "example_complex".to_string(),
-        ..Config::default()
-    }, example_complex::ffi_inventory()).write_file("bindings/csharp/Interop.cs")?;
+    Generator::new(
+        Config {
+            namespace: "My.Company".to_string(),
+            class: "InteropClass".to_string(),
+            dll_name: "example_complex".to_string(),
+            ..Config::default()
+        },
+        example_complex::ffi_inventory(),
+    )
+    .write_file("bindings/csharp/Interop.cs")?;
 
     run_dotnet_command_if_installed("bindings/csharp", "test")?;
 
@@ -30,12 +34,16 @@ fn bindings_c() -> Result<(), Error> {
     "
     .to_string();
 
-    Generator::new(Config {
-        ifndef: "example_complex".to_string(),
-        function_attribute: "__FUNCTION_ATTR ".to_string(),
-        custom_defines,
-        ..Config::default()
-    }, example_complex::ffi_inventory()).write_file("bindings/c/example_complex.h")?;
+    Generator::new(
+        Config {
+            ifndef: "example_complex".to_string(),
+            function_attribute: "__FUNCTION_ATTR ".to_string(),
+            custom_defines,
+            ..Config::default()
+        },
+        example_complex::ffi_inventory(),
+    )
+    .write_file("bindings/c/example_complex.h")?;
 
     compile_c_app_if_installed("bindings/c", "bindings/c/app.c")?;
 

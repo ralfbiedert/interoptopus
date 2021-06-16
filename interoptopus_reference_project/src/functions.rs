@@ -1,7 +1,9 @@
-use crate::types::{some_foreign_type, Callback, Empty, FFIError, Opaque, SomeForeignType, Vec3f32, Generic, Phantom, EnumDocumented, StructDocumented, UseAciiStringPattern};
+use crate::types::{
+    some_foreign_type, Callback, Empty, EnumDocumented, FFIError, Generic, Opaque, Phantom, SomeForeignType, StructDocumented, UseAciiStringPattern, Vec3f32,
+};
 use interoptopus::ffi_function;
-use std::ptr::null;
 use interoptopus::patterns::ascii_pointer::AsciiPointer0In;
+use std::ptr::null;
 
 #[ffi_function]
 #[no_mangle]
@@ -127,8 +129,9 @@ pub extern "C" fn callback(callback: Callback, value: u8) -> u8 {
 
 #[ffi_function]
 #[no_mangle]
-pub extern "C" fn generic(x: Generic<u32>, _y: Phantom<u8>) -> u32 { *x.x }
-
+pub extern "C" fn generic(x: Generic<u32>, _y: Phantom<u8>) -> u32 {
+    *x.x
+}
 
 /// This function has documentation.
 #[ffi_function]
