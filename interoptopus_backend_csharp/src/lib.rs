@@ -97,6 +97,7 @@ pub trait InteropCSharp {
             CType::FnPointer(x) => self.type_fnpointer_to_typename(x),
             CType::Pattern(x) => match x {
                 TypePattern::AsciiPointer => "string".to_string(),
+                TypePattern::SuccessEnum(e) => self.type_enum_to_typename(e),
             },
         }
     }
@@ -125,6 +126,7 @@ pub trait InteropCSharp {
             CType::FnPointer(x) => self.type_fnpointer_to_typename(x),
             CType::Pattern(x) => match x {
                 TypePattern::AsciiPointer => "string".to_string(),
+                TypePattern::SuccessEnum(e) => self.type_enum_to_typename(e),
             },
         }
     }
@@ -140,6 +142,7 @@ pub trait InteropCSharp {
             CType::FnPointer(x) => self.type_fnpointer_to_typename(x),
             CType::Pattern(x) => match x {
                 TypePattern::AsciiPointer => "string".to_string(),
+                TypePattern::SuccessEnum(e) => self.type_enum_to_typename(e),
             },
         }
     }
@@ -269,7 +272,7 @@ pub trait InteropCSharp {
     }
 
     fn write_type_definitions(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        for the_type in self.library().types() {
+        for the_type in self.library().ctypes() {
             self.write_type_definition(w, the_type)?;
         }
 

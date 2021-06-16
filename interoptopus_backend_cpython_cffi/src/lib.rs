@@ -1,5 +1,7 @@
 use interoptopus::generators::Interop;
 use interoptopus::lang::c::{CType, ConstantValue, EnumType, FnPointerType, PrimitiveValue};
+use interoptopus::patterns::class::Class;
+use interoptopus::patterns::LibraryPattern;
 use interoptopus::util::safe_name;
 use interoptopus::writer::IndentWriter;
 use interoptopus::{Error, Library};
@@ -109,7 +111,7 @@ pub trait InteropCPythonCFFI: Interop {
     }
 
     fn write_types(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        for the_type in self.library().types() {
+        for the_type in self.library().ctypes() {
             match the_type {
                 CType::Enum(e) => self.write_enum(w, e)?,
                 _ => {}
@@ -140,7 +142,7 @@ pub trait InteropCPythonCFFI: Interop {
         w.indent();
         w.indented(|w| writeln!(w, r#""""Helpers to define `@ffi.callback`-style callbacks.""""#))?;
 
-        for callback in self.library().types().iter().filter_map(|x| match x {
+        for callback in self.library().ctypes().iter().filter_map(|x| match x {
             CType::FnPointer(x) => Some(x),
             _ => None,
         }) {
@@ -194,6 +196,83 @@ pub trait InteropCPythonCFFI: Interop {
         Ok(())
     }
 
+    fn write_patterns(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        for pattern in self.library().patterns() {
+            match pattern {
+                LibraryPattern::Class(cls) => self.write_pattern_class(w, cls)?,
+            }
+        }
+
+        Ok(())
+    }
+
+    fn write_pattern_class(&self, w: &mut IndentWriter, class: &Class) -> Result<(), Error> {
+        let context_type_name = class.the_type().name();
+
+        w.indented(|w| writeln!(w, r#"class {}(object):"#, context_type_name))?;
+        w.indent();
+
+        // Ctor
+        let args = class
+            .constructor()
+            .signature()
+            .params()
+            .iter()
+            .skip(1)
+            .map(|x| x.name().to_string())
+            .collect::<Vec<_>>()
+            .join(", ");
+        let docs = class.constructor().documentation().lines().join("\n");
+        w.indented(|w| writeln!(w, r#"def __init__(self, {}):"#, args))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
+        w.indented(|w| writeln!(w, r#"global _api, ffi"#))?;
+        w.indented(|w| writeln!(w, r#"self.ctx = ffi.new("{}**")"#, context_type_name))?;
+        w.indented(|w| writeln!(w, r#"return _api.{}(self.ctx, {})"#, class.constructor().name(), &args))?;
+        w.unindent();
+        w.newline()?;
+        w.newline()?;
+
+        // Dtor
+        let docs = class.destructor().documentation().lines().join("\n");
+        w.indented(|w| writeln!(w, r#"def __del__(self):"#))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
+        w.indented(|w| writeln!(w, r#"global _api, ffi"#))?;
+        w.indented(|w| writeln!(w, r#"return _api.{}(self.ctx)"#, class.destructor().name()))?;
+        w.unindent();
+        w.newline()?;
+        w.newline()?;
+
+        for function in class.methods() {
+            let args = function
+                .signature()
+                .params()
+                .iter()
+                .skip(1)
+                .map(|x| x.name().to_string())
+                .collect::<Vec<_>>()
+                .join(", ");
+            let docs = function.documentation().lines().join("\n");
+
+            w.indented(|w| writeln!(w, r#"def {}(self, {}):"#, function.name(), &args))?;
+            w.indent();
+            w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
+            w.indented(|w| writeln!(w, r#"global _api"#))?;
+            w.indented(|w| writeln!(w, r#"return _api.{}(self.ctx[0], {})"#, function.name(), &args))?;
+            w.unindent();
+
+            w.newline()?;
+            w.newline()?;
+        }
+
+        w.unindent();
+        w.newline()?;
+        w.newline()?;
+
+        Ok(())
+    }
+
     fn write_c_header(&self, w: &mut IndentWriter) -> Result<(), Error> {
         w.indented(|w| writeln!(w, r#"api_definition = """"#))?;
         self.c_generator().write_to(w)?;
@@ -228,6 +307,10 @@ impl Interop for Generator {
         w.newline()?;
 
         self.write_function_proxies(w)?;
+        w.newline()?;
+        w.newline()?;
+
+        self.write_patterns(w)?;
         w.newline()?;
         w.newline()?;
 

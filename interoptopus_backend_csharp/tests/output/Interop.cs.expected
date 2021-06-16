@@ -89,6 +89,15 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_simple")]
         public static extern byte pattern_simple(string x, UseAciiStringPattern y);
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "context_init")]
+        public static extern FFIError context_init(out IntPtr context_ptr, uint value);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "context_print_double_and_get")]
+        public static extern uint context_print_double_and_get(IntPtr context);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "context_destroy")]
+        public static extern FFIError context_destroy(out IntPtr context_ptr);
+
     }
 
     /// Documented enum.
@@ -103,6 +112,7 @@ namespace My.Company
     public enum FFIError
     {
         Ok = 0,
+        Null = 100,
         Fail = 200,
     }
 

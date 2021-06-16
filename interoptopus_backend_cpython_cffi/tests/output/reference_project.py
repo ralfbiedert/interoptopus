@@ -18,8 +18,11 @@ typedef enum EnumDocumented
 typedef enum FFIError
     {
     Ok = 0,
+    Null = 100,
     Fail = 200,
     } FFIError;
+
+typedef struct Context Context;
 
 typedef struct Opaque Opaque;
 
@@ -49,15 +52,22 @@ typedef struct Vec3f32
 
 typedef uint8_t (*fptr_fn_u8_rval_u8)(uint8_t x0);
 
+typedef enum FFIError
+    {
+    Ok = 0,
+    Null = 100,
+    Fail = 200,
+    } FFIError;
+
 typedef struct Generic
     {
     uint32_t* x;
     } Generic;
 
-typedef struct UseAciiStringPattern
+typedef struct UseAsciiStringPattern
     {
-    uint8_t* asii_string;
-    } UseAciiStringPattern;
+    uint8_t* ascii_string;
+    } UseAsciiStringPattern;
 
 
 void primitive_void();
@@ -83,7 +93,10 @@ Opaque* complex_2(SomeForeignType _cmplx);
 uint8_t callback(fptr_fn_u8_rval_u8 callback, uint8_t value);
 uint32_t generic(Generic x, Phantom _y);
 EnumDocumented documented(StructDocumented _x);
-uint8_t pattern_simple(uint8_t* x, UseAciiStringPattern y);
+uint8_t pattern_ascii_pointer(uint8_t* x, UseAsciiStringPattern y);
+FFIError pattern_class_create(Context** context_ptr, uint32_t value);
+uint32_t pattern_class_method(Context* context);
+FFIError pattern_class_destroy(Context** context_ptr);
 """
 
 
@@ -117,6 +130,7 @@ class EnumDocumented:
 class FFIError:
     """"""
     Ok = 0
+    Null = 100
     Fail = 200
 
 
@@ -269,10 +283,52 @@ class raw:
         return _api.documented(_x)
 
 
-    def pattern_simple(x, y):
+    def pattern_ascii_pointer(x, y):
         """"""
         global _api
-        return _api.pattern_simple(x, y)
+        return _api.pattern_ascii_pointer(x, y)
+
+
+    def pattern_class_create(context_ptr, value):
+        """"""
+        global _api
+        return _api.pattern_class_create(context_ptr, value)
+
+
+    def pattern_class_method(context):
+        """"""
+        global _api
+        return _api.pattern_class_method(context)
+
+
+    def pattern_class_destroy(context_ptr):
+        """"""
+        global _api
+        return _api.pattern_class_destroy(context_ptr)
+
+
+
+
+
+
+class Context(object):
+    def __init__(self, value):
+        """"""
+        global _api, ffi
+        self.ctx = ffi.new("Context**")
+        return _api.pattern_class_create(self.ctx, value)
+
+
+    def __del__(self):
+        """"""
+        global _api, ffi
+        return _api.pattern_class_destroy(self.ctx)
+
+
+    def pattern_class_method(self, ):
+        """"""
+        global _api
+        return _api.pattern_class_method(self.ctx[0], )
 
 
 

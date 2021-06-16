@@ -10,12 +10,12 @@ use std::ptr::null;
 
 /// Represents a `*const char` on FFI level pointing to an `0x0` terminated ASCII string.
 #[repr(transparent)]
-pub struct AsciiPointer0In<'a> {
+pub struct AsciiPointer<'a> {
     ptr: *const c_char,
     _phandom: PhantomData<&'a ()>,
 }
 
-impl<'a> Default for AsciiPointer0In<'a> {
+impl<'a> Default for AsciiPointer<'a> {
     fn default() -> Self {
         Self {
             ptr: null(),
@@ -24,7 +24,7 @@ impl<'a> Default for AsciiPointer0In<'a> {
     }
 }
 
-impl<'a> AsciiPointer0In<'a> {
+impl<'a> AsciiPointer<'a> {
     /// Create a new `null` ascii pointer.
     pub fn null() -> Self {
         Self::default()
@@ -53,7 +53,7 @@ impl<'a> AsciiPointer0In<'a> {
     }
 }
 
-impl<'a> CTypeInfo for AsciiPointer0In<'a> {
+impl<'a> CTypeInfo for AsciiPointer<'a> {
     fn type_info() -> CType {
         CType::Pattern(TypePattern::AsciiPointer)
     }

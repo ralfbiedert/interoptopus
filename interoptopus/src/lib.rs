@@ -164,7 +164,8 @@ pub mod lang {
 /// interoptopus::inventory_function!(
 ///     my_inventory_function,
 ///     [ C1, C2 ],
-///     [ f ]
+///     [ f ],
+///     []
 /// );
 /// ```
 ///
@@ -185,6 +186,11 @@ macro_rules! inventory_function {
         [
         $(
             $function:path
+        ),*
+        ],
+        [
+        $(
+            $pattern:path
         ),*
         ]
     ) => {
@@ -209,7 +215,14 @@ macro_rules! inventory_function {
                 }
             )*
 
-            $crate::Library::new(functions, constants)
+            let mut patterns: Vec<$crate::patterns::LibraryPattern> = Vec::new();
+            $(
+                {
+                    patterns.push($pattern().into());
+                }
+            )*
+
+            $crate::Library::new(functions, constants, patterns)
         }
     };
 }

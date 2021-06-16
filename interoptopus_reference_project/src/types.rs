@@ -1,7 +1,7 @@
 use interoptopus::ffi_type;
 use interoptopus::lang::c::{CType, CompositeType, Field, PrimitiveType};
 use interoptopus::lang::rust::CTypeInfo;
-use interoptopus::patterns::ascii_pointer::AsciiPointer0In;
+use interoptopus::patterns::ascii_pointer::AsciiPointer;
 use std::marker::PhantomData;
 
 // Let's assume we can't implement `CTypeInfo` for this.
@@ -62,10 +62,11 @@ pub struct Container {
     pub foreign2: SomeForeignType,
 }
 
-#[ffi_type]
+#[ffi_type(patterns(success_enum = "Ok"))]
 #[repr(C)]
 pub enum FFIError {
     Ok = 0,
+    Null = 100,
     Fail = 200,
 }
 
@@ -89,8 +90,16 @@ pub struct StructDocumented {
 
 #[ffi_type]
 #[repr(C)]
-pub struct UseAciiStringPattern<'a> {
-    pub asii_string: AsciiPointer0In<'a>,
+pub struct UseAsciiStringPattern<'a> {
+    pub ascii_string: AsciiPointer<'a>,
+}
+
+// Used for the `context_init(**Context)`, `context_use(*Context)`,
+// `context_destroy(**Context)` pattern that acts like constructors / methods / destructors.
+#[ffi_type(opaque)]
+#[repr(C)]
+pub struct Context {
+    pub(crate) some_field: u32,
 }
 
 // Doesn't need annotations.

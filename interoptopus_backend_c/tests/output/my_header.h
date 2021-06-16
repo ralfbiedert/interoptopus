@@ -25,8 +25,11 @@ typedef enum EnumDocumented
 typedef enum FFIError
     {
     Ok = 0,
+    Null = 100,
     Fail = 200,
     } FFIError;
+
+typedef struct Context Context;
 
 typedef struct Opaque Opaque;
 
@@ -61,10 +64,10 @@ typedef struct Generic
     uint32_t* x;
     } Generic;
 
-typedef struct UseAciiStringPattern
+typedef struct UseAsciiStringPattern
     {
-    uint8_t* asii_string;
-    } UseAciiStringPattern;
+    uint8_t* ascii_string;
+    } UseAsciiStringPattern;
 
 
 void primitive_void();
@@ -90,7 +93,10 @@ Opaque* complex_2(SomeForeignType _cmplx);
 uint8_t callback(fptr_fn_u8_rval_u8 callback, uint8_t value);
 uint32_t generic(Generic x, Phantom _y);
 EnumDocumented documented(StructDocumented _x);
-uint8_t pattern_simple(uint8_t* x, UseAciiStringPattern y);
+uint8_t pattern_ascii_pointer(uint8_t* x, UseAsciiStringPattern y);
+FFIError pattern_class_create(Context** context_ptr, uint32_t value);
+uint32_t pattern_class_method(Context* context);
+FFIError pattern_class_destroy(Context** context_ptr);
 
 #ifdef __cplusplus
 }

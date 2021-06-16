@@ -1,8 +1,8 @@
 use crate::types::{
-    some_foreign_type, Callback, Empty, EnumDocumented, FFIError, Generic, Opaque, Phantom, SomeForeignType, StructDocumented, UseAciiStringPattern, Vec3f32,
+    some_foreign_type, Callback, Context, Empty, EnumDocumented, FFIError, Generic, Opaque, Phantom, SomeForeignType, StructDocumented, UseAsciiStringPattern, Vec3f32,
 };
 use interoptopus::ffi_function;
-use interoptopus::patterns::ascii_pointer::AsciiPointer0In;
+use interoptopus::patterns::ascii_pointer::AsciiPointer;
 use std::ptr::null;
 
 #[ffi_function]
@@ -142,8 +142,48 @@ pub extern "C" fn documented(_x: StructDocumented) -> EnumDocumented {
 
 #[ffi_function]
 #[no_mangle]
-pub extern "C" fn pattern_simple(x: AsciiPointer0In, y: UseAciiStringPattern) -> u8 {
+pub extern "C" fn pattern_ascii_pointer(x: AsciiPointer, y: UseAsciiStringPattern) -> u8 {
     let _ = dbg!(x.as_str());
-    let _ = dbg!(y.asii_string.as_str().unwrap());
+    let _ = dbg!(y.ascii_string.as_str().unwrap());
     0
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn pattern_class_create(context_ptr: Option<&mut *mut Context>, value: u32) -> FFIError {
+    let the_box = Box::new(Context { some_field: value });
+
+    match context_ptr {
+        None => FFIError::Null,
+        Some(c) => {
+            *c = Box::into_raw(the_box);
+            FFIError::Ok
+        }
+    }
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn pattern_class_method(context: Option<&mut Context>) -> u32 {
+    match context {
+        None => 0,
+        Some(c) => {
+            dbg!(c.some_field);
+            c.some_field = 2 * c.some_field;
+            c.some_field
+        }
+    }
+}
+
+#[ffi_function]
+#[no_mangle]
+#[allow(unused_unsafe)]
+pub unsafe extern "C" fn pattern_class_destroy(context_ptr: Option<&mut *mut Context>) -> FFIError {
+    match context_ptr {
+        None => FFIError::Null,
+        Some(c) => {
+            unsafe { Box::from_raw(*c) };
+            FFIError::Ok
+        }
+    }
 }

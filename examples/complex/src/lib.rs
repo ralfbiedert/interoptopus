@@ -15,7 +15,8 @@ interoptopus::inventory_function!(
         ffi::example_update_score_by_callback,
         ffi::example_write_foreign_type,
         ffi::example_double_super_complex_entity
-    ]
+    ],
+    []
 );
 
 // fn fff() {

@@ -1,3 +1,5 @@
+use interoptopus::pattern_class;
+
 pub mod constants;
 pub mod functions;
 pub mod types;
@@ -29,6 +31,18 @@ interoptopus::inventory_function!(
         functions::callback,
         functions::generic,
         functions::documented,
-        functions::pattern_simple
-    ]
+        functions::pattern_ascii_pointer,
+        functions::pattern_class_create,
+        functions::pattern_class_method,
+        functions::pattern_class_destroy
+    ],
+    [my_class_pattern_context]
+);
+
+pattern_class!(
+    my_class_pattern_context,
+    types::Context,
+    functions::pattern_class_create,
+    functions::pattern_class_destroy,
+    [functions::pattern_class_method]
 );

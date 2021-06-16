@@ -1,7 +1,7 @@
 //! "Canonical" representation of our FFI boundary.
 
 use crate::patterns::TypePattern;
-use crate::util::types_from_type_recursive;
+use crate::util::ctypes_from_type_recursive;
 use std::collections::HashSet;
 
 // /// If a name like `abc::XXX` is given, strips the `abc::` part.
@@ -119,10 +119,24 @@ impl CType {
     pub fn embedded_types(&self) -> Vec<CType> {
         let mut hash_set: HashSet<CType> = HashSet::new();
 
-        types_from_type_recursive(self, &mut hash_set);
+        ctypes_from_type_recursive(self, &mut hash_set);
 
         hash_set.remove(self);
         hash_set.iter().cloned().collect()
+    }
+
+    pub fn as_composite_type(&self) -> Option<&CompositeType> {
+        match self {
+            CType::Composite(x) => Some(x),
+            _ => None,
+        }
+    }
+
+    pub fn as_opaque_type(&self) -> Option<&OpaqueType> {
+        match self {
+            CType::Opaque(x) => Some(x),
+            _ => None,
+        }
     }
 }
 
@@ -189,6 +203,10 @@ impl EnumType {
 
     pub fn variants(&self) -> &[Variant] {
         &self.variants
+    }
+
+    pub fn variant_by_name(&self, name: &str) -> Option<Variant> {
+        self.variants.iter().find(|x| x.name == name).cloned()
     }
 
     pub fn documentation(&self) -> &Documentation {

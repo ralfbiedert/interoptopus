@@ -47,42 +47,43 @@ pub fn sort_types_by_dependencies(mut types: Vec<CType>) -> Vec<CType> {
     rval
 }
 
-pub(crate) fn types_from_functions(functions: &[Function]) -> Vec<CType> {
+pub(crate) fn ctypes_from_functions(functions: &[Function]) -> Vec<CType> {
     let mut types = HashSet::new();
 
     for function in functions {
-        types_from_type_recursive(function.signature().rval(), &mut types);
+        ctypes_from_type_recursive(function.signature().rval(), &mut types);
 
         for param in function.signature().params() {
-            types_from_type_recursive(param.the_type(), &mut types);
+            ctypes_from_type_recursive(param.the_type(), &mut types);
         }
     }
 
     types.iter().cloned().collect()
 }
 
-pub(crate) fn types_from_type_recursive(start: &CType, types: &mut HashSet<CType>) {
+pub(crate) fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CType>) {
     types.insert(start.clone());
 
     match start {
         CType::Composite(inner) => {
             for field in inner.fields() {
-                types_from_type_recursive(&field.the_type(), types);
+                ctypes_from_type_recursive(&field.the_type(), types);
             }
         }
         CType::FnPointer(inner) => {
-            types_from_type_recursive(inner.signature().rval(), types);
+            ctypes_from_type_recursive(inner.signature().rval(), types);
             for param in inner.signature().params() {
-                types_from_type_recursive(param.the_type(), types);
+                ctypes_from_type_recursive(param.the_type(), types);
             }
         }
-        CType::ReadPointer(inner) => types_from_type_recursive(inner, types),
-        CType::ReadWritePointer(inner) => types_from_type_recursive(inner, types),
+        CType::ReadPointer(inner) => ctypes_from_type_recursive(inner, types),
+        CType::ReadWritePointer(inner) => ctypes_from_type_recursive(inner, types),
         CType::Primitive(_) => {}
         CType::Enum(_) => {}
         CType::Opaque(_) => {}
         CType::Pattern(x) => match x {
-            TypePattern::AsciiPointer => types_from_type_recursive(&x.fallback_type(), types),
+            TypePattern::AsciiPointer => ctypes_from_type_recursive(&x.fallback_type(), types),
+            TypePattern::SuccessEnum(_) => ctypes_from_type_recursive(&x.fallback_type(), types),
         },
     }
 }

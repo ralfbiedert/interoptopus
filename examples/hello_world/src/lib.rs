@@ -32,7 +32,7 @@ pub extern "C" fn my_game_function(input: Option<&Vec2f32>) -> Vec2f32 {
 //
 // Once you have that `Library` you pass it to a backend (e.g., csharp)
 // which will then produce the interop bindings.
-interoptopus::inventory_function!(ffi_inventory, [MY_CONST], [my_game_function]);
+interoptopus::inventory_function!(ffi_inventory, [MY_CONST], [my_game_function], []);
 
 // This is a small hack, we use a unit test to invoke `ffi_inventory`
 // and produce our backend. You could alternatively use another crate

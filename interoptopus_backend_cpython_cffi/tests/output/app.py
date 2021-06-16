@@ -12,5 +12,9 @@ def my_callback(param):
 assert (reference_project.raw.primitive_i8(5) == 5)
 assert (reference_project.raw.callback(my_callback, 33) == 99)
 
+cls = reference_project.Context(123)
+cls.pattern_class_method()
+
+
 
 print("Worked")

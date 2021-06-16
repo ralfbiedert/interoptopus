@@ -14,6 +14,9 @@ pub struct FFITypeAttributes {
     surrogates: HashMap<String, String>,
 
     #[darling(default)]
+    patterns: HashMap<String, String>,
+
+    #[darling(default)]
     skip: HashMap<String, ()>,
 
     #[darling(default)]
@@ -65,6 +68,14 @@ pub fn ffi_type_enum(attr: FFITypeAttributes, input: TokenStream, item: ItemEnum
         }
     }
 
+    let success_enum_key = attr
+        .patterns
+        .get("success_enum")
+        .map(|x| {
+            quote! { Some(#x) }
+        })
+        .unwrap_or_else(|| quote! { None });
+
     quote! {
         #input
 
@@ -74,6 +85,7 @@ pub fn ffi_type_enum(attr: FFITypeAttributes, input: TokenStream, item: ItemEnum
                 let documentation = interoptopus::lang::c::Documentation::from_line(#doc_line);
 
                 let mut rval = interoptopus::lang::c::EnumType::new(#name.to_string(), documentation);
+                let mut success_variant: Option<&str> = #success_enum_key;
 
                 #({
                     let documentation = interoptopus::lang::c::Documentation::from_line(#variant_docs);
@@ -81,7 +93,15 @@ pub fn ffi_type_enum(attr: FFITypeAttributes, input: TokenStream, item: ItemEnum
                 })*
 
 
-                interoptopus::lang::c::CType::Enum(rval)
+                if let Some(success) = success_variant {
+                    let variant = rval.variant_by_name(success).expect("Success variant must exist");
+                    let the_success_enum = interoptopus::patterns::successenum::SuccessEnum::new(rval, variant);
+                    let the_pattern = interoptopus::patterns::TypePattern::SuccessEnum(the_success_enum);
+                    interoptopus::lang::c::CType::Pattern(the_pattern)
+                } else {
+                    interoptopus::lang::c::CType::Enum(rval)
+                }
+
             }
         }
     }

@@ -2,6 +2,7 @@ use interoptopus::generators::Interop;
 use interoptopus::lang::c::{
     CType, CompositeType, Constant, ConstantValue, Documentation, EnumType, Field, FnPointerType, Function, OpaqueType, Parameter, PrimitiveType, PrimitiveValue, Variant,
 };
+use interoptopus::patterns::TypePattern;
 use interoptopus::util::{safe_name, sort_types_by_dependencies};
 use interoptopus::writer::IndentWriter;
 use interoptopus::{Error, Library};
@@ -210,7 +211,7 @@ pub trait InteropC {
     }
 
     fn write_type_definitions(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        for the_type in &sort_types_by_dependencies(self.library().types().to_vec()) {
+        for the_type in &sort_types_by_dependencies(self.library().ctypes().to_vec()) {
             self.write_type_definition(w, the_type)?;
         }
 
@@ -238,7 +239,13 @@ pub trait InteropC {
             }
             CType::ReadPointer(_) => {}
             CType::ReadWritePointer(_) => {}
-            CType::Pattern(_) => {}
+            CType::Pattern(p) => match p {
+                TypePattern::AsciiPointer => {}
+                TypePattern::SuccessEnum(e) => {
+                    self.write_type_definition_enum(w, e.the_enum())?;
+                    w.newline()?;
+                }
+            },
         }
         Ok(())
     }
