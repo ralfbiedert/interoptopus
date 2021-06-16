@@ -10,7 +10,7 @@ pub struct Library {
 }
 
 impl Library {
-    pub fn new(mut functions: Vec<Function>, constants: Vec<Constant>) -> Self {
+    pub fn new(functions: Vec<Function>, constants: Vec<Constant>) -> Self {
         let mut types = types_from_functions(&functions);
 
         // Dont sort functions
