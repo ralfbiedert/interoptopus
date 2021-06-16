@@ -1,6 +1,7 @@
 use interoptopus::writer::IndentWriter;
 use interoptopus::{Error, Library};
 use interoptopus::lang::c::{ConstantValue, PrimitiveValue, CType, EnumType};
+use interoptopus::generators::Interop;
 
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -37,7 +38,8 @@ impl Generator {
     }
 }
 
-pub trait Interop {
+
+pub trait InteropCPythonCFFI: Interop {
     /// Returns the user config.
     fn config(&self) -> &Config;
 
@@ -65,32 +67,6 @@ pub trait Interop {
         }
     }
 
-    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        self.write_imports(w)?;
-        w.newline()?;
-
-        self.write_c_header(w)?;
-        w.newline()?;
-        w.newline()?;
-
-        self.write_api_load_fuction(w)?;
-        w.newline()?;
-        w.newline()?;
-
-        self.write_constants(w)?;
-        w.newline()?;
-        w.newline()?;
-
-        self.write_types(w)?;
-        w.newline()?;
-        w.newline()?;
-
-        self.write_function_proxies(w)?;
-        w.newline()?;
-        w.newline()?;
-
-        Ok(())
-    }
 
     fn write_imports(&self, w: &mut IndentWriter) -> Result<(), Error> {
         w.indented(|w| writeln!(w, r#"from cffi import FFI"#))?;
@@ -186,8 +162,6 @@ pub trait Interop {
 
 
     fn write_c_header(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        use interoptopus_backend_c::Interop as _;
-
         w.indented(|w| writeln!(w, r#"api_definition = """"#))?;
         self.c_generator().write_to(w)?;
         w.indented(|w| writeln!(w, r#"""""#))?;
@@ -196,6 +170,35 @@ pub trait Interop {
 }
 
 impl Interop for Generator {
+    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        self.write_imports(w)?;
+        w.newline()?;
+
+        self.write_c_header(w)?;
+        w.newline()?;
+        w.newline()?;
+
+        self.write_api_load_fuction(w)?;
+        w.newline()?;
+        w.newline()?;
+
+        self.write_constants(w)?;
+        w.newline()?;
+        w.newline()?;
+
+        self.write_types(w)?;
+        w.newline()?;
+        w.newline()?;
+
+        self.write_function_proxies(w)?;
+        w.newline()?;
+        w.newline()?;
+
+        Ok(())
+    }
+}
+
+impl InteropCPythonCFFI for Generator {
     fn config(&self) -> &Config {
         &self.config
     }

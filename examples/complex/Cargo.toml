@@ -8,7 +8,7 @@ publish = false
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-interoptopus = { path = "../../interoptopus", features = ["derive"] }
+interoptopus = { path = "../../interoptopus", features = ["derive", "testing"] }
 
 [dev-dependencies]
 interoptopus_backend_csharp = { path = "../../interoptopus_backend_csharp" }

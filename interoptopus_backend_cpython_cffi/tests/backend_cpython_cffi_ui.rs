@@ -1,21 +1,12 @@
-use interoptopus::writer::IndentWriter;
 use interoptopus::Error;
-use std::fs::{read_to_string, File};
+use std::fs::{read_to_string};
 use interoptopus::testing::python::run_python_if_installed;
+use interoptopus::generators::Interop;
 
 fn generate_bindings(output: &str) -> Result<(), Error> {
-    use interoptopus_backend_cpython_cffi::{Config, Generator, Interop};
+    use interoptopus_backend_cpython_cffi::{Config, Generator};
 
-    let library = interoptopus_reference_project::ffi_inventory();
-    let config = Config::default();
-    let generator = Generator::new(config, library);
-
-    let mut file = File::create(output)?;
-    let mut writer = IndentWriter::new(&mut file);
-
-    generator.write_to(&mut writer)?;
-
-    Ok(())
+    Generator::new(Config::default(), interoptopus_reference_project::ffi_inventory()).write_file(output)
 }
 
 

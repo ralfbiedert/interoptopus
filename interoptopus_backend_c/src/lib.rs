@@ -2,6 +2,7 @@ use interoptopus::lang::c::{CType, CompositeType, Constant, ConstantValue, EnumT
 use interoptopus::util::{safe_name, sort_types_by_dependencies};
 use interoptopus::writer::IndentWriter;
 use interoptopus::{Error, Library};
+use interoptopus::generators::Interop;
 
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -39,7 +40,7 @@ impl Generator {
     }
 }
 
-pub trait Interop {
+pub trait InteropC {
     /// Returns the user config.
     fn config(&self) -> &Config;
 
@@ -125,36 +126,6 @@ pub trait Interop {
         function.name().to_string()
     }
 
-    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        self.write_file_header_comments(w)?;
-        w.newline()?;
-
-        self.write_ifndef(w, |w| {
-            self.write_ifdefcpp(w, |w| {
-                if self.config().imports {
-                    self.write_imports(w)?;
-                    w.newline()?;
-                }
-
-                self.write_custom_defines(w)?;
-                w.newline()?;
-
-                self.write_constants(w)?;
-                w.newline()?;
-
-                self.write_type_definitions(w)?;
-                w.newline()?;
-
-                self.write_functions(w)?;
-
-                Ok(())
-            })?;
-
-            Ok(())
-        })?;
-
-        Ok(())
-    }
 
     fn write_custom_defines(&self, w: &mut IndentWriter) -> Result<(), Error> {
         writeln!(w.writer(), "{}", &self.config().custom_defines)?;
@@ -393,6 +364,39 @@ pub trait Interop {
 }
 
 impl Interop for Generator {
+    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        self.write_file_header_comments(w)?;
+        w.newline()?;
+
+        self.write_ifndef(w, |w| {
+            self.write_ifdefcpp(w, |w| {
+                if self.config().imports {
+                    self.write_imports(w)?;
+                    w.newline()?;
+                }
+
+                self.write_custom_defines(w)?;
+                w.newline()?;
+
+                self.write_constants(w)?;
+                w.newline()?;
+
+                self.write_type_definitions(w)?;
+                w.newline()?;
+
+                self.write_functions(w)?;
+
+                Ok(())
+            })?;
+
+            Ok(())
+        })?;
+
+        Ok(())
+    }
+}
+
+impl InteropC for Generator {
     fn config(&self) -> &Config {
         &self.config
     }

@@ -1,8 +1,4 @@
-#![allow(unused_imports)]
-
-use interoptopus::writer::IndentWriter;
 use interoptopus::{ffi_constant, ffi_function, ffi_type};
-use interoptopus_backend_csharp::{Config, Generator, Interop};
 
 /// Something something circle.
 #[ffi_constant]
@@ -43,6 +39,10 @@ interoptopus::inventory_function!(ffi_inventory, [MY_CONST], [my_game_function])
 // to do that job.
 #[test]
 fn generate_bindings() -> Result<(), interoptopus::Error> {
+    use interoptopus_backend_csharp::{Config, Generator};
+    use interoptopus::generators::Interop;
+    use interoptopus::writer::IndentWriter;
+
     let library = ffi_inventory();
 
     let config = Config {

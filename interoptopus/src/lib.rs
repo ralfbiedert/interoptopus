@@ -57,7 +57,7 @@
 //!
 //! #[test]
 //! fn generate_csharp_bindings() {
-//!     use interoptopus_backend_csharp::Interop;
+//!     use interoptopus_backend_csharp::InteropCSharp;
 //!     use interoptopus::writer::IndentWriter;
 //!
 //!     let library = ffi_inventory();
@@ -128,6 +128,7 @@ mod error;
 pub mod util;
 pub mod writer;
 pub mod patterns;
+pub mod generators;
 #[cfg(feature = "testing")]
 #[cfg_attr(docsrs, doc(cfg(feature = "testing")))] // does this work?
 pub mod testing;
