@@ -30,6 +30,14 @@ impl<'a> AsciiPointer0In<'a> {
         Self::default()
     }
 
+    /// Create a pointer from a CStr.
+    pub fn from_cstr(cstr: &'a CStr) -> Self {
+        Self {
+            ptr: cstr.as_ptr(),
+            _phandom: Default::default(),
+        }
+    }
+
     /// Create a [`CStr`] for the pointer.
     pub fn as_c_str(&self) -> Option<&'a CStr> {
         if self.ptr.is_null() {
