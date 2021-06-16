@@ -67,30 +67,30 @@ typedef struct UseAciiStringPattern
     } UseAciiStringPattern;
 
 
-uint8_t callback(fptr_fn_u8_rval_u8 callback, uint8_t value);
-FFIError complex_1(Vec3f32 _a, Empty* _b);
-Opaque* complex_2(SomeForeignType _cmplx);
-EnumDocumented documented(StructDocumented _x);
-uint32_t generic(Generic x, Phantom _y);
-uint8_t pattern_simple(uint8_t* x, UseAciiStringPattern y);
+void primitive_void();
+void primitive_void2();
 bool primitive_bool(bool x);
-int16_t primitive_i16(int16_t x);
-int32_t primitive_i32(int32_t x);
-int64_t primitive_i64(int64_t x);
-int8_t primitive_i8(int8_t x);
+uint8_t primitive_u8(uint8_t x);
 uint16_t primitive_u16(uint16_t x);
 uint32_t primitive_u32(uint32_t x);
 uint64_t primitive_u64(uint64_t x);
-uint8_t primitive_u8(uint8_t x);
-void primitive_void();
-void primitive_void2();
+int8_t primitive_i8(int8_t x);
+int16_t primitive_i16(int16_t x);
+int32_t primitive_i32(int32_t x);
+int64_t primitive_i64(int64_t x);
 int64_t* ptr(int64_t* x);
 int64_t* ptr_mut(int64_t* x);
-bool ptr_option(int64_t* x);
-bool ptr_option_mut(int64_t* x);
 int64_t** ptr_ptr(int64_t** x);
 int64_t* ptr_simple(int64_t* x);
 int64_t* ptr_simple_mut(int64_t* x);
+bool ptr_option(int64_t* x);
+bool ptr_option_mut(int64_t* x);
+FFIError complex_1(Vec3f32 _a, Empty* _b);
+Opaque* complex_2(SomeForeignType _cmplx);
+uint8_t callback(fptr_fn_u8_rval_u8 callback, uint8_t value);
+uint32_t generic(Generic x, Phantom _y);
+EnumDocumented documented(StructDocumented _x);
+uint8_t pattern_simple(uint8_t* x, UseAciiStringPattern y);
 
 #ifdef __cplusplus
 }

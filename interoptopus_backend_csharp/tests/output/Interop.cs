@@ -16,39 +16,17 @@ namespace My.Company
         public const int C3 = -100;
 
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "callback")]
-        public static extern byte callback(InteropDelegate_fn_u8_rval_u8 callback, byte value);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_void")]
+        public static extern void primitive_void();
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "complex_1")]
-        public static extern FFIError complex_1(Vec3f32 _a, ref Empty _b);
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "complex_2")]
-        public static extern IntPtr complex_2(SomeForeignType _cmplx);
-
-        /// This function has documentation.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "documented")]
-        public static extern EnumDocumented documented(StructDocumented _x);
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic")]
-        public static extern uint generic(Generic x, Phantom _y);
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_simple")]
-        public static extern byte pattern_simple(string x, UseAciiStringPattern y);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_void2")]
+        public static extern void primitive_void2();
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_bool")]
         public static extern bool primitive_bool(bool x);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_i16")]
-        public static extern short primitive_i16(short x);
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_i32")]
-        public static extern int primitive_i32(int x);
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_i64")]
-        public static extern long primitive_i64(long x);
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_i8")]
-        public static extern sbyte primitive_i8(sbyte x);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_u8")]
+        public static extern byte primitive_u8(byte x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_u16")]
         public static extern ushort primitive_u16(ushort x);
@@ -59,26 +37,23 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_u64")]
         public static extern ulong primitive_u64(ulong x);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_u8")]
-        public static extern byte primitive_u8(byte x);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_i8")]
+        public static extern sbyte primitive_i8(sbyte x);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_void")]
-        public static extern void primitive_void();
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_i16")]
+        public static extern short primitive_i16(short x);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_void2")]
-        public static extern void primitive_void2();
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_i32")]
+        public static extern int primitive_i32(int x);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_i64")]
+        public static extern long primitive_i64(long x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ptr")]
         public static extern IntPtr ptr(ref long x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ptr_mut")]
         public static extern IntPtr ptr_mut(out long x);
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ptr_option")]
-        public static extern bool ptr_option(ref long x);
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ptr_option_mut")]
-        public static extern bool ptr_option_mut(out long x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ptr_ptr")]
         public static extern IntPtr ptr_ptr(ref IntPtr x);
@@ -88,6 +63,31 @@ namespace My.Company
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ptr_simple_mut")]
         public static extern IntPtr ptr_simple_mut(out long x);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ptr_option")]
+        public static extern bool ptr_option(ref long x);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ptr_option_mut")]
+        public static extern bool ptr_option_mut(out long x);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "complex_1")]
+        public static extern FFIError complex_1(Vec3f32 _a, ref Empty _b);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "complex_2")]
+        public static extern IntPtr complex_2(SomeForeignType _cmplx);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "callback")]
+        public static extern byte callback(InteropDelegate_fn_u8_rval_u8 callback, byte value);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic")]
+        public static extern uint generic(Generic x, Phantom _y);
+
+        /// This function has documentation.
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "documented")]
+        public static extern EnumDocumented documented(StructDocumented _x);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_simple")]
+        public static extern byte pattern_simple(string x, UseAciiStringPattern y);
 
     }
 

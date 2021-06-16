@@ -13,13 +13,13 @@ namespace My.Company
         public const uint THE_MAGIC_CONSTANT = 666;
 
 
-        /// A function that always fails.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_always_fails")]
-        public static extern FFIError example_always_fails();
-
         /// Returns the version of this API.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_api_version")]
         public static extern uint example_api_version();
+
+        /// A function that always fails.
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_always_fails")]
+        public static extern FFIError example_always_fails();
 
         /// Creates a new instance of this library.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_create_context")]
@@ -31,9 +31,6 @@ namespace My.Company
         /// `example_create_context`, otherwise bad things will happen.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_destroy_context")]
         public static extern FFIError example_destroy_context(out IntPtr context_ptr);
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_double_super_complex_entity")]
-        public static extern FFIError example_double_super_complex_entity(IntPtr context, ref SuperComplexEntity incoming, out SuperComplexEntity outgoing);
 
         /// Prints the current player score.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_print_score")]
@@ -50,6 +47,9 @@ namespace My.Company
         /// Accepts some foreign types.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_write_foreign_type")]
         public static extern FFIError example_write_foreign_type(IntPtr context, ref WithForeignType foreign);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_double_super_complex_entity")]
+        public static extern FFIError example_double_super_complex_entity(IntPtr context, ref SuperComplexEntity incoming, out SuperComplexEntity outgoing);
 
     }
 

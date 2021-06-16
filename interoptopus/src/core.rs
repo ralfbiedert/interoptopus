@@ -1,7 +1,6 @@
 use crate::lang::c::{CType, Constant, Function};
 use crate::util::types_from_functions;
 
-
 /// Represents all FFI-relevant items, produced via [`crate::inventory_function`], ingested by backends.
 #[derive(Clone, Debug, PartialOrd, PartialEq)]
 pub struct Library {
@@ -14,9 +13,11 @@ impl Library {
     pub fn new(mut functions: Vec<Function>, constants: Vec<Constant>) -> Self {
         let mut types = types_from_functions(&functions);
 
-        functions.sort();
+        // Dont sort functions
+        // functions.sort();
+
         types.sort();
-        // constants.sort(); TODO
+        // constants.sort(); TODO: do sort constants
 
         Self { functions, types, constants }
     }

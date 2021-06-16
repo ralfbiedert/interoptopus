@@ -58,15 +58,15 @@ typedef struct WithForeignType
     } WithForeignType;
 
 
-__FUNCTION_ATTR FFIError example_always_fails();
 __FUNCTION_ATTR uint32_t example_api_version();
+__FUNCTION_ATTR FFIError example_always_fails();
 __FUNCTION_ATTR FFIError example_create_context(Context** context_ptr);
 __FUNCTION_ATTR FFIError example_destroy_context(Context** context_ptr);
-__FUNCTION_ATTR FFIError example_double_super_complex_entity(Context* context, SuperComplexEntity* incoming, SuperComplexEntity* outgoing);
 __FUNCTION_ATTR FFIError example_print_score(Context* context);
 __FUNCTION_ATTR FFIError example_return_score(Context* context, uint32_t* score);
 __FUNCTION_ATTR FFIError example_update_score_by_callback(Context* context, fptr_fn_u32_rval_u32 update);
 __FUNCTION_ATTR FFIError example_write_foreign_type(Context* context, WithForeignType* foreign);
+__FUNCTION_ATTR FFIError example_double_super_complex_entity(Context* context, SuperComplexEntity* incoming, SuperComplexEntity* outgoing);
 
 #ifdef __cplusplus
 }
