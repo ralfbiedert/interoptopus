@@ -23,7 +23,7 @@ fn bindings_match_reference() -> Result<(), Error> {
 
 #[test]
 fn bindings_work() -> Result<(), Error> {
-    generate_bindings("tests/output/Interop.cs")?;
+    generate_bindings("tests/output/reference_project.py")?;
 
     let output = run_python_if_installed("tests/output/", "app.py")?;
 

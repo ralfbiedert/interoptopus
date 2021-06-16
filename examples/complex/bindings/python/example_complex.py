@@ -85,6 +85,13 @@ class FFIError:
 
 
 
+class callbacks:
+    """Helpers to define `@ffi.callback`-style callbacks."""
+    fn_u32_rval_u32 = "uint32_t(uint32_t)"
+
+
+
+
 class raw:
     """Raw access to all exported functions."""
     def example_api_version():

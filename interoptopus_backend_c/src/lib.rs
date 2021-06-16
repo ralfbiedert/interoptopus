@@ -89,16 +89,16 @@ pub trait InteropC {
     }
 
     /// Converts the `u32` part in a Rust paramter `x: u32` to a C# equivalent. Might convert pointers to `out X` or `ref X`.
-    fn type_to_typespecifier(&self, x: &CType) -> String {
+    fn type_to_type_specifier(&self, x: &CType) -> String {
         match x {
             CType::Primitive(x) => self.type_primitive_to_typename(x),
             CType::Enum(x) => self.type_enum_to_typename(x),
             CType::Opaque(x) => self.type_opaque_to_typename(x),
             CType::Composite(x) => self.type_composite_to_typename(x),
-            CType::ReadPointer(x) => format!("{}*", self.type_to_typespecifier(x)),
-            CType::ReadWritePointer(x) => format!("{}*", self.type_to_typespecifier(x)),
+            CType::ReadPointer(x) => format!("{}*", self.type_to_type_specifier(x)),
+            CType::ReadWritePointer(x) => format!("{}*", self.type_to_type_specifier(x)),
             CType::FnPointer(x) => self.type_fnpointer_to_typename(x),
-            CType::Pattern(x) => self.type_to_typespecifier(&x.fallback_type()),
+            CType::Pattern(x) => self.type_to_type_specifier(&x.fallback_type()),
         }
     }
 
@@ -121,7 +121,7 @@ pub trait InteropC {
     }
 
     fn function_parameter_to_csharp_typename(&self, x: &Parameter, _function: &Function) -> String {
-        self.type_to_typespecifier(x.the_type())
+        self.type_to_type_specifier(x.the_type())
     }
 
     fn function_name_to_csharp_name(&self, function: &Function) -> String {
@@ -190,7 +190,7 @@ pub trait InteropC {
                 w,
                 r#"{}{} "#,
                 self.config().function_attribute,
-                self.type_to_typespecifier(function.signature().rval())
+                self.type_to_type_specifier(function.signature().rval())
             )
         })?;
 
@@ -249,12 +249,12 @@ pub trait InteropC {
     }
 
     fn write_type_definition_fn_pointer_body(&self, w: &mut IndentWriter, the_type: &FnPointerType) -> Result<(), Error> {
-        w.indented(|w| write!(w, "typedef {} ", self.type_to_typespecifier(the_type.signature().rval())))?;
+        w.indented(|w| write!(w, "typedef {} ", self.type_to_type_specifier(the_type.signature().rval())))?;
         write!(w.writer(), "(*{})(", self.type_fnpointer_to_typename(the_type))?;
 
         let params = the_type.signature().params();
         for (i, param) in params.iter().enumerate() {
-            write!(w.writer(), "{} x{}", self.type_to_typespecifier(param.the_type()), i)?;
+            write!(w.writer(), "{} x{}", self.type_to_type_specifier(param.the_type()), i)?;
 
             if i < params.len() - 1 {
                 write!(w.writer(), ", ")?;
@@ -322,7 +322,7 @@ pub trait InteropC {
 
     fn write_type_definition_composite_body_field(&self, w: &mut IndentWriter, field: &Field, _the_type: &CompositeType) -> Result<(), Error> {
         let field_name = field.name();
-        let type_name = self.type_to_typespecifier(field.the_type());
+        let type_name = self.type_to_type_specifier(field.the_type());
         w.indented(|w| writeln!(w, r#"{} {};"#, type_name, field_name))?;
         Ok(())
     }

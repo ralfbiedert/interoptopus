@@ -1,13 +1,16 @@
 use interoptopus::generators::Interop;
-use interoptopus::lang::c::{CType, ConstantValue, EnumType, PrimitiveValue};
+use interoptopus::lang::c::{CType, ConstantValue, EnumType, FnPointerType, PrimitiveValue};
+use interoptopus::util::safe_name;
 use interoptopus::writer::IndentWriter;
 use interoptopus::{Error, Library};
+use interoptopus_backend_c::InteropC;
 
 #[derive(Clone, Debug)]
 pub struct Config {
     init_api_function_name: String,
     ffi_attribute: String,
     raw_fn_namespace: String,
+    callback_namespace: String,
 }
 
 impl Default for Config {
@@ -16,6 +19,7 @@ impl Default for Config {
             init_api_function_name: "init_api".to_string(),
             ffi_attribute: "ffi".to_string(),
             raw_fn_namespace: "raw".to_string(),
+            callback_namespace: "callbacks".to_string(),
         }
     }
 }
@@ -131,6 +135,38 @@ pub trait InteropCPythonCFFI: Interop {
         Ok(())
     }
 
+    fn write_callback_helpers(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        w.indented(|w| writeln!(w, r#"class {}:"#, self.config().callback_namespace))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#""""Helpers to define `@ffi.callback`-style callbacks.""""#))?;
+
+        for callback in self.library().types().iter().filter_map(|x| match x {
+            CType::FnPointer(x) => Some(x),
+            _ => None,
+        }) {
+            w.indented(|w| writeln!(w, r#"{} = "{}""#, safe_name(&callback.internal_name()), self.type_fnpointer_to_typename(callback)))?;
+        }
+
+        w.unindent();
+        w.newline()?;
+        w.newline()?;
+
+        Ok(())
+    }
+
+    fn type_fnpointer_to_typename(&self, fn_pointer: &FnPointerType) -> String {
+        let rval = self.c_generator().type_to_type_specifier(&fn_pointer.signature().rval());
+        let params = fn_pointer
+            .signature()
+            .params()
+            .iter()
+            .map(|x| self.c_generator().type_to_type_specifier(x.the_type()))
+            .collect::<Vec<_>>()
+            .join(",");
+
+        format!("{}({})", rval, params)
+    }
+
     fn write_function_proxies(&self, w: &mut IndentWriter) -> Result<(), Error> {
         w.indented(|w| writeln!(w, r#"class {}:"#, self.config().raw_fn_namespace))?;
         w.indent();
@@ -184,6 +220,10 @@ impl Interop for Generator {
         w.newline()?;
 
         self.write_types(w)?;
+        w.newline()?;
+        w.newline()?;
+
+        self.write_callback_helpers(w)?;
         w.newline()?;
         w.newline()?;
 

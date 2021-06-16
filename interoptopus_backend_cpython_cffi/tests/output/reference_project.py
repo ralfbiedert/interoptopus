@@ -122,6 +122,13 @@ class FFIError:
 
 
 
+class callbacks:
+    """Helpers to define `@ffi.callback`-style callbacks."""
+    fn_u8_rval_u8 = "uint8_t(uint8_t)"
+
+
+
+
 class raw:
     """Raw access to all exported functions."""
     def primitive_void():
