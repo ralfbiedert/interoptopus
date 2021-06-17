@@ -87,16 +87,22 @@ namespace My.Company
         public static extern EnumDocumented documented(StructDocumented _x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ascii_pointer")]
-        public static extern byte pattern_ascii_pointer(string x, UseAciiStringPattern y);
+        public static extern byte pattern_ascii_pointer(string x, UseAsciiStringPattern y);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_init")]
-        public static extern FFIError pattern_class_init(out IntPtr context_ptr, uint value);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_create")]
+        public static extern FFIError pattern_class_create(out IntPtr context_ptr, uint value);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_method")]
         public static extern uint pattern_class_method(IntPtr context);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_destroy")]
         public static extern FFIError pattern_class_destroy(out IntPtr context_ptr);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_method_success_enum_ok")]
+        public static extern FFIError pattern_class_method_success_enum_ok(IntPtr _context);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_method_success_enum_fail")]
+        public static extern FFIError pattern_class_method_success_enum_fail(IntPtr _context);
 
     }
 
@@ -107,13 +113,6 @@ namespace My.Company
         A = 0,
         /// Variant B.
         B = 1,
-    }
-
-    public enum FFIError
-    {
-        Ok = 0,
-        Null = 100,
-        Fail = 200,
     }
 
     [Serializable]
@@ -154,9 +153,9 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct UseAciiStringPattern
+    public partial struct UseAsciiStringPattern
     {
-        public string asii_string;
+        public string ascii_string;
     }
 
     [Serializable]
@@ -170,5 +169,12 @@ namespace My.Company
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);
+
+    public enum FFIError
+    {
+        Ok = 0,
+        Null = 100,
+        Fail = 200,
+    }
 
 }

@@ -22,18 +22,18 @@ typedef enum EnumDocumented
     B = 1,
     } EnumDocumented;
 
+typedef struct Context Context;
+
+typedef struct Opaque Opaque;
+
+typedef struct Empty Empty;
+
 typedef enum FFIError
     {
     Ok = 0,
     Null = 100,
     Fail = 200,
     } FFIError;
-
-typedef struct Context Context;
-
-typedef struct Opaque Opaque;
-
-typedef struct Empty Empty;
 
 typedef struct Phantom
     {
@@ -97,6 +97,8 @@ uint8_t pattern_ascii_pointer(uint8_t* x, UseAsciiStringPattern y);
 FFIError pattern_class_create(Context** context_ptr, uint32_t value);
 uint32_t pattern_class_method(Context* context);
 FFIError pattern_class_destroy(Context** context_ptr);
+FFIError pattern_class_method_success_enum_ok(Context* _context);
+FFIError pattern_class_method_success_enum_fail(Context* _context);
 
 #ifdef __cplusplus
 }

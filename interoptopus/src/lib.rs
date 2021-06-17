@@ -53,7 +53,7 @@
 //! }
 //!
 //! // This ultimately defines our FFI exports, all functions have to be listed here.
-//! interoptopus::inventory_function!(ffi_inventory, [], [my_game_function]);
+//! interoptopus::inventory_function!(ffi_inventory, [], [my_game_function], []);
 //!
 //! #[test]
 //! fn generate_csharp_bindings() {

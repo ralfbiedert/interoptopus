@@ -1,4 +1,5 @@
-use crate::lang::c::{Function, OpaqueType};
+use crate::lang::c::{CType, Function, OpaqueType};
+use crate::patterns::TypePattern;
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Class {
@@ -24,13 +25,53 @@ impl Class {
     /// This function is mainly called during compile time therefore panicking with a good error
     /// message is beneficial.
     pub fn assert_valid(&self) {
-        let first = self
+        let constructor_fist_parameter = self
             .constructor
             .signature()
             .params()
             .get(0)
             .expect("Constructor for must have at least one parameter.");
-        // first.the_type().
+
+        match &constructor_fist_parameter.the_type() {
+            CType::ReadWritePointer(x) => match **x {
+                CType::ReadWritePointer(ref x) => match **x {
+                    CType::Opaque(_) => {}
+                    _ => panic!("First parameter must be opaque type"),
+                },
+                _ => panic!("First parameter must be opaque type"),
+            },
+            CType::Opaque(_) => {}
+            _ => panic!("First parameter must be RwPointer(RwPointer(Opaque)) type"),
+        }
+
+        let destructor_first_parameter = self
+            .destructor
+            .signature()
+            .params()
+            .get(0)
+            .expect("Constructor for must have at least one parameter.");
+
+        match &destructor_first_parameter.the_type() {
+            CType::ReadWritePointer(x) => match **x {
+                CType::ReadWritePointer(ref x) => match **x {
+                    CType::Opaque(_) => {}
+                    _ => panic!("First parameter must be opaque type"),
+                },
+                _ => panic!("First parameter must be opaque type"),
+            },
+            CType::Opaque(_) => {}
+            _ => panic!("First parameter must be RwPointer(RwPointer(Opaque)) type"),
+        }
+
+        match self.constructor.signature().rval() {
+            CType::Pattern(TypePattern::SuccessEnum(_)) => {}
+            _ => panic!("Constructor must return a success enum."),
+        }
+
+        match self.destructor.signature().rval() {
+            CType::Pattern(TypePattern::SuccessEnum(_)) => {}
+            _ => panic!("Destructor must return a success enum."),
+        }
     }
 
     pub fn the_type(&self) -> &OpaqueType {
@@ -50,7 +91,7 @@ impl Class {
     }
 }
 
-/// ```
+/// ```ignore
 /// pattern_class!(
 ///     my_class_pattern_context,
 ///     types::Context,
@@ -95,10 +136,13 @@ macro_rules! pattern_class {
                 x::function_info()
             };
 
-            interoptopus::patterns::class::Class::new(
+            let rval = interoptopus::patterns::class::Class::new(
                 <$the_class>::type_info().as_opaque_type().cloned().expect("Class types may only be opaque types."),
                 ctor, dtor, methods
-            )
+            );
+
+            rval.assert_valid();
+            rval
         }
     };
 }

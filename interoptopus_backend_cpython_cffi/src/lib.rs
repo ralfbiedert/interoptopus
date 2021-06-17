@@ -218,7 +218,7 @@ pub trait InteropCPythonCFFI: Interop {
             .join(", ")
     }
 
-    fn write_pattern_class_success_enum_aware_rval(&self, w: &mut IndentWriter, class: &Class, function: &Function, deref_ctx: bool) -> Result<(), Error> {
+    fn write_pattern_class_success_enum_aware_rval(&self, w: &mut IndentWriter, _class: &Class, function: &Function, deref_ctx: bool) -> Result<(), Error> {
         let args = self.pattern_class_args_without_first_to_string(function);
 
         let ctx = if deref_ctx { "self.ctx[0]" } else { "self.ctx" };

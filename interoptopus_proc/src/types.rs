@@ -3,7 +3,6 @@ use darling::FromMeta;
 use proc_macro2::{Ident, TokenStream};
 use quote::{quote, ToTokens};
 use std::collections::HashMap;
-use syn::spanned::Spanned;
 use syn::{AttributeArgs, Expr, GenericParam, ItemEnum, ItemStruct, ItemType, Lit, Type};
 
 #[derive(Debug, FromMeta, Clone)]

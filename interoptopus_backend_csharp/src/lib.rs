@@ -297,6 +297,10 @@ pub trait InteropCSharp {
             }
             CType::ReadPointer(_) => {}
             CType::ReadWritePointer(_) => {}
+            CType::Pattern(TypePattern::SuccessEnum(e)) => {
+                self.write_type_definition_enum(w, e.the_enum())?;
+                w.newline()?;
+            }
             CType::Pattern(_) => {}
         }
         Ok(())
