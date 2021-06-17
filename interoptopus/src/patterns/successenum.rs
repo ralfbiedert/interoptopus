@@ -1,5 +1,9 @@
 use crate::lang::c::{EnumType, Variant};
 
+pub trait Success {
+    const SUCCESS: Self;
+}
+
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct SuccessEnum {
     the_enum: EnumType,
@@ -8,7 +12,10 @@ pub struct SuccessEnum {
 
 impl SuccessEnum {
     pub fn new(the_enum: EnumType, success_variant: Variant) -> Self {
-        Self { the_enum, success_variant }
+        Self {
+            the_enum,
+            success_variant: success_variant,
+        }
     }
 
     pub fn the_enum(&self) -> &EnumType {

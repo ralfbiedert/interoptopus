@@ -1,11 +1,12 @@
 use crate::util::extract_doc_lines;
 use darling::FromMeta;
-use proc_macro2::TokenStream;
+use proc_macro2::{Ident, TokenStream};
 use quote::{quote, ToTokens};
 use std::collections::HashMap;
+use syn::spanned::Spanned;
 use syn::{AttributeArgs, Expr, GenericParam, ItemEnum, ItemStruct, ItemType, Lit, Type};
 
-#[derive(Debug, FromMeta)]
+#[derive(Debug, FromMeta, Clone)]
 pub struct FFITypeAttributes {
     #[darling(default)]
     opaque: bool,
@@ -14,7 +15,7 @@ pub struct FFITypeAttributes {
     surrogates: HashMap<String, String>,
 
     #[darling(default)]
-    patterns: HashMap<String, String>,
+    patterns: HashMap<String, ()>,
 
     #[darling(default)]
     skip: HashMap<String, ()>,
@@ -23,11 +24,34 @@ pub struct FFITypeAttributes {
     tags: HashMap<String, ()>,
 }
 
-pub fn ffi_type_enum(attr: FFITypeAttributes, input: TokenStream, item: ItemEnum) -> TokenStream {
+fn derive_variant_info(item: ItemEnum, idents: &[Ident], names: &[String], values: &[i32], docs: &[String]) -> TokenStream {
+    let span = item.ident.span();
     let name = item.ident.to_string();
-    let name_ident = syn::Ident::new(&name, item.ident.span());
+    let name_ident = syn::Ident::new(&name, span);
+
+    quote! {
+        impl interoptopus::lang::rust::VariantInfo for #name_ident {
+            fn variant_info(&self) -> interoptopus::lang::c::Variant {
+                match self {
+                    #(
+                       Self::#idents => {
+                            let documentation = interoptopus::lang::c::Documentation::from_line(#docs);
+                            interoptopus::lang::c::Variant::new(#names.to_string(), #values as usize, documentation)
+                       },
+                    )*
+                }
+            }
+        }
+    }
+}
+
+pub fn ffi_type_enum(attr: FFITypeAttributes, input: TokenStream, item: ItemEnum) -> TokenStream {
+    let span = item.ident.span();
+    let name = item.ident.to_string();
+    let name_ident = syn::Ident::new(&name, span);
 
     let mut variant_names = Vec::new();
+    let mut variant_idents = Vec::new();
     let mut variant_values = Vec::new();
     let mut variant_docs = Vec::new();
 
@@ -35,25 +59,21 @@ pub fn ffi_type_enum(attr: FFITypeAttributes, input: TokenStream, item: ItemEnum
 
     let doc_line = extract_doc_lines(&item.attrs).join("\n");
 
-    for variant in item.variants {
+    for variant in &item.variants {
         let ident = variant.ident.to_string();
         let variant_doc_line = extract_doc_lines(&variant.attrs).join("\n");
 
-        let this_id = if let Some((_, e)) = variant.discriminant {
+        let this_id = if let Some((_, e)) = &variant.discriminant {
             match e {
-                Expr::Lit(e) => match e.lit {
+                Expr::Lit(e) => match &e.lit {
                     Lit::Int(x) => {
                         let number = x.base10_parse().expect("Must be number");
                         next_id = number + 1;
                         number
                     }
-                    _ => {
-                        panic!("Unknown token.")
-                    }
+                    _ => panic!("Unknown token."),
                 },
-                _ => {
-                    panic!("Unknown token.")
-                }
+                _ => panic!("Unknown token."),
             }
         } else {
             let id = next_id;
@@ -62,46 +82,42 @@ pub fn ffi_type_enum(attr: FFITypeAttributes, input: TokenStream, item: ItemEnum
         };
 
         if !attr.skip.contains_key(&ident) {
+            variant_idents.push(syn::Ident::new(&ident, span));
             variant_names.push(ident);
             variant_values.push(this_id);
             variant_docs.push(variant_doc_line);
         }
     }
 
-    let success_enum_key = attr
-        .patterns
-        .get("success_enum")
-        .map(|x| {
-            quote! { Some(#x) }
-        })
-        .unwrap_or_else(|| quote! { None });
+    let variant_infos = derive_variant_info(item.clone(), &variant_idents, &variant_names, &variant_values, &variant_docs);
+    let ctype_info_return = if attr.patterns.contains_key("success_enum") {
+        quote! {
+            let success_variant = Self::SUCCESS.variant_info();
+            let the_success_enum = interoptopus::patterns::successenum::SuccessEnum::new(rval, success_variant);
+            let the_pattern = interoptopus::patterns::TypePattern::SuccessEnum(the_success_enum);
+            interoptopus::lang::c::CType::Pattern(the_pattern)
+        }
+    } else {
+        quote! { interoptopus::lang::c::CType::Enum(rval) }
+    };
 
     quote! {
         #input
 
+        #variant_infos
+
         impl interoptopus::lang::rust::CTypeInfo for #name_ident {
             fn type_info() -> interoptopus::lang::c::CType {
+                use interoptopus::lang::rust::VariantInfo;
 
                 let documentation = interoptopus::lang::c::Documentation::from_line(#doc_line);
-
                 let mut rval = interoptopus::lang::c::EnumType::new(#name.to_string(), documentation);
-                let mut success_variant: Option<&str> = #success_enum_key;
 
                 #({
-                    let documentation = interoptopus::lang::c::Documentation::from_line(#variant_docs);
-                    rval.add_variant(interoptopus::lang::c::Variant::new(#variant_names.to_string(), #variant_values as usize, documentation));
+                    rval.add_variant(Self::#variant_idents.variant_info());
                 })*
 
-
-                if let Some(success) = success_variant {
-                    let variant = rval.variant_by_name(success).expect("Success variant must exist");
-                    let the_success_enum = interoptopus::patterns::successenum::SuccessEnum::new(rval, variant);
-                    let the_pattern = interoptopus::patterns::TypePattern::SuccessEnum(the_success_enum);
-                    interoptopus::lang::c::CType::Pattern(the_pattern)
-                } else {
-                    interoptopus::lang::c::CType::Enum(rval)
-                }
-
+                #ctype_info_return
             }
         }
     }
@@ -229,7 +245,9 @@ pub fn ffi_type(attr: AttributeArgs, input: TokenStream) -> TokenStream {
     }
 
     if let Ok(item) = syn::parse2::<ItemEnum>(input.clone()) {
-        return ffi_type_enum(ffi_attributes, input, item);
+        let rva = ffi_type_enum(ffi_attributes, input, item);
+        println!("{}", rva);
+        return rva;
     }
 
     if let Ok(_item) = syn::parse2::<ItemType>(input.clone()) {

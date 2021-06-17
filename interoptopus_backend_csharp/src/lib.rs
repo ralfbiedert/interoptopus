@@ -97,7 +97,7 @@ pub trait InteropCSharp {
             CType::FnPointer(x) => self.type_fnpointer_to_typename(x),
             CType::Pattern(x) => match x {
                 TypePattern::AsciiPointer => "string".to_string(),
-                TypePattern::SuccessEnum(e) => self.type_enum_to_typename(e),
+                TypePattern::SuccessEnum(e) => self.type_enum_to_typename(e.the_enum()),
             },
         }
     }
@@ -126,7 +126,7 @@ pub trait InteropCSharp {
             CType::FnPointer(x) => self.type_fnpointer_to_typename(x),
             CType::Pattern(x) => match x {
                 TypePattern::AsciiPointer => "string".to_string(),
-                TypePattern::SuccessEnum(e) => self.type_enum_to_typename(e),
+                TypePattern::SuccessEnum(e) => self.type_enum_to_typename(e.the_enum()),
             },
         }
     }
@@ -142,7 +142,7 @@ pub trait InteropCSharp {
             CType::FnPointer(x) => self.type_fnpointer_to_typename(x),
             CType::Pattern(x) => match x {
                 TypePattern::AsciiPointer => "string".to_string(),
-                TypePattern::SuccessEnum(e) => self.type_enum_to_typename(e),
+                TypePattern::SuccessEnum(e) => self.type_enum_to_typename(e.the_enum()),
             },
         }
     }

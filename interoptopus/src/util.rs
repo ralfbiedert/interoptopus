@@ -83,7 +83,7 @@ pub(crate) fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CTyp
         CType::Opaque(_) => {}
         CType::Pattern(x) => match x {
             TypePattern::AsciiPointer => ctypes_from_type_recursive(&x.fallback_type(), types),
-            TypePattern::SuccessEnum(_) => ctypes_from_type_recursive(&x.fallback_type(), types),
+            TypePattern::SuccessEnum(_) => {} // This _is_ an enum type, don't return fallback type in addition.
         },
     }
 }

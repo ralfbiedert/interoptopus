@@ -15,18 +15,18 @@ typedef enum EnumDocumented
     B = 1,
     } EnumDocumented;
 
+typedef struct Context Context;
+
+typedef struct Opaque Opaque;
+
+typedef struct Empty Empty;
+
 typedef enum FFIError
     {
     Ok = 0,
     Null = 100,
     Fail = 200,
     } FFIError;
-
-typedef struct Context Context;
-
-typedef struct Opaque Opaque;
-
-typedef struct Empty Empty;
 
 typedef struct Phantom
     {
@@ -51,13 +51,6 @@ typedef struct Vec3f32
     } Vec3f32;
 
 typedef uint8_t (*fptr_fn_u8_rval_u8)(uint8_t x0);
-
-typedef enum FFIError
-    {
-    Ok = 0,
-    Null = 100,
-    Fail = 200,
-    } FFIError;
 
 typedef struct Generic
     {
@@ -125,13 +118,6 @@ class EnumDocumented:
     """Documented enum."""
     A = 0
     B = 1
-
-
-class FFIError:
-    """"""
-    Ok = 0
-    Null = 100
-    Fail = 200
 
 
 

@@ -1,6 +1,6 @@
 //! Helpers to introspect Rust code when generating bindings, mostly derived by the `#[ffi_...]` macros.
 
-use crate::lang::c::{CType, Constant, ConstantValue, FnPointerType, Function, FunctionSignature, Parameter, PrimitiveType, PrimitiveValue};
+use crate::lang::c::{CType, Constant, ConstantValue, FnPointerType, Function, FunctionSignature, Parameter, PrimitiveType, PrimitiveValue, Variant};
 use std::ptr::NonNull;
 
 pub trait ConstantInfo {
@@ -13,6 +13,10 @@ pub trait CTypeInfo {
 
 pub trait FunctionInfo {
     fn function_info() -> Function;
+}
+
+pub trait VariantInfo {
+    fn variant_info(&self) -> Variant;
 }
 
 macro_rules! impl_ctype_primitive {
