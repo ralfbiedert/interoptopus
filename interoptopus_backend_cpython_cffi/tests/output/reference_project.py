@@ -90,6 +90,8 @@ uint8_t pattern_ascii_pointer(uint8_t* x, UseAsciiStringPattern y);
 FFIError pattern_class_create(Context** context_ptr, uint32_t value);
 uint32_t pattern_class_method(Context* context);
 FFIError pattern_class_destroy(Context** context_ptr);
+FFIError pattern_class_method_success_enum_ok(Context* _context);
+FFIError pattern_class_method_success_enum_fail(Context* _context);
 """
 
 
@@ -118,6 +120,13 @@ class EnumDocumented:
     """Documented enum."""
     A = 0
     B = 1
+
+
+class FFIError:
+    """"""
+    Ok = 0
+    Null = 100
+    Fail = 200
 
 
 
@@ -293,6 +302,18 @@ class raw:
         return _api.pattern_class_destroy(context_ptr)
 
 
+    def pattern_class_method_success_enum_ok(_context):
+        """"""
+        global _api
+        return _api.pattern_class_method_success_enum_ok(_context)
+
+
+    def pattern_class_method_success_enum_fail(_context):
+        """"""
+        global _api
+        return _api.pattern_class_method_success_enum_fail(_context)
+
+
 
 
 
@@ -302,19 +323,47 @@ class Context(object):
         """"""
         global _api, ffi
         self.ctx = ffi.new("Context**")
-        return _api.pattern_class_create(self.ctx, value)
+        rval = _api.pattern_class_create(self.ctx, value)
+        if rval == FFIError.Ok:
+            return None
+        else:
+            raise "hell"
 
 
     def __del__(self):
         """"""
         global _api, ffi
-        return _api.pattern_class_destroy(self.ctx)
+        rval = _api.pattern_class_destroy(self.ctx, )
+        if rval == FFIError.Ok:
+            return None
+        else:
+            raise "hell"
 
 
     def pattern_class_method(self, ):
         """"""
         global _api
         return _api.pattern_class_method(self.ctx[0], )
+
+
+    def pattern_class_method_success_enum_ok(self, ):
+        """"""
+        global _api
+        rval = _api.pattern_class_method_success_enum_ok(self.ctx[0], )
+        if rval == FFIError.Ok:
+            return None
+        else:
+            raise "hell"
+
+
+    def pattern_class_method_success_enum_fail(self, ):
+        """"""
+        global _api
+        rval = _api.pattern_class_method_success_enum_fail(self.ctx[0], )
+        if rval == FFIError.Ok:
+            return None
+        else:
+            raise "hell"
 
 
 

@@ -34,7 +34,9 @@ interoptopus::inventory_function!(
         functions::pattern_ascii_pointer,
         functions::pattern_class_create,
         functions::pattern_class_method,
-        functions::pattern_class_destroy
+        functions::pattern_class_destroy,
+        functions::pattern_class_method_success_enum_ok,
+        functions::pattern_class_method_success_enum_fail
     ],
     [my_class_pattern_context]
 );
@@ -44,5 +46,9 @@ pattern_class!(
     types::Context,
     functions::pattern_class_create,
     functions::pattern_class_destroy,
-    [functions::pattern_class_method]
+    [
+        functions::pattern_class_method,
+        functions::pattern_class_method_success_enum_ok,
+        functions::pattern_class_method_success_enum_fail
+    ]
 );

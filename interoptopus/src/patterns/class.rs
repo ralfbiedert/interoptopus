@@ -79,10 +79,10 @@ macro_rules! pattern_class {
             let mut methods = Vec::new();
 
             {
-                $(
+                $({
                     use $method as x;
                     methods.push(x::function_info());
-                )*
+                })*
             }
 
             let ctor = {

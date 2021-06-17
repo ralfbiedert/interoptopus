@@ -177,6 +177,18 @@ pub extern "C" fn pattern_class_method(context: Option<&mut Context>) -> u32 {
 
 #[ffi_function]
 #[no_mangle]
+pub extern "C" fn pattern_class_method_success_enum_ok(_context: Option<&mut Context>) -> FFIError {
+    FFIError::Ok
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn pattern_class_method_success_enum_fail(_context: Option<&mut Context>) -> FFIError {
+    FFIError::Fail
+}
+
+#[ffi_function]
+#[no_mangle]
 #[allow(unused_unsafe)]
 pub unsafe extern "C" fn pattern_class_destroy(context_ptr: Option<&mut *mut Context>) -> FFIError {
     match context_ptr {

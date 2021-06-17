@@ -1,7 +1,7 @@
 use interoptopus::generators::Interop;
-use interoptopus::lang::c::{CType, ConstantValue, EnumType, FnPointerType, PrimitiveValue};
+use interoptopus::lang::c::{CType, ConstantValue, EnumType, FnPointerType, Function, PrimitiveValue};
 use interoptopus::patterns::class::Class;
-use interoptopus::patterns::LibraryPattern;
+use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::safe_name;
 use interoptopus::writer::IndentWriter;
 use interoptopus::{Error, Library};
@@ -114,6 +114,7 @@ pub trait InteropCPythonCFFI: Interop {
         for the_type in self.library().ctypes() {
             match the_type {
                 CType::Enum(e) => self.write_enum(w, e)?,
+                CType::Pattern(TypePattern::SuccessEnum(e)) => self.write_enum(w, e.the_enum())?,
                 _ => {}
             }
         }
@@ -206,6 +207,42 @@ pub trait InteropCPythonCFFI: Interop {
         Ok(())
     }
 
+    fn pattern_class_args_without_first_to_string(&self, function: &Function) -> String {
+        function
+            .signature()
+            .params()
+            .iter()
+            .skip(1)
+            .map(|x| x.name().to_string())
+            .collect::<Vec<_>>()
+            .join(", ")
+    }
+
+    fn write_pattern_class_success_enum_aware_rval(&self, w: &mut IndentWriter, class: &Class, function: &Function, deref_ctx: bool) -> Result<(), Error> {
+        let args = self.pattern_class_args_without_first_to_string(function);
+
+        let ctx = if deref_ctx { "self.ctx[0]" } else { "self.ctx" };
+
+        match function.signature().rval() {
+            CType::Pattern(TypePattern::SuccessEnum(e)) => {
+                w.indented(|w| writeln!(w, r#"rval = _api.{}({}, {})"#, function.name(), ctx, &args))?;
+                w.indented(|w| writeln!(w, r#"if rval == {}.{}:"#, e.the_enum().name(), e.success_variant().name()))?;
+                w.indent();
+                w.indented(|w| writeln!(w, r#"return None"#))?;
+                w.unindent();
+                w.indented(|w| writeln!(w, r#"else:"#))?;
+                w.indent();
+                w.indented(|w| writeln!(w, r#"raise "hell""#))?;
+                w.unindent();
+            }
+            _ => {
+                w.indented(|w| writeln!(w, r#"return _api.{}(self.ctx[0], {})"#, function.name(), &args))?;
+            }
+        }
+
+        Ok(())
+    }
+
     fn write_pattern_class(&self, w: &mut IndentWriter, class: &Class) -> Result<(), Error> {
         let context_type_name = class.the_type().name();
 
@@ -213,22 +250,14 @@ pub trait InteropCPythonCFFI: Interop {
         w.indent();
 
         // Ctor
-        let args = class
-            .constructor()
-            .signature()
-            .params()
-            .iter()
-            .skip(1)
-            .map(|x| x.name().to_string())
-            .collect::<Vec<_>>()
-            .join(", ");
+        let args = self.pattern_class_args_without_first_to_string(class.constructor());
         let docs = class.constructor().documentation().lines().join("\n");
         w.indented(|w| writeln!(w, r#"def __init__(self, {}):"#, args))?;
         w.indent();
         w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
         w.indented(|w| writeln!(w, r#"global _api, ffi"#))?;
         w.indented(|w| writeln!(w, r#"self.ctx = ffi.new("{}**")"#, context_type_name))?;
-        w.indented(|w| writeln!(w, r#"return _api.{}(self.ctx, {})"#, class.constructor().name(), &args))?;
+        self.write_pattern_class_success_enum_aware_rval(w, class, class.constructor(), false)?;
         w.unindent();
         w.newline()?;
         w.newline()?;
@@ -239,29 +268,23 @@ pub trait InteropCPythonCFFI: Interop {
         w.indent();
         w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
         w.indented(|w| writeln!(w, r#"global _api, ffi"#))?;
-        w.indented(|w| writeln!(w, r#"return _api.{}(self.ctx)"#, class.destructor().name()))?;
+        self.write_pattern_class_success_enum_aware_rval(w, class, class.destructor(), false)?;
         w.unindent();
         w.newline()?;
         w.newline()?;
 
         for function in class.methods() {
-            let args = function
-                .signature()
-                .params()
-                .iter()
-                .skip(1)
-                .map(|x| x.name().to_string())
-                .collect::<Vec<_>>()
-                .join(", ");
+            let args = self.pattern_class_args_without_first_to_string(function);
             let docs = function.documentation().lines().join("\n");
 
             w.indented(|w| writeln!(w, r#"def {}(self, {}):"#, function.name(), &args))?;
             w.indent();
             w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
             w.indented(|w| writeln!(w, r#"global _api"#))?;
-            w.indented(|w| writeln!(w, r#"return _api.{}(self.ctx[0], {})"#, function.name(), &args))?;
-            w.unindent();
 
+            self.write_pattern_class_success_enum_aware_rval(w, class, function, true)?;
+
+            w.unindent();
             w.newline()?;
             w.newline()?;
         }
