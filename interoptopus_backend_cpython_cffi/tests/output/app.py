@@ -1,4 +1,5 @@
 import reference_project
+import os
 
 reference_project.init_api("../../../target/debug/interoptopus_reference_project.dll")
 
@@ -14,7 +15,12 @@ assert (reference_project.raw.callback(my_callback, 33) == 99)
 
 cls = reference_project.Context(123)
 cls.pattern_class_method()
+cls.pattern_class_method_success_enum_ok()
 
+try:
+    cls.pattern_class_method_success_enum_fail()
+    os.abort() # should not reach this line
+except BaseException:
+    print("Error observed successfully")
 
-
-print("Worked")
+print("Everything Worked")

@@ -327,7 +327,7 @@ class Context(object):
         if rval == FFIError.Ok:
             return None
         else:
-            raise "hell"
+            raise Exception(f"return value ${rval}")
 
 
     def __del__(self):
@@ -337,7 +337,7 @@ class Context(object):
         if rval == FFIError.Ok:
             return None
         else:
-            raise "hell"
+            raise Exception(f"return value ${rval}")
 
 
     def pattern_class_method(self, ):
@@ -353,7 +353,7 @@ class Context(object):
         if rval == FFIError.Ok:
             return None
         else:
-            raise "hell"
+            raise Exception(f"return value ${rval}")
 
 
     def pattern_class_method_success_enum_fail(self, ):
@@ -363,7 +363,7 @@ class Context(object):
         if rval == FFIError.Ok:
             return None
         else:
-            raise "hell"
+            raise Exception(f"return value ${rval}")
 
 
 

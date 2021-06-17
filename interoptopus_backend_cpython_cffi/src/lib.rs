@@ -232,7 +232,7 @@ pub trait InteropCPythonCFFI: Interop {
                 w.unindent();
                 w.indented(|w| writeln!(w, r#"else:"#))?;
                 w.indent();
-                w.indented(|w| writeln!(w, r#"raise "hell""#))?;
+                w.indented(|w| writeln!(w, r#"raise Exception(f"return value ${{rval}}")"#))?;
                 w.unindent();
             }
             _ => {
