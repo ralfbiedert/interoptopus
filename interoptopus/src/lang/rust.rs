@@ -172,10 +172,10 @@ where
     }
 }
 
-impl<T1, R> CTypeInfo for extern "C" fn(T1) -> R
+impl<'a, T1, R> CTypeInfo for extern "C" fn(T1) -> R
 where
-    T1: CTypeInfo,
-    R: CTypeInfo,
+    T1: CTypeInfo + 'a,
+    R: CTypeInfo + 'a,
 {
     fn type_info() -> CType {
         let mut sig = FunctionSignature::new();
@@ -185,10 +185,10 @@ where
     }
 }
 
-impl<T1, R> CTypeInfo for Option<extern "C" fn(T1) -> R>
+impl<'a, T1, R> CTypeInfo for Option<extern "C" fn(T1) -> R>
 where
-    T1: CTypeInfo,
-    R: CTypeInfo,
+    T1: CTypeInfo + 'a,
+    R: CTypeInfo + 'a,
 {
     fn type_info() -> CType {
         let mut sig = FunctionSignature::new();
@@ -198,26 +198,11 @@ where
     }
 }
 
-impl<T1, T2, R> CTypeInfo for extern "C" fn(T1, T2) -> R
+impl<'a, T1, T2, R> CTypeInfo for extern "C" fn(T1, T2) -> R
 where
-    T1: CTypeInfo,
-    T2: CTypeInfo,
-    R: CTypeInfo,
-{
-    fn type_info() -> CType {
-        let mut sig = FunctionSignature::new();
-        sig.add_param(Parameter::new("x1".to_string(), T1::type_info()));
-        sig.add_param(Parameter::new("x2".to_string(), T2::type_info()));
-        sig.set_rval(R::type_info());
-        CType::FnPointer(FnPointerType::new(sig))
-    }
-}
-
-impl<T1, T2, R> CTypeInfo for Option<extern "C" fn(T1, T2) -> R>
-where
-    T1: CTypeInfo,
-    T2: CTypeInfo,
-    R: CTypeInfo,
+    T1: CTypeInfo + 'a,
+    T2: CTypeInfo + 'a,
+    R: CTypeInfo + 'a,
 {
     fn type_info() -> CType {
         let mut sig = FunctionSignature::new();
@@ -228,12 +213,27 @@ where
     }
 }
 
-impl<T1, T2, T3, R> CTypeInfo for extern "C" fn(T1, T2, T3) -> R
+impl<'a, T1, T2, R> CTypeInfo for Option<extern "C" fn(T1, T2) -> R>
 where
-    T1: CTypeInfo,
-    T2: CTypeInfo,
-    T3: CTypeInfo,
-    R: CTypeInfo,
+    T1: CTypeInfo + 'a,
+    T2: CTypeInfo + 'a,
+    R: CTypeInfo + 'a,
+{
+    fn type_info() -> CType {
+        let mut sig = FunctionSignature::new();
+        sig.add_param(Parameter::new("x1".to_string(), T1::type_info()));
+        sig.add_param(Parameter::new("x2".to_string(), T2::type_info()));
+        sig.set_rval(R::type_info());
+        CType::FnPointer(FnPointerType::new(sig))
+    }
+}
+
+impl<'a, T1, T2, T3, R> CTypeInfo for extern "C" fn(T1, T2, T3) -> R
+where
+    T1: CTypeInfo + 'a,
+    T2: CTypeInfo + 'a,
+    T3: CTypeInfo + 'a,
+    R: CTypeInfo + 'a,
 {
     fn type_info() -> CType {
         let mut sig = FunctionSignature::new();
@@ -245,12 +245,12 @@ where
     }
 }
 
-impl<T1, T2, T3, R> CTypeInfo for Option<extern "C" fn(T1, T2, T3) -> R>
+impl<'a, T1, T2, T3, R> CTypeInfo for Option<extern "C" fn(T1, T2, T3) -> R>
 where
-    T1: CTypeInfo,
-    T2: CTypeInfo,
-    T3: CTypeInfo,
-    R: CTypeInfo,
+    T1: CTypeInfo + 'a,
+    T2: CTypeInfo + 'a,
+    T3: CTypeInfo + 'a,
+    R: CTypeInfo + 'a,
 {
     fn type_info() -> CType {
         let mut sig = FunctionSignature::new();
