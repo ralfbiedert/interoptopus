@@ -43,7 +43,6 @@ interoptopus::inventory_function!(
 
 pattern_class!(
     my_class_pattern_context,
-    types::Context,
     functions::pattern_class_create,
     functions::pattern_class_destroy,
     [

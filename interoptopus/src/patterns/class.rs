@@ -10,7 +10,17 @@ pub struct Class {
 }
 
 impl Class {
-    pub fn new(the_type: OpaqueType, constructor: Function, destructor: Function, methods: Vec<Function>) -> Self {
+    pub fn new(constructor: Function, destructor: Function, methods: Vec<Function>) -> Self {
+        let the_type = extract_obvious_opaque_from_parameter(
+            constructor
+                .signature()
+                .params()
+                .first()
+                .expect("Constructor must have at least one parameter")
+                .the_type(),
+        )
+        .expect("First parameter must point to opaque.");
+
         Self {
             the_type,
             constructor,
@@ -106,7 +116,6 @@ impl Class {
 macro_rules! pattern_class {
     (
         $pattern_name:ident,
-        $the_class:path,
         $constructor:path,
         $destructor:path,
         [$(
@@ -137,7 +146,6 @@ macro_rules! pattern_class {
             };
 
             let rval = interoptopus::patterns::class::Class::new(
-                <$the_class>::type_info().as_opaque_type().cloned().expect("Class types may only be opaque types."),
                 ctor, dtor, methods
             );
 
@@ -145,4 +153,21 @@ macro_rules! pattern_class {
             rval
         }
     };
+}
+
+/// Walks the type until it finds the first "obvious" Opaque.
+///
+/// An Opaque is obvious if it is at a singular position (e.g., `*const Opaque`),
+/// but not within the fields of a struct.
+fn extract_obvious_opaque_from_parameter(param: &CType) -> Option<OpaqueType> {
+    match param {
+        CType::Primitive(_) => None,
+        CType::Enum(_) => None,
+        CType::Opaque(x) => Some(x.clone()),
+        CType::Composite(_) => None,
+        CType::FnPointer(_) => None,
+        CType::ReadPointer(x) => extract_obvious_opaque_from_parameter(x),
+        CType::ReadWritePointer(x) => extract_obvious_opaque_from_parameter(x),
+        CType::Pattern(_) => None,
+    }
 }
