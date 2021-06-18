@@ -3,6 +3,7 @@ use crate::types::{
 };
 use interoptopus::ffi_function;
 use interoptopus::patterns::ascii_pointer::AsciiPointer;
+use interoptopus::patterns::ffislice::FFISlice;
 use std::ptr::null;
 
 #[ffi_function]
@@ -160,6 +161,12 @@ pub extern "C" fn pattern_class_create(context_ptr: Option<&mut *mut Context>, v
             FFIError::Ok
         }
     }
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn pattern_ffi_slice(ffi_slice: FFISlice<u32>) -> u32 {
+    ffi_slice.as_slice().len() as u32
 }
 
 #[ffi_function]

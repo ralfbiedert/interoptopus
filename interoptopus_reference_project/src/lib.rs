@@ -36,7 +36,8 @@ interoptopus::inventory_function!(
         functions::pattern_class_method,
         functions::pattern_class_destroy,
         functions::pattern_class_method_success_enum_ok,
-        functions::pattern_class_method_success_enum_fail
+        functions::pattern_class_method_success_enum_fail,
+        functions::pattern_ffi_slice
     ],
     [my_class_pattern_context]
 );
