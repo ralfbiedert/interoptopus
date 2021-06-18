@@ -3,6 +3,7 @@
 use crate::lang::c::{CType, Function};
 use crate::patterns::TypePattern;
 use std::collections::HashSet;
+use std::iter::FromIterator;
 
 /// Converts an internal name like `fn() -> X` to a safe name like `fn_rval_x`
 pub fn safe_name(name: &str) -> String {
@@ -45,6 +46,42 @@ pub fn sort_types_by_dependencies(mut types: Vec<CType>) -> Vec<CType> {
     }
 
     rval
+}
+
+/// Given a number of functions like [`lib_x`, `lib_y`] return the longest common prefix `lib_`.
+///
+///
+/// # Example
+///
+/// ```rust
+/// # use interoptopus::lang::c::{Function, Documentation, FunctionSignature};
+/// # use interoptopus::util::longest_common_prefix;
+///
+/// let functions = [
+///     Function::new("my_lib_f".to_string(), FunctionSignature::default(), Documentation::default()),
+///     Function::new("my_lib_g".to_string(), FunctionSignature::default(), Documentation::default()),
+///     Function::new("my_lib_h".to_string(), FunctionSignature::default(), Documentation::default()),
+/// ];
+///
+/// assert_eq!(longest_common_prefix(&functions), "my_lib_".to_string());
+/// ```
+pub fn longest_common_prefix(functions: &[Function]) -> String {
+    let funcs_as_chars = functions.iter().map(|x| x.name().chars().collect::<Vec<_>>()).collect::<Vec<_>>();
+
+    let mut longest_common: Vec<char> = Vec::new();
+
+    if let Some(first) = funcs_as_chars.first() {
+        for (i, c) in first.iter().enumerate() {
+            for function in &funcs_as_chars {
+                if !function.get(i).map(|x| x == c).unwrap_or(false) {
+                    return String::from_iter(&longest_common);
+                }
+            }
+            longest_common.push(*c);
+        }
+    }
+
+    String::from_iter(&longest_common)
 }
 
 pub(crate) fn ctypes_from_functions(functions: &[Function]) -> Vec<CType> {

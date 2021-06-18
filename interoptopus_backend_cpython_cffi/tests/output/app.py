@@ -14,11 +14,11 @@ assert (reference_project.raw.primitive_i8(5) == 5)
 assert (reference_project.raw.callback(my_callback, 33) == 99)
 
 cls = reference_project.Context(123)
-cls.pattern_class_method()
-cls.pattern_class_method_success_enum_ok()
+cls.method()
+cls.method_success_enum_ok()
 
 try:
-    cls.pattern_class_method_success_enum_fail()
+    cls.method_success_enum_fail()
     os.abort() # should not reach this line
 except BaseException:
     print("Error observed successfully")

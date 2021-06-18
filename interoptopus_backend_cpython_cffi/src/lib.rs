@@ -2,7 +2,7 @@ use interoptopus::generators::Interop;
 use interoptopus::lang::c::{CType, ConstantValue, EnumType, FnPointerType, Function, PrimitiveValue};
 use interoptopus::patterns::class::Class;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
-use interoptopus::util::safe_name;
+use interoptopus::util::{longest_common_prefix, safe_name};
 use interoptopus::writer::IndentWriter;
 use interoptopus::{Error, Library};
 use interoptopus_backend_c::InteropC;
@@ -187,7 +187,6 @@ pub trait InteropCPythonCFFI: Interop {
             w.unindent();
 
             w.newline()?;
-            w.newline()?;
         }
 
         w.unindent();
@@ -246,6 +245,10 @@ pub trait InteropCPythonCFFI: Interop {
     fn write_pattern_class(&self, w: &mut IndentWriter, class: &Class) -> Result<(), Error> {
         let context_type_name = class.the_type().name();
 
+        let mut all_functions = vec![class.constructor().clone(), class.destructor().clone()];
+        all_functions.extend_from_slice(class.methods());
+        let common_prefix = longest_common_prefix(&all_functions);
+
         w.indented(|w| writeln!(w, r#"class {}(object):"#, context_type_name))?;
         w.indent();
 
@@ -277,7 +280,7 @@ pub trait InteropCPythonCFFI: Interop {
             let args = self.pattern_class_args_without_first_to_string(function);
             let docs = function.documentation().lines().join("\n");
 
-            w.indented(|w| writeln!(w, r#"def {}(self, {}):"#, function.name(), &args))?;
+            w.indented(|w| writeln!(w, r#"def {}(self, {}):"#, function.name().replace(&common_prefix, ""), &args))?;
             w.indent();
             w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
             w.indented(|w| writeln!(w, r#"global _api"#))?;
@@ -285,7 +288,6 @@ pub trait InteropCPythonCFFI: Interop {
             self.write_pattern_class_success_enum_aware_rval(w, class, function, true)?;
 
             w.unindent();
-            w.newline()?;
             w.newline()?;
         }
 

@@ -99,18 +99,15 @@ class raw:
         global _api
         return _api.example_api_version()
 
-
     def example_always_fails():
         """A function that always fails."""
         global _api
         return _api.example_always_fails()
 
-
     def example_create_context(context_ptr):
         """Creates a new instance of this library."""
         global _api
         return _api.example_create_context(context_ptr)
-
 
     def example_destroy_context(context_ptr):
         """Deletes an existing instance of this library.
@@ -120,36 +117,30 @@ You **must** ensure that `context_ptr` is being called with the context produced
         global _api
         return _api.example_destroy_context(context_ptr)
 
-
     def example_print_score(context):
         """Prints the current player score."""
         global _api
         return _api.example_print_score(context)
-
 
     def example_return_score(context, score):
         """Updates the score."""
         global _api
         return _api.example_return_score(context, score)
 
-
     def example_update_score_by_callback(context, update):
         """Updates the score."""
         global _api
         return _api.example_update_score_by_callback(context, update)
-
 
     def example_write_foreign_type(context, foreign):
         """Accepts some foreign types."""
         global _api
         return _api.example_write_foreign_type(context, foreign)
 
-
     def example_double_super_complex_entity(context, incoming, outgoing):
         """"""
         global _api
         return _api.example_double_super_complex_entity(context, incoming, outgoing)
-
 
 
 

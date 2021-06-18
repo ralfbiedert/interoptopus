@@ -145,174 +145,145 @@ class raw:
         global _api
         return _api.primitive_void()
 
-
     def primitive_void2():
         """"""
         global _api
         return _api.primitive_void2()
-
 
     def primitive_bool(x):
         """"""
         global _api
         return _api.primitive_bool(x)
 
-
     def primitive_u8(x):
         """"""
         global _api
         return _api.primitive_u8(x)
-
 
     def primitive_u16(x):
         """"""
         global _api
         return _api.primitive_u16(x)
 
-
     def primitive_u32(x):
         """"""
         global _api
         return _api.primitive_u32(x)
-
 
     def primitive_u64(x):
         """"""
         global _api
         return _api.primitive_u64(x)
 
-
     def primitive_i8(x):
         """"""
         global _api
         return _api.primitive_i8(x)
-
 
     def primitive_i16(x):
         """"""
         global _api
         return _api.primitive_i16(x)
 
-
     def primitive_i32(x):
         """"""
         global _api
         return _api.primitive_i32(x)
-
 
     def primitive_i64(x):
         """"""
         global _api
         return _api.primitive_i64(x)
 
-
     def ptr(x):
         """"""
         global _api
         return _api.ptr(x)
-
 
     def ptr_mut(x):
         """"""
         global _api
         return _api.ptr_mut(x)
 
-
     def ptr_ptr(x):
         """"""
         global _api
         return _api.ptr_ptr(x)
-
 
     def ptr_simple(x):
         """"""
         global _api
         return _api.ptr_simple(x)
 
-
     def ptr_simple_mut(x):
         """"""
         global _api
         return _api.ptr_simple_mut(x)
-
 
     def ptr_option(x):
         """"""
         global _api
         return _api.ptr_option(x)
 
-
     def ptr_option_mut(x):
         """"""
         global _api
         return _api.ptr_option_mut(x)
-
 
     def complex_1(_a, _b):
         """"""
         global _api
         return _api.complex_1(_a, _b)
 
-
     def complex_2(_cmplx):
         """"""
         global _api
         return _api.complex_2(_cmplx)
-
 
     def callback(callback, value):
         """"""
         global _api
         return _api.callback(callback, value)
 
-
     def generic(x, _y):
         """"""
         global _api
         return _api.generic(x, _y)
-
 
     def documented(_x):
         """This function has documentation."""
         global _api
         return _api.documented(_x)
 
-
     def pattern_ascii_pointer(x, y):
         """"""
         global _api
         return _api.pattern_ascii_pointer(x, y)
-
 
     def pattern_class_create(context_ptr, value):
         """"""
         global _api
         return _api.pattern_class_create(context_ptr, value)
 
-
     def pattern_class_method(context):
         """"""
         global _api
         return _api.pattern_class_method(context)
-
 
     def pattern_class_destroy(context_ptr):
         """"""
         global _api
         return _api.pattern_class_destroy(context_ptr)
 
-
     def pattern_class_method_success_enum_ok(_context):
         """"""
         global _api
         return _api.pattern_class_method_success_enum_ok(_context)
 
-
     def pattern_class_method_success_enum_fail(_context):
         """"""
         global _api
         return _api.pattern_class_method_success_enum_fail(_context)
-
 
 
 
@@ -340,13 +311,12 @@ class Context(object):
             raise Exception(f"return value ${rval}")
 
 
-    def pattern_class_method(self, ):
+    def method(self, ):
         """"""
         global _api
         return _api.pattern_class_method(self.ctx[0], )
 
-
-    def pattern_class_method_success_enum_ok(self, ):
+    def method_success_enum_ok(self, ):
         """"""
         global _api
         rval = _api.pattern_class_method_success_enum_ok(self.ctx[0], )
@@ -355,8 +325,7 @@ class Context(object):
         else:
             raise Exception(f"return value ${rval}")
 
-
-    def pattern_class_method_success_enum_fail(self, ):
+    def method_success_enum_fail(self, ):
         """"""
         global _api
         rval = _api.pattern_class_method_success_enum_fail(self.ctx[0], )
@@ -364,7 +333,6 @@ class Context(object):
             return None
         else:
             raise Exception(f"return value ${rval}")
-
 
 
 

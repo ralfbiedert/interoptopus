@@ -88,6 +88,12 @@ pub enum CType {
     Pattern(TypePattern),
 }
 
+impl Default for CType {
+    fn default() -> Self {
+        Self::Primitive(PrimitiveType::Void)
+    }
+}
+
 impl CType {
     pub fn size_of(&self) -> usize {
         123
@@ -351,7 +357,7 @@ impl Function {
     }
 }
 
-#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, Default)]
 pub struct FunctionSignature {
     params: Vec<Parameter>,
     rval: CType,
