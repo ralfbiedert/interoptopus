@@ -1,3 +1,5 @@
+//! Bundles function with common receiver into a `class` in object oriented languages.
+
 use crate::lang::c::{CType, Function, OpaqueType};
 use crate::patterns::TypePattern;
 
@@ -101,6 +103,8 @@ impl Class {
     }
 }
 
+/// Defines a [`Class`] pattern, producing a class in OO languages.
+///
 /// ```ignore
 /// pattern_class!(
 ///     my_class_pattern_context,

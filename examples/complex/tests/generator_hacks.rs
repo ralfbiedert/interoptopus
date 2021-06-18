@@ -1,8 +1,8 @@
-use interoptopus::generators::Interop;
 use interoptopus::testing::c::compile_c_app_if_installed;
 use interoptopus::testing::csharp::run_dotnet_command_if_installed;
 use interoptopus::testing::python::run_python_if_installed;
 use interoptopus::Error;
+use interoptopus::Interop;
 
 #[test]
 fn bindings_csharp() -> Result<(), Error> {

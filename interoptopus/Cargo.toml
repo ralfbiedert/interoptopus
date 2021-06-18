@@ -1,6 +1,6 @@
 [package]
 name = "interoptopus"
-description = "Create FFI bindings to your favorite language. Composable. Escape hatches included."
+description = "🦀 → 🐙 → Python, C#, C, … FFI bindings to your favorite language. Composable. Escape hatches included."
 version = "0.1.5"
 edition = "2018"
 license = "MIT"

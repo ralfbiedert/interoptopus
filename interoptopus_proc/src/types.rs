@@ -244,9 +244,7 @@ pub fn ffi_type(attr: AttributeArgs, input: TokenStream) -> TokenStream {
     }
 
     if let Ok(item) = syn::parse2::<ItemEnum>(input.clone()) {
-        let rva = ffi_type_enum(ffi_attributes, input, item);
-        println!("{}", rva);
-        return rva;
+        return ffi_type_enum(ffi_attributes, input, item);
     }
 
     if let Ok(_item) = syn::parse2::<ItemType>(input.clone()) {

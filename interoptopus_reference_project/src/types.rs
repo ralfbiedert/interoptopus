@@ -1,7 +1,8 @@
 use interoptopus::ffi_type;
-use interoptopus::lang::c::{CType, CompositeType, Field, PrimitiveType};
-use interoptopus::lang::rust::CTypeInfo;
+use interoptopus::lang::c::{CType, CompositeType, Field, Function, PrimitiveType};
+use interoptopus::lang::rust::{CTypeInfo, CallbackXY, FunctionInfo};
 use interoptopus::patterns::ascii_pointer::AsciiPointer;
+use interoptopus::patterns::slice::FFISlice;
 use interoptopus::patterns::successenum::Success;
 use std::marker::PhantomData;
 
@@ -108,4 +109,7 @@ pub struct Context {
 }
 
 // Doesn't need annotations.
-pub type Callback = extern "C" fn(u8) -> u8;
+pub type Callbacku8u8 = extern "C" fn(u8) -> u8;
+
+// pub type CallbackFFISlice = extern "C" fn(FFISlice<u8>) -> u8;
+pub type CallbackFFISlice<'a> = CallbackXY<FFISlice<'a, u8>, u8>;

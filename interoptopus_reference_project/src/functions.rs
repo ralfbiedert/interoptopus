@@ -1,9 +1,10 @@
 use crate::types::{
-    some_foreign_type, Callback, Context, Empty, EnumDocumented, FFIError, Generic, Opaque, Phantom, SomeForeignType, StructDocumented, UseAsciiStringPattern, Vec3f32,
+    some_foreign_type, CallbackFFISlice, Callbacku8u8, Context, Empty, EnumDocumented, FFIError, Generic, Opaque, Phantom, SomeForeignType, StructDocumented,
+    UseAsciiStringPattern, Vec3f32,
 };
 use interoptopus::ffi_function;
 use interoptopus::patterns::ascii_pointer::AsciiPointer;
-use interoptopus::patterns::ffislice::FFISlice;
+use interoptopus::patterns::slice::FFISlice;
 use std::ptr::null;
 
 #[ffi_function]
@@ -124,7 +125,7 @@ pub extern "C" fn complex_2(_cmplx: SomeForeignType) -> *const Opaque {
 
 #[ffi_function]
 #[no_mangle]
-pub extern "C" fn callback(callback: Callback, value: u8) -> u8 {
+pub extern "C" fn callback(callback: Callbacku8u8, value: u8) -> u8 {
     callback(value)
 }
 
@@ -167,6 +168,12 @@ pub extern "C" fn pattern_class_create(context_ptr: Option<&mut *mut Context>, v
 #[no_mangle]
 pub extern "C" fn pattern_ffi_slice(ffi_slice: FFISlice<u32>) -> u32 {
     ffi_slice.as_slice().unwrap_or(&[]).len() as u32
+}
+
+#[ffi_function(debug)]
+#[no_mangle]
+pub extern "C" fn pattern_ffi_slice_delegate(callback: CallbackFFISlice) -> u8 {
+    callback.call(FFISlice::from_slice(&[1, 2, 3]))
 }
 
 #[ffi_function]

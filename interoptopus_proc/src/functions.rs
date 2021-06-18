@@ -11,13 +11,10 @@ use syn::spanned::Spanned;
 #[derive(Debug, FromMeta)]
 pub struct FFIFunctionAttributes {
     #[darling(default)]
-    xx: Option<String>,
-
-    #[darling(default)]
-    tags: HashMap<String, String>,
-
-    #[darling(default)]
     surrogates: HashMap<String, String>,
+
+    #[darling(default)]
+    debug: bool,
 }
 
 pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
@@ -93,7 +90,7 @@ pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
         }
     }
 
-    quote! {
+    let rval = quote! {
         #input
 
         #[allow(non_camel_case_types)]
@@ -119,5 +116,11 @@ pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
                 interoptopus::lang::c::Function::new(#function_name.to_string(), signature, documentation)
             }
         }
+    };
+
+    if ffi_attributes.debug {
+        println!("{}", rval.to_string());
     }
+
+    rval
 }

@@ -1,4 +1,4 @@
-//! Helpers to test generated bindings for various languages.
+//! Test generated bindings for various languages.
 //!
 //! Note
 

@@ -1,10 +1,10 @@
-use interoptopus::generators::Interop;
 use interoptopus::lang::c::{
     CType, CompositeType, Constant, ConstantValue, Documentation, EnumType, Field, FnPointerType, Function, OpaqueType, Parameter, PrimitiveType, PrimitiveValue, Variant,
 };
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::{safe_name, sort_types_by_dependencies};
 use interoptopus::writer::IndentWriter;
+use interoptopus::Interop;
 use interoptopus::{Error, Library};
 
 #[derive(Clone, Debug)]
@@ -245,7 +245,7 @@ pub trait InteropC {
                     self.write_type_definition_enum(w, e.the_enum())?;
                     w.newline()?;
                 }
-                TypePattern::FFISlice(_) => {}
+                TypePattern::Slice(_) => {}
             },
         }
         Ok(())

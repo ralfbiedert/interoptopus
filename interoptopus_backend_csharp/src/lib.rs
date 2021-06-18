@@ -1,10 +1,10 @@
-use interoptopus::generators::Interop;
 use interoptopus::lang::c::{
     CType, CompositeType, Constant, ConstantValue, Documentation, EnumType, Field, FnPointerType, Function, OpaqueType, Parameter, PrimitiveType, PrimitiveValue, Variant,
 };
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::safe_name;
 use interoptopus::writer::IndentWriter;
+use interoptopus::Interop;
 use interoptopus::{Error, Library};
 
 #[derive(Clone, Debug)]
@@ -98,7 +98,7 @@ pub trait InteropCSharp {
             CType::Pattern(x) => match x {
                 TypePattern::AsciiPointer => "string".to_string(),
                 TypePattern::SuccessEnum(e) => self.type_enum_to_typename(e.the_enum()),
-                TypePattern::FFISlice(e) => self.type_composite_to_typename(e),
+                TypePattern::Slice(e) => self.type_composite_to_typename(e),
             },
         }
     }
@@ -128,7 +128,7 @@ pub trait InteropCSharp {
             CType::Pattern(x) => match x {
                 TypePattern::AsciiPointer => "string".to_string(),
                 TypePattern::SuccessEnum(e) => self.type_enum_to_typename(e.the_enum()),
-                TypePattern::FFISlice(x) => self.type_composite_to_typename(x),
+                TypePattern::Slice(x) => self.type_composite_to_typename(x),
             },
         }
     }
@@ -145,7 +145,7 @@ pub trait InteropCSharp {
             CType::Pattern(x) => match x {
                 TypePattern::AsciiPointer => "string".to_string(),
                 TypePattern::SuccessEnum(e) => self.type_enum_to_typename(e.the_enum()),
-                TypePattern::FFISlice(x) => self.type_composite_to_typename(x),
+                TypePattern::Slice(x) => self.type_composite_to_typename(x),
             },
         }
     }

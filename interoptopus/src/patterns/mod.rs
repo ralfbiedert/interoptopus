@@ -1,11 +1,13 @@
+//! Optional types that translate to binding with better semantics in languages supporting them.
+
 use crate::lang::c::{CType, CompositeType, PrimitiveType};
 use crate::patterns::class::Class;
 use crate::patterns::successenum::SuccessEnum;
 
 pub mod ascii_pointer;
 pub mod class;
-pub mod ffioption;
-pub mod ffislice;
+pub mod option;
+pub mod slice;
 pub mod successenum;
 
 /// A pattern on a library level, usually involving both methods and types.
@@ -25,7 +27,7 @@ impl From<Class> for LibraryPattern {
 pub enum TypePattern {
     AsciiPointer,
     SuccessEnum(SuccessEnum),
-    FFISlice(CompositeType),
+    Slice(CompositeType),
 }
 
 impl TypePattern {
@@ -35,7 +37,7 @@ impl TypePattern {
         match self {
             TypePattern::AsciiPointer => CType::ReadPointer(Box::new(CType::Primitive(PrimitiveType::U8))),
             TypePattern::SuccessEnum(e) => CType::Enum(e.the_enum().clone()),
-            TypePattern::FFISlice(x) => CType::Composite(x.clone()),
+            TypePattern::Slice(x) => CType::Composite(x.clone()),
         }
     }
 }

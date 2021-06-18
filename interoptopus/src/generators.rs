@@ -3,6 +3,7 @@ use crate::Error;
 use std::fs::File;
 use std::path::Path;
 
+/// Main entry point for backends to generate language bindings.
 pub trait Interop {
     fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error>;
 

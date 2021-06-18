@@ -1,3 +1,5 @@
+//! For return enums with defined `Ok` variants, translating to exceptions if not met.
+
 use crate::lang::c::{EnumType, Variant};
 
 pub trait Success {

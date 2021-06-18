@@ -107,6 +107,9 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice")]
         public static extern uint pattern_ffi_slice(FFISliceu32 ffi_slice);
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_delegate")]
+        public static extern byte pattern_ffi_slice_delegate(InteropDelegate_fn_FFISliceu8_rval_u8 callback);
+
     }
 
     /// Documented enum.
@@ -127,6 +130,14 @@ namespace My.Company
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public partial struct FFISliceu32
+    {
+        public IntPtr slice_ptr;
+        public ulong len;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct FFISliceu8
     {
         public IntPtr slice_ptr;
         public ulong len;
@@ -180,6 +191,9 @@ namespace My.Company
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate byte InteropDelegate_fn_FFISliceu8_rval_u8(FFISliceu8 x0);
 
     public enum FFIError
     {

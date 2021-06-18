@@ -63,10 +63,18 @@ typedef struct FFISliceu32
     uint64_t len;
     } FFISliceu32;
 
+typedef struct FFISliceu8
+    {
+    uint8_t* slice_ptr;
+    uint64_t len;
+    } FFISliceu8;
+
 typedef struct Generic
     {
     uint32_t* x;
     } Generic;
+
+typedef uint8_t (*fptr_fn_FFISliceu8_rval_u8)(FFISliceu8 x0);
 
 
 void primitive_void();
@@ -99,6 +107,7 @@ FFIError pattern_class_destroy(Context** context_ptr);
 FFIError pattern_class_method_success_enum_ok(Context* _context);
 FFIError pattern_class_method_success_enum_fail(Context* _context);
 uint32_t pattern_ffi_slice(FFISliceu32 ffi_slice);
+uint8_t pattern_ffi_slice_delegate(fptr_fn_FFISliceu8_rval_u8 callback);
 """
 
 
@@ -141,6 +150,7 @@ class FFIError:
 class callbacks:
     """Helpers to define `@ffi.callback`-style callbacks."""
     fn_u8_rval_u8 = "uint8_t(uint8_t)"
+    fn_FFISliceu8_rval_u8 = "uint8_t(FFISliceu8)"
 
 
 
@@ -296,6 +306,11 @@ class raw:
         """"""
         global _api
         return _api.pattern_ffi_slice(ffi_slice)
+
+    def pattern_ffi_slice_delegate(callback):
+        """"""
+        global _api
+        return _api.pattern_ffi_slice_delegate(callback)
 
 
 

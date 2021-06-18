@@ -1,6 +1,6 @@
-use interoptopus::generators::Interop;
 use interoptopus::testing::csharp::run_dotnet_command_if_installed;
 use interoptopus::Error;
+use interoptopus::Interop;
 use std::fs::read_to_string;
 
 fn generate_bindings(output: &str) -> Result<(), Error> {

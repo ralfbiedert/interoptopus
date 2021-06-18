@@ -1,9 +1,9 @@
-use interoptopus::generators::Interop;
 use interoptopus::lang::c::{CType, ConstantValue, EnumType, FnPointerType, Function, PrimitiveValue};
 use interoptopus::patterns::class::Class;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{longest_common_prefix, safe_name};
 use interoptopus::writer::IndentWriter;
+use interoptopus::Interop;
 use interoptopus::{Error, Library};
 use interoptopus_backend_c::InteropC;
 

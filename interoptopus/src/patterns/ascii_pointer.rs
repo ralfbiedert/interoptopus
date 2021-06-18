@@ -1,3 +1,5 @@
+//! Raw `*const char` pointer on C-level but ASCII `string` like in languages that support it.
+
 use crate::lang::c::CType;
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::TypePattern;

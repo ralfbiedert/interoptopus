@@ -1,3 +1,5 @@
+//! Like a regular `&[T]` but FFI safe.
+
 use crate::lang::c::{CType, CompositeType, Field, PrimitiveType};
 use crate::lang::rust::CTypeInfo;
 use std::marker::PhantomData;
