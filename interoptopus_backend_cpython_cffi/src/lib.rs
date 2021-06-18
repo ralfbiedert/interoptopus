@@ -263,7 +263,6 @@ pub trait InteropCPythonCFFI: Interop {
         self.write_pattern_class_success_enum_aware_rval(w, class, class.constructor(), false)?;
         w.unindent();
         w.newline()?;
-        w.newline()?;
 
         // Dtor
         let docs = class.destructor().documentation().lines().join("\n");
@@ -273,7 +272,6 @@ pub trait InteropCPythonCFFI: Interop {
         w.indented(|w| writeln!(w, r#"global _api, ffi"#))?;
         self.write_pattern_class_success_enum_aware_rval(w, class, class.destructor(), false)?;
         w.unindent();
-        w.newline()?;
         w.newline()?;
 
         for function in class.methods() {

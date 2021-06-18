@@ -300,7 +300,6 @@ class Context(object):
         else:
             raise Exception(f"return value ${rval}")
 
-
     def __del__(self):
         """"""
         global _api, ffi
@@ -309,7 +308,6 @@ class Context(object):
             return None
         else:
             raise Exception(f"return value ${rval}")
-
 
     def method(self, ):
         """"""
