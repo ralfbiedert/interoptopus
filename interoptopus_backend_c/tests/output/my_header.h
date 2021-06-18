@@ -50,6 +50,11 @@ typedef struct StructDocumented
     float x;
     } StructDocumented;
 
+typedef struct UseAsciiStringPattern
+    {
+    uint8_t* ascii_string;
+    } UseAsciiStringPattern;
+
 typedef struct Vec3f32
     {
     float x;
@@ -59,15 +64,16 @@ typedef struct Vec3f32
 
 typedef uint8_t (*fptr_fn_u8_rval_u8)(uint8_t x0);
 
+typedef struct FFISliceu32
+    {
+    uint32_t* slice_ptr;
+    uint64_t len;
+    } FFISliceu32;
+
 typedef struct Generic
     {
     uint32_t* x;
     } Generic;
-
-typedef struct UseAsciiStringPattern
-    {
-    uint8_t* ascii_string;
-    } UseAsciiStringPattern;
 
 
 void primitive_void();
@@ -99,6 +105,7 @@ uint32_t pattern_class_method(Context* context);
 FFIError pattern_class_destroy(Context** context_ptr);
 FFIError pattern_class_method_success_enum_ok(Context* _context);
 FFIError pattern_class_method_success_enum_fail(Context* _context);
+uint32_t pattern_ffi_slice(FFISliceu32 ffi_slice);
 
 #ifdef __cplusplus
 }

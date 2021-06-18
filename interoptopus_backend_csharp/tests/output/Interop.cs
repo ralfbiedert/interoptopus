@@ -104,6 +104,9 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_method_success_enum_fail")]
         public static extern FFIError pattern_class_method_success_enum_fail(IntPtr _context);
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice")]
+        public static extern uint pattern_ffi_slice(FFISliceu32 ffi_slice);
+
     }
 
     /// Documented enum.
@@ -119,6 +122,14 @@ namespace My.Company
     [StructLayout(LayoutKind.Sequential)]
     public partial struct Empty
     {
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct FFISliceu32
+    {
+        public IntPtr slice_ptr;
+        public ulong len;
     }
 
     [Serializable]

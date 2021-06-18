@@ -166,7 +166,7 @@ pub extern "C" fn pattern_class_create(context_ptr: Option<&mut *mut Context>, v
 #[ffi_function]
 #[no_mangle]
 pub extern "C" fn pattern_ffi_slice(ffi_slice: FFISlice<u32>) -> u32 {
-    ffi_slice.as_slice().len() as u32
+    ffi_slice.as_slice().unwrap_or(&[]).len() as u32
 }
 
 #[ffi_function]
