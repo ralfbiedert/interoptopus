@@ -10,6 +10,7 @@ use std::ptr::null;
 
 /// Represents a `*const char` on FFI level pointing to an `0x0` terminated ASCII string.
 #[repr(transparent)]
+#[derive(Debug)]
 pub struct AsciiPointer<'a> {
     ptr: *const c_char,
     _phandom: PhantomData<&'a ()>,
