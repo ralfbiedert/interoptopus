@@ -118,9 +118,18 @@ pub(crate) fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CTyp
         CType::Primitive(_) => {}
         CType::Enum(_) => {}
         CType::Opaque(_) => {}
+        // Note, patterns must _NEVER_ add themselves as fallbacks. Instead, each code generator should
+        // decide on a case-by-case bases whether it wants to use the type's fallback, or generate an
+        // entirely new pattern. The exception to this rule are patterns that can embed arbitrary
+        // types; which we need to recursively inspect.
         CType::Pattern(x) => match x {
-            TypePattern::AsciiPointer => ctypes_from_type_recursive(&x.fallback_type(), types),
-            TypePattern::SuccessEnum(_) => {} // This _is_ an enum type, don't return fallback type in addition. Backends have to handle this.
+            TypePattern::AsciiPointer => {}
+            TypePattern::SuccessEnum(_) => {}
+            TypePattern::FFISlice(x) => {
+                for field in x.fields() {
+                    ctypes_from_type_recursive(field.the_type(), types);
+                }
+            }
         },
     }
 }

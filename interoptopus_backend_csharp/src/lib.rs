@@ -98,6 +98,7 @@ pub trait InteropCSharp {
             CType::Pattern(x) => match x {
                 TypePattern::AsciiPointer => "string".to_string(),
                 TypePattern::SuccessEnum(e) => self.type_enum_to_typename(e.the_enum()),
+                TypePattern::FFISlice(e) => self.type_composite_to_typename(e),
             },
         }
     }
@@ -127,6 +128,7 @@ pub trait InteropCSharp {
             CType::Pattern(x) => match x {
                 TypePattern::AsciiPointer => "string".to_string(),
                 TypePattern::SuccessEnum(e) => self.type_enum_to_typename(e.the_enum()),
+                TypePattern::FFISlice(x) => self.type_composite_to_typename(x),
             },
         }
     }
@@ -143,6 +145,7 @@ pub trait InteropCSharp {
             CType::Pattern(x) => match x {
                 TypePattern::AsciiPointer => "string".to_string(),
                 TypePattern::SuccessEnum(e) => self.type_enum_to_typename(e.the_enum()),
+                TypePattern::FFISlice(x) => self.type_composite_to_typename(x),
             },
         }
     }

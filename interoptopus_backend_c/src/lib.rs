@@ -245,6 +245,7 @@ pub trait InteropC {
                     self.write_type_definition_enum(w, e.the_enum())?;
                     w.newline()?;
                 }
+                TypePattern::FFISlice(_) => {}
             },
         }
         Ok(())

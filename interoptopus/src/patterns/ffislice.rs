@@ -19,12 +19,20 @@ impl<'a, T> FFISlice<'a, T> {
         }
     }
 
-    pub fn as_slice(&self) -> &[T] {
-        unsafe { std::slice::from_raw_parts(self.slice_ptr, self.len as usize) }
+    pub fn as_slice(&'a self) -> Option<&'a [T]> {
+        if self.slice_ptr.is_null() {
+            None
+        } else {
+            // If non-null this should always point to valid data and the lifetime should be
+            // guaranteed via the struct <'a>.
+            Some(unsafe { std::slice::from_raw_parts(self.slice_ptr, self.len as usize) })
+        }
     }
 }
 
-impl<'a, T> CTypeInfo for FFISlice<'a, T> where T: CTypeInfo
+impl<'a, T> CTypeInfo for FFISlice<'a, T>
+where
+    T: CTypeInfo,
 {
     fn type_info() -> CType {
         let mut composite = CompositeType::new(format!("FFISlice{}", T::type_info().internal_name()));
