@@ -1,8 +1,37 @@
 //! Bundles function with common receiver into a `class` in object oriented languages.
+//!
+//! Classes are defined via the [**pattern_class**](crate::pattern_class) macro and consists of the following items:
+//!
+//! - an [opaque](OpaqueType) **receiver** type,
+//! - a **constructor** function of signature `fn(mmR, ...) -> E`
+//! - **destructor** function of signature `unsafe fn(mmR) -> E`
+//! - arbitrary many **methods** of signature `fn(mR, ...) -> ?`
+//!
+//! where
+//!
+//! - `mmO` refers to a `&mut *mut Receiver`, `*mut *mut Receiver` or `Option<&mut *mut Receiver>`,
+//! - `mO` refers to a `&mut Receiver`, `*mut Receiver` or `Option<&mut Receiver>`,
+//! - `E` to a [success enum](crate::patterns::success_enum),
+//! - `...` ane `?` to arbitrary types.
+//!
+//! The constructor:
+//! - must return `E::SUCCESS` if and only if it successfully wrote an instance of `Receiver` into `mmR`
+//! - may only write a valid instance or leave the parameter at `null`
+//!
+//! The `unsafe` destructor:
+//! - must handle any values produced by a constructor that successfully returned,
+//! - if it successfully completes, it must write a null pointer into `mmR`,
+//!
+//! Violation of any of these conditions may cause UB in FFI calls as the generated bindings rely on this contract.
+//! In addition the bindings will guarantee (and the destructor's signature should indicate) that it
+//!
+//! - will only invoked if the constructor returned `E::SUCCESS`,
+//! - the value for `mmR` will be exactly the value returned by a previous constructor invocation,
 
 use crate::lang::c::{CType, Function, OpaqueType};
 use crate::patterns::TypePattern;
 
+/// Combines a receiver, constructor, destructor and multiple methods in one entity.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Class {
     the_type: OpaqueType,

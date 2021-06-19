@@ -82,6 +82,30 @@ pub fn ffi_type(attr: TokenStream, item: TokenStream) -> TokenStream {
 
 /// Enable an `extern "C"` function to appear in generated bindings.
 ///
+/// This will derive [`FunctionInfo`](interoptopus::lang::rust::FunctionInfo) for a helper struct
+/// of the same name containing the function's name, parameters and return value.
+///
+/// The following attributes can be provided:
+///
+/// | Attribute |  Explanation |
+/// | --- | ---  |
+/// | `surrogates(x="y")` | Invoke function `y` to provide a [`CTypeInfo`](interoptopus::lang::rust::CTypeInfo) for parameter `x`, see below.
+///
+/// # Surrogates
+///
+/// When dealing with types outside of your control you will not be able to implement [`CTypeInfo`](interoptopus::lang::rust::CTypeInfo) for them.
+/// Instead you need a **surrogate**, a helper function which returns that info for the type.
+///
+/// The surrogate's signature is:
+///
+/// ```rust
+/// # use interoptopus::lang::c::CType;
+/// fn some_foreign_type() -> CType {
+///     // Return an appropriate CType
+///     # interoptopus::lang::c::CType::Primitive(interoptopus::lang::c::PrimitiveType::U8)
+/// }
+/// ```
+///
 /// # Example
 ///
 /// ```

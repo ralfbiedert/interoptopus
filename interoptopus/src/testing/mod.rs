@@ -1,6 +1,4 @@
 //! Test generated bindings for various languages.
-//!
-//! Note
 
 pub mod c;
 pub mod csharp;

@@ -3,7 +3,7 @@ use interoptopus::lang::c::{CType, CompositeType, Field, Function, PrimitiveType
 use interoptopus::lang::rust::{CTypeInfo, CallbackXY, FunctionInfo};
 use interoptopus::patterns::ascii_pointer::AsciiPointer;
 use interoptopus::patterns::slice::FFISlice;
-use interoptopus::patterns::successenum::Success;
+use interoptopus::patterns::success_enum::Success;
 use std::marker::PhantomData;
 
 // Let's assume we can't implement `CTypeInfo` for this.

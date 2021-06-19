@@ -1,3 +1,5 @@
+//! Test helpers for Python bindings.
+
 use crate::Error;
 use std::io::ErrorKind;
 use std::path::Path;
