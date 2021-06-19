@@ -2,7 +2,7 @@
 name = "interoptopus"
 description = "🦀 → 🐙 → Python, C#, C, … FFI bindings to your favorite language. Composable. Escape hatches included."
 authors = ["Ralf Biedert <rb@xr.io>"]
-version = "0.1.5"
+version = "0.1.6"
 edition = "2018"
 license = "MIT"
 documentation = "https://docs.rs/interoptopus/"
