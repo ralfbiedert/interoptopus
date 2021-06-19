@@ -141,12 +141,20 @@ For other languages (Python, C, ...) see the `examples` folder.
 
 ## Contributing
 
-PRs are welcome. If it's a major change consider filing an issue first. If you can, try running `scripts/test_all.py` (might need to install `dotnet`, `python`, ...). 
+PRs are welcome. If it's a major change consider filing an issue first. 
+
+Also, please read the next section. 
 
 
 ## License
 
-MIT
+[MIT](https://opensource.org/licenses/MIT)
+
+**License Clarification** 
+
+The MIT license shall only apply to code **in** this repository, not code generated **by** this repository. We do not claim any copyright for any code produced by any backend included here; even if said code was based on a template from this repository.  
+
+In other words, whatever code this repo produces for your FFI layer is entirely yours; to the degree the FFI code was yours to begin with.
 
 [Latest Version]: https://img.shields.io/crates/v/interoptopus.svg
 [crates.io]: https://crates.io/crates/interoptopus

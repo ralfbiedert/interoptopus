@@ -70,18 +70,18 @@ pub trait InteropC {
 
     /// Converts a Rust enum name such as `Error` to a C# enum name `Error`.
     fn type_enum_to_typename(&self, x: &EnumType) -> String {
-        x.name().to_string()
+        x.rust_name().to_string()
     }
 
     /// TODO Converts an opaque Rust struct `Context` to a C# struct ``.
     fn type_opaque_to_typename(&self, opaque: &OpaqueType) -> String {
         // x.name().to_string()
-        opaque.name().to_string()
+        opaque.rust_name().to_string()
     }
 
     /// Converts an Rust struct name `Vec2` to a C# struct name `Vec2`.
     fn type_composite_to_typename(&self, x: &CompositeType) -> String {
-        x.name().to_string()
+        x.rust_name().to_string()
     }
 
     /// Converts an Rust `fn()` to a C# delegate name such as `InteropDelegate`.
@@ -274,7 +274,7 @@ pub trait InteropC {
     }
 
     fn write_type_definition_enum(&self, w: &mut IndentWriter, the_type: &EnumType) -> Result<(), Error> {
-        w.indented(|w| writeln!(w, r#"typedef enum {}"#, the_type.name()))?;
+        w.indented(|w| writeln!(w, r#"typedef enum {}"#, the_type.rust_name()))?;
         w.indent();
         w.indented(|w| writeln!(w, r#"{{"#))?;
 
@@ -282,7 +282,7 @@ pub trait InteropC {
             self.write_type_definition_enum_variant(w, variant, the_type)?;
         }
 
-        w.indented(|w| writeln!(w, r#"}} {};"#, the_type.name()))?;
+        w.indented(|w| writeln!(w, r#"}} {};"#, the_type.rust_name()))?;
         w.unindent();
         Ok(())
     }
@@ -300,14 +300,14 @@ pub trait InteropC {
     }
 
     fn write_type_definition_opaque_body(&self, w: &mut IndentWriter, the_type: &OpaqueType) -> Result<(), Error> {
-        w.indented(|w| writeln!(w, r#"typedef struct {} {};"#, the_type.name(), the_type.name()))?;
+        w.indented(|w| writeln!(w, r#"typedef struct {} {};"#, the_type.rust_name(), the_type.rust_name()))?;
         Ok(())
     }
 
     fn write_type_definition_composite(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
         if the_type.is_empty() {
             // C doesn't allow us writing empty structs.
-            w.indented(|w| writeln!(w, r#"typedef struct {} {};"#, the_type.name(), the_type.name()))?;
+            w.indented(|w| writeln!(w, r#"typedef struct {} {};"#, the_type.rust_name(), the_type.rust_name()))?;
             Ok(())
         } else {
             self.write_type_definition_composite_body(w, the_type)
@@ -315,7 +315,7 @@ pub trait InteropC {
     }
 
     fn write_type_definition_composite_body(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
-        w.indented(|w| writeln!(w, r#"typedef struct {}"#, the_type.name()))?;
+        w.indented(|w| writeln!(w, r#"typedef struct {}"#, the_type.rust_name()))?;
         w.indent();
         w.indented(|w| writeln!(w, r#"{{"#))?;
 
@@ -323,7 +323,7 @@ pub trait InteropC {
             self.write_type_definition_composite_body_field(w, field, the_type)?;
         }
 
-        w.indented(|w| writeln!(w, r#"}} {};"#, the_type.name()))?;
+        w.indented(|w| writeln!(w, r#"}} {};"#, the_type.rust_name()))?;
         w.unindent();
         Ok(())
     }

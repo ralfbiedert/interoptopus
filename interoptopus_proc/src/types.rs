@@ -20,7 +20,7 @@ pub struct FFITypeAttributes {
     skip: HashMap<String, ()>,
 
     #[darling(default)]
-    tags: HashMap<String, ()>,
+    name: Option<String>,
 }
 
 fn derive_variant_info(item: ItemEnum, idents: &[Ident], names: &[String], values: &[i32], docs: &[String]) -> TokenStream {
@@ -125,6 +125,7 @@ pub fn ffi_type_enum(attr: FFITypeAttributes, input: TokenStream, item: ItemEnum
 pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemStruct) -> TokenStream {
     let name = item.ident.to_string();
     let name_ident = syn::Ident::new(&name, item.ident.span());
+    let c_struct_name = attr.name.unwrap_or(name);
 
     let mut generic_params = Vec::new();
     let mut field_names = Vec::new();
@@ -199,7 +200,7 @@ pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemSt
 
                 let documentation = interoptopus::lang::c::Documentation::from_line(#doc_line);
 
-                let mut rval = interoptopus::lang::c::CompositeType::with_documentation(#name.to_string(), documentation);
+                let mut rval = interoptopus::lang::c::CompositeType::with_documentation(#c_struct_name.to_string(), documentation);
 
                 #({
                     let documentation = interoptopus::lang::c::Documentation::from_line(#field_docs);

@@ -3,22 +3,22 @@
 use crate::lang::c::{CType, Constant, ConstantValue, FnPointerType, Function, FunctionSignature, Parameter, PrimitiveType, PrimitiveValue, Variant};
 use std::ptr::NonNull;
 
-/// Implemented for a helper produced by [`ffi_constant`], gives meta info for a constant.
+/// Implemented for a helper produced by [`ffi_constant`](crate::ffi_constant), gives meta info for a constant.
 pub trait ConstantInfo {
     fn constant_info() -> Constant;
 }
 
-/// Implemented for a type via [`ffi_type`], gives meta info for a type.
+/// Implemented for a type via [`ffi_type`](crate::ffi_type), gives meta info for a type.
 pub trait CTypeInfo {
     fn type_info() -> CType;
 }
 
-/// Implemented for a helper produced by [`ffi_function`], gives meta info for a type.
+/// Implemented for a helper produced by [`ffi_function`](crate::ffi_function), gives meta info for a type.
 pub trait FunctionInfo {
     fn function_info() -> Function;
 }
 
-/// Implemented for an enum via [`ffi_type`] allows us to translate a variant into its meta information.
+/// Implemented for an enum via [`ffi_type`](crate::ffi_type) allows us to translate a variant into its meta information.
 pub trait VariantInfo {
     fn variant_info(&self) -> Variant;
 }

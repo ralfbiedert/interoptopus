@@ -1,4 +1,10 @@
 //! "Canonical" representation of our FFI boundary.
+//!
+//! Note, unless in special circumstances (e.g., when implementing [`CTypeInfo`](crate::lang::rust::CTypeInfo)
+//! for a type you don't own; or when writing your own backend) you will not need any of the items in this module.
+//!
+//! In most cases the types here are automatically generated via an attribute; and later consumed
+//! by a backend.
 
 use crate::patterns::TypePattern;
 use crate::util::ctypes_from_type_recursive;
@@ -107,17 +113,24 @@ impl CType {
         Self::Primitive(PrimitiveType::Void)
     }
 
-    /// Produces a name unique for that type.
-    pub fn internal_name(&self) -> String {
+    /// Produces a name unique for that type with respect to this library.
+    ///
+    /// The name here is supposed to uniquely determine a type relative to a [`Library`],
+    /// but it is not guaranteed to be C-compatible and may contain special characters
+    /// (e.g., `*const u32`).
+    ///
+    /// Backends should instead match on the `CType` variant and determine a more appropriate
+    /// name on a case-by-case basis; including changing a name entirely.
+    pub fn name_within_lib(&self) -> String {
         match self {
-            CType::Primitive(x) => x.internal_name().to_string(),
-            CType::Enum(x) => x.name().to_string(),
-            CType::Opaque(x) => x.name().to_string(),
-            CType::Composite(x) => x.name().to_string(),
+            CType::Primitive(x) => x.rust_name().to_string(),
+            CType::Enum(x) => x.rust_name().to_string(),
+            CType::Opaque(x) => x.rust_name().to_string(),
+            CType::Composite(x) => x.rust_name().to_string(),
             CType::FnPointer(x) => x.internal_name(),
-            CType::ReadPointer(x) => format!("*const {}", x.internal_name()),
-            CType::ReadWritePointer(x) => format!("*mut {}", x.internal_name()),
-            CType::Pattern(x) => x.fallback_type().internal_name(),
+            CType::ReadPointer(x) => format!("*const {}", x.name_within_lib()),
+            CType::ReadWritePointer(x) => format!("*mut {}", x.name_within_lib()),
+            CType::Pattern(x) => x.fallback_type().name_within_lib(),
         }
     }
 
@@ -164,7 +177,7 @@ pub enum PrimitiveType {
 }
 
 impl PrimitiveType {
-    pub fn internal_name(&self) -> &str {
+    pub fn rust_name(&self) -> &str {
         match self {
             PrimitiveType::Void => "()",
             PrimitiveType::Bool => "bool",
@@ -203,7 +216,7 @@ impl EnumType {
         self.variants.push(variant);
     }
 
-    pub fn name(&self) -> &str {
+    pub fn rust_name(&self) -> &str {
         &self.name
     }
 
@@ -246,6 +259,20 @@ impl Variant {
     }
 }
 
+/// Used for Rust structs with named fields, must be `#[repr(C)]`.
+///
+/// Might translate to a struct or class in another language, equivalent on
+/// C-level to:
+///
+/// ```ignore
+/// typedef struct MyComposite
+/// {
+///     int   field_1;
+///     float field_2;
+///     char  field_3;
+///     // ...
+/// } MyComposite;
+/// ```
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct CompositeType {
     name: String,
@@ -254,10 +281,12 @@ pub struct CompositeType {
 }
 
 impl CompositeType {
+    /// Creates a new composite with the given name and no fields nor documentation.
     pub fn new(name: String) -> Self {
         Self::with_documentation(name, Documentation::new())
     }
 
+    /// Creates a new composite with the given name and type-level documentation.
     pub fn with_documentation(name: String, documentation: Documentation) -> Self {
         Self {
             name,
@@ -266,11 +295,13 @@ impl CompositeType {
         }
     }
 
+    /// Adds a field to this composite.
     pub fn add_field(&mut self, field: Field) {
         self.fields.push(field);
     }
 
-    pub fn name(&self) -> &str {
+    /// Gets the type's name `
+    pub fn rust_name(&self) -> &str {
         &self.name
     }
 
@@ -327,7 +358,7 @@ impl OpaqueType {
         Self { name }
     }
 
-    pub fn name(&self) -> &str {
+    pub fn rust_name(&self) -> &str {
         &self.name
     }
 }
@@ -424,8 +455,8 @@ impl FnPointerType {
 
     pub fn internal_name(&self) -> String {
         let signature = self.signature();
-        let params = signature.params.iter().map(|x| x.the_type().internal_name()).collect::<Vec<_>>().join(",");
-        let rval = signature.rval.internal_name();
+        let params = signature.params.iter().map(|x| x.the_type().name_within_lib()).collect::<Vec<_>>().join(",");
+        let rval = signature.rval.name_within_lib();
 
         format!("fn({}) -> {}", params, rval)
     }

@@ -125,7 +125,7 @@ pub trait InteropCPythonCFFI: Interop {
     fn write_enum(&self, w: &mut IndentWriter, e: &EnumType) -> Result<(), Error> {
         let docs = e.documentation().lines().join("\n");
 
-        w.indented(|w| writeln!(w, r#"class {}:"#, e.name()))?;
+        w.indented(|w| writeln!(w, r#"class {}:"#, e.rust_name()))?;
         w.indent();
         w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
         for v in e.variants() {
@@ -225,7 +225,7 @@ pub trait InteropCPythonCFFI: Interop {
         match function.signature().rval() {
             CType::Pattern(TypePattern::SuccessEnum(e)) => {
                 w.indented(|w| writeln!(w, r#"rval = _api.{}({}, {})"#, function.name(), ctx, &args))?;
-                w.indented(|w| writeln!(w, r#"if rval == {}.{}:"#, e.the_enum().name(), e.success_variant().name()))?;
+                w.indented(|w| writeln!(w, r#"if rval == {}.{}:"#, e.the_enum().rust_name(), e.success_variant().name()))?;
                 w.indent();
                 w.indented(|w| writeln!(w, r#"return None"#))?;
                 w.unindent();
@@ -243,7 +243,7 @@ pub trait InteropCPythonCFFI: Interop {
     }
 
     fn write_pattern_class(&self, w: &mut IndentWriter, class: &Class) -> Result<(), Error> {
-        let context_type_name = class.the_type().name();
+        let context_type_name = class.the_type().rust_name();
 
         let mut all_functions = vec![class.constructor().clone(), class.destructor().clone()];
         all_functions.extend_from_slice(class.methods());

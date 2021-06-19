@@ -1,6 +1,6 @@
 use crate::types::{
-    some_foreign_type, CallbackFFISlice, Callbacku8u8, Context, Empty, EnumDocumented, FFIError, Generic, Opaque, Phantom, SomeForeignType, StructDocumented,
-    UseAsciiStringPattern, Vec3f32,
+    ambiguous1, ambiguous2, some_foreign_type, CallbackFFISlice, Callbacku8u8, Context, Empty, EnumDocumented, FFIError, Generic, Opaque, Phantom, SomeForeignType,
+    StructDocumented, UseAsciiStringPattern, Vec3f32,
 };
 use interoptopus::ffi_function;
 use interoptopus::patterns::ascii_pointer::AsciiPointer;
@@ -212,4 +212,22 @@ pub unsafe extern "C" fn pattern_class_destroy(context_ptr: Option<&mut *mut Con
             FFIError::Ok
         }
     }
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn ambiguous_1(x: ambiguous1::Vec) -> ambiguous1::Vec {
+    x
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn ambiguous_2(x: ambiguous2::Vec) -> ambiguous2::Vec {
+    x
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn ambiguous_3(x: ambiguous1::Vec, y: ambiguous2::Vec) -> bool {
+    (x.x as f64 - y.x).abs() < 0.5
 }

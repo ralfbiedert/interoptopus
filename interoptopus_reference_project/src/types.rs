@@ -111,5 +111,43 @@ pub struct Context {
 // Doesn't need annotations.
 pub type Callbacku8u8 = extern "C" fn(u8) -> u8;
 
+// This does not work since we can't express the for<'x> bounds in our CTypeInfo implementation.
 // pub type CallbackFFISlice = extern "C" fn(FFISlice<u8>) -> u8;
+
 pub type CallbackFFISlice<'a> = CallbackXY<FFISlice<'a, u8>, u8>;
+
+pub mod ambiguous1 {
+    use interoptopus::ffi_type;
+
+    #[ffi_type(name = "Vec1")]
+    #[repr(C)]
+    pub struct Vec {
+        pub x: f32,
+        pub y: f32,
+    }
+
+    #[ffi_type(name = "Status1")]
+    #[repr(C)]
+    pub enum Status {
+        X = 1,
+        Y = 2,
+    }
+}
+
+pub mod ambiguous2 {
+    use interoptopus::ffi_type;
+
+    #[ffi_type(name = "Vec2")]
+    #[repr(C)]
+    pub struct Vec {
+        pub x: f64,
+        pub z: f64,
+    }
+
+    #[ffi_type(name = "Status2")]
+    #[repr(C)]
+    pub enum Status {
+        X = 100,
+        Z = 200,
+    }
+}

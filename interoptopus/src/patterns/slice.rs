@@ -37,7 +37,7 @@ where
     T: CTypeInfo,
 {
     fn type_info() -> CType {
-        let mut composite = CompositeType::new(format!("FFISlice{}", T::type_info().internal_name()));
+        let mut composite = CompositeType::new(format!("FFISlice{}", T::type_info().name_within_lib()));
         composite.add_field(Field::new("slice_ptr".to_string(), CType::ReadPointer(Box::new(T::type_info()))));
         composite.add_field(Field::new("len".to_string(), CType::Primitive(PrimitiveType::U64)));
         CType::Composite(composite)

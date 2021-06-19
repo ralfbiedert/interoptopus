@@ -48,6 +48,18 @@ typedef struct UseAsciiStringPattern
     uint8_t* ascii_string;
     } UseAsciiStringPattern;
 
+typedef struct Vec1
+    {
+    float x;
+    float y;
+    } Vec1;
+
+typedef struct Vec2
+    {
+    double x;
+    double z;
+    } Vec2;
+
 typedef struct Vec3f32
     {
     float x;
@@ -108,6 +120,9 @@ FFIError pattern_class_method_success_enum_ok(Context* _context);
 FFIError pattern_class_method_success_enum_fail(Context* _context);
 uint32_t pattern_ffi_slice(FFISliceu32 ffi_slice);
 uint8_t pattern_ffi_slice_delegate(fptr_fn_FFISliceu8_rval_u8 callback);
+Vec1 ambiguous_1(Vec1 x);
+Vec2 ambiguous_2(Vec2 x);
+bool ambiguous_3(Vec1 x, Vec2 y);
 """
 
 
@@ -311,6 +326,21 @@ class raw:
         """"""
         global _api
         return _api.pattern_ffi_slice_delegate(callback)
+
+    def ambiguous_1(x):
+        """"""
+        global _api
+        return _api.ambiguous_1(x)
+
+    def ambiguous_2(x):
+        """"""
+        global _api
+        return _api.ambiguous_2(x)
+
+    def ambiguous_3(x, y):
+        """"""
+        global _api
+        return _api.ambiguous_3(x, y)
 
 
 

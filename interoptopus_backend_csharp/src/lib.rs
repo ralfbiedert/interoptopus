@@ -66,7 +66,7 @@ pub trait InteropCSharp {
 
     /// Converts a Rust enum name such as `Error` to a C# enum name `Error`.
     fn type_enum_to_typename(&self, x: &EnumType) -> String {
-        x.name().to_string()
+        x.rust_name().to_string()
     }
 
     /// TODO Converts an opaque Rust struct `Context` to a C# struct ``.
@@ -77,7 +77,7 @@ pub trait InteropCSharp {
 
     /// Converts an Rust struct name `Vec2` to a C# struct name `Vec2`.
     fn type_composite_to_typename(&self, x: &CompositeType) -> String {
-        x.name().to_string()
+        x.rust_name().to_string()
     }
 
     /// Converts an Rust `fn()` to a C# delegate name such as `InteropDelegate`.
@@ -339,7 +339,7 @@ pub trait InteropCSharp {
 
     fn write_type_definition_enum(&self, w: &mut IndentWriter, the_type: &EnumType) -> Result<(), Error> {
         self.write_documentation(w, the_type.documentation())?;
-        w.indented(|w| writeln!(w, r#"public enum {}"#, the_type.name()))?;
+        w.indented(|w| writeln!(w, r#"public enum {}"#, the_type.rust_name()))?;
         w.indented(|w| writeln!(w, r#"{{"#))?;
         w.indent();
 
@@ -375,7 +375,7 @@ pub trait InteropCSharp {
     }
 
     fn write_type_definition_composite_body(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
-        w.indented(|w| writeln!(w, r#"public partial struct {}"#, the_type.name()))?;
+        w.indented(|w| writeln!(w, r#"public partial struct {}"#, the_type.rust_name()))?;
         w.indented(|w| writeln!(w, r#"{{"#))?;
         w.indent();
 

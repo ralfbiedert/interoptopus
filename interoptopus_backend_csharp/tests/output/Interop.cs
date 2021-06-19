@@ -110,6 +110,15 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_delegate")]
         public static extern byte pattern_ffi_slice_delegate(InteropDelegate_fn_FFISliceu8_rval_u8 callback);
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ambiguous_1")]
+        public static extern Vec1 ambiguous_1(Vec1 x);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ambiguous_2")]
+        public static extern Vec2 ambiguous_2(Vec2 x);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ambiguous_3")]
+        public static extern bool ambiguous_3(Vec1 x, Vec2 y);
+
     }
 
     /// Documented enum.
@@ -178,6 +187,22 @@ namespace My.Company
     public partial struct UseAsciiStringPattern
     {
         public string ascii_string;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct Vec1
+    {
+        public float x;
+        public float y;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct Vec2
+    {
+        public double x;
+        public double z;
     }
 
     [Serializable]

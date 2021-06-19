@@ -14,7 +14,7 @@ where
     T: CTypeInfo,
 {
     fn type_info() -> CType {
-        let mut composite = CompositeType::new(format!("FFIOption{}", T::type_info().internal_name()));
+        let mut composite = CompositeType::new(format!("FFIOption{}", T::type_info().name_within_lib()));
         composite.add_field(Field::new("t".to_string(), T::type_info()));
         composite.add_field(Field::new("is_some".to_string(), CType::Primitive(PrimitiveType::U8)));
         CType::Composite(composite)
