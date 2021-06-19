@@ -92,7 +92,7 @@ pub fn ffi_type_enum(attr: FFITypeAttributes, input: TokenStream, item: ItemEnum
     let ctype_info_return = if attr.patterns.contains_key("success_enum") {
         quote! {
             let success_variant = Self::SUCCESS.variant_info();
-            let the_success_enum = interoptopus::patterns::successenum::SuccessEnum::new(rval, success_variant);
+            let the_success_enum = interoptopus::patterns::success_enum::SuccessEnum::new(rval, success_variant);
             let the_pattern = interoptopus::patterns::TypePattern::SuccessEnum(the_success_enum);
             interoptopus::lang::c::CType::Pattern(the_pattern)
         }
