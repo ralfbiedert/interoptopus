@@ -14,9 +14,11 @@ where
     T: CTypeInfo,
 {
     fn type_info() -> CType {
-        let mut composite = CompositeType::new(format!("FFIOption{}", T::type_info().name_within_lib()));
-        composite.add_field(Field::new("t".to_string(), T::type_info()));
-        composite.add_field(Field::new("is_some".to_string(), CType::Primitive(PrimitiveType::U8)));
+        let mut fields = Vec::new();
+        fields.push(Field::new("t".to_string(), T::type_info()));
+        fields.push(Field::new("is_some".to_string(), CType::Primitive(PrimitiveType::U8)));
+
+        let mut composite = CompositeType::new(format!("FFIOption{}", T::type_info().name_within_lib()), fields);
         CType::Composite(composite)
     }
 }

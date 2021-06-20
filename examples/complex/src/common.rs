@@ -42,11 +42,14 @@ fn third_party_option() -> CType {
 
 // We can use this function wherever we refer to `ThirdPartyVecF32`.
 fn third_party_vec_f32() -> CType {
-    let mut composite = CompositeType::new("ThirdPartyVecF32".to_string());
-    composite.add_field(Field::new("x".to_string(), CType::Primitive(PrimitiveType::F32)));
-    composite.add_field(Field::new("y".to_string(), CType::Primitive(PrimitiveType::F32)));
-    composite.add_field(Field::new("z".to_string(), CType::Primitive(PrimitiveType::F32)));
-    composite.add_field(Field::new("w".to_string(), CType::Primitive(PrimitiveType::F32)));
+    let fields = vec![
+        Field::new("x".to_string(), CType::Primitive(PrimitiveType::F32)),
+        Field::new("y".to_string(), CType::Primitive(PrimitiveType::F32)),
+        Field::new("z".to_string(), CType::Primitive(PrimitiveType::F32)),
+        Field::new("w".to_string(), CType::Primitive(PrimitiveType::F32)),
+    ];
+
+    let composite = CompositeType::new("ThirdPartyVecF32".to_string(), fields);
     CType::Composite(composite)
 }
 

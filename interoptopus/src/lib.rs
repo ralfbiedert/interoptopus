@@ -4,7 +4,9 @@
 //! [![docs]][docs.rs]
 //! ![MIT]
 //!
-//! # Interoptopus — 🦀  →  🐙 →  Python, C#, C, ...
+//! # Interoptopus
+//!
+//! 🦀  →  🐙 →  Python, C#, C, ...
 //!
 //! Create FFI bindings to your favorite language. Composable. Escape hatches included.
 //!
@@ -16,9 +18,9 @@
 //! - wrote an `extern "C"` API in Rust
 //! - need C#, Python, C, ... bindings to your library, all at the same time
 //! - prefer having fine-grained control over your API and interop generation
-//! - would like to use some QoL [patterns](crate::patterns) in both Rust and your target language (e.g., [options](crate::patterns::option), [slices](crate::patterns::slice), '[classes](crate::patterns::class)') where feasible
-//! - possibly want to create your own bindings for a not-yet supported language
-//! - prefer to keep all your binding-related information (e.g., documentation) in Rust code
+//! - would like to use quality-of-life [patterns](crate::patterns) on both sides (e.g., [options](crate::patterns::option), [slices](crate::patterns::slice), '[classes](crate::patterns::class)') where feasible
+//! - create your own bindings for a not-yet supported language
+//! - want all your binding-related information (e.g., documentation) in Rust code
 //!
 //! ... then Interoptopus might be for you.
 //!
@@ -149,41 +151,27 @@
 //! on the module level, although smaller scopes are preferred. For example, creating a `FFISlice`
 //! from Rust and directly using it from Rust must never cause UB.
 //!
-//! - We must never willingly generate broken bindings; that is, bindings which
-//! "cannot be used correctly" (e.g., map a `u8` to a `float`). That said
-//! there are situations where the soundness of a binding invocation depends on conditions outside
-//! our control. In these cases we will trust foreign code will invoke the generated functions
+//! - We must never willingly generate broken bindings. For _low level types_ we must never
+//! generate bindings which "cannot be used correctly" (e.g., map a `u8` to a `float`), for
+//! _patterns_ we must generate bindings that are "correct if used according to specification".
+//!
+//! - There are situations where the (Rust) soundness of a binding invocation depends on conditions outside
+//! our control. In these cases we trust foreign code will invoke the generated functions
 //! correctly. For example, if a function is called with an `AsciiPointer` type we consider it _safe and sound_
 //! to obtain a `str` from this pointer as `AsciiPointer`'s contract specifies it must point to
-//! ASCII data. <sup>1</sup>
+//! ASCII data.
 //!
-//! - Related to the previous point we generally assume functions and types on the other side will be used _appropriately_.
-//! In particular, but not limited to:
-//!     - passed references must always point to valid data,
-//!     - Options to references may also be `null`,
-//!     - FFI code respects any declared or required thread safety and it is up to the developer to ensure and communicate these,
-//!     - the host process doesn't do anything that would be considered "bad taste" w.r.t. Rust's owned memory,
-//!     - all `#[repr()]`, `extern "C"` and `#[no_mangle]` attributes have been applied correctly by the developer.
-//!
-//!     It is your responsibility to communicate and / or uphold these conditions in your documenation and wrapping code.
-//!
-//!     In summary, these points do not try to impose _additional_ requirements, they merely state
-//!     conditions you would have to uphold _in any case_ had you written your own bindings
-//!     for the functions and types involved.
+//! - Related to the previous point we generally assume functions and types on both sides are used _appropriately_ w.r.t.
+//! Rust's FFI requirements and we trust you do that, e.g., you must declare types `#[repr(C)]` (or similar)
+//! and functions `extern "C"`.
 //!
 //! - Any `unsafe` code in any abstraction we provide should be "well contained", properly documented
 //! and reasonably be auditable.
 //!
-//! - If 'unsound bindings' were ever needed (e.g., because of a lack of Rust specification,
+//! - If unsound Rust types or bindings were ever needed (e.g., because of a lack of Rust specification,
 //! like 'safely' mapping a trait's vtable) such bindings should be gated behind a feature flag
-//! (e.g., `unsound`) and only enabled via an explicit opt-in.
-//!
-//! <sup>1</sup> The reason for not declaring such potential contract violations `unsafe` is that,
-//! in our opinon, nothing would be gained from doing so. If we assume some contracts could be
-//! broken then any contract can be broken, including contracts essential to Rust's
-//! machine abstraction (e.g., nothing can stop C from writing 100 additional bytes before and after
-//! that ASCII pointer and there is no way to detect it from Rust). In other words, for Rust embedded
-//! as a C library the _entire code base_ already executes under the latent threat of UB.
+//! (e.g., `unsound`) and only enabled via an explicit opt-in. Right now there are none, but this is
+//! to set expectations around discussions.
 //!
 //!
 //! ## Contributing

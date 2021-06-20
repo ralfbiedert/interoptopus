@@ -21,6 +21,9 @@ pub struct FFITypeAttributes {
 
     #[darling(default)]
     name: Option<String>,
+
+    #[darling(default)]
+    namespace: Option<String>,
 }
 
 fn derive_variant_info(item: ItemEnum, idents: &[Ident], names: &[String], values: &[i32], docs: &[String]) -> TokenStream {
@@ -89,6 +92,7 @@ pub fn ffi_type_enum(attr: FFITypeAttributes, input: TokenStream, item: ItemEnum
     }
 
     let variant_infos = derive_variant_info(item, &variant_idents, &variant_names, &variant_values, &variant_docs);
+
     let ctype_info_return = if attr.patterns.contains_key("success_enum") {
         quote! {
             let success_variant = Self::SUCCESS.variant_info();
@@ -109,12 +113,14 @@ pub fn ffi_type_enum(attr: FFITypeAttributes, input: TokenStream, item: ItemEnum
             fn type_info() -> interoptopus::lang::c::CType {
                 use interoptopus::lang::rust::VariantInfo;
 
+                let mut variants = std::vec::Vec::new();
                 let documentation = interoptopus::lang::c::Documentation::from_line(#doc_line);
-                let mut rval = interoptopus::lang::c::EnumType::new(#name.to_string(), documentation);
 
                 #({
-                    rval.add_variant(Self::#variant_idents.variant_info());
+                    variants.push(Self::#variant_idents.variant_info());
                 })*
+
+                let rval = interoptopus::lang::c::EnumType::new(#name.to_string(), variants, documentation);
 
                 #ctype_info_return
             }
@@ -196,15 +202,15 @@ pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemSt
             fn type_info() -> interoptopus::lang::c::CType {
 
                 let documentation = interoptopus::lang::c::Documentation::from_line(#doc_line);
-
-                let mut rval = interoptopus::lang::c::CompositeType::with_documentation(#c_struct_name.to_string(), documentation);
+                let mut fields = std::vec::Vec::new();
 
                 #({
                     let documentation = interoptopus::lang::c::Documentation::from_line(#field_docs);
                     let the_type = #field_types;
-                    rval.add_field(interoptopus::lang::c::Field::with_documentation(#field_names.to_string(), the_type, documentation));
+                    fields.push(interoptopus::lang::c::Field::with_documentation(#field_names.to_string(), the_type, documentation));
                 })*
 
+                let rval = interoptopus::lang::c::CompositeType::with_documentation(#c_struct_name.to_string(), fields, documentation);
                 interoptopus::lang::c::CType::Composite(rval)
             }
         }

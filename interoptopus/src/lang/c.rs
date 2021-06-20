@@ -204,16 +204,8 @@ pub struct EnumType {
 }
 
 impl EnumType {
-    pub fn new(name: String, documentation: Documentation) -> Self {
-        Self {
-            name,
-            variants: Vec::new(),
-            documentation,
-        }
-    }
-
-    pub fn add_variant(&mut self, variant: Variant) {
-        self.variants.push(variant);
+    pub fn new(name: String, variants: Vec<Variant>, documentation: Documentation) -> Self {
+        Self { name, variants, documentation }
     }
 
     pub fn rust_name(&self) -> &str {
@@ -281,23 +273,14 @@ pub struct CompositeType {
 }
 
 impl CompositeType {
-    /// Creates a new composite with the given name and no fields nor documentation.
-    pub fn new(name: String) -> Self {
-        Self::with_documentation(name, Documentation::new())
+    /// Creates a new composite with the given name and fields and no documentation.
+    pub fn new(name: String, fields: Vec<Field>) -> Self {
+        Self::with_documentation(name, fields, Documentation::new())
     }
 
     /// Creates a new composite with the given name and type-level documentation.
-    pub fn with_documentation(name: String, documentation: Documentation) -> Self {
-        Self {
-            name,
-            fields: Vec::new(),
-            documentation,
-        }
-    }
-
-    /// Adds a field to this composite.
-    pub fn add_field(&mut self, field: Field) {
-        self.fields.push(field);
+    pub fn with_documentation(name: String, fields: Vec<Field>, documentation: Documentation) -> Self {
+        Self { name, fields, documentation }
     }
 
     /// Gets the type's name `

@@ -14,8 +14,7 @@ pub struct SomeForeignType {
 
 // Surrogate we can use instead of `SomeForeignType`
 pub fn some_foreign_type() -> CType {
-    let mut composite = CompositeType::new("SomeForeignType".to_string());
-    composite.add_field(Field::new("x".to_string(), CType::Primitive(PrimitiveType::U32)));
+    let composite = CompositeType::new("SomeForeignType".to_string(), vec![Field::new("x".to_string(), CType::Primitive(PrimitiveType::U32))]);
     CType::Composite(composite)
 }
 
@@ -149,5 +148,16 @@ pub mod ambiguous2 {
     pub enum Status {
         X = 100,
         Z = 200,
+    }
+}
+
+pub mod common {
+    use interoptopus::ffi_type;
+
+    #[ffi_type(namespace = "common")]
+    #[repr(C)]
+    pub struct Vec {
+        pub x: f64,
+        pub z: f64,
     }
 }
