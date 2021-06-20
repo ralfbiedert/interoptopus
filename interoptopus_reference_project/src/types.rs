@@ -157,7 +157,7 @@ pub mod ambiguous2 {
 pub mod common {
     use interoptopus::ffi_type;
 
-    #[ffi_type(namespace = "common")]
+    #[ffi_type(export_module = "common")]
     #[repr(C)]
     pub struct Vec {
         pub x: f64,

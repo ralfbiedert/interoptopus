@@ -9,8 +9,8 @@
 //!
 //! where
 //!
-//! - `mmO` refers to a `&mut *mut Receiver`, `*mut *mut Receiver` or `Option<&mut *mut Receiver>`,
-//! - `mO` refers to a `&mut Receiver`, `*mut Receiver` or `Option<&mut Receiver>`,
+//! - `mmR` refers to a `&mut *mut Receiver`, `*mut *mut Receiver` or `Option<&mut *mut Receiver>`,
+//! - `mR` refers to a `&mut Receiver`, `*mut Receiver` or `Option<&mut Receiver>`,
 //! - `E` to a [success enum](crate::patterns::success_enum),
 //! - `...` ane `?` to arbitrary types.
 //!

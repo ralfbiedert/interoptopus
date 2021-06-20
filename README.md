@@ -31,7 +31,7 @@ If you ...
 - if you target only a single language and don't care about your FFI layer other solutions might be better
 
 
-### Supported Languages & Example
+### Example & Backends
 
 Assume you have written this Rust FFI code:
 
@@ -57,13 +57,16 @@ interoptopus::inventory_function!(ffi_inventory, [], [my_game_function], []);
 
 You can now use one of these backends to generate interop code:
 
-| Language | Crate | Comment |
-| --- | --- | --- |
-| C# (incl. Unity) | [**interoptopus_backend_csharp**](https://crates.io/crates/interoptopus_backend_csharp) |  Built-in. |
-| C | [**interoptopus_backend_c**](https://crates.io/crates/interoptopus_backend_c) | Built-in. |
-| Python [CFFI](https://cffi.readthedocs.io/en/latest/index.html) | [**interoptopus_backend_cpython_cffi**](https://crates.io/crates/interoptopus_backend_cpython_cffi) | Built-in. |
-| Your language | Write your own backend! | See existing backends for what to do. |
+| Language | Crate | Sample Output | Comment |
+| --- | --- | --- | --- |
+| C# (incl. Unity) | [**interoptopus_backend_csharp**](https://crates.io/crates/interoptopus_backend_csharp) | [Interop.cs](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_csharp/tests/output/Interop.cs) | Built-in. |
+| C | [**interoptopus_backend_c**](https://crates.io/crates/interoptopus_backend_c) | [my_header.h](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_c/tests/output/my_header.h) | Built-in.|
+| Python [CFFI](https://cffi.readthedocs.io/en/latest/index.html) | [**interoptopus_backend_cpython_cffi**](https://crates.io/crates/interoptopus_backend_cpython_cffi) | [reference.py](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_cpython_cffi/tests/output/reference_project.py) | Built-in.  |
+| Your language | Write your own backend! | - | See existing backends. |
 
+### Features
+
+See the [reference project](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src) for a list of all supported features.
 
 ### Current Status
 

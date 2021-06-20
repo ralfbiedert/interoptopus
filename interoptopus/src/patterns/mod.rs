@@ -18,7 +18,7 @@
 //! to a Python `class`.
 //!
 //! - The pattern is not supported and will be omitted **if the pattern was merely an aggregate** of
-//! existing items. Examples include the[`class`](crate::patterns::class) pattern in C which will not
+//! existing items. Examples include the [`class`](crate::patterns::class) pattern in C which will not
 //! be emitted. However, this will not pose a problem as all constituent types and methods (functions)
 //! are still available as raw bindings.
 //!
@@ -62,6 +62,8 @@ pub enum TypePattern {
 impl TypePattern {
     /// For languages like C that don't care about these patterns, give the
     /// C-equivalent fallback type.
+    ///
+    /// This function will never return a [`CType::Pattern`] variant.
     pub fn fallback_type(&self) -> CType {
         match self {
             TypePattern::AsciiPointer => CType::ReadPointer(Box::new(CType::Primitive(PrimitiveType::U8))),

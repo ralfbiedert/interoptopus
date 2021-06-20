@@ -2,7 +2,7 @@ use crate::lang::c::{CType, Constant, Function};
 use crate::patterns::LibraryPattern;
 use crate::util::ctypes_from_functions;
 
-/// Represents all FFI-relevant items, produced via [`crate::inventory_function`], ingested by backends.
+/// Represents all FFI-relevant items, produced via [`inventory_function`](crate::inventory_function), ingested by backends.
 #[derive(Clone, Debug, PartialOrd, PartialEq)]
 pub struct Library {
     functions: Vec<Function>,

@@ -32,7 +32,7 @@
 //! - if you target only a single language and don't care about your FFI layer other solutions might be better
 //!
 //!
-//! ## Supported Languages & Example
+//! ## Example & Backends
 //!
 //! Assume you have written this Rust FFI code:
 //!
@@ -58,13 +58,16 @@
 //!
 //! You can now use one of these backends to generate interop code:
 //!
-//! | Language | Crate | Comment |
-//! | --- | --- | --- |
-//! | C# (incl. Unity) | [**interoptopus_backend_csharp**](https://crates.io/crates/interoptopus_backend_csharp) |  Built-in. |
-//! | C | [**interoptopus_backend_c**](https://crates.io/crates/interoptopus_backend_c) | Built-in. |
-//! | Python [CFFI](https://cffi.readthedocs.io/en/latest/index.html) | [**interoptopus_backend_cpython_cffi**](https://crates.io/crates/interoptopus_backend_cpython_cffi) | Built-in. |
-//! | Your language | Write your own backend! | See existing backends for what to do. |
+//! | Language | Crate | Sample Output | Comment |
+//! | --- | --- | --- | --- |
+//! | C# (incl. Unity) | [**interoptopus_backend_csharp**](https://crates.io/crates/interoptopus_backend_csharp) | [Interop.cs](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_csharp/tests/output/Interop.cs) | Built-in. |
+//! | C | [**interoptopus_backend_c**](https://crates.io/crates/interoptopus_backend_c) | [my_header.h](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_c/tests/output/my_header.h) | Built-in.|
+//! | Python [CFFI](https://cffi.readthedocs.io/en/latest/index.html) | [**interoptopus_backend_cpython_cffi**](https://crates.io/crates/interoptopus_backend_cpython_cffi) | [reference.py](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_cpython_cffi/tests/output/reference_project.py) | Built-in.  |
+//! | Your language | Write your own backend! | - | See existing backends. |
 //!
+//! ## Features
+//!
+//! See the [reference project](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src) for a list of all supported features.
 //!
 //! ## Current Status
 //!
@@ -135,7 +138,22 @@ pub mod lang {
 /// will have the signature `fn f() -> Library`, where [`Library`] represents all functions,
 /// types, constants and documentation exported by this crate over the FFI boundary.
 ///
-/// Constants and functions must be declared; types are determined automatically.
+/// # Usage
+///
+/// This macro must be invoked with exactly 4 parameters:
+///
+/// ```
+/// inventory_function!(symbol, consts, functions, patterns);
+/// ```
+///
+/// Where
+/// - `symbol` - the name of the exported inventory function producing a [`Library`],
+/// - `consts` - a list of [`#[ffi_constant]`](crate::ffi_constant) constants to include `[C1, C2, ...]`,
+/// - `functions` - a list of [`#[ffi_function]`](crate::ffi_function) functions to include `[f1, f2, ...]`,
+/// - `patterns` - a list of [`LibraryPattern`](crate::patterns::LibraryPattern) to include `[p1, ...]`,
+///
+/// Any of `consts`, `functions` or `patters` can be an empty list `[]` instead. Types are always
+/// inferred automatically based on the used functions.
 ///
 /// # Example
 ///

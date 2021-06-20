@@ -23,7 +23,7 @@ pub struct FFITypeAttributes {
     name: Option<String>,
 
     #[darling(default)]
-    namespace: Option<String>,
+    export_module: Option<String>,
 }
 
 fn derive_variant_info(item: ItemEnum, idents: &[Ident], names: &[String], values: &[i32], docs: &[String]) -> TokenStream {
