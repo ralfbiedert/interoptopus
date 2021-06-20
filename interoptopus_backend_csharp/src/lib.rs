@@ -56,13 +56,17 @@ use interoptopus::writer::IndentWriter;
 use interoptopus::Interop;
 use interoptopus::{Error, Library};
 
+/// Configures C# code generation.
 #[derive(Clone, Debug)]
 pub struct Config {
+    /// The file header, e.g., `// (c) My Company`.
     pub file_header_comment: String,
+    /// Namespace for this module, e.g., `My.Company`.
     pub namespace: String,
+    /// Static class for Interop methods, e.g., `Interop`.
     pub class: String,
+    /// DLL to load, e.g., `my_library`.
     pub dll_name: String,
-    pub strip_from_fn: Option<String>,
 }
 
 impl Default for Config {
@@ -72,11 +76,11 @@ impl Default for Config {
             namespace: "My.Company".to_string(),
             class: "Interop".to_string(),
             dll_name: "library".to_string(),
-            strip_from_fn: None,
         }
     }
 }
 
+/// Helper type implementing [`InteropCSharp`] and [`Interop`].
 pub struct Generator {
     config: Config,
     library: Library,
@@ -88,6 +92,7 @@ impl Generator {
     }
 }
 
+/// Contains all C# generators, create sub-trait to customize.
 pub trait InteropCSharp {
     /// Returns the user config.
     fn config(&self) -> &Config;

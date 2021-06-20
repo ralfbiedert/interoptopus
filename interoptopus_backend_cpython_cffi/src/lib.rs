@@ -63,12 +63,17 @@ use interoptopus::Interop;
 use interoptopus::{Error, Library};
 use interoptopus_backend_c::InteropC;
 
+/// Configures Python code generation.
 #[derive(Clone, Debug)]
 pub struct Config {
-    init_api_function_name: String,
-    ffi_attribute: String,
-    raw_fn_namespace: String,
-    callback_namespace: String,
+    /// How to name the function responsible for loading the DLL, e.g., `init_api`.
+    pub init_api_function_name: String,
+    /// Attribute by which the `cffi` object is exposed, e.g., `ffi`.
+    pub ffi_attribute: String,
+    /// Namespace to put functions into, e.g., `raw`.
+    pub raw_fn_namespace: String,
+    /// Namespace for callback helpers, e.g., `callbacks`.
+    pub callback_namespace: String,
 }
 
 impl Default for Config {
@@ -82,6 +87,7 @@ impl Default for Config {
     }
 }
 
+/// Helper type implementing [`InteropCPythonCFFI`] and [`Interop`].
 pub struct Generator {
     c_generator: interoptopus_backend_c::Generator,
     config: Config,
@@ -104,6 +110,7 @@ impl Generator {
     }
 }
 
+/// Contains all Python generators, create sub-trait to customize.
 pub trait InteropCPythonCFFI: Interop {
     /// Returns the user config.
     fn config(&self) -> &Config;
