@@ -7,7 +7,7 @@
 
 🦀  →  🐙 →  Python, C#, C, ...
 
-FFI bindings to your favorite language. Composable. Sane. Escape hatches included.
+FFI bindings to your favorite language. Composable. Explicit. Escape hatches included.
 
 
 ### Overview

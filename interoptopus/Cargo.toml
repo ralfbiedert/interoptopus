@@ -1,6 +1,6 @@
 [package]
 name = "interoptopus"
-description = "FFI bindings to your favorite language. Composable. Sane. Escape hatches included."
+description = "FFI bindings to your favorite language. Composable. Explicit. Escape hatches included."
 authors = ["Ralf Biedert <rb@xr.io>"]
 version = "0.1.7"
 edition = "2018"
