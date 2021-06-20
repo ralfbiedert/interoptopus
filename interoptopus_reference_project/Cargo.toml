@@ -9,6 +9,7 @@ documentation = "https://docs.rs/interoptopus_reference_project/"
 repository = "https://github.com/ralfbiedert/interoptopus"
 
 [lib]
+path = "src/lib.rs"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]

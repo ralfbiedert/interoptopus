@@ -1,3 +1,5 @@
+//! All supported type patterns.
+
 use interoptopus::ffi_type;
 use interoptopus::lang::c::{CType, CompositeType, Field, PrimitiveType};
 use interoptopus::lang::rust::CTypeInfo;

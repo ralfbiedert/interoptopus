@@ -1,3 +1,5 @@
+//! Various ways to define constants.
+
 use interoptopus::ffi_constant;
 
 const fn f(x: i32) -> i32 {

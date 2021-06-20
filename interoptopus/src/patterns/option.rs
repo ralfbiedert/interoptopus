@@ -18,7 +18,7 @@ where
         fields.push(Field::new("t".to_string(), T::type_info()));
         fields.push(Field::new("is_some".to_string(), CType::Primitive(PrimitiveType::U8)));
 
-        let mut composite = CompositeType::new(format!("FFIOption{}", T::type_info().name_within_lib()), fields);
+        let composite = CompositeType::new(format!("FFIOption{}", T::type_info().name_within_lib()), fields);
         CType::Composite(composite)
     }
 }

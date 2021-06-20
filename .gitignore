@@ -17,4 +17,3 @@ examples/complex/bindings/c/cmake-build-debug
 *.actual
 *.generated
 __pycache__
-interoptopus/README.md

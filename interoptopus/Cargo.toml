@@ -1,6 +1,6 @@
 [package]
 name = "interoptopus"
-description = "🦀 → 🐙 → Python, C#, C, … FFI bindings to your favorite language. Composable. Escape hatches included."
+description = "FFI bindings to your favorite language. Composable. Sane. Escape hatches included."
 authors = ["Ralf Biedert <rb@xr.io>"]
 version = "0.1.6"
 edition = "2018"
@@ -18,3 +18,8 @@ cc = { version = "1.0.68", optional = true }
 
 [dev-dependencies]
 interoptopus_backend_csharp = { path = "../interoptopus_backend_csharp", version = "0.1" }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+

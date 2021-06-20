@@ -1,3 +1,5 @@
+//! Functions using all supported type patterns.
+
 use crate::types::{
     ambiguous1, ambiguous2, common, some_foreign_type, CallbackFFISlice, Callbacku8u8, Context, Empty, EnumDocumented, FFIError, Generic, Opaque, Phantom,
     SomeForeignType, StructDocumented, UseAsciiStringPattern, Vec3f32,

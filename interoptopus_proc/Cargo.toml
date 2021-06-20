@@ -9,6 +9,7 @@ documentation = "https://docs.rs/interoptopus_proc/"
 repository = "https://github.com/ralfbiedert/interoptopus"
 
 [lib]
+path = "src/lib.rs"
 proc-macro = true
 
 [dependencies]

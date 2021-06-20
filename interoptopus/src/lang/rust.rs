@@ -159,7 +159,7 @@ where
     R: CTypeInfo,
 {
     fn type_info() -> CType {
-        let mut sig = FunctionSignature::new(vec![], R::type_info());
+        let sig = FunctionSignature::new(vec![], R::type_info());
         CType::FnPointer(FnPointerType::new(sig))
     }
 }
@@ -169,7 +169,7 @@ where
     R: CTypeInfo,
 {
     fn type_info() -> CType {
-        let mut sig = FunctionSignature::new(vec![], R::type_info());
+        let sig = FunctionSignature::new(vec![], R::type_info());
         CType::FnPointer(FnPointerType::new(sig))
     }
 }

@@ -55,6 +55,12 @@ typedef struct UseAsciiStringPattern
     uint8_t* ascii_string;
     } UseAsciiStringPattern;
 
+typedef struct Vec
+    {
+    double x;
+    double z;
+    } Vec;
+
 typedef struct Vec1
     {
     float x;
@@ -130,6 +136,7 @@ uint8_t pattern_ffi_slice_delegate(fptr_fn_FFISliceu8_rval_u8 callback);
 Vec1 ambiguous_1(Vec1 x);
 Vec2 ambiguous_2(Vec2 x);
 bool ambiguous_3(Vec1 x, Vec2 y);
+Vec namespaced_type(Vec x);
 
 #ifdef __cplusplus
 }
