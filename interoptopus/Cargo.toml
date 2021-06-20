@@ -2,7 +2,7 @@
 name = "interoptopus"
 description = "FFI bindings to your favorite language. Composable. Sane. Escape hatches included."
 authors = ["Ralf Biedert <rb@xr.io>"]
-version = "0.1.6"
+version = "0.1.7"
 edition = "2018"
 license = "MIT"
 documentation = "https://docs.rs/interoptopus/"
