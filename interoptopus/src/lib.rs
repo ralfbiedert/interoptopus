@@ -73,7 +73,7 @@
 //!
 //! ## FAQ
 //!
-//! - [FAQ and Safety Guides](https://github.com/ralfbiedert/interoptopus/blob/master/TODO.md).
+//! - [FAQ and Safety Guides](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md).
 //!
 //! ## Contributing
 //!

@@ -72,7 +72,7 @@ You can now use one of these backends to generate interop code:
 
 ### FAQ
 
-- [FAQ and Safety Guides](https://github.com/ralfbiedert/interoptopus/blob/master/TODO.md).
+- [FAQ and Safety Guides](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md).
 
 ### Contributing
 
