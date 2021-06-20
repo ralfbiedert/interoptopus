@@ -1,6 +1,6 @@
 [package]
 name = "interoptopus"
-description = "FFI bindings to your favorite language. Composable. Explicit. Escape hatches included."
+description = "FFI bindings to your favorite language. Composable. Explicit. Escape hatchets included."
 authors = ["Ralf Biedert <rb@xr.io>"]
 keywords = ["ffi", "code-generation", "bindings"]
 categories = ["api-bindings", "development-tools::ffi"]

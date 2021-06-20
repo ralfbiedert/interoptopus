@@ -8,7 +8,7 @@
 //!
 //! 🦀  →  🐙 →  Python, C#, C, ...
 //!
-//! FFI bindings to your favorite language. Composable. Explicit. Escape hatches included.
+//! FFI bindings to your favorite language. Composable. Explicit. Escape hatchets included.
 //!
 //!
 //! ## Overview
@@ -19,8 +19,8 @@
 //! - need C#, Python, C, ... bindings to your library, all at the same time
 //! - prefer having fine-grained control over your API and interop generation
 //! - would like to use quality-of-life [patterns](crate::patterns) on both sides (e.g., [options](crate::patterns::option), [slices](crate::patterns::slice), '[classes](crate::patterns::class)') where feasible
-//! - create your own bindings for a not-yet supported language
-//! - want all your binding-related information (e.g., documentation) in Rust code
+//! - want to create your own bindings for a not-yet supported language
+//! - think living Rust code should be your FFI [single source of truth](https://en.wikipedia.org/wiki/Single_source_of_truth)
 //!
 //! ... then Interoptopus might be for you.
 //!
@@ -41,7 +41,7 @@
 //!
 //! #[ffi_type]
 //! #[repr(C)]
-//! pub struct Vec3f32 {
+//! pub struct Vec3 {
 //!     pub x: f32,
 //!     pub y: f32,
 //!     pub z: f32,
@@ -49,17 +49,17 @@
 //!
 //! #[ffi_function]
 //! #[no_mangle]
-//! pub extern "C" fn my_game_function(input: Option<&Vec3f32>) -> Vec3f32 {
-//!     Vec3f32 { x: 2.0, y: 4.0, z: 6.0 }
+//! pub extern "C" fn my_function(input: Vec3) -> Vec3 {
+//!     Vec3 { x: 2.0, y: 4.0, z: input.z }
 //! }
 //!
-//! interoptopus::inventory_function!(ffi_inventory, [], [my_game_function], []);
+//! interoptopus::inventory_function!(ffi_inventory, [], [my_function], []);
 //! ```
 //!
 //! You can now use one of these backends to generate interop code:
 //!
-//! | Language | Crate | Sample Output
-//! | --- | --- | --- | --- |
+//! | Language | Crate | Sample Output |
+//! | --- | --- | --- |
 //! | C# (incl. Unity) | [**interoptopus_backend_csharp**](https://crates.io/crates/interoptopus_backend_csharp) | [Interop.cs](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_csharp/tests/output/Interop.cs) |
 //! | C | [**interoptopus_backend_c**](https://crates.io/crates/interoptopus_backend_c) | [my_header.h](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_c/tests/output/my_header.h) |
 //! | Python [CFFI](https://cffi.readthedocs.io/en/latest/index.html) | [**interoptopus_backend_cpython_cffi**](https://crates.io/crates/interoptopus_backend_cpython_cffi) | [reference.py](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_cpython_cffi/tests/output/reference_project.py) |
@@ -71,6 +71,7 @@
 //!
 //! ## Current Status
 //!
+//! - June 20, 2021 - Alpha. Has generated simple working<sup>TM</sup> bindings for a few projects for a week now, many things missing.
 //! - June 13, 2021 - Pre-alpha. Has generated C#, C, Python-CFFI bindings at least once, many things missing, untested.
 //!
 //!
@@ -142,7 +143,8 @@ pub mod lang {
 ///
 /// This macro must be invoked with exactly 4 parameters:
 ///
-/// ```
+/// ```ignore
+/// # use interoptopus::inventory_function;
 /// inventory_function!(symbol, consts, functions, patterns);
 /// ```
 ///
