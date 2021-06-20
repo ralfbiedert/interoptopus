@@ -122,6 +122,9 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ambiguous_3")]
         public static extern bool ambiguous_3(Vec1 x, Vec2 y);
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "namespaced_type")]
+        public static extern Vec namespaced_type(Vec x);
+
     }
 
     /// Documented enum.
@@ -190,6 +193,14 @@ namespace My.Company
     public partial struct UseAsciiStringPattern
     {
         public string ascii_string;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct Vec
+    {
+        public double x;
+        public double z;
     }
 
     [Serializable]

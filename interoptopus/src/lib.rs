@@ -8,7 +8,7 @@
 //!
 //! 🦀  →  🐙 →  Python, C#, C, ...
 //!
-//! Create FFI bindings to your favorite language. Composable. Escape hatches included.
+//! FFI bindings to your favorite language. Composable. Sane. Escape hatches included.
 //!
 //!
 //! ## Overview
@@ -184,8 +184,8 @@
 //! is a major change; which doesn't mean we're opposed to breaking stuff before 1.0, just that
 //! we'd like to talk about it before it happens.
 //!
-//! - New features or patterns must be materialized in the reference project and accompanied by a
-//! an interop test (i.e., a backend test running C# or Python against a DLL invoking that code)
+//! - New features or patterns must be materialized in the reference project and accompanied by
+//! an interop test (i.e., a backend test running C# / Python against a DLL invoking that code)
 //! in at least one included backend.
 //!
 //! Also, please read the next section.

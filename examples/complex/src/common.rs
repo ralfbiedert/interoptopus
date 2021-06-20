@@ -21,7 +21,7 @@ pub struct SuperComplexEntity {
     pub player_1: Vec2f32,
     pub player_2: Vec2f32,
     pub ammo: u64,
-    /// Point to a ASCII encoded whatnot.
+    /// Point to an ASCII encoded whatnot.
     pub some_str: *const u8,
     pub str_len: u32,
 }

@@ -70,7 +70,7 @@ namespace My.Company
         public Vec2f32 player_1;
         public Vec2f32 player_2;
         public ulong ammo;
-        /// Point to a ASCII encoded whatnot.
+        /// Point to an ASCII encoded whatnot.
         public IntPtr some_str;
         public uint str_len;
     }

@@ -41,7 +41,8 @@ interoptopus::inventory_function!(
         functions::pattern_ffi_slice_delegate,
         functions::ambiguous_1,
         functions::ambiguous_2,
-        functions::ambiguous_3
+        functions::ambiguous_3,
+        functions::namespaced_type
     ],
     [my_class_pattern_context]
 );
