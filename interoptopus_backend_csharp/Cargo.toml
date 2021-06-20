@@ -5,6 +5,8 @@ authors = ["Ralf Biedert <rb@xr.io>"]
 version = "0.1.7"
 edition = "2018"
 license = "MIT"
+keywords = ["ffi", "code-generation", "bindings", "c#", "csharp"]
+categories = ["api-bindings", "development-tools::ffi"]
 documentation = "https://docs.rs/interoptopus_backend_csharp/"
 repository = "https://github.com/ralfbiedert/interoptopus"
 

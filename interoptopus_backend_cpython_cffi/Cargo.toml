@@ -4,6 +4,8 @@ description = "Generates CPython CFFI bindings."
 version = "0.1.7"
 edition = "2018"
 license = "MIT"
+keywords = ["ffi", "code-generation", "bindings", "python", "cffi"]
+categories = ["api-bindings", "development-tools::ffi"]
 documentation = "https://docs.rs/interoptopus_backend_cpython_cffi/"
 repository = "https://github.com/ralfbiedert/interoptopus"
 

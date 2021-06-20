@@ -2,6 +2,8 @@
 name = "interoptopus"
 description = "FFI bindings to your favorite language. Composable. Explicit. Escape hatches included."
 authors = ["Ralf Biedert <rb@xr.io>"]
+keywords = ["ffi", "code-generation", "bindings"]
+categories = ["api-bindings", "development-tools::ffi"]
 version = "0.1.7"
 edition = "2018"
 license = "MIT"
