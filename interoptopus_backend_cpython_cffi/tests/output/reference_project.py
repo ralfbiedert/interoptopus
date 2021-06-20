@@ -303,7 +303,9 @@ class raw:
         return _api.pattern_class_method(context)
 
     def pattern_class_destroy(context_ptr):
-        """"""
+        """# Safety
+
+This function may only be called with a context returned by a succeeding `pattern_class_create`."""
         global _api
         return _api.pattern_class_destroy(context_ptr)
 
@@ -358,7 +360,9 @@ class Context(object):
             raise Exception(f"return value ${rval}")
 
     def __del__(self):
-        """"""
+        """# Safety
+
+This function may only be called with a context returned by a succeeding `pattern_class_create`."""
         global _api, ffi
         rval = _api.pattern_class_destroy(self.ctx, )
         if rval == FFIError.Ok:

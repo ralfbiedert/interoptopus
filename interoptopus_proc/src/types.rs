@@ -88,7 +88,7 @@ pub fn ffi_type_enum(attr: FFITypeAttributes, input: TokenStream, item: ItemEnum
         }
     }
 
-    let variant_infos = derive_variant_info(item.clone(), &variant_idents, &variant_names, &variant_values, &variant_docs);
+    let variant_infos = derive_variant_info(item, &variant_idents, &variant_names, &variant_values, &variant_docs);
     let ctype_info_return = if attr.patterns.contains_key("success_enum") {
         quote! {
             let success_variant = Self::SUCCESS.variant_info();
@@ -141,12 +141,9 @@ pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemSt
     for generic in &item.generics.params {
         generic_params.push(quote! { #generic });
 
-        match generic {
-            GenericParam::Type(ty) => {
-                let ident = ty.ident.clone();
-                generic_params_needing_bounds.push(ident);
-            }
-            _ => {}
+        if let GenericParam::Type(ty) = generic {
+            let ident = ty.ident.clone();
+            generic_params_needing_bounds.push(ident);
         }
     }
 

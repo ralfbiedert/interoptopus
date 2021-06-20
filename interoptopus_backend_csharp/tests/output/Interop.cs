@@ -95,6 +95,9 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_method")]
         public static extern uint pattern_class_method(IntPtr context);
 
+        /// # Safety
+        /// 
+        /// This function may only be called with a context returned by a succeeding `pattern_class_create`.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_destroy")]
         public static extern FFIError pattern_class_destroy(out IntPtr context_ptr);
 

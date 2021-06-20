@@ -13,6 +13,7 @@ pub extern "C" fn primitive_void() {}
 
 #[ffi_function]
 #[no_mangle]
+#[allow(clippy::unused_unit)]
 pub extern "C" fn primitive_void2() -> () {}
 
 #[ffi_function]
@@ -183,7 +184,7 @@ pub extern "C" fn pattern_class_method(context: Option<&mut Context>) -> u32 {
         None => 0,
         Some(c) => {
             dbg!(c.some_field);
-            c.some_field = 2 * c.some_field;
+            c.some_field *= 2;
             c.some_field
         }
     }
@@ -201,6 +202,9 @@ pub extern "C" fn pattern_class_method_success_enum_fail(_context: Option<&mut C
     FFIError::Fail
 }
 
+/// # Safety
+///
+/// This function may only be called with a context returned by a succeeding `pattern_class_create`.
 #[ffi_function]
 #[no_mangle]
 #[allow(unused_unsafe)]
