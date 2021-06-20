@@ -102,7 +102,14 @@ pub trait InteropCPythonCFFI: Interop {
 
     fn write_constants(&self, w: &mut IndentWriter) -> Result<(), Error> {
         for constant in self.library().constants() {
-            let docs = constant.documentation().lines().iter().map(|x| format!("# {}", x)).collect::<Vec<_>>().join("\n");
+            let docs = constant
+                .meta()
+                .documentation()
+                .lines()
+                .iter()
+                .map(|x| format!("# {}", x))
+                .collect::<Vec<_>>()
+                .join("\n");
             w.indented(|w| writeln!(w, r#"{}"#, docs))?;
             w.indented(|w| writeln!(w, r#"{} = {}"#, constant.name(), self.constant_value_to_value(constant.value())))?;
         }
@@ -123,7 +130,7 @@ pub trait InteropCPythonCFFI: Interop {
     }
 
     fn write_enum(&self, w: &mut IndentWriter, e: &EnumType) -> Result<(), Error> {
-        let docs = e.documentation().lines().join("\n");
+        let docs = e.meta().documentation().lines().join("\n");
 
         w.indented(|w| writeln!(w, r#"class {}:"#, e.rust_name()))?;
         w.indent();
@@ -177,7 +184,7 @@ pub trait InteropCPythonCFFI: Interop {
 
         for function in self.library().functions() {
             let args = function.signature().params().iter().map(|x| x.name().to_string()).collect::<Vec<_>>().join(", ");
-            let docs = function.documentation().lines().join("\n");
+            let docs = function.meta().documentation().lines().join("\n");
 
             w.indented(|w| writeln!(w, r#"def {}({}):"#, function.name(), &args))?;
             w.indent();
@@ -254,7 +261,7 @@ pub trait InteropCPythonCFFI: Interop {
 
         // Ctor
         let args = self.pattern_class_args_without_first_to_string(class.constructor());
-        let docs = class.constructor().documentation().lines().join("\n");
+        let docs = class.constructor().meta().documentation().lines().join("\n");
         w.indented(|w| writeln!(w, r#"def __init__(self, {}):"#, args))?;
         w.indent();
         w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
@@ -265,7 +272,7 @@ pub trait InteropCPythonCFFI: Interop {
         w.newline()?;
 
         // Dtor
-        let docs = class.destructor().documentation().lines().join("\n");
+        let docs = class.destructor().meta().documentation().lines().join("\n");
         w.indented(|w| writeln!(w, r#"def __del__(self):"#))?;
         w.indent();
         w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
@@ -276,7 +283,7 @@ pub trait InteropCPythonCFFI: Interop {
 
         for function in class.methods() {
             let args = self.pattern_class_args_without_first_to_string(function);
-            let docs = function.documentation().lines().join("\n");
+            let docs = function.meta().documentation().lines().join("\n");
 
             w.indented(|w| writeln!(w, r#"def {}(self, {}):"#, function.name().replace(&common_prefix, ""), &args))?;
             w.indent();

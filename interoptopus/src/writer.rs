@@ -2,6 +2,7 @@
 use crate::Error;
 use std::io::Write;
 
+/// You might not realize how hard it can be to type exactly 4 spaces.
 pub const FOUR_SPACES: &str = "    ";
 
 /// Convenience helper to allow backends to write code with indentation.

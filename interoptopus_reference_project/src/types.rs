@@ -1,7 +1,8 @@
 use interoptopus::ffi_type;
 use interoptopus::lang::c::{CType, CompositeType, Field, PrimitiveType};
-use interoptopus::lang::rust::{CTypeInfo, CallbackXY};
+use interoptopus::lang::rust::CTypeInfo;
 use interoptopus::patterns::ascii_pointer::AsciiPointer;
+use interoptopus::patterns::callbacks::CallbackXY;
 use interoptopus::patterns::slice::FFISlice;
 use interoptopus::patterns::success_enum::Success;
 use std::marker::PhantomData;

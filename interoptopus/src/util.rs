@@ -54,13 +54,13 @@ pub fn sort_types_by_dependencies(mut types: Vec<CType>) -> Vec<CType> {
 /// # Example
 ///
 /// ```rust
-/// # use interoptopus::lang::c::{Function, Documentation, FunctionSignature};
+/// # use interoptopus::lang::c::{Function, FunctionSignature, Meta};
 /// # use interoptopus::util::longest_common_prefix;
 ///
 /// let functions = [
-///     Function::new("my_lib_f".to_string(), FunctionSignature::default(), Documentation::default()),
-///     Function::new("my_lib_g".to_string(), FunctionSignature::default(), Documentation::default()),
-///     Function::new("my_lib_h".to_string(), FunctionSignature::default(), Documentation::default()),
+///     Function::new("my_lib_f".to_string(), FunctionSignature::default(), Meta::default()),
+///     Function::new("my_lib_g".to_string(), FunctionSignature::default(), Meta::default()),
+///     Function::new("my_lib_h".to_string(), FunctionSignature::default(), Meta::default()),
 /// ];
 ///
 /// assert_eq!(longest_common_prefix(&functions), "my_lib_".to_string());

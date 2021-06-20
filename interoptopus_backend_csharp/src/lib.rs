@@ -207,7 +207,7 @@ pub trait InteropCSharp {
     }
 
     fn write_constant(&self, w: &mut IndentWriter, constant: &Constant) -> Result<(), Error> {
-        self.write_documentation(w, constant.documentation())?;
+        self.write_documentation(w, constant.meta().documentation())?;
 
         w.indented(|w| write!(w, r#"public const "#))?;
 
@@ -230,7 +230,7 @@ pub trait InteropCSharp {
     }
 
     fn write_function(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
-        self.write_documentation(w, function.documentation())?;
+        self.write_documentation(w, function.meta().documentation())?;
         self.write_function_annotation(w, function)?;
         self.write_function_declaration(w, function)?;
         Ok(())
@@ -338,7 +338,7 @@ pub trait InteropCSharp {
     }
 
     fn write_type_definition_enum(&self, w: &mut IndentWriter, the_type: &EnumType) -> Result<(), Error> {
-        self.write_documentation(w, the_type.documentation())?;
+        self.write_documentation(w, the_type.meta().documentation())?;
         w.indented(|w| writeln!(w, r#"public enum {}"#, the_type.rust_name()))?;
         w.indented(|w| writeln!(w, r#"{{"#))?;
         w.indent();
@@ -361,7 +361,7 @@ pub trait InteropCSharp {
     }
 
     fn write_type_definition_composite(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
-        self.write_documentation(w, the_type.documentation())?;
+        self.write_documentation(w, the_type.meta().documentation())?;
         self.write_type_definition_composite_annotation(w, the_type)?;
         self.write_type_definition_composite_body(w, the_type)?;
         Ok(())

@@ -34,9 +34,10 @@ pub fn ffi_constant(_attr: AttributeArgs, input: TokenStream) -> TokenStream {
             fn constant_info() -> interoptopus::lang::c::Constant {
 
                 let documentation = interoptopus::lang::c::Documentation::from_line(#doc_line);
+                let meta = interoptopus::lang::c::Meta::with_documentation(documentation);
                 let value = interoptopus::lang::c::ConstantValue::from(#const_ident);
 
-                interoptopus::lang::c::Constant::new(#const_name.to_string(), value, documentation)
+                interoptopus::lang::c::Constant::new(#const_name.to_string(), value, meta)
             }
         }
     }

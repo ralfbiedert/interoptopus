@@ -33,6 +33,7 @@ use crate::patterns::class::Class;
 use crate::patterns::success_enum::SuccessEnum;
 
 pub mod ascii_pointer;
+pub mod callbacks;
 pub mod class;
 pub mod option;
 pub mod slice;

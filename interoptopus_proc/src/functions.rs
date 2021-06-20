@@ -99,21 +99,22 @@ pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
         impl interoptopus::lang::rust::FunctionInfo for #function_ident {
             fn function_info() -> interoptopus::lang::c::Function {
 
-                let mut signature = interoptopus::lang::c::FunctionSignature::new();
-                let mut doc_lines = Vec::new();
+                let mut doc_lines = std::vec::Vec::new();
+                let mut params = std::vec::Vec::new();
 
-                signature.set_rval(#rval);
                 #(
-                    signature.add_param(interoptopus::lang::c::Parameter::new(#args_name.to_string(), #args_type));
+                    params.push(interoptopus::lang::c::Parameter::new(#args_name.to_string(), #args_type));
                 )*
 
                 #(
                     doc_lines.push(#docs.to_string());
                 )*
 
+                let mut signature = interoptopus::lang::c::FunctionSignature::new(params, #rval);
                 let documentation = interoptopus::lang::c::Documentation::from_lines(doc_lines);
+                let meta = interoptopus::lang::c::Meta::with_documentation(documentation);
 
-                interoptopus::lang::c::Function::new(#function_name.to_string(), signature, documentation)
+                interoptopus::lang::c::Function::new(#function_name.to_string(), signature, meta)
             }
         }
     };

@@ -115,12 +115,13 @@ pub fn ffi_type_enum(attr: FFITypeAttributes, input: TokenStream, item: ItemEnum
 
                 let mut variants = std::vec::Vec::new();
                 let documentation = interoptopus::lang::c::Documentation::from_line(#doc_line);
+                let meta = interoptopus::lang::c::Meta::with_documentation(documentation);
 
                 #({
                     variants.push(Self::#variant_idents.variant_info());
                 })*
 
-                let rval = interoptopus::lang::c::EnumType::new(#name.to_string(), variants, documentation);
+                let rval = interoptopus::lang::c::EnumType::new(#name.to_string(), variants, meta);
 
                 #ctype_info_return
             }
@@ -202,6 +203,7 @@ pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemSt
             fn type_info() -> interoptopus::lang::c::CType {
 
                 let documentation = interoptopus::lang::c::Documentation::from_line(#doc_line);
+                let mut meta = interoptopus::lang::c::Meta::with_documentation(documentation);
                 let mut fields = std::vec::Vec::new();
 
                 #({
@@ -210,7 +212,7 @@ pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemSt
                     fields.push(interoptopus::lang::c::Field::with_documentation(#field_names.to_string(), the_type, documentation));
                 })*
 
-                let rval = interoptopus::lang::c::CompositeType::with_documentation(#c_struct_name.to_string(), fields, documentation);
+                let rval = interoptopus::lang::c::CompositeType::with_meta(#c_struct_name.to_string(), fields, meta);
                 interoptopus::lang::c::CType::Composite(rval)
             }
         }

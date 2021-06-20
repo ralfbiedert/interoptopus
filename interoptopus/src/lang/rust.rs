@@ -3,7 +3,7 @@
 use crate::lang::c::{CType, Constant, ConstantValue, FnPointerType, Function, FunctionSignature, Parameter, PrimitiveType, PrimitiveValue, Variant};
 use std::ptr::NonNull;
 
-/// Implemented for a helper produced by [`ffi_constant`](crate::ffi_constant), gives meta info for a constant.
+/// Implemented for a constant-helper produced by [`ffi_constant`](crate::ffi_constant), gives meta info for a constant.
 pub trait ConstantInfo {
     fn constant_info() -> Constant;
 }
@@ -13,7 +13,7 @@ pub trait CTypeInfo {
     fn type_info() -> CType;
 }
 
-/// Implemented for a helper produced by [`ffi_function`](crate::ffi_function), gives meta info for a type.
+/// Implemented for a function-helper produced by [`ffi_function`](crate::ffi_function), gives meta info for a function.
 pub trait FunctionInfo {
     fn function_info() -> Function;
 }
@@ -159,8 +159,7 @@ where
     R: CTypeInfo,
 {
     fn type_info() -> CType {
-        let mut sig = FunctionSignature::new();
-        sig.set_rval(R::type_info());
+        let mut sig = FunctionSignature::new(vec![], R::type_info());
         CType::FnPointer(FnPointerType::new(sig))
     }
 }
@@ -170,8 +169,7 @@ where
     R: CTypeInfo,
 {
     fn type_info() -> CType {
-        let mut sig = FunctionSignature::new();
-        sig.set_rval(R::type_info());
+        let mut sig = FunctionSignature::new(vec![], R::type_info());
         CType::FnPointer(FnPointerType::new(sig))
     }
 }
@@ -182,9 +180,7 @@ where
     R: CTypeInfo,
 {
     fn type_info() -> CType {
-        let mut sig = FunctionSignature::new();
-        sig.add_param(Parameter::new("x1".to_string(), T1::type_info()));
-        sig.set_rval(R::type_info());
+        let sig = FunctionSignature::new(vec![Parameter::new("x0".to_string(), T1::type_info())], R::type_info());
         CType::FnPointer(FnPointerType::new(sig))
     }
 }
@@ -195,9 +191,7 @@ where
     R: CTypeInfo + 'a,
 {
     fn type_info() -> CType {
-        let mut sig = FunctionSignature::new();
-        sig.add_param(Parameter::new("x1".to_string(), T1::type_info()));
-        sig.set_rval(R::type_info());
+        let sig = FunctionSignature::new(vec![Parameter::new("x0".to_string(), T1::type_info())], R::type_info());
         CType::FnPointer(FnPointerType::new(sig))
     }
 }
@@ -209,10 +203,10 @@ where
     R: CTypeInfo + 'a,
 {
     fn type_info() -> CType {
-        let mut sig = FunctionSignature::new();
-        sig.add_param(Parameter::new("x1".to_string(), T1::type_info()));
-        sig.add_param(Parameter::new("x2".to_string(), T2::type_info()));
-        sig.set_rval(R::type_info());
+        let sig = FunctionSignature::new(
+            vec![Parameter::new("x0".to_string(), T1::type_info()), Parameter::new("x1".to_string(), T1::type_info())],
+            R::type_info(),
+        );
         CType::FnPointer(FnPointerType::new(sig))
     }
 }
@@ -224,10 +218,10 @@ where
     R: CTypeInfo + 'a,
 {
     fn type_info() -> CType {
-        let mut sig = FunctionSignature::new();
-        sig.add_param(Parameter::new("x1".to_string(), T1::type_info()));
-        sig.add_param(Parameter::new("x2".to_string(), T2::type_info()));
-        sig.set_rval(R::type_info());
+        let sig = FunctionSignature::new(
+            vec![Parameter::new("x0".to_string(), T1::type_info()), Parameter::new("x1".to_string(), T1::type_info())],
+            R::type_info(),
+        );
         CType::FnPointer(FnPointerType::new(sig))
     }
 }
@@ -240,11 +234,14 @@ where
     R: CTypeInfo + 'a,
 {
     fn type_info() -> CType {
-        let mut sig = FunctionSignature::new();
-        sig.add_param(Parameter::new("x1".to_string(), T1::type_info()));
-        sig.add_param(Parameter::new("x2".to_string(), T2::type_info()));
-        sig.add_param(Parameter::new("x3".to_string(), T3::type_info()));
-        sig.set_rval(R::type_info());
+        let sig = FunctionSignature::new(
+            vec![
+                Parameter::new("x0".to_string(), T1::type_info()),
+                Parameter::new("x1".to_string(), T1::type_info()),
+                Parameter::new("x2".to_string(), T2::type_info()),
+            ],
+            R::type_info(),
+        );
         CType::FnPointer(FnPointerType::new(sig))
     }
 }
@@ -257,35 +254,14 @@ where
     R: CTypeInfo + 'a,
 {
     fn type_info() -> CType {
-        let mut sig = FunctionSignature::new();
-        sig.add_param(Parameter::new("x1".to_string(), T1::type_info()));
-        sig.add_param(Parameter::new("x2".to_string(), T2::type_info()));
-        sig.add_param(Parameter::new("x3".to_string(), T3::type_info()));
-        sig.set_rval(R::type_info());
-        CType::FnPointer(FnPointerType::new(sig))
-    }
-}
-
-#[repr(transparent)]
-pub struct CallbackXY<X1, R> {
-    ptr: extern "C" fn(X1) -> R,
-}
-
-impl<X1, R> CallbackXY<X1, R> {
-    pub fn call(&self, x1: X1) -> R {
-        (self.ptr)(x1)
-    }
-}
-
-impl<T1, R> CTypeInfo for CallbackXY<T1, R>
-where
-    T1: CTypeInfo,
-    R: CTypeInfo,
-{
-    fn type_info() -> CType {
-        let mut sig = FunctionSignature::new();
-        sig.add_param(Parameter::new("x1".to_string(), T1::type_info()));
-        sig.set_rval(R::type_info());
+        let sig = FunctionSignature::new(
+            vec![
+                Parameter::new("x0".to_string(), T1::type_info()),
+                Parameter::new("x1".to_string(), T1::type_info()),
+                Parameter::new("x2".to_string(), T2::type_info()),
+            ],
+            R::type_info(),
+        );
         CType::FnPointer(FnPointerType::new(sig))
     }
 }
