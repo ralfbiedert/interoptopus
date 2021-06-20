@@ -122,7 +122,7 @@ impl CType {
 
     /// Produces a name unique for that type with respect to this library.
     ///
-    /// The name here is supposed to uniquely determine a type relative to a [`Library`],
+    /// The name here is supposed to uniquely determine a type relative to a [`Library`](crate::Library),
     /// but it is not guaranteed to be C-compatible and may contain special characters
     /// (e.g., `*const u32`).
     ///
