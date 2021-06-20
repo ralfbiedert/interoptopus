@@ -7,7 +7,7 @@ use crate::thirdparty::ThirdPartyVecF32;
 #[ffi_type]
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
-pub struct Vec2f32 {
+pub struct Vec3 {
     pub x: f32,
     pub y: f32,
     pub z: f32,
@@ -18,8 +18,8 @@ pub struct Vec2f32 {
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
 pub struct SuperComplexEntity {
-    pub player_1: Vec2f32,
-    pub player_2: Vec2f32,
+    pub player_1: Vec3,
+    pub player_2: Vec3,
     pub ammo: u64,
     /// Point to an ASCII encoded whatnot.
     pub some_str: *const u8,

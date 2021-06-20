@@ -29,14 +29,14 @@ namespace interop_test
         {
             var super1 = new SuperComplexEntity()
             {
-                player_1 = new Vec2f32
+                player_1 = new Vec3
                 {
                     x = 2,
                     y = 4,
                     z = 6,
                 },
 
-                player_2 = new Vec2f32
+                player_2 = new Vec3
                 {
                     x = 2,
                     y = 4,

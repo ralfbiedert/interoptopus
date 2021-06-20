@@ -67,8 +67,8 @@ namespace My.Company
     [StructLayout(LayoutKind.Sequential)]
     public partial struct SuperComplexEntity
     {
-        public Vec2f32 player_1;
-        public Vec2f32 player_2;
+        public Vec3 player_1;
+        public Vec3 player_2;
         public ulong ammo;
         /// Point to an ASCII encoded whatnot.
         public IntPtr some_str;
@@ -88,7 +88,7 @@ namespace My.Company
     /// A vector used in our game engine.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Vec2f32
+    public partial struct Vec3
     {
         public float x;
         public float y;

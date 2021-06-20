@@ -1,4 +1,4 @@
-use crate::common::{GameEngine, SuperComplexEntity, Vec2f32, WithForeignType};
+use crate::common::{GameEngine, SuperComplexEntity, Vec3, WithForeignType};
 use interoptopus::{ffi_constant, ffi_function, ffi_type};
 use std::ptr::null_mut;
 
@@ -21,7 +21,7 @@ pub struct Input {
     x: u8,
     z: u8,
     y: *mut u8,
-    v: Vec2f32,
+    v: Vec3,
 }
 
 #[ffi_type(opaque)]

@@ -18,8 +18,3 @@ interoptopus::inventory_function!(
     ],
     []
 );
-
-// fn fff() {
-//     let n = stringify!(X);
-//     let x = PrimitiveValue::from(X);
-// }

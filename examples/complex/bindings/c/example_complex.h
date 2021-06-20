@@ -33,19 +33,19 @@ typedef struct ThirdPartyVecF32
     float w;
     } ThirdPartyVecF32;
 
-typedef struct Vec2f32
+typedef struct Vec3
     {
     float x;
     float y;
     float z;
-    } Vec2f32;
+    } Vec3;
 
 typedef uint32_t (*fptr_fn_u32_rval_u32)(uint32_t x0);
 
 typedef struct SuperComplexEntity
     {
-    Vec2f32 player_1;
-    Vec2f32 player_2;
+    Vec3 player_1;
+    Vec3 player_2;
     uint64_t ammo;
     uint8_t* some_str;
     uint32_t str_len;
