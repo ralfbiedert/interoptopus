@@ -54,7 +54,7 @@
 //!     return _api.my_game_function(input)
 //! ```
 
-use interoptopus::lang::c::{CType, ConstantValue, EnumType, FnPointerType, Function, PrimitiveValue};
+use interoptopus::lang::c::{CType, CompositeType, ConstantValue, EnumType, FnPointerType, Function, PrimitiveValue};
 use interoptopus::patterns::class::Class;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{longest_common_prefix, safe_name};
@@ -184,10 +184,67 @@ pub trait InteropCPythonCFFI: Interop {
         for the_type in self.library().ctypes() {
             match the_type {
                 CType::Enum(e) => self.write_enum(w, e)?,
+                CType::Composite(c) => self.write_struct(w, c)?,
                 CType::Pattern(TypePattern::SuccessEnum(e)) => self.write_enum(w, e.the_enum())?,
                 _ => {}
             }
         }
+
+        Ok(())
+    }
+
+    fn write_struct(&self, w: &mut IndentWriter, e: &CompositeType) -> Result<(), Error> {
+        let docs = e.meta().documentation().lines().join("\n");
+
+        w.indented(|w| writeln!(w, r#"class {}(object):"#, e.rust_name()))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
+
+        // Ctor
+        w.indented(|w| writeln!(w, r#"def __init__(self):"#))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#"global _api, ffi"#))?;
+        w.indented(|w| writeln!(w, r#"self._ctx = ffi.new("{}[]", 1)[0]"#, e.rust_name()))?;
+        w.unindent();
+        w.newline()?;
+
+        // Array constructor
+        w.indented(|w| writeln!(w, r#"def array(n):"#))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#"global _api, ffi"#))?;
+        w.indented(|w| writeln!(w, r#"return ffi.new("{}[]", n)"#, e.rust_name()))?;
+        w.unindent();
+        w.newline()?;
+
+        for field in e.fields() {
+            let docs = field.documentation().lines().join("\n");
+            w.indented(|w| writeln!(w, r#"@property"#))?;
+            w.indented(|w| writeln!(w, r#"def {}(self):"#, field.name()))?;
+            w.indent();
+            w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
+            w.indented(|w| writeln!(w, r#"return self._ctx.{}"#, field.name()))?;
+            w.unindent();
+            w.newline()?;
+
+            let docs = field.documentation().lines().join("\n");
+            w.indented(|w| writeln!(w, r#"@{}.setter"#, field.name()))?;
+            w.indented(|w| writeln!(w, r#"def {}(self, value):"#, field.name()))?;
+            w.indent();
+            w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
+            w.indented(|w| writeln!(w, r#"self._ctx.{} = value"#, field.name()))?;
+            w.unindent();
+            w.newline()?;
+        }
+
+        // General Getter (gives weird errors
+        // w.indented(|w| writeln!(w, r#"def __get__(self, obj, objtype):"#))?;
+        // w.indent();
+        // w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
+        // w.indented(|w| writeln!(w, r#"return getattr(obj, self.ctx)"#))?;
+        // w.unindent();
+        // w.newline()?;
+
+        w.unindent();
 
         Ok(())
     }
@@ -253,6 +310,16 @@ pub trait InteropCPythonCFFI: Interop {
             w.indent();
             w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
             w.indented(|w| writeln!(w, r#"global _api"#))?;
+
+            // Determine if the function was called with a wrapper we produced which as a private `_ctx`.
+            // If so, use that instead. Otherwise, just pass parameters and hope for the best.
+            for param in function.signature().params() {
+                w.indented(|w| writeln!(w, r#"if hasattr({}, "_ctx"):"#, param.name()))?;
+                w.indent();
+                w.indented(|w| writeln!(w, r#"{p} = {p}._ctx"#, p = param.name()))?;
+                w.unindent()
+            }
+
             w.indented(|w| writeln!(w, r#"return _api.{}({})"#, function.name(), &args))?;
             w.unindent();
 
@@ -372,6 +439,17 @@ pub trait InteropCPythonCFFI: Interop {
         w.indented(|w| writeln!(w, r#"""""#))?;
         Ok(())
     }
+
+    fn write_utils(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        w.indented(|w| writeln!(w, r#"def ascii_string(x):"#))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#""""Must be called with a b"my_string".""""#))?;
+        w.indented(|w| writeln!(w, r#"global ffi"#))?;
+        w.indented(|w| writeln!(w, r#"return ffi.new("char[]", x)"#))?;
+        w.unindent();
+        w.newline()?;
+        Ok(())
+    }
 }
 
 impl Interop for Generator {
@@ -404,6 +482,10 @@ impl Interop for Generator {
         w.newline()?;
 
         self.write_patterns(w)?;
+        w.newline()?;
+        w.newline()?;
+
+        self.write_utils(w)?;
         w.newline()?;
         w.newline()?;
 

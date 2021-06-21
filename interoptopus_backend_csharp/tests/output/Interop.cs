@@ -89,7 +89,7 @@ namespace My.Company
         public static extern EnumDocumented documented(StructDocumented _x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ascii_pointer")]
-        public static extern byte pattern_ascii_pointer(string x, UseAsciiStringPattern y);
+        public static extern uint pattern_ascii_pointer(string x, UseAsciiStringPattern y);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_create")]
         public static extern FFIError pattern_class_create(out IntPtr context_ptr, uint value);
@@ -148,7 +148,7 @@ namespace My.Company
     [StructLayout(LayoutKind.Sequential)]
     public partial struct FFISliceu32
     {
-        public IntPtr slice_ptr;
+        public IntPtr data;
         public ulong len;
     }
 
@@ -156,7 +156,7 @@ namespace My.Company
     [StructLayout(LayoutKind.Sequential)]
     public partial struct FFISliceu8
     {
-        public IntPtr slice_ptr;
+        public IntPtr data;
         public ulong len;
     }
 

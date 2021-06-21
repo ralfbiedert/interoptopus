@@ -8,7 +8,7 @@ use std::ops::Deref;
 /// A representation of an array passed over an FFI boundary
 #[repr(C)]
 pub struct FFISlice<'a, T> {
-    slice_ptr: *const T,
+    data: *const T,
     len: u64,
     _phantom: PhantomData<&'a T>,
 }
@@ -16,19 +16,19 @@ pub struct FFISlice<'a, T> {
 impl<'a, T> FFISlice<'a, T> {
     pub fn from_slice(slice: &[T]) -> Self {
         FFISlice {
-            slice_ptr: slice.as_ptr(),
+            data: slice.as_ptr(),
             len: slice.len() as u64,
             _phantom: Default::default(),
         }
     }
 
     pub fn as_slice(&'a self) -> Option<&'a [T]> {
-        if self.slice_ptr.is_null() {
+        if self.data.is_null() {
             None
         } else {
             // If non-null this should always point to valid data and the lifetime should be
             // guaranteed via the struct <'a>.
-            Some(unsafe { std::slice::from_raw_parts(self.slice_ptr, self.len as usize) })
+            Some(unsafe { std::slice::from_raw_parts(self.data, self.len as usize) })
         }
     }
 }
@@ -46,9 +46,10 @@ where
     T: CTypeInfo,
 {
     fn type_info() -> CType {
-        let mut fields = Vec::new();
-        fields.push(Field::new("slice_ptr".to_string(), CType::ReadPointer(Box::new(T::type_info()))));
-        fields.push(Field::new("len".to_string(), CType::Primitive(PrimitiveType::U64)));
+        let fields = vec![
+            Field::new("data".to_string(), CType::ReadPointer(Box::new(T::type_info()))),
+            Field::new("len".to_string(), CType::Primitive(PrimitiveType::U64)),
+        ];
 
         let composite = CompositeType::new(format!("FFISlice{}", T::type_info().name_within_lib()), fields);
         CType::Composite(composite)

@@ -84,13 +84,13 @@ typedef uint8_t (*fptr_fn_u8_rval_u8)(uint8_t x0);
 
 typedef struct FFISliceu32
     {
-    uint32_t* slice_ptr;
+    uint32_t* data;
     uint64_t len;
     } FFISliceu32;
 
 typedef struct FFISliceu8
     {
-    uint8_t* slice_ptr;
+    uint8_t* data;
     uint64_t len;
     } FFISliceu8;
 
@@ -125,7 +125,7 @@ Opaque* complex_2(SomeForeignType _cmplx);
 uint8_t callback(fptr_fn_u8_rval_u8 callback, uint8_t value);
 uint32_t generic(Generic x, Phantom _y);
 EnumDocumented documented(StructDocumented _x);
-uint8_t pattern_ascii_pointer(uint8_t* x, UseAsciiStringPattern y);
+uint32_t pattern_ascii_pointer(uint8_t* x, UseAsciiStringPattern y);
 FFIError pattern_class_create(Context** context_ptr, uint32_t value);
 uint32_t pattern_class_method(Context* context);
 FFIError pattern_class_destroy(Context** context_ptr);
