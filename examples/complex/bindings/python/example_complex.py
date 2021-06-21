@@ -101,6 +101,7 @@ class SuperComplexEntity(object):
     @player_1.setter
     def player_1(self, value):
         """"""
+        self._ptr_player_1 = value
         self._ctx.player_1 = value
 
     @property
@@ -111,6 +112,7 @@ class SuperComplexEntity(object):
     @player_2.setter
     def player_2(self, value):
         """"""
+        self._ptr_player_2 = value
         self._ctx.player_2 = value
 
     @property
@@ -121,6 +123,7 @@ class SuperComplexEntity(object):
     @ammo.setter
     def ammo(self, value):
         """"""
+        self._ptr_ammo = value
         self._ctx.ammo = value
 
     @property
@@ -131,6 +134,7 @@ class SuperComplexEntity(object):
     @some_str.setter
     def some_str(self, value):
         """Point to an ASCII encoded whatnot."""
+        self._ptr_some_str = value
         self._ctx.some_str = value
 
     @property
@@ -141,6 +145,7 @@ class SuperComplexEntity(object):
     @str_len.setter
     def str_len(self, value):
         """"""
+        self._ptr_str_len = value
         self._ctx.str_len = value
 
 class ThirdPartyVecF32(object):
@@ -161,6 +166,7 @@ class ThirdPartyVecF32(object):
     @x.setter
     def x(self, value):
         """"""
+        self._ptr_x = value
         self._ctx.x = value
 
     @property
@@ -171,6 +177,7 @@ class ThirdPartyVecF32(object):
     @y.setter
     def y(self, value):
         """"""
+        self._ptr_y = value
         self._ctx.y = value
 
     @property
@@ -181,6 +188,7 @@ class ThirdPartyVecF32(object):
     @z.setter
     def z(self, value):
         """"""
+        self._ptr_z = value
         self._ctx.z = value
 
     @property
@@ -191,6 +199,7 @@ class ThirdPartyVecF32(object):
     @w.setter
     def w(self, value):
         """"""
+        self._ptr_w = value
         self._ctx.w = value
 
 class Vec3(object):
@@ -211,6 +220,7 @@ class Vec3(object):
     @x.setter
     def x(self, value):
         """"""
+        self._ptr_x = value
         self._ctx.x = value
 
     @property
@@ -221,6 +231,7 @@ class Vec3(object):
     @y.setter
     def y(self, value):
         """"""
+        self._ptr_y = value
         self._ctx.y = value
 
     @property
@@ -231,6 +242,7 @@ class Vec3(object):
     @z.setter
     def z(self, value):
         """"""
+        self._ptr_z = value
         self._ctx.z = value
 
 class WithForeignType(object):
@@ -251,6 +263,7 @@ class WithForeignType(object):
     @secret_number.setter
     def secret_number(self, value):
         """"""
+        self._ptr_secret_number = value
         self._ctx.secret_number = value
 
     @property
@@ -261,6 +274,7 @@ class WithForeignType(object):
     @third_party.setter
     def third_party(self, value):
         """"""
+        self._ptr_third_party = value
         self._ctx.third_party = value
 
 

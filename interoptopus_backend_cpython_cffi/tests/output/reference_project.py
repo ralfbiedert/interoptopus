@@ -188,6 +188,7 @@ class FFISliceu32(object):
     @data.setter
     def data(self, value):
         """"""
+        self._ptr_data = value
         self._ctx.data = value
 
     @property
@@ -198,6 +199,7 @@ class FFISliceu32(object):
     @len.setter
     def len(self, value):
         """"""
+        self._ptr_len = value
         self._ctx.len = value
 
 class FFISliceu8(object):
@@ -218,6 +220,7 @@ class FFISliceu8(object):
     @data.setter
     def data(self, value):
         """"""
+        self._ptr_data = value
         self._ctx.data = value
 
     @property
@@ -228,6 +231,7 @@ class FFISliceu8(object):
     @len.setter
     def len(self, value):
         """"""
+        self._ptr_len = value
         self._ctx.len = value
 
 class Generic(object):
@@ -248,6 +252,7 @@ class Generic(object):
     @x.setter
     def x(self, value):
         """"""
+        self._ptr_x = value
         self._ctx.x = value
 
 class Phantom(object):
@@ -268,6 +273,7 @@ class Phantom(object):
     @x.setter
     def x(self, value):
         """"""
+        self._ptr_x = value
         self._ctx.x = value
 
 class SomeForeignType(object):
@@ -288,6 +294,7 @@ class SomeForeignType(object):
     @x.setter
     def x(self, value):
         """"""
+        self._ptr_x = value
         self._ctx.x = value
 
 class StructDocumented(object):
@@ -308,6 +315,7 @@ class StructDocumented(object):
     @x.setter
     def x(self, value):
         """Documented field."""
+        self._ptr_x = value
         self._ctx.x = value
 
 class UseAsciiStringPattern(object):
@@ -328,6 +336,7 @@ class UseAsciiStringPattern(object):
     @ascii_string.setter
     def ascii_string(self, value):
         """"""
+        self._ptr_ascii_string = value
         self._ctx.ascii_string = value
 
 class Vec(object):
@@ -348,6 +357,7 @@ class Vec(object):
     @x.setter
     def x(self, value):
         """"""
+        self._ptr_x = value
         self._ctx.x = value
 
     @property
@@ -358,6 +368,7 @@ class Vec(object):
     @z.setter
     def z(self, value):
         """"""
+        self._ptr_z = value
         self._ctx.z = value
 
 class Vec1(object):
@@ -378,6 +389,7 @@ class Vec1(object):
     @x.setter
     def x(self, value):
         """"""
+        self._ptr_x = value
         self._ctx.x = value
 
     @property
@@ -388,6 +400,7 @@ class Vec1(object):
     @y.setter
     def y(self, value):
         """"""
+        self._ptr_y = value
         self._ctx.y = value
 
 class Vec2(object):
@@ -408,6 +421,7 @@ class Vec2(object):
     @x.setter
     def x(self, value):
         """"""
+        self._ptr_x = value
         self._ctx.x = value
 
     @property
@@ -418,6 +432,7 @@ class Vec2(object):
     @z.setter
     def z(self, value):
         """"""
+        self._ptr_z = value
         self._ctx.z = value
 
 class Vec3f32(object):
@@ -438,6 +453,7 @@ class Vec3f32(object):
     @x.setter
     def x(self, value):
         """"""
+        self._ptr_x = value
         self._ctx.x = value
 
     @property
@@ -448,6 +464,7 @@ class Vec3f32(object):
     @y.setter
     def y(self, value):
         """"""
+        self._ptr_y = value
         self._ctx.y = value
 
     @property
@@ -458,6 +475,7 @@ class Vec3f32(object):
     @z.setter
     def z(self, value):
         """"""
+        self._ptr_z = value
         self._ctx.z = value
 
 class FFIError:
@@ -741,9 +759,11 @@ This function may only be called with a context returned by a succeeding `patter
 class Context(object):
     def __init__(self, value):
         """"""
+        if hasattr(value, "_ctx"):
+            value = value._ctx
         global _api, ffi
         self.ctx = ffi.new("Context**")
-        rval = _api.pattern_class_create(self.ctx, value)
+        rval = raw.pattern_class_create(self.ctx, value)
         if rval == FFIError.Ok:
             return None
         else:
@@ -754,7 +774,7 @@ class Context(object):
 
 This function may only be called with a context returned by a succeeding `pattern_class_create`."""
         global _api, ffi
-        rval = _api.pattern_class_destroy(self.ctx, )
+        rval = raw.pattern_class_destroy(self.ctx, )
         if rval == FFIError.Ok:
             return None
         else:
@@ -762,13 +782,13 @@ This function may only be called with a context returned by a succeeding `patter
 
     def method(self, ):
         """"""
-        global _api
+        global raw
         return _api.pattern_class_method(self.ctx[0], )
 
     def method_success_enum_ok(self, ):
         """"""
-        global _api
-        rval = _api.pattern_class_method_success_enum_ok(self.ctx[0], )
+        global raw
+        rval = raw.pattern_class_method_success_enum_ok(self.ctx[0], )
         if rval == FFIError.Ok:
             return None
         else:
@@ -776,8 +796,8 @@ This function may only be called with a context returned by a succeeding `patter
 
     def method_success_enum_fail(self, ):
         """"""
-        global _api
-        rval = _api.pattern_class_method_success_enum_fail(self.ctx[0], )
+        global raw
+        rval = raw.pattern_class_method_success_enum_fail(self.ctx[0], )
         if rval == FFIError.Ok:
             return None
         else:

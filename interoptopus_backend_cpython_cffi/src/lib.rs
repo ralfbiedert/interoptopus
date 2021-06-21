@@ -366,7 +366,7 @@ pub trait InteropCPythonCFFI: Interop {
 
         match function.signature().rval() {
             CType::Pattern(TypePattern::SuccessEnum(e)) => {
-                w.indented(|w| writeln!(w, r#"rval = _api.{}({}, {})"#, function.name(), ctx, &args))?;
+                w.indented(|w| writeln!(w, r#"rval = {}.{}({}, {})"#, self.config().raw_fn_namespace, function.name(), ctx, &args))?;
                 w.indented(|w| writeln!(w, r#"if rval == {}.{}:"#, e.the_enum().rust_name(), e.success_variant().name()))?;
                 w.indent();
                 w.indented(|w| writeln!(w, r#"return None"#))?;
@@ -429,7 +429,7 @@ pub trait InteropCPythonCFFI: Interop {
             w.indented(|w| writeln!(w, r#"def {}(self, {}):"#, function.name().replace(&common_prefix, ""), &args))?;
             w.indent();
             w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
-            w.indented(|w| writeln!(w, r#"global _api"#))?;
+            w.indented(|w| writeln!(w, r#"global {}"#, self.config().raw_fn_namespace))?;
 
             self.write_pattern_class_success_enum_aware_rval(w, class, function, true)?;
 
