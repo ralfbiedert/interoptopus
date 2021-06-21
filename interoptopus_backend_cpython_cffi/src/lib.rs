@@ -231,6 +231,11 @@ pub trait InteropCPythonCFFI: Interop {
             w.indented(|w| writeln!(w, r#"def {}(self, value):"#, field.name()))?;
             w.indent();
             w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
+            // We also write _ptr to hold on to any allocated object created by CFFI. If we do not
+            // then we might assign a pointer in the _ctx line below, but once the parameter (the CFFI handle)
+            // leaves this function the handle might become deallocated and therefore the pointer
+            // becomes invalid
+            w.indented(|w| writeln!(w, r#"self._ptr_{} = value"#, field.name()))?;
             w.indented(|w| writeln!(w, r#"self._ctx.{} = value"#, field.name()))?;
             w.unindent();
             w.newline()?;
