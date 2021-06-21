@@ -1,38 +1,49 @@
+use interoptopus::testing::assert_file_matches_generated;
 use interoptopus::testing::csharp::run_dotnet_command_if_installed;
+use interoptopus::util::NamespaceMappings;
 use interoptopus::Error;
 use interoptopus::Interop;
-use std::fs::read_to_string;
 
-fn generate_bindings(output: &str) -> Result<(), Error> {
+fn generate_bindings_multi(prefix: &str) -> Result<(), Error> {
     use interoptopus_backend_csharp::{Config, Generator};
 
-    Generator::new(
-        Config {
-            namespace: "My.Company".to_string(),
-            class: "InteropClass".to_string(),
-            dll_name: "example_complex".to_string(),
-            ..Config::default()
-        },
-        interoptopus_reference_project::ffi_inventory(),
-    )
-    .write_file(output)
+    let library = interoptopus_reference_project::ffi_inventory();
+    let namespace_mappings = NamespaceMappings::new("My.Company").add("common", "My.Company.Common");
+
+    let config = Config {
+        dll_name: "example_complex".to_string(),
+        namespace_mappings,
+        ..Config::default()
+    };
+
+    for namespace_id in library.namespaces() {
+        let file_name = format!("{}.{}.cs", prefix, namespace_id).replace("..", ".");
+
+        let config = Config {
+            namespace_id: namespace_id.clone(),
+            ..config.clone()
+        };
+
+        Generator::new(config.clone(), interoptopus_reference_project::ffi_inventory()).write_file(file_name)?;
+    }
+
+    Ok(())
 }
 
 #[test]
 fn bindings_match_reference() -> Result<(), Error> {
-    generate_bindings("tests/output/Interop.cs")?;
+    generate_bindings_multi("tests/output/Interop")?;
 
-    let actual = read_to_string("tests/output/Interop.cs")?;
-    let expected = read_to_string("tests/output/Interop.cs.expected")?;
-
-    assert_eq!(expected, actual);
+    assert_file_matches_generated("tests/output/Interop.cs");
+    assert_file_matches_generated("tests/output/Interop.common.cs");
 
     Ok(())
 }
 
 #[test]
 fn bindings_work() -> Result<(), Error> {
-    generate_bindings("tests/output/Interop.cs")?;
+    generate_bindings_multi("tests/output/Interop")?;
+
     run_dotnet_command_if_installed("tests/output/", "build")?;
     Ok(())
 }

@@ -23,6 +23,7 @@ use syn::{parse_macro_input, AttributeArgs};
 /// | Attribute | On |  Explanation |
 /// | --- | --- | ---  |
 /// | `name="X"` | `struct`,`enum` | Uses `name` as the base interop name instead of the item's Rust name.<sup>1</sup> |
+/// | `namespace="X"` | `struct`,`enum` | In backends that support multiple namespaces, determine where this should go.
 /// | `skip(x)` | `struct,enum` | Skip field or variant `x` in the definition, e.g., some `x` of [`PhantomData`](std::marker::PhantomData).
 /// | `patterns(p)` | `struct`,`enum` | Mark this type as part of a pattern, see below.
 /// | `opaque` | `struct` | Creates an opaque type without fields. Can only be used behind a pointer. |

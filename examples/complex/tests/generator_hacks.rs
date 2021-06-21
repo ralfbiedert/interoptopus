@@ -1,6 +1,7 @@
 use interoptopus::testing::c::compile_c_app_if_installed;
 use interoptopus::testing::csharp::run_dotnet_command_if_installed;
 use interoptopus::testing::python::run_python_if_installed;
+use interoptopus::util::NamespaceMappings;
 use interoptopus::Error;
 use interoptopus::Interop;
 
@@ -10,9 +11,9 @@ fn bindings_csharp() -> Result<(), Error> {
 
     Generator::new(
         Config {
-            namespace: "My.Company".to_string(),
             class: "InteropClass".to_string(),
             dll_name: "example_complex".to_string(),
+            namespace_mappings: NamespaceMappings::new("My.Company"),
             ..Config::default()
         },
         example_complex::ffi_inventory(),

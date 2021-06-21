@@ -1,7 +1,7 @@
+use interoptopus::testing::assert_file_matches_generated;
 use interoptopus::testing::python::run_python_if_installed;
 use interoptopus::Error;
 use interoptopus::Interop;
-use std::fs::read_to_string;
 
 fn generate_bindings(output: &str) -> Result<(), Error> {
     use interoptopus_backend_cpython_cffi::{Config, Generator};
@@ -13,10 +13,7 @@ fn generate_bindings(output: &str) -> Result<(), Error> {
 fn bindings_match_reference() -> Result<(), Error> {
     generate_bindings("tests/output/reference_project.py")?;
 
-    let actual = read_to_string("tests/output/reference_project.py")?;
-    let expected = read_to_string("tests/output/reference_project.py.expected")?;
-
-    assert_eq!(expected, actual);
+    assert_file_matches_generated("tests/output/reference_project.py");
 
     Ok(())
 }

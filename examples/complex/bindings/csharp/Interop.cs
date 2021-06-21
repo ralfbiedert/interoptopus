@@ -2,6 +2,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using My.Company;
 
 namespace My.Company
 {

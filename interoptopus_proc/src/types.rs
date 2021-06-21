@@ -23,7 +23,7 @@ pub struct FFITypeAttributes {
     name: Option<String>,
 
     #[darling(default)]
-    export_module: Option<String>,
+    namespace: Option<String>,
 }
 
 fn derive_variant_info(item: ItemEnum, idents: &[Ident], names: &[String], values: &[i32], docs: &[String]) -> TokenStream {
@@ -133,6 +133,7 @@ pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemSt
     let name = item.ident.to_string();
     let name_ident = syn::Ident::new(&name, item.ident.span());
     let c_struct_name = attr.name.unwrap_or(name);
+    let namespace = attr.namespace.unwrap_or_else(|| "".to_string());
 
     let mut generic_params = Vec::new();
     let mut field_names = Vec::new();
@@ -203,7 +204,7 @@ pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemSt
             fn type_info() -> interoptopus::lang::c::CType {
 
                 let documentation = interoptopus::lang::c::Documentation::from_line(#doc_line);
-                let mut meta = interoptopus::lang::c::Meta::with_documentation(documentation);
+                let mut meta = interoptopus::lang::c::Meta::with_namespace_documentation(#namespace.to_string(), documentation);
                 let mut fields = std::vec::Vec::new();
 
                 #({
@@ -219,9 +220,11 @@ pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemSt
     }
 }
 
-pub fn ffi_type_struct_opqaue(_attr: FFITypeAttributes, input: TokenStream, item: ItemStruct) -> TokenStream {
+pub fn ffi_type_struct_opqaue(attr: FFITypeAttributes, input: TokenStream, item: ItemStruct) -> TokenStream {
     let name = item.ident.to_string();
     let name_ident = syn::Ident::new(&name, item.ident.span());
+    let doc_line = extract_doc_lines(&item.attrs).join("\n");
+    let namespace = attr.namespace.unwrap_or_else(|| "".to_string());
 
     quote! {
         #input
@@ -229,8 +232,9 @@ pub fn ffi_type_struct_opqaue(_attr: FFITypeAttributes, input: TokenStream, item
         impl interoptopus::lang::rust::CTypeInfo for #name_ident {
 
             fn type_info() -> interoptopus::lang::c::CType {
-
-                let mut rval = interoptopus::lang::c::OpaqueType::new(#name.to_string());
+                let documentation = interoptopus::lang::c::Documentation::from_line(#doc_line);
+                let mut meta = interoptopus::lang::c::Meta::with_namespace_documentation(#namespace.to_string(), documentation);
+                let mut rval = interoptopus::lang::c::OpaqueType::new(#name.to_string(), meta);
 
                 interoptopus::lang::c::CType::Opaque(rval)
             }

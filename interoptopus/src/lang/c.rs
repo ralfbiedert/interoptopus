@@ -345,15 +345,20 @@ impl Field {
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct OpaqueType {
     name: String,
+    meta: Meta,
 }
 
 impl OpaqueType {
-    pub fn new(name: String) -> Self {
-        Self { name }
+    pub fn new(name: String, meta: Meta) -> Self {
+        Self { name, meta }
     }
 
     pub fn rust_name(&self) -> &str {
         &self.name
+    }
+
+    pub fn meta(&self) -> &Meta {
+        &self.meta
     }
 }
 
@@ -381,8 +386,13 @@ impl Meta {
         &self.documentation
     }
 
-    pub fn namespace(&self) -> &String {
+    pub fn namespace(&self) -> &str {
         &self.namespace
+    }
+
+    /// Convenience method used in generators
+    pub fn is_namespace(&self, namespace: &str) -> bool {
+        self.namespace == namespace
     }
 }
 

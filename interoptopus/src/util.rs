@@ -2,7 +2,7 @@
 
 use crate::lang::c::{CType, Function};
 use crate::patterns::TypePattern;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::iter::FromIterator;
 
 /// Converts an internal name like `fn() -> X` to a safe name like `fn_rval_x`
@@ -131,5 +131,59 @@ pub(crate) fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CTyp
                 }
             }
         },
+    }
+}
+
+/// Extracts annotated namespace strings.
+pub(crate) fn extract_namespaces_from_types(types: &[CType], into: &mut HashSet<String>) {
+    for t in types {
+        match t {
+            CType::Primitive(_) => {}
+            CType::Enum(x) => {
+                into.insert(x.meta().namespace().to_string());
+            }
+            CType::Opaque(x) => {
+                into.insert(x.meta().namespace().to_string());
+            }
+            CType::Composite(x) => {
+                into.insert(x.meta().namespace().to_string());
+            }
+            CType::FnPointer(_) => {}
+            CType::ReadPointer(_) => {}
+            CType::ReadWritePointer(_) => {}
+            CType::Pattern(TypePattern::SuccessEnum(x)) => {
+                into.insert(x.the_enum().meta().namespace().to_string());
+            }
+            CType::Pattern(_) => {}
+        }
+    }
+}
+
+/// Maps an internal namespace like `common` to a language namespace like `Company.Common`.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct NamespaceMappings {
+    mappings: HashMap<String, String>,
+}
+
+impl NamespaceMappings {
+    // pub fn new() -> Self {
+    //     Self::default()
+    // }
+
+    /// Creates new mappings with the default specified.
+    pub fn new(default: &str) -> Self {
+        let mut mappings = HashMap::new();
+        mappings.insert("".to_string(), default.to_string());
+
+        Self { mappings }
+    }
+
+    pub fn add(mut self, id: &str, value: &str) -> Self {
+        self.mappings.insert(id.to_string(), value.to_string());
+        self
+    }
+
+    pub fn get(&self, id: &str) -> Option<&str> {
+        self.mappings.get(id).map(|x| x.as_str())
     }
 }

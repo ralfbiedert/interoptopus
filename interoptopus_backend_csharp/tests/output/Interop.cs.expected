@@ -2,10 +2,12 @@
 
 using System;
 using System.Runtime.InteropServices;
+using My.Company;
+using My.Company.Common;
 
 namespace My.Company
 {
-    public static partial class InteropClass
+    public static partial class Interop
     {
         public const string NativeLib = "example_complex";
 
@@ -193,14 +195,6 @@ namespace My.Company
     public partial struct UseAsciiStringPattern
     {
         public string ascii_string;
-    }
-
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct Vec
-    {
-        public double x;
-        public double z;
     }
 
     [Serializable]
