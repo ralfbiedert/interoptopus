@@ -400,6 +400,12 @@ pub trait InteropCPythonCFFI: Interop {
         w.indented(|w| writeln!(w, r#"def __init__(self, {}):"#, args))?;
         w.indent();
         w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
+        for param in class.constructor().signature().params().iter().skip(1) {
+            w.indented(|w| writeln!(w, r#"if hasattr({}, "_ctx"):"#, param.name()))?;
+            w.indent();
+            w.indented(|w| writeln!(w, r#"{p} = {p}._ctx"#, p = param.name()))?;
+            w.unindent()
+        }
         w.indented(|w| writeln!(w, r#"global _api, ffi"#))?;
         w.indented(|w| writeln!(w, r#"self.ctx = ffi.new("{}**")"#, context_type_name))?;
         self.write_pattern_class_success_enum_aware_rval(w, class, class.constructor(), false)?;
