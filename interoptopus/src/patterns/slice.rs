@@ -3,6 +3,7 @@
 use crate::lang::c::{CType, CompositeType, Field, PrimitiveType};
 use crate::lang::rust::CTypeInfo;
 use std::marker::PhantomData;
+use std::ops::Deref;
 
 /// A representation of an array passed over an FFI boundary
 #[repr(C)]
@@ -29,6 +30,14 @@ impl<'a, T> FFISlice<'a, T> {
             // guaranteed via the struct <'a>.
             Some(unsafe { std::slice::from_raw_parts(self.slice_ptr, self.len as usize) })
         }
+    }
+}
+
+impl<'a, T> Deref for FFISlice<'a, T> {
+    type Target = [T];
+
+    fn deref(&self) -> &Self::Target {
+        self.as_slice().unwrap_or(&[])
     }
 }
 
