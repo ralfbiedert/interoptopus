@@ -1,6 +1,6 @@
 [package]
 name = "interoptopus"
-description = "🦀  →  🐙 →  Python, C#, C, ... FFI bindings to your favorite language. Composable. Escape hatchets included."
+description = "C#, Python, C, ... → 🐙 → 🦀  FFI from your favorite language to Rust. Escape hatchets included."
 authors = ["Ralf Biedert <rb@xr.io>"]
 keywords = ["ffi", "code-generation", "bindings"]
 categories = ["api-bindings", "development-tools::ffi"]

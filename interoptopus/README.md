@@ -7,21 +7,20 @@
 
 ## Interoptopus
 
-🦀  →  🐙 →  Python, C#, C, ...
+C#, Python, C, ... → 🐙 → 🦀
 
-FFI bindings to your favorite language. Composable. Escape hatchets included.
+FFI from your favorite language to Rust. Escape hatchets included.
 
 
 ### Overview
 
 If you ...
 
-- wrote an `extern "C"` API in Rust,
-- need C#, Python, C, ... bindings to your library, all at the same time,
-- prefer having fine-grained control over your API and interop generation,
-- would like to use quality-of-life [patterns](crate::patterns) on both sides (e.g., [options](crate::patterns::option), [slices](crate::patterns::slice), '[classes](crate::patterns::class)') where feasible,
-- want to create your own bindings for a not-yet supported language,
-- think living Rust code should be your FFI [single source of truth](https://en.wikipedia.org/wiki/Single_source_of_truth),
+- **have** an `extern "C"` API in Rust, and **need** C#, Python, C, ... bindings to your library,
+- prefer having **fine-grained-control** over your API and interop generation,
+- would like to use **quality-of-life [patterns](crate::patterns)** on **both sides** (e.g., [options](crate::patterns::option), [slices](crate::patterns::slice), '[classes](crate::patterns::class)') where feasible,
+- might need to swiftly **support a new language** (3-4 hours to get basic interop generation for new language),
+- think your FFI [**single source of truth**](https://en.wikipedia.org/wiki/Single_source_of_truth) should be living Rust code (incl. documentation),
 
 ... then Interoptopus might be for you.
 
