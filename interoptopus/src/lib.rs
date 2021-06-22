@@ -17,19 +17,20 @@
 //!
 //! If you ...
 //!
-//! - **have** an `extern "C"` API in Rust, and **need** C#, Python, C, ... bindings to your library,
+//! - **have** an `extern "C"` API in Rust,
+//! - **need** C#, Python, C, ... bindings to your library,
 //! - prefer having **fine-grained-control** over your API and interop generation,
 //! - would like to use **quality-of-life [patterns](crate::patterns)** on **both sides** (e.g., [options](crate::patterns::option), [slices](crate::patterns::slice), '[classes](crate::patterns::class)') where feasible,
-//! - might need to swiftly **support a new language** (3-4 hours to get basic interop generation for new language),
-//! - think your FFI [**single source of truth**](https://en.wikipedia.org/wiki/Single_source_of_truth) should be living Rust code (incl. documentation),
+//! - might need to swiftly **support a new language**,
+//! - think your FFI [**single source of truth**](https://en.wikipedia.org/wiki/Single_source_of_truth) should be living Rust code,
 //!
 //! ... then Interoptopus might be for you.
 //!
 //!
-//! ## Known limitations
+//! ## Known Limitations
 //!
 //! - not yet used in production
-//! - somewhat verbose if you don't own most of your types (still possible, just more work)
+//! - a bit verbose if you don't own your types (still possible, just more work)
 //! - if you target only a single language and don't care about your FFI layer other solutions might be better
 //!
 //!
