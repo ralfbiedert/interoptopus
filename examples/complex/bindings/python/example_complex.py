@@ -95,34 +95,28 @@ class SuperComplexEntity(object):
 
     @property
     def player_1(self):
-        """"""
         return self._ctx.player_1
 
     @player_1.setter
     def player_1(self, value):
-        """"""
         self._ptr_player_1 = value
         self._ctx.player_1 = value
 
     @property
     def player_2(self):
-        """"""
         return self._ctx.player_2
 
     @player_2.setter
     def player_2(self, value):
-        """"""
         self._ptr_player_2 = value
         self._ctx.player_2 = value
 
     @property
     def ammo(self):
-        """"""
         return self._ctx.ammo
 
     @ammo.setter
     def ammo(self, value):
-        """"""
         self._ptr_ammo = value
         self._ctx.ammo = value
 
@@ -133,23 +127,19 @@ class SuperComplexEntity(object):
 
     @some_str.setter
     def some_str(self, value):
-        """Point to an ASCII encoded whatnot."""
         self._ptr_some_str = value
         self._ctx.some_str = value
 
     @property
     def str_len(self):
-        """"""
         return self._ctx.str_len
 
     @str_len.setter
     def str_len(self, value):
-        """"""
         self._ptr_str_len = value
         self._ctx.str_len = value
 
 class ThirdPartyVecF32(object):
-    """"""
     def __init__(self):
         global _api, ffi
         self._ctx = ffi.new("ThirdPartyVecF32[]", 1)[0]
@@ -160,45 +150,37 @@ class ThirdPartyVecF32(object):
 
     @property
     def x(self):
-        """"""
         return self._ctx.x
 
     @x.setter
     def x(self, value):
-        """"""
         self._ptr_x = value
         self._ctx.x = value
 
     @property
     def y(self):
-        """"""
         return self._ctx.y
 
     @y.setter
     def y(self, value):
-        """"""
         self._ptr_y = value
         self._ctx.y = value
 
     @property
     def z(self):
-        """"""
         return self._ctx.z
 
     @z.setter
     def z(self, value):
-        """"""
         self._ptr_z = value
         self._ctx.z = value
 
     @property
     def w(self):
-        """"""
         return self._ctx.w
 
     @w.setter
     def w(self, value):
-        """"""
         self._ptr_w = value
         self._ctx.w = value
 
@@ -214,34 +196,28 @@ class Vec3(object):
 
     @property
     def x(self):
-        """"""
         return self._ctx.x
 
     @x.setter
     def x(self, value):
-        """"""
         self._ptr_x = value
         self._ctx.x = value
 
     @property
     def y(self):
-        """"""
         return self._ctx.y
 
     @y.setter
     def y(self, value):
-        """"""
         self._ptr_y = value
         self._ctx.y = value
 
     @property
     def z(self):
-        """"""
         return self._ctx.z
 
     @z.setter
     def z(self, value):
-        """"""
         self._ptr_z = value
         self._ctx.z = value
 
@@ -257,23 +233,19 @@ class WithForeignType(object):
 
     @property
     def secret_number(self):
-        """"""
         return self._ctx.secret_number
 
     @secret_number.setter
     def secret_number(self, value):
-        """"""
         self._ptr_secret_number = value
         self._ctx.secret_number = value
 
     @property
     def third_party(self):
-        """"""
         return self._ctx.third_party
 
     @third_party.setter
     def third_party(self, value):
-        """"""
         self._ptr_third_party = value
         self._ctx.third_party = value
 
@@ -350,7 +322,6 @@ You **must** ensure that `context_ptr` is being called with the context produced
         return _api.example_write_foreign_type(context, foreign)
 
     def example_double_super_complex_entity(context, incoming, outgoing):
-        """"""
         global _api
         if hasattr(context, "_ctx"):
             context = context._ctx

@@ -212,16 +212,16 @@ macro_rules! inventory_function {
             let mut constants: Vec<$crate::lang::c::Constant> = Vec::new();
             $(
                 {
-                    use $const as x;
-                    constants.push(x::constant_info());
+                    use $const as user_constant;
+                    constants.push(user_constant::constant_info());
                 }
             )*
 
             let mut functions: Vec<$crate::lang::c::Function> = Vec::new();
             $(
                 {
-                    use $function as x;
-                    functions.push(x::function_info());
+                    use $function as user_function;
+                    functions.push(user_function::function_info());
                 }
             )*
 

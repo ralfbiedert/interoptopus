@@ -8,6 +8,11 @@
   This happens when `#[ffi_type]` appears after `#derive[...]`. Just switch their order.
 
 
+- **Why do I get `use of undeclared crate or module` in `inventory_function!()`?**
+
+  You probably forgot to declare one of your items `#[ffi_function]` or `#[ffi_const]`.
+
+
 - **How do I support a new language?**
 
   1) create a new crate, like `my_language`

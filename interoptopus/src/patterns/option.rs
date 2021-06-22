@@ -2,8 +2,13 @@
 use crate::lang::c::{CType, CompositeType, Field, PrimitiveType};
 use crate::lang::rust::CTypeInfo;
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 /// An option-like type at the FFI boundary where a regular [`Option`] doesn't work.
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Default, Deserialize, Serialize))]
+#[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Default))]
 pub struct FFIOption<T> {
     t: T,
     is_some: u8,

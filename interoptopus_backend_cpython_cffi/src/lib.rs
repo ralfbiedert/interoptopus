@@ -54,7 +54,7 @@
 //!     return _api.my_game_function(input)
 //! ```
 
-use interoptopus::lang::c::{CType, CompositeType, ConstantValue, EnumType, FnPointerType, Function, PrimitiveValue};
+use interoptopus::lang::c::{CType, CompositeType, ConstantValue, Documentation, EnumType, FnPointerType, Function, PrimitiveValue};
 use interoptopus::patterns::class::Class;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{longest_common_prefix, safe_name};
@@ -194,11 +194,9 @@ pub trait InteropCPythonCFFI: Interop {
     }
 
     fn write_struct(&self, w: &mut IndentWriter, e: &CompositeType) -> Result<(), Error> {
-        let docs = e.meta().documentation().lines().join("\n");
-
         w.indented(|w| writeln!(w, r#"class {}(object):"#, e.rust_name()))?;
         w.indent();
-        w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
+        self.write_documentation(w, e.meta().documentation())?;
 
         // Ctor
         w.indented(|w| writeln!(w, r#"def __init__(self):"#))?;
@@ -217,11 +215,10 @@ pub trait InteropCPythonCFFI: Interop {
         w.newline()?;
 
         for field in e.fields() {
-            let docs = field.documentation().lines().join("\n");
             w.indented(|w| writeln!(w, r#"@property"#))?;
             w.indented(|w| writeln!(w, r#"def {}(self):"#, field.name()))?;
             w.indent();
-            w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
+            self.write_documentation(w, field.documentation())?;
             w.indented(|w| writeln!(w, r#"return self._ctx.{}"#, field.name()))?;
             w.unindent();
             w.newline()?;
@@ -230,7 +227,6 @@ pub trait InteropCPythonCFFI: Interop {
             w.indented(|w| writeln!(w, r#"@{}.setter"#, field.name()))?;
             w.indented(|w| writeln!(w, r#"def {}(self, value):"#, field.name()))?;
             w.indent();
-            w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
             // We also write _ptr to hold on to any allocated object created by CFFI. If we do not
             // then we might assign a pointer in the _ctx line below, but once the parameter (the CFFI handle)
             // leaves this function the handle might become deallocated and therefore the pointer
@@ -309,11 +305,10 @@ pub trait InteropCPythonCFFI: Interop {
 
         for function in self.library().functions() {
             let args = function.signature().params().iter().map(|x| x.name().to_string()).collect::<Vec<_>>().join(", ");
-            let docs = function.meta().documentation().lines().join("\n");
 
             w.indented(|w| writeln!(w, r#"def {}({}):"#, function.name(), &args))?;
             w.indent();
-            w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
+            self.write_documentation(w, function.meta().documentation())?;
             w.indented(|w| writeln!(w, r#"global _api"#))?;
 
             // Determine if the function was called with a wrapper we produced which as a private `_ctx`.
@@ -359,6 +354,16 @@ pub trait InteropCPythonCFFI: Interop {
             .join(", ")
     }
 
+    fn write_documentation(&self, w: &mut IndentWriter, documentation: &Documentation) -> Result<(), Error> {
+        let docs: String = documentation.lines().join("\n");
+
+        if !docs.is_empty() {
+            w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
+        }
+
+        Ok(())
+    }
+
     fn write_pattern_class_success_enum_aware_rval(&self, w: &mut IndentWriter, _class: &Class, function: &Function, deref_ctx: bool) -> Result<(), Error> {
         let args = self.pattern_class_args_without_first_to_string(function);
 
@@ -396,10 +401,9 @@ pub trait InteropCPythonCFFI: Interop {
 
         // Ctor
         let args = self.pattern_class_args_without_first_to_string(class.constructor());
-        let docs = class.constructor().meta().documentation().lines().join("\n");
         w.indented(|w| writeln!(w, r#"def __init__(self, {}):"#, args))?;
         w.indent();
-        w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
+        self.write_documentation(w, class.constructor().meta().documentation())?;
         for param in class.constructor().signature().params().iter().skip(1) {
             w.indented(|w| writeln!(w, r#"if hasattr({}, "_ctx"):"#, param.name()))?;
             w.indent();
@@ -413,10 +417,9 @@ pub trait InteropCPythonCFFI: Interop {
         w.newline()?;
 
         // Dtor
-        let docs = class.destructor().meta().documentation().lines().join("\n");
         w.indented(|w| writeln!(w, r#"def __del__(self):"#))?;
         w.indent();
-        w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
+        self.write_documentation(w, class.destructor().meta().documentation())?;
         w.indented(|w| writeln!(w, r#"global _api, ffi"#))?;
         self.write_pattern_class_success_enum_aware_rval(w, class, class.destructor(), false)?;
         w.unindent();
@@ -424,11 +427,10 @@ pub trait InteropCPythonCFFI: Interop {
 
         for function in class.methods() {
             let args = self.pattern_class_args_without_first_to_string(function);
-            let docs = function.meta().documentation().lines().join("\n");
 
             w.indented(|w| writeln!(w, r#"def {}(self, {}):"#, function.name().replace(&common_prefix, ""), &args))?;
             w.indent();
-            w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
+            self.write_documentation(w, function.meta().documentation())?;
             w.indented(|w| writeln!(w, r#"global {}"#, self.config().raw_fn_namespace))?;
 
             self.write_pattern_class_success_enum_aware_rval(w, class, function, true)?;
