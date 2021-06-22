@@ -14,7 +14,8 @@ pub struct FFISlice<'a, T> {
 }
 
 impl<'a, T> FFISlice<'a, T> {
-    pub fn from_slice(slice: &[T]) -> Self {
+    /// Create new Self from a normal slice.
+    pub fn from_slice(slice: &'a [T]) -> Self {
         FFISlice {
             data: slice.as_ptr(),
             len: slice.len() as u64,
@@ -22,6 +23,7 @@ impl<'a, T> FFISlice<'a, T> {
         }
     }
 
+    /// Tries to return a slice if the pointer was not null.
     pub fn as_slice(&'a self) -> Option<&'a [T]> {
         if self.data.is_null() {
             None
@@ -30,6 +32,17 @@ impl<'a, T> FFISlice<'a, T> {
             // guaranteed via the struct <'a>.
             Some(unsafe { std::slice::from_raw_parts(self.data, self.len as usize) })
         }
+    }
+}
+
+impl<'a, T> FFISlice<'a, T>
+where
+    T: 'static,
+{
+    /// Creates a new empty slice.
+    pub fn empty() -> Self {
+        let x: &'static [T] = &[];
+        Self::from_slice(x)
     }
 }
 
