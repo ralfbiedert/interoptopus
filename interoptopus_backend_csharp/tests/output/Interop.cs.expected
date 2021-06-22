@@ -235,4 +235,53 @@ namespace My.Company
         Fail = 200,
     }
 
+
+    /// This can also be used for the `class` pattern.
+    public partial class Context : IDisposable
+    {
+        private IntPtr _context;
+        public Context(uint value)
+        {
+            var rval = Interop.pattern_class_create(out _context ,  value);
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception("Something went wrong");
+            }
+        }
+
+        public void Dispose()
+        {
+            var rval = Interop.pattern_class_destroy(out _context );
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception("Something went wrong");
+            }
+        }
+
+        public uint Method()
+        {
+            return Interop.pattern_class_method(_context );
+        }
+
+        public void MethodSuccessEnumOk()
+        {
+            var rval = Interop.pattern_class_method_success_enum_ok(_context );
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception("Something went wrong");
+            }
+        }
+
+        public void MethodSuccessEnumFail()
+        {
+            var rval = Interop.pattern_class_method_success_enum_fail(_context );
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception("Something went wrong");
+            }
+        }
+
+    }
+
+
 }

@@ -223,7 +223,7 @@ pub trait InteropCPythonCFFI: Interop {
             w.unindent();
             w.newline()?;
 
-            let docs = field.documentation().lines().join("\n");
+            let _docs = field.documentation().lines().join("\n");
             w.indented(|w| writeln!(w, r#"@{}.setter"#, field.name()))?;
             w.indented(|w| writeln!(w, r#"def {}(self, value):"#, field.name()))?;
             w.indent();

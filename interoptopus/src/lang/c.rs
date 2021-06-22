@@ -10,7 +10,7 @@
 //! by a backend**.
 
 use crate::patterns::TypePattern;
-use crate::util::ctypes_from_type_recursive;
+use crate::util::{ctypes_from_type_recursive, IdPrettifier};
 use std::collections::HashSet;
 
 // /// If a name like `abc::XXX` is given, strips the `abc::` part.
@@ -419,6 +419,10 @@ impl Function {
 
     pub fn meta(&self) -> &Meta {
         &self.meta
+    }
+
+    pub fn prettifier(&self) -> IdPrettifier {
+        IdPrettifier::from_rust_lower(self.name())
     }
 }
 

@@ -51,8 +51,9 @@ use interoptopus::lang::c::{
     CType, CompositeType, Constant, ConstantValue, Documentation, EnumType, Field, FnPointerType, Function, Meta, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
     Variant,
 };
-use interoptopus::patterns::TypePattern;
-use interoptopus::util::{safe_name, NamespaceMappings};
+use interoptopus::patterns::class::Class;
+use interoptopus::patterns::{LibraryPattern, TypePattern};
+use interoptopus::util::{longest_common_prefix, safe_name, IdPrettifier, NamespaceMappings};
 use interoptopus::writer::IndentWriter;
 use interoptopus::Interop;
 use interoptopus::{Error, Library};
@@ -519,6 +520,130 @@ pub trait InteropCSharp {
         let rval = meta.namespace() == self.config().namespace_id;
         rval
     }
+
+    fn write_patterns(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        for pattern in self.library().patterns() {
+            match pattern {
+                LibraryPattern::Class(cls) => {
+                    if self.should_emit(cls.the_type().meta()) {
+                        self.write_pattern_class(w, cls)?
+                    }
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    fn write_pattern_class(&self, w: &mut IndentWriter, class: &Class) -> Result<(), Error> {
+        let context_type_name = class.the_type().rust_name();
+
+        let mut all_functions = vec![class.constructor().clone(), class.destructor().clone()];
+        all_functions.extend_from_slice(class.methods());
+        let common_prefix = longest_common_prefix(&all_functions);
+
+        self.write_documentation(w, class.the_type().meta().documentation())?;
+        w.indented(|w| writeln!(w, r#"public partial class {} : IDisposable"#, context_type_name))?;
+        w.indented(|w| writeln!(w, r#"{{"#))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#"private IntPtr _context;"#))?;
+
+        // Ctor
+        let args = self.pattern_class_args_without_first_to_string(class.constructor(), true);
+        self.write_documentation(w, class.constructor().meta().documentation())?;
+        w.indented(|w| writeln!(w, r#"public {}({})"#, context_type_name, args))?;
+        w.indented(|w| writeln!(w, r#"{{"#))?;
+        w.indent();
+        self.write_pattern_class_success_enum_aware_rval(w, class, class.constructor(), false)?;
+        w.unindent();
+        w.indented(|w| writeln!(w, r#"}}"#))?;
+        w.newline()?;
+
+        // Dtor
+        w.indented(|w| writeln!(w, r#"public void Dispose()"#))?;
+        w.indented(|w| writeln!(w, r#"{{"#))?;
+        w.indent();
+        self.write_pattern_class_success_enum_aware_rval(w, class, class.destructor(), false)?;
+        w.unindent();
+        w.indented(|w| writeln!(w, r#"}}"#))?;
+        w.newline()?;
+
+        for function in class.methods() {
+            let args = self.pattern_class_args_without_first_to_string(function, true);
+            let without_common_prefix = function.name().replace(&common_prefix, "");
+            let prettified = IdPrettifier::from_rust_lower(&without_common_prefix);
+            let rval = match function.signature().rval() {
+                CType::Pattern(TypePattern::SuccessEnum(_)) => "void".to_string(),
+                _ => self.type_to_typespecifier_in_rval(function.signature().rval()),
+            };
+
+            self.write_documentation(w, function.meta().documentation())?;
+
+            w.indented(|w| writeln!(w, r#"public {} {}({})"#, rval, prettified.to_camel_case(), &args))?;
+            w.indented(|w| writeln!(w, r#"{{"#))?;
+            w.indent();
+            self.write_pattern_class_success_enum_aware_rval(w, class, function, true)?;
+            w.unindent();
+            w.indented(|w| writeln!(w, r#"}}"#))?;
+            w.newline()?;
+        }
+
+        w.unindent();
+        w.indented(|w| writeln!(w, r#"}}"#))?;
+        w.newline()?;
+        w.newline()?;
+
+        Ok(())
+    }
+
+    fn write_pattern_class_success_enum_aware_rval(&self, w: &mut IndentWriter, _class: &Class, function: &Function, deref_context: bool) -> Result<(), Error> {
+        let mut args = self.pattern_class_args_without_first_to_string(function, false);
+
+        // Make sure we don't have a `,` when only single parameter
+        if !args.is_empty() {
+            args = format!(", {}", args);
+        }
+
+        let context = if deref_context { "_context".to_string() } else { "out _context".to_string() };
+
+        match function.signature().rval() {
+            CType::Pattern(TypePattern::SuccessEnum(e)) => {
+                w.indented(|w| writeln!(w, r#"var rval = {}.{}({} {});"#, self.config().class, function.name(), context, args))?;
+                w.indented(|w| writeln!(w, r#"if (rval != {}.{})"#, e.the_enum().rust_name(), e.success_variant().name()))?;
+                w.indented(|w| writeln!(w, r#"{{"#))?;
+                w.indent();
+                w.indented(|w| writeln!(w, r#"throw new Exception("Something went wrong");"#))?;
+                w.unindent();
+                w.indented(|w| writeln!(w, r#"}}"#))?;
+            }
+            _ => {
+                w.indented(|w| writeln!(w, r#"return {}.{}({} {});"#, self.config().class, function.name(), context, args))?;
+            }
+        }
+
+        Ok(())
+    }
+
+    fn pattern_class_args_without_first_to_string(&self, function: &Function, with_types: bool) -> String {
+        function
+            .signature()
+            .params()
+            .iter()
+            .skip(1)
+            .map(|x| {
+                format!(
+                    "{} {}",
+                    if with_types {
+                        self.type_to_typespecifier_in_param(x.the_type())
+                    } else {
+                        "".to_string()
+                    },
+                    x.name().to_string()
+                )
+            })
+            .collect::<Vec<_>>()
+            .join(", ")
+    }
 }
 
 impl Interop for Generator {
@@ -545,6 +670,9 @@ impl Interop for Generator {
 
             w.newline()?;
             self.write_type_definitions(w)?;
+
+            w.newline()?;
+            self.write_patterns(w)?;
 
             Ok(())
         })?;

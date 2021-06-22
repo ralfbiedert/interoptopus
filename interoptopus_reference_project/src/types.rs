@@ -102,8 +102,7 @@ pub struct UseAsciiStringPattern<'a> {
     pub ascii_string: AsciiPointer<'a>,
 }
 
-// Used for the `context_init(**Context)`, `context_use(*Context)`,
-// `context_destroy(**Context)` pattern that acts like constructors / methods / destructors.
+/// This can also be used for the `class` pattern.
 #[ffi_type(opaque)]
 #[repr(C)]
 pub struct Context {

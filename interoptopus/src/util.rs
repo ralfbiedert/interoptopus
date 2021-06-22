@@ -166,11 +166,7 @@ pub struct NamespaceMappings {
 }
 
 impl NamespaceMappings {
-    // pub fn new() -> Self {
-    //     Self::default()
-    // }
-
-    /// Creates new mappings with the default specified.
+    /// Creates a new mapping, assinging namespace id `""` to `default`.
     pub fn new(default: &str) -> Self {
         let mut mappings = HashMap::new();
         mappings.insert("".to_string(), default.to_string());
@@ -178,12 +174,52 @@ impl NamespaceMappings {
         Self { mappings }
     }
 
+    /// Adds a mapping between namespace `id` to string `value`.
     pub fn add(mut self, id: &str, value: &str) -> Self {
         self.mappings.insert(id.to_string(), value.to_string());
         self
     }
 
+    /// Obtains a mapping for the given ID.
     pub fn get(&self, id: &str) -> Option<&str> {
         self.mappings.get(id).map(|x| x.as_str())
+    }
+}
+
+/// Allows, for example, `my_id` to be converted to `MyId`.
+pub struct IdPrettifier {
+    tokens: Vec<String>,
+}
+
+impl IdPrettifier {
+    /// Creates a new prettifier from a `my_name` identifier.
+    pub fn from_rust_lower(id: &str) -> Self {
+        Self {
+            tokens: id.split('_').map(|x| x.to_string()).collect(),
+        }
+    }
+
+    pub fn to_camel_case(&self) -> String {
+        self.tokens
+            .iter()
+            .map(|x| {
+                x.chars()
+                    .enumerate()
+                    .map(|(i, x)| if i == 0 { x.to_ascii_uppercase() } else { x })
+                    .collect::<String>()
+            })
+            .collect::<Vec<_>>()
+            .join("")
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::util::IdPrettifier;
+
+    #[test]
+    fn is_pretty() {
+        assert_eq!(IdPrettifier::from_rust_lower("hello_world").to_camel_case(), "HelloWorld");
+        assert_eq!(IdPrettifier::from_rust_lower("single").to_camel_case(), "Single");
     }
 }

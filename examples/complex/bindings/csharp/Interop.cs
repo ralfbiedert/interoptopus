@@ -108,4 +108,5 @@ namespace My.Company
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate uint InteropDelegate_fn_u32_rval_u32(uint x0);
 
+
 }
