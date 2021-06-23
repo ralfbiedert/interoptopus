@@ -66,6 +66,7 @@ impl_failure_default!(i32, 0);
 impl_failure_default!(i64, 0);
 impl_failure_default!(f32, f32::NAN);
 impl_failure_default!(f64, f64::NAN);
+impl_failure_default!((), ());
 
 /// Combines a receiver, constructor, destructor and multiple methods in one entity.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -224,6 +225,7 @@ macro_rules! pattern_class_manual {
     };
 }
 
+/// TODO: Document middle one cna't be empty list.
 #[macro_export]
 macro_rules! pattern_class_generated {
     (
@@ -232,14 +234,14 @@ macro_rules! pattern_class_generated {
         $ctor:ident() -> $ctor_error:ty,
         $dtor:ident() -> $dtor_error:ty,
         [
-        $(
-            $method_as_fn:ident($($param:ident: $param_type:ty),*) -> $t:ty: $method:ident
-        ),*
+            $(
+                $method_as_fn:ident($($param:ident: $param_type:ty),*) -> $t:ty: $method:ident
+            ),*
         ],
         [
-        $(
-            $manual_method:ident
-        ),*
+            $(
+                $manual_method:ident
+            ),*
         ]
     ) => {
         #[interoptopus::ffi_function]

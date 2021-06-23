@@ -26,6 +26,8 @@ mod some_rust_module {
             x
         }
 
+        pub fn method_void(&self) {}
+
         pub fn method_mut_self(&mut self, x: u32) -> u32 {
             x
         }
@@ -58,7 +60,8 @@ pattern_class_generated!(
     [
         simple_class_result(x: u32) -> FFIError: method_result,
         simple_class_value(x: u32) -> u32: method_value,
-        simple_class_mut_self(x: u32) -> u32: method_mut_self
+        simple_class_mut_self(x: u32) -> u32: method_mut_self,
+        simple_class_void() -> (): method_void
     ],
     [
         simple_class_extra_method

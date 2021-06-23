@@ -144,6 +144,7 @@ FFIError simple_class_destroy(SimpleClass** context_ptr);
 FFIError simple_class_result(SimpleClass* context_ptr, uint32_t x);
 uint32_t simple_class_value(SimpleClass* context_ptr, uint32_t x);
 uint32_t simple_class_mut_self(SimpleClass* context_ptr, uint32_t x);
+void simple_class_void(SimpleClass* context_ptr);
 uint32_t simple_class_extra_method(SimpleClass* _context);
 
 #ifdef __cplusplus

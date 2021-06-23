@@ -616,6 +616,9 @@ pub trait InteropCSharp {
                 w.unindent();
                 w.indented(|w| writeln!(w, r#"}}"#))?;
             }
+            CType::Primitive(PrimitiveType::Void) => {
+                w.indented(|w| writeln!(w, r#"{}.{}({} {});"#, self.config().class, function.name(), context, args))?;
+            }
             _ => {
                 w.indented(|w| writeln!(w, r#"return {}.{}({} {});"#, self.config().class, function.name(), context, args))?;
             }

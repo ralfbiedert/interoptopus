@@ -137,6 +137,7 @@ FFIError simple_class_destroy(SimpleClass** context_ptr);
 FFIError simple_class_result(SimpleClass* context_ptr, uint32_t x);
 uint32_t simple_class_value(SimpleClass* context_ptr, uint32_t x);
 uint32_t simple_class_mut_self(SimpleClass* context_ptr, uint32_t x);
+void simple_class_void(SimpleClass* context_ptr);
 uint32_t simple_class_extra_method(SimpleClass* _context);
 """
 
@@ -717,6 +718,12 @@ This function may only be called with a context returned by a succeeding `patter
             x = x._ctx
         return _api.simple_class_mut_self(context_ptr, x)
 
+    def simple_class_void(context_ptr):
+        global _api
+        if hasattr(context_ptr, "_ctx"):
+            context_ptr = context_ptr._ctx
+        return _api.simple_class_void(context_ptr)
+
     def simple_class_extra_method(_context):
         """An extra exposed method."""
         global _api
@@ -806,6 +813,10 @@ class SimpleClass(object):
     def mut_self(self, x):
         global raw
         return _api.simple_class_mut_self(self.ctx[0], x)
+
+    def void(self, ):
+        global raw
+        return _api.simple_class_void(self.ctx[0], )
 
     def extra_method(self, ):
         """An extra exposed method."""
