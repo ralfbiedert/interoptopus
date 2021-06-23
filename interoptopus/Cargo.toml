@@ -16,8 +16,8 @@ testing = ["cc"]
 
 [dependencies]
 interoptopus_proc = { path = "../interoptopus_proc", version = "0.1", optional = true }
-cc = { version = "1.0.68", optional = true }
-serde = { version = "1.0.126", opional = true }
+cc = { version = "1.0", optional = true }
+serde = { version = "1.0", optional = true, features = ["derive"] }
 
 [dev-dependencies]
 interoptopus_backend_csharp = { path = "../interoptopus_backend_csharp", version = "0.1" }

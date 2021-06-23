@@ -13,9 +13,10 @@
   You probably forgot to declare one of your items `#[ffi_function]` or `#[ffi_const]`.
 
 
-- **Why do I get `use of undeclared crate or module` in `inventory_function!()`?**
+- **Why do I get `associated type bounds are unstable!()`?**
 
-  You probably forgot to declare one of your items `#[ffi_function]` or `#[ffi_const]`.
+  Right now it doesn't like `struct S<T: X>`. Instead, try `struct S<T> where T: X`.
+
 
 - **How do I support a new language?**
 
