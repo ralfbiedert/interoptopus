@@ -82,8 +82,6 @@ pub fn ffi_type(attr: TokenStream, item: TokenStream) -> TokenStream {
 
     let rval = types::ffi_type(attr_args, input);
 
-    println!("{}", rval);
-
     rval.into()
 }
 
