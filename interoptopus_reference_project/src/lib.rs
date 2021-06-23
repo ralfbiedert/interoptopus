@@ -7,10 +7,12 @@
 //! Note, many items here are deliberately not documented as testing how and if documentation
 //! is generated is part of the test.
 
-use interoptopus::pattern_class;
-
 pub mod constants;
 pub mod functions;
+pub mod patterns {
+    pub mod class_attribute;
+    pub mod class_manual;
+}
 pub mod types;
 
 interoptopus::inventory_function!(
@@ -41,11 +43,6 @@ interoptopus::inventory_function!(
         functions::generic,
         functions::documented,
         functions::pattern_ascii_pointer,
-        functions::pattern_class_create,
-        functions::pattern_class_method,
-        functions::pattern_class_destroy,
-        functions::pattern_class_method_success_enum_ok,
-        functions::pattern_class_method_success_enum_fail,
         functions::pattern_ffi_slice,
         functions::pattern_ffi_slice_delegate,
         functions::ambiguous_1,
@@ -53,16 +50,5 @@ interoptopus::inventory_function!(
         functions::ambiguous_3,
         functions::namespaced_type
     ],
-    [my_class_pattern_context]
-);
-
-pattern_class!(
-    my_class_pattern_context,
-    functions::pattern_class_create,
-    functions::pattern_class_destroy,
-    [
-        functions::pattern_class_method,
-        functions::pattern_class_method_success_enum_ok,
-        functions::pattern_class_method_success_enum_fail
-    ]
+    [patterns::class_manual::my_class_pattern_context]
 );

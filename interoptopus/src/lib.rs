@@ -105,7 +105,7 @@
 pub use error::Error;
 #[cfg(feature = "derive")]
 #[cfg_attr(docsrs, doc(cfg(feature = "derive")))] // does this work?
-pub use interoptopus_proc::{ffi_constant, ffi_function, ffi_type};
+pub use interoptopus_proc::{ffi_class, ffi_constant, ffi_function, ffi_type};
 
 pub use crate::core::Library;
 pub use generators::Interop;
@@ -228,7 +228,17 @@ macro_rules! inventory_function {
             let mut patterns: Vec<$crate::patterns::LibraryPattern> = Vec::new();
             $(
                 {
-                    patterns.push($pattern().into());
+                    let pattern: $crate::patterns::LibraryPattern = $pattern().into();
+
+                    match &pattern {
+                        $crate::patterns::LibraryPattern::Class(class) => {
+                            functions.push(class.constructor().clone());
+                            functions.push(class.destructor().clone());
+                            functions.extend(class.methods().iter().cloned());
+                        }
+                    }
+
+                    patterns.push(pattern);
                 }
             )*
 

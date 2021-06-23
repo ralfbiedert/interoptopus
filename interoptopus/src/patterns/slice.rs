@@ -35,6 +35,12 @@ impl<'a, T> FFISlice<'a, T> {
     }
 }
 
+impl<'a, T> From<&'a [T]> for FFISlice<'a, T> {
+    fn from(slice: &'a [T]) -> Self {
+        Self::from_slice(slice)
+    }
+}
+
 impl<'a, T> FFISlice<'a, T>
 where
     T: 'static,

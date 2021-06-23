@@ -34,7 +34,7 @@ pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
     let rval = if let ReturnType::Type(_, x) = item_fn.sig.output {
         match *x {
             Type::Path(x) => {
-                let token = x.path.to_token_stream();
+                let token = x.to_token_stream();
                 quote! { < #token as interoptopus::lang::rust::CTypeInfo>::type_info() }
             }
             Type::Tuple(_) => {
