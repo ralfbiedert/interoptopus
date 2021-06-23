@@ -132,7 +132,7 @@ FFIError pattern_class_destroy(Context** context_ptr);
 uint32_t pattern_class_method(Context* context);
 FFIError pattern_class_method_success_enum_ok(Context* _context);
 FFIError pattern_class_method_success_enum_fail(Context* _context);
-FFIError simple_class_create(SimpleClass** context_ptr);
+FFIError simple_class_create(SimpleClass** context_ptr, uint32_t x);
 FFIError simple_class_destroy(SimpleClass** context_ptr);
 FFIError simple_class_result(SimpleClass* context_ptr, uint32_t x);
 uint32_t simple_class_value(SimpleClass* context_ptr, uint32_t x);
@@ -682,11 +682,13 @@ This function may only be called with a context returned by a succeeding `patter
             _context = _context._ctx
         return _api.pattern_class_method_success_enum_fail(_context)
 
-    def simple_class_create(context_ptr):
+    def simple_class_create(context_ptr, x):
         global _api
         if hasattr(context_ptr, "_ctx"):
             context_ptr = context_ptr._ctx
-        return _api.simple_class_create(context_ptr)
+        if hasattr(x, "_ctx"):
+            x = x._ctx
+        return _api.simple_class_create(context_ptr, x)
 
     def simple_class_destroy(context_ptr):
         global _api
@@ -781,10 +783,12 @@ This function may only be called with a context returned by a succeeding `patter
 
 
 class SimpleClass(object):
-    def __init__(self, ):
+    def __init__(self, x):
+        if hasattr(x, "_ctx"):
+            x = x._ctx
         global _api, ffi
         self.ctx = ffi.new("SimpleClass**")
-        rval = raw.simple_class_create(self.ctx, )
+        rval = raw.simple_class_create(self.ctx, x)
         if rval == FFIError.Ok:
             return None
         else:

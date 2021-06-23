@@ -128,7 +128,7 @@ namespace My.Company
         public static extern FFIError pattern_class_method_success_enum_fail(IntPtr _context);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_class_create")]
-        public static extern FFIError simple_class_create(out IntPtr context_ptr);
+        public static extern FFIError simple_class_create(out IntPtr context_ptr, uint x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_class_destroy")]
         public static extern FFIError simple_class_destroy(out IntPtr context_ptr);
@@ -309,9 +309,9 @@ namespace My.Company
     public partial class SimpleClass : IDisposable
     {
         private IntPtr _context;
-        public SimpleClass()
+        public SimpleClass(uint x)
         {
-            var rval = Interop.simple_class_create(out _context );
+            var rval = Interop.simple_class_create(out _context ,  x);
             if (rval != FFIError.Ok)
             {
                 throw new Exception("Something went wrong");

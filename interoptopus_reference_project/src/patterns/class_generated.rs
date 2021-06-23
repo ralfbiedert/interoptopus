@@ -18,6 +18,10 @@ mod some_rust_module {
 
     // Regular implementation of methods.
     impl SimpleClass {
+        pub fn new_with(some_value: u32) -> Self {
+            Self { some_value }
+        }
+
         pub fn method_result(&self, _: u32) -> Result<(), Error> {
             Ok(())
         }
@@ -57,7 +61,7 @@ pub extern "C" fn simple_class_extra_method(_context: Option<&mut SimpleClass>) 
 pattern_class_generated!(
     simple_class_pattern,
     SimpleClass,
-    simple_class_create() -> FFIError,
+    simple_class_create(x: u32) -> FFIError: new_with,
     simple_class_destroy() -> FFIError,
     [
         simple_class_result(&mut SimpleClass, x: u32) -> FFIError: method_result,

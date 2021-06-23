@@ -231,7 +231,7 @@ macro_rules! pattern_class_generated {
     (
         $export_function:ident,
         $opaque:ty,
-        $ctor:ident() -> $ctor_error:ty,
+        $ctor:ident($($ctor_param:ident: $ctor_param_type:ty),*) -> $ctor_error:ty: $method_ctor:ident,
         $dtor:ident() -> $dtor_error:ty,
         [
             $(
@@ -246,9 +246,9 @@ macro_rules! pattern_class_generated {
     ) => {
         #[interoptopus::ffi_function]
         #[no_mangle]
-        pub extern "C" fn $ctor(context_ptr: Option<&mut *mut $opaque>) -> $ctor_error {
+        pub extern "C" fn $ctor(context_ptr: Option<&mut *mut $opaque>, $( $ctor_param: $ctor_param_type),*) -> $ctor_error {
             if let Some(context) = context_ptr {
-                let boxed = Box::new(<$opaque>::default());
+                let boxed = Box::new(<$opaque>::$method_ctor($($ctor_param),*));
                 let raw = Box::into_raw(boxed);
 
                 *context = raw;
@@ -263,7 +263,6 @@ macro_rules! pattern_class_generated {
         #[no_mangle]
         pub extern "C" fn $dtor(context_ptr: Option<&mut *mut $opaque>) -> $dtor_error {
             if let Some(context) = context_ptr {
-
 
                 {
                     unsafe { Box::from_raw(*context) };
@@ -280,7 +279,7 @@ macro_rules! pattern_class_generated {
         $(
             #[interoptopus::ffi_function]
             #[no_mangle]
-            pub extern "C" fn $method_as_fn(context_ptr: Option<$self_ty>, $( $param: $param_type), * ) -> $t {
+            pub extern "C" fn $method_as_fn(context_ptr: Option<$self_ty>, $( $param: $param_type),* ) -> $t {
                 if let Some(context) = context_ptr {
                     let rval = <$opaque>::$method(context, $($param),*);
                     rval.into()
