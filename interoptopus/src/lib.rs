@@ -58,7 +58,7 @@
 //! interoptopus::inventory_function!(ffi_inventory, [], [my_function], []);
 //! ```
 //!
-//! ## Interop Code Generated
+//! ## Generated Code
 //!
 //! Once you've written the code above you use one of these backends to generate interop code:
 //!
@@ -72,10 +72,10 @@
 //! ## Features
 //!
 //! See the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src) lists all supported constructs including:
-//! - [functions](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/functions.rs)
-//! - [types](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/types.rs)
-//! - [constants](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/constants.rs)
-//! - [patterns](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src/patterns)
+//! - [functions](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/functions.rs) (`extern "C"` functions and delegates)
+//! - [types](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/types.rs) (primitives, composite, enums (numeric only), opaques, references, pointers, ...)
+//! - [constants](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/constants.rs) (primitive constants; results of const evaluation)
+//! - [patterns](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src/patterns) (ASCII pointers, options, slices, classes, ...)
 //!
 //! As a rule of thumb we recommend to be slightly conservative with your signatures and always "think C", since other languages don't track lifetimes
 //! well and it's is easy to accidentally pass an outlived pointer or doubly alias a `&mut X` on reentrant functions.

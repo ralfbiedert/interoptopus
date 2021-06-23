@@ -159,11 +159,8 @@ pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemSt
         generics_params = quote! { < #(#generic_params),* > };
 
         if !generic_params_needing_bounds.is_empty() {
-            if let Some(x) = item.generics.where_clause {
-                // where_clause = quote! { #x, #( #generic_params_needing_bounds: interoptopus::lang::rust::CTypeInfo)*, }
-                where_clause = quote! { #x }
-            } else {
-                // where_clause = quote! { where #( #generic_params_needing_bounds: interoptopus::lang::rust::CTypeInfo)*, }
+            if let Some(where_cl) = item.generics.where_clause {
+                where_clause = quote! { #where_cl }
             }
         }
     }
@@ -202,10 +199,14 @@ pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemSt
         impl #generics_params interoptopus::lang::rust::CTypeInfo for #name_ident #generics_params #where_clause {
 
             fn type_info() -> interoptopus::lang::c::CType {
-
                 let documentation = interoptopus::lang::c::Documentation::from_line(#doc_line);
                 let mut meta = interoptopus::lang::c::Meta::with_namespace_documentation(#namespace.to_string(), documentation);
                 let mut fields = std::vec::Vec::new();
+                let mut generics: std::vec::Vec<String> = std::vec::Vec::new();
+
+                #({
+                    generics.push(<#generic_params_needing_bounds as interoptopus::lang::rust::CTypeInfo>::type_info().name_within_lib());
+                })*
 
                 #({
                     let documentation = interoptopus::lang::c::Documentation::from_line(#field_docs);
@@ -213,7 +214,9 @@ pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemSt
                     fields.push(interoptopus::lang::c::Field::with_documentation(#field_names.to_string(), the_type, documentation));
                 })*
 
-                let rval = interoptopus::lang::c::CompositeType::with_meta(#c_struct_name.to_string(), fields, meta);
+                let name = format!("{}{}", #c_struct_name.to_string(), generics.join(""));
+
+                let rval = interoptopus::lang::c::CompositeType::with_meta(name, fields, meta);
                 interoptopus::lang::c::CType::Composite(rval)
             }
         }

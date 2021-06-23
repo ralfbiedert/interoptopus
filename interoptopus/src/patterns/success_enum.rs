@@ -2,11 +2,34 @@
 
 use crate::lang::c::{EnumType, Variant};
 
+/// A trait you should implement for enums that signal errors in FFI calls.
+///
+/// The `SUCCESS` variant will be used to automatically convert `Result::Ok`
+/// values, and `NULL` when a required pointer was detected to be `null`.
+///
+/// # Example
+///
+/// ```
+/// use interoptopus::patterns::success_enum::Success;
+///
+/// enum FFIError {
+///     Ok = 0,
+///     NullPassed = 1,
+///     OtherError = 2,
+/// }
+///
+/// impl Success for FFIError {
+///     const SUCCESS: Self = Self::Ok;
+///     const NULL: Self = Self::NullPassed;
+/// }
+/// ```
 pub trait Success {
+    /// This variant
     const SUCCESS: Self;
     const NULL: Self;
 }
 
+/// Internal helper derived for enums that are [`Success`].
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct SuccessEnum {
     the_enum: EnumType,

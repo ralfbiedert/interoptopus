@@ -37,10 +37,10 @@ typedef enum FFIError
     Fail = 200,
     } FFIError;
 
-typedef struct Phantom
+typedef struct Phantomu8
     {
     uint32_t x;
-    } Phantom;
+    } Phantomu8;
 
 typedef struct SomeForeignType
     {
@@ -101,10 +101,15 @@ typedef struct FFISliceu8
     uint64_t len;
     } FFISliceu8;
 
-typedef struct Generic
+typedef struct Genericu32
     {
     uint32_t* x;
-    } Generic;
+    } Genericu32;
+
+typedef struct Genericu8
+    {
+    uint8_t* x;
+    } Genericu8;
 
 typedef uint8_t (*fptr_fn_FFISliceu8_rval_u8)(FFISliceu8 x0);
 
@@ -131,7 +136,8 @@ Tupled tupled(Tupled x);
 FFIError complex_1(Vec3f32 _a, Empty* _b);
 Opaque* complex_2(SomeForeignType _cmplx);
 uint8_t callback(fptr_fn_u8_rval_u8 callback, uint8_t value);
-uint32_t generic(Generic x, Phantom _y);
+uint32_t generic_1(Genericu32 x, Phantomu8 _y);
+uint8_t generic_2(Genericu8 x, Phantomu8 _y);
 EnumDocumented documented(StructDocumented _x);
 uint32_t pattern_ascii_pointer(uint8_t* x, UseAsciiStringPattern y);
 uint32_t pattern_ffi_slice(FFISliceu32 ffi_slice);

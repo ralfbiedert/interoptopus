@@ -30,10 +30,10 @@ typedef enum FFIError
     Fail = 200,
     } FFIError;
 
-typedef struct Phantom
+typedef struct Phantomu8
     {
     uint32_t x;
-    } Phantom;
+    } Phantomu8;
 
 typedef struct SomeForeignType
     {
@@ -94,10 +94,15 @@ typedef struct FFISliceu8
     uint64_t len;
     } FFISliceu8;
 
-typedef struct Generic
+typedef struct Genericu32
     {
     uint32_t* x;
-    } Generic;
+    } Genericu32;
+
+typedef struct Genericu8
+    {
+    uint8_t* x;
+    } Genericu8;
 
 typedef uint8_t (*fptr_fn_FFISliceu8_rval_u8)(FFISliceu8 x0);
 
@@ -124,7 +129,8 @@ Tupled tupled(Tupled x);
 FFIError complex_1(Vec3f32 _a, Empty* _b);
 Opaque* complex_2(SomeForeignType _cmplx);
 uint8_t callback(fptr_fn_u8_rval_u8 callback, uint8_t value);
-uint32_t generic(Generic x, Phantom _y);
+uint32_t generic_1(Genericu32 x, Phantomu8 _y);
+uint8_t generic_2(Genericu8 x, Phantomu8 _y);
 EnumDocumented documented(StructDocumented _x);
 uint32_t pattern_ascii_pointer(uint8_t* x, UseAsciiStringPattern y);
 uint32_t pattern_ffi_slice(FFISliceu32 ffi_slice);
@@ -238,14 +244,14 @@ class FFISliceu8(object):
         self._ptr_len = value
         self._ctx.len = value
 
-class Generic(object):
+class Genericu32(object):
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Generic[]", 1)[0]
+        self._ctx = ffi.new("Genericu32[]", 1)[0]
 
     def array(n):
         global _api, ffi
-        return ffi.new("Generic[]", n)
+        return ffi.new("Genericu32[]", n)
 
     @property
     def x(self):
@@ -256,14 +262,32 @@ class Generic(object):
         self._ptr_x = value
         self._ctx.x = value
 
-class Phantom(object):
+class Genericu8(object):
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Phantom[]", 1)[0]
+        self._ctx = ffi.new("Genericu8[]", 1)[0]
 
     def array(n):
         global _api, ffi
-        return ffi.new("Phantom[]", n)
+        return ffi.new("Genericu8[]", n)
+
+    @property
+    def x(self):
+        return self._ctx.x
+
+    @x.setter
+    def x(self, value):
+        self._ptr_x = value
+        self._ctx.x = value
+
+class Phantomu8(object):
+    def __init__(self):
+        global _api, ffi
+        self._ctx = ffi.new("Phantomu8[]", 1)[0]
+
+    def array(n):
+        global _api, ffi
+        return ffi.new("Phantomu8[]", n)
 
     @property
     def x(self):
@@ -616,13 +640,21 @@ class raw:
             value = value._ctx
         return _api.callback(callback, value)
 
-    def generic(x, _y):
+    def generic_1(x, _y):
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx
         if hasattr(_y, "_ctx"):
             _y = _y._ctx
-        return _api.generic(x, _y)
+        return _api.generic_1(x, _y)
+
+    def generic_2(x, _y):
+        global _api
+        if hasattr(x, "_ctx"):
+            x = x._ctx
+        if hasattr(_y, "_ctx"):
+            _y = _y._ctx
+        return _api.generic_2(x, _y)
 
     def documented(_x):
         """This function has documentation."""
