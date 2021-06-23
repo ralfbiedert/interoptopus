@@ -33,9 +33,9 @@ If you ...
 - if you target only a single language and don't care about your FFI layer other solutions might be better
 
 
-### Example & Backends
+### Rust Code You Write
 
-Assume you have written this Rust FFI code:
+This is code you would write:
 
 ```rust
 use interoptopus::{ffi_function, ffi_type};
@@ -57,7 +57,9 @@ pub extern "C" fn my_function(input: Vec3) -> Vec3 {
 interoptopus::inventory_function!(ffi_inventory, [], [my_function], []);
 ```
 
-You can now use one of these backends to generate interop code:
+### Generated Code
+
+Once you've written the code above you use one of these backends to generate interop code:
 
 | Language | Crate | Sample Output |
 | --- | --- | --- |
@@ -68,7 +70,15 @@ You can now use one of these backends to generate interop code:
 
 ### Features
 
-See the [reference project](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src) for a list of all supported features.
+See the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src) lists all supported constructs including:
+- [functions](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/functions.rs) (`extern "C"` functions and delegates)
+- [types](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/types.rs) (primitives, composite, enums (numeric only), opaques, references, pointers, ...)
+- [constants](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/constants.rs) (primitive constants; results of const evaluation)
+- [patterns](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src/patterns) (ASCII pointers, options, slices, classes, ...)
+
+As a rule of thumb we recommend to be slightly conservative with your signatures and always "think C", since other languages don't track lifetimes
+well and it's is easy to accidentally pass an outlived pointer or doubly alias a `&mut X` on reentrant functions.
+
 
 ### Current Status
 
