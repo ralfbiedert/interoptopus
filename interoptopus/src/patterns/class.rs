@@ -235,7 +235,7 @@ macro_rules! pattern_class_generated {
         $dtor:ident() -> $dtor_error:ty,
         [
             $(
-                $method_as_fn:ident($($param:ident: $param_type:ty),*) -> $t:ty: $method:ident
+                $method_as_fn:ident($self_ty:ty $(, $param:ident: $param_type:ty)*) -> $t:ty: $method:ident
             ),*
         ],
         [
@@ -264,6 +264,7 @@ macro_rules! pattern_class_generated {
         pub extern "C" fn $dtor(context_ptr: Option<&mut *mut $opaque>) -> $dtor_error {
             if let Some(context) = context_ptr {
 
+
                 {
                     unsafe { Box::from_raw(*context) };
                 }
@@ -279,7 +280,7 @@ macro_rules! pattern_class_generated {
         $(
             #[interoptopus::ffi_function]
             #[no_mangle]
-            pub extern "C" fn $method_as_fn(context_ptr: Option<&mut $opaque>, $( $param: $param_type), * ) -> $t {
+            pub extern "C" fn $method_as_fn(context_ptr: Option<$self_ty>, $( $param: $param_type), * ) -> $t {
                 if let Some(context) = context_ptr {
                     let rval = <$opaque>::$method(context, $($param),*);
                     rval.into()

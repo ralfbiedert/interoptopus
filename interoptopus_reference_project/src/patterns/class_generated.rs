@@ -34,12 +34,14 @@ mod some_rust_module {
     }
 }
 
+use some_rust_module::{Error, SimpleClass};
+
 // Needed for Error to FFIError conversion.
-impl From<Result<(), some_rust_module::Error>> for FFIError {
-    fn from(x: Result<(), some_rust_module::Error>) -> Self {
+impl From<Result<(), Error>> for FFIError {
+    fn from(x: Result<(), Error>) -> Self {
         match x {
             Ok(_) => Self::Ok,
-            Err(some_rust_module::Error::Bad) => Self::Fail,
+            Err(Error::Bad) => Self::Fail,
         }
     }
 }
@@ -47,21 +49,21 @@ impl From<Result<(), some_rust_module::Error>> for FFIError {
 /// An extra exposed method.
 #[ffi_function]
 #[no_mangle]
-pub extern "C" fn simple_class_extra_method(_context: Option<&mut some_rust_module::SimpleClass>) -> u32 {
+pub extern "C" fn simple_class_extra_method(_context: Option<&mut SimpleClass>) -> u32 {
     0
 }
 
 // Generate all FFI helpers.
 pattern_class_generated!(
     simple_class_pattern,
-    some_rust_module::SimpleClass,
+    SimpleClass,
     simple_class_create() -> FFIError,
     simple_class_destroy() -> FFIError,
     [
-        simple_class_result(x: u32) -> FFIError: method_result,
-        simple_class_value(x: u32) -> u32: method_value,
-        simple_class_mut_self(x: u32) -> u32: method_mut_self,
-        simple_class_void() -> (): method_void
+        simple_class_result(&mut SimpleClass, x: u32) -> FFIError: method_result,
+        simple_class_value(&mut SimpleClass, x: u32) -> u32: method_value,
+        simple_class_mut_self(&mut SimpleClass, x: u32) -> u32: method_mut_self,
+        simple_class_void(&SimpleClass) -> (): method_void
     ],
     [
         simple_class_extra_method
