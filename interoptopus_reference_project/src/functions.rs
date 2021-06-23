@@ -2,7 +2,7 @@
 
 use crate::types::{
     ambiguous1, ambiguous2, common, some_foreign_type, CallbackFFISlice, Callbacku8u8, Empty, EnumDocumented, FFIError, Generic, Opaque, Phantom, SomeForeignType,
-    StructDocumented, UseAsciiStringPattern, Vec3f32,
+    StructDocumented, Tupled, UseAsciiStringPattern, Vec3f32,
 };
 use interoptopus::ffi_function;
 use interoptopus::patterns::ascii_pointer::AsciiPointer;
@@ -112,6 +112,12 @@ pub extern "C" fn ptr_option(x: Option<&i64>) -> bool {
 #[no_mangle]
 pub extern "C" fn ptr_option_mut(x: Option<&mut i64>) -> bool {
     x.is_some()
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn tupled(x: Tupled) -> Tupled {
+    Tupled(x.0 * 2)
 }
 
 #[ffi_function]

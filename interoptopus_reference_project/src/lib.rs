@@ -37,6 +37,7 @@ interoptopus::inventory_function!(
         functions::ptr_simple_mut,
         functions::ptr_option,
         functions::ptr_option_mut,
+        functions::tupled,
         functions::complex_1,
         functions::complex_2,
         functions::callback,

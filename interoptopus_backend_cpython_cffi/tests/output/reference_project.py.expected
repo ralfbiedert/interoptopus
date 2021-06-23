@@ -45,6 +45,11 @@ typedef struct StructDocumented
     float x;
     } StructDocumented;
 
+typedef struct Tupled
+    {
+    uint8_t x0;
+    } Tupled;
+
 typedef struct UseAsciiStringPattern
     {
     uint8_t* ascii_string;
@@ -115,6 +120,7 @@ int64_t* ptr_simple(int64_t* x);
 int64_t* ptr_simple_mut(int64_t* x);
 bool ptr_option(int64_t* x);
 bool ptr_option_mut(int64_t* x);
+Tupled tupled(Tupled x);
 FFIError complex_1(Vec3f32 _a, Empty* _b);
 Opaque* complex_2(SomeForeignType _cmplx);
 uint8_t callback(fptr_fn_u8_rval_u8 callback, uint8_t value);
@@ -305,6 +311,24 @@ class StructDocumented(object):
     def x(self, value):
         self._ptr_x = value
         self._ctx.x = value
+
+class Tupled(object):
+    def __init__(self):
+        global _api, ffi
+        self._ctx = ffi.new("Tupled[]", 1)[0]
+
+    def array(n):
+        global _api, ffi
+        return ffi.new("Tupled[]", n)
+
+    @property
+    def x0(self):
+        return self._ctx.x0
+
+    @x0.setter
+    def x0(self, value):
+        self._ptr_x0 = value
+        self._ctx.x0 = value
 
 class UseAsciiStringPattern(object):
     def __init__(self):
@@ -563,6 +587,12 @@ class raw:
         if hasattr(x, "_ctx"):
             x = x._ctx
         return _api.ptr_option_mut(x)
+
+    def tupled(x):
+        global _api
+        if hasattr(x, "_ctx"):
+            x = x._ctx
+        return _api.tupled(x)
 
     def complex_1(_a, _b):
         global _api

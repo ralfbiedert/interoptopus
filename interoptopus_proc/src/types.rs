@@ -168,8 +168,8 @@ pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemSt
         }
     }
 
-    for field in &item.fields {
-        let name = field.ident.as_ref().expect("Field must be named").to_string();
+    for (i, field) in item.fields.iter().enumerate() {
+        let name = field.ident.as_ref().map(|x| x.to_string()).unwrap_or_else(|| format!("x{}", i.to_string()));
 
         if attr.skip.contains_key(&name) {
             continue;

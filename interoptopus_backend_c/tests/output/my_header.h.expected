@@ -52,6 +52,11 @@ typedef struct StructDocumented
     float x;
     } StructDocumented;
 
+typedef struct Tupled
+    {
+    uint8_t x0;
+    } Tupled;
+
 typedef struct UseAsciiStringPattern
     {
     uint8_t* ascii_string;
@@ -122,6 +127,7 @@ int64_t* ptr_simple(int64_t* x);
 int64_t* ptr_simple_mut(int64_t* x);
 bool ptr_option(int64_t* x);
 bool ptr_option_mut(int64_t* x);
+Tupled tupled(Tupled x);
 FFIError complex_1(Vec3f32 _a, Empty* _b);
 Opaque* complex_2(SomeForeignType _cmplx);
 uint8_t callback(fptr_fn_u8_rval_u8 callback, uint8_t value);

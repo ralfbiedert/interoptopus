@@ -72,6 +72,9 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ptr_option_mut")]
         public static extern bool ptr_option_mut(out long x);
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tupled")]
+        public static extern Tupled tupled(Tupled x);
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "complex_1")]
         public static extern FFIError complex_1(Vec3f32 _a, ref Empty _b);
 
@@ -210,6 +213,13 @@ namespace My.Company
     {
         /// Documented field.
         public float x;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct Tupled
+    {
+        public byte x0;
     }
 
     [Serializable]

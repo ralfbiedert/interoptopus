@@ -32,6 +32,10 @@ pub struct Opaque {
 
 #[ffi_type]
 #[repr(C)]
+pub struct Tupled(pub u8);
+
+#[ffi_type]
+#[repr(C)]
 pub struct Generic<'a, T>
 where
     T: 'static,
