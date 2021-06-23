@@ -126,17 +126,17 @@ uint8_t callback(fptr_fn_u8_rval_u8 callback, uint8_t value);
 uint32_t generic(Generic x, Phantom _y);
 EnumDocumented documented(StructDocumented _x);
 uint32_t pattern_ascii_pointer(uint8_t* x, UseAsciiStringPattern y);
-FFIError pattern_class_create(Context** context_ptr, uint32_t value);
-uint32_t pattern_class_method(Context* context);
-FFIError pattern_class_destroy(Context** context_ptr);
-FFIError pattern_class_method_success_enum_ok(Context* _context);
-FFIError pattern_class_method_success_enum_fail(Context* _context);
 uint32_t pattern_ffi_slice(FFISliceu32 ffi_slice);
 uint8_t pattern_ffi_slice_delegate(fptr_fn_FFISliceu8_rval_u8 callback);
 Vec1 ambiguous_1(Vec1 x);
 Vec2 ambiguous_2(Vec2 x);
 bool ambiguous_3(Vec1 x, Vec2 y);
 Vec namespaced_type(Vec x);
+FFIError pattern_class_create(Context** context_ptr, uint32_t value);
+FFIError pattern_class_destroy(Context** context_ptr);
+uint32_t pattern_class_method(Context* context);
+FFIError pattern_class_method_success_enum_ok(Context* _context);
+FFIError pattern_class_method_success_enum_fail(Context* _context);
 
 #ifdef __cplusplus
 }

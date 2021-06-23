@@ -4,6 +4,7 @@ use crate::lang::c::{EnumType, Variant};
 
 pub trait Success {
     const SUCCESS: Self;
+    const NULL: Self;
 }
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]

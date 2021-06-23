@@ -1,5 +1,5 @@
 use crate::types::{Context, FFIError};
-use interoptopus::{ffi_function, pattern_class};
+use interoptopus::{ffi_function, pattern_class_manual};
 
 #[ffi_function]
 #[no_mangle]
@@ -56,7 +56,7 @@ pub extern "C" fn pattern_class_method_success_enum_fail(_context: Option<&mut C
     FFIError::Fail
 }
 
-pattern_class!(
+pattern_class_manual!(
     my_class_pattern_context,
     pattern_class_create,
     pattern_class_destroy,

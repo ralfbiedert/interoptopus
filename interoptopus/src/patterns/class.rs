@@ -29,19 +29,43 @@
 //! - the value for `mmR` will be exactly the value returned by a previous constructor invocation,
 
 use crate::lang::c::{CType, Function, OpaqueType};
+use crate::patterns::success_enum::Success;
 use crate::patterns::TypePattern;
 
-pub trait ClassPattern: Sized {
-    type Result;
-
-    type Error;
-
-    type FFIError;
-
-    fn null_error() -> Self::Error;
-
-    fn new() -> Result<Self, Self::Error>;
+macro_rules! impl_failure_default {
+    ($t:ty, $x:expr) => {
+        impl FailureDefault for $t {
+            fn failure_default() -> Self {
+                $x
+            }
+        }
+    };
 }
+
+/// For types that can be returned by a generated class what to return when things went wrong?
+pub trait FailureDefault {
+    fn failure_default() -> Self;
+}
+
+impl<T> FailureDefault for T
+where
+    T: Success,
+{
+    fn failure_default() -> Self {
+        T::NULL
+    }
+}
+
+impl_failure_default!(u8, 0);
+impl_failure_default!(u16, 0);
+impl_failure_default!(u32, 0);
+impl_failure_default!(u64, 0);
+impl_failure_default!(i8, 0);
+impl_failure_default!(i16, 0);
+impl_failure_default!(i32, 0);
+impl_failure_default!(i64, 0);
+impl_failure_default!(f32, f32::NAN);
+impl_failure_default!(f64, f64::NAN);
 
 /// Combines a receiver, constructor, destructor and multiple methods in one entity.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -158,7 +182,7 @@ impl Class {
 /// );
 /// ```
 #[macro_export]
-macro_rules! pattern_class {
+macro_rules! pattern_class_manual {
     (
         $pattern_name:ident,
         $constructor:path,
@@ -197,6 +221,78 @@ macro_rules! pattern_class {
             rval.assert_valid();
             rval
         }
+    };
+}
+
+#[macro_export]
+macro_rules! pattern_class_generated {
+    (
+        $export_function:ident,
+        $opaque:ty,
+        $ctor:ident() -> $ctor_error:ty,
+        $dtor:ident() -> $dtor_error:ty,
+        [
+        $(
+            $method_as_fn:ident($($param:ident: $param_type:ty),*) -> $t:ty: $method:ident
+        ),*
+        ],
+        [
+        $(
+            $manual_method:ident
+        ),*
+        ]
+    ) => {
+        #[interoptopus::ffi_function]
+        #[no_mangle]
+        pub extern "C" fn $ctor(context_ptr: Option<&mut *mut $opaque>) -> $ctor_error {
+            if let Some(context) = context_ptr {
+                let boxed = Box::new(<$opaque>::default());
+                let raw = Box::into_raw(boxed);
+
+                *context = raw;
+
+                <$ctor_error as interoptopus::patterns::success_enum::Success>::SUCCESS
+            } else {
+                <$ctor_error as interoptopus::patterns::success_enum::Success>::NULL
+            }
+        }
+
+        #[interoptopus::ffi_function]
+        #[no_mangle]
+        pub extern "C" fn $dtor(context_ptr: Option<&mut *mut $opaque>) -> $dtor_error {
+            if let Some(context) = context_ptr {
+
+                {
+                    unsafe { Box::from_raw(*context) };
+                }
+
+                *context = std::ptr::null_mut();
+
+                <$dtor_error as interoptopus::patterns::success_enum::Success>::SUCCESS
+            } else {
+                <$dtor_error as interoptopus::patterns::success_enum::Success>::NULL
+            }
+        }
+
+        $(
+            #[interoptopus::ffi_function]
+            #[no_mangle]
+            pub extern "C" fn $method_as_fn(context_ptr: Option<&mut $opaque>, $( $param: $param_type), * ) -> $t {
+                if let Some(context) = context_ptr {
+                    let rval = <$opaque>::$method(context, $($param),*);
+                    rval.into()
+                } else {
+                    < $t as interoptopus::patterns::class::FailureDefault > :: failure_default()
+                }
+            }
+        )*
+
+
+        // Generate export function
+        interoptopus::pattern_class_manual!($export_function, $ctor, $dtor, [
+            $($method_as_fn),*
+            $(,$manual_method)*
+        ]);
     };
 }
 

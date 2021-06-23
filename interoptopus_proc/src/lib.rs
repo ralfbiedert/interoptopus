@@ -8,9 +8,6 @@ mod constants;
 mod functions;
 mod types;
 mod util;
-mod patterns {
-    pub mod class;
-}
 
 use proc_macro::TokenStream;
 use syn::{parse_macro_input, AttributeArgs};
@@ -166,18 +163,6 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr_args = parse_macro_input!(attr as AttributeArgs);
 
     let rval = constants::ffi_constant(attr_args, input);
-
-    rval.into()
-}
-
-#[proc_macro_attribute]
-pub fn ffi_class(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let input = proc_macro2::TokenStream::from(item);
-    let attr_args = parse_macro_input!(attr as AttributeArgs);
-
-    let rval = patterns::class::ffi_class(attr_args, input);
-
-    println!("{}", &rval.to_string());
 
     rval.into()
 }

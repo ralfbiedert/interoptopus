@@ -10,7 +10,7 @@
 pub mod constants;
 pub mod functions;
 pub mod patterns {
-    pub mod class_attribute;
+    pub mod class_generated;
     pub mod class_manual;
 }
 pub mod types;
@@ -50,5 +50,5 @@ interoptopus::inventory_function!(
         functions::ambiguous_3,
         functions::namespaced_type
     ],
-    [patterns::class_manual::my_class_pattern_context]
+    [patterns::class_manual::my_class_pattern_context, patterns::class_generated::simple_class_pattern]
 );

@@ -37,6 +37,10 @@ pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
                 let token = x.to_token_stream();
                 quote! { < #token as interoptopus::lang::rust::CTypeInfo>::type_info() }
             }
+            Type::Group(x) => {
+                let token = x.to_token_stream();
+                quote! { < #token as interoptopus::lang::rust::CTypeInfo>::type_info() }
+            }
             Type::Tuple(_) => {
                 // TODO: Check tuple is really empty.
                 quote! { interoptopus::lang::c::CType::Primitive(interoptopus::lang::c::PrimitiveType::Void) }
@@ -50,7 +54,7 @@ pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
                 quote! { < #token as interoptopus::lang::rust::CTypeInfo>::type_info() }
             }
             _ => {
-                panic!("Unsupported type at interface boundary found: {:?}.", x)
+                panic!("Unsupported type at interface boundary found for rval: {:?}.", x)
             }
         }
     } else {
@@ -77,9 +81,10 @@ pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
                 let token = match pat.ty.as_ref() {
                     Type::Path(x) => x.path.to_token_stream(),
                     Type::Reference(x) => x.to_token_stream(),
+                    Type::Group(x) => x.to_token_stream(),
                     Type::Ptr(x) => x.to_token_stream(),
                     _ => {
-                        panic!("Unsupported type at interface boundary found: {:?}.", pat.ty)
+                        panic!("Unsupported type at interface boundary found for parameter: {:?}.", pat.ty)
                     }
                 };
 
