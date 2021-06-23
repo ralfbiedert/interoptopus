@@ -31,6 +31,18 @@
 use crate::lang::c::{CType, Function, OpaqueType};
 use crate::patterns::TypePattern;
 
+pub trait ClassPattern: Sized {
+    type Result;
+
+    type Error;
+
+    type FFIError;
+
+    fn null_error() -> Self::Error;
+
+    fn new() -> Result<Self, Self::Error>;
+}
+
 /// Combines a receiver, constructor, destructor and multiple methods in one entity.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Class {
@@ -155,7 +167,7 @@ macro_rules! pattern_class {
             $method:path
         ),*]
     ) => {
-        fn $pattern_name() -> interoptopus::patterns::class::Class {
+        pub(crate) fn $pattern_name() -> interoptopus::patterns::class::Class {
             use interoptopus::lang::rust::CTypeInfo;
             use interoptopus::lang::rust::FunctionInfo;
 
