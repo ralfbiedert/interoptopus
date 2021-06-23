@@ -26,6 +26,8 @@ typedef struct Context Context;
 
 typedef struct Opaque Opaque;
 
+typedef struct SimpleClass SimpleClass;
+
 typedef struct Empty Empty;
 
 typedef enum FFIError
@@ -137,6 +139,12 @@ FFIError pattern_class_destroy(Context** context_ptr);
 uint32_t pattern_class_method(Context* context);
 FFIError pattern_class_method_success_enum_ok(Context* _context);
 FFIError pattern_class_method_success_enum_fail(Context* _context);
+FFIError simple_class_create(SimpleClass** context_ptr);
+FFIError simple_class_destroy(SimpleClass** context_ptr);
+FFIError simple_class_result(SimpleClass* context_ptr, uint32_t x);
+uint32_t simple_class_value(SimpleClass* context_ptr, uint32_t x);
+uint32_t simple_class_mut_self(SimpleClass* context_ptr, uint32_t x);
+uint32_t simple_class_extra_method(SimpleClass* _context);
 
 #ifdef __cplusplus
 }

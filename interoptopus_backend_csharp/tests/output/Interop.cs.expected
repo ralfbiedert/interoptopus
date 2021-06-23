@@ -91,24 +91,6 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ascii_pointer")]
         public static extern uint pattern_ascii_pointer(string x, UseAsciiStringPattern y);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_create")]
-        public static extern FFIError pattern_class_create(out IntPtr context_ptr, uint value);
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_method")]
-        public static extern uint pattern_class_method(IntPtr context);
-
-        /// # Safety
-        /// 
-        /// This function may only be called with a context returned by a succeeding `pattern_class_create`.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_destroy")]
-        public static extern FFIError pattern_class_destroy(out IntPtr context_ptr);
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_method_success_enum_ok")]
-        public static extern FFIError pattern_class_method_success_enum_ok(IntPtr _context);
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_method_success_enum_fail")]
-        public static extern FFIError pattern_class_method_success_enum_fail(IntPtr _context);
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice")]
         public static extern uint pattern_ffi_slice(FFISliceu32 ffi_slice);
 
@@ -126,6 +108,43 @@ namespace My.Company
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "namespaced_type")]
         public static extern Vec namespaced_type(Vec x);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_create")]
+        public static extern FFIError pattern_class_create(out IntPtr context_ptr, uint value);
+
+        /// # Safety
+        /// 
+        /// This function may only be called with a context returned by a succeeding `pattern_class_create`.
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_destroy")]
+        public static extern FFIError pattern_class_destroy(out IntPtr context_ptr);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_method")]
+        public static extern uint pattern_class_method(IntPtr context);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_method_success_enum_ok")]
+        public static extern FFIError pattern_class_method_success_enum_ok(IntPtr _context);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_method_success_enum_fail")]
+        public static extern FFIError pattern_class_method_success_enum_fail(IntPtr _context);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_class_create")]
+        public static extern FFIError simple_class_create(out IntPtr context_ptr);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_class_destroy")]
+        public static extern FFIError simple_class_destroy(out IntPtr context_ptr);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_class_result")]
+        public static extern FFIError simple_class_result(IntPtr context_ptr, uint x);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_class_value")]
+        public static extern uint simple_class_value(IntPtr context_ptr, uint x);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_class_mut_self")]
+        public static extern uint simple_class_mut_self(IntPtr context_ptr, uint x);
+
+        /// An extra exposed method.
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_class_extra_method")]
+        public static extern uint simple_class_extra_method(IntPtr _context);
 
     }
 
@@ -279,6 +298,55 @@ namespace My.Company
             {
                 throw new Exception("Something went wrong");
             }
+        }
+
+    }
+
+
+    public partial class SimpleClass : IDisposable
+    {
+        private IntPtr _context;
+        public SimpleClass()
+        {
+            var rval = Interop.simple_class_create(out _context );
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception("Something went wrong");
+            }
+        }
+
+        public void Dispose()
+        {
+            var rval = Interop.simple_class_destroy(out _context );
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception("Something went wrong");
+            }
+        }
+
+        public void Result(uint x)
+        {
+            var rval = Interop.simple_class_result(_context ,  x);
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception("Something went wrong");
+            }
+        }
+
+        public uint Value(uint x)
+        {
+            return Interop.simple_class_value(_context ,  x);
+        }
+
+        public uint MutSelf(uint x)
+        {
+            return Interop.simple_class_mut_self(_context ,  x);
+        }
+
+        /// An extra exposed method.
+        public uint ExtraMethod()
+        {
+            return Interop.simple_class_extra_method(_context );
         }
 
     }

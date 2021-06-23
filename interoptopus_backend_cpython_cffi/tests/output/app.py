@@ -48,8 +48,16 @@ assert (some_vec_array[50].z == 33)
 
 # Test creation of AsciiStrings
 ascii_pattern = reference_project.UseAsciiStringPattern()
-ascii_pattern.ascii_string = reference_project.ascii_string(b"aaa")
-total_length = reference_project.raw.pattern_ascii_pointer(reference_project.ascii_string(b"bbbbbbb"), ascii_pattern)
+
+# This is devious ... We have to store `a` here and can't do `ascii_pattern.ascii_string = ascii_pattern...`
+# instead, as that would assign a pointer but might deallocate the string even before the method is
+# called, leading to spurious errors
+a = reference_project.ascii_string(b"aaa")
+b = reference_project.ascii_string(b"bbbbbbb")
+
+ascii_pattern.ascii_string = a
+total_length = reference_project.raw.pattern_ascii_pointer(b, ascii_pattern)
+print(total_length)
 assert (total_length == 10)
 
 

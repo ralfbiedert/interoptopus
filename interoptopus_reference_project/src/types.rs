@@ -1,12 +1,12 @@
 //! All supported type patterns.
 
+use interoptopus::ffi_type;
 use interoptopus::lang::c::{CType, CompositeType, Field, PrimitiveType};
 use interoptopus::lang::rust::CTypeInfo;
 use interoptopus::patterns::ascii_pointer::AsciiPointer;
 use interoptopus::patterns::callbacks::CallbackXY;
 use interoptopus::patterns::slice::FFISlice;
 use interoptopus::patterns::success_enum::Success;
-use interoptopus::{ffi_type, Error};
 use std::marker::PhantomData;
 
 // Let's assume we can't implement `CTypeInfo` for this.

@@ -142,8 +142,9 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_class_mut_self")]
         public static extern uint simple_class_mut_self(IntPtr context_ptr, uint x);
 
+        /// An extra exposed method.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_class_extra_method")]
-        public static extern uint simple_class_extra_method(IntPtr context);
+        public static extern uint simple_class_extra_method(IntPtr _context);
 
     }
 
@@ -342,6 +343,7 @@ namespace My.Company
             return Interop.simple_class_mut_self(_context ,  x);
         }
 
+        /// An extra exposed method.
         public uint ExtraMethod()
         {
             return Interop.simple_class_extra_method(_context );

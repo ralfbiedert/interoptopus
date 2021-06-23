@@ -19,6 +19,8 @@ typedef struct Context Context;
 
 typedef struct Opaque Opaque;
 
+typedef struct SimpleClass SimpleClass;
+
 typedef struct Empty Empty;
 
 typedef enum FFIError
@@ -130,6 +132,12 @@ FFIError pattern_class_destroy(Context** context_ptr);
 uint32_t pattern_class_method(Context* context);
 FFIError pattern_class_method_success_enum_ok(Context* _context);
 FFIError pattern_class_method_success_enum_fail(Context* _context);
+FFIError simple_class_create(SimpleClass** context_ptr);
+FFIError simple_class_destroy(SimpleClass** context_ptr);
+FFIError simple_class_result(SimpleClass* context_ptr, uint32_t x);
+uint32_t simple_class_value(SimpleClass* context_ptr, uint32_t x);
+uint32_t simple_class_mut_self(SimpleClass* context_ptr, uint32_t x);
+uint32_t simple_class_extra_method(SimpleClass* _context);
 """
 
 
@@ -673,6 +681,49 @@ This function may only be called with a context returned by a succeeding `patter
             _context = _context._ctx
         return _api.pattern_class_method_success_enum_fail(_context)
 
+    def simple_class_create(context_ptr):
+        global _api
+        if hasattr(context_ptr, "_ctx"):
+            context_ptr = context_ptr._ctx
+        return _api.simple_class_create(context_ptr)
+
+    def simple_class_destroy(context_ptr):
+        global _api
+        if hasattr(context_ptr, "_ctx"):
+            context_ptr = context_ptr._ctx
+        return _api.simple_class_destroy(context_ptr)
+
+    def simple_class_result(context_ptr, x):
+        global _api
+        if hasattr(context_ptr, "_ctx"):
+            context_ptr = context_ptr._ctx
+        if hasattr(x, "_ctx"):
+            x = x._ctx
+        return _api.simple_class_result(context_ptr, x)
+
+    def simple_class_value(context_ptr, x):
+        global _api
+        if hasattr(context_ptr, "_ctx"):
+            context_ptr = context_ptr._ctx
+        if hasattr(x, "_ctx"):
+            x = x._ctx
+        return _api.simple_class_value(context_ptr, x)
+
+    def simple_class_mut_self(context_ptr, x):
+        global _api
+        if hasattr(context_ptr, "_ctx"):
+            context_ptr = context_ptr._ctx
+        if hasattr(x, "_ctx"):
+            x = x._ctx
+        return _api.simple_class_mut_self(context_ptr, x)
+
+    def simple_class_extra_method(_context):
+        """An extra exposed method."""
+        global _api
+        if hasattr(_context, "_ctx"):
+            _context = _context._ctx
+        return _api.simple_class_extra_method(_context)
+
 
 
 
@@ -719,6 +770,47 @@ This function may only be called with a context returned by a succeeding `patter
             return None
         else:
             raise Exception(f"return value ${rval}")
+
+
+
+class SimpleClass(object):
+    def __init__(self, ):
+        global _api, ffi
+        self.ctx = ffi.new("SimpleClass**")
+        rval = raw.simple_class_create(self.ctx, )
+        if rval == FFIError.Ok:
+            return None
+        else:
+            raise Exception(f"return value ${rval}")
+
+    def __del__(self):
+        global _api, ffi
+        rval = raw.simple_class_destroy(self.ctx, )
+        if rval == FFIError.Ok:
+            return None
+        else:
+            raise Exception(f"return value ${rval}")
+
+    def result(self, x):
+        global raw
+        rval = raw.simple_class_result(self.ctx[0], x)
+        if rval == FFIError.Ok:
+            return None
+        else:
+            raise Exception(f"return value ${rval}")
+
+    def value(self, x):
+        global raw
+        return _api.simple_class_value(self.ctx[0], x)
+
+    def mut_self(self, x):
+        global raw
+        return _api.simple_class_mut_self(self.ctx[0], x)
+
+    def extra_method(self, ):
+        """An extra exposed method."""
+        global raw
+        return _api.simple_class_extra_method(self.ctx[0], )
 
 
 
