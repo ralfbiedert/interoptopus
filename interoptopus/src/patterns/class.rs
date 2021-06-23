@@ -32,6 +32,42 @@ use crate::lang::c::{CType, Function, OpaqueType};
 use crate::patterns::success_enum::Success;
 use crate::patterns::TypePattern;
 
+macro_rules! impl_failure_default {
+    ($t:ty, $x:expr) => {
+        impl FailureDefault for $t {
+            fn failure_default() -> Self {
+                $x
+            }
+        }
+    };
+}
+
+/// For types that can be returned by a generated class what to return when things went wrong?
+pub trait FailureDefault {
+    fn failure_default() -> Self;
+}
+
+impl<T> FailureDefault for T
+where
+    T: Success,
+{
+    fn failure_default() -> Self {
+        T::NULL
+    }
+}
+
+impl_failure_default!(u8, 0);
+impl_failure_default!(u16, 0);
+impl_failure_default!(u32, 0);
+impl_failure_default!(u64, 0);
+impl_failure_default!(i8, 0);
+impl_failure_default!(i16, 0);
+impl_failure_default!(i32, 0);
+impl_failure_default!(i64, 0);
+impl_failure_default!(f32, f32::NAN);
+impl_failure_default!(f64, f64::NAN);
+impl_failure_default!((), ());
+
 /// Combines a receiver, constructor, destructor and multiple methods in one entity.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Class {
