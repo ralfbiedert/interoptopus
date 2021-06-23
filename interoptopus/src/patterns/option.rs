@@ -6,6 +6,11 @@ use crate::lang::rust::CTypeInfo;
 use serde::{Deserialize, Serialize};
 
 /// An option-like type at the FFI boundary where a regular [`Option`] doesn't work.
+///
+/// # C API
+///
+/// The option will be considered `Some` if and only if `is_some` is `1`. All
+/// other values mean `None`.
 #[repr(C)]
 #[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Default, Deserialize, Serialize))]
 #[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Default))]
@@ -27,14 +32,14 @@ impl<T> FFIOption<T> {
         }
     }
 
-    pub const fn option_ref(&self) -> Option<&T> {
+    pub const fn as_ref(&self) -> Option<&T> {
         match self.is_some {
             1 => Option::Some(&self.t),
             _ => Option::None,
         }
     }
 
-    pub fn option_mut(&mut self) -> Option<&mut T> {
+    pub fn as_mut(&mut self) -> Option<&mut T> {
         match self.is_some {
             1 => Option::Some(&mut self.t),
             _ => Option::None,

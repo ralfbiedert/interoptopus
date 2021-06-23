@@ -84,8 +84,11 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "callback")]
         public static extern byte callback(InteropDelegate_fn_u8_rval_u8 callback, byte value);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic")]
-        public static extern uint generic(Generic x, Phantom _y);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic_1")]
+        public static extern uint generic_1(Generic x, Phantom _y);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic_2")]
+        public static extern byte generic_2(Generic x, Phantom _y);
 
         /// This function has documentation.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "documented")]
@@ -183,6 +186,13 @@ namespace My.Company
     {
         public IntPtr data;
         public ulong len;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct Generic
+    {
+        public IntPtr x;
     }
 
     [Serializable]

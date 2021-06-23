@@ -140,7 +140,13 @@ pub extern "C" fn callback(callback: Callbacku8u8, value: u8) -> u8 {
 
 #[ffi_function]
 #[no_mangle]
-pub extern "C" fn generic(x: Generic<u32>, _y: Phantom<u8>) -> u32 {
+pub extern "C" fn generic_1(x: Generic<u32>, _y: Phantom<u8>) -> u32 {
+    *x.x
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn generic_2(x: Generic<u8>, _y: Phantom<u8>) -> u8 {
     *x.x
 }
 

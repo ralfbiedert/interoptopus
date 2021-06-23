@@ -251,7 +251,11 @@ pub trait InteropCSharp {
         w.indented(|w| writeln!(w, r#"using System.Runtime.InteropServices;"#))?;
 
         for namespace_id in self.library().namespaces() {
-            let namespace = self.config().namespace_mappings.get(namespace_id).expect("Must have namespace for ID.");
+            let namespace = self
+                .config()
+                .namespace_mappings
+                .get(namespace_id)
+                .unwrap_or_else(|| panic!("Must have namespace for '{}' ID", namespace_id));
             w.indented(|w| writeln!(w, r#"using {};"#, namespace))?;
         }
 
