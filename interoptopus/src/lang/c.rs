@@ -151,6 +151,20 @@ impl CType {
         hash_set.iter().cloned().collect()
     }
 
+    /// If this was a pointer type, tries to deref it and return the inner type.
+    pub fn deref_pointer(&self) -> Option<&CType> {
+        match self {
+            CType::Primitive(_) => None,
+            CType::Enum(_) => None,
+            CType::Opaque(_) => None,
+            CType::Composite(_) => None,
+            CType::FnPointer(_) => None,
+            CType::ReadPointer(x) => Some(x.as_ref()),
+            CType::ReadWritePointer(x) => Some(x.as_ref()),
+            CType::Pattern(_) => None,
+        }
+    }
+
     /// Convenience method attempting to convert the contained type as a composite.
     pub fn as_composite_type(&self) -> Option<&CompositeType> {
         match self {

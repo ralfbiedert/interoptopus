@@ -395,6 +395,8 @@ pub trait InteropCSharp {
                     if self.should_emit(x.meta()) {
                         self.write_type_definition_composite(w, x)?;
                         w.newline()?;
+                        self.write_pattern_slice(w, x)?;
+                        w.newline()?;
                     }
                 }
                 TypePattern::Option(x) => {
@@ -552,6 +554,73 @@ pub trait InteropCSharp {
                 }
             }
         }
+
+        Ok(())
+    }
+
+    fn write_pattern_slice(&self, w: &mut IndentWriter, slice: &CompositeType) -> Result<(), Error> {
+        let context_type_name = slice.rust_name();
+        let data_type = slice
+            .fields()
+            .iter()
+            .find(|x| x.name().contains("data"))
+            .expect("Slice must contain field called 'data'.")
+            .the_type()
+            .deref_pointer()
+            .expect("data must be a pointer type");
+
+        let type_string = self.type_to_typespecifier_in_rval(data_type);
+
+        w.indented(|w| writeln!(w, r#"public partial struct {}"#, context_type_name))?;
+        w.indented(|w| writeln!(w, r#"{{"#))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#"public {} this[int i]"#, type_string))?;
+        w.indented(|w| writeln!(w, r#"{{"#))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#"get"#))?;
+        w.indented(|w| writeln!(w, r#"{{"#))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#"var size = Marshal.SizeOf(typeof({}));"#, type_string))?;
+        w.indented(|w| writeln!(w, r#"var ptr = new IntPtr(data.ToInt64() + i * size);"#))?;
+        w.indented(|w| writeln!(w, r#"return  Marshal.PtrToStructure<{}>(ptr);"#, type_string))?;
+        w.unindent();
+        w.indented(|w| writeln!(w, r#"}}"#))?;
+        w.unindent();
+        w.indented(|w| writeln!(w, r#"}}"#))?;
+
+        w.indented(|w| writeln!(w, r#"public {}[] Copied"#, type_string))?;
+        w.indented(|w| writeln!(w, r#"{{"#))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#"get"#))?;
+        w.indented(|w| writeln!(w, r#"{{"#))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#"var rval = new {}[len];"#, type_string))?;
+        w.indented(|w| writeln!(w, r#"for (var i = 0; i < (int) len; i++) {{"#))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#"rval[i] = this[i];"#))?;
+        w.unindent();
+        w.indented(|w| writeln!(w, r#"}}"#))?;
+        w.indented(|w| writeln!(w, r#"return rval;"#))?;
+        w.unindent();
+        w.indented(|w| writeln!(w, r#"}}"#))?;
+        w.unindent();
+        w.indented(|w| writeln!(w, r#"}}"#))?;
+
+        w.indented(|w| writeln!(w, r#"public int Count"#))?;
+        w.indented(|w| writeln!(w, r#"{{"#))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#"get"#))?;
+        w.indented(|w| writeln!(w, r#"{{"#))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#"return (int) len;"#))?;
+        w.unindent();
+        w.indented(|w| writeln!(w, r#"}}"#))?;
+        w.unindent();
+        w.indented(|w| writeln!(w, r#"}}"#))?;
+
+        w.unindent();
+        w.indented(|w| writeln!(w, r#"}}"#))?;
+        w.newline()?;
 
         Ok(())
     }

@@ -11,7 +11,7 @@ fn generate_bindings_multi(prefix: &str) -> Result<(), Error> {
     let namespace_mappings = NamespaceMappings::new("My.Company").add("common", "My.Company.Common");
 
     let config = Config {
-        dll_name: "example_complex".to_string(),
+        dll_name: "interoptopus_reference_project".to_string(),
         namespace_mappings,
         ..Config::default()
     };
