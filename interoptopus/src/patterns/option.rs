@@ -2,6 +2,7 @@
 use crate::lang::c::{CType, CompositeType, Field, PrimitiveType};
 use crate::lang::rust::CTypeInfo;
 
+use crate::patterns::TypePattern;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -105,6 +106,6 @@ where
         ];
 
         let composite = CompositeType::new(format!("FFIOption{}", T::type_info().name_within_lib()), fields);
-        CType::Composite(composite)
+        CType::Pattern(TypePattern::Option(composite))
     }
 }

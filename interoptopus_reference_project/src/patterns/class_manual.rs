@@ -1,4 +1,5 @@
-use crate::types::{Context, FFIError};
+use crate::patterns::success_enum::FFIError;
+use crate::types::Context;
 use interoptopus::{ffi_function, pattern_class_manual};
 
 #[ffi_function]

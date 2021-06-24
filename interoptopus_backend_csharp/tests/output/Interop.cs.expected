@@ -94,15 +94,6 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "documented")]
         public static extern EnumDocumented documented(StructDocumented _x);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ascii_pointer")]
-        public static extern uint pattern_ascii_pointer(string x, UseAsciiStringPattern y);
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice")]
-        public static extern uint pattern_ffi_slice(FFISliceu32 ffi_slice);
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_delegate")]
-        public static extern byte pattern_ffi_slice_delegate(InteropDelegate_fn_FFISliceu8_rval_u8 callback);
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ambiguous_1")]
         public static extern Vec1 ambiguous_1(Vec1 x);
 
@@ -114,6 +105,18 @@ namespace My.Company
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "namespaced_type")]
         public static extern Vec namespaced_type(Vec x);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ascii_pointer")]
+        public static extern uint pattern_ascii_pointer(string x, UseAsciiStringPattern y);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice")]
+        public static extern uint pattern_ffi_slice(FFISliceu32 ffi_slice);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_delegate")]
+        public static extern byte pattern_ffi_slice_delegate(InteropDelegate_fn_FFISliceu8_rval_u8 callback);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_option")]
+        public static extern FFIOptionInner pattern_ffi_option(FFIOptionInner ffi_slice);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_create")]
         public static extern FFIError pattern_class_create(out IntPtr context_ptr, uint value);
@@ -204,6 +207,13 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
+    public partial struct Inner
+    {
+        public float x;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
     public partial struct Phantomu8
     {
         public uint x;
@@ -275,6 +285,14 @@ namespace My.Company
         Ok = 0,
         Null = 100,
         Fail = 200,
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct FFIOptionInner
+    {
+        public Inner t;
+        public byte is_some;
     }
 
 

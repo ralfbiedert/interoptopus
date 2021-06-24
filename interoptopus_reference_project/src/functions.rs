@@ -1,12 +1,10 @@
 //! Functions using all supported type patterns.
 
+use crate::patterns::success_enum::FFIError;
 use crate::types::{
-    ambiguous1, ambiguous2, common, some_foreign_type, CallbackFFISlice, Callbacku8u8, Empty, EnumDocumented, FFIError, Generic, Opaque, Phantom, SomeForeignType,
-    StructDocumented, Tupled, UseAsciiStringPattern, Vec3f32,
+    ambiguous1, ambiguous2, common, some_foreign_type, Callbacku8u8, Empty, EnumDocumented, Generic, Opaque, Phantom, SomeForeignType, StructDocumented, Tupled, Vec3f32,
 };
 use interoptopus::ffi_function;
-use interoptopus::patterns::ascii_pointer::AsciiPointer;
-use interoptopus::patterns::slice::FFISlice;
 use std::ptr::null;
 
 #[ffi_function]
@@ -155,26 +153,6 @@ pub extern "C" fn generic_2(x: Generic<u8>, _y: Phantom<u8>) -> u8 {
 #[no_mangle]
 pub extern "C" fn documented(_x: StructDocumented) -> EnumDocumented {
     EnumDocumented::A
-}
-
-#[ffi_function]
-#[no_mangle]
-pub extern "C" fn pattern_ascii_pointer(x: AsciiPointer, y: UseAsciiStringPattern) -> u32 {
-    let x1 = x.as_str().map(|x| x.len()).unwrap_or(0);
-    let x2 = y.ascii_string.as_str().map(|x| x.len()).unwrap_or(0);
-    (x1 + x2) as u32
-}
-
-#[ffi_function]
-#[no_mangle]
-pub extern "C" fn pattern_ffi_slice(ffi_slice: FFISlice<u32>) -> u32 {
-    ffi_slice.as_slice().unwrap_or(&[]).len() as u32
-}
-
-#[ffi_function]
-#[no_mangle]
-pub extern "C" fn pattern_ffi_slice_delegate(callback: CallbackFFISlice) -> u8 {
-    callback.call(FFISlice::from_slice(&[1, 2, 3]))
 }
 
 #[ffi_function]

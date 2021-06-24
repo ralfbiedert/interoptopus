@@ -30,6 +30,11 @@ typedef enum FFIError
     Fail = 200,
     } FFIError;
 
+typedef struct Inner
+    {
+    float x;
+    } Inner;
+
 typedef struct Phantomu8
     {
     uint32_t x;
@@ -104,6 +109,12 @@ typedef struct Genericu8
     uint8_t* x;
     } Genericu8;
 
+typedef struct FFIOptionInner
+    {
+    Inner t;
+    uint8_t is_some;
+    } FFIOptionInner;
+
 typedef uint8_t (*fptr_fn_FFISliceu8_rval_u8)(FFISliceu8 x0);
 
 
@@ -132,13 +143,14 @@ uint8_t callback(fptr_fn_u8_rval_u8 callback, uint8_t value);
 uint32_t generic_1(Genericu32 x, Phantomu8 _y);
 uint8_t generic_2(Genericu8 x, Phantomu8 _y);
 EnumDocumented documented(StructDocumented _x);
-uint32_t pattern_ascii_pointer(uint8_t* x, UseAsciiStringPattern y);
-uint32_t pattern_ffi_slice(FFISliceu32 ffi_slice);
-uint8_t pattern_ffi_slice_delegate(fptr_fn_FFISliceu8_rval_u8 callback);
 Vec1 ambiguous_1(Vec1 x);
 Vec2 ambiguous_2(Vec2 x);
 bool ambiguous_3(Vec1 x, Vec2 y);
 Vec namespaced_type(Vec x);
+uint32_t pattern_ascii_pointer(uint8_t* x, UseAsciiStringPattern y);
+uint32_t pattern_ffi_slice(FFISliceu32 ffi_slice);
+uint8_t pattern_ffi_slice_delegate(fptr_fn_FFISliceu8_rval_u8 callback);
+FFIOptionInner pattern_ffi_option(FFIOptionInner ffi_slice);
 FFIError pattern_class_create(Context** context_ptr, uint32_t value);
 FFIError pattern_class_destroy(Context** context_ptr);
 uint32_t pattern_class_method(Context* context);
@@ -270,6 +282,24 @@ class Genericu8(object):
     def array(n):
         global _api, ffi
         return ffi.new("Genericu8[]", n)
+
+    @property
+    def x(self):
+        return self._ctx.x
+
+    @x.setter
+    def x(self, value):
+        self._ptr_x = value
+        self._ctx.x = value
+
+class Inner(object):
+    def __init__(self):
+        global _api, ffi
+        self._ctx = ffi.new("Inner[]", 1)[0]
+
+    def array(n):
+        global _api, ffi
+        return ffi.new("Inner[]", n)
 
     @property
     def x(self):
@@ -663,26 +693,6 @@ class raw:
             _x = _x._ctx
         return _api.documented(_x)
 
-    def pattern_ascii_pointer(x, y):
-        global _api
-        if hasattr(x, "_ctx"):
-            x = x._ctx
-        if hasattr(y, "_ctx"):
-            y = y._ctx
-        return _api.pattern_ascii_pointer(x, y)
-
-    def pattern_ffi_slice(ffi_slice):
-        global _api
-        if hasattr(ffi_slice, "_ctx"):
-            ffi_slice = ffi_slice._ctx
-        return _api.pattern_ffi_slice(ffi_slice)
-
-    def pattern_ffi_slice_delegate(callback):
-        global _api
-        if hasattr(callback, "_ctx"):
-            callback = callback._ctx
-        return _api.pattern_ffi_slice_delegate(callback)
-
     def ambiguous_1(x):
         global _api
         if hasattr(x, "_ctx"):
@@ -708,6 +718,32 @@ class raw:
         if hasattr(x, "_ctx"):
             x = x._ctx
         return _api.namespaced_type(x)
+
+    def pattern_ascii_pointer(x, y):
+        global _api
+        if hasattr(x, "_ctx"):
+            x = x._ctx
+        if hasattr(y, "_ctx"):
+            y = y._ctx
+        return _api.pattern_ascii_pointer(x, y)
+
+    def pattern_ffi_slice(ffi_slice):
+        global _api
+        if hasattr(ffi_slice, "_ctx"):
+            ffi_slice = ffi_slice._ctx
+        return _api.pattern_ffi_slice(ffi_slice)
+
+    def pattern_ffi_slice_delegate(callback):
+        global _api
+        if hasattr(callback, "_ctx"):
+            callback = callback._ctx
+        return _api.pattern_ffi_slice_delegate(callback)
+
+    def pattern_ffi_option(ffi_slice):
+        global _api
+        if hasattr(ffi_slice, "_ctx"):
+            ffi_slice = ffi_slice._ctx
+        return _api.pattern_ffi_option(ffi_slice)
 
     def pattern_class_create(context_ptr, value):
         global _api

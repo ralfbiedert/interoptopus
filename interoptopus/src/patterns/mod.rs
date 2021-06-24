@@ -57,6 +57,7 @@ pub enum TypePattern {
     AsciiPointer,
     SuccessEnum(SuccessEnum),
     Slice(CompositeType),
+    Option(CompositeType),
 }
 
 impl TypePattern {
@@ -69,6 +70,7 @@ impl TypePattern {
             TypePattern::AsciiPointer => CType::ReadPointer(Box::new(CType::Primitive(PrimitiveType::U8))),
             TypePattern::SuccessEnum(e) => CType::Enum(e.the_enum().clone()),
             TypePattern::Slice(x) => CType::Composite(x.clone()),
+            TypePattern::Option(x) => CType::Composite(x.clone()),
         }
     }
 }

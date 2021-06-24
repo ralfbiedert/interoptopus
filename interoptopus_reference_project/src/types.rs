@@ -6,7 +6,6 @@ use interoptopus::lang::rust::CTypeInfo;
 use interoptopus::patterns::ascii_pointer::AsciiPointer;
 use interoptopus::patterns::callbacks::CallbackXY;
 use interoptopus::patterns::slice::FFISlice;
-use interoptopus::patterns::success_enum::Success;
 use std::marker::PhantomData;
 
 // Let's assume we can't implement `CTypeInfo` for this.
@@ -68,19 +67,6 @@ pub struct Vec3f32 {
 pub struct Container {
     pub foreign1: SomeForeignType,
     pub foreign2: SomeForeignType,
-}
-
-#[ffi_type(patterns(success_enum))]
-#[repr(C)]
-pub enum FFIError {
-    Ok = 0,
-    Null = 100,
-    Fail = 200,
-}
-
-impl Success for FFIError {
-    const SUCCESS: Self = Self::Ok;
-    const NULL: Self = Self::Null;
 }
 
 /// Documented enum.

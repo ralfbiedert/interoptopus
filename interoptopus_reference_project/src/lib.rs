@@ -10,8 +10,12 @@
 pub mod constants;
 pub mod functions;
 pub mod patterns {
+    pub mod ascii_pointer;
     pub mod class_generated;
     pub mod class_manual;
+    pub mod option;
+    pub mod slice;
+    pub mod success_enum;
 }
 pub mod types;
 
@@ -44,13 +48,14 @@ interoptopus::inventory_function!(
         functions::generic_1,
         functions::generic_2,
         functions::documented,
-        functions::pattern_ascii_pointer,
-        functions::pattern_ffi_slice,
-        functions::pattern_ffi_slice_delegate,
         functions::ambiguous_1,
         functions::ambiguous_2,
         functions::ambiguous_3,
-        functions::namespaced_type
+        functions::namespaced_type,
+        patterns::ascii_pointer::pattern_ascii_pointer,
+        patterns::slice::pattern_ffi_slice,
+        patterns::slice::pattern_ffi_slice_delegate,
+        patterns::option::pattern_ffi_option
     ],
     [patterns::class_manual::my_class_pattern_context, patterns::class_generated::simple_class_pattern]
 );

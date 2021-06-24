@@ -160,6 +160,7 @@ pub trait InteropCSharp {
                 TypePattern::AsciiPointer => "string".to_string(),
                 TypePattern::SuccessEnum(e) => self.type_enum_to_typename(e.the_enum()),
                 TypePattern::Slice(e) => self.type_composite_to_typename(e),
+                TypePattern::Option(e) => self.type_composite_to_typename(e),
             },
         }
     }
@@ -190,6 +191,7 @@ pub trait InteropCSharp {
                 TypePattern::AsciiPointer => "string".to_string(),
                 TypePattern::SuccessEnum(e) => self.type_enum_to_typename(e.the_enum()),
                 TypePattern::Slice(x) => self.type_composite_to_typename(x),
+                TypePattern::Option(x) => self.type_composite_to_typename(x),
             },
         }
     }
@@ -207,6 +209,7 @@ pub trait InteropCSharp {
                 TypePattern::AsciiPointer => "string".to_string(),
                 TypePattern::SuccessEnum(e) => self.type_enum_to_typename(e.the_enum()),
                 TypePattern::Slice(x) => self.type_composite_to_typename(x),
+                TypePattern::Option(x) => self.type_composite_to_typename(x),
             },
         }
     }
@@ -380,13 +383,27 @@ pub trait InteropCSharp {
             }
             CType::ReadPointer(_) => {}
             CType::ReadWritePointer(_) => {}
-            CType::Pattern(TypePattern::SuccessEnum(e)) => {
-                if self.should_emit(e.the_enum().meta()) {
-                    self.write_type_definition_enum(w, e.the_enum())?;
-                    w.newline()?;
+            CType::Pattern(x) => match x {
+                TypePattern::AsciiPointer => {}
+                TypePattern::SuccessEnum(e) => {
+                    if self.should_emit(e.the_enum().meta()) {
+                        self.write_type_definition_enum(w, e.the_enum())?;
+                        w.newline()?;
+                    }
                 }
-            }
-            CType::Pattern(_) => {}
+                TypePattern::Slice(x) => {
+                    if self.should_emit(x.meta()) {
+                        self.write_type_definition_composite(w, x)?;
+                        w.newline()?;
+                    }
+                }
+                TypePattern::Option(x) => {
+                    if self.should_emit(x.meta()) {
+                        self.write_type_definition_composite(w, x)?;
+                        w.newline()?;
+                    }
+                }
+            },
         }
         Ok(())
     }

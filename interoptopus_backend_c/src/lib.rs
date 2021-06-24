@@ -303,7 +303,14 @@ pub trait InteropC {
                     self.write_type_definition_enum(w, e.the_enum())?;
                     w.newline()?;
                 }
-                TypePattern::Slice(_) => {}
+                TypePattern::Slice(x) => {
+                    self.write_type_definition_composite(w, x)?;
+                    w.newline()?;
+                }
+                TypePattern::Option(x) => {
+                    self.write_type_definition_composite(w, x)?;
+                    w.newline()?;
+                }
             },
         }
         Ok(())

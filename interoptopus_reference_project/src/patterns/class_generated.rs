@@ -1,5 +1,6 @@
-use crate::types::FFIError;
+use crate::patterns::success_enum::FFIError;
 use interoptopus::{ffi_function, pattern_class_generated};
+use some_rust_module::{Error, SimpleClass};
 
 mod some_rust_module {
     use interoptopus::ffi_type;
@@ -37,8 +38,6 @@ mod some_rust_module {
         }
     }
 }
-
-use some_rust_module::{Error, SimpleClass};
 
 // Needed for Error to FFIError conversion.
 impl From<Result<(), Error>> for FFIError {
