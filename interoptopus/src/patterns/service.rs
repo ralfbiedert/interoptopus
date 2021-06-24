@@ -1,6 +1,6 @@
-//! Bundles function with common receiver into a `class` in object oriented languages.
+//! Bundles function with common receiver into a `class` or service in object oriented languages.
 //!
-//! Classes are defined via the [**pattern_class**](crate::pattern_class) macro and consists of the following items:
+//! Services are defined via the [**pattern_service_manual**](crate::pattern_service_manual) macro and consists of the following items:
 //!
 //! - an [opaque](OpaqueType) **receiver** type,
 //! - a **constructor** function of signature `fn(mmR, ...) -> E`
@@ -42,7 +42,7 @@ macro_rules! impl_failure_default {
     };
 }
 
-/// For types that can be returned by a generated class what to return when things went wrong?
+/// For types that can be returned by a generated service what to return when things went wrong?
 pub trait FailureDefault {
     fn failure_default() -> Self;
 }
@@ -70,14 +70,14 @@ impl_failure_default!((), ());
 
 /// Combines a receiver, constructor, destructor and multiple methods in one entity.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct Class {
+pub struct Service {
     the_type: OpaqueType,
     constructor: Function,
     destructor: Function,
     methods: Vec<Function>,
 }
 
-impl Class {
+impl Service {
     pub fn new(constructor: Function, destructor: Function, methods: Vec<Function>) -> Self {
         let the_type = extract_obvious_opaque_from_parameter(
             constructor
@@ -97,7 +97,7 @@ impl Class {
         }
     }
 
-    /// Checks if the signature of this class is compatible with the `Class` pattern, panic with
+    /// Checks if the signature of this service is compatible with the `Service` pattern, panic with
     /// error message otherwise.
     ///
     /// This function is mainly called during compile time therefore panicking with a good error
@@ -169,21 +169,21 @@ impl Class {
     }
 }
 
-/// Defines a [`Class`] pattern, producing a class in OO languages.
+/// Defines a [`Service`] pattern, usually producing a class in OO languages.
 ///
 /// ```ignore
-/// pattern_class!(
-///     my_class_pattern_context,
+/// pattern_service_manual!(
+///     my_service_pattern_context,
 ///     types::Context,
-///     functions::pattern_class_create,
-///     functions::pattern_class_destroy
+///     functions::pattern_service_create,
+///     functions::pattern_service_destroy
 ///     [
-///         functions::pattern_class_method,
+///         functions::pattern_service_method,
 ///     ]
 /// );
 /// ```
 #[macro_export]
-macro_rules! pattern_class_manual {
+macro_rules! pattern_service_manual {
     (
         $pattern_name:ident,
         $constructor:path,
@@ -192,7 +192,7 @@ macro_rules! pattern_class_manual {
             $method:path
         ),*]
     ) => {
-        pub(crate) fn $pattern_name() -> interoptopus::patterns::class::Class {
+        pub(crate) fn $pattern_name() -> interoptopus::patterns::service::Service {
             use interoptopus::lang::rust::CTypeInfo;
             use interoptopus::lang::rust::FunctionInfo;
 
@@ -215,7 +215,7 @@ macro_rules! pattern_class_manual {
                 x::function_info()
             };
 
-            let rval = interoptopus::patterns::class::Class::new(
+            let rval = interoptopus::patterns::service::Service::new(
                 ctor, dtor, methods
             );
 
@@ -225,9 +225,9 @@ macro_rules! pattern_class_manual {
     };
 }
 
-/// Defines a [`Class`] pattern _and_ generate FFI wrapper code.
+/// Defines a [`Service`] pattern _and_ generate FFI wrapper code.
 #[macro_export]
-macro_rules! pattern_class_generated {
+macro_rules! pattern_service_generated {
     (
         $export_function:ident,
         $opaque:ty,
@@ -284,14 +284,14 @@ macro_rules! pattern_class_generated {
                     let rval = <$opaque>::$method(context, $($param),*);
                     rval.into()
                 } else {
-                    < $t as interoptopus::patterns::class::FailureDefault > :: failure_default()
+                    < $t as interoptopus::patterns::service::FailureDefault > :: failure_default()
                 }
             }
         )*
 
 
         // Generate export function
-        interoptopus::pattern_class_manual!($export_function, $ctor, $dtor, [
+        interoptopus::pattern_service_manual!($export_function, $ctor, $dtor, [
             $($method_as_fn),*
             $(,$manual_method)*
         ]);

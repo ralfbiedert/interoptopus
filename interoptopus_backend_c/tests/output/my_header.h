@@ -26,7 +26,7 @@ typedef struct Context Context;
 
 typedef struct Opaque Opaque;
 
-typedef struct SimpleClass SimpleClass;
+typedef struct SimpleService SimpleService;
 
 typedef struct Empty Empty;
 
@@ -158,18 +158,18 @@ uint32_t pattern_ascii_pointer(uint8_t* x, UseAsciiStringPattern y);
 uint32_t pattern_ffi_slice(FFISliceu32 ffi_slice);
 uint8_t pattern_ffi_slice_delegate(fptr_fn_FFISliceu8_rval_u8 callback);
 FFIOptionInner pattern_ffi_option(FFIOptionInner ffi_slice);
-FFIError pattern_class_create(Context** context_ptr, uint32_t value);
-FFIError pattern_class_destroy(Context** context_ptr);
-uint32_t pattern_class_method(Context* context);
-FFIError pattern_class_method_success_enum_ok(Context* _context);
-FFIError pattern_class_method_success_enum_fail(Context* _context);
-FFIError simple_class_create(SimpleClass** context_ptr, uint32_t x);
-FFIError simple_class_destroy(SimpleClass** context_ptr);
-FFIError simple_class_result(SimpleClass* context_ptr, uint32_t x);
-uint32_t simple_class_value(SimpleClass* context_ptr, uint32_t x);
-uint32_t simple_class_mut_self(SimpleClass* context_ptr, uint32_t x);
-void simple_class_void(SimpleClass* context_ptr);
-uint32_t simple_class_extra_method(SimpleClass* _context);
+FFIError pattern_service_create(Context** context_ptr, uint32_t value);
+FFIError pattern_service_destroy(Context** context_ptr);
+uint32_t pattern_service_method(Context* context);
+FFIError pattern_service_method_success_enum_ok(Context* _context);
+FFIError pattern_service_method_success_enum_fail(Context* _context);
+FFIError simple_service_create(SimpleService** context_ptr, uint32_t x);
+FFIError simple_service_destroy(SimpleService** context_ptr);
+FFIError simple_service_result(SimpleService* context_ptr, uint32_t x);
+uint32_t simple_service_value(SimpleService* context_ptr, uint32_t x);
+uint32_t simple_service_mut_self(SimpleService* context_ptr, uint32_t x);
+void simple_service_void(SimpleService* context_ptr);
+uint32_t simple_service_extra_method(SimpleService* _context);
 
 #ifdef __cplusplus
 }

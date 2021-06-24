@@ -19,7 +19,7 @@ typedef struct Context Context;
 
 typedef struct Opaque Opaque;
 
-typedef struct SimpleClass SimpleClass;
+typedef struct SimpleService SimpleService;
 
 typedef struct Empty Empty;
 
@@ -151,18 +151,18 @@ uint32_t pattern_ascii_pointer(uint8_t* x, UseAsciiStringPattern y);
 uint32_t pattern_ffi_slice(FFISliceu32 ffi_slice);
 uint8_t pattern_ffi_slice_delegate(fptr_fn_FFISliceu8_rval_u8 callback);
 FFIOptionInner pattern_ffi_option(FFIOptionInner ffi_slice);
-FFIError pattern_class_create(Context** context_ptr, uint32_t value);
-FFIError pattern_class_destroy(Context** context_ptr);
-uint32_t pattern_class_method(Context* context);
-FFIError pattern_class_method_success_enum_ok(Context* _context);
-FFIError pattern_class_method_success_enum_fail(Context* _context);
-FFIError simple_class_create(SimpleClass** context_ptr, uint32_t x);
-FFIError simple_class_destroy(SimpleClass** context_ptr);
-FFIError simple_class_result(SimpleClass* context_ptr, uint32_t x);
-uint32_t simple_class_value(SimpleClass* context_ptr, uint32_t x);
-uint32_t simple_class_mut_self(SimpleClass* context_ptr, uint32_t x);
-void simple_class_void(SimpleClass* context_ptr);
-uint32_t simple_class_extra_method(SimpleClass* _context);
+FFIError pattern_service_create(Context** context_ptr, uint32_t value);
+FFIError pattern_service_destroy(Context** context_ptr);
+uint32_t pattern_service_method(Context* context);
+FFIError pattern_service_method_success_enum_ok(Context* _context);
+FFIError pattern_service_method_success_enum_fail(Context* _context);
+FFIError simple_service_create(SimpleService** context_ptr, uint32_t x);
+FFIError simple_service_destroy(SimpleService** context_ptr);
+FFIError simple_service_result(SimpleService* context_ptr, uint32_t x);
+uint32_t simple_service_value(SimpleService* context_ptr, uint32_t x);
+uint32_t simple_service_mut_self(SimpleService* context_ptr, uint32_t x);
+void simple_service_void(SimpleService* context_ptr);
+uint32_t simple_service_extra_method(SimpleService* _context);
 """
 
 
@@ -745,91 +745,91 @@ class raw:
             ffi_slice = ffi_slice._ctx
         return _api.pattern_ffi_option(ffi_slice)
 
-    def pattern_class_create(context_ptr, value):
+    def pattern_service_create(context_ptr, value):
         global _api
         if hasattr(context_ptr, "_ctx"):
             context_ptr = context_ptr._ctx
         if hasattr(value, "_ctx"):
             value = value._ctx
-        return _api.pattern_class_create(context_ptr, value)
+        return _api.pattern_service_create(context_ptr, value)
 
-    def pattern_class_destroy(context_ptr):
+    def pattern_service_destroy(context_ptr):
         """# Safety
 
-This function may only be called with a context returned by a succeeding `pattern_class_create`."""
+This function may only be called with a context returned by a succeeding `pattern_service_create`."""
         global _api
         if hasattr(context_ptr, "_ctx"):
             context_ptr = context_ptr._ctx
-        return _api.pattern_class_destroy(context_ptr)
+        return _api.pattern_service_destroy(context_ptr)
 
-    def pattern_class_method(context):
+    def pattern_service_method(context):
         global _api
         if hasattr(context, "_ctx"):
             context = context._ctx
-        return _api.pattern_class_method(context)
+        return _api.pattern_service_method(context)
 
-    def pattern_class_method_success_enum_ok(_context):
+    def pattern_service_method_success_enum_ok(_context):
         global _api
         if hasattr(_context, "_ctx"):
             _context = _context._ctx
-        return _api.pattern_class_method_success_enum_ok(_context)
+        return _api.pattern_service_method_success_enum_ok(_context)
 
-    def pattern_class_method_success_enum_fail(_context):
+    def pattern_service_method_success_enum_fail(_context):
         global _api
         if hasattr(_context, "_ctx"):
             _context = _context._ctx
-        return _api.pattern_class_method_success_enum_fail(_context)
+        return _api.pattern_service_method_success_enum_fail(_context)
 
-    def simple_class_create(context_ptr, x):
+    def simple_service_create(context_ptr, x):
         global _api
         if hasattr(context_ptr, "_ctx"):
             context_ptr = context_ptr._ctx
         if hasattr(x, "_ctx"):
             x = x._ctx
-        return _api.simple_class_create(context_ptr, x)
+        return _api.simple_service_create(context_ptr, x)
 
-    def simple_class_destroy(context_ptr):
+    def simple_service_destroy(context_ptr):
         global _api
         if hasattr(context_ptr, "_ctx"):
             context_ptr = context_ptr._ctx
-        return _api.simple_class_destroy(context_ptr)
+        return _api.simple_service_destroy(context_ptr)
 
-    def simple_class_result(context_ptr, x):
-        global _api
-        if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx
-        if hasattr(x, "_ctx"):
-            x = x._ctx
-        return _api.simple_class_result(context_ptr, x)
-
-    def simple_class_value(context_ptr, x):
+    def simple_service_result(context_ptr, x):
         global _api
         if hasattr(context_ptr, "_ctx"):
             context_ptr = context_ptr._ctx
         if hasattr(x, "_ctx"):
             x = x._ctx
-        return _api.simple_class_value(context_ptr, x)
+        return _api.simple_service_result(context_ptr, x)
 
-    def simple_class_mut_self(context_ptr, x):
+    def simple_service_value(context_ptr, x):
         global _api
         if hasattr(context_ptr, "_ctx"):
             context_ptr = context_ptr._ctx
         if hasattr(x, "_ctx"):
             x = x._ctx
-        return _api.simple_class_mut_self(context_ptr, x)
+        return _api.simple_service_value(context_ptr, x)
 
-    def simple_class_void(context_ptr):
+    def simple_service_mut_self(context_ptr, x):
         global _api
         if hasattr(context_ptr, "_ctx"):
             context_ptr = context_ptr._ctx
-        return _api.simple_class_void(context_ptr)
+        if hasattr(x, "_ctx"):
+            x = x._ctx
+        return _api.simple_service_mut_self(context_ptr, x)
 
-    def simple_class_extra_method(_context):
+    def simple_service_void(context_ptr):
+        global _api
+        if hasattr(context_ptr, "_ctx"):
+            context_ptr = context_ptr._ctx
+        return _api.simple_service_void(context_ptr)
+
+    def simple_service_extra_method(_context):
         """An extra exposed method."""
         global _api
         if hasattr(_context, "_ctx"):
             _context = _context._ctx
-        return _api.simple_class_extra_method(_context)
+        return _api.simple_service_extra_method(_context)
 
 
 
@@ -841,7 +841,7 @@ class Context(object):
             value = value._ctx
         global _api, ffi
         self.ctx = ffi.new("Context**")
-        rval = raw.pattern_class_create(self.ctx, value)
+        rval = raw.pattern_service_create(self.ctx, value)
         if rval == FFIError.Ok:
             return None
         else:
@@ -850,9 +850,9 @@ class Context(object):
     def __del__(self):
         """# Safety
 
-This function may only be called with a context returned by a succeeding `pattern_class_create`."""
+This function may only be called with a context returned by a succeeding `pattern_service_create`."""
         global _api, ffi
-        rval = raw.pattern_class_destroy(self.ctx, )
+        rval = raw.pattern_service_destroy(self.ctx, )
         if rval == FFIError.Ok:
             return None
         else:
@@ -860,11 +860,11 @@ This function may only be called with a context returned by a succeeding `patter
 
     def method(self, ):
         global raw
-        return _api.pattern_class_method(self.ctx[0], )
+        return _api.pattern_service_method(self.ctx[0], )
 
     def method_success_enum_ok(self, ):
         global raw
-        rval = raw.pattern_class_method_success_enum_ok(self.ctx[0], )
+        rval = raw.pattern_service_method_success_enum_ok(self.ctx[0], )
         if rval == FFIError.Ok:
             return None
         else:
@@ -872,7 +872,7 @@ This function may only be called with a context returned by a succeeding `patter
 
     def method_success_enum_fail(self, ):
         global raw
-        rval = raw.pattern_class_method_success_enum_fail(self.ctx[0], )
+        rval = raw.pattern_service_method_success_enum_fail(self.ctx[0], )
         if rval == FFIError.Ok:
             return None
         else:
@@ -880,13 +880,13 @@ This function may only be called with a context returned by a succeeding `patter
 
 
 
-class SimpleClass(object):
+class SimpleService(object):
     def __init__(self, x):
         if hasattr(x, "_ctx"):
             x = x._ctx
         global _api, ffi
-        self.ctx = ffi.new("SimpleClass**")
-        rval = raw.simple_class_create(self.ctx, x)
+        self.ctx = ffi.new("SimpleService**")
+        rval = raw.simple_service_create(self.ctx, x)
         if rval == FFIError.Ok:
             return None
         else:
@@ -894,7 +894,7 @@ class SimpleClass(object):
 
     def __del__(self):
         global _api, ffi
-        rval = raw.simple_class_destroy(self.ctx, )
+        rval = raw.simple_service_destroy(self.ctx, )
         if rval == FFIError.Ok:
             return None
         else:
@@ -902,7 +902,7 @@ class SimpleClass(object):
 
     def result(self, x):
         global raw
-        rval = raw.simple_class_result(self.ctx[0], x)
+        rval = raw.simple_service_result(self.ctx[0], x)
         if rval == FFIError.Ok:
             return None
         else:
@@ -910,20 +910,20 @@ class SimpleClass(object):
 
     def value(self, x):
         global raw
-        return _api.simple_class_value(self.ctx[0], x)
+        return _api.simple_service_value(self.ctx[0], x)
 
     def mut_self(self, x):
         global raw
-        return _api.simple_class_mut_self(self.ctx[0], x)
+        return _api.simple_service_mut_self(self.ctx[0], x)
 
     def void(self, ):
         global raw
-        return _api.simple_class_void(self.ctx[0], )
+        return _api.simple_service_void(self.ctx[0], )
 
     def extra_method(self, ):
         """An extra exposed method."""
         global raw
-        return _api.simple_class_extra_method(self.ctx[0], )
+        return _api.simple_service_extra_method(self.ctx[0], )
 
 
 

@@ -118,45 +118,45 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_option")]
         public static extern FFIOptionInner pattern_ffi_option(FFIOptionInner ffi_slice);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_create")]
-        public static extern FFIError pattern_class_create(out IntPtr context_ptr, uint value);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_create")]
+        public static extern FFIError pattern_service_create(out IntPtr context_ptr, uint value);
 
         /// # Safety
         /// 
-        /// This function may only be called with a context returned by a succeeding `pattern_class_create`.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_destroy")]
-        public static extern FFIError pattern_class_destroy(out IntPtr context_ptr);
+        /// This function may only be called with a context returned by a succeeding `pattern_service_create`.
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_destroy")]
+        public static extern FFIError pattern_service_destroy(out IntPtr context_ptr);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_method")]
-        public static extern uint pattern_class_method(IntPtr context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_method")]
+        public static extern uint pattern_service_method(IntPtr context);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_method_success_enum_ok")]
-        public static extern FFIError pattern_class_method_success_enum_ok(IntPtr _context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_method_success_enum_ok")]
+        public static extern FFIError pattern_service_method_success_enum_ok(IntPtr _context);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_class_method_success_enum_fail")]
-        public static extern FFIError pattern_class_method_success_enum_fail(IntPtr _context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_method_success_enum_fail")]
+        public static extern FFIError pattern_service_method_success_enum_fail(IntPtr _context);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_class_create")]
-        public static extern FFIError simple_class_create(out IntPtr context_ptr, uint x);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_create")]
+        public static extern FFIError simple_service_create(out IntPtr context_ptr, uint x);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_class_destroy")]
-        public static extern FFIError simple_class_destroy(out IntPtr context_ptr);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_destroy")]
+        public static extern FFIError simple_service_destroy(out IntPtr context_ptr);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_class_result")]
-        public static extern FFIError simple_class_result(IntPtr context_ptr, uint x);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_result")]
+        public static extern FFIError simple_service_result(IntPtr context_ptr, uint x);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_class_value")]
-        public static extern uint simple_class_value(IntPtr context_ptr, uint x);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_value")]
+        public static extern uint simple_service_value(IntPtr context_ptr, uint x);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_class_mut_self")]
-        public static extern uint simple_class_mut_self(IntPtr context_ptr, uint x);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_mut_self")]
+        public static extern uint simple_service_mut_self(IntPtr context_ptr, uint x);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_class_void")]
-        public static extern void simple_class_void(IntPtr context_ptr);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_void")]
+        public static extern void simple_service_void(IntPtr context_ptr);
 
         /// An extra exposed method.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_class_extra_method")]
-        public static extern uint simple_class_extra_method(IntPtr _context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_extra_method")]
+        public static extern uint simple_service_extra_method(IntPtr _context);
 
     }
 
@@ -302,7 +302,7 @@ namespace My.Company
         private IntPtr _context;
         public Context(uint value)
         {
-            var rval = Interop.pattern_class_create(out _context ,  value);
+            var rval = Interop.pattern_service_create(out _context ,  value);
             if (rval != FFIError.Ok)
             {
                 throw new Exception("Something went wrong");
@@ -311,7 +311,7 @@ namespace My.Company
 
         public void Dispose()
         {
-            var rval = Interop.pattern_class_destroy(out _context );
+            var rval = Interop.pattern_service_destroy(out _context );
             if (rval != FFIError.Ok)
             {
                 throw new Exception("Something went wrong");
@@ -320,12 +320,12 @@ namespace My.Company
 
         public uint Method()
         {
-            return Interop.pattern_class_method(_context );
+            return Interop.pattern_service_method(_context );
         }
 
         public void MethodSuccessEnumOk()
         {
-            var rval = Interop.pattern_class_method_success_enum_ok(_context );
+            var rval = Interop.pattern_service_method_success_enum_ok(_context );
             if (rval != FFIError.Ok)
             {
                 throw new Exception("Something went wrong");
@@ -334,7 +334,7 @@ namespace My.Company
 
         public void MethodSuccessEnumFail()
         {
-            var rval = Interop.pattern_class_method_success_enum_fail(_context );
+            var rval = Interop.pattern_service_method_success_enum_fail(_context );
             if (rval != FFIError.Ok)
             {
                 throw new Exception("Something went wrong");
@@ -344,12 +344,12 @@ namespace My.Company
     }
 
 
-    public partial class SimpleClass : IDisposable
+    public partial class SimpleService : IDisposable
     {
         private IntPtr _context;
-        public SimpleClass(uint x)
+        public SimpleService(uint x)
         {
-            var rval = Interop.simple_class_create(out _context ,  x);
+            var rval = Interop.simple_service_create(out _context ,  x);
             if (rval != FFIError.Ok)
             {
                 throw new Exception("Something went wrong");
@@ -358,7 +358,7 @@ namespace My.Company
 
         public void Dispose()
         {
-            var rval = Interop.simple_class_destroy(out _context );
+            var rval = Interop.simple_service_destroy(out _context );
             if (rval != FFIError.Ok)
             {
                 throw new Exception("Something went wrong");
@@ -367,7 +367,7 @@ namespace My.Company
 
         public void Result(uint x)
         {
-            var rval = Interop.simple_class_result(_context ,  x);
+            var rval = Interop.simple_service_result(_context ,  x);
             if (rval != FFIError.Ok)
             {
                 throw new Exception("Something went wrong");
@@ -376,23 +376,23 @@ namespace My.Company
 
         public uint Value(uint x)
         {
-            return Interop.simple_class_value(_context ,  x);
+            return Interop.simple_service_value(_context ,  x);
         }
 
         public uint MutSelf(uint x)
         {
-            return Interop.simple_class_mut_self(_context ,  x);
+            return Interop.simple_service_mut_self(_context ,  x);
         }
 
         public void Void()
         {
-            Interop.simple_class_void(_context );
+            Interop.simple_service_void(_context );
         }
 
         /// An extra exposed method.
         public uint ExtraMethod()
         {
-            return Interop.simple_class_extra_method(_context );
+            return Interop.simple_service_extra_method(_context );
         }
 
     }

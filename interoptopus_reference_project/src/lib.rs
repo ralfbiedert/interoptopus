@@ -11,9 +11,9 @@ pub mod constants;
 pub mod functions;
 pub mod patterns {
     pub mod ascii_pointer;
-    pub mod class_generated;
-    pub mod class_manual;
     pub mod option;
+    pub mod service_generated;
+    pub mod service_manual;
     pub mod slice;
     pub mod success_enum;
 }
@@ -57,5 +57,8 @@ interoptopus::inventory_function!(
         patterns::slice::pattern_ffi_slice_delegate,
         patterns::option::pattern_ffi_option
     ],
-    [patterns::class_manual::my_class_pattern_context, patterns::class_generated::simple_class_pattern]
+    [
+        patterns::service_manual::my_service_pattern_context,
+        patterns::service_generated::simple_service_pattern
+    ]
 );

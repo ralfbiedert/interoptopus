@@ -51,7 +51,7 @@ use interoptopus::lang::c::{
     CType, CompositeType, Constant, ConstantValue, Documentation, EnumType, Field, FnPointerType, Function, Meta, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
     Variant,
 };
-use interoptopus::patterns::class::Class;
+use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{longest_common_prefix, safe_name, IdPrettifier, NamespaceMappings};
 use interoptopus::writer::IndentWriter;
@@ -556,7 +556,7 @@ pub trait InteropCSharp {
         Ok(())
     }
 
-    fn write_pattern_class(&self, w: &mut IndentWriter, class: &Class) -> Result<(), Error> {
+    fn write_pattern_class(&self, w: &mut IndentWriter, class: &Service) -> Result<(), Error> {
         let context_type_name = class.the_type().rust_name();
 
         let mut all_functions = vec![class.constructor().clone(), class.destructor().clone()];
@@ -617,7 +617,7 @@ pub trait InteropCSharp {
         Ok(())
     }
 
-    fn write_pattern_class_success_enum_aware_rval(&self, w: &mut IndentWriter, _class: &Class, function: &Function, deref_context: bool) -> Result<(), Error> {
+    fn write_pattern_class_success_enum_aware_rval(&self, w: &mut IndentWriter, _class: &Service, function: &Function, deref_context: bool) -> Result<(), Error> {
         let mut args = self.pattern_class_args_without_first_to_string(function, false);
 
         // Make sure we don't have a `,` when only single parameter

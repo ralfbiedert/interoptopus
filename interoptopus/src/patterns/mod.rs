@@ -29,24 +29,24 @@
 //! be accessible from any language.
 
 use crate::lang::c::{CType, CompositeType, PrimitiveType};
-use crate::patterns::class::Class;
+use crate::patterns::service::Service;
 use crate::patterns::success_enum::SuccessEnum;
 
 pub mod ascii_pointer;
 pub mod callbacks;
-pub mod class;
 pub mod option;
+pub mod service;
 pub mod slice;
 pub mod success_enum;
 
 /// A pattern on a library level, usually involving both methods and types.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum LibraryPattern {
-    Class(Class),
+    Class(Service),
 }
 
-impl From<Class> for LibraryPattern {
-    fn from(x: Class) -> Self {
+impl From<Service> for LibraryPattern {
+    fn from(x: Service) -> Self {
         Self::Class(x)
     }
 }

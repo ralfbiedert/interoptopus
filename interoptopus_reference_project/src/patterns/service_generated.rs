@@ -1,6 +1,6 @@
 use crate::patterns::success_enum::FFIError;
-use interoptopus::{ffi_function, pattern_class_generated};
-use some_rust_module::{Error, SimpleClass};
+use interoptopus::{ffi_function, pattern_service_generated};
+use some_rust_module::{Error, SimpleService};
 
 mod some_rust_module {
     use interoptopus::ffi_type;
@@ -13,12 +13,12 @@ mod some_rust_module {
     // Some struct we want to expose as a class.
     #[ffi_type(opaque)]
     #[derive(Default)]
-    pub struct SimpleClass {
+    pub struct SimpleService {
         pub some_value: u32,
     }
 
     // Regular implementation of methods.
-    impl SimpleClass {
+    impl SimpleService {
         pub fn new_with(some_value: u32) -> Self {
             Self { some_value }
         }
@@ -52,23 +52,23 @@ impl From<Result<(), Error>> for FFIError {
 /// An extra exposed method.
 #[ffi_function]
 #[no_mangle]
-pub extern "C" fn simple_class_extra_method(_context: Option<&mut SimpleClass>) -> u32 {
+pub extern "C" fn simple_service_extra_method(_context: Option<&mut SimpleService>) -> u32 {
     0
 }
 
 // Generate all FFI helpers.
-pattern_class_generated!(
-    simple_class_pattern,
-    SimpleClass,
-    simple_class_create(x: u32) -> FFIError: new_with,
-    simple_class_destroy() -> FFIError,
+pattern_service_generated!(
+    simple_service_pattern,
+    SimpleService,
+    simple_service_create(x: u32) -> FFIError: new_with,
+    simple_service_destroy() -> FFIError,
     [
-        simple_class_result(&mut SimpleClass, x: u32) -> FFIError: method_result,
-        simple_class_value(&mut SimpleClass, x: u32) -> u32: method_value,
-        simple_class_mut_self(&mut SimpleClass, x: u32) -> u32: method_mut_self,
-        simple_class_void(&SimpleClass) -> (): method_void
+        simple_service_result(&mut SimpleService, x: u32) -> FFIError: method_result,
+        simple_service_value(&mut SimpleService, x: u32) -> u32: method_value,
+        simple_service_mut_self(&mut SimpleService, x: u32) -> u32: method_mut_self,
+        simple_service_void(&SimpleService) -> (): method_void
     ],
     [
-        simple_class_extra_method
+        simple_service_extra_method
     ]
 );
