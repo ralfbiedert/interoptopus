@@ -251,6 +251,8 @@ pub trait InteropCSharp {
 
     fn write_imports(&self, w: &mut IndentWriter) -> Result<(), Error> {
         w.indented(|w| writeln!(w, r#"using System;"#))?;
+        w.indented(|w| writeln!(w, r#"using System.Collections;"#))?;
+        w.indented(|w| writeln!(w, r#"using System.Collections.Generic;"#))?;
         w.indented(|w| writeln!(w, r#"using System.Runtime.InteropServices;"#))?;
 
         for namespace_id in self.library().namespaces() {
@@ -571,7 +573,7 @@ pub trait InteropCSharp {
 
         let type_string = self.type_to_typespecifier_in_rval(data_type);
 
-        w.indented(|w| writeln!(w, r#"public partial struct {}"#, context_type_name))?;
+        w.indented(|w| writeln!(w, r#"public partial struct {} : IEnumerable<{}>"#, context_type_name, type_string))?;
         w.indented(|w| writeln!(w, r#"{{"#))?;
         w.indent();
         w.indented(|w| writeln!(w, r#"public {} this[int i]"#, type_string))?;
@@ -582,7 +584,7 @@ pub trait InteropCSharp {
         w.indent();
         w.indented(|w| writeln!(w, r#"var size = Marshal.SizeOf(typeof({}));"#, type_string))?;
         w.indented(|w| writeln!(w, r#"var ptr = new IntPtr(data.ToInt64() + i * size);"#))?;
-        w.indented(|w| writeln!(w, r#"return  Marshal.PtrToStructure<{}>(ptr);"#, type_string))?;
+        w.indented(|w| writeln!(w, r#"return Marshal.PtrToStructure<{}>(ptr);"#, type_string))?;
         w.unindent();
         w.indented(|w| writeln!(w, r#"}}"#))?;
         w.unindent();
@@ -615,6 +617,25 @@ pub trait InteropCSharp {
         w.indented(|w| writeln!(w, r#"return (int) len;"#))?;
         w.unindent();
         w.indented(|w| writeln!(w, r#"}}"#))?;
+        w.unindent();
+        w.indented(|w| writeln!(w, r#"}}"#))?;
+
+        w.indented(|w| writeln!(w, r#"public IEnumerator<{}> GetEnumerator()"#, type_string))?;
+        w.indented(|w| writeln!(w, r#"{{"#))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#"for (int i = 0; i < (int)len; ++i)"#))?;
+        w.indented(|w| writeln!(w, r#"{{"#))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#"yield return this[i];"#))?;
+        w.unindent();
+        w.indented(|w| writeln!(w, r#"}}"#))?;
+        w.unindent();
+        w.indented(|w| writeln!(w, r#"}}"#))?;
+
+        w.indented(|w| writeln!(w, r#"IEnumerator IEnumerable.GetEnumerator()"#))?;
+        w.indented(|w| writeln!(w, r#"{{"#))?;
+        w.indent();
+        w.indented(|w| writeln!(w, r#"return this.GetEnumerator();"#))?;
         w.unindent();
         w.indented(|w| writeln!(w, r#"}}"#))?;
 
