@@ -87,6 +87,16 @@ typedef struct Vec3f32
 
 typedef uint8_t (*fptr_fn_u8_rval_u8)(uint8_t x0);
 
+typedef struct Genericu32
+    {
+    uint32_t* x;
+    } Genericu32;
+
+typedef struct Genericu8
+    {
+    uint8_t* x;
+    } Genericu8;
+
 typedef struct FFISliceu32
     {
     uint32_t* data;
@@ -98,16 +108,6 @@ typedef struct FFISliceu8
     uint8_t* data;
     uint64_t len;
     } FFISliceu8;
-
-typedef struct Genericu32
-    {
-    uint32_t* x;
-    } Genericu32;
-
-typedef struct Genericu8
-    {
-    uint8_t* x;
-    } Genericu8;
 
 typedef struct FFIOptionInner
     {
@@ -201,60 +201,6 @@ class Empty(object):
     def array(n):
         global _api, ffi
         return ffi.new("Empty[]", n)
-
-class FFISliceu32(object):
-    def __init__(self):
-        global _api, ffi
-        self._ctx = ffi.new("FFISliceu32[]", 1)[0]
-
-    def array(n):
-        global _api, ffi
-        return ffi.new("FFISliceu32[]", n)
-
-    @property
-    def data(self):
-        return self._ctx.data
-
-    @data.setter
-    def data(self, value):
-        self._ptr_data = value
-        self._ctx.data = value
-
-    @property
-    def len(self):
-        return self._ctx.len
-
-    @len.setter
-    def len(self, value):
-        self._ptr_len = value
-        self._ctx.len = value
-
-class FFISliceu8(object):
-    def __init__(self):
-        global _api, ffi
-        self._ctx = ffi.new("FFISliceu8[]", 1)[0]
-
-    def array(n):
-        global _api, ffi
-        return ffi.new("FFISliceu8[]", n)
-
-    @property
-    def data(self):
-        return self._ctx.data
-
-    @data.setter
-    def data(self, value):
-        self._ptr_data = value
-        self._ctx.data = value
-
-    @property
-    def len(self):
-        return self._ctx.len
-
-    @len.setter
-    def len(self, value):
-        self._ptr_len = value
-        self._ctx.len = value
 
 class Genericu32(object):
     def __init__(self):

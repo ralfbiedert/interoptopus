@@ -9,7 +9,7 @@ namespace My.Company
 {
     public static partial class Interop
     {
-        public const string NativeLib = "example_complex";
+        public const string NativeLib = "interoptopus_reference_project";
 
         public const byte C1 = 1;
 
@@ -177,22 +177,6 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct FFISliceu32
-    {
-        public IntPtr data;
-        public ulong len;
-    }
-
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct FFISliceu8
-    {
-        public IntPtr data;
-        public ulong len;
-    }
-
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct Genericu32
     {
         public IntPtr x;
@@ -286,6 +270,86 @@ namespace My.Company
         Null = 100,
         Fail = 200,
     }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct FFISliceu32
+    {
+        public IntPtr data;
+        public ulong len;
+    }
+
+    public partial struct FFISliceu32
+    {
+        public uint this[int i]
+        {
+            get
+            {
+                var size = Marshal.SizeOf(typeof(uint));
+                var ptr = new IntPtr(data.ToInt64() + i * size);
+                return  Marshal.PtrToStructure<uint>(ptr);
+            }
+        }
+        public uint[] Copied
+        {
+            get
+            {
+                var rval = new uint[len];
+                for (var i = 0; i < (int) len; i++) {
+                    rval[i] = this[i];
+                }
+                return rval;
+            }
+        }
+        public int Count
+        {
+            get
+            {
+                return (int) len;
+            }
+        }
+    }
+
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct FFISliceu8
+    {
+        public IntPtr data;
+        public ulong len;
+    }
+
+    public partial struct FFISliceu8
+    {
+        public byte this[int i]
+        {
+            get
+            {
+                var size = Marshal.SizeOf(typeof(byte));
+                var ptr = new IntPtr(data.ToInt64() + i * size);
+                return  Marshal.PtrToStructure<byte>(ptr);
+            }
+        }
+        public byte[] Copied
+        {
+            get
+            {
+                var rval = new byte[len];
+                for (var i = 0; i < (int) len; i++) {
+                    rval[i] = this[i];
+                }
+                return rval;
+            }
+        }
+        public int Count
+        {
+            get
+            {
+                return (int) len;
+            }
+        }
+    }
+
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]

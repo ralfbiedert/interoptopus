@@ -94,6 +94,16 @@ typedef struct Vec3f32
 
 typedef uint8_t (*fptr_fn_u8_rval_u8)(uint8_t x0);
 
+typedef struct Genericu32
+    {
+    uint32_t* x;
+    } Genericu32;
+
+typedef struct Genericu8
+    {
+    uint8_t* x;
+    } Genericu8;
+
 typedef struct FFISliceu32
     {
     uint32_t* data;
@@ -105,16 +115,6 @@ typedef struct FFISliceu8
     uint8_t* data;
     uint64_t len;
     } FFISliceu8;
-
-typedef struct Genericu32
-    {
-    uint32_t* x;
-    } Genericu32;
-
-typedef struct Genericu8
-    {
-    uint8_t* x;
-    } Genericu8;
 
 typedef struct FFIOptionInner
     {
