@@ -1,5 +1,5 @@
 //! Like a regular [`Option`] but FFI safe.
-use crate::lang::c::{CType, CompositeType, Field, PrimitiveType};
+use crate::lang::c::{CType, CompositeType, Documentation, Field, PrimitiveType, Visibility};
 use crate::lang::rust::CTypeInfo;
 
 use crate::patterns::TypePattern;
@@ -105,8 +105,8 @@ where
 {
     fn type_info() -> CType {
         let fields = vec![
-            Field::new("t".to_string(), T::type_info()),
-            Field::new("is_some".to_string(), CType::Primitive(PrimitiveType::U8)),
+            Field::with_documentation("t".to_string(), T::type_info(), Visibility::Private, Documentation::new()),
+            Field::with_documentation("is_some".to_string(), CType::Primitive(PrimitiveType::U8), Visibility::Private, Documentation::new()),
         ];
 
         let composite = CompositeType::new(format!("FFIOption{}", T::type_info().name_within_lib()), fields);

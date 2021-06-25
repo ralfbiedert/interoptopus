@@ -13,6 +13,8 @@ pub struct Config {
     pub namespace_mappings: NamespaceMappings,
     /// Namespace ID of _this_ namespace to write (default "").
     pub namespace_id: String,
+    /// Whether [`Visibility`](interoptopus::lang::c::Visibility) information should be honored.
+    pub emit_rust_visibility: bool,
 }
 
 impl Config {}
@@ -25,6 +27,7 @@ impl Default for Config {
             dll_name: "library".to_string(),
             namespace_mappings: NamespaceMappings::new("My.Company"),
             namespace_id: "".to_string(),
+            emit_rust_visibility: false,
         }
     }
 }

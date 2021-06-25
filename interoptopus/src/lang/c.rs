@@ -325,21 +325,34 @@ impl CompositeType {
     }
 }
 
+/// Doesn't exist in C, but other languages can benefit from accidentally using 'private' fields.
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub enum Visibility {
+    Public,
+    Private,
+}
+
 /// Fields of a [`CompositeType`].
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Field {
     name: String,
+    visibility: Visibility,
     the_type: CType,
     documentation: Documentation,
 }
 
 impl Field {
     pub fn new(name: String, the_type: CType) -> Self {
-        Self::with_documentation(name, the_type, Documentation::new())
+        Self::with_documentation(name, the_type, Visibility::Public, Documentation::new())
     }
 
-    pub fn with_documentation(name: String, the_type: CType, documentation: Documentation) -> Self {
-        Self { name, the_type, documentation }
+    pub fn with_documentation(name: String, the_type: CType, visibility: Visibility, documentation: Documentation) -> Self {
+        Self {
+            name,
+            visibility,
+            the_type,
+            documentation,
+        }
     }
 
     pub fn name(&self) -> &str {
@@ -348,6 +361,10 @@ impl Field {
 
     pub fn the_type(&self) -> &CType {
         &self.the_type
+    }
+
+    pub fn visibility(&self) -> &Visibility {
+        &self.visibility
     }
 
     pub fn documentation(&self) -> &Documentation {

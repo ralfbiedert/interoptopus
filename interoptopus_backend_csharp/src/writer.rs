@@ -1,6 +1,6 @@
 use crate::config::Config;
 use crate::converter::{CSharpTypeConverter, Converter};
-use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, Meta, PrimitiveType, Variant};
+use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, Meta, PrimitiveType, Variant, Visibility};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{longest_common_prefix, IdPrettifier};
@@ -206,30 +206,25 @@ pub trait CSharpWriter {
         }
 
         w.unindent();
-        indented!(w, r#"}}"#)?;
-        Ok(())
+        indented!(w, r#"}}"#)
     }
 
     fn write_type_definition_enum_variant(&self, w: &mut IndentWriter, variant: &Variant, _the_type: &EnumType) -> Result<(), Error> {
         let variant_name = variant.name();
         let variant_value = variant.value();
         self.write_documentation(w, variant.documentation())?;
-        indented!(w, r#"{} = {},"#, variant_name, variant_value)?;
-        Ok(())
+        indented!(w, r#"{} = {},"#, variant_name, variant_value)
     }
 
     fn write_type_definition_composite(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
         self.write_documentation(w, the_type.meta().documentation())?;
         self.write_type_definition_composite_annotation(w, the_type)?;
-        self.write_type_definition_composite_body(w, the_type)?;
-        Ok(())
+        self.write_type_definition_composite_body(w, the_type)
     }
 
     fn write_type_definition_composite_annotation(&self, w: &mut IndentWriter, _the_type: &CompositeType) -> Result<(), Error> {
         indented!(w, r#"[Serializable]"#)?;
-        indented!(w, r#"[StructLayout(LayoutKind.Sequential)]"#)?;
-
-        Ok(())
+        indented!(w, r#"[StructLayout(LayoutKind.Sequential)]"#)
     }
 
     fn write_type_definition_composite_body(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
@@ -243,15 +238,18 @@ pub trait CSharpWriter {
         }
 
         w.unindent();
-        indented!(w, r#"}}"#)?;
-        Ok(())
+        indented!(w, r#"}}"#)
     }
 
     fn write_type_definition_composite_body_field(&self, w: &mut IndentWriter, field: &Field, the_type: &CompositeType) -> Result<(), Error> {
         let field_name = field.name();
         let type_name = self.converter().to_typespecifier_in_field(field.the_type(), field, the_type);
-        indented!(w, r#"public {} {};"#, type_name, field_name)?;
-        Ok(())
+        let visibility = match field.visibility() {
+            Visibility::Public => "public ",
+            Visibility::Private => "",
+        };
+
+        indented!(w, r#"{}{} {};"#, visibility, type_name, field_name)
     }
 
     fn namespace_for_id(&self, id: &str) -> String {
@@ -270,9 +268,8 @@ pub trait CSharpWriter {
         f(w)?;
 
         w.unindent();
-        indented!(w, r#"}}"#)?;
 
-        Ok(())
+        indented!(w, r#"}}"#)
     }
 
     fn write_class_context(&self, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) -> Result<(), Error> {
@@ -283,9 +280,7 @@ pub trait CSharpWriter {
         f(w)?;
 
         w.unindent();
-        indented!(w, r#"}}"#)?;
-
-        Ok(())
+        indented!(w, r#"}}"#)
     }
 
     fn should_emit_delegate(&self) -> bool {

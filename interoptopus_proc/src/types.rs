@@ -3,7 +3,7 @@ use darling::FromMeta;
 use proc_macro2::{Ident, TokenStream};
 use quote::{quote, ToTokens};
 use std::collections::HashMap;
-use syn::{AttributeArgs, Expr, GenericParam, ItemEnum, ItemStruct, ItemType, Lit, Type};
+use syn::{AttributeArgs, Expr, GenericParam, ItemEnum, ItemStruct, ItemType, Lit, Type, Visibility};
 
 #[derive(Debug, FromMeta, Clone)]
 pub struct FFITypeAttributes {
@@ -139,6 +139,7 @@ pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemSt
     let mut field_names = Vec::new();
     let mut field_types = Vec::new();
     let mut field_docs = Vec::new();
+    let mut field_visibility = Vec::new();
     let mut generic_params_needing_bounds = Vec::new();
 
     let mut generics_params = quote! {};
@@ -172,8 +173,14 @@ pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemSt
             continue;
         }
 
+        let visibility = match &field.vis {
+            Visibility::Public(_) => quote! { interoptopus::lang::c::Visibility::Public },
+            _ => quote! { interoptopus::lang::c::Visibility::Private },
+        };
+
         field_names.push(name.clone());
         field_docs.push(extract_doc_lines(&field.attrs).join("\n"));
+        field_visibility.push(visibility);
 
         if attr.surrogates.contains_key(&name) {
             let lookup = attr.surrogates.get(&name).unwrap();
@@ -211,7 +218,7 @@ pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemSt
                 #({
                     let documentation = interoptopus::lang::c::Documentation::from_line(#field_docs);
                     let the_type = #field_types;
-                    fields.push(interoptopus::lang::c::Field::with_documentation(#field_names.to_string(), the_type, documentation));
+                    fields.push(interoptopus::lang::c::Field::with_documentation(#field_names.to_string(), the_type, #field_visibility, documentation));
                 })*
 
                 let name = format!("{}{}", #c_struct_name.to_string(), generics.join(""));

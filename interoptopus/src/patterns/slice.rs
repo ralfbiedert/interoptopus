@@ -1,6 +1,6 @@
 //! Like a regular `&[T]` but FFI safe.
 
-use crate::lang::c::{CType, CompositeType, Field, PrimitiveType};
+use crate::lang::c::{CType, CompositeType, Documentation, Field, PrimitiveType, Visibility};
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::TypePattern;
 use std::marker::PhantomData;
@@ -65,10 +65,11 @@ impl<'a, T> CTypeInfo for FFISlice<'a, T>
 where
     T: CTypeInfo,
 {
+    #[rustfmt::skip]
     fn type_info() -> CType {
         let fields = vec![
-            Field::new("data".to_string(), CType::ReadPointer(Box::new(T::type_info()))),
-            Field::new("len".to_string(), CType::Primitive(PrimitiveType::U64)),
+            Field::with_documentation("data".to_string(), CType::ReadPointer(Box::new(T::type_info())), Visibility::Private, Documentation::new()),
+            Field::with_documentation("len".to_string(), CType::Primitive(PrimitiveType::U64), Visibility::Private, Documentation::new()),
         ];
 
         let composite = CompositeType::new(format!("FFISlice{}", T::type_info().name_within_lib()), fields);

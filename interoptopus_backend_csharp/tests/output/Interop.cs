@@ -207,7 +207,7 @@ namespace My.Company
     [StructLayout(LayoutKind.Sequential)]
     public partial struct Inner
     {
-        public float x;
+        float x;
     }
 
     [Serializable]
@@ -289,8 +289,8 @@ namespace My.Company
     [StructLayout(LayoutKind.Sequential)]
     public partial struct FFISliceVec3f32
     {
-        public IntPtr data;
-        public ulong len;
+        IntPtr data;
+        ulong len;
     }
 
     public partial struct FFISliceVec3f32 : IEnumerable<Vec3f32>
@@ -340,8 +340,8 @@ namespace My.Company
     [StructLayout(LayoutKind.Sequential)]
     public partial struct FFISliceu32
     {
-        public IntPtr data;
-        public ulong len;
+        IntPtr data;
+        ulong len;
     }
 
     public partial struct FFISliceu32 : IEnumerable<uint>
@@ -391,8 +391,8 @@ namespace My.Company
     [StructLayout(LayoutKind.Sequential)]
     public partial struct FFISliceu8
     {
-        public IntPtr data;
-        public ulong len;
+        IntPtr data;
+        ulong len;
     }
 
     public partial struct FFISliceu8 : IEnumerable<byte>
@@ -442,8 +442,8 @@ namespace My.Company
     [StructLayout(LayoutKind.Sequential)]
     public partial struct FFIOptionInner
     {
-        public Inner t;
-        public byte is_some;
+        Inner t;
+        byte is_some;
     }
 
 
