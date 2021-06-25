@@ -54,23 +54,20 @@
 //!     return _api.my_game_function(input)
 //! ```
 
-use crate::converter::Converter;
-use crate::writer::PythonWriter;
-
-
-
 use interoptopus::writer::IndentWriter;
-use interoptopus::{Interop};
+use interoptopus::Interop;
 use interoptopus::{Error, Library};
-use interoptopus_backend_c::{CWriter};
+use interoptopus_backend_c::CWriter;
 
 mod config;
 mod converter;
 mod writer;
 
+pub use crate::writer::PythonWriter;
 pub use config::Config;
+pub use converter::{Converter, PythonTypeConverter};
 
-/// Helper type implementing [`InteropCPythonCFFI`] and [`Interop`].
+/// **Start here**, main converter implementing [`Interop`].
 pub struct Generator {
     c_generator: interoptopus_backend_c::Generator,
     config: Config,

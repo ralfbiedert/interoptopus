@@ -2,10 +2,12 @@ use interoptopus::lang::c::{CType, CompositeType, ConstantValue, EnumType, Field
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::safe_name;
 
+/// Implements [`CSharpTypeConverter`].
 #[derive(Copy, Clone)]
 pub struct Converter {}
 
-pub trait TypeConverter {
+/// Converts Interoptopus types to C# types.
+pub trait CSharpTypeConverter {
     /// Converts a primitive (Rust) type to a native C# type name, e.g., `f32` to `float`.
     fn type_primitive_to_typename(&self, x: &PrimitiveType) -> String {
         match x {
@@ -144,4 +146,4 @@ pub trait TypeConverter {
     }
 }
 
-impl TypeConverter for Converter {}
+impl CSharpTypeConverter for Converter {}

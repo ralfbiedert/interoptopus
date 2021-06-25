@@ -11,7 +11,7 @@
 //! #[test]
 //! fn generate_c_bindings() {
 //!     use interoptopus::Interop;
-//!     use interoptopus_backend_c::{Generator, Writer, Config};
+//!     use interoptopus_backend_c::{Generator, CWriter, Config};
 //!
 //!     // Converts an `ffi_inventory()` into Python interop definitions.
 //!     Generator::new(Config::default(), ffi_inventory()).write_to("module.h")
@@ -58,10 +58,10 @@ mod converter;
 mod writer;
 
 pub use crate::config::Config;
-pub use converter::{Converter, TypeConverter};
+pub use converter::{CTypeConverter, Converter};
 pub use writer::CWriter;
 
-/// Helper type implementing [`InteropC`] and [`Interop`].
+/// **Start here**, main converter implementing [`Interop`].
 pub struct Generator {
     config: Config,
     library: Library,

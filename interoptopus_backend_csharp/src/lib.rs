@@ -47,11 +47,6 @@
 //! }
 //! ```
 
-use crate::converter::Converter;
-use crate::writer::CSharpWriter;
-
-
-
 use interoptopus::writer::IndentWriter;
 use interoptopus::Interop;
 use interoptopus::{Error, Library};
@@ -61,8 +56,10 @@ mod converter;
 mod writer;
 
 pub use crate::config::Config;
+pub use crate::converter::{CSharpTypeConverter, Converter};
+pub use crate::writer::CSharpWriter;
 
-/// Helper type implementing [`InteropCSharp`] and [`Interop`].
+/// **Start here**, main converter implementing [`Interop`].
 pub struct Generator {
     config: Config,
     library: Library,

@@ -9,6 +9,7 @@
 
 pub mod constants;
 pub mod functions;
+/// Reference implementations of patterns.
 pub mod patterns {
     pub mod ascii_pointer;
     pub mod option;

@@ -1,10 +1,12 @@
 use interoptopus::lang::c::{CType, CompositeType, ConstantValue, EnumType, FnPointerType, Function, OpaqueType, Parameter, PrimitiveType, PrimitiveValue};
 use interoptopus::util::safe_name;
 
+/// Implements [`CTypeConverter`].
 #[derive(Copy, Clone)]
 pub struct Converter {}
 
-pub trait TypeConverter {
+/// Converts Interoptopus types to C types.
+pub trait CTypeConverter {
     /// Converts a primitive (Rust) type to a native C# type name, e.g., `f32` to `float`.
     fn type_primitive_to_typename(&self, x: &PrimitiveType) -> String;
 
@@ -30,7 +32,7 @@ pub trait TypeConverter {
     fn function_name_to_c_name(&self, function: &Function) -> String;
 }
 
-impl TypeConverter for Converter {
+impl CTypeConverter for Converter {
     fn type_primitive_to_typename(&self, x: &PrimitiveType) -> String {
         match x {
             PrimitiveType::Void => "void".to_string(),

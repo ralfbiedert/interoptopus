@@ -1,5 +1,5 @@
 use crate::config::Config;
-use crate::converter::{Converter, TypeConverter};
+use crate::converter::{Converter, PythonTypeConverter};
 use interoptopus::lang::c::{CType, CompositeType, EnumType, Function};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
@@ -7,7 +7,7 @@ use interoptopus::util::{longest_common_prefix, safe_name};
 use interoptopus::writer::IndentWriter;
 use interoptopus::{indented, Error, Interop, Library};
 
-/// Contains all Python generators, create sub-trait to customize.
+/// Writes the Python file format, `impl` this trait to customize output.
 pub trait PythonWriter {
     /// Returns the user config.
     fn config(&self) -> &Config;

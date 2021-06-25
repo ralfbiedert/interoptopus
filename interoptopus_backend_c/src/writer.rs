@@ -1,5 +1,5 @@
+use crate::converter::CTypeConverter;
 use crate::converter::Converter;
-use crate::converter::TypeConverter;
 use crate::Config;
 use interoptopus::indented;
 use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, OpaqueType, Variant};
@@ -8,7 +8,7 @@ use interoptopus::util::sort_types_by_dependencies;
 use interoptopus::writer::IndentWriter;
 use interoptopus::{Error, Library};
 
-/// Contains all C generators, create sub-trait to customize.
+/// Writes the C file format, `impl` this trait to customize output.
 pub trait CWriter {
     /// Returns the user config.
     fn config(&self) -> &Config;

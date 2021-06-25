@@ -1,5 +1,5 @@
 use crate::config::Config;
-use crate::converter::{Converter, TypeConverter};
+use crate::converter::{CSharpTypeConverter, Converter};
 use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, Meta, PrimitiveType, Variant};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
@@ -7,7 +7,7 @@ use interoptopus::util::{longest_common_prefix, IdPrettifier};
 use interoptopus::writer::IndentWriter;
 use interoptopus::{indented, Error, Library};
 
-/// Contains all C# generators, create sub-trait to customize.
+/// Writes the C# file format, `impl` this trait to customize output.
 pub trait CSharpWriter {
     /// Returns the user config.
     fn config(&self) -> &Config;

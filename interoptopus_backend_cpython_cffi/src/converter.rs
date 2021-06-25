@@ -1,11 +1,13 @@
 use interoptopus::lang::c::{ConstantValue, Documentation, FnPointerType, PrimitiveValue};
-use interoptopus_backend_c::TypeConverter as _;
+use interoptopus_backend_c::CTypeConverter as _;
 
+/// Implements [`PythonTypeConverter`].
 pub struct Converter {
     pub c_converter: interoptopus_backend_c::Converter,
 }
 
-pub trait TypeConverter {
+/// Converts Interoptopus types to Python types.
+pub trait PythonTypeConverter {
     fn c_converter(&self) -> &interoptopus_backend_c::Converter;
 
     fn constant_value_to_value(&self, value: &ConstantValue) -> String;
@@ -15,7 +17,7 @@ pub trait TypeConverter {
     fn type_fnpointer_to_typename(&self, fn_pointer: &FnPointerType) -> String;
 }
 
-impl TypeConverter for Converter {
+impl PythonTypeConverter for Converter {
     fn c_converter(&self) -> &interoptopus_backend_c::Converter {
         &self.c_converter
     }
