@@ -6,6 +6,7 @@ use interoptopus::Error;
 use interoptopus::Interop;
 
 #[test]
+#[cfg_attr(miri, ignore)]
 fn bindings_csharp() -> Result<(), Error> {
     use interoptopus_backend_csharp::{Config, Generator};
 
@@ -26,6 +27,7 @@ fn bindings_csharp() -> Result<(), Error> {
 }
 
 #[test]
+#[cfg_attr(miri, ignore)]
 fn bindings_c() -> Result<(), Error> {
     use interoptopus_backend_c::{Config, Generator};
 
@@ -52,6 +54,7 @@ fn bindings_c() -> Result<(), Error> {
 }
 
 #[test]
+#[cfg_attr(miri, ignore)]
 fn bindings_cpython_cffi() -> Result<(), Error> {
     use interoptopus_backend_cpython_cffi::{Config, Generator};
 

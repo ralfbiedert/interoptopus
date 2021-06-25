@@ -75,3 +75,18 @@ where
         CType::Pattern(TypePattern::Slice(composite))
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::patterns::slice::FFISlice;
+
+    #[test]
+    fn can_create() {
+        let slice = &[0, 1, 2, 3, 5];
+        let empty = FFISlice::<u8>::empty();
+        let some = FFISlice::<u8>::from_slice(slice);
+
+        assert_eq!(empty.as_slice().unwrap(), &[]);
+        assert_eq!(some.as_slice().unwrap(), slice);
+    }
+}

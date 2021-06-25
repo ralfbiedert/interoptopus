@@ -51,6 +51,7 @@ impl<'a> AsciiPointer<'a> {
         }
     }
 
+    /// Attempts to return a Rust `str`.
     pub fn as_str(&self) -> Result<&'a str, Error> {
         Ok(self.as_c_str().ok_or(Error::Null)?.to_str()?)
     }
@@ -59,5 +60,23 @@ impl<'a> AsciiPointer<'a> {
 impl<'a> CTypeInfo for AsciiPointer<'a> {
     fn type_info() -> CType {
         CType::Pattern(TypePattern::AsciiPointer)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::patterns::ascii_pointer::AsciiPointer;
+    use std::ffi::CString;
+
+    #[test]
+    fn can_create() {
+        let s = "hello world";
+        let cstr = CString::new(s).unwrap();
+
+        let ptr_none = AsciiPointer::null();
+        let ptr_some = AsciiPointer::from_cstr(&cstr);
+
+        assert_eq!(None, ptr_none.as_c_str());
+        assert_eq!(s, ptr_some.as_str().unwrap());
     }
 }

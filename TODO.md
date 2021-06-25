@@ -1,5 +1,6 @@
 
 
+- propagate visibility
 - unit test all in Python
 - unit test all in C#
 - test constructs in Miri

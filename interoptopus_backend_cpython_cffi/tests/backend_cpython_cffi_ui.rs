@@ -10,6 +10,7 @@ fn generate_bindings(output: &str) -> Result<(), Error> {
 }
 
 #[test]
+#[cfg_attr(miri, ignore)]
 fn bindings_match_reference() -> Result<(), Error> {
     generate_bindings("tests/output/reference_project.py")?;
 
@@ -19,6 +20,7 @@ fn bindings_match_reference() -> Result<(), Error> {
 }
 
 #[test]
+#[cfg_attr(miri, ignore)]
 fn bindings_work() -> Result<(), Error> {
     generate_bindings("tests/output/reference_project.py")?;
 

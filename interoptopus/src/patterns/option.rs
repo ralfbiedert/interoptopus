@@ -51,6 +51,10 @@ impl<T> FFIOption<T> {
         self.is_some == 1
     }
 
+    pub const fn is_none(&self) -> bool {
+        !self.is_some()
+    }
+
     /// Get the value or panic.
     ///
     /// # Panics
@@ -107,5 +111,16 @@ where
 
         let composite = CompositeType::new(format!("FFIOption{}", T::type_info().name_within_lib()), fields);
         CType::Pattern(TypePattern::Option(composite))
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::patterns::option::FFIOption;
+
+    #[test]
+    fn can_create() {
+        assert!(FFIOption::some(100).is_some());
+        assert!(FFIOption::<u8>::none().is_none());
     }
 }

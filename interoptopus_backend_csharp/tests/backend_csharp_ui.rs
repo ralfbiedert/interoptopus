@@ -31,6 +31,7 @@ fn generate_bindings_multi(prefix: &str) -> Result<(), Error> {
 }
 
 #[test]
+#[cfg_attr(miri, ignore)]
 fn bindings_match_reference() -> Result<(), Error> {
     generate_bindings_multi("tests/output/Interop")?;
 
@@ -41,6 +42,7 @@ fn bindings_match_reference() -> Result<(), Error> {
 }
 
 #[test]
+#[cfg_attr(miri, ignore)]
 fn bindings_work() -> Result<(), Error> {
     generate_bindings_multi("tests/output/Interop")?;
 

@@ -10,6 +10,10 @@ pub struct CallbackXY<X0, R> {
 }
 
 impl<X0, R> CallbackXY<X0, R> {
+    pub fn new(ptr: extern "C" fn(X0) -> R) -> Self {
+        Self { ptr }
+    }
+
     pub fn call(&self, x0: X0) -> R {
         (self.ptr)(x0)
     }
@@ -33,6 +37,10 @@ pub struct CallbackXXY<X0, X1, R> {
 }
 
 impl<X0, X1, R> CallbackXXY<X0, X1, R> {
+    pub fn new(ptr: extern "C" fn(X0, X1) -> R) -> Self {
+        Self { ptr }
+    }
+
     pub fn call(&self, x0: X0, x1: X1) -> R {
         (self.ptr)(x0, x1)
     }
@@ -65,5 +73,21 @@ where
             R::type_info(),
         );
         CType::FnPointer(FnPointerType::new(sig))
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::patterns::callbacks::CallbackXY;
+
+    extern "C" fn f(x: u32) -> u32 {
+        x + x
+    }
+
+    #[test]
+    fn can_create() {
+        let callback = CallbackXY::new(f);
+
+        assert_eq!(callback.call(100), 200);
     }
 }
