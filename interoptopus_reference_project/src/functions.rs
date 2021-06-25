@@ -1,6 +1,5 @@
 //! Functions using all supported type patterns.
 
-use crate::patterns::service_generated::some_rust_module::Error;
 use crate::patterns::success_enum::FFIError;
 use crate::types::{
     ambiguous1, ambiguous2, common, some_foreign_type, Callbacku8u8, Empty, EnumDocumented, Generic, Opaque, Phantom, SomeForeignType, StructDocumented, Tupled, Vec3f32,
