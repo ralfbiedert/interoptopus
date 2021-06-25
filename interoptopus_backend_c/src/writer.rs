@@ -91,7 +91,7 @@ pub trait CWriter {
             params.push(format!("{} {}", self.converter().function_parameter_to_csharp_typename(p, function), p.name()));
         }
 
-        indented!(w, r#"{}{} {}({});"#, attr, rval, name, params.join(","))
+        indented!(w, r#"{}{} {}({});"#, attr, rval, name, params.join(", "))
     }
 
     fn write_type_definitions(&self, w: &mut IndentWriter) -> Result<(), Error> {
@@ -155,7 +155,7 @@ pub trait CWriter {
             params.push(format!("{} x{}", self.converter().type_to_type_specifier(param.the_type()), i));
         }
 
-        indented!(w, "typedef {} (*{})({});", rval, name, params.join(","))
+        indented!(w, "typedef {} (*{})({});", rval, name, params.join(", "))
     }
 
     fn write_type_definition_enum(&self, w: &mut IndentWriter, the_type: &EnumType) -> Result<(), Error> {

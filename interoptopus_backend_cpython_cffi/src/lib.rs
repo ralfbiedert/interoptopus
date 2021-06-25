@@ -56,13 +56,13 @@
 
 use crate::converter::Converter;
 use crate::writer::PythonWriter;
-use interoptopus::lang::c::{CType, CompositeType, ConstantValue, Documentation, EnumType, FnPointerType, Function, PrimitiveValue};
-use interoptopus::patterns::{LibraryPattern, TypePattern};
-use interoptopus::util::{longest_common_prefix, safe_name};
+
+
+
 use interoptopus::writer::IndentWriter;
-use interoptopus::{indented, Interop};
+use interoptopus::{Interop};
 use interoptopus::{Error, Library};
-use interoptopus_backend_c::{CWriter, TypeConverter};
+use interoptopus_backend_c::{CWriter};
 
 mod config;
 mod converter;

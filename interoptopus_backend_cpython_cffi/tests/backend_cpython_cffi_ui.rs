@@ -22,7 +22,7 @@ fn bindings_match_reference() -> Result<(), Error> {
 fn bindings_work() -> Result<(), Error> {
     generate_bindings("tests/output/reference_project.py")?;
 
-    let output = run_python_if_installed("tests/output/", "app.py")?;
+    let output = run_python_if_installed("tests/output/", "tests.py")?;
 
     dbg!(output);
 

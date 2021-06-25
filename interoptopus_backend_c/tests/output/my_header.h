@@ -12,9 +12,12 @@ extern "C" {
 
 
 
-const uint8_t U8 = 255;
-const float F32_MIN_POSITIVE = 0.000000000000000000000000000000000000011754944;
-const int32_t COMPUTED_I32 = -2147483647;
+const const uint8_t U8 = 255;
+
+const const float F32_MIN_POSITIVE = 0.000000000000000000000000000000000000011754944;
+
+const const int32_t COMPUTED_I32 = -2147483647;
+
 
 typedef enum EnumDocumented
     {
@@ -145,10 +148,10 @@ int64_t primitive_i64(int64_t x);
 int64_t* ptr(int64_t* x);
 int64_t* ptr_mut(int64_t* x);
 int64_t** ptr_ptr(int64_t** x);
-int64_t* ptr_simple(int64_t* x);
-int64_t* ptr_simple_mut(int64_t* x);
-bool ptr_option(int64_t* x);
-bool ptr_option_mut(int64_t* x);
+int64_t* ref_simple(int64_t* x);
+int64_t* ref_mut_simple(int64_t* x);
+bool ref_option(int64_t* x);
+bool ref_mut_option(int64_t* x);
 Tupled tupled(Tupled x);
 FFIError complex_args_1(Vec3f32 _a, Empty* _b);
 Opaque* complex_args_2(SomeForeignType _cmplx);

@@ -5,7 +5,8 @@ api_definition = """
 
 
 
-#define THE_MAGIC_CONSTANT 666
+const const uint32_t THE_MAGIC_CONSTANT = 666;
+
 
 typedef enum FFIError
     {
@@ -87,7 +88,7 @@ class SuperComplexEntity(object):
     """A vector used in our game engine."""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("SuperComplexEntity[]", 1)[0]
+        self._ctx = ffi.new("SuperComplexEntity[]", 1)
 
     def array(n):
         global _api, ffi
@@ -95,54 +96,59 @@ class SuperComplexEntity(object):
 
     @property
     def player_1(self):
-        return self._ctx.player_1
+        """"""
+        return self._ctx[0].player_1
 
     @player_1.setter
     def player_1(self, value):
         self._ptr_player_1 = value
-        self._ctx.player_1 = value
+        self._ctx[0].player_1 = value
 
     @property
     def player_2(self):
-        return self._ctx.player_2
+        """"""
+        return self._ctx[0].player_2
 
     @player_2.setter
     def player_2(self, value):
         self._ptr_player_2 = value
-        self._ctx.player_2 = value
+        self._ctx[0].player_2 = value
 
     @property
     def ammo(self):
-        return self._ctx.ammo
+        """"""
+        return self._ctx[0].ammo
 
     @ammo.setter
     def ammo(self, value):
         self._ptr_ammo = value
-        self._ctx.ammo = value
+        self._ctx[0].ammo = value
 
     @property
     def some_str(self):
         """Point to an ASCII encoded whatnot."""
-        return self._ctx.some_str
+        return self._ctx[0].some_str
 
     @some_str.setter
     def some_str(self, value):
         self._ptr_some_str = value
-        self._ctx.some_str = value
+        self._ctx[0].some_str = value
 
     @property
     def str_len(self):
-        return self._ctx.str_len
+        """"""
+        return self._ctx[0].str_len
 
     @str_len.setter
     def str_len(self, value):
         self._ptr_str_len = value
-        self._ctx.str_len = value
+        self._ctx[0].str_len = value
 
 class ThirdPartyVecF32(object):
+    """"""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("ThirdPartyVecF32[]", 1)[0]
+        self._ctx = ffi.new("ThirdPartyVecF32[]", 1)
 
     def array(n):
         global _api, ffi
@@ -150,45 +156,49 @@ class ThirdPartyVecF32(object):
 
     @property
     def x(self):
-        return self._ctx.x
+        """"""
+        return self._ctx[0].x
 
     @x.setter
     def x(self, value):
         self._ptr_x = value
-        self._ctx.x = value
+        self._ctx[0].x = value
 
     @property
     def y(self):
-        return self._ctx.y
+        """"""
+        return self._ctx[0].y
 
     @y.setter
     def y(self, value):
         self._ptr_y = value
-        self._ctx.y = value
+        self._ctx[0].y = value
 
     @property
     def z(self):
-        return self._ctx.z
+        """"""
+        return self._ctx[0].z
 
     @z.setter
     def z(self, value):
         self._ptr_z = value
-        self._ctx.z = value
+        self._ctx[0].z = value
 
     @property
     def w(self):
-        return self._ctx.w
+        """"""
+        return self._ctx[0].w
 
     @w.setter
     def w(self, value):
         self._ptr_w = value
-        self._ctx.w = value
+        self._ctx[0].w = value
 
 class Vec3(object):
     """A vector used in our game engine."""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Vec3[]", 1)[0]
+        self._ctx = ffi.new("Vec3[]", 1)
 
     def array(n):
         global _api, ffi
@@ -196,36 +206,39 @@ class Vec3(object):
 
     @property
     def x(self):
-        return self._ctx.x
+        """"""
+        return self._ctx[0].x
 
     @x.setter
     def x(self, value):
         self._ptr_x = value
-        self._ctx.x = value
+        self._ctx[0].x = value
 
     @property
     def y(self):
-        return self._ctx.y
+        """"""
+        return self._ctx[0].y
 
     @y.setter
     def y(self, value):
         self._ptr_y = value
-        self._ctx.y = value
+        self._ctx[0].y = value
 
     @property
     def z(self):
-        return self._ctx.z
+        """"""
+        return self._ctx[0].z
 
     @z.setter
     def z(self, value):
         self._ptr_z = value
-        self._ctx.z = value
+        self._ctx[0].z = value
 
 class WithForeignType(object):
     """A type containing a third-party type."""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("WithForeignType[]", 1)[0]
+        self._ctx = ffi.new("WithForeignType[]", 1)
 
     def array(n):
         global _api, ffi
@@ -233,21 +246,23 @@ class WithForeignType(object):
 
     @property
     def secret_number(self):
-        return self._ctx.secret_number
+        """"""
+        return self._ctx[0].secret_number
 
     @secret_number.setter
     def secret_number(self, value):
         self._ptr_secret_number = value
-        self._ctx.secret_number = value
+        self._ctx[0].secret_number = value
 
     @property
     def third_party(self):
-        return self._ctx.third_party
+        """"""
+        return self._ctx[0].third_party
 
     @third_party.setter
     def third_party(self, value):
         self._ptr_third_party = value
-        self._ctx.third_party = value
+        self._ctx[0].third_party = value
 
 
 
@@ -274,7 +289,7 @@ class raw:
         """Creates a new instance of this library."""
         global _api
         if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx
+            context_ptr = context_ptr._ctx[0]
         return _api.example_create_context(context_ptr)
 
     def example_destroy_context(context_ptr):
@@ -284,51 +299,52 @@ You **must** ensure that `context_ptr` is being called with the context produced
 `example_create_context`, otherwise bad things will happen."""
         global _api
         if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx
+            context_ptr = context_ptr._ctx[0]
         return _api.example_destroy_context(context_ptr)
 
     def example_print_score(context):
         """Prints the current player score."""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx
+            context = context._ctx[0]
         return _api.example_print_score(context)
 
     def example_return_score(context, score):
         """Updates the score."""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx
+            context = context._ctx[0]
         if hasattr(score, "_ctx"):
-            score = score._ctx
+            score = score._ctx[0]
         return _api.example_return_score(context, score)
 
     def example_update_score_by_callback(context, update):
         """Updates the score."""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx
+            context = context._ctx[0]
         if hasattr(update, "_ctx"):
-            update = update._ctx
+            update = update._ctx[0]
         return _api.example_update_score_by_callback(context, update)
 
     def example_write_foreign_type(context, foreign):
         """Accepts some foreign types."""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx
+            context = context._ctx[0]
         if hasattr(foreign, "_ctx"):
-            foreign = foreign._ctx
+            foreign = foreign._ctx[0]
         return _api.example_write_foreign_type(context, foreign)
 
     def example_double_super_complex_entity(context, incoming, outgoing):
+        """"""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx
+            context = context._ctx[0]
         if hasattr(incoming, "_ctx"):
-            incoming = incoming._ctx
+            incoming = incoming._ctx[0]
         if hasattr(outgoing, "_ctx"):
-            outgoing = outgoing._ctx
+            outgoing = outgoing._ctx[0]
         return _api.example_double_super_complex_entity(context, incoming, outgoing)
 
 

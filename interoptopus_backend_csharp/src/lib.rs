@@ -49,12 +49,9 @@
 
 use crate::converter::Converter;
 use crate::writer::CSharpWriter;
-use interoptopus::lang::c::{
-    CType, CompositeType, Constant, ConstantValue, Documentation, EnumType, Field, FnPointerType, Function, Meta, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
-    Variant,
-};
-use interoptopus::patterns::{LibraryPattern, TypePattern};
-use interoptopus::util::{longest_common_prefix, safe_name, IdPrettifier, NamespaceMappings};
+
+
+
 use interoptopus::writer::IndentWriter;
 use interoptopus::Interop;
 use interoptopus::{Error, Library};

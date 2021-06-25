@@ -113,7 +113,7 @@ pub trait CSharpWriter {
             params.push(format!("{} {}", the_type, name));
         }
 
-        indented!(w, r#"public static extern {} {}({});"#, rval, name, params.join(","))
+        indented!(w, r#"public static extern {} {}({});"#, rval, name, params.join(", "))
     }
 
     fn write_type_definitions(&self, w: &mut IndentWriter) -> Result<(), Error> {
@@ -194,7 +194,7 @@ pub trait CSharpWriter {
             params.push(format!("{} x{}", self.converter().type_to_typespecifier_in_param(param.the_type()), i));
         }
 
-        indented!(w, r#"public delegate {} {}({});"#, rval, name, params.join(","))
+        indented!(w, r#"public delegate {} {}({});"#, rval, name, params.join(", "))
     }
 
     fn write_type_definition_enum(&self, w: &mut IndentWriter, the_type: &EnumType) -> Result<(), Error> {

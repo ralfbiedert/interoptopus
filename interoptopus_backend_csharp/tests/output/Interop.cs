@@ -81,19 +81,19 @@ namespace My.Company
         public static extern Tupled tupled(Tupled x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "complex_args_1")]
-        public static extern FFIError complex_args_1(Vec3f32 _a,ref Empty _b);
+        public static extern FFIError complex_args_1(Vec3f32 _a, ref Empty _b);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "complex_args_2")]
         public static extern IntPtr complex_args_2(SomeForeignType _cmplx);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "callback")]
-        public static extern byte callback(InteropDelegate_fn_u8_rval_u8 callback,byte value);
+        public static extern byte callback(InteropDelegate_fn_u8_rval_u8 callback, byte value);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic_1")]
-        public static extern uint generic_1(Genericu32 x,Phantomu8 _y);
+        public static extern uint generic_1(Genericu32 x, Phantomu8 _y);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic_2")]
-        public static extern byte generic_2(Genericu8 x,Phantomu8 _y);
+        public static extern byte generic_2(Genericu8 x, Phantomu8 _y);
 
         /// This function has documentation.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "documented")]
@@ -106,7 +106,7 @@ namespace My.Company
         public static extern Vec2 ambiguous_2(Vec2 x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ambiguous_3")]
-        public static extern bool ambiguous_3(Vec1 x,Vec2 y);
+        public static extern bool ambiguous_3(Vec1 x, Vec2 y);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "namespaced_type")]
         public static extern Vec namespaced_type(Vec x);
@@ -115,13 +115,13 @@ namespace My.Company
         public static extern uint pattern_ascii_pointer_1(string x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ascii_pointer_len")]
-        public static extern uint pattern_ascii_pointer_len(string x,UseAsciiStringPattern y);
+        public static extern uint pattern_ascii_pointer_len(string x, UseAsciiStringPattern y);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_1")]
         public static extern uint pattern_ffi_slice_1(FFISliceu32 ffi_slice);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_2")]
-        public static extern Vec3f32 pattern_ffi_slice_2(FFISliceVec3f32 ffi_slice,int i);
+        public static extern Vec3f32 pattern_ffi_slice_2(FFISliceVec3f32 ffi_slice, int i);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_delegate")]
         public static extern byte pattern_ffi_slice_delegate(InteropDelegate_fn_FFISliceu8_rval_u8 callback);
@@ -133,7 +133,7 @@ namespace My.Company
         public static extern Inner pattern_ffi_option_2(FFIOptionInner ffi_slice);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_create")]
-        public static extern FFIError pattern_service_create(out IntPtr context_ptr,uint value);
+        public static extern FFIError pattern_service_create(out IntPtr context_ptr, uint value);
 
         /// # Safety
         /// 
@@ -151,19 +151,19 @@ namespace My.Company
         public static extern FFIError pattern_service_method_success_enum_fail(IntPtr _context);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_create")]
-        public static extern FFIError simple_service_create(out IntPtr context_ptr,uint x);
+        public static extern FFIError simple_service_create(out IntPtr context_ptr, uint x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_destroy")]
         public static extern FFIError simple_service_destroy(out IntPtr context_ptr);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_result")]
-        public static extern FFIError simple_service_result(IntPtr context_ptr,uint x);
+        public static extern FFIError simple_service_result(IntPtr context_ptr, uint x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_value")]
-        public static extern uint simple_service_value(IntPtr context_ptr,uint x);
+        public static extern uint simple_service_value(IntPtr context_ptr, uint x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_mut_self")]
-        public static extern uint simple_service_mut_self(IntPtr context_ptr,uint x);
+        public static extern uint simple_service_mut_self(IntPtr context_ptr, uint x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_void")]
         public static extern void simple_service_void(IntPtr context_ptr);

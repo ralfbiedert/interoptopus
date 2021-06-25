@@ -1,14 +1,14 @@
-use crate::config::Config;
+
 use interoptopus::lang::c::{
     CType, CompositeType, Constant, ConstantValue, Documentation, EnumType, Field, FnPointerType, Function, Meta, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
     Variant,
 };
-use interoptopus::patterns::service::Service;
-use interoptopus::patterns::{LibraryPattern, TypePattern};
+
+use interoptopus::patterns::{TypePattern};
 use interoptopus::util::{longest_common_prefix, safe_name, IdPrettifier, NamespaceMappings};
-use interoptopus::writer::IndentWriter;
-use interoptopus::Interop;
-use interoptopus::{Error, Library};
+
+
+
 
 #[derive(Copy, Clone)]
 pub struct Converter {}

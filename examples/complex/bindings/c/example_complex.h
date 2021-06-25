@@ -15,7 +15,8 @@ extern "C" {
 #define __FUNCTION_ATTR __declspec( dllimport )
     
 
-#define THE_MAGIC_CONSTANT 666
+const const uint32_t THE_MAGIC_CONSTANT = 666;
+
 
 typedef enum FFIError
     {
