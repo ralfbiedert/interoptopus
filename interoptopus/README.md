@@ -9,7 +9,7 @@
 
 C#, Python, C, ... → 🐙 → 🦀
 
-FFI from your favorite language to Rust. Escape hatch ets included. 🪓
+FFI from your favorite language to Rust. Escape hatchets included. 🪓
 
 
 ### Overview
