@@ -144,6 +144,9 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(10.0, r.raw.namespaced_type(vec).x)
 
 
+    def test_panics(self):
+        self.assertEqual(r.FFIError.Panic, r.raw.panics())
+
 
 class TestPatterns(unittest.TestCase):
 

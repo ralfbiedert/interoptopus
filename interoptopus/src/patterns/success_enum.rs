@@ -57,15 +57,12 @@ impl SuccessEnum {
 /// Helper to transform [`Error`] types to [`Success`] enums inside `extern "C"` functions.
 pub fn panics_and_errors_to_ffi_error<E, FE: Success>(f: impl FnOnce() -> Result<(), E>) -> FE
 where
-    FE: From<E>,
+    FE: From<Result<(), E>>,
 {
     let result: Result<(), E> = match std::panic::catch_unwind(AssertUnwindSafe(|| f())) {
         Ok(x) => x,
         Err(_) => return FE::PANIC,
     };
 
-    match result {
-        Ok(_) => FE::SUCCESS,
-        Err(e) => e.into(),
-    }
+    result.into()
 }

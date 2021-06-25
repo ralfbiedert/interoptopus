@@ -2,7 +2,7 @@ use crate::patterns::success_enum::FFIError;
 use interoptopus::{ffi_function, pattern_service_generated};
 use some_rust_module::{Error, SimpleService};
 
-mod some_rust_module {
+pub mod some_rust_module {
     use interoptopus::ffi_type;
 
     // An error we use in a Rust library

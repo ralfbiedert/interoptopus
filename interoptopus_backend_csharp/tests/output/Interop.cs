@@ -111,6 +111,9 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "namespaced_type")]
         public static extern Vec namespaced_type(Vec x);
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "panics")]
+        public static extern FFIError panics();
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ascii_pointer_1")]
         public static extern uint pattern_ascii_pointer_1(string x);
 

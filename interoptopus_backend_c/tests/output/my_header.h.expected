@@ -158,6 +158,7 @@ my_library_vec1 ambiguous_1(my_library_vec1 x);
 my_library_vec2 ambiguous_2(my_library_vec2 x);
 bool ambiguous_3(my_library_vec1 x, my_library_vec2 y);
 my_library_vec namespaced_type(my_library_vec x);
+my_library_ffierror panics();
 uint32_t pattern_ascii_pointer_1(uint8_t* x);
 uint32_t pattern_ascii_pointer_len(uint8_t* x, my_library_useasciistringpattern y);
 uint32_t pattern_ffi_slice_1(my_library_ffisliceu32 ffi_slice);

@@ -53,6 +53,7 @@ interoptopus::inventory_function!(
         functions::ambiguous_2,
         functions::ambiguous_3,
         functions::namespaced_type,
+        functions::panics,
         patterns::ascii_pointer::pattern_ascii_pointer_1,
         patterns::ascii_pointer::pattern_ascii_pointer_len,
         patterns::slice::pattern_ffi_slice_1,
