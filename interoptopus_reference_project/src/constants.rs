@@ -7,10 +7,10 @@ const fn f(x: i32) -> i32 {
 }
 
 #[ffi_constant]
-pub const C1: u8 = 1;
+pub const U8: u8 = u8::MAX;
 
 #[ffi_constant]
-pub const C2: f32 = 1.0;
+pub const F32_MIN_POSITIVE: f32 = f32::MIN_POSITIVE;
 
 #[ffi_constant]
-pub const C3: i32 = f(100);
+pub const COMPUTED_I32: i32 = f(i32::MAX);

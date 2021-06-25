@@ -51,6 +51,23 @@ impl<'a> IndentWriter<'a> {
         Ok(())
     }
 
+    pub fn indented_block(&mut self, block: Option<(&str, &str)>, f: impl FnOnce(&mut Self) -> Result<(), Error>) -> Result<(), Error> {
+        if let Some(block) = block {
+            self.indented(|w| writeln!(w, "{}", block.0))?;
+        }
+        self.indent();
+
+        f(self)?;
+
+        self.unindent();
+
+        if let Some(block) = block {
+            self.indented(|w| writeln!(w, "{}", block.1))?;
+        }
+
+        Ok(())
+    }
+
     pub fn writer(&mut self) -> &mut dyn Write {
         &mut self.writer
     }
@@ -59,4 +76,37 @@ impl<'a> IndentWriter<'a> {
         writeln!(&mut self.writer)?;
         Ok(())
     }
+}
+
+/// Writes a line of code, possibly with multiple indentations.
+#[macro_export]
+macro_rules! indent {
+    ($w:expr, $($i:pat)+, $x:expr, $($param:expr),*) => {
+        {
+            $(
+                let $i = ();
+                $w.indent();
+            )*
+            let rval = $w.indented(|w| writeln!(w, $x, $($param),*));
+            $(
+                let $i = ();
+                $w.unindent();
+            )*
+            rval
+        }
+
+    };
+
+    ($w:expr, $x:expr, $($param:expr),*) => {
+        {
+            $w.indented(|w| writeln!(w, $x, $($param),*))
+        }
+    };
+
+    ($w:expr, $x:expr) => {
+        {
+            $w.indented(|w| writeln!(w, $x))
+        }
+    };
+
 }

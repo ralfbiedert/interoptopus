@@ -21,7 +21,7 @@ pub mod types;
 
 interoptopus::inventory_function!(
     ffi_inventory,
-    [constants::C1, constants::C2, constants::C3],
+    [constants::U8, constants::F32_MIN_POSITIVE, constants::COMPUTED_I32],
     [
         functions::primitive_void,
         functions::primitive_void2,
@@ -37,13 +37,13 @@ interoptopus::inventory_function!(
         functions::ptr,
         functions::ptr_mut,
         functions::ptr_ptr,
-        functions::ptr_simple,
-        functions::ptr_simple_mut,
-        functions::ptr_option,
-        functions::ptr_option_mut,
+        functions::ref_simple,
+        functions::ref_mut_simple,
+        functions::ref_option,
+        functions::ref_mut_option,
         functions::tupled,
-        functions::complex_1,
-        functions::complex_2,
+        functions::complex_args_1,
+        functions::complex_args_2,
         functions::callback,
         functions::generic_1,
         functions::generic_2,
@@ -52,10 +52,13 @@ interoptopus::inventory_function!(
         functions::ambiguous_2,
         functions::ambiguous_3,
         functions::namespaced_type,
-        patterns::ascii_pointer::pattern_ascii_pointer,
-        patterns::slice::pattern_ffi_slice,
+        patterns::ascii_pointer::pattern_ascii_pointer_1,
+        patterns::ascii_pointer::pattern_ascii_pointer_len,
+        patterns::slice::pattern_ffi_slice_1,
+        patterns::slice::pattern_ffi_slice_2,
         patterns::slice::pattern_ffi_slice_delegate,
-        patterns::option::pattern_ffi_option
+        patterns::option::pattern_ffi_option_1,
+        patterns::option::pattern_ffi_option_2
     ],
     [
         patterns::service_manual::my_service_pattern_context,

@@ -5,9 +5,9 @@ api_definition = """
 
 
 
-#define C1 1
-#define C2 1
-#define C3 -100
+const uint8_t U8 = 255;
+const float F32_MIN_POSITIVE = 0.000000000000000000000000000000000000011754944;
+const int32_t COMPUTED_I32 = -2147483647;
 
 typedef enum EnumDocumented
     {
@@ -117,6 +117,12 @@ typedef struct FFIOptionInner
 
 typedef uint8_t (*fptr_fn_FFISliceu8_rval_u8)(FFISliceu8 x0);
 
+typedef struct FFISliceVec3f32
+    {
+    Vec3f32* data;
+    uint64_t len;
+    } FFISliceVec3f32;
+
 
 void primitive_void();
 void primitive_void2();
@@ -132,13 +138,13 @@ int64_t primitive_i64(int64_t x);
 int64_t* ptr(int64_t* x);
 int64_t* ptr_mut(int64_t* x);
 int64_t** ptr_ptr(int64_t** x);
-int64_t* ptr_simple(int64_t* x);
-int64_t* ptr_simple_mut(int64_t* x);
-bool ptr_option(int64_t* x);
-bool ptr_option_mut(int64_t* x);
+int64_t* ref_simple(int64_t* x);
+int64_t* ref_mut_simple(int64_t* x);
+bool ref_option(int64_t* x);
+bool ref_mut_option(int64_t* x);
 Tupled tupled(Tupled x);
-FFIError complex_1(Vec3f32 _a, Empty* _b);
-Opaque* complex_2(SomeForeignType _cmplx);
+FFIError complex_args_1(Vec3f32 _a, Empty* _b);
+Opaque* complex_args_2(SomeForeignType _cmplx);
 uint8_t callback(fptr_fn_u8_rval_u8 callback, uint8_t value);
 uint32_t generic_1(Genericu32 x, Phantomu8 _y);
 uint8_t generic_2(Genericu8 x, Phantomu8 _y);
@@ -147,10 +153,13 @@ Vec1 ambiguous_1(Vec1 x);
 Vec2 ambiguous_2(Vec2 x);
 bool ambiguous_3(Vec1 x, Vec2 y);
 Vec namespaced_type(Vec x);
-uint32_t pattern_ascii_pointer(uint8_t* x, UseAsciiStringPattern y);
-uint32_t pattern_ffi_slice(FFISliceu32 ffi_slice);
+uint32_t pattern_ascii_pointer_1(uint8_t* x);
+uint32_t pattern_ascii_pointer_len(uint8_t* x, UseAsciiStringPattern y);
+uint32_t pattern_ffi_slice_1(FFISliceu32 ffi_slice);
+Vec3f32 pattern_ffi_slice_2(FFISliceVec3f32 ffi_slice, int32_t i);
 uint8_t pattern_ffi_slice_delegate(fptr_fn_FFISliceu8_rval_u8 callback);
-FFIOptionInner pattern_ffi_option(FFIOptionInner ffi_slice);
+FFIOptionInner pattern_ffi_option_1(FFIOptionInner ffi_slice);
+Inner pattern_ffi_option_2(FFIOptionInner ffi_slice);
 FFIError pattern_service_create(Context** context_ptr, uint32_t value);
 FFIError pattern_service_destroy(Context** context_ptr);
 uint32_t pattern_service_method(Context* context);
@@ -167,6 +176,15 @@ uint32_t simple_service_extra_method(SimpleService* _context);
 
 
 ffi = FFI()
+{
+    ffi = FFI()
+    ffi = FFI()
+    ffi = FFI()
+    ffi = FFI()
+    ffi = FFI()
+        ffi = FFI()
+}
+ffi = FFI()
 ffi.cdef(api_definition)
 _api = None
 
@@ -180,11 +198,11 @@ def init_api(dll):
 
 
 
-C1 = 1
+U8 = 255
 
-C2 = 1
+F32_MIN_POSITIVE = 0.000000000000000000000000000000000000011754944
 
-C3 = -100
+COMPUTED_I32 = -2147483647
 
 
 class EnumDocumented:
@@ -196,7 +214,7 @@ class EnumDocumented:
 class Empty(object):
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Empty[]", 1)[0]
+        self._ctx = ffi.new("Empty[]", 1)
 
     def array(n):
         global _api, ffi
@@ -205,7 +223,7 @@ class Empty(object):
 class Genericu32(object):
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Genericu32[]", 1)[0]
+        self._ctx = ffi.new("Genericu32[]", 1)
 
     def array(n):
         global _api, ffi
@@ -213,17 +231,17 @@ class Genericu32(object):
 
     @property
     def x(self):
-        return self._ctx.x
+        return self._ctx[0].x
 
     @x.setter
     def x(self, value):
         self._ptr_x = value
-        self._ctx.x = value
+        self._ctx[0].x = value
 
 class Genericu8(object):
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Genericu8[]", 1)[0]
+        self._ctx = ffi.new("Genericu8[]", 1)
 
     def array(n):
         global _api, ffi
@@ -231,17 +249,17 @@ class Genericu8(object):
 
     @property
     def x(self):
-        return self._ctx.x
+        return self._ctx[0].x
 
     @x.setter
     def x(self, value):
         self._ptr_x = value
-        self._ctx.x = value
+        self._ctx[0].x = value
 
 class Inner(object):
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Inner[]", 1)[0]
+        self._ctx = ffi.new("Inner[]", 1)
 
     def array(n):
         global _api, ffi
@@ -249,17 +267,17 @@ class Inner(object):
 
     @property
     def x(self):
-        return self._ctx.x
+        return self._ctx[0].x
 
     @x.setter
     def x(self, value):
         self._ptr_x = value
-        self._ctx.x = value
+        self._ctx[0].x = value
 
 class Phantomu8(object):
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Phantomu8[]", 1)[0]
+        self._ctx = ffi.new("Phantomu8[]", 1)
 
     def array(n):
         global _api, ffi
@@ -267,17 +285,17 @@ class Phantomu8(object):
 
     @property
     def x(self):
-        return self._ctx.x
+        return self._ctx[0].x
 
     @x.setter
     def x(self, value):
         self._ptr_x = value
-        self._ctx.x = value
+        self._ctx[0].x = value
 
 class SomeForeignType(object):
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("SomeForeignType[]", 1)[0]
+        self._ctx = ffi.new("SomeForeignType[]", 1)
 
     def array(n):
         global _api, ffi
@@ -285,18 +303,18 @@ class SomeForeignType(object):
 
     @property
     def x(self):
-        return self._ctx.x
+        return self._ctx[0].x
 
     @x.setter
     def x(self, value):
         self._ptr_x = value
-        self._ctx.x = value
+        self._ctx[0].x = value
 
 class StructDocumented(object):
     """Documented struct."""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("StructDocumented[]", 1)[0]
+        self._ctx = ffi.new("StructDocumented[]", 1)
 
     def array(n):
         global _api, ffi
@@ -305,17 +323,17 @@ class StructDocumented(object):
     @property
     def x(self):
         """Documented field."""
-        return self._ctx.x
+        return self._ctx[0].x
 
     @x.setter
     def x(self, value):
         self._ptr_x = value
-        self._ctx.x = value
+        self._ctx[0].x = value
 
 class Tupled(object):
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Tupled[]", 1)[0]
+        self._ctx = ffi.new("Tupled[]", 1)
 
     def array(n):
         global _api, ffi
@@ -323,17 +341,17 @@ class Tupled(object):
 
     @property
     def x0(self):
-        return self._ctx.x0
+        return self._ctx[0].x0
 
     @x0.setter
     def x0(self, value):
         self._ptr_x0 = value
-        self._ctx.x0 = value
+        self._ctx[0].x0 = value
 
 class UseAsciiStringPattern(object):
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("UseAsciiStringPattern[]", 1)[0]
+        self._ctx = ffi.new("UseAsciiStringPattern[]", 1)
 
     def array(n):
         global _api, ffi
@@ -341,17 +359,17 @@ class UseAsciiStringPattern(object):
 
     @property
     def ascii_string(self):
-        return self._ctx.ascii_string
+        return self._ctx[0].ascii_string
 
     @ascii_string.setter
     def ascii_string(self, value):
         self._ptr_ascii_string = value
-        self._ctx.ascii_string = value
+        self._ctx[0].ascii_string = value
 
 class Vec(object):
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Vec[]", 1)[0]
+        self._ctx = ffi.new("Vec[]", 1)
 
     def array(n):
         global _api, ffi
@@ -359,26 +377,26 @@ class Vec(object):
 
     @property
     def x(self):
-        return self._ctx.x
+        return self._ctx[0].x
 
     @x.setter
     def x(self, value):
         self._ptr_x = value
-        self._ctx.x = value
+        self._ctx[0].x = value
 
     @property
     def z(self):
-        return self._ctx.z
+        return self._ctx[0].z
 
     @z.setter
     def z(self, value):
         self._ptr_z = value
-        self._ctx.z = value
+        self._ctx[0].z = value
 
 class Vec1(object):
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Vec1[]", 1)[0]
+        self._ctx = ffi.new("Vec1[]", 1)
 
     def array(n):
         global _api, ffi
@@ -386,26 +404,26 @@ class Vec1(object):
 
     @property
     def x(self):
-        return self._ctx.x
+        return self._ctx[0].x
 
     @x.setter
     def x(self, value):
         self._ptr_x = value
-        self._ctx.x = value
+        self._ctx[0].x = value
 
     @property
     def y(self):
-        return self._ctx.y
+        return self._ctx[0].y
 
     @y.setter
     def y(self, value):
         self._ptr_y = value
-        self._ctx.y = value
+        self._ctx[0].y = value
 
 class Vec2(object):
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Vec2[]", 1)[0]
+        self._ctx = ffi.new("Vec2[]", 1)
 
     def array(n):
         global _api, ffi
@@ -413,26 +431,26 @@ class Vec2(object):
 
     @property
     def x(self):
-        return self._ctx.x
+        return self._ctx[0].x
 
     @x.setter
     def x(self, value):
         self._ptr_x = value
-        self._ctx.x = value
+        self._ctx[0].x = value
 
     @property
     def z(self):
-        return self._ctx.z
+        return self._ctx[0].z
 
     @z.setter
     def z(self, value):
         self._ptr_z = value
-        self._ctx.z = value
+        self._ctx[0].z = value
 
 class Vec3f32(object):
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Vec3f32[]", 1)[0]
+        self._ctx = ffi.new("Vec3f32[]", 1)
 
     def array(n):
         global _api, ffi
@@ -440,30 +458,30 @@ class Vec3f32(object):
 
     @property
     def x(self):
-        return self._ctx.x
+        return self._ctx[0].x
 
     @x.setter
     def x(self, value):
         self._ptr_x = value
-        self._ctx.x = value
+        self._ctx[0].x = value
 
     @property
     def y(self):
-        return self._ctx.y
+        return self._ctx[0].y
 
     @y.setter
     def y(self, value):
         self._ptr_y = value
-        self._ctx.y = value
+        self._ctx[0].y = value
 
     @property
     def z(self):
-        return self._ctx.z
+        return self._ctx[0].z
 
     @z.setter
     def z(self, value):
         self._ptr_z = value
-        self._ctx.z = value
+        self._ctx[0].z = value
 
 class FFIError:
     """"""
@@ -495,208 +513,231 @@ class raw:
     def primitive_bool(x):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         return _api.primitive_bool(x)
 
     def primitive_u8(x):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         return _api.primitive_u8(x)
 
     def primitive_u16(x):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         return _api.primitive_u16(x)
 
     def primitive_u32(x):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         return _api.primitive_u32(x)
 
     def primitive_u64(x):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         return _api.primitive_u64(x)
 
     def primitive_i8(x):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         return _api.primitive_i8(x)
 
     def primitive_i16(x):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         return _api.primitive_i16(x)
 
     def primitive_i32(x):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         return _api.primitive_i32(x)
 
     def primitive_i64(x):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         return _api.primitive_i64(x)
 
     def ptr(x):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         return _api.ptr(x)
 
     def ptr_mut(x):
+        """# Safety
+
+Parameter x must point to valid data."""
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         return _api.ptr_mut(x)
 
     def ptr_ptr(x):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         return _api.ptr_ptr(x)
 
-    def ptr_simple(x):
+    def ref_simple(x):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
-        return _api.ptr_simple(x)
+            x = x._ctx[0]
+        return _api.ref_simple(x)
 
-    def ptr_simple_mut(x):
+    def ref_mut_simple(x):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
-        return _api.ptr_simple_mut(x)
+            x = x._ctx[0]
+        return _api.ref_mut_simple(x)
 
-    def ptr_option(x):
+    def ref_option(x):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
-        return _api.ptr_option(x)
+            x = x._ctx[0]
+        return _api.ref_option(x)
 
-    def ptr_option_mut(x):
+    def ref_mut_option(x):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
-        return _api.ptr_option_mut(x)
+            x = x._ctx[0]
+        return _api.ref_mut_option(x)
 
     def tupled(x):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         return _api.tupled(x)
 
-    def complex_1(_a, _b):
+    def complex_args_1(_a, _b):
         global _api
         if hasattr(_a, "_ctx"):
-            _a = _a._ctx
+            _a = _a._ctx[0]
         if hasattr(_b, "_ctx"):
-            _b = _b._ctx
-        return _api.complex_1(_a, _b)
+            _b = _b._ctx[0]
+        return _api.complex_args_1(_a, _b)
 
-    def complex_2(_cmplx):
+    def complex_args_2(_cmplx):
         global _api
         if hasattr(_cmplx, "_ctx"):
-            _cmplx = _cmplx._ctx
-        return _api.complex_2(_cmplx)
+            _cmplx = _cmplx._ctx[0]
+        return _api.complex_args_2(_cmplx)
 
     def callback(callback, value):
         global _api
         if hasattr(callback, "_ctx"):
-            callback = callback._ctx
+            callback = callback._ctx[0]
         if hasattr(value, "_ctx"):
-            value = value._ctx
+            value = value._ctx[0]
         return _api.callback(callback, value)
 
     def generic_1(x, _y):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         if hasattr(_y, "_ctx"):
-            _y = _y._ctx
+            _y = _y._ctx[0]
         return _api.generic_1(x, _y)
 
     def generic_2(x, _y):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         if hasattr(_y, "_ctx"):
-            _y = _y._ctx
+            _y = _y._ctx[0]
         return _api.generic_2(x, _y)
 
     def documented(_x):
         """This function has documentation."""
         global _api
         if hasattr(_x, "_ctx"):
-            _x = _x._ctx
+            _x = _x._ctx[0]
         return _api.documented(_x)
 
     def ambiguous_1(x):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         return _api.ambiguous_1(x)
 
     def ambiguous_2(x):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         return _api.ambiguous_2(x)
 
     def ambiguous_3(x, y):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         if hasattr(y, "_ctx"):
-            y = y._ctx
+            y = y._ctx[0]
         return _api.ambiguous_3(x, y)
 
     def namespaced_type(x):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         return _api.namespaced_type(x)
 
-    def pattern_ascii_pointer(x, y):
+    def pattern_ascii_pointer_1(x):
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx
-        if hasattr(y, "_ctx"):
-            y = y._ctx
-        return _api.pattern_ascii_pointer(x, y)
+            x = x._ctx[0]
+        return _api.pattern_ascii_pointer_1(x)
 
-    def pattern_ffi_slice(ffi_slice):
+    def pattern_ascii_pointer_len(x, y):
+        global _api
+        if hasattr(x, "_ctx"):
+            x = x._ctx[0]
+        if hasattr(y, "_ctx"):
+            y = y._ctx[0]
+        return _api.pattern_ascii_pointer_len(x, y)
+
+    def pattern_ffi_slice_1(ffi_slice):
         global _api
         if hasattr(ffi_slice, "_ctx"):
-            ffi_slice = ffi_slice._ctx
-        return _api.pattern_ffi_slice(ffi_slice)
+            ffi_slice = ffi_slice._ctx[0]
+        return _api.pattern_ffi_slice_1(ffi_slice)
+
+    def pattern_ffi_slice_2(ffi_slice, i):
+        global _api
+        if hasattr(ffi_slice, "_ctx"):
+            ffi_slice = ffi_slice._ctx[0]
+        if hasattr(i, "_ctx"):
+            i = i._ctx[0]
+        return _api.pattern_ffi_slice_2(ffi_slice, i)
 
     def pattern_ffi_slice_delegate(callback):
         global _api
         if hasattr(callback, "_ctx"):
-            callback = callback._ctx
+            callback = callback._ctx[0]
         return _api.pattern_ffi_slice_delegate(callback)
 
-    def pattern_ffi_option(ffi_slice):
+    def pattern_ffi_option_1(ffi_slice):
         global _api
         if hasattr(ffi_slice, "_ctx"):
-            ffi_slice = ffi_slice._ctx
-        return _api.pattern_ffi_option(ffi_slice)
+            ffi_slice = ffi_slice._ctx[0]
+        return _api.pattern_ffi_option_1(ffi_slice)
+
+    def pattern_ffi_option_2(ffi_slice):
+        global _api
+        if hasattr(ffi_slice, "_ctx"):
+            ffi_slice = ffi_slice._ctx[0]
+        return _api.pattern_ffi_option_2(ffi_slice)
 
     def pattern_service_create(context_ptr, value):
         global _api
         if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx
+            context_ptr = context_ptr._ctx[0]
         if hasattr(value, "_ctx"):
-            value = value._ctx
+            value = value._ctx[0]
         return _api.pattern_service_create(context_ptr, value)
 
     def pattern_service_destroy(context_ptr):
@@ -705,76 +746,76 @@ class raw:
 This function may only be called with a context returned by a succeeding `pattern_service_create`."""
         global _api
         if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx
+            context_ptr = context_ptr._ctx[0]
         return _api.pattern_service_destroy(context_ptr)
 
     def pattern_service_method(context):
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx
+            context = context._ctx[0]
         return _api.pattern_service_method(context)
 
     def pattern_service_method_success_enum_ok(_context):
         global _api
         if hasattr(_context, "_ctx"):
-            _context = _context._ctx
+            _context = _context._ctx[0]
         return _api.pattern_service_method_success_enum_ok(_context)
 
     def pattern_service_method_success_enum_fail(_context):
         global _api
         if hasattr(_context, "_ctx"):
-            _context = _context._ctx
+            _context = _context._ctx[0]
         return _api.pattern_service_method_success_enum_fail(_context)
 
     def simple_service_create(context_ptr, x):
         global _api
         if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx
+            context_ptr = context_ptr._ctx[0]
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         return _api.simple_service_create(context_ptr, x)
 
     def simple_service_destroy(context_ptr):
         global _api
         if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx
+            context_ptr = context_ptr._ctx[0]
         return _api.simple_service_destroy(context_ptr)
 
     def simple_service_result(context_ptr, x):
         global _api
         if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx
+            context_ptr = context_ptr._ctx[0]
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         return _api.simple_service_result(context_ptr, x)
 
     def simple_service_value(context_ptr, x):
         global _api
         if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx
+            context_ptr = context_ptr._ctx[0]
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         return _api.simple_service_value(context_ptr, x)
 
     def simple_service_mut_self(context_ptr, x):
         global _api
         if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx
+            context_ptr = context_ptr._ctx[0]
         if hasattr(x, "_ctx"):
-            x = x._ctx
+            x = x._ctx[0]
         return _api.simple_service_mut_self(context_ptr, x)
 
     def simple_service_void(context_ptr):
         global _api
         if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx
+            context_ptr = context_ptr._ctx[0]
         return _api.simple_service_void(context_ptr)
 
     def simple_service_extra_method(_context):
         """An extra exposed method."""
         global _api
         if hasattr(_context, "_ctx"):
-            _context = _context._ctx
+            _context = _context._ctx[0]
         return _api.simple_service_extra_method(_context)
 
 

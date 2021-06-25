@@ -6,6 +6,9 @@ pub enum Error {
     /// A null pointer was observed where it wasn't expected.
     Null,
 
+    /// An operation was requested that is not supported.
+    Unsupported,
+
     /// Formatting a string failed.
     Format(std::fmt::Error),
 

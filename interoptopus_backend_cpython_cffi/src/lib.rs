@@ -145,6 +145,9 @@ pub trait InteropCPythonCFFI: Interop {
     }
 
     fn write_api_load_fuction(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        indent!(w, r#"{} = FFI()"#, self.config().ffi_attribute)?;
+        indent!(w, _ _, r#"{} = FFI()"#, self.config().ffi_attribute)?;
+        indent!(w, r#"}}"#)?;
         w.indented(|w| writeln!(w, r#"{} = FFI()"#, self.config().ffi_attribute))?;
         w.indented(|w| writeln!(w, r#"{}.cdef(api_definition)"#, self.config().ffi_attribute))?;
         w.indented(|w| writeln!(w, r#"_api = None"#))?;
@@ -200,50 +203,47 @@ pub trait InteropCPythonCFFI: Interop {
 
         // Ctor
         w.indented(|w| writeln!(w, r#"def __init__(self):"#))?;
-        w.indent();
-        w.indented(|w| writeln!(w, r#"global _api, ffi"#))?;
-        w.indented(|w| writeln!(w, r#"self._ctx = ffi.new("{}[]", 1)[0]"#, e.rust_name()))?;
-        w.unindent();
+        w.indented_block(None, |w| {
+            w.indented(|w| writeln!(w, r#"global _api, ffi"#))?;
+            w.indented(|w| writeln!(w, r#"self._ctx = ffi.new("{}[]", 1)"#, e.rust_name()))?;
+            Ok(())
+        })?;
+
         w.newline()?;
 
         // Array constructor
         w.indented(|w| writeln!(w, r#"def array(n):"#))?;
-        w.indent();
-        w.indented(|w| writeln!(w, r#"global _api, ffi"#))?;
-        w.indented(|w| writeln!(w, r#"return ffi.new("{}[]", n)"#, e.rust_name()))?;
-        w.unindent();
+        w.indented_block(None, |w| {
+            w.indented(|w| writeln!(w, r#"global _api, ffi"#))?;
+            w.indented(|w| writeln!(w, r#"return ffi.new("{}[]", n)"#, e.rust_name()))?;
+            Ok(())
+        })?;
         w.newline()?;
 
         for field in e.fields() {
             w.indented(|w| writeln!(w, r#"@property"#))?;
             w.indented(|w| writeln!(w, r#"def {}(self):"#, field.name()))?;
-            w.indent();
-            self.write_documentation(w, field.documentation())?;
-            w.indented(|w| writeln!(w, r#"return self._ctx.{}"#, field.name()))?;
-            w.unindent();
+            w.indented_block(None, |w| {
+                self.write_documentation(w, field.documentation())?;
+                w.indented(|w| writeln!(w, r#"return self._ctx[0].{}"#, field.name()))?;
+                Ok(())
+            })?;
             w.newline()?;
 
             let _docs = field.documentation().lines().join("\n");
             w.indented(|w| writeln!(w, r#"@{}.setter"#, field.name()))?;
             w.indented(|w| writeln!(w, r#"def {}(self, value):"#, field.name()))?;
-            w.indent();
             // We also write _ptr to hold on to any allocated object created by CFFI. If we do not
             // then we might assign a pointer in the _ctx line below, but once the parameter (the CFFI handle)
             // leaves this function the handle might become deallocated and therefore the pointer
             // becomes invalid
-            w.indented(|w| writeln!(w, r#"self._ptr_{} = value"#, field.name()))?;
-            w.indented(|w| writeln!(w, r#"self._ctx.{} = value"#, field.name()))?;
-            w.unindent();
+            w.indented_block(None, |w| {
+                w.indented(|w| writeln!(w, r#"self._ptr_{} = value"#, field.name()))?;
+                w.indented(|w| writeln!(w, r#"self._ctx[0].{} = value"#, field.name()))?;
+                Ok(())
+            })?;
             w.newline()?;
         }
-
-        // General Getter (gives weird errors
-        // w.indented(|w| writeln!(w, r#"def __get__(self, obj, objtype):"#))?;
-        // w.indent();
-        // w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
-        // w.indented(|w| writeln!(w, r#"return getattr(obj, self.ctx)"#))?;
-        // w.unindent();
-        // w.newline()?;
 
         w.unindent();
 
@@ -254,12 +254,14 @@ pub trait InteropCPythonCFFI: Interop {
         let docs = e.meta().documentation().lines().join("\n");
 
         w.indented(|w| writeln!(w, r#"class {}:"#, e.rust_name()))?;
-        w.indent();
-        w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
-        for v in e.variants() {
-            w.indented(|w| writeln!(w, r#"{} = {}"#, v.name(), v.value()))?;
-        }
-        w.unindent();
+        w.indented_block(None, |w| {
+            w.indented(|w| writeln!(w, r#""""{}""""#, docs))?;
+            for v in e.variants() {
+                w.indented(|w| writeln!(w, r#"{} = {}"#, v.name(), v.value()))?;
+            }
+            Ok(())
+        })?;
+
         w.newline()?;
         w.newline()?;
 
@@ -268,17 +270,17 @@ pub trait InteropCPythonCFFI: Interop {
 
     fn write_callback_helpers(&self, w: &mut IndentWriter) -> Result<(), Error> {
         w.indented(|w| writeln!(w, r#"class {}:"#, self.config().callback_namespace))?;
-        w.indent();
-        w.indented(|w| writeln!(w, r#""""Helpers to define `@ffi.callback`-style callbacks.""""#))?;
+        w.indented_block(None, |w| {
+            w.indented(|w| writeln!(w, r#""""Helpers to define `@ffi.callback`-style callbacks.""""#))?;
 
-        for callback in self.library().ctypes().iter().filter_map(|x| match x {
-            CType::FnPointer(x) => Some(x),
-            _ => None,
-        }) {
-            w.indented(|w| writeln!(w, r#"{} = "{}""#, safe_name(&callback.internal_name()), self.type_fnpointer_to_typename(callback)))?;
-        }
-
-        w.unindent();
+            for callback in self.library().ctypes().iter().filter_map(|x| match x {
+                CType::FnPointer(x) => Some(x),
+                _ => None,
+            }) {
+                w.indented(|w| writeln!(w, r#"{} = "{}""#, safe_name(&callback.internal_name()), self.type_fnpointer_to_typename(callback)))?;
+            }
+            Ok(())
+        })?;
         w.newline()?;
         w.newline()?;
 
@@ -316,7 +318,7 @@ pub trait InteropCPythonCFFI: Interop {
             for param in function.signature().params() {
                 w.indented(|w| writeln!(w, r#"if hasattr({}, "_ctx"):"#, param.name()))?;
                 w.indent();
-                w.indented(|w| writeln!(w, r#"{p} = {p}._ctx"#, p = param.name()))?;
+                w.indented(|w| writeln!(w, r#"{p} = {p}._ctx[0]"#, p = param.name()))?;
                 w.unindent()
             }
 

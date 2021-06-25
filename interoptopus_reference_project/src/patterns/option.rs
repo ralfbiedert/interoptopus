@@ -9,6 +9,12 @@ pub struct Inner {
 
 #[ffi_function]
 #[no_mangle]
-pub extern "C" fn pattern_ffi_option(ffi_slice: FFIOption<Inner>) -> FFIOption<Inner> {
+pub extern "C" fn pattern_ffi_option_1(ffi_slice: FFIOption<Inner>) -> FFIOption<Inner> {
     ffi_slice
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn pattern_ffi_option_2(ffi_slice: FFIOption<Inner>) -> Inner {
+    ffi_slice.into_option().unwrap_or(Inner { x: f32::NAN })
 }

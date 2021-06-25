@@ -19,55 +19,55 @@ pub extern "C" fn primitive_void2() -> () {}
 #[ffi_function]
 #[no_mangle]
 pub extern "C" fn primitive_bool(x: bool) -> bool {
-    x
+    !x
 }
 
 #[ffi_function]
 #[no_mangle]
 pub extern "C" fn primitive_u8(x: u8) -> u8 {
-    x
+    u8::MAX - x
 }
 
 #[ffi_function]
 #[no_mangle]
 pub extern "C" fn primitive_u16(x: u16) -> u16 {
-    x
+    u16::MAX - x
 }
 
 #[ffi_function]
 #[no_mangle]
 pub extern "C" fn primitive_u32(x: u32) -> u32 {
-    x
+    u32::MAX - x
 }
 
 #[ffi_function]
 #[no_mangle]
 pub extern "C" fn primitive_u64(x: u64) -> u64 {
-    x
+    u64::MAX - x
 }
 
 #[ffi_function]
 #[no_mangle]
 pub extern "C" fn primitive_i8(x: i8) -> i8 {
-    x
+    -x
 }
 
 #[ffi_function]
 #[no_mangle]
 pub extern "C" fn primitive_i16(x: i16) -> i16 {
-    x
+    -x
 }
 
 #[ffi_function]
 #[no_mangle]
 pub extern "C" fn primitive_i32(x: i32) -> i32 {
-    x
+    -x
 }
 
 #[ffi_function]
 #[no_mangle]
 pub extern "C" fn primitive_i64(x: i64) -> i64 {
-    x
+    -x
 }
 
 #[ffi_function]
@@ -82,33 +82,39 @@ pub extern "C" fn ptr_ptr(x: *const *const i64) -> *const *const i64 {
     x
 }
 
+/// # Safety
+///
+/// Parameter x must point to valid data.
 #[ffi_function]
 #[no_mangle]
-pub extern "C" fn ptr_mut(x: *mut i64) -> *mut i64 {
+#[allow(unused_unsafe)]
+pub unsafe extern "C" fn ptr_mut(x: *mut i64) -> *mut i64 {
+    unsafe { *x = -*x };
     x
 }
 
 #[ffi_function]
 #[no_mangle]
-pub extern "C" fn ptr_simple(x: &i64) -> &i64 {
+pub extern "C" fn ref_simple(x: &i64) -> &i64 {
     x
 }
 
 #[ffi_function]
 #[no_mangle]
-pub extern "C" fn ptr_simple_mut(x: &mut i64) -> &mut i64 {
+pub extern "C" fn ref_mut_simple(x: &mut i64) -> &mut i64 {
+    *x = -*x;
     x
 }
 
 #[ffi_function]
 #[no_mangle]
-pub extern "C" fn ptr_option(x: Option<&i64>) -> bool {
+pub extern "C" fn ref_option(x: Option<&i64>) -> bool {
     x.is_some()
 }
 
 #[ffi_function]
 #[no_mangle]
-pub extern "C" fn ptr_option_mut(x: Option<&mut i64>) -> bool {
+pub extern "C" fn ref_mut_option(x: Option<&mut i64>) -> bool {
     x.is_some()
 }
 
@@ -120,13 +126,13 @@ pub extern "C" fn tupled(x: Tupled) -> Tupled {
 
 #[ffi_function]
 #[no_mangle]
-pub extern "C" fn complex_1(_a: Vec3f32, _b: Option<&Empty>) -> FFIError {
+pub extern "C" fn complex_args_1(_a: Vec3f32, _b: Option<&Empty>) -> FFIError {
     FFIError::Ok
 }
 
 #[ffi_function(surrogates(_cmplx = "some_foreign_type"))]
 #[no_mangle]
-pub extern "C" fn complex_2(_cmplx: SomeForeignType) -> *const Opaque {
+pub extern "C" fn complex_args_2(_cmplx: SomeForeignType) -> *const Opaque {
     null()
 }
 

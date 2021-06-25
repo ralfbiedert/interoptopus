@@ -214,10 +214,16 @@ pub trait InteropC {
     }
 
     fn write_constant(&self, w: &mut IndentWriter, constant: &Constant) -> Result<(), Error> {
-        w.indented(|w| write!(w, r#"#define "#))?;
+        w.indented(|w| write!(w, r#"const "#))?;
 
-        write!(w.writer(), "{} ", constant.name())?;
-        write!(w.writer(), "{}", self.constant_value_to_value(constant.value()))?;
+        let the_type = match constant.the_type() {
+            CType::Primitive(x) => self.type_primitive_to_typename(&x),
+            _ => return Err(Error::Null),
+        };
+
+        write!(w.writer(), "{} ", the_type)?;
+        write!(w.writer(), "{} = ", constant.name())?;
+        write!(w.writer(), "{};", self.constant_value_to_value(constant.value()))?;
 
         Ok(())
     }

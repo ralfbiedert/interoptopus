@@ -72,6 +72,23 @@ like 'safely' mapping a trait's vtable) such bindings should be gated behind a f
 to set expectations around discussions.
 
 
+Long story short, if it's fishy we probably want to fix it, but we rely on external code calling in correctly. 
+
+
+## Errors vs. Panics
+
+Any Rust code ...
+
+- ... likely used in applications **must not** panic, unless a panic is clearly user-requested 
+  (e.g., having an `unwrap()` on an `FFIOption`). If a function can fail it must return a 
+  `Result`. Allocations & co. are currently exempt if they lack a good `Result`-API; 
+  although the plan is to replace them eventually.
+  
+- ... reasonably only used during compilation or unit tests (e.g., proc macro code or code generation 
+  helpers) **should panic**, if panicking can lead to a better developer experience (e.g., 
+  clearer error messages). 
+
+
 ## Licensing
 
 A clarification how the license is meant to be applied:
