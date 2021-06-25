@@ -1,9 +1,7 @@
 
 
-- propagate visibility
 - unit test all in Python
 - unit test all in C#
-- test constructs in Miri
 - service constructs in custom wrapper with re-entrance checks?
 - benchmarks and document reference project call overhead for each backend method
 

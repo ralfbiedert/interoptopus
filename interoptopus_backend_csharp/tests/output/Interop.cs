@@ -282,7 +282,8 @@ namespace My.Company
     {
         Ok = 0,
         Null = 100,
-        Fail = 200,
+        Panic = 200,
+        Fail = 300,
     }
 
     [Serializable]

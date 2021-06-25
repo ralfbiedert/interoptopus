@@ -1,6 +1,7 @@
 //! For return enums with defined `Ok` variants, translating to exceptions if not met.
 
 use crate::lang::c::{EnumType, Variant};
+use std::panic::AssertUnwindSafe;
 
 /// A trait you should implement for enums that signal errors in FFI calls.
 ///
@@ -15,18 +16,21 @@ use crate::lang::c::{EnumType, Variant};
 /// enum FFIError {
 ///     Ok = 0,
 ///     NullPassed = 1,
-///     OtherError = 2,
+///     Panic = 2,
+///     OtherError = 3,
 /// }
 ///
 /// impl Success for FFIError {
 ///     const SUCCESS: Self = Self::Ok;
 ///     const NULL: Self = Self::NullPassed;
+///     const PANIC: Self = Self::Panic;
 /// }
 /// ```
 pub trait Success {
     /// This variant
     const SUCCESS: Self;
     const NULL: Self;
+    const PANIC: Self;
 }
 
 /// Internal helper derived for enums that are [`Success`].
@@ -51,11 +55,16 @@ impl SuccessEnum {
 }
 
 /// Helper to transform [`Error`] types to [`Success`] enums inside `extern "C"` functions.
-pub fn error_to_ffi_error<E, FE: Success>(f: impl FnOnce() -> Result<(), E>) -> FE
+pub fn panics_and_errors_to_ffi_error<E, FE: Success>(f: impl FnOnce() -> Result<(), E>) -> FE
 where
     FE: From<E>,
 {
-    match f() {
+    let result: Result<(), E> = match std::panic::catch_unwind(AssertUnwindSafe(|| f())) {
+        Ok(x) => x,
+        Err(_) => return FE::PANIC,
+    };
+
+    match result {
         Ok(_) => FE::SUCCESS,
         Err(e) => e.into(),
     }

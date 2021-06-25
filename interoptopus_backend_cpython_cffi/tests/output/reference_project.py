@@ -24,7 +24,8 @@ typedef enum cffi_ffierror
     {
     CFFI_OK = 0,
     CFFI_NULL = 100,
-    CFFI_FAIL = 200,
+    CFFI_PANIC = 200,
+    CFFI_FAIL = 300,
     } cffi_ffierror;
 
 typedef struct cffi_inner
@@ -542,7 +543,8 @@ class FFIError:
     """"""
     Ok = 0
     Null = 100
-    Fail = 200
+    Panic = 200
+    Fail = 300
 
 
 

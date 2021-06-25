@@ -248,10 +248,16 @@ macro_rules! pattern_service_generated {
         #[no_mangle]
         pub extern "C" fn $ctor(context_ptr: Option<&mut *mut $opaque>, $( $ctor_param: $ctor_param_type),*) -> $ctor_error {
             if let Some(context) = context_ptr {
-                let boxed = Box::new(<$opaque>::$method_ctor($($ctor_param),*));
-                let raw = Box::into_raw(boxed);
+                let raw = std::panic::catch_unwind(|| {
+                    let boxed = Box::new(<$opaque>::$method_ctor($($ctor_param),*));
+                    Box::into_raw(boxed)
+                });
 
-                *context = raw;
+                if let Ok(raw) = raw {
+                    *context = raw;
+                } else {
+                    return <$ctor_error as interoptopus::patterns::success_enum::Success>::PANIC;
+                }
 
                 <$ctor_error as interoptopus::patterns::success_enum::Success>::SUCCESS
             } else {
@@ -281,8 +287,15 @@ macro_rules! pattern_service_generated {
             #[no_mangle]
             pub extern "C" fn $method_as_fn(context_ptr: Option<$self_ty>, $( $param: $param_type),* ) -> $t {
                 if let Some(context) = context_ptr {
-                    let rval = <$opaque>::$method(context, $($param),*);
-                    rval.into()
+
+                    if let Ok(rval) = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                        <$opaque>::$method(context, $($param),*)
+                    })) {
+                        rval.into()
+                    } else {
+                        return < $t as interoptopus::patterns::service::FailureDefault > :: failure_default();
+                    }
+
                 } else {
                     < $t as interoptopus::patterns::service::FailureDefault > :: failure_default()
                 }

@@ -31,7 +31,8 @@ typedef enum my_library_ffierror
     {
     MY_LIBRARY_OK = 0,
     MY_LIBRARY_NULL = 100,
-    MY_LIBRARY_FAIL = 200,
+    MY_LIBRARY_PANIC = 200,
+    MY_LIBRARY_FAIL = 300,
     } my_library_ffierror;
 
 typedef struct my_library_inner
