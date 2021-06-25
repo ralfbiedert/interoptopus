@@ -11,7 +11,7 @@ use my_crate::ffi_inventory;
 #[test]
 fn generate_csharp_bindings() {
     use interoptopus::Interop;
-    use interoptopus_backend_csharp::{Generator, InteropCSharp, Config};
+    use interoptopus_backend_csharp::{Generator, CSharpWriter, Config};
 
     // Converts an `ffi_inventory()` into C# interop definitions.
     Generator::new(Config::default(), ffi_inventory()).write_to("Interop.cs")

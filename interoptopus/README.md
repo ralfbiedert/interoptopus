@@ -9,14 +9,14 @@
 
 C#, Python, C, ... → 🐙 → 🦀
 
-FFI from your favorite language to Rust. Escape hatchets included.
+FFI from your favorite language to Rust. Escape hatch ets included. 🪓
 
 
 ### Overview
 
 If you ...
 
-- **have** an `extern "C"` API in Rust,
+- are **about to write** an `extern "C"` API in Rust,
 - **need** C#, Python, C, ... bindings to your library,
 - prefer having **fine-grained-control** over your API and interop generation,
 - would like to use **quality-of-life [patterns](crate::patterns)** on **both sides** (e.g., [options](crate::patterns::option), [slices](crate::patterns::slice), '[classes](crate::patterns::class)') where feasible,

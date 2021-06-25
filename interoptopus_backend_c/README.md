@@ -10,7 +10,7 @@ use my_crate::ffi_inventory;
 #[test]
 fn generate_c_bindings() {
     use interoptopus::Interop;
-    use interoptopus_backend_c::{Generator, InteropC, Config};
+    use interoptopus_backend_c::{Generator, CWriter, Config};
 
     // Converts an `ffi_inventory()` into Python interop definitions.
     Generator::new(Config::default(), ffi_inventory()).write_to("module.h")
