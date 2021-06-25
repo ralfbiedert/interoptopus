@@ -1,14 +1,6 @@
-
-use interoptopus::lang::c::{
-    CType, CompositeType, Constant, ConstantValue, Documentation, EnumType, Field, FnPointerType, Function, Meta, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
-    Variant,
-};
-
-use interoptopus::patterns::{TypePattern};
-use interoptopus::util::{longest_common_prefix, safe_name, IdPrettifier, NamespaceMappings};
-
-
-
+use interoptopus::lang::c::{CType, CompositeType, ConstantValue, EnumType, Field, FnPointerType, Function, OpaqueType, Parameter, PrimitiveType, PrimitiveValue};
+use interoptopus::patterns::TypePattern;
+use interoptopus::util::safe_name;
 
 #[derive(Copy, Clone)]
 pub struct Converter {}

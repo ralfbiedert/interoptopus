@@ -1,6 +1,6 @@
 use crate::config::Config;
 use crate::converter::{Converter, TypeConverter};
-use interoptopus::lang::c::{CType, CompositeType, ConstantValue, Documentation, EnumType, FnPointerType, Function, PrimitiveValue};
+use interoptopus::lang::c::{CType, CompositeType, EnumType, Function};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{longest_common_prefix, safe_name};
