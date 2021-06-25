@@ -5,15 +5,18 @@ api_definition = """
 
 
 
-const uint8_t U8 = 255;
-const float F32_MIN_POSITIVE = 0.000000000000000000000000000000000000011754944;
-const int32_t COMPUTED_I32 = -2147483647;
+const const uint8_t U8 = 255;
 
-typedef enum EnumDocumented
+const const float F32_MIN_POSITIVE = 0.000000000000000000000000000000000000011754944;
+
+const const int32_t COMPUTED_I32 = -2147483647;
+
+
+typedef xenum EnumDocumented)
     {
     A = 0,
     B = 1,
-    } EnumDocumented;
+    }
 
 typedef struct Context Context;
 
@@ -23,105 +26,105 @@ typedef struct SimpleService SimpleService;
 
 typedef struct Empty Empty;
 
-typedef enum FFIError
+typedef xenum FFIError)
     {
     Ok = 0,
     Null = 100,
     Fail = 200,
-    } FFIError;
+    }
 
 typedef struct Inner
     {
     float x;
-    } Inner;
+    }
 
 typedef struct Phantomu8
     {
     uint32_t x;
-    } Phantomu8;
+    }
 
 typedef struct SomeForeignType
     {
     uint32_t x;
-    } SomeForeignType;
+    }
 
 typedef struct StructDocumented
     {
     float x;
-    } StructDocumented;
+    }
 
 typedef struct Tupled
     {
     uint8_t x0;
-    } Tupled;
+    }
 
 typedef struct UseAsciiStringPattern
     {
     uint8_t* ascii_string;
-    } UseAsciiStringPattern;
+    }
 
 typedef struct Vec
     {
     double x;
     double z;
-    } Vec;
+    }
 
 typedef struct Vec1
     {
     float x;
     float y;
-    } Vec1;
+    }
 
 typedef struct Vec2
     {
     double x;
     double z;
-    } Vec2;
+    }
 
 typedef struct Vec3f32
     {
     float x;
     float y;
     float z;
-    } Vec3f32;
+    }
 
-typedef uint8_t (*fptr_fn_u8_rval_u8)(uint8_t x0);
+typedef uint8_t (*fptr_fn_u8_rval_u8)(uint8_t x0)
 
 typedef struct Genericu32
     {
     uint32_t* x;
-    } Genericu32;
+    }
 
 typedef struct Genericu8
     {
     uint8_t* x;
-    } Genericu8;
+    }
 
 typedef struct FFISliceu32
     {
     uint32_t* data;
     uint64_t len;
-    } FFISliceu32;
+    }
 
 typedef struct FFISliceu8
     {
     uint8_t* data;
     uint64_t len;
-    } FFISliceu8;
+    }
 
 typedef struct FFIOptionInner
     {
     Inner t;
     uint8_t is_some;
-    } FFIOptionInner;
+    }
 
-typedef uint8_t (*fptr_fn_FFISliceu8_rval_u8)(FFISliceu8 x0);
+typedef uint8_t (*fptr_fn_FFISliceu8_rval_u8)(FFISliceu8 x0)
 
 typedef struct FFISliceVec3f32
     {
     Vec3f32* data;
     uint64_t len;
-    } FFISliceVec3f32;
+    }
 
 
 void primitive_void();
@@ -143,45 +146,39 @@ int64_t* ref_mut_simple(int64_t* x);
 bool ref_option(int64_t* x);
 bool ref_mut_option(int64_t* x);
 Tupled tupled(Tupled x);
-FFIError complex_args_1(Vec3f32 _a, Empty* _b);
+FFIError complex_args_1(Vec3f32 _a,Empty* _b);
 Opaque* complex_args_2(SomeForeignType _cmplx);
-uint8_t callback(fptr_fn_u8_rval_u8 callback, uint8_t value);
-uint32_t generic_1(Genericu32 x, Phantomu8 _y);
-uint8_t generic_2(Genericu8 x, Phantomu8 _y);
+uint8_t callback(fptr_fn_u8_rval_u8 callback,uint8_t value);
+uint32_t generic_1(Genericu32 x,Phantomu8 _y);
+uint8_t generic_2(Genericu8 x,Phantomu8 _y);
 EnumDocumented documented(StructDocumented _x);
 Vec1 ambiguous_1(Vec1 x);
 Vec2 ambiguous_2(Vec2 x);
-bool ambiguous_3(Vec1 x, Vec2 y);
+bool ambiguous_3(Vec1 x,Vec2 y);
 Vec namespaced_type(Vec x);
 uint32_t pattern_ascii_pointer_1(uint8_t* x);
-uint32_t pattern_ascii_pointer_len(uint8_t* x, UseAsciiStringPattern y);
+uint32_t pattern_ascii_pointer_len(uint8_t* x,UseAsciiStringPattern y);
 uint32_t pattern_ffi_slice_1(FFISliceu32 ffi_slice);
-Vec3f32 pattern_ffi_slice_2(FFISliceVec3f32 ffi_slice, int32_t i);
+Vec3f32 pattern_ffi_slice_2(FFISliceVec3f32 ffi_slice,int32_t i);
 uint8_t pattern_ffi_slice_delegate(fptr_fn_FFISliceu8_rval_u8 callback);
 FFIOptionInner pattern_ffi_option_1(FFIOptionInner ffi_slice);
 Inner pattern_ffi_option_2(FFIOptionInner ffi_slice);
-FFIError pattern_service_create(Context** context_ptr, uint32_t value);
+FFIError pattern_service_create(Context** context_ptr,uint32_t value);
 FFIError pattern_service_destroy(Context** context_ptr);
 uint32_t pattern_service_method(Context* context);
 FFIError pattern_service_method_success_enum_ok(Context* _context);
 FFIError pattern_service_method_success_enum_fail(Context* _context);
-FFIError simple_service_create(SimpleService** context_ptr, uint32_t x);
+FFIError simple_service_create(SimpleService** context_ptr,uint32_t x);
 FFIError simple_service_destroy(SimpleService** context_ptr);
-FFIError simple_service_result(SimpleService* context_ptr, uint32_t x);
-uint32_t simple_service_value(SimpleService* context_ptr, uint32_t x);
-uint32_t simple_service_mut_self(SimpleService* context_ptr, uint32_t x);
+FFIError simple_service_result(SimpleService* context_ptr,uint32_t x);
+uint32_t simple_service_value(SimpleService* context_ptr,uint32_t x);
+uint32_t simple_service_mut_self(SimpleService* context_ptr,uint32_t x);
 void simple_service_void(SimpleService* context_ptr);
 uint32_t simple_service_extra_method(SimpleService* _context);
 """
 
 
 ffi = FFI()
-{
-    ffi = FFI()
-    ffi = FFI()
-    ffi = FFI()
-    ffi = FFI()
-    ffi = FFI()
         ffi = FFI()
 }
 ffi = FFI()

@@ -80,8 +80,8 @@ impl<'a> IndentWriter<'a> {
 
 /// Writes a line of code, possibly with multiple indentations.
 #[macro_export]
-macro_rules! indent {
-    ($w:expr, $($i:pat)+, $x:expr, $($param:expr),*) => {
+macro_rules! indented {
+    ($w:expr, [ $($i:pat)+ ], $x:expr, $($param:expr),*) => {
         {
             $(
                 let $i = ();
@@ -97,6 +97,23 @@ macro_rules! indent {
 
     };
 
+    ($w:expr, [ $($i:pat)+ ], $x:expr) => {
+        {
+            $(
+                let $i = ();
+                $w.indent();
+            )*
+            let rval = $w.indented(|w| writeln!(w, $x));
+            $(
+                let $i = ();
+                $w.unindent();
+            )*
+            rval
+        }
+
+    };
+
+
     ($w:expr, $x:expr, $($param:expr),*) => {
         {
             $w.indented(|w| writeln!(w, $x, $($param),*))
@@ -108,5 +125,4 @@ macro_rules! indent {
             $w.indented(|w| writeln!(w, $x))
         }
     };
-
 }

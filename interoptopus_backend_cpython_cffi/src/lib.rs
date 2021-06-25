@@ -59,9 +59,9 @@ use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{longest_common_prefix, safe_name};
 use interoptopus::writer::IndentWriter;
-use interoptopus::Interop;
+use interoptopus::{indented, Interop};
 use interoptopus::{Error, Library};
-use interoptopus_backend_c::InteropC;
+use interoptopus_backend_c::{CWriter, TypeConverter};
 
 /// Configures Python code generation.
 #[derive(Clone, Debug)]
@@ -145,9 +145,9 @@ pub trait InteropCPythonCFFI: Interop {
     }
 
     fn write_api_load_fuction(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        indent!(w, r#"{} = FFI()"#, self.config().ffi_attribute)?;
-        indent!(w, _ _, r#"{} = FFI()"#, self.config().ffi_attribute)?;
-        indent!(w, r#"}}"#)?;
+        indented!(w, r#"{} = FFI()"#, self.config().ffi_attribute)?;
+        indented!(w, [ _ _ ], r#"{} = FFI()"#, self.config().ffi_attribute)?;
+        indented!(w, r#"}}"#)?;
         w.indented(|w| writeln!(w, r#"{} = FFI()"#, self.config().ffi_attribute))?;
         w.indented(|w| writeln!(w, r#"{}.cdef(api_definition)"#, self.config().ffi_attribute))?;
         w.indented(|w| writeln!(w, r#"_api = None"#))?;
@@ -288,12 +288,12 @@ pub trait InteropCPythonCFFI: Interop {
     }
 
     fn type_fnpointer_to_typename(&self, fn_pointer: &FnPointerType) -> String {
-        let rval = self.c_generator().type_to_type_specifier(&fn_pointer.signature().rval());
+        let rval = self.c_generator().converter().type_to_type_specifier(&fn_pointer.signature().rval());
         let params = fn_pointer
             .signature()
             .params()
             .iter()
-            .map(|x| self.c_generator().type_to_type_specifier(x.the_type()))
+            .map(|x| self.c_generator().converter().type_to_type_specifier(x.the_type()))
             .collect::<Vec<_>>()
             .join(",");
 
