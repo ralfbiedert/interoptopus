@@ -209,6 +209,9 @@ class Empty(object):
         global _api, ffi
         return ffi.new("cffi_empty[]", n)
 
+    def ptr(self):
+        return self._ctx
+
 class Genericu32(object):
     """"""
     def __init__(self):
@@ -218,6 +221,9 @@ class Genericu32(object):
     def array(n):
         global _api, ffi
         return ffi.new("cffi_genericu32[]", n)
+
+    def ptr(self):
+        return self._ctx
 
     @property
     def x(self):
@@ -239,6 +245,9 @@ class Genericu8(object):
         global _api, ffi
         return ffi.new("cffi_genericu8[]", n)
 
+    def ptr(self):
+        return self._ctx
+
     @property
     def x(self):
         """"""
@@ -258,6 +267,9 @@ class Inner(object):
     def array(n):
         global _api, ffi
         return ffi.new("cffi_inner[]", n)
+
+    def ptr(self):
+        return self._ctx
 
     @property
     def x(self):
@@ -279,6 +291,9 @@ class Phantomu8(object):
         global _api, ffi
         return ffi.new("cffi_phantomu8[]", n)
 
+    def ptr(self):
+        return self._ctx
+
     @property
     def x(self):
         """"""
@@ -298,6 +313,9 @@ class SomeForeignType(object):
     def array(n):
         global _api, ffi
         return ffi.new("cffi_someforeigntype[]", n)
+
+    def ptr(self):
+        return self._ctx
 
     @property
     def x(self):
@@ -319,6 +337,9 @@ class StructDocumented(object):
         global _api, ffi
         return ffi.new("cffi_structdocumented[]", n)
 
+    def ptr(self):
+        return self._ctx
+
     @property
     def x(self):
         """Documented field."""
@@ -338,6 +359,9 @@ class Tupled(object):
     def array(n):
         global _api, ffi
         return ffi.new("cffi_tupled[]", n)
+
+    def ptr(self):
+        return self._ctx
 
     @property
     def x0(self):
@@ -359,6 +383,9 @@ class UseAsciiStringPattern(object):
         global _api, ffi
         return ffi.new("cffi_useasciistringpattern[]", n)
 
+    def ptr(self):
+        return self._ctx
+
     @property
     def ascii_string(self):
         """"""
@@ -378,6 +405,9 @@ class Vec(object):
     def array(n):
         global _api, ffi
         return ffi.new("cffi_vec[]", n)
+
+    def ptr(self):
+        return self._ctx
 
     @property
     def x(self):
@@ -409,6 +439,9 @@ class Vec1(object):
         global _api, ffi
         return ffi.new("cffi_vec1[]", n)
 
+    def ptr(self):
+        return self._ctx
+
     @property
     def x(self):
         """"""
@@ -439,6 +472,9 @@ class Vec2(object):
         global _api, ffi
         return ffi.new("cffi_vec2[]", n)
 
+    def ptr(self):
+        return self._ctx
+
     @property
     def x(self):
         """"""
@@ -468,6 +504,9 @@ class Vec3f32(object):
     def array(n):
         global _api, ffi
         return ffi.new("cffi_vec3f32[]", n)
+
+    def ptr(self):
+        return self._ctx
 
     @property
     def x(self):

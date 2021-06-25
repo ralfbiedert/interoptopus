@@ -93,6 +93,11 @@ pub trait PythonWriter {
         indented!(w, [_ _], r#"return ffi.new("{}[]", n)"#, cname)?;
         w.newline()?;
 
+        // Ptr
+        indented!(w, [_], r#"def ptr(self):"#)?;
+        indented!(w, [_ _], r#"return self._ctx"#)?;
+        w.newline()?;
+
         for field in e.fields() {
             indented!(w, [_], r#"@property"#)?;
             indented!(w, [_], r#"def {}(self):"#, field.name())?;

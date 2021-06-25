@@ -92,6 +92,9 @@ class SuperComplexEntity(object):
         global _api, ffi
         return ffi.new("cffi_supercomplexentity[]", n)
 
+    def ptr(self):
+        return self._ctx
+
     @property
     def player_1(self):
         """"""
@@ -152,6 +155,9 @@ class ThirdPartyVecF32(object):
         global _api, ffi
         return ffi.new("cffi_thirdpartyvecf32[]", n)
 
+    def ptr(self):
+        return self._ctx
+
     @property
     def x(self):
         """"""
@@ -202,6 +208,9 @@ class Vec3(object):
         global _api, ffi
         return ffi.new("cffi_vec3[]", n)
 
+    def ptr(self):
+        return self._ctx
+
     @property
     def x(self):
         """"""
@@ -241,6 +250,9 @@ class WithForeignType(object):
     def array(n):
         global _api, ffi
         return ffi.new("cffi_withforeigntype[]", n)
+
+    def ptr(self):
+        return self._ctx
 
     @property
     def secret_number(self):
