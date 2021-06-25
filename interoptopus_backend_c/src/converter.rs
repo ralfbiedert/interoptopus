@@ -1,6 +1,7 @@
 use interoptopus::lang::c::{CType, CompositeType, ConstantValue, EnumType, FnPointerType, Function, OpaqueType, Parameter, PrimitiveType, PrimitiveValue};
 use interoptopus::util::safe_name;
 
+#[derive(Copy, Clone)]
 pub struct Converter {}
 
 pub trait TypeConverter {

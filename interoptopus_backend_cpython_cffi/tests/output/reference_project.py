@@ -12,11 +12,11 @@ const const float F32_MIN_POSITIVE = 0.00000000000000000000000000000000000001175
 const const int32_t COMPUTED_I32 = -2147483647;
 
 
-typedef xenum EnumDocumented)
+typedef enum EnumDocumented
     {
     A = 0,
     B = 1,
-    }
+    } EnumDocumented;
 
 typedef struct Context Context;
 
@@ -26,105 +26,105 @@ typedef struct SimpleService SimpleService;
 
 typedef struct Empty Empty;
 
-typedef xenum FFIError)
+typedef enum FFIError
     {
     Ok = 0,
     Null = 100,
     Fail = 200,
-    }
+    } FFIError;
 
 typedef struct Inner
     {
     float x;
-    }
+    } Inner;
 
 typedef struct Phantomu8
     {
     uint32_t x;
-    }
+    } Phantomu8;
 
 typedef struct SomeForeignType
     {
     uint32_t x;
-    }
+    } SomeForeignType;
 
 typedef struct StructDocumented
     {
     float x;
-    }
+    } StructDocumented;
 
 typedef struct Tupled
     {
     uint8_t x0;
-    }
+    } Tupled;
 
 typedef struct UseAsciiStringPattern
     {
     uint8_t* ascii_string;
-    }
+    } UseAsciiStringPattern;
 
 typedef struct Vec
     {
     double x;
     double z;
-    }
+    } Vec;
 
 typedef struct Vec1
     {
     float x;
     float y;
-    }
+    } Vec1;
 
 typedef struct Vec2
     {
     double x;
     double z;
-    }
+    } Vec2;
 
 typedef struct Vec3f32
     {
     float x;
     float y;
     float z;
-    }
+    } Vec3f32;
 
-typedef uint8_t (*fptr_fn_u8_rval_u8)(uint8_t x0)
+typedef uint8_t (*fptr_fn_u8_rval_u8)(uint8_t x0);
 
 typedef struct Genericu32
     {
     uint32_t* x;
-    }
+    } Genericu32;
 
 typedef struct Genericu8
     {
     uint8_t* x;
-    }
+    } Genericu8;
 
 typedef struct FFISliceu32
     {
     uint32_t* data;
     uint64_t len;
-    }
+    } FFISliceu32;
 
 typedef struct FFISliceu8
     {
     uint8_t* data;
     uint64_t len;
-    }
+    } FFISliceu8;
 
 typedef struct FFIOptionInner
     {
     Inner t;
     uint8_t is_some;
-    }
+    } FFIOptionInner;
 
-typedef uint8_t (*fptr_fn_FFISliceu8_rval_u8)(FFISliceu8 x0)
+typedef uint8_t (*fptr_fn_FFISliceu8_rval_u8)(FFISliceu8 x0);
 
 typedef struct FFISliceVec3f32
     {
     Vec3f32* data;
     uint64_t len;
-    }
+    } FFISliceVec3f32;
 
 
 void primitive_void();
@@ -179,9 +179,6 @@ uint32_t simple_service_extra_method(SimpleService* _context);
 
 
 ffi = FFI()
-        ffi = FFI()
-}
-ffi = FFI()
 ffi.cdef(api_definition)
 _api = None
 
@@ -209,6 +206,7 @@ class EnumDocumented:
 
 
 class Empty(object):
+    """"""
     def __init__(self):
         global _api, ffi
         self._ctx = ffi.new("Empty[]", 1)
@@ -218,6 +216,7 @@ class Empty(object):
         return ffi.new("Empty[]", n)
 
 class Genericu32(object):
+    """"""
     def __init__(self):
         global _api, ffi
         self._ctx = ffi.new("Genericu32[]", 1)
@@ -228,6 +227,7 @@ class Genericu32(object):
 
     @property
     def x(self):
+        """"""
         return self._ctx[0].x
 
     @x.setter
@@ -236,6 +236,7 @@ class Genericu32(object):
         self._ctx[0].x = value
 
 class Genericu8(object):
+    """"""
     def __init__(self):
         global _api, ffi
         self._ctx = ffi.new("Genericu8[]", 1)
@@ -246,6 +247,7 @@ class Genericu8(object):
 
     @property
     def x(self):
+        """"""
         return self._ctx[0].x
 
     @x.setter
@@ -254,6 +256,7 @@ class Genericu8(object):
         self._ctx[0].x = value
 
 class Inner(object):
+    """"""
     def __init__(self):
         global _api, ffi
         self._ctx = ffi.new("Inner[]", 1)
@@ -264,6 +267,7 @@ class Inner(object):
 
     @property
     def x(self):
+        """"""
         return self._ctx[0].x
 
     @x.setter
@@ -272,6 +276,7 @@ class Inner(object):
         self._ctx[0].x = value
 
 class Phantomu8(object):
+    """"""
     def __init__(self):
         global _api, ffi
         self._ctx = ffi.new("Phantomu8[]", 1)
@@ -282,6 +287,7 @@ class Phantomu8(object):
 
     @property
     def x(self):
+        """"""
         return self._ctx[0].x
 
     @x.setter
@@ -290,6 +296,7 @@ class Phantomu8(object):
         self._ctx[0].x = value
 
 class SomeForeignType(object):
+    """"""
     def __init__(self):
         global _api, ffi
         self._ctx = ffi.new("SomeForeignType[]", 1)
@@ -300,6 +307,7 @@ class SomeForeignType(object):
 
     @property
     def x(self):
+        """"""
         return self._ctx[0].x
 
     @x.setter
@@ -328,6 +336,7 @@ class StructDocumented(object):
         self._ctx[0].x = value
 
 class Tupled(object):
+    """"""
     def __init__(self):
         global _api, ffi
         self._ctx = ffi.new("Tupled[]", 1)
@@ -338,6 +347,7 @@ class Tupled(object):
 
     @property
     def x0(self):
+        """"""
         return self._ctx[0].x0
 
     @x0.setter
@@ -346,6 +356,7 @@ class Tupled(object):
         self._ctx[0].x0 = value
 
 class UseAsciiStringPattern(object):
+    """"""
     def __init__(self):
         global _api, ffi
         self._ctx = ffi.new("UseAsciiStringPattern[]", 1)
@@ -356,6 +367,7 @@ class UseAsciiStringPattern(object):
 
     @property
     def ascii_string(self):
+        """"""
         return self._ctx[0].ascii_string
 
     @ascii_string.setter
@@ -364,6 +376,7 @@ class UseAsciiStringPattern(object):
         self._ctx[0].ascii_string = value
 
 class Vec(object):
+    """"""
     def __init__(self):
         global _api, ffi
         self._ctx = ffi.new("Vec[]", 1)
@@ -374,6 +387,7 @@ class Vec(object):
 
     @property
     def x(self):
+        """"""
         return self._ctx[0].x
 
     @x.setter
@@ -383,6 +397,7 @@ class Vec(object):
 
     @property
     def z(self):
+        """"""
         return self._ctx[0].z
 
     @z.setter
@@ -391,6 +406,7 @@ class Vec(object):
         self._ctx[0].z = value
 
 class Vec1(object):
+    """"""
     def __init__(self):
         global _api, ffi
         self._ctx = ffi.new("Vec1[]", 1)
@@ -401,6 +417,7 @@ class Vec1(object):
 
     @property
     def x(self):
+        """"""
         return self._ctx[0].x
 
     @x.setter
@@ -410,6 +427,7 @@ class Vec1(object):
 
     @property
     def y(self):
+        """"""
         return self._ctx[0].y
 
     @y.setter
@@ -418,6 +436,7 @@ class Vec1(object):
         self._ctx[0].y = value
 
 class Vec2(object):
+    """"""
     def __init__(self):
         global _api, ffi
         self._ctx = ffi.new("Vec2[]", 1)
@@ -428,6 +447,7 @@ class Vec2(object):
 
     @property
     def x(self):
+        """"""
         return self._ctx[0].x
 
     @x.setter
@@ -437,6 +457,7 @@ class Vec2(object):
 
     @property
     def z(self):
+        """"""
         return self._ctx[0].z
 
     @z.setter
@@ -445,6 +466,7 @@ class Vec2(object):
         self._ctx[0].z = value
 
 class Vec3f32(object):
+    """"""
     def __init__(self):
         global _api, ffi
         self._ctx = ffi.new("Vec3f32[]", 1)
@@ -455,6 +477,7 @@ class Vec3f32(object):
 
     @property
     def x(self):
+        """"""
         return self._ctx[0].x
 
     @x.setter
@@ -464,6 +487,7 @@ class Vec3f32(object):
 
     @property
     def y(self):
+        """"""
         return self._ctx[0].y
 
     @y.setter
@@ -473,6 +497,7 @@ class Vec3f32(object):
 
     @property
     def z(self):
+        """"""
         return self._ctx[0].z
 
     @z.setter
@@ -500,68 +525,80 @@ class callbacks:
 class raw:
     """Raw access to all exported functions."""
     def primitive_void():
+        """"""
         global _api
         return _api.primitive_void()
 
     def primitive_void2():
+        """"""
         global _api
         return _api.primitive_void2()
 
     def primitive_bool(x):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.primitive_bool(x)
 
     def primitive_u8(x):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.primitive_u8(x)
 
     def primitive_u16(x):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.primitive_u16(x)
 
     def primitive_u32(x):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.primitive_u32(x)
 
     def primitive_u64(x):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.primitive_u64(x)
 
     def primitive_i8(x):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.primitive_i8(x)
 
     def primitive_i16(x):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.primitive_i16(x)
 
     def primitive_i32(x):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.primitive_i32(x)
 
     def primitive_i64(x):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.primitive_i64(x)
 
     def ptr(x):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
@@ -577,42 +614,49 @@ Parameter x must point to valid data."""
         return _api.ptr_mut(x)
 
     def ptr_ptr(x):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.ptr_ptr(x)
 
     def ref_simple(x):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.ref_simple(x)
 
     def ref_mut_simple(x):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.ref_mut_simple(x)
 
     def ref_option(x):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.ref_option(x)
 
     def ref_mut_option(x):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.ref_mut_option(x)
 
     def tupled(x):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.tupled(x)
 
     def complex_args_1(_a, _b):
+        """"""
         global _api
         if hasattr(_a, "_ctx"):
             _a = _a._ctx[0]
@@ -621,12 +665,14 @@ Parameter x must point to valid data."""
         return _api.complex_args_1(_a, _b)
 
     def complex_args_2(_cmplx):
+        """"""
         global _api
         if hasattr(_cmplx, "_ctx"):
             _cmplx = _cmplx._ctx[0]
         return _api.complex_args_2(_cmplx)
 
     def callback(callback, value):
+        """"""
         global _api
         if hasattr(callback, "_ctx"):
             callback = callback._ctx[0]
@@ -635,6 +681,7 @@ Parameter x must point to valid data."""
         return _api.callback(callback, value)
 
     def generic_1(x, _y):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
@@ -643,6 +690,7 @@ Parameter x must point to valid data."""
         return _api.generic_1(x, _y)
 
     def generic_2(x, _y):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
@@ -658,18 +706,21 @@ Parameter x must point to valid data."""
         return _api.documented(_x)
 
     def ambiguous_1(x):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.ambiguous_1(x)
 
     def ambiguous_2(x):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.ambiguous_2(x)
 
     def ambiguous_3(x, y):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
@@ -678,18 +729,21 @@ Parameter x must point to valid data."""
         return _api.ambiguous_3(x, y)
 
     def namespaced_type(x):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.namespaced_type(x)
 
     def pattern_ascii_pointer_1(x):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.pattern_ascii_pointer_1(x)
 
     def pattern_ascii_pointer_len(x, y):
+        """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
@@ -698,12 +752,14 @@ Parameter x must point to valid data."""
         return _api.pattern_ascii_pointer_len(x, y)
 
     def pattern_ffi_slice_1(ffi_slice):
+        """"""
         global _api
         if hasattr(ffi_slice, "_ctx"):
             ffi_slice = ffi_slice._ctx[0]
         return _api.pattern_ffi_slice_1(ffi_slice)
 
     def pattern_ffi_slice_2(ffi_slice, i):
+        """"""
         global _api
         if hasattr(ffi_slice, "_ctx"):
             ffi_slice = ffi_slice._ctx[0]
@@ -712,24 +768,28 @@ Parameter x must point to valid data."""
         return _api.pattern_ffi_slice_2(ffi_slice, i)
 
     def pattern_ffi_slice_delegate(callback):
+        """"""
         global _api
         if hasattr(callback, "_ctx"):
             callback = callback._ctx[0]
         return _api.pattern_ffi_slice_delegate(callback)
 
     def pattern_ffi_option_1(ffi_slice):
+        """"""
         global _api
         if hasattr(ffi_slice, "_ctx"):
             ffi_slice = ffi_slice._ctx[0]
         return _api.pattern_ffi_option_1(ffi_slice)
 
     def pattern_ffi_option_2(ffi_slice):
+        """"""
         global _api
         if hasattr(ffi_slice, "_ctx"):
             ffi_slice = ffi_slice._ctx[0]
         return _api.pattern_ffi_option_2(ffi_slice)
 
     def pattern_service_create(context_ptr, value):
+        """"""
         global _api
         if hasattr(context_ptr, "_ctx"):
             context_ptr = context_ptr._ctx[0]
@@ -747,24 +807,28 @@ This function may only be called with a context returned by a succeeding `patter
         return _api.pattern_service_destroy(context_ptr)
 
     def pattern_service_method(context):
+        """"""
         global _api
         if hasattr(context, "_ctx"):
             context = context._ctx[0]
         return _api.pattern_service_method(context)
 
     def pattern_service_method_success_enum_ok(_context):
+        """"""
         global _api
         if hasattr(_context, "_ctx"):
             _context = _context._ctx[0]
         return _api.pattern_service_method_success_enum_ok(_context)
 
     def pattern_service_method_success_enum_fail(_context):
+        """"""
         global _api
         if hasattr(_context, "_ctx"):
             _context = _context._ctx[0]
         return _api.pattern_service_method_success_enum_fail(_context)
 
     def simple_service_create(context_ptr, x):
+        """"""
         global _api
         if hasattr(context_ptr, "_ctx"):
             context_ptr = context_ptr._ctx[0]
@@ -773,12 +837,14 @@ This function may only be called with a context returned by a succeeding `patter
         return _api.simple_service_create(context_ptr, x)
 
     def simple_service_destroy(context_ptr):
+        """"""
         global _api
         if hasattr(context_ptr, "_ctx"):
             context_ptr = context_ptr._ctx[0]
         return _api.simple_service_destroy(context_ptr)
 
     def simple_service_result(context_ptr, x):
+        """"""
         global _api
         if hasattr(context_ptr, "_ctx"):
             context_ptr = context_ptr._ctx[0]
@@ -787,6 +853,7 @@ This function may only be called with a context returned by a succeeding `patter
         return _api.simple_service_result(context_ptr, x)
 
     def simple_service_value(context_ptr, x):
+        """"""
         global _api
         if hasattr(context_ptr, "_ctx"):
             context_ptr = context_ptr._ctx[0]
@@ -795,6 +862,7 @@ This function may only be called with a context returned by a succeeding `patter
         return _api.simple_service_value(context_ptr, x)
 
     def simple_service_mut_self(context_ptr, x):
+        """"""
         global _api
         if hasattr(context_ptr, "_ctx"):
             context_ptr = context_ptr._ctx[0]
@@ -803,6 +871,7 @@ This function may only be called with a context returned by a succeeding `patter
         return _api.simple_service_mut_self(context_ptr, x)
 
     def simple_service_void(context_ptr):
+        """"""
         global _api
         if hasattr(context_ptr, "_ctx"):
             context_ptr = context_ptr._ctx[0]
@@ -821,9 +890,10 @@ This function may only be called with a context returned by a succeeding `patter
 
 class Context(object):
     def __init__(self, value):
+        """"""
+        global _api, ffi
         if hasattr(value, "_ctx"):
             value = value._ctx
-        global _api, ffi
         self.ctx = ffi.new("Context**")
         rval = raw.pattern_service_create(self.ctx, value)
         if rval == FFIError.Ok:
@@ -832,9 +902,6 @@ class Context(object):
             raise Exception(f"return value ${rval}")
 
     def __del__(self):
-        """# Safety
-
-This function may only be called with a context returned by a succeeding `pattern_service_create`."""
         global _api, ffi
         rval = raw.pattern_service_destroy(self.ctx, )
         if rval == FFIError.Ok:
@@ -843,10 +910,12 @@ This function may only be called with a context returned by a succeeding `patter
             raise Exception(f"return value ${rval}")
 
     def method(self, ):
+        """"""
         global raw
         return _api.pattern_service_method(self.ctx[0], )
 
     def method_success_enum_ok(self, ):
+        """"""
         global raw
         rval = raw.pattern_service_method_success_enum_ok(self.ctx[0], )
         if rval == FFIError.Ok:
@@ -855,6 +924,7 @@ This function may only be called with a context returned by a succeeding `patter
             raise Exception(f"return value ${rval}")
 
     def method_success_enum_fail(self, ):
+        """"""
         global raw
         rval = raw.pattern_service_method_success_enum_fail(self.ctx[0], )
         if rval == FFIError.Ok:
@@ -866,9 +936,10 @@ This function may only be called with a context returned by a succeeding `patter
 
 class SimpleService(object):
     def __init__(self, x):
+        """"""
+        global _api, ffi
         if hasattr(x, "_ctx"):
             x = x._ctx
-        global _api, ffi
         self.ctx = ffi.new("SimpleService**")
         rval = raw.simple_service_create(self.ctx, x)
         if rval == FFIError.Ok:
@@ -885,6 +956,7 @@ class SimpleService(object):
             raise Exception(f"return value ${rval}")
 
     def result(self, x):
+        """"""
         global raw
         rval = raw.simple_service_result(self.ctx[0], x)
         if rval == FFIError.Ok:
@@ -893,14 +965,17 @@ class SimpleService(object):
             raise Exception(f"return value ${rval}")
 
     def value(self, x):
+        """"""
         global raw
         return _api.simple_service_value(self.ctx[0], x)
 
     def mut_self(self, x):
+        """"""
         global raw
         return _api.simple_service_mut_self(self.ctx[0], x)
 
     def void(self, ):
+        """"""
         global raw
         return _api.simple_service_void(self.ctx[0], )
 

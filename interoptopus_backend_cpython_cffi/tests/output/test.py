@@ -167,9 +167,9 @@ class TestPatterns(unittest.TestCase):
             self.assertEqual(len(s), r.raw.pattern_ascii_pointer_1(astr))
 
 
-    def test_options(self):
-        inner = r.Inner()
-        option = r.Op
+    # def test_options(self):
+    #     inner = r.Inner()
+    #     option = r.Op
 
 
 

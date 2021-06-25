@@ -155,11 +155,11 @@ pub trait CWriter {
             params.push(format!("{} x{}", self.converter().type_to_type_specifier(param.the_type()), i));
         }
 
-        indented!(w, "typedef {} (*{})({})", rval, name, params.join(","))
+        indented!(w, "typedef {} (*{})({});", rval, name, params.join(","))
     }
 
     fn write_type_definition_enum(&self, w: &mut IndentWriter, the_type: &EnumType) -> Result<(), Error> {
-        indented!(w, "typedef xenum {})", the_type.rust_name())?;
+        indented!(w, "typedef enum {}", the_type.rust_name())?;
         indented!(w, [_], "{{")?;
 
         w.indent();
@@ -170,7 +170,7 @@ pub trait CWriter {
 
         w.unindent();
 
-        indented!(w, [_], "}}")
+        indented!(w, [_], "}} {};", the_type.rust_name())
     }
 
     fn write_type_definition_enum_variant(&self, w: &mut IndentWriter, variant: &Variant, _the_type: &EnumType) -> Result<(), Error> {
@@ -210,7 +210,7 @@ pub trait CWriter {
 
         w.unindent();
 
-        indented!(w, [_], "}}")
+        indented!(w, [_], "}} {};", the_type.rust_name())
     }
 
     fn write_type_definition_composite_body_field(&self, w: &mut IndentWriter, field: &Field, _the_type: &CompositeType) -> Result<(), Error> {
