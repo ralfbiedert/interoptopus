@@ -5,126 +5,120 @@ api_definition = """
 
 
 
-const const uint8_t U8 = 255;
+const uint8_t CFFI_U8 = 255;
+const float CFFI_F32_MIN_POSITIVE = 0.000000000000000000000000000000000000011754944;
+const int32_t CFFI_COMPUTED_I32 = -2147483647;
 
-const const float F32_MIN_POSITIVE = 0.000000000000000000000000000000000000011754944;
-
-const const int32_t COMPUTED_I32 = -2147483647;
-
-
-typedef enum EnumDocumented
+typedef enum cffi_enumdocumented
     {
-    A = 0,
-    B = 1,
-    } EnumDocumented;
+    CFFI_A = 0,
+    CFFI_B = 1,
+    } cffi_enumdocumented;
 
-typedef struct Context Context;
+typedef struct cffi_context cffi_context;
+typedef struct cffi_opaque cffi_opaque;
+typedef struct cffi_simpleservice cffi_simpleservice;
+typedef struct cffi_empty cffi_empty;
 
-typedef struct Opaque Opaque;
-
-typedef struct SimpleService SimpleService;
-
-typedef struct Empty Empty;
-
-typedef enum FFIError
+typedef enum cffi_ffierror
     {
-    Ok = 0,
-    Null = 100,
-    Fail = 200,
-    } FFIError;
+    CFFI_OK = 0,
+    CFFI_NULL = 100,
+    CFFI_FAIL = 200,
+    } cffi_ffierror;
 
-typedef struct Inner
+typedef struct cffi_inner
     {
     float x;
-    } Inner;
+    } cffi_inner;
 
-typedef struct Phantomu8
+typedef struct cffi_phantomu8
     {
     uint32_t x;
-    } Phantomu8;
+    } cffi_phantomu8;
 
-typedef struct SomeForeignType
+typedef struct cffi_someforeigntype
     {
     uint32_t x;
-    } SomeForeignType;
+    } cffi_someforeigntype;
 
-typedef struct StructDocumented
+typedef struct cffi_structdocumented
     {
     float x;
-    } StructDocumented;
+    } cffi_structdocumented;
 
-typedef struct Tupled
+typedef struct cffi_tupled
     {
     uint8_t x0;
-    } Tupled;
+    } cffi_tupled;
 
-typedef struct UseAsciiStringPattern
+typedef struct cffi_useasciistringpattern
     {
     uint8_t* ascii_string;
-    } UseAsciiStringPattern;
+    } cffi_useasciistringpattern;
 
-typedef struct Vec
+typedef struct cffi_vec
     {
     double x;
     double z;
-    } Vec;
+    } cffi_vec;
 
-typedef struct Vec1
+typedef struct cffi_vec1
     {
     float x;
     float y;
-    } Vec1;
+    } cffi_vec1;
 
-typedef struct Vec2
+typedef struct cffi_vec2
     {
     double x;
     double z;
-    } Vec2;
+    } cffi_vec2;
 
-typedef struct Vec3f32
+typedef struct cffi_vec3f32
     {
     float x;
     float y;
     float z;
-    } Vec3f32;
+    } cffi_vec3f32;
 
-typedef uint8_t (*fptr_fn_u8_rval_u8)(uint8_t x0);
+typedef uint8_t (*cffi_fptr_fn_u8_rval_u8)(uint8_t x0);
 
-typedef struct Genericu32
+typedef struct cffi_genericu32
     {
     uint32_t* x;
-    } Genericu32;
+    } cffi_genericu32;
 
-typedef struct Genericu8
+typedef struct cffi_genericu8
     {
     uint8_t* x;
-    } Genericu8;
+    } cffi_genericu8;
 
-typedef struct FFISliceu32
+typedef struct cffi_ffisliceu32
     {
     uint32_t* data;
     uint64_t len;
-    } FFISliceu32;
+    } cffi_ffisliceu32;
 
-typedef struct FFISliceu8
+typedef struct cffi_ffisliceu8
     {
     uint8_t* data;
     uint64_t len;
-    } FFISliceu8;
+    } cffi_ffisliceu8;
 
-typedef struct FFIOptionInner
+typedef struct cffi_ffioptioninner
     {
-    Inner t;
+    cffi_inner t;
     uint8_t is_some;
-    } FFIOptionInner;
+    } cffi_ffioptioninner;
 
-typedef uint8_t (*fptr_fn_FFISliceu8_rval_u8)(FFISliceu8 x0);
+typedef uint8_t (*cffi_fptr_fn_FFISliceu8_rval_u8)(cffi_ffisliceu8 x0);
 
-typedef struct FFISliceVec3f32
+typedef struct cffi_ffislicevec3f32
     {
-    Vec3f32* data;
+    cffi_vec3f32* data;
     uint64_t len;
-    } FFISliceVec3f32;
+    } cffi_ffislicevec3f32;
 
 
 void primitive_void();
@@ -145,36 +139,36 @@ int64_t* ref_simple(int64_t* x);
 int64_t* ref_mut_simple(int64_t* x);
 bool ref_option(int64_t* x);
 bool ref_mut_option(int64_t* x);
-Tupled tupled(Tupled x);
-FFIError complex_args_1(Vec3f32 _a, Empty* _b);
-Opaque* complex_args_2(SomeForeignType _cmplx);
-uint8_t callback(fptr_fn_u8_rval_u8 callback, uint8_t value);
-uint32_t generic_1(Genericu32 x, Phantomu8 _y);
-uint8_t generic_2(Genericu8 x, Phantomu8 _y);
-EnumDocumented documented(StructDocumented _x);
-Vec1 ambiguous_1(Vec1 x);
-Vec2 ambiguous_2(Vec2 x);
-bool ambiguous_3(Vec1 x, Vec2 y);
-Vec namespaced_type(Vec x);
+cffi_tupled tupled(cffi_tupled x);
+cffi_ffierror complex_args_1(cffi_vec3f32 _a, cffi_empty* _b);
+cffi_opaque* complex_args_2(cffi_someforeigntype _cmplx);
+uint8_t callback(cffi_fptr_fn_u8_rval_u8 callback, uint8_t value);
+uint32_t generic_1(cffi_genericu32 x, cffi_phantomu8 _y);
+uint8_t generic_2(cffi_genericu8 x, cffi_phantomu8 _y);
+cffi_enumdocumented documented(cffi_structdocumented _x);
+cffi_vec1 ambiguous_1(cffi_vec1 x);
+cffi_vec2 ambiguous_2(cffi_vec2 x);
+bool ambiguous_3(cffi_vec1 x, cffi_vec2 y);
+cffi_vec namespaced_type(cffi_vec x);
 uint32_t pattern_ascii_pointer_1(uint8_t* x);
-uint32_t pattern_ascii_pointer_len(uint8_t* x, UseAsciiStringPattern y);
-uint32_t pattern_ffi_slice_1(FFISliceu32 ffi_slice);
-Vec3f32 pattern_ffi_slice_2(FFISliceVec3f32 ffi_slice, int32_t i);
-uint8_t pattern_ffi_slice_delegate(fptr_fn_FFISliceu8_rval_u8 callback);
-FFIOptionInner pattern_ffi_option_1(FFIOptionInner ffi_slice);
-Inner pattern_ffi_option_2(FFIOptionInner ffi_slice);
-FFIError pattern_service_create(Context** context_ptr, uint32_t value);
-FFIError pattern_service_destroy(Context** context_ptr);
-uint32_t pattern_service_method(Context* context);
-FFIError pattern_service_method_success_enum_ok(Context* _context);
-FFIError pattern_service_method_success_enum_fail(Context* _context);
-FFIError simple_service_create(SimpleService** context_ptr, uint32_t x);
-FFIError simple_service_destroy(SimpleService** context_ptr);
-FFIError simple_service_result(SimpleService* context_ptr, uint32_t x);
-uint32_t simple_service_value(SimpleService* context_ptr, uint32_t x);
-uint32_t simple_service_mut_self(SimpleService* context_ptr, uint32_t x);
-void simple_service_void(SimpleService* context_ptr);
-uint32_t simple_service_extra_method(SimpleService* _context);
+uint32_t pattern_ascii_pointer_len(uint8_t* x, cffi_useasciistringpattern y);
+uint32_t pattern_ffi_slice_1(cffi_ffisliceu32 ffi_slice);
+cffi_vec3f32 pattern_ffi_slice_2(cffi_ffislicevec3f32 ffi_slice, int32_t i);
+uint8_t pattern_ffi_slice_delegate(cffi_fptr_fn_FFISliceu8_rval_u8 callback);
+cffi_ffioptioninner pattern_ffi_option_1(cffi_ffioptioninner ffi_slice);
+cffi_inner pattern_ffi_option_2(cffi_ffioptioninner ffi_slice);
+cffi_ffierror pattern_service_create(cffi_context** context_ptr, uint32_t value);
+cffi_ffierror pattern_service_destroy(cffi_context** context_ptr);
+uint32_t pattern_service_method(cffi_context* context);
+cffi_ffierror pattern_service_method_success_enum_ok(cffi_context* _context);
+cffi_ffierror pattern_service_method_success_enum_fail(cffi_context* _context);
+cffi_ffierror simple_service_create(cffi_simpleservice** context_ptr, uint32_t x);
+cffi_ffierror simple_service_destroy(cffi_simpleservice** context_ptr);
+cffi_ffierror simple_service_result(cffi_simpleservice* context_ptr, uint32_t x);
+uint32_t simple_service_value(cffi_simpleservice* context_ptr, uint32_t x);
+uint32_t simple_service_mut_self(cffi_simpleservice* context_ptr, uint32_t x);
+void simple_service_void(cffi_simpleservice* context_ptr);
+uint32_t simple_service_extra_method(cffi_simpleservice* _context);
 """
 
 
@@ -209,21 +203,21 @@ class Empty(object):
     """"""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Empty[]", 1)
+        self._ctx = ffi.new("cffi_empty[]", 1)
 
     def array(n):
         global _api, ffi
-        return ffi.new("Empty[]", n)
+        return ffi.new("cffi_empty[]", n)
 
 class Genericu32(object):
     """"""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Genericu32[]", 1)
+        self._ctx = ffi.new("cffi_genericu32[]", 1)
 
     def array(n):
         global _api, ffi
-        return ffi.new("Genericu32[]", n)
+        return ffi.new("cffi_genericu32[]", n)
 
     @property
     def x(self):
@@ -239,11 +233,11 @@ class Genericu8(object):
     """"""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Genericu8[]", 1)
+        self._ctx = ffi.new("cffi_genericu8[]", 1)
 
     def array(n):
         global _api, ffi
-        return ffi.new("Genericu8[]", n)
+        return ffi.new("cffi_genericu8[]", n)
 
     @property
     def x(self):
@@ -259,11 +253,11 @@ class Inner(object):
     """"""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Inner[]", 1)
+        self._ctx = ffi.new("cffi_inner[]", 1)
 
     def array(n):
         global _api, ffi
-        return ffi.new("Inner[]", n)
+        return ffi.new("cffi_inner[]", n)
 
     @property
     def x(self):
@@ -279,11 +273,11 @@ class Phantomu8(object):
     """"""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Phantomu8[]", 1)
+        self._ctx = ffi.new("cffi_phantomu8[]", 1)
 
     def array(n):
         global _api, ffi
-        return ffi.new("Phantomu8[]", n)
+        return ffi.new("cffi_phantomu8[]", n)
 
     @property
     def x(self):
@@ -299,11 +293,11 @@ class SomeForeignType(object):
     """"""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("SomeForeignType[]", 1)
+        self._ctx = ffi.new("cffi_someforeigntype[]", 1)
 
     def array(n):
         global _api, ffi
-        return ffi.new("SomeForeignType[]", n)
+        return ffi.new("cffi_someforeigntype[]", n)
 
     @property
     def x(self):
@@ -319,11 +313,11 @@ class StructDocumented(object):
     """Documented struct."""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("StructDocumented[]", 1)
+        self._ctx = ffi.new("cffi_structdocumented[]", 1)
 
     def array(n):
         global _api, ffi
-        return ffi.new("StructDocumented[]", n)
+        return ffi.new("cffi_structdocumented[]", n)
 
     @property
     def x(self):
@@ -339,11 +333,11 @@ class Tupled(object):
     """"""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Tupled[]", 1)
+        self._ctx = ffi.new("cffi_tupled[]", 1)
 
     def array(n):
         global _api, ffi
-        return ffi.new("Tupled[]", n)
+        return ffi.new("cffi_tupled[]", n)
 
     @property
     def x0(self):
@@ -359,11 +353,11 @@ class UseAsciiStringPattern(object):
     """"""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("UseAsciiStringPattern[]", 1)
+        self._ctx = ffi.new("cffi_useasciistringpattern[]", 1)
 
     def array(n):
         global _api, ffi
-        return ffi.new("UseAsciiStringPattern[]", n)
+        return ffi.new("cffi_useasciistringpattern[]", n)
 
     @property
     def ascii_string(self):
@@ -379,11 +373,11 @@ class Vec(object):
     """"""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Vec[]", 1)
+        self._ctx = ffi.new("cffi_vec[]", 1)
 
     def array(n):
         global _api, ffi
-        return ffi.new("Vec[]", n)
+        return ffi.new("cffi_vec[]", n)
 
     @property
     def x(self):
@@ -409,11 +403,11 @@ class Vec1(object):
     """"""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Vec1[]", 1)
+        self._ctx = ffi.new("cffi_vec1[]", 1)
 
     def array(n):
         global _api, ffi
-        return ffi.new("Vec1[]", n)
+        return ffi.new("cffi_vec1[]", n)
 
     @property
     def x(self):
@@ -439,11 +433,11 @@ class Vec2(object):
     """"""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Vec2[]", 1)
+        self._ctx = ffi.new("cffi_vec2[]", 1)
 
     def array(n):
         global _api, ffi
-        return ffi.new("Vec2[]", n)
+        return ffi.new("cffi_vec2[]", n)
 
     @property
     def x(self):
@@ -469,11 +463,11 @@ class Vec3f32(object):
     """"""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Vec3f32[]", 1)
+        self._ctx = ffi.new("cffi_vec3f32[]", 1)
 
     def array(n):
         global _api, ffi
-        return ffi.new("Vec3f32[]", n)
+        return ffi.new("cffi_vec3f32[]", n)
 
     @property
     def x(self):
@@ -517,7 +511,7 @@ class FFIError:
 class callbacks:
     """Helpers to define `@ffi.callback`-style callbacks."""
     fn_u8_rval_u8 = "uint8_t(uint8_t)"
-    fn_FFISliceu8_rval_u8 = "uint8_t(FFISliceu8)"
+    fn_FFISliceu8_rval_u8 = "uint8_t(cffi_ffisliceu8)"
 
 
 
@@ -894,7 +888,7 @@ class Context(object):
         global _api, ffi
         if hasattr(value, "_ctx"):
             value = value._ctx
-        self.ctx = ffi.new("Context**")
+        self.ctx = ffi.new("cffi_context**")
         rval = raw.pattern_service_create(self.ctx, value)
         if rval == FFIError.Ok:
             return None
@@ -940,7 +934,7 @@ class SimpleService(object):
         global _api, ffi
         if hasattr(x, "_ctx"):
             x = x._ctx
-        self.ctx = ffi.new("SimpleService**")
+        self.ctx = ffi.new("cffi_simpleservice**")
         rval = raw.simple_service_create(self.ctx, x)
         if rval == FFIError.Ok:
             return None

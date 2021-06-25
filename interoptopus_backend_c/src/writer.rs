@@ -37,27 +37,19 @@ pub trait CWriter {
     fn write_constants(&self, w: &mut IndentWriter) -> Result<(), Error> {
         for constant in self.library().constants() {
             self.write_constant(w, constant)?;
-            w.newline()?;
         }
 
         Ok(())
     }
 
     fn write_constant(&self, w: &mut IndentWriter, constant: &Constant) -> Result<(), Error> {
-        w.indented(|w| write!(w, r#"const "#))?;
-
+        let name = self.converter().const_name_to_name(constant);
         let the_type = match constant.the_type() {
-            CType::Primitive(x) => self.converter().type_primitive_to_typename(&x),
+            CType::Primitive(x) => self.converter().primitive_to_typename(&x),
             _ => return Err(Error::Null),
         };
 
-        indented!(
-            w,
-            r#"const {} {} = {};"#,
-            the_type,
-            constant.name(),
-            self.converter().constant_value_to_value(constant.value())
-        )
+        indented!(w, r#"const {} {} = {};"#, the_type, name, self.converter().constant_value_to_value(constant.value()))
     }
 
     fn write_functions(&self, w: &mut IndentWriter) -> Result<(), Error> {
@@ -82,7 +74,7 @@ pub trait CWriter {
 
     fn write_function_declaration(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
         let attr = &self.config().function_attribute;
-        let rval = self.converter().type_to_type_specifier(function.signature().rval());
+        let rval = self.converter().to_type_specifier(function.signature().rval());
         let name = self.converter().function_name_to_c_name(function);
 
         let mut params = Vec::new();
@@ -111,8 +103,8 @@ pub trait CWriter {
             }
             CType::Opaque(o) => {
                 self.write_type_definition_opaque(w, o)?;
-                w.newline()?;
             }
+
             CType::Composite(c) => {
                 self.write_type_definition_composite(w, c)?;
                 w.newline()?;
@@ -147,19 +139,20 @@ pub trait CWriter {
     }
 
     fn write_type_definition_fn_pointer_body(&self, w: &mut IndentWriter, the_type: &FnPointerType) -> Result<(), Error> {
-        let rval = self.converter().type_to_type_specifier(the_type.signature().rval());
-        let name = self.converter().type_fnpointer_to_typename(the_type);
+        let rval = self.converter().to_type_specifier(the_type.signature().rval());
+        let name = self.converter().fnpointer_to_typename(the_type);
 
         let mut params = Vec::new();
         for (i, param) in the_type.signature().params().iter().enumerate() {
-            params.push(format!("{} x{}", self.converter().type_to_type_specifier(param.the_type()), i));
+            params.push(format!("{} x{}", self.converter().to_type_specifier(param.the_type()), i));
         }
 
         indented!(w, "typedef {} (*{})({});", rval, name, params.join(", "))
     }
 
     fn write_type_definition_enum(&self, w: &mut IndentWriter, the_type: &EnumType) -> Result<(), Error> {
-        indented!(w, "typedef enum {}", the_type.rust_name())?;
+        let name = self.converter().enum_to_typename(the_type);
+        indented!(w, "typedef enum {}", name)?;
         indented!(w, [_], "{{")?;
 
         w.indent();
@@ -170,11 +163,11 @@ pub trait CWriter {
 
         w.unindent();
 
-        indented!(w, [_], "}} {};", the_type.rust_name())
+        indented!(w, [_], "}} {};", name)
     }
 
     fn write_type_definition_enum_variant(&self, w: &mut IndentWriter, variant: &Variant, _the_type: &EnumType) -> Result<(), Error> {
-        let variant_name = variant.name();
+        let variant_name = self.converter().enum_variant_to_name(variant);
         let variant_value = variant.value();
 
         indented!(w, r#"{} = {},"#, variant_name, variant_value)
@@ -185,13 +178,16 @@ pub trait CWriter {
     }
 
     fn write_type_definition_opaque_body(&self, w: &mut IndentWriter, the_type: &OpaqueType) -> Result<(), Error> {
-        indented!(w, r#"typedef struct {} {};"#, the_type.rust_name(), the_type.rust_name())
+        let name = self.converter().opaque_to_typename(the_type);
+        indented!(w, r#"typedef struct {} {};"#, name, name)
     }
 
     fn write_type_definition_composite(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
+        let name = self.converter().composite_to_typename(the_type);
+
         if the_type.is_empty() {
             // C doesn't allow us writing empty structs.
-            indented!(w, r#"typedef struct {} {};"#, the_type.rust_name(), the_type.rust_name())?;
+            indented!(w, r#"typedef struct {} {};"#, name, name)?;
             Ok(())
         } else {
             self.write_type_definition_composite_body(w, the_type)
@@ -199,23 +195,23 @@ pub trait CWriter {
     }
 
     fn write_type_definition_composite_body(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
-        indented!(w, r#"typedef struct {}"#, the_type.rust_name())?;
+        let name = self.converter().composite_to_typename(the_type);
+
+        indented!(w, r#"typedef struct {}"#, name)?;
         indented!(w, [_], "{{")?;
 
         w.indent();
-
         for field in the_type.fields() {
             self.write_type_definition_composite_body_field(w, field, the_type)?;
         }
-
         w.unindent();
 
-        indented!(w, [_], "}} {};", the_type.rust_name())
+        indented!(w, [_], "}} {};", name)
     }
 
     fn write_type_definition_composite_body_field(&self, w: &mut IndentWriter, field: &Field, _the_type: &CompositeType) -> Result<(), Error> {
         let field_name = field.name();
-        let type_name = self.converter().type_to_type_specifier(field.the_type());
+        let type_name = self.converter().to_type_specifier(field.the_type());
 
         indented!(w, r#"{} {};"#, type_name, field_name)
     }

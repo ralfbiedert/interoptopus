@@ -5,59 +5,57 @@ api_definition = """
 
 
 
-const const uint32_t THE_MAGIC_CONSTANT = 666;
+const uint32_t CFFI_THE_MAGIC_CONSTANT = 666;
 
-
-typedef enum FFIError
+typedef enum cffi_ffierror
     {
-    Ok = 0,
-    NullPointerPassed = 10,
-    } FFIError;
+    CFFI_OK = 0,
+    CFFI_NULLPOINTERPASSED = 10,
+    } cffi_ffierror;
 
-typedef struct Context Context;
-
-typedef struct ThirdPartyVecF32
+typedef struct cffi_context cffi_context;
+typedef struct cffi_thirdpartyvecf32
     {
     float x;
     float y;
     float z;
     float w;
-    } ThirdPartyVecF32;
+    } cffi_thirdpartyvecf32;
 
-typedef struct Vec3
+typedef struct cffi_vec3
     {
     float x;
     float y;
     float z;
-    } Vec3;
+    } cffi_vec3;
 
-typedef uint32_t (*fptr_fn_u32_rval_u32)(uint32_t x0);
+typedef uint32_t (*cffi_fptr_fn_u32_rval_u32)(uint32_t x0);
 
-typedef struct SuperComplexEntity
+typedef struct cffi_supercomplexentity
     {
-    Vec3 player_1;
-    Vec3 player_2;
+    cffi_vec3 player_1;
+    cffi_vec3 player_2;
     uint64_t ammo;
     uint8_t* some_str;
     uint32_t str_len;
-    } SuperComplexEntity;
+    } cffi_supercomplexentity;
 
-typedef struct WithForeignType
+typedef struct cffi_withforeigntype
     {
     uint64_t secret_number;
-    ThirdPartyVecF32* third_party;
-    } WithForeignType;
+    cffi_thirdpartyvecf32* third_party;
+    } cffi_withforeigntype;
 
 
 uint32_t example_api_version();
-FFIError example_always_fails();
-FFIError example_create_context(Context** context_ptr);
-FFIError example_destroy_context(Context** context_ptr);
-FFIError example_print_score(Context* context);
-FFIError example_return_score(Context* context, uint32_t* score);
-FFIError example_update_score_by_callback(Context* context, fptr_fn_u32_rval_u32 update);
-FFIError example_write_foreign_type(Context* context, WithForeignType* foreign);
-FFIError example_double_super_complex_entity(Context* context, SuperComplexEntity* incoming, SuperComplexEntity* outgoing);
+cffi_ffierror example_always_fails();
+cffi_ffierror example_create_context(cffi_context** context_ptr);
+cffi_ffierror example_destroy_context(cffi_context** context_ptr);
+cffi_ffierror example_print_score(cffi_context* context);
+cffi_ffierror example_return_score(cffi_context* context, uint32_t* score);
+cffi_ffierror example_update_score_by_callback(cffi_context* context, cffi_fptr_fn_u32_rval_u32 update);
+cffi_ffierror example_write_foreign_type(cffi_context* context, cffi_withforeigntype* foreign);
+cffi_ffierror example_double_super_complex_entity(cffi_context* context, cffi_supercomplexentity* incoming, cffi_supercomplexentity* outgoing);
 """
 
 
@@ -88,11 +86,11 @@ class SuperComplexEntity(object):
     """A vector used in our game engine."""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("SuperComplexEntity[]", 1)
+        self._ctx = ffi.new("cffi_supercomplexentity[]", 1)
 
     def array(n):
         global _api, ffi
-        return ffi.new("SuperComplexEntity[]", n)
+        return ffi.new("cffi_supercomplexentity[]", n)
 
     @property
     def player_1(self):
@@ -148,11 +146,11 @@ class ThirdPartyVecF32(object):
     """"""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("ThirdPartyVecF32[]", 1)
+        self._ctx = ffi.new("cffi_thirdpartyvecf32[]", 1)
 
     def array(n):
         global _api, ffi
-        return ffi.new("ThirdPartyVecF32[]", n)
+        return ffi.new("cffi_thirdpartyvecf32[]", n)
 
     @property
     def x(self):
@@ -198,11 +196,11 @@ class Vec3(object):
     """A vector used in our game engine."""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("Vec3[]", 1)
+        self._ctx = ffi.new("cffi_vec3[]", 1)
 
     def array(n):
         global _api, ffi
-        return ffi.new("Vec3[]", n)
+        return ffi.new("cffi_vec3[]", n)
 
     @property
     def x(self):
@@ -238,11 +236,11 @@ class WithForeignType(object):
     """A type containing a third-party type."""
     def __init__(self):
         global _api, ffi
-        self._ctx = ffi.new("WithForeignType[]", 1)
+        self._ctx = ffi.new("cffi_withforeigntype[]", 1)
 
     def array(n):
         global _api, ffi
-        return ffi.new("WithForeignType[]", n)
+        return ffi.new("cffi_withforeigntype[]", n)
 
     @property
     def secret_number(self):

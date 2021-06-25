@@ -1,29 +1,40 @@
-use interoptopus::lang::c::{CType, CompositeType, ConstantValue, EnumType, FnPointerType, Function, OpaqueType, Parameter, PrimitiveType, PrimitiveValue};
+use crate::Config;
+use interoptopus::lang::c::{
+    CType, CompositeType, Constant, ConstantValue, EnumType, FnPointerType, Function, OpaqueType, Parameter, PrimitiveType, PrimitiveValue, Variant,
+};
 use interoptopus::util::safe_name;
 
 /// Implements [`CTypeConverter`].
-#[derive(Copy, Clone)]
-pub struct Converter {}
+#[derive(Clone)]
+pub struct Converter {
+    pub(crate) config: Config,
+}
 
 /// Converts Interoptopus types to C types.
 pub trait CTypeConverter {
+    fn config(&self) -> &Config;
+
     /// Converts a primitive (Rust) type to a native C# type name, e.g., `f32` to `float`.
-    fn type_primitive_to_typename(&self, x: &PrimitiveType) -> String;
+    fn primitive_to_typename(&self, x: &PrimitiveType) -> String;
 
     /// Converts a Rust enum name such as `Error` to a C# enum name `Error`.
-    fn type_enum_to_typename(&self, x: &EnumType) -> String;
+    fn enum_to_typename(&self, x: &EnumType) -> String;
+
+    fn enum_variant_to_name(&self, x: &Variant) -> String;
 
     /// TODO Converts an opaque Rust struct `Context` to a C# struct ``.
-    fn type_opaque_to_typename(&self, opaque: &OpaqueType) -> String;
+    fn opaque_to_typename(&self, opaque: &OpaqueType) -> String;
 
     /// Converts an Rust struct name `Vec2` to a C# struct name `Vec2`.
-    fn type_composite_to_typename(&self, x: &CompositeType) -> String;
+    fn composite_to_typename(&self, x: &CompositeType) -> String;
 
     /// Converts an Rust `fn()` to a C# delegate name such as `InteropDelegate`.
-    fn type_fnpointer_to_typename(&self, x: &FnPointerType) -> String;
+    fn fnpointer_to_typename(&self, x: &FnPointerType) -> String;
 
     /// Converts the `u32` part in a Rust paramter `x: u32` to a C# equivalent. Might convert pointers to `out X` or `ref X`.
-    fn type_to_type_specifier(&self, x: &CType) -> String;
+    fn to_type_specifier(&self, x: &CType) -> String;
+
+    fn const_name_to_name(&self, x: &Constant) -> String;
 
     fn constant_value_to_value(&self, value: &ConstantValue) -> String;
 
@@ -33,7 +44,11 @@ pub trait CTypeConverter {
 }
 
 impl CTypeConverter for Converter {
-    fn type_primitive_to_typename(&self, x: &PrimitiveType) -> String {
+    fn config(&self) -> &Config {
+        &self.config
+    }
+
+    fn primitive_to_typename(&self, x: &PrimitiveType) -> String {
         match x {
             PrimitiveType::Void => "void".to_string(),
             PrimitiveType::Bool => "bool".to_string(),
@@ -50,34 +65,42 @@ impl CTypeConverter for Converter {
         }
     }
 
-    fn type_enum_to_typename(&self, x: &EnumType) -> String {
-        x.rust_name().to_string()
+    fn enum_to_typename(&self, x: &EnumType) -> String {
+        format!("{}{}", self.config().prefix, x.rust_name().to_string()).to_lowercase()
     }
 
-    fn type_opaque_to_typename(&self, opaque: &OpaqueType) -> String {
-        // x.name().to_string()
-        opaque.rust_name().to_string()
+    fn enum_variant_to_name(&self, x: &Variant) -> String {
+        format!("{}{}", self.config().prefix, x.name().to_string()).to_uppercase()
     }
 
-    fn type_composite_to_typename(&self, x: &CompositeType) -> String {
-        x.rust_name().to_string()
+    fn opaque_to_typename(&self, x: &OpaqueType) -> String {
+        format!("{}{}", self.config().prefix, x.rust_name().to_string()).to_lowercase()
     }
 
-    fn type_fnpointer_to_typename(&self, x: &FnPointerType) -> String {
-        vec!["fptr".to_string(), safe_name(&x.internal_name())].join("_")
+    fn composite_to_typename(&self, x: &CompositeType) -> String {
+        format!("{}{}", self.config().prefix, x.rust_name().to_string()).to_lowercase()
     }
 
-    fn type_to_type_specifier(&self, x: &CType) -> String {
+    fn fnpointer_to_typename(&self, x: &FnPointerType) -> String {
+        let prefixed = format!("{}fptr", self.config().prefix);
+        vec![prefixed, safe_name(&x.internal_name())].join("_")
+    }
+
+    fn to_type_specifier(&self, x: &CType) -> String {
         match x {
-            CType::Primitive(x) => self.type_primitive_to_typename(x),
-            CType::Enum(x) => self.type_enum_to_typename(x),
-            CType::Opaque(x) => self.type_opaque_to_typename(x),
-            CType::Composite(x) => self.type_composite_to_typename(x),
-            CType::ReadPointer(x) => format!("{}*", self.type_to_type_specifier(x)),
-            CType::ReadWritePointer(x) => format!("{}*", self.type_to_type_specifier(x)),
-            CType::FnPointer(x) => self.type_fnpointer_to_typename(x),
-            CType::Pattern(x) => self.type_to_type_specifier(&x.fallback_type()),
+            CType::Primitive(x) => self.primitive_to_typename(x),
+            CType::Enum(x) => self.enum_to_typename(x),
+            CType::Opaque(x) => self.opaque_to_typename(x),
+            CType::Composite(x) => self.composite_to_typename(x),
+            CType::ReadPointer(x) => format!("{}*", self.to_type_specifier(x)),
+            CType::ReadWritePointer(x) => format!("{}*", self.to_type_specifier(x)),
+            CType::FnPointer(x) => self.fnpointer_to_typename(x),
+            CType::Pattern(x) => self.to_type_specifier(&x.fallback_type()),
         }
+    }
+
+    fn const_name_to_name(&self, x: &Constant) -> String {
+        format!("{}{}", self.config().prefix, x.name().to_string()).to_uppercase()
     }
 
     fn constant_value_to_value(&self, value: &ConstantValue) -> String {
@@ -99,7 +122,7 @@ impl CTypeConverter for Converter {
     }
 
     fn function_parameter_to_csharp_typename(&self, x: &Parameter, _function: &Function) -> String {
-        self.type_to_type_specifier(x.the_type())
+        self.to_type_specifier(x.the_type())
     }
 
     fn function_name_to_c_name(&self, function: &Function) -> String {

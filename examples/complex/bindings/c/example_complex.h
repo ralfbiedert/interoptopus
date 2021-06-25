@@ -15,59 +15,57 @@ extern "C" {
 #define __FUNCTION_ATTR __declspec( dllimport )
     
 
-const const uint32_t THE_MAGIC_CONSTANT = 666;
+const uint32_t THE_MAGIC_CONSTANT = 666;
 
-
-typedef enum FFIError
+typedef enum ffierror
     {
-    Ok = 0,
-    NullPointerPassed = 10,
-    } FFIError;
+    OK = 0,
+    NULLPOINTERPASSED = 10,
+    } ffierror;
 
-typedef struct Context Context;
-
-typedef struct ThirdPartyVecF32
+typedef struct context context;
+typedef struct thirdpartyvecf32
     {
     float x;
     float y;
     float z;
     float w;
-    } ThirdPartyVecF32;
+    } thirdpartyvecf32;
 
-typedef struct Vec3
+typedef struct vec3
     {
     float x;
     float y;
     float z;
-    } Vec3;
+    } vec3;
 
 typedef uint32_t (*fptr_fn_u32_rval_u32)(uint32_t x0);
 
-typedef struct SuperComplexEntity
+typedef struct supercomplexentity
     {
-    Vec3 player_1;
-    Vec3 player_2;
+    vec3 player_1;
+    vec3 player_2;
     uint64_t ammo;
     uint8_t* some_str;
     uint32_t str_len;
-    } SuperComplexEntity;
+    } supercomplexentity;
 
-typedef struct WithForeignType
+typedef struct withforeigntype
     {
     uint64_t secret_number;
-    ThirdPartyVecF32* third_party;
-    } WithForeignType;
+    thirdpartyvecf32* third_party;
+    } withforeigntype;
 
 
 __FUNCTION_ATTR uint32_t example_api_version();
-__FUNCTION_ATTR FFIError example_always_fails();
-__FUNCTION_ATTR FFIError example_create_context(Context** context_ptr);
-__FUNCTION_ATTR FFIError example_destroy_context(Context** context_ptr);
-__FUNCTION_ATTR FFIError example_print_score(Context* context);
-__FUNCTION_ATTR FFIError example_return_score(Context* context, uint32_t* score);
-__FUNCTION_ATTR FFIError example_update_score_by_callback(Context* context, fptr_fn_u32_rval_u32 update);
-__FUNCTION_ATTR FFIError example_write_foreign_type(Context* context, WithForeignType* foreign);
-__FUNCTION_ATTR FFIError example_double_super_complex_entity(Context* context, SuperComplexEntity* incoming, SuperComplexEntity* outgoing);
+__FUNCTION_ATTR ffierror example_always_fails();
+__FUNCTION_ATTR ffierror example_create_context(context** context_ptr);
+__FUNCTION_ATTR ffierror example_destroy_context(context** context_ptr);
+__FUNCTION_ATTR ffierror example_print_score(context* context);
+__FUNCTION_ATTR ffierror example_return_score(context* context, uint32_t* score);
+__FUNCTION_ATTR ffierror example_update_score_by_callback(context* context, fptr_fn_u32_rval_u32 update);
+__FUNCTION_ATTR ffierror example_write_foreign_type(context* context, withforeigntype* foreign);
+__FUNCTION_ATTR ffierror example_double_super_complex_entity(context* context, supercomplexentity* incoming, supercomplexentity* outgoing);
 
 #ifdef __cplusplus
 }

@@ -6,6 +6,7 @@ use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{longest_common_prefix, safe_name};
 use interoptopus::writer::IndentWriter;
 use interoptopus::{indented, Error, Interop, Library};
+use interoptopus_backend_c::CTypeConverter;
 
 /// Writes the Python file format, `impl` this trait to customize output.
 pub trait PythonWriter {
@@ -74,20 +75,22 @@ pub trait PythonWriter {
     }
 
     fn write_struct(&self, w: &mut IndentWriter, e: &CompositeType) -> Result<(), Error> {
+        let cname = self.converter().c_converter().composite_to_typename(e);
+
         indented!(w, r#"class {}(object):"#, e.rust_name())?;
         indented!(w, [_], r#"{}"#, self.converter().documentation(e.meta().documentation()))?;
 
         // Ctor
         indented!(w, [_], r#"def __init__(self):"#)?;
         indented!(w, [_ _], r#"global _api, ffi"#)?;
-        indented!(w, [_ _], r#"self._ctx = ffi.new("{}[]", 1)"#, e.rust_name())?;
+        indented!(w, [_ _], r#"self._ctx = ffi.new("{}[]", 1)"#, cname)?;
 
         w.newline()?;
 
         // Array constructor
         indented!(w, [_], r#"def array(n):"#)?;
         indented!(w, [_ _], r#"global _api, ffi"#)?;
-        indented!(w, [_ _], r#"return ffi.new("{}[]", n)"#, e.rust_name())?;
+        indented!(w, [_ _], r#"return ffi.new("{}[]", n)"#, cname)?;
         w.newline()?;
 
         for field in e.fields() {
@@ -138,7 +141,7 @@ pub trait PythonWriter {
                 [_],
                 r#"{} = "{}""#,
                 safe_name(&callback.internal_name()),
-                self.converter().type_fnpointer_to_typename(callback)
+                self.converter().fnpointer_to_typename(callback)
             )?;
         }
 
@@ -221,6 +224,7 @@ pub trait PythonWriter {
 
     fn write_pattern_class(&self, w: &mut IndentWriter, class: &Service) -> Result<(), Error> {
         let context_type_name = class.the_type().rust_name();
+        let context_cname = self.converter().c_converter().opaque_to_typename(class.the_type());
 
         let mut all_functions = vec![class.constructor().clone(), class.destructor().clone()];
         all_functions.extend_from_slice(class.methods());
@@ -236,7 +240,7 @@ pub trait PythonWriter {
             indented!(w, [_ _ _], r#"{} = {}._ctx"#, param.name(), param.name())?;
         }
 
-        indented!(w, [_ _], r#"self.ctx = ffi.new("{}**")"#, context_type_name)?;
+        indented!(w, [_ _], r#"self.ctx = ffi.new("{}**")"#, context_cname)?;
         self.write_pattern_class_success_enum_aware_rval(w, class, class.constructor(), false)?;
         w.newline()?;
 

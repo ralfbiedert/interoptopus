@@ -14,7 +14,7 @@ pub trait PythonTypeConverter {
 
     fn documentation(&self, documentation: &Documentation) -> String;
 
-    fn type_fnpointer_to_typename(&self, fn_pointer: &FnPointerType) -> String;
+    fn fnpointer_to_typename(&self, fn_pointer: &FnPointerType) -> String;
 }
 
 impl PythonTypeConverter for Converter {
@@ -45,13 +45,13 @@ impl PythonTypeConverter for Converter {
         }
     }
 
-    fn type_fnpointer_to_typename(&self, fn_pointer: &FnPointerType) -> String {
-        let rval = self.c_converter().type_to_type_specifier(&fn_pointer.signature().rval());
+    fn fnpointer_to_typename(&self, fn_pointer: &FnPointerType) -> String {
+        let rval = self.c_converter().to_type_specifier(&fn_pointer.signature().rval());
         let params = fn_pointer
             .signature()
             .params()
             .iter()
-            .map(|x| self.c_converter().type_to_type_specifier(x.the_type()))
+            .map(|x| self.c_converter().to_type_specifier(x.the_type()))
             .collect::<Vec<_>>()
             .join(",");
 

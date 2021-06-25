@@ -82,12 +82,13 @@ impl Generator {
                 directives: false,
                 imports: false,
                 file_header_comment: "".to_string(),
+                prefix: "cffi_".to_string(),
                 ..interoptopus_backend_c::Config::default()
             },
             library.clone(),
         );
 
-        let c_converter = *c_generator.converter();
+        let c_converter = c_generator.converter().clone();
 
         Self {
             c_generator,

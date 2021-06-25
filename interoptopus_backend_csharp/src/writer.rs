@@ -57,7 +57,7 @@ pub trait CSharpWriter {
     }
 
     fn write_constant(&self, w: &mut IndentWriter, constant: &Constant) -> Result<(), Error> {
-        let rval = self.converter().type_to_typespecifier_in_rval(&constant.the_type());
+        let rval = self.converter().to_typespecifier_in_rval(&constant.the_type());
         let name = constant.name();
         let value = self.converter().constant_value_to_value(constant.value());
 
@@ -184,12 +184,12 @@ pub trait CSharpWriter {
     }
 
     fn write_type_definition_fn_pointer_body(&self, w: &mut IndentWriter, the_type: &FnPointerType) -> Result<(), Error> {
-        let rval = self.converter().type_to_typespecifier_in_rval(the_type.signature().rval());
-        let name = self.converter().type_fnpointer_to_typename(the_type);
+        let rval = self.converter().to_typespecifier_in_rval(the_type.signature().rval());
+        let name = self.converter().fnpointer_to_typename(the_type);
 
         let mut params = Vec::new();
         for (i, param) in the_type.signature().params().iter().enumerate() {
-            params.push(format!("{} x{}", self.converter().type_to_typespecifier_in_param(param.the_type()), i));
+            params.push(format!("{} x{}", self.converter().to_typespecifier_in_param(param.the_type()), i));
         }
 
         indented!(w, r#"public delegate {} {}({});"#, rval, name, params.join(", "))
@@ -249,7 +249,7 @@ pub trait CSharpWriter {
 
     fn write_type_definition_composite_body_field(&self, w: &mut IndentWriter, field: &Field, the_type: &CompositeType) -> Result<(), Error> {
         let field_name = field.name();
-        let type_name = self.converter().type_to_typespecifier_in_field(field.the_type(), field, the_type);
+        let type_name = self.converter().to_typespecifier_in_field(field.the_type(), field, the_type);
         indented!(w, r#"public {} {};"#, type_name, field_name)?;
         Ok(())
     }
@@ -326,7 +326,7 @@ pub trait CSharpWriter {
             .deref_pointer()
             .expect("data must be a pointer type");
 
-        let type_string = self.converter().type_to_typespecifier_in_rval(data_type);
+        let type_string = self.converter().to_typespecifier_in_rval(data_type);
 
         indented!(w, r#"public partial struct {} : IEnumerable<{}>"#, context_type_name, type_string)?;
         indented!(w, r#"{{"#)?;
@@ -424,7 +424,7 @@ pub trait CSharpWriter {
             let prettified = IdPrettifier::from_rust_lower(&without_common_prefix);
             let rval = match function.signature().rval() {
                 CType::Pattern(TypePattern::SuccessEnum(_)) => "void".to_string(),
-                _ => self.converter().type_to_typespecifier_in_rval(function.signature().rval()),
+                _ => self.converter().to_typespecifier_in_rval(function.signature().rval()),
             };
 
             self.write_documentation(w, function.meta().documentation())?;
@@ -485,7 +485,7 @@ pub trait CSharpWriter {
                 format!(
                     "{} {}",
                     if with_types {
-                        self.converter().type_to_typespecifier_in_param(x.the_type())
+                        self.converter().to_typespecifier_in_param(x.the_type())
                     } else {
                         "".to_string()
                     },

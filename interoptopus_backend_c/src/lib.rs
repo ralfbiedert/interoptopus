@@ -71,9 +71,9 @@ pub struct Generator {
 impl Generator {
     pub fn new(config: Config, library: Library) -> Self {
         Self {
-            config,
+            config: config.clone(),
             library,
-            converter: Converter {},
+            converter: Converter { config },
         }
     }
 }

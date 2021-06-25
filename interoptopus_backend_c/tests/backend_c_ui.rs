@@ -6,7 +6,12 @@ use interoptopus::Interop;
 fn generate_bindings(output: &str) -> Result<(), Error> {
     use interoptopus_backend_c::{Config, Generator};
 
-    Generator::new(Config::default(), interoptopus_reference_project::ffi_inventory()).write_file(output)
+    let config = Config {
+        prefix: "my_library_".to_string(),
+        ..Config::default()
+    };
+
+    Generator::new(config, interoptopus_reference_project::ffi_inventory()).write_file(output)
 }
 
 #[test]

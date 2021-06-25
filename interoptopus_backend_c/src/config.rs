@@ -13,6 +13,8 @@ pub struct Config {
     pub function_attribute: String,
     /// Comment at the very beginning of the file, e.g., `// (c) My Company.`
     pub file_header_comment: String,
+    /// How to prefix everything, e.g., `my_company_`, will be capitalized for constants.
+    pub prefix: String,
 }
 
 impl Default for Config {
@@ -24,6 +26,7 @@ impl Default for Config {
             ifndef: "interoptopus_generated".to_string(),
             custom_defines: "".to_string(),
             function_attribute: "".to_string(),
+            prefix: "".to_string(),
         }
     }
 }
