@@ -26,6 +26,9 @@ pub enum Error {
 
     /// A test failed to execute.
     TestFailed,
+
+    /// A specified file was not found.
+    FileNotFound,
 }
 
 impl From<std::fmt::Error> for Error {

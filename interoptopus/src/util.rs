@@ -185,6 +185,11 @@ impl NamespaceMappings {
         self
     }
 
+    /// Returns the default namespace mapping
+    pub fn default_namespace(&self) -> &str {
+        self.get("").expect("This must exist")
+    }
+
     /// Obtains a mapping for the given ID.
     pub fn get(&self, id: &str) -> Option<&str> {
         self.mappings.get(id).map(|x| x.as_str())

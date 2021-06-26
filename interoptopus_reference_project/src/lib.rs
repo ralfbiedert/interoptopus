@@ -17,6 +17,7 @@ pub mod patterns {
     pub mod service_manual;
     pub mod slice;
     pub mod success_enum;
+    pub mod xxx;
 }
 pub mod types;
 
@@ -60,7 +61,8 @@ interoptopus::inventory_function!(
         patterns::slice::pattern_ffi_slice_2,
         patterns::slice::pattern_ffi_slice_delegate,
         patterns::option::pattern_ffi_option_1,
-        patterns::option::pattern_ffi_option_2
+        patterns::option::pattern_ffi_option_2,
+        patterns::xxx::xxx_entry_points
     ],
     [
         patterns::service_manual::my_service_pattern_context,

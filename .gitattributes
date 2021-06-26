@@ -1,3 +1,5 @@
+*.dll filter=lfs diff=lfs merge=lfs -text
+
 *.expected text eol=lf
 *.cs text eol=lf
 *.h text eol=lf

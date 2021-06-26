@@ -24,6 +24,9 @@ pub struct FFITypeAttributes {
 
     #[darling(default)]
     namespace: Option<String>,
+
+    #[darling(default)]
+    debug: bool,
 }
 
 fn derive_variant_info(item: ItemEnum, idents: &[Ident], names: &[String], values: &[i32], docs: &[String]) -> TokenStream {
@@ -47,7 +50,7 @@ fn derive_variant_info(item: ItemEnum, idents: &[Ident], names: &[String], value
     }
 }
 
-pub fn ffi_type_enum(attr: FFITypeAttributes, input: TokenStream, item: ItemEnum) -> TokenStream {
+pub fn ffi_type_enum(attr: &FFITypeAttributes, input: TokenStream, item: ItemEnum) -> TokenStream {
     let span = item.ident.span();
     let name = item.ident.to_string();
     let name_ident = syn::Ident::new(&name, span);
@@ -129,11 +132,11 @@ pub fn ffi_type_enum(attr: FFITypeAttributes, input: TokenStream, item: ItemEnum
     }
 }
 
-pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemStruct) -> TokenStream {
+pub fn ffi_type_struct(attr: &FFITypeAttributes, input: TokenStream, item: ItemStruct) -> TokenStream {
     let name = item.ident.to_string();
     let name_ident = syn::Ident::new(&name, item.ident.span());
-    let c_struct_name = attr.name.unwrap_or(name);
-    let namespace = attr.namespace.unwrap_or_else(|| "".to_string());
+    let c_struct_name = attr.name.clone().unwrap_or(name);
+    let namespace = attr.namespace.clone().unwrap_or_else(|| "".to_string());
 
     let mut generic_params = Vec::new();
     let mut field_names = Vec::new();
@@ -230,11 +233,11 @@ pub fn ffi_type_struct(attr: FFITypeAttributes, input: TokenStream, item: ItemSt
     }
 }
 
-pub fn ffi_type_struct_opqaue(attr: FFITypeAttributes, input: TokenStream, item: ItemStruct) -> TokenStream {
+pub fn ffi_type_struct_opqaue(attr: &FFITypeAttributes, input: TokenStream, item: ItemStruct) -> TokenStream {
     let name = item.ident.to_string();
     let name_ident = syn::Ident::new(&name, item.ident.span());
     let doc_line = extract_doc_lines(&item.attrs).join("\n");
-    let namespace = attr.namespace.unwrap_or_else(|| "".to_string());
+    let namespace = attr.namespace.clone().unwrap_or_else(|| "".to_string());
 
     quote! {
         #input
@@ -255,21 +258,23 @@ pub fn ffi_type_struct_opqaue(attr: FFITypeAttributes, input: TokenStream, item:
 pub fn ffi_type(attr: AttributeArgs, input: TokenStream) -> TokenStream {
     let ffi_attributes: FFITypeAttributes = FFITypeAttributes::from_list(&attr).unwrap();
 
-    if let Ok(item) = syn::parse2::<ItemStruct>(input.clone()) {
-        return if ffi_attributes.opaque {
-            ffi_type_struct_opqaue(ffi_attributes, input, item)
+    let rval = if let Ok(item) = syn::parse2::<ItemStruct>(input.clone()) {
+        if ffi_attributes.opaque {
+            ffi_type_struct_opqaue(&ffi_attributes, input, item)
         } else {
-            ffi_type_struct(ffi_attributes, input, item)
-        };
+            ffi_type_struct(&ffi_attributes, input, item)
+        }
+    } else if let Ok(item) = syn::parse2::<ItemEnum>(input.clone()) {
+        ffi_type_enum(&ffi_attributes, input, item)
+    } else if let Ok(_item) = syn::parse2::<ItemType>(input.clone()) {
+        input
+    } else {
+        panic!("Annotation #[ffi_type] only works with structs and enum types.")
+    };
+
+    if ffi_attributes.debug {
+        println!("{}", rval);
     }
 
-    if let Ok(item) = syn::parse2::<ItemEnum>(input.clone()) {
-        return ffi_type_enum(ffi_attributes, input, item);
-    }
-
-    if let Ok(_item) = syn::parse2::<ItemType>(input.clone()) {
-        return input;
-    }
-
-    panic!("Annotation #[ffi_type] only works with structs and enum types.")
+    rval
 }

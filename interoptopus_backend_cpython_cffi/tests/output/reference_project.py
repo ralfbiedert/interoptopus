@@ -95,6 +95,12 @@ typedef struct cffi_genericu8
     uint8_t* x;
     } cffi_genericu8;
 
+typedef cffi_ffierror (*cffi_fptr_fn_Vec3f32_pconst_Empty_rval_FFIError)(cffi_vec3f32 x0, cffi_empty* x1);
+
+typedef cffi_tupled (*cffi_fptr_fn_Tupled_rval_Tupled)(cffi_tupled x0);
+
+typedef bool (*cffi_fptr_fn_pmut_i64_rval_bool)(int64_t* x0);
+
 typedef struct cffi_ffisliceu32
     {
     uint32_t* data;
@@ -112,6 +118,13 @@ typedef struct cffi_ffioptioninner
     cffi_inner t;
     uint8_t is_some;
     } cffi_ffioptioninner;
+
+typedef struct cffi_pointers
+    {
+    cffi_fptr_fn_pmut_i64_rval_bool f1;
+    cffi_fptr_fn_Tupled_rval_Tupled f2;
+    cffi_fptr_fn_Vec3f32_pconst_Empty_rval_FFIError f3;
+    } cffi_pointers;
 
 typedef uint8_t (*cffi_fptr_fn_FFISliceu8_rval_u8)(cffi_ffisliceu8 x0);
 
@@ -159,6 +172,7 @@ cffi_vec3f32 pattern_ffi_slice_2(cffi_ffislicevec3f32 ffi_slice, int32_t i);
 uint8_t pattern_ffi_slice_delegate(cffi_fptr_fn_FFISliceu8_rval_u8 callback);
 cffi_ffioptioninner pattern_ffi_option_1(cffi_ffioptioninner ffi_slice);
 cffi_inner pattern_ffi_option_2(cffi_ffioptioninner ffi_slice);
+cffi_ffierror xxx_entry_points(cffi_pointers* x);
 cffi_ffierror pattern_service_create(cffi_context** context_ptr, uint32_t value);
 cffi_ffierror pattern_service_destroy(cffi_context** context_ptr);
 uint32_t pattern_service_method(cffi_context* context);
@@ -305,6 +319,49 @@ class Phantomu8(object):
     def x(self, value):
         self._ptr_x = value
         self._ctx[0].x = value
+
+class Pointers(object):
+    """"""
+    def __init__(self):
+        global _api, ffi
+        self._ctx = ffi.new("cffi_pointers[]", 1)
+
+    def array(n):
+        global _api, ffi
+        return ffi.new("cffi_pointers[]", n)
+
+    def ptr(self):
+        return self._ctx
+
+    @property
+    def f1(self):
+        """"""
+        return self._ctx[0].f1
+
+    @f1.setter
+    def f1(self, value):
+        self._ptr_f1 = value
+        self._ctx[0].f1 = value
+
+    @property
+    def f2(self):
+        """"""
+        return self._ctx[0].f2
+
+    @f2.setter
+    def f2(self, value):
+        self._ptr_f2 = value
+        self._ctx[0].f2 = value
+
+    @property
+    def f3(self):
+        """"""
+        return self._ctx[0].f3
+
+    @f3.setter
+    def f3(self, value):
+        self._ptr_f3 = value
+        self._ctx[0].f3 = value
 
 class SomeForeignType(object):
     """"""
@@ -552,6 +609,9 @@ class FFIError:
 
 class callbacks:
     """Helpers to define `@ffi.callback`-style callbacks."""
+    fn_Vec3f32_pconst_Empty_rval_FFIError = "cffi_ffierror(cffi_vec3f32,cffi_empty*)"
+    fn_Tupled_rval_Tupled = "cffi_tupled(cffi_tupled)"
+    fn_pmut_i64_rval_bool = "bool(int64_t*)"
     fn_u8_rval_u8 = "uint8_t(uint8_t)"
     fn_FFISliceu8_rval_u8 = "uint8_t(cffi_ffisliceu8)"
 
@@ -828,6 +888,13 @@ Parameter x must point to valid data."""
         if hasattr(ffi_slice, "_ctx"):
             ffi_slice = ffi_slice._ctx[0]
         return _api.pattern_ffi_option_2(ffi_slice)
+
+    def xxx_entry_points(x):
+        """"""
+        global _api
+        if hasattr(x, "_ctx"):
+            x = x._ctx[0]
+        return _api.xxx_entry_points(x)
 
     def pattern_service_create(context_ptr, value):
         """"""

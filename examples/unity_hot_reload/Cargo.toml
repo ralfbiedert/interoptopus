@@ -1,0 +1,12 @@
+[package]
+name = "unity_hot_reload"
+version = "0.1.0"
+edition = "2018"
+
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+interoptopus = { path = "../../interoptopus", features = ["derive", "testing"] }
+interoptopus_backend_csharp = { path = "../../interoptopus_backend_csharp" }

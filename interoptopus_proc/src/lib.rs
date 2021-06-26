@@ -28,6 +28,7 @@ use syn::{parse_macro_input, AttributeArgs};
 /// | `patterns(p)` | `struct`,`enum` | Mark this type as part of a pattern, see below.
 /// | `opaque` | `struct` | Creates an opaque type without fields. Can only be used behind a pointer. |
 /// | `surrogates(x="y")` | `struct` | Invoke function `y` to provide a [`CTypeInfo`](interoptopus::lang::rust::CTypeInfo) for field `x`, see below.
+/// | `debug` | Print generated helper code in console.
 ///
 /// <sup>1</sup> While a type's name must be unique (even across modules) backends are free to further transform this name, e.g., by converting
 /// `MyVec` to `LibraryMyVec`. In other words, using `name` will change a type's name, but not using `name` is no guarantee the final name will
@@ -95,6 +96,7 @@ pub fn ffi_type(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// | Attribute |  Explanation |
 /// | --- | ---  |
 /// | `surrogates(x="y")` | Invoke function `y` to provide a [`CTypeInfo`](interoptopus::lang::rust::CTypeInfo) for parameter `x`, see below.
+/// | `debug` | Print generated helper code in console.
 ///
 /// # Surrogates
 ///

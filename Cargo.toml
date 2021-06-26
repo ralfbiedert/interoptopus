@@ -8,4 +8,5 @@ members = [
     "interoptopus_reference_project",
     "examples/complex",
     "examples/hello_world",
+    "examples/unity_hot_reload",
 ]
