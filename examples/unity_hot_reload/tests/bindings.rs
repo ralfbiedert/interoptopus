@@ -14,7 +14,7 @@ fn bindings_csharp() -> Result<(), Error> {
         ..Config::default()
     };
 
-    Generator::new(config.clone(), inventory.clone()).write_file("bindings/csharp/Interop.cs")?;
+    Generator::new(config, inventory).write_file("bindings/csharp/Interop.cs")?;
 
     Ok(())
 }

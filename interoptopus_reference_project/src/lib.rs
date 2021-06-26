@@ -11,13 +11,13 @@ pub mod constants;
 pub mod functions;
 /// Reference implementations of patterns.
 pub mod patterns {
+    pub mod api_entry;
     pub mod ascii_pointer;
     pub mod option;
     pub mod service_generated;
     pub mod service_manual;
     pub mod slice;
     pub mod success_enum;
-    pub mod xxx;
 }
 pub mod types;
 
@@ -62,7 +62,7 @@ interoptopus::inventory_function!(
         patterns::slice::pattern_ffi_slice_delegate,
         patterns::option::pattern_ffi_option_1,
         patterns::option::pattern_ffi_option_2,
-        patterns::xxx::xxx_entry_points
+        patterns::api_entry::api_entry_points
     ],
     [
         patterns::service_manual::my_service_pattern_context,

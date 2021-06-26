@@ -188,7 +188,7 @@ pub trait PythonWriter {
     fn write_patterns(&self, w: &mut IndentWriter) -> Result<(), Error> {
         for pattern in self.library().patterns() {
             match pattern {
-                LibraryPattern::Class(cls) => self.write_pattern_class(w, cls)?,
+                LibraryPattern::Service(cls) => self.write_pattern_class(w, cls)?,
             }
         }
 

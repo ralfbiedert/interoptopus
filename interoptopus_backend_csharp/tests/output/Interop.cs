@@ -135,8 +135,8 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_option_2")]
         public static extern Inner pattern_ffi_option_2(FFIOptionInner ffi_slice);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "xxx_entry_points")]
-        public static extern FFIError xxx_entry_points(out Pointers x);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "api_entry_points")]
+        public static extern FFIError api_entry_points(out Pointers x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_create")]
         public static extern FFIError pattern_service_create(out IntPtr context_ptr, uint value);

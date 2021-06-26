@@ -5,66 +5,36 @@
 [![Rust](https://img.shields.io/badge/rust-1.53%2B-blue.svg?maxAge=3600)](https://github.com/ralfbiedert/interoptopus)
 [![Rust](https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml/badge.svg?branch=master)](https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml)
 
-## Interoptopus
+## Interoptopus 🐙
 
-C#, Python, C, ... → 🐙 → 🦀
+Extensible, lightweight, convenient FFI bindings for _any_<sup>*</sup> language calling Rust.
 
-FFI from your favorite language to Rust. Escape hatchets included. 🪓
+Escape hatchets included. 🪓
 
+<sup>*</sup> C#, C, Python provided. Add yours in 4 hours. No pull request needed.
 
-### Overview
-
-If you ...
-
-- are **about to write** an `extern "C"` API in Rust,
-- **need** C#, Python, C, ... bindings to your library,
-- prefer having **fine-grained-control** over your API and interop generation,
-- would like to use **quality-of-life [patterns](crate::patterns)** on **both sides** (e.g., [options](crate::patterns::option), [slices](crate::patterns::slice), '[classes](crate::patterns::class)') where feasible,
-- might need to swiftly **support a new language**,
-- think your FFI [**single source of truth**](https://en.wikipedia.org/wiki/Single_source_of_truth) should be living Rust code,
-
-... then Interoptopus might be for you.
-
-
-### Known Limitations
-
-- not yet used in production
-- a bit verbose if you don't own your types (still possible, just more work)
-- if you target only a single language and don't care about your FFI layer other solutions might be better
-
-
-### Rust Code You Write
-
-This is code you would write:
+### Code you write ...
 
 ```rust
-use interoptopus::{ffi_function, ffi_type};
+use interoptopus::{ffi_function, ffi_type, inventory_function};
 
 #[ffi_type]
 #[repr(C)]
-pub struct Vec3 {
+pub struct Vec2 {
     pub x: f32,
     pub y: f32,
-    pub z: f32,
 }
 
 #[ffi_function]
 #[no_mangle]
-pub extern "C" fn my_function(input: Vec3) -> Vec3 {
-    Vec3 { x: 2.0, y: 4.0, z: input.z }
+pub extern "C" fn my_function(input: Vec2) {
+    println!("{}", input.x);
 }
 
-interoptopus::inventory_function!(
-    ffi_inventory,
-    [],
-    [my_function],
-    []
-);
+inventory_function!(ffi_inventory, [], [my_function], []);
 ```
 
-### Generated Code
-
-Once you've written the code above you use one of these backends to generate interop code:
+### ... Interoptopus generates
 
 | Language | Crate | Sample Output |
 | --- | --- | --- |
@@ -73,9 +43,25 @@ Once you've written the code above you use one of these backends to generate int
 | Python [CFFI](https://cffi.readthedocs.io/en/latest/index.html) | [**interoptopus_backend_cpython_cffi**](https://crates.io/crates/interoptopus_backend_cpython_cffi) | [reference.py](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_cpython_cffi/tests/output/reference_project.py) |
 | Your language | Write your own backend! | - |
 
+
+## Getting Started 🍼
+
+If you ...
+- want to **create a new API** see the [**example projects**](https://github.com/ralfbiedert/interoptopus/tree/master/examples),
+- need to **support a new language** or rewrite a backend, [**copy and adapt the C backend**](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_backend_c).
+
 ### Features
 
-See the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src) lists all supported constructs including:
+- explicit, type-safe, **single source of truth** API definition in Rust,
+- **minimal on dependencies**, build time, tooling impact
+- if your **project compiles your bindings should work**<sup>TM, &#42;*cough*&#42;</sup> (i.e., generated and callable)
+- **extensible**, multiple backends, **easy to support new languages**, or totally change existing ones
+- **quality-of-life [patterns](crate::patterns)** on **both sides** (e.g., [options](crate::patterns::option), [slices](crate::patterns::slice), [services](crate::patterns::service), ...)
+- doesn't need build scripts, `cargo build` + `cargo test` **can produce and test** (if lang installed) generated bindings
+
+
+### Supported Rust Constructs
+See the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src); it lists all supported constructs including:
 - [functions](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/functions.rs) (`extern "C"` functions and delegates)
 - [types](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/types.rs) (primitives, composite, enums (numeric only), opaques, references, pointers, ...)
 - [constants](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/constants.rs) (primitive constants; results of const evaluation)

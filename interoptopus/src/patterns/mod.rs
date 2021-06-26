@@ -42,12 +42,12 @@ pub mod success_enum;
 /// A pattern on a library level, usually involving both methods and types.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum LibraryPattern {
-    Class(Service),
+    Service(Service),
 }
 
 impl From<Service> for LibraryPattern {
     fn from(x: Service) -> Self {
-        Self::Class(x)
+        Self::Service(x)
     }
 }
 

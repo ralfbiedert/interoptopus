@@ -18,15 +18,37 @@
   Right now it doesn't like `struct S<T: X>`. Instead, try `struct S<T> where T: X`.
 
 
-- **How do I support a new language?**
+- **Ok, how many hours does it actually take to create a new backend?**
 
-  1) create a new crate, like `my_language`
-  1) check which existing backend comes closest, copy that code
-  1) start from trait `Interop::write_to` producing some output, fix errors as they appear
-  1) create a UI test against `interoptopus_reference_project` to ensure your bindings are stable
+  Judging from creating the existing backends, and assuming you've done some FFI 
+  calls from that language to a C library, I'd say:
+
+  - **1h** - browsing an existing backend and understanding how CTypes work
+  - **2h** - producing MVP output that can call a single `hello_world()`
+  - **4h** - generate bindings for arbitrary functions with primitive parameters
+  - **1d** - also produce `structs` and `enums`  
+  - **2d** - support the entire C API surface
+  - **3-5d** - have clean, idiomatic wrappers for all patterns and run automated reference tests  
+
+  See below for details. 
 
 
-- **How does it actually work?**
+- **Who's the target audience for this?**
+  
+  Anyone writing 'system libraries' that need to be consumable from multiple 
+  environments at the same time. Our usage profile is:
+  
+  - several libraries with 100+ functions (think Vulkan, OpenXR), 
+  - callable from Unity, Unreal, Python,
+  - high "API uncertainty" in the beginning, requiring lots of iterations to get it right,  
+  - predictable and "industry-grade" APIs in the end (final bindings ship to customers).
+
+
+
+
+
+
+- **How does it work?**
 
   As  [answered by Alex Hirsekorn](https://www.quora.com/How-does-an-octopus-eat-a-crab-without-getting-cuts?share=1):
   - When a GPO [Giant Pacific Octopus] finds a crab it does something called a “flaring web-over” which uses the webbing between the arms to engulf the crab while simultaneously immobilizing the crab’s claws with its suckers.
@@ -38,6 +60,53 @@
   Occasionally a GPO will get minor injuries from capturing the crab but, for the most part they are too careful and too skilled for that to be much of an issue.
 
   After the GPO has rested, FFI bindings are produced.
+
+
+- **How can I add a new pattern?**
+  
+  Adding support for new patterns is best done via a PR. Patterns mimicking common Rust features 
+  and improvements to existing patterns are welcome. As a rule of thumb they 
+  should 
+  - be idiomatic in Rust (e.g., options, slices),
+  - have a safe and sound Rust implementation and 'reasonable' usability in other languages, 
+  - be useful in more than one backend and come with a reference implementation,
+  - _must_ fallback to C primitives (e.g., 'class methods' are functions with receivers).
+  
+  As an alternative, and discouraged for public backends, you might be able to get away using "tags".
+  
+
+
+## New Backends
+
+**Quickstart**
+
+1) start a crate
+1) copy code of whatever backend comes closest (e.g, C)
+1) from `Interop::write_to` produce some output, fix errors as they appear
+1) create UI test against `interoptopus_reference_project` to ensure quality
+
+**Tips**
+
+Once you understand how Interoptopus abstracts APIs writing a backend is quite simple: 
+
+- The `Library` is _the input_ to any backend, as in, it fully describes what you should generate. 
+  It mainly consists of these elements:
+  - Types
+  - Functions
+  - Constants
+  - Patterns
+- Any backend more or less just converts each of these things one-by-one. It usually writes all constants,
+  then all (composite) types and enums, then all functions, then (optionally) all patterns. 
+  
+- Writing and converting types is usually the most tricky part, and might require that you sort types by 
+  dependencies (e.g., for C) or handle types differently depending on where they appear (e.g., in C# an 
+  `IntPtr` in a field might become a `ref T` in a function).
+
+- Patterns are fully optional. You can always just implement their "fallback type" 
+  (e.g, an AsciiPointer is just a `*const u8`) and call it a day. However, when exporting larger APIs 
+  (like 100+ functions) producing _idiomatic_ pattern bindings will be a good investment. 
+
+
 
 
 ## Safety, Soundness, Undefined Behavior
@@ -72,7 +141,7 @@ like 'safely' mapping a trait's vtable) such bindings should be gated behind a f
 to set expectations around discussions.
 
 
-Long story short, if it's fishy we probably want to fix it, but we rely on external code calling in correctly. 
+tl;dr: if it's fishy we probably want to fix it, but we rely on external code calling in 'according to documentation'. 
 
 
 ## Errors vs. Panics

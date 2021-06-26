@@ -299,7 +299,7 @@ pub trait CSharpWriter {
     fn write_patterns(&self, w: &mut IndentWriter) -> Result<(), Error> {
         for pattern in self.library().patterns() {
             match pattern {
-                LibraryPattern::Class(cls) => {
+                LibraryPattern::Service(cls) => {
                     if self.should_emit(cls.the_type().meta()) {
                         self.write_pattern_class(w, cls)?
                     }

@@ -174,13 +174,13 @@ class TestPatterns(unittest.TestCase):
     #     inner = r.Inner()
     #     option = r.Op
 
-    def test_xxx(self):
+    def test_api_entry(self):
         pointers = r.Pointers()
         tuple = r.Tupled()
 
         tuple.x0 = 123
 
-        r.raw.xxx_entry_points(pointers.ptr())
+        r.raw.api_entry_points(pointers.ptr())
 
         print(pointers._ctx)
         tuple2 = pointers.f2(tuple._ctx[0])

@@ -6,6 +6,7 @@ use interoptopus::lang::c::{CType, CompositeType, Field, FnPointerType, Function
 use interoptopus::lang::rust::CTypeInfo;
 
 // TODO - How should this pattern be called?
+// TODO - Finish implementing me.
 
 #[repr(C)]
 pub struct Pointers {
@@ -50,7 +51,7 @@ impl CTypeInfo for Pointers {
 
 #[ffi_function]
 #[no_mangle]
-pub extern "C" fn xxx_entry_points(x: &mut Pointers) -> FFIError {
+pub extern "C" fn api_entry_points(x: &mut Pointers) -> FFIError {
     *x = Pointers {
         f1: ref_mut_option,
         f2: tupled,

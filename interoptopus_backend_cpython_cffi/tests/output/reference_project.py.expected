@@ -172,7 +172,7 @@ cffi_vec3f32 pattern_ffi_slice_2(cffi_ffislicevec3f32 ffi_slice, int32_t i);
 uint8_t pattern_ffi_slice_delegate(cffi_fptr_fn_FFISliceu8_rval_u8 callback);
 cffi_ffioptioninner pattern_ffi_option_1(cffi_ffioptioninner ffi_slice);
 cffi_inner pattern_ffi_option_2(cffi_ffioptioninner ffi_slice);
-cffi_ffierror xxx_entry_points(cffi_pointers* x);
+cffi_ffierror api_entry_points(cffi_pointers* x);
 cffi_ffierror pattern_service_create(cffi_context** context_ptr, uint32_t value);
 cffi_ffierror pattern_service_destroy(cffi_context** context_ptr);
 uint32_t pattern_service_method(cffi_context* context);
@@ -889,12 +889,12 @@ Parameter x must point to valid data."""
             ffi_slice = ffi_slice._ctx[0]
         return _api.pattern_ffi_option_2(ffi_slice)
 
-    def xxx_entry_points(x):
+    def api_entry_points(x):
         """"""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
-        return _api.xxx_entry_points(x)
+        return _api.api_entry_points(x)
 
     def pattern_service_create(context_ptr, value):
         """"""
