@@ -135,6 +135,9 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_option_2")]
         public static extern Inner pattern_ffi_option_2(FFIOptionInner ffi_slice);
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "xxx_entry_points")]
+        public static extern FFIError xxx_entry_points(out Pointers x);
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_create")]
         public static extern FFIError pattern_service_create(out IntPtr context_ptr, uint value);
 
@@ -222,6 +225,15 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
+    public partial struct Pointers
+    {
+        public InteropDelegate_fn_pmut_i64_rval_bool f1;
+        public InteropDelegate_fn_Tupled_rval_Tupled f2;
+        public InteropDelegate_fn_Vec3f32_pconst_Empty_rval_FFIError f3;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
     public partial struct SomeForeignType
     {
         public uint x;
@@ -274,6 +286,15 @@ namespace My.Company
         public float y;
         public float z;
     }
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate FFIError InteropDelegate_fn_Vec3f32_pconst_Empty_rval_FFIError(Vec3f32 x0, ref Empty x1);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate Tupled InteropDelegate_fn_Tupled_rval_Tupled(Tupled x0);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate bool InteropDelegate_fn_pmut_i64_rval_bool(out long x0);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);

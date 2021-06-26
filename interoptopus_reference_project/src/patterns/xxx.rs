@@ -1,9 +1,11 @@
 use crate::functions::{complex_args_1, ref_mut_option, tupled};
 use crate::patterns::success_enum::FFIError;
 use crate::types::{Empty, Tupled, Vec3f32};
+use interoptopus::ffi_function;
 use interoptopus::lang::c::{CType, CompositeType, Field, FnPointerType, Function};
 use interoptopus::lang::rust::CTypeInfo;
-use interoptopus::{ffi_function, ffi_type};
+
+// TODO - How should this pattern be called?
 
 #[repr(C)]
 pub struct Pointers {

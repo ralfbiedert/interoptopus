@@ -1,40 +1,61 @@
+using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace My.Company
+namespace Interoptopus.Utils
 {
-    class InteroptopusHotReload
+    // TODO: This needs more love and cleanup.
+    // - Make work on any Unity platform (not just Windows)
+    // - Copy based on file hash, not random number
+    // - Run automatically when file changes
+    // - Nicer way to specify paths ...?
+    class HotReload
     {
-        private const string DllSource = @"D:\Development\Source\interoptopus\target\debug\unity_hot_reload.dll";
-        private const string DllDst = @"Assets/MyRustLib/Plugins/xxx_sha256_123187.dll";
-        private const string InteropDstRoot = @"Assets/MyRustLib/";
-        private const string InteropSrcRoot = @"D:\Development\Source\interoptopus\examples\unity_hot_reload\bindings\csharp\";
+        private const string DllName = @"unity_hot_reload";
+        private const string SourceDll = @"../../../target/debug";
+        private const string SourceInteropRoot = @"../bindings/csharp";
         private static readonly string[] InteropFiles = {
             @"Interop.cs",
         };
+        private const string DestinationAsssetFolder = @"Assets/MyRustLib/";
 
+        
         static void UpdateInteropFiles()
         {
-            Debug.Log("Running");
-            File.Copy(DllSource, DllDst);
+            var random = new System.Random();
+            var pluginFolder = Path.Combine(DestinationAsssetFolder, "Plugins");
+            
+            // Copy plugin
+            var targetDllPrefix = $"{DllName}.{Math.Abs(random.Next())}";
+            var targetDllFullPath = Path.Combine(pluginFolder, $"{targetDllPrefix}.dll");
+            Directory.CreateDirectory(pluginFolder);
+            File.Copy(Path.Combine(SourceDll, $"{DllName}.dll"), targetDllFullPath);
 
+            // Copy interop files
             foreach (var file in InteropFiles)
             {
+                var sourceFile = Path.Combine(SourceInteropRoot, file); 
+                var destFile = Path.Combine(DestinationAsssetFolder, file);
+
+                var text = File.ReadAllText(sourceFile);
+                var newText = text.Replace(DllName, targetDllPrefix);
                 
-                File.Copy(Path.Combine(InteropSrcRoot, file), Path.Combine(InteropDstRoot, file));
+                File.Delete(destFile);
+                File.WriteAllText(destFile, newText);
             }
+            
+            Debug.Log("Hot reloading successful.");
         }
         
         [InitializeOnLoadMethod]
         static void OnProjectLoadedInEditor()
         {
-            Debug.Log("Project loaded in Unity Editor 2");
-            
-            
+            // TODO: Check hash and copy automatically 
+            // Debug.Log("Project loaded in Unity Editor 2");
         }
         
-        [MenuItem("Interoptopus/Hot Reload - XXX")]
+        [MenuItem("Interoptopus/Hot Reload")]
         static void Init()
         {
             UpdateInteropFiles();

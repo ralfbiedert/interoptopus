@@ -3,8 +3,6 @@ use interoptopus::testing::csharp::run_dotnet_command_if_installed;
 use interoptopus::util::NamespaceMappings;
 use interoptopus::Error;
 use interoptopus::Interop;
-use interoptopus_backend_csharp::unity::UnityReloadHelper;
-use interoptopus_reference_project::ffi_inventory;
 
 fn generate_bindings_multi(prefix: &str) -> Result<(), Error> {
     use interoptopus_backend_csharp::{Config, Generator};
@@ -40,22 +38,6 @@ fn bindings_match_reference() -> Result<(), Error> {
 
     assert_file_matches_generated("tests/output/Interop.cs");
     assert_file_matches_generated("tests/output/Interop.common.cs");
-
-    Ok(())
-}
-
-#[test]
-#[cfg_attr(miri, ignore)]
-fn unity_hot_reload_helper_generated() -> Result<(), Error> {
-    // let reload_helper = UnityReloadHelper {
-    //     inventory: ffi_inventory(),
-    //     config: Default::default(),
-    //     dll_source: "".to_string(),
-    //     asset_name: "".to_string(),
-    //     interop_source: "".to_string(),
-    // };
-    //
-    // reload_helper.write_to_asset_folder("tests/output/InteroptopusHotReload.cs")?;
 
     Ok(())
 }

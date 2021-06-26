@@ -16,20 +16,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "do_math")]
         public static extern uint do_math(uint x);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "xxx_entry_points")]
-        public static extern void xxx_entry_points(out Pointers x);
-
     }
-
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct Pointers
-    {
-        public InteropDelegate_fn_u32_rval_u32 do_math;
-    }
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint InteropDelegate_fn_u32_rval_u32(uint x0);
 
 
 }

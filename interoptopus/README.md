@@ -54,7 +54,12 @@ pub extern "C" fn my_function(input: Vec3) -> Vec3 {
     Vec3 { x: 2.0, y: 4.0, z: input.z }
 }
 
-interoptopus::inventory_function!(ffi_inventory, [], [my_function], []);
+interoptopus::inventory_function!(
+    ffi_inventory,
+    [],
+    [my_function],
+    []
+);
 ```
 
 ### Generated Code

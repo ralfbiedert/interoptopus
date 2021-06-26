@@ -53,7 +53,6 @@ use interoptopus::{Error, Library};
 
 mod config;
 mod converter;
-pub mod unity;
 mod writer;
 
 pub use crate::config::Config;
