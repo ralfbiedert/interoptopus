@@ -162,6 +162,7 @@ cffi_vec2 ambiguous_2(cffi_vec2 x);
 bool ambiguous_3(cffi_vec1 x, cffi_vec2 y);
 cffi_vec namespaced_type(cffi_vec x);
 cffi_ffierror panics();
+void sleep(uint64_t millis);
 uint32_t pattern_ascii_pointer_1(uint8_t* x);
 uint32_t pattern_ascii_pointer_len(uint8_t* x, cffi_useasciistringpattern y);
 uint32_t pattern_ffi_slice_1(cffi_ffisliceu32 ffi_slice);
@@ -821,6 +822,13 @@ Parameter x must point to valid data."""
         """"""
         global _api
         return _api.panics()
+
+    def sleep(millis):
+        """"""
+        global _api
+        if hasattr(millis, "_ctx"):
+            millis = millis._ctx[0]
+        return _api.sleep(millis)
 
     def pattern_ascii_pointer_1(x):
         """"""

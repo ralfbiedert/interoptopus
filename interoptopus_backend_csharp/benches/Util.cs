@@ -103,7 +103,7 @@ profile: --release
 .NET: v3.1 (netcoreapp3.1) 
 ```
 
-## Timings
+## Results
  
 | Construct | µs per 1k calls |
 | --- | --- |
@@ -113,7 +113,7 @@ profile: --release
             sw.Write(header);
             foreach (var entry in Entries)
             {
-                sw.WriteLine($"| `{entry.Name}` | {entry.Result.MicroPer1000()} |");
+                sw.WriteLine($"| `{entry.Name}` | {(long) entry.Result.MicroPer1000()} |");
             }
         }
     }

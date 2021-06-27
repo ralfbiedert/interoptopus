@@ -18,4 +18,5 @@ namespace My.Company.Common
         public double z;
     }
 
+
 }

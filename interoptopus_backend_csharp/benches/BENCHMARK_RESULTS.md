@@ -29,13 +29,13 @@ profile: --release
 .NET: v3.1 (netcoreapp3.1) 
 ```
 
-## Timings
+## Results
  
 | Construct | µs per 1k calls |
 | --- | --- |
-| `primitive_void()` | 8.232 |
-| `primitive_u8(0)` | 8.481 |
-| `primitive_u16(0)` | 8.8 |
-| `primitive_u32(0)` | 8.496 |
-| `primitive_u64(0)` | 8.395 |
-| `pattern_ascii_pointer_1('hello world')` | 45.162 |
+| `primitive_void()` | 8 |
+| `primitive_u8(0)` | 8 |
+| `primitive_u16(0)` | 8 |
+| `primitive_u32(0)` | 8 |
+| `primitive_u64(0)` | 8 |
+| `pattern_ascii_pointer_1('hello world')` | 44 |
