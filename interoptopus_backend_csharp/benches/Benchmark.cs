@@ -43,9 +43,6 @@ namespace Interoptopus
             result = MeasureResult.Measure(Iterations, () => Interop.many_args_10(0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
             writer.Add("many_args_10(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)", result);
 
-            result = MeasureResult.Measure(Iterations, () => Interop.primitive_u64(0));
-            writer.Add("primitive_u64(0)", result);
-
             result = MeasureResult.Measure(Iterations, () => Interop.ptr(ref x));
             writer.Add("ptr(x)", result);
 
