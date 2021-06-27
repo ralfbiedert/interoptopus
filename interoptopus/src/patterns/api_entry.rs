@@ -37,12 +37,18 @@ macro_rules! pattern_api_entry {
 
         #[interoptopus::ffi_function]
         #[no_mangle]
-        pub extern "C" fn $init() -> $struct {
-            $struct {
+        pub extern "C" fn $init(api: *mut $struct) {
+            if api.is_null() {
+                return;
+            }
+
+            let s = $struct {
                 $(
                     $function: $function,
                 )*
-            }
+            };
+
+            unsafe { *api = s; }
         }
 
 

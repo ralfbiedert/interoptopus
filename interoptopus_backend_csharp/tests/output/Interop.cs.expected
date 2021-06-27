@@ -136,7 +136,7 @@ namespace My.Company
         public static extern Inner pattern_ffi_option_2(FFIOptionInner ffi_slice);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "my_api_init_v1")]
-        public static extern MyAPIv1 my_api_init_v1();
+        public static extern void my_api_init_v1(out MyAPIv1 api);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_create")]
         public static extern FFIError pattern_service_create(out IntPtr context_ptr, uint value);

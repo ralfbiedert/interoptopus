@@ -176,7 +176,7 @@ my_library_vec3f32 pattern_ffi_slice_2(my_library_ffislicevec3f32 ffi_slice, int
 uint8_t pattern_ffi_slice_delegate(my_library_fptr_fn_FFISliceu8_rval_u8 callback);
 my_library_ffioptioninner pattern_ffi_option_1(my_library_ffioptioninner ffi_slice);
 my_library_inner pattern_ffi_option_2(my_library_ffioptioninner ffi_slice);
-my_library_myapiv1 my_api_init_v1();
+void my_api_init_v1(my_library_myapiv1* api);
 my_library_ffierror pattern_service_create(my_library_context** context_ptr, uint32_t value);
 my_library_ffierror pattern_service_destroy(my_library_context** context_ptr);
 uint32_t pattern_service_method(my_library_context* context);

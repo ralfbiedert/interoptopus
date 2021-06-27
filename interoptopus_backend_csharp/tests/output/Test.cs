@@ -28,11 +28,13 @@ namespace interop_test
         [Fact]
         public void pattern_api_entry()
         {
-            var api = Interop.my_api_init_v1();
+            // TODO: Why does this not work?
+            Interop.my_api_init_v1(out var api);
+            
             var input = new Tupled {x0 = 10};
             var output = api.tupled(input);
             
-            Assert.Equal(input.x0, output.x0);
+            Assert.Equal(2 * input.x0, output.x0);
             
         }
 

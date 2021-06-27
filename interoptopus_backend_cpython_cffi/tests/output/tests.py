@@ -169,14 +169,16 @@ class TestPatterns(unittest.TestCase):
 
             self.assertEqual(len(s), r.raw.pattern_ascii_pointer_1(astr))
 
-
-    # def test_options(self):
-    #     inner = r.Inner()
-    #     option = r.Op
-
     def test_api_entry(self):
-        api = r.raw.my_api_init_v1()
-        print(api)
+        api = r.MyAPIv1()
+        r.raw.my_api_init_v1(api.ptr())
+
+        t = r.Tupled()
+        t.x0 = 10
+
+        # TODO: The ptr()[0] part is a bit ugly ... should fix
+        t2 = api.tupled(t.ptr()[0])
+        self.assertEqual(20, t2.x0)
 
 
 if __name__ == '__main__':

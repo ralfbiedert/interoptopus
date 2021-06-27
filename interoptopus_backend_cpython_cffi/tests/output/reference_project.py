@@ -169,7 +169,7 @@ cffi_vec3f32 pattern_ffi_slice_2(cffi_ffislicevec3f32 ffi_slice, int32_t i);
 uint8_t pattern_ffi_slice_delegate(cffi_fptr_fn_FFISliceu8_rval_u8 callback);
 cffi_ffioptioninner pattern_ffi_option_1(cffi_ffioptioninner ffi_slice);
 cffi_inner pattern_ffi_option_2(cffi_ffioptioninner ffi_slice);
-cffi_myapiv1 my_api_init_v1();
+void my_api_init_v1(cffi_myapiv1* api);
 cffi_ffierror pattern_service_create(cffi_context** context_ptr, uint32_t value);
 cffi_ffierror pattern_service_destroy(cffi_context** context_ptr);
 uint32_t pattern_service_method(cffi_context* context);
@@ -875,10 +875,12 @@ Parameter x must point to valid data."""
             ffi_slice = ffi_slice._ctx[0]
         return _api.pattern_ffi_option_2(ffi_slice)
 
-    def my_api_init_v1():
+    def my_api_init_v1(api):
         """"""
         global _api
-        return _api.my_api_init_v1()
+        if hasattr(api, "_ctx"):
+            api = api._ctx[0]
+        return _api.my_api_init_v1(api)
 
     def pattern_service_create(context_ptr, value):
         """"""
