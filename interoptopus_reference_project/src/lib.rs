@@ -63,6 +63,7 @@ interoptopus::inventory!(
         patterns::slice::pattern_ffi_slice_1,
         patterns::slice::pattern_ffi_slice_2,
         patterns::slice::pattern_ffi_slice_delegate,
+        patterns::slice::pattern_ffi_slice_delegate_huge,
         patterns::option::pattern_ffi_option_1,
         patterns::option::pattern_ffi_option_2,
         patterns::api_entry::my_api_init_v1

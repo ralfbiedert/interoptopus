@@ -131,6 +131,8 @@ typedef struct cffi_ffislicevec3f32
     uint64_t len;
     } cffi_ffislicevec3f32;
 
+typedef cffi_vec3f32 (*cffi_fptr_fn_FFISliceVec3f32_rval_Vec3f32)(cffi_ffislicevec3f32 x0);
+
 
 void primitive_void();
 void primitive_void2();
@@ -170,6 +172,7 @@ uint32_t pattern_ascii_pointer_len(uint8_t* x, cffi_useasciistringpattern y);
 uint32_t pattern_ffi_slice_1(cffi_ffisliceu32 ffi_slice);
 cffi_vec3f32 pattern_ffi_slice_2(cffi_ffislicevec3f32 ffi_slice, int32_t i);
 uint8_t pattern_ffi_slice_delegate(cffi_fptr_fn_FFISliceu8_rval_u8 callback);
+cffi_vec3f32 pattern_ffi_slice_delegate_huge(cffi_fptr_fn_FFISliceVec3f32_rval_Vec3f32 callback);
 cffi_ffioptioninner pattern_ffi_option_1(cffi_ffioptioninner ffi_slice);
 cffi_inner pattern_ffi_option_2(cffi_ffioptioninner ffi_slice);
 void my_api_init_v1(cffi_myapiv1* api);
@@ -602,6 +605,7 @@ class callbacks:
     fn_Tupled_rval_Tupled = "cffi_tupled(cffi_tupled)"
     fn_pmut_i64_rval_bool = "bool(int64_t*)"
     fn_u8_rval_u8 = "uint8_t(uint8_t)"
+    fn_FFISliceVec3f32_rval_Vec3f32 = "cffi_vec3f32(cffi_ffislicevec3f32)"
     fn_FFISliceu8_rval_u8 = "uint8_t(cffi_ffisliceu8)"
 
 
@@ -910,6 +914,13 @@ Parameter x must point to valid data."""
         if hasattr(callback, "_ctx"):
             callback = callback._ctx[0]
         return _api.pattern_ffi_slice_delegate(callback)
+
+    def pattern_ffi_slice_delegate_huge(callback):
+        """"""
+        global _api
+        if hasattr(callback, "_ctx"):
+            callback = callback._ctx[0]
+        return _api.pattern_ffi_slice_delegate_huge(callback)
 
     def pattern_ffi_option_1(ffi_slice):
         """"""

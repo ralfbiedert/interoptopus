@@ -23,44 +23,58 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_void")]
         public static extern void primitive_void();
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_void2")]
         public static extern void primitive_void2();
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_bool")]
         public static extern bool primitive_bool(bool x);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_u8")]
         public static extern byte primitive_u8(byte x);
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_u16")]
         public static extern ushort primitive_u16(ushort x);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_u32")]
         public static extern uint primitive_u32(uint x);
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_u64")]
         public static extern ulong primitive_u64(ulong x);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_i8")]
         public static extern sbyte primitive_i8(sbyte x);
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_i16")]
         public static extern short primitive_i16(short x);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_i32")]
         public static extern int primitive_i32(int x);
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_i64")]
         public static extern long primitive_i64(long x);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "many_args_5")]
         public static extern long many_args_5(long x0, long x1, long x2, long x3, long x4);
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "many_args_10")]
         public static extern long many_args_10(long x0, long x1, long x2, long x3, long x4, long x5, long x6, long x7, long x8, long x9);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ptr")]
         public static extern IntPtr ptr(ref long x);
+
 
         /// # Safety
         /// 
@@ -68,87 +82,143 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ptr_mut")]
         public static extern IntPtr ptr_mut(out long x);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ptr_ptr")]
         public static extern IntPtr ptr_ptr(ref IntPtr x);
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ref_simple")]
         public static extern IntPtr ref_simple(ref long x);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ref_mut_simple")]
         public static extern IntPtr ref_mut_simple(out long x);
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ref_option")]
         public static extern bool ref_option(ref long x);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ref_mut_option")]
         public static extern bool ref_mut_option(out long x);
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tupled")]
         public static extern Tupled tupled(Tupled x);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "complex_args_1")]
         public static extern FFIError complex_args_1(Vec3f32 _a, ref Empty _b);
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "complex_args_2")]
         public static extern IntPtr complex_args_2(SomeForeignType _cmplx);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "callback")]
         public static extern byte callback(InteropDelegate_fn_u8_rval_u8 callback, byte value);
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic_1")]
         public static extern uint generic_1(Genericu32 x, Phantomu8 _y);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic_2")]
         public static extern byte generic_2(Genericu8 x, Phantomu8 _y);
+
 
         /// This function has documentation.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "documented")]
         public static extern EnumDocumented documented(StructDocumented _x);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ambiguous_1")]
         public static extern Vec1 ambiguous_1(Vec1 x);
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ambiguous_2")]
         public static extern Vec2 ambiguous_2(Vec2 x);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ambiguous_3")]
         public static extern bool ambiguous_3(Vec1 x, Vec2 y);
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "namespaced_type")]
         public static extern Vec namespaced_type(Vec x);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "panics")]
         public static extern FFIError panics();
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "sleep")]
         public static extern void sleep(ulong millis);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ascii_pointer_1")]
         public static extern uint pattern_ascii_pointer_1(string x);
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ascii_pointer_len")]
         public static extern uint pattern_ascii_pointer_len(string x, UseAsciiStringPattern y);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_1")]
         public static extern uint pattern_ffi_slice_1(FFISliceu32 ffi_slice);
+
+        public static uint pattern_ffi_slice_1(uint[] ffi_slice) {
+            var ffi_slice_pinned = GCHandle.Alloc(ffi_slice, GCHandleType.Pinned);
+            var ffi_slice_slice = new FFISliceu32(ffi_slice_pinned, (ulong) ffi_slice.Length);
+            try
+            {
+                return pattern_ffi_slice_1(ffi_slice_slice);
+            }
+            finally
+            {
+                ffi_slice_pinned.Free();
+            }
+        }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_2")]
         public static extern Vec3f32 pattern_ffi_slice_2(FFISliceVec3f32 ffi_slice, int i);
 
+        public static Vec3f32 pattern_ffi_slice_2(Vec3f32[] ffi_slice, int i) {
+            var ffi_slice_pinned = GCHandle.Alloc(ffi_slice, GCHandleType.Pinned);
+            var ffi_slice_slice = new FFISliceVec3f32(ffi_slice_pinned, (ulong) ffi_slice.Length);
+            try
+            {
+                return pattern_ffi_slice_2(ffi_slice_slice, i);
+            }
+            finally
+            {
+                ffi_slice_pinned.Free();
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_delegate")]
         public static extern byte pattern_ffi_slice_delegate(InteropDelegate_fn_FFISliceu8_rval_u8 callback);
+
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_delegate_huge")]
+        public static extern Vec3f32 pattern_ffi_slice_delegate_huge(InteropDelegate_fn_FFISliceVec3f32_rval_Vec3f32 callback);
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_option_1")]
         public static extern FFIOptionInner pattern_ffi_option_1(FFIOptionInner ffi_slice);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_option_2")]
         public static extern Inner pattern_ffi_option_2(FFIOptionInner ffi_slice);
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "my_api_init_v1")]
         public static extern void my_api_init_v1(out MyAPIv1 api);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_create")]
         public static extern FFIError pattern_service_create(out IntPtr context_ptr, uint value);
+
 
         /// # Safety
         /// 
@@ -156,36 +226,47 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_destroy")]
         public static extern FFIError pattern_service_destroy(out IntPtr context_ptr);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_method")]
         public static extern uint pattern_service_method(IntPtr context);
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_method_success_enum_ok")]
         public static extern FFIError pattern_service_method_success_enum_ok(IntPtr _context);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_method_success_enum_fail")]
         public static extern FFIError pattern_service_method_success_enum_fail(IntPtr _context);
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_create")]
         public static extern FFIError simple_service_create(out IntPtr context_ptr, uint x);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_destroy")]
         public static extern FFIError simple_service_destroy(out IntPtr context_ptr);
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_result")]
         public static extern FFIError simple_service_result(IntPtr context_ptr, uint x);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_value")]
         public static extern uint simple_service_value(IntPtr context_ptr, uint x);
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_mut_self")]
         public static extern uint simple_service_mut_self(IntPtr context_ptr, uint x);
 
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_void")]
         public static extern void simple_service_void(IntPtr context_ptr);
+
 
         /// An extra exposed method.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_extra_method")]
         public static extern uint simple_service_extra_method(IntPtr _context);
+
 
     }
 
@@ -305,6 +386,9 @@ namespace My.Company
     public delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate Vec3f32 InteropDelegate_fn_FFISliceVec3f32_rval_Vec3f32(FFISliceVec3f32 x0);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte InteropDelegate_fn_FFISliceu8_rval_u8(FFISliceu8 x0);
 
     public enum FFIError
@@ -325,6 +409,11 @@ namespace My.Company
 
     public partial struct FFISliceVec3f32 : IEnumerable<Vec3f32>
     {
+        public FFISliceVec3f32(GCHandle handle, ulong count)
+        {
+            this.data = handle.AddrOfPinnedObject();
+            this.len = count;
+        }
         public Vec3f32 this[int i]
         {
             get
@@ -376,6 +465,11 @@ namespace My.Company
 
     public partial struct FFISliceu32 : IEnumerable<uint>
     {
+        public FFISliceu32(GCHandle handle, ulong count)
+        {
+            this.data = handle.AddrOfPinnedObject();
+            this.len = count;
+        }
         public uint this[int i]
         {
             get
@@ -427,6 +521,11 @@ namespace My.Company
 
     public partial struct FFISliceu8 : IEnumerable<byte>
     {
+        public FFISliceu8(GCHandle handle, ulong count)
+        {
+            this.data = handle.AddrOfPinnedObject();
+            this.len = count;
+        }
         public byte this[int i]
         {
             get

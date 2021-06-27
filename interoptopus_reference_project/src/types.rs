@@ -56,7 +56,7 @@ where
 
 #[ffi_type]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Default)]
 pub struct Vec3f32 {
     pub x: f32,
     pub y: f32,

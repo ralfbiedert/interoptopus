@@ -1,4 +1,6 @@
-use interoptopus::lang::c::{CType, CompositeType, ConstantValue, EnumType, Field, FnPointerType, Function, OpaqueType, Parameter, PrimitiveType, PrimitiveValue};
+use interoptopus::lang::c::{
+    CType, CompositeType, ConstantValue, EnumType, Field, FnPointerType, Function, FunctionSignature, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
+};
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::safe_name;
 
@@ -35,6 +37,32 @@ pub trait CSharpTypeConverter {
     fn opaque_to_typename(&self, _: &OpaqueType) -> String {
         // x.name().to_string()
         "IntPtr".to_string()
+    }
+
+    fn has_overloadable(&self, signature: &FunctionSignature) -> bool {
+        signature.params().iter().any(|x| matches!(x.the_type(), CType::Pattern(TypePattern::Slice(_))))
+    }
+
+    fn pattern_to_native_in_signature(&self, param: &Parameter, _signature: &FunctionSignature) -> String {
+        match param.the_type() {
+            CType::Pattern(p) => match p {
+                TypePattern::AsciiPointer => "string".to_string(),
+                TypePattern::SuccessEnum(e) => self.enum_to_typename(e.the_enum()),
+                TypePattern::Slice(p) => {
+                    let element_type = p
+                        .fields()
+                        .get(0)
+                        .expect("First parameter must exist")
+                        .the_type()
+                        .deref_pointer()
+                        .expect("Must be pointer");
+
+                    format!("{}[]", self.to_typespecifier_in_param(element_type))
+                }
+                TypePattern::Option(e) => self.composite_to_typename(e),
+            },
+            x => self.to_typespecifier_in_param(x),
+        }
     }
 
     /// Converts an Rust struct name `Vec2` to a C# struct name `Vec2`.

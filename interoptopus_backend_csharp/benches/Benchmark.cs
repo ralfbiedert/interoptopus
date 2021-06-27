@@ -19,6 +19,10 @@ namespace Interoptopus
 
             long x = 0;
             Empty e;
+            var short_vec = new Vec3f32[10];
+            var long_vec = new Vec3f32[100_000];
+
+            Interop.my_api_init_v1(out var dynamic_api);
             
             MeasureResult.Calibrate(Iterations, () => {});
 
@@ -64,13 +68,32 @@ namespace Interoptopus
             result = MeasureResult.Measure(Iterations, () => Interop.callback(x0 => x0, 0));
             writer.Add("callback(x => x, 0)", result);
 
+            result = MeasureResult.Measure(Iterations, () => dynamic_api.tupled(new Tupled()));
+            writer.Add("dynamic_api.tupled(new Tupled())", result);
+
             result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_option_1(new FFIOptionInner()));
             writer.Add("pattern_ffi_option_1(new FFIOptionInner())", result);
 
+            result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_slice_delegate(x => x[0]));
+            writer.Add("pattern_ffi_slice_delegate(x => x[0])", result);
+            
+            result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_slice_delegate(x => x.Copied[0]));
+            writer.Add("pattern_ffi_slice_delegate(x => x.Copied[0])", result);
+
+            result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_slice_delegate_huge(x => x[0]));
+            writer.Add("pattern_ffi_slice_delegate_huge(x => x[0])", result);
+
+            result = MeasureResult.Measure(1000, () => Interop.pattern_ffi_slice_delegate_huge(x => x.Copied[0]));
+            writer.Add("pattern_ffi_slice_delegate_huge(x => x.Copied[0])", result);
+
+            result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_slice_2(short_vec, 0));
+            writer.Add("pattern_ffi_slice_2(short_vec, 0)", result);
+
+            result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_slice_2(long_vec, 0));
+            writer.Add("pattern_ffi_slice_2(long_vec, 0)", result);
+
             result = MeasureResult.Measure(Iterations, () => Interop.pattern_ascii_pointer_1("hello world"));
             writer.Add("pattern_ascii_pointer_1('hello world')", result);
-            
-
             
             writer.Write("BENCHMARK_RESULTS.md");
         }

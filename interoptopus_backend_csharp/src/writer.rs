@@ -1,6 +1,8 @@
 use crate::config::Config;
 use crate::converter::{CSharpTypeConverter, Converter};
-use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, Meta, PrimitiveType, Variant, Visibility};
+use interoptopus::lang::c::{
+    CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, Meta, Parameter, PrimitiveType, Variant, Visibility,
+};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{longest_common_prefix, IdPrettifier};
@@ -80,6 +82,11 @@ pub trait CSharpWriter {
         self.write_documentation(w, function.meta().documentation())?;
         self.write_function_annotation(w, function)?;
         self.write_function_declaration(w, function)?;
+
+        w.newline()?;
+
+        self.write_function_overloaded(w, function)?;
+
         Ok(())
     }
 
@@ -112,6 +119,59 @@ pub trait CSharpWriter {
         }
 
         indented!(w, r#"public static extern {} {}({});"#, rval, name, params.join(", "))
+    }
+
+    #[rustfmt::skip]
+    fn write_function_overloaded(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
+        // If there is nothing to write, don't do it
+        if !self.converter().has_overloadable(function.signature()) {
+            return Ok(());
+        }
+
+        let mut to_pin_name = Vec::new();
+        let mut to_pin_slice_type = Vec::new();
+        let mut to_invoke = Vec::new();
+        let rval = self.converter().function_rval_to_csharp_typename(function);
+        let name = self.converter().function_name_to_csharp_name(function);
+
+        let mut params = Vec::new();
+        for (_, p) in function.signature().params().iter().enumerate() {
+            let name = p.name();
+            let native = self.converter().pattern_to_native_in_signature(p, function.signature());
+            let the_type = self.converter().function_parameter_to_csharp_typename(p, function);
+
+            match p.the_type() {
+                CType::Pattern(TypePattern::Slice(x)) => {
+                    to_pin_name.push(name);
+                    to_pin_slice_type.push(the_type);
+                    to_invoke.push(format!("{}_slice", name));
+                }
+                _ => {
+                    to_invoke.push(name.to_string());
+                }
+            }
+
+            params.push(format!("{} {}", native, name));
+        }
+
+        indented!(w, r#"public static {} {}({}) {{"#, rval, name, params.join(", "))?;
+
+        for (pin_var, slice_struct) in to_pin_name.iter().zip(to_pin_slice_type.iter()) {
+            indented!(w, [_], r#"var {}_pinned = GCHandle.Alloc({}, GCHandleType.Pinned);"#, pin_var, pin_var)?;
+            indented!(w, [_], r#"var {}_slice = new {}({}_pinned, (ulong) {}.Length);"#, pin_var, slice_struct, pin_var, pin_var)?;
+        }
+
+        indented!(w, [_], r#"try"#)?;
+        indented!(w, [_], r#"{{"#)?;
+        indented!(w, [_ _], r#"return {}({});"#, name, to_invoke.join(", "))?;
+        indented!(w, [_], r#"}}"#)?;
+        indented!(w, [_], r#"finally"#)?;
+        indented!(w, [_], r#"{{"#)?;
+        for pin in &to_pin_name {
+            indented!(w, [_ _], r#"{}_pinned.Free();"#, pin)?;
+        }
+        indented!(w, [_], r#"}}"#)?;
+        indented!(w, r#"}}"#)
     }
 
     fn write_type_definitions(&self, w: &mut IndentWriter) -> Result<(), Error> {
@@ -325,6 +385,13 @@ pub trait CSharpWriter {
 
         indented!(w, r#"public partial struct {} : IEnumerable<{}>"#, context_type_name, type_string)?;
         indented!(w, r#"{{"#)?;
+
+        // Ctor
+        indented!(w, [_], r#"public {}(GCHandle handle, ulong count)"#, context_type_name)?;
+        indented!(w, [_], r#"{{"#)?;
+        indented!(w, [_ _], r#"this.data = handle.AddrOfPinnedObject();"#)?;
+        indented!(w, [_ _], r#"this.len = count;"#)?;
+        indented!(w, [_], r#"}}"#)?;
 
         // Getter
         indented!(w, [_], r#"public {} this[int i]"#, type_string)?;

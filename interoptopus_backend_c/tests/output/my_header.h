@@ -138,6 +138,8 @@ typedef struct my_library_ffislicevec3f32
     uint64_t len;
     } my_library_ffislicevec3f32;
 
+typedef my_library_vec3f32 (*my_library_fptr_fn_FFISliceVec3f32_rval_Vec3f32)(my_library_ffislicevec3f32 x0);
+
 
 void primitive_void();
 void primitive_void2();
@@ -177,6 +179,7 @@ uint32_t pattern_ascii_pointer_len(uint8_t* x, my_library_useasciistringpattern 
 uint32_t pattern_ffi_slice_1(my_library_ffisliceu32 ffi_slice);
 my_library_vec3f32 pattern_ffi_slice_2(my_library_ffislicevec3f32 ffi_slice, int32_t i);
 uint8_t pattern_ffi_slice_delegate(my_library_fptr_fn_FFISliceu8_rval_u8 callback);
+my_library_vec3f32 pattern_ffi_slice_delegate_huge(my_library_fptr_fn_FFISliceVec3f32_rval_Vec3f32 callback);
 my_library_ffioptioninner pattern_ffi_option_1(my_library_ffioptioninner ffi_slice);
 my_library_inner pattern_ffi_option_2(my_library_ffioptioninner ffi_slice);
 void my_api_init_v1(my_library_myapiv1* api);
