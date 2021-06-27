@@ -1,6 +1,6 @@
 [package]
 name = "interoptopus"
-description = "Why export to only a single language when you can have them all? The polyglot binding generator for your library. 🐙"
+description = "Why export to only a single language when you can have them all? The polyglot bindings generator for your library. 🐙"
 authors = ["Ralf Biedert <rb@xr.io>"]
 keywords = ["ffi", "code-generation", "bindings"]
 categories = ["api-bindings", "development-tools::ffi"]

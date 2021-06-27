@@ -7,7 +7,7 @@
 
 ## Interoptopus 🐙
 
-Why export to only a single language when you can have them all? The polyglot binding generator for your library.
+Why export to only a single language when you can have them all? The polyglot bindings generator for your library.
 
 <br>
 
@@ -86,7 +86,7 @@ Generated low-level bindings should be "zero cost" w.r.t. hand-crafted bindings 
 have an inherent, language-specific cost. For C# that cost can be almost 0, for Python CFFI it can be high. Patterns and convenience
 helpers might add additional overhead.
 
-If you **need API design guidance** the following (wip) [**C# call-cost table**](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_csharp/benches/BENCHMARK_RESULTS.md) can help.
+If you **need API design guidance** the following (wip) [**C# call-cost table**](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_csharp/benches/BENCHMARK_RESULTS.md)<sup>🔥</sup> can help.
 
 ### Current Status
 
