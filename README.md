@@ -97,8 +97,6 @@ we'd like to talk about it before it happens.
 an interop test (i.e., a backend test running C# / Python against a DLL invoking that code)
 in at least one included backend.
 
-<strike>test</strike>
-
 [Latest Version]: https://img.shields.io/crates/v/interoptopus.svg
 [crates.io]: https://crates.io/crates/interoptopus
 [MIT]: https://img.shields.io/badge/license-MIT-blue.svg
