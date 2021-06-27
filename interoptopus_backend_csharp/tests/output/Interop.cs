@@ -53,6 +53,12 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_i64")]
         public static extern long primitive_i64(long x);
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "many_args_5")]
+        public static extern long many_args_5(long x0, long x1, long x2, long x3, long x4);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "many_args_10")]
+        public static extern long many_args_10(long x0, long x1, long x2, long x3, long x4, long x5, long x6, long x7, long x8, long x9);
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ptr")]
         public static extern IntPtr ptr(ref long x);
 

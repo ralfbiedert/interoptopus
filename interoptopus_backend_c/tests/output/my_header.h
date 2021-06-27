@@ -150,6 +150,8 @@ int8_t primitive_i8(int8_t x);
 int16_t primitive_i16(int16_t x);
 int32_t primitive_i32(int32_t x);
 int64_t primitive_i64(int64_t x);
+int64_t many_args_5(int64_t x0, int64_t x1, int64_t x2, int64_t x3, int64_t x4);
+int64_t many_args_10(int64_t x0, int64_t x1, int64_t x2, int64_t x3, int64_t x4, int64_t x5, int64_t x6, int64_t x7, int64_t x8, int64_t x9);
 int64_t* ptr(int64_t* x);
 int64_t* ptr_mut(int64_t* x);
 int64_t** ptr_ptr(int64_t** x);

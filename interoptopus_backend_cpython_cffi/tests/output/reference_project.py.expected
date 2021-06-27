@@ -143,6 +143,8 @@ int8_t primitive_i8(int8_t x);
 int16_t primitive_i16(int16_t x);
 int32_t primitive_i32(int32_t x);
 int64_t primitive_i64(int64_t x);
+int64_t many_args_5(int64_t x0, int64_t x1, int64_t x2, int64_t x3, int64_t x4);
+int64_t many_args_10(int64_t x0, int64_t x1, int64_t x2, int64_t x3, int64_t x4, int64_t x5, int64_t x6, int64_t x7, int64_t x8, int64_t x9);
 int64_t* ptr(int64_t* x);
 int64_t* ptr_mut(int64_t* x);
 int64_t** ptr_ptr(int64_t** x);
@@ -679,6 +681,46 @@ class raw:
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.primitive_i64(x)
+
+    def many_args_5(x0, x1, x2, x3, x4):
+        """"""
+        global _api
+        if hasattr(x0, "_ctx"):
+            x0 = x0._ctx[0]
+        if hasattr(x1, "_ctx"):
+            x1 = x1._ctx[0]
+        if hasattr(x2, "_ctx"):
+            x2 = x2._ctx[0]
+        if hasattr(x3, "_ctx"):
+            x3 = x3._ctx[0]
+        if hasattr(x4, "_ctx"):
+            x4 = x4._ctx[0]
+        return _api.many_args_5(x0, x1, x2, x3, x4)
+
+    def many_args_10(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9):
+        """"""
+        global _api
+        if hasattr(x0, "_ctx"):
+            x0 = x0._ctx[0]
+        if hasattr(x1, "_ctx"):
+            x1 = x1._ctx[0]
+        if hasattr(x2, "_ctx"):
+            x2 = x2._ctx[0]
+        if hasattr(x3, "_ctx"):
+            x3 = x3._ctx[0]
+        if hasattr(x4, "_ctx"):
+            x4 = x4._ctx[0]
+        if hasattr(x5, "_ctx"):
+            x5 = x5._ctx[0]
+        if hasattr(x6, "_ctx"):
+            x6 = x6._ctx[0]
+        if hasattr(x7, "_ctx"):
+            x7 = x7._ctx[0]
+        if hasattr(x8, "_ctx"):
+            x8 = x8._ctx[0]
+        if hasattr(x9, "_ctx"):
+            x9 = x9._ctx[0]
+        return _api.many_args_10(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9)
 
     def ptr(x):
         """"""

@@ -36,6 +36,8 @@ interoptopus::inventory!(
         functions::primitive_i16,
         functions::primitive_i32,
         functions::primitive_i64,
+        functions::many_args_5,
+        functions::many_args_10,
         functions::ptr,
         functions::ptr_mut,
         functions::ptr_ptr,

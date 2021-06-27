@@ -33,9 +33,20 @@ profile: --release
  
 | Construct | µs per 1k calls |
 | --- | --- |
-| `primitive_void()` | 8 |
+| `primitive_void()` | 7 |
 | `primitive_u8(0)` | 8 |
 | `primitive_u16(0)` | 8 |
-| `primitive_u32(0)` | 8 |
+| `primitive_u32(0)` | 9 |
+| `primitive_u64(0)` | 9 |
+| `many_args_5(0, 0, 0, 0, 0)` | 10 |
+| `many_args_10(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)` | 14 |
 | `primitive_u64(0)` | 8 |
-| `pattern_ascii_pointer_1('hello world')` | 44 |
+| `ptr(x)` | 9 |
+| `ptr_mut(x)` | 9 |
+| `ref_simple(x)` | 8 |
+| `ref_option(x)` | 9 |
+| `tupled(new Tupled())` | 9 |
+| `complex_args_1(new Vec3f32(), ref e)` | 12 |
+| `callback(x => x, 0)` | 43 |
+| `pattern_ffi_option_1(new FFIOptionInner())` | 9 |
+| `pattern_ascii_pointer_1('hello world')` | 43 |

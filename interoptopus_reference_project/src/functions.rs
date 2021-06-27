@@ -74,6 +74,18 @@ pub extern "C" fn primitive_i64(x: i64) -> i64 {
 
 #[ffi_function]
 #[no_mangle]
+pub extern "C" fn many_args_5(x0: i64, x1: i64, x2: i64, x3: i64, x4: i64) -> i64 {
+    x0 + x1 + x2 + x3 + x4
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn many_args_10(x0: i64, x1: i64, x2: i64, x3: i64, x4: i64, x5: i64, x6: i64, x7: i64, x8: i64, x9: i64) -> i64 {
+    x0 + x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
+}
+
+#[ffi_function]
+#[no_mangle]
 pub extern "C" fn ptr(x: *const i64) -> *const i64 {
     x
 }

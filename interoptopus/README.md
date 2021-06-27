@@ -16,7 +16,7 @@ Huh?
 - The world, however, is running Unity, C, Python, ... all at the same time.
 - "Not a problem", you say, "I'll just use Interoptopus".
 
-And our hero lived happily<sup>*</sup> ever after.
+And you'll live happily<sup>*</sup> ever after.
 
 <sub>*Actual results may depend on other life choices.</sub>
 
@@ -80,14 +80,13 @@ As a rule of thumb we recommend to be slightly conservative with your signatures
 well and it's is easy to accidentally pass an outlived pointer or doubly alias a `&mut X` on reentrant functions.
 
 
-### Performance
+### Performance 🏁
 
-- Generated low-level bindings should be "zero cost" w.r.t. hand-crafted bindings for that language.
-- Even hand-crafted bindings have an inherent, language-specific cost.
-- For C# that cost can be almost 0, for Python CFFI it can be high.
-- Patterns and convenience helpers might add additional overhead.
+Generated low-level bindings should be "zero cost" w.r.t. hand-crafted bindings for that language. However, even hand-crafted bindings
+have an inherent, language-specific cost. For C# that cost can be almost 0, for Python CFFI it can be high. Patterns and convenience
+helpers might add additional overhead.
 
-If you need API design guidance the following (wip) [**C# call-cost table**](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_csharp/benches/BENCHMARK_RESULTS.md) can help.
+If you **need API design guidance** the following (wip) [**C# call-cost table**](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_csharp/benches/BENCHMARK_RESULTS.md) can help.
 
 ### Current Status
 
