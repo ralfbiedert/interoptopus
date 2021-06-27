@@ -80,6 +80,14 @@ As a rule of thumb we recommend to be slightly conservative with your signatures
 well and it's is easy to accidentally pass an outlived pointer or doubly alias a `&mut X` on reentrant functions.
 
 
+### Runtime Performance
+
+- Generated low-level bindings should be "zero cost" w.r.t. hand-crafted bindings for that language.
+- Even hand-crafted bindings have an inherent, language-specific cost. For C# it can be almost 0, for Python CFFI it can be high.
+- Patterns and convenience helpers might add additional overhead.
+
+If you need API design guidance the following (wip) [C# call-cost table]() can help.
+
 ### Current Status
 
 - June 20, 2021 - Alpha. Has generated simple working<sup>TM</sup> bindings for a few projects for a week now, many things missing.

@@ -50,3 +50,10 @@ fn bindings_work() -> Result<(), Error> {
     run_dotnet_command_if_installed("tests/output/", "build")?;
     Ok(())
 }
+
+#[test]
+#[cfg_attr(miri, ignore)]
+fn prepare_benchmarks() -> Result<(), Error> {
+    generate_bindings_multi("benches/Interop")?;
+    Ok(())
+}

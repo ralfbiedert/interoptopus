@@ -7,6 +7,7 @@ use crate::types::{
 use interoptopus::ffi_function;
 use interoptopus::patterns::success_enum::panics_and_errors_to_ffi_enum;
 use std::ptr::null;
+use std::time::Duration;
 
 #[ffi_function]
 #[no_mangle]
@@ -190,4 +191,10 @@ pub extern "C" fn namespaced_type(x: common::Vec) -> common::Vec {
 #[no_mangle]
 pub extern "C" fn panics() -> FFIError {
     panics_and_errors_to_ffi_enum(|| panic!("Oh no"))
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn sleep(millis: u64) {
+    std::thread::sleep(Duration::from_millis(millis));
 }
