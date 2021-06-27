@@ -25,5 +25,16 @@ namespace interop_test
             });
         }
 
+        [Fact]
+        public void pattern_api_entry()
+        {
+            var api = Interop.my_api_init_v1();
+            var input = new Tupled {x0 = 10};
+            var output = api.tupled(input);
+            
+            Assert.Equal(input.x0, output.x0);
+            
+        }
+
     }
 }

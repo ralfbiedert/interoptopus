@@ -19,7 +19,7 @@ impl<X0, R> CallbackXY<X0, R> {
     }
 }
 
-impl<X0, R> CTypeInfo for CallbackXY<X0, R>
+unsafe impl<X0, R> CTypeInfo for CallbackXY<X0, R>
 where
     X0: CTypeInfo,
     R: CTypeInfo,
@@ -46,7 +46,7 @@ impl<X0, X1, R> CallbackXXY<X0, X1, R> {
     }
 }
 
-impl<X0, X1, R> CTypeInfo for CallbackXXY<X0, X1, R>
+unsafe impl<X0, X1, R> CTypeInfo for CallbackXXY<X0, X1, R>
 where
     X0: CTypeInfo,
     X1: CTypeInfo,
@@ -61,7 +61,7 @@ where
     }
 }
 
-impl<X0, X1, R> CTypeInfo for Option<CallbackXXY<X0, X1, R>>
+unsafe impl<X0, X1, R> CTypeInfo for Option<CallbackXXY<X0, X1, R>>
 where
     X0: CTypeInfo,
     X1: CTypeInfo,

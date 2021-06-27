@@ -2,7 +2,7 @@ mod common;
 mod ffi;
 mod thirdparty;
 
-interoptopus::inventory_function!(
+interoptopus::inventory!(
     ffi_inventory,
     [ffi::THE_MAGIC_CONSTANT],
     [

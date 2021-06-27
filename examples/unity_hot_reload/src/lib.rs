@@ -7,4 +7,4 @@ extern "C" fn do_math(x: u32) -> u32 {
     x + 1
 }
 
-interoptopus::inventory_function!(ffi_inventory, [], [do_math], []);
+interoptopus::inventory!(ffi_inventory, [], [do_math], []);

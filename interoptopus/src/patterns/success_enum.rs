@@ -27,9 +27,11 @@ use std::panic::AssertUnwindSafe;
 /// }
 /// ```
 pub trait Success {
-    /// This variant
+    /// The variant to return when everything went OK, usually the variant with value `0`.
     const SUCCESS: Self;
+    /// Signals a null pointer was passed where an actual element was needed.
     const NULL: Self;
+    /// The panic variant. Once this is observed no further calls should be attempted.
     const PANIC: Self;
 }
 
@@ -54,8 +56,17 @@ impl SuccessEnum {
     }
 }
 
-/// Helper to transform [`Error`] types to [`Success`] enums inside `extern "C"` functions.
-pub fn panics_and_errors_to_ffi_error<E, FE: Success>(f: impl FnOnce() -> Result<(), E>) -> FE
+/// Helper to transform [`Result`] types to [`Success`] enums inside `extern "C"` functions.
+///
+/// This function executes the given closure `f`. If `f` returns `Ok(())` the `SUCCESS`
+/// variant is returned. On a panic or `Err` the respective error variant is returned instead.
+///
+/// # Safety
+///
+/// Once [`Success::PANIC`] has been observed the enum's recipient should stop calling this API
+/// (and probably gracefully shutdown or restart), as any subsequent call risks causing a
+/// process abort.
+pub fn panics_and_errors_to_ffi_enum<E, FE: Success>(f: impl FnOnce() -> Result<(), E>) -> FE
 where
     FE: From<Result<(), E>>,
 {

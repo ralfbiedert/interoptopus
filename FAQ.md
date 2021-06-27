@@ -18,21 +18,6 @@
   Right now it doesn't like `struct S<T: X>`. Instead, try `struct S<T> where T: X`.
 
 
-- **Ok, how many hours does it actually take to create a new backend?**
-
-  Judging from creating the existing backends, and assuming you've done some FFI 
-  calls from that language to a C library, I'd say:
-
-  - **1h** - browsing an existing backend and understanding how CTypes work
-  - **2h** - producing MVP output that can call a single `hello_world()`
-  - **4h** - generate bindings for arbitrary functions with primitive parameters
-  - **1d** - also produce `structs` and `enums`  
-  - **2d** - support the entire C API surface
-  - **3-5d** - have clean, idiomatic wrappers for all patterns and run automated reference tests  
-
-  See below for details. 
-
-
 - **Who's the target audience for this?**
   
   Anyone writing 'system libraries' that need to be consumable from multiple 
@@ -85,7 +70,7 @@
 1) from `Interop::write_to` produce some output, fix errors as they appear
 1) create UI test against `interoptopus_reference_project` to ensure quality
 
-**Tips**
+**Some Tips**
 
 Once you understand how Interoptopus abstracts APIs writing a backend is quite simple: 
 
@@ -106,6 +91,17 @@ Once you understand how Interoptopus abstracts APIs writing a backend is quite s
   (e.g, an AsciiPointer is just a `*const u8`) and call it a day. However, when exporting larger APIs 
   (like 100+ functions) producing _idiomatic_ pattern bindings will be a good investment. 
 
+**How long will it take?**
+
+Judging from creating the existing backends, and assuming you've done some FFI
+calls from that language to a C library, I'd say:
+
+- **1h** - browsing an existing backend and understanding how CTypes work
+- **2h** - producing MVP output that can call a single `hello_world()`
+- **4h** - generate bindings for arbitrary functions with primitive parameters
+- **1d** - also produce `structs` and `enums`
+- **2d** - support the entire C API surface
+- **3-5d** - have clean, idiomatic wrappers for all patterns and run automated reference tests
 
 
 

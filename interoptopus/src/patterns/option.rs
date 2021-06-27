@@ -99,7 +99,7 @@ impl<T: Default> From<Option<T>> for FFIOption<T> {
     }
 }
 
-impl<T> CTypeInfo for FFIOption<T>
+unsafe impl<T> CTypeInfo for FFIOption<T>
 where
     T: CTypeInfo,
 {

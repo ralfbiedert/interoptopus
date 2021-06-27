@@ -3,7 +3,7 @@ use crate::patterns::LibraryPattern;
 use crate::util::{ctypes_from_functions, extract_namespaces_from_types};
 use std::collections::HashSet;
 
-/// Represents all FFI-relevant items, produced via [`inventory_function`](crate::inventory_function), ingested by backends.
+/// Represents all FFI-relevant items, produced via [`inventory`](crate::inventory), ingested by backends.
 #[derive(Clone, Debug, PartialOrd, PartialEq)]
 pub struct Library {
     functions: Vec<Function>,

@@ -1,6 +1,6 @@
 [package]
 name = "interoptopus"
-description = "Extensible, lightweight, convenient FFI bindings for any language calling Rust. C#, C, Python included. Add yours in 4 hours. No pull request needed. 🐙"
+description = "Why export to only a single language when you can have them all? The polyglot binding generator for your library. 🐙"
 authors = ["Ralf Biedert <rb@xr.io>"]
 keywords = ["ffi", "code-generation", "bindings"]
 categories = ["api-bindings", "development-tools::ffi"]

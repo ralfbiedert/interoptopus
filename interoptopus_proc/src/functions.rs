@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use darling::FromMeta;
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
-use syn::{AttributeArgs, FnArg, ItemFn, Pat, ReturnType, Type};
+use syn::{AttributeArgs, FnArg, ItemFn, Pat, ReturnType, Signature, Type};
 
 use crate::util;
 use syn::spanned::Spanned;
@@ -17,11 +17,32 @@ pub struct FFIFunctionAttributes {
     debug: bool,
 }
 
+pub fn fn_signature_type(signature: &Signature) -> TokenStream {
+    let rval = &signature.output;
+    let abi = &signature.abi;
+    let mut inputs = Vec::new();
+
+    for input in &signature.inputs {
+        match input {
+            FnArg::Typed(x) => {
+                inputs.push(x.ty.clone());
+            }
+            FnArg::Receiver(_) => panic!("Does not support receivers"),
+        }
+    }
+
+    quote! {
+        #abi fn(#(#inputs),*) #rval
+    }
+}
+
 pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
     let item_fn: ItemFn = syn::parse2(input.clone()).expect("Must be item.");
     let ffi_attributes: FFIFunctionAttributes = FFIFunctionAttributes::from_list(&attr).unwrap();
 
     let span = item_fn.span();
+
+    let signature = fn_signature_type(&item_fn.sig);
 
     let function_ident = item_fn.sig.ident;
     let function_name = function_ident.to_string();
@@ -101,7 +122,9 @@ pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
         #[allow(non_camel_case_types)]
         pub(crate) struct #function_ident {}
 
-        impl interoptopus::lang::rust::FunctionInfo for #function_ident {
+        unsafe impl interoptopus::lang::rust::FunctionInfo for #function_ident {
+            type Signature = #signature;
+
             fn function_info() -> interoptopus::lang::c::Function {
 
                 let mut doc_lines = std::vec::Vec::new();

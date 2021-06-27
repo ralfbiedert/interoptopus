@@ -30,7 +30,7 @@ pub fn ffi_constant(_attr: AttributeArgs, input: TokenStream) -> TokenStream {
         #[allow(non_camel_case_types)]
         pub(crate) struct #const_ident {}
 
-        impl interoptopus::lang::rust::ConstantInfo for #const_ident {
+        unsafe impl interoptopus::lang::rust::ConstantInfo for #const_ident {
             fn constant_info() -> interoptopus::lang::c::Constant {
 
                 let documentation = interoptopus::lang::c::Documentation::from_line(#doc_line);

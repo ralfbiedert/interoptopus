@@ -102,8 +102,6 @@ typedef struct my_library_genericu8
     uint8_t* x;
     } my_library_genericu8;
 
-typedef my_library_ffierror (*my_library_fptr_fn_Vec3f32_pconst_Empty_rval_FFIError)(my_library_vec3f32 x0, my_library_empty* x1);
-
 typedef my_library_tupled (*my_library_fptr_fn_Tupled_rval_Tupled)(my_library_tupled x0);
 
 typedef bool (*my_library_fptr_fn_pmut_i64_rval_bool)(int64_t* x0);
@@ -126,12 +124,11 @@ typedef struct my_library_ffioptioninner
     uint8_t is_some;
     } my_library_ffioptioninner;
 
-typedef struct my_library_pointers
+typedef struct my_library_myapiv1
     {
-    my_library_fptr_fn_pmut_i64_rval_bool f1;
-    my_library_fptr_fn_Tupled_rval_Tupled f2;
-    my_library_fptr_fn_Vec3f32_pconst_Empty_rval_FFIError f3;
-    } my_library_pointers;
+    my_library_fptr_fn_pmut_i64_rval_bool ref_mut_option;
+    my_library_fptr_fn_Tupled_rval_Tupled tupled;
+    } my_library_myapiv1;
 
 typedef uint8_t (*my_library_fptr_fn_FFISliceu8_rval_u8)(my_library_ffisliceu8 x0);
 
@@ -179,7 +176,7 @@ my_library_vec3f32 pattern_ffi_slice_2(my_library_ffislicevec3f32 ffi_slice, int
 uint8_t pattern_ffi_slice_delegate(my_library_fptr_fn_FFISliceu8_rval_u8 callback);
 my_library_ffioptioninner pattern_ffi_option_1(my_library_ffioptioninner ffi_slice);
 my_library_inner pattern_ffi_option_2(my_library_ffioptioninner ffi_slice);
-my_library_ffierror api_entry_points(my_library_pointers* x);
+my_library_myapiv1 my_api_init_v1();
 my_library_ffierror pattern_service_create(my_library_context** context_ptr, uint32_t value);
 my_library_ffierror pattern_service_destroy(my_library_context** context_ptr);
 uint32_t pattern_service_method(my_library_context* context);

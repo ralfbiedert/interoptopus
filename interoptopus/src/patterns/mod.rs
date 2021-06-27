@@ -7,18 +7,55 @@
 //! and bindings  for it. In any case, regardless whether a pattern is supported by a backend or not,
 //! fallback bindings will be available.
 //!
-//! ## Pattern Support
+//! ## Pattern Usage
 //!
-//! Patterns are exclusively designed _on top of_ existing, C-compatible functions and types.
+//! Unless otherwise stated, a pattern is used by, well, using it in a signature. For example,
+//! instead of using `*const u8` (or similar) in the following `print` function:
+//!
+//! ```
+//! # use interoptopus::ffi_function;
+//!
+//! #[ffi_function]
+//! #[no_mangle]
+//! pub extern "C" fn print_ptr(x: *const u8) {
+//!    // Write unsafe code to convert `x
+//! }
+//!
+//! ```
+//!
+//! you would instead use [`AsciiPointer`](crate::patterns::ascii_pointer::AsciiPointer):
+//!
+//! ```
+//! # use interoptopus::ffi_function;
+//! # use interoptopus::patterns::ascii_pointer::AsciiPointer;
+//! # use std::ffi::CStr;
+//!
+//! #[ffi_function]
+//! #[no_mangle]
+//! pub extern "C" fn print_ascii(x: AsciiPointer) {
+//!    // Call `x.as_str()` and handle Result
+//! }
+//!
+//! ```
+//!
+//! This has the added benefit that any backend supporting a specific pattern will also
+//! generate more **idiomatic code in the binding**. In the example above, C# might
+//! emit a `ref ubyte` or `IntPtr` type for the `print_ptr`, but will use a correctly marshalled
+//! `string` type for `print_ascii`.
+//!
+//!
+//! ## Pattern Backend Support
+//!
+//! Patterns are exclusively **designed _on top of_ existing, C-compatible functions and types**.
 //! That means a backend will handle a pattern in one of three ways:
 //!
 //! - The pattern is **supported** and the backend will generate the raw, underlying type and / or
 //! a language-specific abstraction that safely and conveniently handles it. Examples
-//! include converting an [`AsciiPointer`](ascii_pointer) to a C# `string`, or a [`class`](crate::patterns::class)
+//! include converting an [`AsciiPointer`](ascii_pointer) to a C# `string`, or a [`service`](crate::patterns::service)
 //! to a Python `class`.
 //!
-//! - The pattern is not supported and will be omitted **if the pattern was merely an aggregate** of
-//! existing items. Examples include the [`class`](crate::patterns::class) pattern in C which will not
+//! - The pattern is not supported and will be **omitted, if the pattern was merely an aggregate** of
+//! existing items. Examples include the [`service`](crate::patterns::service) pattern in C which will not
 //! be emitted. However, this will not pose a problem as all constituent types and methods (functions)
 //! are still available as raw bindings.
 //!
@@ -32,6 +69,7 @@ use crate::lang::c::{CType, CompositeType, PrimitiveType};
 use crate::patterns::service::Service;
 use crate::patterns::success_enum::SuccessEnum;
 
+pub mod api_entry;
 pub mod ascii_pointer;
 pub mod callbacks;
 pub mod option;

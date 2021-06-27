@@ -135,8 +135,8 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_option_2")]
         public static extern Inner pattern_ffi_option_2(FFIOptionInner ffi_slice);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "api_entry_points")]
-        public static extern FFIError api_entry_points(out Pointers x);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "my_api_init_v1")]
+        public static extern MyAPIv1 my_api_init_v1();
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_create")]
         public static extern FFIError pattern_service_create(out IntPtr context_ptr, uint value);
@@ -218,18 +218,17 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Phantomu8
+    public partial struct MyAPIv1
     {
-        public uint x;
+        public InteropDelegate_fn_pmut_i64_rval_bool ref_mut_option;
+        public InteropDelegate_fn_Tupled_rval_Tupled tupled;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Pointers
+    public partial struct Phantomu8
     {
-        public InteropDelegate_fn_pmut_i64_rval_bool f1;
-        public InteropDelegate_fn_Tupled_rval_Tupled f2;
-        public InteropDelegate_fn_Vec3f32_pconst_Empty_rval_FFIError f3;
+        public uint x;
     }
 
     [Serializable]
@@ -286,9 +285,6 @@ namespace My.Company
         public float y;
         public float z;
     }
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate FFIError InteropDelegate_fn_Vec3f32_pconst_Empty_rval_FFIError(Vec3f32 x0, ref Empty x1);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate Tupled InteropDelegate_fn_Tupled_rval_Tupled(Tupled x0);

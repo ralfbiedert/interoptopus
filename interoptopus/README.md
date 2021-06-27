@@ -7,16 +7,23 @@
 
 ## Interoptopus 🐙
 
-Extensible, lightweight, convenient FFI bindings for _any_<sup>*</sup> language calling Rust.
+Why export to only a single language when you can have them all? The polyglot binding generator for your library.
 
-Escape hatchets included. 🪓
+<br>
 
-<sup>*</sup> C#, C, Python provided. Add yours in 4 hours. No pull request needed.
+Huh?
+- Imagine you are writing this cool API and want the world to have it.
+- The world, however, is running Unity, C, Python, ... all at the same time.
+- "Not a problem", you say, "I'll just use Interoptopus".
+
+And our hero lived happily<sup>*</sup> ever after.
+
+<sub>*Actual results may depend on other life choices.</sub>
 
 ### Code you write ...
 
 ```rust
-use interoptopus::{ffi_function, ffi_type, inventory_function};
+use interoptopus::{ffi_function, ffi_type, inventory};
 
 #[ffi_type]
 #[repr(C)]
@@ -31,7 +38,8 @@ pub extern "C" fn my_function(input: Vec2) {
     println!("{}", input.x);
 }
 
-inventory_function!(ffi_inventory, [], [my_function], []);
+inventory!(ffi_inventory, [], [my_function], []);
+
 ```
 
 ### ... Interoptopus generates
@@ -41,10 +49,11 @@ inventory_function!(ffi_inventory, [], [my_function], []);
 | C# (incl. Unity) | [**interoptopus_backend_csharp**](https://crates.io/crates/interoptopus_backend_csharp) | [Interop.cs](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_csharp/tests/output/Interop.cs) |
 | C | [**interoptopus_backend_c**](https://crates.io/crates/interoptopus_backend_c) | [my_header.h](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_c/tests/output/my_header.h) |
 | Python [CFFI](https://cffi.readthedocs.io/en/latest/index.html) | [**interoptopus_backend_cpython_cffi**](https://crates.io/crates/interoptopus_backend_cpython_cffi) | [reference.py](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_cpython_cffi/tests/output/reference_project.py) |
-| Your language | Write your own backend! | - |
+| Your language | Write your own backend<sup>1</sup> | - |
 
+<sup>1</sup> Create your own backend in just a few hours. No pull request needed. [Pinkie promise](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md#new-backends).
 
-## Getting Started 🍼
+### Getting Started 🍼
 
 If you ...
 - want to **create a new API** see the [**example projects**](https://github.com/ralfbiedert/interoptopus/tree/master/examples),
@@ -53,11 +62,11 @@ If you ...
 ### Features
 
 - explicit, type-safe, **single source of truth** API definition in Rust,
-- **minimal on dependencies**, build time, tooling impact
-- if your **project compiles your bindings should work**<sup>TM, &#42;*cough*&#42;</sup> (i.e., generated and callable)
-- **extensible**, multiple backends, **easy to support new languages**, or totally change existing ones
 - **quality-of-life [patterns](crate::patterns)** on **both sides** (e.g., [options](crate::patterns::option), [slices](crate::patterns::slice), [services](crate::patterns::service), ...)
-- doesn't need build scripts, `cargo build` + `cargo test` **can produce and test** (if lang installed) generated bindings
+- **minimal on dependencies**, build time, tooling impact,
+- if your **project compiles your bindings should work**<sup>&#42;*cough*&#42;</sup> (i.e., generated and callable),
+- **extensible**, multiple backends, **easy to support new languages**, fully **customizable**,
+- **no scripts needed**, `cargo build` + `cargo test` **can produce and test** (if lang installed) generated bindings
 
 
 ### Supported Rust Constructs

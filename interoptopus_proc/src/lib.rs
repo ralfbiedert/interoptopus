@@ -100,7 +100,7 @@ pub fn ffi_type(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// # Surrogates
 ///
-/// When dealing with types outside of your control you will not be able to implement [`CTypeInfo`](crate::lang::rust::CTypeInfo) for them.
+/// When dealing with types outside of your control you will not be able to implement [`CTypeInfo`](interoptopus::lang::rust::CTypeInfo) for them.
 /// Instead you need a **surrogate**, a helper function which returns that info for the type.
 ///
 /// The surrogate's signature is:
@@ -138,7 +138,7 @@ pub fn ffi_function(attr: TokenStream, item: TokenStream) -> TokenStream {
 
 /// Enables a `const` to appear in generated bindings.
 ///
-/// This will derive [`ConstantInfo`](crate::lang::rust::ConstantInfo) for a helper struct of the
+/// This will derive [`ConstantInfo`](interoptopus::lang::rust::ConstantInfo) for a helper struct of the
 /// same name containing the const's name and value.
 ///
 /// Constant evaluation is supported.

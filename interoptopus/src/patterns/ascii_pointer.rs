@@ -57,7 +57,7 @@ impl<'a> AsciiPointer<'a> {
     }
 }
 
-impl<'a> CTypeInfo for AsciiPointer<'a> {
+unsafe impl<'a> CTypeInfo for AsciiPointer<'a> {
     fn type_info() -> CType {
         CType::Pattern(TypePattern::AsciiPointer)
     }

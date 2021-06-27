@@ -35,7 +35,7 @@ fn derive_variant_info(item: ItemEnum, idents: &[Ident], names: &[String], value
     let name_ident = syn::Ident::new(&name, span);
 
     quote! {
-        impl interoptopus::lang::rust::VariantInfo for #name_ident {
+        unsafe impl interoptopus::lang::rust::VariantInfo for #name_ident {
             fn variant_info(&self) -> interoptopus::lang::c::Variant {
                 match self {
                     #(
@@ -112,7 +112,7 @@ pub fn ffi_type_enum(attr: &FFITypeAttributes, input: TokenStream, item: ItemEnu
 
         #variant_infos
 
-        impl interoptopus::lang::rust::CTypeInfo for #name_ident {
+        unsafe impl interoptopus::lang::rust::CTypeInfo for #name_ident {
             fn type_info() -> interoptopus::lang::c::CType {
                 use interoptopus::lang::rust::VariantInfo;
 
@@ -191,7 +191,21 @@ pub fn ffi_type_struct(attr: &FFITypeAttributes, input: TokenStream, item: ItemS
             field_types.push(quote! { #ident()  })
         } else {
             let token = match &field.ty {
-                Type::Path(x) => x.path.to_token_stream(),
+                Type::Path(x) => {
+                    if let Some(qself) = &x.qself {
+                        let ty = &qself.ty;
+
+                        // Ok, I really don't know if this is kosher. After some debugging it seems to work,
+                        // but this is probably brittle AF.
+
+                        let first = x.path.segments.first().expect("Must have last path segment.");
+                        let middle = x.path.segments.iter().skip(1).rev().skip(1).rev().collect::<Vec<_>>();
+                        let last = x.path.segments.last().expect("Must have last path segment.");
+                        quote! { < #ty as #first #(:: #middle)*> :: #last }
+                    } else {
+                        x.path.to_token_stream()
+                    }
+                }
                 Type::Ptr(x) => x.to_token_stream(),
                 Type::Reference(x) => x.to_token_stream(),
                 _ => {
@@ -206,7 +220,7 @@ pub fn ffi_type_struct(attr: &FFITypeAttributes, input: TokenStream, item: ItemS
     quote! {
         #input
 
-        impl #generics_params interoptopus::lang::rust::CTypeInfo for #name_ident #generics_params #where_clause {
+        unsafe impl #generics_params interoptopus::lang::rust::CTypeInfo for #name_ident #generics_params #where_clause {
 
             fn type_info() -> interoptopus::lang::c::CType {
                 let documentation = interoptopus::lang::c::Documentation::from_line(#doc_line);
@@ -221,7 +235,8 @@ pub fn ffi_type_struct(attr: &FFITypeAttributes, input: TokenStream, item: ItemS
                 #({
                     let documentation = interoptopus::lang::c::Documentation::from_line(#field_docs);
                     let the_type = #field_types;
-                    fields.push(interoptopus::lang::c::Field::with_documentation(#field_names.to_string(), the_type, #field_visibility, documentation));
+                    let field = interoptopus::lang::c::Field::with_documentation(#field_names.to_string(), the_type, #field_visibility, documentation);
+                    fields.push(field);
                 })*
 
                 let name = format!("{}{}", #c_struct_name.to_string(), generics.join(""));
@@ -242,7 +257,7 @@ pub fn ffi_type_struct_opqaue(attr: &FFITypeAttributes, input: TokenStream, item
     quote! {
         #input
 
-        impl interoptopus::lang::rust::CTypeInfo for #name_ident {
+        unsafe impl interoptopus::lang::rust::CTypeInfo for #name_ident {
 
             fn type_info() -> interoptopus::lang::c::CType {
                 let documentation = interoptopus::lang::c::Documentation::from_line(#doc_line);

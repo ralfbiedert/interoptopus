@@ -175,16 +175,8 @@ class TestPatterns(unittest.TestCase):
     #     option = r.Op
 
     def test_api_entry(self):
-        pointers = r.Pointers()
-        tuple = r.Tupled()
-
-        tuple.x0 = 123
-
-        r.raw.api_entry_points(pointers.ptr())
-
-        print(pointers._ctx)
-        tuple2 = pointers.f2(tuple._ctx[0])
-        print(tuple2.x0)
+        api = r.raw.my_api_init_v1()
+        print(api)
 
 
 if __name__ == '__main__':

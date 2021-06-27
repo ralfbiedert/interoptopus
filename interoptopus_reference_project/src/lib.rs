@@ -21,7 +21,7 @@ pub mod patterns {
 }
 pub mod types;
 
-interoptopus::inventory_function!(
+interoptopus::inventory!(
     ffi_inventory,
     [constants::U8, constants::F32_MIN_POSITIVE, constants::COMPUTED_I32],
     [
@@ -62,7 +62,7 @@ interoptopus::inventory_function!(
         patterns::slice::pattern_ffi_slice_delegate,
         patterns::option::pattern_ffi_option_1,
         patterns::option::pattern_ffi_option_2,
-        patterns::api_entry::api_entry_points
+        patterns::api_entry::my_api_init_v1
     ],
     [
         patterns::service_manual::my_service_pattern_context,

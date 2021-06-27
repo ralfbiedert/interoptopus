@@ -61,7 +61,7 @@ impl<'a, T> Deref for FFISlice<'a, T> {
     }
 }
 
-impl<'a, T> CTypeInfo for FFISlice<'a, T>
+unsafe impl<'a, T> CTypeInfo for FFISlice<'a, T>
 where
     T: CTypeInfo,
 {

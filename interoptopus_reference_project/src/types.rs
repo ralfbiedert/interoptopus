@@ -155,3 +155,29 @@ pub mod common {
         pub z: f64,
     }
 }
+
+pub mod associated_types {
+    use interoptopus::ffi_type;
+
+    pub trait Helper {
+        type X;
+    }
+
+    #[ffi_type]
+    #[repr(C)]
+    pub struct Chicken(u8);
+
+    #[ffi_type]
+    #[repr(C)]
+    pub struct Cow(u16);
+
+    impl Helper for Chicken {
+        type X = Cow;
+    }
+
+    #[ffi_type]
+    #[repr(C)]
+    pub struct FieldsViaAssociatedType {
+        pub x: <Chicken as Helper>::X,
+    }
+}

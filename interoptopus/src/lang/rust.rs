@@ -4,22 +4,50 @@ use crate::lang::c::{CType, Constant, ConstantValue, FnPointerType, Function, Fu
 use std::ptr::NonNull;
 
 /// Implemented for a constant-helper produced by [`ffi_constant`](crate::ffi_constant), gives meta info for a constant.
-pub trait ConstantInfo {
+///
+/// # Safety
+///
+/// This trait must be implemented correctly, or else the generated bindings and this constant will
+/// disagree in type or value, causing UB.
+pub unsafe trait ConstantInfo {
     fn constant_info() -> Constant;
 }
 
 /// Implemented for a type via [`ffi_type`](crate::ffi_type), gives meta info for a type.
-pub trait CTypeInfo {
+///
+/// # Safety
+///
+/// This trait must be implemented correctly, or else the generated bindings disagree in
+/// their type layout from the actual Rust type, leading to immediate UB upon function invocation.
+pub unsafe trait CTypeInfo {
     fn type_info() -> CType;
 }
 
 /// Implemented for a function-helper produced by [`ffi_function`](crate::ffi_function), gives meta info for a function.
-pub trait FunctionInfo {
+///
+/// # Safety
+///
+/// This trait must be implemented correctly, or else the generated bindings signatures disagree from
+/// their Rust counterparts, leading to immediate UB upon function invocation.
+pub unsafe trait FunctionInfo {
+    /// The function as a `fn` type.
+    type Signature;
+
+    // TODO: Code gen for this is total mess, ignore.
+    // The Callback<> surrogate type to obtain proper CTypes when our extern "C" fn() can't be inferred
+    // properly because of lifetimes.
+    // type Surrogate;
+
     fn function_info() -> Function;
 }
 
 /// Implemented for an enum via [`ffi_type`](crate::ffi_type) allows us to translate a variant into its meta information.
-pub trait VariantInfo {
+///
+/// # Safety
+///
+/// This trait must be implemented correctly, or else the generated bindings disagree on variant values
+/// with their Rust counterparts, leading to UB when invoked with non-existent numbers.
+pub unsafe trait VariantInfo {
     fn variant_info(&self) -> Variant;
 }
 
@@ -28,7 +56,7 @@ macro_rules! impl_ctype_primitive {
         $rust_type:ty,
         $primitive:expr
     ) => {
-        impl CTypeInfo for $rust_type {
+        unsafe impl CTypeInfo for $rust_type {
             fn type_info() -> CType {
                 CType::Primitive($primitive)
             }
@@ -91,7 +119,7 @@ impl_ctype_primitive!(Option<std::num::NonZeroI16>, PrimitiveType::I16);
 impl_ctype_primitive!(Option<std::num::NonZeroI32>, PrimitiveType::I32);
 impl_ctype_primitive!(Option<std::num::NonZeroI64>, PrimitiveType::I64);
 
-impl<T> CTypeInfo for NonNull<T>
+unsafe impl<T> CTypeInfo for NonNull<T>
 where
     T: CTypeInfo,
 {
@@ -100,7 +128,7 @@ where
     }
 }
 
-impl<'a, T> CTypeInfo for &'a T
+unsafe impl<'a, T> CTypeInfo for &'a T
 where
     T: CTypeInfo + Sized + 'static,
 {
@@ -109,7 +137,7 @@ where
     }
 }
 
-impl<'a, T> CTypeInfo for &'a mut T
+unsafe impl<'a, T> CTypeInfo for &'a mut T
 where
     T: CTypeInfo + Sized + 'static,
 {
@@ -118,7 +146,7 @@ where
     }
 }
 
-impl<'a, T> CTypeInfo for *const T
+unsafe impl<'a, T> CTypeInfo for *const T
 where
     T: CTypeInfo + Sized + 'static,
 {
@@ -127,7 +155,7 @@ where
     }
 }
 
-impl<'a, T> CTypeInfo for *mut T
+unsafe impl<'a, T> CTypeInfo for *mut T
 where
     T: CTypeInfo + Sized + 'static,
 {
@@ -136,7 +164,7 @@ where
     }
 }
 
-impl<'a, T> CTypeInfo for Option<&'a T>
+unsafe impl<'a, T> CTypeInfo for Option<&'a T>
 where
     T: CTypeInfo + Sized + 'static,
 {
@@ -145,7 +173,7 @@ where
     }
 }
 
-impl<'a, T> CTypeInfo for Option<&'a mut T>
+unsafe impl<'a, T> CTypeInfo for Option<&'a mut T>
 where
     T: CTypeInfo + Sized + 'static,
 {
@@ -154,7 +182,7 @@ where
     }
 }
 
-impl<R> CTypeInfo for extern "C" fn() -> R
+unsafe impl<R> CTypeInfo for extern "C" fn() -> R
 where
     R: CTypeInfo,
 {
@@ -164,7 +192,7 @@ where
     }
 }
 
-impl<R> CTypeInfo for Option<extern "C" fn() -> R>
+unsafe impl<R> CTypeInfo for Option<extern "C" fn() -> R>
 where
     R: CTypeInfo,
 {
@@ -174,7 +202,7 @@ where
     }
 }
 
-impl<T1, R> CTypeInfo for extern "C" fn(T1) -> R
+unsafe impl<T1, R> CTypeInfo for extern "C" fn(T1) -> R
 where
     T1: CTypeInfo,
     R: CTypeInfo,
@@ -185,7 +213,7 @@ where
     }
 }
 
-impl<'a, T1, R> CTypeInfo for Option<extern "C" fn(T1) -> R>
+unsafe impl<'a, T1, R> CTypeInfo for Option<extern "C" fn(T1) -> R>
 where
     T1: CTypeInfo + 'a,
     R: CTypeInfo + 'a,
@@ -196,7 +224,7 @@ where
     }
 }
 
-impl<'a, T1, T2, R> CTypeInfo for extern "C" fn(T1, T2) -> R
+unsafe impl<'a, T1, T2, R> CTypeInfo for extern "C" fn(T1, T2) -> R
 where
     T1: CTypeInfo + 'a,
     T2: CTypeInfo + 'a,
@@ -211,7 +239,7 @@ where
     }
 }
 
-impl<'a, T1, T2, R> CTypeInfo for Option<extern "C" fn(T1, T2) -> R>
+unsafe impl<'a, T1, T2, R> CTypeInfo for Option<extern "C" fn(T1, T2) -> R>
 where
     T1: CTypeInfo + 'a,
     T2: CTypeInfo + 'a,
@@ -226,7 +254,7 @@ where
     }
 }
 
-impl<'a, T1, T2, T3, R> CTypeInfo for extern "C" fn(T1, T2, T3) -> R
+unsafe impl<'a, T1, T2, T3, R> CTypeInfo for extern "C" fn(T1, T2, T3) -> R
 where
     T1: CTypeInfo + 'a,
     T2: CTypeInfo + 'a,
@@ -246,7 +274,7 @@ where
     }
 }
 
-impl<'a, T1, T2, T3, R> CTypeInfo for Option<extern "C" fn(T1, T2, T3) -> R>
+unsafe impl<'a, T1, T2, T3, R> CTypeInfo for Option<extern "C" fn(T1, T2, T3) -> R>
 where
     T1: CTypeInfo + 'a,
     T2: CTypeInfo + 'a,
