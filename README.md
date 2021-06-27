@@ -13,6 +13,7 @@ Escape hatchets included. 🪓
 
 <sup>*</sup> C#, C, Python provided. Add yours in 4 hours. No pull request needed.
 
+
 ### Code you write ...
 
 ```rust
@@ -95,6 +96,8 @@ we'd like to talk about it before it happens.
 - New features or patterns must be materialized in the reference project and accompanied by
 an interop test (i.e., a backend test running C# / Python against a DLL invoking that code)
 in at least one included backend.
+
+<strike>test</strike>
 
 [Latest Version]: https://img.shields.io/crates/v/interoptopus.svg
 [crates.io]: https://crates.io/crates/interoptopus
