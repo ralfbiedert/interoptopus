@@ -1,6 +1,7 @@
 use interoptopus::lang::c::{
     CType, CompositeType, ConstantValue, EnumType, Field, FnPointerType, Function, FunctionSignature, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
 };
+use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::safe_name;
 
@@ -71,6 +72,10 @@ pub trait CSharpTypeConverter {
         x.rust_name().to_string()
     }
 
+    fn named_callback_to_typename(&self, x: &NamedCallback) -> String {
+        x.name().to_string()
+    }
+
     /// Converts an Rust `fn()` to a C# delegate name such as `InteropDelegate`.
     fn fnpointer_to_typename(&self, x: &FnPointerType) -> String {
         vec!["InteropDelegate".to_string(), safe_name(&x.internal_name())].join("_")
@@ -91,7 +96,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::SuccessEnum(e) => self.enum_to_typename(e.the_enum()),
                 TypePattern::Slice(e) => self.composite_to_typename(e),
                 TypePattern::Option(e) => self.composite_to_typename(e),
-                TypePattern::NamedCallback(e) => self.fnpointer_to_typename(e.fnpointer()),
+                TypePattern::NamedCallback(e) => self.named_callback_to_typename(e),
             },
         }
     }
@@ -123,7 +128,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::SuccessEnum(e) => self.enum_to_typename(e.the_enum()),
                 TypePattern::Slice(x) => self.composite_to_typename(x),
                 TypePattern::Option(x) => self.composite_to_typename(x),
-                TypePattern::NamedCallback(x) => self.fnpointer_to_typename(x.fnpointer()),
+                TypePattern::NamedCallback(x) => self.named_callback_to_typename(x),
             },
         }
     }
@@ -142,7 +147,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::SuccessEnum(e) => self.enum_to_typename(e.the_enum()),
                 TypePattern::Slice(x) => self.composite_to_typename(x),
                 TypePattern::Option(x) => self.composite_to_typename(x),
-                TypePattern::NamedCallback(x) => self.fnpointer_to_typename(x.fnpointer()),
+                TypePattern::NamedCallback(x) => self.named_callback_to_typename(x),
             },
         }
     }

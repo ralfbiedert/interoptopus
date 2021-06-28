@@ -1,6 +1,7 @@
 use crate::config::Config;
 use crate::converter::{CSharpTypeConverter, Converter};
 use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, Meta, PrimitiveType, Variant, Visibility};
+use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{longest_common_prefix, IdPrettifier};
@@ -229,7 +230,7 @@ pub trait CSharpWriter {
                 TypePattern::NamedCallback(x) => {
                     // Handle this better way
                     if self.should_emit(&Meta::new()) {
-                        self.write_type_definition_fn_pointer(w, x.fnpointer())?;
+                        self.write_type_definition_named_callback(w, x)?;
                         w.newline()?;
                     }
                 }
@@ -242,6 +243,24 @@ pub trait CSharpWriter {
         self.write_type_definition_fn_pointer_annotation(w, the_type)?;
         self.write_type_definition_fn_pointer_body(w, the_type)?;
         Ok(())
+    }
+
+    fn write_type_definition_named_callback(&self, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
+        self.write_type_definition_fn_pointer_annotation(w, the_type.fnpointer())?;
+        self.write_type_definition_named_callback_body(w, the_type)?;
+        Ok(())
+    }
+
+    fn write_type_definition_named_callback_body(&self, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
+        let rval = self.converter().to_typespecifier_in_rval(the_type.fnpointer().signature().rval());
+        let name = self.converter().named_callback_to_typename(the_type);
+
+        let mut params = Vec::new();
+        for (i, param) in the_type.fnpointer().signature().params().iter().enumerate() {
+            params.push(format!("{} x{}", self.converter().to_typespecifier_in_param(param.the_type()), i));
+        }
+
+        indented!(w, r#"public delegate {} {}({});"#, rval, name, params.join(", "))
     }
 
     fn write_type_definition_fn_pointer_annotation(&self, w: &mut IndentWriter, _the_type: &FnPointerType) -> Result<(), Error> {

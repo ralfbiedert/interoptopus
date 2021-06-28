@@ -197,11 +197,11 @@ namespace My.Company
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_delegate")]
-        public static extern byte pattern_ffi_slice_delegate(InteropDelegate_fn_FFISliceu8_rval_u8 callback);
+        public static extern byte pattern_ffi_slice_delegate(CallbackFFISlice callback);
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_delegate_huge")]
-        public static extern Vec3f32 pattern_ffi_slice_delegate_huge(InteropDelegate_fn_FFISliceVec3f32_rval_Vec3f32 callback);
+        public static extern Vec3f32 pattern_ffi_slice_delegate_huge(CallbackHugeVecSlice callback);
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_option_1")]
@@ -217,7 +217,7 @@ namespace My.Company
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_1")]
-        public static extern uint pattern_callback_1(InteropDelegate_fn_u32_rval_u32 callback, uint x);
+        public static extern uint pattern_callback_1(MyCallback callback, uint x);
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_create")]
@@ -574,13 +574,13 @@ namespace My.Company
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate byte InteropDelegate_fn_FFISliceu8_rval_u8(FFISliceu8 x0);
+    public delegate byte CallbackFFISlice(FFISliceu8 x0);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate Vec3f32 InteropDelegate_fn_FFISliceVec3f32_rval_Vec3f32(FFISliceVec3f32 x0);
+    public delegate Vec3f32 CallbackHugeVecSlice(FFISliceVec3f32 x0);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint InteropDelegate_fn_u32_rval_u32(uint x0);
+    public delegate uint MyCallback(uint x0);
 
 
     /// This can also be used for the `class` pattern.
