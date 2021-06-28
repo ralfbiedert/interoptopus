@@ -408,7 +408,7 @@ pub trait CSharpWriter {
         // ToNullable
         indented!(w, [_], r#"public {}? ToNullable()"#, type_string)?;
         indented!(w, [_], r#"{{"#)?;
-        indented!(w, [_ _], r#"return this.is_some != 0 ? this.t : ({}?)null;"#, type_string)?;
+        indented!(w, [_ _], r#"return this.is_some == 1 ? this.t : ({}?)null;"#, type_string)?;
         indented!(w, [_], r#"}}"#)?;
 
         indented!(w, r#"}}"#)?;
