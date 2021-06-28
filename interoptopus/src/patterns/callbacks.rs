@@ -26,16 +26,17 @@ impl NamedCallback {
     }
 }
 
-/// Defines a callback type, akin to a `fn f(T) -> R`.
+/// Defines a callback type, akin to a `fn f(T) -> R` wrapped in an Option.
 #[macro_export]
 macro_rules! pattern_callback {
     ($name:ident($($param:ident: $ty:ty),*) -> $rval:ty) => {
         #[repr(transparent)]
-        pub struct $name(extern "C" fn($($ty),*) -> $rval);
+        pub struct $name(Option<extern "C" fn($($ty),*) -> $rval>);
 
         impl $name {
+            /// Will call function if it exists, panic otherwise.
             pub fn call(&self, $($param: $ty),*) -> $rval {
-                self.0($($param),*)
+                self.0.expect("Assumed function would exist but it didn't.")($($param),*)
             }
         }
 
