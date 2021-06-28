@@ -66,6 +66,7 @@
 //! be accessible from any language.
 
 use crate::lang::c::{CType, CompositeType, PrimitiveType};
+use crate::patterns::callbacks::NamedCallback;
 use crate::patterns::service::Service;
 use crate::patterns::success_enum::SuccessEnum;
 
@@ -96,6 +97,7 @@ pub enum TypePattern {
     SuccessEnum(SuccessEnum),
     Slice(CompositeType),
     Option(CompositeType),
+    NamedCallback(NamedCallback),
 }
 
 impl TypePattern {
@@ -109,6 +111,7 @@ impl TypePattern {
             TypePattern::SuccessEnum(e) => CType::Enum(e.the_enum().clone()),
             TypePattern::Slice(x) => CType::Composite(x.clone()),
             TypePattern::Option(x) => CType::Composite(x.clone()),
+            TypePattern::NamedCallback(x) => CType::FnPointer(x.fnpointer().clone()),
         }
     }
 }

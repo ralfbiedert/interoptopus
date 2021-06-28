@@ -216,6 +216,10 @@ namespace My.Company
         public static extern void my_api_init_v1(out MyAPIv1 api);
 
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_1")]
+        public static extern uint pattern_callback_1(InteropDelegate_fn_u32_rval_u32 callback, uint x);
+
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_create")]
         public static extern FFIError pattern_service_create(out IntPtr context_ptr, uint value);
 
@@ -384,12 +388,6 @@ namespace My.Company
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate Vec3f32 InteropDelegate_fn_FFISliceVec3f32_rval_Vec3f32(FFISliceVec3f32 x0);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate byte InteropDelegate_fn_FFISliceu8_rval_u8(FFISliceu8 x0);
 
     public enum FFIError
     {
@@ -574,6 +572,15 @@ namespace My.Company
         Inner t;
         byte is_some;
     }
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate byte InteropDelegate_fn_FFISliceu8_rval_u8(FFISliceu8 x0);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate Vec3f32 InteropDelegate_fn_FFISliceVec3f32_rval_Vec3f32(FFISliceVec3f32 x0);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate uint InteropDelegate_fn_u32_rval_u32(uint x0);
 
 
     /// This can also be used for the `class` pattern.

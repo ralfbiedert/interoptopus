@@ -47,6 +47,7 @@ pub trait CSharpTypeConverter {
         match param.the_type() {
             CType::Pattern(p) => match p {
                 TypePattern::AsciiPointer => "string".to_string(),
+                TypePattern::NamedCallback(x) => self.fnpointer_to_typename(x.fnpointer()),
                 TypePattern::SuccessEnum(e) => self.enum_to_typename(e.the_enum()),
                 TypePattern::Slice(p) => {
                     let element_type = p
@@ -90,6 +91,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::SuccessEnum(e) => self.enum_to_typename(e.the_enum()),
                 TypePattern::Slice(e) => self.composite_to_typename(e),
                 TypePattern::Option(e) => self.composite_to_typename(e),
+                TypePattern::NamedCallback(e) => self.fnpointer_to_typename(e.fnpointer()),
             },
         }
     }
@@ -121,6 +123,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::SuccessEnum(e) => self.enum_to_typename(e.the_enum()),
                 TypePattern::Slice(x) => self.composite_to_typename(x),
                 TypePattern::Option(x) => self.composite_to_typename(x),
+                TypePattern::NamedCallback(x) => self.fnpointer_to_typename(x.fnpointer()),
             },
         }
     }
@@ -139,6 +142,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::SuccessEnum(e) => self.enum_to_typename(e.the_enum()),
                 TypePattern::Slice(x) => self.composite_to_typename(x),
                 TypePattern::Option(x) => self.composite_to_typename(x),
+                TypePattern::NamedCallback(x) => self.fnpointer_to_typename(x.fnpointer()),
             },
         }
     }

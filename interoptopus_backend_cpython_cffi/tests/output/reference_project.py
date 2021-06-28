@@ -85,6 +85,8 @@ typedef struct cffi_vec3f32
 
 typedef uint8_t (*cffi_fptr_fn_u8_rval_u8)(uint8_t x0);
 
+typedef uint32_t (*cffi_fptr_fn_u32_rval_u32)(uint32_t x0);
+
 typedef struct cffi_genericu32
     {
     uint32_t* x;
@@ -123,13 +125,13 @@ typedef struct cffi_myapiv1
     cffi_fptr_fn_Tupled_rval_Tupled tupled;
     } cffi_myapiv1;
 
-typedef uint8_t (*cffi_fptr_fn_FFISliceu8_rval_u8)(cffi_ffisliceu8 x0);
-
 typedef struct cffi_ffislicevec3f32
     {
     cffi_vec3f32* data;
     uint64_t len;
     } cffi_ffislicevec3f32;
+
+typedef uint8_t (*cffi_fptr_fn_FFISliceu8_rval_u8)(cffi_ffisliceu8 x0);
 
 typedef cffi_vec3f32 (*cffi_fptr_fn_FFISliceVec3f32_rval_Vec3f32)(cffi_ffislicevec3f32 x0);
 
@@ -176,6 +178,7 @@ cffi_vec3f32 pattern_ffi_slice_delegate_huge(cffi_fptr_fn_FFISliceVec3f32_rval_V
 cffi_ffioptioninner pattern_ffi_option_1(cffi_ffioptioninner ffi_slice);
 cffi_inner pattern_ffi_option_2(cffi_ffioptioninner ffi_slice);
 void my_api_init_v1(cffi_myapiv1* api);
+uint32_t pattern_callback_1(cffi_fptr_fn_u32_rval_u32 callback, uint32_t x);
 cffi_ffierror pattern_service_create(cffi_context** context_ptr, uint32_t value);
 cffi_ffierror pattern_service_destroy(cffi_context** context_ptr);
 uint32_t pattern_service_method(cffi_context* context);
@@ -605,8 +608,6 @@ class callbacks:
     fn_Tupled_rval_Tupled = "cffi_tupled(cffi_tupled)"
     fn_pmut_i64_rval_bool = "bool(int64_t*)"
     fn_u8_rval_u8 = "uint8_t(uint8_t)"
-    fn_FFISliceVec3f32_rval_Vec3f32 = "cffi_vec3f32(cffi_ffislicevec3f32)"
-    fn_FFISliceu8_rval_u8 = "uint8_t(cffi_ffisliceu8)"
 
 
 
@@ -942,6 +943,15 @@ Parameter x must point to valid data."""
         if hasattr(api, "_ctx"):
             api = api._ctx[0]
         return _api.my_api_init_v1(api)
+
+    def pattern_callback_1(callback, x):
+        """"""
+        global _api
+        if hasattr(callback, "_ctx"):
+            callback = callback._ctx[0]
+        if hasattr(x, "_ctx"):
+            x = x._ctx[0]
+        return _api.pattern_callback_1(callback, x)
 
     def pattern_service_create(context_ptr, value):
         """"""

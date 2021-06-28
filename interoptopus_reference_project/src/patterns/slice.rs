@@ -1,11 +1,10 @@
 use crate::types::{CallbackFFISlice, Vec3f32};
-use interoptopus::ffi_function;
-use interoptopus::patterns::callbacks::CallbackXY;
 use interoptopus::patterns::slice::FFISlice;
+use interoptopus::{ffi_function, pattern_callback};
 
 static HUGE_VEC_SLICE: [Vec3f32; 100_000] = [Vec3f32 { x: 0.0, y: 0.0, z: 0.0 }; 100_000];
 
-pub type CallbackHugeVecSlice<'a> = CallbackXY<FFISlice<'a, Vec3f32>, Vec3f32>;
+pattern_callback!(CallbackHugeVecSlice(slice: FFISlice<Vec3f32>) -> Vec3f32);
 
 #[ffi_function]
 #[no_mangle]

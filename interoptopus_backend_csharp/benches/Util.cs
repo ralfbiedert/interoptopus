@@ -17,10 +17,16 @@ namespace Interoptopus
 
         public double MicroPer1000()
         {
-            var nn = (double) _n;
-            var tt = (double) _totalTicks;
+            var n = (double) _n;
+            var ticks_for_all_n = (double) _totalTicks;  
 
-            return (100 * tt / nn);
+            // 1 tick = 100 nanos
+            var micros_for_all_n = ticks_for_all_n / 10;
+            var micros_for_one_n = micros_for_all_n / n;
+            var micros_for_1000_n = 1000 * micros_for_one_n;
+            
+            // return (100 * ticks_for_all_n / n);
+            return micros_for_1000_n;
         }
 
         public MeasureResult(long n, long totalTicks)

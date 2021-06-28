@@ -117,6 +117,10 @@ pub trait CWriter {
             CType::ReadWritePointer(_) => {}
             CType::Pattern(p) => match p {
                 TypePattern::AsciiPointer => {}
+                TypePattern::NamedCallback(e) => {
+                    self.write_type_definition_fn_pointer(w, e.fnpointer())?;
+                    w.newline()?;
+                }
                 TypePattern::SuccessEnum(e) => {
                     self.write_type_definition_enum(w, e.the_enum())?;
                     w.newline()?;

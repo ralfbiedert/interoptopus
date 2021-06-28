@@ -125,6 +125,13 @@ pub(crate) fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CTyp
         CType::Pattern(x) => match x {
             TypePattern::AsciiPointer => {}
             TypePattern::SuccessEnum(_) => {}
+            TypePattern::NamedCallback(x) => {
+                let inner = x.fnpointer();
+                ctypes_from_type_recursive(inner.signature().rval(), types);
+                for param in inner.signature().params() {
+                    ctypes_from_type_recursive(param.the_type(), types);
+                }
+            }
             TypePattern::Slice(x) => {
                 for field in x.fields() {
                     ctypes_from_type_recursive(field.the_type(), types);

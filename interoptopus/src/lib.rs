@@ -8,7 +8,7 @@
 //!
 //! # Interoptopus 🐙
 //!
-//! Why export to only a single language when you can have them all? The polyglot bindings generator for your library.
+//! The polyglot bindings generator for your library (C#, C, Python, ...)
 //!
 //! <br>
 //!

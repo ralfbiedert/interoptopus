@@ -1,93 +1,61 @@
 //! Useful when `extern "C" fn()` delegate types give compile errors.
 
-use crate::lang::c::{CType, FnPointerType, FunctionSignature, Parameter};
-use crate::lang::rust::CTypeInfo;
+use crate::lang::c::FnPointerType;
 
-/// A `fn(X) -> Y` callback.
-#[repr(transparent)]
-pub struct CallbackXY<X0, R> {
-    ptr: extern "C" fn(X0) -> R,
+/// Internal helper naming a generated callback type wrapper.
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub struct NamedCallback {
+    name: String,
+    fnpointer: FnPointerType,
 }
 
-impl<X0, R> CallbackXY<X0, R> {
-    pub fn new(ptr: extern "C" fn(X0) -> R) -> Self {
-        Self { ptr }
+impl NamedCallback {
+    /// Creates a new named callback.
+    pub fn new(name: String, callback: FnPointerType) -> Self {
+        Self { name, fnpointer: callback }
     }
 
-    pub fn call(&self, x0: X0) -> R {
-        (self.ptr)(x0)
+    /// Gets the type name of this callback.
+    pub fn name(&self) -> &str {
+        &self.name
     }
-}
 
-unsafe impl<X0, R> CTypeInfo for CallbackXY<X0, R>
-where
-    X0: CTypeInfo,
-    R: CTypeInfo,
-{
-    fn type_info() -> CType {
-        let sig = FunctionSignature::new(vec![Parameter::new("x0".to_string(), X0::type_info())], R::type_info());
-        CType::FnPointer(FnPointerType::new(sig))
+    /// Returns the function pointer type.
+    pub fn fnpointer(&self) -> &FnPointerType {
+        &self.fnpointer
     }
 }
 
-/// A `fn(X1, X2) -> Y` callback.
-#[repr(transparent)]
-pub struct CallbackXXY<X0, X1, R> {
-    ptr: extern "C" fn(X0, X1) -> R,
-}
+/// Defines a callback type, akin to a `fn f(T) -> R`.
+#[macro_export]
+macro_rules! pattern_callback {
+    ($name:ident($($param:ident: $ty:ty),*) -> $rval:ty) => {
+        #[repr(transparent)]
+        pub struct $name(extern "C" fn($($ty),*) -> $rval);
 
-impl<X0, X1, R> CallbackXXY<X0, X1, R> {
-    pub fn new(ptr: extern "C" fn(X0, X1) -> R) -> Self {
-        Self { ptr }
-    }
+        impl $name {
+            pub fn call(&self, $($param: $ty),*) -> $rval {
+                self.0($($param),*)
+            }
+        }
 
-    pub fn call(&self, x0: X0, x1: X1) -> R {
-        (self.ptr)(x0, x1)
-    }
-}
+        unsafe impl interoptopus::lang::rust::CTypeInfo for $name {
+            fn type_info() -> interoptopus::lang::c::CType {
+                use interoptopus::lang::rust::CTypeInfo;
 
-unsafe impl<X0, X1, R> CTypeInfo for CallbackXXY<X0, X1, R>
-where
-    X0: CTypeInfo,
-    X1: CTypeInfo,
-    R: CTypeInfo,
-{
-    fn type_info() -> CType {
-        let sig = FunctionSignature::new(
-            vec![Parameter::new("x0".to_string(), X0::type_info()), Parameter::new("x1".to_string(), X1::type_info())],
-            R::type_info(),
-        );
-        CType::FnPointer(FnPointerType::new(sig))
-    }
-}
+                let rval = < $rval as CTypeInfo >::type_info();
+                let params = vec![
+                $(
+                    interoptopus::lang::c::Parameter::new(stringify!($param).to_string(), < $ty as CTypeInfo >::type_info()),
+                )*
+                ];
 
-unsafe impl<X0, X1, R> CTypeInfo for Option<CallbackXXY<X0, X1, R>>
-where
-    X0: CTypeInfo,
-    X1: CTypeInfo,
-    R: CTypeInfo,
-{
-    fn type_info() -> CType {
-        let sig = FunctionSignature::new(
-            vec![Parameter::new("x0".to_string(), X0::type_info()), Parameter::new("x1".to_string(), X1::type_info())],
-            R::type_info(),
-        );
-        CType::FnPointer(FnPointerType::new(sig))
-    }
-}
+                let sig = interoptopus::lang::c::FunctionSignature::new(params, rval);
+                let fn_pointer = interoptopus::lang::c::FnPointerType::new(sig);
+                let named_callback = interoptopus::patterns::callbacks::NamedCallback::new(stringify!($name).to_string(), fn_pointer);
 
-#[cfg(test)]
-mod test {
-    use crate::patterns::callbacks::CallbackXY;
-
-    extern "C" fn f(x: u32) -> u32 {
-        x + x
-    }
-
-    #[test]
-    fn can_create() {
-        let callback = CallbackXY::new(f);
-
-        assert_eq!(callback.call(100), 200);
-    }
+                interoptopus::lang::c::CType::Pattern(interoptopus::patterns::TypePattern::NamedCallback(named_callback))
+            }
+        }
+    };
 }

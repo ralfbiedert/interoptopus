@@ -1,8 +1,6 @@
 use crate::config::Config;
 use crate::converter::{CSharpTypeConverter, Converter};
-use interoptopus::lang::c::{
-    CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, Meta, Parameter, PrimitiveType, Variant, Visibility,
-};
+use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, Meta, PrimitiveType, Variant, Visibility};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{longest_common_prefix, IdPrettifier};
@@ -141,7 +139,7 @@ pub trait CSharpWriter {
             let the_type = self.converter().function_parameter_to_csharp_typename(p, function);
 
             match p.the_type() {
-                CType::Pattern(TypePattern::Slice(x)) => {
+                CType::Pattern(TypePattern::Slice(_)) => {
                     to_pin_name.push(name);
                     to_pin_slice_type.push(the_type);
                     to_invoke.push(format!("{}_slice", name));
@@ -225,6 +223,13 @@ pub trait CSharpWriter {
                 TypePattern::Option(x) => {
                     if self.should_emit(x.meta()) {
                         self.write_type_definition_composite(w, x)?;
+                        w.newline()?;
+                    }
+                }
+                TypePattern::NamedCallback(x) => {
+                    // Handle this better way
+                    if self.should_emit(&Meta::new()) {
+                        self.write_type_definition_fn_pointer(w, x.fnpointer())?;
                         w.newline()?;
                     }
                 }
