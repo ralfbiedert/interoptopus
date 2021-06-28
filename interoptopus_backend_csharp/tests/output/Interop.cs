@@ -589,7 +589,7 @@ namespace My.Company
 
         public Inner? ToNullable()
         {
-            return this.is_some != 0 ? this.t : (Inner?)null;
+            return this.is_some == 1 ? this.t : (Inner?)null;
         }
     }
 
