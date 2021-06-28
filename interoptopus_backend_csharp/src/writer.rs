@@ -225,6 +225,8 @@ pub trait CSharpWriter {
                     if self.should_emit(x.meta()) {
                         self.write_type_definition_composite(w, x)?;
                         w.newline()?;
+                        self.write_pattern_option(w, x)?;
+                        w.newline()?;
                     }
                 }
                 TypePattern::NamedCallback(x) => {
@@ -391,6 +393,45 @@ pub trait CSharpWriter {
             }
         }
 
+        Ok(())
+    }
+
+    fn write_pattern_option(&self, w: &mut IndentWriter, slice: &CompositeType) -> Result<(), Error> {
+        let context_type_name = slice.rust_name();
+        let data_type = slice
+            .fields()
+            .iter()
+            .find(|x| x.name().eq("t"))
+            .expect("Option must contain field called 't'.")
+            .the_type();
+
+        let type_string = self.converter().to_typespecifier_in_rval(data_type);
+
+        indented!(w, r#"public partial struct {}"#, context_type_name)?;
+        indented!(w, r#"{{"#)?;
+
+        // FromNullable
+        indented!(w, [_], r#"public static {} FromNullable({}? nullable)"#, context_type_name, type_string)?;
+        indented!(w, [_], r#"{{"#)?;
+        indented!(w, [_ _], r#"var result = new {}();"#, context_type_name)?;
+        indented!(w, [_ _], r#"if (nullable.HasValue)"#)?;
+        indented!(w, [_ _], r#"{{"#)?;
+        indented!(w, [_ _ _], r#"result.is_some = 1;"#)?;
+        indented!(w, [_ _ _], r#"result.t = nullable.Value;"#)?;
+        indented!(w, [_ _], r#"}}"#)?;
+        w.newline()?;
+        indented!(w, [_ _], r#"return result;"#)?;
+        indented!(w, [_], r#"}}"#)?;
+        w.newline()?;
+
+        // ToNullable
+        indented!(w, [_], r#"public {}? ToNullable()"#, type_string)?;
+        indented!(w, [_], r#"{{"#)?;
+        indented!(w, [_ _], r#"return this.is_some != 0 ? this.t : ({}?)null;"#, type_string)?;
+        indented!(w, [_], r#"}}"#)?;
+
+        indented!(w, r#"}}"#)?;
+        w.newline()?;
         Ok(())
     }
 

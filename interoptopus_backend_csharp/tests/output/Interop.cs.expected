@@ -573,6 +573,27 @@ namespace My.Company
         byte is_some;
     }
 
+    public partial struct FFIOptionInner
+    {
+        public static FFIOptionInner FromNullable(Inner? nullable)
+        {
+            var result = new FFIOptionInner();
+            if (nullable.HasValue)
+            {
+                result.is_some = 1;
+                result.t = nullable.Value;
+            }
+
+            return result;
+        }
+
+        public Inner? ToNullable()
+        {
+            return this.is_some != 0 ? this.t : (Inner?)null;
+        }
+    }
+
+
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte CallbackFFISlice(FFISliceu8 x0);
 

@@ -26,6 +26,19 @@ namespace interop_test
         }
 
         [Fact]
+        public void pattern_ffi_option_nullable()
+        {
+            var t = new Inner();
+            FFIOptionInner someOpt = FFIOptionInner.FromNullable(t);
+            Inner? nullableOpt = someOpt.ToNullable();
+            Assert.True(nullableOpt.HasValue);
+
+            FFIOptionInner someOpt2 = FFIOptionInner.FromNullable(null);
+            Inner? nullableOpt2 = someOpt2.ToNullable();
+            Assert.False(nullableOpt2.HasValue);
+        }
+
+        [Fact]
         public void pattern_api_entry()
         {
             // TODO: Why does this not work?
