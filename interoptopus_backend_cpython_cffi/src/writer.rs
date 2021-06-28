@@ -139,6 +139,7 @@ pub trait PythonWriter {
 
         for callback in self.library().ctypes().iter().filter_map(|x| match x {
             CType::FnPointer(x) => Some(x),
+            CType::Pattern(TypePattern::NamedCallback(x)) => Some(x.fnpointer()),
             _ => None,
         }) {
             indented!(

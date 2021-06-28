@@ -608,6 +608,9 @@ class callbacks:
     fn_Tupled_rval_Tupled = "cffi_tupled(cffi_tupled)"
     fn_pmut_i64_rval_bool = "bool(int64_t*)"
     fn_u8_rval_u8 = "uint8_t(uint8_t)"
+    fn_FFISliceu8_rval_u8 = "uint8_t(cffi_ffisliceu8)"
+    fn_FFISliceVec3f32_rval_Vec3f32 = "cffi_vec3f32(cffi_ffislicevec3f32)"
+    fn_u32_rval_u32 = "uint32_t(uint32_t)"
 
 
 
