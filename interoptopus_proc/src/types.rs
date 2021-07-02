@@ -242,6 +242,20 @@ pub fn ffi_type_struct(attr: &FFITypeAttributes, input: TokenStream, item: ItemS
         }
     };
 
+    let name = if let Some(name) = &attr.name {
+        quote! {
+            let name = #name.to_string();
+        }
+    } else {
+        quote! {
+            #({
+                generics.push(<#generic_params_needing_bounds as interoptopus::lang::rust::CTypeInfo>::type_info().name_within_lib());
+            })*
+
+            let name = format!("{}{}", #c_struct_name.to_string(), generics.join(""));
+        }
+    };
+
     quote! {
         #input
 
@@ -253,13 +267,9 @@ pub fn ffi_type_struct(attr: &FFITypeAttributes, input: TokenStream, item: ItemS
                 let mut fields: std::vec::Vec<interoptopus::lang::c::Field> = std::vec::Vec::new();
                 let mut generics: std::vec::Vec<String> = std::vec::Vec::new();
 
-                #({
-                    generics.push(<#generic_params_needing_bounds as interoptopus::lang::rust::CTypeInfo>::type_info().name_within_lib());
-                })*
+                #name
 
                 #fields
-
-                let name = format!("{}{}", #c_struct_name.to_string(), generics.join(""));
 
                 #rval_builder
             }
