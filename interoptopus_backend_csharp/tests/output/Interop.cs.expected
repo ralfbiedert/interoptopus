@@ -127,6 +127,10 @@ namespace My.Company
         public static extern byte generic_2(Genericu8 x, Phantomu8 _y);
 
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic_3")]
+        public static extern byte generic_3(IntPtr x);
+
+
         /// This function has documentation.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "documented")]
         public static extern EnumDocumented documented(StructDocumented _x);

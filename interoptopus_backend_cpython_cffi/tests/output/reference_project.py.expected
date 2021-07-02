@@ -16,6 +16,7 @@ typedef enum cffi_enumdocumented
     } cffi_enumdocumented;
 
 typedef struct cffi_context cffi_context;
+typedef struct cffi_generic2u8 cffi_generic2u8;
 typedef struct cffi_opaque cffi_opaque;
 typedef struct cffi_simpleservice cffi_simpleservice;
 typedef struct cffi_empty cffi_empty;
@@ -162,6 +163,7 @@ cffi_opaque* complex_args_2(cffi_someforeigntype _cmplx);
 uint8_t callback(cffi_fptr_fn_u8_rval_u8 callback, uint8_t value);
 uint32_t generic_1(cffi_genericu32 x, cffi_phantomu8 _y);
 uint8_t generic_2(cffi_genericu8 x, cffi_phantomu8 _y);
+uint8_t generic_3(cffi_generic2u8* x);
 cffi_enumdocumented documented(cffi_structdocumented _x);
 cffi_vec1 ambiguous_1(cffi_vec1 x);
 cffi_vec2 ambiguous_2(cffi_vec2 x);
@@ -830,6 +832,13 @@ Parameter x must point to valid data."""
         if hasattr(_y, "_ctx"):
             _y = _y._ctx[0]
         return _api.generic_2(x, _y)
+
+    def generic_3(x):
+        """"""
+        global _api
+        if hasattr(x, "_ctx"):
+            x = x._ctx[0]
+        return _api.generic_3(x)
 
     def documented(_x):
         """This function has documentation."""

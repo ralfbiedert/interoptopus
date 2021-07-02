@@ -217,6 +217,31 @@ pub fn ffi_type_struct(attr: &FFITypeAttributes, input: TokenStream, item: ItemS
         }
     }
 
+    let rval_builder = if attr.opaque {
+        quote! {
+            let mut rval = interoptopus::lang::c::OpaqueType::new(name, meta);
+            interoptopus::lang::c::CType::Opaque(rval)
+        }
+    } else {
+        quote! {
+            let rval = interoptopus::lang::c::CompositeType::with_meta(name, fields, meta);
+            interoptopus::lang::c::CType::Composite(rval)
+        }
+    };
+
+    let fields = if attr.opaque {
+        quote! {}
+    } else {
+        quote! {
+            #({
+                let documentation = interoptopus::lang::c::Documentation::from_line(#field_docs);
+                let the_type = #field_types;
+                let field = interoptopus::lang::c::Field::with_documentation(#field_names.to_string(), the_type, #field_visibility, documentation);
+                fields.push(field);
+            })*
+        }
+    };
+
     quote! {
         #input
 
@@ -225,46 +250,18 @@ pub fn ffi_type_struct(attr: &FFITypeAttributes, input: TokenStream, item: ItemS
             fn type_info() -> interoptopus::lang::c::CType {
                 let documentation = interoptopus::lang::c::Documentation::from_line(#doc_line);
                 let mut meta = interoptopus::lang::c::Meta::with_namespace_documentation(#namespace.to_string(), documentation);
-                let mut fields = std::vec::Vec::new();
+                let mut fields: std::vec::Vec<interoptopus::lang::c::Field> = std::vec::Vec::new();
                 let mut generics: std::vec::Vec<String> = std::vec::Vec::new();
 
                 #({
                     generics.push(<#generic_params_needing_bounds as interoptopus::lang::rust::CTypeInfo>::type_info().name_within_lib());
                 })*
 
-                #({
-                    let documentation = interoptopus::lang::c::Documentation::from_line(#field_docs);
-                    let the_type = #field_types;
-                    let field = interoptopus::lang::c::Field::with_documentation(#field_names.to_string(), the_type, #field_visibility, documentation);
-                    fields.push(field);
-                })*
+                #fields
 
                 let name = format!("{}{}", #c_struct_name.to_string(), generics.join(""));
 
-                let rval = interoptopus::lang::c::CompositeType::with_meta(name, fields, meta);
-                interoptopus::lang::c::CType::Composite(rval)
-            }
-        }
-    }
-}
-
-pub fn ffi_type_struct_opqaue(attr: &FFITypeAttributes, input: TokenStream, item: ItemStruct) -> TokenStream {
-    let name = item.ident.to_string();
-    let name_ident = syn::Ident::new(&name, item.ident.span());
-    let doc_line = extract_doc_lines(&item.attrs).join("\n");
-    let namespace = attr.namespace.clone().unwrap_or_else(|| "".to_string());
-
-    quote! {
-        #input
-
-        unsafe impl interoptopus::lang::rust::CTypeInfo for #name_ident {
-
-            fn type_info() -> interoptopus::lang::c::CType {
-                let documentation = interoptopus::lang::c::Documentation::from_line(#doc_line);
-                let mut meta = interoptopus::lang::c::Meta::with_namespace_documentation(#namespace.to_string(), documentation);
-                let mut rval = interoptopus::lang::c::OpaqueType::new(#name.to_string(), meta);
-
-                interoptopus::lang::c::CType::Opaque(rval)
+                #rval_builder
             }
         }
     }
@@ -274,11 +271,7 @@ pub fn ffi_type(attr: AttributeArgs, input: TokenStream) -> TokenStream {
     let ffi_attributes: FFITypeAttributes = FFITypeAttributes::from_list(&attr).unwrap();
 
     let rval = if let Ok(item) = syn::parse2::<ItemStruct>(input.clone()) {
-        if ffi_attributes.opaque {
-            ffi_type_struct_opqaue(&ffi_attributes, input, item)
-        } else {
-            ffi_type_struct(&ffi_attributes, input, item)
-        }
+        ffi_type_struct(&ffi_attributes, input, item)
     } else if let Ok(item) = syn::parse2::<ItemEnum>(input.clone()) {
         ffi_type_enum(&ffi_attributes, input, item)
     } else if let Ok(_item) = syn::parse2::<ItemType>(input.clone()) {

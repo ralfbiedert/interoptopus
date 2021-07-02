@@ -52,6 +52,7 @@ interoptopus::inventory!(
         functions::callback,
         functions::generic_1,
         functions::generic_2,
+        functions::generic_3,
         functions::documented,
         functions::ambiguous_1,
         functions::ambiguous_2,

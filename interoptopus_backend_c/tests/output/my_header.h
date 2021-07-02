@@ -23,6 +23,7 @@ typedef enum my_library_enumdocumented
     } my_library_enumdocumented;
 
 typedef struct my_library_context my_library_context;
+typedef struct my_library_generic2u8 my_library_generic2u8;
 typedef struct my_library_opaque my_library_opaque;
 typedef struct my_library_simpleservice my_library_simpleservice;
 typedef struct my_library_empty my_library_empty;
@@ -169,6 +170,7 @@ my_library_opaque* complex_args_2(my_library_someforeigntype _cmplx);
 uint8_t callback(my_library_fptr_fn_u8_rval_u8 callback, uint8_t value);
 uint32_t generic_1(my_library_genericu32 x, my_library_phantomu8 _y);
 uint8_t generic_2(my_library_genericu8 x, my_library_phantomu8 _y);
+uint8_t generic_3(my_library_generic2u8* x);
 my_library_enumdocumented documented(my_library_structdocumented _x);
 my_library_vec1 ambiguous_1(my_library_vec1 x);
 my_library_vec2 ambiguous_2(my_library_vec2 x);

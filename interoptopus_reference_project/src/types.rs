@@ -42,6 +42,15 @@ where
     pub x: &'a T,
 }
 
+#[ffi_type(opaque)]
+#[repr(C)]
+pub struct Generic2<T>
+where
+    T: CTypeInfo,
+{
+    pub x: T,
+}
+
 #[ffi_type(skip(p))]
 #[repr(C)]
 pub struct Phantom<'a, T>
