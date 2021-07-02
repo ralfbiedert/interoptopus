@@ -2,8 +2,8 @@
 
 use crate::patterns::success_enum::FFIError;
 use crate::types::{
-    ambiguous1, ambiguous2, common, some_foreign_type, Callbacku8u8, Empty, EnumDocumented, Generic, Generic2, Opaque, Phantom, SomeForeignType, StructDocumented,
-    Tupled, Vec3f32,
+    ambiguous1, ambiguous2, common, some_foreign_type, Callbacku8u8, Empty, EnumDocumented, Generic, Generic2, Generic3, Opaque, Phantom, SomeForeignType,
+    StructDocumented, Tupled, Vec3f32,
 };
 use interoptopus::ffi_function;
 use interoptopus::patterns::success_enum::panics_and_errors_to_ffi_enum;
@@ -172,6 +172,12 @@ pub extern "C" fn generic_2(x: Generic<u8>, _y: Phantom<u8>) -> u8 {
 #[ffi_function]
 #[no_mangle]
 pub extern "C" fn generic_3(x: &Generic2<u8>) -> u8 {
+    x.x
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn generic_4(x: &Generic3<u8>) -> u8 {
     x.x
 }
 

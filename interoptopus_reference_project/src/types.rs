@@ -51,6 +51,12 @@ where
     pub x: T,
 }
 
+#[ffi_type(opaque, name = "Generic3")]
+#[repr(C)]
+pub struct Generic3<T> {
+    pub x: T,
+}
+
 #[ffi_type(skip(p))]
 #[repr(C)]
 pub struct Phantom<'a, T>
