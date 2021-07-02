@@ -1,10 +1,12 @@
 use crate::types::{CallbackFFISlice, Vec3f32};
-use interoptopus::patterns::slice::FFISlice;
+use interoptopus::patterns::slice::{FFISlice, FFISliceMut};
 use interoptopus::{ffi_function, pattern_callback};
 
 static HUGE_VEC_SLICE: [Vec3f32; 100_000] = [Vec3f32 { x: 0.0, y: 0.0, z: 0.0 }; 100_000];
 
 pattern_callback!(CallbackHugeVecSlice(slice: FFISlice<Vec3f32>) -> Vec3f32);
+
+pattern_callback!(CallbackSliceMut(slice: FFISliceMut<'_, u8>) -> ());
 
 #[ffi_function]
 #[no_mangle]
@@ -32,4 +34,40 @@ pub extern "C" fn pattern_ffi_slice_delegate(callback: CallbackFFISlice) -> u8 {
 #[no_mangle]
 pub extern "C" fn pattern_ffi_slice_delegate_huge(callback: CallbackHugeVecSlice) -> Vec3f32 {
     callback.call(FFISlice::from_slice(&HUGE_VEC_SLICE))
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn pattern_ffi_slice_3(mut slice: FFISliceMut<u8>, callback: CallbackSliceMut) {
+    if let Some(&mut [ref mut x, ..]) = slice.as_slice_mut() {
+        *x += 1;
+    }
+
+    callback.call(slice);
+}
+
+// Some extra tests that were hard to do from core crate.
+#[cfg(test)]
+mod test {
+    use crate::patterns::slice::pattern_ffi_slice_3;
+    use interoptopus::patterns::slice::FFISliceMut;
+
+    #[allow(dead_code)]
+    extern "C" fn f(mut x: FFISliceMut<u8>) {
+        let slice = x.as_slice_mut().unwrap();
+        slice[1] = 100;
+    }
+
+    #[test]
+    fn test_pattern_ffi_slice_3<'a>() {
+        let mut data = [0, 1, 2, 3, 4, 5];
+
+        // Not even its mother would love this ...
+        // let x: extern "C" fn(FFISliceMut<'a, u8>) -> () = f;
+        let jfc: extern "C" fn(FFISliceMut<'_, u8>) -> () = f;
+
+        pattern_ffi_slice_3(FFISliceMut::from_slice(&mut data), jfc.into());
+
+        assert_eq!(&data, &[1, 100, 2, 3, 4, 5])
+    }
 }

@@ -204,6 +204,10 @@ namespace My.Company
             }
         }
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_3")]
+        public static extern void pattern_ffi_slice_3(FFISliceMutu8 slice, CallbackSliceMut callback);
+
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_delegate")]
         public static extern byte pattern_ffi_slice_delegate(CallbackFFISlice callback);
 
@@ -575,6 +579,68 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
+    public partial struct FFISliceMutu8
+    {
+        IntPtr data;
+        ulong len;
+    }
+
+    public partial struct FFISliceMutu8 : IEnumerable<byte>
+    {
+        public FFISliceMutu8(GCHandle handle, ulong count)
+        {
+            this.data = handle.AddrOfPinnedObject();
+            this.len = count;
+        }
+        public byte this[int i]
+        {
+            get
+            {
+                var size = Marshal.SizeOf(typeof(byte));
+                var ptr = new IntPtr(data.ToInt64() + i * size);
+                return Marshal.PtrToStructure<byte>(ptr);
+            }
+            set
+            {
+                var size = Marshal.SizeOf(typeof(byte));
+                var ptr = new IntPtr(data.ToInt64() + i * size);
+                Marshal.StructureToPtr<byte>(value, ptr, false);
+            }
+        }
+        public byte[] Copied
+        {
+            get
+            {
+                var rval = new byte[len];
+                for (var i = 0; i < (int) len; i++) {
+                    rval[i] = this[i];
+                }
+                return rval;
+            }
+        }
+        public int Count
+        {
+            get
+            {
+                return (int) len;
+            }
+        }
+        public IEnumerator<byte> GetEnumerator()
+        {
+            for (int i = 0; i < (int)len; ++i)
+            {
+                yield return this[i];
+            }
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }
+
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
     public partial struct FFIOptionInner
     {
         Inner t;
@@ -607,6 +673,9 @@ namespace My.Company
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate Vec3f32 CallbackHugeVecSlice(FFISliceVec3f32 x0);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void CallbackSliceMut(FFISliceMutu8 x0);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate uint MyCallback(uint x0);

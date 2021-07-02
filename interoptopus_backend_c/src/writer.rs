@@ -129,6 +129,10 @@ pub trait CWriter {
                     self.write_type_definition_composite(w, x)?;
                     w.newline()?;
                 }
+                TypePattern::SliceMut(x) => {
+                    self.write_type_definition_composite(w, x)?;
+                    w.newline()?;
+                }
                 TypePattern::Option(x) => {
                     self.write_type_definition_composite(w, x)?;
                     w.newline()?;

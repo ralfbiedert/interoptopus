@@ -101,6 +101,7 @@ pub enum TypePattern {
     AsciiPointer,
     SuccessEnum(SuccessEnum),
     Slice(CompositeType),
+    SliceMut(CompositeType),
     Option(CompositeType),
     NamedCallback(NamedCallback),
 }
@@ -115,6 +116,7 @@ impl TypePattern {
             TypePattern::AsciiPointer => CType::ReadPointer(Box::new(CType::Primitive(PrimitiveType::U8))),
             TypePattern::SuccessEnum(e) => CType::Enum(e.the_enum().clone()),
             TypePattern::Slice(x) => CType::Composite(x.clone()),
+            TypePattern::SliceMut(x) => CType::Composite(x.clone()),
             TypePattern::Option(x) => CType::Composite(x.clone()),
             TypePattern::NamedCallback(x) => CType::FnPointer(x.fnpointer().clone()),
         }

@@ -137,6 +137,11 @@ pub(crate) fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CTyp
                     ctypes_from_type_recursive(field.the_type(), types);
                 }
             }
+            TypePattern::SliceMut(x) => {
+                for field in x.fields() {
+                    ctypes_from_type_recursive(field.the_type(), types);
+                }
+            }
             TypePattern::Option(x) => {
                 for field in x.fields() {
                     ctypes_from_type_recursive(field.the_type(), types);

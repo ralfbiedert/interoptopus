@@ -221,6 +221,14 @@ pub trait CSharpWriter {
                         w.newline()?;
                     }
                 }
+                TypePattern::SliceMut(x) => {
+                    if self.should_emit(x.meta()) {
+                        self.write_type_definition_composite(w, x)?;
+                        w.newline()?;
+                        self.write_pattern_slice_mut(w, x)?;
+                        w.newline()?;
+                    }
+                }
                 TypePattern::Option(x) => {
                     if self.should_emit(x.meta()) {
                         self.write_type_definition_composite(w, x)?;
@@ -466,6 +474,89 @@ pub trait CSharpWriter {
         indented!(w, [_ _ _], r#"var size = Marshal.SizeOf(typeof({}));"#, type_string)?;
         indented!(w, [_ _ _], r#"var ptr = new IntPtr(data.ToInt64() + i * size);"#)?;
         indented!(w, [_ _ _], r#"return Marshal.PtrToStructure<{}>(ptr);"#, type_string)?;
+        indented!(w, [_ _], r#"}}"#)?;
+        indented!(w, [_], r#"}}"#)?;
+
+        // Copied
+        indented!(w, [_], r#"public {}[] Copied"#, type_string)?;
+        indented!(w, [_], r#"{{"#)?;
+        indented!(w, [_ _], r#"get"#)?;
+        indented!(w, [_ _], r#"{{"#)?;
+        indented!(w, [_ _ _], r#"var rval = new {}[len];"#, type_string)?;
+        indented!(w, [_ _ _], r#"for (var i = 0; i < (int) len; i++) {{"#)?;
+        indented!(w, [_ _ _ _], r#"rval[i] = this[i];"#)?;
+        indented!(w, [_ _ _], r#"}}"#)?;
+        indented!(w, [_ _ _], r#"return rval;"#)?;
+        indented!(w, [_ _], r#"}}"#)?;
+        indented!(w, [_], r#"}}"#)?;
+
+        // Count
+        indented!(w, [_], r#"public int Count"#)?;
+        indented!(w, [_], r#"{{"#)?;
+        indented!(w, [_ _], r#"get"#)?;
+        indented!(w, [_ _], r#"{{"#)?;
+        indented!(w, [_ _ _], r#"return (int) len;"#)?;
+        indented!(w, [_ _], r#"}}"#)?;
+        indented!(w, [_], r#"}}"#)?;
+
+        // GetEnumerator
+        indented!(w, [_], r#"public IEnumerator<{}> GetEnumerator()"#, type_string)?;
+        indented!(w, [_], r#"{{"#)?;
+        indented!(w, [_ _], r#"for (int i = 0; i < (int)len; ++i)"#)?;
+        indented!(w, [_ _], r#"{{"#)?;
+        indented!(w, [_ _ _], r#"yield return this[i];"#)?;
+        indented!(w, [_ _], r#"}}"#)?;
+        indented!(w, [_], r#"}}"#)?;
+
+        // The other GetEnumerator
+        indented!(w, [_], r#"IEnumerator IEnumerable.GetEnumerator()"#)?;
+        indented!(w, [_], r#"{{"#)?;
+        indented!(w, [_ _], r#"return this.GetEnumerator();"#)?;
+        indented!(w, [_], r#"}}"#)?;
+
+        indented!(w, r#"}}"#)?;
+        w.newline()?;
+
+        Ok(())
+    }
+
+    fn write_pattern_slice_mut(&self, w: &mut IndentWriter, slice: &CompositeType) -> Result<(), Error> {
+        let context_type_name = slice.rust_name();
+        let data_type = slice
+            .fields()
+            .iter()
+            .find(|x| x.name().contains("data"))
+            .expect("Slice must contain field called 'data'.")
+            .the_type()
+            .deref_pointer()
+            .expect("data must be a pointer type");
+
+        let type_string = self.converter().to_typespecifier_in_rval(data_type);
+
+        indented!(w, r#"public partial struct {} : IEnumerable<{}>"#, context_type_name, type_string)?;
+        indented!(w, r#"{{"#)?;
+
+        // Ctor
+        indented!(w, [_], r#"public {}(GCHandle handle, ulong count)"#, context_type_name)?;
+        indented!(w, [_], r#"{{"#)?;
+        indented!(w, [_ _], r#"this.data = handle.AddrOfPinnedObject();"#)?;
+        indented!(w, [_ _], r#"this.len = count;"#)?;
+        indented!(w, [_], r#"}}"#)?;
+
+        // Getter
+        indented!(w, [_], r#"public {} this[int i]"#, type_string)?;
+        indented!(w, [_], r#"{{"#)?;
+        indented!(w, [_ _], r#"get"#)?;
+        indented!(w, [_ _], r#"{{"#)?;
+        indented!(w, [_ _ _], r#"var size = Marshal.SizeOf(typeof({}));"#, type_string)?;
+        indented!(w, [_ _ _], r#"var ptr = new IntPtr(data.ToInt64() + i * size);"#)?;
+        indented!(w, [_ _ _], r#"return Marshal.PtrToStructure<{}>(ptr);"#, type_string)?;
+        indented!(w, [_ _], r#"}}"#)?;
+        indented!(w, [_ _], r#"set"#)?;
+        indented!(w, [_ _], r#"{{"#)?;
+        indented!(w, [_ _ _], r#"var size = Marshal.SizeOf(typeof({}));"#, type_string)?;
+        indented!(w, [_ _ _], r#"var ptr = new IntPtr(data.ToInt64() + i * size);"#)?;
+        indented!(w, [_ _ _], r#"Marshal.StructureToPtr<{}>(value, ptr, false);"#, type_string)?;
         indented!(w, [_ _], r#"}}"#)?;
         indented!(w, [_], r#"}}"#)?;
 

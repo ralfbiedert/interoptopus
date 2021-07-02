@@ -61,6 +61,17 @@ pub trait CSharpTypeConverter {
 
                     format!("{}[]", self.to_typespecifier_in_param(element_type))
                 }
+                TypePattern::SliceMut(p) => {
+                    let element_type = p
+                        .fields()
+                        .get(0)
+                        .expect("First parameter must exist")
+                        .the_type()
+                        .deref_pointer()
+                        .expect("Must be pointer");
+                    format!("{}[]", self.to_typespecifier_in_param(element_type))
+                }
+
                 TypePattern::Option(e) => self.composite_to_typename(e),
             },
             x => self.to_typespecifier_in_param(x),
@@ -95,6 +106,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::AsciiPointer => "string".to_string(),
                 TypePattern::SuccessEnum(e) => self.enum_to_typename(e.the_enum()),
                 TypePattern::Slice(e) => self.composite_to_typename(e),
+                TypePattern::SliceMut(e) => self.composite_to_typename(e),
                 TypePattern::Option(e) => self.composite_to_typename(e),
                 TypePattern::NamedCallback(e) => self.named_callback_to_typename(e),
             },
@@ -127,6 +139,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::AsciiPointer => "string".to_string(),
                 TypePattern::SuccessEnum(e) => self.enum_to_typename(e.the_enum()),
                 TypePattern::Slice(x) => self.composite_to_typename(x),
+                TypePattern::SliceMut(x) => self.composite_to_typename(x),
                 TypePattern::Option(x) => self.composite_to_typename(x),
                 TypePattern::NamedCallback(x) => self.named_callback_to_typename(x),
             },
@@ -146,6 +159,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::AsciiPointer => "string".to_string(),
                 TypePattern::SuccessEnum(e) => self.enum_to_typename(e.the_enum()),
                 TypePattern::Slice(x) => self.composite_to_typename(x),
+                TypePattern::SliceMut(x) => self.composite_to_typename(x),
                 TypePattern::Option(x) => self.composite_to_typename(x),
                 TypePattern::NamedCallback(x) => self.named_callback_to_typename(x),
             },

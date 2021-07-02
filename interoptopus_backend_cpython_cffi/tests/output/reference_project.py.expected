@@ -115,6 +115,12 @@ typedef struct cffi_ffisliceu8
     uint64_t len;
     } cffi_ffisliceu8;
 
+typedef struct cffi_ffislicemutu8
+    {
+    uint8_t* data;
+    uint64_t len;
+    } cffi_ffislicemutu8;
+
 typedef struct cffi_ffioptioninner
     {
     cffi_inner t;
@@ -134,6 +140,8 @@ typedef struct cffi_ffislicevec3f32
     } cffi_ffislicevec3f32;
 
 typedef uint8_t (*cffi_fptr_fn_FFISliceu8_rval_u8)(cffi_ffisliceu8 x0);
+
+typedef void (*cffi_fptr_fn_FFISliceMutu8)(cffi_ffislicemutu8 x0);
 
 typedef cffi_vec3f32 (*cffi_fptr_fn_FFISliceVec3f32_rval_Vec3f32)(cffi_ffislicevec3f32 x0);
 
@@ -177,6 +185,7 @@ uint32_t pattern_ascii_pointer_1(uint8_t* x);
 uint32_t pattern_ascii_pointer_len(uint8_t* x, cffi_useasciistringpattern y);
 uint32_t pattern_ffi_slice_1(cffi_ffisliceu32 ffi_slice);
 cffi_vec3f32 pattern_ffi_slice_2(cffi_ffislicevec3f32 ffi_slice, int32_t i);
+void pattern_ffi_slice_3(cffi_ffislicemutu8 slice, cffi_fptr_fn_FFISliceMutu8 callback);
 uint8_t pattern_ffi_slice_delegate(cffi_fptr_fn_FFISliceu8_rval_u8 callback);
 cffi_vec3f32 pattern_ffi_slice_delegate_huge(cffi_fptr_fn_FFISliceVec3f32_rval_Vec3f32 callback);
 cffi_ffioptioninner pattern_ffi_option_1(cffi_ffioptioninner ffi_slice);
@@ -614,6 +623,7 @@ class callbacks:
     fn_u8_rval_u8 = "uint8_t(uint8_t)"
     fn_FFISliceu8_rval_u8 = "uint8_t(cffi_ffisliceu8)"
     fn_FFISliceVec3f32_rval_Vec3f32 = "cffi_vec3f32(cffi_ffislicevec3f32)"
+    fn_FFISliceMutu8 = "void(cffi_ffislicemutu8)"
     fn_u32_rval_u32 = "uint32_t(uint32_t)"
 
 
@@ -929,6 +939,15 @@ Parameter x must point to valid data."""
         if hasattr(i, "_ctx"):
             i = i._ctx[0]
         return _api.pattern_ffi_slice_2(ffi_slice, i)
+
+    def pattern_ffi_slice_3(slice, callback):
+        """"""
+        global _api
+        if hasattr(slice, "_ctx"):
+            slice = slice._ctx[0]
+        if hasattr(callback, "_ctx"):
+            callback = callback._ctx[0]
+        return _api.pattern_ffi_slice_3(slice, callback)
 
     def pattern_ffi_slice_delegate(callback):
         """"""

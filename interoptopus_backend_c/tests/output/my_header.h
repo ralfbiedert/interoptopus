@@ -122,6 +122,12 @@ typedef struct my_library_ffisliceu8
     uint64_t len;
     } my_library_ffisliceu8;
 
+typedef struct my_library_ffislicemutu8
+    {
+    uint8_t* data;
+    uint64_t len;
+    } my_library_ffislicemutu8;
+
 typedef struct my_library_ffioptioninner
     {
     my_library_inner t;
@@ -141,6 +147,8 @@ typedef struct my_library_ffislicevec3f32
     } my_library_ffislicevec3f32;
 
 typedef uint8_t (*my_library_fptr_fn_FFISliceu8_rval_u8)(my_library_ffisliceu8 x0);
+
+typedef void (*my_library_fptr_fn_FFISliceMutu8)(my_library_ffislicemutu8 x0);
 
 typedef my_library_vec3f32 (*my_library_fptr_fn_FFISliceVec3f32_rval_Vec3f32)(my_library_ffislicevec3f32 x0);
 
@@ -184,6 +192,7 @@ uint32_t pattern_ascii_pointer_1(uint8_t* x);
 uint32_t pattern_ascii_pointer_len(uint8_t* x, my_library_useasciistringpattern y);
 uint32_t pattern_ffi_slice_1(my_library_ffisliceu32 ffi_slice);
 my_library_vec3f32 pattern_ffi_slice_2(my_library_ffislicevec3f32 ffi_slice, int32_t i);
+void pattern_ffi_slice_3(my_library_ffislicemutu8 slice, my_library_fptr_fn_FFISliceMutu8 callback);
 uint8_t pattern_ffi_slice_delegate(my_library_fptr_fn_FFISliceu8_rval_u8 callback);
 my_library_vec3f32 pattern_ffi_slice_delegate_huge(my_library_fptr_fn_FFISliceVec3f32_rval_Vec3f32 callback);
 my_library_ffioptioninner pattern_ffi_option_1(my_library_ffioptioninner ffi_slice);

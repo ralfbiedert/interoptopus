@@ -125,6 +125,12 @@ macro_rules! pattern_callback {
             }
         }
 
+        impl From<extern "C" fn($($ty),*) -> $rval> for $name {
+            fn from(x: extern "C" fn($($ty),*) -> $rval) -> Self {
+                Self(Some(x))
+            }
+        }
+
         unsafe impl interoptopus::lang::rust::CTypeInfo for $name {
             fn type_info() -> interoptopus::lang::c::CType {
                 use interoptopus::lang::rust::CTypeInfo;
