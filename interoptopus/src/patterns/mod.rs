@@ -9,8 +9,8 @@
 //!
 //! ## Pattern Usage
 //!
-//! Unless otherwise stated, a pattern is used by, well, using it in a signature. For example,
-//! instead of using `*const u8` (or similar) in the following `print` function:
+//! Unless otherwise stated patterns are used by, well, using them in signatures. For example,
+//! instead of making `x` a type `*const u8` (or similar) in the following `print` function:
 //!
 //! ```
 //! # use interoptopus::ffi_function;
@@ -23,7 +23,7 @@
 //!
 //! ```
 //!
-//! you would instead use [`AsciiPointer`](crate::patterns::ascii_pointer::AsciiPointer):
+//! you would instead accept an [`AsciiPointer`](crate::patterns::ascii_pointer::AsciiPointer):
 //!
 //! ```
 //! # use interoptopus::ffi_function;
@@ -64,6 +64,11 @@
 //!
 //! In other words, regardless of which pattern was used, the involved methods and types will always
 //! be accessible from any language.
+//!
+//! # Status
+//!
+//! Some patterns have seen more testing (and documentation) than others. The ones
+//! marked <sup>🚧</sup> should be considered particularly work-in-progress.
 
 use crate::lang::c::{CType, CompositeType, PrimitiveType};
 use crate::patterns::callbacks::NamedCallback;

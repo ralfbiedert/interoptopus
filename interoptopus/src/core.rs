@@ -4,7 +4,7 @@ use crate::util::{ctypes_from_functions, extract_namespaces_from_types};
 use std::collections::HashSet;
 
 /// Represents all FFI-relevant items, produced via [`inventory`](crate::inventory), ingested by backends.
-#[derive(Clone, Debug, PartialOrd, PartialEq)]
+#[derive(Clone, Debug, PartialOrd, PartialEq, Default)]
 pub struct Library {
     functions: Vec<Function>,
     ctypes: Vec<CType>,
@@ -70,4 +70,41 @@ impl Library {
     pub fn patterns(&self) -> &[LibraryPattern] {
         &self.patterns
     }
+}
+
+/// Create a single [`Library`](Library) from a number of individual libraries.
+///
+/// This function can be useful when your FFI crate exports different sets of
+/// symbols (e.g., _core_ and _extension_ functions) and you want to create different
+/// bindings based on some compile target or configuration
+///
+/// # Example
+///
+/// ```
+/// # mod my_crate {
+/// #     use interoptopus::Library;
+/// #     pub fn inventory_core() -> Library { Library::default() }
+/// #     pub fn inventory_ext() -> Library { Library::default() }
+/// # }
+/// use interoptopus::merge_libraries;
+///
+/// let libraries = [
+///     my_crate::inventory_core(),
+///     my_crate::inventory_ext()
+/// ];
+///
+/// merge_libraries(&libraries);
+/// ```
+pub fn merge_libraries(libraries: &[Library]) -> Library {
+    let mut functions = Vec::new();
+    let mut constants = Vec::new();
+    let mut patterns = Vec::new();
+
+    for library in libraries {
+        functions.extend_from_slice(library.functions());
+        constants.extend_from_slice(library.constants());
+        patterns.extend_from_slice(library.patterns());
+    }
+
+    Library::new(functions, constants, patterns)
 }

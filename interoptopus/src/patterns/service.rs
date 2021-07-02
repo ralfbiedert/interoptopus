@@ -1,4 +1,4 @@
-//! Bundles function with common receiver into a `class` or service in object oriented languages.
+//! Bundles function with common receiver into a `class` or service in object oriented languages.<sup>🚧</sup>
 //!
 //! Services are defined via the [**pattern_service_manual**](crate::pattern_service_manual) macro and consists of the following items:
 //!

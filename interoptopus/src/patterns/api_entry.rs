@@ -1,4 +1,4 @@
-//! Helpers for API loading patterns as [described in this blog post](https://anteru.net/blog/2016/designing-c-apis-in-2016/).
+//! Helpers for API loading patterns as [described in this blog post](https://anteru.net/blog/2016/designing-c-apis-in-2016/).<sup>🚧</sup>
 //!
 //! See [this macro](crate::pattern_api_entry) for details.
 

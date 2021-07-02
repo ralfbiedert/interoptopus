@@ -125,7 +125,7 @@ pub use error::Error;
 #[cfg_attr(docsrs, doc(cfg(feature = "derive")))] // does this work?
 pub use interoptopus_proc::{ffi_constant, ffi_function, ffi_type};
 
-pub use crate::core::Library;
+pub use crate::core::{merge_libraries, Library};
 pub use generators::Interop;
 
 mod core;
