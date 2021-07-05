@@ -20,7 +20,7 @@ cc = { version = "1.0", optional = true }
 serde = { version = "1.0", optional = true, features = ["derive"] }
 
 [dev-dependencies]
-interoptopus_backend_csharp = { path = "../interoptopus_backend_csharp", version = "0.1" }
+interoptopus_backend_csharp = { path = "../interoptopus_backend_csharp" }
 
 [package.metadata.docs.rs]
 all-features = true

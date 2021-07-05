@@ -17,5 +17,5 @@ unity = []
 interoptopus = { path = "../interoptopus", version = "0.2.0" }
 
 [dev-dependencies]
-interoptopus = { path = "../interoptopus", version = "0.1", features = ["testing"] }
-interoptopus_reference_project = { path = "../interoptopus_reference_project", version = "0.1" }
+interoptopus = { path = "../interoptopus", features = ["testing"] }
+interoptopus_reference_project = { path = "../interoptopus_reference_project" }
