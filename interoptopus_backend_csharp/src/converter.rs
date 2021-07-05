@@ -73,6 +73,7 @@ pub trait CSharpTypeConverter {
                 }
 
                 TypePattern::Option(e) => self.composite_to_typename(e),
+                TypePattern::Bool => self.to_typespecifier_in_param(&p.fallback_type()),
             },
             x => self.to_typespecifier_in_param(x),
         }
@@ -93,7 +94,7 @@ pub trait CSharpTypeConverter {
     }
 
     /// Converts the `u32` part in a Rust field `x: u32` to a C# equivalent. Might convert pointers to `IntPtr`.
-    fn to_typespecifier_in_field(&self, x: &CType, _field: &Field, _composite: &CompositeType) -> String {
+    fn to_typespecifier_in_field(&self, x: &CType, field: &Field, composite: &CompositeType) -> String {
         match &x {
             CType::Primitive(x) => self.primitive_to_typename(x),
             CType::Enum(x) => self.enum_to_typename(x),
@@ -109,6 +110,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::SliceMut(e) => self.composite_to_typename(e),
                 TypePattern::Option(e) => self.composite_to_typename(e),
                 TypePattern::NamedCallback(e) => self.named_callback_to_typename(e),
+                TypePattern::Bool => self.to_typespecifier_in_field(&x.fallback_type(), field, composite),
             },
         }
     }
@@ -142,6 +144,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::SliceMut(x) => self.composite_to_typename(x),
                 TypePattern::Option(x) => self.composite_to_typename(x),
                 TypePattern::NamedCallback(x) => self.named_callback_to_typename(x),
+                TypePattern::Bool => self.to_typespecifier_in_param(&x.fallback_type()),
             },
         }
     }
@@ -162,6 +165,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::SliceMut(x) => self.composite_to_typename(x),
                 TypePattern::Option(x) => self.composite_to_typename(x),
                 TypePattern::NamedCallback(x) => self.named_callback_to_typename(x),
+                TypePattern::Bool => self.to_typespecifier_in_rval(&x.fallback_type()),
             },
         }
     }

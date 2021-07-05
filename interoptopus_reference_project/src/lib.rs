@@ -15,6 +15,7 @@ pub mod patterns {
     pub mod ascii_pointer;
     pub mod callbacks;
     pub mod option;
+    pub mod primitives;
     pub mod service_generated;
     pub mod service_manual;
     pub mod slice;
@@ -70,6 +71,7 @@ interoptopus::inventory!(
         patterns::slice::pattern_ffi_slice_delegate_huge,
         patterns::option::pattern_ffi_option_1,
         patterns::option::pattern_ffi_option_2,
+        patterns::primitives::pattern_ffi_bool,
         patterns::api_entry::my_api_init_v1,
         patterns::callbacks::pattern_callback_1
     ],

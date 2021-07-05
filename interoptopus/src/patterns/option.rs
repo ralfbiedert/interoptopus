@@ -2,6 +2,7 @@
 use crate::lang::c::{CType, CompositeType, Documentation, Field, PrimitiveType, Visibility};
 use crate::lang::rust::CTypeInfo;
 
+use crate::patterns::primitives::FFIBool;
 use crate::patterns::TypePattern;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -17,41 +18,41 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Default))]
 pub struct FFIOption<T> {
     t: T,
-    is_some: u8,
+    is_some: FFIBool,
 }
 
 impl<T> FFIOption<T> {
     pub const fn some(data: T) -> Self {
-        Self { is_some: 1, t: data }
+        Self { is_some: FFIBool::TRUE, t: data }
     }
 
     #[allow(clippy::missing_const_for_fn)]
     pub fn into_option(self) -> Option<T> {
-        match self.is_some {
-            1 => Option::Some(self.t),
-            _ => Option::None,
+        match self.is_some.is() {
+            true => Option::Some(self.t),
+            false => Option::None,
         }
     }
 
-    pub const fn as_ref(&self) -> Option<&T> {
-        match self.is_some {
-            1 => Option::Some(&self.t),
-            _ => Option::None,
+    pub fn as_ref(&self) -> Option<&T> {
+        match self.is_some.is() {
+            true => Option::Some(&self.t),
+            false => Option::None,
         }
     }
 
     pub fn as_mut(&mut self) -> Option<&mut T> {
-        match self.is_some {
-            1 => Option::Some(&mut self.t),
-            _ => Option::None,
+        match self.is_some.is() {
+            true => Option::Some(&mut self.t),
+            false => Option::None,
         }
     }
 
-    pub const fn is_some(&self) -> bool {
-        self.is_some == 1
+    pub fn is_some(&self) -> bool {
+        self.is_some.is()
     }
 
-    pub const fn is_none(&self) -> bool {
+    pub fn is_none(&self) -> bool {
         !self.is_some()
     }
 
@@ -62,7 +63,7 @@ impl<T> FFIOption<T> {
     /// Panics if the value is `None`.
     #[track_caller]
     pub fn unwrap(self) -> T {
-        if self.is_some == 1 {
+        if self.is_some.is() {
             self.t
         } else {
             panic!("Trying to unwrap None value");
@@ -76,7 +77,7 @@ impl<T> FFIOption<T> {
     /// Panics if the value is `None`.
     #[track_caller]
     pub fn unwrap_as_mut(&mut self) -> &mut T {
-        if self.is_some == 1 {
+        if self.is_some.is() {
             &mut self.t
         } else {
             panic!("Trying to unwrap None value");
@@ -86,7 +87,10 @@ impl<T> FFIOption<T> {
 
 impl<T: Default> FFIOption<T> {
     pub fn none() -> Self {
-        Self { is_some: 0, t: T::default() }
+        Self {
+            is_some: FFIBool::FALSE,
+            t: T::default(),
+        }
     }
 }
 

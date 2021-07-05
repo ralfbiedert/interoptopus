@@ -190,6 +190,7 @@ uint8_t pattern_ffi_slice_delegate(cffi_fptr_fn_FFISliceu8_rval_u8 callback);
 cffi_vec3f32 pattern_ffi_slice_delegate_huge(cffi_fptr_fn_FFISliceVec3f32_rval_Vec3f32 callback);
 cffi_ffioptioninner pattern_ffi_option_1(cffi_ffioptioninner ffi_slice);
 cffi_inner pattern_ffi_option_2(cffi_ffioptioninner ffi_slice);
+uint8_t pattern_ffi_bool(uint8_t ffi_bool);
 void my_api_init_v1(cffi_myapiv1* api);
 uint32_t pattern_callback_1(cffi_fptr_fn_u32_rval_u32 callback, uint32_t x);
 cffi_ffierror pattern_service_create(cffi_context** context_ptr, uint32_t value);
@@ -976,6 +977,13 @@ Parameter x must point to valid data."""
         if hasattr(ffi_slice, "_ctx"):
             ffi_slice = ffi_slice._ctx[0]
         return _api.pattern_ffi_option_2(ffi_slice)
+
+    def pattern_ffi_bool(ffi_bool):
+        """"""
+        global _api
+        if hasattr(ffi_bool, "_ctx"):
+            ffi_bool = ffi_bool._ctx[0]
+        return _api.pattern_ffi_bool(ffi_bool)
 
     def my_api_init_v1(api):
         """"""

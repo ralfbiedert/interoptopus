@@ -79,6 +79,7 @@ pub mod api_entry;
 pub mod ascii_pointer;
 pub mod callbacks;
 pub mod option;
+pub mod primitives;
 pub mod service;
 pub mod slice;
 pub mod success_enum;
@@ -103,6 +104,7 @@ pub enum TypePattern {
     Slice(CompositeType),
     SliceMut(CompositeType),
     Option(CompositeType),
+    Bool,
     NamedCallback(NamedCallback),
 }
 
@@ -119,6 +121,7 @@ impl TypePattern {
             TypePattern::SliceMut(x) => CType::Composite(x.clone()),
             TypePattern::Option(x) => CType::Composite(x.clone()),
             TypePattern::NamedCallback(x) => CType::FnPointer(x.fnpointer().clone()),
+            TypePattern::Bool => CType::Primitive(PrimitiveType::U8),
         }
     }
 }

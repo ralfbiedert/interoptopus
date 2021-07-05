@@ -244,6 +244,7 @@ pub trait CSharpWriter {
                         w.newline()?;
                     }
                 }
+                TypePattern::Bool => {}
             },
         }
         Ok(())

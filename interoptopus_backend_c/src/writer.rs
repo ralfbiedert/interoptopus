@@ -137,6 +137,7 @@ pub trait CWriter {
                     self.write_type_definition_composite(w, x)?;
                     w.newline()?;
                 }
+                TypePattern::Bool => {}
             },
         }
         Ok(())

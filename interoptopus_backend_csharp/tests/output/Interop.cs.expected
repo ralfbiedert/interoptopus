@@ -224,6 +224,10 @@ namespace My.Company
         public static extern Inner pattern_ffi_option_2(FFIOptionInner ffi_slice);
 
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_bool")]
+        public static extern byte pattern_ffi_bool(byte ffi_bool);
+
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "my_api_init_v1")]
         public static extern void my_api_init_v1(out MyAPIv1 api);
 
