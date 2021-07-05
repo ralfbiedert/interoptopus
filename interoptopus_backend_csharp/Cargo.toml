@@ -2,7 +2,7 @@
 name = "interoptopus_backend_csharp"
 description = "Generates C# bindings."
 authors = ["Ralf Biedert <rb@xr.io>"]
-version = "0.2.0"
+version = "0.2.1"
 edition = "2018"
 license = "MIT"
 keywords = ["ffi", "code-generation", "bindings", "csharp", "dotnet"]
