@@ -713,20 +713,29 @@ pub trait CSharpWriter {
         }
 
         let arg_tokens = names.iter().zip(types.iter()).map(|(n, t)| format!("{} {}", t, n)).collect::<Vec<_>>();
-        let return_stmt = if function.signature().rval().is_void() { "" } else { "return " };
+        let fn_call = format!(r#"{}.{}(_context, {})"#, self.config().class, function.name(), names.join(", "));
 
         indented!(w, r#"public {} {}({})"#, rval, fn_name, arg_tokens.join(", "))?;
         indented!(w, r#"{{"#)?;
-        indented!(
-            w,
-            [_],
-            r#"{}{}.{}(_context, {});"#,
-            return_stmt,
-            self.config().class,
-            function.name(),
-            names.join(", ")
-        )?;
+
+        match function.signature().rval() {
+            CType::Pattern(TypePattern::SuccessEnum(e)) => {
+                indented!(w, [_], r#"var rval = {};"#, fn_call)?;
+                indented!(w, [_], r#"if (rval != {}.{})"#, e.the_enum().rust_name(), e.success_variant().name())?;
+                indented!(w, [_], r#"{{"#)?;
+                indented!(w, [_ _], r#"throw new Exception("Something went wrong");"#)?;
+                indented!(w, [_], r#"}}"#)?;
+            }
+            CType::Primitive(PrimitiveType::Void) => {
+                indented!(w, [_], r#"{};"#, fn_call)?;
+            }
+            _ => {
+                indented!(w, [_], r#"return {};"#, fn_call)?;
+            }
+        }
+
         indented!(w, r#"}}"#)?;
+
         Ok(())
     }
 

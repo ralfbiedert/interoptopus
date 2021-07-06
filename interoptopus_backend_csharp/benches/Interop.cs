@@ -311,6 +311,22 @@ namespace My.Company
             }
         }
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_mut_self_ffi_error")]
+        public static extern FFIError simple_service_mut_self_ffi_error(IntPtr context_ptr, FFISliceu8 slice);
+
+        public static FFIError simple_service_mut_self_ffi_error(IntPtr context_ptr, byte[] slice) {
+            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
+            var slice_slice = new FFISliceu8(slice_pinned, (ulong) slice.Length);
+            try
+            {
+                return simple_service_mut_self_ffi_error(context_ptr, slice_slice);
+            }
+            finally
+            {
+                slice_pinned.Free();
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_void")]
         public static extern void simple_service_void(IntPtr context_ptr);
 
@@ -840,6 +856,24 @@ namespace My.Company
         public void MutSelfVoid(byte[] slice)
         {
             Interop.simple_service_mut_self_void(_context, slice);
+        }
+
+        public void MutSelfFfiError(FFISliceu8 slice)
+        {
+            var rval = Interop.simple_service_mut_self_ffi_error(_context ,  slice);
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception("Something went wrong");
+            }
+        }
+
+        public void MutSelfFfiError(byte[] slice)
+        {
+            var rval = Interop.simple_service_mut_self_ffi_error(_context, slice);
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception("Something went wrong");
+            }
         }
 
         public void Void()
