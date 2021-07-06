@@ -19,8 +19,8 @@ pub mod some_rust_module {
 
     // Regular implementation of methods.
     impl SimpleService {
-        pub fn new_with(some_value: u32) -> Self {
-            Self { some_value }
+        pub fn new_with(some_value: u32) -> Result<Self, Error> {
+            Ok(Self { some_value })
         }
 
         pub fn method_result(&self, _: u32) -> Result<(), Error> {
@@ -40,8 +40,8 @@ pub mod some_rust_module {
 }
 
 // Needed for Error to FFIError conversion.
-impl From<Result<(), Error>> for FFIError {
-    fn from(x: Result<(), Error>) -> Self {
+impl<T> From<Result<T, Error>> for FFIError {
+    fn from(x: Result<T, Error>) -> Self {
         match x {
             Ok(_) => Self::Ok,
             Err(Error::Bad) => Self::Fail,

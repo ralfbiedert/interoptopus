@@ -248,18 +248,26 @@ macro_rules! pattern_service_generated {
         #[no_mangle]
         pub extern "C" fn $ctor(context_ptr: Option<&mut *mut $opaque>, $( $ctor_param: $ctor_param_type),*) -> $ctor_error {
             if let Some(context) = context_ptr {
-                let raw = std::panic::catch_unwind(|| {
-                    let boxed = Box::new(<$opaque>::$method_ctor($($ctor_param),*));
-                    Box::into_raw(boxed)
+
+                let result_result = std::panic::catch_unwind(|| {
+                    <$opaque>::$method_ctor($($ctor_param),*)
                 });
 
-                if let Ok(raw) = raw {
-                    *context = raw;
-                } else {
-                    return <$ctor_error as interoptopus::patterns::success_enum::Success>::PANIC;
-                }
+                match result_result {
+                    Ok(Ok(obj)) => {
+                        let boxed = Box::new(obj);
+                        let raw = Box::into_raw(boxed);
+                        *context = raw;
 
-                <$ctor_error as interoptopus::patterns::success_enum::Success>::SUCCESS
+                        <$ctor_error as interoptopus::patterns::success_enum::Success>::SUCCESS
+                    }
+                    Ok(x) => {
+                        x.into()
+                    }
+                    Err(_) => {
+                        <$ctor_error as interoptopus::patterns::success_enum::Success>::PANIC
+                    }
+                }
             } else {
                 <$ctor_error as interoptopus::patterns::success_enum::Success>::NULL
             }
