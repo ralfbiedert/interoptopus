@@ -153,6 +153,9 @@ pub trait CSharpWriter {
             params.push(format!("{} {}", native, name));
         }
 
+
+        let return_stmt = if function.signature().rval().is_void() { "" } else { "return " };
+
         indented!(w, r#"public static {} {}({}) {{"#, rval, name, params.join(", "))?;
 
         for (pin_var, slice_struct) in to_pin_name.iter().zip(to_pin_slice_type.iter()) {
@@ -162,7 +165,7 @@ pub trait CSharpWriter {
 
         indented!(w, [_], r#"try"#)?;
         indented!(w, [_], r#"{{"#)?;
-        indented!(w, [_ _], r#"return {}({});"#, name, to_invoke.join(", "))?;
+        indented!(w, [_ _], r#"{}{}({});"#, return_stmt, name, to_invoke.join(", "))?;
         indented!(w, [_], r#"}}"#)?;
         indented!(w, [_], r#"finally"#)?;
         indented!(w, [_], r#"{{"#)?;
@@ -710,10 +713,19 @@ pub trait CSharpWriter {
         }
 
         let arg_tokens = names.iter().zip(types.iter()).map(|(n, t)| format!("{} {}", t, n)).collect::<Vec<_>>();
+        let return_stmt = if function.signature().rval().is_void() { "" } else { "return " };
 
-        indented!(w, r#"public {} {}({})"#, rval, fn_name, arg_tokens.join(","))?;
+        indented!(w, r#"public {} {}({})"#, rval, fn_name, arg_tokens.join(", "))?;
         indented!(w, r#"{{"#)?;
-        indented!(w, [_], r#"return {}.{}(_context, {});"#, self.config().class, function.name(), names.join(","))?;
+        indented!(
+            w,
+            [_],
+            r#"{}{}.{}(_context, {});"#,
+            return_stmt,
+            self.config().class,
+            function.name(),
+            names.join(", ")
+        )?;
         indented!(w, r#"}}"#)?;
         Ok(())
     }

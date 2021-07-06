@@ -183,6 +183,11 @@ impl CType {
             _ => None,
         }
     }
+
+    /// Checks if this is a [`PrimitiveType::Void`].
+    pub fn is_void(&self) -> bool {
+        matches!(self, CType::Primitive(PrimitiveType::Void))
+    }
 }
 
 /// A primitive type that natively exists in C and is FFI safe.

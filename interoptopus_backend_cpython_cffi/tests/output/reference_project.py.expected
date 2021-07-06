@@ -209,6 +209,7 @@ cffi_ffierror simple_service_destroy(cffi_simpleservice** context_ptr);
 cffi_ffierror simple_service_result(cffi_simpleservice* context_ptr, uint32_t x);
 uint32_t simple_service_value(cffi_simpleservice* context_ptr, uint32_t x);
 uint8_t simple_service_mut_self(cffi_simpleservice* context_ptr, cffi_ffisliceu8 slice);
+void simple_service_mut_self_void(cffi_simpleservice* context_ptr, cffi_ffisliceu8 slice);
 void simple_service_void(cffi_simpleservice* context_ptr);
 uint32_t simple_service_extra_method(cffi_simpleservice* _context);
 """
@@ -1119,6 +1120,15 @@ This function may only be called with a context returned by a succeeding `patter
             slice = slice._ctx[0]
         return _api.simple_service_mut_self(context_ptr, slice)
 
+    def simple_service_mut_self_void(context_ptr, slice):
+        """"""
+        global _api
+        if hasattr(context_ptr, "_ctx"):
+            context_ptr = context_ptr._ctx[0]
+        if hasattr(slice, "_ctx"):
+            slice = slice._ctx[0]
+        return _api.simple_service_mut_self_void(context_ptr, slice)
+
     def simple_service_void(context_ptr):
         """"""
         global _api
@@ -1222,6 +1232,11 @@ class SimpleService(object):
         """"""
         global raw
         return _api.simple_service_mut_self(self.ctx[0], slice)
+
+    def mut_self_void(self, slice):
+        """"""
+        global raw
+        return _api.simple_service_mut_self_void(self.ctx[0], slice)
 
     def void(self, ):
         """"""

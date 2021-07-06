@@ -38,6 +38,8 @@ pub mod some_rust_module {
         pub fn method_mut_self(&mut self, slice: FFISlice<u8>) -> u8 {
             *slice.as_slice().unwrap_or(&[0]).get(0).unwrap_or(&0)
         }
+
+        pub fn method_mut_self_void(&mut self, _slice: FFISlice<u8>) {}
     }
 }
 
@@ -68,6 +70,7 @@ pattern_service_generated!(
         simple_service_result(&mut SimpleService, x: u32) -> FFIError: method_result,
         simple_service_value(&mut SimpleService, x: u32) -> u32: method_value,
         simple_service_mut_self(&mut SimpleService, slice: FFISlice<u8>) -> u8: method_mut_self,
+        simple_service_mut_self_void(&mut SimpleService, slice: FFISlice<u8>) -> (): method_mut_self_void,
         simple_service_void(&SimpleService) -> (): method_void
     ],
     [
