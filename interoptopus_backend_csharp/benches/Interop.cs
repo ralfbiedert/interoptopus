@@ -280,8 +280,20 @@ namespace My.Company
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_mut_self")]
-        public static extern uint simple_service_mut_self(IntPtr context_ptr, uint x);
+        public static extern byte simple_service_mut_self(IntPtr context_ptr, FFISliceu8 slice);
 
+        public static byte simple_service_mut_self(IntPtr context_ptr, byte[] slice) {
+            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
+            var slice_slice = new FFISliceu8(slice_pinned, (ulong) slice.Length);
+            try
+            {
+                return simple_service_mut_self(context_ptr, slice_slice);
+            }
+            finally
+            {
+                slice_pinned.Free();
+            }
+        }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_void")]
         public static extern void simple_service_void(IntPtr context_ptr);
@@ -794,9 +806,14 @@ namespace My.Company
             return Interop.simple_service_value(_context ,  x);
         }
 
-        public uint MutSelf(uint x)
+        public byte MutSelf(FFISliceu8 slice)
         {
-            return Interop.simple_service_mut_self(_context ,  x);
+            return Interop.simple_service_mut_self(_context ,  slice);
+        }
+
+        public byte MutSelf(byte[] slice)
+        {
+            return Interop.simple_service_mut_self(_context, slice);
         }
 
         public void Void()

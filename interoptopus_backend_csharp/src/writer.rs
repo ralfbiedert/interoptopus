@@ -419,7 +419,7 @@ pub trait CSharpWriter {
             match pattern {
                 LibraryPattern::Service(cls) => {
                     if self.should_emit(cls.the_type().meta()) {
-                        self.write_pattern_class(w, cls)?
+                        self.write_pattern_service(w, cls)?
                     }
                 }
             }
@@ -627,7 +627,7 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_pattern_class(&self, w: &mut IndentWriter, class: &Service) -> Result<(), Error> {
+    fn write_pattern_service(&self, w: &mut IndentWriter, class: &Service) -> Result<(), Error> {
         let mut all_functions = vec![class.constructor().clone(), class.destructor().clone()];
         all_functions.extend_from_slice(class.methods());
 
@@ -646,7 +646,7 @@ pub trait CSharpWriter {
         indented!(w, r#"public {}({})"#, context_type_name, args)?;
         indented!(w, r#"{{"#)?;
         w.indent();
-        self.write_pattern_class_success_enum_aware_rval(w, class, class.constructor(), false)?;
+        self.write_pattern_service_success_enum_aware_rval(w, class, class.constructor(), false)?;
         w.unindent();
         indented!(w, r#"}}"#)?;
         w.newline()?;
@@ -655,15 +655,17 @@ pub trait CSharpWriter {
         indented!(w, r#"public void Dispose()"#)?;
         indented!(w, r#"{{"#)?;
         w.indent();
-        self.write_pattern_class_success_enum_aware_rval(w, class, class.destructor(), false)?;
+        self.write_pattern_service_success_enum_aware_rval(w, class, class.destructor(), false)?;
         w.unindent();
         indented!(w, r#"}}"#)?;
         w.newline()?;
 
         for function in class.methods() {
+            // Main function
             let args = self.pattern_class_args_without_first_to_string(function, true);
             let without_common_prefix = function.name().replace(&common_prefix, "");
             let prettified = IdPrettifier::from_rust_lower(&without_common_prefix);
+            let fn_name = prettified.to_camel_case();
             let rval = match function.signature().rval() {
                 CType::Pattern(TypePattern::SuccessEnum(_)) => "void".to_string(),
                 _ => self.converter().to_typespecifier_in_rval(function.signature().rval()),
@@ -671,13 +673,20 @@ pub trait CSharpWriter {
 
             self.write_documentation(w, function.meta().documentation())?;
 
-            indented!(w, r#"public {} {}({})"#, rval, prettified.to_camel_case(), &args)?;
+            indented!(w, r#"public {} {}({})"#, rval, fn_name, &args)?;
             indented!(w, r#"{{"#)?;
             w.indent();
-            self.write_pattern_class_success_enum_aware_rval(w, class, function, true)?;
+            self.write_pattern_service_success_enum_aware_rval(w, class, function, true)?;
             w.unindent();
             indented!(w, r#"}}"#)?;
             w.newline()?;
+
+            // Overloaded
+            if self.converter().has_overloadable(function.signature()) {
+                self.write_documentation(w, function.meta().documentation())?;
+                self.write_pattern_service_method_overload(w, class, function, &rval, &fn_name)?;
+                w.newline()?;
+            }
         }
 
         w.unindent();
@@ -688,7 +697,28 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_pattern_class_success_enum_aware_rval(&self, w: &mut IndentWriter, _class: &Service, function: &Function, deref_context: bool) -> Result<(), Error> {
+    fn write_pattern_service_method_overload(&self, w: &mut IndentWriter, _class: &Service, function: &Function, rval: &str, fn_name: &str) -> Result<(), Error> {
+        let mut names = Vec::new();
+        let mut types = Vec::new();
+
+        for p in function.signature().params().iter().skip(1) {
+            let name = p.name();
+            let native = self.converter().pattern_to_native_in_signature(p, function.signature());
+
+            names.push(name);
+            types.push(native);
+        }
+
+        let arg_tokens = names.iter().zip(types.iter()).map(|(n, t)| format!("{} {}", t, n)).collect::<Vec<_>>();
+
+        indented!(w, r#"public {} {}({})"#, rval, fn_name, arg_tokens.join(","))?;
+        indented!(w, r#"{{"#)?;
+        indented!(w, [_], r#"return {}.{}(_context, {});"#, self.config().class, function.name(), names.join(","))?;
+        indented!(w, r#"}}"#)?;
+        Ok(())
+    }
+
+    fn write_pattern_service_success_enum_aware_rval(&self, w: &mut IndentWriter, _class: &Service, function: &Function, deref_context: bool) -> Result<(), Error> {
         let mut args = self.pattern_class_args_without_first_to_string(function, false);
 
         // Make sure we don't have a `,` when only single parameter

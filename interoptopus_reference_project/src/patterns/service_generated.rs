@@ -1,9 +1,11 @@
 use crate::patterns::success_enum::FFIError;
+use interoptopus::patterns::slice::FFISlice;
 use interoptopus::{ffi_function, pattern_service_generated};
 use some_rust_module::{Error, SimpleService};
 
 pub mod some_rust_module {
     use interoptopus::ffi_type;
+    use interoptopus::patterns::slice::FFISlice;
 
     // An error we use in a Rust library
     pub enum Error {
@@ -33,8 +35,8 @@ pub mod some_rust_module {
 
         pub fn method_void(&self) {}
 
-        pub fn method_mut_self(&mut self, x: u32) -> u32 {
-            x
+        pub fn method_mut_self(&mut self, slice: FFISlice<u8>) -> u8 {
+            *slice.as_slice().unwrap_or(&[0]).get(0).unwrap_or(&0)
         }
     }
 }
@@ -65,7 +67,7 @@ pattern_service_generated!(
     [
         simple_service_result(&mut SimpleService, x: u32) -> FFIError: method_result,
         simple_service_value(&mut SimpleService, x: u32) -> u32: method_value,
-        simple_service_mut_self(&mut SimpleService, x: u32) -> u32: method_mut_self,
+        simple_service_mut_self(&mut SimpleService, slice: FFISlice<u8>) -> u8: method_mut_self,
         simple_service_void(&SimpleService) -> (): method_void
     ],
     [
