@@ -74,6 +74,10 @@ pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
                 let token = x.to_token_stream();
                 quote! { < #token as interoptopus::lang::rust::CTypeInfo>::type_info() }
             }
+            Type::Array(x) => {
+                let token = x.to_token_stream();
+                quote! { < #token as interoptopus::lang::rust::CTypeInfo>::type_info() }
+            }
             _ => {
                 panic!("Unsupported type at interface boundary found for rval: {:?}.", x)
             }
@@ -104,6 +108,7 @@ pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
                     Type::Reference(x) => x.to_token_stream(),
                     Type::Group(x) => x.to_token_stream(),
                     Type::Ptr(x) => x.to_token_stream(),
+                    Type::Array(x) => x.to_token_stream(),
                     _ => {
                         panic!("Unsupported type at interface boundary found for parameter: {:?}.", pat.ty)
                     }

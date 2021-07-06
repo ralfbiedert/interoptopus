@@ -333,5 +333,6 @@ fn extract_obvious_opaque_from_parameter(param: &CType) -> Option<OpaqueType> {
         CType::ReadPointer(x) => extract_obvious_opaque_from_parameter(x),
         CType::ReadWritePointer(x) => extract_obvious_opaque_from_parameter(x),
         CType::Pattern(_) => None,
+        CType::Array(_) => None,
     }
 }

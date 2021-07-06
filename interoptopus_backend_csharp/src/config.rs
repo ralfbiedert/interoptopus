@@ -15,6 +15,11 @@ pub struct Config {
     pub namespace_id: String,
     /// Whether [`Visibility`](interoptopus::lang::c::Visibility) information should be honored.
     pub emit_rust_visibility: bool,
+    /// Whether, say, a `x: [u8; 3]` should become 3 `x0: u8, ...` instead.
+    ///
+    /// If this is not set, interop generation with arrays in structr will fail. This is a somewhat
+    /// open issue w.r.t Unity-sans-unsafe support and feedback would be greatly welcome!
+    pub unroll_struct_arrays: bool,
 }
 
 impl Config {}
@@ -28,6 +33,7 @@ impl Default for Config {
             namespace_mappings: NamespaceMappings::new("My.Company"),
             namespace_id: "".to_string(),
             emit_rust_visibility: false,
+            unroll_struct_arrays: false,
         }
     }
 }

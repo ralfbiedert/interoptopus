@@ -96,6 +96,11 @@ typedef uint8_t (*my_library_fptr_fn_u8_rval_u8)(uint8_t x0);
 
 typedef uint32_t (*my_library_fptr_fn_u32_rval_u32)(uint32_t x0);
 
+typedef struct my_library_array
+    {
+    uint8_t data[16];
+    } my_library_array;
+
 typedef struct my_library_genericu32
     {
     uint32_t* x;
@@ -181,6 +186,7 @@ uint32_t generic_1(my_library_genericu32 x, my_library_phantomu8 _y);
 uint8_t generic_2(my_library_genericu8 x, my_library_phantomu8 _y);
 uint8_t generic_3(my_library_generic2u8* x);
 uint8_t generic_4(my_library_generic3* x);
+uint8_t array_1(my_library_array x);
 my_library_enumdocumented documented(my_library_structdocumented _x);
 my_library_vec1 ambiguous_1(my_library_vec1 x);
 my_library_vec2 ambiguous_2(my_library_vec2 x);

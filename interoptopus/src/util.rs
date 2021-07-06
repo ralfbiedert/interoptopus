@@ -107,6 +107,7 @@ pub(crate) fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CTyp
                 ctypes_from_type_recursive(&field.the_type(), types);
             }
         }
+        CType::Array(inner) => ctypes_from_type_recursive(&inner.array_type(), types),
         CType::FnPointer(inner) => {
             ctypes_from_type_recursive(inner.signature().rval(), types);
             for param in inner.signature().params() {
@@ -157,6 +158,8 @@ pub(crate) fn extract_namespaces_from_types(types: &[CType], into: &mut HashSet<
     for t in types {
         match t {
             CType::Primitive(_) => {}
+            CType::Array(_) => {}
+
             CType::Enum(x) => {
                 into.insert(x.meta().namespace().to_string());
             }

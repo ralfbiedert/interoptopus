@@ -2,7 +2,7 @@
 
 use crate::patterns::success_enum::FFIError;
 use crate::types::{
-    ambiguous1, ambiguous2, common, some_foreign_type, Callbacku8u8, Empty, EnumDocumented, Generic, Generic2, Generic3, Opaque, Phantom, SomeForeignType,
+    ambiguous1, ambiguous2, common, some_foreign_type, Array, Callbacku8u8, Empty, EnumDocumented, Generic, Generic2, Generic3, Opaque, Phantom, SomeForeignType,
     StructDocumented, Tupled, Vec3f32,
 };
 use interoptopus::ffi_function;
@@ -180,6 +180,20 @@ pub extern "C" fn generic_3(x: &Generic2<u8>) -> u8 {
 pub extern "C" fn generic_4(x: &Generic3<u8>) -> u8 {
     x.x
 }
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn array_1(x: Array) -> u8 {
+    x.data[0]
+}
+
+// Apparently this is not valid C?
+// https://stackoverflow.com/questions/11656532/returning-an-array-using-c
+// #[ffi_function]
+// #[no_mangle]
+// pub extern "C" fn array_2(x: [u8; 16]) -> [u8; 16] {
+//     x
+// }
 
 /// This function has documentation.
 #[ffi_function]

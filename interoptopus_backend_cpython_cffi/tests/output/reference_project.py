@@ -89,6 +89,11 @@ typedef uint8_t (*cffi_fptr_fn_u8_rval_u8)(uint8_t x0);
 
 typedef uint32_t (*cffi_fptr_fn_u32_rval_u32)(uint32_t x0);
 
+typedef struct cffi_array
+    {
+    uint8_t data[16];
+    } cffi_array;
+
 typedef struct cffi_genericu32
     {
     uint32_t* x;
@@ -174,6 +179,7 @@ uint32_t generic_1(cffi_genericu32 x, cffi_phantomu8 _y);
 uint8_t generic_2(cffi_genericu8 x, cffi_phantomu8 _y);
 uint8_t generic_3(cffi_generic2u8* x);
 uint8_t generic_4(cffi_generic3* x);
+uint8_t array_1(cffi_array x);
 cffi_enumdocumented documented(cffi_structdocumented _x);
 cffi_vec1 ambiguous_1(cffi_vec1 x);
 cffi_vec2 ambiguous_2(cffi_vec2 x);
@@ -234,6 +240,29 @@ class EnumDocumented:
     A = 0
     B = 1
 
+
+class Array(object):
+    """"""
+    def __init__(self):
+        global _api, ffi
+        self._ctx = ffi.new("cffi_array[]", 1)
+
+    def array(n):
+        global _api, ffi
+        return ffi.new("cffi_array[]", n)
+
+    def ptr(self):
+        return self._ctx
+
+    @property
+    def data(self):
+        """"""
+        return self._ctx[0].data
+
+    @data.setter
+    def data(self, value):
+        self._ptr_data = value
+        self._ctx[0].data = value
 
 class Empty(object):
     """"""
@@ -859,6 +888,13 @@ Parameter x must point to valid data."""
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.generic_4(x)
+
+    def array_1(x):
+        """"""
+        global _api
+        if hasattr(x, "_ctx"):
+            x = x._ctx[0]
+        return _api.array_1(x)
 
     def documented(_x):
         """This function has documentation."""

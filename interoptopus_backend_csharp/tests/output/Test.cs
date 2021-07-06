@@ -7,6 +7,14 @@ namespace interop_test
 {
     public class GeneralTests
     {
+    
+        [Fact]
+        public void array_1()
+        {
+            var array = new Array {data0 = 5};
+            Assert.Equal(5, Interop.array_1(array));
+        }
+
         [Fact]
         public void pattern_ffi_slice_delegate()
         {

@@ -84,6 +84,28 @@ pub struct Container {
     pub foreign2: SomeForeignType,
 }
 
+#[ffi_type]
+#[repr(C)]
+pub struct Array {
+    pub data: [u8; 16],
+}
+
+#[ffi_type]
+#[repr(C)]
+pub struct GenericArray<T>
+where
+    T: CTypeInfo,
+{
+    pub data: [T; 16],
+}
+
+// TODO
+// #[ffi_type]
+// #[repr(C)]
+// pub struct ConstGenericArray<T, const N: usize> {
+//     data: [T; N]
+// }
+
 /// Documented enum.
 #[ffi_type]
 #[repr(C)]

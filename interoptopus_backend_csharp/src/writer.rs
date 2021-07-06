@@ -184,6 +184,7 @@ pub trait CSharpWriter {
     fn write_type_definition(&self, w: &mut IndentWriter, the_type: &CType) -> Result<(), Error> {
         match the_type {
             CType::Primitive(_) => {}
+            CType::Array(_) => {}
             CType::Enum(e) => {
                 if self.should_emit(e.meta()) {
                     self.write_type_definition_enum(w, e)?;
@@ -337,14 +338,36 @@ pub trait CSharpWriter {
     }
 
     fn write_type_definition_composite_body_field(&self, w: &mut IndentWriter, field: &Field, the_type: &CompositeType) -> Result<(), Error> {
-        let field_name = field.name();
-        let type_name = self.converter().to_typespecifier_in_field(field.the_type(), field, the_type);
-        let visibility = match field.visibility() {
-            Visibility::Public => "public ",
-            Visibility::Private => "",
-        };
+        match field.the_type() {
+            CType::Array(a) => {
+                if !self.config().unroll_struct_arrays {
+                    panic!("Unable to generate bindings for arrays in fields if `unroll_struct_arrays` is not enabled.");
+                }
 
-        indented!(w, r#"{}{} {};"#, visibility, type_name, field_name)
+                let field_name = field.name();
+                let type_name = self.converter().to_typespecifier_in_field(a.array_type(), field, the_type);
+                let visibility = match field.visibility() {
+                    Visibility::Public => "public ",
+                    Visibility::Private => "",
+                };
+
+                for i in 0..a.len() {
+                    indented!(w, r#"{}{} {}{};"#, visibility, type_name, field_name, i)?;
+                }
+
+                Ok(())
+            }
+            _ => {
+                let field_name = field.name();
+                let type_name = self.converter().to_typespecifier_in_field(field.the_type(), field, the_type);
+                let visibility = match field.visibility() {
+                    Visibility::Public => "public ",
+                    Visibility::Private => "",
+                };
+
+                indented!(w, r#"{}{} {};"#, visibility, type_name, field_name)
+            }
+        }
     }
 
     fn namespace_for_id(&self, id: &str) -> String {

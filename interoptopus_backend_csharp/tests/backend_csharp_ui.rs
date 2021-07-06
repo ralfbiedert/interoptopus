@@ -13,6 +13,7 @@ fn generate_bindings_multi(prefix: &str) -> Result<(), Error> {
     let config = Config {
         dll_name: "interoptopus_reference_project".to_string(),
         namespace_mappings,
+        unroll_struct_arrays: true,
         emit_rust_visibility: true,
         ..Config::default()
     };

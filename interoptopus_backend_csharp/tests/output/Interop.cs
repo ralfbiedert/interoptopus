@@ -135,6 +135,10 @@ namespace My.Company
         public static extern byte generic_4(IntPtr x);
 
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "array_1")]
+        public static extern byte array_1(Array x);
+
+
         /// This function has documentation.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "documented")]
         public static extern EnumDocumented documented(StructDocumented _x);
@@ -297,6 +301,28 @@ namespace My.Company
         A = 0,
         /// Variant B.
         B = 1,
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct Array
+    {
+        public byte data0;
+        public byte data1;
+        public byte data2;
+        public byte data3;
+        public byte data4;
+        public byte data5;
+        public byte data6;
+        public byte data7;
+        public byte data8;
+        public byte data9;
+        public byte data10;
+        public byte data11;
+        public byte data12;
+        public byte data13;
+        public byte data14;
+        public byte data15;
     }
 
     [Serializable]

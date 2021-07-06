@@ -97,6 +97,7 @@ pub trait CSharpTypeConverter {
     fn to_typespecifier_in_field(&self, x: &CType, field: &Field, composite: &CompositeType) -> String {
         match &x {
             CType::Primitive(x) => self.primitive_to_typename(x),
+            CType::Array(_) => panic!("Needs special handling in the writer."),
             CType::Enum(x) => self.enum_to_typename(x),
             CType::Opaque(x) => self.opaque_to_typename(x),
             CType::Composite(x) => self.composite_to_typename(x),
@@ -119,6 +120,7 @@ pub trait CSharpTypeConverter {
     fn to_typespecifier_in_param(&self, x: &CType) -> String {
         match &x {
             CType::Primitive(x) => self.primitive_to_typename(x),
+            CType::Array(_) => todo!(),
             CType::Enum(x) => self.enum_to_typename(x),
             CType::Opaque(x) => self.opaque_to_typename(x),
             CType::Composite(x) => self.composite_to_typename(x),
@@ -152,6 +154,7 @@ pub trait CSharpTypeConverter {
     fn to_typespecifier_in_rval(&self, x: &CType) -> String {
         match &x {
             CType::Primitive(x) => self.primitive_to_typename(x),
+            CType::Array(_) => todo!(),
             CType::Enum(x) => self.enum_to_typename(x),
             CType::Opaque(x) => self.opaque_to_typename(x),
             CType::Composite(x) => self.composite_to_typename(x),

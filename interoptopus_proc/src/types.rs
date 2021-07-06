@@ -207,6 +207,7 @@ pub fn ffi_type_struct(attr: &FFITypeAttributes, input: TokenStream, item: ItemS
                     }
                 }
                 Type::Ptr(x) => x.to_token_stream(),
+                Type::Array(x) => x.to_token_stream(),
                 Type::Reference(x) => x.to_token_stream(),
                 _ => {
                     panic!("Unknown token: {:?}", field);

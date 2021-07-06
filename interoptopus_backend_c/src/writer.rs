@@ -80,7 +80,14 @@ pub trait CWriter {
         let mut params = Vec::new();
 
         for (_, p) in function.signature().params().iter().enumerate() {
-            params.push(format!("{} {}", self.converter().function_parameter_to_csharp_typename(p, function), p.name()));
+            match p.the_type() {
+                CType::Array(a) => {
+                    params.push(format!("{} {}[{}]", self.converter().to_type_specifier(a.array_type()), p.name(), a.len(),));
+                }
+                _ => {
+                    params.push(format!("{} {}", self.converter().to_type_specifier(p.the_type()), p.name()));
+                }
+            }
         }
 
         indented!(w, r#"{}{} {}({});"#, attr, rval, name, params.join(", "))
@@ -97,6 +104,7 @@ pub trait CWriter {
     fn write_type_definition(&self, w: &mut IndentWriter, the_type: &CType) -> Result<(), Error> {
         match the_type {
             CType::Primitive(_) => {}
+            CType::Array(_) => {}
             CType::Enum(e) => {
                 self.write_type_definition_enum(w, e)?;
                 w.newline()?;
@@ -219,10 +227,18 @@ pub trait CWriter {
     }
 
     fn write_type_definition_composite_body_field(&self, w: &mut IndentWriter, field: &Field, _the_type: &CompositeType) -> Result<(), Error> {
-        let field_name = field.name();
-        let type_name = self.converter().to_type_specifier(field.the_type());
-
-        indented!(w, r#"{} {};"#, type_name, field_name)
+        match field.the_type() {
+            CType::Array(x) => {
+                let field_name = field.name();
+                let type_name = self.converter().to_type_specifier(x.array_type());
+                indented!(w, r#"{} {}[{}];"#, type_name, field_name, x.len())
+            }
+            _ => {
+                let field_name = field.name();
+                let type_name = self.converter().to_type_specifier(field.the_type());
+                indented!(w, r#"{} {};"#, type_name, field_name)
+            }
+        }
     }
 
     fn write_ifndef(&self, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) -> Result<(), Error> {

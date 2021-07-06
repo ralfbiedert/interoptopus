@@ -1,7 +1,5 @@
 use crate::Config;
-use interoptopus::lang::c::{
-    CType, CompositeType, Constant, ConstantValue, EnumType, FnPointerType, Function, OpaqueType, Parameter, PrimitiveType, PrimitiveValue, Variant,
-};
+use interoptopus::lang::c::{CType, CompositeType, Constant, ConstantValue, EnumType, FnPointerType, Function, OpaqueType, PrimitiveType, PrimitiveValue, Variant};
 use interoptopus::util::safe_name;
 
 /// Implements [`CTypeConverter`].
@@ -37,8 +35,6 @@ pub trait CTypeConverter {
     fn const_name_to_name(&self, x: &Constant) -> String;
 
     fn constant_value_to_value(&self, value: &ConstantValue) -> String;
-
-    fn function_parameter_to_csharp_typename(&self, x: &Parameter, _function: &Function) -> String;
 
     fn function_name_to_c_name(&self, function: &Function) -> String;
 }
@@ -96,6 +92,8 @@ impl CTypeConverter for Converter {
             CType::ReadWritePointer(x) => format!("{}*", self.to_type_specifier(x)),
             CType::FnPointer(x) => self.fnpointer_to_typename(x),
             CType::Pattern(x) => self.to_type_specifier(&x.fallback_type()),
+            // TODO: This should be handled in nicer way so that arrays-of-arrays and other thing work properly
+            CType::Array(_) => panic!("Arrays need special handling in the writer."),
         }
     }
 
@@ -119,10 +117,6 @@ impl CTypeConverter for Converter {
                 PrimitiveValue::F64(x) => format!("{}", x),
             },
         }
-    }
-
-    fn function_parameter_to_csharp_typename(&self, x: &Parameter, _function: &Function) -> String {
-        self.to_type_specifier(x.the_type())
     }
 
     fn function_name_to_c_name(&self, function: &Function) -> String {

@@ -90,6 +90,7 @@ impl Constant {
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum CType {
     Primitive(PrimitiveType),
+    Array(ArrayType),
     Enum(EnumType),
     Opaque(OpaqueType),
     Composite(CompositeType),
@@ -138,6 +139,7 @@ impl CType {
             CType::ReadPointer(x) => format!("*const {}", x.name_within_lib()),
             CType::ReadWritePointer(x) => format!("*mut {}", x.name_within_lib()),
             CType::Pattern(x) => x.fallback_type().name_within_lib(),
+            CType::Array(x) => x.rust_name(),
         }
     }
 
@@ -162,6 +164,7 @@ impl CType {
             CType::ReadPointer(x) => Some(x.as_ref()),
             CType::ReadWritePointer(x) => Some(x.as_ref()),
             CType::Pattern(_) => None,
+            CType::Array(_) => None,
         }
     }
 
@@ -215,6 +218,34 @@ impl PrimitiveType {
             PrimitiveType::F32 => "f32",
             PrimitiveType::F64 => "f64",
         }
+    }
+}
+
+/// A (C-style) `type[N]` containing a fixed number of elements of the same type.
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub struct ArrayType {
+    array_type: Box<CType>,
+    len: usize,
+}
+
+impl ArrayType {
+    pub fn new(array_type: CType, len: usize) -> Self {
+        Self {
+            array_type: Box::new(array_type),
+            len,
+        }
+    }
+
+    pub fn rust_name(&self) -> String {
+        format!("{}[{}]", self.array_type.name_within_lib(), self.len)
+    }
+
+    pub fn array_type(&self) -> &CType {
+        &self.array_type
+    }
+
+    pub fn len(&self) -> usize {
+        self.len
     }
 }
 
