@@ -311,6 +311,10 @@ namespace My.Company
             }
         }
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_mut_self_ref")]
+        public static extern byte simple_service_mut_self_ref(IntPtr context_ptr, ref byte x, out byte _y);
+
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_mut_self_ffi_error")]
         public static extern FFIError simple_service_mut_self_ffi_error(IntPtr context_ptr, FFISliceu8 slice);
 
@@ -856,6 +860,11 @@ namespace My.Company
         public void MutSelfVoid(byte[] slice)
         {
             Interop.simple_service_mut_self_void(_context, slice);
+        }
+
+        public byte MutSelfRef(ref byte x, out byte _y)
+        {
+            return Interop.simple_service_mut_self_ref(_context ,  ref x,  out _y);
         }
 
         public void MutSelfFfiError(FFISliceu8 slice)

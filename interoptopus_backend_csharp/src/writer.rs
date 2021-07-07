@@ -775,15 +775,19 @@ pub trait CSharpWriter {
             .iter()
             .skip(1)
             .map(|x| {
-                format!(
-                    "{} {}",
-                    if with_types {
-                        self.converter().to_typespecifier_in_param(x.the_type())
-                    } else {
-                        "".to_string()
-                    },
+                let with_type = self.converter().to_typespecifier_in_param(x.the_type());
+
+                let name = if with_types {
                     x.name().to_string()
-                )
+                } else if with_type.contains("ref ") {
+                    format!("ref {}", x.name().to_string())
+                } else if with_type.contains("out ") {
+                    format!("out {}", x.name().to_string())
+                } else {
+                    x.name().to_string()
+                };
+
+                format!("{} {}", if with_types { with_type } else { "".to_string() }, name)
             })
             .collect::<Vec<_>>()
             .join(", ")

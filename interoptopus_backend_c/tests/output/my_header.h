@@ -217,6 +217,7 @@ my_library_ffierror simple_service_result(my_library_simpleservice* context_ptr,
 uint32_t simple_service_value(my_library_simpleservice* context_ptr, uint32_t x);
 uint8_t simple_service_mut_self(my_library_simpleservice* context_ptr, my_library_ffisliceu8 slice);
 void simple_service_mut_self_void(my_library_simpleservice* context_ptr, my_library_ffisliceu8 slice);
+uint8_t simple_service_mut_self_ref(my_library_simpleservice* context_ptr, uint8_t* x, uint8_t* _y);
 my_library_ffierror simple_service_mut_self_ffi_error(my_library_simpleservice* context_ptr, my_library_ffisliceu8 slice);
 void simple_service_void(my_library_simpleservice* context_ptr);
 uint32_t simple_service_extra_method(my_library_simpleservice* _context);
