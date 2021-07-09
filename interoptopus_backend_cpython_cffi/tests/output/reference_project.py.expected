@@ -85,6 +85,11 @@ typedef struct cffi_vec3f32
     float z;
     } cffi_vec3f32;
 
+typedef struct cffi_weird1u32
+    {
+    uint32_t x;
+    } cffi_weird1u32;
+
 typedef uint8_t (*cffi_fptr_fn_u8_rval_u8)(uint8_t x0);
 
 typedef uint32_t (*cffi_fptr_fn_u32_rval_u32)(uint32_t x0);
@@ -103,6 +108,13 @@ typedef struct cffi_genericu8
     {
     uint8_t* x;
     } cffi_genericu8;
+
+typedef struct cffi_weird2u8
+    {
+    uint8_t t;
+    uint8_t a[5];
+    uint8_t* r;
+    } cffi_weird2u8;
 
 typedef cffi_tupled (*cffi_fptr_fn_Tupled_rval_Tupled)(cffi_tupled x0);
 
@@ -187,6 +199,7 @@ bool ambiguous_3(cffi_vec1 x, cffi_vec2 y);
 cffi_vec namespaced_type(cffi_vec x);
 cffi_ffierror panics();
 void sleep(uint64_t millis);
+bool weird_1(cffi_weird1u32 _x, cffi_weird2u8 _y);
 uint32_t pattern_ascii_pointer_1(uint8_t* x);
 uint32_t pattern_ascii_pointer_len(uint8_t* x, cffi_useasciistringpattern y);
 uint32_t pattern_ffi_slice_1(cffi_ffisliceu32 ffi_slice);
@@ -640,6 +653,72 @@ class Vec3f32(object):
         self._ptr_z = value
         self._ctx[0].z = value
 
+class Weird1u32(object):
+    """"""
+    def __init__(self):
+        global _api, ffi
+        self._ctx = ffi.new("cffi_weird1u32[]", 1)
+
+    def array(n):
+        global _api, ffi
+        return ffi.new("cffi_weird1u32[]", n)
+
+    def ptr(self):
+        return self._ctx
+
+    @property
+    def x(self):
+        """"""
+        return self._ctx[0].x
+
+    @x.setter
+    def x(self, value):
+        self._ptr_x = value
+        self._ctx[0].x = value
+
+class Weird2u8(object):
+    """"""
+    def __init__(self):
+        global _api, ffi
+        self._ctx = ffi.new("cffi_weird2u8[]", 1)
+
+    def array(n):
+        global _api, ffi
+        return ffi.new("cffi_weird2u8[]", n)
+
+    def ptr(self):
+        return self._ctx
+
+    @property
+    def t(self):
+        """"""
+        return self._ctx[0].t
+
+    @t.setter
+    def t(self, value):
+        self._ptr_t = value
+        self._ctx[0].t = value
+
+    @property
+    def a(self):
+        """"""
+        return self._ctx[0].a
+
+    @a.setter
+    def a(self, value):
+        self._ptr_a = value
+        self._ctx[0].a = value
+
+    @property
+    def r(self):
+        """"""
+        return self._ctx[0].r
+
+    @r.setter
+    def r(self, value):
+        self._ptr_r = value
+        self._ctx[0].r = value
+
 class FFIError:
     """"""
     Ok = 0
@@ -948,6 +1027,15 @@ Parameter x must point to valid data."""
         if hasattr(millis, "_ctx"):
             millis = millis._ctx[0]
         return _api.sleep(millis)
+
+    def weird_1(_x, _y):
+        """"""
+        global _api
+        if hasattr(_x, "_ctx"):
+            _x = _x._ctx[0]
+        if hasattr(_y, "_ctx"):
+            _y = _y._ctx[0]
+        return _api.weird_1(_x, _y)
 
     def pattern_ascii_pointer_1(x):
         """"""

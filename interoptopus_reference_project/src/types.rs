@@ -5,6 +5,7 @@ use interoptopus::lang::rust::CTypeInfo;
 use interoptopus::patterns::ascii_pointer::AsciiPointer;
 use interoptopus::patterns::slice::FFISlice;
 use interoptopus::{ffi_type, pattern_callback};
+use std::fmt::Debug;
 use std::marker::PhantomData;
 
 // Let's assume we can't implement `CTypeInfo` for this.
@@ -135,6 +136,27 @@ pub struct UseAsciiStringPattern<'a> {
 #[repr(C)]
 pub struct Context {
     pub(crate) some_field: u32,
+}
+
+#[ffi_type]
+#[repr(C)]
+pub struct Weird1<T: Clone>
+where
+    T: Copy + Copy,
+{
+    x: T,
+}
+
+#[ffi_type]
+#[repr(C)]
+pub struct Weird2<'a, T: Clone, const N: usize>
+where
+    T: Copy + Copy + 'a,
+    T: Debug,
+{
+    t: T,
+    a: [T; N],
+    r: &'a u8,
 }
 
 // Doesn't need annotations.

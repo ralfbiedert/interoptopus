@@ -3,7 +3,7 @@
 use crate::patterns::success_enum::FFIError;
 use crate::types::{
     ambiguous1, ambiguous2, common, some_foreign_type, Array, Callbacku8u8, Empty, EnumDocumented, Generic, Generic2, Generic3, Opaque, Phantom, SomeForeignType,
-    StructDocumented, Tupled, Vec3f32,
+    StructDocumented, Tupled, Vec3f32, Weird1, Weird2,
 };
 use interoptopus::ffi_function;
 use interoptopus::patterns::success_enum::panics_and_errors_to_ffi_enum;
@@ -236,4 +236,10 @@ pub extern "C" fn panics() -> FFIError {
 #[no_mangle]
 pub extern "C" fn sleep(millis: u64) {
     std::thread::sleep(Duration::from_millis(millis));
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn weird_1(_x: Weird1<u32>, _y: Weird2<u8, 5>) -> bool {
+    true
 }

@@ -248,6 +248,12 @@ namespace My.Company
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "weird_1")]
+        public static extern bool weird_1(Weird1u32 _x, Weird2u8 _y);
+
+        // Debug - write_function_overloaded 
+
+        // Debug - write_function 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ascii_pointer_1")]
         public static extern uint pattern_ascii_pointer_1(string x);
 
@@ -634,6 +640,28 @@ namespace My.Company
         public float x;
         public float y;
         public float z;
+    }
+
+    // Debug - write_type_definition_composite 
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct Weird1u32
+    {
+        uint x;
+    }
+
+    // Debug - write_type_definition_composite 
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct Weird2u8
+    {
+        byte t;
+        byte a0;
+        byte a1;
+        byte a2;
+        byte a3;
+        byte a4;
+        IntPtr r;
     }
 
     // Debug - write_type_definition_fn_pointer 

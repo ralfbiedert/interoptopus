@@ -92,6 +92,11 @@ typedef struct my_library_vec3f32
     float z;
     } my_library_vec3f32;
 
+typedef struct my_library_weird1u32
+    {
+    uint32_t x;
+    } my_library_weird1u32;
+
 typedef uint8_t (*my_library_fptr_fn_u8_rval_u8)(uint8_t x0);
 
 typedef uint32_t (*my_library_fptr_fn_u32_rval_u32)(uint32_t x0);
@@ -110,6 +115,13 @@ typedef struct my_library_genericu8
     {
     uint8_t* x;
     } my_library_genericu8;
+
+typedef struct my_library_weird2u8
+    {
+    uint8_t t;
+    uint8_t a[5];
+    uint8_t* r;
+    } my_library_weird2u8;
 
 typedef my_library_tupled (*my_library_fptr_fn_Tupled_rval_Tupled)(my_library_tupled x0);
 
@@ -194,6 +206,7 @@ bool ambiguous_3(my_library_vec1 x, my_library_vec2 y);
 my_library_vec namespaced_type(my_library_vec x);
 my_library_ffierror panics();
 void sleep(uint64_t millis);
+bool weird_1(my_library_weird1u32 _x, my_library_weird2u8 _y);
 uint32_t pattern_ascii_pointer_1(uint8_t* x);
 uint32_t pattern_ascii_pointer_len(uint8_t* x, my_library_useasciistringpattern y);
 uint32_t pattern_ffi_slice_1(my_library_ffisliceu32 ffi_slice);
