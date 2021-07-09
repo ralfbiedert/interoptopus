@@ -58,7 +58,7 @@ pub struct Generic3<T> {
     pub x: T,
 }
 
-#[ffi_type(skip(p))]
+#[ffi_type(unsafe, skip(p))]
 #[repr(C)]
 pub struct Phantom<'a, T>
 where
@@ -78,7 +78,7 @@ pub struct Vec3f32 {
     pub z: f32,
 }
 
-#[ffi_type(surrogates(foreign1 = "some_foreign_type", foreign2 = "some_foreign_type"))]
+#[ffi_type(unsafe, surrogates(foreign1 = "some_foreign_type", foreign2 = "some_foreign_type"))]
 #[repr(C)]
 pub struct Container {
     pub foreign1: SomeForeignType,
@@ -157,6 +157,21 @@ where
     t: T,
     a: [T; N],
     r: &'a u8,
+}
+
+#[ffi_type(visibility(pblc = "public", prvt = "private"))]
+#[repr(C)]
+pub struct Visibility1 {
+    // Be conservative with naming since some languages don't like `public` as a field.
+    pblc: u8,
+    pub prvt: u8,
+}
+
+#[ffi_type(visibility(_ = "public"))]
+#[repr(C)]
+pub struct Visibility2 {
+    pblc1: u8,
+    pblc2: u8,
 }
 
 // Doesn't need annotations.

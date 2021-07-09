@@ -3,7 +3,7 @@
 use crate::patterns::success_enum::FFIError;
 use crate::types::{
     ambiguous1, ambiguous2, common, some_foreign_type, Array, Callbacku8u8, Empty, EnumDocumented, Generic, Generic2, Generic3, Opaque, Phantom, SomeForeignType,
-    StructDocumented, Tupled, Vec3f32, Weird1, Weird2,
+    StructDocumented, Tupled, Vec3f32, Visibility1, Visibility2, Weird1, Weird2,
 };
 use interoptopus::ffi_function;
 use interoptopus::patterns::success_enum::panics_and_errors_to_ffi_enum;
@@ -145,7 +145,7 @@ pub extern "C" fn complex_args_1(_a: Vec3f32, _b: Option<&Empty>) -> FFIError {
     FFIError::Ok
 }
 
-#[ffi_function(surrogates(_cmplx = "some_foreign_type"))]
+#[ffi_function(unsafe, surrogates(_cmplx = "some_foreign_type"))]
 #[no_mangle]
 pub extern "C" fn complex_args_2(_cmplx: SomeForeignType) -> *const Opaque {
     null()
@@ -243,3 +243,7 @@ pub extern "C" fn sleep(millis: u64) {
 pub extern "C" fn weird_1(_x: Weird1<u32>, _y: Weird2<u8, 5>) -> bool {
     true
 }
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn visibility(_x: Visibility1, _y: Visibility2) {}

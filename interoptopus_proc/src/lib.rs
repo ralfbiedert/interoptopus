@@ -24,18 +24,27 @@ use syn::{parse_macro_input, AttributeArgs};
 /// | --- | --- | ---  |
 /// | `name="X"` | `struct`,`enum` | Uses `name` as the base interop name instead of the item's Rust name.<sup>1</sup> |
 /// | `namespace="X"` | `struct`,`enum` | In backends that support multiple namespaces, determine where this should go.
-/// | `skip(x)` | `struct,enum` | Skip field or variant `x` in the definition, e.g., some `x` of [`PhantomData`](std::marker::PhantomData).
+/// | `skip(x)` | `struct,enum` | Skip field or variant `x` in the definition, e.g., some `x` of [`PhantomData`](std::marker::PhantomData). <sup>⚠️</sup>
 /// | `patterns(p)` | `struct`,`enum` | Mark this type as part of a pattern, see below.
 /// | `opaque` | `struct` | Creates an opaque type without fields. Can only be used behind a pointer. |
-/// | `surrogates(x="y")` | `struct` | Invoke function `y` to provide a [`CTypeInfo`](interoptopus::lang::rust::CTypeInfo) for field `x`, see below.
+/// | `surrogates(x="f")` | `struct` | Invoke function `f` to provide a [`CTypeInfo`](interoptopus::lang::rust::CTypeInfo) for field `x`, see below. <sup>⚠️</sup>
+/// | `visibility(x="v")` | `struct` | Override visibility for field `x` as `public` or `private`; `_` means all fields.
 /// | `debug` | * | Print generated helper code in console.
+/// | `unsafe` | * | Unlocks unsafe options marked: <sup>⚠️</sup>
 ///
 /// <sup>1</sup> While a type's name must be unique (even across modules) backends are free to further transform this name, e.g., by converting
 /// `MyVec` to `LibraryMyVec`. In other words, using `name` will change a type's name, but not using `name` is no guarantee the final name will
 /// not be modified.
 ///
+/// <sup>⚠️</sup> This attribute can lead to undefined behavior when misapplied. You should only
+/// suppress fields that have no impact on the type layout (e.g., zero-sized `Phantom` data).
+/// When using surrogates you must ensure the surrogate matches.
+///
+///
+/// # Including Types
+///
 /// In contrast to functions and constants types annotated with `#[ffi_type]` will be detected
-/// automatically and do not have to be explicitly mentioned for the definition of the `inventory_function!()`.
+/// automatically and do not have to be explicitly mentioned for the definition of the `inventory!()`.
 ///
 /// # Surrogates
 ///
@@ -95,8 +104,12 @@ pub fn ffi_type(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// | Attribute |  Explanation |
 /// | --- | ---  |
-/// | `surrogates(x="y")` | Invoke function `y` to provide a [`CTypeInfo`](interoptopus::lang::rust::CTypeInfo) for parameter `x`, see below.
+/// | `surrogates(x="y")` | Invoke function `y` to provide a [`CTypeInfo`](interoptopus::lang::rust::CTypeInfo) for parameter `x`, see below. <sup>⚠️</sup>
 /// | `debug` | Print generated helper code in console.
+/// | `unsafe` | Unlocks unsafe options marked: <sup>⚠️</sup>
+///
+/// <sup>⚠️</sup> This attribute can lead to undefined behavior when misapplied.
+/// When using surrogates you must ensure the surrogate matches the parameter's type.
 ///
 /// # Surrogates
 ///

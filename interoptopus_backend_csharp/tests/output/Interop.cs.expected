@@ -254,6 +254,12 @@ namespace My.Company
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "visibility")]
+        public static extern void visibility(Visibility1 _x, Visibility2 _y);
+
+        // Debug - write_function_overloaded 
+
+        // Debug - write_function 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ascii_pointer_1")]
         public static extern uint pattern_ascii_pointer_1(string x);
 
@@ -640,6 +646,24 @@ namespace My.Company
         public float x;
         public float y;
         public float z;
+    }
+
+    // Debug - write_type_definition_composite 
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct Visibility1
+    {
+        public byte pblc;
+        byte prvt;
+    }
+
+    // Debug - write_type_definition_composite 
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct Visibility2
+    {
+        public byte pblc1;
+        public byte pblc2;
     }
 
     // Debug - write_type_definition_composite 

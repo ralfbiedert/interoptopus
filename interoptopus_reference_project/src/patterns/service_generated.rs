@@ -34,6 +34,7 @@ pub mod some_rust_module {
             x
         }
 
+        /// This method should be documented.
         pub fn method_void(&self) {}
 
         pub fn method_mut_self(&mut self, slice: FFISlice<u8>) -> u8 {

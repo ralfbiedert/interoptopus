@@ -28,7 +28,7 @@ pub struct SuperComplexEntity {
 
 /// A type containing a third-party type.
 #[repr(C)]
-#[ffi_type(surrogates(third_party = "third_party_option"))]
+#[ffi_type(unsafe, surrogates(third_party = "third_party_option"))]
 #[derive(Copy, Clone, Debug)]
 pub struct WithForeignType {
     pub secret_number: u64,

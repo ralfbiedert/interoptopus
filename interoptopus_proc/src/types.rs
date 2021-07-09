@@ -4,7 +4,7 @@ use proc_macro2::{Ident, TokenStream};
 use quote::{quote, ToTokens};
 use std::collections::HashMap;
 use syn::spanned::Spanned;
-use syn::{AttributeArgs, Expr, GenericParam, ItemEnum, ItemStruct, ItemType, Lit, Type, Visibility};
+use syn::{AttributeArgs, Expr, Field, GenericParam, ItemEnum, ItemStruct, ItemType, Lit, Type, Visibility};
 
 #[derive(Debug, FromMeta, Clone)]
 pub struct FFITypeAttributes {
@@ -21,6 +21,9 @@ pub struct FFITypeAttributes {
     skip: HashMap<String, ()>,
 
     #[darling(default)]
+    visibility: HashMap<String, String>,
+
+    #[darling(default)]
     name: Option<String>,
 
     #[darling(default)]
@@ -28,6 +31,42 @@ pub struct FFITypeAttributes {
 
     #[darling(default)]
     debug: bool,
+
+    #[darling(default, rename = "unsafe")]
+    unsfe: bool,
+}
+
+impl FFITypeAttributes {
+    pub fn assert_valid(&self) {
+        if (!self.surrogates.is_empty() || !self.skip.is_empty()) && !self.unsfe {
+            panic!("When using `surrogate` or `skip` you must also specify `unsafe`.")
+        }
+    }
+
+    pub fn visibility_for_field(&self, field: &Field, name: &str) -> TokenStream {
+        let mut rval = match &field.vis {
+            Visibility::Public(_) => quote! { interoptopus::lang::c::Visibility::Public },
+            _ => quote! { interoptopus::lang::c::Visibility::Private },
+        };
+
+        if let Some(x) = self.visibility.get(name) {
+            rval = match x.as_str() {
+                "public" => quote! { interoptopus::lang::c::Visibility::Public },
+                "private" => quote! { interoptopus::lang::c::Visibility::Private },
+                _ => panic!("Visibility must be `public` or `private`"),
+            };
+        }
+
+        if let Some(x) = self.visibility.get("_") {
+            rval = match x.as_str() {
+                "public" => quote! { interoptopus::lang::c::Visibility::Public },
+                "private" => quote! { interoptopus::lang::c::Visibility::Private },
+                _ => panic!("Visibility must be `public` or `private`"),
+            };
+        }
+
+        rval
+    }
 }
 
 fn derive_variant_info(item: ItemEnum, idents: &[Ident], names: &[String], values: &[i32], docs: &[String]) -> TokenStream {
@@ -52,6 +91,10 @@ fn derive_variant_info(item: ItemEnum, idents: &[Ident], names: &[String], value
 }
 
 pub fn ffi_type_enum(attr: &FFITypeAttributes, input: TokenStream, item: ItemEnum) -> TokenStream {
+    let doc_line = extract_doc_lines(&item.attrs).join("\n");
+
+    attr.assert_valid();
+
     let span = item.ident.span();
     let name = item.ident.to_string();
     let name_ident = syn::Ident::new(&name, span);
@@ -60,10 +103,7 @@ pub fn ffi_type_enum(attr: &FFITypeAttributes, input: TokenStream, item: ItemEnu
     let mut variant_idents = Vec::new();
     let mut variant_values = Vec::new();
     let mut variant_docs = Vec::new();
-
     let mut next_id = 0;
-
-    let doc_line = extract_doc_lines(&item.attrs).join("\n");
 
     for variant in &item.variants {
         let ident = variant.ident.to_string();
@@ -174,6 +214,8 @@ pub fn ffi_type_struct(attr: &FFITypeAttributes, input: TokenStream, item: ItemS
     let namespace = attr.namespace.clone().unwrap_or_else(|| "".to_string());
     let doc_line = extract_doc_lines(&item.attrs).join("\n");
 
+    attr.assert_valid();
+
     let struct_ident_str = item.ident.to_string();
     let struct_ident = syn::Ident::new(&struct_ident_str, item.ident.span());
     let struct_ident_c = attr.name.clone().unwrap_or(struct_ident_str);
@@ -242,10 +284,7 @@ pub fn ffi_type_struct(attr: &FFITypeAttributes, input: TokenStream, item: ItemS
             continue;
         }
 
-        let visibility = match &field.vis {
-            Visibility::Public(_) => quote! { interoptopus::lang::c::Visibility::Public },
-            _ => quote! { interoptopus::lang::c::Visibility::Private },
-        };
+        let visibility = attr.visibility_for_field(field, &name);
 
         field_names.push(name.clone());
         field_docs.push(extract_doc_lines(&field.attrs).join("\n"));

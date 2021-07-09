@@ -92,6 +92,18 @@ typedef struct my_library_vec3f32
     float z;
     } my_library_vec3f32;
 
+typedef struct my_library_visibility1
+    {
+    uint8_t pblc;
+    uint8_t prvt;
+    } my_library_visibility1;
+
+typedef struct my_library_visibility2
+    {
+    uint8_t pblc1;
+    uint8_t pblc2;
+    } my_library_visibility2;
+
 typedef struct my_library_weird1u32
     {
     uint32_t x;
@@ -207,6 +219,7 @@ my_library_vec namespaced_type(my_library_vec x);
 my_library_ffierror panics();
 void sleep(uint64_t millis);
 bool weird_1(my_library_weird1u32 _x, my_library_weird2u8 _y);
+void visibility(my_library_visibility1 _x, my_library_visibility2 _y);
 uint32_t pattern_ascii_pointer_1(uint8_t* x);
 uint32_t pattern_ascii_pointer_len(uint8_t* x, my_library_useasciistringpattern y);
 uint32_t pattern_ffi_slice_1(my_library_ffisliceu32 ffi_slice);

@@ -85,6 +85,18 @@ typedef struct cffi_vec3f32
     float z;
     } cffi_vec3f32;
 
+typedef struct cffi_visibility1
+    {
+    uint8_t pblc;
+    uint8_t prvt;
+    } cffi_visibility1;
+
+typedef struct cffi_visibility2
+    {
+    uint8_t pblc1;
+    uint8_t pblc2;
+    } cffi_visibility2;
+
 typedef struct cffi_weird1u32
     {
     uint32_t x;
@@ -200,6 +212,7 @@ cffi_vec namespaced_type(cffi_vec x);
 cffi_ffierror panics();
 void sleep(uint64_t millis);
 bool weird_1(cffi_weird1u32 _x, cffi_weird2u8 _y);
+void visibility(cffi_visibility1 _x, cffi_visibility2 _y);
 uint32_t pattern_ascii_pointer_1(uint8_t* x);
 uint32_t pattern_ascii_pointer_len(uint8_t* x, cffi_useasciistringpattern y);
 uint32_t pattern_ffi_slice_1(cffi_ffisliceu32 ffi_slice);
@@ -653,6 +666,72 @@ class Vec3f32(object):
         self._ptr_z = value
         self._ctx[0].z = value
 
+class Visibility1(object):
+    """"""
+    def __init__(self):
+        global _api, ffi
+        self._ctx = ffi.new("cffi_visibility1[]", 1)
+
+    def array(n):
+        global _api, ffi
+        return ffi.new("cffi_visibility1[]", n)
+
+    def ptr(self):
+        return self._ctx
+
+    @property
+    def pblc(self):
+        """"""
+        return self._ctx[0].pblc
+
+    @pblc.setter
+    def pblc(self, value):
+        self._ptr_pblc = value
+        self._ctx[0].pblc = value
+
+    @property
+    def prvt(self):
+        """"""
+        return self._ctx[0].prvt
+
+    @prvt.setter
+    def prvt(self, value):
+        self._ptr_prvt = value
+        self._ctx[0].prvt = value
+
+class Visibility2(object):
+    """"""
+    def __init__(self):
+        global _api, ffi
+        self._ctx = ffi.new("cffi_visibility2[]", 1)
+
+    def array(n):
+        global _api, ffi
+        return ffi.new("cffi_visibility2[]", n)
+
+    def ptr(self):
+        return self._ctx
+
+    @property
+    def pblc1(self):
+        """"""
+        return self._ctx[0].pblc1
+
+    @pblc1.setter
+    def pblc1(self, value):
+        self._ptr_pblc1 = value
+        self._ctx[0].pblc1 = value
+
+    @property
+    def pblc2(self):
+        """"""
+        return self._ctx[0].pblc2
+
+    @pblc2.setter
+    def pblc2(self, value):
+        self._ptr_pblc2 = value
+        self._ctx[0].pblc2 = value
+
 class Weird1u32(object):
     """"""
     def __init__(self):
@@ -1036,6 +1115,15 @@ Parameter x must point to valid data."""
         if hasattr(_y, "_ctx"):
             _y = _y._ctx[0]
         return _api.weird_1(_x, _y)
+
+    def visibility(_x, _y):
+        """"""
+        global _api
+        if hasattr(_x, "_ctx"):
+            _x = _x._ctx[0]
+        if hasattr(_y, "_ctx"):
+            _y = _y._ctx[0]
+        return _api.visibility(_x, _y)
 
     def pattern_ascii_pointer_1(x):
         """"""

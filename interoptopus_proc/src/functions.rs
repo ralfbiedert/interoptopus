@@ -15,6 +15,17 @@ pub struct FFIFunctionAttributes {
 
     #[darling(default)]
     debug: bool,
+
+    #[darling(default, rename = "unsafe")]
+    unsfe: bool,
+}
+
+impl FFIFunctionAttributes {
+    pub fn assert_valid(&self) {
+        if (!self.surrogates.is_empty()) && !self.unsfe {
+            panic!("When using `surrogate` you must also specify `unsafe`.")
+        }
+    }
 }
 
 pub fn fn_signature_type(signature: &Signature) -> TokenStream {
@@ -38,19 +49,18 @@ pub fn fn_signature_type(signature: &Signature) -> TokenStream {
 
 pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
     let item_fn: ItemFn = syn::parse2(input.clone()).expect("Must be item.");
+    let docs = util::extract_doc_lines(&item_fn.attrs);
     let ffi_attributes: FFIFunctionAttributes = FFIFunctionAttributes::from_list(&attr).unwrap();
 
+    ffi_attributes.assert_valid();
+
     let span = item_fn.span();
-
     let signature = fn_signature_type(&item_fn.sig);
-
     let function_ident = item_fn.sig.ident;
     let function_name = function_ident.to_string();
 
     let mut args_name = Vec::new();
     let mut args_type = Vec::new();
-
-    let docs = util::extract_doc_lines(&item_fn.attrs);
 
     let rval = if let ReturnType::Type(_, x) = item_fn.sig.output {
         match *x {
