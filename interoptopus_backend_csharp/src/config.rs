@@ -20,6 +20,8 @@ pub struct Config {
     /// If this is not set, interop generation with arrays in structr will fail. This is a somewhat
     /// open issue w.r.t Unity-sans-unsafe support and feedback would be greatly welcome!
     pub unroll_struct_arrays: bool,
+    /// Also generate markers for easier debugging
+    pub debug: bool,
 }
 
 impl Config {}
@@ -34,6 +36,7 @@ impl Default for Config {
             namespace_id: "".to_string(),
             emit_rust_visibility: false,
             unroll_struct_arrays: false,
+            debug: false,
         }
     }
 }

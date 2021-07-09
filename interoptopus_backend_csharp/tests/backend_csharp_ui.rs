@@ -15,6 +15,7 @@ fn generate_bindings_multi(prefix: &str) -> Result<(), Error> {
         namespace_mappings,
         unroll_struct_arrays: true,
         emit_rust_visibility: true,
+        debug: true,
         ..Config::default()
     };
 
