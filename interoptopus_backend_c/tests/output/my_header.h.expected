@@ -37,6 +37,11 @@ typedef enum my_library_ffierror
     MY_LIBRARY_FAIL = 300,
     } my_library_ffierror;
 
+typedef struct my_library_extratypef32
+    {
+    float x;
+    } my_library_extratypef32;
+
 typedef struct my_library_inner
     {
     float x;

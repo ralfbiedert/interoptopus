@@ -16,5 +16,6 @@ interoptopus::inventory!(
         ffi::example_write_foreign_type,
         ffi::example_double_super_complex_entity
     ],
+    [],
     []
 );

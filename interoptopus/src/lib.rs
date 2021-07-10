@@ -165,16 +165,17 @@ pub mod lang {
 ///
 /// ```ignore
 /// # use interoptopus::inventory_function;
-/// inventory_function!(symbol, consts, functions, patterns);
+/// inventory_function!(symbol, consts, functions, extra_types, patterns);
 /// ```
 ///
 /// Where
 /// - `symbol` - the name of the exported inventory function producing a [`Library`],
 /// - `consts` - a list of [`#[ffi_constant]`](crate::ffi_constant) constants to include `[C1, C2, ...]`,
 /// - `functions` - a list of [`#[ffi_function]`](crate::ffi_function) functions to include `[f1, f2, ...]`,
+/// - `extra_types` - additional types not inferred from `functions`, e.g., when using `void` pointers.
 /// - `patterns` - a list of [`LibraryPattern`](crate::patterns::LibraryPattern) to include `[p1, ...]`,
 ///
-/// Any of `consts`, `functions` or `patters` can be an empty list `[]` instead. Types are always
+/// Any of `consts`, `functions` or `patters` can be an empty list `[]` instead. Most types are
 /// inferred automatically based on the used functions.
 ///
 /// # Example
@@ -218,6 +219,11 @@ macro_rules! inventory {
         ],
         [
         $(
+            $extra_type:ty
+        ),*
+        ],
+        [
+        $(
             $pattern:path
         ),*
         ]
@@ -227,7 +233,7 @@ macro_rules! inventory {
             use $crate::lang::rust::FunctionInfo;
             use $crate::lang::rust::ConstantInfo;
 
-            let mut constants: Vec<$crate::lang::c::Constant> = Vec::new();
+            let mut constants: ::std::vec::Vec<$crate::lang::c::Constant> = ::std::vec::Vec::new();
             $(
                 {
                     use $const as user_constant;
@@ -235,7 +241,7 @@ macro_rules! inventory {
                 }
             )*
 
-            let mut functions: Vec<$crate::lang::c::Function> = Vec::new();
+            let mut functions: ::std::vec::Vec<$crate::lang::c::Function> = ::std::vec::Vec::new();
             $(
                 {
                     use $function as user_function;
@@ -243,7 +249,15 @@ macro_rules! inventory {
                 }
             )*
 
-            let mut patterns: Vec<$crate::patterns::LibraryPattern> = Vec::new();
+            let mut extra_types: ::std::vec::Vec<$crate::lang::c::CType> = ::std::vec::Vec::new();
+            $(
+                {
+                    extra_types.push(< $extra_type as $crate::lang::rust::CTypeInfo >::type_info() );
+                }
+            )*
+
+
+            let mut patterns: ::std::vec::Vec<$crate::patterns::LibraryPattern> = ::std::vec::Vec::new();
             $(
                 {
                     let pattern: $crate::patterns::LibraryPattern = $pattern().into();
@@ -260,7 +274,8 @@ macro_rules! inventory {
                 }
             )*
 
-            $crate::Library::new(functions, constants, patterns)
+
+            $crate::Library::new(functions, constants, patterns, extra_types)
         }
     };
 }

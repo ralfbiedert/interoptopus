@@ -84,7 +84,7 @@ pub fn longest_common_prefix(functions: &[Function]) -> String {
     String::from_iter(&longest_common)
 }
 
-pub(crate) fn ctypes_from_functions(functions: &[Function]) -> Vec<CType> {
+pub(crate) fn ctypes_from_functions_types(functions: &[Function], extra_types: &[CType]) -> Vec<CType> {
     let mut types = HashSet::new();
 
     for function in functions {
@@ -93,6 +93,10 @@ pub(crate) fn ctypes_from_functions(functions: &[Function]) -> Vec<CType> {
         for param in function.signature().params() {
             ctypes_from_type_recursive(param.the_type(), &mut types);
         }
+    }
+
+    for ty in extra_types {
+        ctypes_from_type_recursive(ty, &mut types);
     }
 
     types.iter().cloned().collect()

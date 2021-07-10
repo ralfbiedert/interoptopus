@@ -23,7 +23,7 @@ pub extern "C" fn my_function(input: Vec3) -> Vec3 {
 
 // This will create a function `ffi_inventory` which can produce
 // an abstract FFI representation (called `Library`) of this crate.
-interoptopus::inventory!(ffi_inventory, [MY_CONST], [my_function], []);
+interoptopus::inventory!(ffi_inventory, [MY_CONST], [my_function], [], []);
 
 // Small hack, we use a unit test to invoke `ffi_inventory` and produce our backend.
 #[test]

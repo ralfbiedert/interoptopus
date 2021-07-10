@@ -30,6 +30,11 @@ typedef enum cffi_ffierror
     CFFI_FAIL = 300,
     } cffi_ffierror;
 
+typedef struct cffi_extratypef32
+    {
+    float x;
+    } cffi_extratypef32;
+
 typedef struct cffi_inner
     {
     float x;
@@ -306,6 +311,29 @@ class Empty(object):
 
     def ptr(self):
         return self._ctx
+
+class ExtraTypef32(object):
+    """"""
+    def __init__(self):
+        global _api, ffi
+        self._ctx = ffi.new("cffi_extratypef32[]", 1)
+
+    def array(n):
+        global _api, ffi
+        return ffi.new("cffi_extratypef32[]", n)
+
+    def ptr(self):
+        return self._ctx
+
+    @property
+    def x(self):
+        """"""
+        return self._ctx[0].x
+
+    @x.setter
+    def x(self, value):
+        self._ptr_x = value
+        self._ctx[0].x = value
 
 class Genericu32(object):
     """"""

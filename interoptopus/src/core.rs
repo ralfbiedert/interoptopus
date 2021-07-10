@@ -1,6 +1,6 @@
 use crate::lang::c::{CType, Constant, Function};
 use crate::patterns::LibraryPattern;
-use crate::util::{ctypes_from_functions, extract_namespaces_from_types};
+use crate::util::{ctypes_from_functions_types, extract_namespaces_from_types};
 use std::collections::HashSet;
 
 /// Represents all FFI-relevant items, produced via [`inventory`](crate::inventory), ingested by backends.
@@ -17,8 +17,8 @@ impl Library {
     /// Produce a new library for the given functions, constants and patterns.
     ///
     /// Type information will be automatically derived from the used fields and parameters.
-    pub fn new(functions: Vec<Function>, constants: Vec<Constant>, patterns: Vec<LibraryPattern>) -> Self {
-        let mut ctypes = ctypes_from_functions(&functions);
+    pub fn new(functions: Vec<Function>, constants: Vec<Constant>, patterns: Vec<LibraryPattern>, extra_types: Vec<CType>) -> Self {
+        let mut ctypes = ctypes_from_functions_types(&functions, &extra_types);
         let mut namespaces = HashSet::new();
 
         // Extract namespace information
@@ -99,12 +99,14 @@ pub fn merge_libraries(libraries: &[Library]) -> Library {
     let mut functions = Vec::new();
     let mut constants = Vec::new();
     let mut patterns = Vec::new();
+    let mut types = Vec::new();
 
     for library in libraries {
         functions.extend_from_slice(library.functions());
         constants.extend_from_slice(library.constants());
         patterns.extend_from_slice(library.patterns());
+        types.extend_from_slice(library.ctypes());
     }
 
-    Library::new(functions, constants, patterns)
+    Library::new(functions, constants, patterns, types)
 }

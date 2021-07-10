@@ -79,6 +79,7 @@ interoptopus::inventory!(
         patterns::api_entry::my_api_init_v1,
         patterns::callbacks::pattern_callback_1
     ],
+    [types::ExtraType<f32>],
     [
         patterns::service_manual::my_service_pattern_context,
         patterns::service_generated::simple_service_pattern

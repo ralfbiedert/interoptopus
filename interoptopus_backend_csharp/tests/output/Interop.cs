@@ -548,6 +548,14 @@ namespace My.Company
     // Debug - write_type_definition_composite 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
+    public partial struct ExtraTypef32
+    {
+        public float x;
+    }
+
+    // Debug - write_type_definition_composite 
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
     public partial struct Genericu32
     {
         public IntPtr x;
