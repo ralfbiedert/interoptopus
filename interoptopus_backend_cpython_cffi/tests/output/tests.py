@@ -171,7 +171,7 @@ class TestPatterns(unittest.TestCase):
 
     def test_api_entry(self):
         api = r.MyAPIv1()
-        r.raw.my_api_init_v1(api.ptr())
+        r.raw.pattern_my_api_init_v1(api.ptr())
 
         t = r.Tupled()
         t.x0 = 10

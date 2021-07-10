@@ -115,6 +115,8 @@ pub enum EnumDocumented {
     A,
     /// Variant B.
     B,
+    /// Variant B.
+    C,
 }
 
 /// Documented struct.

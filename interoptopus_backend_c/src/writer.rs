@@ -146,6 +146,7 @@ pub trait CWriter {
                     w.newline()?;
                 }
                 TypePattern::Bool => {}
+                TypePattern::APIVersion => {}
             },
         }
         Ok(())

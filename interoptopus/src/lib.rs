@@ -13,8 +13,8 @@
 //! <br>
 //!
 //! Huh?
-//! - Imagine you are writing this cool API and want the world to have it.
-//! - The world, however, is running Unity, C, Python, ... all at the same time.
+//! - Imagine you are writing this cool API and want everyone to use it.
+//! - Everyone else, however, is running Unity, C, Python, ...
 //! - "Not a problem", you say, "I'll just use Interoptopus".
 //!
 //! And you'll live happily<sup>*</sup> ever after.
@@ -39,7 +39,7 @@
 //!     println!("{}", input.x);
 //! }
 //!
-//! inventory!(ffi_inventory, [], [my_function], []);
+//! inventory!(ffi_inventory, [], [my_function], [], []);
 //!
 //! ```
 //!
@@ -161,7 +161,7 @@ pub mod lang {
 ///
 /// # Usage
 ///
-/// This macro must be invoked with exactly 4 parameters:
+/// This macro must be invoked with exactly 5 parameters:
 ///
 /// ```ignore
 /// # use interoptopus::inventory_function;
@@ -194,7 +194,7 @@ pub mod lang {
 ///     my_inventory_function,
 ///     [ MY_CONSTANT ],
 ///     [ f ],
-///     []
+///     [], []
 /// );
 /// ```
 ///

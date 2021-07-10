@@ -12,6 +12,10 @@ namespace My.Company
     {
         public const string NativeLib = "unity_hot_reload";
 
+        static InteropClass()
+        {
+        }
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "do_math")]
         public static extern uint do_math(uint x);

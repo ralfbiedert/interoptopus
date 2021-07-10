@@ -17,6 +17,16 @@ namespace My.Company
         // Debug - write_native_lib_string 
         public const string NativeLib = "interoptopus_reference_project";
 
+        // Debug - write_abi_guard 
+        static Interop()
+        {
+            var api_version = Interop.pattern_api_guard();
+            if (api_version != 9286564606646077908ul)
+            {
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (9286564606646077908). You probably forgot to update / copy either the bindings or the library.");
+            }
+        }
+
         // Debug - write_constant 
         public const byte U8 = (byte) 255;
 
@@ -344,8 +354,14 @@ namespace My.Company
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "my_api_init_v1")]
-        public static extern void my_api_init_v1(out MyAPIv1 api);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_my_api_init_v1")]
+        public static extern void pattern_my_api_init_v1(out MyAPIv1 api);
+
+        // Debug - write_function_overloaded 
+
+        // Debug - write_function 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_api_guard")]
+        public static extern ulong pattern_api_guard();
 
         // Debug - write_function_overloaded 
 
@@ -513,6 +529,8 @@ namespace My.Company
         A = 0,
         /// Variant B.
         B = 1,
+        /// Variant B.
+        C = 2,
     }
 
     // Debug - write_type_definition_composite 

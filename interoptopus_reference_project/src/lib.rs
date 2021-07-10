@@ -12,6 +12,7 @@ pub mod functions;
 /// Reference implementations of patterns.
 pub mod patterns {
     pub mod api_entry;
+    pub mod api_guard;
     pub mod ascii_pointer;
     pub mod callbacks;
     pub mod option;
@@ -76,7 +77,8 @@ interoptopus::inventory!(
         patterns::option::pattern_ffi_option_1,
         patterns::option::pattern_ffi_option_2,
         patterns::primitives::pattern_ffi_bool,
-        patterns::api_entry::my_api_init_v1,
+        patterns::api_entry::pattern_my_api_init_v1,
+        patterns::api_guard::pattern_api_guard,
         patterns::callbacks::pattern_callback_1
     ],
     [types::ExtraType<f32>],

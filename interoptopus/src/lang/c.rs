@@ -12,6 +12,7 @@
 use crate::patterns::TypePattern;
 use crate::util::{ctypes_from_type_recursive, IdPrettifier};
 use std::collections::HashSet;
+use std::hash::{Hash, Hasher};
 
 // /// If a name like `abc::XXX` is given, strips the `abc::` part.
 // fn strip_rust_path_prefix(name_with_path: &str) -> String {
@@ -39,6 +40,26 @@ pub enum PrimitiveValue {
 #[derive(Clone, Debug, PartialOrd, PartialEq)]
 pub enum ConstantValue {
     Primitive(PrimitiveValue),
+}
+
+impl ConstantValue {
+    pub(crate) fn fucking_hash_it_already<H: Hasher>(&self, h: &mut H) {
+        match self {
+            ConstantValue::Primitive(x) => match x {
+                PrimitiveValue::Bool(x) => x.hash(h),
+                PrimitiveValue::U8(x) => x.hash(h),
+                PrimitiveValue::U16(x) => x.hash(h),
+                PrimitiveValue::U32(x) => x.hash(h),
+                PrimitiveValue::U64(x) => x.hash(h),
+                PrimitiveValue::I8(x) => x.hash(h),
+                PrimitiveValue::I16(x) => x.hash(h),
+                PrimitiveValue::I32(x) => x.hash(h),
+                PrimitiveValue::I64(x) => x.hash(h),
+                PrimitiveValue::F32(x) => x.to_le_bytes().hash(h),
+                PrimitiveValue::F64(x) => x.to_le_bytes().hash(h),
+            },
+        }
+    }
 }
 
 /// A Rust `const` definition with a name and value, might become a `#define`.

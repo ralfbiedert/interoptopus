@@ -13,6 +13,7 @@ typedef enum cffi_enumdocumented
     {
     CFFI_A = 0,
     CFFI_B = 1,
+    CFFI_C = 2,
     } cffi_enumdocumented;
 
 typedef struct cffi_context cffi_context;
@@ -228,7 +229,8 @@ cffi_vec3f32 pattern_ffi_slice_delegate_huge(cffi_fptr_fn_FFISliceVec3f32_rval_V
 cffi_ffioptioninner pattern_ffi_option_1(cffi_ffioptioninner ffi_slice);
 cffi_inner pattern_ffi_option_2(cffi_ffioptioninner ffi_slice);
 uint8_t pattern_ffi_bool(uint8_t ffi_bool);
-void my_api_init_v1(cffi_myapiv1* api);
+void pattern_my_api_init_v1(cffi_myapiv1* api);
+uint64_t pattern_api_guard();
 uint32_t pattern_callback_1(cffi_fptr_fn_u32_rval_u32 callback, uint32_t x);
 cffi_ffierror pattern_service_create(cffi_context** context_ptr, uint32_t value);
 cffi_ffierror pattern_service_destroy(cffi_context** context_ptr);
@@ -274,6 +276,7 @@ class EnumDocumented:
     """Documented enum."""
     A = 0
     B = 1
+    C = 2
 
 
 class Array(object):
@@ -1229,12 +1232,17 @@ Parameter x must point to valid data."""
             ffi_bool = ffi_bool._ctx[0]
         return _api.pattern_ffi_bool(ffi_bool)
 
-    def my_api_init_v1(api):
+    def pattern_my_api_init_v1(api):
         """"""
         global _api
         if hasattr(api, "_ctx"):
             api = api._ctx[0]
-        return _api.my_api_init_v1(api)
+        return _api.pattern_my_api_init_v1(api)
+
+    def pattern_api_guard():
+        """"""
+        global _api
+        return _api.pattern_api_guard()
 
     def pattern_callback_1(callback, x):
         """"""

@@ -6,6 +6,14 @@ use std::collections::{HashMap, HashSet};
 use std::iter::FromIterator;
 
 /// Converts an internal name like `fn() -> X` to a safe name like `fn_rval_x`
+///
+/// # Example
+///
+/// ```
+/// use interoptopus::util::safe_name;
+///
+/// assert_eq!(safe_name("fn(u32) -> u8"), "fn_u32_rval_u8");
+/// ```
 pub fn safe_name(name: &str) -> String {
     let mut rval = name.to_string();
 
@@ -84,6 +92,7 @@ pub fn longest_common_prefix(functions: &[Function]) -> String {
     String::from_iter(&longest_common)
 }
 
+/// Given some functions and types, return all used and nested types, without duplicates.
 pub(crate) fn ctypes_from_functions_types(functions: &[Function], extra_types: &[CType]) -> Vec<CType> {
     let mut types = HashSet::new();
 
@@ -102,6 +111,7 @@ pub(crate) fn ctypes_from_functions_types(functions: &[Function], extra_types: &
     types.iter().cloned().collect()
 }
 
+/// Recursive helper for [`ctypes_from_functions_types`].
 pub(crate) fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CType>) {
     types.insert(start.clone());
 
@@ -153,6 +163,7 @@ pub(crate) fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CTyp
                 }
             }
             TypePattern::Bool => {}
+            TypePattern::APIVersion => {}
         },
     }
 }

@@ -12,8 +12,8 @@ The polyglot bindings generator for your library (C#, C, Python, ...)
 <br>
 
 Huh?
-- Imagine you are writing this cool API and want the world to have it.
-- The world, however, is running Unity, C, Python, ... all at the same time.
+- Imagine you are writing this cool API and want everyone to use it.
+- Everyone else, however, is running Unity, C, Python, ...
 - "Not a problem", you say, "I'll just use Interoptopus".
 
 And you'll live happily<sup>*</sup> ever after.
@@ -38,7 +38,7 @@ pub extern "C" fn my_function(input: Vec2) {
     println!("{}", input.x);
 }
 
-inventory!(ffi_inventory, [], [my_function], []);
+inventory!(ffi_inventory, [], [my_function], [], []);
 
 ```
 

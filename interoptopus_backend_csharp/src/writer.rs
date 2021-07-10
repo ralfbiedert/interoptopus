@@ -1,6 +1,7 @@
 use crate::config::Config;
 use crate::converter::{CSharpTypeConverter, Converter};
 use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, Meta, PrimitiveType, Variant, Visibility};
+use interoptopus::patterns::api_guard::library_hash;
 use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
@@ -54,6 +55,32 @@ pub trait CSharpWriter {
     fn write_native_lib_string(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.debug(w, "write_native_lib_string")?;
         indented!(w, r#"public const string NativeLib = "{}";"#, self.config().dll_name)
+    }
+
+    fn write_abi_guard(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        self.debug(w, "write_abi_guard")?;
+
+        indented!(w, r#"static {}()"#, self.config().class)?;
+        indented!(w, r#"{{"#)?;
+
+        // Check if there is a API version marker for us to write
+        if let Some(api_guard) = self
+            .library()
+            .functions()
+            .iter()
+            .find(|x| matches!(x.signature().rval(), CType::Pattern(TypePattern::APIVersion)))
+        {
+            let version = library_hash(self.library());
+            indented!(w, [_], r#"var api_version = {}.{}();"#, self.config().class, api_guard.name())?;
+            indented!(w, [_], r#"if (api_version != {}ul)"#, version)?;
+            indented!(w, [_], r#"{{"#)?;
+            indented!(w, [_ _], r#"throw new Exception($"API reports hash {{api_version}} which differs from hash in bindings ({}). You probably forgot to update / copy either the bindings or the library.");"#, version)?;
+            indented!(w, [_], r#"}}"#)?;
+        }
+
+        indented!(w, r#"}}"#)?;
+
+        Ok(())
     }
 
     fn write_constants(&self, w: &mut IndentWriter) -> Result<(), Error> {
@@ -269,6 +296,7 @@ pub trait CSharpWriter {
                     }
                 }
                 TypePattern::Bool => {}
+                TypePattern::APIVersion => {}
             },
         }
         Ok(())
@@ -847,6 +875,9 @@ pub trait CSharpWriter {
             if self.has_emittable_functions(self.library().functions()) {
                 self.write_class_context(w, |w| {
                     self.write_native_lib_string(w)?;
+                    w.newline()?;
+
+                    self.write_abi_guard(w)?;
                     w.newline()?;
 
                     self.write_constants(w)?;

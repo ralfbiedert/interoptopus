@@ -169,7 +169,7 @@ impl Service {
     }
 }
 
-/// Defines a [`Service`] pattern, usually producing a class in OO languages.
+/// Defines a [`Service`] pattern, usually producing a class in OO languages.<sup>🚧</sup>
 ///
 /// ```ignore
 /// pattern_service_manual!(
@@ -225,7 +225,7 @@ macro_rules! pattern_service_manual {
     };
 }
 
-/// Defines a [`Service`] pattern _and_ generate FFI wrapper code.
+/// Defines a [`Service`] pattern _and_ generate FFI wrapper code.<sup>🚧</sup>
 #[macro_export]
 macro_rules! pattern_service_generated {
     (

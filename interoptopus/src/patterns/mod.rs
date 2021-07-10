@@ -76,6 +76,7 @@ use crate::patterns::service::Service;
 use crate::patterns::success_enum::SuccessEnum;
 
 pub mod api_entry;
+pub mod api_guard;
 pub mod ascii_pointer;
 pub mod callbacks;
 pub mod option;
@@ -100,6 +101,7 @@ impl From<Service> for LibraryPattern {
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum TypePattern {
     AsciiPointer,
+    APIVersion,
     SuccessEnum(SuccessEnum),
     Slice(CompositeType),
     SliceMut(CompositeType),
@@ -122,6 +124,7 @@ impl TypePattern {
             TypePattern::Option(x) => CType::Composite(x.clone()),
             TypePattern::NamedCallback(x) => CType::FnPointer(x.fnpointer().clone()),
             TypePattern::Bool => CType::Primitive(PrimitiveType::U8),
+            TypePattern::APIVersion => CType::Primitive(PrimitiveType::U64),
         }
     }
 }

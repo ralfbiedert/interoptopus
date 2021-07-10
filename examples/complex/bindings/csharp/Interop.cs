@@ -12,6 +12,10 @@ namespace My.Company
     {
         public const string NativeLib = "example_complex";
 
+        static InteropClass()
+        {
+        }
+
         /// Call for a friend.
         public const uint THE_MAGIC_CONSTANT = (uint) 666;
 
