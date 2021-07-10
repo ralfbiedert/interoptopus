@@ -13,11 +13,6 @@
   You probably forgot to declare one of your items `#[ffi_function]` or `#[ffi_const]`.
 
 
-- **Why do I get `associated type bounds are unstable!()`?**
-
-  Right now it doesn't like `struct S<T: X>`. Instead, try `struct S<T> where T: X`.
-
-
 - **Who's the target audience for this?**
   
   Anyone writing 'system libraries' that need to be consumable from multiple 

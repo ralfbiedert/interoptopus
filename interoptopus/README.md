@@ -88,10 +88,11 @@ helpers might add additional overhead.
 
 If you **need API design guidance** the following (wip) [**C# call-cost table**](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_csharp/benches/BENCHMARK_RESULTS.md)<sup>🔥</sup> can help.
 
-### Current Status
+### Changelog
 
-- June 20, 2021 - Alpha. Has generated simple working<sup>TM</sup> bindings for a few projects for a week now, many things missing.
-- June 13, 2021 - Pre-alpha. Has generated C#, C, Python-CFFI bindings at least once, many things missing, untested.
+- **v0.3** - Better compatibility with generics.
+- **v0.2** - Introduced "patterns"; produces generally _working_ interop for C#.
+- **v0.1** - Has generated C#, C, Python-CFFI bindings at least once.
 
 
 ### FAQ
@@ -104,11 +105,10 @@ PRs are welcome.
 
 - Bug fixes can be submitted directly. Major changes should be filed as issues
 first.
-
-- Anything that would make previously working bindings change behavior or stop compiling
-is a major change; which doesn't mean we're opposed to breaking stuff before 1.0, just that
+- Anything that makes previously working bindings change behavior or stop compiling
+is a major change;
+- This doesn't mean we're opposed to breaking stuff just that
 we'd like to talk about it before it happens.
-
 - New features or patterns must be materialized in the reference project and accompanied by
 an interop test (i.e., a backend test running C# / Python against a DLL invoking that code)
 in at least one included backend.
