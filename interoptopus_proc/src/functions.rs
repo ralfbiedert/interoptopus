@@ -28,7 +28,7 @@ impl FFIFunctionAttributes {
     }
 }
 
-pub fn fn_signature_type(signature: &Signature) -> TokenStream {
+pub fn fn_signature_type(signature: Signature) -> TokenStream {
     let rval = &signature.output;
     let abi = &signature.abi;
     let mut inputs = Vec::new();
@@ -47,23 +47,9 @@ pub fn fn_signature_type(signature: &Signature) -> TokenStream {
     }
 }
 
-pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
-    let item_fn: ItemFn = syn::parse2(input.clone()).expect("Must be item.");
-    let docs = util::extract_doc_lines(&item_fn.attrs);
-    let ffi_attributes: FFIFunctionAttributes = FFIFunctionAttributes::from_list(&attr).unwrap();
-
-    ffi_attributes.assert_valid();
-
-    let span = item_fn.span();
-    let signature = fn_signature_type(&item_fn.sig);
-    let function_ident = item_fn.sig.ident;
-    let function_name = function_ident.to_string();
-
-    let mut args_name = Vec::new();
-    let mut args_type = Vec::new();
-
-    let rval = if let ReturnType::Type(_, x) = item_fn.sig.output {
-        match *x {
+pub fn rval_tokens(return_type: &ReturnType) -> TokenStream {
+    if let ReturnType::Type(_, x) = return_type {
+        match &**x {
             Type::Path(x) => {
                 let token = x.to_token_stream();
                 quote! { < #token as interoptopus::lang::rust::CTypeInfo>::type_info() }
@@ -94,7 +80,25 @@ pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
         }
     } else {
         quote! { interoptopus::lang::c::CType::Primitive(interoptopus::lang::c::PrimitiveType::Void) }
-    };
+    }
+}
+
+pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
+    let item_fn: ItemFn = syn::parse2(input.clone()).expect("Must be item.");
+    let docs = util::extract_doc_lines(&item_fn.attrs);
+    let ffi_attributes: FFIFunctionAttributes = FFIFunctionAttributes::from_list(&attr).unwrap();
+
+    ffi_attributes.assert_valid();
+
+    let mut args_name = Vec::new();
+    let mut args_type = Vec::new();
+
+    let span = item_fn.span();
+    let signature = fn_signature_type(item_fn.sig.clone());
+    let rval = rval_tokens(&item_fn.sig.output);
+
+    let function_ident = item_fn.sig.ident;
+    let function_ident_str = function_ident.to_string();
 
     for arg in &item_fn.sig.inputs {
         if let FnArg::Typed(pat) = arg {
@@ -157,7 +161,7 @@ pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
                 let documentation = interoptopus::lang::c::Documentation::from_lines(doc_lines);
                 let meta = interoptopus::lang::c::Meta::with_documentation(documentation);
 
-                interoptopus::lang::c::Function::new(#function_name.to_string(), signature, meta)
+                interoptopus::lang::c::Function::new(#function_ident_str.to_string(), signature, meta)
             }
         }
     };
