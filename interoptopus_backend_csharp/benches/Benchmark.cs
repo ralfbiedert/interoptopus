@@ -12,7 +12,7 @@ namespace Interoptopus
         static void Main(string[] args)
         {
             Interop.primitive_i8(123);
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("Running benchmarks ...");
 
             MeasureResult result;
             var writer = new MarkdownTableWriter();

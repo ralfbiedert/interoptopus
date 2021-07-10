@@ -11,20 +11,20 @@ namespace Interoptopus
     public class MeasureResult
     {
         private static long _calibrationTicks = 0;
-        
+
         long _n;
         long _totalTicks;
 
         public double MicroPer1000()
         {
             var n = (double) _n;
-            var ticks_for_all_n = (double) _totalTicks;  
+            var ticks_for_all_n = (double) _totalTicks;
 
             // 1 tick = 100 nanos
             var micros_for_all_n = ticks_for_all_n / 10;
             var micros_for_one_n = micros_for_all_n / n;
             var micros_for_1000_n = 1000 * micros_for_one_n;
-            
+
             // return (100 * ticks_for_all_n / n);
             return micros_for_1000_n;
         }
@@ -34,7 +34,7 @@ namespace Interoptopus
             _n = n;
             _totalTicks = totalTicks;
         }
-        
+
         public static void Calibrate(uint n, Run r)
         {
             var result = Measure(n, r);
@@ -43,7 +43,7 @@ namespace Interoptopus
 
         public static MeasureResult Measure(uint n, Run r)
         {
-            
+
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             for (var i = 0; i < n; i++)
@@ -81,24 +81,24 @@ namespace Interoptopus
             var header = @"
 # FFI Call Overheads
 
-The numbers below are to help FFI design decisions by giving order-of-magnitude estimates how 
+The numbers below are to help FFI design decisions by giving order-of-magnitude estimates how
 expensive certain constructs are.
 
 ## Notes
 
-- Times were determined by running the given construct N times, taking the elapsed time in ticks, 
-and computing the cost per 1k invocations. 
+- Times were determined by running the given construct N times, taking the elapsed time in ticks,
+and computing the cost per 1k invocations.
 
-- The time of the called function is included. 
+- The time of the called function is included.
 
-- However, the reference project was written so that each function is _minimal_, i.e., any similar 
-function you wrote, would have to at least as expensive operations if it were to do anything sensible with 
-the given type. 
+- However, the reference project was written so that each function is _minimal_, i.e., any similar
+function you wrote, would have to at least as expensive operations if it were to do anything sensible with
+the given type.
 
-- The list is ad-hoc, PRs adding more tests to `Benchmark.cs` are welcome. 
+- The list is ad-hoc, PRs adding more tests to `Benchmark.cs` are welcome.
 
 
-## System 
+## System
 
 The following system was used:
 
@@ -106,15 +106,15 @@ The following system was used:
 System: i9-9900K, 32 GB RAM; Windows 10
 rustc: stable (i.e., 1.53 or later)
 profile: --release
-.NET: v3.1 (netcoreapp3.1) 
+.NET: v3.1 (netcoreapp3.1)
 ```
 
 ## Results
- 
-| Construct | µs per 1k calls |
+
+| Construct | ns per call |
 | --- | --- |
 ";
-            
+
             using StreamWriter sw = File.CreateText(file);
             sw.Write(header);
             foreach (var entry in Entries)
@@ -123,4 +123,4 @@ profile: --release
             }
         }
     }
-}    
+}
