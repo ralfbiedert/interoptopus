@@ -114,8 +114,8 @@ class TestFunctions(unittest.TestCase):
 
         phantom = r.Phantomu8()
 
-        self.assertEqual(10, r.raw.generic_1(genericu32, phantom))
-        self.assertEqual(10, r.raw.generic_2(genericu8, phantom))
+        self.assertEqual(10, r.raw.generic_1a(genericu32, phantom))
+        # self.assertEqual(10, r.raw.generic_2(genericu8.ptr()))
 
     def test_documented(self):
         documented = r.StructDocumented()

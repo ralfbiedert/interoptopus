@@ -21,9 +21,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 9286564606646077908ul)
+            if (api_version != 10446455888379816013ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (9286564606646077908). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (10446455888379816013). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -185,14 +185,20 @@ namespace My.Company
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic_1")]
-        public static extern uint generic_1(Genericu32 x, Phantomu8 _y);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic_1a")]
+        public static extern uint generic_1a(Genericu32 x, Phantomu8 _y);
+
+        // Debug - write_function_overloaded 
+
+        // Debug - write_function 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic_1b")]
+        public static extern byte generic_1b(Genericu8 x, Phantomu8 _y);
 
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic_2")]
-        public static extern byte generic_2(Genericu8 x, Phantomu8 _y);
+        public static extern byte generic_2(IntPtr x);
 
         // Debug - write_function_overloaded 
 
@@ -373,7 +379,7 @@ namespace My.Company
 
         // Debug - write_function 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_create")]
-        public static extern FFIError pattern_service_create(out IntPtr context_ptr, uint value);
+        public static extern FFIError pattern_service_create(ref IntPtr context_ptr, uint value);
 
         // Debug - write_function_overloaded 
 
@@ -382,7 +388,7 @@ namespace My.Company
         /// 
         /// This function may only be called with a context returned by a succeeding `pattern_service_create`.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_destroy")]
-        public static extern FFIError pattern_service_destroy(out IntPtr context_ptr);
+        public static extern FFIError pattern_service_destroy(ref IntPtr context_ptr);
 
         // Debug - write_function_overloaded 
 
@@ -406,13 +412,13 @@ namespace My.Company
 
         // Debug - write_function 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_create")]
-        public static extern FFIError simple_service_create(out IntPtr context_ptr, uint x);
+        public static extern FFIError simple_service_create(ref IntPtr context_ptr, uint x);
 
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_destroy")]
-        public static extern FFIError simple_service_destroy(out IntPtr context_ptr);
+        public static extern FFIError simple_service_destroy(ref IntPtr context_ptr);
 
         // Debug - write_function_overloaded 
 
@@ -1029,7 +1035,7 @@ namespace My.Company
         public Context(uint value)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            var rval = Interop.pattern_service_create(out _context , value);
+            var rval = Interop.pattern_service_create(ref _context , value);
             if (rval != FFIError.Ok)
             {
                 throw new Exception("Something went wrong");
@@ -1039,7 +1045,7 @@ namespace My.Company
         public void Dispose()
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            var rval = Interop.pattern_service_destroy(out _context );
+            var rval = Interop.pattern_service_destroy(ref _context );
             if (rval != FFIError.Ok)
             {
                 throw new Exception("Something went wrong");
@@ -1082,7 +1088,7 @@ namespace My.Company
         public SimpleService(uint x)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            var rval = Interop.simple_service_create(out _context , x);
+            var rval = Interop.simple_service_create(ref _context , x);
             if (rval != FFIError.Ok)
             {
                 throw new Exception("Something went wrong");
@@ -1092,7 +1098,7 @@ namespace My.Company
         public void Dispose()
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            var rval = Interop.simple_service_destroy(out _context );
+            var rval = Interop.simple_service_destroy(ref _context );
             if (rval != FFIError.Ok)
             {
                 throw new Exception("Something went wrong");

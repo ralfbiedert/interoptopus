@@ -818,7 +818,7 @@ pub trait CSharpWriter {
             args = format!(", {}", args);
         }
 
-        let context = if deref_context { "_context".to_string() } else { "out _context".to_string() };
+        let context = if deref_context { "_context".to_string() } else { "ref _context".to_string() };
 
         match function.signature().rval() {
             CType::Pattern(TypePattern::SuccessEnum(e)) => {

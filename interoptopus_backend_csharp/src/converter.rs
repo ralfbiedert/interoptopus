@@ -136,8 +136,8 @@ pub trait CSharpTypeConverter {
             CType::ReadWritePointer(z) => match **z {
                 CType::Opaque(_) => "IntPtr".to_string(),
                 CType::Primitive(PrimitiveType::Void) => "IntPtr".to_string(),
-                CType::ReadPointer(_) => "out IntPtr".to_string(),
-                CType::ReadWritePointer(_) => "out IntPtr".to_string(),
+                CType::ReadPointer(_) => "ref IntPtr".to_string(),
+                CType::ReadWritePointer(_) => "ref IntPtr".to_string(),
                 _ => format!("out {}", self.to_typespecifier_in_param(z)),
             },
             CType::FnPointer(x) => self.fnpointer_to_typename(x),

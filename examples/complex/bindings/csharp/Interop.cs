@@ -32,7 +32,7 @@ namespace My.Company
 
         /// Creates a new instance of this library.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_create_context")]
-        public static extern FFIError example_create_context(out IntPtr context_ptr);
+        public static extern FFIError example_create_context(ref IntPtr context_ptr);
 
 
         /// Deletes an existing instance of this library.
@@ -40,7 +40,7 @@ namespace My.Company
         /// You **must** ensure that `context_ptr` is being called with the context produced by
         /// `example_create_context`, otherwise bad things will happen.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_destroy_context")]
-        public static extern FFIError example_destroy_context(out IntPtr context_ptr);
+        public static extern FFIError example_destroy_context(ref IntPtr context_ptr);
 
 
         /// Prints the current player score.

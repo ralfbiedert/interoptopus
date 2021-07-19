@@ -8,6 +8,10 @@ use interoptopus::{ffi_type, pattern_callback};
 use std::fmt::Debug;
 use std::marker::PhantomData;
 
+pub trait Helper {}
+
+impl Helper for u8 {}
+
 // Let's assume we can't implement `CTypeInfo` for this.
 #[repr(C)]
 pub struct SomeForeignType {
@@ -55,6 +59,15 @@ where
 #[ffi_type(opaque, name = "Generic3")]
 #[repr(C)]
 pub struct Generic3<T> {
+    pub x: T,
+}
+
+#[ffi_type(opaque, name = "Generic4")]
+#[repr(C)]
+pub struct Generic4<T>
+where
+    T: Helper,
+{
     pub x: T,
 }
 
