@@ -576,18 +576,12 @@ pub trait CSharpWriter {
         indented!(w, [_], r#"}}"#)?;
 
         // Count
-        indented!(w, [_], r#"public int Count"#)?;
-        indented!(w, [_], r#"{{"#)?;
-        indented!(w, [_ _], r#"get"#)?;
-        indented!(w, [_ _], r#"{{"#)?;
-        indented!(w, [_ _ _], r#"return (int) len;"#)?;
-        indented!(w, [_ _], r#"}}"#)?;
-        indented!(w, [_], r#"}}"#)?;
+        indented!(w, [_], r#"public int Count => (int) len;"#)?;
 
         // GetEnumerator
         indented!(w, [_], r#"public IEnumerator<{}> GetEnumerator()"#, type_string)?;
         indented!(w, [_], r#"{{"#)?;
-        indented!(w, [_ _], r#"for (int i = 0; i < (int)len; ++i)"#)?;
+        indented!(w, [_ _], r#"for (var i = 0; i < (int)len; ++i)"#)?;
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"yield return this[i];"#)?;
         indented!(w, [_ _], r#"}}"#)?;
@@ -660,18 +654,12 @@ pub trait CSharpWriter {
         indented!(w, [_], r#"}}"#)?;
 
         // Count
-        indented!(w, [_], r#"public int Count"#)?;
-        indented!(w, [_], r#"{{"#)?;
-        indented!(w, [_ _], r#"get"#)?;
-        indented!(w, [_ _], r#"{{"#)?;
-        indented!(w, [_ _ _], r#"return (int) len;"#)?;
-        indented!(w, [_ _], r#"}}"#)?;
-        indented!(w, [_], r#"}}"#)?;
+        indented!(w, [_], r#"public int Count => (int) len;"#)?;
 
         // GetEnumerator
         indented!(w, [_], r#"public IEnumerator<{}> GetEnumerator()"#, type_string)?;
         indented!(w, [_], r#"{{"#)?;
-        indented!(w, [_ _], r#"for (int i = 0; i < (int)len; ++i)"#)?;
+        indented!(w, [_ _], r#"for (var i = 0; i < (int)len; ++i)"#)?;
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"yield return this[i];"#)?;
         indented!(w, [_ _], r#"}}"#)?;

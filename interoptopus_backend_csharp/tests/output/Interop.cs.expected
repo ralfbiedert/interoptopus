@@ -778,16 +778,10 @@ namespace My.Company
                 return rval;
             }
         }
-        public int Count
-        {
-            get
-            {
-                return (int) len;
-            }
-        }
+        public int Count => (int) len;
         public IEnumerator<Vec3f32> GetEnumerator()
         {
-            for (int i = 0; i < (int)len; ++i)
+            for (var i = 0; i < (int)len; ++i)
             {
                 yield return this[i];
             }
@@ -836,16 +830,10 @@ namespace My.Company
                 return rval;
             }
         }
-        public int Count
-        {
-            get
-            {
-                return (int) len;
-            }
-        }
+        public int Count => (int) len;
         public IEnumerator<uint> GetEnumerator()
         {
-            for (int i = 0; i < (int)len; ++i)
+            for (var i = 0; i < (int)len; ++i)
             {
                 yield return this[i];
             }
@@ -894,16 +882,10 @@ namespace My.Company
                 return rval;
             }
         }
-        public int Count
-        {
-            get
-            {
-                return (int) len;
-            }
-        }
+        public int Count => (int) len;
         public IEnumerator<byte> GetEnumerator()
         {
-            for (int i = 0; i < (int)len; ++i)
+            for (var i = 0; i < (int)len; ++i)
             {
                 yield return this[i];
             }
@@ -958,16 +940,10 @@ namespace My.Company
                 return rval;
             }
         }
-        public int Count
-        {
-            get
-            {
-                return (int) len;
-            }
-        }
+        public int Count => (int) len;
         public IEnumerator<byte> GetEnumerator()
         {
-            for (int i = 0; i < (int)len; ++i)
+            for (var i = 0; i < (int)len; ++i)
             {
                 yield return this[i];
             }
