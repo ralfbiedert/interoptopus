@@ -22,7 +22,7 @@ namespace Interoptopus
             var short_vec = new Vec3f32[10];
             var long_vec = new Vec3f32[100_000];
 
-            Interop.my_api_init_v1(out var dynamic_api);
+            Interop.pattern_my_api_init_v1(out var dynamic_api);
             
             MeasureResult.Calibrate(Iterations, () => {});
 
