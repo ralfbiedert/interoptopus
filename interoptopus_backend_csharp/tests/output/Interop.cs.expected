@@ -1179,7 +1179,7 @@ namespace My.Company
             var rval = Interop.simple_service_mut_self_ffi_error(_context, slice);
             if (rval != FFIError.Ok)
             {
-                throw new Exception("Something went wrong");
+                throw new Exception($"Something went wrong: {rval}");
             }
         }
 
