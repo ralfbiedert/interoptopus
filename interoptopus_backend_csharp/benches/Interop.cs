@@ -762,6 +762,7 @@ namespace My.Company
         {
             get
             {
+                if (i >= Count) throw new IndexOutOfRangeException();
                 var size = Marshal.SizeOf(typeof(Vec3f32));
                 var ptr = new IntPtr(data.ToInt64() + i * size);
                 return Marshal.PtrToStructure<Vec3f32>(ptr);
@@ -814,6 +815,7 @@ namespace My.Company
         {
             get
             {
+                if (i >= Count) throw new IndexOutOfRangeException();
                 var size = Marshal.SizeOf(typeof(uint));
                 var ptr = new IntPtr(data.ToInt64() + i * size);
                 return Marshal.PtrToStructure<uint>(ptr);
@@ -866,6 +868,7 @@ namespace My.Company
         {
             get
             {
+                if (i >= Count) throw new IndexOutOfRangeException();
                 var size = Marshal.SizeOf(typeof(byte));
                 var ptr = new IntPtr(data.ToInt64() + i * size);
                 return Marshal.PtrToStructure<byte>(ptr);
@@ -918,12 +921,14 @@ namespace My.Company
         {
             get
             {
+                if (i >= Count) throw new IndexOutOfRangeException();
                 var size = Marshal.SizeOf(typeof(byte));
                 var ptr = new IntPtr(data.ToInt64() + i * size);
                 return Marshal.PtrToStructure<byte>(ptr);
             }
             set
             {
+                if (i >= Count) throw new IndexOutOfRangeException();
                 var size = Marshal.SizeOf(typeof(byte));
                 var ptr = new IntPtr(data.ToInt64() + i * size);
                 Marshal.StructureToPtr<byte>(value, ptr, false);
