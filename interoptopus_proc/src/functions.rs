@@ -1,13 +1,11 @@
-use std::collections::HashMap;
-
-use darling::FromMeta;
-use proc_macro2::{Ident, TokenStream};
-use quote::{quote, ToTokens};
-use syn::{AttributeArgs, FnArg, GenericArgument, GenericParam, ItemFn, Pat, PathArguments, PathSegment, ReturnType, Signature, Type};
-
 use crate::util;
+use darling::FromMeta;
+use proc_macro2::TokenStream;
+use quote::{quote, ToTokens};
+use std::collections::HashMap;
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
+use syn::{AttributeArgs, FnArg, GenericArgument, GenericParam, ItemFn, Pat, PathArguments, ReturnType, Signature, Type};
 
 #[derive(Debug, FromMeta)]
 pub struct FFIFunctionAttributes {

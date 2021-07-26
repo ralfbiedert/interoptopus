@@ -2,7 +2,6 @@ use crate::patterns::success_enum::FFIError;
 use interoptopus::patterns::slice::FFISlice;
 use interoptopus::{ffi_function, pattern_service_generated};
 use some_rust_module::{Error, SimpleService};
-use std::marker::PhantomData;
 
 pub mod some_rust_module {
     use crate::patterns::success_enum::FFIError;
