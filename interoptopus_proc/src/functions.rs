@@ -95,9 +95,15 @@ fn purge_lifetimes_from_type(x: &Type, args: &FFIFunctionAttributes) -> Type {
                         let mut p = Punctuated::new();
 
                         for generic_arg in &mut angled_args.args {
-                            if let GenericArgument::Lifetime(_) = generic_arg {
-                            } else {
-                                p.push(generic_arg.clone());
+                            match generic_arg {
+                                GenericArgument::Lifetime(_) => {}
+                                GenericArgument::Type(x) => {
+                                    let x = purge_lifetimes_from_type(x, args);
+                                    p.push(GenericArgument::Type(x));
+                                }
+                                GenericArgument::Binding(_) => {}
+                                GenericArgument::Constraint(x) => p.push(GenericArgument::Constraint(x.clone())),
+                                GenericArgument::Const(x) => p.push(GenericArgument::Const(x.clone())),
                             }
                         }
 
@@ -111,6 +117,7 @@ fn purge_lifetimes_from_type(x: &Type, args: &FFIFunctionAttributes) -> Type {
             x.lifetime = None;
             x.elem = Box::new(purge_lifetimes_from_type(&x.elem, args))
         }
+        Type::Group(x) => x.elem = Box::new(purge_lifetimes_from_type(&x.elem, args)),
         _ => {}
     }
 

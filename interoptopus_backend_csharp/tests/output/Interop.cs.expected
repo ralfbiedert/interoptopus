@@ -21,9 +21,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 16730845697937917830ul)
+            if (api_version != 16328755259513649950ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (16730845697937917830). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (16328755259513649950). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -198,7 +198,7 @@ namespace My.Company
 
         // Debug - write_function 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic_1c")]
-        public static extern byte generic_1c(ref Genericu8 x);
+        public static extern byte generic_1c(ref Genericu8 _x, ref Genericu8 y);
 
         // Debug - write_function_overloaded 
 
