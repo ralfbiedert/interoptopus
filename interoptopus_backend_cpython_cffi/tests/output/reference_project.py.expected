@@ -247,6 +247,7 @@ uint8_t simple_service_mut_self(cffi_simpleservice* context_ptr, cffi_ffisliceu8
 void simple_service_mut_self_void(cffi_simpleservice* context_ptr, cffi_ffisliceu8 slice);
 uint8_t simple_service_mut_self_ref(cffi_simpleservice* context_ptr, uint8_t* x, uint8_t* _y);
 uint8_t simple_service_mut_self_ref_slice(cffi_simpleservice* context_ptr, uint8_t* x, uint8_t* _y, cffi_ffisliceu8 _slice);
+uint8_t simple_service_mut_self_ref_slice_limited(cffi_simpleservice* context_ptr, uint8_t* x, uint8_t* _y, cffi_ffisliceu8 _slice, cffi_ffisliceu8 _slice2);
 cffi_ffierror simple_service_mut_self_ffi_error(cffi_simpleservice* context_ptr, cffi_ffisliceu8 slice);
 void simple_service_void(cffi_simpleservice* context_ptr);
 uint32_t simple_service_extra_method(cffi_simpleservice* _context);
@@ -1377,6 +1378,21 @@ This function may only be called with a context returned by a succeeding `patter
             _slice = _slice._ctx[0]
         return _api.simple_service_mut_self_ref_slice(context_ptr, x, _y, _slice)
 
+    def simple_service_mut_self_ref_slice_limited(context_ptr, x, _y, _slice, _slice2):
+        """"""
+        global _api
+        if hasattr(context_ptr, "_ctx"):
+            context_ptr = context_ptr._ctx[0]
+        if hasattr(x, "_ctx"):
+            x = x._ctx[0]
+        if hasattr(_y, "_ctx"):
+            _y = _y._ctx[0]
+        if hasattr(_slice, "_ctx"):
+            _slice = _slice._ctx[0]
+        if hasattr(_slice2, "_ctx"):
+            _slice2 = _slice2._ctx[0]
+        return _api.simple_service_mut_self_ref_slice_limited(context_ptr, x, _y, _slice, _slice2)
+
     def simple_service_mut_self_ffi_error(context_ptr, slice):
         """"""
         global _api
@@ -1504,6 +1520,11 @@ class SimpleService(object):
         """"""
         global raw
         return _api.simple_service_mut_self_ref_slice(self.ctx[0], x, _y, _slice)
+
+    def mut_self_ref_slice_limited(self, x, _y, _slice, _slice2):
+        """"""
+        global raw
+        return _api.simple_service_mut_self_ref_slice_limited(self.ctx[0], x, _y, _slice, _slice2)
 
     def mut_self_ffi_error(self, slice):
         """"""

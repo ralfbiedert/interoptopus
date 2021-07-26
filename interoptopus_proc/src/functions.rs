@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use darling::FromMeta;
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
-use syn::{AttributeArgs, FnArg, ItemFn, Pat, ReturnType, Signature, Type};
+use syn::{AttributeArgs, FnArg, GenericParam, ItemFn, Pat, ReturnType, Signature, Type};
 
 use crate::util;
 use syn::spanned::Spanned;
@@ -92,13 +92,37 @@ pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
 
     let mut args_name = Vec::new();
     let mut args_type = Vec::new();
+    let mut generic_parameters = Vec::new();
+    let mut generic_ident = Vec::new();
 
     let span = item_fn.span();
     let signature = fn_signature_type(item_fn.sig.clone());
     let rval = rval_tokens(&item_fn.sig.output);
 
+    for generic in &item_fn.sig.generics.params {
+        match generic {
+            GenericParam::Type(_) => panic!("Generic types not supported in FFI functions."),
+            GenericParam::Const(_) => panic!("Generic consts not supported in FFI functions."),
+            GenericParam::Lifetime(lt) => {
+                generic_parameters.push(lt.lifetime.to_token_stream());
+                generic_ident.push(lt.lifetime.ident.clone());
+            }
+        }
+    }
+
     let function_ident = item_fn.sig.ident;
     let function_ident_str = function_ident.to_string();
+    let mut generic_params = quote! {};
+    let mut phantom_fields = quote! {};
+
+    if !generic_parameters.is_empty() {
+        generic_params = quote! { < #(#generic_parameters,)* > };
+        phantom_fields = quote! {
+            #(
+                #generic_ident: std::marker::PhantomData<& #generic_parameters ()>,
+            )*
+        };
+    }
 
     for arg in &item_fn.sig.inputs {
         if let FnArg::Typed(pat) = arg {
@@ -139,9 +163,9 @@ pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
         #input
 
         #[allow(non_camel_case_types)]
-        pub(crate) struct #function_ident {}
+        pub(crate) struct #function_ident #generic_params { #phantom_fields }
 
-        unsafe impl interoptopus::lang::rust::FunctionInfo for #function_ident {
+        unsafe impl #generic_params interoptopus::lang::rust::FunctionInfo for #function_ident #generic_params {
             type Signature = #signature;
 
             fn function_info() -> interoptopus::lang::c::Function {

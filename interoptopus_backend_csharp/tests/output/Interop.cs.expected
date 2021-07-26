@@ -21,9 +21,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 10446455888379816013ul)
+            if (api_version != 10085597592526804059ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (10446455888379816013). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (10085597592526804059). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -491,6 +491,27 @@ namespace My.Company
             finally
             {
                 _slice_pinned.Free();
+            }
+        }
+
+        // Debug - write_function 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_mut_self_ref_slice_limited")]
+        public static extern byte simple_service_mut_self_ref_slice_limited(IntPtr context_ptr, ref byte x, out byte _y, FFISliceu8 _slice, FFISliceu8 _slice2);
+
+        // Debug - write_function_overloaded 
+        public static byte simple_service_mut_self_ref_slice_limited(IntPtr context_ptr, ref byte x, out byte _y, byte[] _slice, byte[] _slice2) {
+            var _slice_pinned = GCHandle.Alloc(_slice, GCHandleType.Pinned);
+            var _slice_slice = new FFISliceu8(_slice_pinned, (ulong) _slice.Length);
+            var _slice2_pinned = GCHandle.Alloc(_slice2, GCHandleType.Pinned);
+            var _slice2_slice = new FFISliceu8(_slice2_pinned, (ulong) _slice2.Length);
+            try
+            {
+                return simple_service_mut_self_ref_slice_limited(context_ptr, ref x, out _y, _slice_slice, _slice2_slice);
+            }
+            finally
+            {
+                _slice_pinned.Free();
+                _slice2_pinned.Free();
             }
         }
 
@@ -1142,6 +1163,18 @@ namespace My.Company
         public byte MutSelfRefSlice(ref byte x, out byte _y, byte[] _slice)
         {
             return Interop.simple_service_mut_self_ref_slice(_context, ref x, out _y, _slice);
+        }
+
+        public byte MutSelfRefSliceLimited(ref byte x, out byte _y, FFISliceu8 _slice, FFISliceu8 _slice2)
+        {
+            // Debug - write_pattern_service_success_enum_aware_rval 
+            return Interop.simple_service_mut_self_ref_slice_limited(_context, ref x, out _y, _slice, _slice2);
+        }
+
+        // Debug - write_pattern_service_method_overload 
+        public byte MutSelfRefSliceLimited(ref byte x, out byte _y, byte[] _slice, byte[] _slice2)
+        {
+            return Interop.simple_service_mut_self_ref_slice_limited(_context, ref x, out _y, _slice, _slice2);
         }
 
         public void MutSelfFfiError(FFISliceu8 slice)

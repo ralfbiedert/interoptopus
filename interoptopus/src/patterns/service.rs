@@ -235,7 +235,7 @@ macro_rules! pattern_service_generated {
         $dtor:ident() -> $dtor_error:ty,
         [
             $(
-                $method_as_fn:ident($self_ty:ty $(, $param:ident: $param_type:ty)*) -> $t:ty: $method:ident
+                $method_as_fn:ident $(< $($lt:lifetime),+ >)* ($self_ty:ty $(, $param:ident: $param_type:ty)*) -> $t:ty: $method:ident
             ),*
         ],
         [
@@ -293,7 +293,7 @@ macro_rules! pattern_service_generated {
         $(
             #[interoptopus::ffi_function]
             #[no_mangle]
-            pub extern "C" fn $method_as_fn(context_ptr: Option<$self_ty>, $( $param: $param_type),* ) -> $t {
+            pub extern "C" fn $method_as_fn $(<$($lt,)*>)* (context_ptr: Option<$self_ty>, $( $param: $param_type),* ) -> $t {
                 if let Some(context) = context_ptr {
 
                     if let Ok(rval) = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
