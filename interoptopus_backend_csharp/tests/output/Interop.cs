@@ -21,9 +21,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 16328755259513649950ul)
+            if (api_version != 3954303786830653989ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (16328755259513649950). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (3954303786830653989). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -374,6 +374,12 @@ namespace My.Company
         // Debug - write_function 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_api_guard")]
         public static extern ulong pattern_api_guard();
+
+        // Debug - write_function_overloaded 
+
+        // Debug - write_function 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_ext_util")]
+        public static extern void simple_service_ext_util(IntPtr _ptr);
 
         // Debug - write_function_overloaded 
 
@@ -1037,10 +1043,10 @@ namespace My.Company
 
     // Debug - write_pattern_service 
     /// This can also be used for the `class` pattern.
-    public partial class Context : IDisposable
+    public partial class SomeContext : IDisposable
     {
         private IntPtr _context;
-        public Context(uint value)
+        public SomeContext(uint value)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
             var rval = Interop.pattern_service_create(ref _context , value);
@@ -1086,6 +1092,7 @@ namespace My.Company
             }
         }
 
+        public IntPtr Context => _context;
     }
 
 
@@ -1216,6 +1223,7 @@ namespace My.Company
             return Interop.simple_service_extra_method(_context);
         }
 
+        public IntPtr Context => _context;
     }
 
 

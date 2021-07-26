@@ -743,6 +743,8 @@ pub trait CSharpWriter {
             }
         }
 
+        indented!(w, r#"public IntPtr Context => _context;"#)?;
+
         w.unindent();
         indented!(w, r#"}}"#)?;
         w.newline()?;

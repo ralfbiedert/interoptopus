@@ -61,6 +61,10 @@ pub mod some_rust_module {
     }
 }
 
+#[ffi_function]
+#[no_mangle]
+pub fn simple_service_ext_util(_ptr: &SimpleService) {}
+
 // Needed for Error to FFIError conversion.
 impl<T> From<Result<T, Error>> for FFIError {
     fn from(x: Result<T, Error>) -> Self {

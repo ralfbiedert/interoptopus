@@ -16,12 +16,12 @@ typedef enum cffi_enumdocumented
     CFFI_C = 2,
     } cffi_enumdocumented;
 
-typedef struct cffi_context cffi_context;
 typedef struct cffi_generic2u8 cffi_generic2u8;
 typedef struct cffi_generic3 cffi_generic3;
 typedef struct cffi_generic4 cffi_generic4;
 typedef struct cffi_opaque cffi_opaque;
 typedef struct cffi_simpleservice cffi_simpleservice;
+typedef struct cffi_somecontext cffi_somecontext;
 typedef struct cffi_empty cffi_empty;
 
 typedef enum cffi_ffierror
@@ -234,12 +234,13 @@ cffi_inner pattern_ffi_option_2(cffi_ffioptioninner ffi_slice);
 uint8_t pattern_ffi_bool(uint8_t ffi_bool);
 void pattern_my_api_init_v1(cffi_myapiv1* api);
 uint64_t pattern_api_guard();
+void simple_service_ext_util(cffi_simpleservice* _ptr);
 uint32_t pattern_callback_1(cffi_fptr_fn_u32_rval_u32 callback, uint32_t x);
-cffi_ffierror pattern_service_create(cffi_context** context_ptr, uint32_t value);
-cffi_ffierror pattern_service_destroy(cffi_context** context_ptr);
-uint32_t pattern_service_method(cffi_context* context);
-cffi_ffierror pattern_service_method_success_enum_ok(cffi_context* _context);
-cffi_ffierror pattern_service_method_success_enum_fail(cffi_context* _context);
+cffi_ffierror pattern_service_create(cffi_somecontext** context_ptr, uint32_t value);
+cffi_ffierror pattern_service_destroy(cffi_somecontext** context_ptr);
+uint32_t pattern_service_method(cffi_somecontext* context);
+cffi_ffierror pattern_service_method_success_enum_ok(cffi_somecontext* _context);
+cffi_ffierror pattern_service_method_success_enum_fail(cffi_somecontext* _context);
 cffi_ffierror simple_service_create(cffi_simpleservice** context_ptr, uint32_t x);
 cffi_ffierror simple_service_destroy(cffi_simpleservice** context_ptr);
 cffi_ffierror simple_service_result(cffi_simpleservice* context_ptr, uint32_t x);
@@ -1264,6 +1265,13 @@ Parameter x must point to valid data."""
         global _api
         return _api.pattern_api_guard()
 
+    def simple_service_ext_util(_ptr):
+        """"""
+        global _api
+        if hasattr(_ptr, "_ctx"):
+            _ptr = _ptr._ctx[0]
+        return _api.simple_service_ext_util(_ptr)
+
     def pattern_callback_1(callback, x):
         """"""
         global _api
@@ -1430,13 +1438,13 @@ This function may only be called with a context returned by a succeeding `patter
 
 
 
-class Context(object):
+class SomeContext(object):
     def __init__(self, value):
         """"""
         global _api, ffi
         if hasattr(value, "_ctx"):
             value = value._ctx
-        self.ctx = ffi.new("cffi_context**")
+        self.ctx = ffi.new("cffi_somecontext**")
         rval = raw.pattern_service_create(self.ctx, value)
         if rval == FFIError.Ok:
             return None

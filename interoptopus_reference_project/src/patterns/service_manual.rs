@@ -1,11 +1,11 @@
 use crate::patterns::success_enum::FFIError;
-use crate::types::Context;
+use crate::types::SomeContext;
 use interoptopus::{ffi_function, pattern_service_manual};
 
 #[ffi_function]
 #[no_mangle]
-pub extern "C" fn pattern_service_create(context_ptr: Option<&mut *mut Context>, value: u32) -> FFIError {
-    let the_box = Box::new(Context { some_field: value });
+pub extern "C" fn pattern_service_create(context_ptr: Option<&mut *mut SomeContext>, value: u32) -> FFIError {
+    let the_box = Box::new(SomeContext { some_field: value });
 
     match context_ptr {
         None => FFIError::Null,
@@ -22,7 +22,7 @@ pub extern "C" fn pattern_service_create(context_ptr: Option<&mut *mut Context>,
 #[ffi_function]
 #[no_mangle]
 #[allow(unused_unsafe)]
-pub unsafe extern "C" fn pattern_service_destroy(context_ptr: Option<&mut *mut Context>) -> FFIError {
+pub unsafe extern "C" fn pattern_service_destroy(context_ptr: Option<&mut *mut SomeContext>) -> FFIError {
     match context_ptr {
         None => FFIError::Null,
         Some(c) => {
@@ -34,7 +34,7 @@ pub unsafe extern "C" fn pattern_service_destroy(context_ptr: Option<&mut *mut C
 
 #[ffi_function]
 #[no_mangle]
-pub extern "C" fn pattern_service_method(context: Option<&mut Context>) -> u32 {
+pub extern "C" fn pattern_service_method(context: Option<&mut SomeContext>) -> u32 {
     match context {
         None => 0,
         Some(c) => {
@@ -47,13 +47,13 @@ pub extern "C" fn pattern_service_method(context: Option<&mut Context>) -> u32 {
 
 #[ffi_function]
 #[no_mangle]
-pub extern "C" fn pattern_service_method_success_enum_ok(_context: Option<&mut Context>) -> FFIError {
+pub extern "C" fn pattern_service_method_success_enum_ok(_context: Option<&mut SomeContext>) -> FFIError {
     FFIError::Ok
 }
 
 #[ffi_function]
 #[no_mangle]
-pub extern "C" fn pattern_service_method_success_enum_fail(_context: Option<&mut Context>) -> FFIError {
+pub extern "C" fn pattern_service_method_success_enum_fail(_context: Option<&mut SomeContext>) -> FFIError {
     FFIError::Fail
 }
 

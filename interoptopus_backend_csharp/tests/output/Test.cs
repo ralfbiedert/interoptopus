@@ -1,7 +1,9 @@
+using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using My.Company;
 using Xunit;
+using Array = My.Company.Array;
 
 namespace interop_test
 {
@@ -76,7 +78,13 @@ namespace interop_test
             var output = api.tupled(input);
             
             Assert.Equal(2 * input.x0, output.x0);
-            
+        }
+
+        [Fact]
+        public void pattern_service_generated()
+        {
+            var x = new SimpleService(123);
+            Interop.simple_service_ext_util(x.Context);
         }
 
     }
