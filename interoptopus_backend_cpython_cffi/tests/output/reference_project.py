@@ -208,6 +208,7 @@ cffi_opaque* complex_args_2(cffi_someforeigntype _cmplx);
 uint8_t callback(cffi_fptr_fn_u8_rval_u8 callback, uint8_t value);
 uint32_t generic_1a(cffi_genericu32 x, cffi_phantomu8 _y);
 uint8_t generic_1b(cffi_genericu8 x, cffi_phantomu8 _y);
+uint8_t generic_1c(cffi_genericu8* x);
 uint8_t generic_2(cffi_generic2u8* x);
 uint8_t generic_3(cffi_generic3* x);
 uint8_t generic_4(cffi_generic4* x);
@@ -1070,6 +1071,13 @@ Parameter x must point to valid data."""
         if hasattr(_y, "_ctx"):
             _y = _y._ctx[0]
         return _api.generic_1b(x, _y)
+
+    def generic_1c(x):
+        """"""
+        global _api
+        if hasattr(x, "_ctx"):
+            x = x._ctx[0]
+        return _api.generic_1c(x)
 
     def generic_2(x):
         """"""

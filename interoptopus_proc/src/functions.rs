@@ -1,11 +1,12 @@
 use std::collections::HashMap;
 
 use darling::FromMeta;
-use proc_macro2::TokenStream;
+use proc_macro2::{Ident, TokenStream};
 use quote::{quote, ToTokens};
-use syn::{AttributeArgs, FnArg, GenericParam, ItemFn, Pat, ReturnType, Signature, Type};
+use syn::{AttributeArgs, FnArg, GenericArgument, GenericParam, ItemFn, Pat, PathArguments, PathSegment, ReturnType, Signature, Type};
 
 use crate::util;
+use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 
 #[derive(Debug, FromMeta)]
@@ -83,6 +84,41 @@ pub fn rval_tokens(return_type: &ReturnType) -> TokenStream {
     }
 }
 
+/// Ugly, incomplete function to purge `'a` from a `Generic<'a, T>`.
+fn purge_lifetimes_from_type(x: &Type, args: &FFIFunctionAttributes) -> Type {
+    let mut rval = x.clone();
+
+    match &mut rval {
+        Type::Path(x) => {
+            for p in &mut x.path.segments {
+                match &mut p.arguments {
+                    PathArguments::None => {}
+                    PathArguments::AngleBracketed(angled_args) => {
+                        let mut p = Punctuated::new();
+
+                        for generic_arg in &mut angled_args.args {
+                            if let GenericArgument::Lifetime(_) = generic_arg {
+                            } else {
+                                p.push(generic_arg.clone());
+                            }
+                        }
+
+                        angled_args.args = p;
+                    }
+                    PathArguments::Parenthesized(_) => {}
+                }
+            }
+        }
+        Type::Reference(x) => {
+            x.lifetime = None;
+            x.elem = Box::new(purge_lifetimes_from_type(&x.elem, args))
+        }
+        _ => {}
+    }
+
+    rval
+}
+
 pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
     let item_fn: ItemFn = syn::parse2(input.clone()).expect("Must be item.");
     let docs = util::extract_doc_lines(&item_fn.attrs);
@@ -141,7 +177,7 @@ pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
                 let ident = syn::Ident::new(&lookup, span);
                 args_type.push(quote! { #ident()  })
             } else {
-                let token = match pat.ty.as_ref() {
+                let token = match purge_lifetimes_from_type(pat.ty.as_ref(), &ffi_attributes) {
                     Type::Path(x) => x.path.to_token_stream(),
                     Type::Reference(x) => x.to_token_stream(),
                     Type::Group(x) => x.to_token_stream(),

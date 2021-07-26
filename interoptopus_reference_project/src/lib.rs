@@ -54,6 +54,7 @@ interoptopus::inventory!(
         functions::callback,
         functions::generic_1a,
         functions::generic_1b,
+        functions::generic_1c,
         functions::generic_2,
         functions::generic_3,
         functions::generic_4,

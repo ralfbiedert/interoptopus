@@ -52,7 +52,6 @@ pub mod some_rust_module {
             *x
         }
 
-        // TODO: How to support these?
         pub fn method_mut_self_ref_slice_limited<'a, 'b>(&mut self, x: &u8, _y: &mut u8, _slice: FFISlice<'a, u8>, _slice2: FFISlice<'b, u8>) -> u8 {
             *x
         }

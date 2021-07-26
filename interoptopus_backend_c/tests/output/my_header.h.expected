@@ -215,6 +215,7 @@ my_library_opaque* complex_args_2(my_library_someforeigntype _cmplx);
 uint8_t callback(my_library_fptr_fn_u8_rval_u8 callback, uint8_t value);
 uint32_t generic_1a(my_library_genericu32 x, my_library_phantomu8 _y);
 uint8_t generic_1b(my_library_genericu8 x, my_library_phantomu8 _y);
+uint8_t generic_1c(my_library_genericu8* x);
 uint8_t generic_2(my_library_generic2u8* x);
 uint8_t generic_3(my_library_generic3* x);
 uint8_t generic_4(my_library_generic4* x);

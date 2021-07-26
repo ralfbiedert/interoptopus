@@ -171,6 +171,12 @@ pub extern "C" fn generic_1b(x: Generic<u8>, _y: Phantom<u8>) -> u8 {
 
 #[ffi_function]
 #[no_mangle]
+pub extern "C" fn generic_1c<'a>(x: &Generic<'a, u8>) -> u8 {
+    *x.x
+}
+
+#[ffi_function]
+#[no_mangle]
 pub extern "C" fn generic_2(x: &Generic2<u8>) -> u8 {
     x.x
 }
