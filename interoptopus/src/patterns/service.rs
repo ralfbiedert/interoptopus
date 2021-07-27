@@ -274,12 +274,12 @@ macro_rules! pattern_service_generated {
                     //     <$ctor_error as ::interoptopus::patterns::success_enum::Success>::PANIC
                     // }
                     Err(_) => {
-                        ::interoptopus::util::log_error(|| format!("Error or panic constructing service in `{}`", stringify!($ctor)));
+                        ::interoptopus::util::log_error(|| format!("Error or panic in function `{}`", stringify!($ctor)));
                         <$ctor_error as ::interoptopus::patterns::success_enum::Success>::PANIC
                     }
                 }
             } else {
-                ::interoptopus::util::log_error(|| format!("Null pointer constructing service in `{}`", stringify!($ctor)));
+                ::interoptopus::util::log_error(|| format!("Null pointer in function `{}`", stringify!($ctor)));
                 <$ctor_error as interoptopus::patterns::success_enum::Success>::NULL
             }
         }
@@ -297,7 +297,7 @@ macro_rules! pattern_service_generated {
 
                 <$dtor_error as interoptopus::patterns::success_enum::Success>::SUCCESS
             } else {
-                ::interoptopus::util::log_error(|| format!("Null pointer destructing service in `{}`", stringify!($dtor)));
+                ::interoptopus::util::log_error(|| format!("Null pointer in function `{}`", stringify!($dtor)));
                 <$dtor_error as interoptopus::patterns::success_enum::Success>::NULL
             }
         }
@@ -312,16 +312,16 @@ macro_rules! pattern_service_generated {
                     })) {
                         Ok(Ok(_)) => <$t_res as interoptopus::patterns::success_enum::Success>::SUCCESS,
                         Ok(Err(e)) => {
-                            ::interoptopus::util::log_error(|| format!("Error invoking method `{}`: {}", stringify!($method_as_fn_res), e.to_string()));
+                            ::interoptopus::util::log_error(|| format!("Error in function `{}`: {}", stringify!($method_as_fn_res), e.to_string()));
                             < $t_res >::from(Result::<(), _>::Err(e))
                         }
                         Err(e) => {
-                            ::interoptopus::util::log_error(|| format!("Panic invoking method `{}`", stringify!($method_as_fn_res)));
+                            ::interoptopus::util::log_error(|| format!("Panic in function `{}`", stringify!($method_as_fn_res)));
                             < $t_res as interoptopus::patterns::service::FailureDefault > :: failure_default()
                         }
                     }
                 } else {
-                    ::interoptopus::util::log_error(|| format!("Null pointer destructing service in `{}`", stringify!($method_as_fn_res)));
+                    ::interoptopus::util::log_error(|| format!("Null pointer in function `{}`", stringify!($method_as_fn_res)));
                     < $t_res as interoptopus::patterns::service::FailureDefault > :: failure_default()
                 }
             }
@@ -337,12 +337,12 @@ macro_rules! pattern_service_generated {
                     })) {
                         Ok(rval) => rval.into(),
                         Err(e) => {
-                            ::interoptopus::util::log_error(|| format!("Panic or error invoking method `{}`", stringify!($method_as_fn_nres)));
+                            ::interoptopus::util::log_error(|| format!("Panic or error in function `{}`", stringify!($method_as_fn_nres)));
                             return < $t_nres as interoptopus::patterns::service::FailureDefault > :: failure_default();
                         }
                     }
                 } else {
-                    ::interoptopus::util::log_error(|| format!("Null pointer destructing service in `{}`", stringify!($method_as_fn_nres)));
+                    ::interoptopus::util::log_error(|| format!("Null pointer in function `{}`", stringify!($method_as_fn_nres)));
                     < $t_nres as interoptopus::patterns::service::FailureDefault > :: failure_default()
                 }
             }
