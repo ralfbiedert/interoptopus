@@ -254,6 +254,32 @@ impl IdPrettifier {
     }
 }
 
+/// Debug macro resolving to the current file and line number.
+///
+/// ```
+/// use interoptopus::here;
+///
+/// println!(here!())
+/// ```
+#[macro_export]
+macro_rules! here {
+    () => {
+        concat!(file!(), ":", line!())
+    };
+}
+
+/// Logs an error if compiled with feature `log`.
+#[cfg(feature = "log")]
+#[inline(always)]
+pub fn log_error<S: AsRef<str>, F: Fn() -> S>(f: F) {
+    log::error!("{}", f().as_ref());
+}
+
+/// Logs an error if compiled with feature `log`.
+#[cfg(not(feature = "log"))]
+#[inline(always)]
+pub fn log_error<S: AsRef<str>, F: Fn() -> S>(_f: F) {}
+
 #[cfg(test)]
 mod test {
     use crate::util::IdPrettifier;

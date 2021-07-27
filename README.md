@@ -69,6 +69,14 @@ If you ...
 - **no scripts needed**, `cargo build` + `cargo test` **can produce and test** (if lang installed) generated bindings
 
 
+Gated behind **feature flags**, these enable:
+
+- `derive` - Proc macros such as `ffi_constant`, `ffi_function`, `ffi_type`.
+- `testing` - Functions to test generated Python, C#, C from Unit tests.
+- `serde` - Serde attributes on internal types.
+- `log` - Invoke `log` on FFI errors (you still need actual logger).
+
+
 ### Supported Rust Constructs
 See the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src); it lists all supported constructs including:
 - [functions](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/functions.rs) (`extern "C"` functions and delegates)

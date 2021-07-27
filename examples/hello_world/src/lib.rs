@@ -40,5 +40,7 @@ fn generate_bindings() -> Result<(), interoptopus::Error> {
     // Only writes to memory, replace with `write_file` for real interop.
     generator.write_to(&mut writer)?;
 
+    println!(interoptopus::here!());
+
     Ok(())
 }

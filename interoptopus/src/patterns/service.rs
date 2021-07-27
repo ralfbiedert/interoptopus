@@ -235,7 +235,12 @@ macro_rules! pattern_service_generated {
         $dtor:ident() -> $dtor_error:ty,
         [
             $(
-                $method_as_fn:ident $(< $($lt:lifetime),+ >)* ($self_ty:ty $(, $param:ident: $param_type:ty)*) -> $t:ty: $method:ident
+                $method_as_fn_res:ident $(< $($lt_res:lifetime),+ >)* ($self_ty_res:ty $(, $param_res:ident: $param_type_res:ty)*) -> $t_res:ty: $method_res:ident
+            ),*
+        ],
+        [
+            $(
+                $method_as_fn_nres:ident $(< $($lt_nres:lifetime),+ >)* ($self_ty_nres:ty $(, $param_nres:ident: $param_type_nres:ty)*) -> $t_nres:ty: $method_nres:ident
             ),*
         ],
         [
@@ -259,16 +264,22 @@ macro_rules! pattern_service_generated {
                         let raw = Box::into_raw(boxed);
                         *context = raw;
 
-                        <$ctor_error as interoptopus::patterns::success_enum::Success>::SUCCESS
+                        <$ctor_error as ::interoptopus::patterns::success_enum::Success>::SUCCESS
                     }
                     Ok(x) => {
                         x.into()
                     }
+                    // Err(Err(e)) => {
+                    //     ::interoptopus::util::log_error(|| format!("Error constructing service in `{}`: {}", ::interoptopus::here!(), e.to_string()));
+                    //     <$ctor_error as ::interoptopus::patterns::success_enum::Success>::PANIC
+                    // }
                     Err(_) => {
-                        <$ctor_error as interoptopus::patterns::success_enum::Success>::PANIC
+                        ::interoptopus::util::log_error(|| format!("Error or panic constructing service in `{}`", ::interoptopus::here!()));
+                        <$ctor_error as ::interoptopus::patterns::success_enum::Success>::PANIC
                     }
                 }
             } else {
+                ::interoptopus::util::log_error(|| format!("Null pointer constructing service in `{}`", ::interoptopus::here!()));
                 <$ctor_error as interoptopus::patterns::success_enum::Success>::NULL
             }
         }
@@ -286,6 +297,7 @@ macro_rules! pattern_service_generated {
 
                 <$dtor_error as interoptopus::patterns::success_enum::Success>::SUCCESS
             } else {
+                ::interoptopus::util::log_error(|| format!("Null pointer destructing service in `{}`", ::interoptopus::here!()));
                 <$dtor_error as interoptopus::patterns::success_enum::Success>::NULL
             }
         }
@@ -293,19 +305,45 @@ macro_rules! pattern_service_generated {
         $(
             #[interoptopus::ffi_function]
             #[no_mangle]
-            pub extern "C" fn $method_as_fn $(<$($lt,)*>)* (context_ptr: Option<$self_ty>, $( $param: $param_type),* ) -> $t {
+            pub extern "C" fn $method_as_fn_res $(<$($lt_res,)*>)* (context_ptr: Option<$self_ty_res>, $( $param_res: $param_type_res),* ) -> $t_res {
                 if let Some(context) = context_ptr {
-
-                    if let Ok(rval) = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                        <$opaque>::$method(context, $($param),*)
+                    match std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                        <$opaque>::$method_res(context, $($param_res),*)
                     })) {
-                        rval.into()
-                    } else {
-                        return < $t as interoptopus::patterns::service::FailureDefault > :: failure_default();
+                        Ok(Ok(_)) => <$t_res as interoptopus::patterns::success_enum::Success>::SUCCESS,
+                        Ok(Err(e)) => {
+                            ::interoptopus::util::log_error(|| format!("Error invoking method `{}`: {}", ::interoptopus::here!(), e.to_string()));
+                            < $t_res >::from(Result::<(), _>::Err(e))
+                        }
+                        Err(e) => {
+                            ::interoptopus::util::log_error(|| format!("Panic invoking method `{}`", ::interoptopus::here!()));
+                            < $t_res as interoptopus::patterns::service::FailureDefault > :: failure_default()
+                        }
                     }
-
                 } else {
-                    < $t as interoptopus::patterns::service::FailureDefault > :: failure_default()
+                    ::interoptopus::util::log_error(|| format!("Null pointer destructing service in `{}`", ::interoptopus::here!()));
+                    < $t_res as interoptopus::patterns::service::FailureDefault > :: failure_default()
+                }
+            }
+        )*
+
+        $(
+            #[interoptopus::ffi_function]
+            #[no_mangle]
+            pub extern "C" fn $method_as_fn_nres $(<$($lt_nres,)*>)* (context_ptr: Option<$self_ty_nres>, $( $param_nres: $param_type_nres),* ) -> $t_nres {
+                if let Some(context) = context_ptr {
+                    match std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                        <$opaque>::$method_nres(context, $($param_nres),*)
+                    })) {
+                        Ok(rval) => rval.into(),
+                        Err(e) => {
+                            ::interoptopus::util::log_error(|| format!("Panic or error invoking method `{}`", ::interoptopus::here!()));
+                            return < $t_nres as interoptopus::patterns::service::FailureDefault > :: failure_default();
+                        }
+                    }
+                } else {
+                    ::interoptopus::util::log_error(|| format!("Null pointer destructing service in `{}`", ::interoptopus::here!()));
+                    < $t_nres as interoptopus::patterns::service::FailureDefault > :: failure_default()
                 }
             }
         )*
@@ -313,7 +351,8 @@ macro_rules! pattern_service_generated {
 
         // Generate export function
         interoptopus::pattern_service_manual!($export_function, $ctor, $dtor, [
-            $($method_as_fn),*
+            $($method_as_fn_res),*
+            $(,$method_as_fn_nres)*
             $(,$manual_method)*
         ]);
     };
