@@ -74,7 +74,7 @@ impl SuccessEnum {
 /// (and probably gracefully shutdown or restart), as any subsequent call risks causing a
 /// process abort.
 #[allow(unused_variables)]
-pub fn panics_and_errors_to_ffi_enum<E: Error, FE: Success>(f: impl FnOnce() -> Result<(), E>, error_context: &str) -> FE
+pub fn panics_and_errors_to_ffi_enum<E: ToString, FE: Success>(f: impl FnOnce() -> Result<(), E>, error_context: &str) -> FE
 where
     FE: From<Result<(), E>>,
 {
