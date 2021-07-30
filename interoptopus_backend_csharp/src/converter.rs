@@ -41,14 +41,17 @@ pub trait CSharpTypeConverter {
     }
 
     fn has_overloadable(&self, signature: &FunctionSignature) -> bool {
-        signature.params().iter().any(|x| matches!(x.the_type(), CType::Pattern(TypePattern::Slice(_))))
+        signature
+            .params()
+            .iter()
+            .any(|x| matches!(x.the_type(), CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_))))
     }
 
     fn pattern_to_native_in_signature(&self, param: &Parameter, _signature: &FunctionSignature) -> String {
         match param.the_type() {
             CType::Pattern(p) => match p {
                 TypePattern::AsciiPointer => "string".to_string(),
-                TypePattern::NamedCallback(x) => self.fnpointer_to_typename(x.fnpointer()),
+                TypePattern::NamedCallback(x) => x.name().to_string(),
                 TypePattern::SuccessEnum(e) => self.enum_to_typename(e.the_enum()),
                 TypePattern::Slice(p) => {
                     let element_type = p

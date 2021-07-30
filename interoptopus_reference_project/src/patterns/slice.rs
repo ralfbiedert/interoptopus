@@ -39,7 +39,7 @@ pub extern "C" fn pattern_ffi_slice_delegate_huge(callback: CallbackHugeVecSlice
 #[ffi_function]
 #[no_mangle]
 pub extern "C" fn pattern_ffi_slice_3(mut slice: FFISliceMut<u8>, callback: CallbackSliceMut) {
-    if let &mut [ref mut x, ..] = slice.as_slice_mut() {
+    if let [x, ..] = slice.as_slice_mut() {
         *x += 1;
     }
 

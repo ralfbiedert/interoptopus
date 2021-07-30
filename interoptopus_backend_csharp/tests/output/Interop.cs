@@ -21,9 +21,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 3954303786830653989ul)
+            if (api_version != 3308716325106612251ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (3954303786830653989). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (3308716325106612251). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -334,6 +334,18 @@ namespace My.Company
         public static extern void pattern_ffi_slice_3(FFISliceMutu8 slice, CallbackSliceMut callback);
 
         // Debug - write_function_overloaded 
+        public static void pattern_ffi_slice_3(byte[] slice, CallbackSliceMut callback) {
+            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
+            var slice_slice = new FFISliceMutu8(slice_pinned, (ulong) slice.Length);
+            try
+            {
+                pattern_ffi_slice_3(slice_slice, callback);
+            }
+            finally
+            {
+                slice_pinned.Free();
+            }
+        }
 
         // Debug - write_function 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_delegate")]
@@ -529,12 +541,12 @@ namespace My.Company
 
         // Debug - write_function 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_mut_self_ffi_error")]
-        public static extern FFIError simple_service_mut_self_ffi_error(IntPtr context_ptr, FFISliceu8 slice);
+        public static extern FFIError simple_service_mut_self_ffi_error(IntPtr context_ptr, FFISliceMutu8 slice);
 
         // Debug - write_function_overloaded 
         public static FFIError simple_service_mut_self_ffi_error(IntPtr context_ptr, byte[] slice) {
             var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new FFISliceu8(slice_pinned, (ulong) slice.Length);
+            var slice_slice = new FFISliceMutu8(slice_pinned, (ulong) slice.Length);
             try
             {
                 return simple_service_mut_self_ffi_error(context_ptr, slice_slice);
@@ -1190,7 +1202,7 @@ namespace My.Company
             return Interop.simple_service_mut_self_ref_slice_limited(_context, ref x, out _y, _slice, _slice2);
         }
 
-        public void MutSelfFfiError(FFISliceu8 slice)
+        public void MutSelfFfiError(FFISliceMutu8 slice)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
             var rval = Interop.simple_service_mut_self_ffi_error(_context , slice);

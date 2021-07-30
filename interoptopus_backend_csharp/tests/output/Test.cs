@@ -40,15 +40,11 @@ namespace interop_test
         public void pattern_ffi_slice_3()
         {
             var data = new byte[100_000];
-            var handle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            var slice = new FFISliceMutu8(handle, 100_000);
             
-            Interop.pattern_ffi_slice_3(slice, x0 =>
+            Interop.pattern_ffi_slice_3(data, x0 =>
             {
                 x0[1] = 100;
             });
-            
-            handle.Free();
             
             Assert.Equal(data[0], 1);
             Assert.Equal(data[1], 100);
@@ -84,6 +80,10 @@ namespace interop_test
         public void pattern_service_generated()
         {
             var x = new SimpleService(123);
+            var b = new byte[] { 1, 2, 3 } ;
+            
+            x.MutSelfFfiError(b);
+            
             Interop.simple_service_ext_util(x.Context);
         }
 

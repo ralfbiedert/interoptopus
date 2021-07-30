@@ -1,12 +1,12 @@
 use crate::patterns::success_enum::FFIError;
-use interoptopus::patterns::slice::FFISlice;
+use interoptopus::patterns::slice::{FFISlice, FFISliceMut};
 use interoptopus::{ffi_function, pattern_service_generated};
 use some_rust_module::{Error, SimpleService};
 
 pub mod some_rust_module {
     use crate::patterns::success_enum::FFIError;
     use interoptopus::ffi_type;
-    use interoptopus::patterns::slice::FFISlice;
+    use interoptopus::patterns::slice::{FFISlice, FFISliceMut};
     use std::fmt::{Display, Formatter};
 
     // An error we use in a Rust library
@@ -65,7 +65,7 @@ pub mod some_rust_module {
             *x
         }
 
-        pub fn method_mut_self_ffi_error(&mut self, _slice: FFISlice<u8>) -> FFIError {
+        pub fn method_mut_self_ffi_error(&mut self, _slice: FFISliceMut<u8>) -> FFIError {
             FFIError::Ok
         }
     }
@@ -108,7 +108,7 @@ pattern_service_generated!(
       simple_service_mut_self_ref(&mut SimpleService, x: &u8, _y: &mut u8) -> u8: method_mut_self_ref,
       simple_service_mut_self_ref_slice(&mut SimpleService, x: &u8, _y: &mut u8, _slice: FFISlice<u8>) -> u8: method_mut_self_ref_slice,
       simple_service_mut_self_ref_slice_limited<'a, 'b>(&mut SimpleService, x: &u8, _y: &mut u8, _slice: FFISlice<'a, u8>, _slice2: FFISlice<'b, u8>) -> u8: method_mut_self_ref_slice_limited,
-      simple_service_mut_self_ffi_error(&mut SimpleService, slice: FFISlice<u8>) -> FFIError: method_mut_self_ffi_error,
+      simple_service_mut_self_ffi_error(&mut SimpleService, slice: FFISliceMut<u8>) -> FFIError: method_mut_self_ffi_error,
       simple_service_void(&SimpleService) -> (): method_void
   ],
   [

@@ -181,7 +181,7 @@ pub trait CSharpWriter {
             let the_type = self.converter().function_parameter_to_csharp_typename(p, function);
 
             match p.the_type() {
-                CType::Pattern(TypePattern::Slice(_)) => {
+                CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_)) => {
                     to_pin_name.push(name);
                     to_pin_slice_type.push(the_type);
                     to_invoke.push(format!("{}_slice", name));
