@@ -2,7 +2,6 @@
 
 use crate::lang::c::{EnumType, Variant};
 use crate::util::log_error;
-use std::error::Error;
 use std::fmt::Debug;
 use std::panic::AssertUnwindSafe;
 

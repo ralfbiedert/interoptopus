@@ -48,7 +48,7 @@ pub mod some_rust_module {
         pub fn method_void(&self) {}
 
         pub fn method_mut_self(&mut self, slice: FFISlice<u8>) -> u8 {
-            *slice.as_slice().unwrap_or(&[0]).get(0).unwrap_or(&0)
+            *slice.as_slice().get(0).unwrap_or(&0)
         }
 
         pub fn method_mut_self_void(&mut self, _slice: FFISlice<u8>) {}

@@ -25,16 +25,16 @@ impl<'a, T> FFISlice<'a, T> {
     }
 
     /// Tries to return a slice if the pointer was not null.
-    pub fn as_slice<'b>(&'b self) -> Option<&'b [T]>
+    pub fn as_slice<'b>(&'b self) -> &'b [T]
     where
         'a: 'b,
     {
         if self.data.is_null() {
-            None
+            &[]
         } else {
             // If non-null this should always point to valid data and the lifetime should be
             // guaranteed via the struct <'a>.
-            Some(unsafe { std::slice::from_raw_parts(self.data, self.len as usize) })
+            unsafe { std::slice::from_raw_parts(self.data, self.len as usize) }
         }
     }
 }
@@ -60,7 +60,7 @@ impl<'a, T> Deref for FFISlice<'a, T> {
     type Target = [T];
 
     fn deref(&self) -> &Self::Target {
-        self.as_slice().unwrap_or(&[])
+        self.as_slice()
     }
 }
 
@@ -99,30 +99,30 @@ impl<'a, T> FFISliceMut<'a, T> {
     }
 
     /// Tries to return a slice if the pointer was not null.
-    pub fn as_slice_mut<'b>(&'b mut self) -> Option<&'b mut [T]>
+    pub fn as_slice_mut<'b>(&'b mut self) -> &'b mut [T]
     where
         'a: 'b,
     {
         if self.data.is_null() {
-            None
+            &mut []
         } else {
             // If non-null this should always point to valid data and the lifetime should be
             // guaranteed via the struct <'a>.
-            Some(unsafe { std::slice::from_raw_parts_mut(self.data, self.len as usize) })
+            unsafe { std::slice::from_raw_parts_mut(self.data, self.len as usize) }
         }
     }
 
     /// Tries to return a slice if the pointer was not null.
-    pub fn as_slice<'b>(&'b self) -> Option<&'b [T]>
+    pub fn as_slice<'b>(&'b self) -> &'b [T]
     where
         'a: 'b,
     {
         if self.data.is_null() {
-            None
+            &[]
         } else {
             // If non-null this should always point to valid data and the lifetime should be
             // guaranteed via the struct <'a>.
-            Some(unsafe { std::slice::from_raw_parts(self.data, self.len as usize) })
+            unsafe { std::slice::from_raw_parts(self.data, self.len as usize) }
         }
     }
 }
@@ -142,13 +142,13 @@ impl<'a, T> Deref for FFISliceMut<'a, T> {
     type Target = [T];
 
     fn deref(&self) -> &Self::Target {
-        self.as_slice().unwrap_or(&[])
+        self.as_slice()
     }
 }
 
 impl<'a, T> DerefMut for FFISliceMut<'a, T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        self.as_slice_mut().unwrap_or(&mut [])
+        self.as_slice_mut()
     }
 }
 
@@ -178,8 +178,8 @@ mod test {
         let empty = FFISlice::<u8>::empty();
         let some = FFISlice::<u8>::from_slice(slice);
 
-        assert_eq!(empty.as_slice().unwrap(), &[]);
-        assert_eq!(some.as_slice().unwrap(), slice);
+        assert_eq!(empty.as_slice(), &[]);
+        assert_eq!(some.as_slice(), slice);
     }
 
     #[test]
@@ -192,7 +192,7 @@ mod test {
         sub[0] = 6;
         some[0] = 5;
 
-        assert_eq!(empty.as_slice().unwrap(), &[]);
+        assert_eq!(empty.as_slice(), &[]);
         assert_eq!(slice, &[5, 6, 2, 3, 5]);
     }
 }

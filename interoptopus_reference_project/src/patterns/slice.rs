@@ -11,13 +11,13 @@ pattern_callback!(CallbackSliceMut(slice: FFISliceMut<'_, u8>) -> ());
 #[ffi_function]
 #[no_mangle]
 pub extern "C" fn pattern_ffi_slice_1(ffi_slice: FFISlice<u32>) -> u32 {
-    ffi_slice.as_slice().unwrap_or(&[]).len() as u32
+    ffi_slice.as_slice().len() as u32
 }
 
 #[ffi_function]
 #[no_mangle]
 pub extern "C" fn pattern_ffi_slice_2(ffi_slice: FFISlice<Vec3f32>, i: i32) -> Vec3f32 {
-    ffi_slice.as_slice().map(|x| x.get(i as usize)).flatten().copied().unwrap_or(Vec3f32 {
+    ffi_slice.as_slice().get(i as usize).copied().unwrap_or(Vec3f32 {
         x: f32::NAN,
         y: f32::NAN,
         z: f32::NAN,
@@ -39,7 +39,7 @@ pub extern "C" fn pattern_ffi_slice_delegate_huge(callback: CallbackHugeVecSlice
 #[ffi_function]
 #[no_mangle]
 pub extern "C" fn pattern_ffi_slice_3(mut slice: FFISliceMut<u8>, callback: CallbackSliceMut) {
-    if let Some(&mut [ref mut x, ..]) = slice.as_slice_mut() {
+    if let &mut [ref mut x, ..] = slice.as_slice_mut() {
         *x += 1;
     }
 
@@ -54,7 +54,7 @@ mod test {
 
     #[allow(dead_code)]
     extern "C" fn f(mut x: FFISliceMut<u8>) {
-        let slice = x.as_slice_mut().unwrap();
+        let slice = x.as_slice_mut();
         slice[1] = 100;
     }
 
