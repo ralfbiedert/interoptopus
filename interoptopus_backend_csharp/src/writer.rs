@@ -5,7 +5,7 @@ use interoptopus::patterns::api_guard::library_hash;
 use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
-use interoptopus::util::{longest_common_prefix, IdPrettifier};
+use interoptopus::util::{is_global_type, longest_common_prefix, IdPrettifier};
 use interoptopus::writer::IndentWriter;
 use interoptopus::{indented, Error, Library};
 
@@ -85,7 +85,7 @@ pub trait CSharpWriter {
 
     fn write_constants(&self, w: &mut IndentWriter) -> Result<(), Error> {
         for constant in self.library().constants() {
-            if self.should_emit(constant.meta()) {
+            if self.should_emit_by_meta(constant.meta()) {
                 self.write_constant(w, constant)?;
                 w.newline()?;
             }
@@ -106,7 +106,7 @@ pub trait CSharpWriter {
 
     fn write_functions(&self, w: &mut IndentWriter) -> Result<(), Error> {
         for function in self.library().functions() {
-            if self.should_emit(function.meta()) {
+            if self.should_emit_by_meta(function.meta()) {
                 self.write_function(w, function)?;
                 w.newline()?;
             }
@@ -232,79 +232,60 @@ pub trait CSharpWriter {
     }
 
     fn write_type_definition(&self, w: &mut IndentWriter, the_type: &CType) -> Result<(), Error> {
+        if !self.should_emit_by_type(the_type) {
+            return Ok(());
+        }
+
         match the_type {
             CType::Primitive(_) => {}
             CType::Array(_) => {}
             CType::Enum(e) => {
-                if self.should_emit(e.meta()) {
-                    self.write_type_definition_enum(w, e)?;
-                    w.newline()?;
-                }
+                self.write_type_definition_enum(w, e)?;
+                w.newline()?;
             }
             CType::Opaque(_) => {}
             CType::Composite(c) => {
-                if self.should_emit(c.meta()) {
-                    self.write_type_definition_composite(w, c)?;
-                    w.newline()?;
-                }
+                self.write_type_definition_composite(w, c)?;
+                w.newline()?;
             }
             CType::FnPointer(f) => {
-                if self.should_emit_delegate() {
-                    self.write_type_definition_fn_pointer(w, f)?;
-                    w.newline()?;
-                }
+                self.write_type_definition_fn_pointer(w, f)?;
+                w.newline()?;
             }
             CType::ReadPointer(_) => {}
             CType::ReadWritePointer(_) => {}
             CType::Pattern(x) => match x {
                 TypePattern::AsciiPointer => {}
                 TypePattern::SuccessEnum(e) => {
-                    if self.should_emit(e.the_enum().meta()) {
-                        self.write_type_definition_enum(w, e.the_enum())?;
-                        w.newline()?;
-                    }
+                    self.write_type_definition_enum(w, e.the_enum())?;
+                    w.newline()?;
                 }
                 TypePattern::Slice(x) => {
-                    if self.should_emit(x.meta()) {
-                        self.write_type_definition_composite(w, x)?;
-                        w.newline()?;
-                        self.write_pattern_slice(w, x)?;
-                        w.newline()?;
-                    }
+                    self.write_type_definition_composite(w, x)?;
+                    w.newline()?;
+                    self.write_pattern_slice(w, x)?;
+                    w.newline()?;
                 }
                 TypePattern::SliceMut(x) => {
-                    if self.should_emit(x.meta()) {
-                        self.write_type_definition_composite(w, x)?;
-                        w.newline()?;
-                        self.write_pattern_slice_mut(w, x)?;
-                        w.newline()?;
-                    }
+                    self.write_type_definition_composite(w, x)?;
+                    w.newline()?;
+                    self.write_pattern_slice_mut(w, x)?;
+                    w.newline()?;
                 }
                 TypePattern::Option(x) => {
-                    if self.should_emit(x.meta()) {
-                        self.write_type_definition_composite(w, x)?;
-                        w.newline()?;
-                        self.write_pattern_option(w, x)?;
-                        w.newline()?;
-                    }
+                    self.write_type_definition_composite(w, x)?;
+                    w.newline()?;
+                    self.write_pattern_option(w, x)?;
+                    w.newline()?;
                 }
                 TypePattern::NamedCallback(x) => {
                     // Handle this better way
-                    if self.should_emit(&Meta::new()) {
-                        self.write_type_definition_named_callback(w, x)?;
-                        w.newline()?;
-                    }
+                    self.write_type_definition_named_callback(w, x)?;
+                    w.newline()?;
                 }
                 TypePattern::Bool => {
-                    // Bool is an item that can only be written once and uses `config.common_items_in_namespace_id`
-                    // to determine where it should go.
-                    if self.should_emit(&Meta::with_namespace_documentation(
-                        self.config().common_items_in_namespace_id.to_string(),
-                        Documentation::new(),
-                    )) {
-                        self.write_type_definition_ffibool(w)?;
-                        w.newline()?;
-                    }
+                    self.write_type_definition_ffibool(w)?;
+                    w.newline()?;
                 }
 
                 TypePattern::APIVersion => {}
@@ -490,19 +471,46 @@ pub trait CSharpWriter {
     }
 
     fn has_emittable_functions(&self, functions: &[Function]) -> bool {
-        functions.iter().any(|x| self.should_emit(x.meta()))
+        functions.iter().any(|x| self.should_emit_by_meta(x.meta()))
     }
 
-    fn should_emit(&self, meta: &Meta) -> bool {
+    fn should_emit_by_meta(&self, meta: &Meta) -> bool {
         let rval = meta.namespace() == self.config().namespace_id;
         rval
+    }
+
+    fn should_emit_by_type(&self, t: &CType) -> bool {
+        if is_global_type(t) {
+            return self.config().write_global_types;
+        }
+
+        match t {
+            CType::Primitive(_) => self.config().write_global_types,
+            CType::Array(_) => false,
+            CType::Enum(x) => self.should_emit_by_meta(x.meta()),
+            CType::Opaque(x) => self.should_emit_by_meta(x.meta()),
+            CType::Composite(x) => self.should_emit_by_meta(x.meta()),
+            CType::FnPointer(_) => true,
+            CType::ReadPointer(_) => false,
+            CType::ReadWritePointer(_) => false,
+            CType::Pattern(x) => match x {
+                TypePattern::AsciiPointer => true,
+                TypePattern::APIVersion => true,
+                TypePattern::SuccessEnum(x) => self.should_emit_by_meta(x.the_enum().meta()),
+                TypePattern::Slice(x) => self.should_emit_by_meta(x.meta()),
+                TypePattern::SliceMut(x) => self.should_emit_by_meta(x.meta()),
+                TypePattern::Option(x) => self.should_emit_by_meta(x.meta()),
+                TypePattern::Bool => self.config().write_global_types,
+                TypePattern::NamedCallback(_) => true,
+            },
+        }
     }
 
     fn write_patterns(&self, w: &mut IndentWriter) -> Result<(), Error> {
         for pattern in self.library().patterns() {
             match pattern {
                 LibraryPattern::Service(cls) => {
-                    if self.should_emit(cls.the_type().meta()) {
+                    if self.should_emit_by_meta(cls.the_type().meta()) {
                         self.write_pattern_service(w, cls)?
                     }
                 }

@@ -187,10 +187,24 @@ pub(crate) fn extract_namespaces_from_types(types: &[CType], into: &mut HashSet<
             CType::FnPointer(_) => {}
             CType::ReadPointer(_) => {}
             CType::ReadWritePointer(_) => {}
-            CType::Pattern(TypePattern::SuccessEnum(x)) => {
-                into.insert(x.the_enum().meta().namespace().to_string());
-            }
-            CType::Pattern(_) => {}
+            CType::Pattern(x) => match x {
+                TypePattern::AsciiPointer => {}
+                TypePattern::APIVersion => {}
+                TypePattern::SuccessEnum(x) => {
+                    into.insert(x.the_enum().meta().namespace().to_string());
+                }
+                TypePattern::Slice(x) => {
+                    into.insert(x.meta().namespace().to_string());
+                }
+                TypePattern::SliceMut(x) => {
+                    into.insert(x.meta().namespace().to_string());
+                }
+                TypePattern::Option(x) => {
+                    into.insert(x.meta().namespace().to_string());
+                }
+                TypePattern::Bool => {}
+                TypePattern::NamedCallback(_) => {}
+            },
         }
     }
 }
@@ -206,6 +220,7 @@ impl NamespaceMappings {
     pub fn new(default: &str) -> Self {
         let mut mappings = HashMap::new();
         mappings.insert("".to_string(), default.to_string());
+        mappings.insert("_global".to_string(), default.to_string());
 
         Self { mappings }
     }
@@ -251,6 +266,39 @@ impl IdPrettifier {
             })
             .collect::<Vec<_>>()
             .join("")
+    }
+}
+
+/// Checks whether the given type should be "the same type everywhere".
+///
+/// In complex setups we sometimes want to use types between two (otherwise unrelated) bindings.
+/// For example, we would like to produce a `FFISlice<u8>` in library A, and consume that in
+/// library B. On the other hand, a  `FFISlice<MyStruct>` is not something everyone should know of.
+///
+/// For our bindings to know whether some types should go to a shared namespace this function
+/// will inform them whether the underlying type should be shared.
+///
+///
+pub fn is_global_type(t: &CType) -> bool {
+    match t {
+        CType::Primitive(_) => true,
+        CType::Array(x) => is_global_type(x.array_type()),
+        CType::Enum(_) => false,
+        CType::Opaque(_) => false,
+        CType::Composite(_) => false,
+        CType::FnPointer(_) => false,
+        CType::ReadPointer(x) => is_global_type(x),
+        CType::ReadWritePointer(x) => is_global_type(x),
+        CType::Pattern(x) => match x {
+            TypePattern::AsciiPointer => true,
+            TypePattern::APIVersion => false,
+            TypePattern::SuccessEnum(_) => false,
+            TypePattern::Slice(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),
+            TypePattern::SliceMut(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),
+            TypePattern::Option(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),
+            TypePattern::Bool => true,
+            TypePattern::NamedCallback(_) => false,
+        },
     }
 }
 

@@ -13,8 +13,6 @@ pub struct Config {
     pub namespace_mappings: NamespaceMappings,
     /// Namespace ID of _this_ namespace to write (default "").
     pub namespace_id: String,
-    /// Which namespace ID to place common items (e.g., FFIBool) in.
-    pub common_items_in_namespace_id: String,
     /// Whether [`Visibility`](interoptopus::lang::c::Visibility) information should be honored.
     pub emit_rust_visibility: bool,
     /// Whether, say, a `x: [u8; 3]` should become 3 `x0: u8, ...` instead.
@@ -22,6 +20,8 @@ pub struct Config {
     /// If this is not set, interop generation with arrays in structr will fail. This is a somewhat
     /// open issue w.r.t Unity-sans-unsafe support and feedback would be greatly welcome!
     pub unroll_struct_arrays: bool,
+    /// Write types defined in Interoptopus.
+    pub write_global_types: bool,
     /// Also generate markers for easier debugging
     pub debug: bool,
 }
@@ -36,9 +36,9 @@ impl Default for Config {
             dll_name: "library".to_string(),
             namespace_mappings: NamespaceMappings::new("My.Company"),
             namespace_id: "".to_string(),
-            common_items_in_namespace_id: "".to_string(),
             emit_rust_visibility: false,
             unroll_struct_arrays: false,
+            write_global_types: true,
             debug: false,
         }
     }

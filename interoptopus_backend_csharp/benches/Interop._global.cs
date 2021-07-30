@@ -6,32 +6,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using My.Company;
+using My.Company;
 using My.Company.Common;
 
 // Debug - write_namespace_context 
-namespace My.Company.Common
+namespace My.Company
 {
-
-    // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct Vec
-    {
-        public double x;
-        public double z;
-    }
-
-    // Debug - write_type_definition_fn_pointer 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate Tupled InteropDelegate_fn_Tupled_rval_Tupled(Tupled x0);
-
-    // Debug - write_type_definition_fn_pointer 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate bool InteropDelegate_fn_pmut_i64_rval_bool(out long x0);
-
-    // Debug - write_type_definition_fn_pointer 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);
 
     // Debug - write_type_definition_composite 
     [Serializable]

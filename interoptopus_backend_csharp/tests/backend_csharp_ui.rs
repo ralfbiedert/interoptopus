@@ -24,6 +24,7 @@ fn generate_bindings_multi(prefix: &str) -> Result<(), Error> {
 
         let config = Config {
             namespace_id: namespace_id.clone(),
+            write_global_types: !namespace_id.is_empty(),
             ..config.clone()
         };
 

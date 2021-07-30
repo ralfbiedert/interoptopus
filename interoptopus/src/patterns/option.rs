@@ -113,6 +113,8 @@ where
             Field::with_documentation("is_some".to_string(), CType::Primitive(PrimitiveType::U8), Visibility::Private, Documentation::new()),
         ];
 
+        // let namespace = if is_global_type(&T::type_info()) { "_global" } else { "" };
+        // let meta = Meta::with_namespace_documentation(namespace.to_string(), Documentation::new());
         let composite = CompositeType::new(format!("FFIOption{}", T::type_info().name_within_lib()), fields);
         CType::Pattern(TypePattern::Option(composite))
     }
