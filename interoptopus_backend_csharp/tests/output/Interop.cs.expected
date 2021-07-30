@@ -21,9 +21,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 3954303786830653989ul)
+            if (api_version != 1305264660339704481ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (3954303786830653989). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (1305264660339704481). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -334,6 +334,18 @@ namespace My.Company
         public static extern void pattern_ffi_slice_3(FFISliceMutu8 slice, CallbackSliceMut callback);
 
         // Debug - write_function_overloaded 
+        public static void pattern_ffi_slice_3(byte[] slice, CallbackSliceMut callback) {
+            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
+            var slice_slice = new FFISliceMutu8(slice_pinned, (ulong) slice.Length);
+            try
+            {
+                pattern_ffi_slice_3(slice_slice, callback);
+            }
+            finally
+            {
+                slice_pinned.Free();
+            }
+        }
 
         // Debug - write_function 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_delegate")]
@@ -361,7 +373,7 @@ namespace My.Company
 
         // Debug - write_function 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_bool")]
-        public static extern byte pattern_ffi_bool(byte ffi_bool);
+        public static extern FFIBool pattern_ffi_bool(FFIBool ffi_bool);
 
         // Debug - write_function_overloaded 
 
@@ -466,12 +478,12 @@ namespace My.Company
 
         // Debug - write_function 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_mut_self_void")]
-        public static extern void simple_service_mut_self_void(IntPtr context_ptr, FFISliceu8 slice);
+        public static extern void simple_service_mut_self_void(IntPtr context_ptr, FFISliceFFIBool slice);
 
         // Debug - write_function_overloaded 
-        public static void simple_service_mut_self_void(IntPtr context_ptr, byte[] slice) {
+        public static void simple_service_mut_self_void(IntPtr context_ptr, FFIBool[] slice) {
             var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new FFISliceu8(slice_pinned, (ulong) slice.Length);
+            var slice_slice = new FFISliceFFIBool(slice_pinned, (ulong) slice.Length);
             try
             {
                 simple_service_mut_self_void(context_ptr, slice_slice);
@@ -529,12 +541,12 @@ namespace My.Company
 
         // Debug - write_function 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_mut_self_ffi_error")]
-        public static extern FFIError simple_service_mut_self_ffi_error(IntPtr context_ptr, FFISliceu8 slice);
+        public static extern FFIError simple_service_mut_self_ffi_error(IntPtr context_ptr, FFISliceMutu8 slice);
 
         // Debug - write_function_overloaded 
         public static FFIError simple_service_mut_self_ffi_error(IntPtr context_ptr, byte[] slice) {
             var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new FFISliceu8(slice_pinned, (ulong) slice.Length);
+            var slice_slice = new FFISliceMutu8(slice_pinned, (ulong) slice.Length);
             try
             {
                 return simple_service_mut_self_ffi_error(context_ptr, slice_slice);
@@ -773,6 +785,59 @@ namespace My.Company
         Panic = 200,
         Fail = 300,
     }
+
+    // Debug - write_type_definition_composite 
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct FFISliceFFIBool
+    {
+        IntPtr data;
+        ulong len;
+    }
+
+    // Debug - write_pattern_slice 
+    public partial struct FFISliceFFIBool : IEnumerable<FFIBool>
+    {
+        public FFISliceFFIBool(GCHandle handle, ulong count)
+        {
+            this.data = handle.AddrOfPinnedObject();
+            this.len = count;
+        }
+        public FFIBool this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                var size = Marshal.SizeOf(typeof(FFIBool));
+                var ptr = new IntPtr(data.ToInt64() + i * size);
+                return Marshal.PtrToStructure<FFIBool>(ptr);
+            }
+        }
+        public FFIBool[] Copied
+        {
+            get
+            {
+                var rval = new FFIBool[len];
+                for (var i = 0; i < (int) len; i++) {
+                    rval[i] = this[i];
+                }
+                return rval;
+            }
+        }
+        public int Count => (int) len;
+        public IEnumerator<FFIBool> GetEnumerator()
+        {
+            for (var i = 0; i < (int)len; ++i)
+            {
+                yield return this[i];
+            }
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }
+
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1024,6 +1089,18 @@ namespace My.Company
     }
 
 
+    // Debug - write_type_definition_ffibool 
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct FFIBool
+    {
+        public static readonly FFIBool True = new FFIBool { value =  1 };
+        public static readonly FFIBool False = new FFIBool { value =  0 };
+        byte value;
+        public bool Is => value == 1;
+    }
+
+
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte CallbackFFISlice(FFISliceu8 x0);
@@ -1148,14 +1225,14 @@ namespace My.Company
             return Interop.simple_service_mut_self(_context, slice);
         }
 
-        public void MutSelfVoid(FFISliceu8 slice)
+        public void MutSelfVoid(FFISliceFFIBool slice)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
             Interop.simple_service_mut_self_void(_context, slice);
         }
 
         // Debug - write_pattern_service_method_overload 
-        public void MutSelfVoid(byte[] slice)
+        public void MutSelfVoid(FFIBool[] slice)
         {
             Interop.simple_service_mut_self_void(_context, slice);
         }
@@ -1190,7 +1267,7 @@ namespace My.Company
             return Interop.simple_service_mut_self_ref_slice_limited(_context, ref x, out _y, _slice, _slice2);
         }
 
-        public void MutSelfFfiError(FFISliceu8 slice)
+        public void MutSelfFfiError(FFISliceMutu8 slice)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
             var rval = Interop.simple_service_mut_self_ffi_error(_context , slice);

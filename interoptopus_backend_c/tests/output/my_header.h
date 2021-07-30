@@ -146,6 +146,12 @@ typedef my_library_tupled (*my_library_fptr_fn_Tupled_rval_Tupled)(my_library_tu
 
 typedef bool (*my_library_fptr_fn_pmut_i64_rval_bool)(int64_t* x0);
 
+typedef struct my_library_ffisliceffibool
+    {
+    uint8_t* data;
+    uint64_t len;
+    } my_library_ffisliceffibool;
+
 typedef struct my_library_ffisliceu32
     {
     uint32_t* data;
@@ -253,7 +259,7 @@ my_library_ffierror simple_service_destroy(my_library_simpleservice** context_pt
 my_library_ffierror simple_service_result(my_library_simpleservice* context_ptr, uint32_t x);
 uint32_t simple_service_value(my_library_simpleservice* context_ptr, uint32_t x);
 uint8_t simple_service_mut_self(my_library_simpleservice* context_ptr, my_library_ffisliceu8 slice);
-void simple_service_mut_self_void(my_library_simpleservice* context_ptr, my_library_ffisliceu8 slice);
+void simple_service_mut_self_void(my_library_simpleservice* context_ptr, my_library_ffisliceffibool slice);
 uint8_t simple_service_mut_self_ref(my_library_simpleservice* context_ptr, uint8_t* x, uint8_t* _y);
 uint8_t simple_service_mut_self_ref_slice(my_library_simpleservice* context_ptr, uint8_t* x, uint8_t* _y, my_library_ffisliceu8 _slice);
 uint8_t simple_service_mut_self_ref_slice_limited(my_library_simpleservice* context_ptr, uint8_t* x, uint8_t* _y, my_library_ffisliceu8 _slice, my_library_ffisliceu8 _slice2);

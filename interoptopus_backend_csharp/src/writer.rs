@@ -295,10 +295,37 @@ pub trait CSharpWriter {
                         w.newline()?;
                     }
                 }
-                TypePattern::Bool => {}
+                TypePattern::Bool => {
+                    // Bool is an item that can only be written once and uses `config.common_items_in_namespace_id`
+                    // to determine where it should go.
+                    if self.should_emit(&Meta::with_namespace_documentation(
+                        self.config().common_items_in_namespace_id.to_string(),
+                        Documentation::new(),
+                    )) {
+                        self.write_type_definition_ffibool(w)?;
+                        w.newline()?;
+                    }
+                }
+
                 TypePattern::APIVersion => {}
             },
         }
+        Ok(())
+    }
+
+    fn write_type_definition_ffibool(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        self.debug(w, "write_type_definition_ffibool")?;
+
+        indented!(w, r#"[Serializable]"#)?;
+        indented!(w, r#"[StructLayout(LayoutKind.Sequential)]"#)?;
+        indented!(w, r#"public partial struct FFIBool"#)?;
+        indented!(w, r#"{{"#)?;
+        indented!(w, [_], r#"public static readonly FFIBool True = new FFIBool {{ value =  1 }};"#)?;
+        indented!(w, [_], r#"public static readonly FFIBool False = new FFIBool {{ value =  0 }};"#)?;
+        indented!(w, [_], r#"byte value;"#)?;
+        indented!(w, [_], r#"public bool Is => value == 1;"#)?;
+        indented!(w, r#"}}"#)?;
+        w.newline()?;
         Ok(())
     }
 

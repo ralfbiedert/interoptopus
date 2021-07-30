@@ -1,4 +1,5 @@
 use crate::patterns::success_enum::FFIError;
+use interoptopus::patterns::primitives::FFIBool;
 use interoptopus::patterns::slice::{FFISlice, FFISliceMut};
 use interoptopus::{ffi_function, pattern_service_generated};
 use some_rust_module::{Error, SimpleService};
@@ -6,6 +7,7 @@ use some_rust_module::{Error, SimpleService};
 pub mod some_rust_module {
     use crate::patterns::success_enum::FFIError;
     use interoptopus::ffi_type;
+    use interoptopus::patterns::primitives::FFIBool;
     use interoptopus::patterns::slice::{FFISlice, FFISliceMut};
     use std::fmt::{Display, Formatter};
 
@@ -51,7 +53,7 @@ pub mod some_rust_module {
             *slice.as_slice().get(0).unwrap_or(&0)
         }
 
-        pub fn method_mut_self_void(&mut self, _slice: FFISlice<u8>) {}
+        pub fn method_mut_self_void(&mut self, _slice: FFISlice<FFIBool>) {}
 
         pub fn method_mut_self_ref(&mut self, x: &u8, _y: &mut u8) -> u8 {
             *x
@@ -104,7 +106,7 @@ pattern_service_generated!(
   [
       simple_service_value(&mut SimpleService, x: u32) -> u32: method_value,
       simple_service_mut_self(&mut SimpleService, slice: FFISlice<u8>) -> u8: method_mut_self,
-      simple_service_mut_self_void(&mut SimpleService, slice: FFISlice<u8>) -> (): method_mut_self_void,
+      simple_service_mut_self_void(&mut SimpleService, slice: FFISlice<FFIBool>) -> (): method_mut_self_void,
       simple_service_mut_self_ref(&mut SimpleService, x: &u8, _y: &mut u8) -> u8: method_mut_self_ref,
       simple_service_mut_self_ref_slice(&mut SimpleService, x: &u8, _y: &mut u8, _slice: FFISlice<u8>) -> u8: method_mut_self_ref_slice,
       simple_service_mut_self_ref_slice_limited<'a, 'b>(&mut SimpleService, x: &u8, _y: &mut u8, _slice: FFISlice<'a, u8>, _slice2: FFISlice<'b, u8>) -> u8: method_mut_self_ref_slice_limited,
