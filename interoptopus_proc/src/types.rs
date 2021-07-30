@@ -97,6 +97,7 @@ pub fn ffi_type_enum(attr: &FFITypeAttributes, input: TokenStream, item: ItemEnu
 
     let span = item.ident.span();
     let name = item.ident.to_string();
+    let ffi_name = attr.name.clone().unwrap_or_else(|| name.clone());
     let name_ident = syn::Ident::new(&name, span);
 
     let mut variant_names = Vec::new();
@@ -165,7 +166,7 @@ pub fn ffi_type_enum(attr: &FFITypeAttributes, input: TokenStream, item: ItemEnu
                     variants.push(Self::#variant_idents.variant_info());
                 })*
 
-                let rval = interoptopus::lang::c::EnumType::new(#name.to_string(), variants, meta);
+                let rval = interoptopus::lang::c::EnumType::new(#ffi_name.to_string(), variants, meta);
 
                 #ctype_info_return
             }

@@ -2,8 +2,8 @@
 
 use crate::patterns::success_enum::FFIError;
 use crate::types::{
-    ambiguous1, ambiguous2, common, some_foreign_type, Array, Callbacku8u8, Empty, EnumDocumented, Generic, Generic2, Generic3, Generic4, Opaque, Phantom,
-    SomeForeignType, StructDocumented, Tupled, Vec3f32, Visibility1, Visibility2, Weird1, Weird2,
+    ambiguous1, ambiguous2, common, some_foreign_type, Array, Callbacku8u8, Empty, EnumDocumented, EnumRenamedXYZ, Generic, Generic2, Generic3, Generic4, Opaque,
+    Phantom, SomeForeignType, StructDocumented, StructRenamedXYZ, Tupled, Vec3f32, Visibility1, Visibility2, Weird1, Weird2,
 };
 use interoptopus::patterns::success_enum::panics_and_errors_to_ffi_enum;
 use interoptopus::{ffi_function, here};
@@ -197,6 +197,12 @@ pub extern "C" fn generic_4(x: &Generic4<u8>) -> u8 {
 #[no_mangle]
 pub extern "C" fn array_1(x: Array) -> u8 {
     x.data[0]
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn renamed(x: StructRenamedXYZ) -> EnumRenamedXYZ {
+    x.e
 }
 
 // Apparently this is not valid C?

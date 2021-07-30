@@ -66,6 +66,7 @@ interoptopus::inventory!(
         functions::ambiguous_3,
         functions::namespaced_type,
         functions::panics,
+        functions::renamed,
         functions::sleep,
         functions::weird_1,
         functions::visibility,

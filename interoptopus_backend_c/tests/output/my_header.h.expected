@@ -23,6 +23,11 @@ typedef enum my_library_enumdocumented
     MY_LIBRARY_C = 2,
     } my_library_enumdocumented;
 
+typedef enum my_library_enumrenamed
+    {
+    MY_LIBRARY_X = 0,
+    } my_library_enumrenamed;
+
 typedef struct my_library_generic2u8 my_library_generic2u8;
 typedef struct my_library_generic3 my_library_generic3;
 typedef struct my_library_generic4 my_library_generic4;
@@ -63,6 +68,11 @@ typedef struct my_library_structdocumented
     {
     float x;
     } my_library_structdocumented;
+
+typedef struct my_library_structrenamed
+    {
+    my_library_enumrenamed e;
+    } my_library_structrenamed;
 
 typedef struct my_library_tupled
     {
@@ -232,6 +242,7 @@ my_library_vec2 ambiguous_2(my_library_vec2 x);
 bool ambiguous_3(my_library_vec1 x, my_library_vec2 y);
 my_library_vec namespaced_type(my_library_vec x);
 my_library_ffierror panics();
+my_library_enumrenamed renamed(my_library_structrenamed x);
 void sleep(uint64_t millis);
 bool weird_1(my_library_weird1u32 _x, my_library_weird2u8 _y);
 void visibility(my_library_visibility1 _x, my_library_visibility2 _y);

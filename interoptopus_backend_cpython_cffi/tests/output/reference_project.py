@@ -16,6 +16,11 @@ typedef enum cffi_enumdocumented
     CFFI_C = 2,
     } cffi_enumdocumented;
 
+typedef enum cffi_enumrenamed
+    {
+    CFFI_X = 0,
+    } cffi_enumrenamed;
+
 typedef struct cffi_generic2u8 cffi_generic2u8;
 typedef struct cffi_generic3 cffi_generic3;
 typedef struct cffi_generic4 cffi_generic4;
@@ -56,6 +61,11 @@ typedef struct cffi_structdocumented
     {
     float x;
     } cffi_structdocumented;
+
+typedef struct cffi_structrenamed
+    {
+    cffi_enumrenamed e;
+    } cffi_structrenamed;
 
 typedef struct cffi_tupled
     {
@@ -225,6 +235,7 @@ cffi_vec2 ambiguous_2(cffi_vec2 x);
 bool ambiguous_3(cffi_vec1 x, cffi_vec2 y);
 cffi_vec namespaced_type(cffi_vec x);
 cffi_ffierror panics();
+cffi_enumrenamed renamed(cffi_structrenamed x);
 void sleep(uint64_t millis);
 bool weird_1(cffi_weird1u32 _x, cffi_weird2u8 _y);
 void visibility(cffi_visibility1 _x, cffi_visibility2 _y);
@@ -288,6 +299,11 @@ class EnumDocumented:
     A = 0
     B = 1
     C = 2
+
+
+class EnumRenamed:
+    """"""
+    X = 0
 
 
 class Array(object):
@@ -519,6 +535,29 @@ class StructDocumented(object):
     def x(self, value):
         self._ptr_x = value
         self._ctx[0].x = value
+
+class StructRenamed(object):
+    """"""
+    def __init__(self):
+        global _api, ffi
+        self._ctx = ffi.new("cffi_structrenamed[]", 1)
+
+    def array(n):
+        global _api, ffi
+        return ffi.new("cffi_structrenamed[]", n)
+
+    def ptr(self):
+        return self._ctx
+
+    @property
+    def e(self):
+        """"""
+        return self._ctx[0].e
+
+    @e.setter
+    def e(self, value):
+        self._ptr_e = value
+        self._ctx[0].e = value
 
 class Tupled(object):
     """"""
@@ -1157,6 +1196,13 @@ Parameter x must point to valid data."""
         """"""
         global _api
         return _api.panics()
+
+    def renamed(x):
+        """"""
+        global _api
+        if hasattr(x, "_ctx"):
+            x = x._ctx[0]
+        return _api.renamed(x)
 
     def sleep(millis):
         """"""

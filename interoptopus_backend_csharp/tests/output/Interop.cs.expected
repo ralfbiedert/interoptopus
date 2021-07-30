@@ -21,9 +21,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 1305264660339704481ul)
+            if (api_version != 3156391062003776827ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (1305264660339704481). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (3156391062003776827). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -260,6 +260,12 @@ namespace My.Company
         // Debug - write_function 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "panics")]
         public static extern FFIError panics();
+
+        // Debug - write_function_overloaded 
+
+        // Debug - write_function 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "renamed")]
+        public static extern EnumRenamed renamed(StructRenamed x);
 
         // Debug - write_function_overloaded 
 
@@ -584,6 +590,12 @@ namespace My.Company
         C = 2,
     }
 
+    // Debug - write_type_definition_enum 
+    public enum EnumRenamed
+    {
+        X = 0,
+    }
+
     // Debug - write_type_definition_composite 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
@@ -679,6 +691,14 @@ namespace My.Company
     {
         /// Documented field.
         public float x;
+    }
+
+    // Debug - write_type_definition_composite 
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct StructRenamed
+    {
+        public EnumRenamed e;
     }
 
     // Debug - write_type_definition_composite 

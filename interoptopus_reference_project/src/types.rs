@@ -71,6 +71,12 @@ where
     pub x: T,
 }
 
+#[ffi_type(name = "StructRenamed")]
+#[repr(C)]
+pub struct StructRenamedXYZ {
+    pub e: EnumRenamedXYZ,
+}
+
 #[ffi_type(unsafe, skip(p))]
 #[repr(C)]
 pub struct Phantom<'a, T>
@@ -130,6 +136,12 @@ pub enum EnumDocumented {
     B,
     /// Variant B.
     C,
+}
+
+#[ffi_type(name = "EnumRenamed")]
+#[repr(C)]
+pub enum EnumRenamedXYZ {
+    X,
 }
 
 /// Documented struct.
