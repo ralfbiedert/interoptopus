@@ -149,35 +149,35 @@ typedef cffi_tupled (*cffi_fptr_fn_Tupled_rval_Tupled)(cffi_tupled x0);
 
 typedef bool (*cffi_fptr_fn_pmut_i64_rval_bool)(int64_t* x0);
 
-typedef struct cffi_ffisliceffibool
+typedef struct cffi_slicebool
     {
     uint8_t* data;
     uint64_t len;
-    } cffi_ffisliceffibool;
+    } cffi_slicebool;
 
-typedef struct cffi_ffisliceu32
+typedef struct cffi_sliceu32
     {
     uint32_t* data;
     uint64_t len;
-    } cffi_ffisliceu32;
+    } cffi_sliceu32;
 
-typedef struct cffi_ffisliceu8
+typedef struct cffi_sliceu8
     {
     uint8_t* data;
     uint64_t len;
-    } cffi_ffisliceu8;
+    } cffi_sliceu8;
 
-typedef struct cffi_ffislicemutu8
+typedef struct cffi_slicemutu8
     {
     uint8_t* data;
     uint64_t len;
-    } cffi_ffislicemutu8;
+    } cffi_slicemutu8;
 
-typedef struct cffi_ffioptioninner
+typedef struct cffi_optioninner
     {
     cffi_inner t;
     uint8_t is_some;
-    } cffi_ffioptioninner;
+    } cffi_optioninner;
 
 typedef struct cffi_myapiv1
     {
@@ -185,17 +185,17 @@ typedef struct cffi_myapiv1
     cffi_fptr_fn_Tupled_rval_Tupled tupled;
     } cffi_myapiv1;
 
-typedef struct cffi_ffislicevec3f32
+typedef struct cffi_slicevec3f32
     {
     cffi_vec3f32* data;
     uint64_t len;
-    } cffi_ffislicevec3f32;
+    } cffi_slicevec3f32;
 
-typedef uint8_t (*cffi_fptr_fn_FFISliceu8_rval_u8)(cffi_ffisliceu8 x0);
+typedef uint8_t (*cffi_fptr_fn_Sliceu8_rval_u8)(cffi_sliceu8 x0);
 
-typedef void (*cffi_fptr_fn_FFISliceMutu8)(cffi_ffislicemutu8 x0);
+typedef void (*cffi_fptr_fn_SliceMutu8)(cffi_slicemutu8 x0);
 
-typedef cffi_vec3f32 (*cffi_fptr_fn_FFISliceVec3f32_rval_Vec3f32)(cffi_ffislicevec3f32 x0);
+typedef cffi_vec3f32 (*cffi_fptr_fn_SliceVec3f32_rval_Vec3f32)(cffi_slicevec3f32 x0);
 
 
 void primitive_void();
@@ -241,13 +241,13 @@ bool weird_1(cffi_weird1u32 _x, cffi_weird2u8 _y);
 void visibility(cffi_visibility1 _x, cffi_visibility2 _y);
 uint32_t pattern_ascii_pointer_1(uint8_t* x);
 uint32_t pattern_ascii_pointer_len(uint8_t* x, cffi_useasciistringpattern y);
-uint32_t pattern_ffi_slice_1(cffi_ffisliceu32 ffi_slice);
-cffi_vec3f32 pattern_ffi_slice_2(cffi_ffislicevec3f32 ffi_slice, int32_t i);
-void pattern_ffi_slice_3(cffi_ffislicemutu8 slice, cffi_fptr_fn_FFISliceMutu8 callback);
-uint8_t pattern_ffi_slice_delegate(cffi_fptr_fn_FFISliceu8_rval_u8 callback);
-cffi_vec3f32 pattern_ffi_slice_delegate_huge(cffi_fptr_fn_FFISliceVec3f32_rval_Vec3f32 callback);
-cffi_ffioptioninner pattern_ffi_option_1(cffi_ffioptioninner ffi_slice);
-cffi_inner pattern_ffi_option_2(cffi_ffioptioninner ffi_slice);
+uint32_t pattern_ffi_slice_1(cffi_sliceu32 ffi_slice);
+cffi_vec3f32 pattern_ffi_slice_2(cffi_slicevec3f32 ffi_slice, int32_t i);
+void pattern_ffi_slice_3(cffi_slicemutu8 slice, cffi_fptr_fn_SliceMutu8 callback);
+uint8_t pattern_ffi_slice_delegate(cffi_fptr_fn_Sliceu8_rval_u8 callback);
+cffi_vec3f32 pattern_ffi_slice_delegate_huge(cffi_fptr_fn_SliceVec3f32_rval_Vec3f32 callback);
+cffi_optioninner pattern_ffi_option_1(cffi_optioninner ffi_slice);
+cffi_inner pattern_ffi_option_2(cffi_optioninner ffi_slice);
 uint8_t pattern_ffi_bool(uint8_t ffi_bool);
 void pattern_my_api_init_v1(cffi_myapiv1* api);
 uint64_t pattern_api_guard();
@@ -262,12 +262,12 @@ cffi_ffierror simple_service_create(cffi_simpleservice** context_ptr, uint32_t x
 cffi_ffierror simple_service_destroy(cffi_simpleservice** context_ptr);
 cffi_ffierror simple_service_result(cffi_simpleservice* context_ptr, uint32_t x);
 uint32_t simple_service_value(cffi_simpleservice* context_ptr, uint32_t x);
-uint8_t simple_service_mut_self(cffi_simpleservice* context_ptr, cffi_ffisliceu8 slice);
-void simple_service_mut_self_void(cffi_simpleservice* context_ptr, cffi_ffisliceffibool slice);
+uint8_t simple_service_mut_self(cffi_simpleservice* context_ptr, cffi_sliceu8 slice);
+void simple_service_mut_self_void(cffi_simpleservice* context_ptr, cffi_slicebool slice);
 uint8_t simple_service_mut_self_ref(cffi_simpleservice* context_ptr, uint8_t* x, uint8_t* _y);
-uint8_t simple_service_mut_self_ref_slice(cffi_simpleservice* context_ptr, uint8_t* x, uint8_t* _y, cffi_ffisliceu8 _slice);
-uint8_t simple_service_mut_self_ref_slice_limited(cffi_simpleservice* context_ptr, uint8_t* x, uint8_t* _y, cffi_ffisliceu8 _slice, cffi_ffisliceu8 _slice2);
-cffi_ffierror simple_service_mut_self_ffi_error(cffi_simpleservice* context_ptr, cffi_ffislicemutu8 slice);
+uint8_t simple_service_mut_self_ref_slice(cffi_simpleservice* context_ptr, uint8_t* x, uint8_t* _y, cffi_sliceu8 _slice);
+uint8_t simple_service_mut_self_ref_slice_limited(cffi_simpleservice* context_ptr, uint8_t* x, uint8_t* _y, cffi_sliceu8 _slice, cffi_sliceu8 _slice2);
+cffi_ffierror simple_service_mut_self_ffi_error(cffi_simpleservice* context_ptr, cffi_slicemutu8 slice);
 void simple_service_void(cffi_simpleservice* context_ptr);
 uint32_t simple_service_extra_method(cffi_simpleservice* _context);
 """
@@ -894,9 +894,9 @@ class callbacks:
     fn_Tupled_rval_Tupled = "cffi_tupled(cffi_tupled)"
     fn_pmut_i64_rval_bool = "bool(int64_t*)"
     fn_u8_rval_u8 = "uint8_t(uint8_t)"
-    fn_FFISliceu8_rval_u8 = "uint8_t(cffi_ffisliceu8)"
-    fn_FFISliceVec3f32_rval_Vec3f32 = "cffi_vec3f32(cffi_ffislicevec3f32)"
-    fn_FFISliceMutu8 = "void(cffi_ffislicemutu8)"
+    fn_Sliceu8_rval_u8 = "uint8_t(cffi_sliceu8)"
+    fn_SliceVec3f32_rval_Vec3f32 = "cffi_vec3f32(cffi_slicevec3f32)"
+    fn_SliceMutu8 = "void(cffi_slicemutu8)"
     fn_u32_rval_u32 = "uint32_t(uint32_t)"
 
 

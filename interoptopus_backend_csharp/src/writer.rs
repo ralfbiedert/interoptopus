@@ -297,12 +297,14 @@ pub trait CSharpWriter {
     fn write_type_definition_ffibool(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.debug(w, "write_type_definition_ffibool")?;
 
+        let type_name = self.converter().to_typespecifier_in_param(&CType::Pattern(TypePattern::Bool));
+
         indented!(w, r#"[Serializable]"#)?;
         indented!(w, r#"[StructLayout(LayoutKind.Sequential)]"#)?;
-        indented!(w, r#"public partial struct FFIBool"#)?;
+        indented!(w, r#"public partial struct {}"#, type_name)?;
         indented!(w, r#"{{"#)?;
-        indented!(w, [_], r#"public static readonly FFIBool True = new FFIBool {{ value =  1 }};"#)?;
-        indented!(w, [_], r#"public static readonly FFIBool False = new FFIBool {{ value =  0 }};"#)?;
+        indented!(w, [_], r#"public static readonly {} True = new Bool {{ value =  1 }};"#, type_name)?;
+        indented!(w, [_], r#"public static readonly {} False = new Bool {{ value =  0 }};"#, type_name)?;
         indented!(w, [_], r#"byte value;"#)?;
         indented!(w, [_], r#"public bool Is => value == 1;"#)?;
         indented!(w, r#"}}"#)?;

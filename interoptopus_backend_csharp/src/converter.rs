@@ -76,7 +76,7 @@ pub trait CSharpTypeConverter {
                 }
 
                 TypePattern::Option(e) => self.composite_to_typename(e),
-                TypePattern::Bool => "FFIBool".to_string(),
+                TypePattern::Bool => "Bool".to_string(),
                 TypePattern::APIVersion => self.to_typespecifier_in_param(&p.fallback_type()),
             },
             x => self.to_typespecifier_in_param(x),
@@ -115,7 +115,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::SliceMut(e) => self.composite_to_typename(e),
                 TypePattern::Option(e) => self.composite_to_typename(e),
                 TypePattern::NamedCallback(e) => self.named_callback_to_typename(e),
-                TypePattern::Bool => "FFIBool".to_string(),
+                TypePattern::Bool => "Bool".to_string(),
                 TypePattern::APIVersion => self.to_typespecifier_in_field(&x.fallback_type(), field, composite),
             },
         }
@@ -151,7 +151,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::SliceMut(x) => self.composite_to_typename(x),
                 TypePattern::Option(x) => self.composite_to_typename(x),
                 TypePattern::NamedCallback(x) => self.named_callback_to_typename(x),
-                TypePattern::Bool => "FFIBool".to_string(),
+                TypePattern::Bool => "Bool".to_string(),
                 TypePattern::APIVersion => self.to_typespecifier_in_param(&x.fallback_type()),
             },
         }
@@ -174,7 +174,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::SliceMut(x) => self.composite_to_typename(x),
                 TypePattern::Option(x) => self.composite_to_typename(x),
                 TypePattern::NamedCallback(x) => self.named_callback_to_typename(x),
-                TypePattern::Bool => "FFIBool".to_string(),
+                TypePattern::Bool => "Bool".to_string(),
                 TypePattern::APIVersion => self.to_typespecifier_in_rval(&x.fallback_type()),
             },
         }

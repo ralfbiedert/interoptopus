@@ -13,8 +13,8 @@
 //! <br>
 //!
 //! Huh?
-//! - Imagine you are writing this cool API and want everyone to use it.
-//! - Everyone else, however, is running Unity, C, Python, ...
+//! - You wrote this cool Rust library and want everyone else to use it.
+//! - But everyone else runs Unity, C, Python, ...
 //! - "Not a problem", you say, "I'll just use Interoptopus".
 //!
 //! And you'll live happily<sup>*</sup> ever after.

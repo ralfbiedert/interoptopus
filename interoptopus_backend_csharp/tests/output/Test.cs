@@ -21,7 +21,7 @@ namespace interop_test
         [Fact]
         public void pattern_ffi_slice_delegate()
         {
-            Interop.pattern_ffi_slice_delegate(delegate (FFISliceu8 x0)
+            Interop.pattern_ffi_slice_delegate(delegate (Sliceu8 x0)
             {
                 Assert.Equal(x0.Count, 10);
                 Assert.Equal(x0[0], 0);
@@ -56,11 +56,11 @@ namespace interop_test
         public void pattern_ffi_option_nullable()
         {
             var t = new Inner();
-            FFIOptionInner someOpt = FFIOptionInner.FromNullable(t);
+            OptionInner someOpt = OptionInner.FromNullable(t);
             Inner? nullableOpt = someOpt.ToNullable();
             Assert.True(nullableOpt.HasValue);
 
-            FFIOptionInner someOpt2 = FFIOptionInner.FromNullable(null);
+            OptionInner someOpt2 = OptionInner.FromNullable(null);
             Inner? nullableOpt2 = someOpt2.ToNullable();
             Assert.False(nullableOpt2.HasValue);
         }

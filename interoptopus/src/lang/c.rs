@@ -160,7 +160,7 @@ impl CType {
             CType::ReadPointer(x) => format!("*const {}", x.name_within_lib()),
             CType::ReadWritePointer(x) => format!("*mut {}", x.name_within_lib()),
             CType::Pattern(x) => match x {
-                TypePattern::Bool => "FFIBool".to_string(),
+                TypePattern::Bool => "Bool".to_string(),
                 _ => x.fallback_type().name_within_lib(),
             },
             CType::Array(x) => x.rust_name(),
