@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use darling::FromMeta;
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -8,13 +6,7 @@ use syn::{AttributeArgs, ItemConst};
 use crate::util::extract_doc_lines;
 
 #[derive(Debug, FromMeta)]
-pub struct FFIConstantAttributes {
-    #[darling(default)]
-    xx: Option<String>,
-
-    #[darling(default)]
-    tags: HashMap<String, String>,
-}
+pub struct Attributes {}
 
 pub fn ffi_constant(_attr: AttributeArgs, input: TokenStream) -> TokenStream {
     let const_item: ItemConst = syn::parse2(input.clone()).expect("Must be item.");

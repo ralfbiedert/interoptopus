@@ -6,9 +6,9 @@ use some_rust_module::{Error, SimpleService};
 
 pub mod some_rust_module {
     use crate::patterns::success_enum::FFIError;
+    use interoptopus::ffi_type;
     use interoptopus::patterns::primitives::FFIBool;
     use interoptopus::patterns::slice::{FFISlice, FFISliceMut};
-    use interoptopus::{ffi_function, ffi_type};
     use std::fmt::{Display, Formatter};
 
     // An error we use in a Rust library
@@ -33,7 +33,6 @@ pub mod some_rust_module {
     }
 
     // Regular implementation of methods.
-    #[ffi_function(debug, xxx_service)]
     impl SimpleService {
         pub fn new_with(some_value: u32) -> Result<Self, Error> {
             Ok(Self { some_value })
