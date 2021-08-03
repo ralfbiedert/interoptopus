@@ -75,19 +75,19 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
 
     // Constructor needs extra arg for ptr
     if let MethodType::Constructor(_) = &method_type {
-        inputs.push(quote! { this: &mut *mut #service_type });
+        inputs.push(quote! { context: &mut *mut #service_type });
     }
 
     for (i, arg) in function.sig.inputs.iter().enumerate() {
         match arg {
             FnArg::Receiver(receiver) => {
                 if receiver.mutability.is_some() {
-                    inputs.push(quote! { this: &mut #service_type });
+                    inputs.push(quote! { context: &mut #service_type });
                 } else {
-                    inputs.push(quote! { this: & #service_type });
+                    inputs.push(quote! { context: & #service_type });
                 }
 
-                arg_names.push(quote! { this });
+                arg_names.push(quote! { context });
             }
             FnArg::Typed(pat) => match pat.pat.deref() {
                 Pat::Ident(x) => {
@@ -121,7 +121,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                         Ok(Ok(obj)) => {
                             let boxed = Box::new(obj);
                             let raw = Box::into_raw(boxed);
-                            *this = raw;
+                            *context = raw;
 
                             <#error_ident as ::interoptopus::patterns::success_enum::Success>::SUCCESS
                         }
@@ -150,9 +150,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                         }));
 
                         match result_result {
-                            Ok(x) => {
-                                x
-                            }
+                            Ok(x) => x,
                             Err(e) => {
                                 ::interoptopus::util::log_error(|| "xxxxxx");
                                 <#rval>::default()
@@ -209,12 +207,12 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
         /// passing any other value results in undefined behavior.
         #[interoptopus::ffi_function]
         #[no_mangle]
-        pub unsafe extern "C" fn #ffi_fn_ident(this: &mut *mut #service_type) -> #error_ident {
+        pub unsafe extern "C" fn #ffi_fn_ident(context: &mut *mut #service_type) -> #error_ident {
             {
-                unsafe { Box::from_raw(*this) };
+                unsafe { Box::from_raw(*context) };
             }
 
-            *this = ::std::ptr::null_mut();
+            *context = ::std::ptr::null_mut();
 
             <#error_ident as ::interoptopus::patterns::success_enum::Success>::SUCCESS
         }
