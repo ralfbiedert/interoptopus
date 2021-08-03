@@ -72,8 +72,8 @@
 
 use crate::lang::c::{CType, CompositeType, PrimitiveType};
 use crate::patterns::callbacks::NamedCallback;
+use crate::patterns::result::FFIErrorEnum;
 use crate::patterns::service::Service;
-use crate::patterns::success_enum::SuccessEnum;
 
 pub mod api_entry;
 pub mod api_guard;
@@ -81,9 +81,9 @@ pub mod ascii_pointer;
 pub mod callbacks;
 pub mod option;
 pub mod primitives;
+pub mod result;
 pub mod service;
 pub mod slice;
-pub mod success_enum;
 
 /// A pattern on a library level, usually involving both methods and types.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -106,7 +106,7 @@ impl From<Service> for LibraryPattern {
 pub enum TypePattern {
     AsciiPointer,
     APIVersion,
-    SuccessEnum(SuccessEnum),
+    FFIErrorEnum(FFIErrorEnum),
     Slice(CompositeType),
     SliceMut(CompositeType),
     Option(CompositeType),
@@ -122,7 +122,7 @@ impl TypePattern {
     pub fn fallback_type(&self) -> CType {
         match self {
             TypePattern::AsciiPointer => CType::ReadPointer(Box::new(CType::Primitive(PrimitiveType::U8))),
-            TypePattern::SuccessEnum(e) => CType::Enum(e.the_enum().clone()),
+            TypePattern::FFIErrorEnum(e) => CType::Enum(e.the_enum().clone()),
             TypePattern::Slice(x) => CType::Composite(x.clone()),
             TypePattern::SliceMut(x) => CType::Composite(x.clone()),
             TypePattern::Option(x) => CType::Composite(x.clone()),

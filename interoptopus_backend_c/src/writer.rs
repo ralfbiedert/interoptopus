@@ -129,7 +129,7 @@ pub trait CWriter {
                     self.write_type_definition_fn_pointer(w, e.fnpointer())?;
                     w.newline()?;
                 }
-                TypePattern::SuccessEnum(e) => {
+                TypePattern::FFIErrorEnum(e) => {
                     self.write_type_definition_enum(w, e.the_enum())?;
                     w.newline()?;
                 }

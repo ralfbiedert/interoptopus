@@ -123,7 +123,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                             let raw = Box::into_raw(boxed);
                             *context = raw;
 
-                            <#error_ident as ::interoptopus::patterns::success_enum::Success>::SUCCESS
+                            <#error_ident as ::interoptopus::patterns::result::FFIError>::SUCCESS
                         }
 
                         Ok(x) => {
@@ -133,7 +133,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
 
                         Err(_) => {
                             ::interoptopus::util::log_error(|| "xxxxxx");
-                            <#error_ident as ::interoptopus::patterns::success_enum::Success>::PANIC
+                            <#error_ident as ::interoptopus::patterns::result::FFIError>::PANIC
                         }
                     }
                 }
@@ -169,14 +169,14 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                         }));
 
                         match result_result {
-                            Ok(Ok(_)) => <FFIError as interoptopus::patterns::success_enum::Success>::SUCCESS,
+                            Ok(Ok(_)) => <FFIError as interoptopus::patterns::result::FFIError>::SUCCESS,
                             Ok(x) => {
                                 ::interoptopus::util::log_error(|| "xxxxxx");
                                 x.into()
                             }
                             Err(e) => {
                                 ::interoptopus::util::log_error(|| "xxxxxx");
-                                <#error_ident as ::interoptopus::patterns::success_enum::Success>::PANIC
+                                <#error_ident as ::interoptopus::patterns::result::FFIError>::PANIC
                             }
                         }
                     }
@@ -214,7 +214,7 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
 
             *context = ::std::ptr::null_mut();
 
-            <#error_ident as ::interoptopus::patterns::success_enum::Success>::SUCCESS
+            <#error_ident as ::interoptopus::patterns::result::FFIError>::SUCCESS
         }
     };
 

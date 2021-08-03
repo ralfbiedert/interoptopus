@@ -66,7 +66,7 @@ pub trait PythonWriter {
             match the_type {
                 CType::Enum(e) => self.write_enum(w, e)?,
                 CType::Composite(c) => self.write_struct(w, c)?,
-                CType::Pattern(TypePattern::SuccessEnum(e)) => self.write_enum(w, e.the_enum())?,
+                CType::Pattern(TypePattern::FFIErrorEnum(e)) => self.write_enum(w, e.the_enum())?,
                 _ => {}
             }
         }
@@ -213,7 +213,7 @@ pub trait PythonWriter {
         let ctx = if deref_ctx { "self.ctx[0]" } else { "self.ctx" };
 
         match function.signature().rval() {
-            CType::Pattern(TypePattern::SuccessEnum(e)) => {
+            CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
                 indented!(w, [_ _], r#"rval = {}.{}({}, {})"#, self.config().raw_fn_namespace, function.name(), ctx, &args)?;
                 indented!(w, [_ _], r#"if rval == {}.{}:"#, e.the_enum().rust_name(), e.success_variant().name())?;
                 indented!(w, [_ _ _], r#"return None"#)?;

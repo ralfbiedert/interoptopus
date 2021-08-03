@@ -18,7 +18,6 @@ pub mod patterns {
     pub mod option;
     pub mod primitives;
     pub mod service_generated;
-    pub mod service_manual;
     pub mod slice;
     pub mod success_enum;
 }
@@ -82,7 +81,6 @@ interoptopus::inventory!(
         patterns::primitives::pattern_ffi_bool,
         patterns::api_entry::pattern_my_api_init_v1,
         patterns::api_guard::pattern_api_guard,
-        patterns::service_generated::simple_service_ext_util,
         patterns::callbacks::pattern_callback_1
     ],
     [types::ExtraType<f32>],

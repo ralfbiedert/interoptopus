@@ -256,7 +256,7 @@ pub trait CSharpWriter {
             CType::ReadWritePointer(_) => {}
             CType::Pattern(x) => match x {
                 TypePattern::AsciiPointer => {}
-                TypePattern::SuccessEnum(e) => {
+                TypePattern::FFIErrorEnum(e) => {
                     self.write_type_definition_enum(w, e.the_enum())?;
                     w.newline()?;
                 }
@@ -498,7 +498,7 @@ pub trait CSharpWriter {
             CType::Pattern(x) => match x {
                 TypePattern::AsciiPointer => true,
                 TypePattern::APIVersion => true,
-                TypePattern::SuccessEnum(x) => self.should_emit_by_meta(x.the_enum().meta()),
+                TypePattern::FFIErrorEnum(x) => self.should_emit_by_meta(x.the_enum().meta()),
                 TypePattern::Slice(x) => self.should_emit_by_meta(x.meta()),
                 TypePattern::SliceMut(x) => self.should_emit_by_meta(x.meta()),
                 TypePattern::Option(x) => self.should_emit_by_meta(x.meta()),
@@ -758,7 +758,7 @@ pub trait CSharpWriter {
             let prettified = IdPrettifier::from_rust_lower(&without_common_prefix);
             let fn_name = prettified.to_camel_case();
             let rval = match function.signature().rval() {
-                CType::Pattern(TypePattern::SuccessEnum(_)) => "void".to_string(),
+                CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
                 _ => self.converter().to_typespecifier_in_rval(function.signature().rval()),
             };
 
@@ -819,7 +819,7 @@ pub trait CSharpWriter {
         indented!(w, r#"{{"#)?;
 
         match function.signature().rval() {
-            CType::Pattern(TypePattern::SuccessEnum(e)) => {
+            CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
                 indented!(w, [_], r#"var rval = {};"#, fn_call)?;
                 indented!(w, [_], r#"if (rval != {}.{})"#, e.the_enum().rust_name(), e.success_variant().name())?;
                 indented!(w, [_], r#"{{"#)?;
@@ -851,7 +851,7 @@ pub trait CSharpWriter {
         let context = if deref_context { "_context".to_string() } else { "ref _context".to_string() };
 
         match function.signature().rval() {
-            CType::Pattern(TypePattern::SuccessEnum(e)) => {
+            CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
                 indented!(w, r#"var rval = {}.{}({} {});"#, self.config().class, function.name(), context, args)?;
                 indented!(w, r#"if (rval != {}.{})"#, e.the_enum().rust_name(), e.success_variant().name())?;
                 indented!(w, r#"{{"#)?;

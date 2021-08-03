@@ -5,7 +5,7 @@ use crate::types::{
     ambiguous1, ambiguous2, common, some_foreign_type, Array, Callbacku8u8, Empty, EnumDocumented, EnumRenamedXYZ, Generic, Generic2, Generic3, Generic4, Opaque,
     Phantom, SomeForeignType, StructDocumented, StructRenamedXYZ, Tupled, Vec3f32, Visibility1, Visibility2, Weird1, Weird2,
 };
-use interoptopus::patterns::success_enum::panics_and_errors_to_ffi_enum;
+use interoptopus::patterns::result::panics_and_errors_to_ffi_enum;
 use interoptopus::{ffi_function, here};
 use std::ptr::null;
 use std::time::Duration;

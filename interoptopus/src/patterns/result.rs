@@ -1,12 +1,34 @@
-//! Like a [`Result`] but FFI safe.
-use crate::lang::c::{CType, CompositeType, Documentation, Field, PrimitiveType, Visibility};
-use crate::lang::rust::CTypeInfo;
+//! For return enums with defined `Ok` variants, translating to exceptions if not met.
 
-use crate::patterns::primitives::FFIBool;
-use crate::patterns::TypePattern;
+use crate::lang::c::{CompositeType, Documentation, EnumType, Field, PrimitiveType, Variant, Visibility};
+use crate::util::log_error;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+use std::panic::AssertUnwindSafe;
 
+/// A trait you should implement for enums that signal errors in FFI calls.
+///
+/// The `SUCCESS` variant will be used to automatically convert `Result::Ok`
+/// values, and `NULL` when a required pointer was detected to be `null`.
+///
+/// # Example
+///
+/// ```
+/// use interoptopus::patterns::result::FFIError;
+///
+/// enum MyError {
+///     Ok = 0,
+///     NullPassed = 1,
+///     Panic = 2,
+///     OtherError = 3,
+/// }
+///
+/// impl FFIError for MyError {
+///     const SUCCESS: Self = Self::Ok;
+///     const NULL: Self = Self::NullPassed;
+///     const PANIC: Self = Self::Panic;
+/// }
+/// ```
 pub trait FFIError {
     /// The variant to return when everything went OK, usually the variant with value `0`.
     const SUCCESS: Self;
@@ -27,4 +49,57 @@ where
     e: E,
 }
 
-impl<T, E> FFIResult<T> {}
+/// Internal helper derived for enums that are [`Success`].
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub struct FFIErrorEnum {
+    the_enum: EnumType,
+    success_variant: Variant,
+}
+
+impl FFIErrorEnum {
+    pub fn new(the_enum: EnumType, success_variant: Variant) -> Self {
+        Self { the_enum, success_variant }
+    }
+
+    pub fn the_enum(&self) -> &EnumType {
+        &self.the_enum
+    }
+
+    pub fn success_variant(&self) -> &Variant {
+        &self.success_variant
+    }
+}
+
+/// Helper to transform [`Result`] types to [`Success`] enums inside `extern "C"` functions.
+///
+/// This function executes the given closure `f`. If `f` returns `Ok(())` the `SUCCESS`
+/// variant is returned. On a panic or `Err` the respective error variant is returned instead.
+///
+/// # Feature Flags
+///
+/// If the `log` crate option is enabled this will invoke `log::error` on errors.
+///
+/// # Safety
+///
+/// Once [`Success::PANIC`] has been observed the enum's recipient should stop calling this API
+/// (and probably gracefully shutdown or restart), as any subsequent call risks causing a
+/// process abort.
+#[allow(unused_variables)]
+pub fn panics_and_errors_to_ffi_enum<E: ToString, FE: FFIError>(f: impl FnOnce() -> Result<(), E>, error_context: &str) -> FE
+where
+    FE: From<Result<(), E>>,
+{
+    let result: Result<(), E> = match std::panic::catch_unwind(AssertUnwindSafe(|| f())) {
+        Ok(x) => x,
+        Err(_) => {
+            log_error(|| format!("Panic observed near {}", error_context));
+            return FE::PANIC;
+        }
+    };
+
+    if let Err(e) = &result {
+        log_error(|| format!("Error observed near {}: {}", error_context, e.to_string()));
+    }
+
+    result.into()
+}

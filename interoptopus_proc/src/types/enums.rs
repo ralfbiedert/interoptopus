@@ -77,11 +77,11 @@ pub fn ffi_type_enum(attributes: &Attributes, input: TokenStream, item: ItemEnum
 
     let variant_infos = derive_variant_info(item, &variant_idents, &variant_names, &variant_values, &variant_docs);
 
-    let ctype_info_return = if attributes.patterns.contains_key("success_enum") {
+    let ctype_info_return = if attributes.patterns.contains_key("ffi_error") {
         quote! {
             let success_variant = Self::SUCCESS.variant_info();
-            let the_success_enum = interoptopus::patterns::success_enum::SuccessEnum::new(rval, success_variant);
-            let the_pattern = interoptopus::patterns::TypePattern::SuccessEnum(the_success_enum);
+            let the_success_enum = interoptopus::patterns::result::FFIErrorEnum::new(rval, success_variant);
+            let the_pattern = interoptopus::patterns::TypePattern::FFIErrorEnum(the_success_enum);
             interoptopus::lang::c::CType::Pattern(the_pattern)
         }
     } else {

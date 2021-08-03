@@ -139,7 +139,7 @@ pub(crate) fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CTyp
         // types; which we need to recursively inspect.
         CType::Pattern(x) => match x {
             TypePattern::AsciiPointer => {}
-            TypePattern::SuccessEnum(_) => {}
+            TypePattern::FFIErrorEnum(_) => {}
             TypePattern::NamedCallback(x) => {
                 let inner = x.fnpointer();
                 ctypes_from_type_recursive(inner.signature().rval(), types);
@@ -190,7 +190,7 @@ pub(crate) fn extract_namespaces_from_types(types: &[CType], into: &mut HashSet<
             CType::Pattern(x) => match x {
                 TypePattern::AsciiPointer => {}
                 TypePattern::APIVersion => {}
-                TypePattern::SuccessEnum(x) => {
+                TypePattern::FFIErrorEnum(x) => {
                     into.insert(x.the_enum().meta().namespace().to_string());
                 }
                 TypePattern::Slice(x) => {
@@ -292,7 +292,7 @@ pub fn is_global_type(t: &CType) -> bool {
         CType::Pattern(x) => match x {
             TypePattern::AsciiPointer => true,
             TypePattern::APIVersion => false,
-            TypePattern::SuccessEnum(_) => false,
+            TypePattern::FFIErrorEnum(_) => false,
             TypePattern::Slice(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),
             TypePattern::SliceMut(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),
             TypePattern::Option(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),
