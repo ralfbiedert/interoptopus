@@ -31,6 +31,7 @@
 use crate::lang::c::{CType, Function, OpaqueType};
 use crate::patterns::success_enum::Success;
 use crate::patterns::TypePattern;
+use std::fmt::Debug;
 
 macro_rules! impl_failure_default {
     ($t:ty, $x:expr) => {
@@ -56,6 +57,39 @@ where
     }
 }
 
+pub trait ServiceReturn: Sized {
+    #[inline]
+    fn log_if_error(self) -> Self {
+        self
+    }
+}
+
+impl<T, E: Debug> ServiceReturn for Result<T, E> {
+    fn log_if_error(self) -> Self {
+        match &self {
+            Ok(_) => {}
+            #[cfg(feature = "log")]
+            Err(e) => log::error!("{:?}", e),
+            #[cfg(not(feature = "log"))]
+            Err(e) => {}
+        }
+
+        self
+    }
+}
+
+impl ServiceReturn for u8 {}
+impl ServiceReturn for u16 {}
+impl ServiceReturn for u32 {}
+impl ServiceReturn for u64 {}
+impl ServiceReturn for i8 {}
+impl ServiceReturn for i16 {}
+impl ServiceReturn for i32 {}
+impl ServiceReturn for i64 {}
+impl ServiceReturn for f32 {}
+impl ServiceReturn for f64 {}
+impl ServiceReturn for () {}
+
 impl_failure_default!(u8, 0);
 impl_failure_default!(u16, 0);
 impl_failure_default!(u32, 0);
@@ -75,6 +109,10 @@ pub struct Service {
     constructor: Function,
     destructor: Function,
     methods: Vec<Function>,
+}
+
+pub trait ServiceInfo {
+    fn service_info() -> Service;
 }
 
 impl Service {

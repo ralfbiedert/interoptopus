@@ -1,14 +1,15 @@
 use crate::patterns::success_enum::FFIError;
 use interoptopus::patterns::primitives::FFIBool;
+use interoptopus::patterns::service::ServiceReturn;
 use interoptopus::patterns::slice::{FFISlice, FFISliceMut};
-use interoptopus::{ffi_function, pattern_service_generated};
+use interoptopus::{ffi_function, ffi_service, pattern_service_generated};
 use some_rust_module::{Error, SimpleService};
 
 pub mod some_rust_module {
     use crate::patterns::success_enum::FFIError;
     use interoptopus::patterns::primitives::FFIBool;
     use interoptopus::patterns::slice::{FFISlice, FFISliceMut};
-    use interoptopus::{ffi_function, ffi_type};
+    use interoptopus::{ffi_function, ffi_service, ffi_service_ctor, ffi_service_method, ffi_type};
     use std::fmt::{Display, Formatter};
 
     // An error we use in a Rust library
@@ -33,8 +34,9 @@ pub mod some_rust_module {
     }
 
     // Regular implementation of methods.
-    #[ffi_function(debug, xxx_service)]
+    #[ffi_service(debug, error = "FFIError")]
     impl SimpleService {
+        #[ffi_service_ctor]
         pub fn new_with(some_value: u32) -> Result<Self, Error> {
             Ok(Self { some_value })
         }
@@ -43,31 +45,41 @@ pub mod some_rust_module {
             Ok(())
         }
 
+        #[ffi_service_method(direct)]
         pub fn method_value(&self, x: u32) -> u32 {
             x
         }
 
         /// This method should be documented.
+        ///
+        /// Multiple lines.
+        #[ffi_service_method(direct)]
         pub fn method_void(&self) {}
 
+        #[ffi_service_method(direct)]
         pub fn method_mut_self(&mut self, slice: FFISlice<u8>) -> u8 {
             *slice.as_slice().get(0).unwrap_or(&0)
         }
 
+        #[ffi_service_method(direct)]
         pub fn method_mut_self_void(&mut self, _slice: FFISlice<FFIBool>) {}
 
+        #[ffi_service_method(direct)]
         pub fn method_mut_self_ref(&mut self, x: &u8, _y: &mut u8) -> u8 {
             *x
         }
 
+        #[ffi_service_method(direct)]
         pub fn method_mut_self_ref_slice(&mut self, x: &u8, _y: &mut u8, _slice: FFISlice<u8>) -> u8 {
             *x
         }
 
+        #[ffi_service_method(direct)]
         pub fn method_mut_self_ref_slice_limited<'a, 'b>(&mut self, x: &u8, _y: &mut u8, _slice: FFISlice<'a, u8>, _slice2: FFISlice<'b, u8>) -> u8 {
             *x
         }
 
+        #[ffi_service_method(direct)]
         pub fn method_mut_self_ffi_error(&mut self, _slice: FFISliceMut<u8>) -> FFIError {
             FFIError::Ok
         }
@@ -96,25 +108,25 @@ pub extern "C" fn simple_service_extra_method(_context: Option<&mut SimpleServic
 }
 
 // Generate all FFI helpers.
-pattern_service_generated!(
-  simple_service_pattern,
-  SimpleService,
-  simple_service_create(x: u32) -> FFIError: new_with,
-  simple_service_destroy() -> FFIError,
-  [
-      simple_service_result(&mut SimpleService, x: u32) -> FFIError: method_result
-  ],
-  [
-      simple_service_value(&mut SimpleService, x: u32) -> u32: method_value,
-      simple_service_mut_self(&mut SimpleService, slice: FFISlice<u8>) -> u8: method_mut_self,
-      simple_service_mut_self_void(&mut SimpleService, slice: FFISlice<FFIBool>) -> (): method_mut_self_void,
-      simple_service_mut_self_ref(&mut SimpleService, x: &u8, _y: &mut u8) -> u8: method_mut_self_ref,
-      simple_service_mut_self_ref_slice(&mut SimpleService, x: &u8, _y: &mut u8, _slice: FFISlice<u8>) -> u8: method_mut_self_ref_slice,
-      simple_service_mut_self_ref_slice_limited<'a, 'b>(&mut SimpleService, x: &u8, _y: &mut u8, _slice: FFISlice<'a, u8>, _slice2: FFISlice<'b, u8>) -> u8: method_mut_self_ref_slice_limited,
-      simple_service_mut_self_ffi_error(&mut SimpleService, slice: FFISliceMut<u8>) -> FFIError: method_mut_self_ffi_error,
-      simple_service_void(&SimpleService) -> (): method_void
-  ],
-  [
-      simple_service_extra_method
-  ]
-);
+// pattern_service_generated!(
+//   simple_service_pattern,
+//   SimpleService,
+//   simple_service_create(x: u32) -> FFIError: new_with,
+//   simple_service_destroy() -> FFIError,
+//   [
+//       simple_service_result(&mut SimpleService, x: u32) -> FFIError: method_result
+//   ],
+//   [
+//       simple_service_value(&mut SimpleService, x: u32) -> u32: method_value,
+//       simple_service_mut_self(&mut SimpleService, slice: FFISlice<u8>) -> u8: method_mut_self,
+//       simple_service_mut_self_void(&mut SimpleService, slice: FFISlice<FFIBool>) -> (): method_mut_self_void,
+//       simple_service_mut_self_ref(&mut SimpleService, x: &u8, _y: &mut u8) -> u8: method_mut_self_ref,
+//       simple_service_mut_self_ref_slice(&mut SimpleService, x: &u8, _y: &mut u8, _slice: FFISlice<u8>) -> u8: method_mut_self_ref_slice,
+//       simple_service_mut_self_ref_slice_limited<'a, 'b>(&mut SimpleService, x: &u8, _y: &mut u8, _slice: FFISlice<'a, u8>, _slice2: FFISlice<'b, u8>) -> u8: method_mut_self_ref_slice_limited,
+//       simple_service_mut_self_ffi_error(&mut SimpleService, slice: FFISliceMut<u8>) -> FFIError: method_mut_self_ffi_error,
+//       simple_service_void(&SimpleService) -> (): method_void
+//   ],
+//   [
+//       simple_service_extra_method
+//   ]
+// );

@@ -6,6 +6,7 @@ extern crate proc_macro; // Apparently needed to be imported like this.
 
 mod constants;
 mod functions;
+mod service;
 mod types;
 mod util;
 
@@ -181,4 +182,24 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
     let rval = constants::ffi_constant(attr_args, input);
 
     rval.into()
+}
+
+#[proc_macro_attribute] // Can now be used as `#[my_attribute]`
+pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let input = proc_macro2::TokenStream::from(item);
+    let attr_args = parse_macro_input!(attr as AttributeArgs);
+
+    let rval = service::ffi_service(attr_args, input);
+
+    rval.into()
+}
+
+#[proc_macro_attribute]
+pub fn ffi_service_ctor(attr: TokenStream, item: TokenStream) -> TokenStream {
+    item
+}
+
+#[proc_macro_attribute]
+pub fn ffi_service_method(attr: TokenStream, item: TokenStream) -> TokenStream {
+    item
 }

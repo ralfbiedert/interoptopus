@@ -87,7 +87,7 @@ interoptopus::inventory!(
     ],
     [types::ExtraType<f32>],
     [
-        patterns::service_manual::my_service_pattern_context,
-        patterns::service_generated::simple_service_pattern
+        patterns::service_manual::my_service_pattern_context //,
+                                                             // patterns::service_generated::simple_service_pattern
     ]
 );

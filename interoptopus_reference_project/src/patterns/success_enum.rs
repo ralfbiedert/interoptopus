@@ -1,4 +1,5 @@
 use interoptopus::ffi_type;
+use interoptopus::patterns::service::ServiceReturn;
 use interoptopus::patterns::success_enum::Success;
 
 #[ffi_type(patterns(success_enum))]
@@ -10,8 +11,16 @@ pub enum FFIError {
     Fail = 300,
 }
 
+impl Default for FFIError {
+    fn default() -> Self {
+        Self::Ok
+    }
+}
+
 impl Success for FFIError {
     const SUCCESS: Self = Self::Ok;
     const NULL: Self = Self::Null;
     const PANIC: Self = Self::Panic;
 }
+
+impl ServiceReturn for FFIError {}

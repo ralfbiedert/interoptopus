@@ -855,7 +855,7 @@ pub trait CSharpWriter {
                 indented!(w, r#"var rval = {}.{}({} {});"#, self.config().class, function.name(), context, args)?;
                 indented!(w, r#"if (rval != {}.{})"#, e.the_enum().rust_name(), e.success_variant().name())?;
                 indented!(w, r#"{{"#)?;
-                indented!(w, [_], r#"throw new Exception("Something went wrong");"#)?;
+                indented!(w, [_], r#"throw new Exception($"Something went wrong {{rval}}");"#)?;
                 indented!(w, r#"}}"#)?;
             }
             CType::Primitive(PrimitiveType::Void) => {
