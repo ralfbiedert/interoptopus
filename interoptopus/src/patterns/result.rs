@@ -4,6 +4,7 @@ use crate::lang::c::{CompositeType, Documentation, EnumType, Field, PrimitiveTyp
 use crate::util::log_error;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
 use std::panic::AssertUnwindSafe;
 
 /// A trait you should implement for enums that signal errors in FFI calls.
@@ -38,16 +39,16 @@ pub trait FFIError {
     const PANIC: Self;
 }
 
-#[repr(C)]
-#[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Default, Deserialize, Serialize))]
-#[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Default))]
-pub struct FFIResult<T, E>
-where
-    E: FFIError,
-{
-    t: T,
-    e: E,
-}
+// #[repr(C)]
+// #[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Default, Deserialize, Serialize))]
+// #[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Default))]
+// pub struct FFIResult<T, E>
+// where
+//     E: FFIError,
+// {
+//     t: T,
+//     e: E,
+// }
 
 /// Internal helper derived for enums that are [`Success`].
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -85,21 +86,24 @@ impl FFIErrorEnum {
 /// (and probably gracefully shutdown or restart), as any subsequent call risks causing a
 /// process abort.
 #[allow(unused_variables)]
-pub fn panics_and_errors_to_ffi_enum<E: ToString, FE: FFIError>(f: impl FnOnce() -> Result<(), E>, error_context: &str) -> FE
+pub fn panics_and_errors_to_ffi_enum<E: Debug, FE: FFIError>(f: impl FnOnce() -> Result<(), E>, error_context: &str) -> FE
 where
-    FE: From<Result<(), E>>,
+    FE: From<E>,
 {
     let result: Result<(), E> = match std::panic::catch_unwind(AssertUnwindSafe(|| f())) {
         Ok(x) => x,
-        Err(_) => {
-            log_error(|| format!("Panic observed near {}", error_context));
+        Err(e) => {
+            log_error(|| format!("Panic in ({}): {:?}", error_context, e));
             return FE::PANIC;
         }
     };
 
     if let Err(e) = &result {
-        log_error(|| format!("Error observed near {}: {}", error_context, e.to_string()));
+        log_error(|| format!("Error in ({}): {:?}", error_context, e));
     }
 
-    result.into()
+    match result {
+        Ok(_) => FE::SUCCESS,
+        Err(e) => FE::from(e),
+    }
 }

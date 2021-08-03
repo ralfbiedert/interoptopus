@@ -87,12 +87,10 @@ pub mod some_rust_module {
     }
 }
 
-// Needed for Error to FFIError conversion.
-impl<T> From<Result<T, Error>> for FFIError {
-    fn from(x: Result<T, Error>) -> Self {
+impl From<Error> for FFIError {
+    fn from(x: Error) -> Self {
         match x {
-            Ok(_) => Self::Ok,
-            Err(Error::Bad) => Self::Fail,
+            Error::Bad => Self::Fail,
         }
     }
 }

@@ -126,13 +126,13 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                             <#error_ident as ::interoptopus::patterns::result::FFIError>::SUCCESS
                         }
 
-                        Ok(x) => {
-                            ::interoptopus::util::log_error(|| "xxxxxx");
-                            x.into()
+                        Ok(Err(e)) => {
+                            ::interoptopus::util::log_error(|| format!("Error in ({}): {:?}", stringify!(#ffi_fn_ident), e));
+                            e.into()
                         }
 
-                        Err(_) => {
-                            ::interoptopus::util::log_error(|| "xxxxxx");
+                        Err(e) => {
+                            ::interoptopus::util::log_error(|| format!("Panic in ({}): {:?}", stringify!(#ffi_fn_ident), e));
                             <#error_ident as ::interoptopus::patterns::result::FFIError>::PANIC
                         }
                     }
@@ -152,7 +152,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                         match result_result {
                             Ok(x) => x,
                             Err(e) => {
-                                ::interoptopus::util::log_error(|| "xxxxxx");
+                                ::interoptopus::util::log_error(|| format!("Panic in ({}): {:?}", stringify!(#ffi_fn_ident), e));
                                 <#rval>::default()
                             }
                         }
@@ -163,22 +163,9 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     #[interoptopus::ffi_function]
                     #[no_mangle]
                     pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #error_ident {
-
-                        let result_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                        ::interoptopus::patterns::result::panics_and_errors_to_ffi_enum(|| {
                             <#service_type>::#orig_fn_ident( #(#arg_names),* )
-                        }));
-
-                        match result_result {
-                            Ok(Ok(_)) => <FFIError as interoptopus::patterns::result::FFIError>::SUCCESS,
-                            Ok(x) => {
-                                ::interoptopus::util::log_error(|| "xxxxxx");
-                                x.into()
-                            }
-                            Err(e) => {
-                                ::interoptopus::util::log_error(|| "xxxxxx");
-                                <#error_ident as ::interoptopus::patterns::result::FFIError>::PANIC
-                            }
-                        }
+                        }, stringify!(#ffi_fn_ident))
                     }
                 }
             }
