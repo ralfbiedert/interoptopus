@@ -17,9 +17,9 @@ pub mod patterns {
     pub mod callbacks;
     pub mod option;
     pub mod primitives;
-    pub mod service_generated;
+    pub mod result;
+    pub mod service;
     pub mod slice;
-    pub mod success_enum;
 }
 pub mod types;
 
@@ -84,5 +84,5 @@ interoptopus::inventory!(
         patterns::callbacks::pattern_callback_1
     ],
     [types::ExtraType<f32>],
-    [patterns::service_generated::some_rust_module::SimpleService]
+    [patterns::service::SimpleService]
 );

@@ -1,9 +1,7 @@
 //! For return enums with defined `Ok` variants, translating to exceptions if not met.
 
-use crate::lang::c::{CompositeType, Documentation, EnumType, Field, PrimitiveType, Variant, Visibility};
+use crate::lang::c::{EnumType, Variant};
 use crate::util::log_error;
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 use std::panic::AssertUnwindSafe;
 

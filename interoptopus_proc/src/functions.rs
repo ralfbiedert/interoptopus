@@ -1,9 +1,8 @@
 use crate::functions::freestanding::ffi_function_freestanding;
 use darling::FromMeta;
 use proc_macro2::TokenStream;
-use quote::ToTokens;
 use std::collections::HashMap;
-use syn::{AttributeArgs, FnArg, GenericArgument, GenericParam, ItemFn, Pat, PathArguments, ReturnType, Signature, Type};
+use syn::AttributeArgs;
 
 mod freestanding;
 

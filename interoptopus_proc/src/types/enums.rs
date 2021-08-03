@@ -1,11 +1,8 @@
 use crate::types::Attributes;
 use crate::util::extract_doc_lines;
-use darling::FromMeta;
 use proc_macro2::{Ident, TokenStream};
-use quote::{quote, ToTokens};
-use std::collections::HashMap;
-use syn::spanned::Spanned;
-use syn::{AttributeArgs, Expr, Field, GenericParam, ItemEnum, ItemStruct, ItemType, Lit, Type, Visibility};
+use quote::quote;
+use syn::{Expr, ItemEnum, Lit};
 
 fn derive_variant_info(item: ItemEnum, idents: &[Ident], names: &[String], values: &[i32], docs: &[String]) -> TokenStream {
     let span = item.ident.span();
@@ -77,8 +74,9 @@ pub fn ffi_type_enum(attributes: &Attributes, input: TokenStream, item: ItemEnum
 
     let variant_infos = derive_variant_info(item, &variant_idents, &variant_names, &variant_values, &variant_docs);
 
-    let ctype_info_return = if attributes.patterns.contains_key("ffi_error") {
+    let ctype_info_return = if attributes.patterns.contains_key("result") {
         quote! {
+            use interoptopus::patterns::result::FFIError as _;
             let success_variant = Self::SUCCESS.variant_info();
             let the_success_enum = interoptopus::patterns::result::FFIErrorEnum::new(rval, success_variant);
             let the_pattern = interoptopus::patterns::TypePattern::FFIErrorEnum(the_success_enum);

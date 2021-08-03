@@ -1,11 +1,9 @@
 use crate::types::Attributes;
 use crate::util::extract_doc_lines;
-use darling::FromMeta;
-use proc_macro2::{Ident, TokenStream};
+use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
-use std::collections::HashMap;
 use syn::spanned::Spanned;
-use syn::{AttributeArgs, Expr, Field, GenericParam, ItemEnum, ItemStruct, ItemType, Lit, Type, Visibility};
+use syn::{GenericParam, ItemStruct, Type};
 
 // Various Struct examples
 //

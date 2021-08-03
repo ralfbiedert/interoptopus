@@ -1,12 +1,10 @@
 use crate::functions::Attributes;
 use crate::util;
-use darling::FromMeta;
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
-use std::collections::HashMap;
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
-use syn::{AttributeArgs, FnArg, GenericArgument, GenericParam, ItemFn, Pat, PathArguments, ReturnType, Signature, Type};
+use syn::{FnArg, GenericArgument, GenericParam, ItemFn, Pat, PathArguments, ReturnType, Signature, Type};
 
 pub fn fn_signature_type(signature: Signature) -> TokenStream {
     let rval = &signature.output;

@@ -2,8 +2,8 @@ use crate::service::function_impl::{generate_service_dtor, generate_service_meth
 use darling::FromMeta;
 use function_impl::MethodType;
 use proc_macro2::TokenStream;
-use quote::{quote, ToTokens};
-use syn::{AttributeArgs, FnArg, GenericArgument, GenericParam, ImplItem, ItemFn, ItemImpl, Pat, PathArguments, ReturnType, Signature, Type};
+use quote::quote;
+use syn::{AttributeArgs, ImplItem, ItemImpl};
 
 pub mod function_impl;
 
@@ -25,7 +25,7 @@ pub fn ffi_service(attr: AttributeArgs, input: TokenStream) -> TokenStream {
     attributes.assert_valid();
 
     let item = syn::parse2::<ItemImpl>(input.clone()).expect("Must be item.");
-    let mut service_type = &item.self_ty;
+    let service_type = &item.self_ty;
     let mut function_descriptors = Vec::new();
 
     for x in &item.items {

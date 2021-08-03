@@ -1,12 +1,10 @@
 use crate::types::enums::ffi_type_enum;
 use crate::types::structs::ffi_type_struct;
-use crate::util::extract_doc_lines;
 use darling::FromMeta;
-use proc_macro2::{Ident, TokenStream};
-use quote::{quote, ToTokens};
+use proc_macro2::TokenStream;
+use quote::quote;
 use std::collections::HashMap;
-use syn::spanned::Spanned;
-use syn::{AttributeArgs, Expr, Field, GenericParam, ItemEnum, ItemStruct, ItemType, Lit, Type, Visibility};
+use syn::{AttributeArgs, Field, ItemEnum, ItemStruct, ItemType, Visibility};
 
 mod enums;
 mod structs;

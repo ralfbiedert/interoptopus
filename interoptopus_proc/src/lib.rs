@@ -195,11 +195,11 @@ pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_attribute]
-pub fn ffi_service_ctor(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn ffi_service_ctor(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
 
 #[proc_macro_attribute]
-pub fn ffi_service_method(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn ffi_service_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }

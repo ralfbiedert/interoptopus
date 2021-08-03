@@ -4,7 +4,7 @@ use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use std::ops::Deref;
 use syn::spanned::Spanned;
-use syn::{Attribute, FnArg, ImplItemMethod, ItemImpl, Pat, PatType, ReturnType, Type};
+use syn::{Attribute, FnArg, ImplItemMethod, ItemImpl, Pat, ReturnType};
 
 pub struct Descriptor {
     pub ffi_function_tokens: TokenStream,
@@ -95,7 +95,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     arg_names.push(quote! { #i });
                     inputs.push(quote! { #arg });
                 }
-                Pat::Wild(x) => {
+                Pat::Wild(_) => {
                     let new_ident = Ident::new(&*format!("_anon{}", i), arg.span());
                     let ty = &pat.ty;
                     arg_names.push(quote! { #new_ident });
@@ -107,7 +107,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
     }
 
     let generated_function = match &method_type {
-        MethodType::Constructor(x) => {
+        MethodType::Constructor(_) => {
             quote! {
                 #[interoptopus::ffi_function]
                 #[no_mangle]
