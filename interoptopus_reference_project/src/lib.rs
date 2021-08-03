@@ -86,8 +86,5 @@ interoptopus::inventory!(
         patterns::callbacks::pattern_callback_1
     ],
     [types::ExtraType<f32>],
-    [
-        patterns::service_manual::my_service_pattern_context //,
-                                                             // patterns::service_generated::simple_service_pattern
-    ]
+    [patterns::service_generated::some_rust_module::SimpleService]
 );

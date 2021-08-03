@@ -111,10 +111,6 @@ pub struct Service {
     methods: Vec<Function>,
 }
 
-pub trait ServiceInfo {
-    fn service_info() -> Service;
-}
-
 impl Service {
     pub fn new(constructor: Function, destructor: Function, methods: Vec<Function>) -> Self {
         let the_type = extract_obvious_opaque_from_parameter(

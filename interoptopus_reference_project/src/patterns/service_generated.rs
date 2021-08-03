@@ -36,11 +36,14 @@ pub mod some_rust_module {
     // Regular implementation of methods.
     #[ffi_service(debug, error = "FFIError")]
     impl SimpleService {
+        /// The constructor must return a `Result<Self, Error>`.
         #[ffi_service_ctor]
         pub fn new_with(some_value: u32) -> Result<Self, Error> {
             Ok(Self { some_value })
         }
 
+        /// Methods returning a Result<(), _> are the default and do not
+        /// need annotations.
         pub fn method_result(&self, _: u32) -> Result<(), Error> {
             Ok(())
         }

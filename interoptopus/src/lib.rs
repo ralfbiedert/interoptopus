@@ -266,7 +266,7 @@ macro_rules! inventory {
             let mut patterns: ::std::vec::Vec<$crate::patterns::LibraryPattern> = ::std::vec::Vec::new();
             $(
                 {
-                    let pattern: $crate::patterns::LibraryPattern = $pattern().into();
+                    let pattern: $crate::patterns::LibraryPattern = < $pattern as  $crate::patterns::LibraryPatternInfo>::pattern_info();
 
                     match &pattern {
                         $crate::patterns::LibraryPattern::Service(class) => {

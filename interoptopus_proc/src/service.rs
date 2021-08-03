@@ -1,5 +1,6 @@
-use crate::service::function_impl::generate_service_method;
+use crate::service::function_impl::{generate_service_dtor, generate_service_method};
 use darling::FromMeta;
+use function_impl::MethodType;
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
 use syn::{AttributeArgs, FnArg, GenericArgument, GenericParam, ImplItem, ItemFn, ItemImpl, Pat, PathArguments, ReturnType, Signature, Type};
@@ -28,17 +29,28 @@ pub fn ffi_service(attr: AttributeArgs, input: TokenStream) -> TokenStream {
     let mut function_descriptors = Vec::new();
 
     for x in &item.items {
-        match x {
-            ImplItem::Method(x) => {
-                if let Some(xx) = generate_service_method(&attributes, &item, x) {
-                    function_descriptors.push(xx);
-                }
+        if let ImplItem::Method(x) = x {
+            if let Some(xx) = generate_service_method(&attributes, &item, x) {
+                function_descriptors.push(xx);
             }
-            _ => {}
         }
     }
 
     let ffi_functions = function_descriptors.iter().map(|x| x.ffi_function_tokens.clone()).collect::<Vec<_>>();
+    let ffi_dtor = generate_service_dtor(&attributes, &item);
+    let ffi_method_ident = function_descriptors
+        .iter()
+        .filter(|x| matches!(x.method_type, MethodType::Method(_)))
+        .map(|x| x.ident.clone())
+        .collect::<Vec<_>>();
+    let ffi_ctor_ident = &function_descriptors
+        .iter()
+        .find(|x| matches!(x.method_type, MethodType::Constructor(_)))
+        .expect("Must have constructor.")
+        .ident;
+
+    let ffi_dtor_quote = &ffi_dtor.ffi_function_tokens;
+    let ffi_dtor_ident = &ffi_dtor.ident;
 
     let rval = quote! {
         #input
@@ -47,10 +59,38 @@ pub fn ffi_service(attr: AttributeArgs, input: TokenStream) -> TokenStream {
             #ffi_functions
         )*
 
-        impl ::interoptopus::patterns::service::ServiceInfo for #service_type {
-            fn service_info() -> ::interoptopus::patterns::service::Service {
+        #ffi_dtor_quote
 
-                todo!()
+        impl ::interoptopus::patterns::LibraryPatternInfo for #service_type {
+            fn pattern_info() -> ::interoptopus::patterns::LibraryPattern {
+
+                use ::interoptopus::lang::rust::CTypeInfo;
+                use ::interoptopus::lang::rust::FunctionInfo;
+
+                let mut methods = Vec::new();
+
+                #(
+                    {
+                        use #ffi_method_ident as x;
+                        methods.push(x::function_info());
+                    }
+                )*
+
+                let ctor = {
+                    use #ffi_ctor_ident as x;
+                    x::function_info()
+                };
+
+                let dtor = {
+                    use #ffi_dtor_ident as x;
+                    x::function_info()
+                };
+
+                let service = ::interoptopus::patterns::service::Service::new(
+                    ctor, dtor, methods,
+                );
+
+                ::interoptopus::patterns::LibraryPattern::Service(service)
             }
         }
     };
@@ -61,3 +101,74 @@ pub fn ffi_service(attr: AttributeArgs, input: TokenStream) -> TokenStream {
 
     rval
 }
+
+// pub(crate) fn simple_service_pattern() -> interoptopus::patterns::service::Service {
+//     use interoptopus::lang::rust::CTypeInfo;
+//     use interoptopus::lang::rust::FunctionInfo;
+//
+//     let mut methods = Vec::new();
+//
+//     {
+//         {
+//             use simple_service_result
+//             as x;
+//             methods.push(x::function_info());
+//         }
+//         {
+//             use simple_service_value    as x;
+//             methods.push(x::function_info());
+//         }
+//         {
+//             use simple_service_mut_self    as x;
+//             methods.push(x::function_info());
+//         }
+//         {
+//             use simple_service_mut_self_void    as x;
+//             methods.push(x::function_info());
+//         }
+//         {
+//             use simple_service_mut_self_ref    as x;
+//             methods.push(x::function_info());
+//         }
+//         {
+//             use simple_service_mut_self_ref_slice    as x;
+//             methods.push(x::function_info());
+//         }
+//         {
+//             use simple_service_mut_self_ref_slice_limited    as x;
+//             methods.push(x::function_info());
+//         }
+//         {
+//             use simple_service_mut_self_ffi_error    as x;
+//             methods.push(x::function_info());
+//         }
+//         {
+//             use simple_service_void
+//             as x;
+//             methods.push(x::function_info());
+//         }
+//         {
+//             use simple_service_extra_method
+//
+//             as x;
+//             methods.push(x::function_info());
+//         }
+//     }
+//
+//     let ctor = {
+//         use simple_service_create    as x;
+//         x::function_info()
+//     };
+//
+//     let dtor = {
+//         use simple_service_destroy    as x;
+//         x::function_info()
+//     };
+//
+//     let rval = interoptopus::patterns::service::Service::new(
+//         ctor, dtor, methods,
+//     );
+//
+//     rval.assert_valid();
+//     rval
+// }

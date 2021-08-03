@@ -91,6 +91,10 @@ pub enum LibraryPattern {
     Service(Service),
 }
 
+pub trait LibraryPatternInfo {
+    fn pattern_info() -> LibraryPattern;
+}
+
 impl From<Service> for LibraryPattern {
     fn from(x: Service) -> Self {
         Self::Service(x)
