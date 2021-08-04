@@ -1,10 +1,10 @@
-use crate::functions::Attributes;
-use crate::util;
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
-use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
-use syn::{FnArg, GenericArgument, GenericParam, ItemFn, Pat, PathArguments, ReturnType, Signature, Type};
+use syn::{FnArg, GenericParam, ItemFn, Pat, ReturnType, Signature, Type};
+
+use crate::functions::Attributes;
+use crate::util;
 
 pub fn fn_signature_type(signature: Signature) -> TokenStream {
     let rval = &signature.output;
@@ -59,48 +59,6 @@ pub fn rval_tokens(return_type: &ReturnType) -> TokenStream {
     } else {
         quote! { interoptopus::lang::c::CType::Primitive(interoptopus::lang::c::PrimitiveType::Void) }
     }
-}
-
-/// Ugly, incomplete function to purge `'a` from a `Generic<'a, T>`.
-fn purge_lifetimes_from_type(x: &Type, args: &Attributes) -> Type {
-    let mut rval = x.clone();
-
-    match &mut rval {
-        Type::Path(x) => {
-            for p in &mut x.path.segments {
-                match &mut p.arguments {
-                    PathArguments::None => {}
-                    PathArguments::AngleBracketed(angled_args) => {
-                        let mut p = Punctuated::new();
-
-                        for generic_arg in &mut angled_args.args {
-                            match generic_arg {
-                                GenericArgument::Lifetime(_) => {}
-                                GenericArgument::Type(x) => {
-                                    let x = purge_lifetimes_from_type(x, args);
-                                    p.push(GenericArgument::Type(x));
-                                }
-                                GenericArgument::Binding(_) => {}
-                                GenericArgument::Constraint(x) => p.push(GenericArgument::Constraint(x.clone())),
-                                GenericArgument::Const(x) => p.push(GenericArgument::Const(x.clone())),
-                            }
-                        }
-
-                        angled_args.args = p;
-                    }
-                    PathArguments::Parenthesized(_) => {}
-                }
-            }
-        }
-        Type::Reference(x) => {
-            x.lifetime = None;
-            x.elem = Box::new(purge_lifetimes_from_type(&x.elem, args))
-        }
-        Type::Group(x) => x.elem = Box::new(purge_lifetimes_from_type(&x.elem, args)),
-        _ => {}
-    }
-
-    rval
 }
 
 pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream) -> TokenStream {
@@ -158,7 +116,7 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
                 let ident = syn::Ident::new(&lookup, span);
                 args_type.push(quote! { #ident()  })
             } else {
-                let token = match purge_lifetimes_from_type(pat.ty.as_ref(), &ffi_attributes) {
+                let token = match util::purge_lifetimes_from_type(pat.ty.as_ref()) {
                     Type::Path(x) => x.path.to_token_stream(),
                     Type::Reference(x) => x.to_token_stream(),
                     Type::Group(x) => x.to_token_stream(),

@@ -1,10 +1,11 @@
 use crate::service::Attributes;
+use crate::util::purge_lifetimes_from_type;
 use darling::FromMeta;
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use std::ops::Deref;
 use syn::spanned::Spanned;
-use syn::{Attribute, FnArg, ImplItemMethod, ItemImpl, Pat, ReturnType};
+use syn::{Attribute, FnArg, GenericParam, ImplItemMethod, ItemImpl, LifetimeDef, Pat, ReturnType, Type};
 
 pub struct Descriptor {
     pub ffi_function_tokens: TokenStream,
@@ -26,6 +27,21 @@ pub struct AttributeCtor {}
 pub struct AttributeMethod {
     #[darling(default)]
     direct: bool,
+}
+
+struct ServiceAndLifetimes {
+    without_lifetimes: TokenStream,
+    lifetimes: TokenStream,
+}
+
+fn service_lifetimes(impl_block: &ItemImpl) -> ServiceAndLifetimes {
+    let without_lifetime = purge_lifetimes_from_type(&*impl_block.self_ty);
+    let lifetimes = impl_block.generics.lifetimes();
+
+    ServiceAndLifetimes {
+        without_lifetimes: quote! { #without_lifetime },
+        lifetimes: quote! { #(#lifetimes),* },
+    }
 }
 
 /// Inspects all attributes and determines the method type to generate.
@@ -59,12 +75,17 @@ fn method_type(attrs: &[Attribute]) -> MethodType {
 pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, function: &ImplItemMethod) -> Option<Descriptor> {
     let orig_fn_ident = &function.sig.ident;
     let service_type = &impl_block.self_ty;
-    let generics = function.sig.generics.clone();
+    let mut generics = function.sig.generics.clone();
     let mut inputs = Vec::new();
     let mut arg_names = Vec::new();
 
-    let ffi_fn_ident = Ident::new(&format!("ffi_xxx_{}", orig_fn_ident.to_string()), function.span());
+    for lt in impl_block.generics.lifetimes() {
+        generics.params.push(GenericParam::Lifetime(lt.clone()))
+    }
+
+    let ffi_fn_ident = Ident::new(&format!("{}{}", attributes.prefix, orig_fn_ident.to_string()), function.span());
     let error_ident = Ident::new(&attributes.error, function.span());
+    let ServiceAndLifetimes { without_lifetimes, lifetimes } = service_lifetimes(impl_block);
 
     let rval = match &function.sig.output {
         ReturnType::Default => quote! { () },
@@ -146,7 +167,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     #[no_mangle]
                     pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #rval {
                         let result_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                            <#service_type>::#orig_fn_ident( #(#arg_names),* )
+                            <#without_lifetimes>::#orig_fn_ident( #(#arg_names),* )
                         }));
 
                         match result_result {
@@ -164,7 +185,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     #[no_mangle]
                     pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #error_ident {
                         ::interoptopus::patterns::result::panics_and_errors_to_ffi_enum(|| {
-                            <#service_type>::#orig_fn_ident( #(#arg_names),* )
+                            <#without_lifetimes>::#orig_fn_ident( #(#arg_names),* )
                         }, stringify!(#ffi_fn_ident))
                     }
                 }
@@ -181,9 +202,10 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
 }
 
 pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> Descriptor {
-    let ffi_fn_ident = Ident::new(&format!("ffi_xxx_simple_service_destroy"), impl_block.span());
+    let ffi_fn_ident = Ident::new(&format!("{}simple_service_destroy", attributes.prefix), impl_block.span());
     let service_type = &impl_block.self_ty;
     let error_ident = Ident::new(&attributes.error, impl_block.span());
+    let ServiceAndLifetimes { without_lifetimes, lifetimes } = service_lifetimes(impl_block);
 
     let generated_function = quote! {
         /// Destroys the given instance.
@@ -194,7 +216,7 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
         /// passing any other value results in undefined behavior.
         #[interoptopus::ffi_function]
         #[no_mangle]
-        pub unsafe extern "C" fn #ffi_fn_ident(context: &mut *mut #service_type) -> #error_ident {
+        pub unsafe extern "C" fn #ffi_fn_ident(context: &mut *mut #without_lifetimes) -> #error_ident {
             {
                 unsafe { Box::from_raw(*context) };
             }

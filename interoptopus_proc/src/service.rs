@@ -14,6 +14,9 @@ pub struct Attributes {
 
     #[darling(default)]
     error: String,
+
+    #[darling(default)]
+    prefix: String,
 }
 
 impl Attributes {
@@ -52,6 +55,9 @@ pub fn ffi_service(attr: AttributeArgs, input: TokenStream) -> TokenStream {
     let ffi_dtor_quote = &ffi_dtor.ffi_function_tokens;
     let ffi_dtor_ident = &ffi_dtor.ident;
 
+    let lifetimes = item.generics.lifetimes();
+    let lt = quote! { #(#lifetimes),* };
+
     let rval = quote! {
         #input
 
@@ -61,7 +67,7 @@ pub fn ffi_service(attr: AttributeArgs, input: TokenStream) -> TokenStream {
 
         #ffi_dtor_quote
 
-        impl ::interoptopus::patterns::LibraryPatternInfo for #service_type {
+        impl <#lt> ::interoptopus::patterns::LibraryPatternInfo for #service_type {
             fn pattern_info() -> ::interoptopus::patterns::LibraryPattern {
 
                 use ::interoptopus::lang::rust::CTypeInfo;

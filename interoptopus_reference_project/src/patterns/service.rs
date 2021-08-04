@@ -26,7 +26,7 @@ pub struct SimpleService {
 }
 
 // Regular implementation of methods.
-#[ffi_service(error = "FFIError")]
+#[ffi_service(error = "FFIError", prefix = "simple_service_")]
 impl SimpleService {
     /// The constructor must return a `Result<Self, Error>`.
     #[ffi_service_ctor]
@@ -86,4 +86,24 @@ impl From<Error> for FFIError {
             Error::Bad => Self::Fail,
         }
     }
+}
+
+// Some struct we want to expose as a class.
+#[ffi_type(opaque)]
+pub struct SimpleServiceLifetime<'a> {
+    pub some_value: &'a u32,
+}
+
+#[ffi_service(error = "FFIError", prefix = "simple_service_lt_")]
+impl<'a> SimpleServiceLifetime<'a> {
+    #[ffi_service_ctor]
+    pub fn new_with(some_value: &'a u32) -> Result<Self, Error> {
+        Ok(Self { some_value })
+    }
+
+    #[ffi_service_method(direct)]
+    pub fn method_lt(&mut self, _slice: FFISlice<'a, FFIBool>) {}
+
+    #[ffi_service_method(direct)]
+    pub fn method_lt2<'b>(&mut self, _slice: FFISlice<'b, FFIBool>) {}
 }
