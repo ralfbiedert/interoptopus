@@ -21,9 +21,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 5900761074225988713ul)
+            if (api_version != 12225367733384105346ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (5900761074225988713). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (12225367733384105346). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -402,8 +402,8 @@ namespace My.Company
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ffi_xxx_new_with")]
-        public static extern FFIError ffi_xxx_new_with(ref IntPtr context, uint some_value);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_new_with")]
+        public static extern FFIError simple_service_new_with(ref IntPtr context, uint some_value);
 
         // Debug - write_function_overloaded 
 
@@ -414,40 +414,40 @@ namespace My.Company
         /// 
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ffi_xxx_simple_service_destroy")]
-        public static extern FFIError ffi_xxx_simple_service_destroy(ref IntPtr context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_simple_service_destroy")]
+        public static extern FFIError simple_service_simple_service_destroy(ref IntPtr context);
 
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ffi_xxx_method_result")]
-        public static extern FFIError ffi_xxx_method_result(IntPtr context, uint _anon1);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_result")]
+        public static extern FFIError simple_service_method_result(IntPtr context, uint _anon1);
 
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ffi_xxx_method_value")]
-        public static extern uint ffi_xxx_method_value(IntPtr context, uint x);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_value")]
+        public static extern uint simple_service_method_value(IntPtr context, uint x);
 
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ffi_xxx_method_void")]
-        public static extern void ffi_xxx_method_void(IntPtr context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_void")]
+        public static extern void simple_service_method_void(IntPtr context);
 
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ffi_xxx_method_mut_self")]
-        public static extern byte ffi_xxx_method_mut_self(IntPtr context, Sliceu8 slice);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self")]
+        public static extern byte simple_service_method_mut_self(IntPtr context, Sliceu8 slice);
 
         // Debug - write_function_overloaded 
-        public static byte ffi_xxx_method_mut_self(IntPtr context, byte[] slice) {
+        public static byte simple_service_method_mut_self(IntPtr context, byte[] slice) {
             var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
             var slice_slice = new Sliceu8(slice_pinned, (ulong) slice.Length);
             try
             {
-                return ffi_xxx_method_mut_self(context, slice_slice);
+                return simple_service_method_mut_self(context, slice_slice);
             }
             finally
             {
@@ -456,16 +456,16 @@ namespace My.Company
         }
 
         // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ffi_xxx_method_mut_self_void")]
-        public static extern void ffi_xxx_method_mut_self_void(IntPtr context, SliceBool _slice);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_void")]
+        public static extern void simple_service_method_mut_self_void(IntPtr context, SliceBool _slice);
 
         // Debug - write_function_overloaded 
-        public static void ffi_xxx_method_mut_self_void(IntPtr context, Bool[] _slice) {
+        public static void simple_service_method_mut_self_void(IntPtr context, Bool[] _slice) {
             var _slice_pinned = GCHandle.Alloc(_slice, GCHandleType.Pinned);
             var _slice_slice = new SliceBool(_slice_pinned, (ulong) _slice.Length);
             try
             {
-                ffi_xxx_method_mut_self_void(context, _slice_slice);
+                simple_service_method_mut_self_void(context, _slice_slice);
             }
             finally
             {
@@ -474,22 +474,22 @@ namespace My.Company
         }
 
         // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ffi_xxx_method_mut_self_ref")]
-        public static extern byte ffi_xxx_method_mut_self_ref(IntPtr context, ref byte x, out byte _y);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref")]
+        public static extern byte simple_service_method_mut_self_ref(IntPtr context, ref byte x, out byte _y);
 
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ffi_xxx_method_mut_self_ref_slice")]
-        public static extern byte ffi_xxx_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte _y, Sliceu8 _slice);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref_slice")]
+        public static extern byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte _y, Sliceu8 _slice);
 
         // Debug - write_function_overloaded 
-        public static byte ffi_xxx_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte _y, byte[] _slice) {
+        public static byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte _y, byte[] _slice) {
             var _slice_pinned = GCHandle.Alloc(_slice, GCHandleType.Pinned);
             var _slice_slice = new Sliceu8(_slice_pinned, (ulong) _slice.Length);
             try
             {
-                return ffi_xxx_method_mut_self_ref_slice(context, ref x, out _y, _slice_slice);
+                return simple_service_method_mut_self_ref_slice(context, ref x, out _y, _slice_slice);
             }
             finally
             {
@@ -498,18 +498,18 @@ namespace My.Company
         }
 
         // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ffi_xxx_method_mut_self_ref_slice_limited")]
-        public static extern byte ffi_xxx_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte _y, Sliceu8 _slice, Sliceu8 _slice2);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref_slice_limited")]
+        public static extern byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte _y, Sliceu8 _slice, Sliceu8 _slice2);
 
         // Debug - write_function_overloaded 
-        public static byte ffi_xxx_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte _y, byte[] _slice, byte[] _slice2) {
+        public static byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte _y, byte[] _slice, byte[] _slice2) {
             var _slice_pinned = GCHandle.Alloc(_slice, GCHandleType.Pinned);
             var _slice_slice = new Sliceu8(_slice_pinned, (ulong) _slice.Length);
             var _slice2_pinned = GCHandle.Alloc(_slice2, GCHandleType.Pinned);
             var _slice2_slice = new Sliceu8(_slice2_pinned, (ulong) _slice2.Length);
             try
             {
-                return ffi_xxx_method_mut_self_ref_slice_limited(context, ref x, out _y, _slice_slice, _slice2_slice);
+                return simple_service_method_mut_self_ref_slice_limited(context, ref x, out _y, _slice_slice, _slice2_slice);
             }
             finally
             {
@@ -519,16 +519,16 @@ namespace My.Company
         }
 
         // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ffi_xxx_method_mut_self_ffi_error")]
-        public static extern FFIError ffi_xxx_method_mut_self_ffi_error(IntPtr context, SliceMutu8 _slice);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ffi_error")]
+        public static extern FFIError simple_service_method_mut_self_ffi_error(IntPtr context, SliceMutu8 _slice);
 
         // Debug - write_function_overloaded 
-        public static FFIError ffi_xxx_method_mut_self_ffi_error(IntPtr context, byte[] _slice) {
+        public static FFIError simple_service_method_mut_self_ffi_error(IntPtr context, byte[] _slice) {
             var _slice_pinned = GCHandle.Alloc(_slice, GCHandleType.Pinned);
             var _slice_slice = new SliceMutu8(_slice_pinned, (ulong) _slice.Length);
             try
             {
-                return ffi_xxx_method_mut_self_ffi_error(context, _slice_slice);
+                return simple_service_method_mut_self_ffi_error(context, _slice_slice);
             }
             finally
             {
@@ -554,15 +554,6 @@ namespace My.Company
     public enum EnumRenamed
     {
         X = 0,
-    }
-
-    // Debug - write_type_definition_enum 
-    public enum FFIError
-    {
-        Ok = 0,
-        Null = 100,
-        Panic = 200,
-        Fail = 300,
     }
 
     // Debug - write_type_definition_composite 
@@ -766,6 +757,15 @@ namespace My.Company
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);
 
+    // Debug - write_type_definition_enum 
+    public enum FFIError
+    {
+        Ok = 0,
+        Null = 100,
+        Panic = 200,
+        Fail = 300,
+    }
+
     // Debug - write_type_definition_composite 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
@@ -874,97 +874,117 @@ namespace My.Company
         public SimpleService(uint some_value)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            return Interop.ffi_xxx_new_with(ref _context, some_value);
+            var rval = Interop.simple_service_new_with(ref _context , some_value);
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception($"Something went wrong {rval}");
+            }
         }
 
         public void Dispose()
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            return Interop.ffi_xxx_simple_service_destroy(ref _context);
+            var rval = Interop.simple_service_simple_service_destroy(ref _context );
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception($"Something went wrong {rval}");
+            }
         }
 
-        public FFIError MethodResult(uint _anon1)
+        public void MethodResult(uint _anon1)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            return Interop.ffi_xxx_method_result(_context, _anon1);
+            var rval = Interop.simple_service_method_result(_context , _anon1);
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception($"Something went wrong {rval}");
+            }
         }
 
         public uint MethodValue(uint x)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            return Interop.ffi_xxx_method_value(_context, x);
+            return Interop.simple_service_method_value(_context, x);
         }
 
         public void MethodVoid()
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            Interop.ffi_xxx_method_void(_context);
+            Interop.simple_service_method_void(_context);
         }
 
         public byte MethodMutSelf(Sliceu8 slice)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            return Interop.ffi_xxx_method_mut_self(_context, slice);
+            return Interop.simple_service_method_mut_self(_context, slice);
         }
 
         // Debug - write_pattern_service_method_overload 
         public byte MethodMutSelf(byte[] slice)
         {
-            return Interop.ffi_xxx_method_mut_self(_context, slice);
+            return Interop.simple_service_method_mut_self(_context, slice);
         }
 
         public void MethodMutSelfVoid(SliceBool _slice)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            Interop.ffi_xxx_method_mut_self_void(_context, _slice);
+            Interop.simple_service_method_mut_self_void(_context, _slice);
         }
 
         // Debug - write_pattern_service_method_overload 
         public void MethodMutSelfVoid(Bool[] _slice)
         {
-            Interop.ffi_xxx_method_mut_self_void(_context, _slice);
+            Interop.simple_service_method_mut_self_void(_context, _slice);
         }
 
         public byte MethodMutSelfRef(ref byte x, out byte _y)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            return Interop.ffi_xxx_method_mut_self_ref(_context, ref x, out _y);
+            return Interop.simple_service_method_mut_self_ref(_context, ref x, out _y);
         }
 
         public byte MethodMutSelfRefSlice(ref byte x, out byte _y, Sliceu8 _slice)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            return Interop.ffi_xxx_method_mut_self_ref_slice(_context, ref x, out _y, _slice);
+            return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out _y, _slice);
         }
 
         // Debug - write_pattern_service_method_overload 
         public byte MethodMutSelfRefSlice(ref byte x, out byte _y, byte[] _slice)
         {
-            return Interop.ffi_xxx_method_mut_self_ref_slice(_context, ref x, out _y, _slice);
+            return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out _y, _slice);
         }
 
         public byte MethodMutSelfRefSliceLimited(ref byte x, out byte _y, Sliceu8 _slice, Sliceu8 _slice2)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            return Interop.ffi_xxx_method_mut_self_ref_slice_limited(_context, ref x, out _y, _slice, _slice2);
+            return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out _y, _slice, _slice2);
         }
 
         // Debug - write_pattern_service_method_overload 
         public byte MethodMutSelfRefSliceLimited(ref byte x, out byte _y, byte[] _slice, byte[] _slice2)
         {
-            return Interop.ffi_xxx_method_mut_self_ref_slice_limited(_context, ref x, out _y, _slice, _slice2);
+            return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out _y, _slice, _slice2);
         }
 
-        public FFIError MethodMutSelfFfiError(SliceMutu8 _slice)
+        public void MethodMutSelfFfiError(SliceMutu8 _slice)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            return Interop.ffi_xxx_method_mut_self_ffi_error(_context, _slice);
+            var rval = Interop.simple_service_method_mut_self_ffi_error(_context , _slice);
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception($"Something went wrong {rval}");
+            }
         }
 
         // Debug - write_pattern_service_method_overload 
-        public FFIError MethodMutSelfFfiError(byte[] _slice)
+        public void MethodMutSelfFfiError(byte[] _slice)
         {
-            return Interop.ffi_xxx_method_mut_self_ffi_error(_context, _slice);
+            var rval = Interop.simple_service_method_mut_self_ffi_error(_context, _slice);
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception($"Something went wrong: {rval}");
+            }
         }
 
         public IntPtr Context => _context;

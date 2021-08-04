@@ -21,9 +21,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 16654059701817874724ul)
+            if (api_version != 12225367733384105346ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (16654059701817874724). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (12225367733384105346). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -396,85 +396,58 @@ namespace My.Company
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_ext_util")]
-        public static extern void simple_service_ext_util(IntPtr _ptr);
-
-        // Debug - write_function_overloaded 
-
-        // Debug - write_function 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_1")]
         public static extern uint pattern_callback_1(MyCallback callback, uint x);
 
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_create")]
-        public static extern FFIError pattern_service_create(ref IntPtr context_ptr, uint value);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_new_with")]
+        public static extern FFIError simple_service_new_with(ref IntPtr context, uint some_value);
 
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
+        /// Destroys the given instance.
+        /// 
         /// # Safety
         /// 
-        /// This function may only be called with a context returned by a succeeding `pattern_service_create`.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_destroy")]
-        public static extern FFIError pattern_service_destroy(ref IntPtr context_ptr);
+        /// The passed parameter MUST have been created with the corresponding init function;
+        /// passing any other value results in undefined behavior.
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_simple_service_destroy")]
+        public static extern FFIError simple_service_simple_service_destroy(ref IntPtr context);
 
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_method")]
-        public static extern uint pattern_service_method(IntPtr context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_result")]
+        public static extern FFIError simple_service_method_result(IntPtr context, uint _anon1);
 
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_method_success_enum_ok")]
-        public static extern FFIError pattern_service_method_success_enum_ok(IntPtr _context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_value")]
+        public static extern uint simple_service_method_value(IntPtr context, uint x);
 
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_service_method_success_enum_fail")]
-        public static extern FFIError pattern_service_method_success_enum_fail(IntPtr _context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_void")]
+        public static extern void simple_service_method_void(IntPtr context);
 
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_create")]
-        public static extern FFIError simple_service_create(ref IntPtr context_ptr, uint x);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self")]
+        public static extern byte simple_service_method_mut_self(IntPtr context, Sliceu8 slice);
 
         // Debug - write_function_overloaded 
-
-        // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_destroy")]
-        public static extern FFIError simple_service_destroy(ref IntPtr context_ptr);
-
-        // Debug - write_function_overloaded 
-
-        // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_result")]
-        public static extern FFIError simple_service_result(IntPtr context_ptr, uint x);
-
-        // Debug - write_function_overloaded 
-
-        // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_value")]
-        public static extern uint simple_service_value(IntPtr context_ptr, uint x);
-
-        // Debug - write_function_overloaded 
-
-        // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_mut_self")]
-        public static extern byte simple_service_mut_self(IntPtr context_ptr, Sliceu8 slice);
-
-        // Debug - write_function_overloaded 
-        public static byte simple_service_mut_self(IntPtr context_ptr, byte[] slice) {
+        public static byte simple_service_method_mut_self(IntPtr context, byte[] slice) {
             var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
             var slice_slice = new Sliceu8(slice_pinned, (ulong) slice.Length);
             try
             {
-                return simple_service_mut_self(context_ptr, slice_slice);
+                return simple_service_method_mut_self(context, slice_slice);
             }
             finally
             {
@@ -483,40 +456,16 @@ namespace My.Company
         }
 
         // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_mut_self_void")]
-        public static extern void simple_service_mut_self_void(IntPtr context_ptr, SliceBool slice);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_void")]
+        public static extern void simple_service_method_mut_self_void(IntPtr context, SliceBool _slice);
 
         // Debug - write_function_overloaded 
-        public static void simple_service_mut_self_void(IntPtr context_ptr, Bool[] slice) {
-            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new SliceBool(slice_pinned, (ulong) slice.Length);
-            try
-            {
-                simple_service_mut_self_void(context_ptr, slice_slice);
-            }
-            finally
-            {
-                slice_pinned.Free();
-            }
-        }
-
-        // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_mut_self_ref")]
-        public static extern byte simple_service_mut_self_ref(IntPtr context_ptr, ref byte x, out byte _y);
-
-        // Debug - write_function_overloaded 
-
-        // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_mut_self_ref_slice")]
-        public static extern byte simple_service_mut_self_ref_slice(IntPtr context_ptr, ref byte x, out byte _y, Sliceu8 _slice);
-
-        // Debug - write_function_overloaded 
-        public static byte simple_service_mut_self_ref_slice(IntPtr context_ptr, ref byte x, out byte _y, byte[] _slice) {
+        public static void simple_service_method_mut_self_void(IntPtr context, Bool[] _slice) {
             var _slice_pinned = GCHandle.Alloc(_slice, GCHandleType.Pinned);
-            var _slice_slice = new Sliceu8(_slice_pinned, (ulong) _slice.Length);
+            var _slice_slice = new SliceBool(_slice_pinned, (ulong) _slice.Length);
             try
             {
-                return simple_service_mut_self_ref_slice(context_ptr, ref x, out _y, _slice_slice);
+                simple_service_method_mut_self_void(context, _slice_slice);
             }
             finally
             {
@@ -525,18 +474,42 @@ namespace My.Company
         }
 
         // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_mut_self_ref_slice_limited")]
-        public static extern byte simple_service_mut_self_ref_slice_limited(IntPtr context_ptr, ref byte x, out byte _y, Sliceu8 _slice, Sliceu8 _slice2);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref")]
+        public static extern byte simple_service_method_mut_self_ref(IntPtr context, ref byte x, out byte _y);
 
         // Debug - write_function_overloaded 
-        public static byte simple_service_mut_self_ref_slice_limited(IntPtr context_ptr, ref byte x, out byte _y, byte[] _slice, byte[] _slice2) {
+
+        // Debug - write_function 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref_slice")]
+        public static extern byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte _y, Sliceu8 _slice);
+
+        // Debug - write_function_overloaded 
+        public static byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte _y, byte[] _slice) {
+            var _slice_pinned = GCHandle.Alloc(_slice, GCHandleType.Pinned);
+            var _slice_slice = new Sliceu8(_slice_pinned, (ulong) _slice.Length);
+            try
+            {
+                return simple_service_method_mut_self_ref_slice(context, ref x, out _y, _slice_slice);
+            }
+            finally
+            {
+                _slice_pinned.Free();
+            }
+        }
+
+        // Debug - write_function 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref_slice_limited")]
+        public static extern byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte _y, Sliceu8 _slice, Sliceu8 _slice2);
+
+        // Debug - write_function_overloaded 
+        public static byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte _y, byte[] _slice, byte[] _slice2) {
             var _slice_pinned = GCHandle.Alloc(_slice, GCHandleType.Pinned);
             var _slice_slice = new Sliceu8(_slice_pinned, (ulong) _slice.Length);
             var _slice2_pinned = GCHandle.Alloc(_slice2, GCHandleType.Pinned);
             var _slice2_slice = new Sliceu8(_slice2_pinned, (ulong) _slice2.Length);
             try
             {
-                return simple_service_mut_self_ref_slice_limited(context_ptr, ref x, out _y, _slice_slice, _slice2_slice);
+                return simple_service_method_mut_self_ref_slice_limited(context, ref x, out _y, _slice_slice, _slice2_slice);
             }
             finally
             {
@@ -546,35 +519,22 @@ namespace My.Company
         }
 
         // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_mut_self_ffi_error")]
-        public static extern FFIError simple_service_mut_self_ffi_error(IntPtr context_ptr, SliceMutu8 slice);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ffi_error")]
+        public static extern FFIError simple_service_method_mut_self_ffi_error(IntPtr context, SliceMutu8 _slice);
 
         // Debug - write_function_overloaded 
-        public static FFIError simple_service_mut_self_ffi_error(IntPtr context_ptr, byte[] slice) {
-            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new SliceMutu8(slice_pinned, (ulong) slice.Length);
+        public static FFIError simple_service_method_mut_self_ffi_error(IntPtr context, byte[] _slice) {
+            var _slice_pinned = GCHandle.Alloc(_slice, GCHandleType.Pinned);
+            var _slice_slice = new SliceMutu8(_slice_pinned, (ulong) _slice.Length);
             try
             {
-                return simple_service_mut_self_ffi_error(context_ptr, slice_slice);
+                return simple_service_method_mut_self_ffi_error(context, _slice_slice);
             }
             finally
             {
-                slice_pinned.Free();
+                _slice_pinned.Free();
             }
         }
-
-        // Debug - write_function 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_void")]
-        public static extern void simple_service_void(IntPtr context_ptr);
-
-        // Debug - write_function_overloaded 
-
-        // Debug - write_function 
-        /// An extra exposed method.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_extra_method")]
-        public static extern uint simple_service_extra_method(IntPtr _context);
-
-        // Debug - write_function_overloaded 
 
     }
 
@@ -908,185 +868,123 @@ namespace My.Company
 
 
     // Debug - write_pattern_service 
-    /// This can also be used for the `class` pattern.
-    public partial class SomeContext : IDisposable
-    {
-        private IntPtr _context;
-        public SomeContext(uint value)
-        {
-            // Debug - write_pattern_service_success_enum_aware_rval 
-            var rval = Interop.pattern_service_create(ref _context , value);
-            if (rval != FFIError.Ok)
-            {
-                throw new Exception("Something went wrong");
-            }
-        }
-
-        public void Dispose()
-        {
-            // Debug - write_pattern_service_success_enum_aware_rval 
-            var rval = Interop.pattern_service_destroy(ref _context );
-            if (rval != FFIError.Ok)
-            {
-                throw new Exception("Something went wrong");
-            }
-        }
-
-        public uint Method()
-        {
-            // Debug - write_pattern_service_success_enum_aware_rval 
-            return Interop.pattern_service_method(_context);
-        }
-
-        public void MethodSuccessEnumOk()
-        {
-            // Debug - write_pattern_service_success_enum_aware_rval 
-            var rval = Interop.pattern_service_method_success_enum_ok(_context );
-            if (rval != FFIError.Ok)
-            {
-                throw new Exception("Something went wrong");
-            }
-        }
-
-        public void MethodSuccessEnumFail()
-        {
-            // Debug - write_pattern_service_success_enum_aware_rval 
-            var rval = Interop.pattern_service_method_success_enum_fail(_context );
-            if (rval != FFIError.Ok)
-            {
-                throw new Exception("Something went wrong");
-            }
-        }
-
-        public IntPtr Context => _context;
-    }
-
-
-    // Debug - write_pattern_service 
     public partial class SimpleService : IDisposable
     {
         private IntPtr _context;
-        public SimpleService(uint x)
+        public SimpleService(uint some_value)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            var rval = Interop.simple_service_create(ref _context , x);
+            var rval = Interop.simple_service_new_with(ref _context , some_value);
             if (rval != FFIError.Ok)
             {
-                throw new Exception("Something went wrong");
+                throw new Exception($"Something went wrong {rval}");
             }
         }
 
         public void Dispose()
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            var rval = Interop.simple_service_destroy(ref _context );
+            var rval = Interop.simple_service_simple_service_destroy(ref _context );
             if (rval != FFIError.Ok)
             {
-                throw new Exception("Something went wrong");
+                throw new Exception($"Something went wrong {rval}");
             }
         }
 
-        public void Result(uint x)
+        public void MethodResult(uint _anon1)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            var rval = Interop.simple_service_result(_context , x);
+            var rval = Interop.simple_service_method_result(_context , _anon1);
             if (rval != FFIError.Ok)
             {
-                throw new Exception("Something went wrong");
+                throw new Exception($"Something went wrong {rval}");
             }
         }
 
-        public uint Value(uint x)
+        public uint MethodValue(uint x)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            return Interop.simple_service_value(_context, x);
+            return Interop.simple_service_method_value(_context, x);
         }
 
-        public byte MutSelf(Sliceu8 slice)
+        public void MethodVoid()
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            return Interop.simple_service_mut_self(_context, slice);
+            Interop.simple_service_method_void(_context);
+        }
+
+        public byte MethodMutSelf(Sliceu8 slice)
+        {
+            // Debug - write_pattern_service_success_enum_aware_rval 
+            return Interop.simple_service_method_mut_self(_context, slice);
         }
 
         // Debug - write_pattern_service_method_overload 
-        public byte MutSelf(byte[] slice)
+        public byte MethodMutSelf(byte[] slice)
         {
-            return Interop.simple_service_mut_self(_context, slice);
+            return Interop.simple_service_method_mut_self(_context, slice);
         }
 
-        public void MutSelfVoid(SliceBool slice)
+        public void MethodMutSelfVoid(SliceBool _slice)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            Interop.simple_service_mut_self_void(_context, slice);
+            Interop.simple_service_method_mut_self_void(_context, _slice);
         }
 
         // Debug - write_pattern_service_method_overload 
-        public void MutSelfVoid(Bool[] slice)
+        public void MethodMutSelfVoid(Bool[] _slice)
         {
-            Interop.simple_service_mut_self_void(_context, slice);
+            Interop.simple_service_method_mut_self_void(_context, _slice);
         }
 
-        public byte MutSelfRef(ref byte x, out byte _y)
+        public byte MethodMutSelfRef(ref byte x, out byte _y)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            return Interop.simple_service_mut_self_ref(_context, ref x, out _y);
+            return Interop.simple_service_method_mut_self_ref(_context, ref x, out _y);
         }
 
-        public byte MutSelfRefSlice(ref byte x, out byte _y, Sliceu8 _slice)
+        public byte MethodMutSelfRefSlice(ref byte x, out byte _y, Sliceu8 _slice)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            return Interop.simple_service_mut_self_ref_slice(_context, ref x, out _y, _slice);
+            return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out _y, _slice);
         }
 
         // Debug - write_pattern_service_method_overload 
-        public byte MutSelfRefSlice(ref byte x, out byte _y, byte[] _slice)
+        public byte MethodMutSelfRefSlice(ref byte x, out byte _y, byte[] _slice)
         {
-            return Interop.simple_service_mut_self_ref_slice(_context, ref x, out _y, _slice);
+            return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out _y, _slice);
         }
 
-        public byte MutSelfRefSliceLimited(ref byte x, out byte _y, Sliceu8 _slice, Sliceu8 _slice2)
+        public byte MethodMutSelfRefSliceLimited(ref byte x, out byte _y, Sliceu8 _slice, Sliceu8 _slice2)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            return Interop.simple_service_mut_self_ref_slice_limited(_context, ref x, out _y, _slice, _slice2);
+            return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out _y, _slice, _slice2);
         }
 
         // Debug - write_pattern_service_method_overload 
-        public byte MutSelfRefSliceLimited(ref byte x, out byte _y, byte[] _slice, byte[] _slice2)
+        public byte MethodMutSelfRefSliceLimited(ref byte x, out byte _y, byte[] _slice, byte[] _slice2)
         {
-            return Interop.simple_service_mut_self_ref_slice_limited(_context, ref x, out _y, _slice, _slice2);
+            return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out _y, _slice, _slice2);
         }
 
-        public void MutSelfFfiError(SliceMutu8 slice)
+        public void MethodMutSelfFfiError(SliceMutu8 _slice)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            var rval = Interop.simple_service_mut_self_ffi_error(_context , slice);
+            var rval = Interop.simple_service_method_mut_self_ffi_error(_context , _slice);
             if (rval != FFIError.Ok)
             {
-                throw new Exception("Something went wrong");
+                throw new Exception($"Something went wrong {rval}");
             }
         }
 
         // Debug - write_pattern_service_method_overload 
-        public void MutSelfFfiError(byte[] slice)
+        public void MethodMutSelfFfiError(byte[] _slice)
         {
-            var rval = Interop.simple_service_mut_self_ffi_error(_context, slice);
+            var rval = Interop.simple_service_method_mut_self_ffi_error(_context, _slice);
             if (rval != FFIError.Ok)
             {
                 throw new Exception($"Something went wrong: {rval}");
             }
-        }
-
-        public void Void()
-        {
-            // Debug - write_pattern_service_success_enum_aware_rval 
-            Interop.simple_service_void(_context);
-        }
-
-        /// An extra exposed method.
-        public uint ExtraMethod()
-        {
-            // Debug - write_pattern_service_success_enum_aware_rval 
-            return Interop.simple_service_extra_method(_context);
         }
 
         public IntPtr Context => _context;

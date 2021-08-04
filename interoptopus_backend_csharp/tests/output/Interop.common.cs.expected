@@ -36,35 +36,35 @@ namespace My.Company.Common
     // Debug - write_type_definition_composite 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct FFISliceFFIBool
+    public partial struct SliceBool
     {
         IntPtr data;
         ulong len;
     }
 
     // Debug - write_pattern_slice 
-    public partial struct FFISliceFFIBool : IEnumerable<FFIBool>
+    public partial struct SliceBool : IEnumerable<Bool>
     {
-        public FFISliceFFIBool(GCHandle handle, ulong count)
+        public SliceBool(GCHandle handle, ulong count)
         {
             this.data = handle.AddrOfPinnedObject();
             this.len = count;
         }
-        public FFIBool this[int i]
+        public Bool this[int i]
         {
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(FFIBool));
+                var size = Marshal.SizeOf(typeof(Bool));
                 var ptr = new IntPtr(data.ToInt64() + i * size);
-                return Marshal.PtrToStructure<FFIBool>(ptr);
+                return Marshal.PtrToStructure<Bool>(ptr);
             }
         }
-        public FFIBool[] Copied
+        public Bool[] Copied
         {
             get
             {
-                var rval = new FFIBool[len];
+                var rval = new Bool[len];
                 for (var i = 0; i < (int) len; i++) {
                     rval[i] = this[i];
                 }
@@ -72,7 +72,7 @@ namespace My.Company.Common
             }
         }
         public int Count => (int) len;
-        public IEnumerator<FFIBool> GetEnumerator()
+        public IEnumerator<Bool> GetEnumerator()
         {
             for (var i = 0; i < (int)len; ++i)
             {
@@ -89,16 +89,16 @@ namespace My.Company.Common
     // Debug - write_type_definition_composite 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct FFISliceu32
+    public partial struct Sliceu32
     {
         IntPtr data;
         ulong len;
     }
 
     // Debug - write_pattern_slice 
-    public partial struct FFISliceu32 : IEnumerable<uint>
+    public partial struct Sliceu32 : IEnumerable<uint>
     {
-        public FFISliceu32(GCHandle handle, ulong count)
+        public Sliceu32(GCHandle handle, ulong count)
         {
             this.data = handle.AddrOfPinnedObject();
             this.len = count;
@@ -142,16 +142,16 @@ namespace My.Company.Common
     // Debug - write_type_definition_composite 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct FFISliceu8
+    public partial struct Sliceu8
     {
         IntPtr data;
         ulong len;
     }
 
     // Debug - write_pattern_slice 
-    public partial struct FFISliceu8 : IEnumerable<byte>
+    public partial struct Sliceu8 : IEnumerable<byte>
     {
-        public FFISliceu8(GCHandle handle, ulong count)
+        public Sliceu8(GCHandle handle, ulong count)
         {
             this.data = handle.AddrOfPinnedObject();
             this.len = count;
@@ -195,16 +195,16 @@ namespace My.Company.Common
     // Debug - write_type_definition_composite 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct FFISliceMutu8
+    public partial struct SliceMutu8
     {
         IntPtr data;
         ulong len;
     }
 
     // Debug - write_pattern_slice_mut 
-    public partial struct FFISliceMutu8 : IEnumerable<byte>
+    public partial struct SliceMutu8 : IEnumerable<byte>
     {
-        public FFISliceMutu8(GCHandle handle, ulong count)
+        public SliceMutu8(GCHandle handle, ulong count)
         {
             this.data = handle.AddrOfPinnedObject();
             this.len = count;
@@ -255,10 +255,10 @@ namespace My.Company.Common
     // Debug - write_type_definition_ffibool 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct FFIBool
+    public partial struct Bool
     {
-        public static readonly FFIBool True = new FFIBool { value =  1 };
-        public static readonly FFIBool False = new FFIBool { value =  0 };
+        public static readonly Bool True = new Bool { value =  1 };
+        public static readonly Bool False = new Bool { value =  0 };
         byte value;
         public bool Is => value == 1;
     }
@@ -266,15 +266,15 @@ namespace My.Company.Common
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate byte CallbackFFISlice(FFISliceu8 x0);
+    public delegate byte CallbackFFISlice(Sliceu8 x0);
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate Vec3f32 CallbackHugeVecSlice(FFISliceVec3f32 x0);
+    public delegate Vec3f32 CallbackHugeVecSlice(SliceVec3f32 x0);
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void CallbackSliceMut(FFISliceMutu8 x0);
+    public delegate void CallbackSliceMut(SliceMutu8 x0);
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]

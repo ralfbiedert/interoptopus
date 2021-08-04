@@ -33,7 +33,6 @@ typedef struct my_library_generic3 my_library_generic3;
 typedef struct my_library_generic4 my_library_generic4;
 typedef struct my_library_opaque my_library_opaque;
 typedef struct my_library_simpleservice my_library_simpleservice;
-typedef struct my_library_somecontext my_library_somecontext;
 typedef struct my_library_empty my_library_empty;
 
 typedef enum my_library_ffierror
@@ -258,25 +257,18 @@ my_library_inner pattern_ffi_option_2(my_library_optioninner ffi_slice);
 uint8_t pattern_ffi_bool(uint8_t ffi_bool);
 void pattern_my_api_init_v1(my_library_myapiv1* api);
 uint64_t pattern_api_guard();
-void simple_service_ext_util(my_library_simpleservice* _ptr);
 uint32_t pattern_callback_1(my_library_fptr_fn_u32_rval_u32 callback, uint32_t x);
-my_library_ffierror pattern_service_create(my_library_somecontext** context_ptr, uint32_t value);
-my_library_ffierror pattern_service_destroy(my_library_somecontext** context_ptr);
-uint32_t pattern_service_method(my_library_somecontext* context);
-my_library_ffierror pattern_service_method_success_enum_ok(my_library_somecontext* _context);
-my_library_ffierror pattern_service_method_success_enum_fail(my_library_somecontext* _context);
-my_library_ffierror simple_service_create(my_library_simpleservice** context_ptr, uint32_t x);
-my_library_ffierror simple_service_destroy(my_library_simpleservice** context_ptr);
-my_library_ffierror simple_service_result(my_library_simpleservice* context_ptr, uint32_t x);
-uint32_t simple_service_value(my_library_simpleservice* context_ptr, uint32_t x);
-uint8_t simple_service_mut_self(my_library_simpleservice* context_ptr, my_library_sliceu8 slice);
-void simple_service_mut_self_void(my_library_simpleservice* context_ptr, my_library_slicebool slice);
-uint8_t simple_service_mut_self_ref(my_library_simpleservice* context_ptr, uint8_t* x, uint8_t* _y);
-uint8_t simple_service_mut_self_ref_slice(my_library_simpleservice* context_ptr, uint8_t* x, uint8_t* _y, my_library_sliceu8 _slice);
-uint8_t simple_service_mut_self_ref_slice_limited(my_library_simpleservice* context_ptr, uint8_t* x, uint8_t* _y, my_library_sliceu8 _slice, my_library_sliceu8 _slice2);
-my_library_ffierror simple_service_mut_self_ffi_error(my_library_simpleservice* context_ptr, my_library_slicemutu8 slice);
-void simple_service_void(my_library_simpleservice* context_ptr);
-uint32_t simple_service_extra_method(my_library_simpleservice* _context);
+my_library_ffierror simple_service_new_with(my_library_simpleservice** context, uint32_t some_value);
+my_library_ffierror simple_service_simple_service_destroy(my_library_simpleservice** context);
+my_library_ffierror simple_service_method_result(my_library_simpleservice* context, uint32_t _anon1);
+uint32_t simple_service_method_value(my_library_simpleservice* context, uint32_t x);
+void simple_service_method_void(my_library_simpleservice* context);
+uint8_t simple_service_method_mut_self(my_library_simpleservice* context, my_library_sliceu8 slice);
+void simple_service_method_mut_self_void(my_library_simpleservice* context, my_library_slicebool _slice);
+uint8_t simple_service_method_mut_self_ref(my_library_simpleservice* context, uint8_t* x, uint8_t* _y);
+uint8_t simple_service_method_mut_self_ref_slice(my_library_simpleservice* context, uint8_t* x, uint8_t* _y, my_library_sliceu8 _slice);
+uint8_t simple_service_method_mut_self_ref_slice_limited(my_library_simpleservice* context, uint8_t* x, uint8_t* _y, my_library_sliceu8 _slice, my_library_sliceu8 _slice2);
+my_library_ffierror simple_service_method_mut_self_ffi_error(my_library_simpleservice* context, my_library_slicemutu8 _slice);
 
 #ifdef __cplusplus
 }

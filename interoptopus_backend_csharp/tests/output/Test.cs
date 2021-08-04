@@ -82,10 +82,8 @@ namespace interop_test
         {
             var x = new SimpleService(123);
             var b = new byte[] { 1, 2, 3 } ;
-
-            x.MutSelfFfiError(b);
             
-            Interop.simple_service_ext_util(x.Context);
+            x.MethodMutSelfFfiError(b);
         }
 
     }

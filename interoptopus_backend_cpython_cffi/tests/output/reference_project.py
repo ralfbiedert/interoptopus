@@ -26,7 +26,6 @@ typedef struct cffi_generic3 cffi_generic3;
 typedef struct cffi_generic4 cffi_generic4;
 typedef struct cffi_opaque cffi_opaque;
 typedef struct cffi_simpleservice cffi_simpleservice;
-typedef struct cffi_somecontext cffi_somecontext;
 typedef struct cffi_empty cffi_empty;
 
 typedef enum cffi_ffierror
@@ -251,25 +250,18 @@ cffi_inner pattern_ffi_option_2(cffi_optioninner ffi_slice);
 uint8_t pattern_ffi_bool(uint8_t ffi_bool);
 void pattern_my_api_init_v1(cffi_myapiv1* api);
 uint64_t pattern_api_guard();
-void simple_service_ext_util(cffi_simpleservice* _ptr);
 uint32_t pattern_callback_1(cffi_fptr_fn_u32_rval_u32 callback, uint32_t x);
-cffi_ffierror pattern_service_create(cffi_somecontext** context_ptr, uint32_t value);
-cffi_ffierror pattern_service_destroy(cffi_somecontext** context_ptr);
-uint32_t pattern_service_method(cffi_somecontext* context);
-cffi_ffierror pattern_service_method_success_enum_ok(cffi_somecontext* _context);
-cffi_ffierror pattern_service_method_success_enum_fail(cffi_somecontext* _context);
-cffi_ffierror simple_service_create(cffi_simpleservice** context_ptr, uint32_t x);
-cffi_ffierror simple_service_destroy(cffi_simpleservice** context_ptr);
-cffi_ffierror simple_service_result(cffi_simpleservice* context_ptr, uint32_t x);
-uint32_t simple_service_value(cffi_simpleservice* context_ptr, uint32_t x);
-uint8_t simple_service_mut_self(cffi_simpleservice* context_ptr, cffi_sliceu8 slice);
-void simple_service_mut_self_void(cffi_simpleservice* context_ptr, cffi_slicebool slice);
-uint8_t simple_service_mut_self_ref(cffi_simpleservice* context_ptr, uint8_t* x, uint8_t* _y);
-uint8_t simple_service_mut_self_ref_slice(cffi_simpleservice* context_ptr, uint8_t* x, uint8_t* _y, cffi_sliceu8 _slice);
-uint8_t simple_service_mut_self_ref_slice_limited(cffi_simpleservice* context_ptr, uint8_t* x, uint8_t* _y, cffi_sliceu8 _slice, cffi_sliceu8 _slice2);
-cffi_ffierror simple_service_mut_self_ffi_error(cffi_simpleservice* context_ptr, cffi_slicemutu8 slice);
-void simple_service_void(cffi_simpleservice* context_ptr);
-uint32_t simple_service_extra_method(cffi_simpleservice* _context);
+cffi_ffierror simple_service_new_with(cffi_simpleservice** context, uint32_t some_value);
+cffi_ffierror simple_service_simple_service_destroy(cffi_simpleservice** context);
+cffi_ffierror simple_service_method_result(cffi_simpleservice* context, uint32_t _anon1);
+uint32_t simple_service_method_value(cffi_simpleservice* context, uint32_t x);
+void simple_service_method_void(cffi_simpleservice* context);
+uint8_t simple_service_method_mut_self(cffi_simpleservice* context, cffi_sliceu8 slice);
+void simple_service_method_mut_self_void(cffi_simpleservice* context, cffi_slicebool _slice);
+uint8_t simple_service_method_mut_self_ref(cffi_simpleservice* context, uint8_t* x, uint8_t* _y);
+uint8_t simple_service_method_mut_self_ref_slice(cffi_simpleservice* context, uint8_t* x, uint8_t* _y, cffi_sliceu8 _slice);
+uint8_t simple_service_method_mut_self_ref_slice_limited(cffi_simpleservice* context, uint8_t* x, uint8_t* _y, cffi_sliceu8 _slice, cffi_sliceu8 _slice2);
+cffi_ffierror simple_service_method_mut_self_ffi_error(cffi_simpleservice* context, cffi_slicemutu8 _slice);
 """
 
 
@@ -1317,13 +1309,6 @@ Parameter x must point to valid data."""
         global _api
         return _api.pattern_api_guard()
 
-    def simple_service_ext_util(_ptr):
-        """"""
-        global _api
-        if hasattr(_ptr, "_ctx"):
-            _ptr = _ptr._ctx[0]
-        return _api.simple_service_ext_util(_ptr)
-
     def pattern_callback_1(callback, x):
         """"""
         global _api
@@ -1333,126 +1318,99 @@ Parameter x must point to valid data."""
             x = x._ctx[0]
         return _api.pattern_callback_1(callback, x)
 
-    def pattern_service_create(context_ptr, value):
-        """"""
-        global _api
-        if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx[0]
-        if hasattr(value, "_ctx"):
-            value = value._ctx[0]
-        return _api.pattern_service_create(context_ptr, value)
-
-    def pattern_service_destroy(context_ptr):
-        """# Safety
-
-This function may only be called with a context returned by a succeeding `pattern_service_create`."""
-        global _api
-        if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx[0]
-        return _api.pattern_service_destroy(context_ptr)
-
-    def pattern_service_method(context):
+    def simple_service_new_with(context, some_value):
         """"""
         global _api
         if hasattr(context, "_ctx"):
             context = context._ctx[0]
-        return _api.pattern_service_method(context)
+        if hasattr(some_value, "_ctx"):
+            some_value = some_value._ctx[0]
+        return _api.simple_service_new_with(context, some_value)
 
-    def pattern_service_method_success_enum_ok(_context):
+    def simple_service_simple_service_destroy(context):
+        """Destroys the given instance.
+
+# Safety
+
+The passed parameter MUST have been created with the corresponding init function;
+passing any other value results in undefined behavior."""
+        global _api
+        if hasattr(context, "_ctx"):
+            context = context._ctx[0]
+        return _api.simple_service_simple_service_destroy(context)
+
+    def simple_service_method_result(context, _anon1):
         """"""
         global _api
-        if hasattr(_context, "_ctx"):
-            _context = _context._ctx[0]
-        return _api.pattern_service_method_success_enum_ok(_context)
+        if hasattr(context, "_ctx"):
+            context = context._ctx[0]
+        if hasattr(_anon1, "_ctx"):
+            _anon1 = _anon1._ctx[0]
+        return _api.simple_service_method_result(context, _anon1)
 
-    def pattern_service_method_success_enum_fail(_context):
+    def simple_service_method_value(context, x):
         """"""
         global _api
-        if hasattr(_context, "_ctx"):
-            _context = _context._ctx[0]
-        return _api.pattern_service_method_success_enum_fail(_context)
-
-    def simple_service_create(context_ptr, x):
-        """"""
-        global _api
-        if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx[0]
+        if hasattr(context, "_ctx"):
+            context = context._ctx[0]
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
-        return _api.simple_service_create(context_ptr, x)
+        return _api.simple_service_method_value(context, x)
 
-    def simple_service_destroy(context_ptr):
+    def simple_service_method_void(context):
         """"""
         global _api
-        if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx[0]
-        return _api.simple_service_destroy(context_ptr)
+        if hasattr(context, "_ctx"):
+            context = context._ctx[0]
+        return _api.simple_service_method_void(context)
 
-    def simple_service_result(context_ptr, x):
+    def simple_service_method_mut_self(context, slice):
         """"""
         global _api
-        if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx[0]
-        if hasattr(x, "_ctx"):
-            x = x._ctx[0]
-        return _api.simple_service_result(context_ptr, x)
-
-    def simple_service_value(context_ptr, x):
-        """"""
-        global _api
-        if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx[0]
-        if hasattr(x, "_ctx"):
-            x = x._ctx[0]
-        return _api.simple_service_value(context_ptr, x)
-
-    def simple_service_mut_self(context_ptr, slice):
-        """"""
-        global _api
-        if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx[0]
+        if hasattr(context, "_ctx"):
+            context = context._ctx[0]
         if hasattr(slice, "_ctx"):
             slice = slice._ctx[0]
-        return _api.simple_service_mut_self(context_ptr, slice)
+        return _api.simple_service_method_mut_self(context, slice)
 
-    def simple_service_mut_self_void(context_ptr, slice):
+    def simple_service_method_mut_self_void(context, _slice):
         """"""
         global _api
-        if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx[0]
-        if hasattr(slice, "_ctx"):
-            slice = slice._ctx[0]
-        return _api.simple_service_mut_self_void(context_ptr, slice)
+        if hasattr(context, "_ctx"):
+            context = context._ctx[0]
+        if hasattr(_slice, "_ctx"):
+            _slice = _slice._ctx[0]
+        return _api.simple_service_method_mut_self_void(context, _slice)
 
-    def simple_service_mut_self_ref(context_ptr, x, _y):
+    def simple_service_method_mut_self_ref(context, x, _y):
         """"""
         global _api
-        if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx[0]
+        if hasattr(context, "_ctx"):
+            context = context._ctx[0]
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         if hasattr(_y, "_ctx"):
             _y = _y._ctx[0]
-        return _api.simple_service_mut_self_ref(context_ptr, x, _y)
+        return _api.simple_service_method_mut_self_ref(context, x, _y)
 
-    def simple_service_mut_self_ref_slice(context_ptr, x, _y, _slice):
+    def simple_service_method_mut_self_ref_slice(context, x, _y, _slice):
         """"""
         global _api
-        if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx[0]
+        if hasattr(context, "_ctx"):
+            context = context._ctx[0]
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         if hasattr(_y, "_ctx"):
             _y = _y._ctx[0]
         if hasattr(_slice, "_ctx"):
             _slice = _slice._ctx[0]
-        return _api.simple_service_mut_self_ref_slice(context_ptr, x, _y, _slice)
+        return _api.simple_service_method_mut_self_ref_slice(context, x, _y, _slice)
 
-    def simple_service_mut_self_ref_slice_limited(context_ptr, x, _y, _slice, _slice2):
+    def simple_service_method_mut_self_ref_slice_limited(context, x, _y, _slice, _slice2):
         """"""
         global _api
-        if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx[0]
+        if hasattr(context, "_ctx"):
+            context = context._ctx[0]
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         if hasattr(_y, "_ctx"):
@@ -1461,89 +1419,29 @@ This function may only be called with a context returned by a succeeding `patter
             _slice = _slice._ctx[0]
         if hasattr(_slice2, "_ctx"):
             _slice2 = _slice2._ctx[0]
-        return _api.simple_service_mut_self_ref_slice_limited(context_ptr, x, _y, _slice, _slice2)
+        return _api.simple_service_method_mut_self_ref_slice_limited(context, x, _y, _slice, _slice2)
 
-    def simple_service_mut_self_ffi_error(context_ptr, slice):
+    def simple_service_method_mut_self_ffi_error(context, _slice):
         """"""
         global _api
-        if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx[0]
-        if hasattr(slice, "_ctx"):
-            slice = slice._ctx[0]
-        return _api.simple_service_mut_self_ffi_error(context_ptr, slice)
-
-    def simple_service_void(context_ptr):
-        """"""
-        global _api
-        if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx[0]
-        return _api.simple_service_void(context_ptr)
-
-    def simple_service_extra_method(_context):
-        """An extra exposed method."""
-        global _api
-        if hasattr(_context, "_ctx"):
-            _context = _context._ctx[0]
-        return _api.simple_service_extra_method(_context)
+        if hasattr(context, "_ctx"):
+            context = context._ctx[0]
+        if hasattr(_slice, "_ctx"):
+            _slice = _slice._ctx[0]
+        return _api.simple_service_method_mut_self_ffi_error(context, _slice)
 
 
-
-
-
-class SomeContext(object):
-    def __init__(self, value):
-        """"""
-        global _api, ffi
-        if hasattr(value, "_ctx"):
-            value = value._ctx
-        self.ctx = ffi.new("cffi_somecontext**")
-        rval = raw.pattern_service_create(self.ctx, value)
-        if rval == FFIError.Ok:
-            return None
-        else:
-            raise Exception(f"return value ${rval}")
-
-    def __del__(self):
-        global _api, ffi
-        rval = raw.pattern_service_destroy(self.ctx, )
-        if rval == FFIError.Ok:
-            return None
-        else:
-            raise Exception(f"return value ${rval}")
-
-    def method(self, ):
-        """"""
-        global raw
-        return _api.pattern_service_method(self.ctx[0], )
-
-    def method_success_enum_ok(self, ):
-        """"""
-        global raw
-        rval = raw.pattern_service_method_success_enum_ok(self.ctx[0], )
-        if rval == FFIError.Ok:
-            return None
-        else:
-            raise Exception(f"return value ${rval}")
-
-    def method_success_enum_fail(self, ):
-        """"""
-        global raw
-        rval = raw.pattern_service_method_success_enum_fail(self.ctx[0], )
-        if rval == FFIError.Ok:
-            return None
-        else:
-            raise Exception(f"return value ${rval}")
 
 
 
 class SimpleService(object):
-    def __init__(self, x):
+    def __init__(self, some_value):
         """"""
         global _api, ffi
-        if hasattr(x, "_ctx"):
-            x = x._ctx
+        if hasattr(some_value, "_ctx"):
+            some_value = some_value._ctx
         self.ctx = ffi.new("cffi_simpleservice**")
-        rval = raw.simple_service_create(self.ctx, x)
+        rval = raw.simple_service_new_with(self.ctx, some_value)
         if rval == FFIError.Ok:
             return None
         else:
@@ -1551,69 +1449,64 @@ class SimpleService(object):
 
     def __del__(self):
         global _api, ffi
-        rval = raw.simple_service_destroy(self.ctx, )
+        rval = raw.simple_service_simple_service_destroy(self.ctx, )
         if rval == FFIError.Ok:
             return None
         else:
             raise Exception(f"return value ${rval}")
 
-    def result(self, x):
+    def method_result(self, _anon1):
         """"""
         global raw
-        rval = raw.simple_service_result(self.ctx[0], x)
+        rval = raw.simple_service_method_result(self.ctx[0], _anon1)
         if rval == FFIError.Ok:
             return None
         else:
             raise Exception(f"return value ${rval}")
 
-    def value(self, x):
+    def method_value(self, x):
         """"""
         global raw
-        return _api.simple_service_value(self.ctx[0], x)
+        return _api.simple_service_method_value(self.ctx[0], x)
 
-    def mut_self(self, slice):
+    def method_void(self, ):
         """"""
         global raw
-        return _api.simple_service_mut_self(self.ctx[0], slice)
+        return _api.simple_service_method_void(self.ctx[0], )
 
-    def mut_self_void(self, slice):
+    def method_mut_self(self, slice):
         """"""
         global raw
-        return _api.simple_service_mut_self_void(self.ctx[0], slice)
+        return _api.simple_service_method_mut_self(self.ctx[0], slice)
 
-    def mut_self_ref(self, x, _y):
+    def method_mut_self_void(self, _slice):
         """"""
         global raw
-        return _api.simple_service_mut_self_ref(self.ctx[0], x, _y)
+        return _api.simple_service_method_mut_self_void(self.ctx[0], _slice)
 
-    def mut_self_ref_slice(self, x, _y, _slice):
+    def method_mut_self_ref(self, x, _y):
         """"""
         global raw
-        return _api.simple_service_mut_self_ref_slice(self.ctx[0], x, _y, _slice)
+        return _api.simple_service_method_mut_self_ref(self.ctx[0], x, _y)
 
-    def mut_self_ref_slice_limited(self, x, _y, _slice, _slice2):
+    def method_mut_self_ref_slice(self, x, _y, _slice):
         """"""
         global raw
-        return _api.simple_service_mut_self_ref_slice_limited(self.ctx[0], x, _y, _slice, _slice2)
+        return _api.simple_service_method_mut_self_ref_slice(self.ctx[0], x, _y, _slice)
 
-    def mut_self_ffi_error(self, slice):
+    def method_mut_self_ref_slice_limited(self, x, _y, _slice, _slice2):
         """"""
         global raw
-        rval = raw.simple_service_mut_self_ffi_error(self.ctx[0], slice)
+        return _api.simple_service_method_mut_self_ref_slice_limited(self.ctx[0], x, _y, _slice, _slice2)
+
+    def method_mut_self_ffi_error(self, _slice):
+        """"""
+        global raw
+        rval = raw.simple_service_method_mut_self_ffi_error(self.ctx[0], _slice)
         if rval == FFIError.Ok:
             return None
         else:
             raise Exception(f"return value ${rval}")
-
-    def void(self, ):
-        """"""
-        global raw
-        return _api.simple_service_void(self.ctx[0], )
-
-    def extra_method(self, ):
-        """An extra exposed method."""
-        global raw
-        return _api.simple_service_extra_method(self.ctx[0], )
 
 
 
