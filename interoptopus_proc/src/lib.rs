@@ -72,7 +72,7 @@ use syn::{parse_macro_input, AttributeArgs};
 ///
 /// | Pattern | On |  Explanation |
 /// | --- | --- | ---  |
-/// | `success_enum` | `enum` | Denotes this as a [`SuccessEnum`](interoptopus::patterns::successenum::SuccessEnum). |
+/// | `ffi_error` | `enum` | Denotes this as a [`FFIError`](interoptopus::patterns::result::FFIError). |
 ///
 /// # Examples
 ///
@@ -184,6 +184,9 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
     rval.into()
 }
 
+/// Make a `impl Service {}` block a FFI service.<sup>🚧</sup>
+///
+/// TODO
 #[proc_macro_attribute] // Can now be used as `#[my_attribute]`
 pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = proc_macro2::TokenStream::from(item);
@@ -194,11 +197,13 @@ pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
     rval.into()
 }
 
+/// Inside a `#[ffi_service]` block, mark the FFI constructor.<sup>🚧</sup>
 #[proc_macro_attribute]
 pub fn ffi_service_ctor(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
 
+/// Inside a `#[ffi_service]` block, provide special directives to functions.<sup>🚧</sup>
 #[proc_macro_attribute]
 pub fn ffi_service_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item

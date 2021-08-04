@@ -1,6 +1,6 @@
-//! Defines a helper function ensuring the bindings match the used DLL.
+//! Defines a helper function ensuring the bindings match the used DLL.<sup>🚧</sup>
 //!
-//! For details, see [`pattern_api_hash`].
+//! For details, see [`pattern_api_guard`].
 //!
 use crate::lang::c::CType;
 use crate::lang::rust::CTypeInfo;
