@@ -21,9 +21,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 12225367733384105346ul)
+            if (api_version != 17496670553516700726ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (12225367733384105346). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (17496670553516700726). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -123,7 +123,7 @@ namespace My.Company
 
         // Debug - write_function 
         /// # Safety
-        /// 
+        ///
         /// Parameter x must point to valid data.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ptr_mut")]
         public static extern IntPtr ptr_mut(out long x);
@@ -402,6 +402,7 @@ namespace My.Company
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
+        /// The constructor must return a `Result<Self, Error>`.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_new_with")]
         public static extern FFIError simple_service_new_with(ref IntPtr context, uint some_value);
 
@@ -409,9 +410,9 @@ namespace My.Company
 
         // Debug - write_function 
         /// Destroys the given instance.
-        /// 
+        ///
         /// # Safety
-        /// 
+        ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_simple_service_destroy")]
@@ -420,6 +421,8 @@ namespace My.Company
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
+        /// Methods returning a Result<(), _> are the default and do not
+        /// need annotations.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_result")]
         public static extern FFIError simple_service_method_result(IntPtr context, uint _anon1);
 
@@ -432,6 +435,9 @@ namespace My.Company
         // Debug - write_function_overloaded 
 
         // Debug - write_function 
+        /// This method should be documented.
+        ///
+        /// Multiple lines.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_void")]
         public static extern void simple_service_method_void(IntPtr context);
 
@@ -456,6 +462,7 @@ namespace My.Company
         }
 
         // Debug - write_function 
+        /// Single line.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_void")]
         public static extern void simple_service_method_mut_self_void(IntPtr context, SliceBool _slice);
 
@@ -868,9 +875,11 @@ namespace My.Company
 
 
     // Debug - write_pattern_service 
+    /// Some struct we want to expose as a class.
     public partial class SimpleService : IDisposable
     {
         private IntPtr _context;
+        /// The constructor must return a `Result<Self, Error>`.
         public SimpleService(uint some_value)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
@@ -891,6 +900,8 @@ namespace My.Company
             }
         }
 
+        /// Methods returning a Result<(), _> are the default and do not
+        /// need annotations.
         public void MethodResult(uint _anon1)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
@@ -907,6 +918,9 @@ namespace My.Company
             return Interop.simple_service_method_value(_context, x);
         }
 
+        /// This method should be documented.
+        ///
+        /// Multiple lines.
         public void MethodVoid()
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
@@ -925,12 +939,14 @@ namespace My.Company
             return Interop.simple_service_method_mut_self(_context, slice);
         }
 
+        /// Single line.
         public void MethodMutSelfVoid(SliceBool _slice)
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
             Interop.simple_service_method_mut_self_void(_context, _slice);
         }
 
+        /// Single line.
         // Debug - write_pattern_service_method_overload 
         public void MethodMutSelfVoid(Bool[] _slice)
         {

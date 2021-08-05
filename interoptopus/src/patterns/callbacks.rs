@@ -2,7 +2,7 @@
 //!
 //! # Code Generation
 //!
-//! The macro [**`pattern_callback`**](crate::pattern_callback) enables two use cases:
+//! The macro [**`callback`**](crate::callback) enables two use cases:
 //!
 //! - On the **Rust** side it will generate a new function-pointer type with better compatibility
 //! with respect to lifetimes in signatures, and accepting an unlimited number of args.
@@ -44,18 +44,18 @@
 //! The reasons for this are somewhat technical, but it boils down to us being unable to generally
 //! implement [`CTypeInfo`](crate::lang::rust::CTypeInfo) for _all_ types you may want to use;
 //! [`FFISlice`](crate::patterns::slice::FFISlice) here being one of them.
-//! To fix this, you can replace `pub type CallbackSlice = ...` with a `pattern_callback!` call
+//! To fix this, you can replace `pub type CallbackSlice = ...` with a `callback!` call
 //! which should generate a helper type that works.
 //!
 //! # Example
 //!
 //! Here is how the example above would be expressed instead:
 //!
-//! ```
-//! use interoptopus::{ffi_function, pattern_callback};
+//!```
+//! use interoptopus::{ffi_function, callback};
 //! use interoptopus::patterns::slice::FFISlice;
 //!
-//! pattern_callback!(CallbackSlice(x: FFISlice<u8>) -> ());
+//! callback!(CallbackSlice(x: FFISlice<u8>) -> ());
 //!
 //! #[ffi_function]
 //! pub extern "C" fn my_function(callback: CallbackSlice) {
@@ -99,10 +99,10 @@ impl NamedCallback {
 /// This defines a type `MyCallback` with a parameter `slice` returning an `u8`.
 ///
 /// ```
-/// use interoptopus::pattern_callback;
+/// use interoptopus::callback;
 /// use interoptopus::patterns::slice::FFISlice;
 ///
-/// pattern_callback!(MyCallback(slice: FFISlice<u8>) -> u8);
+/// callback!(MyCallback(slice: FFISlice<u8>) -> u8);
 /// ```
 ///
 /// The generated type definition similar to:
@@ -113,7 +113,7 @@ impl NamedCallback {
 /// pub struct MyCallback(Option<extern "C" fn(FFISlice<u8>) -> u8>);
 /// ```
 #[macro_export]
-macro_rules! pattern_callback {
+macro_rules! callback {
     ($name:ident($($param:ident: $ty:ty),*) -> $rval:ty) => {
         #[repr(transparent)]
         pub struct $name(Option<extern "C" fn($($ty),*) -> $rval>);

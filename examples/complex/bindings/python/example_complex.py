@@ -72,18 +72,18 @@ def init_api(dll):
 
 
 
-# Call for a friend.
+#  Call for a friend.
 THE_MAGIC_CONSTANT = 666
 
 
 class FFIError:
-    """Possible errors in our library."""
+    """ Possible errors in our library."""
     Ok = 0
     NullPointerPassed = 10
 
 
 class SuperComplexEntity(object):
-    """A vector used in our game engine."""
+    """ A vector used in our game engine."""
     def __init__(self):
         global _api, ffi
         self._ctx = ffi.new("cffi_supercomplexentity[]", 1)
@@ -127,7 +127,7 @@ class SuperComplexEntity(object):
 
     @property
     def some_str(self):
-        """Point to an ASCII encoded whatnot."""
+        """ Point to an ASCII encoded whatnot."""
         return self._ctx[0].some_str
 
     @some_str.setter
@@ -199,7 +199,7 @@ class ThirdPartyVecF32(object):
         self._ctx[0].w = value
 
 class Vec3(object):
-    """A vector used in our game engine."""
+    """ A vector used in our game engine."""
     def __init__(self):
         global _api, ffi
         self._ctx = ffi.new("cffi_vec3[]", 1)
@@ -242,7 +242,7 @@ class Vec3(object):
         self._ctx[0].z = value
 
 class WithForeignType(object):
-    """A type containing a third-party type."""
+    """ A type containing a third-party type."""
     def __init__(self):
         global _api, ffi
         self._ctx = ffi.new("cffi_withforeigntype[]", 1)
@@ -286,41 +286,41 @@ class callbacks:
 class raw:
     """Raw access to all exported functions."""
     def example_api_version():
-        """Returns the version of this API."""
+        """ Returns the version of this API."""
         global _api
         return _api.example_api_version()
 
     def example_always_fails():
-        """A function that always fails."""
+        """ A function that always fails."""
         global _api
         return _api.example_always_fails()
 
     def example_create_context(context_ptr):
-        """Creates a new instance of this library."""
+        """ Creates a new instance of this library."""
         global _api
         if hasattr(context_ptr, "_ctx"):
             context_ptr = context_ptr._ctx[0]
         return _api.example_create_context(context_ptr)
 
     def example_destroy_context(context_ptr):
-        """Deletes an existing instance of this library.
+        """ Deletes an existing instance of this library.
 
-You **must** ensure that `context_ptr` is being called with the context produced by
-`example_create_context`, otherwise bad things will happen."""
+ You **must** ensure that `context_ptr` is being called with the context produced by
+ `example_create_context`, otherwise bad things will happen."""
         global _api
         if hasattr(context_ptr, "_ctx"):
             context_ptr = context_ptr._ctx[0]
         return _api.example_destroy_context(context_ptr)
 
     def example_print_score(context):
-        """Prints the current player score."""
+        """ Prints the current player score."""
         global _api
         if hasattr(context, "_ctx"):
             context = context._ctx[0]
         return _api.example_print_score(context)
 
     def example_return_score(context, score):
-        """Updates the score."""
+        """ Updates the score."""
         global _api
         if hasattr(context, "_ctx"):
             context = context._ctx[0]
@@ -329,7 +329,7 @@ You **must** ensure that `context_ptr` is being called with the context produced
         return _api.example_return_score(context, score)
 
     def example_update_score_by_callback(context, update):
-        """Updates the score."""
+        """ Updates the score."""
         global _api
         if hasattr(context, "_ctx"):
             context = context._ctx[0]
@@ -338,7 +338,7 @@ You **must** ensure that `context_ptr` is being called with the context produced
         return _api.example_update_score_by_callback(context, update)
 
     def example_write_foreign_type(context, foreign):
-        """Accepts some foreign types."""
+        """ Accepts some foreign types."""
         global _api
         if hasattr(context, "_ctx"):
             context = context._ctx[0]

@@ -1,6 +1,6 @@
-use interoptopus::{ffi_function, pattern_callback};
+use interoptopus::{callback, ffi_function};
 
-pattern_callback!(MyCallback(x: u32) -> u32);
+callback!(MyCallback(x: u32) -> u32);
 
 #[ffi_function]
 #[no_mangle]

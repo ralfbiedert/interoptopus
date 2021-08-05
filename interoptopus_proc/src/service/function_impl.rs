@@ -1,5 +1,5 @@
 use crate::service::Attributes;
-use crate::util::purge_lifetimes_from_type;
+use crate::util::{extract_doc_lines, purge_lifetimes_from_type};
 use darling::FromMeta;
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
@@ -71,6 +71,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
     let ffi_fn_ident = Ident::new(&format!("{}{}", attributes.prefix, orig_fn_ident.to_string()), function.span());
     let error_ident = Ident::new(&attributes.error, function.span());
     let without_lifetimes = purge_lifetimes_from_type(&*impl_block.self_ty);
+    let doc_lines = extract_doc_lines(&function.attrs);
 
     let rval = match &function.sig.output {
         ReturnType::Default => quote! { () },
@@ -117,6 +118,9 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
             quote! {
                 #[interoptopus::ffi_function]
                 #[no_mangle]
+                #(
+                    #[doc = #doc_lines]
+                )*
                 pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #error_ident {
 
                     let result_result = std::panic::catch_unwind(|| {
@@ -150,6 +154,9 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 quote! {
                     #[interoptopus::ffi_function]
                     #[no_mangle]
+                    #(
+                        #[doc = #doc_lines]
+                    )*
                     pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #rval {
                         let result_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                             <#without_lifetimes>::#orig_fn_ident( #(#arg_names),* )
@@ -168,6 +175,9 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 quote! {
                     #[interoptopus::ffi_function]
                     #[no_mangle]
+                    #(
+                        #[doc = #doc_lines]
+                    )*
                     pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #error_ident {
                         ::interoptopus::patterns::result::panics_and_errors_to_ffi_enum(|| {
                             <#without_lifetimes>::#orig_fn_ident( #(#arg_names),* )

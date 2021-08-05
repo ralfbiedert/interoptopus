@@ -36,7 +36,7 @@ namespace My.Company
 
 
         /// Deletes an existing instance of this library.
-        /// 
+        ///
         /// You **must** ensure that `context_ptr` is being called with the context produced by
         /// `example_create_context`, otherwise bad things will happen.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_destroy_context")]

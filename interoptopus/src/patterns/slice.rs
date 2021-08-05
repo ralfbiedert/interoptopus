@@ -140,6 +140,12 @@ where
     }
 }
 
+impl<'a, T> From<&'a mut [T]> for FFISliceMut<'a, T> {
+    fn from(slice: &'a mut [T]) -> Self {
+        Self::from_slice(slice)
+    }
+}
+
 impl<'a, T> Deref for FFISliceMut<'a, T> {
     type Target = [T];
 

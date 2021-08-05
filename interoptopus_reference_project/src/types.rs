@@ -4,7 +4,7 @@ use interoptopus::lang::c::{CType, CompositeType, Field, PrimitiveType};
 use interoptopus::lang::rust::CTypeInfo;
 use interoptopus::patterns::ascii_pointer::AsciiPointer;
 use interoptopus::patterns::slice::FFISlice;
-use interoptopus::{ffi_type, pattern_callback};
+use interoptopus::{callback, ffi_type};
 use std::fmt::Debug;
 use std::marker::PhantomData;
 
@@ -214,7 +214,7 @@ pub type Callbacku8u8 = extern "C" fn(u8) -> u8;
 // This does not work since we can't express the for<'x> bounds in our CTypeInfo implementation.
 // pub type CallbackFFISlice = extern "C" fn(FFISlice<u8>) -> u8;
 
-pattern_callback!(CallbackFFISlice(slice: FFISlice<u8>) -> u8);
+callback!(CallbackFFISlice(slice: FFISlice<u8>) -> u8);
 
 pub mod ambiguous1 {
     use interoptopus::ffi_type;

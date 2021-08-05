@@ -130,7 +130,7 @@ pub trait CSharpWriter {
 
     fn write_documentation(&self, w: &mut IndentWriter, documentation: &Documentation) -> Result<(), Error> {
         for line in documentation.lines() {
-            indented!(w, r#"/// {}"#, line)?;
+            indented!(w, r#"///{}"#, line)?;
         }
 
         Ok(())
@@ -853,8 +853,6 @@ pub trait CSharpWriter {
         }
 
         let context = if deref_context { "_context".to_string() } else { "ref _context".to_string() };
-
-        dbg!(function.signature());
 
         match function.signature().rval() {
             CType::Pattern(TypePattern::FFIErrorEnum(e)) => {

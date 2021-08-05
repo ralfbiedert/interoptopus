@@ -18,7 +18,7 @@ impl Display for Error {
 
 impl std::error::Error for Error {}
 
-// Some struct we want to expose as a class.
+/// Some struct we want to expose as a class.
 #[ffi_type(opaque)]
 #[derive(Default)]
 pub struct SimpleService {
@@ -56,6 +56,7 @@ impl SimpleService {
         *slice.as_slice().get(0).unwrap_or(&0)
     }
 
+    /// Single line.
     #[ffi_service_method(direct)]
     pub fn method_mut_self_void(&mut self, _slice: FFISlice<FFIBool>) {}
 

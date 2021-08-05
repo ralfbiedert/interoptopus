@@ -11,7 +11,7 @@ pub fn extract_doc_lines(attributes: &[Attribute]) -> Vec<String> {
             match attr.parse_meta().unwrap() {
                 Meta::NameValue(x) => match x.lit {
                     syn::Lit::Str(x) => {
-                        let the_line = x.value().replacen(" ", "", 1).to_string();
+                        let the_line = x.value().to_string();
                         docs.push(the_line);
                     }
                     _ => panic!("This was a bit unexpected."),

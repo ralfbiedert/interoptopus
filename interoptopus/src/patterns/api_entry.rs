@@ -12,7 +12,7 @@
 /// exporting `f1` and `f2`.
 ///
 /// ```rust
-/// use interoptopus::{pattern_api_entry, ffi_function};
+/// use interoptopus::{api_entry, ffi_function};
 ///
 /// #[ffi_function]
 /// extern "C" fn f1() {}
@@ -20,10 +20,10 @@
 /// #[ffi_function]
 /// extern "C" fn f2() {}
 ///
-/// pattern_api_entry!(MyAPIv1, my_api_init_v1, [f1, f2]);
+/// api_entry!(MyAPIv1, my_api_init_v1, [f1, f2]);
 /// ```
 #[macro_export]
-macro_rules! pattern_api_entry {
+macro_rules! api_entry {
     (
         $struct:ident,
         $init:ident,

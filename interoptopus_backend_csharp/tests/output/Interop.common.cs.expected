@@ -259,6 +259,10 @@ namespace My.Company.Common
     {
         public static readonly Bool True = new Bool { value =  1 };
         public static readonly Bool False = new Bool { value =  0 };
+        public Bool(bool b)
+        {
+            value = (byte) (b ? 1 : 0);
+        }
         byte value;
         public bool Is => value == 1;
     }

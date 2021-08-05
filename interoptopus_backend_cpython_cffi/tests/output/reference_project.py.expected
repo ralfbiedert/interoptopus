@@ -287,7 +287,7 @@ COMPUTED_I32 = -2147483647
 
 
 class EnumDocumented:
-    """Documented enum."""
+    """ Documented enum."""
     A = 0
     B = 1
     C = 2
@@ -506,7 +506,7 @@ class SomeForeignType(object):
         self._ctx[0].x = value
 
 class StructDocumented(object):
-    """Documented struct."""
+    """ Documented struct."""
     def __init__(self):
         global _api, ffi
         self._ctx = ffi.new("cffi_structdocumented[]", 1)
@@ -520,7 +520,7 @@ class StructDocumented(object):
 
     @property
     def x(self):
-        """Documented field."""
+        """ Documented field."""
         return self._ctx[0].x
 
     @x.setter
@@ -1017,9 +1017,9 @@ class raw:
         return _api.ptr(x)
 
     def ptr_mut(x):
-        """# Safety
+        """ # Safety
 
-Parameter x must point to valid data."""
+ Parameter x must point to valid data."""
         global _api
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
@@ -1148,7 +1148,7 @@ Parameter x must point to valid data."""
         return _api.array_1(x)
 
     def documented(_x):
-        """This function has documentation."""
+        """ This function has documentation."""
         global _api
         if hasattr(_x, "_ctx"):
             _x = _x._ctx[0]
@@ -1319,7 +1319,7 @@ Parameter x must point to valid data."""
         return _api.pattern_callback_1(callback, x)
 
     def simple_service_new_with(context, some_value):
-        """"""
+        """ The constructor must return a `Result<Self, Error>`."""
         global _api
         if hasattr(context, "_ctx"):
             context = context._ctx[0]
@@ -1328,19 +1328,20 @@ Parameter x must point to valid data."""
         return _api.simple_service_new_with(context, some_value)
 
     def simple_service_simple_service_destroy(context):
-        """Destroys the given instance.
+        """ Destroys the given instance.
 
-# Safety
+ # Safety
 
-The passed parameter MUST have been created with the corresponding init function;
-passing any other value results in undefined behavior."""
+ The passed parameter MUST have been created with the corresponding init function;
+ passing any other value results in undefined behavior."""
         global _api
         if hasattr(context, "_ctx"):
             context = context._ctx[0]
         return _api.simple_service_simple_service_destroy(context)
 
     def simple_service_method_result(context, _anon1):
-        """"""
+        """ Methods returning a Result<(), _> are the default and do not
+ need annotations."""
         global _api
         if hasattr(context, "_ctx"):
             context = context._ctx[0]
@@ -1358,7 +1359,9 @@ passing any other value results in undefined behavior."""
         return _api.simple_service_method_value(context, x)
 
     def simple_service_method_void(context):
-        """"""
+        """ This method should be documented.
+
+ Multiple lines."""
         global _api
         if hasattr(context, "_ctx"):
             context = context._ctx[0]
@@ -1374,7 +1377,7 @@ passing any other value results in undefined behavior."""
         return _api.simple_service_method_mut_self(context, slice)
 
     def simple_service_method_mut_self_void(context, _slice):
-        """"""
+        """ Single line."""
         global _api
         if hasattr(context, "_ctx"):
             context = context._ctx[0]
@@ -1436,7 +1439,7 @@ passing any other value results in undefined behavior."""
 
 class SimpleService(object):
     def __init__(self, some_value):
-        """"""
+        """ The constructor must return a `Result<Self, Error>`."""
         global _api, ffi
         if hasattr(some_value, "_ctx"):
             some_value = some_value._ctx
@@ -1456,7 +1459,8 @@ class SimpleService(object):
             raise Exception(f"return value ${rval}")
 
     def method_result(self, _anon1):
-        """"""
+        """ Methods returning a Result<(), _> are the default and do not
+ need annotations."""
         global raw
         rval = raw.simple_service_method_result(self.ctx[0], _anon1)
         if rval == FFIError.Ok:
@@ -1470,7 +1474,9 @@ class SimpleService(object):
         return _api.simple_service_method_value(self.ctx[0], x)
 
     def method_void(self, ):
-        """"""
+        """ This method should be documented.
+
+ Multiple lines."""
         global raw
         return _api.simple_service_method_void(self.ctx[0], )
 
@@ -1480,7 +1486,7 @@ class SimpleService(object):
         return _api.simple_service_method_mut_self(self.ctx[0], slice)
 
     def method_mut_self_void(self, _slice):
-        """"""
+        """ Single line."""
         global raw
         return _api.simple_service_method_mut_self_void(self.ctx[0], _slice)
 

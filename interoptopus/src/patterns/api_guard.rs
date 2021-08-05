@@ -1,6 +1,40 @@
-//! Defines a helper function ensuring the bindings match the used DLL.<sup>🚧</sup>
+//! Helper to ensure the bindings match the used DLL.<sup>🚧</sup>
 //!
-//! For details, see [`pattern_api_guard`].
+//!
+//! # Hash Value
+//!
+//! The hash value
+//!
+//! - is based on the signatures of the involved functions, types and constants,
+//! - is expected to change when the API changes, e.g., functions, types, fields, ... are added
+//! changed or removed,
+//! - will even react to benign API changes (e.g., just adding functions),
+//! - might even react to documentation changes (subject to change; feedback welcome).
+//!
+//!
+//! # Example
+//!
+//! This will create a FFI function called `pattern_api_guard`, and backends might automatically
+//! create guards calling this function when loading the DLL.
+//!
+//! ```
+//! use interoptopus::ffi_function;
+//! use interoptopus::patterns::api_guard::APIVersion;
+//!
+//! // Inventory of our exports.
+//! interoptopus::inventory!(
+//!     my_inventory,
+//!     [],
+//!     [ pattern_api_guard ],
+//!     [], []
+//! );
+//!
+//! // Guard function used by backends.
+//! #[ffi_function]
+//! #[no_mangle]
+//! pub extern "C" fn pattern_api_guard() -> APIVersion {
+//!     APIVersion::from_library(&my_inventory())
+//! }
 //!
 use crate::lang::c::CType;
 use crate::lang::rust::CTypeInfo;
@@ -21,65 +55,18 @@ impl APIVersion {
     pub fn new(version: u64) -> Self {
         Self { version }
     }
+
+    /// Create a new API version from the given library.
+    pub fn from_library(library: &Library) -> Self {
+        let version = library_hash(&library);
+        Self { version }
+    }
 }
 
 unsafe impl CTypeInfo for APIVersion {
     fn type_info() -> CType {
         CType::Pattern(TypePattern::APIVersion)
     }
-}
-
-/// Defines a helper function ensuring the bindings match the used DLL.
-///
-/// The generated function can be called manually and will return a `u64` hash value. In addition,
-/// backends might issue an automatic version check when loading the DLL by comparing the version the
-/// DLL reports with the version stored in the interop bindings.
-///
-/// # Hash Value
-///
-/// The hash value
-///
-/// - is based on the signatures of the involved functions, types and constants,
-/// - is expected to change when the API changes, e.g., functions, types, fields, ... are added
-/// changed or removed,
-/// - will even react to benign API changes (e.g., just adding functions),
-/// - might even react to documentation changes (subject to change; feedback welcome).
-///
-///
-/// # Example
-///
-/// This will create a FFI function called `check_abi`, and backends might automatically create
-/// guards calling this function when loading the DLL.
-///
-/// ```
-/// use interoptopus::{inventory, pattern_api_guard, Library};
-///
-/// /// Define an inventory function `my_inventory`.
-/// interoptopus::inventory!(
-///     my_inventory, [],
-///     // Also register `check_abi` below.
-///     [ check_api ],
-///     [], []
-/// );
-///
-/// // Define a guard function called `check_api` and make it use inventory.
-/// // Note: This looks circular, but isn't.
-/// pattern_api_guard!(check_api, my_inventory);
-///
-///
-/// ```
-#[macro_export]
-macro_rules! pattern_api_guard {
-    ($name:ident, $inventory:ident) => {
-        #[::interoptopus::ffi_function]
-        #[no_mangle]
-        pub extern "C" fn $name() -> ::interoptopus::patterns::api_guard::APIVersion {
-            let library = $inventory();
-            let hash = ::interoptopus::patterns::api_guard::library_hash(&library);
-
-            ::interoptopus::patterns::api_guard::APIVersion::new(hash)
-        }
-    };
 }
 
 /// Returns a unique hash for a library.
