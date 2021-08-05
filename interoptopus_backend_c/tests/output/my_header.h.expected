@@ -18,14 +18,14 @@ const int32_t MY_LIBRARY_COMPUTED_I32 = -2147483647;
 
 typedef enum my_library_enumdocumented
     {
-    MY_LIBRARY_A = 0,
-    MY_LIBRARY_B = 1,
-    MY_LIBRARY_C = 2,
+    MY_LIBRARY_ENUMDOCUMENTED_A = 0,
+    MY_LIBRARY_ENUMDOCUMENTED_B = 1,
+    MY_LIBRARY_ENUMDOCUMENTED_C = 2,
     } my_library_enumdocumented;
 
 typedef enum my_library_enumrenamed
     {
-    MY_LIBRARY_X = 0,
+    MY_LIBRARY_ENUMRENAMED_X = 0,
     } my_library_enumrenamed;
 
 typedef struct my_library_generic2u8 my_library_generic2u8;
@@ -37,10 +37,10 @@ typedef struct my_library_empty my_library_empty;
 
 typedef enum my_library_ffierror
     {
-    MY_LIBRARY_OK = 0,
-    MY_LIBRARY_NULL = 100,
-    MY_LIBRARY_PANIC = 200,
-    MY_LIBRARY_FAIL = 300,
+    MY_LIBRARY_FFIERROR_OK = 0,
+    MY_LIBRARY_FFIERROR_NULL = 100,
+    MY_LIBRARY_FFIERROR_PANIC = 200,
+    MY_LIBRARY_FFIERROR_FAIL = 300,
     } my_library_ffierror;
 
 typedef struct my_library_extratypef32

@@ -9,8 +9,8 @@ const uint32_t CFFI_THE_MAGIC_CONSTANT = 666;
 
 typedef enum cffi_ffierror
     {
-    CFFI_OK = 0,
-    CFFI_NULLPOINTERPASSED = 10,
+    CFFI_FFIERROR_OK = 0,
+    CFFI_FFIERROR_NULLPOINTERPASSED = 10,
     } cffi_ffierror;
 
 typedef struct cffi_context cffi_context;

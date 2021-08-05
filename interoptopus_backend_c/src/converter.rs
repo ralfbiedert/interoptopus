@@ -18,7 +18,7 @@ pub trait CTypeConverter {
     /// Converts a Rust enum name such as `Error` to a C# enum name `Error`.
     fn enum_to_typename(&self, x: &EnumType) -> String;
 
-    fn enum_variant_to_name(&self, x: &Variant) -> String;
+    fn enum_variant_to_name(&self, the_enum: &EnumType, x: &Variant) -> String;
 
     /// TODO Converts an opaque Rust struct `Context` to a C# struct ``.
     fn opaque_to_typename(&self, opaque: &OpaqueType) -> String;
@@ -65,8 +65,8 @@ impl CTypeConverter for Converter {
         format!("{}{}", self.config().prefix, x.rust_name().to_string()).to_lowercase()
     }
 
-    fn enum_variant_to_name(&self, x: &Variant) -> String {
-        format!("{}{}", self.config().prefix, x.name().to_string()).to_uppercase()
+    fn enum_variant_to_name(&self, the_enum: &EnumType, x: &Variant) -> String {
+        format!("{}{}_{}", self.config().prefix, the_enum.rust_name(), x.name().to_string()).to_uppercase()
     }
 
     fn opaque_to_typename(&self, x: &OpaqueType) -> String {

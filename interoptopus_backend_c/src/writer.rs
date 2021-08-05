@@ -184,8 +184,8 @@ pub trait CWriter {
         indented!(w, [_], "}} {};", name)
     }
 
-    fn write_type_definition_enum_variant(&self, w: &mut IndentWriter, variant: &Variant, _the_type: &EnumType) -> Result<(), Error> {
-        let variant_name = self.converter().enum_variant_to_name(variant);
+    fn write_type_definition_enum_variant(&self, w: &mut IndentWriter, variant: &Variant, the_enum: &EnumType) -> Result<(), Error> {
+        let variant_name = self.converter().enum_variant_to_name(the_enum, variant);
         let variant_value = variant.value();
 
         indented!(w, r#"{} = {},"#, variant_name, variant_value)

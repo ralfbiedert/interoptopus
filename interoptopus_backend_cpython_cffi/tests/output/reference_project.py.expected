@@ -11,14 +11,14 @@ const int32_t CFFI_COMPUTED_I32 = -2147483647;
 
 typedef enum cffi_enumdocumented
     {
-    CFFI_A = 0,
-    CFFI_B = 1,
-    CFFI_C = 2,
+    CFFI_ENUMDOCUMENTED_A = 0,
+    CFFI_ENUMDOCUMENTED_B = 1,
+    CFFI_ENUMDOCUMENTED_C = 2,
     } cffi_enumdocumented;
 
 typedef enum cffi_enumrenamed
     {
-    CFFI_X = 0,
+    CFFI_ENUMRENAMED_X = 0,
     } cffi_enumrenamed;
 
 typedef struct cffi_generic2u8 cffi_generic2u8;
@@ -30,10 +30,10 @@ typedef struct cffi_empty cffi_empty;
 
 typedef enum cffi_ffierror
     {
-    CFFI_OK = 0,
-    CFFI_NULL = 100,
-    CFFI_PANIC = 200,
-    CFFI_FAIL = 300,
+    CFFI_FFIERROR_OK = 0,
+    CFFI_FFIERROR_NULL = 100,
+    CFFI_FFIERROR_PANIC = 200,
+    CFFI_FFIERROR_FAIL = 300,
     } cffi_ffierror;
 
 typedef struct cffi_extratypef32

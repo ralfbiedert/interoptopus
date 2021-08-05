@@ -19,8 +19,8 @@ const uint32_t THE_MAGIC_CONSTANT = 666;
 
 typedef enum ffierror
     {
-    OK = 0,
-    NULLPOINTERPASSED = 10,
+    FFIERROR_OK = 0,
+    FFIERROR_NULLPOINTERPASSED = 10,
     } ffierror;
 
 typedef struct context context;
