@@ -305,6 +305,10 @@ pub trait CSharpWriter {
         indented!(w, r#"{{"#)?;
         indented!(w, [_], r#"public static readonly {} True = new Bool {{ value =  1 }};"#, type_name)?;
         indented!(w, [_], r#"public static readonly {} False = new Bool {{ value =  0 }};"#, type_name)?;
+        indented!(w, [_], r#"public Bool(bool b)"#)?;
+        indented!(w, [_], r#"{{"#)?;
+        indented!(w, [_ _ ], r#"value = (byte) (b ? 1 : 0);"#)?;
+        indented!(w, [_], r#"}}"#)?;
         indented!(w, [_], r#"byte value;"#)?;
         indented!(w, [_], r#"public bool Is => value == 1;"#)?;
         indented!(w, r#"}}"#)?;
@@ -849,6 +853,8 @@ pub trait CSharpWriter {
         }
 
         let context = if deref_context { "_context".to_string() } else { "ref _context".to_string() };
+
+        dbg!(function.signature());
 
         match function.signature().rval() {
             CType::Pattern(TypePattern::FFIErrorEnum(e)) => {

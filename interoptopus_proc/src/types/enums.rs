@@ -74,7 +74,7 @@ pub fn ffi_type_enum(attributes: &Attributes, input: TokenStream, item: ItemEnum
 
     let variant_infos = derive_variant_info(item, &variant_idents, &variant_names, &variant_values, &variant_docs);
 
-    let ctype_info_return = if attributes.patterns.contains_key("result") {
+    let ctype_info_return = if attributes.patterns.contains_key("ffi_error") {
         quote! {
             use interoptopus::patterns::result::FFIError as _;
             let success_variant = Self::SUCCESS.variant_info();

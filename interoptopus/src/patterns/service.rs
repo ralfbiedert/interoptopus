@@ -80,12 +80,12 @@ impl Service {
 
         match self.constructor.signature().rval() {
             CType::Pattern(TypePattern::FFIErrorEnum(_)) => {}
-            _ => panic!("Constructor must return a success enum."),
+            _ => panic!("Constructor must return a `ffi_error` type pattern."),
         }
 
         match self.destructor.signature().rval() {
             CType::Pattern(TypePattern::FFIErrorEnum(_)) => {}
-            _ => panic!("Destructor must return a success enum."),
+            _ => panic!("Destructor must return a `ffi_error` type pattern."),
         }
     }
 

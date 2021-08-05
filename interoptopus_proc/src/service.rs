@@ -96,6 +96,8 @@ pub fn ffi_service(attr: AttributeArgs, input: TokenStream) -> TokenStream {
                     ctor, dtor, methods,
                 );
 
+                service.assert_valid();
+
                 ::interoptopus::patterns::LibraryPattern::Service(service)
             }
         }

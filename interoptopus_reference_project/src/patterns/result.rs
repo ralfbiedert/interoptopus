@@ -1,6 +1,6 @@
 use interoptopus::ffi_type;
 
-#[ffi_type(patterns(result))]
+#[ffi_type(patterns(ffi_error))]
 #[repr(C)]
 pub enum FFIError {
     Ok = 0,
