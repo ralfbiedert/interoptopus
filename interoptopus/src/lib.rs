@@ -216,22 +216,22 @@ macro_rules! inventory {
         [
         $(
             $const:path
-        ),*
+        ),* $(,)?
         ],
         [
         $(
             $function:path
-        ),*
+        ),* $(,)?
         ],
         [
         $(
             $extra_type:ty
-        ),*
+        ),* $(,)?
         ],
         [
         $(
             $pattern:path
-        ),*
+        ),* $(,)?
         ]
     ) => {
         #[doc(hidden)]
