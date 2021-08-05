@@ -11,6 +11,7 @@ documentation = "https://docs.rs/interoptopus/"
 repository = "https://github.com/ralfbiedert/interoptopus"
 
 [features]
+default = ["derive"]
 derive = ["interoptopus_proc"]
 testing = ["cc"]
 
