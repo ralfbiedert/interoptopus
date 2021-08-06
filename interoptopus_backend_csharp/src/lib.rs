@@ -55,7 +55,7 @@ mod config;
 mod converter;
 mod writer;
 
-pub use crate::config::Config;
+pub use crate::config::{Config, WriteTypes};
 pub use crate::converter::{CSharpTypeConverter, Converter};
 pub use crate::writer::CSharpWriter;
 

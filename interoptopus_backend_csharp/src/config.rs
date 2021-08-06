@@ -1,5 +1,16 @@
 use interoptopus::util::NamespaceMappings;
 
+/// The types to write for the given recorder.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum WriteTypes {
+    /// Only write items defined in the library for this namespace.
+    Namespace,
+    /// Write types in this namespace and global interoptopus types (e.g., FFIBool)
+    NamespaceAndInteroptopusGlobal,
+    /// Write every type in the library, regardless of namespace association.
+    All,
+}
+
 /// Configures C# code generation.
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -20,8 +31,8 @@ pub struct Config {
     /// If this is not set, interop generation with arrays in structr will fail. This is a somewhat
     /// open issue w.r.t Unity-sans-unsafe support and feedback would be greatly welcome!
     pub unroll_struct_arrays: bool,
-    /// Write types defined in Interoptopus.
-    pub write_global_types: bool,
+    /// Which types to write.
+    pub write_types: WriteTypes,
     /// Also generate markers for easier debugging
     pub debug: bool,
 }
@@ -38,7 +49,7 @@ impl Default for Config {
             namespace_id: "".to_string(),
             emit_rust_visibility: false,
             unroll_struct_arrays: false,
-            write_global_types: true,
+            write_types: WriteTypes::NamespaceAndInteroptopusGlobal,
             debug: false,
         }
     }

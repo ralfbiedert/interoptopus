@@ -3,6 +3,7 @@ use interoptopus::testing::csharp::run_dotnet_command_if_installed;
 use interoptopus::util::NamespaceMappings;
 use interoptopus::Error;
 use interoptopus::Interop;
+use interoptopus_backend_csharp::WriteTypes;
 
 fn generate_bindings_multi(prefix: &str) -> Result<(), Error> {
     use interoptopus_backend_csharp::{Config, Generator};
@@ -22,9 +23,15 @@ fn generate_bindings_multi(prefix: &str) -> Result<(), Error> {
     for namespace_id in library.namespaces() {
         let file_name = format!("{}.{}.cs", prefix, namespace_id).replace("..", ".");
 
+        let write_types = if namespace_id.is_empty() {
+            WriteTypes::Namespace
+        } else {
+            WriteTypes::NamespaceAndInteroptopusGlobal
+        };
+
         let config = Config {
             namespace_id: namespace_id.clone(),
-            write_global_types: !namespace_id.is_empty(),
+            write_types,
             ..config.clone()
         };
 

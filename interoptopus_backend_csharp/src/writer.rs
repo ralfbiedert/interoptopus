@@ -1,4 +1,4 @@
-use crate::config::Config;
+use crate::config::{Config, WriteTypes};
 use crate::converter::{CSharpTypeConverter, Converter};
 use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, Meta, PrimitiveType, Variant, Visibility};
 use interoptopus::patterns::api_guard::library_hash;
@@ -473,7 +473,11 @@ pub trait CSharpWriter {
     }
 
     fn should_emit_delegate(&self) -> bool {
-        self.config().namespace_id.is_empty()
+        match self.config().write_types {
+            WriteTypes::Namespace => false,
+            WriteTypes::NamespaceAndInteroptopusGlobal => self.config().namespace_id.is_empty(),
+            WriteTypes::All => true,
+        }
     }
 
     fn has_emittable_functions(&self, functions: &[Function]) -> bool {
@@ -486,12 +490,16 @@ pub trait CSharpWriter {
     }
 
     fn should_emit_by_type(&self, t: &CType) -> bool {
+        if self.config().write_types == WriteTypes::All {
+            return true;
+        }
+
         if is_global_type(t) {
-            return self.config().write_global_types;
+            return self.config().write_types == WriteTypes::NamespaceAndInteroptopusGlobal;
         }
 
         match t {
-            CType::Primitive(_) => self.config().write_global_types,
+            CType::Primitive(_) => self.config().write_types == WriteTypes::NamespaceAndInteroptopusGlobal,
             CType::Array(_) => false,
             CType::Enum(x) => self.should_emit_by_meta(x.meta()),
             CType::Opaque(x) => self.should_emit_by_meta(x.meta()),
@@ -506,7 +514,7 @@ pub trait CSharpWriter {
                 TypePattern::Slice(x) => self.should_emit_by_meta(x.meta()),
                 TypePattern::SliceMut(x) => self.should_emit_by_meta(x.meta()),
                 TypePattern::Option(x) => self.should_emit_by_meta(x.meta()),
-                TypePattern::Bool => self.config().write_global_types,
+                TypePattern::Bool => self.config().write_types == WriteTypes::NamespaceAndInteroptopusGlobal,
                 TypePattern::NamedCallback(_) => true,
             },
         }
