@@ -21,9 +21,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 17496670553516700726ul)
+            if (api_version != 9589975498115539482ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (17496670553516700726). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (9589975498115539482). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -415,8 +415,8 @@ namespace My.Company
         ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_simple_service_destroy")]
-        public static extern FFIError simple_service_simple_service_destroy(ref IntPtr context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_destroy")]
+        public static extern FFIError simple_service_destroy(ref IntPtr context);
 
         // Debug - write_function_overloaded 
 
@@ -893,7 +893,7 @@ namespace My.Company
         public void Dispose()
         {
             // Debug - write_pattern_service_success_enum_aware_rval 
-            var rval = Interop.simple_service_simple_service_destroy(ref _context );
+            var rval = Interop.simple_service_destroy(ref _context );
             if (rval != FFIError.Ok)
             {
                 throw new Exception($"Something went wrong {rval}");

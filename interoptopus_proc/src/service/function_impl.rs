@@ -197,7 +197,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
 }
 
 pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> Descriptor {
-    let ffi_fn_ident = Ident::new(&format!("{}simple_service_destroy", attributes.prefix), impl_block.span());
+    let ffi_fn_ident = Ident::new(&format!("{}destroy", attributes.prefix), impl_block.span());
     let error_ident = Ident::new(&attributes.error, impl_block.span());
     let without_lifetimes = purge_lifetimes_from_type(&*impl_block.self_ty);
 

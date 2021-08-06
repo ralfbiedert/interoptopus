@@ -122,6 +122,7 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
                     Type::Group(x) => x.to_token_stream(),
                     Type::Ptr(x) => x.to_token_stream(),
                     Type::Array(x) => x.to_token_stream(),
+                    Type::BareFn(x) => x.to_token_stream(),
                     _ => {
                         panic!("Unsupported type at interface boundary found for parameter: {:?}.", pat.ty)
                     }

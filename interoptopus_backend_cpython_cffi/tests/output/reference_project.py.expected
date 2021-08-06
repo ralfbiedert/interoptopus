@@ -252,7 +252,7 @@ void pattern_my_api_init_v1(cffi_myapiv1* api);
 uint64_t pattern_api_guard();
 uint32_t pattern_callback_1(cffi_fptr_fn_u32_rval_u32 callback, uint32_t x);
 cffi_ffierror simple_service_new_with(cffi_simpleservice** context, uint32_t some_value);
-cffi_ffierror simple_service_simple_service_destroy(cffi_simpleservice** context);
+cffi_ffierror simple_service_destroy(cffi_simpleservice** context);
 cffi_ffierror simple_service_method_result(cffi_simpleservice* context, uint32_t _anon1);
 uint32_t simple_service_method_value(cffi_simpleservice* context, uint32_t x);
 void simple_service_method_void(cffi_simpleservice* context);
@@ -1327,7 +1327,7 @@ class raw:
             some_value = some_value._ctx[0]
         return _api.simple_service_new_with(context, some_value)
 
-    def simple_service_simple_service_destroy(context):
+    def simple_service_destroy(context):
         """ Destroys the given instance.
 
  # Safety
@@ -1337,7 +1337,7 @@ class raw:
         global _api
         if hasattr(context, "_ctx"):
             context = context._ctx[0]
-        return _api.simple_service_simple_service_destroy(context)
+        return _api.simple_service_destroy(context)
 
     def simple_service_method_result(context, _anon1):
         """ Methods returning a Result<(), _> are the default and do not
@@ -1452,7 +1452,7 @@ class SimpleService(object):
 
     def __del__(self):
         global _api, ffi
-        rval = raw.simple_service_simple_service_destroy(self.ctx, )
+        rval = raw.simple_service_destroy(self.ctx, )
         if rval == FFIError.Ok:
             return None
         else:
