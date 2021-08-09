@@ -5,6 +5,17 @@ use quote::{quote, ToTokens};
 use syn::spanned::Spanned;
 use syn::{GenericParam, ItemStruct, Type};
 
+fn assert_valid_repr(attributes: &Attributes, item: &ItemStruct) {
+    // Opaques don't need any #[repr] annotation
+    if attributes.opaque {
+        return;
+    }
+
+    if item.attrs.iter().find(|x| x.to_token_stream().to_string().contains("repr")).is_none() {
+        panic!("Struct {} must have `#[repr()] annotation.", item.ident);
+    }
+}
+
 // Various Struct examples
 //
 // ```
@@ -47,6 +58,7 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
     let doc_line = extract_doc_lines(&item.attrs).join("\n");
 
     attributes.assert_valid();
+    assert_valid_repr(attributes, &item);
 
     let struct_ident_str = item.ident.to_string();
     let struct_ident = syn::Ident::new(&struct_ident_str, item.ident.span());
