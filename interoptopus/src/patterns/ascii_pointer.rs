@@ -10,6 +10,8 @@ use std::option::Option::None;
 use std::os::raw::c_char;
 use std::ptr::null;
 
+static EMPTY: &[u8] = b"\0";
+
 /// Represents a `*const char` on FFI level pointing to an `0x0` terminated ASCII string.
 #[repr(transparent)]
 #[derive(Debug)]
@@ -28,9 +30,11 @@ impl<'a> Default for AsciiPointer<'a> {
 }
 
 impl<'a> AsciiPointer<'a> {
-    /// Create a new `null` ascii pointer.
-    pub fn null() -> Self {
-        Self::default()
+    pub fn empty() -> Self {
+        Self {
+            ptr: EMPTY.as_ptr().cast(),
+            _phandom: Default::default(),
+        }
     }
 
     /// Create a pointer from a CStr.
@@ -73,10 +77,8 @@ mod test {
         let s = "hello world";
         let cstr = CString::new(s).unwrap();
 
-        let ptr_none = AsciiPointer::null();
         let ptr_some = AsciiPointer::from_cstr(&cstr);
 
-        assert_eq!(None, ptr_none.as_c_str());
         assert_eq!(s, ptr_some.as_str().unwrap());
     }
 }
