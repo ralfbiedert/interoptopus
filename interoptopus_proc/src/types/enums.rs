@@ -1,8 +1,15 @@
 use crate::types::Attributes;
 use crate::util::extract_doc_lines;
+use darling::ToTokens;
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use syn::{Expr, ItemEnum, Lit};
+
+fn assert_valid_repr(_attributes: &Attributes, item: &ItemEnum) {
+    if !item.attrs.iter().any(|x| x.to_token_stream().to_string().contains("repr")) {
+        panic!("Enum {} must have `#[repr()] annotation.", item.ident);
+    }
+}
 
 fn derive_variant_info(item: ItemEnum, idents: &[Ident], names: &[String], values: &[i32], docs: &[String]) -> TokenStream {
     let span = item.ident.span();
@@ -29,6 +36,7 @@ pub fn ffi_type_enum(attributes: &Attributes, input: TokenStream, item: ItemEnum
     let doc_line = extract_doc_lines(&item.attrs).join("\n");
 
     attributes.assert_valid();
+    assert_valid_repr(attributes, &item);
 
     let span = item.ident.span();
     let name = item.ident.to_string();
