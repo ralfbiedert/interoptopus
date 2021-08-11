@@ -211,13 +211,19 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
         #[interoptopus::ffi_function]
         #[no_mangle]
         pub unsafe extern "C" fn #ffi_fn_ident(context: &mut *mut #without_lifetimes) -> #error_ident {
-            {
+            let result_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                 unsafe { Box::from_raw(*context) };
-            }
+            }));
 
             *context = ::std::ptr::null_mut();
 
-            <#error_ident as ::interoptopus::patterns::result::FFIError>::SUCCESS
+            match result_result {
+                Ok(_) => <#error_ident as ::interoptopus::patterns::result::FFIError>::SUCCESS,
+                Err(e) => {
+                    ::interoptopus::util::log_error(|| format!("Panic in ({}): {:?}", stringify!(#ffi_fn_ident), e));
+                    <#error_ident as ::interoptopus::patterns::result::FFIError>::PANIC
+                }
+            }
         }
     };
 
