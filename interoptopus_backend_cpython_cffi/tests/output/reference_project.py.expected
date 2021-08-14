@@ -1,10 +1,6 @@
 from cffi import FFI
 
 api_definition = """
-
-
-
-
 const uint8_t CFFI_U8 = 255;
 const float CFFI_F32_MIN_POSITIVE = 0.000000000000000000000000000000000000011754944;
 const int32_t CFFI_COMPUTED_I32 = -2147483647;

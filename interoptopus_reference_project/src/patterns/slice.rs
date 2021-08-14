@@ -5,7 +5,6 @@ use interoptopus::{callback, ffi_function};
 static HUGE_VEC_SLICE: [Vec3f32; 100_000] = [Vec3f32 { x: 0.0, y: 0.0, z: 0.0 }; 100_000];
 
 callback!(CallbackHugeVecSlice(slice: FFISlice<Vec3f32>) -> Vec3f32);
-
 callback!(CallbackSliceMut(slice: FFISliceMut<'_, u8>) -> ());
 
 #[ffi_function]
@@ -62,8 +61,6 @@ mod test {
     fn test_pattern_ffi_slice_3<'a>() {
         let mut data = [0, 1, 2, 3, 4, 5];
 
-        // Not even its mother would love this ...
-        // let x: extern "C" fn(FFISliceMut<'a, u8>) -> () = f;
         let jfc: extern "C" fn(FFISliceMut<'_, u8>) -> () = f;
 
         pattern_ffi_slice_3(FFISliceMut::from_slice(&mut data), jfc.into());

@@ -1,10 +1,6 @@
 from cffi import FFI
 
 api_definition = """
-
-
-
-
 const uint32_t CFFI_THE_MAGIC_CONSTANT = 666;
 
 typedef enum cffi_ffierror

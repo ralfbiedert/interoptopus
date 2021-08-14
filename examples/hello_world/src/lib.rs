@@ -15,6 +15,6 @@ pub extern "C" fn my_function(input: Vec2) -> Vec2 {
     input
 }
 
-// This will create a function `ffi_inventory` which can produce
-// an abstract FFI representation (called `Library`) of this crate.
+// This will create a function `my_inventory` which can produce
+// an abstract FFI representation (called `Library`) for this crate.
 interoptopus::inventory!(my_inventory, [], [my_function], [], []);

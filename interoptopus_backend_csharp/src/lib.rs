@@ -1,56 +1,108 @@
 //! Generates C# bindings for [Interoptopus](https://github.com/ralfbiedert/interoptopus).
 //!
-//! ## Usage
+//! # Usage
 //!
-//! In your library or a support project add this:
+//! Assuming you have written a crate containing your FFI logic called `example_library_ffi` and
+//! want to generate **C# bindings**, follow the instructions below.
+//!
+//! ### Inside Your Library
+//!
+//! Add [**Interoptopus**](https://crates.io/crates/interoptopus) attributes to the library you have
+//! written, and define an [**inventory**](https://docs.rs/interoptopus/latest/interoptopus/macro.inventory.html)
+//! function listing all symbols you wish to export. An overview of all supported constructs can be found in the
+//! [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src).
+//!
+//! ```rust
+//! use interoptopus::{ffi_function, ffi_type};
+//!
+//! #[ffi_type]
+//! #[repr(C)]
+//! pub struct Vec2 {
+//!     pub x: f32,
+//!     pub y: f32,
+//! }
+//!
+//! #[ffi_function]
+//! #[no_mangle]
+//! pub extern "C" fn my_function(input: Vec2) -> Vec2 {
+//!     input
+//! }
+//!
+//! interoptopus::inventory!(my_inventory, [], [my_function], [], []);
+//! ```
+//!
+//!
+//! Add these to your `Cargo.toml` so the attributes and the binding generator can be found
+//! (note, the mentioned versions might be outdated, we recommend to pick the latest ones):
+//!
+//! ```toml
+//! [dependencies]
+//! interoptopus = "0.7"
+//! interoptopus_backend_csharp = "0.7"
+//! ```
+//!
+//! Create a unit test in `tests/bindings.rs` which will generate your bindings when run
+//! with `cargo test`. In real projects you might want to add this code to another crate instead:
 //!
 //! ```
-//! # mod my_crate { use interoptopus::{Library}; pub fn ffi_inventory() -> Library { todo!() } }
-//! use my_crate::ffi_inventory;
+//! use interoptopus::util::NamespaceMappings;
+//! use interoptopus::{Error, Interop};
 //!
 //! #[test]
-//! fn generate_csharp_bindings() {
-//!     use interoptopus::Interop;
-//!     use interoptopus_backend_csharp::{Generator, CSharpWriter, Config};
+//! fn bindings_csharp() -> Result<(), Error> {
+//!     use interoptopus_backend_csharp::{Config, Generator};
 //!
-//!     // Converts an `ffi_inventory()` into C# interop definitions.
-//!     Generator::new(Config::default(), ffi_inventory()).write_to("Interop.cs")
+//!     Generator::new(
+//!         Config {
+//!             dll_name: "example_library".to_string(),
+//!             namespace_mappings: NamespaceMappings::new("My.Company"),
+//!             ..Config::default()
+//!         },
+//!         example_library_ffi::my_inventory(),
+//!     ).write_file("bindings/csharp/Interop.cs")?;
+//!
+//!     Ok(())
 //! }
 //! ```
 //!
-//! And we might produce something like this:
+//! Now run `cargo test`.
 //!
-//! ```cs
-//! using System;
-//! using System.Runtime.InteropServices;
+//! If anything is unclear you can find a [**working sample on Github**](https://github.com/ralfbiedert/interoptopus/tree/master/examples/hello_world).
+//!
+//! ### Generated Output
+//!
+//! The output below is what this backend might generate. Have a look at the [`Config`] struct
+//! if you want to customize something. If you really don't like how something is generated it is
+//! easy to [**create your own**](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md#new-backends).
+//!
+//! ```csharp
+//!using System;
+//!using System.Collections;
+//!using System.Collections.Generic;
+//!using System.Runtime.InteropServices;
+//!using My.Company;
 //!
 //! namespace My.Company
 //! {
-//!     public static class InteropClass
+//!     public static partial class InteropClass
 //!     {
-//!         public const string NativeLib = "hello_world";
+//!         public const string NativeLib = "example_library";
 //!
-//!         /// A function which does something with the vector.
-//!         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "my_game_function")]
-//!         public static extern Vec3f32 my_game_function(ref Vec3f32 input);
+//!         /// Function using the type.
+//!         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "my_function")]
+//!         public static extern Vec2 my_function(Vec2 input);
 //!     }
 //!
+//!     /// A simple type in our FFI layer.
 //!     [Serializable]
 //!     [StructLayout(LayoutKind.Sequential)]
-//!     public partial struct Vec3f32
+//!     public partial struct Vec2
 //!     {
 //!         public float x;
 //!         public float y;
-//!         public float z;
 //!     }
 //! }
 //! ```
-//!
-//! START_INCLUDE
-//! ```csharp,ignore
-#![doc = include_str!("../../examples/hello_world/bindings/csharp/Interop.cs")]
-//! ```
-//! END_INCLUDE
 
 use interoptopus::writer::IndentWriter;
 use interoptopus::Interop;
