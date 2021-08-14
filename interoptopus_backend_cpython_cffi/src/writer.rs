@@ -274,7 +274,16 @@ pub trait PythonWriter {
 
     fn write_c_header(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r#"api_definition = """"#)?;
-        self.c_generator().write_to(w)?;
+
+        let mut c_header: Vec<u8> = Vec::new();
+        let mut ident_writer = IndentWriter::new(&mut c_header);
+
+        self.c_generator().write_to(&mut ident_writer)?;
+
+        let as_string = String::from_utf8(c_header)?;
+
+        writeln!(w.writer(), "{}", as_string.trim())?;
+
         indented!(w, r#"""""#)?;
         Ok(())
     }
