@@ -1,9 +1,8 @@
 use interoptopus::testing::assert_file_matches_generated;
-use interoptopus::testing::csharp::run_dotnet_command_if_installed;
 use interoptopus::util::NamespaceMappings;
 use interoptopus::Error;
 use interoptopus::Interop;
-use interoptopus_backend_csharp::WriteTypes;
+use interoptopus_backend_csharp::{run_dotnet_command_if_installed, WriteTypes};
 
 fn generate_bindings_multi(prefix: &str) -> Result<(), Error> {
     use interoptopus_backend_csharp::{Config, Generator};

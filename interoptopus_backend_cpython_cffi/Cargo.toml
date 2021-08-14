@@ -14,5 +14,5 @@ interoptopus = { path = "../interoptopus", version = "0.7.0" }
 interoptopus_backend_c = { path = "../interoptopus_backend_c", version = "0.7.0" }
 
 [dev-dependencies]
-interoptopus = { path = "../interoptopus", features = ["testing"] }
+interoptopus = { path = "../interoptopus" }
 interoptopus_reference_project = { path = "../interoptopus_reference_project" }

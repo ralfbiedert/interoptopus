@@ -151,11 +151,13 @@ use interoptopus_backend_c::CWriter;
 
 mod config;
 mod converter;
+mod testing;
 mod writer;
 
-pub use crate::writer::PythonWriter;
 pub use config::Config;
 pub use converter::{Converter, PythonTypeConverter};
+pub use testing::run_python_if_installed;
+pub use writer::PythonWriter;
 
 /// **Start here**, main converter implementing [`Interop`].
 pub struct Generator {

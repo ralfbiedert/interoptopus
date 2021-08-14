@@ -1,6 +1,3 @@
-use interoptopus::testing::c::compile_c_app_if_installed;
-use interoptopus::testing::csharp::run_dotnet_command_if_installed;
-use interoptopus::testing::python::run_python_if_installed;
 use interoptopus::util::NamespaceMappings;
 use interoptopus::Error;
 use interoptopus::Interop;
@@ -8,6 +5,7 @@ use interoptopus::Interop;
 #[test]
 #[cfg_attr(miri, ignore)]
 fn bindings_csharp() -> Result<(), Error> {
+    use interoptopus_backend_csharp::run_dotnet_command_if_installed;
     use interoptopus_backend_csharp::{Config, Generator};
 
     Generator::new(
@@ -29,6 +27,7 @@ fn bindings_csharp() -> Result<(), Error> {
 #[test]
 #[cfg_attr(miri, ignore)]
 fn bindings_c() -> Result<(), Error> {
+    use interoptopus_backend_c::compile_c_app_if_installed;
     use interoptopus_backend_c::{Config, Generator};
 
     let custom_defines = r"
@@ -56,6 +55,7 @@ fn bindings_c() -> Result<(), Error> {
 #[test]
 #[cfg_attr(miri, ignore)]
 fn bindings_cpython_cffi() -> Result<(), Error> {
+    use interoptopus_backend_cpython_cffi::run_python_if_installed;
     use interoptopus_backend_cpython_cffi::{Config, Generator};
 
     Generator::new(Config::default(), example_complex::ffi_inventory()).write_file("bindings/python/example_complex.py")?;

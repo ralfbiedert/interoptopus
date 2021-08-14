@@ -13,11 +13,9 @@ repository = "https://github.com/ralfbiedert/interoptopus"
 [features]
 default = ["derive"]
 derive = ["interoptopus_proc"]
-testing = ["cc"]
 
 [dependencies]
 interoptopus_proc = { path = "../interoptopus_proc", version = "0.7.0", optional = true }
-cc = { version = "1.0", optional = true }
 serde = { version = "1.0", optional = true, features = ["derive"] }
 log = { version = "0.4.14", optional = true }
 

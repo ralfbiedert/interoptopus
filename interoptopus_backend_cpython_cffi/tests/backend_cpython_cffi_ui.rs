@@ -1,7 +1,7 @@
 use interoptopus::testing::assert_file_matches_generated;
-use interoptopus::testing::python::run_python_if_installed;
 use interoptopus::Error;
 use interoptopus::Interop;
+use interoptopus_backend_cpython_cffi::run_python_if_installed;
 
 fn generate_bindings(output: &str) -> Result<(), Error> {
     use interoptopus_backend_cpython_cffi::{Config, Generator};

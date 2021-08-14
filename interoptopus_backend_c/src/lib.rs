@@ -113,10 +113,12 @@ use interoptopus::{Error, Library};
 
 mod config;
 mod converter;
+mod testing;
 mod writer;
 
-pub use crate::config::Config;
+pub use config::Config;
 pub use converter::{CTypeConverter, Converter};
+pub use testing::compile_c_app_if_installed;
 pub use writer::CWriter;
 
 /// **Start here**, main converter implementing [`Interop`].

@@ -113,11 +113,13 @@ use interoptopus::{Error, Library};
 
 mod config;
 mod converter;
+mod testing;
 mod writer;
 
-pub use crate::config::{Config, WriteTypes};
-pub use crate::converter::{CSharpTypeConverter, Converter};
-pub use crate::writer::CSharpWriter;
+pub use config::{Config, WriteTypes};
+pub use converter::{CSharpTypeConverter, Converter};
+pub use testing::run_dotnet_command_if_installed;
+pub use writer::CSharpWriter;
 
 /// **Start here**, main converter implementing [`Interop`].
 pub struct Generator {

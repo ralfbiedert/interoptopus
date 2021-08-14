@@ -134,8 +134,6 @@ mod core;
 mod error;
 mod generators;
 pub mod patterns;
-#[cfg(feature = "testing")]
-#[cfg_attr(docsrs, doc(cfg(feature = "testing")))] // does this work?
 pub mod testing;
 pub mod util;
 pub mod writer;
