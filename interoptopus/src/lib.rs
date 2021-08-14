@@ -40,30 +40,29 @@
 //! | C# (incl. Unity) | [**interoptopus_backend_csharp**](https://crates.io/crates/interoptopus_backend_csharp) | [Interop.cs](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_csharp/tests/output/Interop.cs) |
 //! | C | [**interoptopus_backend_c**](https://crates.io/crates/interoptopus_backend_c) | [my_header.h](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_c/tests/output/my_header.h) |
 //! | Python [CFFI](https://cffi.readthedocs.io/en/latest/index.html) | [**interoptopus_backend_cpython_cffi**](https://crates.io/crates/interoptopus_backend_cpython_cffi) | [reference.py](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_cpython_cffi/tests/output/reference_project.py) |
-//! | Your language | Write your own backend<sup>1</sup> | - |
+//! | New language? | Write your own backend<sup>1</sup> | - |
 //!
 //! <sup>1</sup> Create your own backend in just a few hours. No pull request needed. [Pinkie promise](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md#new-backends).
 //!
 //! ## Getting Started 🍼
 //!
-//! If you ...
-//! - want to **create a new API** see the [**example projects**](https://github.com/ralfbiedert/interoptopus/tree/master/examples),
-//! - need to **support a new language** or rewrite a backend, [**copy and adapt the C backend**](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_backend_c).
+//! If you want to ...
+//! - **create a new API** see the [**hello world**](https://github.com/ralfbiedert/interoptopus/tree/master/examples/hello_world),
+//! - **understand what's possible**, see the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src),
+//! - **support a new language**, [**copy the C backend**](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_backend_c).
 //!
 //! ## Features
 //!
 //! - explicit, type-safe, **single source of truth** API definition in Rust,
 //! - **quality-of-life [patterns](crate::patterns)** on **both sides** (e.g., [options](crate::patterns::option), [slices](crate::patterns::slice), [services](crate::patterns::service), ...)
-//! - **minimal on dependencies**, build time, tooling impact,
-//! - if your **project compiles your bindings should work**<sup>&#42;*cough*&#42;</sup> (i.e., generated and callable),
-//! - **extensible**, multiple backends, **easy to support new languages**, fully **customizable**,
-//! - **no scripts needed**, `cargo build` + `cargo test` **can produce and test** (if lang installed) generated bindings
+//! - if your **project compiles your bindings should work**, <sup>&#42;*cough*&#42;</sup>
+//! - easy to support new languages, fully **customizable**,
+//! - **no scripts needed**, works from `cargo build` + `cargo test`.
 //!
 //!
 //! Gated behind **feature flags**, these enable:
 //!
 //! - `derive` - Proc macros such as `ffi_constant`, `ffi_function`, `ffi_type`.
-//! - `testing` - Functions to test generated Python, C#, C from Unit tests.
 //! - `serde` - Serde attributes on internal types.
 //! - `log` - Invoke `log` on FFI errors (you still need actual logger).
 //!
@@ -71,7 +70,7 @@
 //! ## Supported Rust Constructs
 //! See the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src); it lists all supported constructs including:
 //! - [functions](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/functions.rs) (`extern "C"` functions and delegates)
-//! - [types](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/types.rs) (primitives, composite, enums (numeric only), opaques, references, pointers, ...)
+//! - [types](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/types.rs) (composites, enums, opaques, references, pointers, ...)
 //! - [constants](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/constants.rs) (primitive constants; results of const evaluation)
 //! - [patterns](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src/patterns) (ASCII pointers, options, slices, classes, ...)
 //!
@@ -107,8 +106,7 @@
 //!
 //! PRs are welcome.
 //!
-//! - Bug fixes can be submitted directly. Major changes should be filed as issues
-//! first.
+//! - Submit small bug fixes directly. Major changes should be issues first.
 //! - Anything that makes previously working bindings change behavior or stop compiling
 //! is a major change;
 //! - This doesn't mean we're opposed to breaking stuff just that
