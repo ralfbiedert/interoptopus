@@ -1,60 +1,91 @@
 # FAQ
 
 
-## Misc
+## General
+
+- **Why should I use this and not X?**
+
+  As a rule of thumb, if you only need to support a single language (e.g., Python) then 
+  `X` might be better; and you'll probably write FFI bindings tailored to that specific runtime 
+  anyway.
+  However, once you target more than one language everything you do needs to have
+  a proper C representation and this crate aims to give you the best of both worlds, being both
+  universally C-level _and_ reasonably idiomatic in each backend; including Rust.  
+
+
+- **Who's the target audience for this?**
+
+  Anyone writing 'system libraries' that need to be consumable from multiple
+  environments at the same time. Our usage profile is:
+
+  - several libraries with 100+ functions (think Vulkan, OpenXR),
+  - callable from Unity, Unreal, Python,
+  - high "API uncertainty" in the beginning, requiring lots of iterations to get it right,
+  - predictable and "industry-grade" APIs in the end (final bindings ship to customers).
+
+
+- **Where can I ask questions?**
+
+  Use [Github Discussions](https://github.com/ralfbiedert/interoptopus/discussions).
+
+
+
+## Rust Usage
+
 
 - **Why do I get `error[E0658]: macro attributes in #[derive] output are unstable`?**
 
   This happens when `#[ffi_type]` appears after `#derive[...]`. Just switch their order.
 
 
-- **Why do I get `use of undeclared crate or module` in `inventory_function!()`?**
+- **Why do I get `use of undeclared crate or module` in `inventory!()`?**
 
   You probably forgot to declare one of your items `#[ffi_function]` or `#[ffi_const]`.
 
 
-- **Who's the target audience for this?**
-  
-  Anyone writing 'system libraries' that need to be consumable from multiple 
-  environments at the same time. Our usage profile is:
-  
-  - several libraries with 100+ functions (think Vulkan, OpenXR), 
-  - callable from Unity, Unreal, Python,
-  - high "API uncertainty" in the beginning, requiring lots of iterations to get it right,  
-  - predictable and "industry-grade" APIs in the end (final bindings ship to customers).
-
-
-- **Where can I ask questions?**
-
-  Use [Github Discussions](https://github.com/ralfbiedert/interoptopus/discussions). 
-
-
-- **How does it work?**
-
-  As  [answered by Alex Hirsekorn](https://www.quora.com/How-does-an-octopus-eat-a-crab-without-getting-cuts?share=1):
-  - When a GPO [Giant Pacific Octopus] finds a crab it does something called a “flaring web-over” which uses the webbing between the arms to engulf the crab while simultaneously immobilizing the crab’s claws with its suckers.
-  - With the crab in what amounts to a sealed bag the GPO spits one of its two types of saliva into that space. This first saliva is called cephalotoxin and acts as a sedative, rendering the crab unconscious but still alive. [If the crab is taken away from the GPO at this point it will wake up and run away.]
-  - The GPO then spits the other kind of saliva into the crab; that saliva is a powerful digestive enzyme. Since the crab is still alive at this point it pumps that enzyme throughout its body and basically digests itself on the GPO’s behalf. The octopus typically takes a nap during this stage.
-  - After some period of time (I’ve seen this vary from 1.5 to 3 hours) the GPO wakes up, disassembles the crab, and licks out what amounts to crab meat Jell-O with a tongue-like structure called a radula. As Kathleen said the GPO does the disassembly with its suckers but it doesn’t just open the carapace: It will also take the claws and legs apart at the various joints.
-  - When the meal is finished and the shell parts tossed out the GPO will take another nap until it’s hungry again. [Studies have shown that a GPO spends as much as 70% of its time sleeping in its den.]
-
-  Occasionally a GPO will get minor injuries from capturing the crab but, for the most part they are too careful and too skilled for that to be much of an issue.
-
-  After the GPO has rested, FFI bindings are produced.
-
-
 - **How can I add a new pattern?**
-  
-  Adding support for new patterns is best done via a PR. Patterns mimicking common Rust features 
-  and improvements to existing patterns are welcome. As a rule of thumb they 
-  should 
+
+  Adding support for new patterns is best done via a PR. Patterns mimicking common Rust features
+  and improvements to existing patterns are welcome. As a rule of thumb they
+  should
   - be idiomatic in Rust (e.g., options, slices),
-  - have a safe and sound Rust implementation and 'reasonable' usability in other languages, 
+  - have a safe and sound Rust implementation and 'reasonable' usability in other languages,
   - be useful in more than one backend and come with a reference implementation,
   - _must_ fallback to C primitives (e.g., 'class methods' are functions with receivers).
-  
+
   As an alternative, and discouraged for public backends, you might be able to get away using "tags".
+
+
+
+
+
+## Existing Backends
+
+### C#
+
+- **Why do you pin objects in the C# bindings and pass GCHandles to slice constructors?**
+
+  This question relates to bindings generated like this:
+
+  ```csharp
+  public static uint pattern_ffi_slice_1(uint[] ffi_slice) {
+      var ffi_slice_pinned = GCHandle.Alloc(ffi_slice, GCHandleType.Pinned);
+      var ffi_slice_slice = new Sliceu32(ffi_slice_pinned, (ulong) ffi_slice.Length);
+      try
+      {
+          return pattern_ffi_slice_1(ffi_slice_slice);
+      }
+      finally
+      {
+          ffi_slice_pinned.Free();
+      }
+  }
+  ```
   
+  - Without pinning the .NET runtime could relocate the memory while the FFI call is running. In other words, when you enter `pattern_ffi_slice_1` `ffi_slice` might reside at `0x1234`, but during FFI execution the CLR GC can move the whole array to `0x1000` if it wants to optimize memory layout. Since this could happen while Rust is still accessing the old location UB or an access violation would ensue. Pinning prevents that.
+  
+  - The reason `Sliceu32` in turn only accepts a `GCHandle` and not the `uint[]` array itself is that once an object is pinned, somebody needs to remember its proper lifetime and to unpin it, but `Sliceu32` has no reserved field for that, being a low-level primitive. In most cases the method overload handling pinning is the right place, as lifetimes are guaranteed to be correct, but if you need a "long-lived" FFI slice (which, I'd argue, is playing with fire from an interop perspective) you'll also need to handle proper pinning / unpinning (aka _lifetime semantics_) and race prevention elsewhere.
+
 
 
 ## New Backends
@@ -133,7 +164,8 @@ like 'safely' mapping a trait's vtable) such bindings should be gated behind a f
 to set expectations around discussions.
 
 
-tl;dr: if it's fishy we probably want to fix it, but we rely on external code calling in 'according to documentation'. 
+**tl;dr**: if it's fishy we probably want to fix it, but we rely on external code calling in 'according to documentation'. 
+
 
 
 ## Errors vs. Panics
