@@ -10,16 +10,8 @@
 //! guard against panics (prevent them from bubbling into C which would be undefined behavior)
 //! and can provide transparent error handling.
 //!
-//! In short, if your library provides a "service", the _service pattern_ might provide a noticeable
+//! In short, if your library offers a "service", the _service pattern_ might give you a noticeable
 //! quality of life improvement.
-//!
-//! # C API
-//!
-//! Services reflect a common pattern in C APIs, where an opaque type `Service` is created with a
-//! `service_init(*s)` function. A set of functions can then be invoked on `s`, such as
-//! `service_compute(s, x)`. Once the service is no longer needed it will be removed
-//! with `service_destroy(*s)`.
-//!
 //!
 //! # Defining Services
 //!

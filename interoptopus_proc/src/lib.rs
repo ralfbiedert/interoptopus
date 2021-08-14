@@ -15,7 +15,7 @@ use syn::{parse_macro_input, AttributeArgs};
 
 /// Enable a `struct` or `enum` to appear in generated bindings.
 ///
-/// This will derive [`CTypeInfo`](interoptopus::lang::rust::CTypeInfo) based on the _visible_ information in the type definition. This
+/// This will derive [`CTypeInfo`](https://docs.rs/interoptopus/latest/interoptopus/lang/rust/trait.CTypeInfo.html) based on the _visible_ information in the type definition. This
 /// is the preferred way of enabling FFI types; although in some cases (e.g., when dealing with
 /// types outside of your control) you will have to implement a **surrogate** manually, see below.
 ///
@@ -28,7 +28,7 @@ use syn::{parse_macro_input, AttributeArgs};
 /// | `skip(x)` | `struct,enum` | Skip field or variant `x` in the definition, e.g., some `x` of [`PhantomData`](std::marker::PhantomData). <sup>⚠️</sup>
 /// | `patterns(p)` | `struct`,`enum` | Mark this type as part of a pattern, see below. <sup>2</sup>
 /// | `opaque` | `struct` | Creates an opaque type without fields. Can only be used behind a pointer. |
-/// | `surrogates(x="f")` | `struct` | Invoke function `f` to provide a [`CTypeInfo`](interoptopus::lang::rust::CTypeInfo) for field `x`, see below. <sup>⚠️</sup>
+/// | `surrogates(x="f")` | `struct` | Invoke function `f` to provide a [`CTypeInfo`](https://docs.rs/interoptopus/latest/interoptopus/lang/rust/trait.CTypeInfo.html) for field `x`, see below. <sup>⚠️</sup>
 /// | `visibility(x="v")` | `struct` | Override visibility for field `x` as `public` or `private`; `_` means all fields. <sup>2</sup>
 /// | `debug` | * | Print generated helper code in console.
 /// | `unsafe` | * | Unlocks unsafe options marked: <sup>⚠️</sup>
@@ -52,7 +52,7 @@ use syn::{parse_macro_input, AttributeArgs};
 ///
 /// # Surrogates
 ///
-/// When dealing with types outside of your control you will not be able to implement [`CTypeInfo`](interoptopus::lang::rust::CTypeInfo) for them.
+/// When dealing with types outside of your control you will not be able to implement [`CTypeInfo`](https://docs.rs/interoptopus/latest/interoptopus/lang/rust/trait.CTypeInfo.html) for them.
 /// Instead you need a **surrogate**, a helper function which returns that info for the type.
 ///
 /// The surrogate's signature is:
@@ -72,7 +72,7 @@ use syn::{parse_macro_input, AttributeArgs};
 ///
 /// | Pattern | On |  Explanation |
 /// | --- | --- | ---  |
-/// | `ffi_error` | `enum` | Denotes this as a [`FFIError`](interoptopus::patterns::result::FFIError). |
+/// | `ffi_error` | `enum` | Denotes this as a [`FFIError`](https://docs.rs/interoptopus/latest/interoptopus/patterns/result/trait.FFIError.html). |
 ///
 /// # Examples
 ///
@@ -101,14 +101,14 @@ pub fn ffi_type(attr: TokenStream, item: TokenStream) -> TokenStream {
 
 /// Enable an `extern "C"` function to appear in generated bindings.
 ///
-/// This will derive [`FunctionInfo`](interoptopus::lang::rust::FunctionInfo) for a helper struct
+/// This will derive [`FunctionInfo`](https://docs.rs/interoptopus/latest/interoptopus/lang/rust/trait.FunctionInfo.html) for a helper struct
 /// of the same name containing the function's name, parameters and return value.
 ///
 /// The following attributes can be provided:
 ///
 /// | Attribute |  Explanation |
 /// | --- | ---  |
-/// | `surrogates(x="y")` | Invoke function `y` to provide a [`CTypeInfo`](interoptopus::lang::rust::CTypeInfo) for parameter `x`, see below. <sup>⚠️</sup>
+/// | `surrogates(x="y")` | Invoke function `y` to provide a [`CTypeInfo`](https://docs.rs/interoptopus/latest/interoptopus/lang/rust/trait.CTypeInfo.html) for parameter `x`, see below. <sup>⚠️</sup>
 /// | `debug` | Print generated helper code in console.
 /// | `unsafe` | Unlocks unsafe options marked: <sup>⚠️</sup>
 ///
@@ -117,7 +117,7 @@ pub fn ffi_type(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// # Surrogates
 ///
-/// When dealing with types outside of your control you will not be able to implement [`CTypeInfo`](interoptopus::lang::rust::CTypeInfo) for them.
+/// When dealing with types outside of your control you will not be able to implement [`CTypeInfo`](https://docs.rs/interoptopus/latest/interoptopus/lang/rust/trait.CTypeInfo.html) for them.
 /// Instead you need a **surrogate**, a helper function which returns that info for the type.
 ///
 /// The surrogate's signature is:
@@ -153,13 +153,13 @@ pub fn ffi_function(attr: TokenStream, item: TokenStream) -> TokenStream {
 
 /// Enables a `const` to appear in generated bindings.
 ///
-/// This will derive [`ConstantInfo`](interoptopus::lang::rust::ConstantInfo) for a helper struct of the
+/// This will derive [`ConstantInfo`](https://docs.rs/interoptopus/latest/interoptopus/lang/rust/trait.ConstantInfo.html) for a helper struct of the
 /// same name containing the const's name and value.
 ///
 /// Constant evaluation is supported.
 ///
 /// In order to appear in generated bindings the constant has to be mentioned in the definition
-/// of the libaries `inventory_function!()`.
+/// of the libaries [`inventory!()`](https://docs.rs/interoptopus/latest/interoptopus/macro.inventory.html).
 ///
 /// # Examples
 ///
@@ -193,9 +193,9 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// For this attribute to work a number of preconditions must be fulfilled:
 ///
 /// - The attribute must be used on `impl SomeType {}` blocks
-/// - The `error` parameter must be provided and point to an FFIError type.
-/// - The respective `SomeType` type must have an `#[ffi_type(opaque)]` attribute.
-/// - Exactly one method inside the `impl {}` must be marked with `#[ffi_service_ctor]`.
+/// - The `error` parameter must be provided and point to an [`FFIError`](https://docs.rs/interoptopus/latest/interoptopus/patterns/result/trait.FFIError.html) type.
+/// - The respective `SomeType` type must have an [`#[ffi_type(opaque)]`](macro@crate::ffi_type) attribute.
+/// - Exactly one method inside the `impl {}` must be marked with [`#[ffi_service_ctor]`](macro@crate::ffi_service_ctor).
 ///
 /// We recommend to have a look at the [reference project](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/patterns/service.rs).
 ///
@@ -205,7 +205,7 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// | Attribute |  Explanation |
 /// | --- | ---  |
-/// | `error = "t"` | Use `t` as the FFIError type, mandatory.
+/// | `error = "t"` | Use `t` as the [`FFIError`](https://docs.rs/interoptopus/latest/interoptopus/patterns/result/trait.FFIError.html) type, mandatory.
 /// | `prefix  = "p"` | Add `p` to all generated method names.
 ///
 /// # Example
@@ -274,7 +274,7 @@ pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
     rval.into()
 }
 
-/// Inside a `#[ffi_service]` block, mark the FFI constructor.
+/// Inside a [`#[ffi_service]`](macro@crate::ffi_service) block, mark the FFI constructor.
 ///
 /// See the [service module](https://docs.rs/interoptopus/latest/interoptopus/patterns/service/index.html) for an introduction into services.
 ///
@@ -282,7 +282,7 @@ pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// For this attribute to work a number of preconditions must be fulfilled:
 ///
-/// - The attribute must be used inside an `impl SomeType {}` block marked with `#[ffi_service]`.
+/// - The attribute must be used inside an `impl SomeType {}` block marked with [`#[ffi_service]`](macro@crate::ffi_service).
 /// - It must be applied to exactly one method.
 /// - The method must return `Result<Self, Error>`.
 ///
@@ -349,7 +349,7 @@ pub fn ffi_service_ctor(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
 
-/// Inside a `#[ffi_service]` block, provide special directives to functions.
+/// Inside a [`#[ffi_service]`](macro@crate::ffi_service) block, provide special directives to functions.
 ///
 /// This is an optional attribute that can be applied to some methods.
 ///
