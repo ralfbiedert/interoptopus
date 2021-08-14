@@ -1,6 +1,5 @@
 //! Generates C# bindings for [Interoptopus](https://github.com/ralfbiedert/interoptopus).
 //!
-//!
 //! ## Usage
 //!
 //! In your library or a support project add this:
@@ -46,6 +45,12 @@
 //!     }
 //! }
 //! ```
+//!
+//! START_INCLUDE
+//! ```csharp,ignore
+#![doc = include_str!("../../examples/hello_world/bindings/csharp/Interop.cs")]
+//! ```
+//! END_INCLUDE
 
 use interoptopus::writer::IndentWriter;
 use interoptopus::Interop;
