@@ -10,16 +10,6 @@
 //!
 //! The polyglot bindings generator for your library (C#, C, Python, ...)
 //!
-//! <br>
-//!
-//! Huh?
-//! - You wrote this cool Rust library and want everyone else to use it.
-//! - But everyone else runs Unity, C, Python, ...
-//! - "Not a problem", you say, "I'll just use Interoptopus".
-//!
-//! And you'll live happily<sup>*</sup> ever after.
-//!
-//! <sub>*Actual results may depend on other life choices.</sub>
 //!
 //! ## Code you write ...
 //!
@@ -99,6 +89,10 @@
 //!
 //! ## Changelog
 //!
+//! - **v0.7** - Patterns mostly use proc macros now for better FFI docs.
+//! - **v0.6** - Renamed and clarified many patterns.
+//! - **v0.5** - More ergonomic slice usage in Rust and FFI.
+//! - **v0.4** - Enable logging support in auto-generated FFI calls.
 //! - **v0.3** - Better compatibility with generics.
 //! - **v0.2** - Introduced "patterns"; produces generally _working_ interop for C#.
 //! - **v0.1** - Has generated C#, C, Python-CFFI bindings at least once.

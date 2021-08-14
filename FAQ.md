@@ -24,8 +24,9 @@
   - predictable and "industry-grade" APIs in the end (final bindings ship to customers).
 
 
+- **Where can I ask questions?**
 
-
+  Use [Github Discussions](https://github.com/ralfbiedert/interoptopus/discussions). 
 
 
 - **How does it work?**

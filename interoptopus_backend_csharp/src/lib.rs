@@ -36,6 +36,9 @@
 //! (note, the mentioned versions might be outdated, we recommend to pick the latest ones):
 //!
 //! ```toml
+//! [lib]
+//! crate-type = ["cdylib", "rlib"]
+//!
 //! [dependencies]
 //! interoptopus = "0.7"
 //! interoptopus_backend_csharp = "0.7"
