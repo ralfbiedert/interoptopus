@@ -184,9 +184,86 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
     rval.into()
 }
 
-/// Make a `impl Service {}` block a FFI service.<sup>🚧</sup>
+/// Creates a FFI service from an `impl Service {}` block.
 ///
-/// TODO
+/// See the [service module](https://docs.rs/interoptopus/latest/interoptopus/patterns/service/index.html) for an introduction into services.
+///
+/// # Requirements
+///
+/// For this attribute to work a number of preconditions must be fulfilled:
+///
+/// - The attribute must be used on `impl SomeType {}` blocks
+/// - The `error` parameter must be provided and point to an FFIError type.
+/// - The respective `SomeType` type must have an `#[ffi_type(opaque)]` attribute.
+/// - Exactly one method inside the `impl {}` must be marked with `#[ffi_service_ctor]`.
+///
+/// We recommend to have a look at the [reference project](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/patterns/service.rs).
+///
+/// # Parameters
+///
+/// The following attributes can be provided:
+///
+/// | Attribute |  Explanation |
+/// | --- | ---  |
+/// | `error = "t"` | Use `t` as the FFIError type, mandatory.
+/// | `prefix  = "p"` | Add `p` to all generated method names.
+///
+/// # Example
+///
+/// ```
+/// # use std::fmt::{Display, Formatter};
+/// # use interoptopus::patterns::result::FFIError;
+/// # #[derive(Debug)]
+/// # pub enum Error {
+/// #     Bad,
+/// # }
+/// #
+/// # impl Display for Error {
+/// #     fn fmt(&self, _: &mut Formatter<'_>) -> std::fmt::Result {
+/// #         Ok(())
+/// #     }
+/// # }
+/// #
+/// # impl std::error::Error for Error {}
+/// #
+/// # #[ffi_type(patterns(ffi_error))]
+/// # #[repr(C)]
+/// # pub enum MyFFIError {
+/// #     Ok = 0,
+/// #     NullPassed = 1,
+/// #     Panic = 2,
+/// #     OtherError = 3,
+/// # }
+/// #
+/// # impl FFIError for MyFFIError {
+/// #     const SUCCESS: Self = Self::Ok;
+/// #     const NULL: Self = Self::NullPassed;
+/// #     const PANIC: Self = Self::Panic;
+/// # }
+/// #
+/// # impl From<Error> for MyFFIError {
+/// #     fn from(x: Error) -> Self {
+/// #         match x {
+/// #             Error::Bad => Self::OtherError,
+/// #         }
+/// #     }
+/// # }
+/// #
+/// use interoptopus::{ffi_type, ffi_service, ffi_service_ctor};
+///
+/// #[ffi_type(opaque)]
+/// pub struct SimpleService { }
+///
+/// #[ffi_service(error = "MyFFIError", prefix = "simple_service_")]
+/// impl SimpleService {
+///
+///     #[ffi_service_ctor]
+///     pub fn new_with(some_value: u32) -> Result<Self, Error> {
+///         Ok(Self { })
+///     }
+/// }
+/// ```
+///
 #[proc_macro_attribute] // Can now be used as `#[my_attribute]`
 pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = proc_macro2::TokenStream::from(item);
@@ -197,13 +274,176 @@ pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
     rval.into()
 }
 
-/// Inside a `#[ffi_service]` block, mark the FFI constructor.<sup>🚧</sup>
+/// Inside a `#[ffi_service]` block, mark the FFI constructor.
+///
+/// See the [service module](https://docs.rs/interoptopus/latest/interoptopus/patterns/service/index.html) for an introduction into services.
+///
+/// # Requirements
+///
+/// For this attribute to work a number of preconditions must be fulfilled:
+///
+/// - The attribute must be used inside an `impl SomeType {}` block marked with `#[ffi_service]`.
+/// - It must be applied to exactly one method.
+/// - The method must return `Result<Self, Error>`.
+///
+/// We recommend to have a look at the [reference project](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/patterns/service.rs).
+///
+/// # Example
+///
+/// ```
+/// # use std::fmt::{Display, Formatter};
+/// # use interoptopus::patterns::result::FFIError;
+/// #
+/// # #[derive(Debug)]
+/// # pub enum Error {
+/// #     Bad,
+/// # }
+/// #
+/// # impl Display for Error {
+/// #     fn fmt(&self, _: &mut Formatter<'_>) -> std::fmt::Result {
+/// #         Ok(())
+/// #     }
+/// # }
+/// #
+/// # impl std::error::Error for Error {}
+/// #
+/// # #[ffi_type(patterns(ffi_error))]
+/// # #[repr(C)]
+/// # pub enum MyFFIError {
+/// #     Ok = 0,
+/// #     NullPassed = 1,
+/// #     Panic = 2,
+/// #     OtherError = 3,
+/// # }
+/// #
+/// # impl FFIError for MyFFIError {
+/// #     const SUCCESS: Self = Self::Ok;
+/// #     const NULL: Self = Self::NullPassed;
+/// #     const PANIC: Self = Self::Panic;
+/// # }
+/// #
+/// # impl From<Error> for MyFFIError {
+/// #     fn from(x: Error) -> Self {
+/// #         match x {
+/// #             Error::Bad => Self::OtherError,
+/// #         }
+/// #     }
+/// # }
+/// #
+/// use interoptopus::{ffi_type, ffi_service, ffi_service_ctor};
+///
+/// #[ffi_type(opaque)]
+/// pub struct SimpleService { }
+///
+/// #[ffi_service(error = "MyFFIError", prefix = "simple_service_")]
+/// impl SimpleService {
+///
+///     #[ffi_service_ctor]
+///     pub fn new_with(some_value: u32) -> Result<Self, Error> {
+///         Ok(Self { })
+///     }
+/// }
+/// ```
 #[proc_macro_attribute]
 pub fn ffi_service_ctor(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
 
-/// Inside a `#[ffi_service]` block, provide special directives to functions.<sup>🚧</sup>
+/// Inside a `#[ffi_service]` block, provide special directives to functions.
+///
+/// This is an optional attribute that can be applied to some methods.
+///
+/// By default service methods
+/// must return a `Result<(), Error>` return type that will be mapped to an `FFIError` and
+/// transparently checked in languages supporting the pattern.
+/// However, sometimes you might want to return an actual value. Using this attribute you can
+/// opt out of error mapping and instead return the value as-is.
+///
+/// See the [service module](https://docs.rs/interoptopus/latest/interoptopus/patterns/service/index.html) for an introduction into services.
+///
+/// # Parameters
+///
+/// The following attributes can be provided:
+///
+/// | Attribute |  Explanation |
+/// | --- | ---  |
+/// | `direct` | Mark methods not returning a `Result<(), Error>`; will return [`default()`](Default::default) on panic.
+///
+/// ⚠️ Note that generated methods always add panic guards. Since `direct` methods have no
+/// other way to signal errors they will return [`Default::default()`] instead if a panic
+/// is encountered. If you compiled Interoptopus with the `log` feature a message will be emitted
+/// in that case.
+///
+/// # Example
+///
+/// ```
+/// # use std::fmt::{Display, Formatter};
+/// # use interoptopus::patterns::result::FFIError;
+/// #
+/// # #[derive(Debug)]
+/// # pub enum Error {
+/// #     Bad,
+/// # }
+/// #
+/// # impl Display for Error {
+/// #     fn fmt(&self, _: &mut Formatter<'_>) -> std::fmt::Result {
+/// #         Ok(())
+/// #     }
+/// # }
+/// #
+/// # impl std::error::Error for Error {}
+/// #
+/// # #[ffi_type(patterns(ffi_error))]
+/// # #[repr(C)]
+/// # pub enum MyFFIError {
+/// #     Ok = 0,
+/// #     NullPassed = 1,
+/// #     Panic = 2,
+/// #     OtherError = 3,
+/// # }
+/// #
+/// # impl FFIError for MyFFIError {
+/// #     const SUCCESS: Self = Self::Ok;
+/// #     const NULL: Self = Self::NullPassed;
+/// #     const PANIC: Self = Self::Panic;
+/// # }
+/// #
+/// # impl From<Error> for MyFFIError {
+/// #     fn from(x: Error) -> Self {
+/// #         match x {
+/// #             Error::Bad => Self::OtherError,
+/// #         }
+/// #     }
+/// # }
+/// #
+/// use interoptopus::{ffi_type, ffi_service, ffi_service_ctor, ffi_service_method};
+///
+/// #[ffi_type(opaque)]
+/// pub struct SimpleService { }
+///
+/// #[ffi_service(error = "MyFFIError", prefix = "simple_service_")]
+/// impl SimpleService {
+///
+///     #[ffi_service_ctor]
+///     pub fn new_with(some_value: u32) -> Result<Self, Error> {
+///         Ok(Self { })
+///     }
+///
+///     #[ffi_service_method(direct)]
+///     pub fn return_value(&self) -> u32 {
+///         123
+///     }
+///
+///     #[ffi_service_method(direct)]
+///     #[allow(unconditional_panic)]
+///     pub fn oops(&self, x: u32) -> u32 {
+///         let array = [0, 1, 2];
+///
+///         // This will panic. The method will return 0 instead.
+///         array[5]
+///     }
+/// }
+/// ```
 #[proc_macro_attribute]
 pub fn ffi_service_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item

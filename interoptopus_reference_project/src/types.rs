@@ -2,8 +2,8 @@
 
 use interoptopus::lang::c::{CType, CompositeType, Field, PrimitiveType};
 use interoptopus::lang::rust::CTypeInfo;
-use interoptopus::patterns::ascii_pointer::AsciiPointer;
 use interoptopus::patterns::slice::FFISlice;
+use interoptopus::patterns::string::AsciiPointer;
 use interoptopus::{callback, ffi_type};
 use std::fmt::Debug;
 use std::marker::PhantomData;

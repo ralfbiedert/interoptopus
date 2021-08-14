@@ -23,11 +23,11 @@
 //!
 //! ```
 //!
-//! you would instead accept an [`AsciiPointer`](crate::patterns::ascii_pointer::AsciiPointer):
+//! you would instead accept an [`AsciiPointer`](crate::patterns::string::AsciiPointer):
 //!
 //! ```
 //! # use interoptopus::ffi_function;
-//! # use interoptopus::patterns::ascii_pointer::AsciiPointer;
+//! # use interoptopus::patterns::string::AsciiPointer;
 //! # use std::ffi::CStr;
 //!
 //! #[ffi_function]
@@ -51,7 +51,7 @@
 //!
 //! - The pattern is **supported** and the backend will generate the raw, underlying type and / or
 //! a language-specific abstraction that safely and conveniently handles it. Examples
-//! include converting an [`AsciiPointer`](ascii_pointer) to a C# `string`, or a [`service`](crate::patterns::service)
+//! include converting an [`AsciiPointer`](string) to a C# `string`, or a [`service`](crate::patterns::service)
 //! to a Python `class`.
 //!
 //! - The pattern is not supported and will be **omitted, if the pattern was merely an aggregate** of
@@ -60,7 +60,7 @@
 //! are still available as raw bindings.
 //!
 //! - The pattern is not supported and will be **replaced with a fallback type**. Examples include
-//! the [`AsciiPointer`](ascii_pointer) which will become a regular `*const u8` in C.
+//! the [`AsciiPointer`](string) which will become a regular `*const u8` in C.
 //!
 //! In other words, regardless of which pattern was used, the involved methods and types will always
 //! be accessible from any language.
@@ -75,15 +75,16 @@ use crate::patterns::callbacks::NamedCallback;
 use crate::patterns::result::FFIErrorEnum;
 use crate::patterns::service::Service;
 
+#[doc(hidden)]
 pub mod api_entry;
 pub mod api_guard;
-pub mod ascii_pointer;
 pub mod callbacks;
 pub mod option;
 pub mod primitives;
 pub mod result;
 pub mod service;
 pub mod slice;
+pub mod string;
 
 /// A pattern on a library level, usually involving both methods and types.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -91,6 +92,8 @@ pub enum LibraryPattern {
     Service(Service),
 }
 
+/// Used mostly internally and provides pattern info for auto generated structs.
+#[doc(hidden)]
 pub trait LibraryPatternInfo {
     fn pattern_info() -> LibraryPattern;
 }

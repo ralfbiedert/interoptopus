@@ -7,6 +7,10 @@ use crate::patterns::TypePattern;
 use serde::{Deserialize, Serialize};
 use std::ops::Not;
 
+/// A single-byte boolean value where `1` means `true`, and `0` is `false`.
+///
+/// Other values (`2` ..= `255`) will also map to `false`(!) and [`FFIBool::is_strange`] will
+/// signal `true`, but no undefined behavior will be triggered.
 #[repr(transparent)]
 #[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Default, Deserialize, Serialize))]
 #[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Default))]
@@ -20,6 +24,11 @@ impl FFIBool {
 
     pub fn is(self) -> bool {
         self.into()
+    }
+
+    /// If a value not `0` or `1` was found.
+    pub fn is_strange(self) -> bool {
+        self.value > 1
     }
 }
 

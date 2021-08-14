@@ -1,5 +1,31 @@
 //! Raw `*const char` pointer on C-level but ASCII `string` like in languages that support it.
-
+//!
+//! # Example
+//!
+//! In your library you can accept ASCII strings like this:
+//!
+//! ```
+//! use interoptopus::ffi_function;
+//! use interoptopus::patterns::string::AsciiPointer;
+//!
+//! #[ffi_function]
+//! #[no_mangle]
+//! pub extern "C" fn call_with_string(_string: AsciiPointer)  {
+//!     //
+//! }
+//! ```
+//!
+//! Backends supporting this pattern might generate the equivalent to the following pseudo-code:
+//!
+//! ```csharp
+//! void call_with_string(string _string);
+//! ```
+//!
+//! Backends not supporting this pattern, and C FFI, will see the equivalent of the following C code:
+//! ```c
+//! void call_with_string(uint8_t* _string);
+//! ```
+//!
 use crate::lang::c::CType;
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::TypePattern;
@@ -69,7 +95,7 @@ unsafe impl<'a> CTypeInfo for AsciiPointer<'a> {
 
 #[cfg(test)]
 mod test {
-    use crate::patterns::ascii_pointer::AsciiPointer;
+    use crate::patterns::string::AsciiPointer;
     use std::ffi::CString;
 
     #[test]

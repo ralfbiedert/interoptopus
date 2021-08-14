@@ -1,6 +1,6 @@
 use crate::types::UseAsciiStringPattern;
 use interoptopus::ffi_function;
-use interoptopus::patterns::ascii_pointer::AsciiPointer;
+use interoptopus::patterns::string::AsciiPointer;
 
 #[ffi_function]
 #[no_mangle]

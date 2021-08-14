@@ -1,16 +1,11 @@
-//! Helper to ensure the bindings match the used DLL.<sup>🚧</sup>
+//! Helper to ensure the bindings match the used DLL.
 //!
+//! Using an API guard is as simple as defining and exporting a function `my_api_guard` returning an
+//! [`APIVersion`] as in the example below. Backends supporting API guards will automatically
+//! generate guard code executed when the library is loaded.
 //!
-//! # Hash Value
-//!
-//! The hash value
-//!
-//! - is based on the signatures of the involved functions, types and constants,
-//! - is expected to change when the API changes, e.g., functions, types, fields, ... are added
-//! changed or removed,
-//! - will even react to benign API changes (e.g., just adding functions),
-//! - might even react to documentation changes (subject to change; feedback welcome).
-//!
+//! When developing we **highly recommend** adding API guards, as mismatching bindings are the #1
+//! cause of "inexplicable" errors (undefined behavior) that often take hours to hunt down.
 //!
 //! # Example
 //!
@@ -25,16 +20,35 @@
 //! interoptopus::inventory!(
 //!     my_inventory,
 //!     [],
-//!     [ pattern_api_guard ],
+//!     [ my_api_guard ],
 //!     [], []
 //! );
 //!
 //! // Guard function used by backends.
 //! #[ffi_function]
 //! #[no_mangle]
-//! pub extern "C" fn pattern_api_guard() -> APIVersion {
+//! pub extern "C" fn my_api_guard() -> APIVersion {
 //!     APIVersion::from_library(&my_inventory())
 //! }
+//! ```
+//!
+//! In backends that support API guards an error message like this might be emitted if you try load
+//! a library with mismatching bindings:
+//!
+//! ```csharp
+//! Exception: API reports hash X which differs from hash in bindings (Y). You probably forgot to update / copy either the bindings or the library.
+//! ```
+//!
+//!
+//! # Hash Value
+//!
+//! The hash value
+//!
+//! - is based on the signatures of the involved functions, types and constants,
+//! - is expected to change when the API changes, e.g., functions, types, fields, ... are added
+//! changed or removed,
+//! - will even react to benign API changes (e.g., just adding functions),
+//! - might even react to documentation changes (subject to change; feedback welcome).
 //!
 use crate::lang::c::CType;
 use crate::lang::rust::CTypeInfo;
@@ -43,7 +57,7 @@ use crate::Library;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
-/// Holds the API version hash returned by the helper function.
+/// Holds the API version hash of the given library.
 #[repr(transparent)]
 #[allow(dead_code)]
 pub struct APIVersion {
@@ -69,7 +83,7 @@ unsafe impl CTypeInfo for APIVersion {
     }
 }
 
-/// Returns a unique hash for a library.
+/// Returns a unique hash for a library; used by backends.
 pub fn library_hash(library: &Library) -> u64 {
     let mut hasher = DefaultHasher::new();
 

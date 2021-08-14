@@ -1,5 +1,37 @@
 //! Useful when `extern "C" fn()` delegate types give compile errors.
 //!
+//! # Example
+//!
+//! If you want to accept user-provided callbacks or "delegates":
+//!
+//!```
+//! use interoptopus::{ffi_function, callback};
+//! use interoptopus::patterns::slice::FFISlice;
+//!
+//! callback!(CallbackSlice(x: FFISlice<u8>) -> u8);
+//!
+//! #[ffi_function]
+//! pub extern "C" fn my_function(callback: CallbackSlice) {
+//!     callback.call(FFISlice::empty());
+//! }
+//!
+//! ```
+//! Backends supporting this pattern might generate the equivalent to the following pseudo-code:
+//!
+//! ```csharp
+//! public delegate uint CallbackSlice(Sliceu8 x0);
+//!
+//! void my_function(CallbackSlice callback);
+//! ```
+//!
+//! Backends not supporting this pattern, and C FFI, will see the equivalent of the following C code:
+//! ```c
+//! typedef void (*fptr_fn_Sliceu8)(my_library_slicemutu8 x0);
+//!
+//! void my_function(fptr_fn_Sliceu8 callback);
+//! ```
+//!
+//!
 //! # Code Generation
 //!
 //! The macro [**`callback`**](crate::callback) enables two use cases:
@@ -47,21 +79,6 @@
 //! To fix this, you can replace `pub type CallbackSlice = ...` with a `callback!` call
 //! which should generate a helper type that works.
 //!
-//! # Example
-//!
-//! Here is how the example above would be expressed instead:
-//!
-//!```
-//! use interoptopus::{ffi_function, callback};
-//! use interoptopus::patterns::slice::FFISlice;
-//!
-//! callback!(CallbackSlice(x: FFISlice<u8>) -> u8);
-//!
-//! #[ffi_function]
-//! pub extern "C" fn my_function(callback: CallbackSlice) {
-//!     callback.call(FFISlice::empty());
-//! }
-//! ```
 
 use crate::lang::c::FnPointerType;
 

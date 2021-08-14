@@ -1,4 +1,42 @@
 //! Like a regular `&[T]` and `&mut [T]` but FFI safe.
+//!
+//! FFI slices work similar to Rust slices, except that they are FFI safe and map to "nice"
+//! interop code. Internally they are represented by a pointer and length.
+//!
+//! # Example
+//!
+//! Here we export a function that wants the FFI equivalent of an `&[u32]`:
+//!
+//! ```
+//! use interoptopus::{ffi_function};
+//! use interoptopus::patterns::slice::FFISlice;
+//!
+//! #[ffi_function]
+//! #[no_mangle]
+//! pub extern "C" fn call_with_slice(ffi_slice: FFISlice<u32>) {
+//!     // ...
+//! }
+//! ```
+//!
+//! In backends supporting this pattern (e.g., C#), a function equivalent to the following
+//! signature would be emitted, transparently handling all slice-related pinning and conversions:
+//!
+//! ```csharp
+//! public static void call_with_slice(uint[] ffi_slice);
+//! ```
+//!
+//! In C and unsupported backends the equivalent of this code will be emitted:
+//!
+//! ```c
+//! typedef struct sliceu32
+//!     {
+//!     uint32_t* data;
+//!     uint64_t len;
+//!     } sliceu32;
+//!
+//! void call_with_slice(sliceu32 ffi_slice);
+//! ```
+//!
 
 use crate::lang::c::{CType, CompositeType, Documentation, Field, PrimitiveType, Visibility};
 use crate::lang::rust::CTypeInfo;

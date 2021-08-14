@@ -1,6 +1,6 @@
 //! Helpers for API loading patterns as [described in this blog post](https://anteru.net/blog/2016/designing-c-apis-in-2016/).<sup>🚧</sup>
 //!
-//! See [this macro](crate::pattern_api_entry) for details.
+//! See the macro [api_entry](crate::api_entry) for details.
 
 /// Defines a new API entry function and corresponding struct.
 ///
@@ -22,6 +22,7 @@
 ///
 /// api_entry!(MyAPIv1, my_api_init_v1, [f1, f2]);
 /// ```
+#[doc(hidden)]
 #[macro_export]
 macro_rules! api_entry {
     (

@@ -2,6 +2,7 @@
 
 use std::fs::read_to_string;
 
+/// Used by backends to verify a `file.ext` matches an existing `file.ext.expected`.
 #[track_caller]
 pub fn assert_file_matches_generated(file: &str) {
     let actual = read_to_string(file).unwrap_or_else(|_| panic!("Must be able to read file '{}'", file));

@@ -1,4 +1,32 @@
 //! Like a regular [`Option`] but FFI safe.
+//!
+//! # Example
+//!
+//! This function accepts an FFI option and converts it into a Rust option.
+//!
+//! ```
+//! use interoptopus::ffi_function;
+//! use interoptopus::patterns::option::FFIOption;
+//!
+//! #[ffi_function]
+//! #[no_mangle]
+//! pub extern "C" fn set_value(x: FFIOption<u8>) {
+//!     let _ = x.into_option();
+//! }
+//! ```
+//!
+//! On C FFI level the following binding code is generated:
+//!
+//! ```c
+//! typedef struct optionu8
+//!     {
+//!     uint8_t t;
+//!     uint8_t is_some;
+//!     } optionu8;
+//!
+//! void set_value(optionu8 x);
+//! ```
+//!
 use crate::lang::c::{CType, CompositeType, Documentation, Field, PrimitiveType, Visibility};
 use crate::lang::rust::CTypeInfo;
 

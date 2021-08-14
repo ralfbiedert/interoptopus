@@ -88,6 +88,7 @@ If you **need API design guidance** the following (wip) [**C# call-cost table**]
 
 ### Changelog
 
+- **v0.8** - Moved testing functions to respective backend crates.
 - **v0.7** - Patterns mostly use proc macros now for better FFI docs.
 - **v0.6** - Renamed and clarified many patterns.
 - **v0.5** - More ergonomic slice usage in Rust and FFI.
