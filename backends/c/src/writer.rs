@@ -2,7 +2,7 @@ use crate::converter::CTypeConverter;
 use crate::converter::Converter;
 use crate::Config;
 use interoptopus::indented;
-use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, OpaqueType, Variant};
+use interoptopus::lang::c::{CType, CompositeType, Constant, EnumType, Field, FnPointerType, Function, OpaqueType, Variant};
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::sort_types_by_dependencies;
 use interoptopus::writer::IndentWriter;
@@ -61,18 +61,10 @@ pub trait CWriter {
     }
 
     fn write_function(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
-        self.write_function_declaration(w, function)
+        self.write_function_declaration(w, function, 999)
     }
 
-    fn write_documentation(&self, w: &mut IndentWriter, documentation: &Documentation) -> Result<(), Error> {
-        for line in documentation.lines() {
-            indented!(w, r#"/// {}"#, line)?;
-        }
-
-        Ok(())
-    }
-
-    fn write_function_declaration(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
+    fn write_function_declaration(&self, w: &mut IndentWriter, function: &Function, max_line: usize) -> Result<(), Error> {
         let attr = &self.config().function_attribute;
         let rval = self.converter().to_type_specifier(function.signature().rval());
         let name = self.converter().function_name_to_c_name(function);
@@ -90,7 +82,18 @@ pub trait CWriter {
             }
         }
 
-        indented!(w, r#"{}{} {}({});"#, attr, rval, name, params.join(", "))
+        // Test print line to see if we need to break it
+        let line = format!(r#"{}{} {}({});"#, attr, rval, name, params.join(", "));
+
+        if line.len() <= max_line {
+            indented!(w, r#"{}{} {}({});"#, attr, rval, name, params.join(", "))
+        } else {
+            indented!(w, r#"{}{} {}("#, attr, rval, name)?;
+            for p in params {
+                indented!(w, [_], r#"{}"#, p)?;
+            }
+            indented!(w, [_], r#");"#)
+        }
     }
 
     fn write_type_definitions(&self, w: &mut IndentWriter) -> Result<(), Error> {
