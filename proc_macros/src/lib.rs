@@ -31,7 +31,7 @@ use syn::{parse_macro_input, AttributeArgs};
 /// | `opaque` | `struct` | Creates an opaque type without fields. Can only be used behind a pointer. |
 /// | `visibility(x="v")` | `struct` | Override visibility for field `x` as `public` or `private`; `_` means all fields. <sup>2</sup>
 /// | `debug` | * | Print generated helper code in console.
-/// | `unsafe` | * | Unlocks unsafe helpers such as [`#[ffi_surrogate]`](macro@crate::ffi_surrogate).
+/// | `unsafe` | * | Unlocks unsafe helpers such as [`#[ffi_surrogates]`](macro@crate::ffi_surrogates).
 ///
 /// <sup>1</sup> While a type's name must be unique (even across modules) backends are free to further transform this name, e.g., by converting
 /// `MyVec` to `LibraryMyVec`. In other words, using `name` will change a type's name, but not using `name` is no guarantee the final name will
@@ -96,7 +96,7 @@ pub fn ffi_type(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// | Parameter |  Explanation |
 /// | --- | ---  |
 /// | `debug` | Print generated helper code in console.
-/// | `unsafe` | Unlocks unsafe helpers such as [`#[ffi_surrogate]`](macro@crate::ffi_surrogate).
+/// | `unsafe` | Unlocks unsafe helpers such as [`#[ffi_surrogates]`](macro@crate::ffi_surrogates).
 ///
 ///
 /// # Example
@@ -438,7 +438,7 @@ pub fn ffi_service_method(_attr: TokenStream, item: TokenStream) -> TokenStream 
 /// }
 /// ```
 ///
-/// Once defined you can use `#[ffi_surrogate]` to hint at the surrogate in [`#[ffi_type]`](macro@crate::ffi_type) and
+/// Once defined you can use `#[ffi_surrogates]` to hint at the surrogate in [`#[ffi_type]`](macro@crate::ffi_type) and
 /// [`#[ffi_function]`](macro@crate::ffi_function) helpers.
 ///
 /// # Safety
@@ -451,7 +451,7 @@ pub fn ffi_service_method(_attr: TokenStream, item: TokenStream) -> TokenStream 
 ///
 /// ```
 /// use interoptopus::lang::c::{CType, Field, PrimitiveType, CompositeType};
-/// use interoptopus::{ffi_surrogate, ffi_function};
+/// use interoptopus::{ffi_surrogates, ffi_function};
 ///
 /// // A type in a foreign crate you can't use `#[ffi_type]` on.
 /// #[repr(C)]
@@ -467,7 +467,7 @@ pub fn ffi_service_method(_attr: TokenStream, item: TokenStream) -> TokenStream 
 /// }
 ///
 /// #[ffi_function(unsafe)]
-/// #[ffi_surrogate(x = "some_foreign_type")]
+/// #[ffi_surrogates(x = "some_foreign_type")]
 /// #[no_mangle]
 /// pub extern "C" fn my_ffi_function(x: SomeForeignType) -> u32 {
 ///     x.x
@@ -475,6 +475,6 @@ pub fn ffi_service_method(_attr: TokenStream, item: TokenStream) -> TokenStream 
 ///
 /// ```
 #[proc_macro_attribute]
-pub fn ffi_surrogate(_attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn ffi_surrogates(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
