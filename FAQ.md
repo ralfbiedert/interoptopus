@@ -32,7 +32,6 @@
 
 ## Rust Usage
 
-
 - **Why do I get `error[E0658]: macro attributes in #[derive] output are unstable`?**
 
   This happens when `#[ffi_type]` appears after `#derive[...]`. Just switch their order.
@@ -54,6 +53,14 @@
   - _must_ fallback to C primitives (e.g., 'class methods' are functions with receivers).
 
   As an alternative, and discouraged for public backends, you might be able to get away using "tags".
+
+
+- **How should I design my APIs?**
+
+  This is a broad question and depends on your use case. As a rule of thumb we recommend being
+  slightly conservative with your signatures and always
+  _think C_. Other languages do not track lifetimes well, and it is easy to accidentally pass an
+  outlived pointer, or doubly alias a `&mut X` on reentrant functions.
 
 
 
