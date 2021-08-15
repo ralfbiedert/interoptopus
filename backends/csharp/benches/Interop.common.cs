@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 using My.Company;
 using My.Company.Common;
 
@@ -52,9 +53,11 @@ namespace My.Company.Common
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(Bool));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                return Marshal.PtrToStructure<Bool>(ptr);
+                unsafe
+                {
+                    var d = (Bool*) data.ToPointer();
+                    return d[i];
+                }
             }
         }
         public Bool[] Copied
@@ -62,8 +65,12 @@ namespace My.Company.Common
             get
             {
                 var rval = new Bool[len];
-                for (var i = 0; i < (int) len; i++) {
-                    rval[i] = this[i];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                    }
                 }
                 return rval;
             }
@@ -108,9 +115,11 @@ namespace My.Company.Common
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(uint));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                return Marshal.PtrToStructure<uint>(ptr);
+                unsafe
+                {
+                    var d = (uint*) data.ToPointer();
+                    return d[i];
+                }
             }
         }
         public uint[] Copied
@@ -118,8 +127,12 @@ namespace My.Company.Common
             get
             {
                 var rval = new uint[len];
-                for (var i = 0; i < (int) len; i++) {
-                    rval[i] = this[i];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                    }
                 }
                 return rval;
             }
@@ -164,9 +177,11 @@ namespace My.Company.Common
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(byte));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                return Marshal.PtrToStructure<byte>(ptr);
+                unsafe
+                {
+                    var d = (byte*) data.ToPointer();
+                    return d[i];
+                }
             }
         }
         public byte[] Copied
@@ -174,8 +189,12 @@ namespace My.Company.Common
             get
             {
                 var rval = new byte[len];
-                for (var i = 0; i < (int) len; i++) {
-                    rval[i] = this[i];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                    }
                 }
                 return rval;
             }
@@ -220,16 +239,20 @@ namespace My.Company.Common
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(byte));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                return Marshal.PtrToStructure<byte>(ptr);
+                unsafe
+                {
+                    var d = (byte*) data.ToPointer();
+                    return d[i];
+                }
             }
             set
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(byte));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                Marshal.StructureToPtr<byte>(value, ptr, false);
+                unsafe
+                {
+                    var d = (byte*) data.ToPointer();
+                    d[i] = value;
+                }
             }
         }
         public byte[] Copied
@@ -237,8 +260,12 @@ namespace My.Company.Common
             get
             {
                 var rval = new byte[len];
-                for (var i = 0; i < (int) len; i++) {
-                    rval[i] = this[i];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                    }
                 }
                 return rval;
             }

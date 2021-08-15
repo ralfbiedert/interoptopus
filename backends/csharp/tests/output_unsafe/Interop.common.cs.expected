@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 using My.Company;
 using My.Company.Common;
 
@@ -64,8 +65,12 @@ namespace My.Company.Common
             get
             {
                 var rval = new Bool[len];
-                for (var i = 0; i < (int) len; i++) {
-                    rval[i] = this[i];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                    }
                 }
                 return rval;
             }
@@ -122,8 +127,12 @@ namespace My.Company.Common
             get
             {
                 var rval = new uint[len];
-                for (var i = 0; i < (int) len; i++) {
-                    rval[i] = this[i];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                    }
                 }
                 return rval;
             }
@@ -180,8 +189,12 @@ namespace My.Company.Common
             get
             {
                 var rval = new byte[len];
-                for (var i = 0; i < (int) len; i++) {
-                    rval[i] = this[i];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                    }
                 }
                 return rval;
             }
@@ -247,8 +260,12 @@ namespace My.Company.Common
             get
             {
                 var rval = new byte[len];
-                for (var i = 0; i < (int) len; i++) {
-                    rval[i] = this[i];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                    }
                 }
                 return rval;
             }

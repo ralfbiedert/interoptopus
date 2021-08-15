@@ -39,6 +39,10 @@ pub trait CSharpWriter {
         indented!(w, r#"using System.Collections.Generic;"#)?;
         indented!(w, r#"using System.Runtime.InteropServices;"#)?;
 
+        if self.config().use_unsafe {
+            indented!(w, r#"using System.Runtime.CompilerServices;"#)?;
+        }
+
         for namespace_id in self.library().namespaces() {
             let namespace = self
                 .config()
@@ -673,9 +677,20 @@ pub trait CSharpWriter {
         indented!(w, [_ _], r#"get"#)?;
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"var rval = new {}[len];"#, type_string)?;
-        indented!(w, [_ _ _], r#"for (var i = 0; i < (int) len; i++) {{"#)?;
-        indented!(w, [_ _ _ _], r#"rval[i] = this[i];"#)?;
-        indented!(w, [_ _ _], r#"}}"#)?;
+
+        if self.config().use_unsafe {
+            indented!(w, [_ _ _], r#"unsafe"#)?;
+            indented!(w, [_ _ _], r#"{{"#)?;
+            indented!(w, [_ _ _ _ ], r#"fixed (void* dst = rval)"#)?;
+            indented!(w, [_ _ _ _ ], r#"{{"#)?;
+            indented!(w, [_ _ _ _ _], r#"Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);"#)?;
+            indented!(w, [_ _ _ _ ], r#"}}"#)?;
+            indented!(w, [_ _ _], r#"}}"#)?;
+        } else {
+            indented!(w, [_ _ _], r#"for (var i = 0; i < (int) len; i++) {{"#)?;
+            indented!(w, [_ _ _ _], r#"rval[i] = this[i];"#)?;
+            indented!(w, [_ _ _], r#"}}"#)?;
+        }
         indented!(w, [_ _ _], r#"return rval;"#)?;
         indented!(w, [_ _], r#"}}"#)?;
         indented!(w, [_], r#"}}"#)?;
@@ -776,9 +791,21 @@ pub trait CSharpWriter {
         indented!(w, [_ _], r#"get"#)?;
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"var rval = new {}[len];"#, type_string)?;
-        indented!(w, [_ _ _], r#"for (var i = 0; i < (int) len; i++) {{"#)?;
-        indented!(w, [_ _ _ _], r#"rval[i] = this[i];"#)?;
-        indented!(w, [_ _ _], r#"}}"#)?;
+
+        if self.config().use_unsafe {
+            indented!(w, [_ _ _], r#"unsafe"#)?;
+            indented!(w, [_ _ _], r#"{{"#)?;
+            indented!(w, [_ _ _ _ ], r#"fixed (void* dst = rval)"#)?;
+            indented!(w, [_ _ _ _ ], r#"{{"#)?;
+            indented!(w, [_ _ _ _ _], r#"Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);"#)?;
+            indented!(w, [_ _ _ _ ], r#"}}"#)?;
+            indented!(w, [_ _ _], r#"}}"#)?;
+        } else {
+            indented!(w, [_ _ _], r#"for (var i = 0; i < (int) len; i++) {{"#)?;
+            indented!(w, [_ _ _ _], r#"rval[i] = this[i];"#)?;
+            indented!(w, [_ _ _], r#"}}"#)?;
+        }
+
         indented!(w, [_ _ _], r#"return rval;"#)?;
         indented!(w, [_ _], r#"}}"#)?;
         indented!(w, [_], r#"}}"#)?;

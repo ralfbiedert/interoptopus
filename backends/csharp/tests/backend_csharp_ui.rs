@@ -70,6 +70,6 @@ fn bindings_work() -> Result<(), Error> {
 #[test]
 #[cfg_attr(miri, ignore)]
 fn prepare_benchmarks() -> Result<(), Error> {
-    generate_bindings_multi("benches/Interop", false)?;
+    generate_bindings_multi("benches/Interop", true)?;
     Ok(())
 }
