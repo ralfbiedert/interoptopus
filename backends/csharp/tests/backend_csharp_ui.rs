@@ -62,8 +62,8 @@ fn bindings_work() -> Result<(), Error> {
     generate_bindings_multi("tests/output_safe/Interop", false)?;
     generate_bindings_multi("tests/output_unsafe/Interop", true)?;
 
-    run_dotnet_command_if_installed("tests/output_safe/", "build")?;
-    run_dotnet_command_if_installed("tests/output_unsafe/", "build")?;
+    run_dotnet_command_if_installed("tests/output_safe/", "test")?;
+    run_dotnet_command_if_installed("tests/output_unsafe/", "test")?;
     Ok(())
 }
 

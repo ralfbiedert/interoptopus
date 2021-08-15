@@ -9,7 +9,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\target\debug\*reference_project*">
+    <Content Include="..\..\..\..\target\debug\*reference_project*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
