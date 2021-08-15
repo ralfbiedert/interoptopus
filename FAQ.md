@@ -108,17 +108,17 @@
   | `pattern_ffi_slice_2(short_vec, 0)` | 64 
   | `pattern_ffi_slice_2(long_vec, 0)` | 61 |
 - 
-  For a dramatic 2x - 8x performance increase you can enable `use_unsafe` in the C# backend which will use 
+  For a dramatic 2x - 150x (!) performance increase you can enable `use_unsafe` in the C# backend which will use 
   a `fixed` slice instead. 
 
   | Construct | ns per call |
   | --- | --- |
   | `pattern_ffi_slice_delegate(x => x[0])` | 52 |
-  | `pattern_ffi_slice_delegate(x => x.Copied[0])` | 161 |
-  | `pattern_ffi_slice_delegate_huge(x => x[0])` | 62 |
-  | `pattern_ffi_slice_delegate_huge(x => x.Copied[0])` | 1484303 |
-  | `pattern_ffi_slice_2(short_vec, 0)` | 27 |
-  | `pattern_ffi_slice_2(long_vec, 0)` | 23 |
+  | `pattern_ffi_slice_delegate(x => x.Copied[0])` | 87 |
+  | `pattern_ffi_slice_delegate_huge(x => x[0])` | 61 |
+  | `pattern_ffi_slice_delegate_huge(x => x.Copied[0])` | 79741 |
+  | `pattern_ffi_slice_2(short_vec, 0)` | 28 |
+  | `pattern_ffi_slice_2(long_vec, 0)` | 24 |
   | `pattern_ffi_slice_4(short_byte, short_byte)` | 28 |
 
   This gives more performance when working with slices, but requires `<AllowUnsafeBlocks>true</AllowUnsafeBlocks>`

@@ -39,8 +39,12 @@ pub trait CSharpWriter {
         indented!(w, r#"using System.Collections.Generic;"#)?;
         indented!(w, r#"using System.Runtime.InteropServices;"#)?;
 
-        if self.config().use_unsafe == Unsafe::UnsafeCompilerService {
+        if self.config().use_unsafe == Unsafe::UnsafePlatformMemCpy {
+            indented!(w, r#"#if UNITY_2018_1_OR_NEWER"#)?;
+            indented!(w, r#"using Unity.Collections.LowLevel.Unsafe;"#)?;
+            indented!(w, r#"#else"#)?;
             indented!(w, r#"using System.Runtime.CompilerServices;"#)?;
+            indented!(w, r#"#endif"#)?;
         }
 
         for namespace_id in self.library().namespaces() {
@@ -678,12 +682,16 @@ pub trait CSharpWriter {
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"var rval = new {}[len];"#, type_string)?;
 
-        if self.config().use_unsafe == Unsafe::UnsafeCompilerService {
+        if self.config().use_unsafe == Unsafe::UnsafePlatformMemCpy {
             indented!(w, [_ _ _], r#"unsafe"#)?;
             indented!(w, [_ _ _], r#"{{"#)?;
             indented!(w, [_ _ _ _ ], r#"fixed (void* dst = rval)"#)?;
             indented!(w, [_ _ _ _ ], r#"{{"#)?;
+            indented!(w, [_ _ _ _ _], r#"#if UNITY_2018_1_OR_NEWER"#)?;
+            indented!(w, [_ _ _ _ _], r#"UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof({})));"#, type_string)?;
+            indented!(w, [_ _ _ _ _], r#"#else"#)?;
             indented!(w, [_ _ _ _ _], r#"Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);"#)?;
+            indented!(w, [_ _ _ _ _], r#"#endif"#)?;
             indented!(w, [_ _ _ _ ], r#"}}"#)?;
             indented!(w, [_ _ _], r#"}}"#)?;
         } else {
@@ -792,12 +800,16 @@ pub trait CSharpWriter {
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"var rval = new {}[len];"#, type_string)?;
 
-        if self.config().use_unsafe == Unsafe::UnsafeCompilerService {
+        if self.config().use_unsafe == Unsafe::UnsafePlatformMemCpy {
             indented!(w, [_ _ _], r#"unsafe"#)?;
             indented!(w, [_ _ _], r#"{{"#)?;
             indented!(w, [_ _ _ _ ], r#"fixed (void* dst = rval)"#)?;
             indented!(w, [_ _ _ _ ], r#"{{"#)?;
+            indented!(w, [_ _ _ _ _], r#"#if UNITY_2018_1_OR_NEWER"#)?;
+            indented!(w, [_ _ _ _ _], r#"UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof({})));"#, type_string)?;
+            indented!(w, [_ _ _ _ _], r#"#else"#)?;
             indented!(w, [_ _ _ _ _], r#"Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);"#)?;
+            indented!(w, [_ _ _ _ _], r#"#endif"#)?;
             indented!(w, [_ _ _ _ ], r#"}}"#)?;
             indented!(w, [_ _ _], r#"}}"#)?;
         } else {

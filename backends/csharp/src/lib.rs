@@ -116,7 +116,7 @@ mod converter;
 mod testing;
 mod writer;
 
-pub use config::{Config, WriteTypes};
+pub use config::{Config, Unsafe, WriteTypes};
 pub use converter::{CSharpTypeConverter, Converter};
 pub use testing::run_dotnet_command_if_installed;
 pub use writer::CSharpWriter;

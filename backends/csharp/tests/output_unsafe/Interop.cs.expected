@@ -4,7 +4,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+#if UNITY_2018_1_OR_NEWER
+using Unity.Collections.LowLevel.Unsafe;
+#else
 using System.Runtime.CompilerServices;
+#endif
 using My.Company;
 using My.Company.Common;
 
@@ -654,7 +658,11 @@ namespace My.Company
                 {
                     fixed (void* dst = rval)
                     {
+                        #if UNITY_2018_1_OR_NEWER
+                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(Vec3f32)));
+                        #else
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        #endif
                     }
                 }
                 return rval;

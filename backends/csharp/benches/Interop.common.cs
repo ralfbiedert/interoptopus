@@ -4,7 +4,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+#if UNITY_2018_1_OR_NEWER
+using Unity.Collections.LowLevel.Unsafe;
+#else
 using System.Runtime.CompilerServices;
+#endif
 using My.Company;
 using My.Company.Common;
 
@@ -69,7 +73,11 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
+                        #if UNITY_2018_1_OR_NEWER
+                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(Bool)));
+                        #else
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        #endif
                     }
                 }
                 return rval;
@@ -131,7 +139,11 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
+                        #if UNITY_2018_1_OR_NEWER
+                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(uint)));
+                        #else
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        #endif
                     }
                 }
                 return rval;
@@ -193,7 +205,11 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
+                        #if UNITY_2018_1_OR_NEWER
+                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(byte)));
+                        #else
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        #endif
                     }
                 }
                 return rval;
@@ -264,7 +280,11 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
+                        #if UNITY_2018_1_OR_NEWER
+                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(byte)));
+                        #else
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        #endif
                     }
                 }
                 return rval;

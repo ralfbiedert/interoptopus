@@ -17,8 +17,8 @@ pub enum Unsafe {
     None,
     /// Use `unsafe` for performance optimizations (Unity compatible).
     UnsafeKeyword,
-    /// Also use `unsafe` for slice copies (not Unity compatible).
-    UnsafeCompilerService,
+    /// Also use `unsafe` for slice copies.
+    UnsafePlatformMemCpy,
 }
 
 impl Unsafe {
@@ -26,7 +26,7 @@ impl Unsafe {
         match self {
             Unsafe::None => false,
             Unsafe::UnsafeKeyword => true,
-            Unsafe::UnsafeCompilerService => true,
+            Unsafe::UnsafePlatformMemCpy => true,
         }
     }
 }

@@ -17,6 +17,8 @@ the given type.
 
 - The list is ad-hoc, PRs adding more tests to `Benchmark.cs` are welcome.
 
+- Bindings were generated with the C# `use_unsafe` config, which dramatically (between 2x and 150x(!)) speeds
+  up slice access and copies in .NET and Unity, [see the FAQ for details](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md#existing-backends). 
 
 ## System
 
@@ -38,21 +40,22 @@ profile: --release
 | `primitive_u16(0)` | 8 |
 | `primitive_u32(0)` | 8 |
 | `primitive_u64(0)` | 8 |
-| `many_args_5(0, 0, 0, 0, 0)` | 11 |
+| `many_args_5(0, 0, 0, 0, 0)` | 10 |
 | `many_args_10(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)` | 14 |
-| `ptr(x)` | 9 |
-| `ptr_mut(x)` | 10 |
+| `ptr(x)` | 8 |
+| `ptr_mut(x)` | 9 |
 | `ref_simple(x)` | 8 |
-| `ref_option(x)` | 11 |
-| `tupled(new Tupled())` | 9 |
-| `complex_args_1(new Vec3f32(), ref e)` | 12 |
-| `callback(x => x, 0)` | 48 |
-| `dynamic_api.tupled(new Tupled())` | 15 |
-| `pattern_ffi_option_1(new FFIOptionInner())` | 9 |
-| `pattern_ffi_slice_delegate(x => x[0])` | 195 |
-| `pattern_ffi_slice_delegate(x => x.Copied[0])` | 1307 |
-| `pattern_ffi_slice_delegate_huge(x => x[0])` | 190 |
-| `pattern_ffi_slice_delegate_huge(x => x.Copied[0])` | 11844317 |
-| `pattern_ffi_slice_2(short_vec, 0)` | 64 |
-| `pattern_ffi_slice_2(long_vec, 0)` | 61 |
-| `pattern_ascii_pointer_1('hello world')` | 44 |
+| `ref_option(x)` | 9 |
+| `tupled(new Tupled())` | 8 |
+| `complex_args_1(new Vec3f32(), ref e)` | 11 |
+| `callback(x => x, 0)` | 43 |
+| `dynamic_api.tupled(new Tupled())` | 17 |
+| `pattern_ffi_option_1(new OptionInner())` | 9 |
+| `pattern_ffi_slice_delegate(x => x[0])` | 53 |
+| `pattern_ffi_slice_delegate(x => x.Copied[0])` | 85 |
+| `pattern_ffi_slice_delegate_huge(x => x[0])` | 110 |
+| `pattern_ffi_slice_delegate_huge(x => x.Copied[0])` | 79919 |
+| `pattern_ffi_slice_2(short_vec, 0)` | 27 |
+| `pattern_ffi_slice_2(long_vec, 0)` | 24 |
+| `pattern_ffi_slice_4(short_byte, short_byte)` | 29 |
+| `pattern_ascii_pointer_1('hello world')` | 42 |
