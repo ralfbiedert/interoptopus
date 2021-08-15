@@ -37,9 +37,9 @@
 //!
 //! | Language | Crate | Sample Output |
 //! | --- | --- | --- |
-//! | C# | [**interoptopus_backend_csharp**](https://crates.io/crates/interoptopus_backend_csharp) | [Interop.cs](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_csharp/tests/output/Interop.cs) |
-//! | C | [**interoptopus_backend_c**](https://crates.io/crates/interoptopus_backend_c) | [my_header.h](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_c/tests/output/my_header.h) |
-//! | Python<sup>1</sup> | [**interoptopus_backend_cpython_cffi**](https://crates.io/crates/interoptopus_backend_cpython_cffi) | [reference.py](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_cpython_cffi/tests/output/reference_project.py) |
+//! | C# | [**interoptopus_backend_csharp**](https://crates.io/crates/interoptopus_backend_csharp) | [Interop.cs](https://github.com/ralfbiedert/interoptopus/blob/master/backends/csharp/tests/output/Interop.cs) |
+//! | C | [**interoptopus_backend_c**](https://crates.io/crates/interoptopus_backend_c) | [my_header.h](https://github.com/ralfbiedert/interoptopus/blob/master/backends/c/tests/output/my_header.h) |
+//! | Python<sup>1</sup> | [**interoptopus_backend_cpython_cffi**](https://crates.io/crates/interoptopus_backend_cpython_cffi) | [reference.py](https://github.com/ralfbiedert/interoptopus/blob/master/backends/cpython_cffi/tests/output/reference_project.py) |
 //! | Other | Write your own backend<sup>2</sup> | - |
 //!
 //! <sup>1</sup> Using Python [CFFI](https://cffi.readthedocs.io/en/latest/index.html). <br>
@@ -49,8 +49,8 @@
 //!
 //! If you want to ...
 //! - **create a new API** see the [**hello world**](https://github.com/ralfbiedert/interoptopus/tree/master/examples/hello_world),
-//! - **understand what's possible**, see the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src),
-//! - **support a new language**, [**copy the C backend**](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_backend_c).
+//! - **understand what's possible**, see the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/reference_project/src),
+//! - **support a new language**, [**copy the C backend**](https://github.com/ralfbiedert/interoptopus/tree/master/backends/c).
 //!
 //! ## Features
 //!
@@ -70,11 +70,11 @@
 //!
 //! ## Supported Rust Constructs
 //!
-//! See the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src) for an overview:
-//! - [functions](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/functions.rs) (`extern "C"` functions and delegates)
-//! - [types](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/types.rs) (composites, enums, opaques, references, ...)
-//! - [constants](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/constants.rs) (primitive constants; results of const evaluation)
-//! - [patterns](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src/patterns) (ASCII pointers, options, slices, classes, ...)
+//! See the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/reference_project/src) for an overview:
+//! - [functions](https://github.com/ralfbiedert/interoptopus/blob/master/reference_project/src/functions.rs) (`extern "C"` functions and delegates)
+//! - [types](https://github.com/ralfbiedert/interoptopus/blob/master/reference_project/src/types.rs) (composites, enums, opaques, references, ...)
+//! - [constants](https://github.com/ralfbiedert/interoptopus/blob/master/reference_project/src/constants.rs) (primitive constants; results of const evaluation)
+//! - [patterns](https://github.com/ralfbiedert/interoptopus/tree/master/reference_project/src/patterns) (ASCII pointers, options, slices, classes, ...)
 //!
 //!
 //!
@@ -86,7 +86,7 @@
 //! at the FFI boundary (e.g., marshalling or pinning in managed languages) For C# that cost
 //! can be nanoseconds, for Python CFFI it can be microseconds.
 //!
-//! See this [**C# call-cost table**](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_csharp/benches/BENCHMARK_RESULTS.md)<sup>🔥</sup> for ballpark figures.
+//! See this [**C# call-cost table**](https://github.com/ralfbiedert/interoptopus/blob/master/backends/csharp/benches/BENCHMARK_RESULTS.md)<sup>🔥</sup> for ballpark figures.
 //!
 //! ## Changelog
 //!
@@ -96,8 +96,8 @@
 //! - **v0.5** - More ergonomic slice usage in Rust and FFI.
 //! - **v0.4** - Enable logging support in auto-generated FFI calls.
 //! - **v0.3** - Better compatibility with generics.
-//! - **v0.2** - Introduced "patterns"; produces generally _working_ interop for C#.
-//! - **v0.1** - Has generated C#, C, Python-CFFI bindings at least once.
+//! - **v0.2** - Introduced "patterns"; _working_ interop for C#.
+//! - **v0.1** - First version.
 //!
 //!
 //! ## FAQ
