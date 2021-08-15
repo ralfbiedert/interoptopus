@@ -33,6 +33,8 @@ pub struct Config {
     pub unroll_struct_arrays: bool,
     /// Which types to write.
     pub write_types: WriteTypes,
+    /// If enabled bindings will use C# `unsafe` for increased performance; but will need to be enabled in C# project settings to work.
+    pub use_unsafe: bool,
     /// Also generate markers for easier debugging
     pub debug: bool,
 }
@@ -50,6 +52,7 @@ impl Default for Config {
             emit_rust_visibility: false,
             unroll_struct_arrays: false,
             write_types: WriteTypes::NamespaceAndInteroptopusGlobal,
+            use_unsafe: false,
             debug: false,
         }
     }

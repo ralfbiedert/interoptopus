@@ -205,21 +205,54 @@ pub trait CSharpWriter {
 
         indented!(w, r#"public static {} {}({}) {{"#, rval, name, params.join(", "))?;
 
-        for (pin_var, slice_struct) in to_pin_name.iter().zip(to_pin_slice_type.iter()) {
-            indented!(w, [_], r#"var {}_pinned = GCHandle.Alloc({}, GCHandleType.Pinned);"#, pin_var, pin_var)?;
-            indented!(w, [_], r#"var {}_slice = new {}({}_pinned, (ulong) {}.Length);"#, pin_var, slice_struct, pin_var, pin_var)?;
+        if self.config().use_unsafe {
+
+            // unsafe
+            //     {
+            //         fixed (Vec3f32* ptr = ffi_slice)
+            //         {
+            //             var ffi_slice_slice = new SliceVec3f32(new IntPtr(ptr), (ulong)ffi_slice.Length);
+            //             return pattern_ffi_slice_2(ffi_slice_slice, i);
+            //         }
+            //     }
+
+            indented!(w, [_], r#"unsafe"#)?;
+            indented!(w, [_], r#"{{"#)?;
+            w.indent();
+
+            for (pin_var, slice_struct) in to_pin_name.iter().zip(to_pin_slice_type.iter()) {
+                indented!(w, [_], r#"fixed (void* ptr_{} = {})"#, pin_var, pin_var)?;
+                indented!(w, [_], r#"{{"#)?;
+                indented!(w, [_ _], r#"var {}_slice = new {}(new IntPtr(ptr_{}), (ulong) {}.Length);"#, pin_var, slice_struct, pin_var, pin_var)?;
+                w.indent();
+            }
+
+            indented!(w, [_], r#"{}{}({});"#, return_stmt, name, to_invoke.join(", "))?;
+            for _ in to_pin_name.iter() {
+                w.unindent();
+                indented!(w, [_], r#"}}"#)?;
+            }
+
+            w.unindent();
+            indented!(w, [_], r#"}}"#)?;
+        } else {
+            for (pin_var, slice_struct) in to_pin_name.iter().zip(to_pin_slice_type.iter()) {
+                indented!(w, [_], r#"var {}_pinned = GCHandle.Alloc({}, GCHandleType.Pinned);"#, pin_var, pin_var)?;
+                indented!(w, [_], r#"var {}_slice = new {}({}_pinned, (ulong) {}.Length);"#, pin_var, slice_struct, pin_var, pin_var)?;
+            }
+
+            indented!(w, [_], r#"try"#)?;
+            indented!(w, [_], r#"{{"#)?;
+            indented!(w, [_ _], r#"{}{}({});"#, return_stmt, name, to_invoke.join(", "))?;
+            indented!(w, [_], r#"}}"#)?;
+            indented!(w, [_], r#"finally"#)?;
+            indented!(w, [_], r#"{{"#)?;
+            for pin in &to_pin_name {
+                indented!(w, [_ _], r#"{}_pinned.Free();"#, pin)?;
+            }
+            indented!(w, [_], r#"}}"#)?;
         }
 
-        indented!(w, [_], r#"try"#)?;
-        indented!(w, [_], r#"{{"#)?;
-        indented!(w, [_ _], r#"{}{}({});"#, return_stmt, name, to_invoke.join(", "))?;
-        indented!(w, [_], r#"}}"#)?;
-        indented!(w, [_], r#"finally"#)?;
-        indented!(w, [_], r#"{{"#)?;
-        for pin in &to_pin_name {
-            indented!(w, [_ _], r#"{}_pinned.Free();"#, pin)?;
-        }
-        indented!(w, [_], r#"}}"#)?;
         indented!(w, r#"}}"#)
     }
 
@@ -303,13 +336,18 @@ pub trait CSharpWriter {
         indented!(w, r#"[StructLayout(LayoutKind.Sequential)]"#)?;
         indented!(w, r#"public partial struct {}"#, type_name)?;
         indented!(w, r#"{{"#)?;
+        indented!(w, [_], r#"byte value;"#)?;
+        indented!(w, r#"}}"#)?;
+        w.newline()?;
+
+        indented!(w, r#"public partial struct {}"#, type_name)?;
+        indented!(w, r#"{{"#)?;
         indented!(w, [_], r#"public static readonly {} True = new Bool {{ value =  1 }};"#, type_name)?;
         indented!(w, [_], r#"public static readonly {} False = new Bool {{ value =  0 }};"#, type_name)?;
         indented!(w, [_], r#"public Bool(bool b)"#)?;
         indented!(w, [_], r#"{{"#)?;
         indented!(w, [_ _ ], r#"value = (byte) (b ? 1 : 0);"#)?;
         indented!(w, [_], r#"}}"#)?;
-        indented!(w, [_], r#"byte value;"#)?;
         indented!(w, [_], r#"public bool Is => value == 1;"#)?;
         indented!(w, r#"}}"#)?;
         w.newline()?;
@@ -600,6 +638,13 @@ pub trait CSharpWriter {
         indented!(w, [_ _], r#"this.len = count;"#)?;
         indented!(w, [_], r#"}}"#)?;
 
+        // Ctor
+        indented!(w, [_], r#"public {}(IntPtr handle, ulong count)"#, context_type_name)?;
+        indented!(w, [_], r#"{{"#)?;
+        indented!(w, [_ _], r#"this.data = handle;"#)?;
+        indented!(w, [_ _], r#"this.len = count;"#)?;
+        indented!(w, [_], r#"}}"#)?;
+
         // Getter
         indented!(w, [_], r#"public {} this[int i]"#, type_string)?;
         indented!(w, [_], r#"{{"#)?;
@@ -670,6 +715,13 @@ pub trait CSharpWriter {
         indented!(w, [_], r#"public {}(GCHandle handle, ulong count)"#, context_type_name)?;
         indented!(w, [_], r#"{{"#)?;
         indented!(w, [_ _], r#"this.data = handle.AddrOfPinnedObject();"#)?;
+        indented!(w, [_ _], r#"this.len = count;"#)?;
+        indented!(w, [_], r#"}}"#)?;
+
+        // Ctor
+        indented!(w, [_], r#"public {}(IntPtr handle, ulong count)"#, context_type_name)?;
+        indented!(w, [_], r#"{{"#)?;
+        indented!(w, [_ _], r#"this.data = handle;"#)?;
         indented!(w, [_ _], r#"this.len = count;"#)?;
         indented!(w, [_], r#"}}"#)?;
 
