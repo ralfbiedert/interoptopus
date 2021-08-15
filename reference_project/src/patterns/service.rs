@@ -1,22 +1,7 @@
-use crate::patterns::result::FFIError;
+use crate::patterns::result::{Error, FFIError};
 use interoptopus::patterns::primitives::FFIBool;
 use interoptopus::patterns::slice::{FFISlice, FFISliceMut};
 use interoptopus::{ffi_service, ffi_service_ctor, ffi_service_method, ffi_type};
-use std::fmt::{Display, Formatter};
-
-// An error we use in a Rust library
-#[derive(Debug)]
-pub enum Error {
-    Bad,
-}
-
-impl Display for Error {
-    fn fmt(&self, _: &mut Formatter<'_>) -> std::fmt::Result {
-        Ok(())
-    }
-}
-
-impl std::error::Error for Error {}
 
 /// Some struct we want to expose as a class.
 #[ffi_type(opaque)]
@@ -78,14 +63,6 @@ impl SimpleService {
     #[ffi_service_method(direct)]
     pub fn method_mut_self_ffi_error(&mut self, _slice: FFISliceMut<u8>) -> FFIError {
         FFIError::Ok
-    }
-}
-
-impl From<Error> for FFIError {
-    fn from(x: Error) -> Self {
-        match x {
-            Error::Bad => Self::Fail,
-        }
     }
 }
 
