@@ -1,7 +1,7 @@
 use interoptopus::util::NamespaceMappings;
 
 /// The types to write for the given recorder.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum WriteTypes {
     /// Only write items defined in the library for this namespace.
     Namespace,
@@ -9,6 +9,26 @@ pub enum WriteTypes {
     NamespaceAndInteroptopusGlobal,
     /// Write every type in the library, regardless of namespace association.
     All,
+}
+
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum Unsafe {
+    /// Do not use C# `unsafe`.
+    None,
+    /// Use `unsafe` for performance optimizations (Unity compatible).
+    UnsafeKeyword,
+    /// Also use `unsafe` for slice copies (not Unity compatible).
+    UnsafeCompilerService,
+}
+
+impl Unsafe {
+    pub fn any_unsafe(self) -> bool {
+        match self {
+            Unsafe::None => false,
+            Unsafe::UnsafeKeyword => true,
+            Unsafe::UnsafeCompilerService => true,
+        }
+    }
 }
 
 /// Configures C# code generation.
@@ -34,7 +54,7 @@ pub struct Config {
     /// Which types to write.
     pub write_types: WriteTypes,
     /// If enabled bindings will use C# `unsafe` for increased performance; but will need to be enabled in C# project settings to work.
-    pub use_unsafe: bool,
+    pub use_unsafe: Unsafe,
     /// Also generate markers for easier debugging
     pub debug: bool,
 }
@@ -52,7 +72,7 @@ impl Default for Config {
             emit_rust_visibility: false,
             unroll_struct_arrays: false,
             write_types: WriteTypes::NamespaceAndInteroptopusGlobal,
-            use_unsafe: false,
+            use_unsafe: Unsafe::None,
             debug: false,
         }
     }

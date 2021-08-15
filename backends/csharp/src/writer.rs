@@ -1,4 +1,4 @@
-use crate::config::{Config, WriteTypes};
+use crate::config::{Config, Unsafe, WriteTypes};
 use crate::converter::{CSharpTypeConverter, Converter};
 use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, Meta, PrimitiveType, Variant, Visibility};
 use interoptopus::patterns::api_guard::library_hash;
@@ -39,7 +39,7 @@ pub trait CSharpWriter {
         indented!(w, r#"using System.Collections.Generic;"#)?;
         indented!(w, r#"using System.Runtime.InteropServices;"#)?;
 
-        if self.config().use_unsafe {
+        if self.config().use_unsafe == Unsafe::UnsafeCompilerService {
             indented!(w, r#"using System.Runtime.CompilerServices;"#)?;
         }
 
@@ -209,7 +209,7 @@ pub trait CSharpWriter {
 
         indented!(w, r#"public static {} {}({}) {{"#, rval, name, params.join(", "))?;
 
-        if self.config().use_unsafe {
+        if self.config().use_unsafe.any_unsafe() {
 
             // unsafe
             //     {
@@ -656,7 +656,7 @@ pub trait CSharpWriter {
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"if (i >= Count) throw new IndexOutOfRangeException();"#)?;
 
-        if self.config().use_unsafe {
+        if self.config().use_unsafe.any_unsafe() {
             indented!(w, [_ _ _], r#"unsafe"#)?;
             indented!(w, [_ _ _], r#"{{"#)?;
             indented!(w, [_ _ _ _], r#"var d = ({}*) data.ToPointer();"#, type_string)?;
@@ -678,7 +678,7 @@ pub trait CSharpWriter {
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"var rval = new {}[len];"#, type_string)?;
 
-        if self.config().use_unsafe {
+        if self.config().use_unsafe == Unsafe::UnsafeCompilerService {
             indented!(w, [_ _ _], r#"unsafe"#)?;
             indented!(w, [_ _ _], r#"{{"#)?;
             indented!(w, [_ _ _ _ ], r#"fixed (void* dst = rval)"#)?;
@@ -756,7 +756,7 @@ pub trait CSharpWriter {
         indented!(w, [_ _], r#"get"#)?;
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"if (i >= Count) throw new IndexOutOfRangeException();"#)?;
-        if self.config().use_unsafe {
+        if self.config().use_unsafe.any_unsafe() {
             indented!(w, [_ _ _], r#"unsafe"#)?;
             indented!(w, [_ _ _], r#"{{"#)?;
             indented!(w, [_ _ _ _], r#"var d = ({}*) data.ToPointer();"#, type_string)?;
@@ -771,7 +771,7 @@ pub trait CSharpWriter {
         indented!(w, [_ _], r#"set"#)?;
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"if (i >= Count) throw new IndexOutOfRangeException();"#)?;
-        if self.config().use_unsafe {
+        if self.config().use_unsafe.any_unsafe() {
             indented!(w, [_ _ _], r#"unsafe"#)?;
             indented!(w, [_ _ _], r#"{{"#)?;
             indented!(w, [_ _ _ _], r#"var d = ({}*) data.ToPointer();"#, type_string)?;
@@ -792,7 +792,7 @@ pub trait CSharpWriter {
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"var rval = new {}[len];"#, type_string)?;
 
-        if self.config().use_unsafe {
+        if self.config().use_unsafe == Unsafe::UnsafeCompilerService {
             indented!(w, [_ _ _], r#"unsafe"#)?;
             indented!(w, [_ _ _], r#"{{"#)?;
             indented!(w, [_ _ _ _ ], r#"fixed (void* dst = rval)"#)?;
