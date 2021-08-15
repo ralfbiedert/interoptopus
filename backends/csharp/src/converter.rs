@@ -4,7 +4,6 @@ use interoptopus::lang::c::{
 use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::safe_name;
-use std::ops::Deref;
 
 /// Implements [`CSharpTypeConverter`].
 #[derive(Copy, Clone)]

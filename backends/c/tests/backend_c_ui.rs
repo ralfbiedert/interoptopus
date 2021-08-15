@@ -1,7 +1,7 @@
 use interoptopus::testing::assert_file_matches_generated;
 use interoptopus::Error;
 use interoptopus::Interop;
-use interoptopus_backend_c::{compile_c_app_if_installed, DocGenerator};
+use interoptopus_backend_c::compile_c_app_if_installed;
 
 fn generate_bindings(output: &str) -> Result<(), Error> {
     use interoptopus_backend_c::{Config, Generator};
@@ -13,7 +13,7 @@ fn generate_bindings(output: &str) -> Result<(), Error> {
 
     let library = interoptopus_reference_project::ffi_inventory();
 
-    let generator = Generator::new(config, library.clone());
+    let generator = Generator::new(config, library);
     generator.write_file(format!("{}/my_header.h", output))?;
 
     // let doc_gen = DocGenerator::new(library, generator);
