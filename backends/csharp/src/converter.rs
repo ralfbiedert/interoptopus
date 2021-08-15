@@ -4,6 +4,7 @@ use interoptopus::lang::c::{
 use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::safe_name;
+use std::ops::Deref;
 
 /// Implements [`CSharpTypeConverter`].
 #[derive(Copy, Clone)]
@@ -41,10 +42,14 @@ pub trait CSharpTypeConverter {
     }
 
     fn has_overloadable(&self, signature: &FunctionSignature) -> bool {
-        signature
-            .params()
-            .iter()
-            .any(|x| matches!(x.the_type(), CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_))))
+        signature.params().iter().any(|x| match x.the_type() {
+            // CType::ReadPointer(x) | CType::ReadWritePointer(x) => match x.deref() {
+            //     CType::Pattern(x) => matches!(x, TypePattern::Slice(_) | TypePattern::SliceMut(_)),
+            //     _ => false,
+            // },
+            CType::Pattern(x) => matches!(x, TypePattern::Slice(_) | TypePattern::SliceMut(_)),
+            _ => false,
+        })
     }
 
     fn pattern_to_native_in_signature(&self, param: &Parameter, _signature: &FunctionSignature) -> String {
@@ -134,6 +139,8 @@ pub trait CSharpTypeConverter {
                 CType::Primitive(PrimitiveType::Void) => "IntPtr".to_string(),
                 CType::ReadPointer(_) => "ref IntPtr".to_string(),
                 CType::ReadWritePointer(_) => "ref IntPtr".to_string(),
+                CType::Pattern(TypePattern::Slice(_)) => format!("ref {}", self.to_typespecifier_in_param(z)),
+                CType::Pattern(TypePattern::SliceMut(_)) => format!("ref {}", self.to_typespecifier_in_param(z)),
                 _ => format!("ref {}", self.to_typespecifier_in_param(z)),
             },
             CType::ReadWritePointer(z) => match **z {
@@ -141,6 +148,8 @@ pub trait CSharpTypeConverter {
                 CType::Primitive(PrimitiveType::Void) => "IntPtr".to_string(),
                 CType::ReadPointer(_) => "ref IntPtr".to_string(),
                 CType::ReadWritePointer(_) => "ref IntPtr".to_string(),
+                CType::Pattern(TypePattern::Slice(_)) => format!("ref {}", self.to_typespecifier_in_param(z)),
+                CType::Pattern(TypePattern::SliceMut(_)) => format!("ref {}", self.to_typespecifier_in_param(z)),
                 _ => format!("out {}", self.to_typespecifier_in_param(z)),
             },
             CType::FnPointer(x) => self.fnpointer_to_typename(x),

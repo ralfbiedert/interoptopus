@@ -75,6 +75,7 @@ interoptopus::inventory!(
         patterns::slice::pattern_ffi_slice_2,
         patterns::slice::pattern_ffi_slice_3,
         patterns::slice::pattern_ffi_slice_4,
+        patterns::slice::pattern_ffi_slice_5,
         patterns::slice::pattern_ffi_slice_delegate,
         patterns::slice::pattern_ffi_slice_delegate_huge,
         patterns::option::pattern_ffi_option_1,

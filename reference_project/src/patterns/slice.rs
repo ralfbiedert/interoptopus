@@ -49,6 +49,13 @@ pub extern "C" fn pattern_ffi_slice_3(mut slice: FFISliceMut<u8>, callback: Call
 #[no_mangle]
 pub extern "C" fn pattern_ffi_slice_4(_slice: FFISlice<u8>, _slice2: FFISliceMut<u8>) {}
 
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn pattern_ffi_slice_5(slice: &FFISlice<u8>, slice2: &mut FFISliceMut<u8>) {
+    let _ = slice.as_slice().len();
+    let _ = slice2.as_slice().len();
+}
+
 // Some extra tests that were hard to do from core crate.
 #[cfg(test)]
 mod test {

@@ -16,9 +16,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 6267814788633886251ul)
+            if (api_version != 12447785630982032897ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (6267814788633886251). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (12447785630982032897). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -271,6 +271,10 @@ namespace My.Company
                 _slice2_pinned.Free();
             }
         }
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_5")]
+        public static extern void pattern_ffi_slice_5(ref Sliceu8 slice, ref SliceMutu8 slice2);
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_delegate")]
         public static extern byte pattern_ffi_slice_delegate(CallbackFFISlice callback);
