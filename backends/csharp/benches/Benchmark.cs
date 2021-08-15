@@ -71,8 +71,8 @@ namespace Interoptopus
             result = MeasureResult.Measure(Iterations, () => dynamic_api.tupled(new Tupled()));
             writer.Add("dynamic_api.tupled(new Tupled())", result);
 
-            result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_option_1(new FFIOptionInner()));
-            writer.Add("pattern_ffi_option_1(new FFIOptionInner())", result);
+            result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_option_1(new OptionInner()));
+            writer.Add("pattern_ffi_option_1(new OptionInner())", result);
 
             result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_slice_delegate(x => x[0]));
             writer.Add("pattern_ffi_slice_delegate(x => x[0])", result);
