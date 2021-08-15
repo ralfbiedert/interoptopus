@@ -45,6 +45,10 @@ pub extern "C" fn pattern_ffi_slice_3(mut slice: FFISliceMut<u8>, callback: Call
     callback.call(slice);
 }
 
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn pattern_ffi_slice_4(_slice: FFISlice<u8>, _slice2: FFISliceMut<u8>) {}
+
 // Some extra tests that were hard to do from core crate.
 #[cfg(test)]
 mod test {
