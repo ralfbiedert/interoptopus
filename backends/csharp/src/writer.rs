@@ -651,9 +651,19 @@ pub trait CSharpWriter {
         indented!(w, [_ _], r#"get"#)?;
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"if (i >= Count) throw new IndexOutOfRangeException();"#)?;
-        indented!(w, [_ _ _], r#"var size = Marshal.SizeOf(typeof({}));"#, type_string)?;
-        indented!(w, [_ _ _], r#"var ptr = new IntPtr(data.ToInt64() + i * size);"#)?;
-        indented!(w, [_ _ _], r#"return Marshal.PtrToStructure<{}>(ptr);"#, type_string)?;
+
+        if self.config().use_unsafe {
+            indented!(w, [_ _ _], r#"unsafe"#)?;
+            indented!(w, [_ _ _], r#"{{"#)?;
+            indented!(w, [_ _ _ _], r#"var d = ({}*) data.ToPointer();"#, type_string)?;
+            indented!(w, [_ _ _ _], r#"return d[i];"#)?;
+            indented!(w, [_ _ _], r#"}}"#)?;
+        } else {
+            indented!(w, [_ _ _], r#"var size = Marshal.SizeOf(typeof({}));"#, type_string)?;
+            indented!(w, [_ _ _], r#"var ptr = new IntPtr(data.ToInt64() + i * size);"#)?;
+            indented!(w, [_ _ _], r#"return Marshal.PtrToStructure<{}>(ptr);"#, type_string)?;
+        }
+
         indented!(w, [_ _], r#"}}"#)?;
         indented!(w, [_], r#"}}"#)?;
 
@@ -731,16 +741,32 @@ pub trait CSharpWriter {
         indented!(w, [_ _], r#"get"#)?;
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"if (i >= Count) throw new IndexOutOfRangeException();"#)?;
-        indented!(w, [_ _ _], r#"var size = Marshal.SizeOf(typeof({}));"#, type_string)?;
-        indented!(w, [_ _ _], r#"var ptr = new IntPtr(data.ToInt64() + i * size);"#)?;
-        indented!(w, [_ _ _], r#"return Marshal.PtrToStructure<{}>(ptr);"#, type_string)?;
+        if self.config().use_unsafe {
+            indented!(w, [_ _ _], r#"unsafe"#)?;
+            indented!(w, [_ _ _], r#"{{"#)?;
+            indented!(w, [_ _ _ _], r#"var d = ({}*) data.ToPointer();"#, type_string)?;
+            indented!(w, [_ _ _ _], r#"return d[i];"#)?;
+            indented!(w, [_ _ _], r#"}}"#)?;
+        } else {
+            indented!(w, [_ _ _], r#"var size = Marshal.SizeOf(typeof({}));"#, type_string)?;
+            indented!(w, [_ _ _], r#"var ptr = new IntPtr(data.ToInt64() + i * size);"#)?;
+            indented!(w, [_ _ _], r#"return Marshal.PtrToStructure<{}>(ptr);"#, type_string)?;
+        }
         indented!(w, [_ _], r#"}}"#)?;
         indented!(w, [_ _], r#"set"#)?;
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"if (i >= Count) throw new IndexOutOfRangeException();"#)?;
-        indented!(w, [_ _ _], r#"var size = Marshal.SizeOf(typeof({}));"#, type_string)?;
-        indented!(w, [_ _ _], r#"var ptr = new IntPtr(data.ToInt64() + i * size);"#)?;
-        indented!(w, [_ _ _], r#"Marshal.StructureToPtr<{}>(value, ptr, false);"#, type_string)?;
+        if self.config().use_unsafe {
+            indented!(w, [_ _ _], r#"unsafe"#)?;
+            indented!(w, [_ _ _], r#"{{"#)?;
+            indented!(w, [_ _ _ _], r#"var d = ({}*) data.ToPointer();"#, type_string)?;
+            indented!(w, [_ _ _ _], r#"d[i] = value;"#)?;
+            indented!(w, [_ _ _], r#"}}"#)?;
+        } else {
+            indented!(w, [_ _ _], r#"var size = Marshal.SizeOf(typeof({}));"#, type_string)?;
+            indented!(w, [_ _ _], r#"var ptr = new IntPtr(data.ToInt64() + i * size);"#)?;
+            indented!(w, [_ _ _], r#"Marshal.StructureToPtr<{}>(value, ptr, false);"#, type_string)?;
+        }
         indented!(w, [_ _], r#"}}"#)?;
         indented!(w, [_], r#"}}"#)?;
 

@@ -101,18 +101,25 @@
 
   | Construct | ns per call |
   | --- | --- |
-  | `pattern_ffi_slice_2(short_vec, 0)` | 66 |
-  | `pattern_ffi_slice_2(long_vec, 0)` | 60 |
-  | `pattern_ffi_slice_4(short_byte, short_byte)` | 104 |
-
-  For a notable performance increase you can enable `use_unsafe` in the C# backend which will use 
+  | `pattern_ffi_slice_delegate(x => x[0])` | 195 |
+  | `pattern_ffi_slice_delegate(x => x.Copied[0])` | 1307 |
+  | `pattern_ffi_slice_delegate_huge(x => x[0])` | 190 |
+  | `pattern_ffi_slice_delegate_huge(x => x.Copied[0])` | 11844317 |
+  | `pattern_ffi_slice_2(short_vec, 0)` | 64 
+  | `pattern_ffi_slice_2(long_vec, 0)` | 61 |
+- 
+  For a dramatic 2x - 8x performance increase you can enable `use_unsafe` in the C# backend which will use 
   a `fixed` slice instead. 
 
   | Construct | ns per call |
   | --- | --- |
-  | `pattern_ffi_slice_2(short_vec, 0)` | 28 |
+  | `pattern_ffi_slice_delegate(x => x[0])` | 52 |
+  | `pattern_ffi_slice_delegate(x => x.Copied[0])` | 161 |
+  | `pattern_ffi_slice_delegate_huge(x => x[0])` | 62 |
+  | `pattern_ffi_slice_delegate_huge(x => x.Copied[0])` | 1484303 |
+  | `pattern_ffi_slice_2(short_vec, 0)` | 27 |
   | `pattern_ffi_slice_2(long_vec, 0)` | 23 |
-  | `pattern_ffi_slice_4(short_byte, short_byte)` | 29 |
+  | `pattern_ffi_slice_4(short_byte, short_byte)` | 28 |
 
   This gives more performance when working with slices, but requires `<AllowUnsafeBlocks>true</AllowUnsafeBlocks>`
   being enabled in the C# project setting. In Unity it will force the entire game

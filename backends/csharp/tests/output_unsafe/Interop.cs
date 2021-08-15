@@ -637,9 +637,11 @@ namespace My.Company
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(Vec3f32));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                return Marshal.PtrToStructure<Vec3f32>(ptr);
+                unsafe
+                {
+                    var d = (Vec3f32*) data.ToPointer();
+                    return d[i];
+                }
             }
         }
         public Vec3f32[] Copied

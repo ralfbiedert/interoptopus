@@ -52,9 +52,11 @@ namespace My.Company.Common
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(Bool));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                return Marshal.PtrToStructure<Bool>(ptr);
+                unsafe
+                {
+                    var d = (Bool*) data.ToPointer();
+                    return d[i];
+                }
             }
         }
         public Bool[] Copied
@@ -108,9 +110,11 @@ namespace My.Company.Common
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(uint));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                return Marshal.PtrToStructure<uint>(ptr);
+                unsafe
+                {
+                    var d = (uint*) data.ToPointer();
+                    return d[i];
+                }
             }
         }
         public uint[] Copied
@@ -164,9 +168,11 @@ namespace My.Company.Common
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(byte));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                return Marshal.PtrToStructure<byte>(ptr);
+                unsafe
+                {
+                    var d = (byte*) data.ToPointer();
+                    return d[i];
+                }
             }
         }
         public byte[] Copied
@@ -220,16 +226,20 @@ namespace My.Company.Common
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(byte));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                return Marshal.PtrToStructure<byte>(ptr);
+                unsafe
+                {
+                    var d = (byte*) data.ToPointer();
+                    return d[i];
+                }
             }
             set
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(byte));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                Marshal.StructureToPtr<byte>(value, ptr, false);
+                unsafe
+                {
+                    var d = (byte*) data.ToPointer();
+                    d[i] = value;
+                }
             }
         }
         public byte[] Copied
