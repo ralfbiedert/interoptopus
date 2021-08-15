@@ -7,7 +7,7 @@
 
 ## Interoptopus 🐙
 
-The polyglot bindings generator for your library (C#, C, Python, ...)
+The polyglot bindings generator for your library.
 
 
 ### Code you write ...
@@ -52,8 +52,8 @@ If you want to ...
 
 ### Features
 
-- explicit, type-safe, **single source of truth** API definition in Rust,
-- **quality-of-life [patterns](crate::patterns)** on **both sides** (e.g., [options](crate::patterns::option), [slices](crate::patterns::slice), [services](crate::patterns::service), ...)
+- explicit, **single source of truth** API definition in Rust,
+- **quality-of-life [patterns](crate::patterns)** on **both sides** ([slices](crate::patterns::slice), [services](crate::patterns::service), ...)
 - if your **project compiles your bindings should work**, <sup>&#42;*cough*&#42;</sup>
 - easy to support new languages, fully **customizable**,
 - **no scripts needed**, works from `cargo build` + `cargo test`.
@@ -61,7 +61,7 @@ If you want to ...
 
 Gated behind **feature flags**, these enable:
 
-- `derive` - Proc macros such as `ffi_constant`, `ffi_function`, `ffi_type`.
+- `derive` - Proc macros such as `ffi_type`, ...
 - `serde` - Serde attributes on internal types.
 - `log` - Invoke `log` on FFI errors (you still need actual logger).
 
@@ -87,8 +87,8 @@ If you **need API design guidance** the following (wip) [**C# call-cost table**]
 
 ### Changelog
 
-- **v0.8** - Moved testing functions to respective backend crates.
-- **v0.7** - Patterns mostly use proc macros now for better FFI docs.
+- **v0.8** - Moved testing functions to respective backends.
+- **v0.7** - Move patterns to proc macros for better FFI docs.
 - **v0.6** - Renamed and clarified many patterns.
 - **v0.5** - More ergonomic slice usage in Rust and FFI.
 - **v0.4** - Enable logging support in auto-generated FFI calls.
