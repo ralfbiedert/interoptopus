@@ -16,9 +16,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 9589975498115539482ul)
+            if (api_version != 6267814788633886251ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (9589975498115539482). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (6267814788633886251). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -250,6 +250,25 @@ namespace My.Company
             finally
             {
                 slice_pinned.Free();
+            }
+        }
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_4")]
+        public static extern void pattern_ffi_slice_4(Sliceu8 _slice, SliceMutu8 _slice2);
+
+        public static void pattern_ffi_slice_4(byte[] _slice, byte[] _slice2) {
+            var _slice_pinned = GCHandle.Alloc(_slice, GCHandleType.Pinned);
+            var _slice_slice = new Sliceu8(_slice_pinned, (ulong) _slice.Length);
+            var _slice2_pinned = GCHandle.Alloc(_slice2, GCHandleType.Pinned);
+            var _slice2_slice = new SliceMutu8(_slice2_pinned, (ulong) _slice2.Length);
+            try
+            {
+                pattern_ffi_slice_4(_slice_slice, _slice2_slice);
+            }
+            finally
+            {
+                _slice_pinned.Free();
+                _slice2_pinned.Free();
             }
         }
 
@@ -622,6 +641,11 @@ namespace My.Company
         public SliceVec3f32(GCHandle handle, ulong count)
         {
             this.data = handle.AddrOfPinnedObject();
+            this.len = count;
+        }
+        public SliceVec3f32(IntPtr handle, ulong count)
+        {
+            this.data = handle;
             this.len = count;
         }
         public Vec3f32 this[int i]

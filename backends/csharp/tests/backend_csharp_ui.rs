@@ -4,7 +4,7 @@ use interoptopus::Error;
 use interoptopus::Interop;
 use interoptopus_backend_csharp::{run_dotnet_command_if_installed, WriteTypes};
 
-fn generate_bindings_multi(prefix: &str) -> Result<(), Error> {
+fn generate_bindings_multi(prefix: &str, use_unsafe: bool) -> Result<(), Error> {
     use interoptopus_backend_csharp::{Config, Generator};
 
     let library = interoptopus_reference_project::ffi_inventory();
@@ -15,6 +15,7 @@ fn generate_bindings_multi(prefix: &str) -> Result<(), Error> {
         namespace_mappings,
         unroll_struct_arrays: true,
         emit_rust_visibility: true,
+        use_unsafe,
         // debug: true,
         ..Config::default()
     };
@@ -43,10 +44,14 @@ fn generate_bindings_multi(prefix: &str) -> Result<(), Error> {
 #[test]
 #[cfg_attr(miri, ignore)]
 fn bindings_match_reference() -> Result<(), Error> {
-    generate_bindings_multi("tests/output/Interop")?;
+    generate_bindings_multi("tests/output_safe/Interop", false)?;
+    generate_bindings_multi("tests/output_unsafe/Interop", true)?;
 
-    assert_file_matches_generated("tests/output/Interop.cs");
-    assert_file_matches_generated("tests/output/Interop.common.cs");
+    assert_file_matches_generated("tests/output_safe/Interop.cs");
+    assert_file_matches_generated("tests/output_safe/Interop.common.cs");
+
+    assert_file_matches_generated("tests/output_unsafe/Interop.cs");
+    assert_file_matches_generated("tests/output_unsafe/Interop.common.cs");
 
     Ok(())
 }
@@ -54,15 +59,17 @@ fn bindings_match_reference() -> Result<(), Error> {
 #[test]
 #[cfg_attr(miri, ignore)]
 fn bindings_work() -> Result<(), Error> {
-    generate_bindings_multi("tests/output/Interop")?;
+    generate_bindings_multi("tests/output_safe/Interop", false)?;
+    generate_bindings_multi("tests/output_unsafe/Interop", true)?;
 
-    run_dotnet_command_if_installed("tests/output/", "build")?;
+    run_dotnet_command_if_installed("tests/output_safe/", "build")?;
+    run_dotnet_command_if_installed("tests/output_unsafe/", "build")?;
     Ok(())
 }
 
 #[test]
 #[cfg_attr(miri, ignore)]
 fn prepare_benchmarks() -> Result<(), Error> {
-    generate_bindings_multi("benches/Interop")?;
+    generate_bindings_multi("benches/Interop", false)?;
     Ok(())
 }

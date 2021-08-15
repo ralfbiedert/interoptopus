@@ -250,6 +250,7 @@ uint32_t pattern_ascii_pointer_len(uint8_t* x, my_library_useasciistringpattern 
 uint32_t pattern_ffi_slice_1(my_library_sliceu32 ffi_slice);
 my_library_vec3f32 pattern_ffi_slice_2(my_library_slicevec3f32 ffi_slice, int32_t i);
 void pattern_ffi_slice_3(my_library_slicemutu8 slice, my_library_fptr_fn_SliceMutu8 callback);
+void pattern_ffi_slice_4(my_library_sliceu8 _slice, my_library_slicemutu8 _slice2);
 uint8_t pattern_ffi_slice_delegate(my_library_fptr_fn_Sliceu8_rval_u8 callback);
 my_library_vec3f32 pattern_ffi_slice_delegate_huge(my_library_fptr_fn_SliceVec3f32_rval_Vec3f32 callback);
 my_library_optioninner pattern_ffi_option_1(my_library_optioninner ffi_slice);

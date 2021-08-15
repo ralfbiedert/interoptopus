@@ -209,15 +209,13 @@ namespace My.Company
         public static extern uint pattern_ffi_slice_1(Sliceu32 ffi_slice);
 
         public static uint pattern_ffi_slice_1(uint[] ffi_slice) {
-            var ffi_slice_pinned = GCHandle.Alloc(ffi_slice, GCHandleType.Pinned);
-            var ffi_slice_slice = new Sliceu32(ffi_slice_pinned, (ulong) ffi_slice.Length);
-            try
+            unsafe
             {
-                return pattern_ffi_slice_1(ffi_slice_slice);
-            }
-            finally
-            {
-                ffi_slice_pinned.Free();
+                fixed (void* ptr_ffi_slice = ffi_slice)
+                {
+                    var ffi_slice_slice = new Sliceu32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
+                    return pattern_ffi_slice_1(ffi_slice_slice);
+                }
             }
         }
 
@@ -225,15 +223,13 @@ namespace My.Company
         public static extern Vec3f32 pattern_ffi_slice_2(SliceVec3f32 ffi_slice, int i);
 
         public static Vec3f32 pattern_ffi_slice_2(Vec3f32[] ffi_slice, int i) {
-            var ffi_slice_pinned = GCHandle.Alloc(ffi_slice, GCHandleType.Pinned);
-            var ffi_slice_slice = new SliceVec3f32(ffi_slice_pinned, (ulong) ffi_slice.Length);
-            try
+            unsafe
             {
-                return pattern_ffi_slice_2(ffi_slice_slice, i);
-            }
-            finally
-            {
-                ffi_slice_pinned.Free();
+                fixed (void* ptr_ffi_slice = ffi_slice)
+                {
+                    var ffi_slice_slice = new SliceVec3f32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
+                    return pattern_ffi_slice_2(ffi_slice_slice, i);
+                }
             }
         }
 
@@ -241,15 +237,13 @@ namespace My.Company
         public static extern void pattern_ffi_slice_3(SliceMutu8 slice, CallbackSliceMut callback);
 
         public static void pattern_ffi_slice_3(byte[] slice, CallbackSliceMut callback) {
-            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new SliceMutu8(slice_pinned, (ulong) slice.Length);
-            try
+            unsafe
             {
-                pattern_ffi_slice_3(slice_slice, callback);
-            }
-            finally
-            {
-                slice_pinned.Free();
+                fixed (void* ptr_slice = slice)
+                {
+                    var slice_slice = new SliceMutu8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                    pattern_ffi_slice_3(slice_slice, callback);
+                }
             }
         }
 
@@ -257,18 +251,17 @@ namespace My.Company
         public static extern void pattern_ffi_slice_4(Sliceu8 _slice, SliceMutu8 _slice2);
 
         public static void pattern_ffi_slice_4(byte[] _slice, byte[] _slice2) {
-            var _slice_pinned = GCHandle.Alloc(_slice, GCHandleType.Pinned);
-            var _slice_slice = new Sliceu8(_slice_pinned, (ulong) _slice.Length);
-            var _slice2_pinned = GCHandle.Alloc(_slice2, GCHandleType.Pinned);
-            var _slice2_slice = new SliceMutu8(_slice2_pinned, (ulong) _slice2.Length);
-            try
+            unsafe
             {
-                pattern_ffi_slice_4(_slice_slice, _slice2_slice);
-            }
-            finally
-            {
-                _slice_pinned.Free();
-                _slice2_pinned.Free();
+                fixed (void* ptr__slice = _slice)
+                {
+                    var _slice_slice = new Sliceu8(new IntPtr(ptr__slice), (ulong) _slice.Length);
+                    fixed (void* ptr__slice2 = _slice2)
+                    {
+                        var _slice2_slice = new SliceMutu8(new IntPtr(ptr__slice2), (ulong) _slice2.Length);
+                        pattern_ffi_slice_4(_slice_slice, _slice2_slice);
+                    }
+                }
             }
         }
 
@@ -340,15 +333,13 @@ namespace My.Company
         public static extern byte simple_service_method_mut_self(IntPtr context, Sliceu8 slice);
 
         public static byte simple_service_method_mut_self(IntPtr context, byte[] slice) {
-            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new Sliceu8(slice_pinned, (ulong) slice.Length);
-            try
+            unsafe
             {
-                return simple_service_method_mut_self(context, slice_slice);
-            }
-            finally
-            {
-                slice_pinned.Free();
+                fixed (void* ptr_slice = slice)
+                {
+                    var slice_slice = new Sliceu8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                    return simple_service_method_mut_self(context, slice_slice);
+                }
             }
         }
 
@@ -357,15 +348,13 @@ namespace My.Company
         public static extern void simple_service_method_mut_self_void(IntPtr context, SliceBool _slice);
 
         public static void simple_service_method_mut_self_void(IntPtr context, Bool[] _slice) {
-            var _slice_pinned = GCHandle.Alloc(_slice, GCHandleType.Pinned);
-            var _slice_slice = new SliceBool(_slice_pinned, (ulong) _slice.Length);
-            try
+            unsafe
             {
-                simple_service_method_mut_self_void(context, _slice_slice);
-            }
-            finally
-            {
-                _slice_pinned.Free();
+                fixed (void* ptr__slice = _slice)
+                {
+                    var _slice_slice = new SliceBool(new IntPtr(ptr__slice), (ulong) _slice.Length);
+                    simple_service_method_mut_self_void(context, _slice_slice);
+                }
             }
         }
 
@@ -377,15 +366,13 @@ namespace My.Company
         public static extern byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte _y, Sliceu8 _slice);
 
         public static byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte _y, byte[] _slice) {
-            var _slice_pinned = GCHandle.Alloc(_slice, GCHandleType.Pinned);
-            var _slice_slice = new Sliceu8(_slice_pinned, (ulong) _slice.Length);
-            try
+            unsafe
             {
-                return simple_service_method_mut_self_ref_slice(context, ref x, out _y, _slice_slice);
-            }
-            finally
-            {
-                _slice_pinned.Free();
+                fixed (void* ptr__slice = _slice)
+                {
+                    var _slice_slice = new Sliceu8(new IntPtr(ptr__slice), (ulong) _slice.Length);
+                    return simple_service_method_mut_self_ref_slice(context, ref x, out _y, _slice_slice);
+                }
             }
         }
 
@@ -393,18 +380,17 @@ namespace My.Company
         public static extern byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte _y, Sliceu8 _slice, Sliceu8 _slice2);
 
         public static byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte _y, byte[] _slice, byte[] _slice2) {
-            var _slice_pinned = GCHandle.Alloc(_slice, GCHandleType.Pinned);
-            var _slice_slice = new Sliceu8(_slice_pinned, (ulong) _slice.Length);
-            var _slice2_pinned = GCHandle.Alloc(_slice2, GCHandleType.Pinned);
-            var _slice2_slice = new Sliceu8(_slice2_pinned, (ulong) _slice2.Length);
-            try
+            unsafe
             {
-                return simple_service_method_mut_self_ref_slice_limited(context, ref x, out _y, _slice_slice, _slice2_slice);
-            }
-            finally
-            {
-                _slice_pinned.Free();
-                _slice2_pinned.Free();
+                fixed (void* ptr__slice = _slice)
+                {
+                    var _slice_slice = new Sliceu8(new IntPtr(ptr__slice), (ulong) _slice.Length);
+                    fixed (void* ptr__slice2 = _slice2)
+                    {
+                        var _slice2_slice = new Sliceu8(new IntPtr(ptr__slice2), (ulong) _slice2.Length);
+                        return simple_service_method_mut_self_ref_slice_limited(context, ref x, out _y, _slice_slice, _slice2_slice);
+                    }
+                }
             }
         }
 
@@ -412,15 +398,13 @@ namespace My.Company
         public static extern FFIError simple_service_method_mut_self_ffi_error(IntPtr context, SliceMutu8 _slice);
 
         public static FFIError simple_service_method_mut_self_ffi_error(IntPtr context, byte[] _slice) {
-            var _slice_pinned = GCHandle.Alloc(_slice, GCHandleType.Pinned);
-            var _slice_slice = new SliceMutu8(_slice_pinned, (ulong) _slice.Length);
-            try
+            unsafe
             {
-                return simple_service_method_mut_self_ffi_error(context, _slice_slice);
-            }
-            finally
-            {
-                _slice_pinned.Free();
+                fixed (void* ptr__slice = _slice)
+                {
+                    var _slice_slice = new SliceMutu8(new IntPtr(ptr__slice), (ulong) _slice.Length);
+                    return simple_service_method_mut_self_ffi_error(context, _slice_slice);
+                }
             }
         }
 

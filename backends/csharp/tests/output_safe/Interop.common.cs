@@ -42,6 +42,11 @@ namespace My.Company.Common
             this.data = handle.AddrOfPinnedObject();
             this.len = count;
         }
+        public SliceBool(IntPtr handle, ulong count)
+        {
+            this.data = handle;
+            this.len = count;
+        }
         public Bool this[int i]
         {
             get
@@ -91,6 +96,11 @@ namespace My.Company.Common
         public Sliceu32(GCHandle handle, ulong count)
         {
             this.data = handle.AddrOfPinnedObject();
+            this.len = count;
+        }
+        public Sliceu32(IntPtr handle, ulong count)
+        {
+            this.data = handle;
             this.len = count;
         }
         public uint this[int i]
@@ -144,6 +154,11 @@ namespace My.Company.Common
             this.data = handle.AddrOfPinnedObject();
             this.len = count;
         }
+        public Sliceu8(IntPtr handle, ulong count)
+        {
+            this.data = handle;
+            this.len = count;
+        }
         public byte this[int i]
         {
             get
@@ -195,6 +210,11 @@ namespace My.Company.Common
             this.data = handle.AddrOfPinnedObject();
             this.len = count;
         }
+        public SliceMutu8(IntPtr handle, ulong count)
+        {
+            this.data = handle;
+            this.len = count;
+        }
         public byte this[int i]
         {
             get
@@ -242,13 +262,17 @@ namespace My.Company.Common
     [StructLayout(LayoutKind.Sequential)]
     public partial struct Bool
     {
+        byte value;
+    }
+
+    public partial struct Bool
+    {
         public static readonly Bool True = new Bool { value =  1 };
         public static readonly Bool False = new Bool { value =  0 };
         public Bool(bool b)
         {
             value = (byte) (b ? 1 : 0);
         }
-        byte value;
         public bool Is => value == 1;
     }
 

@@ -239,6 +239,7 @@ uint32_t pattern_ascii_pointer_len(uint8_t* x, cffi_useasciistringpattern y);
 uint32_t pattern_ffi_slice_1(cffi_sliceu32 ffi_slice);
 cffi_vec3f32 pattern_ffi_slice_2(cffi_slicevec3f32 ffi_slice, int32_t i);
 void pattern_ffi_slice_3(cffi_slicemutu8 slice, cffi_fptr_fn_SliceMutu8 callback);
+void pattern_ffi_slice_4(cffi_sliceu8 _slice, cffi_slicemutu8 _slice2);
 uint8_t pattern_ffi_slice_delegate(cffi_fptr_fn_Sliceu8_rval_u8 callback);
 cffi_vec3f32 pattern_ffi_slice_delegate_huge(cffi_fptr_fn_SliceVec3f32_rval_Vec3f32 callback);
 cffi_optioninner pattern_ffi_option_1(cffi_optioninner ffi_slice);
@@ -1257,6 +1258,15 @@ class raw:
         if hasattr(callback, "_ctx"):
             callback = callback._ctx[0]
         return _api.pattern_ffi_slice_3(slice, callback)
+
+    def pattern_ffi_slice_4(_slice, _slice2):
+        """"""
+        global _api
+        if hasattr(_slice, "_ctx"):
+            _slice = _slice._ctx[0]
+        if hasattr(_slice2, "_ctx"):
+            _slice2 = _slice2._ctx[0]
+        return _api.pattern_ffi_slice_4(_slice, _slice2)
 
     def pattern_ffi_slice_delegate(callback):
         """"""
