@@ -39,14 +39,15 @@ inventory!(ffi_inventory, [], [my_function], [], []);
 | C# (incl. Unity) | [**interoptopus_backend_csharp**](https://crates.io/crates/interoptopus_backend_csharp) | [Interop.cs](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_csharp/tests/output/Interop.cs) |
 | C | [**interoptopus_backend_c**](https://crates.io/crates/interoptopus_backend_c) | [my_header.h](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_c/tests/output/my_header.h) |
 | Python [CFFI](https://cffi.readthedocs.io/en/latest/index.html) | [**interoptopus_backend_cpython_cffi**](https://crates.io/crates/interoptopus_backend_cpython_cffi) | [reference.py](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_cpython_cffi/tests/output/reference_project.py) |
-| Your language | Write your own backend<sup>1</sup> | - |
+| New language? | Write your own backend<sup>1</sup> | - |
 
 <sup>1</sup> Create your own backend in just a few hours. No pull request needed. [Pinkie promise](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md#new-backends).
 
 ### Getting Started 🍼
 
 If you want to ...
-- **create a new API** see the [**example projects**](https://github.com/ralfbiedert/interoptopus/tree/master/examples),
+- **create a new API** see the [**hello world**](https://github.com/ralfbiedert/interoptopus/tree/master/examples/hello_world),
+- **understand what's possible**, see the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src),
 - **support a new language**, [**copy the C backend**](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_backend_c).
 
 ### Features

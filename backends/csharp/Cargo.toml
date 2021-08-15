@@ -14,8 +14,8 @@ repository = "https://github.com/ralfbiedert/interoptopus"
 unity = []
 
 [dependencies]
-interoptopus = { path = "../interoptopus", version = "0.8.0" }
+interoptopus = { path = "../../core", version = "0.8.0" }
 
 [dev-dependencies]
-interoptopus = { path = "../interoptopus" }
-interoptopus_reference_project = { path = "../interoptopus_reference_project" }
+interoptopus = { path = "../../core" }
+interoptopus_reference_project = { path = "../../reference_project" }

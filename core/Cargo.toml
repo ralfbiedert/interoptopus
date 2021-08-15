@@ -15,12 +15,12 @@ default = ["derive"]
 derive = ["interoptopus_proc"]
 
 [dependencies]
-interoptopus_proc = { path = "../interoptopus_proc", version = "0.8.0", optional = true }
+interoptopus_proc = { path = "../proc_macros", version = "0.8.0", optional = true }
 serde = { version = "1.0", optional = true, features = ["derive"] }
 log = { version = "0.4.14", optional = true }
 
 [dev-dependencies]
-interoptopus_backend_csharp = { path = "../interoptopus_backend_csharp" }
+interoptopus_backend_csharp = { path = "../backends/csharp" }
 
 [package.metadata.docs.rs]
 all-features = true

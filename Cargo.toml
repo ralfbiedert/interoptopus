@@ -1,11 +1,11 @@
 [workspace]
 members = [
-    "interoptopus",
-    "interoptopus_backend_c",
-    "interoptopus_backend_cpython_cffi",
-    "interoptopus_backend_csharp",
-    "interoptopus_proc",
-    "interoptopus_reference_project",
+    "core",
+    "backends/c",
+    "backends/cpython_cffi",
+    "backends/csharp",
+    "proc_macros",
+    "reference_project",
     "examples/complex",
     "examples/hello_world",
     "examples/unity_hot_reload"

@@ -15,4 +15,4 @@ path = "src/lib.rs"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-interoptopus = { path = "../interoptopus", version = "0.8.0" }
+interoptopus = { path = "../core", version = "0.8.0" }
