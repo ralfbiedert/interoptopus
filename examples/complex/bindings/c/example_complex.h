@@ -50,12 +50,6 @@ typedef struct supercomplexentity
     uint32_t str_len;
     } supercomplexentity;
 
-typedef struct withforeigntype
-    {
-    uint64_t secret_number;
-    thirdpartyvecf32* third_party;
-    } withforeigntype;
-
 
 __FUNCTION_ATTR uint32_t example_api_version();
 __FUNCTION_ATTR ffierror example_always_fails();
@@ -64,7 +58,7 @@ __FUNCTION_ATTR ffierror example_destroy_context(context** context_ptr);
 __FUNCTION_ATTR ffierror example_print_score(context* context);
 __FUNCTION_ATTR ffierror example_return_score(context* context, uint32_t* score);
 __FUNCTION_ATTR ffierror example_update_score_by_callback(context* context, fptr_fn_u32_rval_u32 update);
-__FUNCTION_ATTR ffierror example_write_foreign_type(context* context, withforeigntype* foreign);
+__FUNCTION_ATTR ffierror example_write_foreign_type(context* context, thirdpartyvecf32* foreign);
 __FUNCTION_ATTR ffierror example_double_super_complex_entity(context* context, supercomplexentity* incoming, supercomplexentity* outgoing);
 
 #ifdef __cplusplus

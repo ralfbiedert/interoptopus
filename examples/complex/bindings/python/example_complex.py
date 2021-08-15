@@ -36,12 +36,6 @@ typedef struct cffi_supercomplexentity
     uint32_t str_len;
     } cffi_supercomplexentity;
 
-typedef struct cffi_withforeigntype
-    {
-    uint64_t secret_number;
-    cffi_thirdpartyvecf32* third_party;
-    } cffi_withforeigntype;
-
 
 uint32_t example_api_version();
 cffi_ffierror example_always_fails();
@@ -50,7 +44,7 @@ cffi_ffierror example_destroy_context(cffi_context** context_ptr);
 cffi_ffierror example_print_score(cffi_context* context);
 cffi_ffierror example_return_score(cffi_context* context, uint32_t* score);
 cffi_ffierror example_update_score_by_callback(cffi_context* context, cffi_fptr_fn_u32_rval_u32 update);
-cffi_ffierror example_write_foreign_type(cffi_context* context, cffi_withforeigntype* foreign);
+cffi_ffierror example_write_foreign_type(cffi_context* context, cffi_thirdpartyvecf32* foreign);
 cffi_ffierror example_double_super_complex_entity(cffi_context* context, cffi_supercomplexentity* incoming, cffi_supercomplexentity* outgoing);
 """
 
@@ -236,39 +230,6 @@ class Vec3(object):
     def z(self, value):
         self._ptr_z = value
         self._ctx[0].z = value
-
-class WithForeignType(object):
-    """ A type containing a third-party type."""
-    def __init__(self):
-        global _api, ffi
-        self._ctx = ffi.new("cffi_withforeigntype[]", 1)
-
-    def array(n):
-        global _api, ffi
-        return ffi.new("cffi_withforeigntype[]", n)
-
-    def ptr(self):
-        return self._ctx
-
-    @property
-    def secret_number(self):
-        """"""
-        return self._ctx[0].secret_number
-
-    @secret_number.setter
-    def secret_number(self, value):
-        self._ptr_secret_number = value
-        self._ctx[0].secret_number = value
-
-    @property
-    def third_party(self):
-        """"""
-        return self._ctx[0].third_party
-
-    @third_party.setter
-    def third_party(self, value):
-        self._ptr_third_party = value
-        self._ctx[0].third_party = value
 
 
 

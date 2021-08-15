@@ -28,7 +28,6 @@ pub struct SuperComplexEntity {
 
 /// A type containing a third-party type.
 #[repr(C)]
-#[ffi_type(unsafe, surrogates(third_party = "third_party_option"))]
 #[derive(Copy, Clone, Debug)]
 pub struct WithForeignType {
     pub secret_number: u64,
@@ -36,7 +35,7 @@ pub struct WithForeignType {
 }
 
 // Won't win a beauty contest, but does the job.
-fn third_party_option() -> CType {
+pub fn third_party_option() -> CType {
     CType::ReadPointer(Box::new(third_party_vec_f32()))
 }
 

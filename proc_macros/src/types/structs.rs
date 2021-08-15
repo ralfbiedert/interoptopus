@@ -1,3 +1,4 @@
+use crate::surrogates::read_surrogates;
 use crate::types::Attributes;
 use crate::util::extract_doc_lines;
 use proc_macro2::TokenStream;
@@ -63,6 +64,11 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
     let struct_ident_str = item.ident.to_string();
     let struct_ident = syn::Ident::new(&struct_ident_str, item.ident.span());
     let struct_ident_c = attributes.name.clone().unwrap_or(struct_ident_str);
+    let surrogates = read_surrogates(&item.attrs);
+
+    if !surrogates.1.is_empty() && !attributes.unsfe {
+        panic!("When using surrogates `unsafe` must be specified.");
+    }
 
     let mut field_names = Vec::new();
     let mut field_types = Vec::new();
@@ -134,35 +140,35 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
         field_docs.push(extract_doc_lines(&field.attrs).join("\n"));
         field_visibilities.push(visibility);
 
-        if attributes.surrogates.contains_key(&name) {
-            let lookup = attributes.surrogates.get(&name).unwrap();
-            let ident = syn::Ident::new(&lookup, item.ident.span());
+        let token = match &field.ty {
+            Type::Path(x) => {
+                if let Some(qself) = &x.qself {
+                    let ty = &qself.ty;
+
+                    // Ok, I really don't know if this is kosher. After some debugging it seems to work,
+                    // but this is probably brittle AF.
+
+                    let first = x.path.segments.first().expect("Must have last path segment.");
+                    let middle = x.path.segments.iter().skip(1).rev().skip(1).rev().collect::<Vec<_>>();
+                    let last = x.path.segments.last().expect("Must have last path segment.");
+                    quote! { < #ty as #first #(:: #middle)*> :: #last }
+                } else {
+                    x.path.to_token_stream()
+                }
+            }
+            Type::Ptr(x) => x.to_token_stream(),
+            Type::Array(x) => x.to_token_stream(),
+            Type::Reference(x) => x.to_token_stream(),
+            _ => {
+                panic!("Unknown token: {:?}", field);
+            }
+        };
+
+        if surrogates.1.contains_key(&name) {
+            let lookup = surrogates.1.get(&name).unwrap();
+            let ident = syn::Ident::new(&lookup, surrogates.0.unwrap());
             field_types.push(quote! { #ident()  })
         } else {
-            let token = match &field.ty {
-                Type::Path(x) => {
-                    if let Some(qself) = &x.qself {
-                        let ty = &qself.ty;
-
-                        // Ok, I really don't know if this is kosher. After some debugging it seems to work,
-                        // but this is probably brittle AF.
-
-                        let first = x.path.segments.first().expect("Must have last path segment.");
-                        let middle = x.path.segments.iter().skip(1).rev().skip(1).rev().collect::<Vec<_>>();
-                        let last = x.path.segments.last().expect("Must have last path segment.");
-                        quote! { < #ty as #first #(:: #middle)*> :: #last }
-                    } else {
-                        x.path.to_token_stream()
-                    }
-                }
-                Type::Ptr(x) => x.to_token_stream(),
-                Type::Array(x) => x.to_token_stream(),
-                Type::Reference(x) => x.to_token_stream(),
-                _ => {
-                    panic!("Unknown token: {:?}", field);
-                }
-            };
-
             field_types.push(quote! { < #token as interoptopus::lang::rust::CTypeInfo >::type_info()  })
         }
     }

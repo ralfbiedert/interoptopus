@@ -6,7 +6,7 @@ use crate::types::{
     Phantom, SomeForeignType, StructDocumented, StructRenamedXYZ, Tupled, Vec3f32, Visibility1, Visibility2, Weird1, Weird2,
 };
 use interoptopus::patterns::result::panics_and_errors_to_ffi_enum;
-use interoptopus::{ffi_function, here};
+use interoptopus::{ffi_function, ffi_surrogate, here};
 use std::ptr::null;
 use std::time::Duration;
 
@@ -145,7 +145,8 @@ pub extern "C" fn complex_args_1(_a: Vec3f32, _b: Option<&Empty>) -> FFIError {
     FFIError::Ok
 }
 
-#[ffi_function(unsafe, surrogates(_cmplx = "some_foreign_type"))]
+#[ffi_function(unsafe)]
+#[ffi_surrogate(_cmplx = "some_foreign_type")]
 #[no_mangle]
 pub extern "C" fn complex_args_2(_cmplx: SomeForeignType) -> *const Opaque {
     null()

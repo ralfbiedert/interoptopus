@@ -4,7 +4,7 @@ use interoptopus::lang::c::{CType, CompositeType, Field, PrimitiveType};
 use interoptopus::lang::rust::CTypeInfo;
 use interoptopus::patterns::slice::FFISlice;
 use interoptopus::patterns::string::AsciiPointer;
-use interoptopus::{callback, ffi_type};
+use interoptopus::{callback, ffi_surrogate, ffi_type};
 use std::fmt::Debug;
 use std::marker::PhantomData;
 
@@ -97,7 +97,8 @@ pub struct Vec3f32 {
     pub z: f32,
 }
 
-#[ffi_type(unsafe, surrogates(foreign1 = "some_foreign_type", foreign2 = "some_foreign_type"))]
+#[ffi_type(unsafe)]
+#[ffi_surrogate(foreign1 = "some_foreign_type", foreign2 = "some_foreign_type")]
 #[repr(C)]
 pub struct Container {
     pub foreign1: SomeForeignType,

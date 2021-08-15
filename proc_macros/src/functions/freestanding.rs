@@ -1,9 +1,9 @@
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
-use syn::spanned::Spanned;
 use syn::{FnArg, GenericParam, ItemFn, Pat, ReturnType, Signature, Type};
 
 use crate::functions::Attributes;
+use crate::surrogates::read_surrogates;
 use crate::util;
 
 pub fn fn_signature_type(signature: Signature) -> TokenStream {
@@ -70,9 +70,13 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
     let mut generic_parameters = Vec::new();
     let mut generic_ident = Vec::new();
 
-    let span = item_fn.span();
     let signature = fn_signature_type(item_fn.sig.clone());
     let rval = rval_tokens(&item_fn.sig.output);
+    let surrogates = read_surrogates(&item_fn.attrs);
+
+    if !surrogates.1.is_empty() && !ffi_attributes.unsfe {
+        panic!("When using surrogates `unsafe` must be specified.");
+    }
 
     for generic in &item_fn.sig.generics.params {
         match generic {
@@ -111,23 +115,23 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
 
             args_name.push(name.clone());
 
-            if ffi_attributes.surrogates.contains_key(&name) {
-                let lookup = ffi_attributes.surrogates.get(&name).unwrap();
-                let ident = syn::Ident::new(&lookup, span);
+            let token = match util::purge_lifetimes_from_type(pat.ty.as_ref()) {
+                Type::Path(x) => x.path.to_token_stream(),
+                Type::Reference(x) => x.to_token_stream(),
+                Type::Group(x) => x.to_token_stream(),
+                Type::Ptr(x) => x.to_token_stream(),
+                Type::Array(x) => x.to_token_stream(),
+                Type::BareFn(x) => x.to_token_stream(),
+                _ => {
+                    panic!("Unsupported type at interface boundary found for parameter: {:?}.", pat.ty)
+                }
+            };
+
+            if surrogates.1.contains_key(&name) {
+                let lookup = surrogates.1.get(&name).unwrap();
+                let ident = syn::Ident::new(&lookup, surrogates.0.unwrap());
                 args_type.push(quote! { #ident()  })
             } else {
-                let token = match util::purge_lifetimes_from_type(pat.ty.as_ref()) {
-                    Type::Path(x) => x.path.to_token_stream(),
-                    Type::Reference(x) => x.to_token_stream(),
-                    Type::Group(x) => x.to_token_stream(),
-                    Type::Ptr(x) => x.to_token_stream(),
-                    Type::Array(x) => x.to_token_stream(),
-                    Type::BareFn(x) => x.to_token_stream(),
-                    _ => {
-                        panic!("Unsupported type at interface boundary found for parameter: {:?}.", pat.ty)
-                    }
-                };
-
                 args_type.push(quote! { < #token as interoptopus::lang::rust::CTypeInfo>::type_info() });
             }
         } else {

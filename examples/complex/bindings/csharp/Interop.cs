@@ -60,7 +60,7 @@ namespace My.Company
 
         /// Accepts some foreign types.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_write_foreign_type")]
-        public static extern FFIError example_write_foreign_type(IntPtr context, ref WithForeignType foreign);
+        public static extern FFIError example_write_foreign_type(IntPtr context, ref ThirdPartyVecF32 foreign);
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_double_super_complex_entity")]
@@ -109,15 +109,6 @@ namespace My.Company
         public float x;
         public float y;
         public float z;
-    }
-
-    /// A type containing a third-party type.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct WithForeignType
-    {
-        public ulong secret_number;
-        public IntPtr third_party;
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]

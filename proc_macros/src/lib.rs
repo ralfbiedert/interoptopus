@@ -7,6 +7,7 @@ extern crate proc_macro; // Apparently needed to be imported like this.
 mod constants;
 mod functions;
 mod service;
+mod surrogates;
 mod types;
 mod util;
 
@@ -28,10 +29,9 @@ use syn::{parse_macro_input, AttributeArgs};
 /// | `skip(x)` | `struct,enum` | Skip field or variant `x` in the definition, e.g., some `x` of [`PhantomData`](std::marker::PhantomData). <sup>⚠️</sup>
 /// | `patterns(p)` | `struct`,`enum` | Mark this type as part of a pattern, see below. <sup>2</sup>
 /// | `opaque` | `struct` | Creates an opaque type without fields. Can only be used behind a pointer. |
-/// | `surrogates(x="f")` | `struct` | Invoke function `f` to provide a [`CTypeInfo`](https://docs.rs/interoptopus/latest/interoptopus/lang/rust/trait.CTypeInfo.html) for field `x`, see below. <sup>⚠️</sup>
 /// | `visibility(x="v")` | `struct` | Override visibility for field `x` as `public` or `private`; `_` means all fields. <sup>2</sup>
 /// | `debug` | * | Print generated helper code in console.
-/// | `unsafe` | * | Unlocks unsafe options marked: <sup>⚠️</sup>
+/// | `unsafe` | * | Unlocks unsafe helpers such as [`#[ffi_surrogate]`](macro@crate::ffi_surrogate).
 ///
 /// <sup>1</sup> While a type's name must be unique (even across modules) backends are free to further transform this name, e.g., by converting
 /// `MyVec` to `LibraryMyVec`. In other words, using `name` will change a type's name, but not using `name` is no guarantee the final name will
@@ -40,30 +40,15 @@ use syn::{parse_macro_input, AttributeArgs};
 /// <sup>2</sup> Will not be reflected in C backend, but available to languages supporting them,
 /// e.g., C# will emit field visibility and generate classes from service patterns.
 ///
-/// <sup>⚠️</sup> This attribute can lead to undefined behavior when misapplied. You should only
-/// suppress fields that have no impact on the type layout (e.g., zero-sized `Phantom` data).
-/// When using surrogates you must ensure the surrogate matches.
 ///
+/// # Types and the Inventory
 ///
-/// # Including Types
+/// In contrast to functions and constants most types annotated with `#[ffi_type]` will be detected
+/// automatically and need no mention in the [`inventory!()`](https://docs.rs/interoptopus/latest/interoptopus/macro.inventory.html).
 ///
-/// In contrast to functions and constants types annotated with `#[ffi_type]` will be detected
-/// automatically and do not have to be explicitly mentioned for the definition of the `inventory!()`.
+/// The exception are types that do not show up as fields of another type, or inside a function
+/// signature.
 ///
-/// # Surrogates
-///
-/// When dealing with types outside of your control you will not be able to implement [`CTypeInfo`](https://docs.rs/interoptopus/latest/interoptopus/lang/rust/trait.CTypeInfo.html) for them.
-/// Instead you need a **surrogate**, a helper function which returns that info for the type.
-///
-/// The surrogate's signature is:
-///
-/// ```rust
-/// # use interoptopus::lang::c::CType;
-/// fn some_foreign_type() -> CType {
-///     // Return an appropriate CType
-///     # interoptopus::lang::c::CType::Primitive(interoptopus::lang::c::PrimitiveType::U8)
-/// }
-/// ```
 ///
 /// # Patterns
 ///
@@ -104,31 +89,15 @@ pub fn ffi_type(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// This will derive [`FunctionInfo`](https://docs.rs/interoptopus/latest/interoptopus/lang/rust/trait.FunctionInfo.html) for a helper struct
 /// of the same name containing the function's name, parameters and return value.
 ///
-/// The following attributes can be provided:
+/// # Parameters
 ///
-/// | Attribute |  Explanation |
+/// The following parameters can be provided:
+///
+/// | Parameter |  Explanation |
 /// | --- | ---  |
-/// | `surrogates(x="y")` | Invoke function `y` to provide a [`CTypeInfo`](https://docs.rs/interoptopus/latest/interoptopus/lang/rust/trait.CTypeInfo.html) for parameter `x`, see below. <sup>⚠️</sup>
 /// | `debug` | Print generated helper code in console.
-/// | `unsafe` | Unlocks unsafe options marked: <sup>⚠️</sup>
+/// | `unsafe` | Unlocks unsafe helpers such as [`#[ffi_surrogate]`](macro@crate::ffi_surrogate).
 ///
-/// <sup>⚠️</sup> This attribute can lead to undefined behavior when misapplied.
-/// When using surrogates you must ensure the surrogate matches the parameter's type.
-///
-/// # Surrogates
-///
-/// When dealing with types outside of your control you will not be able to implement [`CTypeInfo`](https://docs.rs/interoptopus/latest/interoptopus/lang/rust/trait.CTypeInfo.html) for them.
-/// Instead you need a **surrogate**, a helper function which returns that info for the type.
-///
-/// The surrogate's signature is:
-///
-/// ```rust
-/// # use interoptopus::lang::c::CType;
-/// fn some_foreign_type() -> CType {
-///     // Return an appropriate CType
-///     # interoptopus::lang::c::CType::Primitive(interoptopus::lang::c::PrimitiveType::U8)
-/// }
-/// ```
 ///
 /// # Example
 ///
@@ -201,9 +170,9 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// # Parameters
 ///
-/// The following attributes can be provided:
+/// The following parameters can be provided:
 ///
-/// | Attribute |  Explanation |
+/// | Parameter |  Explanation |
 /// | --- | ---  |
 /// | `error = "t"` | Use `t` as the [`FFIError`](https://docs.rs/interoptopus/latest/interoptopus/patterns/result/trait.FFIError.html) type, mandatory.
 /// | `prefix  = "p"` | Add `p` to all generated method names.
@@ -365,9 +334,11 @@ pub fn ffi_service_ctor(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// The following attributes can be provided:
 ///
-/// | Attribute |  Explanation |
+/// | Parameter |  Explanation |
 /// | --- | ---  |
 /// | `direct` | Mark methods not returning a `Result<(), Error>`; will return [`default()`](Default::default) on panic.
+///
+/// # Panic Behavior
 ///
 /// ⚠️ Note that generated methods always add panic guards. Since `direct` methods have no
 /// other way to signal errors they will return [`Default::default()`] instead if a panic
@@ -446,5 +417,64 @@ pub fn ffi_service_ctor(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 #[proc_macro_attribute]
 pub fn ffi_service_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    item
+}
+
+/// On methods and structs, provide a type helper for foreign types.<sup>⚠️</sup>
+///
+/// When dealing with types outside of your control you will not be able to implement [`CTypeInfo`](https://docs.rs/interoptopus/latest/interoptopus/lang/rust/trait.CTypeInfo.html) for them.
+/// Instead you need a **surrogate**, a helper function which returns that info for the type.
+///
+/// # Surrogate Signature
+///
+/// The surrogate's signature is:
+///
+/// ```rust
+/// use interoptopus::lang::c::CType;
+///
+/// fn some_foreign_type() -> CType {
+///     // Return an appropriate CType
+///     # interoptopus::lang::c::CType::Primitive(interoptopus::lang::c::PrimitiveType::U8)
+/// }
+/// ```
+///
+/// Once defined you can use `#[ffi_surrogate]` to hint at the surrogate in [`#[ffi_type]`](macro@crate::ffi_type) and
+/// [`#[ffi_function]`](macro@crate::ffi_function) helpers.
+///
+/// # Safety
+///
+/// <sup>⚠️</sup> This attribute can lead to undefined behavior when misapplied.
+/// When using surrogates you must ensure the surrogate matches the parameter's type.
+///
+///
+/// # Example
+///
+/// ```
+/// use interoptopus::lang::c::{CType, Field, PrimitiveType, CompositeType};
+/// use interoptopus::{ffi_surrogate, ffi_function};
+///
+/// // A type in a foreign crate you can't use `#[ffi_type]` on.
+/// #[repr(C)]
+/// pub struct SomeForeignType {
+///     x: u32,
+/// }
+///
+/// // Helper function defining the type.
+/// pub fn some_foreign_type() -> CType {
+///     let fields = vec![Field::new("x".to_string(), CType::Primitive(PrimitiveType::U32))];
+///     let composite = CompositeType::new("SomeForeignType".to_string(), fields);
+///     CType::Composite(composite)
+/// }
+///
+/// #[ffi_function(unsafe)]
+/// #[ffi_surrogate(x = "some_foreign_type")]
+/// #[no_mangle]
+/// pub extern "C" fn my_ffi_function(x: SomeForeignType) -> u32 {
+///     x.x
+/// }
+///
+/// ```
+#[proc_macro_attribute]
+pub fn ffi_surrogate(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }

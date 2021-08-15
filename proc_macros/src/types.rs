@@ -15,9 +15,6 @@ pub struct Attributes {
     opaque: bool,
 
     #[darling(default)]
-    surrogates: HashMap<String, String>,
-
-    #[darling(default)]
     patterns: HashMap<String, ()>,
 
     #[darling(default)]
@@ -41,7 +38,7 @@ pub struct Attributes {
 
 impl Attributes {
     pub fn assert_valid(&self) {
-        if (!self.surrogates.is_empty() || !self.skip.is_empty()) && !self.unsfe {
+        if !self.skip.is_empty() && !self.unsfe {
             panic!("When using `surrogate` or `skip` you must also specify `unsafe`.")
         }
     }
