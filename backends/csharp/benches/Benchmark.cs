@@ -20,6 +20,7 @@ namespace Interoptopus
             long x = 0;
             Empty e;
             var short_vec = new Vec3f32[10];
+            var short_byte = new byte[10];
             var long_vec = new Vec3f32[100_000];
 
             Interop.pattern_my_api_init_v1(out var dynamic_api);
@@ -91,6 +92,9 @@ namespace Interoptopus
 
             result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_slice_2(long_vec, 0));
             writer.Add("pattern_ffi_slice_2(long_vec, 0)", result);
+
+            result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_slice_4(short_byte, short_byte));
+            writer.Add("pattern_ffi_slice_4(short_byte, short_byte)", result);
 
             result = MeasureResult.Measure(Iterations, () => Interop.pattern_ascii_pointer_1("hello world"));
             writer.Add("pattern_ascii_pointer_1('hello world')", result);

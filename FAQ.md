@@ -94,6 +94,31 @@
   - The reason `Sliceu32` in turn only accepts a `GCHandle` and not the `uint[]` array itself is that once an object is pinned, somebody needs to remember its proper lifetime and to unpin it, but `Sliceu32` has no reserved field for that, being a low-level primitive. In most cases the method overload handling pinning is the right place, as lifetimes are guaranteed to be correct, but if you need a "long-lived" FFI slice (which, I'd argue, is playing with fire from an interop perspective) you'll also need to handle proper pinning / unpinning (aka _lifetime semantics_) and race prevention elsewhere.
 
 
+- **How can I get more performance with slices?**
+
+  As mentioned above, the C# backend will pin slices by default. On our test machine this incurs a 
+  performance overhead of about 30-40ns per pinned slice, but uses only safe C#:
+
+  | Construct | ns per call |
+  | --- | --- |
+  | `pattern_ffi_slice_2(short_vec, 0)` | 66 |
+  | `pattern_ffi_slice_2(long_vec, 0)` | 60 |
+  | `pattern_ffi_slice_4(short_byte, short_byte)` | 104 |
+
+  For a notable performance increase you can enable `use_unsafe` in the C# backend which will use 
+  a `fixed` slice instead. 
+
+  | Construct | ns per call |
+  | --- | --- |
+  | `pattern_ffi_slice_2(short_vec, 0)` | 28 |
+  | `pattern_ffi_slice_2(long_vec, 0)` | 23 |
+  | `pattern_ffi_slice_4(short_byte, short_byte)` | 29 |
+
+  This gives more performance when working with slices, but requires `<AllowUnsafeBlocks>true</AllowUnsafeBlocks>`
+  being enabled in the C# project setting. In Unity it will force the entire game
+  project to be ticked `Unsafe` and might not be _nice_ if you ship bindings to customers.
+  However, if you only consume your own bindings and don't give them to 3rd parties this is a non-issue.
+
 
 ## New Backends
 
