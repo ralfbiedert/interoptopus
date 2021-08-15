@@ -77,7 +77,7 @@ pub struct StructRenamedXYZ {
     pub e: EnumRenamedXYZ,
 }
 
-#[ffi_type(unsafe, skip(p))]
+#[ffi_type(skip(p))]
 #[repr(C)]
 pub struct Phantom<'a, T>
 where
@@ -97,7 +97,7 @@ pub struct Vec3f32 {
     pub z: f32,
 }
 
-#[ffi_type(unsafe)]
+#[ffi_type]
 #[ffi_surrogates(foreign1 = "some_foreign_type", foreign2 = "some_foreign_type")]
 #[repr(C)]
 pub struct Container {

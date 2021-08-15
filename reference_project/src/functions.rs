@@ -145,7 +145,7 @@ pub extern "C" fn complex_args_1(_a: Vec3f32, _b: Option<&Empty>) -> FFIError {
     FFIError::Ok
 }
 
-#[ffi_function(unsafe)]
+#[ffi_function]
 #[ffi_surrogates(_cmplx = "some_foreign_type")]
 #[no_mangle]
 pub extern "C" fn complex_args_2(_cmplx: SomeForeignType) -> *const Opaque {

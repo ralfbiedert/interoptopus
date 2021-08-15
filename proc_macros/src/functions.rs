@@ -9,9 +9,6 @@ mod freestanding;
 pub struct Attributes {
     #[darling(default)]
     debug: bool,
-
-    #[darling(default, rename = "unsafe")]
-    unsfe: bool,
 }
 
 pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {

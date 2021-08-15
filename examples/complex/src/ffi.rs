@@ -154,7 +154,7 @@ pub extern "C" fn example_double_super_complex_entity(
 }
 
 /// Accepts some foreign types.
-#[ffi_function(unsafe)]
+#[ffi_function]
 #[ffi_surrogates(foreign = "third_party_option")]
 #[no_mangle]
 pub extern "C" fn example_write_foreign_type(context: Option<&mut Context>, foreign: Option<&WithForeignType>) -> FFIError {

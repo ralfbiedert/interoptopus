@@ -31,17 +31,10 @@ pub struct Attributes {
 
     #[darling(default)]
     debug: bool,
-
-    #[darling(default, rename = "unsafe")]
-    unsfe: bool,
 }
 
 impl Attributes {
-    pub fn assert_valid(&self) {
-        if !self.skip.is_empty() && !self.unsfe {
-            panic!("When using `surrogate` or `skip` you must also specify `unsafe`.")
-        }
-    }
+    pub fn assert_valid(&self) {}
 
     pub fn visibility_for_field(&self, field: &Field, name: &str) -> TokenStream {
         let mut rval = match &field.vis {

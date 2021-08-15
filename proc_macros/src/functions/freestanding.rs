@@ -61,7 +61,7 @@ pub fn rval_tokens(return_type: &ReturnType) -> TokenStream {
     }
 }
 
-pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream) -> TokenStream {
+pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStream) -> TokenStream {
     let item_fn: ItemFn = syn::parse2(input.clone()).expect("Must be item.");
     let docs = util::extract_doc_lines(&item_fn.attrs);
 
@@ -73,10 +73,6 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
     let signature = fn_signature_type(item_fn.sig.clone());
     let rval = rval_tokens(&item_fn.sig.output);
     let surrogates = read_surrogates(&item_fn.attrs);
-
-    if !surrogates.1.is_empty() && !ffi_attributes.unsfe {
-        panic!("When using surrogates `unsafe` must be specified.");
-    }
 
     for generic in &item_fn.sig.generics.params {
         match generic {

@@ -66,10 +66,6 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
     let struct_ident_c = attributes.name.clone().unwrap_or(struct_ident_str);
     let surrogates = read_surrogates(&item.attrs);
 
-    if !surrogates.1.is_empty() && !attributes.unsfe {
-        panic!("When using surrogates `unsafe` must be specified.");
-    }
-
     let mut field_names = Vec::new();
     let mut field_types = Vec::new();
     let mut field_docs = Vec::new();
