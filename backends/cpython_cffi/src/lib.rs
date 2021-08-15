@@ -33,15 +33,15 @@
 //!
 //!
 //! Add these to your `Cargo.toml` so the attributes and the binding generator can be found
-//! (note, the mentioned versions might be outdated, we recommend to pick the latest ones):
+//! (replace `...` with the latest version):
 //!
 //! ```toml
 //! [lib]
 //! crate-type = ["cdylib", "rlib"]
 //!
 //! [dependencies]
-//! interoptopus = "0.7"
-//! interoptopus_backend_cpython_cffi = "0.7"
+//! interoptopus = "..."
+//! interoptopus_backend_cpython_cffi = "..."
 //! ```
 //!
 //! Create a unit test in `tests/bindings.rs` which will generate your bindings when run
