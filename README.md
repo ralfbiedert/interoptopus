@@ -36,9 +36,9 @@ inventory!(ffi_inventory, [], [my_function], [], []);
 
 | Language | Crate | Sample Output |
 | --- | --- | --- |
-| C# (incl. Unity) | [**interoptopus_backend_csharp**](https://crates.io/crates/interoptopus_backend_csharp) | [Interop.cs](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_csharp/tests/output/Interop.cs) |
+| C# | [**interoptopus_backend_csharp**](https://crates.io/crates/interoptopus_backend_csharp) | [Interop.cs](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_csharp/tests/output/Interop.cs) |
 | C | [**interoptopus_backend_c**](https://crates.io/crates/interoptopus_backend_c) | [my_header.h](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_c/tests/output/my_header.h) |
-| Python [CFFI](https://cffi.readthedocs.io/en/latest/index.html) | [**interoptopus_backend_cpython_cffi**](https://crates.io/crates/interoptopus_backend_cpython_cffi) | [reference.py](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_cpython_cffi/tests/output/reference_project.py) |
+| [Python-CFFI](https://cffi.readthedocs.io/en/latest/index.html) | [**interoptopus_backend_cpython_cffi**](https://crates.io/crates/interoptopus_backend_cpython_cffi) | [reference.py](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_backend_cpython_cffi/tests/output/reference_project.py) |
 | New language? | Write your own backend<sup>1</sup> | - |
 
 <sup>1</sup> Create your own backend in just a few hours. No pull request needed. [Pinkie promise](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md#new-backends).
@@ -53,7 +53,7 @@ If you want to ...
 ### Features
 
 - explicit, **single source of truth** API definition in Rust,
-- **quality-of-life [patterns](crate::patterns)** on **both sides** ([slices](crate::patterns::slice), [services](crate::patterns::service), ...)
+- **quality-of-life [patterns](crate::patterns)** on **both sides** (e.g., [slices](crate::patterns::slice), [services](crate::patterns::service), ...)
 - if your **project compiles your bindings should work**, <sup>&#42;*cough*&#42;</sup>
 - easy to support new languages, fully **customizable**,
 - **no scripts needed**, works from `cargo build` + `cargo test`.
@@ -69,7 +69,7 @@ Gated behind **feature flags**, these enable:
 ### Supported Rust Constructs
 See the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src); it lists all supported constructs including:
 - [functions](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/functions.rs) (`extern "C"` functions and delegates)
-- [types](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/types.rs) (composites, enums, opaques, references, pointers, ...)
+- [types](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/types.rs) (composites, enums, opaques, references, ...)
 - [constants](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/constants.rs) (primitive constants; results of const evaluation)
 - [patterns](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src/patterns) (ASCII pointers, options, slices, classes, ...)
 
@@ -88,7 +88,7 @@ If you **need API design guidance** the following (wip) [**C# call-cost table**]
 ### Changelog
 
 - **v0.8** - Moved testing functions to respective backends.
-- **v0.7** - Move patterns to proc macros for better FFI docs.
+- **v0.7** - Make patterns proc macros for better FFI docs.
 - **v0.6** - Renamed and clarified many patterns.
 - **v0.5** - More ergonomic slice usage in Rust and FFI.
 - **v0.4** - Enable logging support in auto-generated FFI calls.
