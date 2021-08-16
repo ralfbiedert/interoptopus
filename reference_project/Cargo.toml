@@ -2,7 +2,7 @@
 name = "interoptopus_reference_project"
 description = "A reference project for Interoptopus backends to test interop generation."
 authors = ["Ralf Biedert <rb@xr.io>"]
-version = "0.8.1"
+version = "0.9.0"
 edition = "2018"
 license = "MIT"
 keywords = ["ffi"]
@@ -15,4 +15,4 @@ path = "src/lib.rs"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-interoptopus = { path = "../core", version = "0.8.0" }
+interoptopus = { path = "../core", version = "0.9.0" }
