@@ -51,6 +51,10 @@ pub trait CSharpTypeConverter {
         })
     }
 
+    fn has_ffi_error_rval(&self, signature: &FunctionSignature) -> bool {
+        matches!(signature.rval(), CType::Pattern(TypePattern::FFIErrorEnum(_)))
+    }
+
     fn pattern_to_native_in_signature(&self, param: &Parameter, _signature: &FunctionSignature) -> String {
         match param.the_type() {
             CType::Pattern(p) => match p {

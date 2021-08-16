@@ -124,6 +124,13 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "complex_args_1")]
         public static extern FFIError complex_args_1(Vec3f32 _a, ref Empty _b);
 
+        public static void complex_args_1_checked(Vec3f32 _a, ref Empty _b) {
+            var rval = complex_args_1(_a, ref _b);;
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception($"Something went wrong: {rval}");
+            }
+        }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "complex_args_2")]
         public static extern IntPtr complex_args_2(SomeForeignType _cmplx);
@@ -185,6 +192,13 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "panics")]
         public static extern FFIError panics();
 
+        public static void panics_checked() {
+            var rval = panics();;
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception($"Something went wrong: {rval}");
+            }
+        }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "renamed")]
         public static extern EnumRenamed renamed(StructRenamed x);
@@ -219,7 +233,7 @@ namespace My.Company
                 fixed (void* ptr_ffi_slice = ffi_slice)
                 {
                     var ffi_slice_slice = new Sliceu32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
-                    return pattern_ffi_slice_1(ffi_slice_slice);
+                    return pattern_ffi_slice_1(ffi_slice_slice);;
                 }
             }
         }
@@ -233,7 +247,7 @@ namespace My.Company
                 fixed (void* ptr_ffi_slice = ffi_slice)
                 {
                     var ffi_slice_slice = new SliceVec3f32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
-                    return pattern_ffi_slice_2(ffi_slice_slice, i);
+                    return pattern_ffi_slice_2(ffi_slice_slice, i);;
                 }
             }
         }
@@ -247,7 +261,7 @@ namespace My.Company
                 fixed (void* ptr_slice = slice)
                 {
                     var slice_slice = new SliceMutu8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                    pattern_ffi_slice_3(slice_slice, callback);
+                    pattern_ffi_slice_3(slice_slice, callback);;
                 }
             }
         }
@@ -264,7 +278,7 @@ namespace My.Company
                     fixed (void* ptr__slice2 = _slice2)
                     {
                         var _slice2_slice = new SliceMutu8(new IntPtr(ptr__slice2), (ulong) _slice2.Length);
-                        pattern_ffi_slice_4(_slice_slice, _slice2_slice);
+                        pattern_ffi_slice_4(_slice_slice, _slice2_slice);;
                     }
                 }
             }
@@ -315,21 +329,49 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_destroy")]
         public static extern FFIError simple_service_destroy(ref IntPtr context);
 
+        public static void simple_service_destroy_checked(ref IntPtr context) {
+            var rval = simple_service_destroy(ref context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception($"Something went wrong: {rval}");
+            }
+        }
 
         /// The constructor must return a `Result<Self, Error>`.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_new_with")]
         public static extern FFIError simple_service_new_with(ref IntPtr context, uint some_value);
 
+        public static void simple_service_new_with_checked(ref IntPtr context, uint some_value) {
+            var rval = simple_service_new_with(ref context, some_value);;
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception($"Something went wrong: {rval}");
+            }
+        }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_new_without")]
         public static extern FFIError simple_service_new_without(ref IntPtr context);
 
+        public static void simple_service_new_without_checked(ref IntPtr context) {
+            var rval = simple_service_new_without(ref context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception($"Something went wrong: {rval}");
+            }
+        }
 
         /// Methods returning a Result<(), _> are the default and do not
         /// need annotations.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_result")]
         public static extern FFIError simple_service_method_result(IntPtr context, uint _anon1);
 
+        public static void simple_service_method_result_checked(IntPtr context, uint _anon1) {
+            var rval = simple_service_method_result(context, _anon1);;
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception($"Something went wrong: {rval}");
+            }
+        }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_value")]
         public static extern uint simple_service_method_value(IntPtr context, uint x);
@@ -351,7 +393,7 @@ namespace My.Company
                 fixed (void* ptr_slice = slice)
                 {
                     var slice_slice = new Sliceu8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                    return simple_service_method_mut_self(context, slice_slice);
+                    return simple_service_method_mut_self(context, slice_slice);;
                 }
             }
         }
@@ -366,7 +408,7 @@ namespace My.Company
                 fixed (void* ptr__slice = _slice)
                 {
                     var _slice_slice = new SliceBool(new IntPtr(ptr__slice), (ulong) _slice.Length);
-                    simple_service_method_mut_self_void(context, _slice_slice);
+                    simple_service_method_mut_self_void(context, _slice_slice);;
                 }
             }
         }
@@ -384,7 +426,7 @@ namespace My.Company
                 fixed (void* ptr__slice = _slice)
                 {
                     var _slice_slice = new Sliceu8(new IntPtr(ptr__slice), (ulong) _slice.Length);
-                    return simple_service_method_mut_self_ref_slice(context, ref x, out _y, _slice_slice);
+                    return simple_service_method_mut_self_ref_slice(context, ref x, out _y, _slice_slice);;
                 }
             }
         }
@@ -401,7 +443,7 @@ namespace My.Company
                     fixed (void* ptr__slice2 = _slice2)
                     {
                         var _slice2_slice = new Sliceu8(new IntPtr(ptr__slice2), (ulong) _slice2.Length);
-                        return simple_service_method_mut_self_ref_slice_limited(context, ref x, out _y, _slice_slice, _slice2_slice);
+                        return simple_service_method_mut_self_ref_slice_limited(context, ref x, out _y, _slice_slice, _slice2_slice);;
                     }
                 }
             }
@@ -410,13 +452,17 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ffi_error")]
         public static extern FFIError simple_service_method_mut_self_ffi_error(IntPtr context, SliceMutu8 _slice);
 
-        public static FFIError simple_service_method_mut_self_ffi_error(IntPtr context, byte[] _slice) {
+        public static void simple_service_method_mut_self_ffi_error_checked(IntPtr context, byte[] _slice) {
             unsafe
             {
                 fixed (void* ptr__slice = _slice)
                 {
                     var _slice_slice = new SliceMutu8(new IntPtr(ptr__slice), (ulong) _slice.Length);
-                    return simple_service_method_mut_self_ffi_error(context, _slice_slice);
+                    var rval = simple_service_method_mut_self_ffi_error(context, _slice_slice);;
+                    if (rval != FFIError.Ok)
+                    {
+                        throw new Exception($"Something went wrong: {rval}");
+                    }
                 }
             }
         }
@@ -738,42 +784,26 @@ namespace My.Company
     {
         private IntPtr _context;
         /// The constructor must return a `Result<Self, Error>`.
-        public SimpleService(uint some_value)
+        public  SimpleService(uint some_value)
         {
-            var rval = Interop.simple_service_new_with(ref _context , some_value);
-            if (rval != FFIError.Ok)
-            {
-                throw new Exception($"Something went wrong {rval}");
-            }
+            Interop.simple_service_new_with_checked(ref _context, some_value);
         }
 
-        public SimpleService()
+        public  SimpleService()
         {
-            var rval = Interop.simple_service_new_without(ref _context );
-            if (rval != FFIError.Ok)
-            {
-                throw new Exception($"Something went wrong {rval}");
-            }
+            Interop.simple_service_new_without_checked(ref _context);
         }
 
         public void Dispose()
         {
-            var rval = Interop.simple_service_destroy(ref _context );
-            if (rval != FFIError.Ok)
-            {
-                throw new Exception($"Something went wrong {rval}");
-            }
+            Interop.simple_service_destroy_checked(ref _context);
         }
 
         /// Methods returning a Result<(), _> are the default and do not
         /// need annotations.
         public void MethodResult(uint _anon1)
         {
-            var rval = Interop.simple_service_method_result(_context , _anon1);
-            if (rval != FFIError.Ok)
-            {
-                throw new Exception($"Something went wrong {rval}");
-            }
+            Interop.simple_service_method_result_checked(_context, _anon1);
         }
 
         public uint MethodValue(uint x)
@@ -789,24 +819,24 @@ namespace My.Company
             Interop.simple_service_method_void(_context);
         }
 
-        public byte MethodMutSelf(Sliceu8 slice)
-        {
-            return Interop.simple_service_method_mut_self(_context, slice);
-        }
-
         public byte MethodMutSelf(byte[] slice)
         {
             return Interop.simple_service_method_mut_self(_context, slice);
         }
 
+        public byte MethodMutSelf(Sliceu8 slice)
+        {
+            return Interop.simple_service_method_mut_self(_context, slice);
+        }
+
         /// Single line.
-        public void MethodMutSelfVoid(SliceBool _slice)
+        public void MethodMutSelfVoid(Bool[] _slice)
         {
             Interop.simple_service_method_mut_self_void(_context, _slice);
         }
 
         /// Single line.
-        public void MethodMutSelfVoid(Bool[] _slice)
+        public void MethodMutSelfVoid(SliceBool _slice)
         {
             Interop.simple_service_method_mut_self_void(_context, _slice);
         }
@@ -816,19 +846,14 @@ namespace My.Company
             return Interop.simple_service_method_mut_self_ref(_context, ref x, out _y);
         }
 
-        public byte MethodMutSelfRefSlice(ref byte x, out byte _y, Sliceu8 _slice)
-        {
-            return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out _y, _slice);
-        }
-
         public byte MethodMutSelfRefSlice(ref byte x, out byte _y, byte[] _slice)
         {
             return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out _y, _slice);
         }
 
-        public byte MethodMutSelfRefSliceLimited(ref byte x, out byte _y, Sliceu8 _slice, Sliceu8 _slice2)
+        public byte MethodMutSelfRefSlice(ref byte x, out byte _y, Sliceu8 _slice)
         {
-            return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out _y, _slice, _slice2);
+            return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out _y, _slice);
         }
 
         public byte MethodMutSelfRefSliceLimited(ref byte x, out byte _y, byte[] _slice, byte[] _slice2)
@@ -836,22 +861,19 @@ namespace My.Company
             return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out _y, _slice, _slice2);
         }
 
-        public void MethodMutSelfFfiError(SliceMutu8 _slice)
+        public byte MethodMutSelfRefSliceLimited(ref byte x, out byte _y, Sliceu8 _slice, Sliceu8 _slice2)
         {
-            var rval = Interop.simple_service_method_mut_self_ffi_error(_context , _slice);
-            if (rval != FFIError.Ok)
-            {
-                throw new Exception($"Something went wrong {rval}");
-            }
+            return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out _y, _slice, _slice2);
         }
 
         public void MethodMutSelfFfiError(byte[] _slice)
         {
-            var rval = Interop.simple_service_method_mut_self_ffi_error(_context, _slice);
-            if (rval != FFIError.Ok)
-            {
-                throw new Exception($"Something went wrong: {rval}");
-            }
+            Interop.simple_service_method_mut_self_ffi_error_checked(_context, _slice);
+        }
+
+        public FFIError MethodMutSelfFfiError(SliceMutu8 _slice)
+        {
+            return Interop.simple_service_method_mut_self_ffi_error(_context, _slice);
         }
 
         public IntPtr Context => _context;

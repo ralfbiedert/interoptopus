@@ -171,16 +171,29 @@ pub trait CSharpWriter {
     fn write_function_overloaded(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
         self.debug(w, "write_function_overloaded")?;
 
+        let has_overload = self.converter().has_overloadable(function.signature());
+        let has_error_enum = self.converter().has_ffi_error_rval(function.signature());
+
         // If there is nothing to write, don't do it
-        if !self.converter().has_overloadable(function.signature()) {
+        if !has_overload && !has_error_enum {
             return Ok(());
         }
 
         let mut to_pin_name = Vec::new();
         let mut to_pin_slice_type = Vec::new();
         let mut to_invoke = Vec::new();
-        let rval = self.converter().function_rval_to_csharp_typename(function);
-        let name = self.converter().function_name_to_csharp_name(function);
+        let raw_name = self.converter().function_name_to_csharp_name(function);
+        let this_name = if has_error_enum {
+            format!("{}_checked", raw_name)
+        } else {
+            raw_name.clone()
+        };
+
+        let rval = match function.signature().rval() {
+            CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
+            _ => self.converter().to_typespecifier_in_rval(function.signature().rval()),
+        };
+
 
         let mut params = Vec::new();
         for (_, p) in function.signature().params().iter().enumerate() {
@@ -208,60 +221,90 @@ pub trait CSharpWriter {
             params.push(format!("{} {}", native, name));
         }
 
-
-        let return_stmt = if function.signature().rval().is_void() { "" } else { "return " };
-
-        indented!(w, r#"public static {} {}({}) {{"#, rval, name, params.join(", "))?;
+        indented!(w, r#"public static {} {}({}) {{"#, rval, this_name, params.join(", "))?;
 
         if self.config().use_unsafe.any_unsafe() {
-
-            // unsafe
-            //     {
-            //         fixed (Vec3f32* ptr = ffi_slice)
-            //         {
-            //             var ffi_slice_slice = new SliceVec3f32(new IntPtr(ptr), (ulong)ffi_slice.Length);
-            //             return pattern_ffi_slice_2(ffi_slice_slice, i);
-            //         }
-            //     }
-
-            indented!(w, [_], r#"unsafe"#)?;
-            indented!(w, [_], r#"{{"#)?;
-            w.indent();
-
-            for (pin_var, slice_struct) in to_pin_name.iter().zip(to_pin_slice_type.iter()) {
-                indented!(w, [_], r#"fixed (void* ptr_{} = {})"#, pin_var, pin_var)?;
+            if !to_pin_name.is_empty() {
+                indented!(w, [_], r#"unsafe"#)?;
                 indented!(w, [_], r#"{{"#)?;
-                indented!(w, [_ _], r#"var {}_slice = new {}(new IntPtr(ptr_{}), (ulong) {}.Length);"#, pin_var, slice_struct, pin_var, pin_var)?;
                 w.indent();
+
+                for (pin_var, slice_struct) in to_pin_name.iter().zip(to_pin_slice_type.iter()) {
+                    indented!(w, [_], r#"fixed (void* ptr_{} = {})"#, pin_var, pin_var)?;
+                    indented!(w, [_], r#"{{"#)?;
+                    indented!(w, [_ _], r#"var {}_slice = new {}(new IntPtr(ptr_{}), (ulong) {}.Length);"#, pin_var, slice_struct, pin_var, pin_var)?;
+                    w.indent();
+                }
             }
 
-            indented!(w, [_], r#"{}{}({});"#, return_stmt, name, to_invoke.join(", "))?;
-            for _ in to_pin_name.iter() {
+            let call = format!(r#"{}({});"#, raw_name, to_invoke.join(", "));
+            self.write_function_overloaded_invoke_with_error_handling(w, function, &call)?;
+
+            if !to_pin_name.is_empty() {
+                for _ in to_pin_name.iter() {
+                    w.unindent();
+                    indented!(w, [_], r#"}}"#)?;
+                }
+
                 w.unindent();
                 indented!(w, [_], r#"}}"#)?;
             }
 
-            w.unindent();
-            indented!(w, [_], r#"}}"#)?;
         } else {
-            for (pin_var, slice_struct) in to_pin_name.iter().zip(to_pin_slice_type.iter()) {
-                indented!(w, [_], r#"var {}_pinned = GCHandle.Alloc({}, GCHandleType.Pinned);"#, pin_var, pin_var)?;
-                indented!(w, [_], r#"var {}_slice = new {}({}_pinned, (ulong) {}.Length);"#, pin_var, slice_struct, pin_var, pin_var)?;
+
+            if !to_pin_name.is_empty() {
+                for (pin_var, slice_struct) in to_pin_name.iter().zip(to_pin_slice_type.iter()) {
+                    indented!(w, [_], r#"var {}_pinned = GCHandle.Alloc({}, GCHandleType.Pinned);"#, pin_var, pin_var)?;
+                    indented!(w, [_], r#"var {}_slice = new {}({}_pinned, (ulong) {}.Length);"#, pin_var, slice_struct, pin_var, pin_var)?;
+                }
+
+                indented!(w, [_], r#"try"#)?;
+                indented!(w, [_], r#"{{"#)?;
+
+                w.indent();
             }
 
-            indented!(w, [_], r#"try"#)?;
-            indented!(w, [_], r#"{{"#)?;
-            indented!(w, [_ _], r#"{}{}({});"#, return_stmt, name, to_invoke.join(", "))?;
-            indented!(w, [_], r#"}}"#)?;
-            indented!(w, [_], r#"finally"#)?;
-            indented!(w, [_], r#"{{"#)?;
-            for pin in &to_pin_name {
-                indented!(w, [_ _], r#"{}_pinned.Free();"#, pin)?;
+            let call = format!(r#"{}({});"#, raw_name, to_invoke.join(", "));
+            self.write_function_overloaded_invoke_with_error_handling(w, function, &call)?;
+
+
+            if !to_pin_name.is_empty() {
+                w.unindent();
+                indented!(w, [_], r#"}}"#)?;
+                indented!(w, [_], r#"finally"#)?;
+                indented!(w, [_], r#"{{"#)?;
+                for pin in &to_pin_name {
+                    indented!(w, [_ _], r#"{}_pinned.Free();"#, pin)?;
+                }
+                indented!(w, [_], r#"}}"#)?;
             }
-            indented!(w, [_], r#"}}"#)?;
         }
 
         indented!(w, r#"}}"#)
+
+
+    }
+
+    #[rustfmt::skip]
+    fn write_function_overloaded_invoke_with_error_handling(&self, w: &mut IndentWriter, function: &Function, fn_call: &str) -> Result<(), Error> {
+
+        match function.signature().rval() {
+            CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
+                indented!(w, [_], r#"var rval = {};"#, fn_call)?;
+                indented!(w, [_], r#"if (rval != {}.{})"#, e.the_enum().rust_name(), e.success_variant().name())?;
+                indented!(w, [_], r#"{{"#)?;
+                indented!(w, [_ _], r#"throw new Exception($"Something went wrong: {{rval}}");"#)?;
+                indented!(w, [_], r#"}}"#)?;
+            }
+            CType::Primitive(PrimitiveType::Void) => {
+                indented!(w, [_], r#"{};"#, fn_call)?;
+            }
+            _ => {
+                indented!(w, [_], r#"return {};"#, fn_call)?;
+            }
+        }
+
+        Ok(())
     }
 
     fn write_type_definitions(&self, w: &mut IndentWriter) -> Result<(), Error> {
@@ -863,53 +906,40 @@ pub trait CSharpWriter {
 
         for ctor in class.constructors() {
             // Ctor
-            let args = self.pattern_class_args_without_first_to_string(ctor, true);
             self.write_documentation(w, ctor.meta().documentation())?;
-            indented!(w, r#"public {}({})"#, context_type_name, args)?;
-            indented!(w, r#"{{"#)?;
-            w.indent();
-            self.write_pattern_service_success_enum_aware_rval(w, class, ctor, false)?;
-            w.unindent();
-            indented!(w, r#"}}"#)?;
+            self.write_pattern_service_method(w, class, ctor, "", context_type_name, true, true)?;
             w.newline()?;
         }
 
         // Dtor
-        indented!(w, r#"public void Dispose()"#)?;
-        indented!(w, r#"{{"#)?;
-        w.indent();
-        self.write_pattern_service_success_enum_aware_rval(w, class, class.destructor(), false)?;
-        w.unindent();
-        indented!(w, r#"}}"#)?;
+        self.write_pattern_service_method(w, class, class.destructor(), "void", "Dispose", true, true)?;
         w.newline()?;
 
         for function in class.methods() {
             // Main function
-            let args = self.pattern_class_args_without_first_to_string(function, true);
             let without_common_prefix = function.name().replace(&common_prefix, "");
             let prettified = IdPrettifier::from_rust_lower(&without_common_prefix);
             let fn_name = prettified.to_camel_case();
+
+            // Write checked method. These are "normal" methods that accept
+            // common C# types.
             let rval = match function.signature().rval() {
                 CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
                 _ => self.converter().to_typespecifier_in_rval(function.signature().rval()),
             };
-
             self.write_documentation(w, function.meta().documentation())?;
+            self.write_pattern_service_method(w, class, function, &rval, &fn_name, false, true)?;
 
-            indented!(w, r#"public {} {}({})"#, rval, fn_name, &args)?;
-            indented!(w, r#"{{"#)?;
-            w.indent();
-            self.write_pattern_service_success_enum_aware_rval(w, class, function, true)?;
-            w.unindent();
-            indented!(w, r#"}}"#)?;
-            w.newline()?;
-
-            // Overloaded
+            // Write unchecked method if overloadable exists. These expose the raw `Slicexxx`
+            // and friends, and are mainly used when composing complex interop.
             if self.converter().has_overloadable(function.signature()) {
-                self.write_documentation(w, function.meta().documentation())?;
-                self.write_pattern_service_method_overload(w, class, function, &rval, &fn_name)?;
                 w.newline()?;
+                let rval = self.converter().to_typespecifier_in_rval(function.signature().rval());
+                self.write_documentation(w, function.meta().documentation())?;
+                self.write_pattern_service_method(w, class, function, &rval, &fn_name, false, false)?;
             }
+
+            w.newline()?;
         }
 
         indented!(w, r#"public IntPtr Context => _context;"#)?;
@@ -922,16 +952,37 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_pattern_service_method_overload(&self, w: &mut IndentWriter, _class: &Service, function: &Function, rval: &str, fn_name: &str) -> Result<(), Error> {
-        self.debug(w, "write_pattern_service_method_overload")?;
+    #[allow(clippy::too_many_arguments)]
+    fn write_pattern_service_method(
+        &self,
+        w: &mut IndentWriter,
+        _class: &Service,
+        function: &Function,
+        rval: &str,
+        fn_name: &str,
+        write_contxt_by_ref: bool,
+        call_checked_function: bool,
+    ) -> Result<(), Error> {
+        self.debug(w, "write_pattern_service_method")?;
+
         let mut names = Vec::new();
         let mut to_invoke = Vec::new();
         let mut types = Vec::new();
 
+        // For every parameter except the first, figure out how we should forward
+        // it to the invocation we perform.
         for p in function.signature().params().iter().skip(1) {
             let name = p.name();
-            let native = self.converter().pattern_to_native_in_signature(p, function.signature());
 
+            // If we call the checked function we want to resolve a `SliceU8` to a `byte[]`,
+            // but if we call the unchecked version we want to keep that `Sliceu8` in our signature.
+            let native = if call_checked_function {
+                self.converter().pattern_to_native_in_signature(p, function.signature())
+            } else {
+                self.converter().to_typespecifier_in_param(p.the_type())
+            };
+
+            // Forward `ref` and `out` accordingly.
             if native.contains("out ") {
                 to_invoke.push(format!("out {}", name.to_string()));
             } else if native.contains("ref ") {
@@ -944,19 +995,35 @@ pub trait CSharpWriter {
             types.push(native);
         }
 
-        let arg_tokens = names.iter().zip(types.iter()).map(|(n, t)| format!("{} {}", t, n)).collect::<Vec<_>>();
-        let fn_call = format!(r#"{}.{}(_context, {})"#, self.config().class, function.name(), to_invoke.join(", "));
+        // Determine which method we should invoke
+        let method_to_invoke = match function.signature().rval() {
+            CType::Pattern(TypePattern::FFIErrorEnum(_)) if call_checked_function => {
+                format!("{}_checked", function.name())
+            }
+            _ => function.name().to_string(),
+        };
 
+        // Make sure we properly handle the trailing comman and whitespace for optional
+        // parameters.
+        let extra_args = if to_invoke.is_empty() {
+            "".to_string()
+        } else {
+            format!(", {}", to_invoke.join(", "))
+        };
+
+        // Assemble actual function call.
+        let context = if write_contxt_by_ref { "ref _context" } else { "_context" };
+        let arg_tokens = names.iter().zip(types.iter()).map(|(n, t)| format!("{} {}", t, n)).collect::<Vec<_>>();
+        let fn_call = format!(r#"{}.{}({}{})"#, self.config().class, method_to_invoke, context, extra_args);
+
+        // Write signature.
         indented!(w, r#"public {} {}({})"#, rval, fn_name, arg_tokens.join(", "))?;
         indented!(w, r#"{{"#)?;
 
+        // Determine return value behavior and write function call.
         match function.signature().rval() {
-            CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
-                indented!(w, [_], r#"var rval = {};"#, fn_call)?;
-                indented!(w, [_], r#"if (rval != {}.{})"#, e.the_enum().rust_name(), e.success_variant().name())?;
-                indented!(w, [_], r#"{{"#)?;
-                indented!(w, [_ _], r#"throw new Exception($"Something went wrong: {{rval}}");"#)?;
-                indented!(w, [_], r#"}}"#)?;
+            CType::Pattern(TypePattern::FFIErrorEnum(_)) if call_checked_function => {
+                indented!(w, [_], r#"{};"#, fn_call)?;
             }
             CType::Primitive(PrimitiveType::Void) => {
                 indented!(w, [_], r#"{};"#, fn_call)?;
@@ -969,61 +1036,6 @@ pub trait CSharpWriter {
         indented!(w, r#"}}"#)?;
 
         Ok(())
-    }
-
-    fn write_pattern_service_success_enum_aware_rval(&self, w: &mut IndentWriter, _class: &Service, function: &Function, deref_context: bool) -> Result<(), Error> {
-        self.debug(w, "write_pattern_service_success_enum_aware_rval")?;
-        let mut args = self.pattern_class_args_without_first_to_string(function, false);
-
-        // Make sure we don't have a `,` when only single parameter
-        if !args.is_empty() {
-            args = format!(", {}", args);
-        }
-
-        let context = if deref_context { "_context".to_string() } else { "ref _context".to_string() };
-
-        match function.signature().rval() {
-            CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
-                indented!(w, r#"var rval = {}.{}({} {});"#, self.config().class, function.name(), context, args)?;
-                indented!(w, r#"if (rval != {}.{})"#, e.the_enum().rust_name(), e.success_variant().name())?;
-                indented!(w, r#"{{"#)?;
-                indented!(w, [_], r#"throw new Exception($"Something went wrong {{rval}}");"#)?;
-                indented!(w, r#"}}"#)?;
-            }
-            CType::Primitive(PrimitiveType::Void) => {
-                indented!(w, r#"{}.{}({}{});"#, self.config().class, function.name(), context, args)?;
-            }
-            _ => {
-                indented!(w, r#"return {}.{}({}{});"#, self.config().class, function.name(), context, args)?;
-            }
-        }
-
-        Ok(())
-    }
-
-    fn pattern_class_args_without_first_to_string(&self, function: &Function, with_types: bool) -> String {
-        function
-            .signature()
-            .params()
-            .iter()
-            .skip(1)
-            .map(|x| {
-                let with_type = self.converter().to_typespecifier_in_param(x.the_type());
-
-                let name = if with_types {
-                    x.name().to_string()
-                } else if with_type.contains("ref ") {
-                    format!("ref {}", x.name().to_string())
-                } else if with_type.contains("out ") {
-                    format!("out {}", x.name().to_string())
-                } else {
-                    x.name().to_string()
-                };
-
-                format!("{}{}", if with_types { format!("{} ", with_type) } else { "".to_string() }, name)
-            })
-            .collect::<Vec<_>>()
-            .join(", ")
     }
 
     fn write_all(&self, w: &mut IndentWriter) -> Result<(), Error> {
