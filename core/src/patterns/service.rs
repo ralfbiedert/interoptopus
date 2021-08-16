@@ -120,15 +120,17 @@ use std::fmt::Debug;
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Service {
     the_type: OpaqueType,
-    constructor: Function,
+    constructors: Vec<Function>,
     destructor: Function,
     methods: Vec<Function>,
 }
 
 impl Service {
-    pub fn new(constructor: Function, destructor: Function, methods: Vec<Function>) -> Self {
+    pub fn new(constructors: Vec<Function>, destructor: Function, methods: Vec<Function>) -> Self {
         let the_type = extract_obvious_opaque_from_parameter(
-            constructor
+            constructors
+                .first()
+                .expect("Must have at least one constructor")
                 .signature()
                 .params()
                 .first()
@@ -139,7 +141,7 @@ impl Service {
 
         Self {
             the_type,
-            constructor,
+            constructors,
             destructor,
             methods,
         }
@@ -152,7 +154,9 @@ impl Service {
     /// message is beneficial.
     pub fn assert_valid(&self) {
         let constructor_fist_parameter = self
-            .constructor
+            .constructors
+            .first()
+            .expect("Must have at least one constructor")
             .signature()
             .params()
             .get(0)
@@ -189,9 +193,11 @@ impl Service {
             _ => panic!("First parameter must be RwPointer(RwPointer(Opaque)) type"),
         }
 
-        match self.constructor.signature().rval() {
-            CType::Pattern(TypePattern::FFIErrorEnum(_)) => {}
-            _ => panic!("Constructor must return a `ffi_error` type pattern."),
+        for constructor in self.constructors.iter() {
+            match constructor.signature().rval() {
+                CType::Pattern(TypePattern::FFIErrorEnum(_)) => {}
+                _ => panic!("Constructor must return a `ffi_error` type pattern."),
+            }
         }
 
         match self.destructor.signature().rval() {
@@ -204,8 +210,8 @@ impl Service {
         &self.the_type
     }
 
-    pub fn constructor(&self) -> &Function {
-        &self.constructor
+    pub fn constructors(&self) -> &[Function] {
+        &self.constructors
     }
 
     pub fn destructor(&self) -> &Function {

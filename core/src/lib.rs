@@ -262,8 +262,8 @@ macro_rules! inventory {
 
                     match &pattern {
                         $crate::patterns::LibraryPattern::Service(class) => {
-                            functions.push(class.constructor().clone());
                             functions.push(class.destructor().clone());
+                            functions.extend(class.constructors().iter().cloned());
                             functions.extend(class.methods().iter().cloned());
                         }
                     }

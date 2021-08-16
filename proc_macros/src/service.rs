@@ -46,11 +46,11 @@ pub fn ffi_service(attr: AttributeArgs, input: TokenStream) -> TokenStream {
         .filter(|x| matches!(x.method_type, MethodType::Method(_)))
         .map(|x| x.ident.clone())
         .collect::<Vec<_>>();
-    let ffi_ctor_ident = &function_descriptors
+    let ffi_ctors = function_descriptors
         .iter()
-        .find(|x| matches!(x.method_type, MethodType::Constructor(_)))
-        .expect("Must have constructor.")
-        .ident;
+        .filter(|x| matches!(x.method_type, MethodType::Constructor(_)))
+        .map(|x| x.ident.clone())
+        .collect::<Vec<_>>();
 
     let ffi_dtor_quote = &ffi_dtor.ffi_function_tokens;
     let ffi_dtor_ident = &ffi_dtor.ident;
@@ -74,6 +74,7 @@ pub fn ffi_service(attr: AttributeArgs, input: TokenStream) -> TokenStream {
                 use ::interoptopus::lang::rust::FunctionInfo;
 
                 let mut methods = Vec::new();
+                let mut ctors = Vec::new();
 
                 #(
                     {
@@ -82,10 +83,13 @@ pub fn ffi_service(attr: AttributeArgs, input: TokenStream) -> TokenStream {
                     }
                 )*
 
-                let ctor = {
-                    use #ffi_ctor_ident as x;
-                    x::function_info()
-                };
+
+                #(
+                    {
+                        use #ffi_ctors as x;
+                        ctors.push(x::function_info());
+                    }
+                )*
 
                 let dtor = {
                     use #ffi_dtor_ident as x;
@@ -93,7 +97,7 @@ pub fn ffi_service(attr: AttributeArgs, input: TokenStream) -> TokenStream {
                 };
 
                 let service = ::interoptopus::patterns::service::Service::new(
-                    ctor, dtor, methods,
+                    ctors, dtor, methods,
                 );
 
                 service.assert_valid();

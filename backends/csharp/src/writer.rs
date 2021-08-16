@@ -848,8 +848,9 @@ pub trait CSharpWriter {
 
     fn write_pattern_service(&self, w: &mut IndentWriter, class: &Service) -> Result<(), Error> {
         self.debug(w, "write_pattern_service")?;
-        let mut all_functions = vec![class.constructor().clone(), class.destructor().clone()];
+        let mut all_functions = class.constructors().to_vec();
         all_functions.extend_from_slice(class.methods());
+        all_functions.push(class.destructor().clone());
 
         let context_type_name = class.the_type().rust_name();
         let common_prefix = longest_common_prefix(&all_functions);
@@ -860,16 +861,18 @@ pub trait CSharpWriter {
         w.indent();
         indented!(w, r#"private IntPtr _context;"#)?;
 
-        // Ctor
-        let args = self.pattern_class_args_without_first_to_string(class.constructor(), true);
-        self.write_documentation(w, class.constructor().meta().documentation())?;
-        indented!(w, r#"public {}({})"#, context_type_name, args)?;
-        indented!(w, r#"{{"#)?;
-        w.indent();
-        self.write_pattern_service_success_enum_aware_rval(w, class, class.constructor(), false)?;
-        w.unindent();
-        indented!(w, r#"}}"#)?;
-        w.newline()?;
+        for ctor in class.constructors() {
+            // Ctor
+            let args = self.pattern_class_args_without_first_to_string(ctor, true);
+            self.write_documentation(w, ctor.meta().documentation())?;
+            indented!(w, r#"public {}({})"#, context_type_name, args)?;
+            indented!(w, r#"{{"#)?;
+            w.indent();
+            self.write_pattern_service_success_enum_aware_rval(w, class, ctor, false)?;
+            w.unindent();
+            indented!(w, r#"}}"#)?;
+            w.newline()?;
+        }
 
         // Dtor
         indented!(w, r#"public void Dispose()"#)?;

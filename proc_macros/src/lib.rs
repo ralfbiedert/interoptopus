@@ -250,7 +250,6 @@ pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// For this attribute to work a number of preconditions must be fulfilled:
 ///
 /// - The attribute must be used inside an `impl SomeType {}` block marked with [`#[ffi_service]`](macro@crate::ffi_service).
-/// - It must be applied to exactly one method.
 /// - The method must return `Result<Self, Error>`.
 ///
 /// We recommend to have a look at the [reference project](https://github.com/ralfbiedert/interoptopus/blob/master/interoptopus_reference_project/src/patterns/service.rs).

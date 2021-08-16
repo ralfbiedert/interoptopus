@@ -19,6 +19,11 @@ impl SimpleService {
         Ok(Self { some_value })
     }
 
+    #[ffi_service_ctor]
+    pub fn new_without() -> Result<Self, Error> {
+        Ok(Self { some_value: 0 })
+    }
+
     /// Methods returning a Result<(), _> are the default and do not
     /// need annotations.
     pub fn method_result(&self, _: u32) -> Result<(), Error> {

@@ -3,7 +3,7 @@ import ctypes
 import random
 import reference_project as r
 
-r.init_api("../../../target/debug/interoptopus_reference_project.dll")
+r.init_api("../../../../target/debug/interoptopus_reference_project.dll")
 
 # https://stackoverflow.com/questions/52475749/maximum-and-minimum-value-of-c-types-integers-from-python
 def limits(c_int_type):
@@ -179,6 +179,11 @@ class TestPatterns(unittest.TestCase):
         # TODO: The ptr()[0] part is a bit ugly ... should fix
         t2 = api.tupled(t.ptr()[0])
         self.assertEqual(20, t2.x0)
+
+    def test_services(self):
+        x = r.SimpleService()
+        # y = r.SimpleService(123)
+
 
 
 if __name__ == '__main__':

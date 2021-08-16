@@ -21,9 +21,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 12447785630982032897ul)
+            if (api_version != 12902512664028031058ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (12447785630982032897). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (12902512664028031058). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -306,11 +306,6 @@ namespace My.Company
         public static extern uint pattern_callback_1(MyCallback callback, uint x);
 
 
-        /// The constructor must return a `Result<Self, Error>`.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_new_with")]
-        public static extern FFIError simple_service_new_with(ref IntPtr context, uint some_value);
-
-
         /// Destroys the given instance.
         ///
         /// # Safety
@@ -319,6 +314,15 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_destroy")]
         public static extern FFIError simple_service_destroy(ref IntPtr context);
+
+
+        /// The constructor must return a `Result<Self, Error>`.
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_new_with")]
+        public static extern FFIError simple_service_new_with(ref IntPtr context, uint some_value);
+
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_new_without")]
+        public static extern FFIError simple_service_new_without(ref IntPtr context);
 
 
         /// Methods returning a Result<(), _> are the default and do not
@@ -737,6 +741,15 @@ namespace My.Company
         public SimpleService(uint some_value)
         {
             var rval = Interop.simple_service_new_with(ref _context , some_value);
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception($"Something went wrong {rval}");
+            }
+        }
+
+        public SimpleService()
+        {
+            var rval = Interop.simple_service_new_without(ref _context );
             if (rval != FFIError.Ok)
             {
                 throw new Exception($"Something went wrong {rval}");

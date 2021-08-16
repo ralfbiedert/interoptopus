@@ -249,8 +249,9 @@ uint8_t pattern_ffi_bool(uint8_t ffi_bool);
 void pattern_my_api_init_v1(cffi_myapiv1* api);
 uint64_t pattern_api_guard();
 uint32_t pattern_callback_1(cffi_fptr_fn_u32_rval_u32 callback, uint32_t x);
-cffi_ffierror simple_service_new_with(cffi_simpleservice** context, uint32_t some_value);
 cffi_ffierror simple_service_destroy(cffi_simpleservice** context);
+cffi_ffierror simple_service_new_with(cffi_simpleservice** context, uint32_t some_value);
+cffi_ffierror simple_service_new_without(cffi_simpleservice** context);
 cffi_ffierror simple_service_method_result(cffi_simpleservice* context, uint32_t _anon1);
 uint32_t simple_service_method_value(cffi_simpleservice* context, uint32_t x);
 void simple_service_method_void(cffi_simpleservice* context);
@@ -1334,15 +1335,6 @@ class raw:
             x = x._ctx[0]
         return _api.pattern_callback_1(callback, x)
 
-    def simple_service_new_with(context, some_value):
-        """ The constructor must return a `Result<Self, Error>`."""
-        global _api
-        if hasattr(context, "_ctx"):
-            context = context._ctx[0]
-        if hasattr(some_value, "_ctx"):
-            some_value = some_value._ctx[0]
-        return _api.simple_service_new_with(context, some_value)
-
     def simple_service_destroy(context):
         """ Destroys the given instance.
 
@@ -1354,6 +1346,22 @@ class raw:
         if hasattr(context, "_ctx"):
             context = context._ctx[0]
         return _api.simple_service_destroy(context)
+
+    def simple_service_new_with(context, some_value):
+        """ The constructor must return a `Result<Self, Error>`."""
+        global _api
+        if hasattr(context, "_ctx"):
+            context = context._ctx[0]
+        if hasattr(some_value, "_ctx"):
+            some_value = some_value._ctx[0]
+        return _api.simple_service_new_with(context, some_value)
+
+    def simple_service_new_without(context):
+        """"""
+        global _api
+        if hasattr(context, "_ctx"):
+            context = context._ctx[0]
+        return _api.simple_service_new_without(context)
 
     def simple_service_method_result(context, _anon1):
         """ Methods returning a Result<(), _> are the default and do not
@@ -1461,6 +1469,16 @@ class SimpleService(object):
             some_value = some_value._ctx
         self.ctx = ffi.new("cffi_simpleservice**")
         rval = raw.simple_service_new_with(self.ctx, some_value)
+        if rval == FFIError.Ok:
+            return None
+        else:
+            raise Exception(f"return value ${rval}")
+
+    def __init__(self, ):
+        """"""
+        global _api, ffi
+        self.ctx = ffi.new("cffi_simpleservice**")
+        rval = raw.simple_service_new_without(self.ctx, )
         if rval == FFIError.Ok:
             return None
         else:

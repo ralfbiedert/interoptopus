@@ -232,23 +232,28 @@ pub trait PythonWriter {
         let context_type_name = class.the_type().rust_name();
         let context_cname = self.converter().c_converter().opaque_to_typename(class.the_type());
 
-        let mut all_functions = vec![class.constructor().clone(), class.destructor().clone()];
+        let mut all_functions = class.constructors().to_vec();
         all_functions.extend_from_slice(class.methods());
+        all_functions.push(class.destructor().clone());
+
         let common_prefix = longest_common_prefix(&all_functions);
 
-        let ctor_args = self.pattern_class_args_without_first_to_string(class.constructor());
         indented!(w, r#"class {}(object):"#, context_type_name)?;
-        indented!(w, [_], r#"def __init__(self, {}):"#, ctor_args)?;
-        indented!(w, [_ _], r#"{}"#, self.converter().documentation(class.constructor().meta().documentation()))?;
-        indented!(w, [_ _], r#"global _api, ffi"#)?;
-        for param in class.constructor().signature().params().iter().skip(1) {
-            indented!(w, [_ _ ], r#"if hasattr({}, "_ctx"):"#, param.name())?;
-            indented!(w, [_ _ _], r#"{} = {}._ctx"#, param.name(), param.name())?;
-        }
 
-        indented!(w, [_ _], r#"self.ctx = ffi.new("{}**")"#, context_cname)?;
-        self.write_pattern_class_success_enum_aware_rval(w, class, class.constructor(), false)?;
-        w.newline()?;
+        for ctor in class.constructors() {
+            let ctor_args = self.pattern_class_args_without_first_to_string(ctor);
+            indented!(w, [_], r#"def __init__(self, {}):"#, ctor_args)?;
+            indented!(w, [_ _], r#"{}"#, self.converter().documentation(ctor.meta().documentation()))?;
+            indented!(w, [_ _], r#"global _api, ffi"#)?;
+            for param in ctor.signature().params().iter().skip(1) {
+                indented!(w, [_ _ ], r#"if hasattr({}, "_ctx"):"#, param.name())?;
+                indented!(w, [_ _ _], r#"{} = {}._ctx"#, param.name(), param.name())?;
+            }
+
+            indented!(w, [_ _], r#"self.ctx = ffi.new("{}**")"#, context_cname)?;
+            self.write_pattern_class_success_enum_aware_rval(w, class, ctor, false)?;
+            w.newline()?;
+        }
 
         // Dtor
         indented!(w, [_], r#"def __del__(self):"#)?;
