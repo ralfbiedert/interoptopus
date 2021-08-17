@@ -299,16 +299,21 @@ class EnumRenamed:
 
 class Array(object):
     """"""
-    def __init__(self):
+    def __init__(self, data = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_array[]", 1)
+        if data is not None:
+            self.data = data
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_array[]", n)
+        return CArray("cffi_array", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def data(self):
@@ -317,34 +322,47 @@ class Array(object):
 
     @data.setter
     def data(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_data = value
         self._ctx[0].data = value
 
 class Empty(object):
     """"""
-    def __init__(self):
+    def __init__(self, ):
         global _api, ffi
         self._ctx = ffi.new("cffi_empty[]", 1)
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_empty[]", n)
+        return CArray("cffi_empty", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
 class ExtraTypef32(object):
     """"""
-    def __init__(self):
+    def __init__(self, x = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_extratypef32[]", 1)
+        if x is not None:
+            self.x = x
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_extratypef32[]", n)
+        return CArray("cffi_extratypef32", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def x(self):
@@ -353,21 +371,31 @@ class ExtraTypef32(object):
 
     @x.setter
     def x(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_x = value
         self._ctx[0].x = value
 
 class Genericu32(object):
     """"""
-    def __init__(self):
+    def __init__(self, x = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_genericu32[]", 1)
+        if x is not None:
+            self.x = x
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_genericu32[]", n)
+        return CArray("cffi_genericu32", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def x(self):
@@ -376,21 +404,31 @@ class Genericu32(object):
 
     @x.setter
     def x(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_x = value
         self._ctx[0].x = value
 
 class Genericu8(object):
     """"""
-    def __init__(self):
+    def __init__(self, x = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_genericu8[]", 1)
+        if x is not None:
+            self.x = x
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_genericu8[]", n)
+        return CArray("cffi_genericu8", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def x(self):
@@ -399,21 +437,31 @@ class Genericu8(object):
 
     @x.setter
     def x(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_x = value
         self._ctx[0].x = value
 
 class Inner(object):
     """"""
-    def __init__(self):
+    def __init__(self, x = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_inner[]", 1)
+        if x is not None:
+            self.x = x
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_inner[]", n)
+        return CArray("cffi_inner", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def x(self):
@@ -422,21 +470,33 @@ class Inner(object):
 
     @x.setter
     def x(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_x = value
         self._ctx[0].x = value
 
 class MyAPIv1(object):
     """"""
-    def __init__(self):
+    def __init__(self, ref_mut_option = None, tupled = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_myapiv1[]", 1)
+        if ref_mut_option is not None:
+            self.ref_mut_option = ref_mut_option
+        if tupled is not None:
+            self.tupled = tupled
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_myapiv1[]", n)
+        return CArray("cffi_myapiv1", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def ref_mut_option(self):
@@ -445,6 +505,11 @@ class MyAPIv1(object):
 
     @ref_mut_option.setter
     def ref_mut_option(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_ref_mut_option = value
         self._ctx[0].ref_mut_option = value
 
@@ -455,21 +520,31 @@ class MyAPIv1(object):
 
     @tupled.setter
     def tupled(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_tupled = value
         self._ctx[0].tupled = value
 
 class Phantomu8(object):
     """"""
-    def __init__(self):
+    def __init__(self, x = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_phantomu8[]", 1)
+        if x is not None:
+            self.x = x
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_phantomu8[]", n)
+        return CArray("cffi_phantomu8", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def x(self):
@@ -478,21 +553,31 @@ class Phantomu8(object):
 
     @x.setter
     def x(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_x = value
         self._ctx[0].x = value
 
 class SomeForeignType(object):
     """"""
-    def __init__(self):
+    def __init__(self, x = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_someforeigntype[]", 1)
+        if x is not None:
+            self.x = x
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_someforeigntype[]", n)
+        return CArray("cffi_someforeigntype", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def x(self):
@@ -501,21 +586,31 @@ class SomeForeignType(object):
 
     @x.setter
     def x(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_x = value
         self._ctx[0].x = value
 
 class StructDocumented(object):
     """ Documented struct."""
-    def __init__(self):
+    def __init__(self, x = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_structdocumented[]", 1)
+        if x is not None:
+            self.x = x
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_structdocumented[]", n)
+        return CArray("cffi_structdocumented", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def x(self):
@@ -524,21 +619,31 @@ class StructDocumented(object):
 
     @x.setter
     def x(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_x = value
         self._ctx[0].x = value
 
 class StructRenamed(object):
     """"""
-    def __init__(self):
+    def __init__(self, e = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_structrenamed[]", 1)
+        if e is not None:
+            self.e = e
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_structrenamed[]", n)
+        return CArray("cffi_structrenamed", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def e(self):
@@ -547,21 +652,31 @@ class StructRenamed(object):
 
     @e.setter
     def e(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_e = value
         self._ctx[0].e = value
 
 class Tupled(object):
     """"""
-    def __init__(self):
+    def __init__(self, x0 = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_tupled[]", 1)
+        if x0 is not None:
+            self.x0 = x0
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_tupled[]", n)
+        return CArray("cffi_tupled", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def x0(self):
@@ -570,21 +685,31 @@ class Tupled(object):
 
     @x0.setter
     def x0(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_x0 = value
         self._ctx[0].x0 = value
 
 class UseAsciiStringPattern(object):
     """"""
-    def __init__(self):
+    def __init__(self, ascii_string = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_useasciistringpattern[]", 1)
+        if ascii_string is not None:
+            self.ascii_string = ascii_string
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_useasciistringpattern[]", n)
+        return CArray("cffi_useasciistringpattern", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def ascii_string(self):
@@ -593,21 +718,33 @@ class UseAsciiStringPattern(object):
 
     @ascii_string.setter
     def ascii_string(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_ascii_string = value
         self._ctx[0].ascii_string = value
 
 class Vec(object):
     """"""
-    def __init__(self):
+    def __init__(self, x = None, z = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_vec[]", 1)
+        if x is not None:
+            self.x = x
+        if z is not None:
+            self.z = z
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_vec[]", n)
+        return CArray("cffi_vec", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def x(self):
@@ -616,6 +753,11 @@ class Vec(object):
 
     @x.setter
     def x(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_x = value
         self._ctx[0].x = value
 
@@ -626,21 +768,33 @@ class Vec(object):
 
     @z.setter
     def z(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_z = value
         self._ctx[0].z = value
 
 class Vec1(object):
     """"""
-    def __init__(self):
+    def __init__(self, x = None, y = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_vec1[]", 1)
+        if x is not None:
+            self.x = x
+        if y is not None:
+            self.y = y
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_vec1[]", n)
+        return CArray("cffi_vec1", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def x(self):
@@ -649,6 +803,11 @@ class Vec1(object):
 
     @x.setter
     def x(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_x = value
         self._ctx[0].x = value
 
@@ -659,21 +818,33 @@ class Vec1(object):
 
     @y.setter
     def y(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_y = value
         self._ctx[0].y = value
 
 class Vec2(object):
     """"""
-    def __init__(self):
+    def __init__(self, x = None, z = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_vec2[]", 1)
+        if x is not None:
+            self.x = x
+        if z is not None:
+            self.z = z
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_vec2[]", n)
+        return CArray("cffi_vec2", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def x(self):
@@ -682,6 +853,11 @@ class Vec2(object):
 
     @x.setter
     def x(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_x = value
         self._ctx[0].x = value
 
@@ -692,21 +868,35 @@ class Vec2(object):
 
     @z.setter
     def z(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_z = value
         self._ctx[0].z = value
 
 class Vec3f32(object):
     """"""
-    def __init__(self):
+    def __init__(self, x = None, y = None, z = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_vec3f32[]", 1)
+        if x is not None:
+            self.x = x
+        if y is not None:
+            self.y = y
+        if z is not None:
+            self.z = z
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_vec3f32[]", n)
+        return CArray("cffi_vec3f32", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def x(self):
@@ -715,6 +905,11 @@ class Vec3f32(object):
 
     @x.setter
     def x(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_x = value
         self._ctx[0].x = value
 
@@ -725,6 +920,11 @@ class Vec3f32(object):
 
     @y.setter
     def y(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_y = value
         self._ctx[0].y = value
 
@@ -735,21 +935,33 @@ class Vec3f32(object):
 
     @z.setter
     def z(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_z = value
         self._ctx[0].z = value
 
 class Visibility1(object):
     """"""
-    def __init__(self):
+    def __init__(self, pblc = None, prvt = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_visibility1[]", 1)
+        if pblc is not None:
+            self.pblc = pblc
+        if prvt is not None:
+            self.prvt = prvt
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_visibility1[]", n)
+        return CArray("cffi_visibility1", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def pblc(self):
@@ -758,6 +970,11 @@ class Visibility1(object):
 
     @pblc.setter
     def pblc(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_pblc = value
         self._ctx[0].pblc = value
 
@@ -768,21 +985,33 @@ class Visibility1(object):
 
     @prvt.setter
     def prvt(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_prvt = value
         self._ctx[0].prvt = value
 
 class Visibility2(object):
     """"""
-    def __init__(self):
+    def __init__(self, pblc1 = None, pblc2 = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_visibility2[]", 1)
+        if pblc1 is not None:
+            self.pblc1 = pblc1
+        if pblc2 is not None:
+            self.pblc2 = pblc2
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_visibility2[]", n)
+        return CArray("cffi_visibility2", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def pblc1(self):
@@ -791,6 +1020,11 @@ class Visibility2(object):
 
     @pblc1.setter
     def pblc1(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_pblc1 = value
         self._ctx[0].pblc1 = value
 
@@ -801,21 +1035,31 @@ class Visibility2(object):
 
     @pblc2.setter
     def pblc2(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_pblc2 = value
         self._ctx[0].pblc2 = value
 
 class Weird1u32(object):
     """"""
-    def __init__(self):
+    def __init__(self, x = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_weird1u32[]", 1)
+        if x is not None:
+            self.x = x
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_weird1u32[]", n)
+        return CArray("cffi_weird1u32", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def x(self):
@@ -824,21 +1068,35 @@ class Weird1u32(object):
 
     @x.setter
     def x(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_x = value
         self._ctx[0].x = value
 
 class Weird2u8(object):
     """"""
-    def __init__(self):
+    def __init__(self, t = None, a = None, r = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_weird2u8[]", 1)
+        if t is not None:
+            self.t = t
+        if a is not None:
+            self.a = a
+        if r is not None:
+            self.r = r
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_weird2u8[]", n)
+        return CArray("cffi_weird2u8", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def t(self):
@@ -847,6 +1105,11 @@ class Weird2u8(object):
 
     @t.setter
     def t(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_t = value
         self._ctx[0].t = value
 
@@ -857,6 +1120,11 @@ class Weird2u8(object):
 
     @a.setter
     def a(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_a = value
         self._ctx[0].a = value
 
@@ -867,6 +1135,11 @@ class Weird2u8(object):
 
     @r.setter
     def r(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_r = value
         self._ctx[0].r = value
 
@@ -1012,7 +1285,7 @@ class raw:
         """"""
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx[0]
+            x = x.c_ptr()
         return _api.ptr(x)
 
     def ptr_mut(x):
@@ -1021,42 +1294,42 @@ class raw:
  Parameter x must point to valid data."""
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx[0]
+            x = x.c_ptr()
         return _api.ptr_mut(x)
 
     def ptr_ptr(x):
         """"""
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx[0]
+            x = x.c_ptr()
         return _api.ptr_ptr(x)
 
     def ref_simple(x):
         """"""
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx[0]
+            x = x.c_ptr()
         return _api.ref_simple(x)
 
     def ref_mut_simple(x):
         """"""
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx[0]
+            x = x.c_ptr()
         return _api.ref_mut_simple(x)
 
     def ref_option(x):
         """"""
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx[0]
+            x = x.c_ptr()
         return _api.ref_option(x)
 
     def ref_mut_option(x):
         """"""
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx[0]
+            x = x.c_ptr()
         return _api.ref_mut_option(x)
 
     def tupled(x):
@@ -1072,7 +1345,7 @@ class raw:
         if hasattr(_a, "_ctx"):
             _a = _a._ctx[0]
         if hasattr(_b, "_ctx"):
-            _b = _b._ctx[0]
+            _b = _b.c_ptr()
         return _api.complex_args_1(_a, _b)
 
     def complex_args_2(_cmplx):
@@ -1113,30 +1386,30 @@ class raw:
         """"""
         global _api
         if hasattr(_x, "_ctx"):
-            _x = _x._ctx[0]
+            _x = _x.c_ptr()
         if hasattr(y, "_ctx"):
-            y = y._ctx[0]
+            y = y.c_ptr()
         return _api.generic_1c(_x, y)
 
     def generic_2(x):
         """"""
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx[0]
+            x = x.c_ptr()
         return _api.generic_2(x)
 
     def generic_3(x):
         """"""
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx[0]
+            x = x.c_ptr()
         return _api.generic_3(x)
 
     def generic_4(x):
         """"""
         global _api
         if hasattr(x, "_ctx"):
-            x = x._ctx[0]
+            x = x.c_ptr()
         return _api.generic_4(x)
 
     def array_1(x):
@@ -1239,15 +1512,19 @@ class raw:
     def pattern_ffi_slice_1(ffi_slice):
         """"""
         global _api
-        if hasattr(ffi_slice, "_ctx"):
-            ffi_slice = ffi_slice._ctx[0]
+        _ffi_slice = ffi.new("cffi_sliceu32[]", 1)
+        _ffi_slice[0].data = ffi_slice._ctx
+        _ffi_slice[0].len = ffi_slice._len
+        ffi_slice = _ffi_slice[0]
         return _api.pattern_ffi_slice_1(ffi_slice)
 
     def pattern_ffi_slice_2(ffi_slice, i):
         """"""
         global _api
-        if hasattr(ffi_slice, "_ctx"):
-            ffi_slice = ffi_slice._ctx[0]
+        _ffi_slice = ffi.new("cffi_slicevec3f32[]", 1)
+        _ffi_slice[0].data = ffi_slice._ctx
+        _ffi_slice[0].len = ffi_slice._len
+        ffi_slice = _ffi_slice[0]
         if hasattr(i, "_ctx"):
             i = i._ctx[0]
         return _api.pattern_ffi_slice_2(ffi_slice, i)
@@ -1255,8 +1532,10 @@ class raw:
     def pattern_ffi_slice_3(slice, callback):
         """"""
         global _api
-        if hasattr(slice, "_ctx"):
-            slice = slice._ctx[0]
+        _slice = ffi.new("cffi_slicemutu8[]", 1)
+        _slice[0].data = slice._ctx
+        _slice[0].len = slice._len
+        slice = _slice[0]
         if hasattr(callback, "_ctx"):
             callback = callback._ctx[0]
         return _api.pattern_ffi_slice_3(slice, callback)
@@ -1264,19 +1543,23 @@ class raw:
     def pattern_ffi_slice_4(_slice, _slice2):
         """"""
         global _api
-        if hasattr(_slice, "_ctx"):
-            _slice = _slice._ctx[0]
-        if hasattr(_slice2, "_ctx"):
-            _slice2 = _slice2._ctx[0]
+        __slice = ffi.new("cffi_sliceu8[]", 1)
+        __slice[0].data = _slice._ctx
+        __slice[0].len = _slice._len
+        _slice = __slice[0]
+        __slice2 = ffi.new("cffi_slicemutu8[]", 1)
+        __slice2[0].data = _slice2._ctx
+        __slice2[0].len = _slice2._len
+        _slice2 = __slice2[0]
         return _api.pattern_ffi_slice_4(_slice, _slice2)
 
     def pattern_ffi_slice_5(slice, slice2):
         """"""
         global _api
         if hasattr(slice, "_ctx"):
-            slice = slice._ctx[0]
+            slice = slice.c_ptr()
         if hasattr(slice2, "_ctx"):
-            slice2 = slice2._ctx[0]
+            slice2 = slice2.c_ptr()
         return _api.pattern_ffi_slice_5(slice, slice2)
 
     def pattern_ffi_slice_delegate(callback):
@@ -1318,7 +1601,7 @@ class raw:
         """"""
         global _api
         if hasattr(api, "_ctx"):
-            api = api._ctx[0]
+            api = api.c_ptr()
         return _api.pattern_my_api_init_v1(api)
 
     def pattern_api_guard():
@@ -1344,14 +1627,14 @@ class raw:
  passing any other value results in undefined behavior."""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx[0]
+            context = context.c_ptr()
         return _api.simple_service_destroy(context)
 
     def simple_service_new_with(context, some_value):
         """ The constructor must return a `Result<Self, Error>`."""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx[0]
+            context = context.c_ptr()
         if hasattr(some_value, "_ctx"):
             some_value = some_value._ctx[0]
         return _api.simple_service_new_with(context, some_value)
@@ -1360,7 +1643,7 @@ class raw:
         """"""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx[0]
+            context = context.c_ptr()
         return _api.simple_service_new_without(context)
 
     def simple_service_method_result(context, _anon1):
@@ -1368,7 +1651,7 @@ class raw:
  need annotations."""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx[0]
+            context = context.c_ptr()
         if hasattr(_anon1, "_ctx"):
             _anon1 = _anon1._ctx[0]
         return _api.simple_service_method_result(context, _anon1)
@@ -1377,7 +1660,7 @@ class raw:
         """"""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx[0]
+            context = context.c_ptr()
         if hasattr(x, "_ctx"):
             x = x._ctx[0]
         return _api.simple_service_method_value(context, x)
@@ -1388,73 +1671,85 @@ class raw:
  Multiple lines."""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx[0]
+            context = context.c_ptr()
         return _api.simple_service_method_void(context)
 
     def simple_service_method_mut_self(context, slice):
         """"""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx[0]
-        if hasattr(slice, "_ctx"):
-            slice = slice._ctx[0]
+            context = context.c_ptr()
+        _slice = ffi.new("cffi_sliceu8[]", 1)
+        _slice[0].data = slice._ctx
+        _slice[0].len = slice._len
+        slice = _slice[0]
         return _api.simple_service_method_mut_self(context, slice)
 
     def simple_service_method_mut_self_void(context, _slice):
         """ Single line."""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx[0]
-        if hasattr(_slice, "_ctx"):
-            _slice = _slice._ctx[0]
+            context = context.c_ptr()
+        __slice = ffi.new("cffi_slicebool[]", 1)
+        __slice[0].data = _slice._ctx
+        __slice[0].len = _slice._len
+        _slice = __slice[0]
         return _api.simple_service_method_mut_self_void(context, _slice)
 
     def simple_service_method_mut_self_ref(context, x, _y):
         """"""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx[0]
+            context = context.c_ptr()
         if hasattr(x, "_ctx"):
-            x = x._ctx[0]
+            x = x.c_ptr()
         if hasattr(_y, "_ctx"):
-            _y = _y._ctx[0]
+            _y = _y.c_ptr()
         return _api.simple_service_method_mut_self_ref(context, x, _y)
 
     def simple_service_method_mut_self_ref_slice(context, x, _y, _slice):
         """"""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx[0]
+            context = context.c_ptr()
         if hasattr(x, "_ctx"):
-            x = x._ctx[0]
+            x = x.c_ptr()
         if hasattr(_y, "_ctx"):
-            _y = _y._ctx[0]
-        if hasattr(_slice, "_ctx"):
-            _slice = _slice._ctx[0]
+            _y = _y.c_ptr()
+        __slice = ffi.new("cffi_sliceu8[]", 1)
+        __slice[0].data = _slice._ctx
+        __slice[0].len = _slice._len
+        _slice = __slice[0]
         return _api.simple_service_method_mut_self_ref_slice(context, x, _y, _slice)
 
     def simple_service_method_mut_self_ref_slice_limited(context, x, _y, _slice, _slice2):
         """"""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx[0]
+            context = context.c_ptr()
         if hasattr(x, "_ctx"):
-            x = x._ctx[0]
+            x = x.c_ptr()
         if hasattr(_y, "_ctx"):
-            _y = _y._ctx[0]
-        if hasattr(_slice, "_ctx"):
-            _slice = _slice._ctx[0]
-        if hasattr(_slice2, "_ctx"):
-            _slice2 = _slice2._ctx[0]
+            _y = _y.c_ptr()
+        __slice = ffi.new("cffi_sliceu8[]", 1)
+        __slice[0].data = _slice._ctx
+        __slice[0].len = _slice._len
+        _slice = __slice[0]
+        __slice2 = ffi.new("cffi_sliceu8[]", 1)
+        __slice2[0].data = _slice2._ctx
+        __slice2[0].len = _slice2._len
+        _slice2 = __slice2[0]
         return _api.simple_service_method_mut_self_ref_slice_limited(context, x, _y, _slice, _slice2)
 
     def simple_service_method_mut_self_ffi_error(context, _slice):
         """"""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx[0]
-        if hasattr(_slice, "_ctx"):
-            _slice = _slice._ctx[0]
+            context = context.c_ptr()
+        __slice = ffi.new("cffi_slicemutu8[]", 1)
+        __slice[0].data = _slice._ctx
+        __slice[0].len = _slice._len
+        _slice = __slice[0]
         return _api.simple_service_method_mut_self_ffi_error(context, _slice)
 
 
@@ -1550,6 +1845,20 @@ class SimpleService(object):
 
 
 
+
+
+class CArray(object):
+    """Holds a native C array with a given length."""
+    def __init__(self, type, n):
+        self._ctx = ffi.new(f"{type}[{n}]")
+        self._len = n
+        self._c_array = True
+
+    def __getitem__(self, key):
+        return self._ctx[key]
+
+    def __setitem__(self, key, value):
+        self._ctx[key] = value
 
 
 def ascii_string(x):

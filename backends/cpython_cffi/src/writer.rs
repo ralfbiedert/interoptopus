@@ -81,21 +81,31 @@ pub trait PythonWriter {
         indented!(w, [_], r#"{}"#, self.converter().documentation(e.meta().documentation()))?;
 
         // Ctor
-        indented!(w, [_], r#"def __init__(self):"#)?;
+        let extra_args = e.fields().iter().map(|x| format!("{} = None", x.name())).collect::<Vec<_>>().join(", ");
+        indented!(w, [_], r#"def __init__(self, {}):"#, extra_args)?;
         indented!(w, [_ _], r#"global _api, ffi"#)?;
         indented!(w, [_ _], r#"self._ctx = ffi.new("{}[]", 1)"#, cname)?;
+        for field in e.fields().iter() {
+            indented!(w, [_ _], r#"if {} is not None:"#, field.name())?;
+            indented!(w, [_ _ _], r#"self.{} = {}"#, field.name(), field.name())?;
+        }
 
         w.newline()?;
 
         // Array constructor
-        indented!(w, [_], r#"def array(n):"#)?;
+        indented!(w, [_], r#"def c_array(n):"#)?;
         indented!(w, [_ _], r#"global _api, ffi"#)?;
-        indented!(w, [_ _], r#"return ffi.new("{}[]", n)"#, cname)?;
+        indented!(w, [_ _], r#"return CArray("{}", n)"#, cname)?;
         w.newline()?;
 
         // Ptr
-        indented!(w, [_], r#"def ptr(self):"#)?;
+        indented!(w, [_], r#"def c_ptr(self):"#)?;
         indented!(w, [_ _], r#"return self._ctx"#)?;
+        w.newline()?;
+
+        // Value
+        indented!(w, [_], r#"def c_value(self):"#)?;
+        indented!(w, [_ _], r#"return self._ctx[0]"#)?;
         w.newline()?;
 
         for field in e.fields() {
@@ -108,6 +118,11 @@ pub trait PythonWriter {
             let _docs = field.documentation().lines().join("\n");
             indented!(w, [_], r#"@{}.setter"#, field.name())?;
             indented!(w, [_], r#"def {}(self, value):"#, field.name())?;
+            indented!(w, [_ _], r#"if hasattr(value, "_ctx"):"#)?;
+            indented!(w, [_ _ _], r#"if hasattr(value, "_c_array"):"#)?;
+            indented!(w, [_ _ _ _], r#"value = value._ctx"#)?;
+            indented!(w, [_ _ _], r#"else:"#)?;
+            indented!(w, [_ _ _ _], r#"value = value._ctx[0]"#)?;
             // We also write _ptr to hold on to any allocated object created by CFFI. If we do not
             // then we might assign a pointer in the _ctx line below, but once the parameter (the CFFI handle)
             // leaves this function the handle might become deallocated and therefore the pointer
@@ -171,8 +186,34 @@ pub trait PythonWriter {
             // Determine if the function was called with a wrapper we produced which as a private `_ctx`.
             // If so, use that instead. Otherwise, just pass parameters and hope for the best.
             for param in function.signature().params() {
-                indented!(w, [_ _], r#"if hasattr({}, "_ctx"):"#, param.name())?;
-                indented!(w, [_ _ _], r#"{} = {}._ctx[0]"#, param.name(), param.name())?;
+                match param.the_type() {
+                    CType::ReadPointer(_) => {
+                        indented!(w, [_ _], r#"if hasattr({}, "_ctx"):"#, param.name())?;
+                        indented!(w, [_ _ _], r#"{} = {}.c_ptr()"#, param.name(), param.name())?
+                    }
+                    CType::ReadWritePointer(_) => {
+                        indented!(w, [_ _], r#"if hasattr({}, "_ctx"):"#, param.name())?;
+                        indented!(w, [_ _ _], r#"{} = {}.c_ptr()"#, param.name(), param.name())?
+                    }
+                    x @ CType::Pattern(TypePattern::SliceMut(_)) => {
+                        let slice_type = self.converter().c_converter().to_type_specifier(x);
+                        indented!(w, [_ _], r#"_{} = ffi.new("{}[]", 1)"#, param.name(), slice_type)?;
+                        indented!(w, [_ _], r#"_{}[0].data = {}._ctx"#, param.name(), param.name())?;
+                        indented!(w, [_ _], r#"_{}[0].len = {}._len"#, param.name(), param.name())?;
+                        indented!(w, [_ _], r#"{} = _{}[0]"#, param.name(), param.name())?;
+                    }
+                    x @ CType::Pattern(TypePattern::Slice(_)) => {
+                        let slice_type = self.converter().c_converter().to_type_specifier(x);
+                        indented!(w, [_ _], r#"_{} = ffi.new("{}[]", 1)"#, param.name(), slice_type)?;
+                        indented!(w, [_ _], r#"_{}[0].data = {}._ctx"#, param.name(), param.name())?;
+                        indented!(w, [_ _], r#"_{}[0].len = {}._len"#, param.name(), param.name())?;
+                        indented!(w, [_ _], r#"{} = _{}[0]"#, param.name(), param.name())?;
+                    }
+                    _ => {
+                        indented!(w, [_ _], r#"if hasattr({}, "_ctx"):"#, param.name())?;
+                        indented!(w, [_ _ _], r#"{} = {}._ctx[0]"#, param.name(), param.name())?
+                    }
+                }
             }
 
             indented!(w, [_ _], r#"return _api.{}({})"#, function.name(), &args)?;
@@ -267,6 +308,14 @@ pub trait PythonWriter {
             indented!(w, [_], r#"def {}(self, {}):"#, function.name().replace(&common_prefix, ""), &args)?;
             indented!(w, [_ _], r#"{}"#, self.converter().documentation(function.meta().documentation()))?;
             indented!(w, [_ _], r#"global {}"#, self.config().raw_fn_namespace)?;
+
+            // // Determine if the function was called with a wrapper we produced which as a private `_ctx`.
+            // // If so, use that instead. Otherwise, just pass parameters and hope for the best.
+            // for param in function.signature().params().iter().skip(1) {
+            //     indented!(w, [_ _], r#"if hasattr({}, "_ctx"):"#, param.name())?;
+            //     indented!(w, [_ _ _], r#"{} = {}._ctx[0]"#, param.name(), param.name())?;
+            // }
+
             self.write_pattern_class_success_enum_aware_rval(w, class, function, true)?;
             w.newline()?;
         }
@@ -294,6 +343,21 @@ pub trait PythonWriter {
     }
 
     fn write_utils(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        indented!(w, r#"class CArray(object):"#)?;
+        indented!(w, [_], r#""""Holds a native C array with a given length.""""#)?;
+        indented!(w, [_], r#"def __init__(self, type, n):"#)?;
+        indented!(w, [_ _], r#"self._ctx = ffi.new(f"{{type}}[{{n}}]")"#)?;
+        indented!(w, [_ _], r#"self._len = n"#)?;
+        indented!(w, [_ _], r#"self._c_array = True"#)?;
+        w.newline()?;
+        indented!(w, [_], r#"def __getitem__(self, key):"#)?;
+        indented!(w, [_ _], r#"return self._ctx[key]"#)?;
+        w.newline()?;
+        indented!(w, [_], r#"def __setitem__(self, key, value):"#)?;
+        indented!(w, [_ _], r#"self._ctx[key] = value"#)?;
+        w.newline()?;
+        w.newline()?;
+
         indented!(w, r#"def ascii_string(x):"#)?;
         indented!(w, [_], r#""""Must be called with a b"my_string".""""#)?;
         indented!(w, [_], r#"global ffi"#)?;

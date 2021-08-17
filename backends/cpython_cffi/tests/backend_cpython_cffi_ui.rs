@@ -1,6 +1,5 @@
 use interoptopus::testing::assert_file_matches_generated;
-use interoptopus::Error;
-use interoptopus::Interop;
+use interoptopus::{Error, Interop};
 use interoptopus_backend_cpython_cffi::run_python_if_installed;
 
 fn generate_bindings(output: &str) -> Result<(), Error> {
@@ -24,9 +23,7 @@ fn bindings_match_reference() -> Result<(), Error> {
 fn bindings_work() -> Result<(), Error> {
     generate_bindings("tests/output/reference_project.py")?;
 
-    let output = run_python_if_installed("tests/output/", "tests.py")?;
-
-    dbg!(output);
+    run_python_if_installed("tests/output/", "tests.py")?;
 
     Ok(())
 }

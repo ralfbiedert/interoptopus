@@ -1,9 +1,12 @@
+import sys
 import unittest
 import ctypes
 import random
+
 import reference_project as r
 
 r.init_api("../../../../target/debug/interoptopus_reference_project.dll")
+
 
 # https://stackoverflow.com/questions/52475749/maximum-and-minimum-value-of-c-types-integers-from-python
 def limits(c_int_type):
@@ -81,16 +84,13 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(ptr[0], 100)
 
     def test_tuple(self):
-        tuple = r.Tupled()
-        tuple.x0 = 100
+        tupled = r.Tupled(x0=100)
 
-        self.assertEqual(200, r.raw.tupled(tuple).x0)
+        self.assertEqual(200, r.raw.tupled(tupled).x0)
 
     def test_complex(self):
         vec = r.Vec3f32()
         foreign = r.SomeForeignType()
-
-        ptr = r.ffi.new("int64_t*", 100)
 
         self.assertEqual(r.FFIError.Ok, r.raw.complex_args_1(vec, null))
         self.assertEqual(null, r.raw.complex_args_2(foreign))
@@ -106,12 +106,8 @@ class TestFunctions(unittest.TestCase):
         uint32 = r.ffi.new("uint32_t *", 10)
         uint8 = r.ffi.new("uint8_t *", 10)
 
-        genericu32 = r.Genericu32()
-        genericu32.x = uint32
-
-        genericu8 = r.Genericu8()
-        genericu8.x = uint8
-
+        genericu32 = r.Genericu32(x=uint32)
+        genericu8 = r.Genericu8(x=uint8)
         phantom = r.Phantomu8()
 
         self.assertEqual(10, r.raw.generic_1a(genericu32, phantom))
@@ -122,27 +118,19 @@ class TestFunctions(unittest.TestCase):
 
         self.assertEqual(r.EnumDocumented.A, r.raw.documented(documented))
 
-
     def test_ambiguous(self):
-        vec1 = r.Vec1()
-        vec1.x = 10.0
-
-        vec2 = r.Vec2()
-        vec2.x = 10.0
-        vec2.z = 11.0
+        vec1 = r.Vec1(x=10.0)
+        vec2 = r.Vec2(x=10.0, z=11.0)
 
         for i in range(1000):
             self.assertEqual(10.0, r.raw.ambiguous_1(vec1).x)
             self.assertEqual(11.0, r.raw.ambiguous_2(vec2).z)
             self.assertEqual(True, r.raw.ambiguous_3(vec1, vec2))
 
-
     def test_namespaces(self):
-        vec = r.Vec()
-        vec.x = 10
+        vec = r.Vec(x=10)
 
         self.assertEqual(10.0, r.raw.namespaced_type(vec).x)
-
 
     def test_panics(self):
         self.assertEqual(r.FFIError.Panic, r.raw.panics())
@@ -171,20 +159,33 @@ class TestPatterns(unittest.TestCase):
 
     def test_api_entry(self):
         api = r.MyAPIv1()
-        r.raw.pattern_my_api_init_v1(api.ptr())
+        r.raw.pattern_my_api_init_v1(api.c_ptr())
 
-        t = r.Tupled()
-        t.x0 = 10
+        t = r.Tupled(x0=10)
 
-        # TODO: The ptr()[0] part is a bit ugly ... should fix
-        t2 = api.tupled(t.ptr()[0])
+        t2 = api.tupled(t.c_value())
         self.assertEqual(20, t2.x0)
 
-    def test_services(self):
-        x = r.SimpleService()
-        # y = r.SimpleService(123)
+    def test_slices(self):
+        uint32 = r.CArray("uint32_t", 10_000_000_000)
+        vecs = r.Vec3f32.c_array(100)
 
+        r.raw.pattern_ffi_slice_1(uint32)
+        r.raw.pattern_ffi_slice_2(vecs, 1000)
+
+        @r.ffi.callback(r.callbacks.fn_Sliceu8_rval_u8)
+        def my_callback(param):
+            pass
+
+        # r.raw.pattern_ffi_slice_delegate(my_callback)
+
+    def test_services(self):
+        service = r.SimpleService()
+        service.method_void()
+        # service.method_result()
 
 
 if __name__ == '__main__':
     unittest.main()
+    sys.exit(0)
+

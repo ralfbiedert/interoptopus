@@ -29,16 +29,23 @@ def init_api(dll):
 
 class Vec2(object):
     """ A simple type in our FFI layer."""
-    def __init__(self):
+    def __init__(self, x = None, y = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_vec2[]", 1)
+        if x is not None:
+            self.x = x
+        if y is not None:
+            self.y = y
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_vec2[]", n)
+        return CArray("cffi_vec2", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def x(self):
@@ -47,6 +54,11 @@ class Vec2(object):
 
     @x.setter
     def x(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_x = value
         self._ctx[0].x = value
 
@@ -57,6 +69,11 @@ class Vec2(object):
 
     @y.setter
     def y(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_y = value
         self._ctx[0].y = value
 
@@ -81,6 +98,20 @@ class raw:
 
 
 
+
+
+class CArray(object):
+    """Holds a native C array with a given length."""
+    def __init__(self, type, n):
+        self._ctx = ffi.new(f"{type}[{n}]")
+        self._len = n
+        self._c_array = True
+
+    def __getitem__(self, key):
+        return self._ctx[key]
+
+    def __setitem__(self, key, value):
+        self._ctx[key] = value
 
 
 def ascii_string(x):

@@ -17,7 +17,7 @@ complex_in.ammo = 10
 
 # Call APIs
 e.raw.example_create_context(context)
-e.raw.example_double_super_complex_entity(context[0], complex_in.ptr(), complex_out.ptr())
+e.raw.example_double_super_complex_entity(context[0], complex_in, complex_out)
 e.raw.example_destroy_context(context)
 
 assert (2 * complex_in.ammo == complex_out.ammo)

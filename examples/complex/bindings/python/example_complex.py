@@ -74,16 +74,29 @@ class FFIError:
 
 class SuperComplexEntity(object):
     """ A vector used in our game engine."""
-    def __init__(self):
+    def __init__(self, player_1 = None, player_2 = None, ammo = None, some_str = None, str_len = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_supercomplexentity[]", 1)
+        if player_1 is not None:
+            self.player_1 = player_1
+        if player_2 is not None:
+            self.player_2 = player_2
+        if ammo is not None:
+            self.ammo = ammo
+        if some_str is not None:
+            self.some_str = some_str
+        if str_len is not None:
+            self.str_len = str_len
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_supercomplexentity[]", n)
+        return CArray("cffi_supercomplexentity", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def player_1(self):
@@ -92,6 +105,11 @@ class SuperComplexEntity(object):
 
     @player_1.setter
     def player_1(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_player_1 = value
         self._ctx[0].player_1 = value
 
@@ -102,6 +120,11 @@ class SuperComplexEntity(object):
 
     @player_2.setter
     def player_2(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_player_2 = value
         self._ctx[0].player_2 = value
 
@@ -112,6 +135,11 @@ class SuperComplexEntity(object):
 
     @ammo.setter
     def ammo(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_ammo = value
         self._ctx[0].ammo = value
 
@@ -122,6 +150,11 @@ class SuperComplexEntity(object):
 
     @some_str.setter
     def some_str(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_some_str = value
         self._ctx[0].some_str = value
 
@@ -132,21 +165,37 @@ class SuperComplexEntity(object):
 
     @str_len.setter
     def str_len(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_str_len = value
         self._ctx[0].str_len = value
 
 class ThirdPartyVecF32(object):
     """"""
-    def __init__(self):
+    def __init__(self, x = None, y = None, z = None, w = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_thirdpartyvecf32[]", 1)
+        if x is not None:
+            self.x = x
+        if y is not None:
+            self.y = y
+        if z is not None:
+            self.z = z
+        if w is not None:
+            self.w = w
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_thirdpartyvecf32[]", n)
+        return CArray("cffi_thirdpartyvecf32", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def x(self):
@@ -155,6 +204,11 @@ class ThirdPartyVecF32(object):
 
     @x.setter
     def x(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_x = value
         self._ctx[0].x = value
 
@@ -165,6 +219,11 @@ class ThirdPartyVecF32(object):
 
     @y.setter
     def y(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_y = value
         self._ctx[0].y = value
 
@@ -175,6 +234,11 @@ class ThirdPartyVecF32(object):
 
     @z.setter
     def z(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_z = value
         self._ctx[0].z = value
 
@@ -185,21 +249,35 @@ class ThirdPartyVecF32(object):
 
     @w.setter
     def w(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_w = value
         self._ctx[0].w = value
 
 class Vec3(object):
     """ A vector used in our game engine."""
-    def __init__(self):
+    def __init__(self, x = None, y = None, z = None):
         global _api, ffi
         self._ctx = ffi.new("cffi_vec3[]", 1)
+        if x is not None:
+            self.x = x
+        if y is not None:
+            self.y = y
+        if z is not None:
+            self.z = z
 
-    def array(n):
+    def c_array(n):
         global _api, ffi
-        return ffi.new("cffi_vec3[]", n)
+        return CArray("cffi_vec3", n)
 
-    def ptr(self):
+    def c_ptr(self):
         return self._ctx
+
+    def c_value(self):
+        return self._ctx[0]
 
     @property
     def x(self):
@@ -208,6 +286,11 @@ class Vec3(object):
 
     @x.setter
     def x(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_x = value
         self._ctx[0].x = value
 
@@ -218,6 +301,11 @@ class Vec3(object):
 
     @y.setter
     def y(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_y = value
         self._ctx[0].y = value
 
@@ -228,6 +316,11 @@ class Vec3(object):
 
     @z.setter
     def z(self, value):
+        if hasattr(value, "_ctx"):
+            if hasattr(value, "_c_array"):
+                value = value._ctx
+            else:
+                value = value._ctx[0]
         self._ptr_z = value
         self._ctx[0].z = value
 
@@ -256,7 +349,7 @@ class raw:
         """ Creates a new instance of this library."""
         global _api
         if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx[0]
+            context_ptr = context_ptr.c_ptr()
         return _api.example_create_context(context_ptr)
 
     def example_destroy_context(context_ptr):
@@ -266,30 +359,30 @@ class raw:
  `example_create_context`, otherwise bad things will happen."""
         global _api
         if hasattr(context_ptr, "_ctx"):
-            context_ptr = context_ptr._ctx[0]
+            context_ptr = context_ptr.c_ptr()
         return _api.example_destroy_context(context_ptr)
 
     def example_print_score(context):
         """ Prints the current player score."""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx[0]
+            context = context.c_ptr()
         return _api.example_print_score(context)
 
     def example_return_score(context, score):
         """ Updates the score."""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx[0]
+            context = context.c_ptr()
         if hasattr(score, "_ctx"):
-            score = score._ctx[0]
+            score = score.c_ptr()
         return _api.example_return_score(context, score)
 
     def example_update_score_by_callback(context, update):
         """ Updates the score."""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx[0]
+            context = context.c_ptr()
         if hasattr(update, "_ctx"):
             update = update._ctx[0]
         return _api.example_update_score_by_callback(context, update)
@@ -298,26 +391,40 @@ class raw:
         """ Accepts some foreign types."""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx[0]
+            context = context.c_ptr()
         if hasattr(foreign, "_ctx"):
-            foreign = foreign._ctx[0]
+            foreign = foreign.c_ptr()
         return _api.example_write_foreign_type(context, foreign)
 
     def example_double_super_complex_entity(context, incoming, outgoing):
         """"""
         global _api
         if hasattr(context, "_ctx"):
-            context = context._ctx[0]
+            context = context.c_ptr()
         if hasattr(incoming, "_ctx"):
-            incoming = incoming._ctx[0]
+            incoming = incoming.c_ptr()
         if hasattr(outgoing, "_ctx"):
-            outgoing = outgoing._ctx[0]
+            outgoing = outgoing.c_ptr()
         return _api.example_double_super_complex_entity(context, incoming, outgoing)
 
 
 
 
 
+
+
+class CArray(object):
+    """Holds a native C array with a given length."""
+    def __init__(self, type, n):
+        self._ctx = ffi.new(f"{type}[{n}]")
+        self._len = n
+        self._c_array = True
+
+    def __getitem__(self, key):
+        return self._ctx[key]
+
+    def __setitem__(self, key, value):
+        self._ctx[key] = value
 
 
 def ascii_string(x):
