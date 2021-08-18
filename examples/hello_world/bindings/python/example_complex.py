@@ -25,27 +25,56 @@ def init_api(dll):
 
 
 
+class BaseStruct(object):
+    """Base class from which all struct type wrappers are derived."""
+    def __init__(self):
+        pass
+
+    def c_ptr(self):
+        """Returns a C-level pointer to the native data structure."""
+        return self._ctx
+
+    def c_value(self):
+        """From the underlying pointer returns the (first) entry as a value."""
+        return self._ctx[0]
 
 
-class Vec2(object):
+class CArray(BaseStruct):
+    """Holds a native C array with a given length."""
+    def __init__(self, type, n):
+        self._ctx = ffi.new(f"{type}[{n}]")
+        self._c_array = True
+        self._len = n
+
+    def __getitem__(self, key):
+        return self._ctx[key]
+
+    def __setitem__(self, key, value):
+        self._ctx[key] = value
+
+    def __len__(self):
+        return self._len
+
+
+def ascii_string(x):
+    """Must be called with a b"my_string"."""
+    return ffi.new("char[]", x)
+
+
+
+
+class Vec2(BaseStruct):
     """ A simple type in our FFI layer."""
-    def __init__(self, x = None, y = None):
-        global _api, ffi
+    def __init__(self, x=None, y=None):
         self._ctx = ffi.new("cffi_vec2[]", 1)
         if x is not None:
             self.x = x
         if y is not None:
             self.y = y
 
+    @staticmethod
     def c_array(n):
-        global _api, ffi
         return CArray("cffi_vec2", n)
-
-    def c_ptr(self):
-        return self._ctx
-
-    def c_value(self):
-        return self._ctx[0]
 
     @property
     def x(self):
@@ -56,9 +85,9 @@ class Vec2(object):
     def x(self, value):
         if hasattr(value, "_ctx"):
             if hasattr(value, "_c_array"):
-                value = value._ctx
+                value = value.c_ptr()
             else:
-                value = value._ctx[0]
+                value = value.c_value()
         self._ptr_x = value
         self._ctx[0].x = value
 
@@ -71,53 +100,28 @@ class Vec2(object):
     def y(self, value):
         if hasattr(value, "_ctx"):
             if hasattr(value, "_c_array"):
-                value = value._ctx
+                value = value.c_ptr()
             else:
-                value = value._ctx[0]
+                value = value.c_value()
         self._ptr_y = value
         self._ctx[0].y = value
-
 
 
 class callbacks:
     """Helpers to define `@ffi.callback`-style callbacks."""
 
 
-
-
-class raw:
+class api:
     """Raw access to all exported functions."""
+    @staticmethod
     def my_function(input):
         """ Function using the type."""
-        global _api
         if hasattr(input, "_ctx"):
-            input = input._ctx[0]
+            input = input.c_value()
+
         return _api.my_function(input)
 
 
-
-
-
-
-
-class CArray(object):
-    """Holds a native C array with a given length."""
-    def __init__(self, type, n):
-        self._ctx = ffi.new(f"{type}[{n}]")
-        self._len = n
-        self._c_array = True
-
-    def __getitem__(self, key):
-        return self._ctx[key]
-
-    def __setitem__(self, key, value):
-        self._ctx[key] = value
-
-
-def ascii_string(x):
-    """Must be called with a b"my_string"."""
-    global ffi
-    return ffi.new("char[]", x)
 
 
 
