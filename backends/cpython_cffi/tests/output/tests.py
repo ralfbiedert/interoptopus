@@ -167,7 +167,7 @@ class TestPatterns(unittest.TestCase):
         self.assertEqual(20, t2.x0)
 
     def test_slices(self):
-        uint32 = r.CArray("uint32_t", 10_000_000_000)
+        uint32 = r.CArray("uint32_t", 10_000)
         vecs = r.Vec3f32.c_array(100)
 
         r.raw.pattern_ffi_slice_1(uint32)
