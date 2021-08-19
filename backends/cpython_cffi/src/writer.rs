@@ -1,6 +1,6 @@
 use crate::config::Config;
 use crate::converter::{Converter, PythonTypeConverter};
-use interoptopus::lang::c::{CType, CompositeType, EnumType, Function};
+use interoptopus::lang::c::{CType, CompositeType, EnumType, Function, PrimitiveType};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{longest_common_prefix, safe_name};
@@ -23,7 +23,12 @@ pub trait PythonWriter {
     fn c_generator(&self) -> &interoptopus_backend_c::Generator;
 
     fn write_imports(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        indented!(w, r#"from cffi import FFI"#)?;
+        indented!(w, r#"# Print usable error message if dependency is not installed."#)?;
+        indented!(w, r#"try:"#)?;
+        indented!(w, [_], r#"from cffi import FFI"#)?;
+        indented!(w, r#"except ImportError:"#)?;
+        indented!(w, [_], r#"print("Please install package `cffi`, probably via `pip install cffi`.")"#)?;
+        indented!(w, [_], r#"print("")"#)?;
         Ok(())
     }
 
@@ -90,7 +95,7 @@ pub trait PythonWriter {
     fn write_struct(&self, w: &mut IndentWriter, e: &CompositeType) -> Result<(), Error> {
         let cname = self.converter().c_converter().composite_to_typename(e);
 
-        indented!(w, r#"class {}(BaseStruct):"#, e.rust_name())?;
+        indented!(w, r#"class {}(CHeapAllocated):"#, e.rust_name())?;
         indented!(w, [_], r#"{}"#, self.converter().documentation(e.meta().documentation()))?;
 
         // Ctor
@@ -129,7 +134,7 @@ pub trait PythonWriter {
             // then we might assign a pointer in the _ctx line below, but once the parameter (the CFFI handle)
             // leaves this function the handle might become deallocated and therefore the pointer
             // becomes invalid
-            indented!(w, [_ _], r#"self._ptr_{} = value"#, field.name())?;
+            // indented!(w, [_ _], r#"self._ptr_{} = value"#, field.name())?;
             indented!(w, [_ _], r#"self._ctx[0].{} = value"#, field.name())?;
         }
 
@@ -212,6 +217,14 @@ pub trait PythonWriter {
                         w.newline()?;
                         indented!(w, [_ _], r#"@ffi.callback(callbacks.{})"#, callback_ref)?;
                         indented!(w, [_ _], r#"def _{}_callback({}):"#, param.name(), params)?;
+                        for p in fnpointer.signature().params() {
+                            match p.the_type() {
+                                CType::Pattern(TypePattern::Slice(_)) | CType::Pattern(TypePattern::SliceMut(_)) => {
+                                    indented!(w, [_ _ _], r#"{} = CSlice({})"#, param.name(), param.name())?;
+                                }
+                                _ => {}
+                            }
+                        }
                         indented!(w, [_ _ _], r#"return _{}({})"#, param.name(), params)?;
                         w.newline()?;
                         indented!(w, [_ _], r#"{} = _{}_callback"#, param.name(), param.name())?;
@@ -224,6 +237,14 @@ pub trait PythonWriter {
                         w.newline()?;
                         indented!(w, [_ _], r#"@ffi.callback(callbacks.{})"#, callback_ref)?;
                         indented!(w, [_ _], r#"def _{}_callback({}):"#, param.name(), params)?;
+                        for p in fnpointer.signature().params() {
+                            match p.the_type() {
+                                CType::Pattern(TypePattern::Slice(_)) | CType::Pattern(TypePattern::SliceMut(_)) => {
+                                    indented!(w, [_ _ _], r#"{} = CSlice({})"#, p.name(), p.name())?;
+                                }
+                                _ => {}
+                            }
+                        }
                         indented!(w, [_ _ _], r#"return _{}({})"#, param.name(), params)?;
                         w.newline()?;
                         indented!(w, [_ _], r#"{} = _{}_callback"#, param.name(), param.name())?;
@@ -305,7 +326,7 @@ pub trait PythonWriter {
 
         let common_prefix = longest_common_prefix(&all_functions);
 
-        indented!(w, r#"class {}(BaseStruct):"#, context_type_name)?;
+        indented!(w, r#"class {}(CHeapAllocated):"#, context_type_name)?;
 
         for ctor in class.constructors() {
             let ctor_args = self.pattern_class_args_without_first_to_string(ctor);
@@ -365,7 +386,7 @@ pub trait PythonWriter {
     }
 
     fn write_utils(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        indented!(w, r#"class BaseStruct(object):"#)?;
+        indented!(w, r#"class CHeapAllocated(object):"#)?;
         indented!(w, [_], r#""""Base class from which all struct type wrappers are derived.""""#)?;
         indented!(w, [_], r#"def __init__(self):"#)?;
         indented!(w, [_ _], r#"pass"#)?;
@@ -380,7 +401,16 @@ pub trait PythonWriter {
         w.newline()?;
         w.newline()?;
 
-        indented!(w, r#"class CArray(BaseStruct):"#)?;
+        self.write_utils_primitive(w, &self.converter().c_converter.to_type_specifier(&CType::Primitive(PrimitiveType::I8)))?;
+        self.write_utils_primitive(w, &self.converter().c_converter.to_type_specifier(&CType::Primitive(PrimitiveType::I16)))?;
+        self.write_utils_primitive(w, &self.converter().c_converter.to_type_specifier(&CType::Primitive(PrimitiveType::I32)))?;
+        self.write_utils_primitive(w, &self.converter().c_converter.to_type_specifier(&CType::Primitive(PrimitiveType::I64)))?;
+        self.write_utils_primitive(w, &self.converter().c_converter.to_type_specifier(&CType::Primitive(PrimitiveType::U8)))?;
+        self.write_utils_primitive(w, &self.converter().c_converter.to_type_specifier(&CType::Primitive(PrimitiveType::U16)))?;
+        self.write_utils_primitive(w, &self.converter().c_converter.to_type_specifier(&CType::Primitive(PrimitiveType::U32)))?;
+        self.write_utils_primitive(w, &self.converter().c_converter.to_type_specifier(&CType::Primitive(PrimitiveType::U64)))?;
+
+        indented!(w, r#"class CArray(CHeapAllocated):"#)?;
         indented!(w, [_], r#""""Holds a native C array with a given length.""""#)?;
         indented!(w, [_], r#"def __init__(self, type, n):"#)?;
         indented!(w, [_ _], r#"self._ctx = ffi.new(f"{{type}}[{{n}}]")"#)?;
@@ -398,10 +428,41 @@ pub trait PythonWriter {
         w.newline()?;
         w.newline()?;
 
+        indented!(w, r#"class CSlice(CArray):"#)?;
+        indented!(w, [_], r#""""Holds a native C array with a given length.""""#)?;
+        indented!(w, [_], r#"def __init__(self, c_slice):"#)?;
+        indented!(w, [_ _], r#"self._ctx = c_slice"#)?;
+        indented!(w, [_ _], r#"self._c_slice = True"#)?;
+        indented!(w, [_ _], r#"self._len = c_slice.len"#)?;
+        w.newline()?;
+        indented!(w, [_], r#"def __getitem__(self, key):"#)?;
+        indented!(w, [_ _], r#"return self._ctx.data[key]"#)?;
+        w.newline()?;
+        indented!(w, [_], r#"def __setitem__(self, key, value):"#)?;
+        indented!(w, [_ _], r#"self._ctx.data[key] = value"#)?;
+        w.newline()?;
+        indented!(w, [_], r#"def __len__(self):"#)?;
+        indented!(w, [_ _], r#"return self._ctx.len"#)?;
+        w.newline()?;
+        w.newline()?;
+
         indented!(w, r#"def ascii_string(x):"#)?;
         indented!(w, [_], r#""""Must be called with a b"my_string".""""#)?;
         // indented!(w, [_], r#"global ffi"#)?;
         indented!(w, [_], r#"return ffi.new("char[]", x)"#)?;
+        Ok(())
+    }
+
+    fn write_utils_primitive(&self, w: &mut IndentWriter, x: &str) -> Result<(), Error> {
+        indented!(w, r#"class {}(CHeapAllocated):"#, x)?;
+        indented!(w, [_], r#""""One or more heap allocated primitive `{}` values.""""#, x)?;
+        indented!(w, [_], r#"def __init__(self, x=None):"#)?;
+        indented!(w, [_ _], r#"self._ctx = ffi.new(f"{}[1]", [0])"#, x)?;
+        indented!(w, [_ _], r#"if x is not None:"#)?;
+        indented!(w, [_ _ _], r#"self._ctx[0] = x"#)?;
+        w.newline()?;
+        w.newline()?;
+
         Ok(())
     }
 

@@ -1,4 +1,9 @@
-from cffi import FFI
+# Print usable error message if dependency is not installed.
+try:
+    from cffi import FFI
+except ImportError:
+    print("Please install package `cffi`, probably via `pip install cffi`.")
+    print("")
 
 api_definition = """
 typedef struct cffi_vec2
@@ -25,7 +30,7 @@ def init_api(dll):
 
 
 
-class BaseStruct(object):
+class CHeapAllocated(object):
     """Base class from which all struct type wrappers are derived."""
     def __init__(self):
         pass
@@ -39,7 +44,71 @@ class BaseStruct(object):
         return self._ctx[0]
 
 
-class CArray(BaseStruct):
+class int8_t(CHeapAllocated):
+    """One or more heap allocated primitive `int8_t` values."""
+    def __init__(self, x=None):
+        self._ctx = ffi.new(f"int8_t[1]", [0])
+        if x is not None:
+            self._ctx[0] = x
+
+
+class int16_t(CHeapAllocated):
+    """One or more heap allocated primitive `int16_t` values."""
+    def __init__(self, x=None):
+        self._ctx = ffi.new(f"int16_t[1]", [0])
+        if x is not None:
+            self._ctx[0] = x
+
+
+class int32_t(CHeapAllocated):
+    """One or more heap allocated primitive `int32_t` values."""
+    def __init__(self, x=None):
+        self._ctx = ffi.new(f"int32_t[1]", [0])
+        if x is not None:
+            self._ctx[0] = x
+
+
+class int64_t(CHeapAllocated):
+    """One or more heap allocated primitive `int64_t` values."""
+    def __init__(self, x=None):
+        self._ctx = ffi.new(f"int64_t[1]", [0])
+        if x is not None:
+            self._ctx[0] = x
+
+
+class uint8_t(CHeapAllocated):
+    """One or more heap allocated primitive `uint8_t` values."""
+    def __init__(self, x=None):
+        self._ctx = ffi.new(f"uint8_t[1]", [0])
+        if x is not None:
+            self._ctx[0] = x
+
+
+class uint16_t(CHeapAllocated):
+    """One or more heap allocated primitive `uint16_t` values."""
+    def __init__(self, x=None):
+        self._ctx = ffi.new(f"uint16_t[1]", [0])
+        if x is not None:
+            self._ctx[0] = x
+
+
+class uint32_t(CHeapAllocated):
+    """One or more heap allocated primitive `uint32_t` values."""
+    def __init__(self, x=None):
+        self._ctx = ffi.new(f"uint32_t[1]", [0])
+        if x is not None:
+            self._ctx[0] = x
+
+
+class uint64_t(CHeapAllocated):
+    """One or more heap allocated primitive `uint64_t` values."""
+    def __init__(self, x=None):
+        self._ctx = ffi.new(f"uint64_t[1]", [0])
+        if x is not None:
+            self._ctx[0] = x
+
+
+class CArray(CHeapAllocated):
     """Holds a native C array with a given length."""
     def __init__(self, type, n):
         self._ctx = ffi.new(f"{type}[{n}]")
@@ -56,6 +125,23 @@ class CArray(BaseStruct):
         return self._len
 
 
+class CSlice(CArray):
+    """Holds a native C array with a given length."""
+    def __init__(self, c_slice):
+        self._ctx = c_slice
+        self._c_slice = True
+        self._len = c_slice.len
+
+    def __getitem__(self, key):
+        return self._ctx.data[key]
+
+    def __setitem__(self, key, value):
+        self._ctx.data[key] = value
+
+    def __len__(self):
+        return self._ctx.len
+
+
 def ascii_string(x):
     """Must be called with a b"my_string"."""
     return ffi.new("char[]", x)
@@ -63,7 +149,7 @@ def ascii_string(x):
 
 
 
-class Vec2(BaseStruct):
+class Vec2(CHeapAllocated):
     """ A simple type in our FFI layer."""
     def __init__(self, x=None, y=None):
         self._ctx = ffi.new("cffi_vec2[]", 1)
@@ -88,7 +174,6 @@ class Vec2(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_x = value
         self._ctx[0].x = value
 
     @property
@@ -103,7 +188,6 @@ class Vec2(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_y = value
         self._ctx[0].y = value
 
 

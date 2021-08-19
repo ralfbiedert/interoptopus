@@ -1,4 +1,9 @@
-from cffi import FFI
+# Print usable error message if dependency is not installed.
+try:
+    from cffi import FFI
+except ImportError:
+    print("Please install package `cffi`, probably via `pip install cffi`.")
+    print("")
 
 api_definition = """
 const uint8_t CFFI_U8 = 255;
@@ -280,7 +285,7 @@ F32_MIN_POSITIVE = 0.000000000000000000000000000000000000011754944
 COMPUTED_I32 = -2147483647
 
 
-class BaseStruct(object):
+class CHeapAllocated(object):
     """Base class from which all struct type wrappers are derived."""
     def __init__(self):
         pass
@@ -294,7 +299,71 @@ class BaseStruct(object):
         return self._ctx[0]
 
 
-class CArray(BaseStruct):
+class int8_t(CHeapAllocated):
+    """One or more heap allocated primitive `int8_t` values."""
+    def __init__(self, x=None):
+        self._ctx = ffi.new(f"int8_t[1]", [0])
+        if x is not None:
+            self._ctx[0] = x
+
+
+class int16_t(CHeapAllocated):
+    """One or more heap allocated primitive `int16_t` values."""
+    def __init__(self, x=None):
+        self._ctx = ffi.new(f"int16_t[1]", [0])
+        if x is not None:
+            self._ctx[0] = x
+
+
+class int32_t(CHeapAllocated):
+    """One or more heap allocated primitive `int32_t` values."""
+    def __init__(self, x=None):
+        self._ctx = ffi.new(f"int32_t[1]", [0])
+        if x is not None:
+            self._ctx[0] = x
+
+
+class int64_t(CHeapAllocated):
+    """One or more heap allocated primitive `int64_t` values."""
+    def __init__(self, x=None):
+        self._ctx = ffi.new(f"int64_t[1]", [0])
+        if x is not None:
+            self._ctx[0] = x
+
+
+class uint8_t(CHeapAllocated):
+    """One or more heap allocated primitive `uint8_t` values."""
+    def __init__(self, x=None):
+        self._ctx = ffi.new(f"uint8_t[1]", [0])
+        if x is not None:
+            self._ctx[0] = x
+
+
+class uint16_t(CHeapAllocated):
+    """One or more heap allocated primitive `uint16_t` values."""
+    def __init__(self, x=None):
+        self._ctx = ffi.new(f"uint16_t[1]", [0])
+        if x is not None:
+            self._ctx[0] = x
+
+
+class uint32_t(CHeapAllocated):
+    """One or more heap allocated primitive `uint32_t` values."""
+    def __init__(self, x=None):
+        self._ctx = ffi.new(f"uint32_t[1]", [0])
+        if x is not None:
+            self._ctx[0] = x
+
+
+class uint64_t(CHeapAllocated):
+    """One or more heap allocated primitive `uint64_t` values."""
+    def __init__(self, x=None):
+        self._ctx = ffi.new(f"uint64_t[1]", [0])
+        if x is not None:
+            self._ctx[0] = x
+
+
+class CArray(CHeapAllocated):
     """Holds a native C array with a given length."""
     def __init__(self, type, n):
         self._ctx = ffi.new(f"{type}[{n}]")
@@ -309,6 +378,23 @@ class CArray(BaseStruct):
 
     def __len__(self):
         return self._len
+
+
+class CSlice(CArray):
+    """Holds a native C array with a given length."""
+    def __init__(self, c_slice):
+        self._ctx = c_slice
+        self._c_slice = True
+        self._len = c_slice.len
+
+    def __getitem__(self, key):
+        return self._ctx.data[key]
+
+    def __setitem__(self, key, value):
+        self._ctx.data[key] = value
+
+    def __len__(self):
+        return self._ctx.len
 
 
 def ascii_string(x):
@@ -330,7 +416,7 @@ class EnumRenamed:
     X = 0
 
 
-class Array(BaseStruct):
+class Array(CHeapAllocated):
     """"""
     def __init__(self, data=None):
         self._ctx = ffi.new("cffi_array[]", 1)
@@ -353,11 +439,10 @@ class Array(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_data = value
         self._ctx[0].data = value
 
 
-class Empty(BaseStruct):
+class Empty(CHeapAllocated):
     """"""
     def __init__(self, ):
         self._ctx = ffi.new("cffi_empty[]", 1)
@@ -367,7 +452,7 @@ class Empty(BaseStruct):
         return CArray("cffi_empty", n)
 
 
-class ExtraTypef32(BaseStruct):
+class ExtraTypef32(CHeapAllocated):
     """"""
     def __init__(self, x=None):
         self._ctx = ffi.new("cffi_extratypef32[]", 1)
@@ -390,11 +475,10 @@ class ExtraTypef32(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_x = value
         self._ctx[0].x = value
 
 
-class Genericu32(BaseStruct):
+class Genericu32(CHeapAllocated):
     """"""
     def __init__(self, x=None):
         self._ctx = ffi.new("cffi_genericu32[]", 1)
@@ -417,11 +501,10 @@ class Genericu32(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_x = value
         self._ctx[0].x = value
 
 
-class Genericu8(BaseStruct):
+class Genericu8(CHeapAllocated):
     """"""
     def __init__(self, x=None):
         self._ctx = ffi.new("cffi_genericu8[]", 1)
@@ -444,11 +527,10 @@ class Genericu8(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_x = value
         self._ctx[0].x = value
 
 
-class Inner(BaseStruct):
+class Inner(CHeapAllocated):
     """"""
     def __init__(self, x=None):
         self._ctx = ffi.new("cffi_inner[]", 1)
@@ -471,11 +553,10 @@ class Inner(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_x = value
         self._ctx[0].x = value
 
 
-class MyAPIv1(BaseStruct):
+class MyAPIv1(CHeapAllocated):
     """"""
     def __init__(self, ref_mut_option=None, tupled=None):
         self._ctx = ffi.new("cffi_myapiv1[]", 1)
@@ -500,7 +581,6 @@ class MyAPIv1(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_ref_mut_option = value
         self._ctx[0].ref_mut_option = value
 
     @property
@@ -515,11 +595,10 @@ class MyAPIv1(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_tupled = value
         self._ctx[0].tupled = value
 
 
-class Phantomu8(BaseStruct):
+class Phantomu8(CHeapAllocated):
     """"""
     def __init__(self, x=None):
         self._ctx = ffi.new("cffi_phantomu8[]", 1)
@@ -542,11 +621,10 @@ class Phantomu8(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_x = value
         self._ctx[0].x = value
 
 
-class SomeForeignType(BaseStruct):
+class SomeForeignType(CHeapAllocated):
     """"""
     def __init__(self, x=None):
         self._ctx = ffi.new("cffi_someforeigntype[]", 1)
@@ -569,11 +647,10 @@ class SomeForeignType(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_x = value
         self._ctx[0].x = value
 
 
-class StructDocumented(BaseStruct):
+class StructDocumented(CHeapAllocated):
     """ Documented struct."""
     def __init__(self, x=None):
         self._ctx = ffi.new("cffi_structdocumented[]", 1)
@@ -596,11 +673,10 @@ class StructDocumented(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_x = value
         self._ctx[0].x = value
 
 
-class StructRenamed(BaseStruct):
+class StructRenamed(CHeapAllocated):
     """"""
     def __init__(self, e=None):
         self._ctx = ffi.new("cffi_structrenamed[]", 1)
@@ -623,11 +699,10 @@ class StructRenamed(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_e = value
         self._ctx[0].e = value
 
 
-class Tupled(BaseStruct):
+class Tupled(CHeapAllocated):
     """"""
     def __init__(self, x0=None):
         self._ctx = ffi.new("cffi_tupled[]", 1)
@@ -650,11 +725,10 @@ class Tupled(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_x0 = value
         self._ctx[0].x0 = value
 
 
-class UseAsciiStringPattern(BaseStruct):
+class UseAsciiStringPattern(CHeapAllocated):
     """"""
     def __init__(self, ascii_string=None):
         self._ctx = ffi.new("cffi_useasciistringpattern[]", 1)
@@ -677,11 +751,10 @@ class UseAsciiStringPattern(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_ascii_string = value
         self._ctx[0].ascii_string = value
 
 
-class Vec(BaseStruct):
+class Vec(CHeapAllocated):
     """"""
     def __init__(self, x=None, z=None):
         self._ctx = ffi.new("cffi_vec[]", 1)
@@ -706,7 +779,6 @@ class Vec(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_x = value
         self._ctx[0].x = value
 
     @property
@@ -721,11 +793,10 @@ class Vec(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_z = value
         self._ctx[0].z = value
 
 
-class Vec1(BaseStruct):
+class Vec1(CHeapAllocated):
     """"""
     def __init__(self, x=None, y=None):
         self._ctx = ffi.new("cffi_vec1[]", 1)
@@ -750,7 +821,6 @@ class Vec1(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_x = value
         self._ctx[0].x = value
 
     @property
@@ -765,11 +835,10 @@ class Vec1(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_y = value
         self._ctx[0].y = value
 
 
-class Vec2(BaseStruct):
+class Vec2(CHeapAllocated):
     """"""
     def __init__(self, x=None, z=None):
         self._ctx = ffi.new("cffi_vec2[]", 1)
@@ -794,7 +863,6 @@ class Vec2(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_x = value
         self._ctx[0].x = value
 
     @property
@@ -809,11 +877,10 @@ class Vec2(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_z = value
         self._ctx[0].z = value
 
 
-class Vec3f32(BaseStruct):
+class Vec3f32(CHeapAllocated):
     """"""
     def __init__(self, x=None, y=None, z=None):
         self._ctx = ffi.new("cffi_vec3f32[]", 1)
@@ -840,7 +907,6 @@ class Vec3f32(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_x = value
         self._ctx[0].x = value
 
     @property
@@ -855,7 +921,6 @@ class Vec3f32(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_y = value
         self._ctx[0].y = value
 
     @property
@@ -870,11 +935,10 @@ class Vec3f32(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_z = value
         self._ctx[0].z = value
 
 
-class Visibility1(BaseStruct):
+class Visibility1(CHeapAllocated):
     """"""
     def __init__(self, pblc=None, prvt=None):
         self._ctx = ffi.new("cffi_visibility1[]", 1)
@@ -899,7 +963,6 @@ class Visibility1(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_pblc = value
         self._ctx[0].pblc = value
 
     @property
@@ -914,11 +977,10 @@ class Visibility1(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_prvt = value
         self._ctx[0].prvt = value
 
 
-class Visibility2(BaseStruct):
+class Visibility2(CHeapAllocated):
     """"""
     def __init__(self, pblc1=None, pblc2=None):
         self._ctx = ffi.new("cffi_visibility2[]", 1)
@@ -943,7 +1005,6 @@ class Visibility2(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_pblc1 = value
         self._ctx[0].pblc1 = value
 
     @property
@@ -958,11 +1019,10 @@ class Visibility2(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_pblc2 = value
         self._ctx[0].pblc2 = value
 
 
-class Weird1u32(BaseStruct):
+class Weird1u32(CHeapAllocated):
     """"""
     def __init__(self, x=None):
         self._ctx = ffi.new("cffi_weird1u32[]", 1)
@@ -985,11 +1045,10 @@ class Weird1u32(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_x = value
         self._ctx[0].x = value
 
 
-class Weird2u8(BaseStruct):
+class Weird2u8(CHeapAllocated):
     """"""
     def __init__(self, t=None, a=None, r=None):
         self._ctx = ffi.new("cffi_weird2u8[]", 1)
@@ -1016,7 +1075,6 @@ class Weird2u8(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_t = value
         self._ctx[0].t = value
 
     @property
@@ -1031,7 +1089,6 @@ class Weird2u8(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_a = value
         self._ctx[0].a = value
 
     @property
@@ -1046,7 +1103,6 @@ class Weird2u8(BaseStruct):
                 value = value.c_ptr()
             else:
                 value = value.c_value()
-        self._ptr_r = value
         self._ctx[0].r = value
 
 
@@ -1501,6 +1557,7 @@ class api:
 
         @ffi.callback(callbacks.fn_SliceMutu8)
         def _callback_callback(slice):
+            slice = CSlice(slice)
             return _callback(slice)
 
         callback = _callback_callback
@@ -1538,6 +1595,7 @@ class api:
 
         @ffi.callback(callbacks.fn_Sliceu8_rval_u8)
         def _callback_callback(slice):
+            slice = CSlice(slice)
             return _callback(slice)
 
         callback = _callback_callback
@@ -1551,6 +1609,7 @@ class api:
 
         @ffi.callback(callbacks.fn_SliceVec3f32_rval_Vec3f32)
         def _callback_callback(slice):
+            slice = CSlice(slice)
             return _callback(slice)
 
         callback = _callback_callback
@@ -1778,7 +1837,7 @@ class api:
 
 
 
-class SimpleService(BaseStruct):
+class SimpleService(CHeapAllocated):
     def __init__(self, some_value):
         """ The constructor must return a `Result<Self, Error>`."""
         self._ctx = ffi.new("cffi_simpleservice**")

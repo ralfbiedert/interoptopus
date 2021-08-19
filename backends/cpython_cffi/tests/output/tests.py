@@ -69,20 +69,21 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(-i64_max, api.primitive_i64(i64_max))
 
     def test_ptr(self):
-        ptr = r.ffi.new("int64_t*", 100)
-        ptr_ptr = r.ffi.new("int64_t**", ptr)
+        ptr = r.int64_t(100)
+        # ptr = r.ffi.new("int64_t*", 100)
+        ptr_ptr = r.ffi.new("int64_t**", ptr.c_ptr())
 
-        self.assertEqual(ptr, api.ptr(ptr))
+        self.assertEqual(ptr.c_ptr(), api.ptr(ptr))
         self.assertEqual(ptr_ptr, api.ptr_ptr(ptr_ptr))
 
         self.assertEqual(True, api.ref_option(ptr))
         self.assertEqual(True, api.ref_mut_option(ptr))
 
-        self.assertEqual(ptr, api.ptr_mut(ptr))
-        self.assertEqual(ptr[0], -100)
+        self.assertEqual(ptr.c_ptr(), api.ptr_mut(ptr))
+        self.assertEqual(ptr.c_value(), -100)
 
-        self.assertEqual(ptr, api.ref_mut_simple(ptr))
-        self.assertEqual(ptr[0], 100)
+        self.assertEqual(ptr.c_ptr(), api.ref_mut_simple(ptr))
+        self.assertEqual(ptr.c_value(), 100)
 
     def test_tuple(self):
         tupled = r.Tupled(x0=100)
@@ -103,11 +104,11 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(9, api.callback(my_callback, 3))
 
     def test_generic(self):
-        uint32 = r.ffi.new("uint32_t *", 10)
-        uint8 = r.ffi.new("uint8_t *", 10)
+        uint32 = r.uint32_t(10)
+        uint8 = r.uint8_t(10)
 
-        genericu32 = r.Genericu32(x=uint32)
-        genericu8 = r.Genericu8(x=uint8)
+        genericu32 = r.Genericu32(x=uint32.c_ptr())
+        genericu8 = r.Genericu8(x=uint8.c_ptr())
         phantom = r.Phantomu8()
 
         self.assertEqual(10, api.generic_1a(genericu32, phantom))
@@ -133,11 +134,15 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(10.0, api.namespaced_type(vec).x)
 
     def test_panics(self):
+        worked = False
         try:
             api.panics()
-            self.assertTrue(False)
+            worked = True
         except:
             pass
+
+        self.assertFalse(worked)
+
 
 class TestPatterns(unittest.TestCase):
 
@@ -173,11 +178,16 @@ class TestPatterns(unittest.TestCase):
         api.pattern_ffi_slice_1(uint32)
         api.pattern_ffi_slice_2(vecs, 1000)
 
+        some_value = 0
+
         def my_callback(param):
-            # print("hello world", param[0])
+            nonlocal some_value
+            some_value = param[4]
             return 0
 
         api.pattern_ffi_slice_delegate(my_callback)
+
+        self.assertEqual(some_value, 4)
 
     def test_services(self):
         service = r.SimpleService()
