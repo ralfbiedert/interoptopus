@@ -1,3 +1,8 @@
+# Typehints for nicer dev UX.
+from __future__ import annotations
+from typing import TypeVar, Generic
+T = TypeVar("T")
+
 # Print usable error message if dependency is not installed.
 try:
     from cffi import FFI
@@ -69,7 +74,7 @@ def init_api(dll):
 THE_MAGIC_CONSTANT = 666
 
 
-class CHeapAllocated(object):
+class CHeapAllocated(Generic[T]):
     """Base class from which all struct type wrappers are derived."""
     def __init__(self):
         pass
@@ -78,110 +83,142 @@ class CHeapAllocated(object):
         """Returns a C-level pointer to the native data structure."""
         return self._ctx
 
-    def c_value(self):
+    def c_value(self) -> T:
         """From the underlying pointer returns the (first) entry as a value."""
         return self._ctx[0]
 
 
-class int8_t(CHeapAllocated):
+class int8_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `int8_t` values."""
-    def __init__(self, x=None):
+    def __init__(self, x: int=None):
         self._ctx = ffi.new(f"int8_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
+    @staticmethod
+    def c_array(n:int=None) -> CArray[int]:
+        return CArray("int8_t", n)
 
-class int16_t(CHeapAllocated):
+
+class int16_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `int16_t` values."""
-    def __init__(self, x=None):
+    def __init__(self, x: int=None):
         self._ctx = ffi.new(f"int16_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
+    @staticmethod
+    def c_array(n:int=None) -> CArray[int]:
+        return CArray("int16_t", n)
 
-class int32_t(CHeapAllocated):
+
+class int32_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `int32_t` values."""
-    def __init__(self, x=None):
+    def __init__(self, x: int=None):
         self._ctx = ffi.new(f"int32_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
+    @staticmethod
+    def c_array(n:int=None) -> CArray[int]:
+        return CArray("int32_t", n)
 
-class int64_t(CHeapAllocated):
+
+class int64_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `int64_t` values."""
-    def __init__(self, x=None):
+    def __init__(self, x: int=None):
         self._ctx = ffi.new(f"int64_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
+    @staticmethod
+    def c_array(n:int=None) -> CArray[int]:
+        return CArray("int64_t", n)
 
-class uint8_t(CHeapAllocated):
+
+class uint8_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `uint8_t` values."""
-    def __init__(self, x=None):
+    def __init__(self, x: int=None):
         self._ctx = ffi.new(f"uint8_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
+    @staticmethod
+    def c_array(n:int=None) -> CArray[int]:
+        return CArray("uint8_t", n)
 
-class uint16_t(CHeapAllocated):
+
+class uint16_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `uint16_t` values."""
-    def __init__(self, x=None):
+    def __init__(self, x: int=None):
         self._ctx = ffi.new(f"uint16_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
+    @staticmethod
+    def c_array(n:int=None) -> CArray[int]:
+        return CArray("uint16_t", n)
 
-class uint32_t(CHeapAllocated):
+
+class uint32_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `uint32_t` values."""
-    def __init__(self, x=None):
+    def __init__(self, x: int=None):
         self._ctx = ffi.new(f"uint32_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
+    @staticmethod
+    def c_array(n:int=None) -> CArray[int]:
+        return CArray("uint32_t", n)
 
-class uint64_t(CHeapAllocated):
+
+class uint64_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `uint64_t` values."""
-    def __init__(self, x=None):
+    def __init__(self, x: int=None):
         self._ctx = ffi.new(f"uint64_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
+    @staticmethod
+    def c_array(n:int=None) -> CArray[int]:
+        return CArray("uint64_t", n)
 
-class CArray(CHeapAllocated):
+
+class CArray(CHeapAllocated, Generic[T]):
     """Holds a native C array with a given length."""
     def __init__(self, type, n):
         self._ctx = ffi.new(f"{type}[{n}]")
         self._c_array = True
         self._len = n
 
-    def __getitem__(self, key):
+    def __getitem__(self, key) -> T:
         return self._ctx[key]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, value: T):
         self._ctx[key] = value
 
     def __len__(self):
         return self._len
 
 
-class CSlice(CHeapAllocated):
+class CSlice(CHeapAllocated, Generic[T]):
     """Holds a native C array with a given length."""
     def __init__(self, c_slice):
         self._ctx = c_slice
         self._c_slice = True
         self._len = c_slice.len
 
-    def __getitem__(self, key):
+    def __getitem__(self, key) -> T:
         return self._ctx.data[key]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, value: T):
         self._ctx.data[key] = value
 
     def __len__(self):
         return self._ctx.len
 
 
-def ascii_string(x):
+def ascii_string(x: bytes):
     """Must be called with a b"my_string"."""
     return ffi.new("char[]", x)
 
@@ -196,7 +233,7 @@ class FFIError:
 
 class SuperComplexEntity(CHeapAllocated):
     """ A vector used in our game engine."""
-    def __init__(self, player_1=None, player_2=None, ammo=None, some_str=None, str_len=None):
+    def __init__(self, player_1: Vec3=None, player_2: Vec3=None, ammo: int=None, some_str=None, str_len: int=None):
         self._ctx = ffi.new("cffi_supercomplexentity[]", 1)
         if player_1 is not None:
             self.player_1 = player_1
@@ -210,16 +247,16 @@ class SuperComplexEntity(CHeapAllocated):
             self.str_len = str_len
 
     @staticmethod
-    def c_array(n):
+    def c_array(n: int) -> CArray[SuperComplexEntity]:
         return CArray("cffi_supercomplexentity", n)
 
     @property
-    def player_1(self):
+    def player_1(self) -> Vec3:
         """"""
         return self._ctx[0].player_1
 
     @player_1.setter
-    def player_1(self, value):
+    def player_1(self, value: Vec3):
         if hasattr(value, "_ctx"):
             if hasattr(value, "_c_array"):
                 value = value.c_ptr()
@@ -228,12 +265,12 @@ class SuperComplexEntity(CHeapAllocated):
         self._ctx[0].player_1 = value
 
     @property
-    def player_2(self):
+    def player_2(self) -> Vec3:
         """"""
         return self._ctx[0].player_2
 
     @player_2.setter
-    def player_2(self, value):
+    def player_2(self, value: Vec3):
         if hasattr(value, "_ctx"):
             if hasattr(value, "_c_array"):
                 value = value.c_ptr()
@@ -242,12 +279,12 @@ class SuperComplexEntity(CHeapAllocated):
         self._ctx[0].player_2 = value
 
     @property
-    def ammo(self):
+    def ammo(self) -> int:
         """"""
         return self._ctx[0].ammo
 
     @ammo.setter
-    def ammo(self, value):
+    def ammo(self, value: int):
         if hasattr(value, "_ctx"):
             if hasattr(value, "_c_array"):
                 value = value.c_ptr()
@@ -270,12 +307,12 @@ class SuperComplexEntity(CHeapAllocated):
         self._ctx[0].some_str = value
 
     @property
-    def str_len(self):
+    def str_len(self) -> int:
         """"""
         return self._ctx[0].str_len
 
     @str_len.setter
-    def str_len(self, value):
+    def str_len(self, value: int):
         if hasattr(value, "_ctx"):
             if hasattr(value, "_c_array"):
                 value = value.c_ptr()
@@ -286,7 +323,7 @@ class SuperComplexEntity(CHeapAllocated):
 
 class ThirdPartyVecF32(CHeapAllocated):
     """"""
-    def __init__(self, x=None, y=None, z=None, w=None):
+    def __init__(self, x: float=None, y: float=None, z: float=None, w: float=None):
         self._ctx = ffi.new("cffi_thirdpartyvecf32[]", 1)
         if x is not None:
             self.x = x
@@ -298,16 +335,16 @@ class ThirdPartyVecF32(CHeapAllocated):
             self.w = w
 
     @staticmethod
-    def c_array(n):
+    def c_array(n: int) -> CArray[ThirdPartyVecF32]:
         return CArray("cffi_thirdpartyvecf32", n)
 
     @property
-    def x(self):
+    def x(self) -> float:
         """"""
         return self._ctx[0].x
 
     @x.setter
-    def x(self, value):
+    def x(self, value: float):
         if hasattr(value, "_ctx"):
             if hasattr(value, "_c_array"):
                 value = value.c_ptr()
@@ -316,12 +353,12 @@ class ThirdPartyVecF32(CHeapAllocated):
         self._ctx[0].x = value
 
     @property
-    def y(self):
+    def y(self) -> float:
         """"""
         return self._ctx[0].y
 
     @y.setter
-    def y(self, value):
+    def y(self, value: float):
         if hasattr(value, "_ctx"):
             if hasattr(value, "_c_array"):
                 value = value.c_ptr()
@@ -330,12 +367,12 @@ class ThirdPartyVecF32(CHeapAllocated):
         self._ctx[0].y = value
 
     @property
-    def z(self):
+    def z(self) -> float:
         """"""
         return self._ctx[0].z
 
     @z.setter
-    def z(self, value):
+    def z(self, value: float):
         if hasattr(value, "_ctx"):
             if hasattr(value, "_c_array"):
                 value = value.c_ptr()
@@ -344,12 +381,12 @@ class ThirdPartyVecF32(CHeapAllocated):
         self._ctx[0].z = value
 
     @property
-    def w(self):
+    def w(self) -> float:
         """"""
         return self._ctx[0].w
 
     @w.setter
-    def w(self, value):
+    def w(self, value: float):
         if hasattr(value, "_ctx"):
             if hasattr(value, "_c_array"):
                 value = value.c_ptr()
@@ -360,7 +397,7 @@ class ThirdPartyVecF32(CHeapAllocated):
 
 class Vec3(CHeapAllocated):
     """ A vector used in our game engine."""
-    def __init__(self, x=None, y=None, z=None):
+    def __init__(self, x: float=None, y: float=None, z: float=None):
         self._ctx = ffi.new("cffi_vec3[]", 1)
         if x is not None:
             self.x = x
@@ -370,16 +407,16 @@ class Vec3(CHeapAllocated):
             self.z = z
 
     @staticmethod
-    def c_array(n):
+    def c_array(n: int) -> CArray[Vec3]:
         return CArray("cffi_vec3", n)
 
     @property
-    def x(self):
+    def x(self) -> float:
         """"""
         return self._ctx[0].x
 
     @x.setter
-    def x(self, value):
+    def x(self, value: float):
         if hasattr(value, "_ctx"):
             if hasattr(value, "_c_array"):
                 value = value.c_ptr()
@@ -388,12 +425,12 @@ class Vec3(CHeapAllocated):
         self._ctx[0].x = value
 
     @property
-    def y(self):
+    def y(self) -> float:
         """"""
         return self._ctx[0].y
 
     @y.setter
-    def y(self, value):
+    def y(self, value: float):
         if hasattr(value, "_ctx"):
             if hasattr(value, "_c_array"):
                 value = value.c_ptr()
@@ -402,12 +439,12 @@ class Vec3(CHeapAllocated):
         self._ctx[0].y = value
 
     @property
-    def z(self):
+    def z(self) -> float:
         """"""
         return self._ctx[0].z
 
     @z.setter
-    def z(self, value):
+    def z(self, value: float):
         if hasattr(value, "_ctx"):
             if hasattr(value, "_c_array"):
                 value = value.c_ptr()
@@ -424,19 +461,19 @@ class callbacks:
 class api:
     """Raw access to all exported functions."""
     @staticmethod
-    def example_api_version():
+    def example_api_version() -> int:
         """ Returns the version of this API."""
 
         return _api.example_api_version()
 
     @staticmethod
-    def example_always_fails():
+    def example_always_fails() -> FFIError:
         """ A function that always fails."""
 
         return _api.example_always_fails()
 
     @staticmethod
-    def example_create_context(context_ptr):
+    def example_create_context(context_ptr) -> FFIError:
         """ Creates a new instance of this library."""
         if hasattr(context_ptr, "_ctx"):
             context_ptr = context_ptr.c_ptr()
@@ -444,7 +481,7 @@ class api:
         return _api.example_create_context(context_ptr)
 
     @staticmethod
-    def example_destroy_context(context_ptr):
+    def example_destroy_context(context_ptr) -> FFIError:
         """ Deletes an existing instance of this library.
 
  You **must** ensure that `context_ptr` is being called with the context produced by
@@ -455,7 +492,7 @@ class api:
         return _api.example_destroy_context(context_ptr)
 
     @staticmethod
-    def example_print_score(context):
+    def example_print_score(context) -> FFIError:
         """ Prints the current player score."""
         if hasattr(context, "_ctx"):
             context = context.c_ptr()
@@ -463,7 +500,7 @@ class api:
         return _api.example_print_score(context)
 
     @staticmethod
-    def example_return_score(context, score):
+    def example_return_score(context, score) -> FFIError:
         """ Updates the score."""
         if hasattr(context, "_ctx"):
             context = context.c_ptr()
@@ -473,7 +510,7 @@ class api:
         return _api.example_return_score(context, score)
 
     @staticmethod
-    def example_update_score_by_callback(context, update):
+    def example_update_score_by_callback(context, update) -> FFIError:
         """ Updates the score."""
         if hasattr(context, "_ctx"):
             context = context.c_ptr()
@@ -488,7 +525,7 @@ class api:
         return _api.example_update_score_by_callback(context, update)
 
     @staticmethod
-    def example_write_foreign_type(context, foreign):
+    def example_write_foreign_type(context, foreign) -> FFIError:
         """ Accepts some foreign types."""
         if hasattr(context, "_ctx"):
             context = context.c_ptr()
@@ -498,7 +535,7 @@ class api:
         return _api.example_write_foreign_type(context, foreign)
 
     @staticmethod
-    def example_double_super_complex_entity(context, incoming, outgoing):
+    def example_double_super_complex_entity(context, incoming, outgoing) -> FFIError:
         """"""
         if hasattr(context, "_ctx"):
             context = context.c_ptr()

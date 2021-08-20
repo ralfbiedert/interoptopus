@@ -215,7 +215,7 @@ impl CType {
 }
 
 /// A primitive type that natively exists in C and is FFI safe.
-#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum PrimitiveType {
     Void,
     Bool,

@@ -23,6 +23,11 @@ pub trait PythonWriter {
     fn c_generator(&self) -> &interoptopus_backend_c::Generator;
 
     fn write_imports(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        indented!(w, r#"# Typehints for nicer dev UX."#)?;
+        indented!(w, r#"from __future__ import annotations"#)?;
+        indented!(w, r#"from typing import TypeVar, Generic"#)?;
+        indented!(w, r#"T = TypeVar("T")"#)?;
+        w.newline()?;
         indented!(w, r#"# Print usable error message if dependency is not installed."#)?;
         indented!(w, r#"try:"#)?;
         indented!(w, [_], r#"from cffi import FFI"#)?;
@@ -99,7 +104,16 @@ pub trait PythonWriter {
         indented!(w, [_], r#"{}"#, self.converter().documentation(e.meta().documentation()))?;
 
         // Ctor
-        let extra_args = e.fields().iter().map(|x| format!("{}=None", x.name())).collect::<Vec<_>>().join(", ");
+        let extra_args = e
+            .fields()
+            .iter()
+            .map(|x| {
+                let type_hint_in = self.converter().to_type_hint_in(x.the_type());
+
+                format!("{}{}=None", x.name(), type_hint_in)
+            })
+            .collect::<Vec<_>>()
+            .join(", ");
         indented!(w, [_], r#"def __init__(self, {}):"#, extra_args)?;
         // indented!(w, [_ _], r#"global _api, ffi"#)?;
         indented!(w, [_ _], r#"self._ctx = ffi.new("{}[]", 1)"#, cname)?;
@@ -110,21 +124,24 @@ pub trait PythonWriter {
         w.newline()?;
 
         indented!(w, [_], r#"@staticmethod"#)?;
-        indented!(w, [_], r#"def c_array(n):"#)?;
+        indented!(w, [_], r#"def c_array(n: int) -> CArray[{}]:"#, e.rust_name())?;
         indented!(w, [_ _], r#"return CArray("{}", n)"#, cname)?;
 
         for field in e.fields() {
             w.newline()?;
 
+            let type_hint_in = self.converter().to_type_hint_in(field.the_type());
+            let type_hint_out = self.converter().to_type_hint_out(field.the_type());
+
             indented!(w, [_], r#"@property"#)?;
-            indented!(w, [_], r#"def {}(self):"#, field.name())?;
+            indented!(w, [_], r#"def {}(self){}:"#, field.name(), type_hint_out)?;
             indented!(w, [_ _], r#"{}"#, self.converter().documentation(field.documentation()))?;
             indented!(w, [_ _], r#"return self._ctx[0].{}"#, field.name())?;
             w.newline()?;
 
             let _docs = field.documentation().lines().join("\n");
             indented!(w, [_], r#"@{}.setter"#, field.name())?;
-            indented!(w, [_], r#"def {}(self, value):"#, field.name())?;
+            indented!(w, [_], r#"def {}(self, value{}):"#, field.name(), type_hint_in)?;
             indented!(w, [_ _], r#"if hasattr(value, "_ctx"):"#)?;
             indented!(w, [_ _ _], r#"if hasattr(value, "_c_array"):"#)?;
             indented!(w, [_ _ _ _], r#"value = value.c_ptr()"#)?;
@@ -177,10 +194,22 @@ pub trait PythonWriter {
         indented!(w, [_], r#""""Raw access to all exported functions.""""#)?;
 
         for function in self.library().functions() {
+            let type_hint_out = self.converter().to_type_hint_out(function.signature().rval());
             let args = function.signature().params().iter().map(|x| x.name().to_string()).collect::<Vec<_>>().join(", ");
+            let args_with_typehints = function
+                .signature()
+                .params()
+                .iter()
+                .map(|x| {
+                    let name = x.name().to_string();
+                    let type_hint = self.converter().to_type_hint_in(x.the_type());
+                    format!("{}{}", name, type_hint)
+                })
+                .collect::<Vec<_>>()
+                .join(", ");
 
             indented!(w, [_], r#"@staticmethod"#)?;
-            indented!(w, [_], r#"def {}({}):"#, function.name(), &args)?;
+            indented!(w, [_], r#"def {}({}){}:"#, function.name(), &args_with_typehints, type_hint_out)?;
             indented!(w, [_ _], r#"{}"#, self.converter().documentation(function.meta().documentation()))?;
             // indented!(w, [_ _], r#"global _api"#)?;
 
@@ -293,19 +322,26 @@ pub trait PythonWriter {
         Ok(())
     }
 
-    fn pattern_class_args_without_first_to_string(&self, function: &Function) -> String {
+    fn pattern_class_args_without_first_to_string(&self, function: &Function, type_hints: bool) -> String {
         function
             .signature()
             .params()
             .iter()
             .skip(1)
-            .map(|x| x.name().to_string())
+            .map(|x| {
+                let type_hint = if type_hints {
+                    self.converter().to_type_hint_in(x.the_type())
+                } else {
+                    "".to_string()
+                };
+                format!("{}{}", x.name().to_string(), type_hint)
+            })
             .collect::<Vec<_>>()
             .join(", ")
     }
 
     fn write_pattern_class_success_enum_aware_rval(&self, w: &mut IndentWriter, _class: &Service, function: &Function, deref_ctx: bool) -> Result<(), Error> {
-        let args = self.pattern_class_args_without_first_to_string(function);
+        let args = self.pattern_class_args_without_first_to_string(function, false);
         let ctx = if deref_ctx { "self.c_value()" } else { "self.c_ptr()" };
 
         if deref_ctx {
@@ -329,7 +365,7 @@ pub trait PythonWriter {
         indented!(w, r#"class {}(CHeapAllocated):"#, context_type_name)?;
 
         for ctor in class.constructors() {
-            let ctor_args = self.pattern_class_args_without_first_to_string(ctor);
+            let ctor_args = self.pattern_class_args_without_first_to_string(ctor, true);
             indented!(w, [_], r#"def __init__(self, {}):"#, ctor_args)?;
             indented!(w, [_ _], r#"{}"#, self.converter().documentation(ctor.meta().documentation()))?;
             indented!(w, [_ _], r#"self._ctx = ffi.new("{}**")"#, context_cname)?;
@@ -350,9 +386,10 @@ pub trait PythonWriter {
         for function in class.methods() {
             w.newline()?;
 
-            let args = self.pattern_class_args_without_first_to_string(function);
+            let args = self.pattern_class_args_without_first_to_string(function, true);
+            let type_hint_out = self.converter().to_type_hint_out(function.signature().rval());
 
-            indented!(w, [_], r#"def {}(self, {}):"#, function.name().replace(&common_prefix, ""), &args)?;
+            indented!(w, [_], r#"def {}(self, {}){}:"#, function.name().replace(&common_prefix, ""), &args, type_hint_out)?;
             indented!(w, [_ _], r#"{}"#, self.converter().documentation(function.meta().documentation()))?;
             // indented!(w, [_ _], r#"global {}"#, self.config().raw_fn_namespace)?;
 
@@ -386,7 +423,7 @@ pub trait PythonWriter {
     }
 
     fn write_utils(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        indented!(w, r#"class CHeapAllocated(object):"#)?;
+        indented!(w, r#"class CHeapAllocated(Generic[T]):"#)?;
         indented!(w, [_], r#""""Base class from which all struct type wrappers are derived.""""#)?;
         indented!(w, [_], r#"def __init__(self):"#)?;
         indented!(w, [_ _], r#"pass"#)?;
@@ -395,32 +432,32 @@ pub trait PythonWriter {
         indented!(w, [_ _], r#""""Returns a C-level pointer to the native data structure.""""#)?;
         indented!(w, [_ _], r#"return self._ctx"#)?;
         w.newline()?;
-        indented!(w, [_], r#"def c_value(self):"#)?;
+        indented!(w, [_], r#"def c_value(self) -> T:"#)?;
         indented!(w, [_ _], r#""""From the underlying pointer returns the (first) entry as a value.""""#)?;
         indented!(w, [_ _], r#"return self._ctx[0]"#)?;
         w.newline()?;
         w.newline()?;
 
-        self.write_utils_primitive(w, &self.converter().c_converter.to_type_specifier(&CType::Primitive(PrimitiveType::I8)))?;
-        self.write_utils_primitive(w, &self.converter().c_converter.to_type_specifier(&CType::Primitive(PrimitiveType::I16)))?;
-        self.write_utils_primitive(w, &self.converter().c_converter.to_type_specifier(&CType::Primitive(PrimitiveType::I32)))?;
-        self.write_utils_primitive(w, &self.converter().c_converter.to_type_specifier(&CType::Primitive(PrimitiveType::I64)))?;
-        self.write_utils_primitive(w, &self.converter().c_converter.to_type_specifier(&CType::Primitive(PrimitiveType::U8)))?;
-        self.write_utils_primitive(w, &self.converter().c_converter.to_type_specifier(&CType::Primitive(PrimitiveType::U16)))?;
-        self.write_utils_primitive(w, &self.converter().c_converter.to_type_specifier(&CType::Primitive(PrimitiveType::U32)))?;
-        self.write_utils_primitive(w, &self.converter().c_converter.to_type_specifier(&CType::Primitive(PrimitiveType::U64)))?;
+        self.write_utils_primitive(w, PrimitiveType::I8)?;
+        self.write_utils_primitive(w, PrimitiveType::I16)?;
+        self.write_utils_primitive(w, PrimitiveType::I32)?;
+        self.write_utils_primitive(w, PrimitiveType::I64)?;
+        self.write_utils_primitive(w, PrimitiveType::U8)?;
+        self.write_utils_primitive(w, PrimitiveType::U16)?;
+        self.write_utils_primitive(w, PrimitiveType::U32)?;
+        self.write_utils_primitive(w, PrimitiveType::U64)?;
 
-        indented!(w, r#"class CArray(CHeapAllocated):"#)?;
+        indented!(w, r#"class CArray(CHeapAllocated, Generic[T]):"#)?;
         indented!(w, [_], r#""""Holds a native C array with a given length.""""#)?;
         indented!(w, [_], r#"def __init__(self, type, n):"#)?;
         indented!(w, [_ _], r#"self._ctx = ffi.new(f"{{type}}[{{n}}]")"#)?;
         indented!(w, [_ _], r#"self._c_array = True"#)?;
         indented!(w, [_ _], r#"self._len = n"#)?;
         w.newline()?;
-        indented!(w, [_], r#"def __getitem__(self, key):"#)?;
+        indented!(w, [_], r#"def __getitem__(self, key) -> T:"#)?;
         indented!(w, [_ _], r#"return self._ctx[key]"#)?;
         w.newline()?;
-        indented!(w, [_], r#"def __setitem__(self, key, value):"#)?;
+        indented!(w, [_], r#"def __setitem__(self, key, value: T):"#)?;
         indented!(w, [_ _], r#"self._ctx[key] = value"#)?;
         w.newline()?;
         indented!(w, [_], r#"def __len__(self):"#)?;
@@ -428,17 +465,17 @@ pub trait PythonWriter {
         w.newline()?;
         w.newline()?;
 
-        indented!(w, r#"class CSlice(CHeapAllocated):"#)?;
+        indented!(w, r#"class CSlice(CHeapAllocated, Generic[T]):"#)?;
         indented!(w, [_], r#""""Holds a native C array with a given length.""""#)?;
         indented!(w, [_], r#"def __init__(self, c_slice):"#)?;
         indented!(w, [_ _], r#"self._ctx = c_slice"#)?;
         indented!(w, [_ _], r#"self._c_slice = True"#)?;
         indented!(w, [_ _], r#"self._len = c_slice.len"#)?;
         w.newline()?;
-        indented!(w, [_], r#"def __getitem__(self, key):"#)?;
+        indented!(w, [_], r#"def __getitem__(self, key) -> T:"#)?;
         indented!(w, [_ _], r#"return self._ctx.data[key]"#)?;
         w.newline()?;
-        indented!(w, [_], r#"def __setitem__(self, key, value):"#)?;
+        indented!(w, [_], r#"def __setitem__(self, key, value: T):"#)?;
         indented!(w, [_ _], r#"self._ctx.data[key] = value"#)?;
         w.newline()?;
         indented!(w, [_], r#"def __len__(self):"#)?;
@@ -446,20 +483,28 @@ pub trait PythonWriter {
         w.newline()?;
         w.newline()?;
 
-        indented!(w, r#"def ascii_string(x):"#)?;
+        indented!(w, r#"def ascii_string(x: bytes):"#)?;
         indented!(w, [_], r#""""Must be called with a b"my_string".""""#)?;
         // indented!(w, [_], r#"global ffi"#)?;
         indented!(w, [_], r#"return ffi.new("char[]", x)"#)?;
         Ok(())
     }
 
-    fn write_utils_primitive(&self, w: &mut IndentWriter, x: &str) -> Result<(), Error> {
-        indented!(w, r#"class {}(CHeapAllocated):"#, x)?;
-        indented!(w, [_], r#""""One or more heap allocated primitive `{}` values.""""#, x)?;
-        indented!(w, [_], r#"def __init__(self, x=None):"#)?;
-        indented!(w, [_ _], r#"self._ctx = ffi.new(f"{}[1]", [0])"#, x)?;
+    fn write_utils_primitive(&self, w: &mut IndentWriter, primitive: PrimitiveType) -> Result<(), Error> {
+        let the_type = self.converter().c_converter.to_type_specifier(&CType::Primitive(primitive));
+        let type_hint_in = self.converter().to_type_hint_in(&CType::Primitive(primitive));
+        let type_hint = self.converter().to_type_hint(&CType::Primitive(primitive));
+
+        indented!(w, r#"class {}(CHeapAllocated[T]):"#, the_type)?;
+        indented!(w, [_], r#""""One or more heap allocated primitive `{}` values.""""#, the_type)?;
+        indented!(w, [_], r#"def __init__(self, x{}=None):"#, type_hint_in)?;
+        indented!(w, [_ _], r#"self._ctx = ffi.new(f"{}[1]", [0])"#, the_type)?;
         indented!(w, [_ _], r#"if x is not None:"#)?;
         indented!(w, [_ _ _], r#"self._ctx[0] = x"#)?;
+        w.newline()?;
+        indented!(w, [_], r#"@staticmethod"#)?;
+        indented!(w, [_], r#"def c_array(n:int=None) -> CArray[{}]:"#, type_hint)?;
+        indented!(w, [_ _], r#"return CArray("{}", n)"#, the_type)?;
         w.newline()?;
         w.newline()?;
 

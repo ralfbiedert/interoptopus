@@ -3,7 +3,7 @@ Generates CPython CFFI bindings for [Interoptopus](https://github.com/ralfbieder
 ## Usage
 
 Assuming you have written a crate containing your FFI logic called `example_library_ffi` and
-want to generate **CPython CFFI bindings**, follow the instructions below.
+want to generate **CPython CFFI bindings** for Python 3.7+, follow the instructions below.
 
 #### Inside Your Library
 

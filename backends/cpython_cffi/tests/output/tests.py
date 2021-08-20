@@ -87,7 +87,6 @@ class TestFunctions(unittest.TestCase):
 
     def test_tuple(self):
         tupled = r.Tupled(x0=100)
-
         self.assertEqual(200, api.tupled(tupled).x0)
 
     def test_complex(self):
@@ -127,6 +126,7 @@ class TestFunctions(unittest.TestCase):
             self.assertEqual(10.0, api.ambiguous_1(vec1).x)
             self.assertEqual(11.0, api.ambiguous_2(vec2).z)
             self.assertEqual(True, api.ambiguous_3(vec1, vec2))
+
 
     def test_namespaces(self):
         vec = r.Vec(x=10)
@@ -172,10 +172,11 @@ class TestPatterns(unittest.TestCase):
         self.assertEqual(20, t2.x0)
 
     def test_slices(self):
-        uint32 = r.CArray("uint32_t", 10_000)
+        # uint32 = r.CArray("uint32_t", 10_000)
+        uints = r.uint32_t.c_array(10_000)
         vecs = r.Vec3f32.c_array(100)
 
-        api.pattern_ffi_slice_1(uint32)
+        api.pattern_ffi_slice_1(uints)
         api.pattern_ffi_slice_2(vecs, 1000)
 
         some_value = 0
@@ -192,6 +193,7 @@ class TestPatterns(unittest.TestCase):
     def test_services(self):
         service = r.SimpleService()
         service.method_void()
+
         # service.method_result()
 
 
