@@ -42,6 +42,7 @@ pub trait CSharpWriter {
         if self.config().use_unsafe == Unsafe::UnsafePlatformMemCpy {
             indented!(w, r#"#if UNITY_2018_1_OR_NEWER"#)?;
             indented!(w, r#"using Unity.Collections.LowLevel.Unsafe;"#)?;
+            indented!(w, r#"using Unity.Collections;"#)?;
             indented!(w, r#"#else"#)?;
             indented!(w, r#"using System.Runtime.CompilerServices;"#)?;
             indented!(w, r#"#endif"#)?;
@@ -696,6 +697,20 @@ pub trait CSharpWriter {
         indented!(w, [_ _], r#"this.len = count;"#)?;
         indented!(w, [_], r#"}}"#)?;
 
+        if self.config().use_unsafe == Unsafe::UnsafePlatformMemCpy {
+            // Ctor unity
+            indented!(w, [_], r#"#if UNITY_2018_1_OR_NEWER"#)?;
+            indented!(w, [_], r#"public {}(NativeArray<{}> handle)"#, context_type_name, type_string)?;
+            indented!(w, [_], r#"{{"#)?;
+            indented!(w, [_ _], r#"unsafe"#)?;
+            indented!(w, [_ _], r#"{{"#)?;
+            indented!(w, [_ _ _], r#"this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));"#)?;
+            indented!(w, [_ _ _], r#"this.len = (ulong) handle.Length;"#)?;
+            indented!(w, [_ _], r#"}}"#)?;
+            indented!(w, [_], r#"}}"#)?;
+            indented!(w, [_], r#"#endif"#)?;
+        }
+
         // Getter
         indented!(w, [_], r#"public {} this[int i]"#, type_string)?;
         indented!(w, [_], r#"{{"#)?;
@@ -800,6 +815,20 @@ pub trait CSharpWriter {
         indented!(w, [_ _], r#"this.data = handle;"#)?;
         indented!(w, [_ _], r#"this.len = count;"#)?;
         indented!(w, [_], r#"}}"#)?;
+
+        if self.config().use_unsafe == Unsafe::UnsafePlatformMemCpy {
+            // Ctor unity
+            indented!(w, [_], r#"#if UNITY_2018_1_OR_NEWER"#)?;
+            indented!(w, [_], r#"public {}(NativeArray<{}> handle)"#, context_type_name, type_string)?;
+            indented!(w, [_], r#"{{"#)?;
+            indented!(w, [_ _], r#"unsafe"#)?;
+            indented!(w, [_ _], r#"{{"#)?;
+            indented!(w, [_ _ _], r#"this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafePtr(handle));"#)?;
+            indented!(w, [_ _ _], r#"this.len = (ulong) handle.Length;"#)?;
+            indented!(w, [_ _], r#"}}"#)?;
+            indented!(w, [_], r#"}}"#)?;
+            indented!(w, [_], r#"#endif"#)?;
+        }
 
         // Getter
         indented!(w, [_], r#"public {} this[int i]"#, type_string)?;

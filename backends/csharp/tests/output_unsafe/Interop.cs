@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 #if UNITY_2018_1_OR_NEWER
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Collections;
 #else
 using System.Runtime.CompilerServices;
 #endif
@@ -691,6 +692,16 @@ namespace My.Company
             this.data = handle;
             this.len = count;
         }
+        #if UNITY_2018_1_OR_NEWER
+        public SliceVec3f32(NativeArray<Vec3f32> handle)
+        {
+            unsafe
+            {
+                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
+                this.len = (ulong) handle.Length;
+            }
+        }
+        #endif
         public Vec3f32 this[int i]
         {
             get

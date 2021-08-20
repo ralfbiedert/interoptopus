@@ -1,13 +1,15 @@
+from __future__ import annotations
+
 # Print usable error message if dependency is not installed.
 try:
     from cffi import FFI
-    from __future__ import annotations
     from typing import TypeVar, Generic
     T = TypeVar("T")
 except ImportError:
     print("Ensure you run Python 3.7+ and have CFFI installed (`pip install cffi`).")
-    print("")
+    exit(1)
 
+# Raw API definition for CFFI.
 api_definition = """
 typedef struct cffi_vec2
     {
@@ -49,97 +51,97 @@ class CHeapAllocated(Generic[T]):
 
 class int8_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `int8_t` values."""
-    def __init__(self, x: int=None):
+    def __init__(self, x: int = None):
         self._ctx = ffi.new(f"int8_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
     @staticmethod
-    def c_array(n:int=None) -> CArray[int]:
+    def c_array(n:int = None) -> CArray[int]:
         return CArray("int8_t", n)
 
 
 class int16_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `int16_t` values."""
-    def __init__(self, x: int=None):
+    def __init__(self, x: int = None):
         self._ctx = ffi.new(f"int16_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
     @staticmethod
-    def c_array(n:int=None) -> CArray[int]:
+    def c_array(n:int = None) -> CArray[int]:
         return CArray("int16_t", n)
 
 
 class int32_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `int32_t` values."""
-    def __init__(self, x: int=None):
+    def __init__(self, x: int = None):
         self._ctx = ffi.new(f"int32_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
     @staticmethod
-    def c_array(n:int=None) -> CArray[int]:
+    def c_array(n:int = None) -> CArray[int]:
         return CArray("int32_t", n)
 
 
 class int64_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `int64_t` values."""
-    def __init__(self, x: int=None):
+    def __init__(self, x: int = None):
         self._ctx = ffi.new(f"int64_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
     @staticmethod
-    def c_array(n:int=None) -> CArray[int]:
+    def c_array(n:int = None) -> CArray[int]:
         return CArray("int64_t", n)
 
 
 class uint8_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `uint8_t` values."""
-    def __init__(self, x: int=None):
+    def __init__(self, x: int = None):
         self._ctx = ffi.new(f"uint8_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
     @staticmethod
-    def c_array(n:int=None) -> CArray[int]:
+    def c_array(n:int = None) -> CArray[int]:
         return CArray("uint8_t", n)
 
 
 class uint16_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `uint16_t` values."""
-    def __init__(self, x: int=None):
+    def __init__(self, x: int = None):
         self._ctx = ffi.new(f"uint16_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
     @staticmethod
-    def c_array(n:int=None) -> CArray[int]:
+    def c_array(n:int = None) -> CArray[int]:
         return CArray("uint16_t", n)
 
 
 class uint32_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `uint32_t` values."""
-    def __init__(self, x: int=None):
+    def __init__(self, x: int = None):
         self._ctx = ffi.new(f"uint32_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
     @staticmethod
-    def c_array(n:int=None) -> CArray[int]:
+    def c_array(n:int = None) -> CArray[int]:
         return CArray("uint32_t", n)
 
 
 class uint64_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `uint64_t` values."""
-    def __init__(self, x: int=None):
+    def __init__(self, x: int = None):
         self._ctx = ffi.new(f"uint64_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
     @staticmethod
-    def c_array(n:int=None) -> CArray[int]:
+    def c_array(n:int = None) -> CArray[int]:
         return CArray("uint64_t", n)
 
 
@@ -186,7 +188,7 @@ def ascii_string(x: bytes):
 
 class Vec2(CHeapAllocated):
     """ A simple type in our FFI layer."""
-    def __init__(self, x: float=None, y: float=None):
+    def __init__(self, x: float = None, y: float = None):
         self._ctx = ffi.new("cffi_vec2[]", 1)
         if x is not None:
             self.x = x
@@ -232,6 +234,7 @@ class callbacks:
 
 class api:
     """Raw access to all exported functions."""
+
     @staticmethod
     def my_function(input: Vec2) -> Vec2:
         """ Function using the type."""

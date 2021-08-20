@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 #if UNITY_2018_1_OR_NEWER
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Collections;
 #else
 using System.Runtime.CompilerServices;
 #endif
@@ -52,6 +53,16 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
+        #if UNITY_2018_1_OR_NEWER
+        public SliceBool(NativeArray<Bool> handle)
+        {
+            unsafe
+            {
+                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
+                this.len = (ulong) handle.Length;
+            }
+        }
+        #endif
         public Bool this[int i]
         {
             get
@@ -118,6 +129,16 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
+        #if UNITY_2018_1_OR_NEWER
+        public Sliceu32(NativeArray<uint> handle)
+        {
+            unsafe
+            {
+                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
+                this.len = (ulong) handle.Length;
+            }
+        }
+        #endif
         public uint this[int i]
         {
             get
@@ -184,6 +205,16 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
+        #if UNITY_2018_1_OR_NEWER
+        public Sliceu8(NativeArray<byte> handle)
+        {
+            unsafe
+            {
+                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
+                this.len = (ulong) handle.Length;
+            }
+        }
+        #endif
         public byte this[int i]
         {
             get
@@ -250,6 +281,16 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
+        #if UNITY_2018_1_OR_NEWER
+        public SliceMutu8(NativeArray<byte> handle)
+        {
+            unsafe
+            {
+                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafePtr(handle));
+                this.len = (ulong) handle.Length;
+            }
+        }
+        #endif
         public byte this[int i]
         {
             get
