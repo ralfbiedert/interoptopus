@@ -428,7 +428,7 @@ pub trait PythonWriter {
         w.newline()?;
         w.newline()?;
 
-        indented!(w, r#"class CSlice(CArray):"#)?;
+        indented!(w, r#"class CSlice(CHeapAllocated):"#)?;
         indented!(w, [_], r#""""Holds a native C array with a given length.""""#)?;
         indented!(w, [_], r#"def __init__(self, c_slice):"#)?;
         indented!(w, [_ _], r#"self._ctx = c_slice"#)?;

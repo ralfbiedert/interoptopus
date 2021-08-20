@@ -380,7 +380,7 @@ class CArray(CHeapAllocated):
         return self._len
 
 
-class CSlice(CArray):
+class CSlice(CHeapAllocated):
     """Holds a native C array with a given length."""
     def __init__(self, c_slice):
         self._ctx = c_slice
