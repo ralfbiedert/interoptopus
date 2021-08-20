@@ -1,13 +1,11 @@
-# Typehints for nicer dev UX.
-from __future__ import annotations
-from typing import TypeVar, Generic
-T = TypeVar("T")
-
 # Print usable error message if dependency is not installed.
 try:
     from cffi import FFI
+    from __future__ import annotations
+    from typing import TypeVar, Generic
+    T = TypeVar("T")
 except ImportError:
-    print("Please install package `cffi`, probably via `pip install cffi`.")
+    print("Ensure you run Python 3.7+ and have CFFI installed (`pip install cffi`).")
     print("")
 
 api_definition = """

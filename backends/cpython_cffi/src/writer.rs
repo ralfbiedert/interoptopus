@@ -23,17 +23,16 @@ pub trait PythonWriter {
     fn c_generator(&self) -> &interoptopus_backend_c::Generator;
 
     fn write_imports(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        indented!(w, r#"# Typehints for nicer dev UX."#)?;
         indented!(w, r#"from __future__ import annotations"#)?;
-        indented!(w, r#"from typing import TypeVar, Generic"#)?;
-        indented!(w, r#"T = TypeVar("T")"#)?;
         w.newline()?;
         indented!(w, r#"# Print usable error message if dependency is not installed."#)?;
         indented!(w, r#"try:"#)?;
         indented!(w, [_], r#"from cffi import FFI"#)?;
+        indented!(w, [_], r#"from typing import TypeVar, Generic"#)?;
+        indented!(w, [_], r#"T = TypeVar("T")"#)?;
         indented!(w, r#"except ImportError:"#)?;
-        indented!(w, [_], r#"print("Please install package `cffi`, probably via `pip install cffi`.")"#)?;
-        indented!(w, [_], r#"print("")"#)?;
+        indented!(w, [_], r#"print("Ensure you run Python 3.7+ and have CFFI installed (`pip install cffi`).")"#)?;
+        indented!(w, [_], r#"exit(1)"#)?;
         Ok(())
     }
 
@@ -110,7 +109,7 @@ pub trait PythonWriter {
             .map(|x| {
                 let type_hint_in = self.converter().to_type_hint_in(x.the_type());
 
-                format!("{}{}=None", x.name(), type_hint_in)
+                format!("{}{} = None", x.name(), type_hint_in)
             })
             .collect::<Vec<_>>()
             .join(", ");
@@ -192,6 +191,7 @@ pub trait PythonWriter {
     fn write_function_proxies(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r#"class {}:"#, self.config().raw_fn_namespace)?;
         indented!(w, [_], r#""""Raw access to all exported functions.""""#)?;
+        w.newline()?;
 
         for function in self.library().functions() {
             let type_hint_out = self.converter().to_type_hint_out(function.signature().rval());
@@ -407,6 +407,7 @@ pub trait PythonWriter {
     }
 
     fn write_c_header(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        indented!(w, r#"# Raw API definition for CFFI."#)?;
         indented!(w, r#"api_definition = """"#)?;
 
         let mut c_header: Vec<u8> = Vec::new();
@@ -497,13 +498,13 @@ pub trait PythonWriter {
 
         indented!(w, r#"class {}(CHeapAllocated[T]):"#, the_type)?;
         indented!(w, [_], r#""""One or more heap allocated primitive `{}` values.""""#, the_type)?;
-        indented!(w, [_], r#"def __init__(self, x{}=None):"#, type_hint_in)?;
+        indented!(w, [_], r#"def __init__(self, x{} = None):"#, type_hint_in)?;
         indented!(w, [_ _], r#"self._ctx = ffi.new(f"{}[1]", [0])"#, the_type)?;
         indented!(w, [_ _], r#"if x is not None:"#)?;
         indented!(w, [_ _ _], r#"self._ctx[0] = x"#)?;
         w.newline()?;
         indented!(w, [_], r#"@staticmethod"#)?;
-        indented!(w, [_], r#"def c_array(n:int=None) -> CArray[{}]:"#, type_hint)?;
+        indented!(w, [_], r#"def c_array(n:int = None) -> CArray[{}]:"#, type_hint)?;
         indented!(w, [_ _], r#"return CArray("{}", n)"#, the_type)?;
         w.newline()?;
         w.newline()?;

@@ -1,15 +1,15 @@
-# Typehints for nicer dev UX.
 from __future__ import annotations
-from typing import TypeVar, Generic
-T = TypeVar("T")
 
 # Print usable error message if dependency is not installed.
 try:
     from cffi import FFI
+    from typing import TypeVar, Generic
+    T = TypeVar("T")
 except ImportError:
-    print("Please install package `cffi`, probably via `pip install cffi`.")
-    print("")
+    print("Ensure you run Python 3.7+ and have CFFI installed (`pip install cffi`).")
+    exit(1)
 
+# Raw API definition for CFFI.
 api_definition = """
 const uint8_t CFFI_U8 = 255;
 const float CFFI_F32_MIN_POSITIVE = 0.000000000000000000000000000000000000011754944;
@@ -306,97 +306,97 @@ class CHeapAllocated(Generic[T]):
 
 class int8_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `int8_t` values."""
-    def __init__(self, x: int=None):
+    def __init__(self, x: int = None):
         self._ctx = ffi.new(f"int8_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
     @staticmethod
-    def c_array(n:int=None) -> CArray[int]:
+    def c_array(n:int = None) -> CArray[int]:
         return CArray("int8_t", n)
 
 
 class int16_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `int16_t` values."""
-    def __init__(self, x: int=None):
+    def __init__(self, x: int = None):
         self._ctx = ffi.new(f"int16_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
     @staticmethod
-    def c_array(n:int=None) -> CArray[int]:
+    def c_array(n:int = None) -> CArray[int]:
         return CArray("int16_t", n)
 
 
 class int32_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `int32_t` values."""
-    def __init__(self, x: int=None):
+    def __init__(self, x: int = None):
         self._ctx = ffi.new(f"int32_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
     @staticmethod
-    def c_array(n:int=None) -> CArray[int]:
+    def c_array(n:int = None) -> CArray[int]:
         return CArray("int32_t", n)
 
 
 class int64_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `int64_t` values."""
-    def __init__(self, x: int=None):
+    def __init__(self, x: int = None):
         self._ctx = ffi.new(f"int64_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
     @staticmethod
-    def c_array(n:int=None) -> CArray[int]:
+    def c_array(n:int = None) -> CArray[int]:
         return CArray("int64_t", n)
 
 
 class uint8_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `uint8_t` values."""
-    def __init__(self, x: int=None):
+    def __init__(self, x: int = None):
         self._ctx = ffi.new(f"uint8_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
     @staticmethod
-    def c_array(n:int=None) -> CArray[int]:
+    def c_array(n:int = None) -> CArray[int]:
         return CArray("uint8_t", n)
 
 
 class uint16_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `uint16_t` values."""
-    def __init__(self, x: int=None):
+    def __init__(self, x: int = None):
         self._ctx = ffi.new(f"uint16_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
     @staticmethod
-    def c_array(n:int=None) -> CArray[int]:
+    def c_array(n:int = None) -> CArray[int]:
         return CArray("uint16_t", n)
 
 
 class uint32_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `uint32_t` values."""
-    def __init__(self, x: int=None):
+    def __init__(self, x: int = None):
         self._ctx = ffi.new(f"uint32_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
     @staticmethod
-    def c_array(n:int=None) -> CArray[int]:
+    def c_array(n:int = None) -> CArray[int]:
         return CArray("uint32_t", n)
 
 
 class uint64_t(CHeapAllocated[T]):
     """One or more heap allocated primitive `uint64_t` values."""
-    def __init__(self, x: int=None):
+    def __init__(self, x: int = None):
         self._ctx = ffi.new(f"uint64_t[1]", [0])
         if x is not None:
             self._ctx[0] = x
 
     @staticmethod
-    def c_array(n:int=None) -> CArray[int]:
+    def c_array(n:int = None) -> CArray[int]:
         return CArray("uint64_t", n)
 
 
@@ -455,7 +455,7 @@ class EnumRenamed:
 
 class Array(CHeapAllocated):
     """"""
-    def __init__(self, data=None):
+    def __init__(self, data = None):
         self._ctx = ffi.new("cffi_array[]", 1)
         if data is not None:
             self.data = data
@@ -491,7 +491,7 @@ class Empty(CHeapAllocated):
 
 class ExtraTypef32(CHeapAllocated):
     """"""
-    def __init__(self, x: float=None):
+    def __init__(self, x: float = None):
         self._ctx = ffi.new("cffi_extratypef32[]", 1)
         if x is not None:
             self.x = x
@@ -517,7 +517,7 @@ class ExtraTypef32(CHeapAllocated):
 
 class Genericu32(CHeapAllocated):
     """"""
-    def __init__(self, x=None):
+    def __init__(self, x = None):
         self._ctx = ffi.new("cffi_genericu32[]", 1)
         if x is not None:
             self.x = x
@@ -543,7 +543,7 @@ class Genericu32(CHeapAllocated):
 
 class Genericu8(CHeapAllocated):
     """"""
-    def __init__(self, x=None):
+    def __init__(self, x = None):
         self._ctx = ffi.new("cffi_genericu8[]", 1)
         if x is not None:
             self.x = x
@@ -569,7 +569,7 @@ class Genericu8(CHeapAllocated):
 
 class Inner(CHeapAllocated):
     """"""
-    def __init__(self, x: float=None):
+    def __init__(self, x: float = None):
         self._ctx = ffi.new("cffi_inner[]", 1)
         if x is not None:
             self.x = x
@@ -595,7 +595,7 @@ class Inner(CHeapAllocated):
 
 class MyAPIv1(CHeapAllocated):
     """"""
-    def __init__(self, ref_mut_option=None, tupled=None):
+    def __init__(self, ref_mut_option = None, tupled = None):
         self._ctx = ffi.new("cffi_myapiv1[]", 1)
         if ref_mut_option is not None:
             self.ref_mut_option = ref_mut_option
@@ -637,7 +637,7 @@ class MyAPIv1(CHeapAllocated):
 
 class Phantomu8(CHeapAllocated):
     """"""
-    def __init__(self, x: int=None):
+    def __init__(self, x: int = None):
         self._ctx = ffi.new("cffi_phantomu8[]", 1)
         if x is not None:
             self.x = x
@@ -663,7 +663,7 @@ class Phantomu8(CHeapAllocated):
 
 class SomeForeignType(CHeapAllocated):
     """"""
-    def __init__(self, x: int=None):
+    def __init__(self, x: int = None):
         self._ctx = ffi.new("cffi_someforeigntype[]", 1)
         if x is not None:
             self.x = x
@@ -689,7 +689,7 @@ class SomeForeignType(CHeapAllocated):
 
 class StructDocumented(CHeapAllocated):
     """ Documented struct."""
-    def __init__(self, x: float=None):
+    def __init__(self, x: float = None):
         self._ctx = ffi.new("cffi_structdocumented[]", 1)
         if x is not None:
             self.x = x
@@ -715,7 +715,7 @@ class StructDocumented(CHeapAllocated):
 
 class StructRenamed(CHeapAllocated):
     """"""
-    def __init__(self, e: EnumRenamed=None):
+    def __init__(self, e: EnumRenamed = None):
         self._ctx = ffi.new("cffi_structrenamed[]", 1)
         if e is not None:
             self.e = e
@@ -741,7 +741,7 @@ class StructRenamed(CHeapAllocated):
 
 class Tupled(CHeapAllocated):
     """"""
-    def __init__(self, x0: int=None):
+    def __init__(self, x0: int = None):
         self._ctx = ffi.new("cffi_tupled[]", 1)
         if x0 is not None:
             self.x0 = x0
@@ -767,7 +767,7 @@ class Tupled(CHeapAllocated):
 
 class UseAsciiStringPattern(CHeapAllocated):
     """"""
-    def __init__(self, ascii_string=None):
+    def __init__(self, ascii_string = None):
         self._ctx = ffi.new("cffi_useasciistringpattern[]", 1)
         if ascii_string is not None:
             self.ascii_string = ascii_string
@@ -793,7 +793,7 @@ class UseAsciiStringPattern(CHeapAllocated):
 
 class Vec(CHeapAllocated):
     """"""
-    def __init__(self, x: float=None, z: float=None):
+    def __init__(self, x: float = None, z: float = None):
         self._ctx = ffi.new("cffi_vec[]", 1)
         if x is not None:
             self.x = x
@@ -835,7 +835,7 @@ class Vec(CHeapAllocated):
 
 class Vec1(CHeapAllocated):
     """"""
-    def __init__(self, x: float=None, y: float=None):
+    def __init__(self, x: float = None, y: float = None):
         self._ctx = ffi.new("cffi_vec1[]", 1)
         if x is not None:
             self.x = x
@@ -877,7 +877,7 @@ class Vec1(CHeapAllocated):
 
 class Vec2(CHeapAllocated):
     """"""
-    def __init__(self, x: float=None, z: float=None):
+    def __init__(self, x: float = None, z: float = None):
         self._ctx = ffi.new("cffi_vec2[]", 1)
         if x is not None:
             self.x = x
@@ -919,7 +919,7 @@ class Vec2(CHeapAllocated):
 
 class Vec3f32(CHeapAllocated):
     """"""
-    def __init__(self, x: float=None, y: float=None, z: float=None):
+    def __init__(self, x: float = None, y: float = None, z: float = None):
         self._ctx = ffi.new("cffi_vec3f32[]", 1)
         if x is not None:
             self.x = x
@@ -977,7 +977,7 @@ class Vec3f32(CHeapAllocated):
 
 class Visibility1(CHeapAllocated):
     """"""
-    def __init__(self, pblc: int=None, prvt: int=None):
+    def __init__(self, pblc: int = None, prvt: int = None):
         self._ctx = ffi.new("cffi_visibility1[]", 1)
         if pblc is not None:
             self.pblc = pblc
@@ -1019,7 +1019,7 @@ class Visibility1(CHeapAllocated):
 
 class Visibility2(CHeapAllocated):
     """"""
-    def __init__(self, pblc1: int=None, pblc2: int=None):
+    def __init__(self, pblc1: int = None, pblc2: int = None):
         self._ctx = ffi.new("cffi_visibility2[]", 1)
         if pblc1 is not None:
             self.pblc1 = pblc1
@@ -1061,7 +1061,7 @@ class Visibility2(CHeapAllocated):
 
 class Weird1u32(CHeapAllocated):
     """"""
-    def __init__(self, x: int=None):
+    def __init__(self, x: int = None):
         self._ctx = ffi.new("cffi_weird1u32[]", 1)
         if x is not None:
             self.x = x
@@ -1087,7 +1087,7 @@ class Weird1u32(CHeapAllocated):
 
 class Weird2u8(CHeapAllocated):
     """"""
-    def __init__(self, t: int=None, a=None, r=None):
+    def __init__(self, t: int = None, a = None, r = None):
         self._ctx = ffi.new("cffi_weird2u8[]", 1)
         if t is not None:
             self.t = t
@@ -1164,6 +1164,7 @@ class callbacks:
 
 class api:
     """Raw access to all exported functions."""
+
     @staticmethod
     def primitive_void():
         """"""
