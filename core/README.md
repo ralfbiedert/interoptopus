@@ -89,6 +89,7 @@ See this [**C# call-cost table**](https://github.com/ralfbiedert/interoptopus/bl
 
 ### Changelog
 
+- **v0.9** - 150x faster C# slices, Python type hints.
 - **v0.8** - Moved testing functions to respective backends.
 - **v0.7** - Make patterns proc macros for better FFI docs.
 - **v0.6** - Renamed and clarified many patterns.
