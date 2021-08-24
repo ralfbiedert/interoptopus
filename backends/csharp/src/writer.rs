@@ -1,5 +1,6 @@
 use crate::config::{Config, Unsafe, WriteTypes};
 use crate::converter::{CSharpTypeConverter, Converter};
+use crate::overloads::{Helper, OverloadWriter};
 use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, Meta, PrimitiveType, Variant, Visibility};
 use interoptopus::patterns::api_guard::library_hash;
 use interoptopus::patterns::callbacks::NamedCallback;
@@ -18,6 +19,15 @@ pub trait CSharpWriter {
     fn library(&self) -> &Library;
 
     fn converter(&self) -> &Converter;
+
+    fn overloads(&self) -> &[Box<dyn OverloadWriter>];
+
+    fn helper(&self) -> Helper {
+        Helper {
+            config: self.config(),
+            converter: self.converter(),
+        }
+    }
 
     fn write_file_header_comments(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r#"{}"#, &self.config().file_header_comment)?;
@@ -39,13 +49,8 @@ pub trait CSharpWriter {
         indented!(w, r#"using System.Collections.Generic;"#)?;
         indented!(w, r#"using System.Runtime.InteropServices;"#)?;
 
-        if self.config().use_unsafe == Unsafe::UnsafePlatformMemCpy {
-            indented!(w, r#"#if UNITY_2018_1_OR_NEWER"#)?;
-            indented!(w, r#"using Unity.Collections.LowLevel.Unsafe;"#)?;
-            indented!(w, r#"using Unity.Collections;"#)?;
-            indented!(w, r#"#else"#)?;
-            indented!(w, r#"using System.Runtime.CompilerServices;"#)?;
-            indented!(w, r#"#endif"#)?;
+        for overload in self.overloads() {
+            overload.write_imports(w, self.helper())?;
         }
 
         for namespace_id in self.library().namespaces() {

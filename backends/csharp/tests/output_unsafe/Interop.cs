@@ -7,9 +7,8 @@ using System.Runtime.InteropServices;
 #if UNITY_2018_1_OR_NEWER
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Collections;
-#else
-using System.Runtime.CompilerServices;
 #endif
+using System.Runtime.CompilerServices;
 using My.Company;
 using My.Company.Common;
 

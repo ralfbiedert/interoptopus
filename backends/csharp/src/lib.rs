@@ -113,11 +113,13 @@ use interoptopus::{Error, Library};
 
 mod config;
 mod converter;
+pub mod overloads;
 mod testing;
 mod writer;
 
 pub use config::{Config, Unsafe, WriteTypes};
 pub use converter::{CSharpTypeConverter, Converter};
+use overloads::OverloadWriter;
 pub use testing::run_dotnet_command_if_installed;
 pub use writer::CSharpWriter;
 
@@ -126,6 +128,7 @@ pub struct Generator {
     config: Config,
     library: Library,
     converter: Converter,
+    overload_writer: Vec<Box<dyn OverloadWriter>>,
 }
 
 impl Generator {
@@ -134,7 +137,13 @@ impl Generator {
             config,
             library,
             converter: Converter {},
+            overload_writer: vec![],
         }
+    }
+
+    pub fn add_overload_writer(&mut self, writer: Box<dyn OverloadWriter>) -> &mut Self {
+        self.overload_writer.push(writer);
+        self
     }
 }
 
@@ -155,5 +164,9 @@ impl CSharpWriter for Generator {
 
     fn converter(&self) -> &Converter {
         &self.converter
+    }
+
+    fn overloads(&self) -> &[Box<dyn OverloadWriter>] {
+        self.overload_writer.as_slice()
     }
 }
