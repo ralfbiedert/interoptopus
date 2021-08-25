@@ -1876,17 +1876,27 @@ class api:
 
 
 class SimpleService(CHeapAllocated):
-    def __init__(self, some_value: int):
-        """ The constructor must return a `Result<Self, Error>`."""
+    __api_lock = object()
+
+    def __init__(self, api_lock):
+        assert(api_lock == SimpleService.__api_lock), "You must create this with a static constructor." 
         self._ctx = ffi.new("cffi_simpleservice**")
+
+    @staticmethod
+    def new_with(some_value: int) -> SimpleService:
+        """ The constructor must return a `Result<Self, Error>`."""
+        self = SimpleService(SimpleService.__api_lock)
         if hasattr(some_value, "_ctx"):
             some_value = some_value.c_ptr()
         api.simple_service_new_with(self.c_ptr(), some_value)
+        return self
 
-    def __init__(self, ):
+    @staticmethod
+    def new_without() -> SimpleService:
         """"""
-        self._ctx = ffi.new("cffi_simpleservice**")
+        self = SimpleService(SimpleService.__api_lock)
         api.simple_service_new_without(self.c_ptr(), )
+        return self
 
     def __del__(self):
         api.simple_service_destroy(self.c_ptr(), )

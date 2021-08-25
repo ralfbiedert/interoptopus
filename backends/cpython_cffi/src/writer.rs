@@ -363,18 +363,25 @@ pub trait PythonWriter {
         let common_prefix = longest_common_prefix(&all_functions);
 
         indented!(w, r#"class {}(CHeapAllocated):"#, context_type_name)?;
+        indented!(w, [_], r#"__api_lock = object()"#)?;
+        w.newline()?;
+        indented!(w, [_], r#"def __init__(self, api_lock):"#)?;
+        indented!(w, [_ _], r#"assert(api_lock == {}.__api_lock), "You must create this with a static constructor." "#, context_type_name)?;
+        indented!(w, [_ _], r#"self._ctx = ffi.new("{}**")"#, context_cname)?;
+        w.newline()?;
 
         for ctor in class.constructors() {
             let ctor_args = self.pattern_class_args_without_first_to_string(ctor, true);
-            indented!(w, [_], r#"def __init__(self, {}):"#, ctor_args)?;
+            indented!(w, [_], r#"@staticmethod"#)?;
+            indented!(w, [_], r#"def {}({}) -> {}:"#, ctor.name().replace(&common_prefix, ""), ctor_args, context_type_name)?;
             indented!(w, [_ _], r#"{}"#, self.converter().documentation(ctor.meta().documentation()))?;
-            indented!(w, [_ _], r#"self._ctx = ffi.new("{}**")"#, context_cname)?;
+            indented!(w, [_ _], r#"self = {}({}.__api_lock)"#, context_type_name, context_type_name)?;
             for param in ctor.signature().params().iter().skip(1) {
                 indented!(w, [_ _ ], r#"if hasattr({}, "_ctx"):"#, param.name())?;
                 indented!(w, [_ _ _], r#"{} = {}.c_ptr()"#, param.name(), param.name())?;
             }
-
             self.write_pattern_class_success_enum_aware_rval(w, class, ctor, false)?;
+            indented!(w, [_ _], r#"return self"#)?;
             w.newline()?;
         }
 

@@ -191,10 +191,10 @@ class TestPatterns(unittest.TestCase):
         self.assertEqual(some_value, 4)
 
     def test_services(self):
-        service = r.SimpleService()
-        service.method_void()
+        s1 = r.SimpleService.new_without()
+        s2 = r.SimpleService.new_with(123)
 
-        # service.method_result()
+        assert (s1.method_value(123) == s2.method_value(123))
 
 
 if __name__ == '__main__':
