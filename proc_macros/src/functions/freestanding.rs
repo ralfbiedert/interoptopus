@@ -103,13 +103,14 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
         if let FnArg::Typed(pat) = arg {
             let name = match pat.pat.as_ref() {
                 Pat::Ident(ident) => ident.ident.to_string(),
-                Pat::Wild(_) => "_".to_string(),
+                Pat::Wild(_) => "_ignored".to_string(),
                 _ => {
                     panic!("Only supports normal identifiers for parameters, e.g., `x: ...`");
                 }
             };
 
-            args_name.push(name.clone());
+            let clean_name = name.strip_prefix('_').unwrap_or(&name);
+            args_name.push(clean_name.to_string());
 
             let token = match util::purge_lifetimes_from_type(pat.ty.as_ref()) {
                 Type::Path(x) => x.path.to_token_stream(),

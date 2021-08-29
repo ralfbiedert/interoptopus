@@ -22,9 +22,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 2800930564132731776ul)
+            if (api_version != 13858447161442889851ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (2800930564132731776). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (13858447161442889851). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -123,10 +123,10 @@ namespace My.Company
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "complex_args_1")]
-        public static extern FFIError complex_args_1(Vec3f32 _a, ref Empty _b);
+        public static extern FFIError complex_args_1(Vec3f32 a, ref Empty b);
 
-        public static void complex_args_1_checked(Vec3f32 _a, ref Empty _b) {
-            var rval = complex_args_1(_a, ref _b);;
+        public static void complex_args_1_checked(Vec3f32 a, ref Empty b) {
+            var rval = complex_args_1(a, ref b);;
             if (rval != FFIError.Ok)
             {
                 throw new Exception($"Something went wrong: {rval}");
@@ -134,7 +134,7 @@ namespace My.Company
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "complex_args_2")]
-        public static extern IntPtr complex_args_2(SomeForeignType _cmplx);
+        public static extern IntPtr complex_args_2(SomeForeignType cmplx);
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "callback")]
@@ -142,15 +142,15 @@ namespace My.Company
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic_1a")]
-        public static extern uint generic_1a(Genericu32 x, Phantomu8 _y);
+        public static extern uint generic_1a(Genericu32 x, Phantomu8 y);
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic_1b")]
-        public static extern byte generic_1b(Genericu8 x, Phantomu8 _y);
+        public static extern byte generic_1b(Genericu8 x, Phantomu8 y);
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic_1c")]
-        public static extern byte generic_1c(ref Genericu8 _x, ref Genericu8 y);
+        public static extern byte generic_1c(ref Genericu8 x, ref Genericu8 y);
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic_2")]
@@ -171,7 +171,7 @@ namespace My.Company
 
         /// This function has documentation.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "documented")]
-        public static extern EnumDocumented documented(StructDocumented _x);
+        public static extern EnumDocumented documented(StructDocumented x);
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ambiguous_1")]
@@ -210,11 +210,11 @@ namespace My.Company
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "weird_1")]
-        public static extern bool weird_1(Weird1u32 _x, Weird2u8 _y);
+        public static extern bool weird_1(Weird1u32 x, Weird2u8 y);
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "visibility")]
-        public static extern void visibility(Visibility1 _x, Visibility2 _y);
+        public static extern void visibility(Visibility1 x, Visibility2 y);
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ascii_pointer_1")]
@@ -268,18 +268,18 @@ namespace My.Company
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_4")]
-        public static extern void pattern_ffi_slice_4(Sliceu8 _slice, SliceMutu8 _slice2);
+        public static extern void pattern_ffi_slice_4(Sliceu8 slice, SliceMutu8 slice2);
 
-        public static void pattern_ffi_slice_4(byte[] _slice, byte[] _slice2) {
+        public static void pattern_ffi_slice_4(byte[] slice, byte[] slice2) {
             unsafe
             {
-                fixed (void* ptr__slice = _slice)
+                fixed (void* ptr_slice = slice)
                 {
-                    var _slice_slice = new Sliceu8(new IntPtr(ptr__slice), (ulong) _slice.Length);
-                    fixed (void* ptr__slice2 = _slice2)
+                    var slice_slice = new Sliceu8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                    fixed (void* ptr_slice2 = slice2)
                     {
-                        var _slice2_slice = new SliceMutu8(new IntPtr(ptr__slice2), (ulong) _slice2.Length);
-                        pattern_ffi_slice_4(_slice_slice, _slice2_slice);;
+                        var slice2_slice = new SliceMutu8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
+                        pattern_ffi_slice_4(slice_slice, slice2_slice);;
                     }
                 }
             }
@@ -362,10 +362,10 @@ namespace My.Company
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_new_failing")]
-        public static extern FFIError simple_service_new_failing(ref IntPtr context, byte _some_value);
+        public static extern FFIError simple_service_new_failing(ref IntPtr context, byte some_value);
 
-        public static void simple_service_new_failing_checked(ref IntPtr context, byte _some_value) {
-            var rval = simple_service_new_failing(ref context, _some_value);;
+        public static void simple_service_new_failing_checked(ref IntPtr context, byte some_value) {
+            var rval = simple_service_new_failing(ref context, some_value);;
             if (rval != FFIError.Ok)
             {
                 throw new Exception($"Something went wrong: {rval}");
@@ -375,10 +375,10 @@ namespace My.Company
         /// Methods returning a Result<(), _> are the default and do not
         /// need annotations.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_result")]
-        public static extern FFIError simple_service_method_result(IntPtr context, uint _anon1);
+        public static extern FFIError simple_service_method_result(IntPtr context, uint anon1);
 
-        public static void simple_service_method_result_checked(IntPtr context, uint _anon1) {
-            var rval = simple_service_method_result(context, _anon1);;
+        public static void simple_service_method_result_checked(IntPtr context, uint anon1) {
+            var rval = simple_service_method_result(context, anon1);;
             if (rval != FFIError.Ok)
             {
                 throw new Exception($"Something went wrong: {rval}");
@@ -412,65 +412,65 @@ namespace My.Company
 
         /// Single line.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_void")]
-        public static extern void simple_service_method_mut_self_void(IntPtr context, SliceBool _slice);
+        public static extern void simple_service_method_mut_self_void(IntPtr context, SliceBool slice);
 
-        public static void simple_service_method_mut_self_void(IntPtr context, Bool[] _slice) {
+        public static void simple_service_method_mut_self_void(IntPtr context, Bool[] slice) {
             unsafe
             {
-                fixed (void* ptr__slice = _slice)
+                fixed (void* ptr_slice = slice)
                 {
-                    var _slice_slice = new SliceBool(new IntPtr(ptr__slice), (ulong) _slice.Length);
-                    simple_service_method_mut_self_void(context, _slice_slice);;
+                    var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
+                    simple_service_method_mut_self_void(context, slice_slice);;
                 }
             }
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref")]
-        public static extern byte simple_service_method_mut_self_ref(IntPtr context, ref byte x, out byte _y);
+        public static extern byte simple_service_method_mut_self_ref(IntPtr context, ref byte x, out byte y);
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref_slice")]
-        public static extern byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte _y, Sliceu8 _slice);
+        public static extern byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, Sliceu8 slice);
 
-        public static byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte _y, byte[] _slice) {
+        public static byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, byte[] slice) {
             unsafe
             {
-                fixed (void* ptr__slice = _slice)
+                fixed (void* ptr_slice = slice)
                 {
-                    var _slice_slice = new Sliceu8(new IntPtr(ptr__slice), (ulong) _slice.Length);
-                    return simple_service_method_mut_self_ref_slice(context, ref x, out _y, _slice_slice);;
+                    var slice_slice = new Sliceu8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                    return simple_service_method_mut_self_ref_slice(context, ref x, out y, slice_slice);;
                 }
             }
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref_slice_limited")]
-        public static extern byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte _y, Sliceu8 _slice, Sliceu8 _slice2);
+        public static extern byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, Sliceu8 slice, Sliceu8 slice2);
 
-        public static byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte _y, byte[] _slice, byte[] _slice2) {
+        public static byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, byte[] slice, byte[] slice2) {
             unsafe
             {
-                fixed (void* ptr__slice = _slice)
+                fixed (void* ptr_slice = slice)
                 {
-                    var _slice_slice = new Sliceu8(new IntPtr(ptr__slice), (ulong) _slice.Length);
-                    fixed (void* ptr__slice2 = _slice2)
+                    var slice_slice = new Sliceu8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                    fixed (void* ptr_slice2 = slice2)
                     {
-                        var _slice2_slice = new Sliceu8(new IntPtr(ptr__slice2), (ulong) _slice2.Length);
-                        return simple_service_method_mut_self_ref_slice_limited(context, ref x, out _y, _slice_slice, _slice2_slice);;
+                        var slice2_slice = new Sliceu8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
+                        return simple_service_method_mut_self_ref_slice_limited(context, ref x, out y, slice_slice, slice2_slice);;
                     }
                 }
             }
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ffi_error")]
-        public static extern FFIError simple_service_method_mut_self_ffi_error(IntPtr context, SliceMutu8 _slice);
+        public static extern FFIError simple_service_method_mut_self_ffi_error(IntPtr context, SliceMutu8 slice);
 
-        public static void simple_service_method_mut_self_ffi_error_checked(IntPtr context, byte[] _slice) {
+        public static void simple_service_method_mut_self_ffi_error_checked(IntPtr context, byte[] slice) {
             unsafe
             {
-                fixed (void* ptr__slice = _slice)
+                fixed (void* ptr_slice = slice)
                 {
-                    var _slice_slice = new SliceMutu8(new IntPtr(ptr__slice), (ulong) _slice.Length);
-                    var rval = simple_service_method_mut_self_ffi_error(context, _slice_slice);;
+                    var slice_slice = new SliceMutu8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                    var rval = simple_service_method_mut_self_ffi_error(context, slice_slice);;
                     if (rval != FFIError.Ok)
                     {
                         throw new Exception($"Something went wrong: {rval}");
@@ -816,9 +816,9 @@ namespace My.Company
             Interop.simple_service_new_without_checked(ref _context);
         }
 
-        public  SimpleService(byte _some_value)
+        public  SimpleService(byte some_value)
         {
-            Interop.simple_service_new_failing_checked(ref _context, _some_value);
+            Interop.simple_service_new_failing_checked(ref _context, some_value);
         }
 
         public void Dispose()
@@ -828,9 +828,9 @@ namespace My.Company
 
         /// Methods returning a Result<(), _> are the default and do not
         /// need annotations.
-        public void MethodResult(uint _anon1)
+        public void MethodResult(uint anon1)
         {
-            Interop.simple_service_method_result_checked(_context, _anon1);
+            Interop.simple_service_method_result_checked(_context, anon1);
         }
 
         public uint MethodValue(uint x)
@@ -857,50 +857,50 @@ namespace My.Company
         }
 
         /// Single line.
-        public void MethodMutSelfVoid(Bool[] _slice)
+        public void MethodMutSelfVoid(Bool[] slice)
         {
-            Interop.simple_service_method_mut_self_void(_context, _slice);
+            Interop.simple_service_method_mut_self_void(_context, slice);
         }
 
         /// Single line.
-        public void MethodMutSelfVoid(SliceBool _slice)
+        public void MethodMutSelfVoid(SliceBool slice)
         {
-            Interop.simple_service_method_mut_self_void(_context, _slice);
+            Interop.simple_service_method_mut_self_void(_context, slice);
         }
 
-        public byte MethodMutSelfRef(ref byte x, out byte _y)
+        public byte MethodMutSelfRef(ref byte x, out byte y)
         {
-            return Interop.simple_service_method_mut_self_ref(_context, ref x, out _y);
+            return Interop.simple_service_method_mut_self_ref(_context, ref x, out y);
         }
 
-        public byte MethodMutSelfRefSlice(ref byte x, out byte _y, byte[] _slice)
+        public byte MethodMutSelfRefSlice(ref byte x, out byte y, byte[] slice)
         {
-            return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out _y, _slice);
+            return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out y, slice);
         }
 
-        public byte MethodMutSelfRefSlice(ref byte x, out byte _y, Sliceu8 _slice)
+        public byte MethodMutSelfRefSlice(ref byte x, out byte y, Sliceu8 slice)
         {
-            return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out _y, _slice);
+            return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out y, slice);
         }
 
-        public byte MethodMutSelfRefSliceLimited(ref byte x, out byte _y, byte[] _slice, byte[] _slice2)
+        public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, byte[] slice, byte[] slice2)
         {
-            return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out _y, _slice, _slice2);
+            return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
         }
 
-        public byte MethodMutSelfRefSliceLimited(ref byte x, out byte _y, Sliceu8 _slice, Sliceu8 _slice2)
+        public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, Sliceu8 slice, Sliceu8 slice2)
         {
-            return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out _y, _slice, _slice2);
+            return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
         }
 
-        public void MethodMutSelfFfiError(byte[] _slice)
+        public void MethodMutSelfFfiError(byte[] slice)
         {
-            Interop.simple_service_method_mut_self_ffi_error_checked(_context, _slice);
+            Interop.simple_service_method_mut_self_ffi_error_checked(_context, slice);
         }
 
-        public FFIError MethodMutSelfFfiError(SliceMutu8 _slice)
+        public FFIError MethodMutSelfFfiError(SliceMutu8 slice)
         {
-            return Interop.simple_service_method_mut_self_ffi_error(_context, _slice);
+            return Interop.simple_service_method_mut_self_ffi_error(_context, slice);
         }
 
         public IntPtr Context => _context;
