@@ -123,6 +123,8 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 )*
                 pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #error_ident {
 
+                    *context = ::std::ptr::null_mut();
+
                     let result_result = std::panic::catch_unwind(|| {
                         <#service_type>::#orig_fn_ident( #(#arg_names),* )
                     });
@@ -211,6 +213,11 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
         #[interoptopus::ffi_function]
         #[no_mangle]
         pub unsafe extern "C" fn #ffi_fn_ident(context: &mut *mut #without_lifetimes) -> #error_ident {
+            // Checks the _contained_ pointer is not null, which usually means service was not initialized.
+            if context.is_null() {
+                return <#error_ident as ::interoptopus::patterns::result::FFIError>::NULL;
+            }
+
             let result_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                 unsafe { Box::from_raw(*context) };
             }));

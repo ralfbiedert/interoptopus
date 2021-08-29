@@ -194,6 +194,12 @@ class TestPatterns(unittest.TestCase):
         s1 = r.SimpleService.new_without()
         s2 = r.SimpleService.new_with(123)
 
+        try:
+            s3 = r.SimpleService.new_failing()
+            s3.method_void()
+        except:
+            pass
+
         assert (s1.method_value(123) == s2.method_value(123))
 
 

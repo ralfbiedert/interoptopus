@@ -22,9 +22,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 12902512664028031058ul)
+            if (api_version != 2800930564132731776ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (12902512664028031058). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (2800930564132731776). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -355,6 +355,17 @@ namespace My.Company
 
         public static void simple_service_new_without_checked(ref IntPtr context) {
             var rval = simple_service_new_without(ref context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception($"Something went wrong: {rval}");
+            }
+        }
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_new_failing")]
+        public static extern FFIError simple_service_new_failing(ref IntPtr context, byte _some_value);
+
+        public static void simple_service_new_failing_checked(ref IntPtr context, byte _some_value) {
+            var rval = simple_service_new_failing(ref context, _some_value);;
             if (rval != FFIError.Ok)
             {
                 throw new Exception($"Something went wrong: {rval}");
@@ -803,6 +814,11 @@ namespace My.Company
         public  SimpleService()
         {
             Interop.simple_service_new_without_checked(ref _context);
+        }
+
+        public  SimpleService(byte _some_value)
+        {
+            Interop.simple_service_new_failing_checked(ref _context, _some_value);
         }
 
         public void Dispose()

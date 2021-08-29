@@ -262,6 +262,7 @@ uint32_t pattern_callback_1(cffi_fptr_fn_u32_rval_u32 callback, uint32_t x);
 cffi_ffierror simple_service_destroy(cffi_simpleservice** context);
 cffi_ffierror simple_service_new_with(cffi_simpleservice** context, uint32_t some_value);
 cffi_ffierror simple_service_new_without(cffi_simpleservice** context);
+cffi_ffierror simple_service_new_failing(cffi_simpleservice** context, uint8_t _some_value);
 cffi_ffierror simple_service_method_result(cffi_simpleservice* context, uint32_t _anon1);
 uint32_t simple_service_method_value(cffi_simpleservice* context, uint32_t x);
 void simple_service_method_void(cffi_simpleservice* context);
@@ -1751,6 +1752,20 @@ class api:
             raise Exception(f"Function returned error {_rval}")
 
     @staticmethod
+    def simple_service_new_failing(context, _some_value: int):
+        """"""
+        if hasattr(context, "_ctx"):
+            context = context.c_ptr()
+        if hasattr(_some_value, "_ctx"):
+            _some_value = _some_value.c_value()
+
+        _rval = _api.simple_service_new_failing(context, _some_value)
+        if _rval == FFIError.Ok:
+            return _rval
+        else:
+            raise Exception(f"Function returned error {_rval}")
+
+    @staticmethod
     def simple_service_method_result(context, _anon1: int):
         """ Methods returning a Result<(), _> are the default and do not
  need annotations."""
@@ -1878,24 +1893,36 @@ class api:
 class SimpleService(CHeapAllocated):
     __api_lock = object()
 
-    def __init__(self, api_lock):
+    def __init__(self, api_lock, ctx):
         assert(api_lock == SimpleService.__api_lock), "You must create this with a static constructor." 
-        self._ctx = ffi.new("cffi_simpleservice**")
+        self._ctx = ctx
 
     @staticmethod
     def new_with(some_value: int) -> SimpleService:
         """ The constructor must return a `Result<Self, Error>`."""
-        self = SimpleService(SimpleService.__api_lock)
         if hasattr(some_value, "_ctx"):
             some_value = some_value.c_ptr()
-        api.simple_service_new_with(self.c_ptr(), some_value)
+        ctx = ffi.new("cffi_simpleservice**")
+        api.simple_service_new_with(ctx, some_value)
+        self = SimpleService(SimpleService.__api_lock, ctx)
         return self
 
     @staticmethod
     def new_without() -> SimpleService:
         """"""
-        self = SimpleService(SimpleService.__api_lock)
-        api.simple_service_new_without(self.c_ptr(), )
+        ctx = ffi.new("cffi_simpleservice**")
+        api.simple_service_new_without(ctx, )
+        self = SimpleService(SimpleService.__api_lock, ctx)
+        return self
+
+    @staticmethod
+    def new_failing(_some_value: int) -> SimpleService:
+        """"""
+        if hasattr(_some_value, "_ctx"):
+            _some_value = _some_value.c_ptr()
+        ctx = ffi.new("cffi_simpleservice**")
+        api.simple_service_new_failing(ctx, _some_value)
+        self = SimpleService(SimpleService.__api_lock, ctx)
         return self
 
     def __del__(self):

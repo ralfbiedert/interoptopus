@@ -263,6 +263,7 @@ uint32_t pattern_callback_1(my_library_fptr_fn_u32_rval_u32 callback, uint32_t x
 my_library_ffierror simple_service_destroy(my_library_simpleservice** context);
 my_library_ffierror simple_service_new_with(my_library_simpleservice** context, uint32_t some_value);
 my_library_ffierror simple_service_new_without(my_library_simpleservice** context);
+my_library_ffierror simple_service_new_failing(my_library_simpleservice** context, uint8_t _some_value);
 my_library_ffierror simple_service_method_result(my_library_simpleservice* context, uint32_t _anon1);
 uint32_t simple_service_method_value(my_library_simpleservice* context, uint32_t x);
 void simple_service_method_void(my_library_simpleservice* context);

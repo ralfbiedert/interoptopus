@@ -317,6 +317,8 @@ pub trait PythonWriter {
             match pattern {
                 LibraryPattern::Service(cls) => self.write_pattern_class(w, cls)?,
             }
+            w.newline()?;
+            w.newline()?;
         }
 
         Ok(())
@@ -340,11 +342,10 @@ pub trait PythonWriter {
             .join(", ")
     }
 
-    fn write_pattern_class_success_enum_aware_rval(&self, w: &mut IndentWriter, _class: &Service, function: &Function, deref_ctx: bool) -> Result<(), Error> {
+    fn write_pattern_class_success_enum_aware_rval(&self, w: &mut IndentWriter, _class: &Service, function: &Function, ctx: &str, ret: bool) -> Result<(), Error> {
         let args = self.pattern_class_args_without_first_to_string(function, false);
-        let ctx = if deref_ctx { "self.c_value()" } else { "self.c_ptr()" };
 
-        if deref_ctx {
+        if ret {
             indented!(w, [_ _], r#"return {}.{}({}, {})"#, self.config().raw_fn_namespace, function.name(), ctx, &args)?;
         } else {
             indented!(w, [_ _], r#"{}.{}({}, {})"#, self.config().raw_fn_namespace, function.name(), ctx, &args)?;
@@ -365,9 +366,9 @@ pub trait PythonWriter {
         indented!(w, r#"class {}(CHeapAllocated):"#, context_type_name)?;
         indented!(w, [_], r#"__api_lock = object()"#)?;
         w.newline()?;
-        indented!(w, [_], r#"def __init__(self, api_lock):"#)?;
+        indented!(w, [_], r#"def __init__(self, api_lock, ctx):"#)?;
         indented!(w, [_ _], r#"assert(api_lock == {}.__api_lock), "You must create this with a static constructor." "#, context_type_name)?;
-        indented!(w, [_ _], r#"self._ctx = ffi.new("{}**")"#, context_cname)?;
+        indented!(w, [_ _], r#"self._ctx = ctx"#)?;
         w.newline()?;
 
         for ctor in class.constructors() {
@@ -375,12 +376,13 @@ pub trait PythonWriter {
             indented!(w, [_], r#"@staticmethod"#)?;
             indented!(w, [_], r#"def {}({}) -> {}:"#, ctor.name().replace(&common_prefix, ""), ctor_args, context_type_name)?;
             indented!(w, [_ _], r#"{}"#, self.converter().documentation(ctor.meta().documentation()))?;
-            indented!(w, [_ _], r#"self = {}({}.__api_lock)"#, context_type_name, context_type_name)?;
             for param in ctor.signature().params().iter().skip(1) {
                 indented!(w, [_ _ ], r#"if hasattr({}, "_ctx"):"#, param.name())?;
                 indented!(w, [_ _ _], r#"{} = {}.c_ptr()"#, param.name(), param.name())?;
             }
-            self.write_pattern_class_success_enum_aware_rval(w, class, ctor, false)?;
+            indented!(w, [_ _], r#"ctx = ffi.new("{}**")"#, context_cname)?;
+            self.write_pattern_class_success_enum_aware_rval(w, class, ctor, "ctx", false)?;
+            indented!(w, [_ _], r#"self = {}({}.__api_lock, ctx)"#, context_type_name, context_type_name)?;
             indented!(w, [_ _], r#"return self"#)?;
             w.newline()?;
         }
@@ -388,7 +390,7 @@ pub trait PythonWriter {
         // Dtor
         indented!(w, [_], r#"def __del__(self):"#)?;
         // indented!(w, [_ _], r#"global _api, ffi"#)?;
-        self.write_pattern_class_success_enum_aware_rval(w, class, class.destructor(), false)?;
+        self.write_pattern_class_success_enum_aware_rval(w, class, class.destructor(), "self.c_ptr()", false)?;
 
         for function in class.methods() {
             w.newline()?;
@@ -398,16 +400,8 @@ pub trait PythonWriter {
 
             indented!(w, [_], r#"def {}(self, {}){}:"#, function.name().replace(&common_prefix, ""), &args, type_hint_out)?;
             indented!(w, [_ _], r#"{}"#, self.converter().documentation(function.meta().documentation()))?;
-            // indented!(w, [_ _], r#"global {}"#, self.config().raw_fn_namespace)?;
 
-            // // Determine if the function was called with a wrapper we produced which as a private `_ctx`.
-            // // If so, use that instead. Otherwise, just pass parameters and hope for the best.
-            // for param in function.signature().params().iter().skip(1) {
-            //     indented!(w, [_ _], r#"if hasattr({}, "_ctx"):"#, param.name())?;
-            //     indented!(w, [_ _ _], r#"{} = {}._ctx[0]"#, param.name(), param.name())?;
-            // }
-
-            self.write_pattern_class_success_enum_aware_rval(w, class, function, true)?;
+            self.write_pattern_class_success_enum_aware_rval(w, class, function, "self.c_value()", true)?;
         }
 
         Ok(())
@@ -552,8 +546,6 @@ pub trait PythonWriter {
         w.newline()?;
 
         self.write_patterns(w)?;
-        w.newline()?;
-        w.newline()?;
 
         Ok(())
     }

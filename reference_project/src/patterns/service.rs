@@ -24,6 +24,11 @@ impl SimpleService {
         Ok(Self { some_value: 0 })
     }
 
+    #[ffi_service_ctor]
+    pub fn new_failing(_some_value: u8) -> Result<Self, Error> {
+        Err(Error::Bad)
+    }
+
     /// Methods returning a Result<(), _> are the default and do not
     /// need annotations.
     pub fn method_result(&self, _: u32) -> Result<(), Error> {
