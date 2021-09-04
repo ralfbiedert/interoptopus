@@ -40,55 +40,8 @@ pub trait CSharpTypeConverter {
         "IntPtr".to_string()
     }
 
-    fn has_overloadable(&self, signature: &FunctionSignature) -> bool {
-        signature.params().iter().any(|x| match x.the_type() {
-            // CType::ReadPointer(x) | CType::ReadWritePointer(x) => match x.deref() {
-            //     CType::Pattern(x) => matches!(x, TypePattern::Slice(_) | TypePattern::SliceMut(_)),
-            //     _ => false,
-            // },
-            CType::Pattern(x) => matches!(x, TypePattern::Slice(_) | TypePattern::SliceMut(_)),
-            _ => false,
-        })
-    }
-
     fn has_ffi_error_rval(&self, signature: &FunctionSignature) -> bool {
         matches!(signature.rval(), CType::Pattern(TypePattern::FFIErrorEnum(_)))
-    }
-
-    fn pattern_to_native_in_signature(&self, param: &Parameter, _signature: &FunctionSignature) -> String {
-        match param.the_type() {
-            CType::Pattern(p) => match p {
-                TypePattern::AsciiPointer => "string".to_string(),
-                TypePattern::NamedCallback(x) => x.name().to_string(),
-                TypePattern::FFIErrorEnum(e) => self.enum_to_typename(e.the_enum()),
-                TypePattern::Slice(p) => {
-                    let element_type = p
-                        .fields()
-                        .get(0)
-                        .expect("First parameter must exist")
-                        .the_type()
-                        .deref_pointer()
-                        .expect("Must be pointer");
-
-                    format!("{}[]", self.to_typespecifier_in_param(element_type))
-                }
-                TypePattern::SliceMut(p) => {
-                    let element_type = p
-                        .fields()
-                        .get(0)
-                        .expect("First parameter must exist")
-                        .the_type()
-                        .deref_pointer()
-                        .expect("Must be pointer");
-                    format!("{}[]", self.to_typespecifier_in_param(element_type))
-                }
-
-                TypePattern::Option(e) => self.composite_to_typename(e),
-                TypePattern::Bool => "Bool".to_string(),
-                TypePattern::APIVersion => self.to_typespecifier_in_param(&p.fallback_type()),
-            },
-            x => self.to_typespecifier_in_param(x),
-        }
     }
 
     /// Converts an Rust struct name `Vec2` to a C# struct name `Vec2`.

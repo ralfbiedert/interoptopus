@@ -2,7 +2,7 @@ use interoptopus::testing::assert_file_matches_generated;
 use interoptopus::util::NamespaceMappings;
 use interoptopus::Error;
 use interoptopus::Interop;
-use interoptopus_backend_csharp::overloads::{BasicCSharp, Unity};
+use interoptopus_backend_csharp::overloads::{CommonCSharp, Unity};
 use interoptopus_backend_csharp::{run_dotnet_command_if_installed, Unsafe, WriteTypes};
 
 fn generate_bindings_multi(prefix: &str, use_unsafe: Unsafe) -> Result<(), Error> {
@@ -36,12 +36,9 @@ fn generate_bindings_multi(prefix: &str, use_unsafe: Unsafe) -> Result<(), Error
             ..config.clone()
         };
 
-        let unity = Box::new(Unity {});
-        let normal = Box::new(BasicCSharp {});
-
         Generator::new(config.clone(), interoptopus_reference_project::ffi_inventory())
-            .add_overload_writer(unity)
-            .add_overload_writer(normal)
+            .add_overload_writer(Unity::new())
+            .add_overload_writer(CommonCSharp::new())
             .write_file(file_name)?;
     }
 

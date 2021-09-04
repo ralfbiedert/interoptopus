@@ -83,10 +83,15 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
-                        #if UNITY_2018_1_OR_NEWER
+                        #if __INTEROPTOPUS_NEVER
+                        #elif UNITY_2018_1_OR_NEWER
                         UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(Bool)));
-                        #else
+                        #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        #else
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
                         #endif
                     }
                 }
@@ -159,10 +164,15 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
-                        #if UNITY_2018_1_OR_NEWER
+                        #if __INTEROPTOPUS_NEVER
+                        #elif UNITY_2018_1_OR_NEWER
                         UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(uint)));
-                        #else
+                        #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        #else
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
                         #endif
                     }
                 }
@@ -235,10 +245,15 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
-                        #if UNITY_2018_1_OR_NEWER
+                        #if __INTEROPTOPUS_NEVER
+                        #elif UNITY_2018_1_OR_NEWER
                         UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(byte)));
-                        #else
+                        #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        #else
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
                         #endif
                     }
                 }
@@ -285,7 +300,7 @@ namespace My.Company.Common
         {
             unsafe
             {
-                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafePtr(handle));
+                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
                 this.len = (ulong) handle.Length;
             }
         }
@@ -320,10 +335,15 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
-                        #if UNITY_2018_1_OR_NEWER
+                        #if __FALSE
+                        #elif UNITY_2018_1_OR_NEWER
                         UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(byte)));
-                        #else
+                        #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        #else
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
                         #endif
                     }
                 }
