@@ -126,6 +126,7 @@ typedef struct cffi_weird1u32
 
 typedef uint8_t (*cffi_fptr_fn_u8_rval_u8)(uint8_t x0);
 
+
 typedef uint32_t (*cffi_fptr_fn_u32_rval_u32)(uint32_t x0);
 
 typedef struct cffi_array
@@ -149,10 +150,6 @@ typedef struct cffi_weird2u8
     uint8_t a[5];
     uint8_t* r;
     } cffi_weird2u8;
-
-typedef cffi_tupled (*cffi_fptr_fn_Tupled_rval_Tupled)(cffi_tupled x0);
-
-typedef bool (*cffi_fptr_fn_pmut_i64_rval_bool)(int64_t* x0);
 
 typedef struct cffi_slicebool
     {
@@ -183,12 +180,6 @@ typedef struct cffi_optioninner
     cffi_inner t;
     uint8_t is_some;
     } cffi_optioninner;
-
-typedef struct cffi_myapiv1
-    {
-    cffi_fptr_fn_pmut_i64_rval_bool ref_mut_option;
-    cffi_fptr_fn_Tupled_rval_Tupled tupled;
-    } cffi_myapiv1;
 
 typedef struct cffi_slicevec3f32
     {
@@ -251,12 +242,12 @@ cffi_vec3f32 pattern_ffi_slice_2(cffi_slicevec3f32 ffi_slice, int32_t i);
 void pattern_ffi_slice_3(cffi_slicemutu8 slice, cffi_fptr_fn_SliceMutu8 callback);
 void pattern_ffi_slice_4(cffi_sliceu8 slice, cffi_slicemutu8 slice2);
 void pattern_ffi_slice_5(cffi_sliceu8* slice, cffi_slicemutu8* slice2);
+void pattern_ffi_slice_6(cffi_slicemutu8* slice, cffi_fptr_fn_u8_rval_u8 callback);
 uint8_t pattern_ffi_slice_delegate(cffi_fptr_fn_Sliceu8_rval_u8 callback);
 cffi_vec3f32 pattern_ffi_slice_delegate_huge(cffi_fptr_fn_SliceVec3f32_rval_Vec3f32 callback);
 cffi_optioninner pattern_ffi_option_1(cffi_optioninner ffi_slice);
 cffi_inner pattern_ffi_option_2(cffi_optioninner ffi_slice);
 uint8_t pattern_ffi_bool(uint8_t ffi_bool);
-void pattern_my_api_init_v1(cffi_myapiv1* api);
 uint64_t pattern_api_guard();
 uint32_t pattern_callback_1(cffi_fptr_fn_u32_rval_u32 callback, uint32_t x);
 cffi_ffierror simple_service_destroy(cffi_simpleservice** context);
@@ -272,6 +263,8 @@ uint8_t simple_service_method_mut_self_ref(cffi_simpleservice* context, uint8_t*
 uint8_t simple_service_method_mut_self_ref_slice(cffi_simpleservice* context, uint8_t* x, uint8_t* y, cffi_sliceu8 slice);
 uint8_t simple_service_method_mut_self_ref_slice_limited(cffi_simpleservice* context, uint8_t* x, uint8_t* y, cffi_sliceu8 slice, cffi_sliceu8 slice2);
 cffi_ffierror simple_service_method_mut_self_ffi_error(cffi_simpleservice* context, cffi_slicemutu8 slice);
+void simple_service_method_mut_self_no_error(cffi_simpleservice* context, cffi_slicemutu8 slice);
+cffi_ffierror simple_service_method_void_ffi_error(cffi_simpleservice* context);
 """
 
 
@@ -592,48 +585,6 @@ class Inner(CHeapAllocated):
             else:
                 value = value.c_value()
         self._ctx[0].x = value
-
-
-class MyAPIv1(CHeapAllocated):
-    """"""
-    def __init__(self, ref_mut_option = None, tupled = None):
-        self._ctx = ffi.new("cffi_myapiv1[]", 1)
-        if ref_mut_option is not None:
-            self.ref_mut_option = ref_mut_option
-        if tupled is not None:
-            self.tupled = tupled
-
-    @staticmethod
-    def c_array(n: int) -> CArray[MyAPIv1]:
-        return CArray("cffi_myapiv1", n)
-
-    @property
-    def ref_mut_option(self):
-        """"""
-        return self._ctx[0].ref_mut_option
-
-    @ref_mut_option.setter
-    def ref_mut_option(self, value):
-        if hasattr(value, "_ctx"):
-            if hasattr(value, "_c_array"):
-                value = value.c_ptr()
-            else:
-                value = value.c_value()
-        self._ctx[0].ref_mut_option = value
-
-    @property
-    def tupled(self):
-        """"""
-        return self._ctx[0].tupled
-
-    @tupled.setter
-    def tupled(self, value):
-        if hasattr(value, "_ctx"):
-            if hasattr(value, "_c_array"):
-                value = value.c_ptr()
-            else:
-                value = value.c_value()
-        self._ctx[0].tupled = value
 
 
 class Phantomu8(CHeapAllocated):
@@ -1154,12 +1105,11 @@ class FFIError:
 
 class callbacks:
     """Helpers to define `@ffi.callback`-style callbacks."""
-    fn_Tupled_rval_Tupled = "cffi_tupled(cffi_tupled)"
-    fn_pmut_i64_rval_bool = "bool(int64_t*)"
     fn_u8_rval_u8 = "uint8_t(uint8_t)"
     fn_Sliceu8_rval_u8 = "uint8_t(cffi_sliceu8)"
     fn_SliceVec3f32_rval_Vec3f32 = "cffi_vec3f32(cffi_slicevec3f32)"
     fn_SliceMutu8 = "void(cffi_slicemutu8)"
+    fn_u8_rval_u8 = "uint8_t(uint8_t)"
     fn_u32_rval_u32 = "uint32_t(uint32_t)"
 
 
@@ -1628,6 +1578,21 @@ class api:
         return _api.pattern_ffi_slice_5(slice, slice2)
 
     @staticmethod
+    def pattern_ffi_slice_6(slice, callback):
+        """"""
+        if hasattr(slice, "_ctx"):
+            slice = slice.c_ptr()
+        _callback = callback
+
+        @ffi.callback(callbacks.fn_u8_rval_u8)
+        def _callback_callback(x):
+            return _callback(x)
+
+        callback = _callback_callback
+
+        return _api.pattern_ffi_slice_6(slice, callback)
+
+    @staticmethod
     def pattern_ffi_slice_delegate(callback) -> int:
         """"""
         _callback = callback
@@ -1678,14 +1643,6 @@ class api:
             ffi_bool = ffi_bool.c_value()
 
         return _api.pattern_ffi_bool(ffi_bool)
-
-    @staticmethod
-    def pattern_my_api_init_v1(api):
-        """"""
-        if hasattr(api, "_ctx"):
-            api = api.c_ptr()
-
-        return _api.pattern_my_api_init_v1(api)
 
     @staticmethod
     def pattern_api_guard():
@@ -1888,6 +1845,30 @@ class api:
         else:
             raise Exception(f"Function returned error {_rval}")
 
+    @staticmethod
+    def simple_service_method_mut_self_no_error(context, slice):
+        """"""
+        if hasattr(context, "_ctx"):
+            context = context.c_ptr()
+        _slice = ffi.new("cffi_slicemutu8[]", 1)
+        _slice[0].data = slice.c_ptr()
+        _slice[0].len = len(slice)
+        slice = _slice[0]
+
+        return _api.simple_service_method_mut_self_no_error(context, slice)
+
+    @staticmethod
+    def simple_service_method_void_ffi_error(context):
+        """"""
+        if hasattr(context, "_ctx"):
+            context = context.c_ptr()
+
+        _rval = _api.simple_service_method_void_ffi_error(context)
+        if _rval == FFIError.Ok:
+            return _rval
+        else:
+            raise Exception(f"Function returned error {_rval}")
+
 
 
 class SimpleService(CHeapAllocated):
@@ -1966,5 +1947,13 @@ class SimpleService(CHeapAllocated):
     def method_mut_self_ffi_error(self, slice):
         """"""
         return api.simple_service_method_mut_self_ffi_error(self.c_value(), slice)
+
+    def method_mut_self_no_error(self, slice):
+        """"""
+        return api.simple_service_method_mut_self_no_error(self.c_value(), slice)
+
+    def method_void_ffi_error(self, ):
+        """"""
+        return api.simple_service_method_void_ffi_error(self.c_value(), )
 
 

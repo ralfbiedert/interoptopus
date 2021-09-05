@@ -7,9 +7,8 @@ using System.Runtime.InteropServices;
 #if UNITY_2018_1_OR_NEWER
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Collections;
-#else
-using System.Runtime.CompilerServices;
 #endif
+using System.Runtime.CompilerServices;
 using My.Company;
 using My.Company.Common;
 
@@ -23,12 +22,6 @@ namespace My.Company.Common
         public double x;
         public double z;
     }
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate Tupled InteropDelegate_fn_Tupled_rval_Tupled(Tupled x0);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate bool InteropDelegate_fn_pmut_i64_rval_bool(out long x0);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);
@@ -84,10 +77,15 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
-                        #if UNITY_2018_1_OR_NEWER
+                        #if __INTEROPTOPUS_NEVER
+                        #elif UNITY_2018_1_OR_NEWER
                         UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(Bool)));
-                        #else
+                        #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        #else
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
                         #endif
                     }
                 }
@@ -160,10 +158,15 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
-                        #if UNITY_2018_1_OR_NEWER
+                        #if __INTEROPTOPUS_NEVER
+                        #elif UNITY_2018_1_OR_NEWER
                         UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(uint)));
-                        #else
+                        #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        #else
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
                         #endif
                     }
                 }
@@ -236,10 +239,15 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
-                        #if UNITY_2018_1_OR_NEWER
+                        #if __INTEROPTOPUS_NEVER
+                        #elif UNITY_2018_1_OR_NEWER
                         UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(byte)));
-                        #else
+                        #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        #else
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
                         #endif
                     }
                 }
@@ -286,7 +294,7 @@ namespace My.Company.Common
         {
             unsafe
             {
-                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafePtr(handle));
+                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
                 this.len = (ulong) handle.Length;
             }
         }
@@ -321,10 +329,15 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
-                        #if UNITY_2018_1_OR_NEWER
+                        #if __FALSE
+                        #elif UNITY_2018_1_OR_NEWER
                         UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(byte)));
-                        #else
+                        #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        #else
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
                         #endif
                     }
                 }
@@ -373,6 +386,9 @@ namespace My.Company.Common
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void CallbackSliceMut(SliceMutu8 x0);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate byte CallbackU8(byte x0);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate uint MyCallback(uint x0);

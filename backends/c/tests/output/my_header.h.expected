@@ -127,6 +127,7 @@ typedef struct my_library_weird1u32
 
 typedef uint8_t (*my_library_fptr_fn_u8_rval_u8)(uint8_t x0);
 
+
 typedef uint32_t (*my_library_fptr_fn_u32_rval_u32)(uint32_t x0);
 
 typedef struct my_library_array
@@ -150,10 +151,6 @@ typedef struct my_library_weird2u8
     uint8_t a[5];
     uint8_t* r;
     } my_library_weird2u8;
-
-typedef my_library_tupled (*my_library_fptr_fn_Tupled_rval_Tupled)(my_library_tupled x0);
-
-typedef bool (*my_library_fptr_fn_pmut_i64_rval_bool)(int64_t* x0);
 
 typedef struct my_library_slicebool
     {
@@ -184,12 +181,6 @@ typedef struct my_library_optioninner
     my_library_inner t;
     uint8_t is_some;
     } my_library_optioninner;
-
-typedef struct my_library_myapiv1
-    {
-    my_library_fptr_fn_pmut_i64_rval_bool ref_mut_option;
-    my_library_fptr_fn_Tupled_rval_Tupled tupled;
-    } my_library_myapiv1;
 
 typedef struct my_library_slicevec3f32
     {
@@ -225,17 +216,17 @@ int64_t* ref_mut_simple(int64_t* x);
 bool ref_option(int64_t* x);
 bool ref_mut_option(int64_t* x);
 my_library_tupled tupled(my_library_tupled x);
-my_library_ffierror complex_args_1(my_library_vec3f32 _a, my_library_empty* _b);
-my_library_opaque* complex_args_2(my_library_someforeigntype _cmplx);
+my_library_ffierror complex_args_1(my_library_vec3f32 a, my_library_empty* b);
+my_library_opaque* complex_args_2(my_library_someforeigntype cmplx);
 uint8_t callback(my_library_fptr_fn_u8_rval_u8 callback, uint8_t value);
-uint32_t generic_1a(my_library_genericu32 x, my_library_phantomu8 _y);
-uint8_t generic_1b(my_library_genericu8 x, my_library_phantomu8 _y);
-uint8_t generic_1c(my_library_genericu8* _x, my_library_genericu8* y);
+uint32_t generic_1a(my_library_genericu32 x, my_library_phantomu8 y);
+uint8_t generic_1b(my_library_genericu8 x, my_library_phantomu8 y);
+uint8_t generic_1c(my_library_genericu8* x, my_library_genericu8* y);
 uint8_t generic_2(my_library_generic2u8* x);
 uint8_t generic_3(my_library_generic3* x);
 uint8_t generic_4(my_library_generic4* x);
 uint8_t array_1(my_library_array x);
-my_library_enumdocumented documented(my_library_structdocumented _x);
+my_library_enumdocumented documented(my_library_structdocumented x);
 my_library_vec1 ambiguous_1(my_library_vec1 x);
 my_library_vec2 ambiguous_2(my_library_vec2 x);
 bool ambiguous_3(my_library_vec1 x, my_library_vec2 y);
@@ -243,36 +234,38 @@ my_library_vec namespaced_type(my_library_vec x);
 my_library_ffierror panics();
 my_library_enumrenamed renamed(my_library_structrenamed x);
 void sleep(uint64_t millis);
-bool weird_1(my_library_weird1u32 _x, my_library_weird2u8 _y);
-void visibility(my_library_visibility1 _x, my_library_visibility2 _y);
+bool weird_1(my_library_weird1u32 x, my_library_weird2u8 y);
+void visibility(my_library_visibility1 x, my_library_visibility2 y);
 uint32_t pattern_ascii_pointer_1(uint8_t* x);
 uint32_t pattern_ascii_pointer_len(uint8_t* x, my_library_useasciistringpattern y);
 uint32_t pattern_ffi_slice_1(my_library_sliceu32 ffi_slice);
 my_library_vec3f32 pattern_ffi_slice_2(my_library_slicevec3f32 ffi_slice, int32_t i);
 void pattern_ffi_slice_3(my_library_slicemutu8 slice, my_library_fptr_fn_SliceMutu8 callback);
-void pattern_ffi_slice_4(my_library_sliceu8 _slice, my_library_slicemutu8 _slice2);
+void pattern_ffi_slice_4(my_library_sliceu8 slice, my_library_slicemutu8 slice2);
 void pattern_ffi_slice_5(my_library_sliceu8* slice, my_library_slicemutu8* slice2);
+void pattern_ffi_slice_6(my_library_slicemutu8* slice, my_library_fptr_fn_u8_rval_u8 callback);
 uint8_t pattern_ffi_slice_delegate(my_library_fptr_fn_Sliceu8_rval_u8 callback);
 my_library_vec3f32 pattern_ffi_slice_delegate_huge(my_library_fptr_fn_SliceVec3f32_rval_Vec3f32 callback);
 my_library_optioninner pattern_ffi_option_1(my_library_optioninner ffi_slice);
 my_library_inner pattern_ffi_option_2(my_library_optioninner ffi_slice);
 uint8_t pattern_ffi_bool(uint8_t ffi_bool);
-void pattern_my_api_init_v1(my_library_myapiv1* api);
 uint64_t pattern_api_guard();
 uint32_t pattern_callback_1(my_library_fptr_fn_u32_rval_u32 callback, uint32_t x);
 my_library_ffierror simple_service_destroy(my_library_simpleservice** context);
 my_library_ffierror simple_service_new_with(my_library_simpleservice** context, uint32_t some_value);
 my_library_ffierror simple_service_new_without(my_library_simpleservice** context);
-my_library_ffierror simple_service_new_failing(my_library_simpleservice** context, uint8_t _some_value);
-my_library_ffierror simple_service_method_result(my_library_simpleservice* context, uint32_t _anon1);
+my_library_ffierror simple_service_new_failing(my_library_simpleservice** context, uint8_t some_value);
+my_library_ffierror simple_service_method_result(my_library_simpleservice* context, uint32_t anon1);
 uint32_t simple_service_method_value(my_library_simpleservice* context, uint32_t x);
 void simple_service_method_void(my_library_simpleservice* context);
 uint8_t simple_service_method_mut_self(my_library_simpleservice* context, my_library_sliceu8 slice);
-void simple_service_method_mut_self_void(my_library_simpleservice* context, my_library_slicebool _slice);
-uint8_t simple_service_method_mut_self_ref(my_library_simpleservice* context, uint8_t* x, uint8_t* _y);
-uint8_t simple_service_method_mut_self_ref_slice(my_library_simpleservice* context, uint8_t* x, uint8_t* _y, my_library_sliceu8 _slice);
-uint8_t simple_service_method_mut_self_ref_slice_limited(my_library_simpleservice* context, uint8_t* x, uint8_t* _y, my_library_sliceu8 _slice, my_library_sliceu8 _slice2);
-my_library_ffierror simple_service_method_mut_self_ffi_error(my_library_simpleservice* context, my_library_slicemutu8 _slice);
+void simple_service_method_mut_self_void(my_library_simpleservice* context, my_library_slicebool slice);
+uint8_t simple_service_method_mut_self_ref(my_library_simpleservice* context, uint8_t* x, uint8_t* y);
+uint8_t simple_service_method_mut_self_ref_slice(my_library_simpleservice* context, uint8_t* x, uint8_t* y, my_library_sliceu8 slice);
+uint8_t simple_service_method_mut_self_ref_slice_limited(my_library_simpleservice* context, uint8_t* x, uint8_t* y, my_library_sliceu8 slice, my_library_sliceu8 slice2);
+my_library_ffierror simple_service_method_mut_self_ffi_error(my_library_simpleservice* context, my_library_slicemutu8 slice);
+void simple_service_method_mut_self_no_error(my_library_simpleservice* context, my_library_slicemutu8 slice);
+my_library_ffierror simple_service_method_void_ffi_error(my_library_simpleservice* context);
 
 #ifdef __cplusplus
 }

@@ -20,7 +20,6 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "do_math")]
         public static extern uint do_math(uint x);
 
-
     }
 
 

@@ -1,6 +1,6 @@
 use crate::overloads::{write_function_overloaded_invoke_with_error_handling, Helper};
 use crate::{OverloadWriter, Unsafe};
-use interoptopus::lang::c::{CType, Function, FunctionSignature, Parameter, PrimitiveType};
+use interoptopus::lang::c::{CType, Function, FunctionSignature, Parameter};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::IndentWriter;
@@ -234,7 +234,7 @@ impl OverloadWriter for Unity {
         Ok(())
     }
 
-    fn write_service_method_overload(&self, w: &mut IndentWriter, h: Helper, class: &Service, function: &Function) -> Result<(), Error> {
+    fn write_service_method_overload(&self, _w: &mut IndentWriter, _h: Helper, _class: &Service, _function: &Function, _fn_pretty: &str) -> Result<(), Error> {
         Ok(())
     }
 
@@ -256,7 +256,7 @@ impl OverloadWriter for Unity {
         Ok(())
     }
 
-    fn write_pattern_slice_unsafe_copied_fragment(&self, w: &mut IndentWriter, h: Helper, type_string: &str) -> Result<(), Error> {
+    fn write_pattern_slice_unsafe_copied_fragment(&self, w: &mut IndentWriter, _h: Helper, type_string: &str) -> Result<(), Error> {
         indented!(w, [_ _ _ _ _], r#"#elif UNITY_2018_1_OR_NEWER"#)?;
         indented!(w, [_ _ _ _ _], r#"UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof({})));"#, type_string)?;
         Ok(())

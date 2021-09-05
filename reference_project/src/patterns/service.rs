@@ -70,9 +70,15 @@ impl SimpleService {
         *x
     }
 
+    pub fn method_mut_self_ffi_error(&mut self, _slice: FFISliceMut<u8>) -> Result<(), Error> {
+        Ok(())
+    }
+
     #[ffi_service_method(direct)]
-    pub fn method_mut_self_ffi_error(&mut self, _slice: FFISliceMut<u8>) -> FFIError {
-        FFIError::Ok
+    pub fn method_mut_self_no_error(&mut self, _slice: FFISliceMut<u8>) {}
+
+    pub fn method_void_ffi_error(&mut self) -> Result<(), Error> {
+        Ok(())
     }
 }
 

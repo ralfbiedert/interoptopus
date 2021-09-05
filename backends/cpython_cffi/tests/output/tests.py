@@ -162,14 +162,6 @@ class TestPatterns(unittest.TestCase):
             s = b"x" * random.randint(0, 100)
             self.assertEqual(len(s), api.pattern_ascii_pointer_1(s))
 
-    def test_api_entry(self):
-        my_api = r.MyAPIv1()
-        api.pattern_my_api_init_v1(my_api.c_ptr())
-
-        t = r.Tupled(x0=10)
-
-        t2 = my_api.tupled(t.c_value())
-        self.assertEqual(20, t2.x0)
 
     def test_slices(self):
         # uint32 = r.CArray("uint32_t", 10_000)

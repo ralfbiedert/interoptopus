@@ -10,7 +10,7 @@ want to generate **C# bindings**, follow the instructions below.
 Add [**Interoptopus**](https://crates.io/crates/interoptopus) attributes to the library you have
 written, and define an [**inventory**](https://docs.rs/interoptopus/latest/interoptopus/macro.inventory.html)
 function listing all symbols you wish to export. An overview of all supported constructs can be found in the
-[**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/interoptopus_reference_project/src).
+[**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/reference_project/src).
 
 ```rust
 use interoptopus::{ffi_function, ffi_type};
@@ -53,16 +53,18 @@ use interoptopus::{Error, Interop};
 
 #[test]
 fn bindings_csharp() -> Result<(), Error> {
-    use interoptopus_backend_csharp::{Config, Generator};
+    use interoptopus_backend_csharp::{Config, Generator, Unity, DotNet};
 
-    Generator::new(
-        Config {
-            dll_name: "example_library".to_string(),
-            namespace_mappings: NamespaceMappings::new("My.Company"),
-            ..Config::default()
-        },
-        example_library_ffi::my_inventory(),
-    ).write_file("bindings/csharp/Interop.cs")?;
+    let config = Config {
+        dll_name: "example_library".to_string(),
+        namespace_mappings: NamespaceMappings::new("My.Company"),
+        ..Config::default()
+    };
+
+    Generator::new(config, example_library_ffi::my_inventory())
+        .add_overload_writer(Unity::new())
+        .add_overload_writer(CommonCSharp::new())
+        .write_file("bindings/csharp/Interop.cs")?;
 
     Ok(())
 }

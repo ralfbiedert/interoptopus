@@ -19,12 +19,6 @@ namespace My.Company.Common
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate Tupled InteropDelegate_fn_Tupled_rval_Tupled(Tupled x0);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate bool InteropDelegate_fn_pmut_i64_rval_bool(out long x0);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);
 
     [Serializable]
@@ -285,6 +279,9 @@ namespace My.Company.Common
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void CallbackSliceMut(SliceMutu8 x0);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate byte CallbackU8(byte x0);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate uint MyCallback(uint x0);

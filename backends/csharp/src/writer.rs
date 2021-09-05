@@ -818,7 +818,7 @@ pub trait CSharpWriter {
             self.write_pattern_service_method(w, class, function, &rval, &fn_name, false)?;
 
             for overload in self.overloads() {
-                overload.write_service_method_overload(w, self.helper(), class, function)?;
+                overload.write_service_method_overload(w, self.helper(), class, function, &fn_name)?;
             }
 
             w.newline()?;

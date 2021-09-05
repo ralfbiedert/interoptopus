@@ -1,6 +1,6 @@
 use crate::overloads::{write_function_overloaded_invoke_with_error_handling, Helper};
 use crate::{OverloadWriter, Unsafe};
-use interoptopus::lang::c::{CType, Function, FunctionSignature, Parameter};
+use interoptopus::lang::c::{CType, Function, FunctionSignature, Parameter, PrimitiveType};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::IndentWriter;
@@ -228,15 +228,83 @@ impl OverloadWriter for DotNet {
         indented!(w, r#"}}"#)
     }
 
-    fn write_service_method_overload(&self, w: &mut IndentWriter, h: Helper, class: &Service, function: &Function) -> Result<(), Error> {
+    fn write_service_method_overload(&self, w: &mut IndentWriter, h: Helper, _class: &Service, function: &Function, fn_pretty: &str) -> Result<(), Error> {
+        if !self.has_overloadable(function.signature()) {
+            return Ok(());
+        }
+
+        let mut names = Vec::new();
+        let mut to_invoke = Vec::new();
+        let mut types = Vec::new();
+
+        // Write checked method. These are "normal" methods that accept
+        // common C# types.
+        let rval = match function.signature().rval() {
+            CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
+            _ => h.converter.to_typespecifier_in_rval(function.signature().rval()),
+        };
+
+        // For every parameter except the first, figure out how we should forward
+        // it to the invocation we perform.
+        for p in function.signature().params().iter().skip(1) {
+            let name = p.name();
+
+            // If we call the checked function we want to resolve a `SliceU8` to a `byte[]`,
+            // but if we call the unchecked version we want to keep that `Sliceu8` in our signature.
+            // let native = self.to_typespecifier_in_param(p.the_type());
+            let native = self.pattern_to_native_in_signature(&h, p, function.signature());
+
+            // Forward `ref` and `out` accordingly.
+            if native.contains("out ") {
+                to_invoke.push(format!("out {}", name.to_string()));
+            } else if native.contains("ref ") {
+                to_invoke.push(format!("ref {}", name.to_string()));
+            } else {
+                to_invoke.push(name.to_string());
+            }
+
+            names.push(name);
+            types.push(native);
+        }
+
+        let method_to_invoke = function.name().to_string();
+        let extra_args = if to_invoke.is_empty() {
+            "".to_string()
+        } else {
+            format!(", {}", to_invoke.join(", "))
+        };
+
+        // Assemble actual function call.
+        let context = "_context";
+        let arg_tokens = names.iter().zip(types.iter()).map(|(n, t)| format!("{} {}", t, n)).collect::<Vec<_>>();
+        let fn_call = format!(r#"{}.{}({}{})"#, h.config.class, method_to_invoke, context, extra_args);
+
+        // Write signature.
+        indented!(w, r#"public {} {}({})"#, rval, fn_pretty, arg_tokens.join(", "))?;
+        indented!(w, r#"{{"#)?;
+
+        match function.signature().rval() {
+            CType::Pattern(TypePattern::FFIErrorEnum(_)) => {
+                indented!(w, [_], r#"{};"#, fn_call)?;
+            }
+            CType::Primitive(PrimitiveType::Void) => {
+                indented!(w, [_], r#"{};"#, fn_call)?;
+            }
+            _ => {
+                indented!(w, [_], r#"return {};"#, fn_call)?;
+            }
+        }
+
+        indented!(w, r#"}}"#)?;
+
         Ok(())
     }
 
-    fn write_pattern_slice_overload(&self, w: &mut IndentWriter, h: Helper, context_type_name: &str, type_string: &str) -> Result<(), Error> {
+    fn write_pattern_slice_overload(&self, _w: &mut IndentWriter, _h: Helper, _context_type_name: &str, _type_string: &str) -> Result<(), Error> {
         Ok(())
     }
 
-    fn write_pattern_slice_unsafe_copied_fragment(&self, w: &mut IndentWriter, h: Helper, type_string: &str) -> Result<(), Error> {
+    fn write_pattern_slice_unsafe_copied_fragment(&self, w: &mut IndentWriter, _h: Helper, _type_string: &str) -> Result<(), Error> {
         indented!(w, [_ _ _ _ _], r#"#elif NETCOREAPP"#)?;
         indented!(w, [_ _ _ _ _], r#"Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);"#)?;
         Ok(())

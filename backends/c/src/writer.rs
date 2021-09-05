@@ -97,14 +97,16 @@ pub trait CWriter {
     }
 
     fn write_type_definitions(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        let mut known_function_pointers = vec![];
+
         for the_type in &sort_types_by_dependencies(self.library().ctypes().to_vec()) {
-            self.write_type_definition(w, the_type)?;
+            self.write_type_definition(w, the_type, &mut known_function_pointers)?;
         }
 
         Ok(())
     }
 
-    fn write_type_definition(&self, w: &mut IndentWriter, the_type: &CType) -> Result<(), Error> {
+    fn write_type_definition(&self, w: &mut IndentWriter, the_type: &CType, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
         match the_type {
             CType::Primitive(_) => {}
             CType::Array(_) => {}
@@ -121,7 +123,7 @@ pub trait CWriter {
                 w.newline()?;
             }
             CType::FnPointer(f) => {
-                self.write_type_definition_fn_pointer(w, f)?;
+                self.write_type_definition_fn_pointer(w, f, known_function_pointers)?;
                 w.newline()?;
             }
             CType::ReadPointer(_) => {}
@@ -129,7 +131,7 @@ pub trait CWriter {
             CType::Pattern(p) => match p {
                 TypePattern::AsciiPointer => {}
                 TypePattern::NamedCallback(e) => {
-                    self.write_type_definition_fn_pointer(w, e.fnpointer())?;
+                    self.write_type_definition_fn_pointer(w, e.fnpointer(), known_function_pointers)?;
                     w.newline()?;
                 }
                 TypePattern::FFIErrorEnum(e) => {
@@ -155,11 +157,11 @@ pub trait CWriter {
         Ok(())
     }
 
-    fn write_type_definition_fn_pointer(&self, w: &mut IndentWriter, the_type: &FnPointerType) -> Result<(), Error> {
-        self.write_type_definition_fn_pointer_body(w, the_type)
+    fn write_type_definition_fn_pointer(&self, w: &mut IndentWriter, the_type: &FnPointerType, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
+        self.write_type_definition_fn_pointer_body(w, the_type, known_function_pointers)
     }
 
-    fn write_type_definition_fn_pointer_body(&self, w: &mut IndentWriter, the_type: &FnPointerType) -> Result<(), Error> {
+    fn write_type_definition_fn_pointer_body(&self, w: &mut IndentWriter, the_type: &FnPointerType, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
         let rval = self.converter().to_type_specifier(the_type.signature().rval());
         let name = self.converter().fnpointer_to_typename(the_type);
 
@@ -168,7 +170,14 @@ pub trait CWriter {
             params.push(format!("{} x{}", self.converter().to_type_specifier(param.the_type()), i));
         }
 
-        indented!(w, "typedef {} (*{})({});", rval, name, params.join(", "))
+        let fn_pointer = format!("typedef {} (*{})({});", rval, name, params.join(", "));
+
+        if !known_function_pointers.contains(&fn_pointer) {
+            indented!(w, "{}", fn_pointer)?;
+            known_function_pointers.push(fn_pointer);
+        }
+
+        Ok(())
     }
 
     fn write_type_definition_enum(&self, w: &mut IndentWriter, the_type: &EnumType) -> Result<(), Error> {

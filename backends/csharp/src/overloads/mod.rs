@@ -21,7 +21,7 @@ pub trait OverloadWriter {
 
     fn write_function_overload(&self, w: &mut IndentWriter, h: Helper, function: &Function) -> Result<(), Error>;
 
-    fn write_service_method_overload(&self, w: &mut IndentWriter, h: Helper, class: &Service, function: &Function) -> Result<(), Error>;
+    fn write_service_method_overload(&self, w: &mut IndentWriter, h: Helper, class: &Service, function: &Function, fn_pretty: &str) -> Result<(), Error>;
 
     fn write_pattern_slice_overload(&self, w: &mut IndentWriter, h: Helper, context_type_name: &str, type_string: &str) -> Result<(), Error>;
 

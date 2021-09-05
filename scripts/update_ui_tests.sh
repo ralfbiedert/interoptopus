@@ -10,3 +10,5 @@ cp "$PROJECT_ROOT"/backends/csharp/tests/output_safe/Interop.cs "$PROJECT_ROOT"/
 cp "$PROJECT_ROOT"/backends/csharp/tests/output_safe/Interop.common.cs "$PROJECT_ROOT"/backends/csharp/tests/output_safe/Interop.common.cs.expected
 cp "$PROJECT_ROOT"/backends/csharp/tests/output_unsafe/Interop.cs "$PROJECT_ROOT"/backends/csharp/tests/output_unsafe/Interop.cs.expected
 cp "$PROJECT_ROOT"/backends/csharp/tests/output_unsafe/Interop.common.cs "$PROJECT_ROOT"/backends/csharp/tests/output_unsafe/Interop.common.cs.expected
+cp "$PROJECT_ROOT"/backends/csharp/tests/output_unity/Assets/Interop.cs "$PROJECT_ROOT"/backends/csharp/tests/output_unity/Assets/Interop.cs.expected
+cp "$PROJECT_ROOT"/backends/csharp/tests/output_unity/Assets/Interop.common.cs "$PROJECT_ROOT"/backends/csharp/tests/output_unity/Assets/Interop.common.cs.expected

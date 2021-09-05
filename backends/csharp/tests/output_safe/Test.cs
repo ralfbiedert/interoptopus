@@ -66,18 +66,6 @@ namespace interop_test
         }
 
         [Fact]
-        public void pattern_api_entry()
-        {
-            // TODO: Why does this not work?
-            Interop.pattern_my_api_init_v1(out var api);
-            
-            var input = new Tupled {x0 = 10};
-            var output = api.tupled(input);
-            
-            Assert.Equal(2 * input.x0, output.x0);
-        }
-
-        [Fact]
         public void pattern_service_generated()
         {
             var x = new SimpleService((uint) 123);

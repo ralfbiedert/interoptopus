@@ -58,8 +58,8 @@ fn bindings_match_reference() -> Result<(), Error> {
     assert_file_matches_generated("tests/output_unsafe/Interop.cs");
     assert_file_matches_generated("tests/output_unsafe/Interop.common.cs");
 
-    assert_file_matches_generated("tests/output_unsafe_unity/Assets/Interop.cs");
-    assert_file_matches_generated("tests/output_unsafe_unity/Assets/Interop.common.cs");
+    assert_file_matches_generated("tests/output_unity/Assets/Interop.cs");
+    assert_file_matches_generated("tests/output_unity/Assets/Interop.common.cs");
 
     Ok(())
 }

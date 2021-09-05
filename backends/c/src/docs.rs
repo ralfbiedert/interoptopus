@@ -24,14 +24,16 @@ impl<W: CWriter> DocGenerator<W> {
     pub fn write_types(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r#"# Types "#)?;
 
+        let mut known_function_pointers = vec![];
+
         for the_type in &sort_types_by_dependencies(self.library().ctypes().to_vec()) {
-            self.write_type_definition(w, the_type)?;
+            self.write_type_definition(w, the_type, &mut known_function_pointers)?;
         }
 
         Ok(())
     }
 
-    pub fn write_type_definition(&self, w: &mut IndentWriter, the_type: &CType) -> Result<(), Error> {
+    pub fn write_type_definition(&self, w: &mut IndentWriter, the_type: &CType, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
         let meta = match the_type {
             CType::Primitive(_) => return Ok(()),
             CType::Array(_) => return Ok(()),
@@ -56,7 +58,7 @@ impl<W: CWriter> DocGenerator<W> {
         }
 
         indented!(w, r#"```"#)?;
-        self.c_writer.write_type_definition(w, the_type)?;
+        self.c_writer.write_type_definition(w, the_type, known_function_pointers)?;
         indented!(w, r#"```"#)?;
 
         Ok(())

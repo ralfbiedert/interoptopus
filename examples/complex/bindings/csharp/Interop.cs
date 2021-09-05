@@ -24,16 +24,13 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_api_version")]
         public static extern uint example_api_version();
 
-
         /// A function that always fails.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_always_fails")]
         public static extern FFIError example_always_fails();
 
-
         /// Creates a new instance of this library.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_create_context")]
         public static extern FFIError example_create_context(ref IntPtr context_ptr);
-
 
         /// Deletes an existing instance of this library.
         ///
@@ -42,30 +39,24 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_destroy_context")]
         public static extern FFIError example_destroy_context(ref IntPtr context_ptr);
 
-
         /// Prints the current player score.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_print_score")]
         public static extern FFIError example_print_score(IntPtr context);
-
 
         /// Updates the score.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_return_score")]
         public static extern FFIError example_return_score(IntPtr context, out uint score);
 
-
         /// Updates the score.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_update_score_by_callback")]
         public static extern FFIError example_update_score_by_callback(IntPtr context, InteropDelegate_fn_u32_rval_u32 update);
-
 
         /// Accepts some foreign types.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_write_foreign_type")]
         public static extern FFIError example_write_foreign_type(IntPtr context, ref ThirdPartyVecF32 foreign);
 
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_double_super_complex_entity")]
         public static extern FFIError example_double_super_complex_entity(IntPtr context, ref SuperComplexEntity incoming, out SuperComplexEntity outgoing);
-
 
     }
 
