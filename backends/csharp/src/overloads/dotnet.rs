@@ -1,24 +1,25 @@
-use crate::overloads::Helper;
+use crate::overloads::{write_function_overloaded_invoke_with_error_handling, Helper};
 use crate::{OverloadWriter, Unsafe};
-use interoptopus::lang::c::{CType, Function, FunctionSignature, Parameter, PrimitiveType};
+use interoptopus::lang::c::{CType, Function, FunctionSignature, Parameter};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::IndentWriter;
 use interoptopus::{indented, Error};
+use std::ops::Deref;
 
-pub struct CommonCSharp {}
+pub struct DotNet {}
 
-impl CommonCSharp {
+impl DotNet {
     pub fn new() -> Box<Self> {
         Box::new(Self {})
     }
 
     fn has_overloadable(&self, signature: &FunctionSignature) -> bool {
         signature.params().iter().any(|x| match x.the_type() {
-            // CType::ReadPointer(x) | CType::ReadWritePointer(x) => match x.deref() {
-            //     CType::Pattern(x) => matches!(x, TypePattern::Slice(_) | TypePattern::SliceMut(_)),
-            //     _ => false,
-            // },
+            CType::ReadPointer(x) | CType::ReadWritePointer(x) => match x.deref() {
+                CType::Pattern(x) => matches!(x, TypePattern::Slice(_) | TypePattern::SliceMut(_)),
+                _ => false,
+            },
             CType::Pattern(x) => matches!(x, TypePattern::Slice(_) | TypePattern::SliceMut(_)),
             _ => false,
         })
@@ -27,9 +28,6 @@ impl CommonCSharp {
     fn pattern_to_native_in_signature(&self, h: &Helper, param: &Parameter, _signature: &FunctionSignature) -> String {
         match param.the_type() {
             CType::Pattern(p) => match p {
-                TypePattern::AsciiPointer => "string".to_string(),
-                TypePattern::NamedCallback(x) => x.name().to_string(),
-                TypePattern::FFIErrorEnum(e) => h.converter.enum_to_typename(e.the_enum()),
                 TypePattern::Slice(p) => {
                     let element_type = p
                         .fields()
@@ -51,40 +49,43 @@ impl CommonCSharp {
                         .expect("Must be pointer");
                     format!("{}[]", h.converter.to_typespecifier_in_param(element_type))
                 }
-
-                TypePattern::Option(e) => h.converter.composite_to_typename(e),
-                TypePattern::Bool => "Bool".to_string(),
-                TypePattern::APIVersion => h.converter.to_typespecifier_in_param(&p.fallback_type()),
+                _ => h.converter.to_typespecifier_in_param(param.the_type()),
             },
+            CType::ReadPointer(x) | CType::ReadWritePointer(x) => match x.deref() {
+                CType::Pattern(x) => match x {
+                    TypePattern::Slice(p) => {
+                        let element_type = p
+                            .fields()
+                            .get(0)
+                            .expect("First parameter must exist")
+                            .the_type()
+                            .deref_pointer()
+                            .expect("Must be pointer");
+
+                        format!("{}[]", h.converter.to_typespecifier_in_param(element_type))
+                    }
+                    TypePattern::SliceMut(p) => {
+                        let element_type = p
+                            .fields()
+                            .get(0)
+                            .expect("First parameter must exist")
+                            .the_type()
+                            .deref_pointer()
+                            .expect("Must be pointer");
+
+                        format!("{}[]", h.converter.to_typespecifier_in_param(element_type))
+                    }
+                    _ => h.converter.to_typespecifier_in_param(param.the_type()),
+                },
+                _ => h.converter.to_typespecifier_in_param(param.the_type()),
+            },
+
             x => h.converter.to_typespecifier_in_param(x),
         }
     }
-
-
-    #[rustfmt::skip]
-    fn write_function_overloaded_invoke_with_error_handling(&self, w: &mut IndentWriter, function: &Function, fn_call: &str) -> Result<(), Error> {
-
-        match function.signature().rval() {
-            CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
-                indented!(w, [_], r#"var rval = {};"#, fn_call)?;
-                indented!(w, [_], r#"if (rval != {}.{})"#, e.the_enum().rust_name(), e.success_variant().name())?;
-                indented!(w, [_], r#"{{"#)?;
-                indented!(w, [_ _], r#"throw new Exception($"Something went wrong: {{rval}}");"#)?;
-                indented!(w, [_], r#"}}"#)?;
-            }
-            CType::Primitive(PrimitiveType::Void) => {
-                indented!(w, [_], r#"{};"#, fn_call)?;
-            }
-            _ => {
-                indented!(w, [_], r#"return {};"#, fn_call)?;
-            }
-        }
-
-        Ok(())
-    }
 }
 
-impl OverloadWriter for CommonCSharp {
+impl OverloadWriter for DotNet {
     fn write_imports(&self, w: &mut IndentWriter, h: Helper) -> Result<(), Error> {
         if h.config.use_unsafe == Unsafe::UnsafePlatformMemCpy {
             indented!(w, r#"using System.Runtime.CompilerServices;"#)?;
@@ -105,7 +106,11 @@ impl OverloadWriter for CommonCSharp {
         let mut to_pin_slice_type = Vec::new();
         let mut to_invoke = Vec::new();
         let raw_name = h.converter.function_name_to_csharp_name(function);
-        let this_name = if has_error_enum { format!("{}_checked", raw_name) } else { raw_name.clone() };
+        let this_name = if has_error_enum && !has_overload {
+            format!("{}_checked", raw_name)
+        } else {
+            raw_name.clone()
+        };
 
         let rval = match function.signature().rval() {
             CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
@@ -118,21 +123,39 @@ impl OverloadWriter for CommonCSharp {
             let native = self.pattern_to_native_in_signature(&h, p, function.signature());
             let the_type = h.converter.function_parameter_to_csharp_typename(p, function);
 
+            let mut fallback = || {
+                if native.contains("out ") {
+                    to_invoke.push(format!("out {}", name.to_string()));
+                } else if native.contains("ref ") {
+                    to_invoke.push(format!("ref {}", name.to_string()));
+                } else {
+                    to_invoke.push(name.to_string());
+                }
+            };
+
             match p.the_type() {
                 CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_)) => {
                     to_pin_name.push(name);
                     to_pin_slice_type.push(the_type);
                     to_invoke.push(format!("{}_slice", name));
                 }
-                _ => {
-                    if native.contains("out ") {
-                        to_invoke.push(format!("out {}", name.to_string()));
-                    } else if native.contains("ref ") {
-                        to_invoke.push(format!("ref {}", name.to_string()));
-                    } else {
-                        to_invoke.push(name.to_string());
-                    }
-                }
+                CType::ReadPointer(x) | CType::ReadWritePointer(x) => match x.deref() {
+                    CType::Pattern(x) => match x {
+                        TypePattern::Slice(_) => {
+                            to_pin_name.push(name);
+                            to_pin_slice_type.push(the_type.replace("ref ", ""));
+                            to_invoke.push(format!("ref {}_slice", name));
+                        }
+                        TypePattern::SliceMut(_) => {
+                            to_pin_name.push(name);
+                            to_pin_slice_type.push(the_type.replace("ref ", ""));
+                            to_invoke.push(format!("ref {}_slice", name));
+                        }
+                        _ => fallback(),
+                    },
+                    _ => fallback(),
+                },
+                _ => fallback(),
             }
 
             params.push(format!("{} {}", native, name));
@@ -155,7 +178,7 @@ impl OverloadWriter for CommonCSharp {
             }
 
             let call = format!(r#"{}({});"#, raw_name, to_invoke.join(", "));
-            self.write_function_overloaded_invoke_with_error_handling(w, function, &call)?;
+            write_function_overloaded_invoke_with_error_handling(w, function, &call)?;
 
             if !to_pin_name.is_empty() {
                 for _ in to_pin_name.iter() {
@@ -188,7 +211,7 @@ impl OverloadWriter for CommonCSharp {
             }
 
             let call = format!(r#"{}({});"#, raw_name, to_invoke.join(", "));
-            self.write_function_overloaded_invoke_with_error_handling(w, function, &call)?;
+            write_function_overloaded_invoke_with_error_handling(w, function, &call)?;
 
             if !to_pin_name.is_empty() {
                 w.unindent();

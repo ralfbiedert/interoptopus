@@ -16,9 +16,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 13858447161442889851ul)
+            if (api_version != 7790762385767854763ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (13858447161442889851). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (7790762385767854763). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -337,6 +337,38 @@ namespace My.Company
         public static extern void pattern_ffi_slice_5(ref Sliceu8 slice, ref SliceMutu8 slice2);
 
 
+        public static void pattern_ffi_slice_5(byte[] slice, byte[] slice2) {
+            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
+            var slice_slice = new Sliceu8(slice_pinned, (ulong) slice.Length);
+            var slice2_pinned = GCHandle.Alloc(slice2, GCHandleType.Pinned);
+            var slice2_slice = new SliceMutu8(slice2_pinned, (ulong) slice2.Length);
+            try
+            {
+                pattern_ffi_slice_5(ref slice_slice, ref slice2_slice);;
+            }
+            finally
+            {
+                slice_pinned.Free();
+                slice2_pinned.Free();
+            }
+        }
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_6")]
+        public static extern void pattern_ffi_slice_6(ref SliceMutu8 slice, CallbackU8 callback);
+
+
+        public static void pattern_ffi_slice_6(byte[] slice, CallbackU8 callback) {
+            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
+            var slice_slice = new SliceMutu8(slice_pinned, (ulong) slice.Length);
+            try
+            {
+                pattern_ffi_slice_6(ref slice_slice, callback);;
+            }
+            finally
+            {
+                slice_pinned.Free();
+            }
+        }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_delegate")]
         public static extern byte pattern_ffi_slice_delegate(CallbackFFISlice callback);
@@ -360,11 +392,6 @@ namespace My.Company
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_bool")]
         public static extern Bool pattern_ffi_bool(Bool ffi_bool);
-
-
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_my_api_init_v1")]
-        public static extern void pattern_my_api_init_v1(out MyAPIv1 api);
 
 
 
@@ -541,7 +568,7 @@ namespace My.Company
         public static extern FFIError simple_service_method_mut_self_ffi_error(IntPtr context, SliceMutu8 slice);
 
 
-        public static void simple_service_method_mut_self_ffi_error_checked(IntPtr context, byte[] slice) {
+        public static void simple_service_method_mut_self_ffi_error(IntPtr context, byte[] slice) {
             var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
             var slice_slice = new SliceMutu8(slice_pinned, (ulong) slice.Length);
             try
@@ -630,14 +657,6 @@ namespace My.Company
     public partial struct Inner
     {
         float x;
-    }
-
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct MyAPIv1
-    {
-        public InteropDelegate_fn_pmut_i64_rval_bool ref_mut_option;
-        public InteropDelegate_fn_Tupled_rval_Tupled tupled;
     }
 
     [Serializable]
@@ -746,12 +765,6 @@ namespace My.Company
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate Tupled InteropDelegate_fn_Tupled_rval_Tupled(Tupled x0);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate bool InteropDelegate_fn_pmut_i64_rval_bool(out long x0);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);
 
     public enum FFIError
@@ -855,6 +868,9 @@ namespace My.Company
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void CallbackSliceMut(SliceMutu8 x0);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate byte CallbackU8(byte x0);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate uint MyCallback(uint x0);

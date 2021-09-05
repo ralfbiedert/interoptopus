@@ -47,13 +47,13 @@
 //! Create a unit test in `tests/bindings.rs` which will generate your bindings when run
 //! with `cargo test`. In real projects you might want to add this code to another crate instead:
 //!
-//! ```
+//!```
 //! use interoptopus::util::NamespaceMappings;
 //! use interoptopus::{Error, Interop};
 //!
 //! #[test]
 //! fn bindings_csharp() -> Result<(), Error> {
-//!     use interoptopus_backend_csharp::{Config, Generator, Unity, CommonCSharp};
+//!     use interoptopus_backend_csharp::{Config, Generator, Unity, DotNet};
 //!
 //!     let config = Config {
 //!         dll_name: "example_library".to_string(),
@@ -122,7 +122,7 @@ mod writer;
 
 pub use config::{Config, Unsafe, WriteTypes};
 pub use converter::{CSharpTypeConverter, Converter};
-pub use overloads::{CommonCSharp, Unity};
+pub use overloads::{DotNet, Unity};
 pub use testing::run_dotnet_command_if_installed;
 pub use writer::CSharpWriter;
 

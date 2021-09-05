@@ -6,6 +6,7 @@ static HUGE_VEC_SLICE: [Vec3f32; 100_000] = [Vec3f32 { x: 0.0, y: 0.0, z: 0.0 };
 
 callback!(CallbackHugeVecSlice(slice: FFISlice<Vec3f32>) -> Vec3f32);
 callback!(CallbackSliceMut(slice: FFISliceMut<'_, u8>) -> ());
+callback!(CallbackU8(x: u8) -> u8);
 
 #[ffi_function]
 #[no_mangle]
@@ -54,6 +55,12 @@ pub extern "C" fn pattern_ffi_slice_4(_slice: FFISlice<u8>, _slice2: FFISliceMut
 pub extern "C" fn pattern_ffi_slice_5(slice: &FFISlice<u8>, slice2: &mut FFISliceMut<u8>) {
     let _ = slice.as_slice().len();
     let _ = slice2.as_slice().len();
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn pattern_ffi_slice_6(slice: &FFISliceMut<u8>, callback: CallbackU8) {
+    callback.call(slice.as_slice().get(0).copied().unwrap_or(0));
 }
 
 // Some extra tests that were hard to do from core crate.
