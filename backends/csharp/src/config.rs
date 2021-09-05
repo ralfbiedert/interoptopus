@@ -11,6 +11,7 @@ pub enum WriteTypes {
     All,
 }
 
+/// Whether and how `unsafe` in generated C# should be emitted.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum Unsafe {
     /// Do not use C# `unsafe`.

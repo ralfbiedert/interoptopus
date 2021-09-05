@@ -90,6 +90,7 @@
 //!
 //! ## Changelog
 //!
+//! - **v0.10** - C# flavors `DotNet` and `Unity` (incl. Burst).
 //! - **v0.9** - 150x faster C# slices, Python type hints.
 //! - **v0.8** - Moved testing functions to respective backends.
 //! - **v0.7** - Make patterns proc macros for better FFI docs.
@@ -100,6 +101,7 @@
 //! - **v0.2** - Introduced "patterns"; _working_ interop for C#.
 //! - **v0.1** - First version.
 //!
+//! Also see our [upgrade instructions](https://github.com/ralfbiedert/interoptopus/blob/master/UPGRADE_INSTRUCTIONS.md).
 //!
 //! ## FAQ
 //!

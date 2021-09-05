@@ -7,9 +7,18 @@ use interoptopus::writer::IndentWriter;
 use interoptopus::{indented, Error};
 use std::ops::Deref;
 
+/// Provides Unity overloads, make sure to use [`Unsafe::UnsafeKeyword`](crate::Unsafe::UnsafeKeyword) or higher.
+///
+/// This provider adds convenience methods when working with `unsafe` and Burst Unity. It adds:
+///
+/// - signatures with `NativeArray<>`,
+/// - fast memcpy for slices,
+/// - handling of the `ref Slice` pattern for Burst,
+/// - IntPtr overloads for callbacks, making them Burst compatible.
 pub struct Unity {}
 
 impl Unity {
+    /// Creates a new Unity overload generator.
     pub fn new() -> Box<Self> {
         Box::new(Self {})
     }
@@ -127,6 +136,10 @@ impl Unity {
 
 impl OverloadWriter for Unity {
     fn write_imports(&self, w: &mut IndentWriter, h: Helper) -> Result<(), Error> {
+        if !h.config.use_unsafe.any_unsafe() {
+            panic!("The Unity overload writer requires `Unsafe::UnsafeKeyword` or higher.")
+        }
+
         if h.config.use_unsafe == Unsafe::UnsafePlatformMemCpy {
             indented!(w, r#"#if UNITY_2018_1_OR_NEWER"#)?;
             indented!(w, r#"using Unity.Collections.LowLevel.Unsafe;"#)?;

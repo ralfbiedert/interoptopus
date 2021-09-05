@@ -7,9 +7,17 @@ use interoptopus::writer::IndentWriter;
 use interoptopus::{indented, Error};
 use std::ops::Deref;
 
+/// **Highly recommended**, provides most convenience methods.
+///
+/// In most cases adding this overload provider is the right thing to do, as it generates
+///
+/// - `my_array[]` support for slices,
+/// - much faster (up to 150x) .NET Core slice copies (with [`Unsafe::UnsafePlatformMemCpy`](crate::Unsafe::UnsafePlatformMemCpy)),
+/// - service overloads.
 pub struct DotNet {}
 
 impl DotNet {
+    /// Creates a new .NET overload generator.
     pub fn new() -> Box<Self> {
         Box::new(Self {})
     }

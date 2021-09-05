@@ -36,10 +36,15 @@ fn generate_bindings_multi(prefix: &str, use_unsafe: Unsafe) -> Result<(), Error
             ..config.clone()
         };
 
-        Generator::new(config.clone(), interoptopus_reference_project::ffi_inventory())
-            .add_overload_writer(Unity::new())
-            .add_overload_writer(DotNet::new())
-            .write_file(file_name)?;
+        let mut generator = Generator::new(config.clone(), interoptopus_reference_project::ffi_inventory());
+
+        generator.add_overload_writer(DotNet::new());
+
+        if use_unsafe.any_unsafe() {
+            generator.add_overload_writer(Unity::new());
+        }
+
+        generator.write_file(file_name)?;
     }
 
     Ok(())

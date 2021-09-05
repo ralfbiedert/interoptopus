@@ -53,7 +53,8 @@ use interoptopus::{Error, Interop};
 
 #[test]
 fn bindings_csharp() -> Result<(), Error> {
-    use interoptopus_backend_csharp::{Config, Generator, Unity, DotNet};
+    use interoptopus_backend_csharp::{Config, Generator};
+    use interoptopus_backend_csharp::overloads::{DotNet, Unity};
 
     let config = Config {
         dll_name: "example_library".to_string(),
@@ -62,8 +63,8 @@ fn bindings_csharp() -> Result<(), Error> {
     };
 
     Generator::new(config, example_library_ffi::my_inventory())
-        .add_overload_writer(Unity::new())
-        .add_overload_writer(CommonCSharp::new())
+        .add_overload_writer(DotNet::new())
+        //.add_overload_writer(Unity::new())
         .write_file("bindings/csharp/Interop.cs")?;
 
     Ok(())

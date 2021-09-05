@@ -4,11 +4,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 #if UNITY_2018_1_OR_NEWER
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Collections;
 #endif
-using System.Runtime.CompilerServices;
 using My.Company;
 using My.Company.Common;
 
@@ -78,10 +78,10 @@ namespace My.Company.Common
                     fixed (void* dst = rval)
                     {
                         #if __INTEROPTOPUS_NEVER
-                        #elif UNITY_2018_1_OR_NEWER
-                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(Bool)));
                         #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        #elif UNITY_2018_1_OR_NEWER
+                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(Bool)));
                         #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
@@ -159,10 +159,10 @@ namespace My.Company.Common
                     fixed (void* dst = rval)
                     {
                         #if __INTEROPTOPUS_NEVER
-                        #elif UNITY_2018_1_OR_NEWER
-                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(uint)));
                         #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        #elif UNITY_2018_1_OR_NEWER
+                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(uint)));
                         #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
@@ -240,10 +240,10 @@ namespace My.Company.Common
                     fixed (void* dst = rval)
                     {
                         #if __INTEROPTOPUS_NEVER
-                        #elif UNITY_2018_1_OR_NEWER
-                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(byte)));
                         #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        #elif UNITY_2018_1_OR_NEWER
+                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(byte)));
                         #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
@@ -330,10 +330,10 @@ namespace My.Company.Common
                     fixed (void* dst = rval)
                     {
                         #if __FALSE
-                        #elif UNITY_2018_1_OR_NEWER
-                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(byte)));
                         #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        #elif UNITY_2018_1_OR_NEWER
+                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(byte)));
                         #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
