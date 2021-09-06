@@ -1,4 +1,4 @@
-use crate::overloads::{write_function_overloaded_invoke_with_error_handling, Helper};
+use crate::overloads::{write_common_service_method_overload, write_function_overloaded_invoke_with_error_handling, Helper};
 use crate::{OverloadWriter, Unsafe};
 use interoptopus::lang::c::{CType, Function, FunctionSignature, Parameter};
 use interoptopus::patterns::service::Service;
@@ -247,7 +247,17 @@ impl OverloadWriter for Unity {
         Ok(())
     }
 
-    fn write_service_method_overload(&self, _w: &mut IndentWriter, _h: Helper, _class: &Service, _function: &Function, _fn_pretty: &str) -> Result<(), Error> {
+    fn write_service_method_overload(&self, w: &mut IndentWriter, h: Helper, _class: &Service, function: &Function, fn_pretty: &str) -> Result<(), Error> {
+        if !self.has_overloadable(function.signature()) {
+            return Ok(());
+        }
+
+        w.newline()?;
+
+        indented!(w, r#"#if UNITY_2018_1_OR_NEWER"#)?;
+        write_common_service_method_overload(w, h, function, fn_pretty, |h, p| self.pattern_to_native_in_signature(h, p, function.signature()))?;
+        indented!(w, r#"#endif"#)?;
+
         Ok(())
     }
 

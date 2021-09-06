@@ -1,6 +1,6 @@
-use crate::overloads::{write_function_overloaded_invoke_with_error_handling, Helper};
+use crate::overloads::{write_common_service_method_overload, write_function_overloaded_invoke_with_error_handling, Helper};
 use crate::{OverloadWriter, Unsafe};
-use interoptopus::lang::c::{CType, Function, FunctionSignature, Parameter, PrimitiveType};
+use interoptopus::lang::c::{CType, Function, FunctionSignature, Parameter};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::IndentWriter;
@@ -241,69 +241,9 @@ impl OverloadWriter for DotNet {
             return Ok(());
         }
 
-        let mut names = Vec::new();
-        let mut to_invoke = Vec::new();
-        let mut types = Vec::new();
+        w.newline()?;
 
-        // Write checked method. These are "normal" methods that accept
-        // common C# types.
-        let rval = match function.signature().rval() {
-            CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
-            _ => h.converter.to_typespecifier_in_rval(function.signature().rval()),
-        };
-
-        // For every parameter except the first, figure out how we should forward
-        // it to the invocation we perform.
-        for p in function.signature().params().iter().skip(1) {
-            let name = p.name();
-
-            // If we call the checked function we want to resolve a `SliceU8` to a `byte[]`,
-            // but if we call the unchecked version we want to keep that `Sliceu8` in our signature.
-            // let native = self.to_typespecifier_in_param(p.the_type());
-            let native = self.pattern_to_native_in_signature(&h, p, function.signature());
-
-            // Forward `ref` and `out` accordingly.
-            if native.contains("out ") {
-                to_invoke.push(format!("out {}", name.to_string()));
-            } else if native.contains("ref ") {
-                to_invoke.push(format!("ref {}", name.to_string()));
-            } else {
-                to_invoke.push(name.to_string());
-            }
-
-            names.push(name);
-            types.push(native);
-        }
-
-        let method_to_invoke = function.name().to_string();
-        let extra_args = if to_invoke.is_empty() {
-            "".to_string()
-        } else {
-            format!(", {}", to_invoke.join(", "))
-        };
-
-        // Assemble actual function call.
-        let context = "_context";
-        let arg_tokens = names.iter().zip(types.iter()).map(|(n, t)| format!("{} {}", t, n)).collect::<Vec<_>>();
-        let fn_call = format!(r#"{}.{}({}{})"#, h.config.class, method_to_invoke, context, extra_args);
-
-        // Write signature.
-        indented!(w, r#"public {} {}({})"#, rval, fn_pretty, arg_tokens.join(", "))?;
-        indented!(w, r#"{{"#)?;
-
-        match function.signature().rval() {
-            CType::Pattern(TypePattern::FFIErrorEnum(_)) => {
-                indented!(w, [_], r#"{};"#, fn_call)?;
-            }
-            CType::Primitive(PrimitiveType::Void) => {
-                indented!(w, [_], r#"{};"#, fn_call)?;
-            }
-            _ => {
-                indented!(w, [_], r#"return {};"#, fn_call)?;
-            }
-        }
-
-        indented!(w, r#"}}"#)?;
+        write_common_service_method_overload(w, h, function, fn_pretty, |h, p| self.pattern_to_native_in_signature(h, p, function.signature()))?;
 
         Ok(())
     }

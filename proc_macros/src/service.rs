@@ -31,10 +31,10 @@ pub fn ffi_service(attr: AttributeArgs, input: TokenStream) -> TokenStream {
     let service_type = &item.self_ty;
     let mut function_descriptors = Vec::new();
 
-    for x in &item.items {
-        if let ImplItem::Method(x) = x {
-            if let Some(xx) = generate_service_method(&attributes, &item, x) {
-                function_descriptors.push(xx);
+    for impl_item in &item.items {
+        if let ImplItem::Method(method) = impl_item {
+            if let Some(descriptor) = generate_service_method(&attributes, &item, method) {
+                function_descriptors.push(descriptor);
             }
         }
     }
@@ -113,74 +113,3 @@ pub fn ffi_service(attr: AttributeArgs, input: TokenStream) -> TokenStream {
 
     rval
 }
-
-// pub(crate) fn simple_service_pattern() -> interoptopus::patterns::service::Service {
-//     use interoptopus::lang::rust::CTypeInfo;
-//     use interoptopus::lang::rust::FunctionInfo;
-//
-//     let mut methods = Vec::new();
-//
-//     {
-//         {
-//             use simple_service_result
-//             as x;
-//             methods.push(x::function_info());
-//         }
-//         {
-//             use simple_service_value    as x;
-//             methods.push(x::function_info());
-//         }
-//         {
-//             use simple_service_mut_self    as x;
-//             methods.push(x::function_info());
-//         }
-//         {
-//             use simple_service_mut_self_void    as x;
-//             methods.push(x::function_info());
-//         }
-//         {
-//             use simple_service_mut_self_ref    as x;
-//             methods.push(x::function_info());
-//         }
-//         {
-//             use simple_service_mut_self_ref_slice    as x;
-//             methods.push(x::function_info());
-//         }
-//         {
-//             use simple_service_mut_self_ref_slice_limited    as x;
-//             methods.push(x::function_info());
-//         }
-//         {
-//             use simple_service_mut_self_ffi_error    as x;
-//             methods.push(x::function_info());
-//         }
-//         {
-//             use simple_service_void
-//             as x;
-//             methods.push(x::function_info());
-//         }
-//         {
-//             use simple_service_extra_method
-//
-//             as x;
-//             methods.push(x::function_info());
-//         }
-//     }
-//
-//     let ctor = {
-//         use simple_service_create    as x;
-//         x::function_info()
-//     };
-//
-//     let dtor = {
-//         use simple_service_destroy    as x;
-//         x::function_info()
-//     };
-//
-//     let rval = interoptopus::patterns::service::Service::new(
-//         ctor, dtor, methods,
-//     );
-//
-//     rval.assert_valid();
-//     rval
-// }

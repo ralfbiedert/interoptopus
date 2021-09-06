@@ -16,9 +16,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 6664744449398655833ul)
+            if (api_version != 5066755664026058268ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (6664744449398655833). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (5066755664026058268). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -517,14 +517,18 @@ namespace My.Company
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_no_error")]
-        public static extern void simple_service_method_mut_self_no_error(IntPtr context, SliceMutu8 slice);
+        public static extern FFIError simple_service_method_mut_self_no_error(IntPtr context, SliceMutu8 slice);
 
         public static void simple_service_method_mut_self_no_error(IntPtr context, byte[] slice) {
             var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
             var slice_slice = new SliceMutu8(slice_pinned, (ulong) slice.Length);
             try
             {
-                simple_service_method_mut_self_no_error(context, slice_slice);;
+                var rval = simple_service_method_mut_self_no_error(context, slice_slice);;
+                if (rval != FFIError.Ok)
+                {
+                    throw new Exception($"Something went wrong: {rval}");
+                }
             }
             finally
             {
@@ -903,6 +907,7 @@ namespace My.Company
         {
             return Interop.simple_service_method_mut_self(_context, slice);
         }
+
         public byte MethodMutSelf(byte[] slice)
         {
             return Interop.simple_service_method_mut_self(_context, slice);
@@ -913,6 +918,7 @@ namespace My.Company
         {
             Interop.simple_service_method_mut_self_void(_context, slice);
         }
+
         public void MethodMutSelfVoid(Bool[] slice)
         {
             Interop.simple_service_method_mut_self_void(_context, slice);
@@ -927,6 +933,7 @@ namespace My.Company
         {
             return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out y, slice);
         }
+
         public byte MethodMutSelfRefSlice(ref byte x, out byte y, byte[] slice)
         {
             return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out y, slice);
@@ -936,6 +943,7 @@ namespace My.Company
         {
             return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
         }
+
         public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, byte[] slice, byte[] slice2)
         {
             return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
@@ -949,6 +957,7 @@ namespace My.Company
                 throw new Exception($"Something went wrong: {rval}");
             }
         }
+
         public void MethodMutSelfFfiError(byte[] slice)
         {
             Interop.simple_service_method_mut_self_ffi_error(_context, slice);
@@ -956,8 +965,13 @@ namespace My.Company
 
         public void MethodMutSelfNoError(SliceMutu8 slice)
         {
-            Interop.simple_service_method_mut_self_no_error(_context, slice);
+            var rval = Interop.simple_service_method_mut_self_no_error(_context, slice);
+            if (rval != FFIError.Ok)
+            {
+                throw new Exception($"Something went wrong: {rval}");
+            }
         }
+
         public void MethodMutSelfNoError(byte[] slice)
         {
             Interop.simple_service_method_mut_self_no_error(_context, slice);

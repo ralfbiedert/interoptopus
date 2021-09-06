@@ -74,8 +74,11 @@ impl SimpleService {
         Ok(())
     }
 
-    #[ffi_service_method(direct)]
-    pub fn method_mut_self_no_error(&mut self, _slice: FFISliceMut<u8>) {}
+    // #[ffi_service_method(direct)]
+    pub fn method_mut_self_no_error(&mut self, mut slice: FFISliceMut<u8>) -> Result<(), Error> {
+        slice.as_slice_mut();
+        Ok(())
+    }
 
     pub fn method_void_ffi_error(&mut self) -> Result<(), Error> {
         Ok(())

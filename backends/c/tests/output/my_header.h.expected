@@ -264,7 +264,7 @@ uint8_t simple_service_method_mut_self_ref(my_library_simpleservice* context, ui
 uint8_t simple_service_method_mut_self_ref_slice(my_library_simpleservice* context, uint8_t* x, uint8_t* y, my_library_sliceu8 slice);
 uint8_t simple_service_method_mut_self_ref_slice_limited(my_library_simpleservice* context, uint8_t* x, uint8_t* y, my_library_sliceu8 slice, my_library_sliceu8 slice2);
 my_library_ffierror simple_service_method_mut_self_ffi_error(my_library_simpleservice* context, my_library_slicemutu8 slice);
-void simple_service_method_mut_self_no_error(my_library_simpleservice* context, my_library_slicemutu8 slice);
+my_library_ffierror simple_service_method_mut_self_no_error(my_library_simpleservice* context, my_library_slicemutu8 slice);
 my_library_ffierror simple_service_method_void_ffi_error(my_library_simpleservice* context);
 
 #ifdef __cplusplus

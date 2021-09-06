@@ -263,7 +263,7 @@ uint8_t simple_service_method_mut_self_ref(cffi_simpleservice* context, uint8_t*
 uint8_t simple_service_method_mut_self_ref_slice(cffi_simpleservice* context, uint8_t* x, uint8_t* y, cffi_sliceu8 slice);
 uint8_t simple_service_method_mut_self_ref_slice_limited(cffi_simpleservice* context, uint8_t* x, uint8_t* y, cffi_sliceu8 slice, cffi_sliceu8 slice2);
 cffi_ffierror simple_service_method_mut_self_ffi_error(cffi_simpleservice* context, cffi_slicemutu8 slice);
-void simple_service_method_mut_self_no_error(cffi_simpleservice* context, cffi_slicemutu8 slice);
+cffi_ffierror simple_service_method_mut_self_no_error(cffi_simpleservice* context, cffi_slicemutu8 slice);
 cffi_ffierror simple_service_method_void_ffi_error(cffi_simpleservice* context);
 """
 
@@ -1855,7 +1855,11 @@ class api:
         _slice[0].len = len(slice)
         slice = _slice[0]
 
-        return _api.simple_service_method_mut_self_no_error(context, slice)
+        _rval = _api.simple_service_method_mut_self_no_error(context, slice)
+        if _rval == FFIError.Ok:
+            return _rval
+        else:
+            raise Exception(f"Function returned error {_rval}")
 
     @staticmethod
     def simple_service_method_void_ffi_error(context):
