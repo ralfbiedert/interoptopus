@@ -44,6 +44,8 @@ pub trait CSharpWriter {
 
     fn write_imports(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.debug(w, "write_imports")?;
+
+        indented!(w, r#"#pragma warning disable 0105"#)?;
         indented!(w, r#"using System;"#)?;
         indented!(w, r#"using System.Collections;"#)?;
         indented!(w, r#"using System.Collections.Generic;"#)?;
@@ -62,6 +64,7 @@ pub trait CSharpWriter {
 
             indented!(w, r#"using {};"#, namespace)?;
         }
+        indented!(w, r#"#pragma warning restore 0105"#)?;
 
         Ok(())
     }
