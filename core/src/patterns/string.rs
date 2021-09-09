@@ -63,6 +63,27 @@ impl<'a> AsciiPointer<'a> {
         }
     }
 
+    /// Create an AsciiPointer from a `&[u8]` slice reference.
+    ///
+    /// The parameter `ascii_with_nul` must contain nul (`0x0`), but it does not need to contain nul
+    /// at the end.
+    pub fn from_slice_with_nul(ascii_with_nul: &[u8]) -> Result<Self, Error> {
+        // Check we actually contain one `0x0`.
+        if !ascii_with_nul.contains(&0) {
+            return Err(Error::Ascii);
+        }
+
+        // Any previous characters must not be extended ASCII.
+        if ascii_with_nul.iter().any(|x| *x > 127) {
+            return Err(Error::Ascii);
+        }
+
+        Ok(Self {
+            ptr: ascii_with_nul.as_ptr().cast(),
+            _phandom: Default::default(),
+        })
+    }
+
     /// Create a pointer from a CStr.
     pub fn from_cstr(cstr: &'a CStr) -> Self {
         Self {
@@ -106,5 +127,21 @@ mod test {
         let ptr_some = AsciiPointer::from_cstr(&cstr);
 
         assert_eq!(s, ptr_some.as_str().unwrap());
+    }
+
+    #[test]
+    fn from_slice_with_nul_works() {
+        let s = b"hello\0world";
+        let ptr_some = AsciiPointer::from_slice_with_nul(&s[..]).unwrap();
+
+        assert_eq!("hello", ptr_some.as_str().unwrap());
+    }
+
+    #[test]
+    fn from_slice_with_nul_fails_if_not_nul() {
+        let s = b"hello world";
+        let ptr_some = AsciiPointer::from_slice_with_nul(&s[..]);
+
+        assert!(ptr_some.is_err());
     }
 }
