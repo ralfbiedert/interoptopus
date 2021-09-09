@@ -1,6 +1,7 @@
 import example_complex as e
 from example_complex import api
 
+
 e.init_api("../../../../target/debug/example_complex")
 
 assert (e.THE_MAGIC_CONSTANT == 666)
