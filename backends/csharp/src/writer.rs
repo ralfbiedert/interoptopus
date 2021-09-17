@@ -358,6 +358,11 @@ pub trait CSharpWriter {
 
         for field in the_type.fields() {
             self.write_documentation(w, field.documentation())?;
+
+            for overload in self.overloads() {
+                overload.write_field_decorators(w, self.helper(), field, the_type)?;
+            }
+
             self.write_type_definition_composite_body_field(w, field, the_type)?;
         }
 

@@ -762,6 +762,9 @@ namespace My.Company
     [StructLayout(LayoutKind.Sequential)]
     public partial struct Genericu32
     {
+        #if UNITY_2018_1_OR_NEWER
+        [NativeDisableUnsafePtrRestriction]
+        #endif
         public IntPtr x;
     }
 
@@ -769,6 +772,9 @@ namespace My.Company
     [StructLayout(LayoutKind.Sequential)]
     public partial struct Genericu8
     {
+        #if UNITY_2018_1_OR_NEWER
+        [NativeDisableUnsafePtrRestriction]
+        #endif
         public IntPtr x;
     }
 
@@ -881,6 +887,9 @@ namespace My.Company
         byte a2;
         byte a3;
         byte a4;
+        #if UNITY_2018_1_OR_NEWER
+        [NativeDisableUnsafePtrRestriction]
+        #endif
         IntPtr r;
     }
 
@@ -899,6 +908,9 @@ namespace My.Company
     [StructLayout(LayoutKind.Sequential)]
     public partial struct SliceVec3f32
     {
+        #if UNITY_2018_1_OR_NEWER
+        [NativeDisableUnsafePtrRestriction]
+        #endif
         IntPtr data;
         ulong len;
     }

@@ -1,6 +1,6 @@
 use crate::overloads::{write_common_service_method_overload, write_function_overloaded_invoke_with_error_handling, Helper};
 use crate::{OverloadWriter, Unsafe};
-use interoptopus::lang::c::{CType, Function, FunctionSignature, Parameter};
+use interoptopus::lang::c::{CType, CompositeType, Field, Function, FunctionSignature, Parameter};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::IndentWriter;
@@ -146,6 +146,24 @@ impl OverloadWriter for Unity {
             indented!(w, r#"using Unity.Collections;"#)?;
             indented!(w, r#"#endif"#)?;
         }
+        Ok(())
+    }
+
+    fn write_field_decorators(&self, w: &mut IndentWriter, h: Helper, field: &Field, strct: &CompositeType) -> Result<(), Error> {
+        match field.the_type() {
+            // Must not act on arrays (would panic, not supported in C#).
+            CType::Array(_) => {}
+            _ => {
+                let the_type = h.converter.to_typespecifier_in_field(field.the_type(), field, strct);
+
+                if the_type == "IntPtr" {
+                    indented!(w, r#"#if UNITY_2018_1_OR_NEWER"#)?;
+                    indented!(w, r#"[NativeDisableUnsafePtrRestriction]"#)?;
+                    indented!(w, r#"#endif"#)?;
+                }
+            }
+        }
+
         Ok(())
     }
 

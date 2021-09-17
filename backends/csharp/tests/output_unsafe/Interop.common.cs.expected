@@ -32,6 +32,9 @@ namespace My.Company.Common
     [StructLayout(LayoutKind.Sequential)]
     public partial struct SliceBool
     {
+        #if UNITY_2018_1_OR_NEWER
+        [NativeDisableUnsafePtrRestriction]
+        #endif
         IntPtr data;
         ulong len;
     }
@@ -113,6 +116,9 @@ namespace My.Company.Common
     [StructLayout(LayoutKind.Sequential)]
     public partial struct Sliceu32
     {
+        #if UNITY_2018_1_OR_NEWER
+        [NativeDisableUnsafePtrRestriction]
+        #endif
         IntPtr data;
         ulong len;
     }
@@ -194,6 +200,9 @@ namespace My.Company.Common
     [StructLayout(LayoutKind.Sequential)]
     public partial struct Sliceu8
     {
+        #if UNITY_2018_1_OR_NEWER
+        [NativeDisableUnsafePtrRestriction]
+        #endif
         IntPtr data;
         ulong len;
     }
@@ -275,6 +284,9 @@ namespace My.Company.Common
     [StructLayout(LayoutKind.Sequential)]
     public partial struct SliceMutu8
     {
+        #if UNITY_2018_1_OR_NEWER
+        [NativeDisableUnsafePtrRestriction]
+        #endif
         IntPtr data;
         ulong len;
     }

@@ -50,7 +50,7 @@
 //! }
 //!
 
-use interoptopus::lang::c::{CType, Function, Parameter, PrimitiveType};
+use interoptopus::lang::c::{CType, CompositeType, Field, Function, Parameter, PrimitiveType};
 use interoptopus::patterns::service::Service;
 use interoptopus::writer::IndentWriter;
 use interoptopus::{indented, Error};
@@ -72,6 +72,8 @@ pub struct Helper<'a> {
 #[doc(hidden)]
 pub trait OverloadWriter {
     fn write_imports(&self, w: &mut IndentWriter, h: Helper) -> Result<(), Error>;
+
+    fn write_field_decorators(&self, w: &mut IndentWriter, h: Helper, field: &Field, strct: &CompositeType) -> Result<(), Error>;
 
     fn write_function_overload(&self, w: &mut IndentWriter, h: Helper, function: &Function) -> Result<(), Error>;
 

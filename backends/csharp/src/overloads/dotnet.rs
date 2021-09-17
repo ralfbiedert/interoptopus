@@ -1,6 +1,6 @@
 use crate::overloads::{write_common_service_method_overload, write_function_overloaded_invoke_with_error_handling, Helper};
 use crate::{OverloadWriter, Unsafe};
-use interoptopus::lang::c::{CType, Function, FunctionSignature, Parameter};
+use interoptopus::lang::c::{CType, CompositeType, Field, Function, FunctionSignature, Parameter};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::IndentWriter;
@@ -98,6 +98,10 @@ impl OverloadWriter for DotNet {
         if h.config.use_unsafe == Unsafe::UnsafePlatformMemCpy {
             indented!(w, r#"using System.Runtime.CompilerServices;"#)?;
         }
+        Ok(())
+    }
+
+    fn write_field_decorators(&self, _w: &mut IndentWriter, _h: Helper, _field: &Field, _strct: &CompositeType) -> Result<(), Error> {
         Ok(())
     }
 
