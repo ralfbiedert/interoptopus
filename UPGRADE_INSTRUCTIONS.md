@@ -4,6 +4,17 @@
 
 Tips for solving non-trivial breaking changes when upgrading from previous versions.
 
+
+### 0.12 → 0.13
+
+- Deprecated Python CFFI backend, replace with Python CTypes backend. 
+  - Might require changing some invocations. Please see `reference_project.py`. 
+- Renamed attributes of `#[ffi_service_method]` once more, no behavior changed: 
+  - `wrap` is now `on_panic`
+  - `direct` is `return_default`
+  - `raw` is `undefined_behavior`
+
+
 ### 0.11 → 0.12
 
 - Changed behavior of `#[ffi_service_method]`

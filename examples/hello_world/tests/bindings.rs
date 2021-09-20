@@ -40,7 +40,7 @@ fn bindings_c() -> Result<(), Error> {
 #[test]
 #[cfg_attr(miri, ignore)]
 fn bindings_cpython_cffi() -> Result<(), Error> {
-    use interoptopus_backend_cpython_cffi::{Config, Generator};
+    use interoptopus_backend_cpython::{Config, Generator};
 
     let library = example_hello_world::my_inventory();
     Generator::new(Config::default(), library).write_file("bindings/python/example_complex.py")?;

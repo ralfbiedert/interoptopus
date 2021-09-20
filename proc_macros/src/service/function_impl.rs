@@ -24,20 +24,20 @@ pub enum MethodType {
 pub struct AttributeCtor {}
 
 #[derive(Debug, FromMeta)]
-pub enum WrappingMode {
-    Result,
-    Direct,
-    Raw,
+pub enum OnPanic {
+    FfiError,
+    ReturnDefault,
+    UndefinedBehavior,
 }
 
 #[derive(Debug, FromMeta)]
 pub struct AttributeMethod {
-    wrap: WrappingMode,
+    on_panic: OnPanic,
 }
 
 impl Default for AttributeMethod {
     fn default() -> Self {
-        Self { wrap: WrappingMode::Result }
+        Self { on_panic: OnPanic::FfiError }
     }
 }
 
@@ -164,8 +164,8 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 }
             }
         }
-        MethodType::Method(x) => match x.wrap {
-            WrappingMode::Direct => {
+        MethodType::Method(x) => match x.on_panic {
+            OnPanic::ReturnDefault => {
                 quote! {
                     #[interoptopus::ffi_function]
                     #[no_mangle]
@@ -188,7 +188,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     }
                 }
             }
-            WrappingMode::Raw => {
+            OnPanic::UndefinedBehavior => {
                 quote! {
                     #[interoptopus::ffi_function]
                     #[no_mangle]
@@ -201,7 +201,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     }
                 }
             }
-            WrappingMode::Result => {
+            OnPanic::FfiError => {
                 quote! {
                     #[interoptopus::ffi_function]
                     #[no_mangle]

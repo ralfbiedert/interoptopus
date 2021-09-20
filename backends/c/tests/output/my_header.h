@@ -244,6 +244,7 @@ void sleep(uint64_t millis);
 bool weird_1(my_library_weird1u32 x, my_library_weird2u8 y);
 void visibility(my_library_visibility1 x, my_library_visibility2 y);
 uint32_t pattern_ascii_pointer_1(uint8_t* x);
+uint8_t* pattern_ascii_pointer_2();
 uint32_t pattern_ascii_pointer_len(uint8_t* x, my_library_useasciistringpattern y);
 uint32_t pattern_ffi_slice_1(my_library_sliceu32 ffi_slice);
 my_library_vec3f32 pattern_ffi_slice_2(my_library_slicevec3f32 ffi_slice, int32_t i);

@@ -3,6 +3,7 @@ members = [
     "core",
     "backends/c",
     "backends/cpython_cffi",
+    "backends/cpython",
     "backends/csharp",
     "proc_macros",
     "reference_project",

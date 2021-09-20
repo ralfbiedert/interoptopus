@@ -1,16 +1,9 @@
-//! Generates CPython CFFI bindings for [Interoptopus](https://github.com/ralfbiedert/interoptopus).
-//!
-//!
-//! # ⚠️ Deprecation Notice
-//!
-//! This backend is deprecated. Use the [interoptopus_backend_cpython](https://crates.io/crates/interoptopus_backend_cpython) instead, which has
-//! better Python compatibility and generates cleaner code.
-//!
+//! Generates CPython bindings for [Interoptopus](https://github.com/ralfbiedert/interoptopus).
 //!
 //! # Usage
 //!
 //! Assuming you have written a crate containing your FFI logic called `example_library_ffi` and
-//! want to generate **CPython CFFI bindings** for Python 3.7+, follow the instructions below.
+//! want to generate **CPython bindings** for Python 3.7+, follow the instructions below.
 //!
 //! ### Inside Your Library
 //!
@@ -48,7 +41,7 @@
 //!
 //! [dependencies]
 //! interoptopus = "..."
-//! interoptopus_backend_cpython_cffi = "..."
+//! interoptopus_backend_cpython = "..."
 //! ```
 //!
 //! Create a unit test in `tests/bindings.rs` which will generate your bindings when run
@@ -60,7 +53,7 @@
 //!
 //! #[test]
 //! fn bindings_cpython_cffi() -> Result<(), Error> {
-//!     use interoptopus_backend_cpython_cffi::{Config, Generator};
+//!     use interoptopus_backend_cpython::{Config, Generator};
 //!
 //!     let library = example_library_ffi::my_inventory();
 //!
@@ -82,79 +75,13 @@
 //! easy to [**create your own**](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md#new-backends).
 //!
 //! ```python
-//! from cffi import FFI
-//!
-//! api_definition = """
-//! typedef struct cffi_vec2
-//!     {
-//!     float x;
-//!     float y;
-//!     } cffi_vec2;
-//!
-//!
-//! cffi_vec2 my_function(cffi_vec2 input);
-//! """
-//!
-//! ffi = FFI()
-//! ffi.cdef(api_definition)
-//! _api = None
-//!
-//! def init_api(dll):
-//!     """Initializes this library, call with path to DLL."""
-//!     global _api
-//!     _api = ffi.dlopen(dll)
-//!
-//!
-//! class Vec2(object):
-//!     """ A simple type in our FFI layer."""
-//!     def __init__(self):
-//!         global _api, ffi
-//!         self._ctx = ffi.new("cffi_vec2[]", 1)
-//!
-//!     def array(n):
-//!         global _api, ffi
-//!         return ffi.new("cffi_vec2[]", n)
-//!
-//!     def ptr(self):
-//!         return self._ctx
-//!
-//!     @property
-//!     def x(self):
-//!         """"""
-//!         return self._ctx[0].x
-//!
-//!     @x.setter
-//!     def x(self, value):
-//!         self._ptr_x = value
-//!         self._ctx[0].x = value
-//!
-//!     @property
-//!     def y(self):
-//!         """"""
-//!         return self._ctx[0].y
-//!
-//!     @y.setter
-//!     def y(self, value):
-//!         self._ptr_y = value
-//!         self._ctx[0].y = value
-//!
-//!
-//! class raw:
-//!     """Raw access to all exported functions."""
-//!     def my_function(input):
-//!         """ Function using the type."""
-//!         global _api
-//!         if hasattr(input, "_ctx"):
-//!             input = input._ctx[0]
-//!
-//!         return _api.my_function(input)
+//! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //!
 //! ```
 
 use interoptopus::writer::IndentWriter;
 use interoptopus::Interop;
 use interoptopus::{Error, Library};
-use interoptopus_backend_c::CWriter;
 
 mod config;
 mod converter;
@@ -162,13 +89,12 @@ mod testing;
 mod writer;
 
 pub use config::Config;
-pub use converter::{Converter, PythonTypeConverter};
+pub use converter::Converter;
 pub use testing::run_python_if_installed;
 pub use writer::PythonWriter;
 
 /// **Start here**, main converter implementing [`Interop`].
 pub struct Generator {
-    c_generator: interoptopus_backend_c::Generator,
     config: Config,
     library: Library,
     converter: Converter,
@@ -176,24 +102,10 @@ pub struct Generator {
 
 impl Generator {
     pub fn new(config: Config, library: Library) -> Self {
-        let c_generator = interoptopus_backend_c::Generator::new(
-            interoptopus_backend_c::Config {
-                directives: false,
-                imports: false,
-                file_header_comment: "".to_string(),
-                prefix: "cffi_".to_string(),
-                ..interoptopus_backend_c::Config::default()
-            },
-            library.clone(),
-        );
-
-        let c_converter = c_generator.converter().clone();
-
         Self {
-            c_generator,
             config,
             library,
-            converter: Converter { c_converter },
+            converter: Converter {},
         }
     }
 }
@@ -215,9 +127,5 @@ impl PythonWriter for Generator {
 
     fn converter(&self) -> &Converter {
         &self.converter
-    }
-
-    fn c_generator(&self) -> &interoptopus_backend_c::Generator {
-        &self.c_generator
     }
 }

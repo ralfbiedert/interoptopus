@@ -243,6 +243,7 @@ void sleep(uint64_t millis);
 bool weird_1(cffi_weird1u32 x, cffi_weird2u8 y);
 void visibility(cffi_visibility1 x, cffi_visibility2 y);
 uint32_t pattern_ascii_pointer_1(uint8_t* x);
+uint8_t* pattern_ascii_pointer_2();
 uint32_t pattern_ascii_pointer_len(uint8_t* x, cffi_useasciistringpattern y);
 uint32_t pattern_ffi_slice_1(cffi_sliceu32 ffi_slice);
 cffi_vec3f32 pattern_ffi_slice_2(cffi_slicevec3f32 ffi_slice, int32_t i);
@@ -1518,6 +1519,12 @@ class api:
             x = ascii_string(x)
 
         return _api.pattern_ascii_pointer_1(x)
+
+    @staticmethod
+    def pattern_ascii_pointer_2():
+        """"""
+
+        return _api.pattern_ascii_pointer_2()
 
     @staticmethod
     def pattern_ascii_pointer_len(x, y: UseAsciiStringPattern) -> int:

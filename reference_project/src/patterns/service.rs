@@ -47,7 +47,7 @@ impl SimpleService {
         Ok(())
     }
 
-    #[ffi_service_method(wrap = "direct")]
+    #[ffi_service_method(on_panic = "return_default")]
     pub fn method_value(&self, x: u32) -> u32 {
         x
     }
@@ -55,33 +55,35 @@ impl SimpleService {
     /// This method should be documented.
     ///
     /// Multiple lines.
-    #[ffi_service_method(wrap = "direct")]
+    #[ffi_service_method(on_panic = "return_default")]
     pub fn method_void(&self) {}
 
-    #[ffi_service_method(wrap = "direct")]
+    #[ffi_service_method(on_panic = "return_default")]
     pub fn method_mut_self(&mut self, slice: FFISlice<u8>) -> u8 {
         *slice.as_slice().get(0).unwrap_or(&0)
     }
 
     /// Single line.
-    #[ffi_service_method(wrap = "direct")]
+    #[ffi_service_method(on_panic = "return_default")]
     pub fn method_mut_self_void(&mut self, _slice: FFISlice<FFIBool>) {}
 
-    #[ffi_service_method(wrap = "direct")]
+    #[ffi_service_method(on_panic = "return_default")]
     pub fn method_mut_self_ref(&mut self, x: &u8, _y: &mut u8) -> u8 {
         *x
     }
 
-    #[ffi_service_method(wrap = "direct")]
+    #[ffi_service_method(on_panic = "return_default")]
     pub fn method_mut_self_ref_slice(&mut self, x: &u8, _y: &mut u8, _slice: FFISlice<u8>) -> u8 {
         *x
     }
 
-    #[ffi_service_method(wrap = "direct")]
+    #[ffi_service_method(on_panic = "return_default")]
     pub fn method_mut_self_ref_slice_limited<'a, 'b>(&mut self, x: &u8, _y: &mut u8, _slice: FFISlice<'a, u8>, _slice2: FFISlice<'b, u8>) -> u8 {
         *x
     }
 
+    // This annotation isn't really needed, `ffi_error` is standard error handling.
+    #[ffi_service_method(on_panic = "ffi_error")]
     pub fn method_mut_self_ffi_error(&mut self, _slice: FFISliceMut<u8>) -> Result<(), Error> {
         Ok(())
     }
@@ -93,19 +95,19 @@ impl SimpleService {
 
     /// Warning, you _must_ discard the returned slice object before calling into this service
     /// again, as otherwise undefined behavior might happen.
-    #[ffi_service_method(wrap = "raw")]
+    #[ffi_service_method(on_panic = "undefined_behavior")]
     pub fn return_slice(&mut self) -> FFISlice<u32> {
         FFISlice::from_slice(&self.data)
     }
 
     /// Warning, you _must_ discard the returned slice object before calling into this service
     /// again, as otherwise undefined behavior might happen.
-    #[ffi_service_method(wrap = "raw")]
+    #[ffi_service_method(on_panic = "undefined_behavior")]
     pub fn return_slice_mut(&mut self) -> FFISliceMut<u32> {
         FFISliceMut::from_slice(&mut self.data)
     }
 
-    #[ffi_service_method(wrap = "raw")]
+    #[ffi_service_method(on_panic = "undefined_behavior")]
     pub fn return_string(&mut self) -> AsciiPointer {
         AsciiPointer::from_cstr(&self.c_string)
     }
@@ -128,14 +130,14 @@ impl<'a> SimpleServiceLifetime<'a> {
         Ok(Self { some_value })
     }
 
-    #[ffi_service_method(wrap = "direct")]
+    #[ffi_service_method(on_panic = "return_default")]
     pub fn method_lt(&mut self, _slice: FFISlice<'a, FFIBool>) {}
 
-    #[ffi_service_method(wrap = "direct")]
+    #[ffi_service_method(on_panic = "return_default")]
     pub fn method_lt2(&mut self, _slice: FFISlice<FFIBool>) {}
 
     // Sometimes lifetime params can get confused in low level codegen, so we have to replace `self` with explicit self.
-    #[ffi_service_method(wrap = "raw")]
+    #[ffi_service_method(on_panic = "undefined_behavior")]
     pub fn return_string_accept_slice<'b>(_: &mut SimpleServiceLifetime<'b>, _: FFISlice<'b, u8>) -> AsciiPointer<'b> {
         AsciiPointer::empty()
     }

@@ -18,9 +18,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 6434875194133105768ul)
+            if (api_version != 10360875418836631568ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (6434875194133105768). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (10360875418836631568). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -215,6 +215,10 @@ namespace My.Company
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ascii_pointer_1")]
         public static extern uint pattern_ascii_pointer_1(string x);
+
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ascii_pointer_2")]
+        public static extern IntPtr pattern_ascii_pointer_2();
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ascii_pointer_len")]

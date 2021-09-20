@@ -55,8 +55,8 @@ fn bindings_c() -> Result<(), Error> {
 #[test]
 #[cfg_attr(miri, ignore)]
 fn bindings_cpython_cffi() -> Result<(), Error> {
-    use interoptopus_backend_cpython_cffi::run_python_if_installed;
-    use interoptopus_backend_cpython_cffi::{Config, Generator};
+    use interoptopus_backend_cpython::run_python_if_installed;
+    use interoptopus_backend_cpython::{Config, Generator};
 
     Generator::new(Config::default(), example_complex::ffi_inventory()).write_file("bindings/python/example_complex.py")?;
 

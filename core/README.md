@@ -9,6 +9,19 @@
 
 The polyglot bindings generator for your library.
 
+Interoptopus allows _you_ to deliver high-quality system libraries
+to your users, and enables _your users_ to easily consume those libraries from the
+language of _their_ choice:
+
+- Design a single `.dll` / `.so` in Rust, consume it from any language.
+- Use patterns (e.g., classes, strings) in languages that have them.
+- Always be fully C compatible.
+- Painless workflow, no external tools required.
+
+We strive to make our generated bindings _zero cost_. They should be as idiomatic
+as you could have reasonably written them yourself, but never magic or hiding the interface
+you actually wanted to expose.
+
 
 ### Code you write ...
 
@@ -28,9 +41,13 @@ pub extern "C" fn my_function(input: Vec2) {
     println!("{}", input.x);
 }
 
+// This defines our FFI interface as `ffi_inventory` containing
+// no constants, a single function `my_function`, no additional
+// types (types are usually inferred) and no codegen patterns.
 inventory!(ffi_inventory, [], [my_function], [], []);
 
 ```
+
 
 ### ... Interoptopus generates
 
@@ -38,11 +55,12 @@ inventory!(ffi_inventory, [], [my_function], [], []);
 | --- | --- | --- |
 | C# | [**interoptopus_backend_csharp**](https://crates.io/crates/interoptopus_backend_csharp) | [Interop.cs](https://github.com/ralfbiedert/interoptopus/blob/master/backends/csharp/tests/output_safe/Interop.cs) |
 | C | [**interoptopus_backend_c**](https://crates.io/crates/interoptopus_backend_c) | [my_header.h](https://github.com/ralfbiedert/interoptopus/blob/master/backends/c/tests/output/my_header.h) |
-| Python<sup>1</sup> | [**interoptopus_backend_cpython_cffi**](https://crates.io/crates/interoptopus_backend_cpython_cffi) | [reference.py](https://github.com/ralfbiedert/interoptopus/blob/master/backends/cpython_cffi/tests/output/reference_project.py) |
-| Other | Write your own backend<sup>2</sup> | - |
+| Python | [**interoptopus_backend_cpython**](https://crates.io/crates/interoptopus_backend_cpython) | [reference.py](https://github.com/ralfbiedert/interoptopus/blob/master/backends/cpython/tests/output/reference_project.py) |
+| Other | Write your own backend<sup>1</sup> | - |
 
-<sup>1</sup> Using Python [CFFI](https://cffi.readthedocs.io/en/latest/index.html). <br>
-<sup>2</sup> Create your own backend in just a few hours. No pull request needed. [Pinkie promise](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md#new-backends).
+<sup>1</sup> Create your own backend in just a few hours. No pull request needed. [Pinkie promise](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md#new-backends).
+
+
 
 ### Getting Started 🍼
 
@@ -50,21 +68,6 @@ If you want to ...
 - **create a new API** see the [**hello world**](https://github.com/ralfbiedert/interoptopus/tree/master/examples/hello_world),
 - **understand what's possible**, see the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/reference_project/src),
 - **support a new language**, [**copy the C backend**](https://github.com/ralfbiedert/interoptopus/tree/master/backends/c).
-
-### Features
-
-- explicit, **single source of truth** API definition in Rust,
-- **quality-of-life [patterns](crate::patterns)** (e.g., [slices](crate::patterns::slice), [services](crate::patterns::service), ...)
-- if your **project compiles your bindings should work**, <sup>&#42;*cough*&#42;</sup>
-- easy to support new languages, fully **customizable**,
-- **no scripts needed**, just `cargo build` + `cargo test`.
-
-
-Gated behind **feature flags**, these enable:
-
-- `derive` - Proc macros such as `ffi_type`, ...
-- `serde` - Serde attributes on internal types.
-- `log` - Invoke [log](https://crates.io/crates/log) on FFI errors.
 
 
 ### Supported Rust Constructs
@@ -76,19 +79,47 @@ See the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree
 - [patterns](https://github.com/ralfbiedert/interoptopus/tree/master/reference_project/src/patterns) (ASCII pointers, options, slices, classes, ...)
 
 
-
 ### Performance 🏁
 
-Generated low-level bindings are "zero cost" w.r.t. hand-crafted bindings for that language.
+Generated low-level bindings are _zero cost_ w.r.t. hand-crafted bindings for that language.
 
 That said, even hand-crafted bindings encounter some target-specific overhead
-at the FFI boundary (e.g., marshalling or pinning in managed languages) For C# that cost
-can be nanoseconds, for Python CFFI it can be microseconds.
+at the FFI boundary (e.g., marshalling or pinning in managed languages). For C# that cost
+is often nanoseconds, for Python CFFI it can be microseconds.
 
-See this [**C# call-cost table**](https://github.com/ralfbiedert/interoptopus/blob/master/backends/csharp/benches/BENCHMARK_RESULTS.md)<sup>🔥</sup> for ballpark figures.
+While there is nothing you can do about Being aware of the call cost
+can help you design better APIs.
+
+Detailed call cost tables can be found here: <sup>🔥</sup>
+
+- [**C# call overhead**](https://github.com/ralfbiedert/interoptopus/blob/master/backends/csharp/benches/BENCHMARK_RESULTS.md)
+- [**Python call overhead**](https://github.com/ralfbiedert/interoptopus/blob/master/backends/python/tests/output/BENCHMARK_RESULTS.md)
+
+For quick ballpark figures this table lists the most common call types in _ns / call_:
+
+| Construct | C# | Python |
+| --- | --- | --- |
+| `primitive_void()` | 7 | 272 |
+| `primitive_u32(0)` | 8 | 392 |
+| `many_args_5(0, 0, 0, 0, 0)` | 10 | 786 |
+| `callback(x => x, 0)` | 43 | 1168 |
+
+<br/>
+
+
+
+### Feature Flags
+
+Gated behind **feature flags**, these enable:
+
+- `derive` - Proc macros such as `ffi_type`, ...
+- `serde` - Serde attributes on internal types.
+- `log` - Invoke [log](https://crates.io/crates/log) on FFI errors.
+
 
 ### Changelog
 
+- **v0.13** - Python backend uses `ctypes` now.
 - **v0.12** - Better compat using `#[ffi_service_method]`.
 - **v0.11** - C# switch ctors to static methods.
 - **v0.10** - C# flavors `DotNet` and `Unity` (incl. Burst).
@@ -104,9 +135,11 @@ See this [**C# call-cost table**](https://github.com/ralfbiedert/interoptopus/bl
 
 Also see our [upgrade instructions](https://github.com/ralfbiedert/interoptopus/blob/master/UPGRADE_INSTRUCTIONS.md).
 
+
 ### FAQ
 
 - [FAQ and Safety Guides](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md).
+
 
 ### Contributing
 

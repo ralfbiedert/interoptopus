@@ -1,12 +1,5 @@
 Generates CPython CFFI bindings for [Interoptopus](https://github.com/ralfbiedert/interoptopus).
 
-
-## ⚠️ Deprecation Notice
-
-This backend is deprecated. Use the [interoptopus_backend_cpython](https://crates.io/crates/interoptopus_backend_cpython) instead, which has
-better Python compatibility and generates cleaner code.
-
-
 ## Usage
 
 Assuming you have written a crate containing your FFI logic called `example_library_ffi` and
