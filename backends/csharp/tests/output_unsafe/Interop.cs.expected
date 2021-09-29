@@ -151,7 +151,7 @@ namespace My.Company
             var rval = complex_args_1(a, ref b);;
             if (rval != FFIError.Ok)
             {
-                throw new InteropException(rval);
+                throw new InteropException<FFIError>(rval);
             }
         }
 
@@ -237,7 +237,7 @@ namespace My.Company
             var rval = panics();;
             if (rval != FFIError.Ok)
             {
-                throw new InteropException(rval);
+                throw new InteropException<FFIError>(rval);
             }
         }
 
@@ -471,7 +471,7 @@ namespace My.Company
             var rval = simple_service_destroy(ref context);;
             if (rval != FFIError.Ok)
             {
-                throw new InteropException(rval);
+                throw new InteropException<FFIError>(rval);
             }
         }
 
@@ -484,7 +484,7 @@ namespace My.Company
             var rval = simple_service_new_with(ref context, some_value);;
             if (rval != FFIError.Ok)
             {
-                throw new InteropException(rval);
+                throw new InteropException<FFIError>(rval);
             }
         }
 
@@ -496,7 +496,7 @@ namespace My.Company
             var rval = simple_service_new_without(ref context);;
             if (rval != FFIError.Ok)
             {
-                throw new InteropException(rval);
+                throw new InteropException<FFIError>(rval);
             }
         }
 
@@ -508,7 +508,7 @@ namespace My.Company
             var rval = simple_service_new_failing(ref context, some_value);;
             if (rval != FFIError.Ok)
             {
-                throw new InteropException(rval);
+                throw new InteropException<FFIError>(rval);
             }
         }
 
@@ -522,7 +522,7 @@ namespace My.Company
             var rval = simple_service_method_result(context, anon1);;
             if (rval != FFIError.Ok)
             {
-                throw new InteropException(rval);
+                throw new InteropException<FFIError>(rval);
             }
         }
 
@@ -647,7 +647,7 @@ namespace My.Company
                     var rval = simple_service_method_mut_self_ffi_error(context, slice_slice);;
                     if (rval != FFIError.Ok)
                     {
-                        throw new InteropException(rval);
+                        throw new InteropException<FFIError>(rval);
                     }
                 }
             }
@@ -659,7 +659,7 @@ namespace My.Company
             var rval = simple_service_method_mut_self_ffi_error(context, slice_slice);;
             if (rval != FFIError.Ok)
             {
-                throw new InteropException(rval);
+                throw new InteropException<FFIError>(rval);
             }
         }
         #endif
@@ -676,7 +676,7 @@ namespace My.Company
                     var rval = simple_service_method_mut_self_no_error(context, slice_slice);;
                     if (rval != FFIError.Ok)
                     {
-                        throw new InteropException(rval);
+                        throw new InteropException<FFIError>(rval);
                     }
                 }
             }
@@ -688,7 +688,7 @@ namespace My.Company
             var rval = simple_service_method_mut_self_no_error(context, slice_slice);;
             if (rval != FFIError.Ok)
             {
-                throw new InteropException(rval);
+                throw new InteropException<FFIError>(rval);
             }
         }
         #endif
@@ -700,7 +700,7 @@ namespace My.Company
             var rval = simple_service_method_void_ffi_error(context);;
             if (rval != FFIError.Ok)
             {
-                throw new InteropException(rval);
+                throw new InteropException<FFIError>(rval);
             }
         }
 
@@ -1047,7 +1047,7 @@ namespace My.Company
             var rval = Interop.simple_service_new_with(ref self._context, some_value);
             if (rval != FFIError.Ok)
             {
-                throw new InteropException(rval);
+                throw new InteropException<FFIError>(rval);
             }
             return self;
         }
@@ -1058,7 +1058,7 @@ namespace My.Company
             var rval = Interop.simple_service_new_without(ref self._context);
             if (rval != FFIError.Ok)
             {
-                throw new InteropException(rval);
+                throw new InteropException<FFIError>(rval);
             }
             return self;
         }
@@ -1069,7 +1069,7 @@ namespace My.Company
             var rval = Interop.simple_service_new_failing(ref self._context, some_value);
             if (rval != FFIError.Ok)
             {
-                throw new InteropException(rval);
+                throw new InteropException<FFIError>(rval);
             }
             return self;
         }
@@ -1079,7 +1079,7 @@ namespace My.Company
             var rval = Interop.simple_service_destroy(ref _context);
             if (rval != FFIError.Ok)
             {
-                throw new InteropException(rval);
+                throw new InteropException<FFIError>(rval);
             }
         }
 
@@ -1090,7 +1090,7 @@ namespace My.Company
             var rval = Interop.simple_service_method_result(_context, anon1);
             if (rval != FFIError.Ok)
             {
-                throw new InteropException(rval);
+                throw new InteropException<FFIError>(rval);
             }
         }
 
@@ -1186,7 +1186,7 @@ namespace My.Company
             var rval = Interop.simple_service_method_mut_self_ffi_error(_context, slice);
             if (rval != FFIError.Ok)
             {
-                throw new InteropException(rval);
+                throw new InteropException<FFIError>(rval);
             }
         }
 
@@ -1207,7 +1207,7 @@ namespace My.Company
             var rval = Interop.simple_service_method_mut_self_no_error(_context, slice);
             if (rval != FFIError.Ok)
             {
-                throw new InteropException(rval);
+                throw new InteropException<FFIError>(rval);
             }
         }
 
@@ -1228,7 +1228,7 @@ namespace My.Company
             var rval = Interop.simple_service_method_void_ffi_error(_context);
             if (rval != FFIError.Ok)
             {
-                throw new InteropException(rval);
+                throw new InteropException<FFIError>(rval);
             }
         }
 
@@ -1236,15 +1236,5 @@ namespace My.Company
     }
 
 
-
-    public class InteropException : Exception
-    {
-        public FFIError Error { get; private set; }
-
-        public InteropException(FFIError error): base($"Something went wrong: {error}")
-        {
-            Error = error;
-        }
-    }
 
 }

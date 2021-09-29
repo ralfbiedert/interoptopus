@@ -11,6 +11,16 @@ pub enum WriteTypes {
     All,
 }
 
+impl WriteTypes {
+    pub fn write_interoptopus_globals(&self) -> bool {
+        match self {
+            WriteTypes::Namespace => false,
+            WriteTypes::NamespaceAndInteroptopusGlobal => true,
+            WriteTypes::All => true,
+        }
+    }
+}
+
 /// Whether and how `unsafe` in generated C# should be emitted.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum Unsafe {

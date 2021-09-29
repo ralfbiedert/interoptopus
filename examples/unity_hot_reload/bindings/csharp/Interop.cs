@@ -26,11 +26,11 @@ namespace My.Company
 
 
 
-    public class InteropException : Exception
+    public class InteropException<T> : Exception
     {
-        public FFIError Error { get; private set; }
+        public T Error { get; private set; }
 
-        public InteropException(FFIError error): base($"Something went wrong: {error}")
+        public InteropException(T error): base($"Something went wrong: {error}")
         {
             Error = error;
         }
