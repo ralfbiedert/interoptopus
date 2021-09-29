@@ -798,16 +798,24 @@ pub trait CSharpWriter {
         indented!(w, r#"{{"#)?;
         w.indent();
         indented!(w, r#"private IntPtr _context;"#)?;
+        w.newline()?;
+        indented!(w, r#"private {}() {{}}"#, context_type_name)?;
+        w.newline()?;
 
         for ctor in class.constructors() {
             // Ctor
+            let without_common_prefix = ctor.name().replace(&common_prefix, "");
+            let prettified = IdPrettifier::from_rust_lower(&without_common_prefix);
+            let fn_name = prettified.to_camel_case();
+            let rval = format!("static {}", context_type_name);
+
             self.write_documentation(w, ctor.meta().documentation())?;
-            self.write_pattern_service_method(w, class, ctor, "", context_type_name, true)?;
+            self.write_pattern_service_method(w, class, ctor, &rval, &fn_name, true, true)?;
             w.newline()?;
         }
 
         // Dtor
-        self.write_pattern_service_method(w, class, class.destructor(), "void", "Dispose", true)?;
+        self.write_pattern_service_method(w, class, class.destructor(), "void", "Dispose", true, false)?;
         w.newline()?;
 
         for function in class.methods() {
@@ -823,7 +831,7 @@ pub trait CSharpWriter {
                 _ => self.converter().to_typespecifier_in_rval(function.signature().rval()),
             };
             self.write_documentation(w, function.meta().documentation())?;
-            self.write_pattern_service_method(w, class, function, &rval, &fn_name, false)?;
+            self.write_pattern_service_method(w, class, function, &rval, &fn_name, false, false)?;
 
             for overload in self.overloads() {
                 overload.write_service_method_overload(w, self.helper(), class, function, &fn_name)?;
@@ -843,14 +851,16 @@ pub trait CSharpWriter {
     }
 
     #[allow(clippy::too_many_arguments)]
+    #[rustfmt::skip]
     fn write_pattern_service_method(
         &self,
         w: &mut IndentWriter,
-        _class: &Service,
+        class: &Service,
         function: &Function,
         rval: &str,
         fn_name: &str,
         write_contxt_by_ref: bool,
+        is_ctor: bool,
     ) -> Result<(), Error> {
         self.debug(w, "write_pattern_service_method")?;
 
@@ -888,13 +898,17 @@ pub trait CSharpWriter {
         };
 
         // Assemble actual function call.
-        let context = if write_contxt_by_ref { "ref _context" } else { "_context" };
+        let context = if write_contxt_by_ref { if is_ctor { "ref self._context" } else { "ref _context"} } else { "_context" };
         let arg_tokens = names.iter().zip(types.iter()).map(|(n, t)| format!("{} {}", t, n)).collect::<Vec<_>>();
         let fn_call = format!(r#"{}.{}({}{})"#, self.config().class, method_to_invoke, context, extra_args);
 
         // Write signature.
         indented!(w, r#"public {} {}({})"#, rval, fn_name, arg_tokens.join(", "))?;
         indented!(w, r#"{{"#)?;
+
+        if is_ctor {
+            indented!(w, [_], r#"var self = new {}();"#, class.the_type().rust_name())?;
+        }
 
         // Determine return value behavior and write function call.
         match function.signature().rval() {
@@ -911,6 +925,10 @@ pub trait CSharpWriter {
             _ => {
                 indented!(w, [_], r#"return {};"#, fn_call)?;
             }
+        }
+
+        if is_ctor {
+            indented!(w, [_], r#"return self;"#)?;
         }
 
         indented!(w, r#"}}"#)?;

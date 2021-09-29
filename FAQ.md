@@ -68,6 +68,15 @@
 
 ## Existing Backends
 
+### General
+
+- **I'm trying to compose pattern X with Y but get errors.**
+
+  While on the Rust side patterns compose easily, backends usually have some trouble creating
+  nice (or even working) code for things like `FFISlice<FFIOption<AsciiPointer>>`. We 
+  recommend using patterns in moderation.  
+  
+
 ### C#
 
 - **Why do you pin objects in the C# bindings and pass GCHandles to slice constructors?**

@@ -1037,32 +1037,41 @@ namespace My.Company
     public partial class SimpleService : IDisposable
     {
         private IntPtr _context;
+
+        private SimpleService() {}
+
         /// The constructor must return a `Result<Self, Error>`.
-        public  SimpleService(uint some_value)
+        public static SimpleService NewWith(uint some_value)
         {
-            var rval = Interop.simple_service_new_with(ref _context, some_value);
+            var self = new SimpleService();
+            var rval = Interop.simple_service_new_with(ref self._context, some_value);
             if (rval != FFIError.Ok)
             {
                 throw new Exception($"Something went wrong: {rval}");
             }
+            return self;
         }
 
-        public  SimpleService()
+        public static SimpleService NewWithout()
         {
-            var rval = Interop.simple_service_new_without(ref _context);
+            var self = new SimpleService();
+            var rval = Interop.simple_service_new_without(ref self._context);
             if (rval != FFIError.Ok)
             {
                 throw new Exception($"Something went wrong: {rval}");
             }
+            return self;
         }
 
-        public  SimpleService(byte some_value)
+        public static SimpleService NewFailing(byte some_value)
         {
-            var rval = Interop.simple_service_new_failing(ref _context, some_value);
+            var self = new SimpleService();
+            var rval = Interop.simple_service_new_failing(ref self._context, some_value);
             if (rval != FFIError.Ok)
             {
                 throw new Exception($"Something went wrong: {rval}");
             }
+            return self;
         }
 
         public void Dispose()

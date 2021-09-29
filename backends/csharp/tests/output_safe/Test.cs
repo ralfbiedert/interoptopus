@@ -68,7 +68,7 @@ namespace interop_test
         [Fact]
         public void pattern_service_generated()
         {
-            var x = new SimpleService((uint) 123);
+            var x = SimpleService.NewWith(123);
             var b = new byte[] { 1, 2, 3 } ;
             
             x.MethodMutSelfFfiError(b);
