@@ -108,4 +108,15 @@ namespace My.Company
     public delegate uint InteropDelegate_fn_u32_rval_u32(uint x0);
 
 
+
+    public class InteropException : Exception
+    {
+        public FFIError Error { get; private set; }
+
+        public InteropException(FFIError error): base($"Something went wrong: {error}")
+        {
+            Error = error;
+        }
+    }
+
 }

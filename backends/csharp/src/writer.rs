@@ -916,7 +916,7 @@ pub trait CSharpWriter {
                 indented!(w, [_], r#"var rval = {};"#, fn_call)?;
                 indented!(w, [_], r#"if (rval != {}.{})"#, e.the_enum().rust_name(), e.success_variant().name())?;
                 indented!(w, [_], r#"{{"#)?;
-                indented!(w, [_ _], r#"throw new Exception($"Something went wrong: {{rval}}");"#)?;
+                indented!(w, [_ _], r#"throw new InteropException(rval);"#)?;
                 indented!(w, [_], r#"}}"#)?;
             }
             CType::Primitive(PrimitiveType::Void) => {
@@ -932,6 +932,21 @@ pub trait CSharpWriter {
         }
 
         indented!(w, r#"}}"#)?;
+
+        Ok(())
+    }
+
+    fn write_builtins(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        indented!(w, r#"public class InteropException : Exception"#)?;
+        indented!(w, r#"{{"#)?;
+        indented!(w, [_], r#"public FFIError Error {{ get; private set; }}"#)?;
+        w.newline()?;
+        indented!(w, [_], r#"public InteropException(FFIError error): base($"Something went wrong: {{error}}")"#)?;
+        indented!(w, [_], r#"{{"#)?;
+        indented!(w, [_ _], r#"Error = error;"#)?;
+        indented!(w, [_], r#"}}"#)?;
+        indented!(w, r#"}}"#)?;
+        w.newline()?;
 
         Ok(())
     }
@@ -965,6 +980,9 @@ pub trait CSharpWriter {
 
             w.newline()?;
             self.write_patterns(w)?;
+
+            w.newline()?;
+            self.write_builtins(w)?;
 
             Ok(())
         })?;

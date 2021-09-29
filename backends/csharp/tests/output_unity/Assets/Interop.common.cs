@@ -408,4 +408,15 @@ namespace My.Company.Common
     public delegate uint MyCallback(uint x0);
 
 
+
+    public class InteropException : Exception
+    {
+        public FFIError Error { get; private set; }
+
+        public InteropException(FFIError error): base($"Something went wrong: {error}")
+        {
+            Error = error;
+        }
+    }
+
 }
