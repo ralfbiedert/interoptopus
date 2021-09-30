@@ -126,9 +126,9 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
 
                     *context = ::std::ptr::null_mut();
 
-                    let result_result = std::panic::catch_unwind(|| {
+                    let result_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                         <#service_type>::#orig_fn_ident( #(#arg_names),* )
-                    });
+                    }));
 
                     match result_result {
                         Ok(Ok(obj)) => {
