@@ -798,7 +798,7 @@ namespace My.Company
         }
 
         #if UNITY_2018_1_OR_NEWER
-        public static IntPtr simple_service_lt_return_string_accept_slice(IntPtr anon0, NativeArray<byte> anon1) {
+        public static string simple_service_lt_return_string_accept_slice(IntPtr anon0, NativeArray<byte> anon1) {
             var anon1_slice = new Sliceu8(anon1);
             var s = simple_service_lt_return_string_accept_slice(anon0, anon1_slice);;
             return Marshal.PtrToStringAnsi(s);

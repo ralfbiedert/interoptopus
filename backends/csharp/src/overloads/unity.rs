@@ -201,6 +201,7 @@ impl OverloadWriter for Unity {
 
         let rval = match function.signature().rval() {
             CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
+            CType::Pattern(TypePattern::AsciiPointer) => "string".to_string(),
             _ => h.converter.to_typespecifier_in_rval(function.signature().rval()),
         };
 
