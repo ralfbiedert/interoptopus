@@ -87,5 +87,5 @@ interoptopus::inventory!(
         patterns::callbacks::pattern_callback_1,
     ],
     [types::ExtraType<f32>],
-    [patterns::service::SimpleService]
+    [patterns::service::SimpleService, patterns::service::SimpleServiceLifetime]
 );

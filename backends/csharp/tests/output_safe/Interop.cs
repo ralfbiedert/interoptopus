@@ -18,9 +18,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 5066755664026058268ul)
+            if (api_version != 15413286039450138463ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (5066755664026058268). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (15413286039450138463). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -538,11 +538,86 @@ namespace My.Company
             }
         }
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_return_string")]
+        public static extern string simple_service_return_string(IntPtr context);
+
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_void_ffi_error")]
         public static extern FFIError simple_service_method_void_ffi_error(IntPtr context);
 
         public static void simple_service_method_void_ffi_error_checked(IntPtr context) {
             var rval = simple_service_method_void_ffi_error(context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
+        /// Destroys the given instance.
+        ///
+        /// # Safety
+        ///
+        /// The passed parameter MUST have been created with the corresponding init function;
+        /// passing any other value results in undefined behavior.
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lt_destroy")]
+        public static extern FFIError simple_service_lt_destroy(ref IntPtr context);
+
+        public static void simple_service_lt_destroy_checked(ref IntPtr context) {
+            var rval = simple_service_lt_destroy(ref context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lt_new_with")]
+        public static extern FFIError simple_service_lt_new_with(ref IntPtr context, ref uint some_value);
+
+        public static void simple_service_lt_new_with_checked(ref IntPtr context, ref uint some_value) {
+            var rval = simple_service_lt_new_with(ref context, ref some_value);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lt_method_lt")]
+        public static extern void simple_service_lt_method_lt(IntPtr context, SliceBool slice);
+
+        public static void simple_service_lt_method_lt(IntPtr context, Bool[] slice) {
+            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
+            var slice_slice = new SliceBool(slice_pinned, (ulong) slice.Length);
+            try
+            {
+                simple_service_lt_method_lt(context, slice_slice);;
+            }
+            finally
+            {
+                slice_pinned.Free();
+            }
+        }
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lt_method_lt2")]
+        public static extern void simple_service_lt_method_lt2(IntPtr context, SliceBool slice);
+
+        public static void simple_service_lt_method_lt2(IntPtr context, Bool[] slice) {
+            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
+            var slice_slice = new SliceBool(slice_pinned, (ulong) slice.Length);
+            try
+            {
+                simple_service_lt_method_lt2(context, slice_slice);;
+            }
+            finally
+            {
+                slice_pinned.Free();
+            }
+        }
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lt_method_void_ffi_error")]
+        public static extern FFIError simple_service_lt_method_void_ffi_error(IntPtr context);
+
+        public static void simple_service_lt_method_void_ffi_error_checked(IntPtr context) {
+            var rval = simple_service_lt_method_void_ffi_error(context);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -988,9 +1063,73 @@ namespace My.Company
             Interop.simple_service_method_mut_self_no_error(_context, slice);
         }
 
+        public string ReturnString()
+        {
+            return Interop.simple_service_return_string(_context);
+        }
+
         public void MethodVoidFfiError()
         {
             var rval = Interop.simple_service_method_void_ffi_error(_context);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
+        public IntPtr Context => _context;
+    }
+
+
+    public partial class SimpleServiceLifetime : IDisposable
+    {
+        private IntPtr _context;
+
+        private SimpleServiceLifetime() {}
+
+        public static SimpleServiceLifetime NewWith(ref uint some_value)
+        {
+            var self = new SimpleServiceLifetime();
+            var rval = Interop.simple_service_lt_new_with(ref self._context, ref some_value);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+            return self;
+        }
+
+        public void Dispose()
+        {
+            var rval = Interop.simple_service_lt_destroy(ref _context);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
+        public void MethodLt(SliceBool slice)
+        {
+            Interop.simple_service_lt_method_lt(_context, slice);
+        }
+
+        public void MethodLt(Bool[] slice)
+        {
+            Interop.simple_service_lt_method_lt(_context, slice);
+        }
+
+        public void MethodLt2(SliceBool slice)
+        {
+            Interop.simple_service_lt_method_lt2(_context, slice);
+        }
+
+        public void MethodLt2(Bool[] slice)
+        {
+            Interop.simple_service_lt_method_lt2(_context, slice);
+        }
+
+        public void MethodVoidFfiError()
+        {
+            var rval = Interop.simple_service_lt_method_void_ffi_error(_context);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);

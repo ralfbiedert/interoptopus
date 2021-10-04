@@ -4,6 +4,17 @@
 
 Tips for solving non-trivial breaking changes when upgrading from previous versions.
 
+### 0.11 → 0.12
+
+- Changed behavior of `#[ffi_service_method]`
+  - `#[ffi_service_method(direct)]` is now `#[ffi_service_method(wrap = "direct")]` 
+
+
+### 0.10 → 0.11
+
+- C# backend switched constructors to static methods
+  - Wherever you used `new Service(x)` now use `Service.NewWith(x)` (or similar).
+
 
 ### 0.9 → 0.10
 

@@ -33,6 +33,7 @@ typedef struct my_library_generic3 my_library_generic3;
 typedef struct my_library_generic4 my_library_generic4;
 typedef struct my_library_opaque my_library_opaque;
 typedef struct my_library_simpleservice my_library_simpleservice;
+typedef struct my_library_simpleservicelifetime my_library_simpleservicelifetime;
 typedef struct my_library_empty my_library_empty;
 
 typedef enum my_library_ffierror
@@ -265,7 +266,13 @@ uint8_t simple_service_method_mut_self_ref_slice(my_library_simpleservice* conte
 uint8_t simple_service_method_mut_self_ref_slice_limited(my_library_simpleservice* context, uint8_t* x, uint8_t* y, my_library_sliceu8 slice, my_library_sliceu8 slice2);
 my_library_ffierror simple_service_method_mut_self_ffi_error(my_library_simpleservice* context, my_library_slicemutu8 slice);
 my_library_ffierror simple_service_method_mut_self_no_error(my_library_simpleservice* context, my_library_slicemutu8 slice);
+uint8_t* simple_service_return_string(my_library_simpleservice* context);
 my_library_ffierror simple_service_method_void_ffi_error(my_library_simpleservice* context);
+my_library_ffierror simple_service_lt_destroy(my_library_simpleservicelifetime** context);
+my_library_ffierror simple_service_lt_new_with(my_library_simpleservicelifetime** context, uint32_t* some_value);
+void simple_service_lt_method_lt(my_library_simpleservicelifetime* context, my_library_slicebool slice);
+void simple_service_lt_method_lt2(my_library_simpleservicelifetime* context, my_library_slicebool slice);
+my_library_ffierror simple_service_lt_method_void_ffi_error(my_library_simpleservicelifetime* context);
 
 #ifdef __cplusplus
 }

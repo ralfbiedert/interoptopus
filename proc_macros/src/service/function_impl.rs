@@ -23,10 +23,22 @@ pub enum MethodType {
 #[derive(Debug, Default, FromMeta)]
 pub struct AttributeCtor {}
 
-#[derive(Debug, Default, FromMeta)]
+#[derive(Debug, FromMeta)]
+pub enum WrappingMode {
+    Result,
+    Direct,
+    Raw,
+}
+
+#[derive(Debug, FromMeta)]
 pub struct AttributeMethod {
-    #[darling(default)]
-    direct: bool,
+    wrap: WrappingMode,
+}
+
+impl Default for AttributeMethod {
+    fn default() -> Self {
+        Self { wrap: WrappingMode::Result }
+    }
 }
 
 /// Inspects all attributes and determines the method type to generate.
@@ -35,7 +47,7 @@ fn method_type(attrs: &[Attribute]) -> MethodType {
         let ctor_attributes = attrs
             .iter()
             .filter_map(|attribute| {
-                let meta = attribute.parse_meta().ok()?;
+                let meta = attribute.parse_meta().unwrap();
                 AttributeCtor::from_meta(&meta).ok()
             })
             .next()
@@ -46,9 +58,9 @@ fn method_type(attrs: &[Attribute]) -> MethodType {
         let function_attributes = attrs
             .iter()
             .filter(|x| format!("{:?}", x).contains("ffi_service_method"))
-            .filter_map(|attribute| {
-                let meta = attribute.parse_meta().ok()?;
-                AttributeMethod::from_meta(&meta).ok()
+            .map(|attribute| {
+                let meta = attribute.parse_meta().unwrap();
+                AttributeMethod::from_meta(&meta).unwrap()
             })
             .next()
             .unwrap_or_default();
@@ -152,8 +164,8 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 }
             }
         }
-        MethodType::Method(x) => {
-            if x.direct {
+        MethodType::Method(x) => match x.wrap {
+            WrappingMode::Direct => {
                 quote! {
                     #[interoptopus::ffi_function]
                     #[no_mangle]
@@ -175,7 +187,21 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                         }
                     }
                 }
-            } else {
+            }
+            WrappingMode::Raw => {
+                quote! {
+                    #[interoptopus::ffi_function]
+                    #[no_mangle]
+                    #[allow(unused_mut)]
+                    #(
+                        #[doc = #doc_lines]
+                    )*
+                    pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #rval {
+                        <#without_lifetimes>::#orig_fn_ident( #(#arg_names),* )
+                    }
+                }
+            }
+            WrappingMode::Result => {
                 quote! {
                     #[interoptopus::ffi_function]
                     #[no_mangle]
@@ -190,7 +216,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     }
                 }
             }
-        }
+        },
         MethodType::Destructor => panic!("Must not happen."),
     };
 

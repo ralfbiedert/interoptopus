@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using My.Company;
@@ -72,6 +73,8 @@ namespace interop_test
             var b = new byte[] { 1, 2, 3 } ;
             
             x.MethodMutSelfFfiError(b);
+            var s1 = x.ReturnString();
+            var s2 = x.ReturnString();
         }
 
     }
