@@ -18,9 +18,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 15413286039450138463ul)
+            if (api_version != 1535588064847758560ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (15413286039450138463). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (1535588064847758560). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -539,7 +539,7 @@ namespace My.Company
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_return_string")]
-        public static extern string simple_service_return_string(IntPtr context);
+        public static extern IntPtr simple_service_return_string(IntPtr context);
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_void_ffi_error")]
@@ -610,6 +610,23 @@ namespace My.Company
             finally
             {
                 slice_pinned.Free();
+            }
+        }
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lt_return_string_accept_slice")]
+        public static extern IntPtr simple_service_lt_return_string_accept_slice(IntPtr anon0, Sliceu8 anon1);
+
+        public static string simple_service_lt_return_string_accept_slice(IntPtr anon0, byte[] anon1) {
+            var anon1_pinned = GCHandle.Alloc(anon1, GCHandleType.Pinned);
+            var anon1_slice = new Sliceu8(anon1_pinned, (ulong) anon1.Length);
+            try
+            {
+                var s = simple_service_lt_return_string_accept_slice(anon0, anon1_slice);;
+                return Marshal.PtrToStringAnsi(s);
+            }
+            finally
+            {
+                anon1_pinned.Free();
             }
         }
 
@@ -1065,7 +1082,8 @@ namespace My.Company
 
         public string ReturnString()
         {
-            return Interop.simple_service_return_string(_context);
+            var s = Interop.simple_service_return_string(_context);
+            return Marshal.PtrToStringAnsi(s);
         }
 
         public void MethodVoidFfiError()
@@ -1125,6 +1143,17 @@ namespace My.Company
         public void MethodLt2(Bool[] slice)
         {
             Interop.simple_service_lt_method_lt2(_context, slice);
+        }
+
+        public string ReturnStringAcceptSlice(Sliceu8 anon1)
+        {
+            var s = Interop.simple_service_lt_return_string_accept_slice(_context, anon1);
+            return Marshal.PtrToStringAnsi(s);
+        }
+
+        public string ReturnStringAcceptSlice(byte[] anon1)
+        {
+            return Interop.simple_service_lt_return_string_accept_slice(_context, anon1);
         }
 
         public void MethodVoidFfiError()

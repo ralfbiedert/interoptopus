@@ -85,7 +85,7 @@
 //!         Ok(())
 //!     }
 //!
-//!     #[ffi_service_method(direct)]
+//!     #[ffi_service_method(wrap = "direct")]
 //!     pub fn just_return_value(&self) -> u32 {
 //!         self.some_value
 //!     }

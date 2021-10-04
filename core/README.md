@@ -89,6 +89,8 @@ See this [**C# call-cost table**](https://github.com/ralfbiedert/interoptopus/bl
 
 ### Changelog
 
+- **v0.12** - Better compat using `#[ffi_service_method]`.
+- **v0.11** - C# switch ctors to static methods.
 - **v0.10** - C# flavors `DotNet` and `Unity` (incl. Burst).
 - **v0.9** - 150x faster C# slices, Python type hints.
 - **v0.8** - Moved testing functions to respective backends.

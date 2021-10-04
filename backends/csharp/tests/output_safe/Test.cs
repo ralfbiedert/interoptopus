@@ -69,12 +69,18 @@ namespace interop_test
         [Fact]
         public void pattern_service_generated()
         {
-            var x = SimpleService.NewWith(123);
+            var simpleService = SimpleService.NewWith(123);
             var b = new byte[] { 1, 2, 3 } ;
             
-            x.MethodMutSelfFfiError(b);
-            var s1 = x.ReturnString();
-            var s2 = x.ReturnString();
+            simpleService.MethodMutSelfFfiError(b);
+            var s1 = simpleService.ReturnString();
+            var s2 = simpleService.ReturnString();
+
+
+            uint value = 123;
+            var lt = SimpleServiceLifetime.NewWith(ref value);
+            var s3 = lt.ReturnStringAcceptSlice(System.Array.Empty<byte>());
+            var s4 = lt.ReturnStringAcceptSlice(System.Array.Empty<byte>());
         }
 
     }

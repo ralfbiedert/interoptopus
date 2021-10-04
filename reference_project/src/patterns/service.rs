@@ -115,7 +115,13 @@ impl<'a> SimpleServiceLifetime<'a> {
     pub fn method_lt(&mut self, _slice: FFISlice<'a, FFIBool>) {}
 
     #[ffi_service_method(wrap = "direct")]
-    pub fn method_lt2<'b>(&mut self, _slice: FFISlice<'b, FFIBool>) {}
+    pub fn method_lt2(&mut self, _slice: FFISlice<FFIBool>) {}
+
+    // Sometimes lifetime params can get confused in low level codegen, so we have to replace `self` with explicit self.
+    #[ffi_service_method(wrap = "raw")]
+    pub fn return_string_accept_slice<'b>(_: &mut SimpleServiceLifetime<'b>, _: FFISlice<'b, u8>) -> AsciiPointer<'b> {
+        AsciiPointer::empty()
+    }
 
     pub fn method_void_ffi_error(&mut self) -> Result<(), Error> {
         Ok(())

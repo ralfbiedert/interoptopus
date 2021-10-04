@@ -271,6 +271,7 @@ cffi_ffierror simple_service_lt_destroy(cffi_simpleservicelifetime** context);
 cffi_ffierror simple_service_lt_new_with(cffi_simpleservicelifetime** context, uint32_t* some_value);
 void simple_service_lt_method_lt(cffi_simpleservicelifetime* context, cffi_slicebool slice);
 void simple_service_lt_method_lt2(cffi_simpleservicelifetime* context, cffi_slicebool slice);
+uint8_t* simple_service_lt_return_string_accept_slice(cffi_simpleservicelifetime* anon0, cffi_sliceu8 anon1);
 cffi_ffierror simple_service_lt_method_void_ffi_error(cffi_simpleservicelifetime* context);
 """
 
@@ -1944,6 +1945,18 @@ class api:
         return _api.simple_service_lt_method_lt2(context, slice)
 
     @staticmethod
+    def simple_service_lt_return_string_accept_slice(anon0, anon1):
+        """"""
+        if hasattr(anon0, "_ctx"):
+            anon0 = anon0.c_ptr()
+        _anon1 = ffi.new("cffi_sliceu8[]", 1)
+        _anon1[0].data = anon1.c_ptr()
+        _anon1[0].len = len(anon1)
+        anon1 = _anon1[0]
+
+        return _api.simple_service_lt_return_string_accept_slice(anon0, anon1)
+
+    @staticmethod
     def simple_service_lt_method_void_ffi_error(context):
         """"""
         if hasattr(context, "_ctx"):
@@ -2074,6 +2087,10 @@ class SimpleServiceLifetime(CHeapAllocated):
     def method_lt2(self, slice):
         """"""
         return api.simple_service_lt_method_lt2(self.c_value(), slice)
+
+    def return_string_accept_slice(self, anon1):
+        """"""
+        return api.simple_service_lt_return_string_accept_slice(self.c_value(), anon1)
 
     def method_void_ffi_error(self, ):
         """"""

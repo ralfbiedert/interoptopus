@@ -828,6 +828,7 @@ pub trait CSharpWriter {
             // common C# types.
             let rval = match function.signature().rval() {
                 CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
+                CType::Pattern(TypePattern::AsciiPointer) => "string".to_string(),
                 _ => self.converter().to_typespecifier_in_rval(function.signature().rval()),
             };
             self.write_documentation(w, function.meta().documentation())?;
@@ -918,6 +919,10 @@ pub trait CSharpWriter {
                 indented!(w, [_], r#"{{"#)?;
                 indented!(w, [_ _], r#"throw new InteropException<{}>(rval);"#, e.the_enum().rust_name())?;
                 indented!(w, [_], r#"}}"#)?;
+            }
+            CType::Pattern(TypePattern::AsciiPointer) => {
+                indented!(w, [_], r#"var s = {};"#, fn_call)?;
+                indented!(w, [_], r#"return Marshal.PtrToStringAnsi(s);"#)?;
             }
             CType::Primitive(PrimitiveType::Void) => {
                 indented!(w, [_], r#"{};"#, fn_call)?;

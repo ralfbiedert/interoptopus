@@ -32,6 +32,7 @@ typedef struct cffi_generic3 cffi_generic3;
 typedef struct cffi_generic4 cffi_generic4;
 typedef struct cffi_opaque cffi_opaque;
 typedef struct cffi_simpleservice cffi_simpleservice;
+typedef struct cffi_simpleservicelifetime cffi_simpleservicelifetime;
 typedef struct cffi_empty cffi_empty;
 
 typedef enum cffi_ffierror
@@ -264,7 +265,14 @@ uint8_t simple_service_method_mut_self_ref_slice(cffi_simpleservice* context, ui
 uint8_t simple_service_method_mut_self_ref_slice_limited(cffi_simpleservice* context, uint8_t* x, uint8_t* y, cffi_sliceu8 slice, cffi_sliceu8 slice2);
 cffi_ffierror simple_service_method_mut_self_ffi_error(cffi_simpleservice* context, cffi_slicemutu8 slice);
 cffi_ffierror simple_service_method_mut_self_no_error(cffi_simpleservice* context, cffi_slicemutu8 slice);
+uint8_t* simple_service_return_string(cffi_simpleservice* context);
 cffi_ffierror simple_service_method_void_ffi_error(cffi_simpleservice* context);
+cffi_ffierror simple_service_lt_destroy(cffi_simpleservicelifetime** context);
+cffi_ffierror simple_service_lt_new_with(cffi_simpleservicelifetime** context, uint32_t* some_value);
+void simple_service_lt_method_lt(cffi_simpleservicelifetime* context, cffi_slicebool slice);
+void simple_service_lt_method_lt2(cffi_simpleservicelifetime* context, cffi_slicebool slice);
+uint8_t* simple_service_lt_return_string_accept_slice(cffi_simpleservicelifetime* anon0, cffi_sliceu8 anon1);
+cffi_ffierror simple_service_lt_method_void_ffi_error(cffi_simpleservicelifetime* context);
 """
 
 
@@ -1862,12 +1870,99 @@ class api:
             raise Exception(f"Function returned error {_rval}")
 
     @staticmethod
+    def simple_service_return_string(context):
+        """"""
+        if hasattr(context, "_ctx"):
+            context = context.c_ptr()
+
+        return _api.simple_service_return_string(context)
+
+    @staticmethod
     def simple_service_method_void_ffi_error(context):
         """"""
         if hasattr(context, "_ctx"):
             context = context.c_ptr()
 
         _rval = _api.simple_service_method_void_ffi_error(context)
+        if _rval == FFIError.Ok:
+            return _rval
+        else:
+            raise Exception(f"Function returned error {_rval}")
+
+    @staticmethod
+    def simple_service_lt_destroy(context):
+        """ Destroys the given instance.
+
+ # Safety
+
+ The passed parameter MUST have been created with the corresponding init function;
+ passing any other value results in undefined behavior."""
+        if hasattr(context, "_ctx"):
+            context = context.c_ptr()
+
+        _rval = _api.simple_service_lt_destroy(context)
+        if _rval == FFIError.Ok:
+            return _rval
+        else:
+            raise Exception(f"Function returned error {_rval}")
+
+    @staticmethod
+    def simple_service_lt_new_with(context, some_value):
+        """"""
+        if hasattr(context, "_ctx"):
+            context = context.c_ptr()
+        if hasattr(some_value, "_ctx"):
+            some_value = some_value.c_ptr()
+
+        _rval = _api.simple_service_lt_new_with(context, some_value)
+        if _rval == FFIError.Ok:
+            return _rval
+        else:
+            raise Exception(f"Function returned error {_rval}")
+
+    @staticmethod
+    def simple_service_lt_method_lt(context, slice):
+        """"""
+        if hasattr(context, "_ctx"):
+            context = context.c_ptr()
+        _slice = ffi.new("cffi_slicebool[]", 1)
+        _slice[0].data = slice.c_ptr()
+        _slice[0].len = len(slice)
+        slice = _slice[0]
+
+        return _api.simple_service_lt_method_lt(context, slice)
+
+    @staticmethod
+    def simple_service_lt_method_lt2(context, slice):
+        """"""
+        if hasattr(context, "_ctx"):
+            context = context.c_ptr()
+        _slice = ffi.new("cffi_slicebool[]", 1)
+        _slice[0].data = slice.c_ptr()
+        _slice[0].len = len(slice)
+        slice = _slice[0]
+
+        return _api.simple_service_lt_method_lt2(context, slice)
+
+    @staticmethod
+    def simple_service_lt_return_string_accept_slice(anon0, anon1):
+        """"""
+        if hasattr(anon0, "_ctx"):
+            anon0 = anon0.c_ptr()
+        _anon1 = ffi.new("cffi_sliceu8[]", 1)
+        _anon1[0].data = anon1.c_ptr()
+        _anon1[0].len = len(anon1)
+        anon1 = _anon1[0]
+
+        return _api.simple_service_lt_return_string_accept_slice(anon0, anon1)
+
+    @staticmethod
+    def simple_service_lt_method_void_ffi_error(context):
+        """"""
+        if hasattr(context, "_ctx"):
+            context = context.c_ptr()
+
+        _rval = _api.simple_service_lt_method_void_ffi_error(context)
         if _rval == FFIError.Ok:
             return _rval
         else:
@@ -1956,8 +2051,49 @@ class SimpleService(CHeapAllocated):
         """"""
         return api.simple_service_method_mut_self_no_error(self.c_value(), slice)
 
+    def return_string(self, ):
+        """"""
+        return api.simple_service_return_string(self.c_value(), )
+
     def method_void_ffi_error(self, ):
         """"""
         return api.simple_service_method_void_ffi_error(self.c_value(), )
+
+
+class SimpleServiceLifetime(CHeapAllocated):
+    __api_lock = object()
+
+    def __init__(self, api_lock, ctx):
+        assert(api_lock == SimpleServiceLifetime.__api_lock), "You must create this with a static constructor." 
+        self._ctx = ctx
+
+    @staticmethod
+    def new_with(some_value) -> SimpleServiceLifetime:
+        """"""
+        if hasattr(some_value, "_ctx"):
+            some_value = some_value.c_ptr()
+        ctx = ffi.new("cffi_simpleservicelifetime**")
+        api.simple_service_lt_new_with(ctx, some_value)
+        self = SimpleServiceLifetime(SimpleServiceLifetime.__api_lock, ctx)
+        return self
+
+    def __del__(self):
+        api.simple_service_lt_destroy(self.c_ptr(), )
+
+    def method_lt(self, slice):
+        """"""
+        return api.simple_service_lt_method_lt(self.c_value(), slice)
+
+    def method_lt2(self, slice):
+        """"""
+        return api.simple_service_lt_method_lt2(self.c_value(), slice)
+
+    def return_string_accept_slice(self, anon1):
+        """"""
+        return api.simple_service_lt_return_string_accept_slice(self.c_value(), anon1)
+
+    def method_void_ffi_error(self, ):
+        """"""
+        return api.simple_service_lt_method_void_ffi_error(self.c_value(), )
 
 
