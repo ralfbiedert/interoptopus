@@ -171,6 +171,12 @@ typedef struct my_library_sliceu8
     uint64_t len;
     } my_library_sliceu8;
 
+typedef struct my_library_slicemutu32
+    {
+    uint32_t* data;
+    uint64_t len;
+    } my_library_slicemutu32;
+
 typedef struct my_library_slicemutu8
     {
     uint8_t* data;
@@ -266,6 +272,8 @@ uint8_t simple_service_method_mut_self_ref_slice(my_library_simpleservice* conte
 uint8_t simple_service_method_mut_self_ref_slice_limited(my_library_simpleservice* context, uint8_t* x, uint8_t* y, my_library_sliceu8 slice, my_library_sliceu8 slice2);
 my_library_ffierror simple_service_method_mut_self_ffi_error(my_library_simpleservice* context, my_library_slicemutu8 slice);
 my_library_ffierror simple_service_method_mut_self_no_error(my_library_simpleservice* context, my_library_slicemutu8 slice);
+my_library_sliceu32 simple_service_return_slice(my_library_simpleservice* context);
+my_library_slicemutu32 simple_service_return_slice_mut(my_library_simpleservice* context);
 uint8_t* simple_service_return_string(my_library_simpleservice* context);
 my_library_ffierror simple_service_method_void_ffi_error(my_library_simpleservice* context);
 my_library_ffierror simple_service_lt_destroy(my_library_simpleservicelifetime** context);

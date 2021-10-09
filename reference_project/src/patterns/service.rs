@@ -11,6 +11,7 @@ use std::ffi::CString;
 pub struct SimpleService {
     pub some_value: u32,
     pub c_string: CString,
+    pub data: Vec<u32>,
 }
 
 // Regular implementation of methods.
@@ -22,6 +23,7 @@ impl SimpleService {
         Ok(Self {
             some_value,
             c_string: CString::new("Hello new_with").unwrap(),
+            data: vec![some_value; some_value as usize],
         })
     }
 
@@ -30,6 +32,7 @@ impl SimpleService {
         Ok(Self {
             some_value: 0,
             c_string: CString::new("Hello new_without").unwrap(),
+            data: vec![1, 2, 3],
         })
     }
 
@@ -86,6 +89,20 @@ impl SimpleService {
     pub fn method_mut_self_no_error(&mut self, mut slice: FFISliceMut<u8>) -> Result<(), Error> {
         slice.as_slice_mut();
         Ok(())
+    }
+
+    /// Warning, you _must_ discard the returned slice object before calling into this service
+    /// again, as otherwise undefined behavior might happen.
+    #[ffi_service_method(wrap = "raw")]
+    pub fn return_slice(&mut self) -> FFISlice<u32> {
+        FFISlice::from_slice(&self.data)
+    }
+
+    /// Warning, you _must_ discard the returned slice object before calling into this service
+    /// again, as otherwise undefined behavior might happen.
+    #[ffi_service_method(wrap = "raw")]
+    pub fn return_slice_mut(&mut self) -> FFISliceMut<u32> {
+        FFISliceMut::from_slice(&mut self.data)
     }
 
     #[ffi_service_method(wrap = "raw")]

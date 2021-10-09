@@ -170,6 +170,12 @@ typedef struct cffi_sliceu8
     uint64_t len;
     } cffi_sliceu8;
 
+typedef struct cffi_slicemutu32
+    {
+    uint32_t* data;
+    uint64_t len;
+    } cffi_slicemutu32;
+
 typedef struct cffi_slicemutu8
     {
     uint8_t* data;
@@ -265,6 +271,8 @@ uint8_t simple_service_method_mut_self_ref_slice(cffi_simpleservice* context, ui
 uint8_t simple_service_method_mut_self_ref_slice_limited(cffi_simpleservice* context, uint8_t* x, uint8_t* y, cffi_sliceu8 slice, cffi_sliceu8 slice2);
 cffi_ffierror simple_service_method_mut_self_ffi_error(cffi_simpleservice* context, cffi_slicemutu8 slice);
 cffi_ffierror simple_service_method_mut_self_no_error(cffi_simpleservice* context, cffi_slicemutu8 slice);
+cffi_sliceu32 simple_service_return_slice(cffi_simpleservice* context);
+cffi_slicemutu32 simple_service_return_slice_mut(cffi_simpleservice* context);
 uint8_t* simple_service_return_string(cffi_simpleservice* context);
 cffi_ffierror simple_service_method_void_ffi_error(cffi_simpleservice* context);
 cffi_ffierror simple_service_lt_destroy(cffi_simpleservicelifetime** context);
@@ -1870,6 +1878,24 @@ class api:
             raise Exception(f"Function returned error {_rval}")
 
     @staticmethod
+    def simple_service_return_slice(context):
+        """ Warning, you _must_ discard the returned slice object before calling into this service
+ again, as otherwise undefined behavior might happen."""
+        if hasattr(context, "_ctx"):
+            context = context.c_ptr()
+
+        return _api.simple_service_return_slice(context)
+
+    @staticmethod
+    def simple_service_return_slice_mut(context):
+        """ Warning, you _must_ discard the returned slice object before calling into this service
+ again, as otherwise undefined behavior might happen."""
+        if hasattr(context, "_ctx"):
+            context = context.c_ptr()
+
+        return _api.simple_service_return_slice_mut(context)
+
+    @staticmethod
     def simple_service_return_string(context):
         """"""
         if hasattr(context, "_ctx"):
@@ -2050,6 +2076,16 @@ class SimpleService(CHeapAllocated):
     def method_mut_self_no_error(self, slice):
         """"""
         return api.simple_service_method_mut_self_no_error(self.c_value(), slice)
+
+    def return_slice(self, ):
+        """ Warning, you _must_ discard the returned slice object before calling into this service
+ again, as otherwise undefined behavior might happen."""
+        return api.simple_service_return_slice(self.c_value(), )
+
+    def return_slice_mut(self, ):
+        """ Warning, you _must_ discard the returned slice object before calling into this service
+ again, as otherwise undefined behavior might happen."""
+        return api.simple_service_return_slice_mut(self.c_value(), )
 
     def return_string(self, ):
         """"""

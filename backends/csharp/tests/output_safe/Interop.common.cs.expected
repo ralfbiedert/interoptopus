@@ -193,6 +193,69 @@ namespace My.Company.Common
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
+    public partial struct SliceMutu32
+    {
+        IntPtr data;
+        ulong len;
+    }
+
+    public partial struct SliceMutu32 : IEnumerable<uint>
+    {
+        public SliceMutu32(GCHandle handle, ulong count)
+        {
+            this.data = handle.AddrOfPinnedObject();
+            this.len = count;
+        }
+        public SliceMutu32(IntPtr handle, ulong count)
+        {
+            this.data = handle;
+            this.len = count;
+        }
+        public uint this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                var size = Marshal.SizeOf(typeof(uint));
+                var ptr = new IntPtr(data.ToInt64() + i * size);
+                return Marshal.PtrToStructure<uint>(ptr);
+            }
+            set
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                var size = Marshal.SizeOf(typeof(uint));
+                var ptr = new IntPtr(data.ToInt64() + i * size);
+                Marshal.StructureToPtr<uint>(value, ptr, false);
+            }
+        }
+        public uint[] Copied
+        {
+            get
+            {
+                var rval = new uint[len];
+                for (var i = 0; i < (int) len; i++) {
+                    rval[i] = this[i];
+                }
+                return rval;
+            }
+        }
+        public int Count => (int) len;
+        public IEnumerator<uint> GetEnumerator()
+        {
+            for (var i = 0; i < (int)len; ++i)
+            {
+                yield return this[i];
+            }
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }
+
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
     public partial struct SliceMutu8
     {
         IntPtr data;

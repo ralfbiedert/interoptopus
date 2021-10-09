@@ -18,9 +18,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 1535588064847758560ul)
+            if (api_version != 6434875194133105768ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (1535588064847758560). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (6434875194133105768). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -537,6 +537,18 @@ namespace My.Company
                 slice_pinned.Free();
             }
         }
+
+        /// Warning, you _must_ discard the returned slice object before calling into this service
+        /// again, as otherwise undefined behavior might happen.
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_return_slice")]
+        public static extern Sliceu32 simple_service_return_slice(IntPtr context);
+
+
+        /// Warning, you _must_ discard the returned slice object before calling into this service
+        /// again, as otherwise undefined behavior might happen.
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_return_slice_mut")]
+        public static extern SliceMutu32 simple_service_return_slice_mut(IntPtr context);
+
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_return_string")]
         public static extern IntPtr simple_service_return_string(IntPtr context);
@@ -1078,6 +1090,20 @@ namespace My.Company
         public void MethodMutSelfNoError(byte[] slice)
         {
             Interop.simple_service_method_mut_self_no_error(_context, slice);
+        }
+
+        /// Warning, you _must_ discard the returned slice object before calling into this service
+        /// again, as otherwise undefined behavior might happen.
+        public Sliceu32 ReturnSlice()
+        {
+            return Interop.simple_service_return_slice(_context);
+        }
+
+        /// Warning, you _must_ discard the returned slice object before calling into this service
+        /// again, as otherwise undefined behavior might happen.
+        public SliceMutu32 ReturnSliceMut()
+        {
+            return Interop.simple_service_return_slice_mut(_context);
         }
 
         public string ReturnString()

@@ -282,6 +282,99 @@ namespace My.Company.Common
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
+    public partial struct SliceMutu32
+    {
+        #if UNITY_2018_1_OR_NEWER
+        [NativeDisableUnsafePtrRestriction]
+        #endif
+        IntPtr data;
+        ulong len;
+    }
+
+    public partial struct SliceMutu32 : IEnumerable<uint>
+    {
+        public SliceMutu32(GCHandle handle, ulong count)
+        {
+            this.data = handle.AddrOfPinnedObject();
+            this.len = count;
+        }
+        public SliceMutu32(IntPtr handle, ulong count)
+        {
+            this.data = handle;
+            this.len = count;
+        }
+        #if UNITY_2018_1_OR_NEWER
+        public SliceMutu32(NativeArray<uint> handle)
+        {
+            unsafe
+            {
+                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
+                this.len = (ulong) handle.Length;
+            }
+        }
+        #endif
+        public uint this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                unsafe
+                {
+                    var d = (uint*) data.ToPointer();
+                    return d[i];
+                }
+            }
+            set
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                unsafe
+                {
+                    var d = (uint*) data.ToPointer();
+                    d[i] = value;
+                }
+            }
+        }
+        public uint[] Copied
+        {
+            get
+            {
+                var rval = new uint[len];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        #if __FALSE
+                        #elif NETCOREAPP
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        #elif UNITY_2018_1_OR_NEWER
+                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(uint)));
+                        #else
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
+                        #endif
+                    }
+                }
+                return rval;
+            }
+        }
+        public int Count => (int) len;
+        public IEnumerator<uint> GetEnumerator()
+        {
+            for (var i = 0; i < (int)len; ++i)
+            {
+                yield return this[i];
+            }
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }
+
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
     public partial struct SliceMutu8
     {
         #if UNITY_2018_1_OR_NEWER
