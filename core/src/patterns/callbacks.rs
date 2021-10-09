@@ -132,7 +132,7 @@ impl NamedCallback {
 #[macro_export]
 macro_rules! callback {
     ($name:ident($($param:ident: $ty:ty),*) $(-> $rval:ty)?) => {
-        #[derive(Clone)]
+        #[derive(Default, Clone)]
         #[repr(transparent)]
         pub struct $name(Option<extern "C" fn($($ty),*) $(-> $rval)?>);
 

@@ -43,6 +43,7 @@ use crate::lang::rust::CTypeInfo;
 use crate::patterns::TypePattern;
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
+use std::ptr::{null, null_mut};
 
 /// A representation of an array passed over an FFI boundary
 #[repr(C)]
@@ -50,6 +51,16 @@ pub struct FFISlice<'a, T> {
     data: *const T,
     len: u64,
     _phantom: PhantomData<&'a T>,
+}
+
+impl<'a, T> Default for FFISlice<'a, T> {
+    fn default() -> Self {
+        Self {
+            data: null(),
+            len: 0,
+            _phantom: PhantomData,
+        }
+    }
 }
 
 impl<'a, T> FFISlice<'a, T> {
@@ -126,6 +137,16 @@ pub struct FFISliceMut<'a, T> {
     data: *mut T,
     len: u64,
     _phantom: PhantomData<&'a mut T>,
+}
+
+impl<'a, T> Default for FFISliceMut<'a, T> {
+    fn default() -> Self {
+        Self {
+            data: null_mut(),
+            len: 0,
+            _phantom: PhantomData,
+        }
+    }
 }
 
 impl<'a, T> FFISliceMut<'a, T> {

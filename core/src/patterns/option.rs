@@ -122,6 +122,12 @@ impl<T: Default> FFIOption<T> {
     }
 }
 
+impl<T: Default> Default for FFIOption<T> {
+    fn default() -> Self {
+        Self::none()
+    }
+}
+
 impl<T: Default> From<Option<T>> for FFIOption<T> {
     fn from(option: Option<T>) -> Self {
         match option {

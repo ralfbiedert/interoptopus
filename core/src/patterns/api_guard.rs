@@ -60,6 +60,7 @@ use std::hash::{Hash, Hasher};
 /// Holds the API version hash of the given library.
 #[repr(transparent)]
 #[allow(dead_code)]
+#[derive(Debug, Default, PartialOrd, PartialEq, Copy, Clone)]
 pub struct APIVersion {
     version: u64,
 }
