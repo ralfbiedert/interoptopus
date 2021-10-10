@@ -24,15 +24,14 @@ Python: 3.10.0
 
 | Construct | ns per call |
 | --- | --- |
-| `empty`                                            | 51 |
-| `primitive_void()`                                 | 276 |
-| `primitive_u8(0)`                                  | 379 |
-| `primitive_u16(0)`                                 | 395 |
-| `primitive_u32(0)`                                 | 386 |
-| `primitive_u64(0)`                                 | 408 |
-| `many_args_5(0, 0, 0, 0, 0)`                       | 803 |
-| `ptr(x)`                                           | 457 |
-| `tupled(r.Tupled())`                               | 491 |
+| `primitive_void()`                                 | 270 |
+| `primitive_u8(0)`                                  | 380 |
+| `primitive_u16(0)`                                 | 380 |
+| `primitive_u32(0)`                                 | 392 |
+| `primitive_u64(0)`                                 | 391 |
+| `many_args_5(0, 0, 0, 0, 0)`                       | 792 |
+| `ptr(x)`                                           | 462 |
+| `tupled(r.Tupled())`                               | 467 |
 | `complex_args_1(r.Vec3f32(), empty)`               | 662 |
-| `callback(lambda x: x, 0)`                         | 1,084 |
-| `pattern_ffi_slice_delegate(lambda x: x[0])`       | 1,196 |
+| `callback(lambda x: x, 0)`                         | 1,093 |
+| `pattern_ffi_slice_delegate(lambda x: x[0])`       | 1,211 |

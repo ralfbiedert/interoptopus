@@ -17,7 +17,10 @@ def bench(file, name, f, reference = 0):
     nanos_per_single = (nanos / N) - reference
 
     name = f"`{name}`"
-    print("|", name.ljust(50), "| {:,.0f} |".format(nanos_per_single), file=file)
+
+    if reference > 0:
+        print("|", name.ljust(50), "| {:,.0f} |".format(nanos_per_single), file=file)
+
     return nanos_per_single
 
 
@@ -53,7 +56,7 @@ Python: 3.10.0
 | Construct | ns per call |
 | --- | --- |""", file=f)
 
-    reference = bench(f, "empty", lambda: 0)
+    reference = bench(f, "Baseline (already subtracted)", lambda: 0)
     bench(f, "primitive_void()", lambda: r.primitive_void(), reference)
     bench(f, "primitive_u8(0)", lambda: r.primitive_u8(0), reference)
     bench(f, "primitive_u16(0)", lambda: r.primitive_u16(0), reference)
