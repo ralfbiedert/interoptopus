@@ -23,6 +23,7 @@
   - high "API uncertainty" in the beginning, requiring lots of iterations to get it right,
   - predictable and "industry-grade" APIs in the end (final bindings ship to customers).
 
+  
 
 - **Where can I ask questions?**
 
@@ -42,18 +43,6 @@
   You probably forgot to declare one of your items `#[ffi_function]` or `#[ffi_const]`.
 
 
-- **How can I add a new pattern?**
-
-  Adding support for new patterns is best done via a PR. Patterns mimicking common Rust features
-  and improvements to existing patterns are welcome. As a rule of thumb they
-  should
-  - be idiomatic in Rust (e.g., options, slices),
-  - have a safe and sound Rust implementation and 'reasonable' usability in other languages,
-  - be useful in more than one backend and come with a reference implementation,
-  - _must_ fallback to C primitives (e.g., 'class methods' are functions with receivers).
-
-  As an alternative, and discouraged for public backends, you might be able to get away using "tags".
-
 
 - **How should I design my APIs?**
 
@@ -61,6 +50,21 @@
   slightly conservative with your signatures and always
   _think C_. Other languages do not track lifetimes well, and it is easy to accidentally pass an
   outlived pointer, or doubly alias a `&mut X` on reentrant functions.
+
+
+- **I have a `Vec<T>` in Rust, how can I move it to C#, Python, ...?**
+  
+  Moving a `Vec<T>` as-is cannot work as the type would be deallocted on passing the FFI boundary. Creating a 
+  new `FFIVec<T>` pattern _could_ be implemented, but is currently unsupported. The main design issue is that 
+  we would have to create helper methods on the user's behalf and manage ownership and (de)allocation on both side of the boundary. 
+  
+  That said, if you want to pass arbitrarily long data from a Rust function `f` to FFI you have 3 options:
+
+  - Accept a callback `f(c: MyCallback)`. This allows you to create data ad-hoc within `f` and invoke `callback` with a `FFISlice`. 
+  - Return a slice `f() -> FFISlice<T>`. For your users this is a bit nicer to call, but requires you to hold the `Vec<T>` somewhere else. Usually `f` would be a method of some service pattern. You also run the risk of UB if callers hold on to your slice for too long.   
+  - Accept a mutable slice `f(slice: FFISliceMut<T>)` and write into it. This is a bit more verbose for your caller but usually the most flexible and performant option.  
+  
+  We recommend to accept callbacks if you have _a few but unknown-many_ elements and mutable slices if users can query the length by other means.  
 
 
 
@@ -73,9 +77,23 @@
 - **I'm trying to compose pattern X with Y but get errors.**
 
   While on the Rust side patterns compose easily, backends usually have some trouble creating
-  nice (or even working) code for things like `FFISlice<FFIOption<AsciiPointer>>`. We 
-  recommend using patterns in moderation.  
-  
+  working code for things like `FFISlice<FFIOption<AsciiPointer>>`. For example C# does 
+  not support generics on FFI types, thus a new `FFISliceT` type has to be generated for every use of `FFISlice<T>` in Rust. We 
+  generally do not recommend to nest type patterns.  
+
+
+- **How can I add a new pattern?**
+
+  Adding support for new patterns is best done via a PR. Patterns mimicking common Rust features
+  and improvements to existing patterns are welcome. As a rule of thumb they
+  should
+  - be idiomatic in Rust (e.g., options, slices),
+  - have a safe and sound Rust implementation and 'reasonable' usability in other languages,
+  - be useful in more than one backend and come with a reference implementation,
+  - _must_ fallback to C primitives (e.g., 'class methods' are functions with receivers).
+
+  As an alternative, and discouraged for public backends, you might be able to get away using "tags".
+ 
 
 ### C#
 
@@ -134,6 +152,18 @@
   being enabled in the C# project setting. In Unity it will force the entire game
   project to be ticked `Unsafe` and might not be _nice_ if you ship bindings to customers.
   However, if you only consume your own bindings and don't give them to 3rd parties this is a non-issue.
+
+
+### Python
+
+- **Why `ctypes` and not `cffi`?**
+  
+  We had a cffi backend, but ctypes works out of the box and there was, according to our benchmarks, no significant 
+  speed difference between these two. Also, ctypes code looks nicer. 
+
+- **How can I return a ctypes struct in a ctypes callback?**
+
+  Right now you can't. This is a [know bug in Python](https://bugs.python.org/issue5710) and outside of our control. 
 
 
 ## New Backends
