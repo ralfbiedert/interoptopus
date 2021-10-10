@@ -95,7 +95,7 @@
 //! Detailed call cost tables can be found here: <sup>🔥</sup>
 //!
 //! - [**C# call overhead**](https://github.com/ralfbiedert/interoptopus/blob/master/backends/csharp/benches/BENCHMARK_RESULTS.md)
-//! - [**Python call overhead**](https://github.com/ralfbiedert/interoptopus/blob/master/backends/cpython/tests/output/BENCHMARK_RESULTS.mdmd)
+//! - [**Python call overhead**](https://github.com/ralfbiedert/interoptopus/blob/master/backends/cpython/tests/output/BENCHMARK_RESULTS.md)
 //!
 //! For a quick overview, this table lists the most common call types in _ns / call_:
 //!
