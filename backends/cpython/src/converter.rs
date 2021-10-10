@@ -3,7 +3,7 @@ use interoptopus::patterns::TypePattern;
 use interoptopus::util::safe_name;
 use std::ops::Deref;
 
-/// Maps
+/// Maps CType constructs to Pythonic constructs.
 pub struct Converter {}
 
 impl Converter {

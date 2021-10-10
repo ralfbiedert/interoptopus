@@ -13,6 +13,7 @@ update_readme "core"
 update_readme "proc_macros"
 update_readme "backends/c"
 update_readme "backends/csharp"
+update_readme "backends/cpython"
 update_readme "backends/cpython_cffi"
 update_readme "reference_project"
 

@@ -23,6 +23,7 @@ as you could have reasonably written them yourself, but never magic or hiding th
 you actually wanted to expose.
 
 
+
 ### Code you write ...
 
 ```rust
@@ -93,9 +94,9 @@ can help you design better APIs.
 Detailed call cost tables can be found here: <sup>🔥</sup>
 
 - [**C# call overhead**](https://github.com/ralfbiedert/interoptopus/blob/master/backends/csharp/benches/BENCHMARK_RESULTS.md)
-- [**Python call overhead**](https://github.com/ralfbiedert/interoptopus/blob/master/backends/python/tests/output/BENCHMARK_RESULTS.md)
+- [**Python call overhead**](https://github.com/ralfbiedert/interoptopus/blob/master/backends/cpython/tests/output/BENCHMARK_RESULTS.mdmd)
 
-For quick ballpark figures this table lists the most common call types in _ns / call_:
+For a quick overview, this table lists the most common call types in _ns / call_:
 
 | Construct | C# | Python |
 | --- | --- | --- |

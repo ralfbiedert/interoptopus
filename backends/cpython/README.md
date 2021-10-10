@@ -1,9 +1,9 @@
-Generates CPython CFFI bindings for [Interoptopus](https://github.com/ralfbiedert/interoptopus).
+Generates CPython bindings for [Interoptopus](https://github.com/ralfbiedert/interoptopus).
 
 ## Usage
 
 Assuming you have written a crate containing your FFI logic called `example_library_ffi` and
-want to generate **CPython CFFI bindings** for Python 3.7+, follow the instructions below.
+want to generate **CPython bindings** for Python 3.7+, follow the instructions below.
 
 #### Inside Your Library
 
@@ -41,7 +41,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 interoptopus = "..."
-interoptopus_backend_cpython_cffi = "..."
+interoptopus_backend_cpython = "..."
 ```
 
 Create a unit test in `tests/bindings.rs` which will generate your bindings when run
@@ -53,7 +53,7 @@ use interoptopus::{Error, Interop};
 
 #[test]
 fn bindings_cpython_cffi() -> Result<(), Error> {
-    use interoptopus_backend_cpython_cffi::{Config, Generator};
+    use interoptopus_backend_cpython::{Config, Generator};
 
     let library = example_library_ffi::my_inventory();
 
@@ -75,71 +75,56 @@ if you want to customize something. If you really don't like how something is ge
 easy to [**create your own**](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md#new-backends).
 
 ```python
-from cffi import FFI
+from __future__ import annotations
+import ctypes
+import typing
 
-api_definition = """
-typedef struct cffi_vec2
-    {
-    float x;
-    float y;
-    } cffi_vec2;
+T = typing.TypeVar("T")
+c_lib = None
 
-
-cffi_vec2 my_function(cffi_vec2 input);
-"""
-
-ffi = FFI()
-ffi.cdef(api_definition)
-_api = None
-
-def init_api(dll):
-    """Initializes this library, call with path to DLL."""
-    global _api
-    _api = ffi.dlopen(dll)
+def init_lib(path):
+    """Initializes the native library. Must be called at least once before anything else."""
+    global c_lib
+    c_lib = ctypes.cdll.LoadLibrary(path)
+    c_lib.my_function.argtypes = [Vec2]
+    c_lib.my_function.restype = Vec2
 
 
-class Vec2(object):
-    """ A simple type in our FFI layer."""
-    def __init__(self):
-        global _api, ffi
-        self._ctx = ffi.new("cffi_vec2[]", 1)
+def my_function(input: Vec2) -> Vec2:
+    return c_lib.my_function(input)
 
-    def array(n):
-        global _api, ffi
-        return ffi.new("cffi_vec2[]", n)
 
-    def ptr(self):
-        return self._ctx
+TRUE = ctypes.c_uint8(1)
+FALSE = ctypes.c_uint8(0)
+
+
+class Vec2(ctypes.Structure):
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("x", ctypes.c_float),
+        ("y", ctypes.c_float),
+    ]
+
+    def __init__(self, x: float = None, y: float = None):
+        if x is not None:
+            self.x = x
+        if y is not None:
+            self.y = y
 
     @property
-    def x(self):
-        """"""
-        return self._ctx[0].x
+    def x(self) -> float:
+        return ctypes.Structure.__get__(self, "x")
 
     @x.setter
-    def x(self, value):
-        self._ptr_x = value
-        self._ctx[0].x = value
+    def x(self, value: float):
+        return ctypes.Structure.__set__(self, "x", value)
 
     @property
-    def y(self):
-        """"""
-        return self._ctx[0].y
+    def y(self) -> float:
+        return ctypes.Structure.__get__(self, "y")
 
     @y.setter
-    def y(self, value):
-        self._ptr_y = value
-        self._ctx[0].y = value
-
-
-class raw:
-    """Raw access to all exported functions."""
-    def my_function(input):
-        """ Function using the type."""
-        global _api
-        if hasattr(input, "_ctx"):
-            input = input._ctx[0]
-
-        return _api.my_function(input)
+    def y(self, value: float):
+        return ctypes.Structure.__set__(self, "y", value)
 
 ```
