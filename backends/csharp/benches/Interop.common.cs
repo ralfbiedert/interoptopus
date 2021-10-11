@@ -500,6 +500,9 @@ namespace My.Company.Common
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate uint MyCallback(uint x0);
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void MyCallbackVoid(IntPtr x0);
+
 
 
     public class InteropException<T> : Exception

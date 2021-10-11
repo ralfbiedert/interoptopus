@@ -89,7 +89,7 @@
 //! at the FFI boundary (e.g., marshalling or pinning in managed languages). For C# that cost
 //! is often nanoseconds, for Python CFFI it can be microseconds.
 //!
-//! While there is nothing you can do about Being aware of the call cost
+//! While ultimately there is nothing you can do about a language's FFI performance, being aware of call costs
 //! can help you design better APIs.
 //!
 //! Detailed call cost tables can be found here: <sup>🔥</sup>

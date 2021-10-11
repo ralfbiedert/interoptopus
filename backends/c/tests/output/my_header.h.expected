@@ -189,6 +189,8 @@ typedef struct my_library_optioninner
     uint8_t is_some;
     } my_library_optioninner;
 
+typedef void (*my_library_fptr_fn_pconst)(void* x0);
+
 typedef struct my_library_slicevec3f32
     {
     my_library_vec3f32* data;
@@ -259,6 +261,7 @@ my_library_inner pattern_ffi_option_2(my_library_optioninner ffi_slice);
 uint8_t pattern_ffi_bool(uint8_t ffi_bool);
 uint64_t pattern_api_guard();
 uint32_t pattern_callback_1(my_library_fptr_fn_u32_rval_u32 callback, uint32_t x);
+my_library_fptr_fn_pconst pattern_callback_2(my_library_fptr_fn_pconst callback);
 my_library_ffierror simple_service_destroy(my_library_simpleservice** context);
 my_library_ffierror simple_service_new_with(my_library_simpleservice** context, uint32_t some_value);
 my_library_ffierror simple_service_new_without(my_library_simpleservice** context);

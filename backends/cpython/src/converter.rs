@@ -72,10 +72,12 @@ impl Converter {
             CType::FnPointer(x) => format!("callbacks.{}", safe_name(&x.internal_name())), //self.fnpointer_to_typename(x),
             CType::ReadPointer(x) => match x.deref() {
                 CType::Opaque(_) => "ctypes.c_void_p".to_string(),
+                CType::Primitive(PrimitiveType::Void) => "ctypes.c_void_p".to_string(),
                 _ => format!("ctypes.POINTER({})", self.to_ctypes_name(x, with_type_annotations)),
             },
             CType::ReadWritePointer(x) => match x.deref() {
                 CType::Opaque(_) => "ctypes.c_void_p".to_string(),
+                CType::Primitive(PrimitiveType::Void) => "ctypes.c_void_p".to_string(),
                 _ => format!("ctypes.POINTER({})", self.to_ctypes_name(x, with_type_annotations)),
             },
             CType::Pattern(pattern) => match pattern {

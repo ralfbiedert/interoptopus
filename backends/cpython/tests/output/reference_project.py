@@ -67,6 +67,7 @@ def init_lib(path):
     c_lib.pattern_ffi_bool.argtypes = [ctypes.c_uint8]
     c_lib.pattern_api_guard.argtypes = []
     c_lib.pattern_callback_1.argtypes = [callbacks.fn_u32_rval_u32, ctypes.c_uint32]
+    c_lib.pattern_callback_2.argtypes = [callbacks.fn_pconst]
     c_lib.simple_service_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.simple_service_new_with.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.c_uint32]
     c_lib.simple_service_new_without.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
@@ -141,6 +142,7 @@ def init_lib(path):
     c_lib.pattern_ffi_bool.restype = ctypes.c_uint8
     c_lib.pattern_api_guard.restype = ctypes.c_uint64
     c_lib.pattern_callback_1.restype = ctypes.c_uint32
+    c_lib.pattern_callback_2.restype = callbacks.fn_pconst
     c_lib.simple_service_destroy.restype = ctypes.c_int
     c_lib.simple_service_new_with.restype = ctypes.c_int
     c_lib.simple_service_new_without.restype = ctypes.c_int
@@ -374,6 +376,12 @@ def pattern_callback_1(callback, x: int) -> int:
         callback = callbacks.fn_u32_rval_u32(callback)
 
     return c_lib.pattern_callback_1(callback, x)
+
+def pattern_callback_2(callback):
+    if not hasattr(callback, "__ctypes_from_outparam__"):
+        callback = callbacks.fn_pconst(callback)
+
+    return c_lib.pattern_callback_2(callback)
 
 def simple_service_destroy(context: ctypes.POINTER(ctypes.c_void_p)):
     """ Destroys the given instance.
@@ -1126,6 +1134,7 @@ class callbacks:
     fn_SliceMutu8 = ctypes.CFUNCTYPE(None, SliceMutu8)
     fn_u8_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8)
     fn_u32_rval_u32 = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)
+    fn_pconst = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
 
 
 class SimpleService:

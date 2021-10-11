@@ -188,6 +188,8 @@ typedef struct cffi_optioninner
     uint8_t is_some;
     } cffi_optioninner;
 
+typedef void (*cffi_fptr_fn_pconst)(void* x0);
+
 typedef struct cffi_slicevec3f32
     {
     cffi_vec3f32* data;
@@ -258,6 +260,7 @@ cffi_inner pattern_ffi_option_2(cffi_optioninner ffi_slice);
 uint8_t pattern_ffi_bool(uint8_t ffi_bool);
 uint64_t pattern_api_guard();
 uint32_t pattern_callback_1(cffi_fptr_fn_u32_rval_u32 callback, uint32_t x);
+cffi_fptr_fn_pconst pattern_callback_2(cffi_fptr_fn_pconst callback);
 cffi_ffierror simple_service_destroy(cffi_simpleservice** context);
 cffi_ffierror simple_service_new_with(cffi_simpleservice** context, uint32_t some_value);
 cffi_ffierror simple_service_new_without(cffi_simpleservice** context);
@@ -1128,6 +1131,7 @@ class callbacks:
     fn_SliceMutu8 = "void(cffi_slicemutu8)"
     fn_u8_rval_u8 = "uint8_t(uint8_t)"
     fn_u32_rval_u32 = "uint32_t(uint32_t)"
+    fn_pconst = "void(void*)"
 
 
 class api:
@@ -1687,6 +1691,19 @@ class api:
             x = x.c_value()
 
         return _api.pattern_callback_1(callback, x)
+
+    @staticmethod
+    def pattern_callback_2(callback):
+        """"""
+        _callback = callback
+
+        @ffi.callback(callbacks.fn_pconst)
+        def _callback_callback(ptr):
+            return _callback(ptr)
+
+        callback = _callback_callback
+
+        return _api.pattern_callback_2(callback)
 
     @staticmethod
     def simple_service_destroy(context):

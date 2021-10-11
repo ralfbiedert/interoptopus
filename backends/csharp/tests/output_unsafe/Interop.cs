@@ -23,9 +23,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 10360875418836631568ul)
+            if (api_version != 17487233993711971522ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (10360875418836631568). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (17487233993711971522). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -461,6 +461,14 @@ namespace My.Company
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_1")]
         public static extern uint pattern_callback_1(IntPtr callback, uint x);
+
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_2")]
+        public static extern MyCallbackVoid pattern_callback_2(MyCallbackVoid callback);
+
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_2")]
+        public static extern MyCallbackVoid pattern_callback_2(IntPtr callback);
 
 
         /// Destroys the given instance.
@@ -1162,6 +1170,9 @@ namespace My.Company
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate uint MyCallback(uint x0);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void MyCallbackVoid(IntPtr x0);
 
 
     /// Some struct we want to expose as a class.
