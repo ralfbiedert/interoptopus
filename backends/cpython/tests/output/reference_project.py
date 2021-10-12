@@ -497,6 +497,15 @@ def _errcheck(returned, success):
     else: raise Exception(f"Function returned error: {returned}")
 
 
+class CallbackVars(object):
+    """Helper to be used `lambda x: setattr(cv, "x", x)` when getting values from callbacks."""
+    def __str__(self):
+        rval = ""
+        for var in  filter(lambda x: "__" not in x, dir(self)):
+            rval += f"{var}: {getattr(self, var)}"
+        return rval
+
+
 class EnumDocumented:
     A = 0
     B = 1
@@ -1144,6 +1153,10 @@ class SimpleService:
         assert(api_lock == SimpleService.__api_lock), "You must create this with a static constructor." 
         self._ctx = ctx
 
+    @property
+    def _as_parameter_(self):
+        return self._ctx
+
     @staticmethod
     def new_with(some_value: int) -> SimpleService:
         """ The constructor must return a `Result<Self, Error>`."""
@@ -1239,6 +1252,10 @@ class SimpleServiceLifetime:
     def __init__(self, api_lock, ctx):
         assert(api_lock == SimpleServiceLifetime.__api_lock), "You must create this with a static constructor." 
         self._ctx = ctx
+
+    @property
+    def _as_parameter_(self):
+        return self._ctx
 
     @staticmethod
     def new_with(some_value: ctypes.POINTER(ctypes.c_uint32)) -> SimpleServiceLifetime:

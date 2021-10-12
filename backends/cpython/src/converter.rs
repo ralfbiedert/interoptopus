@@ -30,10 +30,12 @@ impl Converter {
             },
             CType::ReadPointer(x) => match x.deref() {
                 CType::Opaque(_) => "ctypes.c_void_p".to_string(),
+                CType::Primitive(PrimitiveType::Void) => "ctypes.c_void_p".to_string(),
                 _ => format!("ctypes.POINTER({})", self.to_ctypes_name(x, true)),
             },
             CType::ReadWritePointer(x) => match x.deref() {
                 CType::Opaque(_) => "ctypes.c_void_p".to_string(),
+                CType::Primitive(PrimitiveType::Void) => "ctypes.c_void_p".to_string(),
                 _ => format!("ctypes.POINTER({})", self.to_ctypes_name(x, true)),
             },
             CType::Enum(_) => "ctypes.c_int".to_string(), // is this correct?

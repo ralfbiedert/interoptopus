@@ -151,7 +151,16 @@ pub trait PythonWriter {
             if !documentation.is_empty() {
                 indented!(w, [_ _], r#""""{}""""#, documentation)?;
             }
-            indented!(w, [_ _], r#"return ctypes.Structure.__get__(self, "{}")"#, f.name())?;
+
+            match f.the_type() {
+                CType::Pattern(p) => match p {
+                    // This does not seem to do anything to callback-returned values
+                    // TypePattern::AsciiPointer => indented!(w, [_ _], r#"return ctypes.string_at(ctypes.Structure.__get__(self, "{}"))"#, f.name())?,
+                    _ => indented!(w, [_ _], r#"return ctypes.Structure.__get__(self, "{}")"#, f.name())?,
+                },
+                _ => indented!(w, [_ _], r#"return ctypes.Structure.__get__(self, "{}")"#, f.name())?,
+            }
+
             w.newline()?;
 
             indented!(w, [_], r#"@{}.setter"#, f.name())?;
@@ -320,6 +329,10 @@ pub trait PythonWriter {
         indented!(w, [_ _], r#"assert(api_lock == {}.__api_lock), "You must create this with a static constructor." "#, context_type_name)?;
         indented!(w, [_ _], r#"self._ctx = ctx"#)?;
         w.newline()?;
+        indented!(w, [_], r#"@property"#)?;
+        indented!(w, [_], r#"def _as_parameter_(self):"#)?;
+        indented!(w, [_ _], r#"return self._ctx"#)?;
+        w.newline()?;
 
         for ctor in class.constructors() {
             let ctor_args = self.pattern_class_args_without_first_to_string(ctor, true);
@@ -419,6 +432,20 @@ pub trait PythonWriter {
         indented!(w, [_], r#""""Checks for FFIErrors and converts them to an exception.""""#)?;
         indented!(w, [_], r#"if returned == success: return"#)?;
         indented!(w, [_], r#"else: raise Exception(f"Function returned error: {{returned}}")"#)?;
+        w.newline()?;
+        w.newline()?;
+
+        indented!(w, r#"class CallbackVars(object):"#)?;
+        indented!(
+            w,
+            [_],
+            r#""""Helper to be used `lambda x: setattr(cv, "x", x)` when getting values from callbacks.""""#
+        )?;
+        indented!(w, [_], r#"def __str__(self):"#)?;
+        indented!(w, [_ _], r#"rval = """#)?;
+        indented!(w, [_ _], r#"for var in  filter(lambda x: "__" not in x, dir(self)):"#)?;
+        indented!(w, [_ _ _], r#"rval += f"{{var}}: {{getattr(self, var)}}""#)?;
+        indented!(w, [_ _], r#"return rval"#)?;
         w.newline()?;
         w.newline()?;
 

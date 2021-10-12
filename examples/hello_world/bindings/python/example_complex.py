@@ -34,6 +34,15 @@ def _errcheck(returned, success):
     else: raise Exception(f"Function returned error: {returned}")
 
 
+class CallbackVars(object):
+    """Helper to be used `lambda x: setattr(cv, "x", x)` when getting values from callbacks."""
+    def __str__(self):
+        rval = ""
+        for var in  filter(lambda x: "__" not in x, dir(self)):
+            rval += f"{var}: {getattr(self, var)}"
+        return rval
+
+
 class Vec2(ctypes.Structure):
     """ A simple type in our FFI layer."""
 
