@@ -383,103 +383,6 @@ def pattern_callback_2(callback):
 
     return c_lib.pattern_callback_2(callback)
 
-def simple_service_destroy(context: ctypes.POINTER(ctypes.c_void_p)):
-    """ Destroys the given instance.
-
- # Safety
-
- The passed parameter MUST have been created with the corresponding init function;
- passing any other value results in undefined behavior."""
-    return c_lib.simple_service_destroy(context)
-
-def simple_service_new_with(context: ctypes.POINTER(ctypes.c_void_p), some_value: int):
-    """ The constructor must return a `Result<Self, Error>`."""
-    return c_lib.simple_service_new_with(context, some_value)
-
-def simple_service_new_without(context: ctypes.POINTER(ctypes.c_void_p)):
-    return c_lib.simple_service_new_without(context)
-
-def simple_service_new_failing(context: ctypes.POINTER(ctypes.c_void_p), some_value: int):
-    return c_lib.simple_service_new_failing(context, some_value)
-
-def simple_service_method_result(context: ctypes.c_void_p, anon1: int):
-    """ Methods returning a Result<(), _> are the default and do not
- need annotations."""
-    return c_lib.simple_service_method_result(context, anon1)
-
-def simple_service_method_value(context: ctypes.c_void_p, x: int) -> int:
-    return c_lib.simple_service_method_value(context, x)
-
-def simple_service_method_void(context: ctypes.c_void_p):
-    """ This method should be documented.
-
- Multiple lines."""
-    return c_lib.simple_service_method_void(context)
-
-def simple_service_method_mut_self(context: ctypes.c_void_p, slice: Sliceu8) -> int:
-    return c_lib.simple_service_method_mut_self(context, slice)
-
-def simple_service_method_mut_self_void(context: ctypes.c_void_p, slice: SliceBool):
-    """ Single line."""
-    return c_lib.simple_service_method_mut_self_void(context, slice)
-
-def simple_service_method_mut_self_ref(context: ctypes.c_void_p, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8)) -> int:
-    return c_lib.simple_service_method_mut_self_ref(context, x, y)
-
-def simple_service_method_mut_self_ref_slice(context: ctypes.c_void_p, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8), slice: Sliceu8) -> int:
-    return c_lib.simple_service_method_mut_self_ref_slice(context, x, y, slice)
-
-def simple_service_method_mut_self_ref_slice_limited(context: ctypes.c_void_p, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8), slice: Sliceu8, slice2: Sliceu8) -> int:
-    return c_lib.simple_service_method_mut_self_ref_slice_limited(context, x, y, slice, slice2)
-
-def simple_service_method_mut_self_ffi_error(context: ctypes.c_void_p, slice: SliceMutu8):
-    return c_lib.simple_service_method_mut_self_ffi_error(context, slice)
-
-def simple_service_method_mut_self_no_error(context: ctypes.c_void_p, slice: SliceMutu8):
-    return c_lib.simple_service_method_mut_self_no_error(context, slice)
-
-def simple_service_return_slice(context: ctypes.c_void_p) -> Sliceu32:
-    """ Warning, you _must_ discard the returned slice object before calling into this service
- again, as otherwise undefined behavior might happen."""
-    return c_lib.simple_service_return_slice(context)
-
-def simple_service_return_slice_mut(context: ctypes.c_void_p) -> SliceMutu32:
-    """ Warning, you _must_ discard the returned slice object before calling into this service
- again, as otherwise undefined behavior might happen."""
-    return c_lib.simple_service_return_slice_mut(context)
-
-def simple_service_return_string(context: ctypes.c_void_p) -> str:
-    rval = c_lib.simple_service_return_string(context)
-    return ctypes.string_at(rval)
-
-def simple_service_method_void_ffi_error(context: ctypes.c_void_p):
-    return c_lib.simple_service_method_void_ffi_error(context)
-
-def simple_service_lt_destroy(context: ctypes.POINTER(ctypes.c_void_p)):
-    """ Destroys the given instance.
-
- # Safety
-
- The passed parameter MUST have been created with the corresponding init function;
- passing any other value results in undefined behavior."""
-    return c_lib.simple_service_lt_destroy(context)
-
-def simple_service_lt_new_with(context: ctypes.POINTER(ctypes.c_void_p), some_value: ctypes.POINTER(ctypes.c_uint32)):
-    return c_lib.simple_service_lt_new_with(context, some_value)
-
-def simple_service_lt_method_lt(context: ctypes.c_void_p, slice: SliceBool):
-    return c_lib.simple_service_lt_method_lt(context, slice)
-
-def simple_service_lt_method_lt2(context: ctypes.c_void_p, slice: SliceBool):
-    return c_lib.simple_service_lt_method_lt2(context, slice)
-
-def simple_service_lt_return_string_accept_slice(anon0: ctypes.c_void_p, anon1: Sliceu8) -> str:
-    rval = c_lib.simple_service_lt_return_string_accept_slice(anon0, anon1)
-    return ctypes.string_at(rval)
-
-def simple_service_lt_method_void_ffi_error(context: ctypes.c_void_p):
-    return c_lib.simple_service_lt_method_void_ffi_error(context)
-
 
 
 U8 = 255
@@ -1161,7 +1064,7 @@ class SimpleService:
     def new_with(some_value: int) -> SimpleService:
         """ The constructor must return a `Result<Self, Error>`."""
         ctx = ctypes.c_void_p()
-        simple_service_new_with(ctx, some_value)
+        c_lib.simple_service_new_with(ctx, some_value)
         self = SimpleService(SimpleService.__api_lock, ctx)
         return self
 
@@ -1169,7 +1072,7 @@ class SimpleService:
     def new_without() -> SimpleService:
         """"""
         ctx = ctypes.c_void_p()
-        simple_service_new_without(ctx, )
+        c_lib.simple_service_new_without(ctx, )
         self = SimpleService(SimpleService.__api_lock, ctx)
         return self
 
@@ -1177,73 +1080,74 @@ class SimpleService:
     def new_failing(some_value: int) -> SimpleService:
         """"""
         ctx = ctypes.c_void_p()
-        simple_service_new_failing(ctx, some_value)
+        c_lib.simple_service_new_failing(ctx, some_value)
         self = SimpleService(SimpleService.__api_lock, ctx)
         return self
 
     def __del__(self):
-        simple_service_destroy(self._ctx, )
+        c_lib.simple_service_destroy(self._ctx, )
 
     def method_result(self, anon1: int):
         """ Methods returning a Result<(), _> are the default and do not
  need annotations."""
-        return simple_service_method_result(self._ctx, anon1)
+        return c_lib.simple_service_method_result(self._ctx, anon1)
 
     def method_value(self, x: int) -> int:
         """"""
-        return simple_service_method_value(self._ctx, x)
+        return c_lib.simple_service_method_value(self._ctx, x)
 
     def method_void(self, ):
         """ This method should be documented.
 
  Multiple lines."""
-        return simple_service_method_void(self._ctx, )
+        return c_lib.simple_service_method_void(self._ctx, )
 
     def method_mut_self(self, slice: Sliceu8) -> int:
         """"""
-        return simple_service_method_mut_self(self._ctx, slice)
+        return c_lib.simple_service_method_mut_self(self._ctx, slice)
 
     def method_mut_self_void(self, slice: SliceBool):
         """ Single line."""
-        return simple_service_method_mut_self_void(self._ctx, slice)
+        return c_lib.simple_service_method_mut_self_void(self._ctx, slice)
 
     def method_mut_self_ref(self, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8)) -> int:
         """"""
-        return simple_service_method_mut_self_ref(self._ctx, x, y)
+        return c_lib.simple_service_method_mut_self_ref(self._ctx, x, y)
 
     def method_mut_self_ref_slice(self, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8), slice: Sliceu8) -> int:
         """"""
-        return simple_service_method_mut_self_ref_slice(self._ctx, x, y, slice)
+        return c_lib.simple_service_method_mut_self_ref_slice(self._ctx, x, y, slice)
 
     def method_mut_self_ref_slice_limited(self, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8), slice: Sliceu8, slice2: Sliceu8) -> int:
         """"""
-        return simple_service_method_mut_self_ref_slice_limited(self._ctx, x, y, slice, slice2)
+        return c_lib.simple_service_method_mut_self_ref_slice_limited(self._ctx, x, y, slice, slice2)
 
     def method_mut_self_ffi_error(self, slice: SliceMutu8):
         """"""
-        return simple_service_method_mut_self_ffi_error(self._ctx, slice)
+        return c_lib.simple_service_method_mut_self_ffi_error(self._ctx, slice)
 
     def method_mut_self_no_error(self, slice: SliceMutu8):
         """"""
-        return simple_service_method_mut_self_no_error(self._ctx, slice)
+        return c_lib.simple_service_method_mut_self_no_error(self._ctx, slice)
 
     def return_slice(self, ) -> Sliceu32:
         """ Warning, you _must_ discard the returned slice object before calling into this service
  again, as otherwise undefined behavior might happen."""
-        return simple_service_return_slice(self._ctx, )
+        return c_lib.simple_service_return_slice(self._ctx, )
 
     def return_slice_mut(self, ) -> SliceMutu32:
         """ Warning, you _must_ discard the returned slice object before calling into this service
  again, as otherwise undefined behavior might happen."""
-        return simple_service_return_slice_mut(self._ctx, )
+        return c_lib.simple_service_return_slice_mut(self._ctx, )
 
     def return_string(self, ) -> str:
         """"""
-        return simple_service_return_string(self._ctx, )
+        rval = c_lib.simple_service_return_string(self._ctx, )
+        return ctypes.string_at(rval)
 
     def method_void_ffi_error(self, ):
         """"""
-        return simple_service_method_void_ffi_error(self._ctx, )
+        return c_lib.simple_service_method_void_ffi_error(self._ctx, )
 
 
 class SimpleServiceLifetime:
@@ -1261,27 +1165,28 @@ class SimpleServiceLifetime:
     def new_with(some_value: ctypes.POINTER(ctypes.c_uint32)) -> SimpleServiceLifetime:
         """"""
         ctx = ctypes.c_void_p()
-        simple_service_lt_new_with(ctx, some_value)
+        c_lib.simple_service_lt_new_with(ctx, some_value)
         self = SimpleServiceLifetime(SimpleServiceLifetime.__api_lock, ctx)
         return self
 
     def __del__(self):
-        simple_service_lt_destroy(self._ctx, )
+        c_lib.simple_service_lt_destroy(self._ctx, )
 
     def method_lt(self, slice: SliceBool):
         """"""
-        return simple_service_lt_method_lt(self._ctx, slice)
+        return c_lib.simple_service_lt_method_lt(self._ctx, slice)
 
     def method_lt2(self, slice: SliceBool):
         """"""
-        return simple_service_lt_method_lt2(self._ctx, slice)
+        return c_lib.simple_service_lt_method_lt2(self._ctx, slice)
 
     def return_string_accept_slice(self, anon1: Sliceu8) -> str:
         """"""
-        return simple_service_lt_return_string_accept_slice(self._ctx, anon1)
+        rval = c_lib.simple_service_lt_return_string_accept_slice(self._ctx, anon1)
+        return ctypes.string_at(rval)
 
     def method_void_ffi_error(self, ):
         """"""
-        return simple_service_lt_method_void_ffi_error(self._ctx, )
+        return c_lib.simple_service_lt_method_void_ffi_error(self._ctx, )
 
 

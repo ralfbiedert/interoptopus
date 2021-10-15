@@ -206,7 +206,7 @@ pub trait PythonWriter {
     }
 
     fn write_function_proxies(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        for function in self.library().functions() {
+        for function in self.non_service_functions() {
             let mut param_names = Vec::new();
             let mut param_sig = Vec::new();
             let rval_sig = self.converter().to_type_hint_out(function.signature().rval());
@@ -360,7 +360,17 @@ pub trait PythonWriter {
             indented!(w, [_], r#"def {}(self, {}){}:"#, function.name().replace(&common_prefix, ""), &args, type_hint_out)?;
             indented!(w, [_ _], r#"{}"#, self.converter().documentation(function.meta().documentation()))?;
 
-            self.write_pattern_class_success_enum_aware_rval(w, class, function, "self._ctx", true)?;
+            let args = self.pattern_class_args_without_first_to_string(function, false);
+            match function.signature().rval() {
+                CType::Pattern(x) => match x {
+                    TypePattern::AsciiPointer => {
+                        indented!(w, [_ _], r#"rval = c_lib.{}({}, {})"#, function.name(), "self._ctx", &args)?;
+                        indented!(w, [_ _], r#"return ctypes.string_at(rval)"#)?;
+                    }
+                    _ => self.write_pattern_class_success_enum_aware_rval(w, class, function, "self._ctx", true)?,
+                },
+                _ => self.write_pattern_class_success_enum_aware_rval(w, class, function, "self._ctx", true)?,
+            }
         }
 
         w.newline()?;
@@ -391,9 +401,9 @@ pub trait PythonWriter {
         let args = self.pattern_class_args_without_first_to_string(function, false);
 
         if ret {
-            indented!(w, [_ _], r#"return {}({}, {})"#, function.name(), ctx, &args)?;
+            indented!(w, [_ _], r#"return c_lib.{}({}, {})"#, function.name(), ctx, &args)?;
         } else {
-            indented!(w, [_ _], r#"{}({}, {})"#, function.name(), ctx, &args)?;
+            indented!(w, [_ _], r#"c_lib.{}({}, {})"#, function.name(), ctx, &args)?;
         }
         Ok(())
     }
@@ -482,5 +492,20 @@ pub trait PythonWriter {
         self.write_patterns(w)?;
 
         Ok(())
+    }
+
+    fn non_service_functions(&self) -> Vec<&Function> {
+        let mut methods = vec![];
+        for pattern in self.library().patterns() {
+            match pattern {
+                LibraryPattern::Service(service) => {
+                    methods.extend_from_slice(service.methods());
+                    methods.extend_from_slice(service.constructors());
+                    methods.push(service.destructor().clone());
+                }
+            }
+        }
+
+        self.library().functions().iter().filter(|&x| !methods.contains(x)).collect()
     }
 }
