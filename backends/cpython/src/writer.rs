@@ -5,7 +5,7 @@ use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{longest_common_prefix, safe_name, sort_types_by_dependencies};
 use interoptopus::writer::IndentWriter;
-use interoptopus::{indented, Error, Library};
+use interoptopus::{indented, non_service_functions, Error, Library};
 
 /// Writes the Python file format, `impl` this trait to customize output.
 pub trait PythonWriter {
@@ -206,7 +206,7 @@ pub trait PythonWriter {
     }
 
     fn write_function_proxies(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        for function in self.non_service_functions() {
+        for function in non_service_functions(self.library()) {
             let mut param_names = Vec::new();
             let mut param_sig = Vec::new();
             let rval_sig = self.converter().to_type_hint_out(function.signature().rval());
@@ -492,20 +492,5 @@ pub trait PythonWriter {
         self.write_patterns(w)?;
 
         Ok(())
-    }
-
-    fn non_service_functions(&self) -> Vec<&Function> {
-        let mut methods = vec![];
-        for pattern in self.library().patterns() {
-            match pattern {
-                LibraryPattern::Service(service) => {
-                    methods.extend_from_slice(service.methods());
-                    methods.extend_from_slice(service.constructors());
-                    methods.push(service.destructor().clone());
-                }
-            }
-        }
-
-        self.library().functions().iter().filter(|&x| !methods.contains(x)).collect()
     }
 }
