@@ -70,6 +70,23 @@ impl Library {
     pub fn patterns(&self) -> &[LibraryPattern] {
         &self.patterns
     }
+
+}
+
+/// Return all functions which don't belong to a [`Service`](crate::patterns::Service) pattern.
+pub fn non_service_functions(library: &Library) -> Vec<&Function> {
+    let mut methods = vec![];
+    for pattern in library.patterns() {
+        match pattern {
+            LibraryPattern::Service(service) => {
+                methods.extend_from_slice(service.methods());
+                methods.extend_from_slice(service.constructors());
+                methods.push(service.destructor().clone());
+            }
+        }
+    }
+
+    library.functions().iter().filter(|&x| !methods.contains(x)).collect()
 }
 
 /// Create a single [`Library`](Library) from a number of individual libraries.
