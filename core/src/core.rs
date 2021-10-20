@@ -70,23 +70,25 @@ impl Library {
     pub fn patterns(&self) -> &[LibraryPattern] {
         &self.patterns
     }
-
 }
 
-/// Return all functions which don't belong to a [`Service`](crate::patterns::Service) pattern.
+/// Returns all functions not belonging to a [`service`](crate::patterns::service) pattern.
+///
+/// Useful in backends like Python that can fully encapsulate services and should not expose their
+/// raw methods in the main namespace.
 pub fn non_service_functions(library: &Library) -> Vec<&Function> {
-    let mut methods = vec![];
+    let mut service_methods = vec![];
     for pattern in library.patterns() {
         match pattern {
             LibraryPattern::Service(service) => {
-                methods.extend_from_slice(service.methods());
-                methods.extend_from_slice(service.constructors());
-                methods.push(service.destructor().clone());
+                service_methods.extend_from_slice(service.methods());
+                service_methods.extend_from_slice(service.constructors());
+                service_methods.push(service.destructor().clone());
             }
         }
     }
 
-    library.functions().iter().filter(|&x| !methods.contains(x)).collect()
+    library.functions().iter().filter(|&x| !service_methods.contains(x)).collect()
 }
 
 /// Create a single [`Library`](Library) from a number of individual libraries.
