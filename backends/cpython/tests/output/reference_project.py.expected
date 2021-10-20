@@ -1086,6 +1086,8 @@ class SimpleService:
     def new_with_string(ascii: str) -> SimpleService:
         """"""
         ctx = ctypes.c_void_p()
+        if not hasattr(ascii, "__ctypes_from_outparam__"):
+            ascii = ctypes.cast(ascii, ctypes.POINTER(ctypes.c_uint8))
         c_lib.simple_service_new_with_string(ctx, ascii)
         self = SimpleService(SimpleService.__api_lock, ctx)
         return self

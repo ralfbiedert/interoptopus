@@ -327,6 +327,7 @@ pub trait PythonWriter {
             indented!(w, [_ _], r#"{}"#, self.converter().documentation(ctor.meta().documentation()))?;
             indented!(w, [_ _], r#"ctx = ctypes.c_void_p()"#)?;
             w.indent();
+            self.write_param_helpers(w, ctor)?;
             self.write_success_enum_aware_rval(w, ctor, &self.get_method_args(ctor, "ctx"), false)?;
             w.unindent();
             indented!(w, [_ _], r#"self = {}({}.__api_lock, ctx)"#, context_type_name, context_type_name)?;
