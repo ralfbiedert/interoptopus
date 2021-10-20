@@ -131,6 +131,9 @@ class TestPatterns(unittest.TestCase):
         self.assertEqual(10, service.method_value(10))
         self.assertEqual(123, slice[0])
 
+    def test_service_new_string(self):
+        service = r.SimpleService.new_with_string(b"abc")
+
     def test_ascii_pointer(self):
         self.assertEqual(3, r.pattern_ascii_pointer_1(b"111"))
         self.assertEqual(b'', r.pattern_ascii_pointer_2())

@@ -23,9 +23,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 412098576526984246ul)
+            if (api_version != 17470010777779783453ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (412098576526984246). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (17470010777779783453). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -507,6 +507,18 @@ namespace My.Company
 
         public static void simple_service_new_without_checked(ref IntPtr context) {
             var rval = simple_service_new_without(ref context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_new_with_string")]
+        public static extern FFIError simple_service_new_with_string(ref IntPtr context, string ascii);
+
+        public static void simple_service_new_with_string_checked(ref IntPtr context, string ascii) {
+            var rval = simple_service_new_with_string(ref context, ascii);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -1213,6 +1225,17 @@ namespace My.Company
         {
             var self = new SimpleService();
             var rval = Interop.simple_service_new_without(ref self._context);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+            return self;
+        }
+
+        public static SimpleService NewWithString(string ascii)
+        {
+            var self = new SimpleService();
+            var rval = Interop.simple_service_new_with_string(ref self._context, ascii);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);

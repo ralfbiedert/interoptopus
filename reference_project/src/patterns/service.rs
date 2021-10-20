@@ -38,6 +38,15 @@ impl SimpleService {
     }
 
     #[ffi_service_ctor]
+    pub fn new_with_string(ascii: AsciiPointer) -> Result<Self, Error> {
+        Ok(Self {
+            some_value: 0,
+            c_string: ascii.as_c_str().unwrap().into(),
+            data: vec![1, 2, 3],
+        })
+    }
+
+    #[ffi_service_ctor]
     pub fn new_failing(_some_value: u8) -> Result<Self, Error> {
         Err(Error::Bad)
     }

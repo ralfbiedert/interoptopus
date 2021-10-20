@@ -265,6 +265,7 @@ my_library_fptr_fn_pconst pattern_callback_2(my_library_fptr_fn_pconst callback)
 my_library_ffierror simple_service_destroy(my_library_simpleservice** context);
 my_library_ffierror simple_service_new_with(my_library_simpleservice** context, uint32_t some_value);
 my_library_ffierror simple_service_new_without(my_library_simpleservice** context);
+my_library_ffierror simple_service_new_with_string(my_library_simpleservice** context, uint8_t* ascii);
 my_library_ffierror simple_service_new_failing(my_library_simpleservice** context, uint8_t some_value);
 my_library_ffierror simple_service_method_result(my_library_simpleservice* context, uint32_t anon1);
 uint32_t simple_service_method_value(my_library_simpleservice* context, uint32_t x);

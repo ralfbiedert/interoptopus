@@ -264,6 +264,7 @@ cffi_fptr_fn_pconst pattern_callback_2(cffi_fptr_fn_pconst callback);
 cffi_ffierror simple_service_destroy(cffi_simpleservice** context);
 cffi_ffierror simple_service_new_with(cffi_simpleservice** context, uint32_t some_value);
 cffi_ffierror simple_service_new_without(cffi_simpleservice** context);
+cffi_ffierror simple_service_new_with_string(cffi_simpleservice** context, uint8_t* ascii);
 cffi_ffierror simple_service_new_failing(cffi_simpleservice** context, uint8_t some_value);
 cffi_ffierror simple_service_method_result(cffi_simpleservice* context, uint32_t anon1);
 uint32_t simple_service_method_value(cffi_simpleservice* context, uint32_t x);
@@ -1750,6 +1751,20 @@ class api:
             raise Exception(f"Function returned error {_rval}")
 
     @staticmethod
+    def simple_service_new_with_string(context, ascii):
+        """"""
+        if hasattr(context, "_ctx"):
+            context = context.c_ptr()
+        if isinstance(ascii, bytes):
+            ascii = ascii_string(ascii)
+
+        _rval = _api.simple_service_new_with_string(context, ascii)
+        if _rval == FFIError.Ok:
+            return _rval
+        else:
+            raise Exception(f"Function returned error {_rval}")
+
+    @staticmethod
     def simple_service_new_failing(context, some_value: int):
         """"""
         if hasattr(context, "_ctx"):
@@ -2062,6 +2077,16 @@ class SimpleService(CHeapAllocated):
         """"""
         ctx = ffi.new("cffi_simpleservice**")
         api.simple_service_new_without(ctx, )
+        self = SimpleService(SimpleService.__api_lock, ctx)
+        return self
+
+    @staticmethod
+    def new_with_string(ascii) -> SimpleService:
+        """"""
+        if hasattr(ascii, "_ctx"):
+            ascii = ascii.c_ptr()
+        ctx = ffi.new("cffi_simpleservice**")
+        api.simple_service_new_with_string(ctx, ascii)
         self = SimpleService(SimpleService.__api_lock, ctx)
         return self
 
