@@ -207,63 +207,50 @@ pub trait PythonWriter {
 
     fn write_function_proxies(&self, w: &mut IndentWriter) -> Result<(), Error> {
         for function in non_service_functions(self.library()) {
-            let mut param_names = Vec::new();
-            let mut param_sig = Vec::new();
             let rval_sig = self.converter().to_type_hint_out(function.signature().rval());
-
-            for arg in function.signature().params() {
-                let name = arg.name();
-
-                param_sig.push(format!("{}{}", name, self.converter().to_type_hint_in(arg.the_type())));
-                param_names.push(name.to_string());
-            }
-
+            let args = self.function_args_to_string(function, true, false);
             let documentation = function.meta().documentation().lines().join("\n");
 
-            indented!(w, r#"def {}({}){}:"#, function.name(), param_sig.join(", "), rval_sig)?;
+            indented!(w, r#"def {}({}){}:"#, function.name(), args, rval_sig)?;
 
             if !documentation.is_empty() {
                 indented!(w, [_], r#""""{}""""#, documentation)?;
             }
 
-            for arg in function.signature().params() {
-                match arg.the_type() {
-                    CType::FnPointer(x) => {
-                        indented!(w, [_], r#"if not hasattr({}, "__ctypes_from_outparam__"):"#, arg.name())?;
-                        indented!(w, [_ _], r#"{} = callbacks.{}({})"#, arg.name(), safe_name(&x.internal_name()), arg.name())?;
-                        w.newline()?;
-                    }
-                    CType::Pattern(pattern) => match pattern {
-                        TypePattern::NamedCallback(x) => {
-                            let x = x.fnpointer();
-                            indented!(w, [_], r#"if not hasattr({}, "__ctypes_from_outparam__"):"#, arg.name())?;
-                            indented!(w, [_ _], r#"{} = callbacks.{}({})"#, arg.name(), safe_name(&x.internal_name()), arg.name())?;
-                            w.newline()?;
-                        }
-                        TypePattern::AsciiPointer => {
-                            indented!(w, [_], r#"if not hasattr({}, "__ctypes_from_outparam__"):"#, arg.name())?;
-                            indented!(w, [_ _], r#"{} = ctypes.cast({}, ctypes.POINTER(ctypes.c_uint8))"#, arg.name(), arg.name())?;
-                        }
-                        _ => {}
-                    },
-                    _ => {}
-                }
-            }
+            self.write_param_helpers(w, function)?;
 
-            match function.signature().rval() {
-                CType::Pattern(x) => match x {
-                    TypePattern::AsciiPointer => {
-                        indented!(w, [_], r#"rval = c_lib.{}({})"#, function.name(), param_names.join(", "))?;
-                        indented!(w, [_], r#"return ctypes.string_at(rval)"#)?;
-                    }
-                    _ => indented!(w, [_], r#"return c_lib.{}({})"#, function.name(), param_names.join(", "))?,
-                },
-                _ => indented!(w, [_], r#"return c_lib.{}({})"#, function.name(), param_names.join(", "))?,
-            }
+            self.write_library_call(w, function, None)?;
 
             w.newline()?;
         }
 
+        Ok(())
+    }
+
+    fn write_param_helpers(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
+        for arg in function.signature().params() {
+            match arg.the_type() {
+                CType::FnPointer(x) => {
+                    indented!(w, [_], r#"if not hasattr({}, "__ctypes_from_outparam__"):"#, arg.name())?;
+                    indented!(w, [_ _], r#"{} = callbacks.{}({})"#, arg.name(), safe_name(&x.internal_name()), arg.name())?;
+                    w.newline()?;
+                }
+                CType::Pattern(pattern) => match pattern {
+                    TypePattern::NamedCallback(x) => {
+                        let x = x.fnpointer();
+                        indented!(w, [_], r#"if not hasattr({}, "__ctypes_from_outparam__"):"#, arg.name())?;
+                        indented!(w, [_ _], r#"{} = callbacks.{}({})"#, arg.name(), safe_name(&x.internal_name()), arg.name())?;
+                        w.newline()?;
+                    }
+                    TypePattern::AsciiPointer => {
+                        indented!(w, [_], r#"if not hasattr({}, "__ctypes_from_outparam__"):"#, arg.name())?;
+                        indented!(w, [_ _], r#"{} = ctypes.cast({}, ctypes.POINTER(ctypes.c_uint8))"#, arg.name(), arg.name())?;
+                    }
+                    _ => {}
+                },
+                _ => {}
+            }
+        }
         Ok(())
     }
 
@@ -335,12 +322,14 @@ pub trait PythonWriter {
         w.newline()?;
 
         for ctor in class.constructors() {
-            let ctor_args = self.pattern_class_args_without_first_to_string(ctor, true);
+            let ctor_args = self.function_args_to_string(ctor, true, true);
             indented!(w, [_], r#"@staticmethod"#)?;
             indented!(w, [_], r#"def {}({}) -> {}:"#, ctor.name().replace(&common_prefix, ""), ctor_args, context_type_name)?;
             indented!(w, [_ _], r#"{}"#, self.converter().documentation(ctor.meta().documentation()))?;
             indented!(w, [_ _], r#"ctx = ctypes.c_void_p()"#)?;
-            self.write_pattern_class_success_enum_aware_rval(w, class, ctor, "ctx", false)?;
+            w.indent();
+            self.write_success_enum_aware_rval(w, ctor, &self.get_method_args(ctor, "ctx"), false)?;
+            w.unindent();
             indented!(w, [_ _], r#"self = {}({}.__api_lock, ctx)"#, context_type_name, context_type_name)?;
             indented!(w, [_ _], r#"return self"#)?;
             w.newline()?;
@@ -349,28 +338,22 @@ pub trait PythonWriter {
         // Dtor
         indented!(w, [_], r#"def __del__(self):"#)?;
         // indented!(w, [_ _], r#"global _api, ffi"#)?;
-        self.write_pattern_class_success_enum_aware_rval(w, class, class.destructor(), "self._ctx", false)?;
+        w.indent();
+        self.write_success_enum_aware_rval(w, class.destructor(), &self.get_method_args(class.destructor(), "self._ctx"), false)?;
+        w.unindent();
 
         for function in class.methods() {
             w.newline()?;
 
-            let args = self.pattern_class_args_without_first_to_string(function, true);
+            let args = self.function_args_to_string(function, true, true);
             let type_hint_out = self.converter().to_type_hint_out(function.signature().rval());
 
             indented!(w, [_], r#"def {}(self, {}){}:"#, function.name().replace(&common_prefix, ""), &args, type_hint_out)?;
             indented!(w, [_ _], r#"{}"#, self.converter().documentation(function.meta().documentation()))?;
 
-            let args = self.pattern_class_args_without_first_to_string(function, false);
-            match function.signature().rval() {
-                CType::Pattern(x) => match x {
-                    TypePattern::AsciiPointer => {
-                        indented!(w, [_ _], r#"rval = c_lib.{}({}, {})"#, function.name(), "self._ctx", &args)?;
-                        indented!(w, [_ _], r#"return ctypes.string_at(rval)"#)?;
-                    }
-                    _ => self.write_pattern_class_success_enum_aware_rval(w, class, function, "self._ctx", true)?,
-                },
-                _ => self.write_pattern_class_success_enum_aware_rval(w, class, function, "self._ctx", true)?,
-            }
+            self.write_param_helpers(w, function)?;
+
+            self.write_library_call(w, function, Some("self._ctx"))?;
         }
 
         w.newline()?;
@@ -379,12 +362,40 @@ pub trait PythonWriter {
         Ok(())
     }
 
-    fn pattern_class_args_without_first_to_string(&self, function: &Function, type_hints: bool) -> String {
+    fn write_library_call(&self, w: &mut IndentWriter, function: &Function, class_str: Option<&str>) -> Result<(), Error> {
+        let args = match class_str {
+            None => self.function_args_to_string(function, false, false),
+            Some(class) => {
+                w.indent();
+                self.get_method_args(function, class)
+            }
+        };
+
+        match function.signature().rval() {
+            CType::Pattern(x) => match x {
+                TypePattern::AsciiPointer => {
+                    indented!(w, [_], r#"rval = c_lib.{}({})"#, function.name(), &args)?;
+                    indented!(w, [_], r#"return ctypes.string_at(rval)"#)?;
+                }
+                _ => self.write_success_enum_aware_rval(w, function, &args, true)?,
+            },
+            _ => self.write_success_enum_aware_rval(w, function, &args, true)?,
+        }
+
+        if class_str.is_some() {
+            w.unindent();
+        }
+
+        Ok(())
+    }
+
+    fn function_args_to_string(&self, function: &Function, type_hints: bool, skip_first: bool) -> String {
+        let skip = if skip_first { 1 } else { 0 };
         function
             .signature()
             .params()
             .iter()
-            .skip(1)
+            .skip(skip)
             .map(|x| {
                 let type_hint = if type_hints {
                     self.converter().to_type_hint_in(x.the_type())
@@ -397,15 +408,19 @@ pub trait PythonWriter {
             .join(", ")
     }
 
-    fn write_pattern_class_success_enum_aware_rval(&self, w: &mut IndentWriter, _class: &Service, function: &Function, ctx: &str, ret: bool) -> Result<(), Error> {
-        let args = self.pattern_class_args_without_first_to_string(function, false);
-
+    fn write_success_enum_aware_rval(&self, w: &mut IndentWriter, function: &Function, args: &str, ret: bool) -> Result<(), Error> {
         if ret {
-            indented!(w, [_ _], r#"return c_lib.{}({}, {})"#, function.name(), ctx, &args)?;
+            indented!(w, [_], r#"return c_lib.{}({})"#, function.name(), &args)?;
         } else {
-            indented!(w, [_ _], r#"c_lib.{}({}, {})"#, function.name(), ctx, &args)?;
+            indented!(w, [_], r#"c_lib.{}({})"#, function.name(), &args)?;
         }
         Ok(())
+    }
+
+    fn get_method_args(&self, function: &Function, ctx: &str) -> String {
+        let mut args = self.function_args_to_string(function, false, true);
+        args.insert_str(0, &format!("{}, ", ctx));
+        args
     }
 
     fn write_utils(&self, w: &mut IndentWriter) -> Result<(), Error> {
