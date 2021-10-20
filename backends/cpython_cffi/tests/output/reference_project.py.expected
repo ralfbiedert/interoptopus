@@ -279,6 +279,7 @@ cffi_sliceu32 simple_service_return_slice(cffi_simpleservice* context);
 cffi_slicemutu32 simple_service_return_slice_mut(cffi_simpleservice* context);
 uint8_t* simple_service_return_string(cffi_simpleservice* context);
 cffi_ffierror simple_service_method_void_ffi_error(cffi_simpleservice* context);
+cffi_ffierror simple_service_method_callback(cffi_simpleservice* context, cffi_fptr_fn_u32_rval_u32 callback);
 cffi_ffierror simple_service_lt_destroy(cffi_simpleservicelifetime** context);
 cffi_ffierror simple_service_lt_new_with(cffi_simpleservicelifetime** context, uint32_t* some_value);
 void simple_service_lt_method_lt(cffi_simpleservicelifetime* context, cffi_slicebool slice);
@@ -1940,6 +1941,25 @@ class api:
             raise Exception(f"Function returned error {_rval}")
 
     @staticmethod
+    def simple_service_method_callback(context, callback):
+        """"""
+        if hasattr(context, "_ctx"):
+            context = context.c_ptr()
+        _callback = callback
+
+        @ffi.callback(callbacks.fn_u32_rval_u32)
+        def _callback_callback(x):
+            return _callback(x)
+
+        callback = _callback_callback
+
+        _rval = _api.simple_service_method_callback(context, callback)
+        if _rval == FFIError.Ok:
+            return _rval
+        else:
+            raise Exception(f"Function returned error {_rval}")
+
+    @staticmethod
     def simple_service_lt_destroy(context):
         """ Destroys the given instance.
 
@@ -2118,6 +2138,10 @@ class SimpleService(CHeapAllocated):
     def method_void_ffi_error(self, ):
         """"""
         return api.simple_service_method_void_ffi_error(self.c_value(), )
+
+    def method_callback(self, callback):
+        """"""
+        return api.simple_service_method_callback(self.c_value(), callback)
 
 
 class SimpleServiceLifetime(CHeapAllocated):

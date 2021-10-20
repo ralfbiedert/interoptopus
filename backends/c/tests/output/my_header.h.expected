@@ -280,6 +280,7 @@ my_library_sliceu32 simple_service_return_slice(my_library_simpleservice* contex
 my_library_slicemutu32 simple_service_return_slice_mut(my_library_simpleservice* context);
 uint8_t* simple_service_return_string(my_library_simpleservice* context);
 my_library_ffierror simple_service_method_void_ffi_error(my_library_simpleservice* context);
+my_library_ffierror simple_service_method_callback(my_library_simpleservice* context, my_library_fptr_fn_u32_rval_u32 callback);
 my_library_ffierror simple_service_lt_destroy(my_library_simpleservicelifetime** context);
 my_library_ffierror simple_service_lt_new_with(my_library_simpleservicelifetime** context, uint32_t* some_value);
 void simple_service_lt_method_lt(my_library_simpleservicelifetime* context, my_library_slicebool slice);

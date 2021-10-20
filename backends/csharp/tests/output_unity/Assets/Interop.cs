@@ -23,9 +23,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 17487233993711971522ul)
+            if (api_version != 412098576526984246ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (17487233993711971522). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (412098576526984246). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -737,6 +737,21 @@ namespace My.Company
         }
 
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_callback")]
+        public static extern FFIError simple_service_method_callback(IntPtr context, MyCallback callback);
+
+        public static void simple_service_method_callback_checked(IntPtr context, MyCallback callback) {
+            var rval = simple_service_method_callback(context, callback);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_callback")]
+        public static extern FFIError simple_service_method_callback(IntPtr context, IntPtr callback);
+
+
         /// Destroys the given instance.
         ///
         /// # Safety
@@ -1393,6 +1408,22 @@ namespace My.Company
                 throw new InteropException<FFIError>(rval);
             }
         }
+
+        public void MethodCallback(MyCallback callback)
+        {
+            var rval = Interop.simple_service_method_callback(_context, callback);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
+        #if UNITY_2018_1_OR_NEWER
+        public void MethodCallback(IntPtr callback)
+        {
+            Interop.simple_service_method_callback(_context, callback);
+        }
+        #endif
 
         public IntPtr Context => _context;
     }

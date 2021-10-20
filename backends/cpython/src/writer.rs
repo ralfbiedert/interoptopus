@@ -218,7 +218,6 @@ pub trait PythonWriter {
             }
 
             self.write_param_helpers(w, function)?;
-
             self.write_library_call(w, function, None)?;
 
             w.newline()?;
@@ -351,7 +350,9 @@ pub trait PythonWriter {
             indented!(w, [_], r#"def {}(self, {}){}:"#, function.name().replace(&common_prefix, ""), &args, type_hint_out)?;
             indented!(w, [_ _], r#"{}"#, self.converter().documentation(function.meta().documentation()))?;
 
+            w.indent();
             self.write_param_helpers(w, function)?;
+            w.unindent();
 
             self.write_library_call(w, function, Some("self._ctx"))?;
         }

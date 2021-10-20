@@ -86,6 +86,7 @@ def init_lib(path):
     c_lib.simple_service_return_slice_mut.argtypes = [ctypes.c_void_p]
     c_lib.simple_service_return_string.argtypes = [ctypes.c_void_p]
     c_lib.simple_service_method_void_ffi_error.argtypes = [ctypes.c_void_p]
+    c_lib.simple_service_method_callback.argtypes = [ctypes.c_void_p, callbacks.fn_u32_rval_u32]
     c_lib.simple_service_lt_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.simple_service_lt_new_with.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.POINTER(ctypes.c_uint32)]
     c_lib.simple_service_lt_method_lt.argtypes = [ctypes.c_void_p, SliceBool]
@@ -159,6 +160,7 @@ def init_lib(path):
     c_lib.simple_service_return_slice_mut.restype = SliceMutu32
     c_lib.simple_service_return_string.restype = ctypes.POINTER(ctypes.c_uint8)
     c_lib.simple_service_method_void_ffi_error.restype = ctypes.c_int
+    c_lib.simple_service_method_callback.restype = ctypes.c_int
     c_lib.simple_service_lt_destroy.restype = ctypes.c_int
     c_lib.simple_service_lt_new_with.restype = ctypes.c_int
     c_lib.simple_service_lt_return_string_accept_slice.restype = ctypes.POINTER(ctypes.c_uint8)
@@ -174,6 +176,7 @@ def init_lib(path):
     c_lib.simple_service_method_mut_self_ffi_error.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.simple_service_method_mut_self_no_error.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.simple_service_method_void_ffi_error.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.simple_service_method_callback.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.simple_service_lt_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.simple_service_lt_new_with.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.simple_service_lt_method_void_ffi_error.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
@@ -1148,6 +1151,13 @@ class SimpleService:
     def method_void_ffi_error(self, ):
         """"""
         return c_lib.simple_service_method_void_ffi_error(self._ctx, )
+
+    def method_callback(self, callback):
+        """"""
+        if not hasattr(callback, "__ctypes_from_outparam__"):
+            callback = callbacks.fn_u32_rval_u32(callback)
+
+        return c_lib.simple_service_method_callback(self._ctx, callback)
 
 
 class SimpleServiceLifetime:

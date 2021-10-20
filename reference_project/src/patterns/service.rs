@@ -1,3 +1,4 @@
+use crate::patterns::callbacks::MyCallback;
 use crate::patterns::result::{Error, FFIError};
 use interoptopus::patterns::primitives::FFIBool;
 use interoptopus::patterns::slice::{FFISlice, FFISliceMut};
@@ -113,6 +114,11 @@ impl SimpleService {
     }
 
     pub fn method_void_ffi_error(&mut self) -> Result<(), Error> {
+        Ok(())
+    }
+
+    pub fn method_callback(&mut self, callback: MyCallback) -> Result<(), Error> {
+        callback.call(0);
         Ok(())
     }
 }
