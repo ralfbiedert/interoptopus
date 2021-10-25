@@ -175,9 +175,17 @@ pub trait PythonWriter {
     }
 
     fn write_enum(&self, w: &mut IndentWriter, e: &EnumType) -> Result<(), Error> {
+        let documentation = e.meta().documentation().lines().join("\n");
+
         indented!(w, r#"class {}:"#, e.rust_name())?;
+        if !documentation.is_empty() {
+            indented!(w, [_], r#""""{}""""#, documentation)?;
+        }
 
         for v in e.variants() {
+            for line in v.documentation().lines() {
+                indented!(w, [_], r#"# {}"#, line)?;
+            }
             indented!(w, [_], r#"{} = {}"#, v.name(), v.value())?;
         }
 
@@ -307,8 +315,12 @@ pub trait PythonWriter {
         all_functions.push(class.destructor().clone());
 
         let common_prefix = longest_common_prefix(&all_functions);
+        let documentation = class.the_type().meta().documentation().lines().join("\n");
 
         indented!(w, r#"class {}:"#, context_type_name)?;
+        if !documentation.is_empty() {
+            indented!(w, [_], r#""""{}""""#, documentation)?;
+        }
         indented!(w, [_], r#"__api_lock = object()"#)?;
         w.newline()?;
         indented!(w, [_], r#"def __init__(self, api_lock, ctx):"#)?;

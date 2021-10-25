@@ -416,8 +416,12 @@ class CallbackVars(object):
 
 
 class EnumDocumented:
+    """ Documented enum."""
+    #  Variant A.
     A = 0
+    #  Variant B.
     B = 1
+    #  Variant B.
     C = 2
 
 
@@ -1056,6 +1060,7 @@ class callbacks:
 
 
 class SimpleService:
+    """ Some struct we want to expose as a class."""
     __api_lock = object()
 
     def __init__(self, api_lock, ctx):
