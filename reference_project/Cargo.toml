@@ -2,7 +2,7 @@
 name = "interoptopus_reference_project"
 description = "A reference project for Interoptopus backends to test interop generation."
 authors = ["Ralf Biedert <rb@xr.io>"]
-version = "0.13.5"
+version = "0.13.6"
 edition = "2018"
 license = "MIT"
 keywords = ["ffi"]
