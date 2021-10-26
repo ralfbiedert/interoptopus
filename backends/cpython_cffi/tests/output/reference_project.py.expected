@@ -33,8 +33,6 @@ typedef struct cffi_generic4 cffi_generic4;
 typedef struct cffi_opaque cffi_opaque;
 typedef struct cffi_simpleservice cffi_simpleservice;
 typedef struct cffi_simpleservicelifetime cffi_simpleservicelifetime;
-typedef struct cffi_empty cffi_empty;
-
 typedef enum cffi_ffierror
     {
     CFFI_FFIERROR_OK = 0,
@@ -224,7 +222,7 @@ int64_t* ref_mut_simple(int64_t* x);
 bool ref_option(int64_t* x);
 bool ref_mut_option(int64_t* x);
 cffi_tupled tupled(cffi_tupled x);
-cffi_ffierror complex_args_1(cffi_vec3f32 a, cffi_empty* b);
+cffi_ffierror complex_args_1(cffi_vec3f32 a, cffi_tupled* b);
 cffi_opaque* complex_args_2(cffi_someforeigntype cmplx);
 uint8_t callback(cffi_fptr_fn_u8_rval_u8 callback, uint8_t value);
 uint32_t generic_1a(cffi_genericu32 x, cffi_phantomu8 y);
@@ -244,6 +242,7 @@ cffi_enumrenamed renamed(cffi_structrenamed x);
 void sleep(uint64_t millis);
 bool weird_1(cffi_weird1u32 x, cffi_weird2u8 y);
 void visibility(cffi_visibility1 x, cffi_visibility2 y);
+cffi_tupled repr_transparent(cffi_tupled x, cffi_tupled* r);
 uint32_t pattern_ascii_pointer_1(uint8_t* x);
 uint8_t* pattern_ascii_pointer_2();
 uint32_t pattern_ascii_pointer_len(uint8_t* x, cffi_useasciistringpattern y);
@@ -493,16 +492,6 @@ class Array(CHeapAllocated):
             else:
                 value = value.c_value()
         self._ctx[0].data = value
-
-
-class Empty(CHeapAllocated):
-    """"""
-    def __init__(self, ):
-        self._ctx = ffi.new("cffi_empty[]", 1)
-
-    @staticmethod
-    def c_array(n: int) -> CArray[Empty]:
-        return CArray("cffi_empty", n)
 
 
 class ExtraTypef32(CHeapAllocated):
@@ -1517,6 +1506,16 @@ class api:
             y = y.c_value()
 
         return _api.visibility(x, y)
+
+    @staticmethod
+    def repr_transparent(x: Tupled, r) -> Tupled:
+        """"""
+        if hasattr(x, "_ctx"):
+            x = x.c_value()
+        if hasattr(r, "_ctx"):
+            r = r.c_ptr()
+
+        return _api.repr_transparent(x, r)
 
     @staticmethod
     def pattern_ascii_pointer_1(x) -> int:

@@ -34,8 +34,6 @@ typedef struct my_library_generic4 my_library_generic4;
 typedef struct my_library_opaque my_library_opaque;
 typedef struct my_library_simpleservice my_library_simpleservice;
 typedef struct my_library_simpleservicelifetime my_library_simpleservicelifetime;
-typedef struct my_library_empty my_library_empty;
-
 typedef enum my_library_ffierror
     {
     MY_LIBRARY_FFIERROR_OK = 0,
@@ -225,7 +223,7 @@ int64_t* ref_mut_simple(int64_t* x);
 bool ref_option(int64_t* x);
 bool ref_mut_option(int64_t* x);
 my_library_tupled tupled(my_library_tupled x);
-my_library_ffierror complex_args_1(my_library_vec3f32 a, my_library_empty* b);
+my_library_ffierror complex_args_1(my_library_vec3f32 a, my_library_tupled* b);
 my_library_opaque* complex_args_2(my_library_someforeigntype cmplx);
 uint8_t callback(my_library_fptr_fn_u8_rval_u8 callback, uint8_t value);
 uint32_t generic_1a(my_library_genericu32 x, my_library_phantomu8 y);
@@ -245,6 +243,7 @@ my_library_enumrenamed renamed(my_library_structrenamed x);
 void sleep(uint64_t millis);
 bool weird_1(my_library_weird1u32 x, my_library_weird2u8 y);
 void visibility(my_library_visibility1 x, my_library_visibility2 y);
+my_library_tupled repr_transparent(my_library_tupled x, my_library_tupled* r);
 uint32_t pattern_ascii_pointer_1(uint8_t* x);
 uint8_t* pattern_ascii_pointer_2();
 uint32_t pattern_ascii_pointer_len(uint8_t* x, my_library_useasciistringpattern y);

@@ -23,9 +23,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 17470010777779783453ul)
+            if (api_version != 1472391296032959303ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (17470010777779783453). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (1472391296032959303). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -145,9 +145,9 @@ namespace My.Company
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "complex_args_1")]
-        public static extern FFIError complex_args_1(Vec3f32 a, ref Empty b);
+        public static extern FFIError complex_args_1(Vec3f32 a, ref Tupled b);
 
-        public static void complex_args_1_checked(Vec3f32 a, ref Empty b) {
+        public static void complex_args_1_checked(Vec3f32 a, ref Tupled b) {
             var rval = complex_args_1(a, ref b);;
             if (rval != FFIError.Ok)
             {
@@ -259,6 +259,11 @@ namespace My.Company
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "visibility")]
         public static extern void visibility(Visibility1 x, Visibility2 y);
+
+
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "repr_transparent")]
+        public static extern Tupled repr_transparent(Tupled x, ref Tupled r);
 
 
 
@@ -909,12 +914,6 @@ namespace My.Company
         public byte data13;
         public byte data14;
         public byte data15;
-    }
-
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct Empty
-    {
     }
 
     [Serializable]

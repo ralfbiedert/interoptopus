@@ -69,6 +69,7 @@ interoptopus::inventory!(
         functions::sleep,
         functions::weird_1,
         functions::visibility,
+        functions::repr_transparent,
         patterns::ascii_pointer::pattern_ascii_pointer_1,
         patterns::ascii_pointer::pattern_ascii_pointer_2,
         patterns::ascii_pointer::pattern_ascii_pointer_len,

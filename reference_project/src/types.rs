@@ -24,7 +24,8 @@ pub fn some_foreign_type() -> CType {
     CType::Composite(composite)
 }
 
-#[ffi_type]
+/// Empty structs are only allowed as opaques.
+#[ffi_type(opaque)]
 #[repr(C)]
 pub struct Empty {}
 
@@ -36,6 +37,10 @@ pub struct Opaque {
 #[ffi_type]
 #[repr(C)]
 pub struct Tupled(pub u8);
+
+#[ffi_type]
+#[repr(transparent)]
+pub struct Transparent(Tupled);
 
 #[ffi_type]
 #[repr(C)]

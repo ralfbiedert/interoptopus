@@ -31,7 +31,7 @@ def init_lib(path):
     c_lib.ref_option.argtypes = [ctypes.POINTER(ctypes.c_int64)]
     c_lib.ref_mut_option.argtypes = [ctypes.POINTER(ctypes.c_int64)]
     c_lib.tupled.argtypes = [Tupled]
-    c_lib.complex_args_1.argtypes = [Vec3f32, ctypes.POINTER(Empty)]
+    c_lib.complex_args_1.argtypes = [Vec3f32, ctypes.POINTER(Tupled)]
     c_lib.complex_args_2.argtypes = [SomeForeignType]
     c_lib.callback.argtypes = [callbacks.fn_u8_rval_u8, ctypes.c_uint8]
     c_lib.generic_1a.argtypes = [Genericu32, Phantomu8]
@@ -51,6 +51,7 @@ def init_lib(path):
     c_lib.sleep.argtypes = [ctypes.c_uint64]
     c_lib.weird_1.argtypes = [Weird1u32, Weird2u8]
     c_lib.visibility.argtypes = [Visibility1, Visibility2]
+    c_lib.repr_transparent.argtypes = [Tupled, ctypes.POINTER(Tupled)]
     c_lib.pattern_ascii_pointer_1.argtypes = [ctypes.POINTER(ctypes.c_uint8)]
     c_lib.pattern_ascii_pointer_2.argtypes = []
     c_lib.pattern_ascii_pointer_len.argtypes = [ctypes.POINTER(ctypes.c_uint8), UseAsciiStringPattern]
@@ -132,6 +133,7 @@ def init_lib(path):
     c_lib.panics.restype = ctypes.c_int
     c_lib.renamed.restype = ctypes.c_int
     c_lib.weird_1.restype = ctypes.c_bool
+    c_lib.repr_transparent.restype = Tupled
     c_lib.pattern_ascii_pointer_1.restype = ctypes.c_uint32
     c_lib.pattern_ascii_pointer_2.restype = ctypes.POINTER(ctypes.c_uint8)
     c_lib.pattern_ascii_pointer_len.restype = ctypes.c_uint32
@@ -251,7 +253,7 @@ def ref_mut_option(x: ctypes.POINTER(ctypes.c_int64)) -> bool:
 def tupled(x: Tupled) -> Tupled:
     return c_lib.tupled(x)
 
-def complex_args_1(a: Vec3f32, b: ctypes.POINTER(Empty)):
+def complex_args_1(a: Vec3f32, b: ctypes.POINTER(Tupled)):
     return c_lib.complex_args_1(a, b)
 
 def complex_args_2(cmplx: SomeForeignType) -> ctypes.c_void_p:
@@ -314,6 +316,9 @@ def weird_1(x: Weird1u32, y: Weird2u8) -> bool:
 
 def visibility(x: Visibility1, y: Visibility2):
     return c_lib.visibility(x, y)
+
+def repr_transparent(x: Tupled, r: ctypes.POINTER(Tupled)) -> Tupled:
+    return c_lib.repr_transparent(x, r)
 
 def pattern_ascii_pointer_1(x: str) -> int:
     if not hasattr(x, "__ctypes_from_outparam__"):
@@ -416,20 +421,17 @@ class CallbackVars(object):
 
 
 class EnumDocumented:
+    """ Documented enum."""
+    #  Variant A.
     A = 0
+    #  Variant B.
     B = 1
+    #  Variant B.
     C = 2
 
 
 class EnumRenamed:
     X = 0
-
-
-class Empty(ctypes.Structure):
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-    ]
 
 
 class FFIError:
@@ -1056,6 +1058,7 @@ class callbacks:
 
 
 class SimpleService:
+    """ Some struct we want to expose as a class."""
     __api_lock = object()
 
     def __init__(self, api_lock, ctx):

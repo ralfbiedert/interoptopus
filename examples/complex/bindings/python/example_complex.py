@@ -98,7 +98,10 @@ class CallbackVars(object):
 
 
 class FFIError:
+    """ Possible errors in our library."""
+    #  All went fine.
     Ok = 0
+    #  Naughty API call detected.
     NullPointerPassed = 10
 
 

@@ -6,14 +6,28 @@ use quote::{quote, ToTokens};
 use syn::spanned::Spanned;
 use syn::{GenericParam, ItemStruct, Type};
 
-fn assert_valid_repr(attributes: &Attributes, item: &ItemStruct) {
-    // Opaques don't need any #[repr] annotation
+#[derive(Debug, Copy, Clone)]
+pub enum TypeRepr {
+    C,
+    Transparent,
+    Opaque,
+}
+
+fn type_repr(attributes: &Attributes, item: &ItemStruct) -> TypeRepr {
     if attributes.opaque {
-        return;
+        return TypeRepr::Opaque;
     }
 
-    if item.attrs.iter().find(|x| x.to_token_stream().to_string().contains("repr")).is_none() {
-        panic!("Struct {} must have `#[repr()] annotation.", item.ident);
+    let repr = item
+        .attrs
+        .iter()
+        .find(|x| x.to_token_stream().to_string().contains("repr"))
+        .expect(&format!("Struct {} must have `#[repr()] annotation.", item.ident));
+
+    if repr.to_token_stream().to_string().contains("transparent") {
+        TypeRepr::Transparent
+    } else {
+        TypeRepr::C
     }
 }
 
@@ -58,8 +72,7 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
     let namespace = attributes.namespace.clone().unwrap_or_else(|| "".to_string());
     let doc_line = extract_doc_lines(&item.attrs).join("\n");
 
-    attributes.assert_valid();
-    assert_valid_repr(attributes, &item);
+    let type_repr = type_repr(attributes, &item);
 
     let struct_ident_str = item.ident.to_string();
     let struct_ident = syn::Ident::new(&struct_ident_str, item.ident.span());
@@ -67,6 +80,7 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
     let surrogates = read_surrogates(&item.attrs);
 
     let mut field_names = Vec::new();
+    let mut field_type_info = Vec::new();
     let mut field_types = Vec::new();
     let mut field_docs = Vec::new();
     let mut field_visibilities = Vec::new();
@@ -163,9 +177,11 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
         if surrogates.1.contains_key(&name) {
             let lookup = surrogates.1.get(&name).unwrap();
             let ident = syn::Ident::new(&lookup, surrogates.0.unwrap());
-            field_types.push(quote! { #ident()  })
+            field_type_info.push(quote! { #ident()  });
+            field_types.push(quote! { #ident()  }); // TODO: are these 2 correct?
         } else {
-            field_types.push(quote! { < #token as interoptopus::lang::rust::CTypeInfo >::type_info()  })
+            field_type_info.push(quote! { < #token as interoptopus::lang::rust::CTypeInfo >::type_info()  });
+            field_types.push(quote! { #token });
         }
     }
 
@@ -187,7 +203,7 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
         quote! {
             #({
                 let documentation = interoptopus::lang::c::Documentation::from_line(#field_docs);
-                let the_type = #field_types;
+                let the_type = #field_type_info;
                 let field = interoptopus::lang::c::Field::with_documentation(#field_names.to_string(), the_type, #field_visibilities, documentation);
                 fields.push(field);
             })*
@@ -208,22 +224,40 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
         }
     };
 
-    quote! {
-        #input
+    match type_repr {
+        TypeRepr::C | TypeRepr::Opaque => {
+            quote! {
+                #input
 
-        unsafe impl #param_param interoptopus::lang::rust::CTypeInfo for #struct_ident #param_struct #param_where {
+                unsafe impl #param_param interoptopus::lang::rust::CTypeInfo for #struct_ident #param_struct #param_where {
 
-            fn type_info() -> interoptopus::lang::c::CType {
-                let documentation = interoptopus::lang::c::Documentation::from_line(#doc_line);
-                let mut meta = interoptopus::lang::c::Meta::with_namespace_documentation(#namespace.to_string(), documentation);
-                let mut fields: std::vec::Vec<interoptopus::lang::c::Field> = std::vec::Vec::new();
-                let mut generics: std::vec::Vec<String> = std::vec::Vec::new();
+                    fn type_info() -> interoptopus::lang::c::CType {
+                        let documentation = interoptopus::lang::c::Documentation::from_line(#doc_line);
+                        let mut meta = interoptopus::lang::c::Meta::with_namespace_documentation(#namespace.to_string(), documentation);
+                        let mut fields: std::vec::Vec<interoptopus::lang::c::Field> = std::vec::Vec::new();
+                        let mut generics: std::vec::Vec<String> = std::vec::Vec::new();
 
-                #let_name
+                        #let_name
 
-                #let_fields
+                        #let_fields
 
-                #rval_builder
+                        #rval_builder
+                    }
+                }
+            }
+        }
+        TypeRepr::Transparent => {
+            let first_field_type = field_types.get(0).expect("Transparent structs must have at least one field");
+
+            quote! {
+                #input
+
+                unsafe impl #param_param interoptopus::lang::rust::CTypeInfo for #struct_ident #param_struct #param_where {
+
+                    fn type_info() -> interoptopus::lang::c::CType {
+                        < #first_field_type > :: type_info()
+                    }
+                }
             }
         }
     }

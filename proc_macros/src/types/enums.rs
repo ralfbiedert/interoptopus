@@ -35,7 +35,6 @@ fn derive_variant_info(item: ItemEnum, idents: &[Ident], names: &[String], value
 pub fn ffi_type_enum(attributes: &Attributes, input: TokenStream, item: ItemEnum) -> TokenStream {
     let doc_line = extract_doc_lines(&item.attrs).join("\n");
 
-    attributes.assert_valid();
     assert_valid_repr(attributes, &item);
 
     let span = item.ident.span();

@@ -2,8 +2,8 @@
 
 use crate::patterns::result::{Error, FFIError};
 use crate::types::{
-    ambiguous1, ambiguous2, common, some_foreign_type, Array, Callbacku8u8, Empty, EnumDocumented, EnumRenamedXYZ, Generic, Generic2, Generic3, Generic4, Opaque,
-    Phantom, SomeForeignType, StructDocumented, StructRenamedXYZ, Tupled, Vec3f32, Visibility1, Visibility2, Weird1, Weird2,
+    ambiguous1, ambiguous2, common, some_foreign_type, Array, Callbacku8u8, EnumDocumented, EnumRenamedXYZ, Generic, Generic2, Generic3, Generic4, Opaque, Phantom,
+    SomeForeignType, StructDocumented, StructRenamedXYZ, Transparent, Tupled, Vec3f32, Visibility1, Visibility2, Weird1, Weird2,
 };
 use interoptopus::patterns::result::panics_and_errors_to_ffi_enum;
 use interoptopus::{ffi_function, ffi_surrogates, here};
@@ -141,7 +141,13 @@ pub extern "C" fn tupled(x: Tupled) -> Tupled {
 
 #[ffi_function]
 #[no_mangle]
-pub extern "C" fn complex_args_1(_a: Vec3f32, _b: Option<&Empty>) -> FFIError {
+pub extern "C" fn repr_transparent(x: Transparent, _r: &Transparent) -> Transparent {
+    x
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn complex_args_1(_a: Vec3f32, _b: Option<&Tupled>) -> FFIError {
     FFIError::Ok
 }
 
