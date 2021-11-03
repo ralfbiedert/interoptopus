@@ -73,10 +73,13 @@ impl<'a> AsciiPointer<'a> {
             return Err(Error::Ascii);
         }
 
+        // Can't do this, C# treats ASCII as extended and bytes > 127 might show up, which
+        // is going to be a problem when returning a string we previously accepted.
+        //
         // Any previous characters must not be extended ASCII.
-        if ascii_with_nul.iter().any(|x| *x > 127) {
-            return Err(Error::Ascii);
-        }
+        // if ascii_with_nul.iter().any(|x| *x > 127) {
+        //     return Err(Error::Ascii);
+        // }
 
         Ok(Self {
             ptr: ascii_with_nul.as_ptr().cast(),
