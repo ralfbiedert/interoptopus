@@ -174,7 +174,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                         #[doc = #doc_lines]
                     )*
                     pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #rval {
-                        let result_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                        let result_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(move || {
                             <#without_lifetimes>::#orig_fn_ident( #(#arg_names),* )
                         }));
 
@@ -210,7 +210,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                         #[doc = #doc_lines]
                     )*
                     pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #error_ident {
-                        ::interoptopus::patterns::result::panics_and_errors_to_ffi_enum(|| {
+                        ::interoptopus::patterns::result::panics_and_errors_to_ffi_enum(move || {
                             <#without_lifetimes>::#orig_fn_ident( #(#arg_names),* )
                         }, stringify!(#ffi_fn_ident))
                     }
