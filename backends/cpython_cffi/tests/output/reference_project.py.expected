@@ -188,6 +188,12 @@ typedef struct cffi_optioninner
 
 typedef void (*cffi_fptr_fn_pconst)(void* x0);
 
+typedef struct cffi_sliceuseasciistringpattern
+    {
+    cffi_useasciistringpattern* data;
+    uint64_t len;
+    } cffi_sliceuseasciistringpattern;
+
 typedef struct cffi_slicevec3f32
     {
     cffi_vec3f32* data;
@@ -246,6 +252,7 @@ cffi_tupled repr_transparent(cffi_tupled x, cffi_tupled* r);
 uint32_t pattern_ascii_pointer_1(uint8_t* x);
 uint8_t* pattern_ascii_pointer_2();
 uint32_t pattern_ascii_pointer_len(uint8_t* x, cffi_useasciistringpattern y);
+cffi_sliceuseasciistringpattern pattern_ascii_pointer_return_slice();
 uint32_t pattern_ffi_slice_1(cffi_sliceu32 ffi_slice);
 cffi_vec3f32 pattern_ffi_slice_2(cffi_slicevec3f32 ffi_slice, int32_t i);
 void pattern_ffi_slice_3(cffi_slicemutu8 slice, cffi_fptr_fn_SliceMutu8 callback);
@@ -1540,6 +1547,12 @@ class api:
             y = y.c_value()
 
         return _api.pattern_ascii_pointer_len(x, y)
+
+    @staticmethod
+    def pattern_ascii_pointer_return_slice():
+        """"""
+
+        return _api.pattern_ascii_pointer_return_slice()
 
     @staticmethod
     def pattern_ffi_slice_1(ffi_slice) -> int:

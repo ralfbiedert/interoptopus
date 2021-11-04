@@ -1,5 +1,6 @@
 use crate::types::UseAsciiStringPattern;
 use interoptopus::ffi_function;
+use interoptopus::patterns::slice::FFISlice;
 use interoptopus::patterns::string::AsciiPointer;
 
 #[ffi_function]
@@ -21,3 +22,10 @@ pub extern "C" fn pattern_ascii_pointer_len(x: AsciiPointer, y: UseAsciiStringPa
     let x2 = y.ascii_string.as_str().map(|x| x.len()).unwrap_or(0);
     (x1 + x2) as u32
 }
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn pattern_ascii_pointer_return_slice() -> FFISlice<'static, UseAsciiStringPattern<'static>> {
+    FFISlice::empty()
+}
+

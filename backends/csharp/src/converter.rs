@@ -49,6 +49,34 @@ pub trait CSharpTypeConverter {
         x.rust_name().to_string()
     }
 
+
+    /// Checks if the type is on the C# side blittable, in particular, if it can be accessed via raw pointers and memcopied.
+    fn is_blittable(&self, x: &CType) -> bool {
+        match x {
+            CType::Primitive(_) => true,
+            CType::Composite(c) => {
+                c.fields().iter().all(|x| self.is_blittable(x.the_type()))
+            }
+            CType::Pattern(x) => match x {
+                TypePattern::AsciiPointer => false,
+                TypePattern::APIVersion => true,
+                TypePattern::FFIErrorEnum(_) => true,
+                TypePattern::Slice(_) => false,
+                TypePattern::SliceMut(_) => false,
+                TypePattern::Option(_) => true,
+                TypePattern::Bool => true,
+                TypePattern::NamedCallback(_) => false
+            },
+            CType::Array(_) => false, // TODO: should check inner and maybe return true
+            CType::Enum(_) => true,
+            CType::Opaque(_) => true,
+            CType::FnPointer(_) => true,
+            CType::ReadPointer(_) => true,
+            CType::ReadWritePointer(_) => true,
+        }
+    }
+
+
     fn named_callback_to_typename(&self, x: &NamedCallback) -> String {
         x.name().to_string()
     }

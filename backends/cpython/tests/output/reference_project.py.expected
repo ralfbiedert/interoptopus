@@ -55,6 +55,7 @@ def init_lib(path):
     c_lib.pattern_ascii_pointer_1.argtypes = [ctypes.POINTER(ctypes.c_uint8)]
     c_lib.pattern_ascii_pointer_2.argtypes = []
     c_lib.pattern_ascii_pointer_len.argtypes = [ctypes.POINTER(ctypes.c_uint8), UseAsciiStringPattern]
+    c_lib.pattern_ascii_pointer_return_slice.argtypes = []
     c_lib.pattern_ffi_slice_1.argtypes = [Sliceu32]
     c_lib.pattern_ffi_slice_2.argtypes = [SliceVec3f32, ctypes.c_int32]
     c_lib.pattern_ffi_slice_3.argtypes = [SliceMutu8, callbacks.fn_SliceMutu8]
@@ -137,6 +138,7 @@ def init_lib(path):
     c_lib.pattern_ascii_pointer_1.restype = ctypes.c_uint32
     c_lib.pattern_ascii_pointer_2.restype = ctypes.POINTER(ctypes.c_uint8)
     c_lib.pattern_ascii_pointer_len.restype = ctypes.c_uint32
+    c_lib.pattern_ascii_pointer_return_slice.restype = SliceUseAsciiStringPattern
     c_lib.pattern_ffi_slice_1.restype = ctypes.c_uint32
     c_lib.pattern_ffi_slice_2.restype = Vec3f32
     c_lib.pattern_ffi_slice_delegate.restype = ctypes.c_uint8
@@ -333,6 +335,9 @@ def pattern_ascii_pointer_len(x: str, y: UseAsciiStringPattern) -> int:
     if not hasattr(x, "__ctypes_from_outparam__"):
         x = ctypes.cast(x, ctypes.POINTER(ctypes.c_uint8))
     return c_lib.pattern_ascii_pointer_len(x, y)
+
+def pattern_ascii_pointer_return_slice() -> SliceUseAsciiStringPattern:
+    return c_lib.pattern_ascii_pointer_return_slice()
 
 def pattern_ffi_slice_1(ffi_slice: Sliceu32) -> int:
     return c_lib.pattern_ffi_slice_1(ffi_slice)
@@ -1028,6 +1033,20 @@ class OptionInner(ctypes.Structure):
     @is_some.setter
     def is_some(self, value: int):
         return ctypes.Structure.__set__(self, "is_some", value)
+
+
+class SliceUseAsciiStringPattern(ctypes.Structure):
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("data", ctypes.POINTER(UseAsciiStringPattern)),
+        ("len", ctypes.c_uint64),
+    ]
+
+    def __len__(self):
+        return self.len
+
+    def __getitem__(self, i) -> UseAsciiStringPattern:
+        return self.data[i]
 
 
 class SliceVec3f32(ctypes.Structure):

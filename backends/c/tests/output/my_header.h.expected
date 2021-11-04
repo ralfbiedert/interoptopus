@@ -189,6 +189,12 @@ typedef struct my_library_optioninner
 
 typedef void (*my_library_fptr_fn_pconst)(void* x0);
 
+typedef struct my_library_sliceuseasciistringpattern
+    {
+    my_library_useasciistringpattern* data;
+    uint64_t len;
+    } my_library_sliceuseasciistringpattern;
+
 typedef struct my_library_slicevec3f32
     {
     my_library_vec3f32* data;
@@ -247,6 +253,7 @@ my_library_tupled repr_transparent(my_library_tupled x, my_library_tupled* r);
 uint32_t pattern_ascii_pointer_1(uint8_t* x);
 uint8_t* pattern_ascii_pointer_2();
 uint32_t pattern_ascii_pointer_len(uint8_t* x, my_library_useasciistringpattern y);
+my_library_sliceuseasciistringpattern pattern_ascii_pointer_return_slice();
 uint32_t pattern_ffi_slice_1(my_library_sliceu32 ffi_slice);
 my_library_vec3f32 pattern_ffi_slice_2(my_library_slicevec3f32 ffi_slice, int32_t i);
 void pattern_ffi_slice_3(my_library_slicemutu8 slice, my_library_fptr_fn_SliceMutu8 callback);

@@ -130,6 +130,12 @@ impl SimpleService {
         callback.call(0);
         Ok(())
     }
+
+    /// No FFI bindings are generated for non-pub methods.
+    #[allow(unused)]
+    fn not_exposed<T>(&mut self, _: T) -> Result<(), Error> {
+        Ok(())
+    }
 }
 
 // Some struct we want to expose as a class.

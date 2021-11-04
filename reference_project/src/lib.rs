@@ -73,6 +73,7 @@ interoptopus::inventory!(
         patterns::ascii_pointer::pattern_ascii_pointer_1,
         patterns::ascii_pointer::pattern_ascii_pointer_2,
         patterns::ascii_pointer::pattern_ascii_pointer_len,
+        patterns::ascii_pointer::pattern_ascii_pointer_return_slice,
         patterns::slice::pattern_ffi_slice_1,
         patterns::slice::pattern_ffi_slice_2,
         patterns::slice::pattern_ffi_slice_3,

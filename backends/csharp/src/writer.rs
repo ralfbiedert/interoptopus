@@ -553,6 +553,7 @@ pub trait CSharpWriter {
             .expect("data must be a pointer type");
 
         let type_string = self.converter().to_typespecifier_in_rval(data_type);
+        let is_blittable = self.converter().is_blittable(data_type);
 
         indented!(w, r#"public partial struct {} : IEnumerable<{}>"#, context_type_name, type_string)?;
         indented!(w, r#"{{"#)?;
@@ -582,7 +583,7 @@ pub trait CSharpWriter {
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"if (i >= Count) throw new IndexOutOfRangeException();"#)?;
 
-        if self.config().use_unsafe.any_unsafe() {
+        if self.config().use_unsafe.any_unsafe() && is_blittable {
             indented!(w, [_ _ _], r#"unsafe"#)?;
             indented!(w, [_ _ _], r#"{{"#)?;
             indented!(w, [_ _ _ _], r#"var d = ({}*) data.ToPointer();"#, type_string)?;
@@ -604,7 +605,7 @@ pub trait CSharpWriter {
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"var rval = new {}[len];"#, type_string)?;
 
-        if self.config().use_unsafe == Unsafe::UnsafePlatformMemCpy {
+        if self.config().use_unsafe == Unsafe::UnsafePlatformMemCpy && is_blittable {
             indented!(w, [_ _ _], r#"unsafe"#)?;
             indented!(w, [_ _ _], r#"{{"#)?;
             indented!(w, [_ _ _ _ ], r#"fixed (void* dst = rval)"#)?;

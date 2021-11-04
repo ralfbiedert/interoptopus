@@ -3,7 +3,7 @@ use darling::FromMeta;
 use function_impl::MethodType;
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{AttributeArgs, ImplItem, ItemImpl};
+use syn::{AttributeArgs, ImplItem, ItemImpl, Visibility};
 
 pub mod function_impl;
 
@@ -33,8 +33,13 @@ pub fn ffi_service(attr: AttributeArgs, input: TokenStream) -> TokenStream {
 
     for impl_item in &item.items {
         if let ImplItem::Method(method) = impl_item {
-            if let Some(descriptor) = generate_service_method(&attributes, &item, method) {
-                function_descriptors.push(descriptor);
+            match &method.vis {
+                Visibility::Public(_) => {
+                    if let Some(descriptor) = generate_service_method(&attributes, &item, method) {
+                        function_descriptors.push(descriptor);
+                    }
+                }
+                _ => {}
             }
         }
     }

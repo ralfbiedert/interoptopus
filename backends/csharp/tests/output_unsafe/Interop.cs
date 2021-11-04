@@ -23,9 +23,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 1472391296032959303ul)
+            if (api_version != 18266456295059506754ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (1472391296032959303). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (18266456295059506754). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -279,6 +279,11 @@ namespace My.Company
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ascii_pointer_len")]
         public static extern uint pattern_ascii_pointer_len(string x, UseAsciiStringPattern y);
+
+
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ascii_pointer_return_slice")]
+        public static extern SliceUseAsciiStringPattern pattern_ascii_pointer_return_slice();
 
 
 
@@ -1068,6 +1073,75 @@ namespace My.Company
         Panic = 200,
         Fail = 300,
     }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct SliceUseAsciiStringPattern
+    {
+        #if UNITY_2018_1_OR_NEWER
+        [NativeDisableUnsafePtrRestriction]
+        #endif
+        IntPtr data;
+        ulong len;
+    }
+
+    public partial struct SliceUseAsciiStringPattern : IEnumerable<UseAsciiStringPattern>
+    {
+        public SliceUseAsciiStringPattern(GCHandle handle, ulong count)
+        {
+            this.data = handle.AddrOfPinnedObject();
+            this.len = count;
+        }
+        public SliceUseAsciiStringPattern(IntPtr handle, ulong count)
+        {
+            this.data = handle;
+            this.len = count;
+        }
+        #if UNITY_2018_1_OR_NEWER
+        public SliceUseAsciiStringPattern(NativeArray<UseAsciiStringPattern> handle)
+        {
+            unsafe
+            {
+                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
+                this.len = (ulong) handle.Length;
+            }
+        }
+        #endif
+        public UseAsciiStringPattern this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                var size = Marshal.SizeOf(typeof(UseAsciiStringPattern));
+                var ptr = new IntPtr(data.ToInt64() + i * size);
+                return Marshal.PtrToStructure<UseAsciiStringPattern>(ptr);
+            }
+        }
+        public UseAsciiStringPattern[] Copied
+        {
+            get
+            {
+                var rval = new UseAsciiStringPattern[len];
+                for (var i = 0; i < (int) len; i++) {
+                    rval[i] = this[i];
+                }
+                return rval;
+            }
+        }
+        public int Count => (int) len;
+        public IEnumerator<UseAsciiStringPattern> GetEnumerator()
+        {
+            for (var i = 0; i < (int)len; ++i)
+            {
+                yield return this[i];
+            }
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }
+
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
