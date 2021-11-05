@@ -86,7 +86,9 @@ pub trait PythonWriter {
                     TypePattern::FFIErrorEnum(e) => self.write_enum(w, e.the_enum())?,
                     TypePattern::Slice(c) => self.write_slice(w, c, false)?,
                     TypePattern::SliceMut(c) => self.write_slice(w, c, true)?,
-                    TypePattern::Option(c) => self.write_struct(w, c)?,
+                    TypePattern::Option(c) =>  {
+                        self.write_option(w, c)?;
+                    },
                     _ => continue,
                 },
                 _ => continue,
@@ -294,8 +296,60 @@ pub trait PythonWriter {
             indented!(w, [_ _], r#"self.data[i] = v"#)?;
         }
 
+        w.newline()?;
+        indented!(w, [_], r#"def copied(self) -> {}:"#, c.rust_name())?;
+        indented!(w, [_ _], r#""""Returns a shallow, owned copy of the underlying slice.
+
+        The returned object owns the immediate data, but not the targets of any contained
+        pointers. In other words, if your struct contains any pointers the returned object
+        may only be used as long as these pointers are valid. If the struct did not contain
+        any pointers the returned object is valid indefinitely.""""#)?;
+        indented!(w, [_ _], r#"array = ({} * len(self))()"#, data_type_python)?;
+        indented!(w, [_ _], r#"ctypes.memmove(array, self.data, len(self) * ctypes.sizeof({}))"#, data_type_python)?;
+        indented!(w, [_ _], r#"rval = {}(data=ctypes.cast(array, ctypes.POINTER({})), len=len(self))"#, c.rust_name(), data_type_python)?;
+        indented!(w, [_ _], r#"rval.owned = array  # Store array in returned slice to prevent memory deallocation"#)?;
+        indented!(w, [_ _], r#"return rval"#)?;
+
         Ok(())
     }
+
+    fn write_option(&self, w: &mut IndentWriter, c: &CompositeType) -> Result<(), Error> {
+        let data_type = c
+            .fields()
+            .iter()
+            .find(|x| x.name().contains("t"))
+            .expect("Slice must contain field called 't'.")
+            .the_type();
+
+        let data_type_python = self.converter().to_ctypes_name(data_type, true);
+
+        indented!(w, r#"class {}(ctypes.Structure):"#, c.rust_name())?;
+        indented!(w, [_], r#""""May optionally hold a value.""""#)?;
+        w.newline()?;
+        indented!(w, [_], r#"_fields_ = ["#)?;
+        indented!(w, [_], r#"    ("_t", {}),"#, data_type_python)?;
+        indented!(w, [_], r#"    ("_is_some", ctypes.c_uint8),"#)?;
+        indented!(w, [_], r#"]"#)?;
+        w.newline()?;
+        indented!(w, [_], r#"@property"#)?;
+        indented!(w, [_], r#"def value(self) -> {}:"#, data_type_python)?;
+        indented!(w, [_ _], r#""""Returns the value if it exists, or None.""""#)?;
+        indented!(w, [_ _], r#"if self._is_some == 1:"#)?;
+        indented!(w, [_ _ _], r#"return self._t"#)?;
+        indented!(w, [_ _], r#"else:"#)?;
+        indented!(w, [_ _ _], r#"return None"#)?;
+        w.newline()?;
+        indented!(w, [_], r#"def is_some(self) -> bool:"#)?;
+        indented!(w, [_ _], r#""""Returns true if the value exists.""""#)?;
+        indented!(w, [_ _], r#"return self._is_some == 1"#)?;
+        w.newline()?;
+        indented!(w, [_], r#"def is_none(self) -> bool:"#)?;
+        indented!(w, [_ _], r#""""Returns true if the value does not exist.""""#)?;
+        indented!(w, [_ _], r#"return self._is_some != 0"#)?;
+
+        Ok(())
+    }
+
 
     fn write_patterns(&self, w: &mut IndentWriter) -> Result<(), Error> {
         for pattern in self.library().patterns() {

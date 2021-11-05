@@ -941,6 +941,19 @@ class SliceBool(ctypes.Structure):
     def __getitem__(self, i):
         return self.data[i]
 
+    def copied(self) -> SliceBool:
+        """Returns a shallow, owned copy of the underlying slice.
+
+        The returned object owns the immediate data, but not the targets of any contained
+        pointers. In other words, if your struct contains any pointers the returned object
+        may only be used as long as these pointers are valid. If the struct did not contain
+        any pointers the returned object is valid indefinitely."""
+        array = (ctypes.c_uint8 * len(self))()
+        ctypes.memmove(array, self.data, len(self) * ctypes.sizeof(ctypes.c_uint8))
+        rval = SliceBool(data=ctypes.cast(array, ctypes.POINTER(ctypes.c_uint8)), len=len(self))
+        rval.owned = array  # Store array in returned slice to prevent memory deallocation
+        return rval
+
 
 class Sliceu32(ctypes.Structure):
     # These fields represent the underlying C data layout
@@ -955,6 +968,19 @@ class Sliceu32(ctypes.Structure):
     def __getitem__(self, i) -> int:
         return self.data[i]
 
+    def copied(self) -> Sliceu32:
+        """Returns a shallow, owned copy of the underlying slice.
+
+        The returned object owns the immediate data, but not the targets of any contained
+        pointers. In other words, if your struct contains any pointers the returned object
+        may only be used as long as these pointers are valid. If the struct did not contain
+        any pointers the returned object is valid indefinitely."""
+        array = (ctypes.c_uint32 * len(self))()
+        ctypes.memmove(array, self.data, len(self) * ctypes.sizeof(ctypes.c_uint32))
+        rval = Sliceu32(data=ctypes.cast(array, ctypes.POINTER(ctypes.c_uint32)), len=len(self))
+        rval.owned = array  # Store array in returned slice to prevent memory deallocation
+        return rval
+
 
 class Sliceu8(ctypes.Structure):
     # These fields represent the underlying C data layout
@@ -968,6 +994,19 @@ class Sliceu8(ctypes.Structure):
 
     def __getitem__(self, i) -> int:
         return self.data[i]
+
+    def copied(self) -> Sliceu8:
+        """Returns a shallow, owned copy of the underlying slice.
+
+        The returned object owns the immediate data, but not the targets of any contained
+        pointers. In other words, if your struct contains any pointers the returned object
+        may only be used as long as these pointers are valid. If the struct did not contain
+        any pointers the returned object is valid indefinitely."""
+        array = (ctypes.c_uint8 * len(self))()
+        ctypes.memmove(array, self.data, len(self) * ctypes.sizeof(ctypes.c_uint8))
+        rval = Sliceu8(data=ctypes.cast(array, ctypes.POINTER(ctypes.c_uint8)), len=len(self))
+        rval.owned = array  # Store array in returned slice to prevent memory deallocation
+        return rval
 
 
 class SliceMutu32(ctypes.Structure):
@@ -986,6 +1025,19 @@ class SliceMutu32(ctypes.Structure):
     def __setitem__(self, i, v: int):
         self.data[i] = v
 
+    def copied(self) -> SliceMutu32:
+        """Returns a shallow, owned copy of the underlying slice.
+
+        The returned object owns the immediate data, but not the targets of any contained
+        pointers. In other words, if your struct contains any pointers the returned object
+        may only be used as long as these pointers are valid. If the struct did not contain
+        any pointers the returned object is valid indefinitely."""
+        array = (ctypes.c_uint32 * len(self))()
+        ctypes.memmove(array, self.data, len(self) * ctypes.sizeof(ctypes.c_uint32))
+        rval = SliceMutu32(data=ctypes.cast(array, ctypes.POINTER(ctypes.c_uint32)), len=len(self))
+        rval.owned = array  # Store array in returned slice to prevent memory deallocation
+        return rval
+
 
 class SliceMutu8(ctypes.Structure):
     # These fields represent the underlying C data layout
@@ -1003,36 +1055,43 @@ class SliceMutu8(ctypes.Structure):
     def __setitem__(self, i, v: int):
         self.data[i] = v
 
+    def copied(self) -> SliceMutu8:
+        """Returns a shallow, owned copy of the underlying slice.
+
+        The returned object owns the immediate data, but not the targets of any contained
+        pointers. In other words, if your struct contains any pointers the returned object
+        may only be used as long as these pointers are valid. If the struct did not contain
+        any pointers the returned object is valid indefinitely."""
+        array = (ctypes.c_uint8 * len(self))()
+        ctypes.memmove(array, self.data, len(self) * ctypes.sizeof(ctypes.c_uint8))
+        rval = SliceMutu8(data=ctypes.cast(array, ctypes.POINTER(ctypes.c_uint8)), len=len(self))
+        rval.owned = array  # Store array in returned slice to prevent memory deallocation
+        return rval
+
 
 class OptionInner(ctypes.Structure):
+    """May optionally hold a value."""
 
-    # These fields represent the underlying C data layout
     _fields_ = [
-        ("t", Inner),
-        ("is_some", ctypes.c_uint8),
+        ("_t", Inner),
+        ("_is_some", ctypes.c_uint8),
     ]
 
-    def __init__(self, t: Inner = None, is_some: int = None):
-        if t is not None:
-            self.t = t
-        if is_some is not None:
-            self.is_some = is_some
-
     @property
-    def t(self) -> Inner:
-        return ctypes.Structure.__get__(self, "t")
+    def value(self) -> Inner:
+        """Returns the value if it exists, or None."""
+        if self._is_some == 1:
+            return self._t
+        else:
+            return None
 
-    @t.setter
-    def t(self, value: Inner):
-        return ctypes.Structure.__set__(self, "t", value)
+    def is_some(self) -> bool:
+        """Returns true if the value exists."""
+        return self._is_some == 1
 
-    @property
-    def is_some(self) -> int:
-        return ctypes.Structure.__get__(self, "is_some")
-
-    @is_some.setter
-    def is_some(self, value: int):
-        return ctypes.Structure.__set__(self, "is_some", value)
+    def is_none(self) -> bool:
+        """Returns true if the value does not exist."""
+        return self._is_some != 0
 
 
 class SliceUseAsciiStringPattern(ctypes.Structure):
@@ -1048,6 +1107,19 @@ class SliceUseAsciiStringPattern(ctypes.Structure):
     def __getitem__(self, i) -> UseAsciiStringPattern:
         return self.data[i]
 
+    def copied(self) -> SliceUseAsciiStringPattern:
+        """Returns a shallow, owned copy of the underlying slice.
+
+        The returned object owns the immediate data, but not the targets of any contained
+        pointers. In other words, if your struct contains any pointers the returned object
+        may only be used as long as these pointers are valid. If the struct did not contain
+        any pointers the returned object is valid indefinitely."""
+        array = (UseAsciiStringPattern * len(self))()
+        ctypes.memmove(array, self.data, len(self) * ctypes.sizeof(UseAsciiStringPattern))
+        rval = SliceUseAsciiStringPattern(data=ctypes.cast(array, ctypes.POINTER(UseAsciiStringPattern)), len=len(self))
+        rval.owned = array  # Store array in returned slice to prevent memory deallocation
+        return rval
+
 
 class SliceVec3f32(ctypes.Structure):
     # These fields represent the underlying C data layout
@@ -1061,6 +1133,19 @@ class SliceVec3f32(ctypes.Structure):
 
     def __getitem__(self, i) -> Vec3f32:
         return self.data[i]
+
+    def copied(self) -> SliceVec3f32:
+        """Returns a shallow, owned copy of the underlying slice.
+
+        The returned object owns the immediate data, but not the targets of any contained
+        pointers. In other words, if your struct contains any pointers the returned object
+        may only be used as long as these pointers are valid. If the struct did not contain
+        any pointers the returned object is valid indefinitely."""
+        array = (Vec3f32 * len(self))()
+        ctypes.memmove(array, self.data, len(self) * ctypes.sizeof(Vec3f32))
+        rval = SliceVec3f32(data=ctypes.cast(array, ctypes.POINTER(Vec3f32)), len=len(self))
+        rval.owned = array  # Store array in returned slice to prevent memory deallocation
+        return rval
 
 
 
