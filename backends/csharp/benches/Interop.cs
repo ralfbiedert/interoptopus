@@ -23,9 +23,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 18266456295059506754ul)
+            if (api_version != 8521182769715904968ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (18266456295059506754). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (8521182769715904968). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -742,6 +742,7 @@ namespace My.Company
 
 
 
+        /// This function has no panic safeguards. If it panics your host app will be in an undefined state.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_return_string")]
         public static extern IntPtr simple_service_return_string(IntPtr context);
 
@@ -1490,6 +1491,7 @@ namespace My.Company
             return Interop.simple_service_return_slice_mut(_context);
         }
 
+        /// This function has no panic safeguards. If it panics your host app will be in an undefined state.
         public string ReturnString()
         {
             var s = Interop.simple_service_return_string(_context);

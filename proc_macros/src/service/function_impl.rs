@@ -2,7 +2,7 @@ use crate::service::Attributes;
 use crate::util::{extract_doc_lines, purge_lifetimes_from_type};
 use darling::FromMeta;
 use proc_macro2::{Ident, TokenStream};
-use quote::quote;
+use quote::quote_spanned;
 use std::ops::Deref;
 use syn::spanned::Spanned;
 use syn::{Attribute, FnArg, GenericParam, ImplItemMethod, ItemImpl, Pat, ReturnType};
@@ -85,40 +85,46 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
     let without_lifetimes = purge_lifetimes_from_type(&*impl_block.self_ty);
     let doc_lines = extract_doc_lines(&function.attrs);
 
+    let span_rval = function.sig.output.span();
+    let span_function = function.span();
+    let span_body = function.block.span();
+    let span_service_ty = impl_block.self_ty.span();
+
     let rval = match &function.sig.output {
-        ReturnType::Default => quote! { () },
-        ReturnType::Type(_, x) => quote! { #x },
+        ReturnType::Default => quote_spanned!(span_rval=> ()),
+        ReturnType::Type(_, x) => quote_spanned!(span_rval=> #x),
     };
 
     let method_type = method_type(&function.attrs);
 
     // Constructor needs extra arg for ptr
     if let MethodType::Constructor(_) = &method_type {
-        inputs.push(quote! { context: &mut *mut #service_type });
+        inputs.push(quote_spanned!(span_service_ty=> context: &mut *mut #service_type));
     }
 
     for (i, arg) in function.sig.inputs.iter().enumerate() {
+        let span_arg = arg.span();
         match arg {
             FnArg::Receiver(receiver) => {
                 if receiver.mutability.is_some() {
-                    inputs.push(quote! { context: &mut #service_type });
+                    inputs.push(quote_spanned!(span_arg=> context: &mut #service_type));
                 } else {
-                    inputs.push(quote! { context: & #service_type });
+                    inputs.push(quote_spanned!(span_arg=> context: & #service_type));
                 }
 
-                arg_names.push(quote! { context });
+                arg_names.push(quote_spanned!(span_arg=> context));
             }
             FnArg::Typed(pat) => match pat.pat.deref() {
                 Pat::Ident(x) => {
                     let i = &x.ident;
-                    arg_names.push(quote! { #i });
-                    inputs.push(quote! { #arg });
+                    arg_names.push(quote_spanned!(span_arg=> #i));
+                    inputs.push(quote_spanned!(span_arg=> #arg));
                 }
                 Pat::Wild(_) => {
                     let new_ident = Ident::new(&*format!("_anon{}", i), arg.span());
                     let ty = &pat.ty;
-                    arg_names.push(quote! { #new_ident });
-                    inputs.push(quote! { #new_ident: #ty });
+                    arg_names.push(quote_spanned!(span_arg=> #new_ident));
+                    inputs.push(quote_spanned!(span_arg=> #new_ident: #ty));
                 }
                 _ => panic!("Unknown pattern {:?}", pat),
             },
@@ -127,7 +133,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
 
     let generated_function = match &method_type {
         MethodType::Constructor(_) => {
-            quote! {
+            quote_spanned! { span_function =>
                 #[interoptopus::ffi_function]
                 #[no_mangle]
                 #[allow(unused_mut)]
@@ -138,14 +144,14 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
 
                     *context = ::std::ptr::null_mut();
 
-                    let result_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                    let result_result = std::panic::catch_unwind(::std::panic::AssertUnwindSafe(|| {
                         <#service_type>::#orig_fn_ident( #(#arg_names),* )
                     }));
 
                     match result_result {
                         Ok(Ok(obj)) => {
-                            let boxed = Box::new(obj);
-                            let raw = Box::into_raw(boxed);
+                            let boxed = ::std::boxed::Box::new(obj);
+                            let raw = ::std::boxed::Box::into_raw(boxed);
                             *context = raw;
 
                             <#error_ident as ::interoptopus::patterns::result::FFIError>::SUCCESS
@@ -166,7 +172,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
         }
         MethodType::Method(x) => match x.on_panic {
             OnPanic::ReturnDefault => {
-                quote! {
+                quote_spanned! { span_function =>
                     #[interoptopus::ffi_function]
                     #[no_mangle]
                     #[allow(unused_mut)]
@@ -174,7 +180,11 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                         #[doc = #doc_lines]
                     )*
                     pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #rval {
-                        let result_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(move || {
+                        let result_result = ::std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                            // Make sure we only have a FnOnce closure and prevent lifetime errors.
+                            #(
+                                let #arg_names = #arg_names;
+                            )*
                             <#without_lifetimes>::#orig_fn_ident( #(#arg_names),* )
                         }));
 
@@ -189,7 +199,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 }
             }
             OnPanic::UndefinedBehavior => {
-                quote! {
+                quote_spanned! { span_function =>
                     #[interoptopus::ffi_function]
                     #[no_mangle]
                     #[allow(unused_mut)]
@@ -202,7 +212,11 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 }
             }
             OnPanic::FfiError => {
-                quote! {
+                let block = quote_spanned! { span_body =>
+                    <#without_lifetimes>::#orig_fn_ident( #(#arg_names),* )
+                };
+
+                quote_spanned! { span_function =>
                     #[interoptopus::ffi_function]
                     #[no_mangle]
                     #[allow(unused_mut)]
@@ -211,7 +225,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     )*
                     pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #error_ident {
                         ::interoptopus::patterns::result::panics_and_errors_to_ffi_enum(move || {
-                            <#without_lifetimes>::#orig_fn_ident( #(#arg_names),* )
+                            #block
                         }, stringify!(#ffi_fn_ident))
                     }
                 }
@@ -232,7 +246,9 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
     let error_ident = Ident::new(&attributes.error, impl_block.span());
     let without_lifetimes = purge_lifetimes_from_type(&*impl_block.self_ty);
 
-    let generated_function = quote! {
+    let span_service_ty = impl_block.self_ty.span();
+
+    let generated_function = quote_spanned! {span_service_ty=>
         /// Destroys the given instance.
         ///
         /// # Safety
@@ -248,8 +264,8 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
                 return <#error_ident as ::interoptopus::patterns::result::FFIError>::NULL;
             }
 
-            let result_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                unsafe { Box::from_raw(*context) };
+            let result_result = ::std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                unsafe { ::std::boxed::Box::from_raw(*context) };
             }));
 
             *context = ::std::ptr::null_mut();

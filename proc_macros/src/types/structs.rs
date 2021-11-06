@@ -22,7 +22,7 @@ fn type_repr(attributes: &Attributes, item: &ItemStruct) -> TypeRepr {
         .attrs
         .iter()
         .find(|x| x.to_token_stream().to_string().contains("repr"))
-        .expect(&format!("Struct {} must have `#[repr()] annotation.", item.ident));
+        .unwrap_or_else(|| panic!("Struct {} must have `#[repr()] annotation.", item.ident));
 
     if repr.to_token_stream().to_string().contains("transparent") {
         TypeRepr::Transparent
@@ -180,20 +180,20 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
             field_type_info.push(quote! { #ident()  });
             field_types.push(quote! { #ident()  }); // TODO: are these 2 correct?
         } else {
-            field_type_info.push(quote! { < #token as interoptopus::lang::rust::CTypeInfo >::type_info()  });
+            field_type_info.push(quote! { < #token as ::interoptopus::lang::rust::CTypeInfo >::type_info()  });
             field_types.push(quote! { #token });
         }
     }
 
     let rval_builder = if attributes.opaque {
         quote! {
-            let mut rval = interoptopus::lang::c::OpaqueType::new(name, meta);
-            interoptopus::lang::c::CType::Opaque(rval)
+            let mut rval = ::interoptopus::lang::c::OpaqueType::new(name, meta);
+            ::interoptopus::lang::c::CType::Opaque(rval)
         }
     } else {
         quote! {
-            let rval = interoptopus::lang::c::CompositeType::with_meta(name, fields, meta);
-            interoptopus::lang::c::CType::Composite(rval)
+            let rval = ::interoptopus::lang::c::CompositeType::with_meta(name, fields, meta);
+            ::interoptopus::lang::c::CType::Composite(rval)
         }
     };
 
@@ -202,9 +202,9 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
     } else {
         quote! {
             #({
-                let documentation = interoptopus::lang::c::Documentation::from_line(#field_docs);
+                let documentation = ::interoptopus::lang::c::Documentation::from_line(#field_docs);
                 let the_type = #field_type_info;
-                let field = interoptopus::lang::c::Field::with_documentation(#field_names.to_string(), the_type, #field_visibilities, documentation);
+                let field = ::interoptopus::lang::c::Field::with_documentation(#field_names.to_string(), the_type, #field_visibilities, documentation);
                 fields.push(field);
             })*
         }
@@ -217,7 +217,7 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
     } else {
         quote! {
             #({
-                generics.push(<#generic_params_needing_ctypeinfo_bounds as interoptopus::lang::rust::CTypeInfo>::type_info().name_within_lib());
+                generics.push(<#generic_params_needing_ctypeinfo_bounds as ::interoptopus::lang::rust::CTypeInfo>::type_info().name_within_lib());
             })*
 
             let name = format!("{}{}", #struct_ident_c.to_string(), generics.join(""));
@@ -229,13 +229,13 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
             quote! {
                 #input
 
-                unsafe impl #param_param interoptopus::lang::rust::CTypeInfo for #struct_ident #param_struct #param_where {
+                unsafe impl #param_param ::interoptopus::lang::rust::CTypeInfo for #struct_ident #param_struct #param_where {
 
-                    fn type_info() -> interoptopus::lang::c::CType {
-                        let documentation = interoptopus::lang::c::Documentation::from_line(#doc_line);
-                        let mut meta = interoptopus::lang::c::Meta::with_namespace_documentation(#namespace.to_string(), documentation);
-                        let mut fields: std::vec::Vec<interoptopus::lang::c::Field> = std::vec::Vec::new();
-                        let mut generics: std::vec::Vec<String> = std::vec::Vec::new();
+                    fn type_info() -> ::interoptopus::lang::c::CType {
+                        let documentation = ::interoptopus::lang::c::Documentation::from_line(#doc_line);
+                        let mut meta = ::interoptopus::lang::c::Meta::with_namespace_documentation(#namespace.to_string(), documentation);
+                        let mut fields: ::std::vec::Vec<interoptopus::lang::c::Field> = ::std::vec::Vec::new();
+                        let mut generics: ::std::vec::Vec<String> = ::std::vec::Vec::new();
 
                         #let_name
 
@@ -252,9 +252,9 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
             quote! {
                 #input
 
-                unsafe impl #param_param interoptopus::lang::rust::CTypeInfo for #struct_ident #param_struct #param_where {
+                unsafe impl #param_param ::interoptopus::lang::rust::CTypeInfo for #struct_ident #param_struct #param_where {
 
-                    fn type_info() -> interoptopus::lang::c::CType {
+                    fn type_info() -> ::interoptopus::lang::c::CType {
                         < #first_field_type > :: type_info()
                     }
                 }

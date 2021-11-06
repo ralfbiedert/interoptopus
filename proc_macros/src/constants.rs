@@ -22,14 +22,14 @@ pub fn ffi_constant(_attr: AttributeArgs, input: TokenStream) -> TokenStream {
         #[allow(non_camel_case_types)]
         pub(crate) struct #const_ident {}
 
-        unsafe impl interoptopus::lang::rust::ConstantInfo for #const_ident {
+        unsafe impl ::interoptopus::lang::rust::ConstantInfo for #const_ident {
             fn constant_info() -> interoptopus::lang::c::Constant {
 
-                let documentation = interoptopus::lang::c::Documentation::from_line(#doc_line);
-                let meta = interoptopus::lang::c::Meta::with_documentation(documentation);
-                let value = interoptopus::lang::c::ConstantValue::from(#const_ident);
+                let documentation = ::interoptopus::lang::c::Documentation::from_line(#doc_line);
+                let meta = ::interoptopus::lang::c::Meta::with_documentation(documentation);
+                let value = ::interoptopus::lang::c::ConstantValue::from(#const_ident);
 
-                interoptopus::lang::c::Constant::new(#const_name.to_string(), value, meta)
+                ::interoptopus::lang::c::Constant::new(#const_name.to_string(), value, meta)
             }
         }
     }

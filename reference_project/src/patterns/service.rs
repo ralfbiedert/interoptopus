@@ -66,7 +66,8 @@ impl SimpleService {
     ///
     /// Multiple lines.
     #[ffi_service_method(on_panic = "return_default")]
-    pub fn method_void(&self) {}
+    pub fn method_void(&self) {
+    }
 
     #[ffi_service_method(on_panic = "return_default")]
     pub fn method_mut_self(&mut self, slice: FFISlice<u8>) -> u8 {
@@ -105,18 +106,19 @@ impl SimpleService {
 
     /// Warning, you _must_ discard the returned slice object before calling into this service
     /// again, as otherwise undefined behavior might happen.
-    #[ffi_service_method(on_panic = "undefined_behavior")]
+    #[ffi_service_method(on_panic = "return_default")]
     pub fn return_slice(&mut self) -> FFISlice<u32> {
-        FFISlice::from_slice(&self.data)
+        self.data.as_slice().into()
     }
 
     /// Warning, you _must_ discard the returned slice object before calling into this service
     /// again, as otherwise undefined behavior might happen.
-    #[ffi_service_method(on_panic = "undefined_behavior")]
+    #[ffi_service_method(on_panic = "return_default")]
     pub fn return_slice_mut(&mut self) -> FFISliceMut<u32> {
         FFISliceMut::from_slice(&mut self.data)
     }
 
+    /// This function has no panic safeguards. If it panics your host app will be in an undefined state.
     #[ffi_service_method(on_panic = "undefined_behavior")]
     pub fn return_string(&mut self) -> AsciiPointer {
         AsciiPointer::from_cstr(&self.c_string)
@@ -138,6 +140,7 @@ impl SimpleService {
     }
 }
 
+
 // Some struct we want to expose as a class.
 #[ffi_type(opaque)]
 pub struct SimpleServiceLifetime<'a> {
@@ -158,7 +161,7 @@ impl<'a> SimpleServiceLifetime<'a> {
     pub fn method_lt2(&mut self, _slice: FFISlice<FFIBool>) {}
 
     // Sometimes lifetime params can get confused in low level codegen, so we have to replace `self` with explicit self.
-    #[ffi_service_method(on_panic = "undefined_behavior")]
+    #[ffi_service_method(on_panic = "return_default")]
     pub fn return_string_accept_slice<'b>(_: &mut SimpleServiceLifetime<'b>, _: FFISlice<'b, u8>) -> AsciiPointer<'b> {
         AsciiPointer::empty()
     }

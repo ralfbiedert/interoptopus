@@ -1949,7 +1949,7 @@ class api:
 
     @staticmethod
     def simple_service_return_string(context):
-        """"""
+        """ This function has no panic safeguards. If it panics your host app will be in an undefined state."""
         if hasattr(context, "_ctx"):
             context = context.c_ptr()
 
@@ -2169,7 +2169,7 @@ class SimpleService(CHeapAllocated):
         return api.simple_service_return_slice_mut(self.c_value(), )
 
     def return_string(self, ):
-        """"""
+        """ This function has no panic safeguards. If it panics your host app will be in an undefined state."""
         return api.simple_service_return_string(self.c_value(), )
 
     def method_void_ffi_error(self, ):

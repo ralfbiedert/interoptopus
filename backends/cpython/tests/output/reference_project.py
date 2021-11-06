@@ -1264,7 +1264,7 @@ class SimpleService:
         return c_lib.simple_service_return_slice_mut(self._ctx, )
 
     def return_string(self, ) -> str:
-        """"""
+        """ This function has no panic safeguards. If it panics your host app will be in an undefined state."""
         rval = c_lib.simple_service_return_string(self._ctx, )
         return ctypes.string_at(rval)
 

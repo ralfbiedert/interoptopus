@@ -7,23 +7,22 @@ use syn::{Expr, ItemEnum, Lit};
 
 fn assert_valid_repr(_attributes: &Attributes, item: &ItemEnum) {
     if !item.attrs.iter().any(|x| x.to_token_stream().to_string().contains("repr")) {
-        panic!("Enum {} must have `#[repr()] annotation.", item.ident);
+        panic!("Enum `{}` must have `#[repr()]` annotation.", item.ident);
     }
 }
 
 fn derive_variant_info(item: ItemEnum, idents: &[Ident], names: &[String], values: &[i32], docs: &[String]) -> TokenStream {
-    let span = item.ident.span();
     let name = item.ident.to_string();
-    let name_ident = syn::Ident::new(&name, span);
+    let name_ident = syn::Ident::new(&name, item.ident.span());
 
     quote! {
-        unsafe impl interoptopus::lang::rust::VariantInfo for #name_ident {
-            fn variant_info(&self) -> interoptopus::lang::c::Variant {
+        unsafe impl ::interoptopus::lang::rust::VariantInfo for #name_ident {
+            fn variant_info(&self) -> ::interoptopus::lang::c::Variant {
                 match self {
                     #(
                        Self::#idents => {
-                            let documentation = interoptopus::lang::c::Documentation::from_line(#docs);
-                            interoptopus::lang::c::Variant::new(#names.to_string(), #values as usize, documentation)
+                            let documentation = ::interoptopus::lang::c::Documentation::from_line(#docs);
+                            ::interoptopus::lang::c::Variant::new(#names.to_string(), #values as usize, documentation)
                        },
                     )*
                 }
@@ -83,14 +82,14 @@ pub fn ffi_type_enum(attributes: &Attributes, input: TokenStream, item: ItemEnum
 
     let ctype_info_return = if attributes.patterns.contains_key("ffi_error") {
         quote! {
-            use interoptopus::patterns::result::FFIError as _;
+            use ::interoptopus::patterns::result::FFIError as _;
             let success_variant = Self::SUCCESS.variant_info();
-            let the_success_enum = interoptopus::patterns::result::FFIErrorEnum::new(rval, success_variant);
-            let the_pattern = interoptopus::patterns::TypePattern::FFIErrorEnum(the_success_enum);
-            interoptopus::lang::c::CType::Pattern(the_pattern)
+            let the_success_enum = ::interoptopus::patterns::result::FFIErrorEnum::new(rval, success_variant);
+            let the_pattern = ::interoptopus::patterns::TypePattern::FFIErrorEnum(the_success_enum);
+            ::interoptopus::lang::c::CType::Pattern(the_pattern)
         }
     } else {
-        quote! { interoptopus::lang::c::CType::Enum(rval) }
+        quote! { ::interoptopus::lang::c::CType::Enum(rval) }
     };
 
     quote! {
@@ -98,19 +97,19 @@ pub fn ffi_type_enum(attributes: &Attributes, input: TokenStream, item: ItemEnum
 
         #variant_infos
 
-        unsafe impl interoptopus::lang::rust::CTypeInfo for #name_ident {
-            fn type_info() -> interoptopus::lang::c::CType {
-                use interoptopus::lang::rust::VariantInfo;
+        unsafe impl ::interoptopus::lang::rust::CTypeInfo for #name_ident {
+            fn type_info() -> ::interoptopus::lang::c::CType {
+                use ::interoptopus::lang::rust::VariantInfo;
 
-                let mut variants = std::vec::Vec::new();
-                let documentation = interoptopus::lang::c::Documentation::from_line(#doc_line);
-                let mut meta = interoptopus::lang::c::Meta::with_namespace_documentation(#namespace.to_string(), documentation);
+                let mut variants = ::std::vec::Vec::new();
+                let documentation = ::interoptopus::lang::c::Documentation::from_line(#doc_line);
+                let mut meta = ::interoptopus::lang::c::Meta::with_namespace_documentation(#namespace.to_string(), documentation);
 
                 #({
                     variants.push(Self::#variant_idents.variant_info());
                 })*
 
-                let rval = interoptopus::lang::c::EnumType::new(#ffi_name.to_string(), variants, meta);
+                let rval = ::interoptopus::lang::c::EnumType::new(#ffi_name.to_string(), variants, meta);
 
                 #ctype_info_return
             }

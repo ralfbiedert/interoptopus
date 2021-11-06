@@ -1,6 +1,7 @@
 use proc_macro2::TokenStream;
-use quote::{quote, ToTokens};
+use quote::{quote, quote_spanned, ToTokens};
 use syn::{FnArg, GenericParam, ItemFn, Pat, ReturnType, Signature, Type};
+use syn::spanned::Spanned;
 
 use crate::functions::Attributes;
 use crate::surrogates::read_surrogates;
@@ -20,44 +21,46 @@ pub fn fn_signature_type(signature: Signature) -> TokenStream {
         }
     }
 
-    quote! {
-        #abi fn(#(#inputs),*) #rval
-    }
+    let span = signature.span();
+
+    quote_spanned!(span=> #abi fn(#(#inputs),*) #rval)
 }
 
 pub fn rval_tokens(return_type: &ReturnType) -> TokenStream {
+    let span = return_type.span();
+
     if let ReturnType::Type(_, x) = return_type {
         match &**x {
             Type::Path(x) => {
                 let token = x.to_token_stream();
-                quote! { < #token as interoptopus::lang::rust::CTypeInfo>::type_info() }
+                quote_spanned!(span=> < #token as ::interoptopus::lang::rust::CTypeInfo>::type_info())
             }
             Type::Group(x) => {
                 let token = x.to_token_stream();
-                quote! { < #token as interoptopus::lang::rust::CTypeInfo>::type_info() }
+                quote_spanned!(span=> < #token as ::interoptopus::lang::rust::CTypeInfo>::type_info())
             }
             Type::Tuple(_) => {
                 // TODO: Check tuple is really empty.
-                quote! { interoptopus::lang::c::CType::Primitive(interoptopus::lang::c::PrimitiveType::Void) }
+                quote_spanned!(span=> ::interoptopus::lang::c::CType::Primitive(::interoptopus::lang::c::PrimitiveType::Void))
             }
             Type::Reference(x) => {
                 let token = x.to_token_stream();
-                quote! { < #token as interoptopus::lang::rust::CTypeInfo>::type_info() }
+                quote_spanned!(span=> < #token as ::interoptopus::lang::rust::CTypeInfo>::type_info())
             }
             Type::Ptr(x) => {
                 let token = x.to_token_stream();
-                quote! { < #token as interoptopus::lang::rust::CTypeInfo>::type_info() }
+                quote_spanned!(span=> < #token as ::interoptopus::lang::rust::CTypeInfo>::type_info())
             }
             Type::Array(x) => {
                 let token = x.to_token_stream();
-                quote! { < #token as interoptopus::lang::rust::CTypeInfo>::type_info() }
+                quote_spanned!(span=> < #token as ::interoptopus::lang::rust::CTypeInfo>::type_info())
             }
             _ => {
                 panic!("Unsupported type at interface boundary found for rval: {:?}.", x)
             }
         }
     } else {
-        quote! { interoptopus::lang::c::CType::Primitive(interoptopus::lang::c::PrimitiveType::Void) }
+        quote_spanned!(span=> ::interoptopus::lang::c::CType::Primitive(interoptopus::lang::c::PrimitiveType::Void))
     }
 }
 
@@ -94,7 +97,7 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
         generic_params = quote! { < #(#generic_parameters,)* > };
         phantom_fields = quote! {
             #(
-                #generic_ident: std::marker::PhantomData<& #generic_parameters ()>,
+                #generic_ident: ::std::marker::PhantomData<& #generic_parameters ()>,
             )*
         };
     }
@@ -129,7 +132,7 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
                 let ident = syn::Ident::new(&lookup, surrogates.0.unwrap());
                 args_type.push(quote! { #ident()  })
             } else {
-                args_type.push(quote! { < #token as interoptopus::lang::rust::CTypeInfo>::type_info() });
+                args_type.push(quote! { < #token as ::interoptopus::lang::rust::CTypeInfo>::type_info() });
             }
         } else {
             panic!("Does not support methods.")
@@ -142,27 +145,27 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
         #[allow(non_camel_case_types)]
         pub(crate) struct #function_ident #generic_params { #phantom_fields }
 
-        unsafe impl #generic_params interoptopus::lang::rust::FunctionInfo for #function_ident #generic_params {
+        unsafe impl #generic_params ::interoptopus::lang::rust::FunctionInfo for #function_ident #generic_params {
             type Signature = #signature;
 
-            fn function_info() -> interoptopus::lang::c::Function {
+            fn function_info() -> ::interoptopus::lang::c::Function {
 
-                let mut doc_lines = std::vec::Vec::new();
-                let mut params = std::vec::Vec::new();
+                let mut doc_lines = ::std::vec::Vec::new();
+                let mut params = ::std::vec::Vec::new();
 
                 #(
-                    params.push(interoptopus::lang::c::Parameter::new(#args_name.to_string(), #args_type));
+                    params.push(::interoptopus::lang::c::Parameter::new(#args_name.to_string(), #args_type));
                 )*
 
                 #(
                     doc_lines.push(#docs.to_string());
                 )*
 
-                let mut signature = interoptopus::lang::c::FunctionSignature::new(params, #rval);
-                let documentation = interoptopus::lang::c::Documentation::from_lines(doc_lines);
-                let meta = interoptopus::lang::c::Meta::with_documentation(documentation);
+                let mut signature = ::interoptopus::lang::c::FunctionSignature::new(params, #rval);
+                let documentation = ::interoptopus::lang::c::Documentation::from_lines(doc_lines);
+                let meta = ::interoptopus::lang::c::Meta::with_documentation(documentation);
 
-                interoptopus::lang::c::Function::new(#function_ident_str.to_string(), signature, meta)
+                ::interoptopus::lang::c::Function::new(#function_ident_str.to_string(), signature, meta)
             }
         }
     };
