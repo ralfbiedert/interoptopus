@@ -86,9 +86,9 @@ pub trait PythonWriter {
                     TypePattern::FFIErrorEnum(e) => self.write_enum(w, e.the_enum())?,
                     TypePattern::Slice(c) => self.write_slice(w, c, false)?,
                     TypePattern::SliceMut(c) => self.write_slice(w, c, true)?,
-                    TypePattern::Option(c) =>  {
+                    TypePattern::Option(c) => {
                         self.write_option(w, c)?;
-                    },
+                    }
                     _ => continue,
                 },
                 _ => continue,
@@ -309,7 +309,13 @@ pub trait PythonWriter {
         indented!(w, [_ _], r#"rval = {}(data=ctypes.cast(array, ctypes.POINTER({})), len=len(self))"#, c.rust_name(), data_type_python)?;
         indented!(w, [_ _], r#"rval.owned = array  # Store array in returned slice to prevent memory deallocation"#)?;
         indented!(w, [_ _], r#"return rval"#)?;
-
+        w.newline()?;
+        indented!(w, [_], r#"def __iter__(self):"#)?;
+        indented!(w, [_ _], r#"return _Iter(self)"#)?;
+        w.newline()?;
+        indented!(w, [_], r#"def iter(self):"#)?;
+        indented!(w, [_ _], r#""""Convenience method returning a value iterator.""""#)?;
+        indented!(w, [_ _], r#"return iter(self)"#)?;
         Ok(())
     }
 
@@ -349,7 +355,6 @@ pub trait PythonWriter {
 
         Ok(())
     }
-
 
     fn write_patterns(&self, w: &mut IndentWriter) -> Result<(), Error> {
         for pattern in self.library().patterns() {
@@ -538,6 +543,25 @@ pub trait PythonWriter {
         indented!(w, [_ _], r#"rval = """#)?;
         indented!(w, [_ _], r#"for var in  filter(lambda x: "__" not in x, dir(self)):"#)?;
         indented!(w, [_ _ _], r#"rval += f"{{var}}: {{getattr(self, var)}}""#)?;
+        indented!(w, [_ _], r#"return rval"#)?;
+        w.newline()?;
+        w.newline()?;
+
+        indented!(w, r#"class _Iter(object):"#)?;
+        indented!(w, [_], r#""""Helper for slice iterators.""""#)?;
+        indented!(w, [_], r#"def __init__(self, target):"#)?;
+        indented!(w, [_ _], r#"self.i = 0"#)?;
+        indented!(w, [_ _], r#"self.target = target"#)?;
+        w.newline()?;
+        indented!(w, [_], r#"def __iter__(self):"#)?;
+        indented!(w, [_ _], r#"self.i = 0"#)?;
+        indented!(w, [_ _], r#"return self"#)?;
+        w.newline()?;
+        indented!(w, [_], r#"def __next__(self):"#)?;
+        indented!(w, [_ _], r#"if self.i >= self.target.len:"#)?;
+        indented!(w, [_ _ _], r#"raise StopIteration()"#)?;
+        indented!(w, [_ _], r#"rval = self.target[self.i]"#)?;
+        indented!(w, [_ _], r#"self.i += 1"#)?;
         indented!(w, [_ _], r#"return rval"#)?;
         w.newline()?;
         w.newline()?;

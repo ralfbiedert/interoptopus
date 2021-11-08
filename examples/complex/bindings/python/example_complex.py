@@ -97,6 +97,24 @@ class CallbackVars(object):
         return rval
 
 
+class _Iter(object):
+    """Helper for slice iterators."""
+    def __init__(self, target):
+        self.i = 0
+        self.target = target
+
+    def __iter__(self):
+        self.i = 0
+        return self
+
+    def __next__(self):
+        if self.i >= self.target.len:
+            raise StopIteration()
+        rval = self.target[self.i]
+        self.i += 1
+        return rval
+
+
 class FFIError:
     """ Possible errors in our library."""
     #  All went fine.

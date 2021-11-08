@@ -425,6 +425,24 @@ class CallbackVars(object):
         return rval
 
 
+class _Iter(object):
+    """Helper for slice iterators."""
+    def __init__(self, target):
+        self.i = 0
+        self.target = target
+
+    def __iter__(self):
+        self.i = 0
+        return self
+
+    def __next__(self):
+        if self.i >= self.target.len:
+            raise StopIteration()
+        rval = self.target[self.i]
+        self.i += 1
+        return rval
+
+
 class EnumDocumented:
     """ Documented enum."""
     #  Variant A.
@@ -954,6 +972,13 @@ class SliceBool(ctypes.Structure):
         rval.owned = array  # Store array in returned slice to prevent memory deallocation
         return rval
 
+    def __iter__(self):
+        return _Iter(self)
+
+    def iter(self):
+        """Convenience method returning a value iterator."""
+        return iter(self)
+
 
 class Sliceu32(ctypes.Structure):
     # These fields represent the underlying C data layout
@@ -981,6 +1006,13 @@ class Sliceu32(ctypes.Structure):
         rval.owned = array  # Store array in returned slice to prevent memory deallocation
         return rval
 
+    def __iter__(self):
+        return _Iter(self)
+
+    def iter(self):
+        """Convenience method returning a value iterator."""
+        return iter(self)
+
 
 class Sliceu8(ctypes.Structure):
     # These fields represent the underlying C data layout
@@ -1007,6 +1039,13 @@ class Sliceu8(ctypes.Structure):
         rval = Sliceu8(data=ctypes.cast(array, ctypes.POINTER(ctypes.c_uint8)), len=len(self))
         rval.owned = array  # Store array in returned slice to prevent memory deallocation
         return rval
+
+    def __iter__(self):
+        return _Iter(self)
+
+    def iter(self):
+        """Convenience method returning a value iterator."""
+        return iter(self)
 
 
 class SliceMutu32(ctypes.Structure):
@@ -1038,6 +1077,13 @@ class SliceMutu32(ctypes.Structure):
         rval.owned = array  # Store array in returned slice to prevent memory deallocation
         return rval
 
+    def __iter__(self):
+        return _Iter(self)
+
+    def iter(self):
+        """Convenience method returning a value iterator."""
+        return iter(self)
+
 
 class SliceMutu8(ctypes.Structure):
     # These fields represent the underlying C data layout
@@ -1067,6 +1113,13 @@ class SliceMutu8(ctypes.Structure):
         rval = SliceMutu8(data=ctypes.cast(array, ctypes.POINTER(ctypes.c_uint8)), len=len(self))
         rval.owned = array  # Store array in returned slice to prevent memory deallocation
         return rval
+
+    def __iter__(self):
+        return _Iter(self)
+
+    def iter(self):
+        """Convenience method returning a value iterator."""
+        return iter(self)
 
 
 class OptionInner(ctypes.Structure):
@@ -1120,6 +1173,13 @@ class SliceUseAsciiStringPattern(ctypes.Structure):
         rval.owned = array  # Store array in returned slice to prevent memory deallocation
         return rval
 
+    def __iter__(self):
+        return _Iter(self)
+
+    def iter(self):
+        """Convenience method returning a value iterator."""
+        return iter(self)
+
 
 class SliceVec3f32(ctypes.Structure):
     # These fields represent the underlying C data layout
@@ -1146,6 +1206,13 @@ class SliceVec3f32(ctypes.Structure):
         rval = SliceVec3f32(data=ctypes.cast(array, ctypes.POINTER(Vec3f32)), len=len(self))
         rval.owned = array  # Store array in returned slice to prevent memory deallocation
         return rval
+
+    def __iter__(self):
+        return _Iter(self)
+
+    def iter(self):
+        """Convenience method returning a value iterator."""
+        return iter(self)
 
 
 
