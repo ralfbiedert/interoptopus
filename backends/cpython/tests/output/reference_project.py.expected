@@ -972,10 +972,10 @@ class SliceBool(ctypes.Structure):
         rval.owned = array  # Store array in returned slice to prevent memory deallocation
         return rval
 
-    def __iter__(self):
+    def __iter__(self) -> typing.Iterable[ctypes.c_uint8]:
         return _Iter(self)
 
-    def iter(self):
+    def iter(self) -> typing.Iterable[ctypes.c_uint8]:
         """Convenience method returning a value iterator."""
         return iter(self)
 
@@ -1006,10 +1006,10 @@ class Sliceu32(ctypes.Structure):
         rval.owned = array  # Store array in returned slice to prevent memory deallocation
         return rval
 
-    def __iter__(self):
+    def __iter__(self) -> typing.Iterable[ctypes.c_uint32]:
         return _Iter(self)
 
-    def iter(self):
+    def iter(self) -> typing.Iterable[ctypes.c_uint32]:
         """Convenience method returning a value iterator."""
         return iter(self)
 
@@ -1040,10 +1040,10 @@ class Sliceu8(ctypes.Structure):
         rval.owned = array  # Store array in returned slice to prevent memory deallocation
         return rval
 
-    def __iter__(self):
+    def __iter__(self) -> typing.Iterable[ctypes.c_uint8]:
         return _Iter(self)
 
-    def iter(self):
+    def iter(self) -> typing.Iterable[ctypes.c_uint8]:
         """Convenience method returning a value iterator."""
         return iter(self)
 
@@ -1077,10 +1077,10 @@ class SliceMutu32(ctypes.Structure):
         rval.owned = array  # Store array in returned slice to prevent memory deallocation
         return rval
 
-    def __iter__(self):
+    def __iter__(self) -> typing.Iterable[ctypes.c_uint32]:
         return _Iter(self)
 
-    def iter(self):
+    def iter(self) -> typing.Iterable[ctypes.c_uint32]:
         """Convenience method returning a value iterator."""
         return iter(self)
 
@@ -1114,10 +1114,10 @@ class SliceMutu8(ctypes.Structure):
         rval.owned = array  # Store array in returned slice to prevent memory deallocation
         return rval
 
-    def __iter__(self):
+    def __iter__(self) -> typing.Iterable[ctypes.c_uint8]:
         return _Iter(self)
 
-    def iter(self):
+    def iter(self) -> typing.Iterable[ctypes.c_uint8]:
         """Convenience method returning a value iterator."""
         return iter(self)
 
@@ -1173,10 +1173,10 @@ class SliceUseAsciiStringPattern(ctypes.Structure):
         rval.owned = array  # Store array in returned slice to prevent memory deallocation
         return rval
 
-    def __iter__(self):
+    def __iter__(self) -> typing.Iterable[UseAsciiStringPattern]:
         return _Iter(self)
 
-    def iter(self):
+    def iter(self) -> typing.Iterable[UseAsciiStringPattern]:
         """Convenience method returning a value iterator."""
         return iter(self)
 
@@ -1207,10 +1207,10 @@ class SliceVec3f32(ctypes.Structure):
         rval.owned = array  # Store array in returned slice to prevent memory deallocation
         return rval
 
-    def __iter__(self):
+    def __iter__(self) -> typing.Iterable[Vec3f32]:
         return _Iter(self)
 
-    def iter(self):
+    def iter(self) -> typing.Iterable[Vec3f32]:
         """Convenience method returning a value iterator."""
         return iter(self)
 

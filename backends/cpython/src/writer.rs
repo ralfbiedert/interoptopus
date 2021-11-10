@@ -310,10 +310,10 @@ pub trait PythonWriter {
         indented!(w, [_ _], r#"rval.owned = array  # Store array in returned slice to prevent memory deallocation"#)?;
         indented!(w, [_ _], r#"return rval"#)?;
         w.newline()?;
-        indented!(w, [_], r#"def __iter__(self):"#)?;
+        indented!(w, [_], r#"def __iter__(self) -> typing.Iterable[{}]:"#, data_type_python)?;
         indented!(w, [_ _], r#"return _Iter(self)"#)?;
         w.newline()?;
-        indented!(w, [_], r#"def iter(self):"#)?;
+        indented!(w, [_], r#"def iter(self) -> typing.Iterable[{}]:"#, data_type_python)?;
         indented!(w, [_ _], r#""""Convenience method returning a value iterator.""""#)?;
         indented!(w, [_ _], r#"return iter(self)"#)?;
         Ok(())
