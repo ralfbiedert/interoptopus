@@ -20,6 +20,7 @@ pub fn ffi_constant(_attr: AttributeArgs, input: TokenStream) -> TokenStream {
         #input
 
         #[allow(non_camel_case_types)]
+        #[allow(clippy::redundant_pub_crate)]
         pub(crate) struct #const_ident {}
 
         unsafe impl ::interoptopus::lang::rust::ConstantInfo for #const_ident {

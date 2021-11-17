@@ -137,6 +137,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 #[interoptopus::ffi_function]
                 #[no_mangle]
                 #[allow(unused_mut)]
+                #[allow(clippy::needless_lifetimes)]
                 #(
                     #[doc = #doc_lines]
                 )*
@@ -176,6 +177,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     #[interoptopus::ffi_function]
                     #[no_mangle]
                     #[allow(unused_mut)]
+                    #[allow(clippy::needless_lifetimes)]
                     #(
                         #[doc = #doc_lines]
                     )*
@@ -203,6 +205,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     #[interoptopus::ffi_function]
                     #[no_mangle]
                     #[allow(unused_mut)]
+                    #[allow(clippy::needless_lifetimes)]
                     #(
                         #[doc = #doc_lines]
                     )*
@@ -220,6 +223,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     #[interoptopus::ffi_function]
                     #[no_mangle]
                     #[allow(unused_mut)]
+                    #[allow(clippy::needless_lifetimes)]
                     #(
                         #[doc = #doc_lines]
                     )*

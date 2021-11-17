@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream;
 use quote::{quote, quote_spanned, ToTokens};
-use syn::{FnArg, GenericParam, ItemFn, Pat, ReturnType, Signature, Type};
 use syn::spanned::Spanned;
+use syn::{FnArg, GenericParam, ItemFn, Pat, ReturnType, Signature, Type};
 
 use crate::functions::Attributes;
 use crate::surrogates::read_surrogates;
@@ -143,6 +143,7 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
         #input
 
         #[allow(non_camel_case_types)]
+        #[allow(clippy::redundant_pub_crate)]
         pub(crate) struct #function_ident #generic_params { #phantom_fields }
 
         unsafe impl #generic_params ::interoptopus::lang::rust::FunctionInfo for #function_ident #generic_params {
