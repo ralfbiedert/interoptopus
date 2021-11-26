@@ -7,6 +7,13 @@ use interoptopus::util::{longest_common_prefix, safe_name, sort_types_by_depende
 use interoptopus::writer::IndentWriter;
 use interoptopus::{indented, non_service_functions, Error, Library};
 
+/// In some places we can write for docs or for actual code generation.
+#[derive(PartialOrd, PartialEq, Copy, Clone, Debug)]
+pub enum WriteFor {
+    Code,
+    Docs,
+}
+
 /// Writes the Python file format, `impl` this trait to customize output.
 pub trait PythonWriter {
     /// Returns the user config.
@@ -80,10 +87,10 @@ pub trait PythonWriter {
 
         for t in &sorted_types {
             match t {
-                CType::Composite(c) => self.write_struct(w, c)?,
-                CType::Enum(e) => self.write_enum(w, e)?,
+                CType::Composite(c) => self.write_struct(w, c, WriteFor::Code)?,
+                CType::Enum(e) => self.write_enum(w, e, WriteFor::Code)?,
                 CType::Pattern(p) => match p {
-                    TypePattern::FFIErrorEnum(e) => self.write_enum(w, e.the_enum())?,
+                    TypePattern::FFIErrorEnum(e) => self.write_enum(w, e.the_enum(), WriteFor::Code)?,
                     TypePattern::Slice(c) => self.write_slice(w, c, false)?,
                     TypePattern::SliceMut(c) => self.write_slice(w, c, true)?,
                     TypePattern::Option(c) => {
@@ -101,16 +108,18 @@ pub trait PythonWriter {
         Ok(())
     }
 
-    fn write_struct(&self, w: &mut IndentWriter, c: &CompositeType) -> Result<(), Error> {
+    fn write_struct(&self, w: &mut IndentWriter, c: &CompositeType, write_for: WriteFor) -> Result<(), Error> {
         let documentation = c.meta().documentation().lines().join("\n");
 
         indented!(w, r#"class {}(ctypes.Structure):"#, c.rust_name())?;
-        if !documentation.is_empty() {
+        if !documentation.is_empty() && write_for == WriteFor::Code {
             indented!(w, [_], r#""""{}""""#, documentation)?;
         }
 
         w.newline()?;
-        indented!(w, [_], r#"# These fields represent the underlying C data layout"#)?;
+        if write_for == WriteFor::Code {
+            indented!(w, [_], r#"# These fields represent the underlying C data layout"#)?;
+        }
         indented!(w, [_], r#"_fields_ = ["#)?;
         for f in c.fields() {
             let type_name = self.converter().to_ctypes_name(f.the_type(), true);
@@ -133,10 +142,19 @@ pub trait PythonWriter {
         if !c.fields().is_empty() {
             w.newline()?;
             indented!(w, [_], r#"def __init__(self, {}):"#, extra_args)?;
-            for field in c.fields().iter() {
-                indented!(w, [_ _], r#"if {} is not None:"#, field.name())?;
-                indented!(w, [_ _ _], r#"self.{} = {}"#, field.name(), field.name())?;
+
+            if write_for == WriteFor::Code {
+                for field in c.fields().iter() {
+                    indented!(w, [_ _], r#"if {} is not None:"#, field.name())?;
+                    indented!(w, [_ _ _], r#"self.{} = {}"#, field.name(), field.name())?;
+                }
+            } else {
+                indented!(w, [_ _], r#"..."#)?;
             }
+        }
+
+        if write_for == WriteFor::Docs {
+            return Ok(());
         }
 
         // Fields
@@ -150,6 +168,7 @@ pub trait PythonWriter {
 
             indented!(w, [_], r#"@property"#)?;
             indented!(w, [_], r#"def {}(self){}:"#, f.name(), hint_out)?;
+
             if !documentation.is_empty() {
                 indented!(w, [_ _], r#""""{}""""#, documentation)?;
             }
@@ -176,17 +195,19 @@ pub trait PythonWriter {
         Ok(())
     }
 
-    fn write_enum(&self, w: &mut IndentWriter, e: &EnumType) -> Result<(), Error> {
+    fn write_enum(&self, w: &mut IndentWriter, e: &EnumType, write_for: WriteFor) -> Result<(), Error> {
         let documentation = e.meta().documentation().lines().join("\n");
 
         indented!(w, r#"class {}:"#, e.rust_name())?;
-        if !documentation.is_empty() {
+        if !documentation.is_empty() && write_for == WriteFor::Code {
             indented!(w, [_], r#""""{}""""#, documentation)?;
         }
 
         for v in e.variants() {
-            for line in v.documentation().lines() {
-                indented!(w, [_], r#"# {}"#, line)?;
+            if write_for == WriteFor::Code {
+                for line in v.documentation().lines() {
+                    indented!(w, [_], r#"# {}"#, line)?;
+                }
             }
             indented!(w, [_], r#"{} = {}"#, v.name(), v.value())?;
         }
@@ -217,20 +238,29 @@ pub trait PythonWriter {
 
     fn write_function_proxies(&self, w: &mut IndentWriter) -> Result<(), Error> {
         for function in non_service_functions(self.library()) {
-            let rval_sig = self.converter().to_type_hint_out(function.signature().rval());
-            let args = self.function_args_to_string(function, true, false);
-            let documentation = function.meta().documentation().lines().join("\n");
+            self.write_function(w, function, WriteFor::Code)?;
+        }
 
-            indented!(w, r#"def {}({}){}:"#, function.name(), args, rval_sig)?;
+        Ok(())
+    }
 
+    fn write_function(&self, w: &mut IndentWriter, function: &Function, write_for: WriteFor) -> Result<(), Error> {
+        let rval_sig = self.converter().to_type_hint_out(function.signature().rval());
+        let args = self.function_args_to_string(function, true, false);
+        let documentation = function.meta().documentation().lines().join("\n");
+
+        indented!(w, r#"def {}({}){}:"#, function.name(), args, rval_sig)?;
+
+        if write_for == WriteFor::Code {
             if !documentation.is_empty() {
                 indented!(w, [_], r#""""{}""""#, documentation)?;
             }
 
             self.write_param_helpers(w, function)?;
             self.write_library_call(w, function, None)?;
-
             w.newline()?;
+        } else {
+            indented!(w, [_], r#"..."#)?;
         }
 
         Ok(())
@@ -392,18 +422,7 @@ pub trait PythonWriter {
         w.newline()?;
 
         for ctor in class.constructors() {
-            let ctor_args = self.function_args_to_string(ctor, true, true);
-            indented!(w, [_], r#"@staticmethod"#)?;
-            indented!(w, [_], r#"def {}({}) -> {}:"#, ctor.name().replace(&common_prefix, ""), ctor_args, context_type_name)?;
-            indented!(w, [_ _], r#"{}"#, self.converter().documentation(ctor.meta().documentation()))?;
-            indented!(w, [_ _], r#"ctx = ctypes.c_void_p()"#)?;
-            w.indent();
-            self.write_param_helpers(w, ctor)?;
-            self.write_success_enum_aware_rval(w, ctor, &self.get_method_args(ctor, "ctx"), false)?;
-            w.unindent();
-            indented!(w, [_ _], r#"self = {}({}.__api_lock, ctx)"#, context_type_name, context_type_name)?;
-            indented!(w, [_ _], r#"return self"#)?;
-            w.newline()?;
+            self.write_pattern_class_ctor(w, class, ctor, WriteFor::Code)?;
         }
 
         // Dtor
@@ -414,22 +433,67 @@ pub trait PythonWriter {
         w.unindent();
 
         for function in class.methods() {
-            w.newline()?;
-
-            let args = self.function_args_to_string(function, true, true);
-            let type_hint_out = self.converter().to_type_hint_out(function.signature().rval());
-
-            indented!(w, [_], r#"def {}(self, {}){}:"#, function.name().replace(&common_prefix, ""), &args, type_hint_out)?;
-            indented!(w, [_ _], r#"{}"#, self.converter().documentation(function.meta().documentation()))?;
-
-            w.indent();
-            self.write_param_helpers(w, function)?;
-            w.unindent();
-
-            self.write_library_call(w, function, Some("self._ctx"))?;
+            self.write_pattern_class_method(w, class, function, WriteFor::Code)?;
         }
 
         w.newline()?;
+        w.newline()?;
+
+        Ok(())
+    }
+
+    fn write_pattern_class_ctor(&self, w: &mut IndentWriter, class: &Service, ctor: &Function, write_for: WriteFor) -> Result<(), Error> {
+        let context_type_name = class.the_type().rust_name();
+        let mut all_functions = class.constructors().to_vec();
+        all_functions.extend_from_slice(class.methods());
+        all_functions.push(class.destructor().clone());
+
+        let common_prefix = longest_common_prefix(&all_functions);
+
+        let ctor_args = self.function_args_to_string(ctor, true, true);
+        indented!(w, [_], r#"@staticmethod"#)?;
+        indented!(w, [_], r#"def {}({}) -> {}:"#, ctor.name().replace(&common_prefix, ""), ctor_args, context_type_name)?;
+
+        if write_for == WriteFor::Docs {
+            return Ok(());
+        }
+
+        indented!(w, [_ _], r#"{}"#, self.converter().documentation(ctor.meta().documentation()))?;
+        indented!(w, [_ _], r#"ctx = ctypes.c_void_p()"#)?;
+        w.indent();
+        self.write_param_helpers(w, ctor)?;
+        self.write_success_enum_aware_rval(w, ctor, &self.get_method_args(ctor, "ctx"), false)?;
+        w.unindent();
+        indented!(w, [_ _], r#"self = {}({}.__api_lock, ctx)"#, context_type_name, context_type_name)?;
+        indented!(w, [_ _], r#"return self"#)?;
+        w.newline()?;
+
+        Ok(())
+    }
+
+    fn write_pattern_class_method(&self, w: &mut IndentWriter, class: &Service, function: &Function, write_for: WriteFor) -> Result<(), Error> {
+        let mut all_functions = class.constructors().to_vec();
+        all_functions.extend_from_slice(class.methods());
+        all_functions.push(class.destructor().clone());
+
+        let common_prefix = longest_common_prefix(&all_functions);
+
+        let args = self.function_args_to_string(function, true, true);
+        let type_hint_out = self.converter().to_type_hint_out(function.signature().rval());
+
+        indented!(w, [_], r#"def {}(self, {}){}:"#, function.name().replace(&common_prefix, ""), &args, type_hint_out)?;
+
+        if write_for == WriteFor::Docs {
+            return Ok(());
+        }
+
+        indented!(w, [_ _], r#"{}"#, self.converter().documentation(function.meta().documentation()))?;
+
+        w.indent();
+        self.write_param_helpers(w, function)?;
+        w.unindent();
+
+        self.write_library_call(w, function, Some("self._ctx"))?;
         w.newline()?;
 
         Ok(())

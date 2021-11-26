@@ -135,11 +135,13 @@ use interoptopus::{Error, Library};
 
 mod config;
 mod converter;
+mod docs;
 mod testing;
 mod writer;
 
-pub use config::Config;
+pub use config::{Config, DocConfig};
 pub use converter::Converter;
+pub use docs::DocGenerator;
 pub use testing::run_python_if_installed;
 pub use writer::PythonWriter;
 
