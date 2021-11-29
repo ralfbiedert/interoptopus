@@ -62,7 +62,7 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
             for x in pattern.constructors() {
                 let target = format!("{}.{}", name, x.name().replace(&prefix, ""));
                 let doc = x.meta().documentation().lines().first().cloned().unwrap_or_default();
-                indented!(w, r#"     - **[{}](#{})** <sup>ctor</sup> - {}"#, x.name().replace(&prefix, ""), target, doc)?;
+                indented!(w, r#"     - **[{}](#{})** <sup>**ctor**</sup> - {}"#, x.name().replace(&prefix, ""), target, doc)?;
             }
             for x in pattern.methods() {
                 let target = format!("{}.{}", name, x.name().replace(&prefix, ""));
@@ -131,9 +131,11 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
 
             indented!(w, r#"#### Definition "#)?;
             indented!(w, r#"```python"#)?;
-            self.python_writer.write_struct(w, &composite, WriteFor::Docs);
+            self.python_writer.write_struct(w, &composite, WriteFor::Docs)?;
             indented!(w, r#"```"#)?;
 
+            w.newline()?;
+            indented!(w, r#"---"#)?;
             w.newline()?;
         }
 
@@ -172,6 +174,9 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
             indented!(w, r#"```python"#)?;
             self.python_writer.write_enum(w, the_enum, WriteFor::Docs)?;
             indented!(w, r#"```"#)?;
+            w.newline()?;
+            indented!(w, r#"---"#)?;
+            w.newline()?;
         }
 
         Ok(())
@@ -201,7 +206,8 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
         indented!(w, r#"```python"#)?;
         self.python_writer.write_function(w, function, WriteFor::Docs)?;
         indented!(w, r#"```"#)?;
-
+        w.newline()?;
+        indented!(w, r#"---"#)?;
         w.newline()?;
 
         Ok(())
@@ -218,22 +224,30 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
             let doc = pattern.the_type().meta().documentation().lines();
             let class_name = pattern.the_type().rust_name();
 
-            indented!(w, r#" ## <a name="{}">**{}**</a> <sup>ctor</sup>"#, class_name, class_name)?;
+            indented!(w, r#"## <a name="{}">**{}**</a> <sup>ctor</sup>"#, class_name, class_name)?;
 
             for line in doc {
+                let line = line.replace(" # ", " #### ");
+                let line = line.replace(" ## ", " ##### ");
+                let line = line.replace(" ### ", " ###### ");
+
                 indented!(w, r#"{}"#, line)?;
             }
 
             for x in pattern.constructors() {
                 let fname = x.name().replace(&prefix, "");
                 let target = format!("{}.{}", class_name, fname);
-                indented!(w, r#" ### <a name="{}">**{}**</a> <sup>ctor</sup>"#, target, fname)?;
+                indented!(w, r#"### <a name="{}">**{}**</a> <sup>ctor</sup>"#, target, fname)?;
 
                 let doc = x.meta().documentation().lines();
                 for line in doc {
+                    let line = line.replace(" # ", " #### ");
+                    let line = line.replace(" ## ", " ##### ");
+                    let line = line.replace(" ### ", " ###### ");
                     indented!(w, r#"{}"#, line)?;
                 }
 
+                w.newline()?;
                 indented!(w, r#"#### Definition "#)?;
                 indented!(w, r#"```python"#)?;
                 indented!(w, r#"class {}:"#, class_name)?;
@@ -241,17 +255,25 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
                 self.python_writer.write_pattern_class_ctor(w, pattern, x, WriteFor::Docs)?;
                 indented!(w, [_ _], r#"..."#)?;
                 indented!(w, r#"```"#)?;
+                w.newline()?;
+                indented!(w, r#"---"#)?;
+                w.newline()?;
             }
 
             for x in pattern.methods() {
                 let fname = x.name().replace(&prefix, "");
                 let target = format!("{}.{}", class_name, fname);
-                indented!(w, r#" ### <a name="{}">**{}**</a>"#, target, fname)?;
+                indented!(w, r#"### <a name="{}">**{}**</a>"#, target, fname)?;
 
+                let doc = x.meta().documentation().lines();
                 for line in doc {
+                    let line = line.replace(" # ", " #### ");
+                    let line = line.replace(" ## ", " ##### ");
+                    let line = line.replace(" ### ", " ###### ");
                     indented!(w, r#"{}"#, line)?;
                 }
 
+                w.newline()?;
                 indented!(w, r#"#### Definition "#)?;
                 indented!(w, r#"```python"#)?;
                 indented!(w, r#"class {}:"#, class_name)?;
@@ -259,8 +281,12 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
                 self.python_writer.write_pattern_class_method(w, pattern, x, WriteFor::Docs)?;
                 indented!(w, [_ _], r#"..."#)?;
                 indented!(w, r#"```"#)?;
+                w.newline()?;
+                indented!(w, r#"---"#)?;
+                w.newline()?;
             }
 
+            w.newline()?;
             w.newline()?;
         }
 
