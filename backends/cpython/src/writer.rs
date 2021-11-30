@@ -403,7 +403,7 @@ pub trait PythonWriter {
         all_functions.extend_from_slice(class.methods());
         all_functions.push(class.destructor().clone());
 
-        let common_prefix = longest_common_prefix(&all_functions);
+        let _common_prefix = longest_common_prefix(&all_functions);
         let documentation = class.the_type().meta().documentation().lines().join("\n");
 
         indented!(w, r#"class {}:"#, context_type_name)?;

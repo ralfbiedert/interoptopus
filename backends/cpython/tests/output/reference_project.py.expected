@@ -1276,7 +1276,6 @@ class SimpleService:
 
     def __del__(self):
         c_lib.simple_service_destroy(self._ctx, )
-
     def method_result(self, anon1: int):
         """ Methods returning a Result<(), _> are the default and do not
  need annotations."""
@@ -1347,6 +1346,7 @@ class SimpleService:
         return c_lib.simple_service_method_callback(self._ctx, callback)
 
 
+
 class SimpleServiceLifetime:
     __api_lock = object()
 
@@ -1368,7 +1368,6 @@ class SimpleServiceLifetime:
 
     def __del__(self):
         c_lib.simple_service_lt_destroy(self._ctx, )
-
     def method_lt(self, slice: SliceBool):
         """"""
         return c_lib.simple_service_lt_method_lt(self._ctx, slice)
@@ -1385,5 +1384,6 @@ class SimpleServiceLifetime:
     def method_void_ffi_error(self, ):
         """"""
         return c_lib.simple_service_lt_method_void_ffi_error(self._ctx, )
+
 
 

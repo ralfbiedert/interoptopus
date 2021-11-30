@@ -2,7 +2,7 @@ use crate::writer::WriteFor;
 use crate::{DocConfig, PythonWriter};
 use interoptopus::lang::c::{CType, Function};
 use interoptopus::patterns::{LibraryPattern, TypePattern};
-use interoptopus::util::{longest_common_prefix, sort_types_by_dependencies};
+use interoptopus::util::longest_common_prefix;
 use interoptopus::writer::IndentWriter;
 use interoptopus::{indented, non_service_functions};
 use interoptopus::{Error, Library};
@@ -51,7 +51,6 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
 
         for pattern in self.library.patterns().iter().filter_map(|x| match x {
             LibraryPattern::Service(s) => Some(s),
-            _ => None,
         }) {
             let prefix = longest_common_prefix(pattern.methods());
             let doc = pattern.the_type().meta().documentation().lines().first().cloned().unwrap_or_default();
@@ -87,14 +86,22 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
         indented!(w, r#"### Data Structs"#)?;
         indented!(w, r#"Composite data used by functions and methods."#)?;
 
-        for the_type in self.library.ctypes().iter().filter_map(|x| match x {
-            CType::Composite(c) => Some(c.clone()),
-            CType::Pattern(p @ TypePattern::Option(_)) => Some(p.fallback_type().as_composite_type().cloned().unwrap()),
-            CType::Pattern(p @ TypePattern::Slice(_)) => Some(p.fallback_type().as_composite_type().cloned().unwrap()),
-            _ => None,
-        }) {
-            let doc = the_type.meta().documentation().lines().first().cloned().unwrap_or_default();
-            indented!(w, r#" - **[{}](#{})** - {}"#, the_type.rust_name(), the_type.rust_name(), doc)?;
+        for the_type in self.library.ctypes().iter() {
+            match the_type {
+                CType::Composite(c) => {
+                    let doc = c.meta().documentation().lines().first().cloned().unwrap_or_default();
+                    indented!(w, r#" - **[{}](#{})** - {}"#, c.rust_name(), c.rust_name(), doc)?;
+                }
+                CType::Pattern(p @ TypePattern::Option(_)) => {
+                    let c = p.fallback_type().as_composite_type().cloned().unwrap();
+                    indented!(w, r#" - **[{}](#{})** - A boolean flag and optionally data."#, c.rust_name(), c.rust_name())?;
+                }
+                CType::Pattern(p @ TypePattern::Slice(_)) => {
+                    let c = p.fallback_type().as_composite_type().cloned().unwrap();
+                    indented!(w, r#" - **[{}](#{})** - A pointer and length of un-owned elements."#, c.rust_name(), c.rust_name())?;
+                }
+                _ => continue,
+            }
         }
 
         Ok(())
@@ -218,7 +225,6 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
 
         for pattern in self.library.patterns().iter().filter_map(|x| match x {
             LibraryPattern::Service(s) => Some(s),
-            _ => None,
         }) {
             let prefix = longest_common_prefix(pattern.methods());
             let doc = pattern.the_type().meta().documentation().lines();

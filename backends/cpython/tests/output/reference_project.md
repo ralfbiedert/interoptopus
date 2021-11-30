@@ -67,10 +67,10 @@ Freestanding callables inside the module.
 ### Classes
 Methods operating on common state.
  - **[SimpleService](#SimpleService)** -  Some struct we want to expose as a class.
-     - **[new_with](#SimpleService.new_with)** <sup>ctor</sup> -  The constructor must return a `Result<Self, Error>`.
-     - **[new_without](#SimpleService.new_without)** <sup>ctor</sup> - 
-     - **[new_with_string](#SimpleService.new_with_string)** <sup>ctor</sup> - 
-     - **[new_failing](#SimpleService.new_failing)** <sup>ctor</sup> - 
+     - **[new_with](#SimpleService.new_with)** <sup>**ctor**</sup> -  The constructor must return a `Result<Self, Error>`.
+     - **[new_without](#SimpleService.new_without)** <sup>**ctor**</sup> - 
+     - **[new_with_string](#SimpleService.new_with_string)** <sup>**ctor**</sup> - 
+     - **[new_failing](#SimpleService.new_failing)** <sup>**ctor**</sup> - 
      - **[method_result](#SimpleService.method_result)** -  Methods returning a Result<(), _> are the default and do not
      - **[method_value](#SimpleService.method_value)** - 
      - **[method_void](#SimpleService.method_void)** -  This method should be documented.
@@ -87,7 +87,7 @@ Methods operating on common state.
      - **[method_void_ffi_error](#SimpleService.method_void_ffi_error)** - 
      - **[method_callback](#SimpleService.method_callback)** - 
  - **[SimpleServiceLifetime](#SimpleServiceLifetime)** - 
-     - **[new_with](#SimpleServiceLifetime.new_with)** <sup>ctor</sup> - 
+     - **[new_with](#SimpleServiceLifetime.new_with)** <sup>**ctor**</sup> - 
      - **[method_lt](#SimpleServiceLifetime.method_lt)** - 
      - **[method_lt2](#SimpleServiceLifetime.method_lt2)** - 
      - **[return_string_accept_slice](#SimpleServiceLifetime.return_string_accept_slice)** - 
@@ -119,12 +119,12 @@ Composite data used by functions and methods.
  - **[Visibility2](#Visibility2)** - 
  - **[Weird1u32](#Weird1u32)** - 
  - **[Weird2u8](#Weird2u8)** - 
- - **[SliceBool](#SliceBool)** - 
- - **[SliceUseAsciiStringPattern](#SliceUseAsciiStringPattern)** - 
- - **[SliceVec3f32](#SliceVec3f32)** - 
- - **[Sliceu32](#Sliceu32)** - 
- - **[Sliceu8](#Sliceu8)** - 
- - **[OptionInner](#OptionInner)** - 
+ - **[SliceBool](#SliceBool)** - A pointer and length of un-owned elements.
+ - **[SliceUseAsciiStringPattern](#SliceUseAsciiStringPattern)** - A pointer and length of un-owned elements.
+ - **[SliceVec3f32](#SliceVec3f32)** - A pointer and length of un-owned elements.
+ - **[Sliceu32](#Sliceu32)** - A pointer and length of un-owned elements.
+ - **[Sliceu8](#Sliceu8)** - A pointer and length of un-owned elements.
+ - **[OptionInner](#OptionInner)** - A boolean flag and optionally data.
 # Types 
 
 
@@ -144,6 +144,8 @@ class Array(ctypes.Structure):
         ...
 ```
 
+---
+
 
 
  ### <a name="ExtraTypef32">**ExtraTypef32**</a>
@@ -161,6 +163,8 @@ class ExtraTypef32(ctypes.Structure):
     def __init__(self, x: float = None):
         ...
 ```
+
+---
 
 
 
@@ -180,6 +184,8 @@ class Genericu32(ctypes.Structure):
         ...
 ```
 
+---
+
 
 
  ### <a name="Genericu8">**Genericu8**</a>
@@ -197,6 +203,8 @@ class Genericu8(ctypes.Structure):
     def __init__(self, x: ctypes.POINTER(ctypes.c_uint8) = None):
         ...
 ```
+
+---
 
 
 
@@ -216,6 +224,8 @@ class Inner(ctypes.Structure):
         ...
 ```
 
+---
+
 
 
  ### <a name="Phantomu8">**Phantomu8**</a>
@@ -234,6 +244,8 @@ class Phantomu8(ctypes.Structure):
         ...
 ```
 
+---
+
 
 
  ### <a name="SomeForeignType">**SomeForeignType**</a>
@@ -251,6 +263,8 @@ class SomeForeignType(ctypes.Structure):
     def __init__(self, x: int = None):
         ...
 ```
+
+---
 
 
 
@@ -271,6 +285,8 @@ class StructDocumented(ctypes.Structure):
         ...
 ```
 
+---
+
 
 
  ### <a name="StructRenamed">**StructRenamed**</a>
@@ -288,6 +304,8 @@ class StructRenamed(ctypes.Structure):
     def __init__(self, e: ctypes.c_int = None):
         ...
 ```
+
+---
 
 
 
@@ -307,6 +325,8 @@ class Tupled(ctypes.Structure):
         ...
 ```
 
+---
+
 
 
  ### <a name="UseAsciiStringPattern">**UseAsciiStringPattern**</a>
@@ -324,6 +344,8 @@ class UseAsciiStringPattern(ctypes.Structure):
     def __init__(self, ascii_string: str = None):
         ...
 ```
+
+---
 
 
 
@@ -345,6 +367,8 @@ class Vec(ctypes.Structure):
         ...
 ```
 
+---
+
 
 
  ### <a name="Vec1">**Vec1**</a>
@@ -365,6 +389,8 @@ class Vec1(ctypes.Structure):
         ...
 ```
 
+---
+
 
 
  ### <a name="Vec2">**Vec2**</a>
@@ -384,6 +410,8 @@ class Vec2(ctypes.Structure):
     def __init__(self, x: float = None, z: float = None):
         ...
 ```
+
+---
 
 
 
@@ -407,6 +435,8 @@ class Vec3f32(ctypes.Structure):
         ...
 ```
 
+---
+
 
 
  ### <a name="Visibility1">**Visibility1**</a>
@@ -426,6 +456,8 @@ class Visibility1(ctypes.Structure):
     def __init__(self, pblc: int = None, prvt: int = None):
         ...
 ```
+
+---
 
 
 
@@ -447,6 +479,8 @@ class Visibility2(ctypes.Structure):
         ...
 ```
 
+---
+
 
 
  ### <a name="Weird1u32">**Weird1u32**</a>
@@ -464,6 +498,8 @@ class Weird1u32(ctypes.Structure):
     def __init__(self, x: int = None):
         ...
 ```
+
+---
 
 
 
@@ -487,6 +523,8 @@ class Weird2u8(ctypes.Structure):
         ...
 ```
 
+---
+
 
 
  ### <a name="SliceBool">**SliceBool**</a>
@@ -506,6 +544,8 @@ class SliceBool(ctypes.Structure):
     def __init__(self, data: ctypes.POINTER(ctypes.c_uint8) = None, len: int = None):
         ...
 ```
+
+---
 
 
 
@@ -527,6 +567,8 @@ class SliceUseAsciiStringPattern(ctypes.Structure):
         ...
 ```
 
+---
+
 
 
  ### <a name="SliceVec3f32">**SliceVec3f32**</a>
@@ -546,6 +588,8 @@ class SliceVec3f32(ctypes.Structure):
     def __init__(self, data: ctypes.POINTER(Vec3f32) = None, len: int = None):
         ...
 ```
+
+---
 
 
 
@@ -567,6 +611,8 @@ class Sliceu32(ctypes.Structure):
         ...
 ```
 
+---
+
 
 
  ### <a name="Sliceu8">**Sliceu8**</a>
@@ -586,6 +632,8 @@ class Sliceu8(ctypes.Structure):
     def __init__(self, data: ctypes.POINTER(ctypes.c_uint8) = None, len: int = None):
         ...
 ```
+
+---
 
 
 
@@ -607,6 +655,8 @@ class OptionInner(ctypes.Structure):
         ...
 ```
 
+---
+
 # Enums 
 
 
@@ -626,6 +676,9 @@ class EnumDocumented:
     C = 2
 ```
 
+---
+
+
 
  ### <a name="EnumRenamed">**EnumRenamed**</a>
 
@@ -637,6 +690,9 @@ class EnumDocumented:
 class EnumRenamed:
     X = 0
 ```
+
+---
+
 # Functions
 ## primitive_void 
 #### Definition 
@@ -645,12 +701,16 @@ def primitive_void():
     ...
 ```
 
+---
+
 ## primitive_void2 
 #### Definition 
 ```python
 def primitive_void2():
     ...
 ```
+
+---
 
 ## primitive_bool 
 #### Definition 
@@ -659,12 +719,16 @@ def primitive_bool(x: bool) -> bool:
     ...
 ```
 
+---
+
 ## primitive_u8 
 #### Definition 
 ```python
 def primitive_u8(x: int) -> int:
     ...
 ```
+
+---
 
 ## primitive_u16 
 #### Definition 
@@ -673,12 +737,16 @@ def primitive_u16(x: int) -> int:
     ...
 ```
 
+---
+
 ## primitive_u32 
 #### Definition 
 ```python
 def primitive_u32(x: int) -> int:
     ...
 ```
+
+---
 
 ## primitive_u64 
 #### Definition 
@@ -687,12 +755,16 @@ def primitive_u64(x: int) -> int:
     ...
 ```
 
+---
+
 ## primitive_i8 
 #### Definition 
 ```python
 def primitive_i8(x: int) -> int:
     ...
 ```
+
+---
 
 ## primitive_i16 
 #### Definition 
@@ -701,12 +773,16 @@ def primitive_i16(x: int) -> int:
     ...
 ```
 
+---
+
 ## primitive_i32 
 #### Definition 
 ```python
 def primitive_i32(x: int) -> int:
     ...
 ```
+
+---
 
 ## primitive_i64 
 #### Definition 
@@ -715,12 +791,16 @@ def primitive_i64(x: int) -> int:
     ...
 ```
 
+---
+
 ## many_args_5 
 #### Definition 
 ```python
 def many_args_5(x0: int, x1: int, x2: int, x3: int, x4: int) -> int:
     ...
 ```
+
+---
 
 ## many_args_10 
 #### Definition 
@@ -729,12 +809,16 @@ def many_args_10(x0: int, x1: int, x2: int, x3: int, x4: int, x5: int, x6: int, 
     ...
 ```
 
+---
+
 ## ptr 
 #### Definition 
 ```python
 def ptr(x: ctypes.POINTER(ctypes.c_int64)) -> ctypes.POINTER(ctypes.c_int64):
     ...
 ```
+
+---
 
 ## ptr_mut 
 ### Safety
@@ -746,12 +830,16 @@ def ptr_mut(x: ctypes.POINTER(ctypes.c_int64)) -> ctypes.POINTER(ctypes.c_int64)
     ...
 ```
 
+---
+
 ## ptr_ptr 
 #### Definition 
 ```python
 def ptr_ptr(x: ctypes.POINTER(ctypes.POINTER(ctypes.c_int64))) -> ctypes.POINTER(ctypes.POINTER(ctypes.c_int64)):
     ...
 ```
+
+---
 
 ## ref_simple 
 #### Definition 
@@ -760,12 +848,16 @@ def ref_simple(x: ctypes.POINTER(ctypes.c_int64)) -> ctypes.POINTER(ctypes.c_int
     ...
 ```
 
+---
+
 ## ref_mut_simple 
 #### Definition 
 ```python
 def ref_mut_simple(x: ctypes.POINTER(ctypes.c_int64)) -> ctypes.POINTER(ctypes.c_int64):
     ...
 ```
+
+---
 
 ## ref_option 
 #### Definition 
@@ -774,12 +866,16 @@ def ref_option(x: ctypes.POINTER(ctypes.c_int64)) -> bool:
     ...
 ```
 
+---
+
 ## ref_mut_option 
 #### Definition 
 ```python
 def ref_mut_option(x: ctypes.POINTER(ctypes.c_int64)) -> bool:
     ...
 ```
+
+---
 
 ## tupled 
 #### Definition 
@@ -788,12 +884,16 @@ def tupled(x: Tupled) -> Tupled:
     ...
 ```
 
+---
+
 ## complex_args_1 
 #### Definition 
 ```python
 def complex_args_1(a: Vec3f32, b: ctypes.POINTER(Tupled)):
     ...
 ```
+
+---
 
 ## complex_args_2 
 #### Definition 
@@ -802,12 +902,16 @@ def complex_args_2(cmplx: SomeForeignType) -> ctypes.c_void_p:
     ...
 ```
 
+---
+
 ## callback 
 #### Definition 
 ```python
 def callback(callback, value: int) -> int:
     ...
 ```
+
+---
 
 ## generic_1a 
 #### Definition 
@@ -816,12 +920,16 @@ def generic_1a(x: Genericu32, y: Phantomu8) -> int:
     ...
 ```
 
+---
+
 ## generic_1b 
 #### Definition 
 ```python
 def generic_1b(x: Genericu8, y: Phantomu8) -> int:
     ...
 ```
+
+---
 
 ## generic_1c 
 #### Definition 
@@ -830,12 +938,16 @@ def generic_1c(x: ctypes.POINTER(Genericu8), y: ctypes.POINTER(Genericu8)) -> in
     ...
 ```
 
+---
+
 ## generic_2 
 #### Definition 
 ```python
 def generic_2(x: ctypes.c_void_p) -> int:
     ...
 ```
+
+---
 
 ## generic_3 
 #### Definition 
@@ -844,6 +956,8 @@ def generic_3(x: ctypes.c_void_p) -> int:
     ...
 ```
 
+---
+
 ## generic_4 
 #### Definition 
 ```python
@@ -851,12 +965,16 @@ def generic_4(x: ctypes.c_void_p) -> int:
     ...
 ```
 
+---
+
 ## array_1 
 #### Definition 
 ```python
 def array_1(x: Array) -> int:
     ...
 ```
+
+---
 
 ## documented 
 This function has documentation.
@@ -866,12 +984,16 @@ def documented(x: StructDocumented) -> ctypes.c_int:
     ...
 ```
 
+---
+
 ## ambiguous_1 
 #### Definition 
 ```python
 def ambiguous_1(x: Vec1) -> Vec1:
     ...
 ```
+
+---
 
 ## ambiguous_2 
 #### Definition 
@@ -880,12 +1002,16 @@ def ambiguous_2(x: Vec2) -> Vec2:
     ...
 ```
 
+---
+
 ## ambiguous_3 
 #### Definition 
 ```python
 def ambiguous_3(x: Vec1, y: Vec2) -> bool:
     ...
 ```
+
+---
 
 ## namespaced_type 
 #### Definition 
@@ -894,12 +1020,16 @@ def namespaced_type(x: Vec) -> Vec:
     ...
 ```
 
+---
+
 ## panics 
 #### Definition 
 ```python
 def panics():
     ...
 ```
+
+---
 
 ## renamed 
 #### Definition 
@@ -908,12 +1038,16 @@ def renamed(x: StructRenamed) -> ctypes.c_int:
     ...
 ```
 
+---
+
 ## sleep 
 #### Definition 
 ```python
 def sleep(millis: int):
     ...
 ```
+
+---
 
 ## weird_1 
 #### Definition 
@@ -922,12 +1056,16 @@ def weird_1(x: Weird1u32, y: Weird2u8) -> bool:
     ...
 ```
 
+---
+
 ## visibility 
 #### Definition 
 ```python
 def visibility(x: Visibility1, y: Visibility2):
     ...
 ```
+
+---
 
 ## repr_transparent 
 #### Definition 
@@ -936,12 +1074,16 @@ def repr_transparent(x: Tupled, r: ctypes.POINTER(Tupled)) -> Tupled:
     ...
 ```
 
+---
+
 ## pattern_ascii_pointer_1 
 #### Definition 
 ```python
 def pattern_ascii_pointer_1(x: str) -> int:
     ...
 ```
+
+---
 
 ## pattern_ascii_pointer_2 
 #### Definition 
@@ -950,12 +1092,16 @@ def pattern_ascii_pointer_2() -> str:
     ...
 ```
 
+---
+
 ## pattern_ascii_pointer_len 
 #### Definition 
 ```python
 def pattern_ascii_pointer_len(x: str, y: UseAsciiStringPattern) -> int:
     ...
 ```
+
+---
 
 ## pattern_ascii_pointer_return_slice 
 #### Definition 
@@ -964,12 +1110,16 @@ def pattern_ascii_pointer_return_slice() -> SliceUseAsciiStringPattern:
     ...
 ```
 
+---
+
 ## pattern_ffi_slice_1 
 #### Definition 
 ```python
 def pattern_ffi_slice_1(ffi_slice: Sliceu32) -> int:
     ...
 ```
+
+---
 
 ## pattern_ffi_slice_2 
 #### Definition 
@@ -978,12 +1128,16 @@ def pattern_ffi_slice_2(ffi_slice: SliceVec3f32, i: int) -> Vec3f32:
     ...
 ```
 
+---
+
 ## pattern_ffi_slice_3 
 #### Definition 
 ```python
 def pattern_ffi_slice_3(slice: SliceMutu8, callback):
     ...
 ```
+
+---
 
 ## pattern_ffi_slice_4 
 #### Definition 
@@ -992,12 +1146,16 @@ def pattern_ffi_slice_4(slice: Sliceu8, slice2: SliceMutu8):
     ...
 ```
 
+---
+
 ## pattern_ffi_slice_5 
 #### Definition 
 ```python
 def pattern_ffi_slice_5(slice: ctypes.POINTER(Sliceu8), slice2: ctypes.POINTER(SliceMutu8)):
     ...
 ```
+
+---
 
 ## pattern_ffi_slice_6 
 #### Definition 
@@ -1006,12 +1164,16 @@ def pattern_ffi_slice_6(slice: ctypes.POINTER(SliceMutu8), callback):
     ...
 ```
 
+---
+
 ## pattern_ffi_slice_delegate 
 #### Definition 
 ```python
 def pattern_ffi_slice_delegate(callback) -> int:
     ...
 ```
+
+---
 
 ## pattern_ffi_slice_delegate_huge 
 #### Definition 
@@ -1020,12 +1182,16 @@ def pattern_ffi_slice_delegate_huge(callback) -> Vec3f32:
     ...
 ```
 
+---
+
 ## pattern_ffi_option_1 
 #### Definition 
 ```python
 def pattern_ffi_option_1(ffi_slice: OptionInner) -> OptionInner:
     ...
 ```
+
+---
 
 ## pattern_ffi_option_2 
 #### Definition 
@@ -1034,12 +1200,16 @@ def pattern_ffi_option_2(ffi_slice: OptionInner) -> Inner:
     ...
 ```
 
+---
+
 ## pattern_ffi_bool 
 #### Definition 
 ```python
 def pattern_ffi_bool(ffi_bool):
     ...
 ```
+
+---
 
 ## pattern_api_guard 
 #### Definition 
@@ -1048,6 +1218,8 @@ def pattern_api_guard():
     ...
 ```
 
+---
+
 ## pattern_callback_1 
 #### Definition 
 ```python
@@ -1055,12 +1227,16 @@ def pattern_callback_1(callback, x: int) -> int:
     ...
 ```
 
+---
+
 ## pattern_callback_2 
 #### Definition 
 ```python
 def pattern_callback_2(callback):
     ...
 ```
+
+---
 
 # Services
 ## <a name="SimpleService">**SimpleService**</a> <sup>ctor</sup>
@@ -1077,6 +1253,8 @@ class SimpleService:
         ...
 ```
 
+---
+
 ### <a name="SimpleService.new_without">**new_without**</a> <sup>ctor</sup>
 
 #### Definition 
@@ -1087,6 +1265,8 @@ class SimpleService:
     def new_without() -> SimpleService:
         ...
 ```
+
+---
 
 ### <a name="SimpleService.new_with_string">**new_with_string**</a> <sup>ctor</sup>
 
@@ -1099,6 +1279,8 @@ class SimpleService:
         ...
 ```
 
+---
+
 ### <a name="SimpleService.new_failing">**new_failing**</a> <sup>ctor</sup>
 
 #### Definition 
@@ -1110,8 +1292,11 @@ class SimpleService:
         ...
 ```
 
- ### <a name="SimpleService.method_result">**method_result**</a>
- Some struct we want to expose as a class.
+---
+
+### <a name="SimpleService.method_result">**method_result**</a>
+ Methods returning a Result<(), _> are the default and do not
+ need annotations.
 
 #### Definition 
 ```python
@@ -1121,8 +1306,9 @@ class SimpleService:
         ...
 ```
 
- ### <a name="SimpleService.method_value">**method_value**</a>
- Some struct we want to expose as a class.
+---
+
+### <a name="SimpleService.method_value">**method_value**</a>
 
 #### Definition 
 ```python
@@ -1132,8 +1318,12 @@ class SimpleService:
         ...
 ```
 
- ### <a name="SimpleService.method_void">**method_void**</a>
- Some struct we want to expose as a class.
+---
+
+### <a name="SimpleService.method_void">**method_void**</a>
+ This method should be documented.
+
+ Multiple lines.
 
 #### Definition 
 ```python
@@ -1143,8 +1333,9 @@ class SimpleService:
         ...
 ```
 
- ### <a name="SimpleService.method_mut_self">**method_mut_self**</a>
- Some struct we want to expose as a class.
+---
+
+### <a name="SimpleService.method_mut_self">**method_mut_self**</a>
 
 #### Definition 
 ```python
@@ -1154,8 +1345,10 @@ class SimpleService:
         ...
 ```
 
- ### <a name="SimpleService.method_mut_self_void">**method_mut_self_void**</a>
- Some struct we want to expose as a class.
+---
+
+### <a name="SimpleService.method_mut_self_void">**method_mut_self_void**</a>
+ Single line.
 
 #### Definition 
 ```python
@@ -1165,8 +1358,9 @@ class SimpleService:
         ...
 ```
 
- ### <a name="SimpleService.method_mut_self_ref">**method_mut_self_ref**</a>
- Some struct we want to expose as a class.
+---
+
+### <a name="SimpleService.method_mut_self_ref">**method_mut_self_ref**</a>
 
 #### Definition 
 ```python
@@ -1176,8 +1370,9 @@ class SimpleService:
         ...
 ```
 
- ### <a name="SimpleService.method_mut_self_ref_slice">**method_mut_self_ref_slice**</a>
- Some struct we want to expose as a class.
+---
+
+### <a name="SimpleService.method_mut_self_ref_slice">**method_mut_self_ref_slice**</a>
 
 #### Definition 
 ```python
@@ -1187,8 +1382,9 @@ class SimpleService:
         ...
 ```
 
- ### <a name="SimpleService.method_mut_self_ref_slice_limited">**method_mut_self_ref_slice_limited**</a>
- Some struct we want to expose as a class.
+---
+
+### <a name="SimpleService.method_mut_self_ref_slice_limited">**method_mut_self_ref_slice_limited**</a>
 
 #### Definition 
 ```python
@@ -1198,8 +1394,9 @@ class SimpleService:
         ...
 ```
 
- ### <a name="SimpleService.method_mut_self_ffi_error">**method_mut_self_ffi_error**</a>
- Some struct we want to expose as a class.
+---
+
+### <a name="SimpleService.method_mut_self_ffi_error">**method_mut_self_ffi_error**</a>
 
 #### Definition 
 ```python
@@ -1209,8 +1406,9 @@ class SimpleService:
         ...
 ```
 
- ### <a name="SimpleService.method_mut_self_no_error">**method_mut_self_no_error**</a>
- Some struct we want to expose as a class.
+---
+
+### <a name="SimpleService.method_mut_self_no_error">**method_mut_self_no_error**</a>
 
 #### Definition 
 ```python
@@ -1220,8 +1418,11 @@ class SimpleService:
         ...
 ```
 
- ### <a name="SimpleService.return_slice">**return_slice**</a>
- Some struct we want to expose as a class.
+---
+
+### <a name="SimpleService.return_slice">**return_slice**</a>
+ Warning, you _must_ discard the returned slice object before calling into this service
+ again, as otherwise undefined behavior might happen.
 
 #### Definition 
 ```python
@@ -1231,8 +1432,11 @@ class SimpleService:
         ...
 ```
 
- ### <a name="SimpleService.return_slice_mut">**return_slice_mut**</a>
- Some struct we want to expose as a class.
+---
+
+### <a name="SimpleService.return_slice_mut">**return_slice_mut**</a>
+ Warning, you _must_ discard the returned slice object before calling into this service
+ again, as otherwise undefined behavior might happen.
 
 #### Definition 
 ```python
@@ -1242,8 +1446,10 @@ class SimpleService:
         ...
 ```
 
- ### <a name="SimpleService.return_string">**return_string**</a>
- Some struct we want to expose as a class.
+---
+
+### <a name="SimpleService.return_string">**return_string**</a>
+ This function has no panic safeguards. If it panics your host app will be in an undefined state.
 
 #### Definition 
 ```python
@@ -1253,8 +1459,9 @@ class SimpleService:
         ...
 ```
 
- ### <a name="SimpleService.method_void_ffi_error">**method_void_ffi_error**</a>
- Some struct we want to expose as a class.
+---
+
+### <a name="SimpleService.method_void_ffi_error">**method_void_ffi_error**</a>
 
 #### Definition 
 ```python
@@ -1264,8 +1471,9 @@ class SimpleService:
         ...
 ```
 
- ### <a name="SimpleService.method_callback">**method_callback**</a>
- Some struct we want to expose as a class.
+---
+
+### <a name="SimpleService.method_callback">**method_callback**</a>
 
 #### Definition 
 ```python
@@ -1274,6 +1482,8 @@ class SimpleService:
     def method_callback(self, callback):
         ...
 ```
+
+---
 
 
 
@@ -1289,7 +1499,9 @@ class SimpleServiceLifetime:
         ...
 ```
 
- ### <a name="SimpleServiceLifetime.method_lt">**method_lt**</a>
+---
+
+### <a name="SimpleServiceLifetime.method_lt">**method_lt**</a>
 
 #### Definition 
 ```python
@@ -1299,7 +1511,9 @@ class SimpleServiceLifetime:
         ...
 ```
 
- ### <a name="SimpleServiceLifetime.method_lt2">**method_lt2**</a>
+---
+
+### <a name="SimpleServiceLifetime.method_lt2">**method_lt2**</a>
 
 #### Definition 
 ```python
@@ -1309,7 +1523,9 @@ class SimpleServiceLifetime:
         ...
 ```
 
- ### <a name="SimpleServiceLifetime.return_string_accept_slice">**return_string_accept_slice**</a>
+---
+
+### <a name="SimpleServiceLifetime.return_string_accept_slice">**return_string_accept_slice**</a>
 
 #### Definition 
 ```python
@@ -1319,7 +1535,9 @@ class SimpleServiceLifetime:
         ...
 ```
 
- ### <a name="SimpleServiceLifetime.method_void_ffi_error">**method_void_ffi_error**</a>
+---
+
+### <a name="SimpleServiceLifetime.method_void_ffi_error">**method_void_ffi_error**</a>
 
 #### Definition 
 ```python
@@ -1328,6 +1546,8 @@ class SimpleServiceLifetime:
     def method_void_ffi_error(self, ):
         ...
 ```
+
+---
 
 
 
