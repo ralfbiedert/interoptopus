@@ -130,6 +130,7 @@ Composite data used by functions and methods.
 
  ### <a name="Array">**Array**</a>
 
+
 #### Fields 
 - **data** -  
 #### Definition 
@@ -149,6 +150,7 @@ class Array(ctypes.Structure):
 
 
  ### <a name="ExtraTypef32">**ExtraTypef32**</a>
+
 
 #### Fields 
 - **x** -  
@@ -170,6 +172,7 @@ class ExtraTypef32(ctypes.Structure):
 
  ### <a name="Genericu32">**Genericu32**</a>
 
+
 #### Fields 
 - **x** -  
 #### Definition 
@@ -189,6 +192,7 @@ class Genericu32(ctypes.Structure):
 
 
  ### <a name="Genericu8">**Genericu8**</a>
+
 
 #### Fields 
 - **x** -  
@@ -210,6 +214,7 @@ class Genericu8(ctypes.Structure):
 
  ### <a name="Inner">**Inner**</a>
 
+
 #### Fields 
 - **x** -  
 #### Definition 
@@ -230,6 +235,7 @@ class Inner(ctypes.Structure):
 
  ### <a name="Phantomu8">**Phantomu8**</a>
 
+
 #### Fields 
 - **x** -  
 #### Definition 
@@ -249,6 +255,7 @@ class Phantomu8(ctypes.Structure):
 
 
  ### <a name="SomeForeignType">**SomeForeignType**</a>
+
 
 #### Fields 
 - **x** -  
@@ -271,6 +278,7 @@ class SomeForeignType(ctypes.Structure):
  ### <a name="StructDocumented">**StructDocumented**</a>
 
 Documented struct.
+
 #### Fields 
 - **x** -  Documented field. 
 #### Definition 
@@ -290,6 +298,7 @@ class StructDocumented(ctypes.Structure):
 
 
  ### <a name="StructRenamed">**StructRenamed**</a>
+
 
 #### Fields 
 - **e** -  
@@ -311,6 +320,7 @@ class StructRenamed(ctypes.Structure):
 
  ### <a name="Tupled">**Tupled**</a>
 
+
 #### Fields 
 - **x0** -  
 #### Definition 
@@ -331,6 +341,7 @@ class Tupled(ctypes.Structure):
 
  ### <a name="UseAsciiStringPattern">**UseAsciiStringPattern**</a>
 
+
 #### Fields 
 - **ascii_string** -  
 #### Definition 
@@ -350,6 +361,7 @@ class UseAsciiStringPattern(ctypes.Structure):
 
 
  ### <a name="Vec">**Vec**</a>
+
 
 #### Fields 
 - **x** -  
@@ -373,6 +385,7 @@ class Vec(ctypes.Structure):
 
  ### <a name="Vec1">**Vec1**</a>
 
+
 #### Fields 
 - **x** -  
 - **y** -  
@@ -395,6 +408,7 @@ class Vec1(ctypes.Structure):
 
  ### <a name="Vec2">**Vec2**</a>
 
+
 #### Fields 
 - **x** -  
 - **z** -  
@@ -416,6 +430,7 @@ class Vec2(ctypes.Structure):
 
 
  ### <a name="Vec3f32">**Vec3f32**</a>
+
 
 #### Fields 
 - **x** -  
@@ -441,6 +456,7 @@ class Vec3f32(ctypes.Structure):
 
  ### <a name="Visibility1">**Visibility1**</a>
 
+
 #### Fields 
 - **pblc** -  
 - **prvt** -  
@@ -462,6 +478,7 @@ class Visibility1(ctypes.Structure):
 
 
  ### <a name="Visibility2">**Visibility2**</a>
+
 
 #### Fields 
 - **pblc1** -  
@@ -485,6 +502,7 @@ class Visibility2(ctypes.Structure):
 
  ### <a name="Weird1u32">**Weird1u32**</a>
 
+
 #### Fields 
 - **x** -  
 #### Definition 
@@ -504,6 +522,7 @@ class Weird1u32(ctypes.Structure):
 
 
  ### <a name="Weird2u8">**Weird2u8**</a>
+
 
 #### Fields 
 - **t** -  
@@ -529,9 +548,11 @@ class Weird2u8(ctypes.Structure):
 
  ### <a name="SliceBool">**SliceBool**</a>
 
+A pointer to an array of data someone else owns which may not be modified.
+
 #### Fields 
-- **data** -  
-- **len** -  
+- **data** - Pointer to start of immutable data. 
+- **len** - Number of elements. 
 #### Definition 
 ```python
 class SliceBool(ctypes.Structure):
@@ -551,9 +572,11 @@ class SliceBool(ctypes.Structure):
 
  ### <a name="SliceUseAsciiStringPattern">**SliceUseAsciiStringPattern**</a>
 
+A pointer to an array of data someone else owns which may not be modified.
+
 #### Fields 
-- **data** -  
-- **len** -  
+- **data** - Pointer to start of immutable data. 
+- **len** - Number of elements. 
 #### Definition 
 ```python
 class SliceUseAsciiStringPattern(ctypes.Structure):
@@ -573,9 +596,11 @@ class SliceUseAsciiStringPattern(ctypes.Structure):
 
  ### <a name="SliceVec3f32">**SliceVec3f32**</a>
 
+A pointer to an array of data someone else owns which may not be modified.
+
 #### Fields 
-- **data** -  
-- **len** -  
+- **data** - Pointer to start of immutable data. 
+- **len** - Number of elements. 
 #### Definition 
 ```python
 class SliceVec3f32(ctypes.Structure):
@@ -595,9 +620,11 @@ class SliceVec3f32(ctypes.Structure):
 
  ### <a name="Sliceu32">**Sliceu32**</a>
 
+A pointer to an array of data someone else owns which may not be modified.
+
 #### Fields 
-- **data** -  
-- **len** -  
+- **data** - Pointer to start of immutable data. 
+- **len** - Number of elements. 
 #### Definition 
 ```python
 class Sliceu32(ctypes.Structure):
@@ -617,9 +644,11 @@ class Sliceu32(ctypes.Structure):
 
  ### <a name="Sliceu8">**Sliceu8**</a>
 
+A pointer to an array of data someone else owns which may not be modified.
+
 #### Fields 
-- **data** -  
-- **len** -  
+- **data** - Pointer to start of immutable data. 
+- **len** - Number of elements. 
 #### Definition 
 ```python
 class Sliceu8(ctypes.Structure):
@@ -639,8 +668,10 @@ class Sliceu8(ctypes.Structure):
 
  ### <a name="OptionInner">**OptionInner**</a>
 
+Option type containing boolean flag and maybe valid data.
+
 #### Fields 
-- **t** - Element that is maybe valid.. 
+- **t** - Element that is maybe valid. 
 - **is_some** - Byte where `1` means element `t` is valid. 
 #### Definition 
 ```python

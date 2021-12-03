@@ -23,9 +23,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 1232667826795359750ul)
+            if (api_version != 10722219666297254147ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (1232667826795359750). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (10722219666297254147). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -1075,14 +1075,17 @@ namespace My.Company
         Fail = 300,
     }
 
+    ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public partial struct SliceUseAsciiStringPattern
     {
+        ///Pointer to start of immutable data.
         #if UNITY_2018_1_OR_NEWER
         [NativeDisableUnsafePtrRestriction]
         #endif
         IntPtr data;
+        ///Number of elements.
         ulong len;
     }
 
@@ -1144,14 +1147,17 @@ namespace My.Company
     }
 
 
+    ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public partial struct SliceVec3f32
     {
+        ///Pointer to start of immutable data.
         #if UNITY_2018_1_OR_NEWER
         [NativeDisableUnsafePtrRestriction]
         #endif
         IntPtr data;
+        ///Number of elements.
         ulong len;
     }
 
@@ -1228,11 +1234,12 @@ namespace My.Company
     }
 
 
+    ///Option type containing boolean flag and maybe valid data.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public partial struct OptionInner
     {
-        ///Element that is maybe valid..
+        ///Element that is maybe valid.
         Inner t;
         ///Byte where `1` means element `t` is valid.
         byte is_some;
