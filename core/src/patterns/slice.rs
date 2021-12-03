@@ -38,7 +38,7 @@
 //! ```
 //!
 
-use crate::lang::c::{CType, CompositeType, Documentation, Field, PrimitiveType, Visibility};
+use crate::lang::c::{CType, CompositeType, Documentation, Field, Meta, PrimitiveType, Visibility};
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::TypePattern;
 use std::marker::PhantomData;
@@ -119,14 +119,17 @@ where
 {
     #[rustfmt::skip]
     fn type_info() -> CType {
+        let doc_data = Documentation::from_line("Pointer to start of immutable data.");
+        let doc_len = Documentation::from_line("Number of elements.");
+
         let fields = vec![
-            Field::with_documentation("data".to_string(), CType::ReadPointer(Box::new(T::type_info())), Visibility::Private, Documentation::new()),
-            Field::with_documentation("len".to_string(), CType::Primitive(PrimitiveType::U64), Visibility::Private, Documentation::new()),
+            Field::with_documentation("data".to_string(), CType::ReadPointer(Box::new(T::type_info())), Visibility::Private, doc_data),
+            Field::with_documentation("len".to_string(), CType::Primitive(PrimitiveType::U64), Visibility::Private, doc_len),
         ];
 
-        // let namespace = if is_global_type(&T::type_info()) { "_global" } else { "" };
-        // let meta = Meta::with_namespace_documentation(namespace.to_string(), Documentation::new());
-        let composite = CompositeType::new(format!("Slice{}", T::type_info().name_within_lib()), fields);
+        let doc = Documentation::from_line("A pointer to an array of data someone else owns which may not be modified.");
+        let meta = Meta::with_namespace_documentation(String::new(), doc);
+        let composite = CompositeType::with_meta(format!("Slice{}", T::type_info().name_within_lib()), fields, meta);
         CType::Pattern(TypePattern::Slice(composite))
     }
 }
@@ -225,14 +228,16 @@ where
 {
     #[rustfmt::skip]
     fn type_info() -> CType {
+        let doc_data = Documentation::from_line("Pointer to start of mutable data.");
+        let doc_len = Documentation::from_line("Number of elements.");
         let fields = vec![
-            Field::with_documentation("data".to_string(), CType::ReadPointer(Box::new(T::type_info())), Visibility::Private, Documentation::new()),
-            Field::with_documentation("len".to_string(), CType::Primitive(PrimitiveType::U64), Visibility::Private, Documentation::new()),
+            Field::with_documentation("data".to_string(), CType::ReadPointer(Box::new(T::type_info())), Visibility::Private, doc_data),
+            Field::with_documentation("len".to_string(), CType::Primitive(PrimitiveType::U64), Visibility::Private, doc_len),
         ];
 
-        // let namespace = if is_global_type(&T::type_info()) { "_global" } else { "" };
-        // let meta = Meta::with_namespace_documentation(namespace.to_string(), Documentation::new());
-        let composite = CompositeType::new(format!("SliceMut{}", T::type_info().name_within_lib()), fields);
+        let doc = Documentation::from_line("A pointer to an array of data someone else owns which may be modified.");
+        let meta = Meta::with_namespace_documentation(String::new(), doc);
+        let composite = CompositeType::with_meta(format!("SliceMut{}", T::type_info().name_within_lib()), fields, meta);
         CType::Pattern(TypePattern::SliceMut(composite))
     }
 }

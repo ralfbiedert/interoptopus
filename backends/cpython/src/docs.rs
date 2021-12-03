@@ -1,8 +1,7 @@
 use crate::writer::WriteFor;
 use crate::{DocConfig, PythonWriter};
-use interoptopus::lang::c::{CType, Function};
+use interoptopus::lang::c::{CType, CompositeType, Function};
 use interoptopus::patterns::{LibraryPattern, TypePattern};
-use interoptopus::util::longest_common_prefix;
 use interoptopus::writer::IndentWriter;
 use interoptopus::{indented, non_service_functions};
 use interoptopus::{Error, Library};
@@ -52,7 +51,7 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
         for pattern in self.library.patterns().iter().filter_map(|x| match x {
             LibraryPattern::Service(s) => Some(s),
         }) {
-            let prefix = longest_common_prefix(pattern.methods());
+            let prefix = pattern.common_prefix();
             let doc = pattern.the_type().meta().documentation().lines().first().cloned().unwrap_or_default();
             let name = pattern.the_type().rust_name();
 
@@ -111,40 +110,46 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
         indented!(w, r#"# Types "#)?;
 
         for the_type in self.library().ctypes() {
-            let composite = match the_type {
-                CType::Composite(e) => e.clone(),
-                CType::Pattern(p @ TypePattern::Option(_)) => p.fallback_type().as_composite_type().cloned().unwrap(),
-                CType::Pattern(p @ TypePattern::Slice(_)) => p.fallback_type().as_composite_type().cloned().unwrap(),
+            match the_type {
+                CType::Composite(e) => self.write_composite(w, e)?,
+                CType::Pattern(p @ TypePattern::Option(_)) => self.write_composite(w, p.fallback_type().as_composite_type().unwrap())?,
+                CType::Pattern(p @ TypePattern::Slice(_)) => self.write_composite(w, p.fallback_type().as_composite_type().unwrap())?,
                 _ => continue,
             };
-
-            let meta = composite.meta();
-
-            w.newline()?;
-            w.newline()?;
-
-            indented!(w, r#" ### <a name="{}">**{}**</a>"#, the_type.name_within_lib(), the_type.name_within_lib())?;
-            w.newline()?;
-
-            for line in meta.documentation().lines() {
-                indented!(w, r#"{}"#, line.trim())?;
-            }
-
-            indented!(w, r#"#### Fields "#)?;
-            for f in composite.fields() {
-                let doc = f.documentation().lines().join("\n");
-                indented!(w, r#"- **{}** - {} "#, f.name(), doc)?;
-            }
-
-            indented!(w, r#"#### Definition "#)?;
-            indented!(w, r#"```python"#)?;
-            self.python_writer.write_struct(w, &composite, WriteFor::Docs)?;
-            indented!(w, r#"```"#)?;
 
             w.newline()?;
             indented!(w, r#"---"#)?;
             w.newline()?;
         }
+
+        Ok(())
+    }
+
+    pub fn write_composite(&self, w: &mut IndentWriter, composite: &CompositeType) -> Result<(), Error> {
+        let meta = composite.meta();
+
+        w.newline()?;
+        w.newline()?;
+
+        indented!(w, r#" ### <a name="{}">**{}**</a>"#, composite.rust_name(), composite.rust_name())?;
+        w.newline()?;
+
+        for line in meta.documentation().lines() {
+            indented!(w, r#"{}"#, line.trim())?;
+        }
+
+        w.newline()?;
+
+        indented!(w, r#"#### Fields "#)?;
+        for f in composite.fields() {
+            let doc = f.documentation().lines().join("\n");
+            indented!(w, r#"- **{}** - {} "#, f.name(), doc)?;
+        }
+
+        indented!(w, r#"#### Definition "#)?;
+        indented!(w, r#"```python"#)?;
+        self.python_writer.write_struct(w, &composite, WriteFor::Docs)?;
+        indented!(w, r#"```"#)?;
 
         Ok(())
     }
@@ -226,7 +231,7 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
         for pattern in self.library.patterns().iter().filter_map(|x| match x {
             LibraryPattern::Service(s) => Some(s),
         }) {
-            let prefix = longest_common_prefix(pattern.methods());
+            let prefix = pattern.common_prefix();
             let doc = pattern.the_type().meta().documentation().lines();
             let class_name = pattern.the_type().rust_name();
 

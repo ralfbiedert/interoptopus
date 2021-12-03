@@ -114,6 +114,7 @@
 
 use crate::lang::c::{CType, Function, OpaqueType};
 use crate::patterns::TypePattern;
+use crate::util::longest_common_prefix;
 use std::fmt::Debug;
 
 /// Combines a receiver, constructor, destructor and multiple methods in one entity.
@@ -220,6 +221,13 @@ impl Service {
 
     pub fn methods(&self) -> &[Function] {
         &self.methods
+    }
+
+    /// Returns the longest common prefix all methods of this service share.
+    pub fn common_prefix(&self) -> String {
+        let mut all_methods = self.methods().to_vec();
+        all_methods.extend_from_slice(self.constructors());
+        longest_common_prefix(all_methods.as_slice())
     }
 }
 

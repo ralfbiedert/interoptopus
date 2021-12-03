@@ -195,7 +195,9 @@ namespace My.Company.Common
     [StructLayout(LayoutKind.Sequential)]
     public partial struct SliceMutu32
     {
+        ///Pointer to start of mutable data.
         IntPtr data;
+        ///Number of elements.
         ulong len;
     }
 
@@ -258,7 +260,9 @@ namespace My.Company.Common
     [StructLayout(LayoutKind.Sequential)]
     public partial struct SliceMutu8
     {
+        ///Pointer to start of mutable data.
         IntPtr data;
+        ///Number of elements.
         ulong len;
     }
 

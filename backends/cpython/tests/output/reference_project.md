@@ -640,8 +640,8 @@ class Sliceu8(ctypes.Structure):
  ### <a name="OptionInner">**OptionInner**</a>
 
 #### Fields 
-- **t** -  
-- **is_some** -  
+- **t** - Element that is maybe valid.. 
+- **is_some** - Byte where `1` means element `t` is valid. 
 #### Definition 
 ```python
 class OptionInner(ctypes.Structure):

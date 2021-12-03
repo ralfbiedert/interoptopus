@@ -27,7 +27,7 @@
 //! void set_value(optionu8 x);
 //! ```
 //!
-use crate::lang::c::{CType, CompositeType, Documentation, Field, PrimitiveType, Visibility};
+use crate::lang::c::{CType, CompositeType, Documentation, Field, Meta, PrimitiveType, Visibility};
 use crate::lang::rust::CTypeInfo;
 
 use crate::patterns::primitives::FFIBool;
@@ -136,14 +136,17 @@ where
     T: CTypeInfo,
 {
     fn type_info() -> CType {
+        let doc_t = Documentation::from_line("Element that is maybe valid.");
+        let doc_is_some = Documentation::from_line("Byte where `1` means element `t` is valid.");
+
         let fields = vec![
-            Field::with_documentation("t".to_string(), T::type_info(), Visibility::Private, Documentation::new()),
-            Field::with_documentation("is_some".to_string(), CType::Primitive(PrimitiveType::U8), Visibility::Private, Documentation::new()),
+            Field::with_documentation("t".to_string(), T::type_info(), Visibility::Private, doc_t),
+            Field::with_documentation("is_some".to_string(), CType::Primitive(PrimitiveType::U8), Visibility::Private, doc_is_some),
         ];
 
-        // let namespace = if is_global_type(&T::type_info()) { "_global" } else { "" };
-        // let meta = Meta::with_namespace_documentation(namespace.to_string(), Documentation::new());
-        let composite = CompositeType::new(format!("Option{}", T::type_info().name_within_lib()), fields);
+        let doc = Documentation::from_line("Option type containing boolean flag and maybe valid data.");
+        let meta = Meta::with_namespace_documentation(String::new(), doc);
+        let composite = CompositeType::with_meta(format!("Option{}", T::type_info().name_within_lib()), fields, meta);
         CType::Pattern(TypePattern::Option(composite))
     }
 }

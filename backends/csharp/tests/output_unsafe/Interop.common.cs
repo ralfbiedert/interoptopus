@@ -284,10 +284,12 @@ namespace My.Company.Common
     [StructLayout(LayoutKind.Sequential)]
     public partial struct SliceMutu32
     {
+        ///Pointer to start of mutable data.
         #if UNITY_2018_1_OR_NEWER
         [NativeDisableUnsafePtrRestriction]
         #endif
         IntPtr data;
+        ///Number of elements.
         ulong len;
     }
 
@@ -377,10 +379,12 @@ namespace My.Company.Common
     [StructLayout(LayoutKind.Sequential)]
     public partial struct SliceMutu8
     {
+        ///Pointer to start of mutable data.
         #if UNITY_2018_1_OR_NEWER
         [NativeDisableUnsafePtrRestriction]
         #endif
         IntPtr data;
+        ///Number of elements.
         ulong len;
     }
 

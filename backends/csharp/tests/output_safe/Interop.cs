@@ -18,9 +18,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 8521182769715904968ul)
+            if (api_version != 1232667826795359750ul)
             {
-                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (8521182769715904968). You probably forgot to update / copy either the bindings or the library.");
+                throw new Exception($"API reports hash {api_version} which differs from hash in bindings (1232667826795359750). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -992,7 +992,9 @@ namespace My.Company
     [StructLayout(LayoutKind.Sequential)]
     public partial struct OptionInner
     {
+        ///Element that is maybe valid..
         Inner t;
+        ///Byte where `1` means element `t` is valid.
         byte is_some;
     }
 
