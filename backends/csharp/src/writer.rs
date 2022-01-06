@@ -1,6 +1,7 @@
 use crate::config::{Config, Unsafe, WriteTypes};
 use crate::converter::{CSharpTypeConverter, Converter};
 use crate::overloads::{Helper, OverloadWriter};
+use heck::ToLowerCamelCase;
 use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, Meta, PrimitiveType, Variant, Visibility};
 use interoptopus::patterns::api_guard::library_hash;
 use interoptopus::patterns::callbacks::NamedCallback;
@@ -164,7 +165,7 @@ pub trait CSharpWriter {
 
     fn write_function_declaration(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
         let rval = self.converter().function_rval_to_csharp_typename(function);
-        let name = self.converter().function_name_to_csharp_name(function);
+        let name = self.converter().function_name_to_csharp_name(function, self.config().rename_symbols);
 
         let mut params = Vec::new();
         for (_, p) in function.signature().params().iter().enumerate() {
@@ -377,7 +378,11 @@ pub trait CSharpWriter {
                     panic!("Unable to generate bindings for arrays in fields if `unroll_struct_arrays` is not enabled.");
                 }
 
-                let field_name = field.name();
+                let field_name = if self.config().rename_symbols {
+                    field.name().to_lower_camel_case()
+                } else {
+                    field.name().into()
+                };
                 let type_name = self.converter().to_typespecifier_in_field(a.array_type(), field, the_type);
                 let visibility = match field.visibility() {
                     Visibility::Public => "public ",
@@ -391,7 +396,11 @@ pub trait CSharpWriter {
                 Ok(())
             }
             _ => {
-                let field_name = field.name();
+                let field_name = if self.config().rename_symbols {
+                    field.name().to_lower_camel_case()
+                } else {
+                    field.name().into()
+                };
                 let type_name = self.converter().to_typespecifier_in_field(field.the_type(), field, the_type);
                 let visibility = match field.visibility() {
                     Visibility::Public => "public ",

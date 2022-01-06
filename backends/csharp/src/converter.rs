@@ -1,3 +1,4 @@
+use heck::ToUpperCamelCase;
 use interoptopus::lang::c::{
     CType, CompositeType, ConstantValue, EnumType, Field, FnPointerType, Function, FunctionSignature, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
 };
@@ -199,8 +200,12 @@ pub trait CSharpTypeConverter {
         self.to_typespecifier_in_rval(function.signature().rval())
     }
 
-    fn function_name_to_csharp_name(&self, function: &Function) -> String {
-        function.name().to_string()
+    fn function_name_to_csharp_name(&self, function: &Function, rename_symbols: bool) -> String {
+        if rename_symbols {
+            function.name().to_upper_camel_case()
+        } else {
+            function.name().to_string()
+        }
     }
 }
 

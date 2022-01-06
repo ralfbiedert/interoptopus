@@ -117,7 +117,7 @@ impl OverloadWriter for DotNet {
         let mut to_pin_name = Vec::new();
         let mut to_pin_slice_type = Vec::new();
         let mut to_invoke = Vec::new();
-        let raw_name = h.converter.function_name_to_csharp_name(function);
+        let raw_name = h.converter.function_name_to_csharp_name(function, h.config.rename_symbols);
         let this_name = if has_error_enum && !has_overload {
             format!("{}_checked", raw_name)
         } else {

@@ -66,6 +66,9 @@ pub struct Config {
     pub write_types: WriteTypes,
     /// If enabled bindings will use C# `unsafe` for increased performance; but will need to be enabled in C# project settings to work.
     pub use_unsafe: Unsafe,
+    // Change the symbolic names of functions and fields to be exported according to the backend naming conventions
+    // Currently, only the C# backend is supported.
+    pub rename_symbols: bool,
     /// Also generate markers for easier debugging
     pub debug: bool,
 }
@@ -84,6 +87,7 @@ impl Default for Config {
             unroll_struct_arrays: false,
             write_types: WriteTypes::NamespaceAndInteroptopusGlobal,
             use_unsafe: Unsafe::None,
+            rename_symbols: false,
             debug: false,
         }
     }
