@@ -108,7 +108,7 @@ impl Unity {
 
     fn write_function_delegate_overload_helper(&self, w: &mut IndentWriter, h: &Helper, function: &Function) -> Result<(), Error> {
         let rval = h.converter.function_rval_to_csharp_typename(function);
-        let name = h.converter.function_name_to_csharp_name(function);
+        let name = h.converter.function_name_to_csharp_name(function, h.config.rename_symbols);
 
         let mut params = Vec::new();
         for (_, p) in function.signature().params().iter().enumerate() {
@@ -192,7 +192,7 @@ impl OverloadWriter for Unity {
         let mut to_pin_name = Vec::new();
         let mut to_pin_slice_type = Vec::new();
         let mut to_invoke = Vec::new();
-        let raw_name = h.converter.function_name_to_csharp_name(function);
+        let raw_name = h.converter.function_name_to_csharp_name(function, h.config.rename_symbols);
         let this_name = if has_error_enum && !has_overload {
             format!("{}_checked", raw_name)
         } else {
