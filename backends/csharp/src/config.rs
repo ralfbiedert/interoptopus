@@ -66,8 +66,7 @@ pub struct Config {
     pub write_types: WriteTypes,
     /// If enabled bindings will use C# `unsafe` for increased performance; but will need to be enabled in C# project settings to work.
     pub use_unsafe: Unsafe,
-    // Change the symbolic names of functions and fields to be exported according to the backend naming conventions
-    // Currently, only the C# backend is supported.
+    /// Generate functions and field names matching C# conventions, instead of mapping them 1:1 with Rust.
     pub rename_symbols: bool,
     /// Also generate markers for easier debugging
     pub debug: bool,
