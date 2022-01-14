@@ -3,7 +3,7 @@ use interoptopus::util::NamespaceMappings;
 use interoptopus::Error;
 use interoptopus::Interop;
 use interoptopus_backend_csharp::overloads::{DotNet, Unity};
-use interoptopus_backend_csharp::{run_dotnet_command_if_installed, Unsafe, WriteTypes};
+use interoptopus_backend_csharp::{run_dotnet_command_if_installed, CSharpVisibility, Unsafe, WriteTypes};
 
 fn generate_bindings_multi(prefix: &str, use_unsafe: Unsafe) -> Result<(), Error> {
     use interoptopus_backend_csharp::{Config, Generator};
@@ -15,7 +15,7 @@ fn generate_bindings_multi(prefix: &str, use_unsafe: Unsafe) -> Result<(), Error
         dll_name: "interoptopus_reference_project".to_string(),
         namespace_mappings,
         unroll_struct_arrays: true,
-        emit_rust_visibility: true,
+        emit_rust_visibility: CSharpVisibility::AsDeclared,
         use_unsafe,
         // debug: true,
         ..Config::default()
