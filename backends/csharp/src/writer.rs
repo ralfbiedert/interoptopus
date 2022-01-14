@@ -256,13 +256,13 @@ pub trait CSharpWriter {
 
         indented!(w, r#"[Serializable]"#)?;
         indented!(w, r#"[StructLayout(LayoutKind.Sequential)]"#)?;
-        indented!(w, r#"public partial struct {}"#, type_name)?;
+        indented!(w, r#"{} partial struct {}"#, self.config().emit_rust_visibility.to_access_modifier(), type_name)?;
         indented!(w, r#"{{"#)?;
         indented!(w, [_], r#"byte value;"#)?;
         indented!(w, r#"}}"#)?;
         w.newline()?;
 
-        indented!(w, r#"public partial struct {}"#, type_name)?;
+        indented!(w, r#"{} partial struct {}"#, self.config().emit_rust_visibility.to_access_modifier(), type_name)?;
         indented!(w, r#"{{"#)?;
         indented!(w, [_], r#"public static readonly {} True = new Bool {{ value =  1 }};"#, type_name)?;
         indented!(w, [_], r#"public static readonly {} False = new Bool {{ value =  0 }};"#, type_name)?;
@@ -353,7 +353,12 @@ pub trait CSharpWriter {
     }
 
     fn write_type_definition_composite_body(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
-        indented!(w, r#"public partial struct {}"#, the_type.rust_name())?;
+        indented!(
+            w,
+            r#"{} partial struct {}"#,
+            self.config().emit_rust_visibility.to_access_modifier(),
+            the_type.rust_name()
+        )?;
         indented!(w, r#"{{"#)?;
         w.indent();
 
@@ -435,7 +440,12 @@ pub trait CSharpWriter {
 
     fn write_class_context(&self, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) -> Result<(), Error> {
         self.debug(w, "write_class_context")?;
-        indented!(w, r#"public static partial class {}"#, self.config().class)?;
+        indented!(
+            w,
+            r#"{} static partial class {}"#,
+            self.config().emit_rust_visibility.to_access_modifier(),
+            self.config().class
+        )?;
         indented!(w, r#"{{"#)?;
         w.indent();
 
@@ -520,7 +530,12 @@ pub trait CSharpWriter {
 
         let type_string = self.converter().to_typespecifier_in_rval(data_type);
 
-        indented!(w, r#"public partial struct {}"#, context_type_name)?;
+        indented!(
+            w,
+            r#"{} partial struct {}"#,
+            self.config().emit_rust_visibility.to_access_modifier(),
+            context_type_name
+        )?;
         indented!(w, r#"{{"#)?;
 
         // FromNullable
@@ -564,7 +579,13 @@ pub trait CSharpWriter {
         let type_string = self.converter().to_typespecifier_in_rval(data_type);
         let is_blittable = self.converter().is_blittable(data_type);
 
-        indented!(w, r#"public partial struct {} : IEnumerable<{}>"#, context_type_name, type_string)?;
+        indented!(
+            w,
+            r#"{} partial struct {} : IEnumerable<{}>"#,
+            self.config().emit_rust_visibility.to_access_modifier(),
+            context_type_name,
+            type_string
+        )?;
         indented!(w, r#"{{"#)?;
 
         // Ctor
@@ -679,7 +700,13 @@ pub trait CSharpWriter {
 
         let type_string = self.converter().to_typespecifier_in_rval(data_type);
 
-        indented!(w, r#"public partial struct {} : IEnumerable<{}>"#, context_type_name, type_string)?;
+        indented!(
+            w,
+            r#"{} partial struct {} : IEnumerable<{}>"#,
+            self.config().emit_rust_visibility.to_access_modifier(),
+            context_type_name,
+            type_string
+        )?;
         indented!(w, r#"{{"#)?;
 
         // Ctor
@@ -804,7 +831,12 @@ pub trait CSharpWriter {
         let common_prefix = longest_common_prefix(&all_functions);
 
         self.write_documentation(w, class.the_type().meta().documentation())?;
-        indented!(w, r#"public partial class {} : IDisposable"#, context_type_name)?;
+        indented!(
+            w,
+            r#"{} partial class {} : IDisposable"#,
+            self.config().emit_rust_visibility.to_access_modifier(),
+            context_type_name
+        )?;
         indented!(w, r#"{{"#)?;
         w.indent();
         indented!(w, r#"private IntPtr _context;"#)?;
