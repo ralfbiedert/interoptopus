@@ -256,13 +256,13 @@ pub trait CSharpWriter {
 
         indented!(w, r#"[Serializable]"#)?;
         indented!(w, r#"[StructLayout(LayoutKind.Sequential)]"#)?;
-        indented!(w, r#"{} partial struct {}"#, self.config().emit_rust_visibility.to_access_modifier(), type_name)?;
+        indented!(w, r#"{} partial struct {}"#, self.config().visibility_types.to_access_modifier(), type_name)?;
         indented!(w, r#"{{"#)?;
         indented!(w, [_], r#"byte value;"#)?;
         indented!(w, r#"}}"#)?;
         w.newline()?;
 
-        indented!(w, r#"{} partial struct {}"#, self.config().emit_rust_visibility.to_access_modifier(), type_name)?;
+        indented!(w, r#"{} partial struct {}"#, self.config().visibility_types.to_access_modifier(), type_name)?;
         indented!(w, r#"{{"#)?;
         indented!(w, [_], r#"public static readonly {} True = new Bool {{ value =  1 }};"#, type_name)?;
         indented!(w, [_], r#"public static readonly {} False = new Bool {{ value =  0 }};"#, type_name)?;
@@ -356,7 +356,7 @@ pub trait CSharpWriter {
         indented!(
             w,
             r#"{} partial struct {}"#,
-            self.config().emit_rust_visibility.to_access_modifier(),
+            self.config().visibility_types.to_access_modifier(),
             the_type.rust_name()
         )?;
         indented!(w, r#"{{"#)?;
@@ -443,7 +443,7 @@ pub trait CSharpWriter {
         indented!(
             w,
             r#"{} static partial class {}"#,
-            self.config().emit_rust_visibility.to_access_modifier(),
+            self.config().visibility_types.to_access_modifier(),
             self.config().class
         )?;
         indented!(w, r#"{{"#)?;
@@ -530,12 +530,7 @@ pub trait CSharpWriter {
 
         let type_string = self.converter().to_typespecifier_in_rval(data_type);
 
-        indented!(
-            w,
-            r#"{} partial struct {}"#,
-            self.config().emit_rust_visibility.to_access_modifier(),
-            context_type_name
-        )?;
+        indented!(w, r#"{} partial struct {}"#, self.config().visibility_types.to_access_modifier(), context_type_name)?;
         indented!(w, r#"{{"#)?;
 
         // FromNullable
@@ -582,7 +577,7 @@ pub trait CSharpWriter {
         indented!(
             w,
             r#"{} partial struct {} : IEnumerable<{}>"#,
-            self.config().emit_rust_visibility.to_access_modifier(),
+            self.config().visibility_types.to_access_modifier(),
             context_type_name,
             type_string
         )?;
@@ -703,7 +698,7 @@ pub trait CSharpWriter {
         indented!(
             w,
             r#"{} partial struct {} : IEnumerable<{}>"#,
-            self.config().emit_rust_visibility.to_access_modifier(),
+            self.config().visibility_types.to_access_modifier(),
             context_type_name,
             type_string
         )?;
@@ -834,7 +829,7 @@ pub trait CSharpWriter {
         indented!(
             w,
             r#"{} partial class {} : IDisposable"#,
-            self.config().emit_rust_visibility.to_access_modifier(),
+            self.config().visibility_types.to_access_modifier(),
             context_type_name
         )?;
         indented!(w, r#"{{"#)?;

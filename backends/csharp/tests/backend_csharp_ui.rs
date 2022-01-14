@@ -15,7 +15,7 @@ fn generate_bindings_multi(prefix: &str, use_unsafe: Unsafe) -> Result<(), Error
         dll_name: "interoptopus_reference_project".to_string(),
         namespace_mappings,
         unroll_struct_arrays: true,
-        emit_rust_visibility: CSharpVisibility::AsDeclared,
+        visibility_types: CSharpVisibility::AsDeclared,
         use_unsafe,
         // debug: true,
         ..Config::default()
