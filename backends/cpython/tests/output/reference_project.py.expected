@@ -979,6 +979,14 @@ class SliceBool(ctypes.Structure):
         """Convenience method returning a value iterator."""
         return iter(self)
 
+    def first(self):
+        """Returns the first element of this slice."""
+        return self[0]
+
+    def last(self):
+        """Returns the last element of this slice."""
+        return self[len(self)-1]
+
 
 class Sliceu32(ctypes.Structure):
     # These fields represent the underlying C data layout
@@ -1013,6 +1021,14 @@ class Sliceu32(ctypes.Structure):
         """Convenience method returning a value iterator."""
         return iter(self)
 
+    def first(self) -> int:
+        """Returns the first element of this slice."""
+        return self[0]
+
+    def last(self) -> int:
+        """Returns the last element of this slice."""
+        return self[len(self)-1]
+
 
 class Sliceu8(ctypes.Structure):
     # These fields represent the underlying C data layout
@@ -1046,6 +1062,21 @@ class Sliceu8(ctypes.Structure):
     def iter(self) -> typing.Iterable[ctypes.c_uint8]:
         """Convenience method returning a value iterator."""
         return iter(self)
+
+    def first(self) -> int:
+        """Returns the first element of this slice."""
+        return self[0]
+
+    def last(self) -> int:
+        """Returns the last element of this slice."""
+        return self[len(self)-1]
+
+    def bytearray(self):
+        """Returns a bytearray with the content of this slice."""
+        rval = bytearray(len(self))
+        for i in range(len(self)):
+            rval[i] = self[i]
+        return rval
 
 
 class SliceMutu32(ctypes.Structure):
@@ -1084,6 +1115,14 @@ class SliceMutu32(ctypes.Structure):
         """Convenience method returning a value iterator."""
         return iter(self)
 
+    def first(self) -> int:
+        """Returns the first element of this slice."""
+        return self[0]
+
+    def last(self) -> int:
+        """Returns the last element of this slice."""
+        return self[len(self)-1]
+
 
 class SliceMutu8(ctypes.Structure):
     # These fields represent the underlying C data layout
@@ -1120,6 +1159,21 @@ class SliceMutu8(ctypes.Structure):
     def iter(self) -> typing.Iterable[ctypes.c_uint8]:
         """Convenience method returning a value iterator."""
         return iter(self)
+
+    def first(self) -> int:
+        """Returns the first element of this slice."""
+        return self[0]
+
+    def last(self) -> int:
+        """Returns the last element of this slice."""
+        return self[len(self)-1]
+
+    def bytearray(self):
+        """Returns a bytearray with the content of this slice."""
+        rval = bytearray(len(self))
+        for i in range(len(self)):
+            rval[i] = self[i]
+        return rval
 
 
 class OptionInner(ctypes.Structure):
@@ -1180,6 +1234,14 @@ class SliceUseAsciiStringPattern(ctypes.Structure):
         """Convenience method returning a value iterator."""
         return iter(self)
 
+    def first(self) -> UseAsciiStringPattern:
+        """Returns the first element of this slice."""
+        return self[0]
+
+    def last(self) -> UseAsciiStringPattern:
+        """Returns the last element of this slice."""
+        return self[len(self)-1]
+
 
 class SliceVec3f32(ctypes.Structure):
     # These fields represent the underlying C data layout
@@ -1213,6 +1275,14 @@ class SliceVec3f32(ctypes.Structure):
     def iter(self) -> typing.Iterable[Vec3f32]:
         """Convenience method returning a value iterator."""
         return iter(self)
+
+    def first(self) -> Vec3f32:
+        """Returns the first element of this slice."""
+        return self[0]
+
+    def last(self) -> Vec3f32:
+        """Returns the last element of this slice."""
+        return self[len(self)-1]
 
 
 

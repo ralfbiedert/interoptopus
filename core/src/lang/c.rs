@@ -131,11 +131,28 @@ impl Default for CType {
 
 impl CType {
     pub fn size_of(&self) -> usize {
-        123
+        match self {
+            CType::Primitive(p) => match p {
+                PrimitiveType::Void => 0,
+                PrimitiveType::Bool => 1,
+                PrimitiveType::U8 => 1,
+                PrimitiveType::U16 => 2,
+                PrimitiveType::U32 => 4,
+                PrimitiveType::U64 => 8,
+                PrimitiveType::I8 => 1,
+                PrimitiveType::I16 => 2,
+                PrimitiveType::I32 => 4,
+                PrimitiveType::I64 => 8,
+                PrimitiveType::F32 => 4,
+                PrimitiveType::F64 => 8,
+            },
+            // TODO
+            _ => 999,
+        }
     }
 
     pub fn align_of(&self) -> usize {
-        456
+        unimplemented!()
     }
 
     pub const fn void() -> Self {

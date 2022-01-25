@@ -346,6 +346,26 @@ pub trait PythonWriter {
         indented!(w, [_], r#"def iter(self) -> typing.Iterable[{}]:"#, data_type_python)?;
         indented!(w, [_ _], r#""""Convenience method returning a value iterator.""""#)?;
         indented!(w, [_ _], r#"return iter(self)"#)?;
+        w.newline()?;
+        indented!(w, [_], r#"def first(self){}:"#, hint_out)?;
+        indented!(w, [_ _], r#""""Returns the first element of this slice.""""#)?;
+        indented!(w, [_ _], r#"return self[0]"#)?;
+        w.newline()?;
+        indented!(w, [_], r#"def last(self){}:"#, hint_out)?;
+        indented!(w, [_ _], r#""""Returns the last element of this slice.""""#)?;
+        indented!(w, [_ _], r#"return self[len(self)-1]"#)?;
+
+        // Only write this for byte-like types right now
+        if data_type.size_of() == 1 {
+            w.newline()?;
+            indented!(w, [_], r#"def bytearray(self):"#)?;
+            indented!(w, [_ _], r#""""Returns a bytearray with the content of this slice.""""#)?;
+            indented!(w, [_ _], r#"rval = bytearray(len(self))"#)?;
+            indented!(w, [_ _], r#"for i in range(len(self)):"#)?;
+            indented!(w, [_ _ _], r#"rval[i] = self[i]"#)?;
+            indented!(w, [_ _], r#"return rval"#)?;
+        }
+
         Ok(())
     }
 
