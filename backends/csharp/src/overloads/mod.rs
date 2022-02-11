@@ -154,7 +154,7 @@ fn write_common_service_method_overload<FPatternMap: Fn(&Helper, &Parameter) -> 
         types.push(native);
     }
 
-    let method_to_invoke = function.name().to_string();
+    let method_to_invoke = h.converter.function_name_to_csharp_name(function, h.config.rename_symbols);
     let extra_args = if to_invoke.is_empty() {
         "".to_string()
     } else {

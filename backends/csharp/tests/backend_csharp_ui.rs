@@ -17,6 +17,7 @@ fn generate_bindings_multi(prefix: &str, use_unsafe: Unsafe) -> Result<(), Error
         unroll_struct_arrays: true,
         visibility_types: CSharpVisibility::AsDeclared,
         use_unsafe,
+        // rename_symbols: true,
         // debug: true,
         ..Config::default()
     };

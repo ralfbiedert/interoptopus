@@ -190,7 +190,9 @@ impl OverloadWriter for DotNet {
                 }
             }
 
-            let call = format!(r#"{}({});"#, raw_name, to_invoke.join(", "));
+            let fn_name = h.converter.function_name_to_csharp_name(function, h.config.rename_symbols);
+            let call = format!(r#"{}({});"#, fn_name, to_invoke.join(", "));
+
             write_function_overloaded_invoke_with_error_handling(w, function, &call)?;
 
             if !to_pin_name.is_empty() {
@@ -223,7 +225,8 @@ impl OverloadWriter for DotNet {
                 w.indent();
             }
 
-            let call = format!(r#"{}({});"#, raw_name, to_invoke.join(", "));
+            let fn_name = h.converter.function_name_to_csharp_name(function, h.config.rename_symbols);
+            let call = format!(r#"{}({});"#, fn_name, to_invoke.join(", "));
             write_function_overloaded_invoke_with_error_handling(w, function, &call)?;
 
             if !to_pin_name.is_empty() {

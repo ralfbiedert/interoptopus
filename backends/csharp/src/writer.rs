@@ -89,7 +89,8 @@ pub trait CSharpWriter {
             .find(|x| matches!(x.signature().rval(), CType::Pattern(TypePattern::APIVersion)))
         {
             let version = library_hash(self.library());
-            indented!(w, [_], r#"var api_version = {}.{}();"#, self.config().class, api_guard.name())?;
+            let fn_call = self.converter().function_name_to_csharp_name(api_guard, self.config().rename_symbols);
+            indented!(w, [_], r#"var api_version = {}.{}();"#, self.config().class, fn_call)?;
             indented!(w, [_], r#"if (api_version != {}ul)"#, version)?;
             indented!(w, [_], r#"{{"#)?;
             indented!(w, [_ _], r#"throw new TypeLoadException($"API reports hash {{api_version}} which differs from hash in bindings ({}). You probably forgot to update / copy either the bindings or the library.");"#, version)?;
@@ -529,6 +530,7 @@ pub trait CSharpWriter {
             .the_type();
 
         let type_string = self.converter().to_typespecifier_in_rval(data_type);
+        let is_some = if self.config().rename_symbols { "isSome" } else { "is_some" };
 
         indented!(w, r#"{} partial struct {}"#, self.config().visibility_types.to_access_modifier(), context_type_name)?;
         indented!(w, r#"{{"#)?;
@@ -539,7 +541,7 @@ pub trait CSharpWriter {
         indented!(w, [_ _], r#"var result = new {}();"#, context_type_name)?;
         indented!(w, [_ _], r#"if (nullable.HasValue)"#)?;
         indented!(w, [_ _], r#"{{"#)?;
-        indented!(w, [_ _ _], r#"result.is_some = 1;"#)?;
+        indented!(w, [_ _ _], r#"result.{} = 1;"#, is_some)?;
         indented!(w, [_ _ _], r#"result.t = nullable.Value;"#)?;
         indented!(w, [_ _], r#"}}"#)?;
         w.newline()?;
@@ -550,7 +552,7 @@ pub trait CSharpWriter {
         // ToNullable
         indented!(w, [_], r#"public {}? ToNullable()"#, type_string)?;
         indented!(w, [_], r#"{{"#)?;
-        indented!(w, [_ _], r#"return this.is_some == 1 ? this.t : ({}?)null;"#, type_string)?;
+        indented!(w, [_ _], r#"return this.{} == 1 ? this.t : ({}?)null;"#, is_some, type_string)?;
         indented!(w, [_], r#"}}"#)?;
 
         indented!(w, r#"}}"#)?;
@@ -928,7 +930,8 @@ pub trait CSharpWriter {
             types.push(native);
         }
 
-        let method_to_invoke = function.name().to_string();
+        let method_to_invoke = self.converter().function_name_to_csharp_name(function, self.config().rename_symbols);
+        // let method_to_invoke = function.name().to_string();
         let extra_args = if to_invoke.is_empty() {
             "".to_string()
         } else {
