@@ -92,7 +92,7 @@ pub trait CSharpWriter {
             indented!(w, [_], r#"var api_version = {}.{}();"#, self.config().class, api_guard.name())?;
             indented!(w, [_], r#"if (api_version != {}ul)"#, version)?;
             indented!(w, [_], r#"{{"#)?;
-            indented!(w, [_ _], r#"throw new Exception($"API reports hash {{api_version}} which differs from hash in bindings ({}). You probably forgot to update / copy either the bindings or the library.");"#, version)?;
+            indented!(w, [_ _], r#"throw new TypeLoadException($"API reports hash {{api_version}} which differs from hash in bindings ({}). You probably forgot to update / copy either the bindings or the library.");"#, version)?;
             indented!(w, [_], r#"}}"#)?;
         }
 
