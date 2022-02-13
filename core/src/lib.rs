@@ -163,7 +163,7 @@
 //! [docs]: https://docs.rs/interoptopus/badge.svg
 //! [docs.rs]: https://docs.rs/interoptopus/
 
-pub use crate::core::{merge_libraries, non_service_functions, Library};
+pub use crate::core::{merge_libraries, non_service_functions, Library, LibraryBuilder};
 pub use error::Error;
 pub use generators::Interop;
 #[cfg(feature = "derive")]

@@ -7,6 +7,9 @@
 //! Note, many items here are deliberately not documented as testing how and if documentation
 //! is generated is part of the test.
 
+use interoptopus::lang::rust::FunctionInfo;
+use interoptopus::{Library, LibraryBuilder};
+
 pub mod constants;
 pub mod functions;
 /// Reference implementations of patterns.
@@ -22,6 +25,19 @@ pub mod patterns {
     pub mod slice;
 }
 pub mod types;
+
+macro_rules! xxx {
+    ($x:path) => {{
+        use $x as user_function;
+        user_function::function_info()
+    }};
+}
+
+pub fn inventory_xxx() -> Library {
+    {
+        LibraryBuilder::new().f3(xxx!(functions::primitive_void)).library()
+    }
+}
 
 interoptopus::inventory!(
     ffi_inventory,

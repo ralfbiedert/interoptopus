@@ -1,7 +1,47 @@
 use crate::lang::c::{CType, Constant, Function};
+use crate::lang::rust::{CTypeInfo, FunctionInfo};
 use crate::patterns::LibraryPattern;
 use crate::util::{ctypes_from_functions_types, extract_namespaces_from_types};
 use std::collections::HashSet;
+
+pub struct LibraryBuilder {
+    functions: Vec<Function>,
+    ctypes: Vec<CType>,
+    constants: Vec<Constant>,
+    patterns: Vec<LibraryPattern>,
+    namespaces: Vec<String>,
+}
+
+impl LibraryBuilder {
+    pub fn new() -> Self {
+        LibraryBuilder {
+            functions: vec![],
+            ctypes: vec![],
+            constants: vec![],
+            patterns: vec![],
+            namespaces: vec![],
+        }
+    }
+
+    pub fn function<T: FunctionInfo>(mut self, t: T) -> Self {
+        self.functions.push(T::function_info());
+        self
+    }
+
+    pub fn f3(mut self, t: Function) -> Self {
+        self.functions.push(t);
+        self
+    }
+
+    pub fn f2(mut self, t: impl FunctionInfo) -> Self {
+        // self.functions.push(t::function_info());
+        self
+    }
+
+    pub fn library(self) -> Library {
+        todo!()
+    }
+}
 
 /// Represents all FFI-relevant items, produced via [`inventory`](crate::inventory), ingested by backends.
 #[derive(Clone, Debug, PartialOrd, PartialEq, Default)]
