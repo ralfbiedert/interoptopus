@@ -163,7 +163,7 @@
 //! [docs]: https://docs.rs/interoptopus/badge.svg
 //! [docs.rs]: https://docs.rs/interoptopus/
 
-pub use crate::core::{merge_libraries, non_service_functions, Library, LibraryBuilder};
+pub use crate::core::{merge_libraries, non_service_functions, Library, LibraryBuilder, Symbol};
 pub use error::Error;
 pub use generators::Interop;
 #[cfg(feature = "derive")]
@@ -191,6 +191,42 @@ pub mod lang {
     //! [surrogates section in `ffi_type`](crate::ffi_type#surrogates).
     pub mod c;
     pub mod rust;
+}
+
+#[macro_export]
+macro_rules! function {
+    ($x:path) => {{
+        use $crate::lang::rust::FunctionInfo;
+        use $x as function;
+        let info = function::function_info();
+        $crate::Symbol::Function(info)
+    }};
+}
+
+#[macro_export]
+macro_rules! constant {
+    ($x:path) => {{
+        use $crate::lang::rust::ConstantInfo;
+        use $x as constant;
+        let info = constant::constant_info();
+        $crate::Symbol::Constant(info)
+    }};
+}
+
+#[macro_export]
+macro_rules! ctype {
+    ($x:ty) => {{
+        let info = <$x as $crate::lang::rust::CTypeInfo>::type_info();
+        $crate::Symbol::Type(info)
+    }};
+}
+
+#[macro_export]
+macro_rules! pattern {
+    ($x:path) => {{
+        let info: $crate::patterns::LibraryPattern = <$x as $crate::patterns::LibraryPatternInfo>::pattern_info();
+        $crate::Symbol::Pattern(info)
+    }};
 }
 
 /// **The** macro to define your library, ties everything together!

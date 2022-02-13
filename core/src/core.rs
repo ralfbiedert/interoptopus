@@ -1,45 +1,47 @@
 use crate::lang::c::{CType, Constant, Function};
-use crate::lang::rust::{CTypeInfo, FunctionInfo};
 use crate::patterns::LibraryPattern;
 use crate::util::{ctypes_from_functions_types, extract_namespaces_from_types};
 use std::collections::HashSet;
 
+#[derive(Debug)]
+pub enum Symbol {
+    Function(Function),
+    Constant(Constant),
+    Type(CType),
+    Pattern(LibraryPattern),
+}
+
+#[derive(Default, Debug)]
 pub struct LibraryBuilder {
     functions: Vec<Function>,
     ctypes: Vec<CType>,
     constants: Vec<Constant>,
     patterns: Vec<LibraryPattern>,
-    namespaces: Vec<String>,
 }
 
 impl LibraryBuilder {
     pub fn new() -> Self {
         LibraryBuilder {
-            functions: vec![],
-            ctypes: vec![],
-            constants: vec![],
-            patterns: vec![],
-            namespaces: vec![],
+            functions: Vec::new(),
+            ctypes: Vec::new(),
+            constants: Vec::new(),
+            patterns: Vec::new(),
         }
     }
 
-    pub fn function<T: FunctionInfo>(mut self, t: T) -> Self {
-        self.functions.push(T::function_info());
-        self
-    }
+    pub fn register(mut self, s: Symbol) -> Self {
+        match s {
+            Symbol::Function(x) => self.functions.push(x),
+            Symbol::Constant(x) => self.constants.push(x),
+            Symbol::Type(x) => self.ctypes.push(x),
+            Symbol::Pattern(x) => self.patterns.push(x),
+        }
 
-    pub fn f3(mut self, t: Function) -> Self {
-        self.functions.push(t);
-        self
-    }
-
-    pub fn f2(mut self, t: impl FunctionInfo) -> Self {
-        // self.functions.push(t::function_info());
         self
     }
 
     pub fn library(self) -> Library {
-        todo!()
+        Library::new(self.functions, self.constants, self.patterns, self.ctypes)
     }
 }
 

@@ -7,8 +7,7 @@
 //! Note, many items here are deliberately not documented as testing how and if documentation
 //! is generated is part of the test.
 
-use interoptopus::lang::rust::FunctionInfo;
-use interoptopus::{Library, LibraryBuilder};
+use interoptopus::{constant, ctype, function, pattern, Library, LibraryBuilder};
 
 pub mod constants;
 pub mod functions;
@@ -26,86 +25,79 @@ pub mod patterns {
 }
 pub mod types;
 
-macro_rules! xxx {
-    ($x:path) => {{
-        use $x as user_function;
-        user_function::function_info()
-    }};
-}
-
-pub fn inventory_xxx() -> Library {
+pub fn inventory() -> Library {
     {
-        LibraryBuilder::new().f3(xxx!(functions::primitive_void)).library()
+        LibraryBuilder::new()
+            // Functions
+            .register(function!(functions::primitive_void))
+            .register(function!(functions::primitive_void2))
+            .register(function!(functions::primitive_bool))
+            .register(function!(functions::primitive_u8))
+            .register(function!(functions::primitive_u16))
+            .register(function!(functions::primitive_u32))
+            .register(function!(functions::primitive_u64))
+            .register(function!(functions::primitive_i8))
+            .register(function!(functions::primitive_i16))
+            .register(function!(functions::primitive_i32))
+            .register(function!(functions::primitive_i64))
+            .register(function!(functions::many_args_5))
+            .register(function!(functions::many_args_10))
+            .register(function!(functions::ptr))
+            .register(function!(functions::ptr_mut))
+            .register(function!(functions::ptr_ptr))
+            .register(function!(functions::ref_simple))
+            .register(function!(functions::ref_mut_simple))
+            .register(function!(functions::ref_option))
+            .register(function!(functions::ref_mut_option))
+            .register(function!(functions::tupled))
+            .register(function!(functions::complex_args_1))
+            .register(function!(functions::complex_args_2))
+            .register(function!(functions::callback))
+            .register(function!(functions::generic_1a))
+            .register(function!(functions::generic_1b))
+            .register(function!(functions::generic_1c))
+            .register(function!(functions::generic_2))
+            .register(function!(functions::generic_3))
+            .register(function!(functions::generic_4))
+            .register(function!(functions::array_1))
+            .register(function!(functions::documented))
+            .register(function!(functions::ambiguous_1))
+            .register(function!(functions::ambiguous_2))
+            .register(function!(functions::ambiguous_3))
+            .register(function!(functions::namespaced_type))
+            .register(function!(functions::panics))
+            .register(function!(functions::renamed))
+            .register(function!(functions::sleep))
+            .register(function!(functions::weird_1))
+            .register(function!(functions::visibility))
+            .register(function!(functions::repr_transparent))
+            .register(function!(patterns::ascii_pointer::pattern_ascii_pointer_1))
+            .register(function!(patterns::ascii_pointer::pattern_ascii_pointer_2))
+            .register(function!(patterns::ascii_pointer::pattern_ascii_pointer_len))
+            .register(function!(patterns::ascii_pointer::pattern_ascii_pointer_return_slice))
+            .register(function!(patterns::slice::pattern_ffi_slice_1))
+            .register(function!(patterns::slice::pattern_ffi_slice_2))
+            .register(function!(patterns::slice::pattern_ffi_slice_3))
+            .register(function!(patterns::slice::pattern_ffi_slice_4))
+            .register(function!(patterns::slice::pattern_ffi_slice_5))
+            .register(function!(patterns::slice::pattern_ffi_slice_6))
+            .register(function!(patterns::slice::pattern_ffi_slice_delegate))
+            .register(function!(patterns::slice::pattern_ffi_slice_delegate_huge))
+            .register(function!(patterns::option::pattern_ffi_option_1))
+            .register(function!(patterns::option::pattern_ffi_option_2))
+            .register(function!(patterns::primitives::pattern_ffi_bool))
+            .register(function!(patterns::api_guard::pattern_api_guard))
+            .register(function!(patterns::callbacks::pattern_callback_1))
+            .register(function!(patterns::callbacks::pattern_callback_2))
+            // Constants
+            .register(constant!(constants::U8))
+            .register(constant!(constants::F32_MIN_POSITIVE))
+            .register(constant!(constants::COMPUTED_I32))
+            // Extra Types
+            .register(ctype!(types::ExtraType<f32>))
+            // Patterns
+            .register(pattern!(patterns::service::SimpleService))
+            .register(pattern!(patterns::service::SimpleServiceLifetime))
+            .library()
     }
 }
-
-interoptopus::inventory!(
-    ffi_inventory,
-    [constants::U8, constants::F32_MIN_POSITIVE, constants::COMPUTED_I32],
-    [
-        functions::primitive_void,
-        functions::primitive_void2,
-        functions::primitive_bool,
-        functions::primitive_u8,
-        functions::primitive_u16,
-        functions::primitive_u32,
-        functions::primitive_u64,
-        functions::primitive_i8,
-        functions::primitive_i16,
-        functions::primitive_i32,
-        functions::primitive_i64,
-        functions::many_args_5,
-        functions::many_args_10,
-        functions::ptr,
-        functions::ptr_mut,
-        functions::ptr_ptr,
-        functions::ref_simple,
-        functions::ref_mut_simple,
-        functions::ref_option,
-        functions::ref_mut_option,
-        functions::tupled,
-        functions::complex_args_1,
-        functions::complex_args_2,
-        functions::callback,
-        functions::generic_1a,
-        functions::generic_1b,
-        functions::generic_1c,
-        functions::generic_2,
-        functions::generic_3,
-        functions::generic_4,
-        functions::array_1,
-        // functions::array_2,
-        functions::documented,
-        functions::ambiguous_1,
-        functions::ambiguous_2,
-        functions::ambiguous_3,
-        functions::namespaced_type,
-        functions::panics,
-        functions::renamed,
-        functions::sleep,
-        functions::weird_1,
-        functions::visibility,
-        functions::repr_transparent,
-        patterns::ascii_pointer::pattern_ascii_pointer_1,
-        patterns::ascii_pointer::pattern_ascii_pointer_2,
-        patterns::ascii_pointer::pattern_ascii_pointer_len,
-        patterns::ascii_pointer::pattern_ascii_pointer_return_slice,
-        patterns::slice::pattern_ffi_slice_1,
-        patterns::slice::pattern_ffi_slice_2,
-        patterns::slice::pattern_ffi_slice_3,
-        patterns::slice::pattern_ffi_slice_4,
-        patterns::slice::pattern_ffi_slice_5,
-        patterns::slice::pattern_ffi_slice_6,
-        patterns::slice::pattern_ffi_slice_delegate,
-        patterns::slice::pattern_ffi_slice_delegate_huge,
-        patterns::option::pattern_ffi_option_1,
-        patterns::option::pattern_ffi_option_2,
-        patterns::primitives::pattern_ffi_bool,
-        // patterns::api_entry::pattern_my_api_init_v1,
-        patterns::api_guard::pattern_api_guard,
-        patterns::callbacks::pattern_callback_1,
-        patterns::callbacks::pattern_callback_2,
-    ],
-    [types::ExtraType<f32>],
-    [patterns::service::SimpleService, patterns::service::SimpleServiceLifetime]
-);
