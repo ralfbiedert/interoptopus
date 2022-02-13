@@ -34,7 +34,16 @@ impl LibraryBuilder {
             Symbol::Function(x) => self.functions.push(x),
             Symbol::Constant(x) => self.constants.push(x),
             Symbol::Type(x) => self.ctypes.push(x),
-            Symbol::Pattern(x) => self.patterns.push(x),
+            Symbol::Pattern(x) => {
+                match &x {
+                    LibraryPattern::Service(x) => {
+                        self.functions.push(x.destructor().clone());
+                        self.functions.extend(x.constructors().iter().cloned());
+                        self.functions.extend(x.methods().iter().cloned());
+                    }
+                }
+                self.patterns.push(x)
+            }
         }
 
         self

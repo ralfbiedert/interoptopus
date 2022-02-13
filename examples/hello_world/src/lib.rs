@@ -1,4 +1,4 @@
-use interoptopus::{ffi_function, ffi_type};
+use interoptopus::{ffi_function, ffi_type, function, Library, LibraryBuilder};
 
 /// A simple type in our FFI layer.
 #[ffi_type]
@@ -17,4 +17,8 @@ pub extern "C" fn my_function(input: Vec2) -> Vec2 {
 
 // This will create a function `my_inventory` which can produce
 // an abstract FFI representation (called `Library`) for this crate.
-interoptopus::inventory!(my_inventory, [], [my_function], [], []);
+pub fn my_inventory() -> Library {
+    {
+        LibraryBuilder::new().register(function!(my_function)).library()
+    }
+}
