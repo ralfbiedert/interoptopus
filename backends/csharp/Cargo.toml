@@ -2,7 +2,7 @@
 name = "interoptopus_backend_csharp"
 description = "Generates C# bindings."
 authors = ["Ralf Biedert <rb@xr.io>"]
-version = "0.13.14"
+version = "0.14.0"
 edition = "2018"
 license = "MIT"
 keywords = ["ffi", "code-generation", "bindings", "csharp", "dotnet"]
@@ -14,7 +14,7 @@ repository = "https://github.com/ralfbiedert/interoptopus"
 unity = []
 
 [dependencies]
-interoptopus = { path = "../../core", version = "0.13.0" }
+interoptopus = { path = "../../core", version = "0.14.0" }
 heck = "0.4.0"
 
 [dev-dependencies]

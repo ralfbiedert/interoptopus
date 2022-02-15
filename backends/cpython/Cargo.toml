@@ -1,7 +1,7 @@
 [package]
 name = "interoptopus_backend_cpython"
 description = "Generates CPython bindings."
-version = "0.13.15"
+version = "0.14.0"
 edition = "2018"
 license = "MIT"
 keywords = ["ffi", "code-generation", "bindings", "python"]
@@ -10,7 +10,7 @@ documentation = "https://docs.rs/interoptopus_backend_cpython/"
 repository = "https://github.com/ralfbiedert/interoptopus"
 
 [dependencies]
-interoptopus = { path = "../../core", version = "0.13.0" }
+interoptopus = { path = "../../core", version = "0.14.0" }
 
 [dev-dependencies]
 interoptopus = { path = "../../core" }
