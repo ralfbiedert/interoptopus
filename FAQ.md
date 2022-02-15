@@ -38,12 +38,6 @@
   This happens when `#[ffi_type]` appears after `#derive[...]`. Just switch their order.
 
 
-- **Why do I get `use of undeclared crate or module` in `inventory!()`?**
-
-  You probably forgot to declare one of your items `#[ffi_function]` or `#[ffi_const]`.
-
-
-
 - **How should I design my APIs?**
 
   This is a broad question and depends on your use case. As a rule of thumb we recommend being

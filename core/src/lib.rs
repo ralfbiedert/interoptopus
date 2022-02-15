@@ -28,7 +28,7 @@
 //! ## Code you write ...
 //!
 //! ```rust
-//! use interoptopus::{ffi_function, ffi_type, inventory};
+//! use interoptopus::{ffi_function, ffi_type, Library, LibraryBuilder, function};
 //!
 //! #[ffi_type]
 //! #[repr(C)]
@@ -46,7 +46,11 @@
 //! // This defines our FFI interface as `ffi_inventory` containing
 //! // no constants, a single function `my_function`, no additional
 //! // types (types are usually inferred) and no codegen patterns.
-//! inventory!(ffi_inventory, [], [my_function], [], []);
+//! pub fn ffi_inventory() -> Library {
+//!     LibraryBuilder::new()
+//!         .register(function!(my_function))
+//!         .library()
+//! }
 //!
 //! ```
 //!
@@ -194,16 +198,18 @@ pub mod lang {
     pub mod rust;
 }
 
+/// Register a function with a [`LibraryBuilder`].
 #[macro_export]
 macro_rules! function {
-    ($x:path) => {{
+    ($x:ty) => {{
         use $crate::lang::rust::FunctionInfo;
-        use $x as function;
-        let info = function::function_info();
+        // use $x as fnc;
+        let info = <$x>::function_info();
         $crate::Symbol::Function(info)
     }};
 }
 
+/// Register a constant with a [`LibraryBuilder`].
 #[macro_export]
 macro_rules! constant {
     ($x:path) => {{
@@ -214,14 +220,19 @@ macro_rules! constant {
     }};
 }
 
+/// Register an extra type with a [`LibraryBuilder`].
+///
+/// Note, most types are registered automatically. You only need this to pass types not directly visible in
+/// your function signatures, e.g., when accepting multiple types via a void pointer.
 #[macro_export]
-macro_rules! ctype {
+macro_rules! extra_type {
     ($x:ty) => {{
         let info = <$x as $crate::lang::rust::CTypeInfo>::type_info();
         $crate::Symbol::Type(info)
     }};
 }
 
+/// Register a pattern with a [`LibraryBuilder`].
 #[macro_export]
 macro_rules! pattern {
     ($x:path) => {{

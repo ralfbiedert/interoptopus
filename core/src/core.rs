@@ -3,6 +3,9 @@ use crate::patterns::LibraryPattern;
 use crate::util::{ctypes_from_functions_types, extract_namespaces_from_types};
 use std::collections::HashSet;
 
+/// Tells the [`LibraryBuilder`] what to register.
+///
+/// Most users won't need to touch this enum directly, as its variants are usually created via the [`function`](crate::function), [`constant`](crate::constant), [`extra_type`](crate::ctype) and [`pattern`](crate::pattern) macros.
 #[derive(Debug)]
 pub enum Symbol {
     Function(Function),
@@ -11,6 +14,44 @@ pub enum Symbol {
     Pattern(LibraryPattern),
 }
 
+/// Produces a [`Library`] inside your inventory function, **start here**.
+///
+///
+///
+/// # Example
+///
+/// Define an inventory function containing a function, constant, and an extra type.
+/// This function can be called from your unit tests and the returned [`Library`] used to create bindings.
+///
+/// ```rust
+/// use interoptopus::{Library, LibraryBuilder, function, constant, extra_type, pattern, ffi_function, ffi_constant, ffi_type};
+///
+/// // First, define some items our DLL uses or needs.
+///
+/// #[ffi_function]
+/// #[no_mangle]
+/// pub extern "C" fn primitive_void() { }
+///
+/// #[ffi_constant]
+/// pub const MY_CONSTANT: u32 = 123;
+///
+/// #[ffi_type]
+/// #[repr(C)]
+/// pub struct ExtraType<T> {
+///     x: T
+/// }
+///
+/// // Then list all items for which to generate bindings. Call this function
+/// // from another crate or unit test and feed the `Library` into a backend to
+/// // generate bindings for a specific language.
+/// pub fn my_inventory() -> Library {
+///     LibraryBuilder::new()
+///         .register(function!(primitive_void))
+///         .register(constant!(MY_CONSTANT))
+///         .register(extra_type!(ExtraType<f32>))
+///         .library()
+/// }
+/// ```
 #[derive(Default, Debug)]
 pub struct LibraryBuilder {
     functions: Vec<Function>,
@@ -20,6 +61,7 @@ pub struct LibraryBuilder {
 }
 
 impl LibraryBuilder {
+    /// Start creating a new library.
     pub fn new() -> Self {
         LibraryBuilder {
             functions: Vec::new(),
@@ -29,6 +71,10 @@ impl LibraryBuilder {
         }
     }
 
+    /// Registers a symbol.
+    ///
+    /// Call this with the result of a [`function`](crate::function), [`constant`](crate::constant), [`extra_type`](crate::extra_type) or [`pattern`](crate::pattern) macro,
+    /// see the example above.
     pub fn register(mut self, s: Symbol) -> Self {
         match s {
             Symbol::Function(x) => self.functions.push(x),
@@ -49,12 +95,13 @@ impl LibraryBuilder {
         self
     }
 
+    /// Produce the [`Library`].
     pub fn library(self) -> Library {
         Library::new(self.functions, self.constants, self.patterns, self.ctypes)
     }
 }
 
-/// Represents all FFI-relevant items, produced via [`inventory`](crate::inventory), ingested by backends.
+/// Represents all FFI-relevant items, produced via [`LibraryBuilder`], ingested by backends.
 #[derive(Clone, Debug, PartialOrd, PartialEq, Default)]
 pub struct Library {
     functions: Vec<Function>,
@@ -68,7 +115,7 @@ impl Library {
     /// Produce a new library for the given functions, constants and patterns.
     ///
     /// Type information will be automatically derived from the used fields and parameters.
-    pub fn new(functions: Vec<Function>, constants: Vec<Constant>, patterns: Vec<LibraryPattern>, extra_types: Vec<CType>) -> Self {
+    fn new(functions: Vec<Function>, constants: Vec<Constant>, patterns: Vec<LibraryPattern>, extra_types: Vec<CType>) -> Self {
         let mut ctypes = ctypes_from_functions_types(&functions, &extra_types);
         let mut namespaces = HashSet::new();
 

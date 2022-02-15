@@ -7,7 +7,7 @@
 //! Note, many items here are deliberately not documented as testing how and if documentation
 //! is generated is part of the test.
 
-use interoptopus::{constant, ctype, function, pattern, Library, LibraryBuilder};
+use interoptopus::{constant, extra_type, function, pattern, Library, LibraryBuilder};
 
 pub mod constants;
 pub mod functions;
@@ -25,7 +25,7 @@ pub mod patterns {
 }
 pub mod types;
 
-pub fn inventory() -> Library {
+pub fn ffi_inventory() -> Library {
     {
         LibraryBuilder::new()
             // Functions
@@ -94,7 +94,7 @@ pub fn inventory() -> Library {
             .register(constant!(constants::F32_MIN_POSITIVE))
             .register(constant!(constants::COMPUTED_I32))
             // Extra Types
-            .register(ctype!(types::ExtraType<f32>))
+            .register(extra_type!(types::ExtraType<f32>))
             // Patterns
             .register(pattern!(patterns::service::SimpleService))
             .register(pattern!(patterns::service::SimpleServiceLifetime))

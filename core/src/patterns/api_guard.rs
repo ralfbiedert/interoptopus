@@ -13,22 +13,21 @@
 //! create guards calling this function when loading the DLL.
 //!
 //! ```
-//! use interoptopus::ffi_function;
+//! use interoptopus::{ffi_function, Library, LibraryBuilder, function};
 //! use interoptopus::patterns::api_guard::APIVersion;
-//!
-//! // Inventory of our exports.
-//! interoptopus::inventory!(
-//!     my_inventory,
-//!     [],
-//!     [ my_api_guard ],
-//!     [], []
-//! );
 //!
 //! // Guard function used by backends.
 //! #[ffi_function]
 //! #[no_mangle]
 //! pub extern "C" fn my_api_guard() -> APIVersion {
 //!     APIVersion::from_library(&my_inventory())
+//! }
+//!
+//! // Inventory of our exports.
+//! pub fn my_inventory() -> Library {
+//!     LibraryBuilder::new()
+//!         .register(function!(my_api_guard))
+//!         .library()
 //! }
 //! ```
 //!
