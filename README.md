@@ -42,9 +42,8 @@ pub extern "C" fn my_function(input: Vec2) {
     println!("{}", input.x);
 }
 
-// This defines our FFI interface as `ffi_inventory` containing
-// no constants, a single function `my_function`, no additional
-// types (types are usually inferred) and no codegen patterns.
+// Define our FFI interface as `ffi_inventory` containing
+// a single function `my_function`. Type are inferred.
 pub fn ffi_inventory() -> Library {
     LibraryBuilder::new()
         .register(function!(my_function))
