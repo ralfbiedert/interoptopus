@@ -3,27 +3,44 @@ use interoptopus::util::NamespaceMappings;
 use interoptopus::Error;
 use interoptopus::Interop;
 use interoptopus_backend_csharp::overloads::{DotNet, Unity};
-use interoptopus_backend_csharp::{run_dotnet_command_if_installed, CSharpVisibility, Unsafe, WriteTypes};
+use interoptopus_backend_csharp::{run_dotnet_command_if_installed, CSharpVisibility, Config, Generator, Unsafe, WriteTypes};
+use std::path::{Path, PathBuf};
+use tempdir::TempDir;
 
-fn generate_bindings_multi(prefix: &str, use_unsafe: Unsafe) -> Result<(), Error> {
-    use interoptopus_backend_csharp::{Config, Generator};
+/// Writes a simple project config so `dotnet build` works.
+pub fn write_simple_project_file(path: impl AsRef<Path>) -> Result<(), Error> {
+    let csprj = r#"
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+  </ItemGroup>
+</Project>"#;
 
+    let mut project_path = PathBuf::new();
+    project_path.push(path);
+    project_path.push("project.csproj");
+    std::fs::write(project_path, csprj)?;
+    Ok(())
+}
+
+/// Generates runnable bindings for the reference project.
+fn generate_bindings_multi(folder: impl AsRef<Path>, use_unsafe: Unsafe, config: Option<Config>) -> Result<(), Error> {
     let library = interoptopus_reference_project::ffi_inventory();
-    let namespace_mappings = NamespaceMappings::new("My.Company").add("common", "My.Company.Common");
 
-    let config = Config {
+    let config = config.unwrap_or(Config {
         dll_name: "interoptopus_reference_project".to_string(),
-        namespace_mappings,
-        unroll_struct_arrays: true,
+        namespace_mappings: NamespaceMappings::new("My.Company").add("common", "My.Company.Common"),
         visibility_types: CSharpVisibility::AsDeclared,
         use_unsafe,
-        // rename_symbols: true,
-        // debug: true,
         ..Config::default()
-    };
+    });
 
     for namespace_id in library.namespaces() {
-        let file_name = format!("{}.{}.cs", prefix, namespace_id).replace("..", ".");
+        let file_name = format!("{}/Interop.{}.cs", folder.as_ref().to_str().ok_or(Error::FileNotFound)?, namespace_id).replace("..", ".");
 
         let write_types = if namespace_id.is_empty() {
             WriteTypes::Namespace
@@ -54,9 +71,9 @@ fn generate_bindings_multi(prefix: &str, use_unsafe: Unsafe) -> Result<(), Error
 #[test]
 #[cfg_attr(miri, ignore)]
 fn bindings_match_reference() -> Result<(), Error> {
-    generate_bindings_multi("tests/output_safe/Interop", Unsafe::None)?;
-    generate_bindings_multi("tests/output_unsafe/Interop", Unsafe::UnsafePlatformMemCpy)?;
-    generate_bindings_multi("tests/output_unity/Assets/Interop", Unsafe::UnsafePlatformMemCpy)?;
+    generate_bindings_multi("tests/output_safe", Unsafe::None, None)?;
+    generate_bindings_multi("tests/output_unsafe", Unsafe::UnsafePlatformMemCpy, None)?;
+    generate_bindings_multi("tests/output_unity/Assets", Unsafe::UnsafePlatformMemCpy, None)?;
 
     assert_file_matches_generated("tests/output_safe/Interop.cs");
     assert_file_matches_generated("tests/output_safe/Interop.common.cs");
@@ -73,8 +90,8 @@ fn bindings_match_reference() -> Result<(), Error> {
 #[test]
 #[cfg_attr(miri, ignore)]
 fn bindings_work() -> Result<(), Error> {
-    generate_bindings_multi("tests/output_safe/Interop", Unsafe::None)?;
-    generate_bindings_multi("tests/output_unsafe/Interop", Unsafe::UnsafePlatformMemCpy)?;
+    generate_bindings_multi("tests/output_safe", Unsafe::None, None)?;
+    generate_bindings_multi("tests/output_unsafe", Unsafe::UnsafePlatformMemCpy, None)?;
 
     run_dotnet_command_if_installed("tests/output_safe/", "test")?;
     run_dotnet_command_if_installed("tests/output_unsafe/", "test")?;
@@ -84,6 +101,100 @@ fn bindings_work() -> Result<(), Error> {
 #[test]
 #[cfg_attr(miri, ignore)]
 fn prepare_benchmarks() -> Result<(), Error> {
-    generate_bindings_multi("benches/Interop", Unsafe::UnsafePlatformMemCpy)?;
+    generate_bindings_multi("benches", Unsafe::UnsafePlatformMemCpy, None)?;
+    Ok(())
+}
+
+#[test]
+#[cfg_attr(miri, ignore)]
+fn config_rename_symbols() -> Result<(), Error> {
+    let temp = TempDir::new("interoptopus_csharp")?;
+
+    let config = Config {
+        namespace_mappings: NamespaceMappings::new("My.Company").add("common", "My.Company.Common"),
+        rename_symbols: true,
+        use_unsafe: Unsafe::UnsafeKeyword,
+        ..Config::default()
+    };
+
+    generate_bindings_multi(temp.path(), Unsafe::None, Some(config))?;
+    write_simple_project_file(temp.path())?;
+    run_dotnet_command_if_installed(temp.path(), "build")?;
+
+    Ok(())
+}
+
+#[test]
+#[cfg_attr(miri, ignore)]
+fn config_no_unsafe() -> Result<(), Error> {
+    let temp = TempDir::new("interoptopus_csharp")?;
+
+    let config = Config {
+        namespace_mappings: NamespaceMappings::new("My.Company").add("common", "My.Company.Common"),
+        use_unsafe: Unsafe::None,
+        ..Config::default()
+    };
+
+    generate_bindings_multi(temp.path(), Unsafe::None, Some(config))?;
+    write_simple_project_file(temp.path())?;
+    run_dotnet_command_if_installed(temp.path(), "build")?;
+
+    Ok(())
+}
+
+#[test]
+#[cfg_attr(miri, ignore)]
+fn config_unsafe_memcpy() -> Result<(), Error> {
+    let temp = TempDir::new("interoptopus_csharp")?;
+
+    let config = Config {
+        namespace_mappings: NamespaceMappings::new("My.Company").add("common", "My.Company.Common"),
+        use_unsafe: Unsafe::UnsafePlatformMemCpy,
+        ..Config::default()
+    };
+
+    generate_bindings_multi(temp.path(), Unsafe::None, Some(config))?;
+    write_simple_project_file(temp.path())?;
+    run_dotnet_command_if_installed(temp.path(), "build")?;
+
+    Ok(())
+}
+
+#[test]
+#[cfg_attr(miri, ignore)]
+fn config_visibility_force_visibility_internal() -> Result<(), Error> {
+    let temp = TempDir::new("interoptopus_csharp")?;
+
+    let config = Config {
+        namespace_mappings: NamespaceMappings::new("My.Company").add("common", "My.Company.Common"),
+        use_unsafe: Unsafe::UnsafeKeyword,
+        // visibility_types: CSharpVisibility::ForcePrivate, // TODO: Totally broken, removed
+        visibility_types: CSharpVisibility::ForceInternal,
+        ..Config::default()
+    };
+
+    generate_bindings_multi(temp.path(), Unsafe::None, Some(config))?;
+    write_simple_project_file(temp.path())?;
+    run_dotnet_command_if_installed(temp.path(), "build")?;
+
+    Ok(())
+}
+
+#[test]
+#[cfg_attr(miri, ignore)]
+fn config_visibility_force_visibility_public() -> Result<(), Error> {
+    let temp = TempDir::new("interoptopus_csharp")?;
+
+    let config = Config {
+        namespace_mappings: NamespaceMappings::new("My.Company").add("common", "My.Company.Common"),
+        use_unsafe: Unsafe::UnsafeKeyword,
+        visibility_types: CSharpVisibility::ForcePublic,
+        ..Config::default()
+    };
+
+    generate_bindings_multi(temp.path(), Unsafe::None, Some(config))?;
+    write_simple_project_file(temp.path())?;
+    run_dotnet_command_if_installed(temp.path(), "build")?;
+
     Ok(())
 }

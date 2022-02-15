@@ -82,7 +82,7 @@ pub struct Config {
     pub visibility_types: CSharpVisibility,
     /// Whether, say, a `x: [u8; 3]` should become 3 `x0: u8, ...` instead.
     ///
-    /// If this is not set, interop generation with arrays in structr will fail. This is a somewhat
+    /// If this is not set, interop generation with arrays in structs will fail. This is a somewhat
     /// open issue w.r.t Unity-sans-unsafe support and feedback would be greatly welcome!
     pub unroll_struct_arrays: bool,
     /// Which types to write.
@@ -106,7 +106,7 @@ impl Default for Config {
             namespace_mappings: NamespaceMappings::new("My.Company"),
             namespace_id: "".to_string(),
             visibility_types: CSharpVisibility::AsDeclared,
-            unroll_struct_arrays: false,
+            unroll_struct_arrays: true,
             write_types: WriteTypes::NamespaceAndInteroptopusGlobal,
             use_unsafe: Unsafe::None,
             rename_symbols: false,

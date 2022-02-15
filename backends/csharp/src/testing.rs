@@ -6,7 +6,7 @@ use std::path::Path;
 use std::process::Command;
 
 /// If `dotnet` is installed, run the command as `dotnet command` from `path`, ignore and succeed otherwise.
-pub fn run_dotnet_command_if_installed<P: AsRef<Path>>(path: P, command: &str) -> Result<String, Error> {
+pub fn run_dotnet_command_if_installed(path: impl AsRef<Path>, command: &str) -> Result<String, Error> {
     let child = match Command::new("dotnet").arg(command).current_dir(path).spawn() {
         Ok(x) => x,
         Err(x @ std::io::Error { .. }) if x.kind() == ErrorKind::NotFound => {
