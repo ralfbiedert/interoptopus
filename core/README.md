@@ -27,7 +27,7 @@ you actually wanted to expose.
 ### Code you write ...
 
 ```rust
-use interoptopus::{ffi_function, ffi_type, inventory};
+use interoptopus::{ffi_function, ffi_type, Library, LibraryBuilder, function};
 
 #[ffi_type]
 #[repr(C)]
@@ -45,7 +45,11 @@ pub extern "C" fn my_function(input: Vec2) {
 // This defines our FFI interface as `ffi_inventory` containing
 // no constants, a single function `my_function`, no additional
 // types (types are usually inferred) and no codegen patterns.
-inventory!(ffi_inventory, [], [my_function], [], []);
+pub fn ffi_inventory() -> Library {
+    LibraryBuilder::new()
+        .register(function!(my_function))
+        .library()
+}
 
 ```
 
@@ -121,6 +125,7 @@ Gated behind **feature flags**, these enable:
 
 ### Changelog
 
+- **v0.14** - Better inventory UX.
 - **v0.13** - Python backend uses `ctypes` now.
 - **v0.12** - Better compat using `#[ffi_service_method]`.
 - **v0.11** - C# switch ctors to static methods.

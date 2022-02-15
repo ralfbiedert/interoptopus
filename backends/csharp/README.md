@@ -13,7 +13,7 @@ function listing all symbols you wish to export. An overview of all supported co
 [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/reference_project/src).
 
 ```rust
-use interoptopus::{ffi_function, ffi_type};
+use interoptopus::{ffi_function, ffi_type, Library, LibraryBuilder, function};
 
 #[ffi_type]
 #[repr(C)]
@@ -28,7 +28,11 @@ pub extern "C" fn my_function(input: Vec2) -> Vec2 {
     input
 }
 
-interoptopus::inventory!(my_inventory, [], [my_function], [], []);
+pub fn my_inventory() -> Library {
+    LibraryBuilder::new()
+        .register(function!(my_function))
+        .library()
+}
 ```
 
 
