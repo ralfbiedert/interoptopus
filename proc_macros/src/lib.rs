@@ -43,7 +43,7 @@ use syn::{parse_macro_input, AttributeArgs};
 /// # Types and the Inventory
 ///
 /// In contrast to functions and constants most types annotated with `#[ffi_type]` will be detected
-/// automatically and need no mention in the [`inventory!()`](https://docs.rs/interoptopus/latest/interoptopus/macro.inventory.html).
+/// automatically and need no mention in the inventory function.
 ///
 /// The exception are types that do not show up as fields of another type, or inside a function
 /// signature.
@@ -88,7 +88,7 @@ pub fn ffi_type(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// This will derive [`FunctionInfo`](https://docs.rs/interoptopus/latest/interoptopus/lang/rust/trait.FunctionInfo.html) for a helper struct
 /// of the same name containing the function's name, parameters and return value.
 ///
-/// In order to appear in generated bindings the function also has to be mentioned in the [`inventory!()`](https://docs.rs/interoptopus/latest/interoptopus/macro.inventory.html).
+/// In order to appear in generated bindings the function also has to be mentioned in the inventory function.
 ///
 /// # Parameters
 ///
@@ -132,7 +132,7 @@ pub fn ffi_function(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// Constant evaluation is supported.
 ///
-/// In order to appear in generated bindings the constant also has to be mentioned in the [`inventory!()`](https://docs.rs/interoptopus/latest/interoptopus/macro.inventory.html).
+/// In order to appear in generated bindings the constant also has to be mentioned in the inventory function.
 ///
 /// # Examples
 ///
@@ -161,7 +161,7 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// See the [service module](https://docs.rs/interoptopus/latest/interoptopus/patterns/service/index.html) for an introduction into services.
 ///
-/// In order to appear in generated bindings the service also has to be mentioned in the [`inventory!()`](https://docs.rs/interoptopus/latest/interoptopus/macro.inventory.html).
+/// In order to appear in generated bindings the service also has to be mentioned in the inventory function.
 ///
 /// # Requirements
 ///

@@ -15,10 +15,10 @@ path = "src/lib.rs"
 proc-macro = true
 
 [dependencies]
-proc-macro2 = "1.0.32"
-syn = { version = "1.0.82", features = ["full"] }
-quote = "1.0.10"
-darling = "0.13.0"
+proc-macro2 = "1.0.36"
+syn = { version = "1.0.86", features = ["full"] }
+quote = "1.0.15"
+darling = "0.13.1"
 
 [dev-dependencies]
 interoptopus = { path = "../core" }
