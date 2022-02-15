@@ -18,7 +18,7 @@
 //! #[ffi_function]
 //! #[no_mangle]
 //! pub extern "C" fn print_ptr(x: *const u8) {
-//!    // Write unsafe code to convert `x
+//!    // Write unsafe code to convert `x`
 //! }
 //!
 //! ```

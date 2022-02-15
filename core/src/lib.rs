@@ -44,7 +44,7 @@
 //! }
 //!
 //! // Define our FFI interface as `ffi_inventory` containing
-//! // a single function `my_function`. Type are inferred.
+//! // a single function `my_function`. Types are inferred.
 //! pub fn ffi_inventory() -> Library {
 //!     LibraryBuilder::new()
 //!         .register(function!(my_function))
@@ -198,6 +198,24 @@ pub mod lang {
 }
 
 /// Register a function with a [`LibraryBuilder`].
+///
+/// You must also annotate the function with [`#[ffi_function]`](crate::ffi_function), and preferably with `#[no_mangle]` and `extern "C"`.
+///
+/// # Example
+///
+/// ```rust
+/// use interoptopus::{ffi_function, Library, LibraryBuilder, function};
+///
+/// #[ffi_function]
+/// #[no_mangle]
+/// pub extern "C" fn my_function() { }
+///
+/// pub fn inventory() -> Library {
+///     LibraryBuilder::new()
+///         .register(function!(my_function))
+///         .library()
+/// }
+/// ```
 #[macro_export]
 macro_rules! function {
     ($x:ty) => {{
@@ -209,6 +227,23 @@ macro_rules! function {
 }
 
 /// Register a constant with a [`LibraryBuilder`].
+///
+/// You must also annotate the constant with [`#[ffi_constant]`](crate::ffi_constant).
+///
+/// # Example
+///
+/// ```rust
+/// use interoptopus::{ffi_constant, Library, LibraryBuilder, constant};
+///
+/// #[ffi_constant]
+/// pub const MY_CONSTANT: u32 = 123;
+///
+/// pub fn inventory() -> Library {
+///     LibraryBuilder::new()
+///         .register(constant!(MY_CONSTANT))
+///         .library()
+/// }
+/// ```
 #[macro_export]
 macro_rules! constant {
     ($x:path) => {{
@@ -221,8 +256,27 @@ macro_rules! constant {
 
 /// Register an extra type with a [`LibraryBuilder`].
 ///
+/// You must also annotate the type with [`#[ffi_type]`](crate::ffi_type) and `#[repr(C)]`.
+///
 /// Note, most types are registered automatically. You only need this to pass types not directly visible in
 /// your function signatures, e.g., when accepting multiple types via a void pointer.
+///
+/// # Example
+///
+/// ```rust
+/// use interoptopus::{ffi_type, Library, LibraryBuilder, extra_type};
+///
+/// #[ffi_type]
+/// #[repr(C)]
+/// pub struct S<T> {
+///     t: T
+/// };
+///
+/// pub fn inventory() -> Library {
+///     LibraryBuilder::new()
+///         .register(extra_type!(S<f32>))
+///         .library()
+/// }
 #[macro_export]
 macro_rules! extra_type {
     ($x:ty) => {{
@@ -232,6 +286,76 @@ macro_rules! extra_type {
 }
 
 /// Register a pattern with a [`LibraryBuilder`].
+///
+/// You only need to register [`LibraryPattern`](crate::patterns::LibraryPattern), as [`TypePattern`](crate::patterns::TypePattern) are detected automatically.
+///
+/// # Example
+///
+/// Note, as this example focuses on the `pattern` macro it omits the definition of `Error` and `MyFFIError`.
+/// Their implementation can be found in the [FFIError](crate::patterns::result::FFIError) example.
+///
+/// ```rust
+/// use interoptopus::{ffi_type, ffi_service, ffi_service_ctor, Library, LibraryBuilder, pattern};
+///
+/// # use std::fmt::{Display, Formatter};
+/// # use interoptopus::patterns::result::FFIError;
+/// #
+/// # #[derive(Debug)]
+/// # pub enum Error {
+/// #     Bad,
+/// # }
+/// #
+/// # impl Display for Error {
+/// #     fn fmt(&self, _: &mut Formatter<'_>) -> std::fmt::Result {
+/// #         Ok(())
+/// #     }
+/// # }
+/// #
+/// # impl std::error::Error for Error {}
+/// #
+/// # #[ffi_type(patterns(ffi_error))]
+/// # #[repr(C)]
+/// # pub enum MyFFIError {
+/// #     Ok = 0,
+/// #     NullPassed = 1,
+/// #     Panic = 2,
+/// #     OtherError = 3,
+/// # }
+/// #
+/// # impl FFIError for MyFFIError {
+/// #     const SUCCESS: Self = Self::Ok;
+/// #     const NULL: Self = Self::NullPassed;
+/// #     const PANIC: Self = Self::Panic;
+/// # }
+/// #
+/// # impl From<Error> for MyFFIError {
+/// #     fn from(x: Error) -> Self {
+/// #         match x {
+/// #             Error::Bad => Self::OtherError,
+/// #         }
+/// #     }
+/// # }
+/// #
+///
+/// #[ffi_type(opaque)]
+/// pub struct SimpleService {
+///     pub some_value: u32,
+/// }
+///
+/// #[ffi_service(error = "MyFFIError", prefix = "simple_service_")]
+/// impl SimpleService {
+///
+///     #[ffi_service_ctor]
+///     pub fn new_with(some_value: u32) -> Result<Self, Error> {
+///         Ok(Self { some_value })
+///     }
+/// }
+///
+/// pub fn inventory() -> Library {
+///     LibraryBuilder::new()
+///         .register(pattern!(SimpleService))
+///         .library()
+/// }
 #[macro_export]
 macro_rules! pattern {
     ($x:path) => {{
