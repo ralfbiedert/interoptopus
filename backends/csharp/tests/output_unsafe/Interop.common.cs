@@ -54,11 +54,14 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
-        public ReadOnlySpan<Bool> GetReadOnlySpan()
+        public ReadOnlySpan<Bool> ReadOnlySpan
         {
-            unsafe
+            get
             {
-                return new ReadOnlySpan<Bool>(this.data.ToPointer(), (int) this.len);
+                unsafe
+                {
+                    return new ReadOnlySpan<Bool>(this.data.ToPointer(), (int) this.len);
+                }
             }
         }
         #if UNITY_2018_1_OR_NEWER
@@ -148,11 +151,14 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
-        public ReadOnlySpan<uint> GetReadOnlySpan()
+        public ReadOnlySpan<uint> ReadOnlySpan
         {
-            unsafe
+            get
             {
-                return new ReadOnlySpan<uint>(this.data.ToPointer(), (int) this.len);
+                unsafe
+                {
+                    return new ReadOnlySpan<uint>(this.data.ToPointer(), (int) this.len);
+                }
             }
         }
         #if UNITY_2018_1_OR_NEWER
@@ -242,11 +248,14 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
-        public ReadOnlySpan<byte> GetReadOnlySpan()
+        public ReadOnlySpan<byte> ReadOnlySpan
         {
-            unsafe
+            get
             {
-                return new ReadOnlySpan<byte>(this.data.ToPointer(), (int) this.len);
+                unsafe
+                {
+                    return new ReadOnlySpan<byte>(this.data.ToPointer(), (int) this.len);
+                }
             }
         }
         #if UNITY_2018_1_OR_NEWER
@@ -336,11 +345,14 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
-        public ReadOnlySpan<uint> GetReadOnlySpan()
+        public ReadOnlySpan<uint> ReadOnlySpan
         {
-            unsafe
+            get
             {
-                return new ReadOnlySpan<uint>(this.data.ToPointer(), (int) this.len);
+                unsafe
+                {
+                    return new ReadOnlySpan<uint>(this.data.ToPointer(), (int) this.len);
+                }
             }
         }
         #if UNITY_2018_1_OR_NEWER
@@ -353,11 +365,14 @@ namespace My.Company.Common
             }
         }
         #endif
-        public Span<uint> GetSpan()
+        public Span<uint> Span
         {
-            unsafe
+            get
             {
-                return new Span<uint>(this.data.ToPointer(), (int) this.len);
+                unsafe
+                {
+                    return new Span<uint>(this.data.ToPointer(), (int) this.len);
+                }
             }
         }
         public uint this[int i]
@@ -446,11 +461,14 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
-        public ReadOnlySpan<byte> GetReadOnlySpan()
+        public ReadOnlySpan<byte> ReadOnlySpan
         {
-            unsafe
+            get
             {
-                return new ReadOnlySpan<byte>(this.data.ToPointer(), (int) this.len);
+                unsafe
+                {
+                    return new ReadOnlySpan<byte>(this.data.ToPointer(), (int) this.len);
+                }
             }
         }
         #if UNITY_2018_1_OR_NEWER
@@ -463,11 +481,14 @@ namespace My.Company.Common
             }
         }
         #endif
-        public Span<byte> GetSpan()
+        public Span<byte> Span
         {
-            unsafe
+            get
             {
-                return new Span<byte>(this.data.ToPointer(), (int) this.len);
+                unsafe
+                {
+                    return new Span<byte>(this.data.ToPointer(), (int) this.len);
+                }
             }
         }
         public byte this[int i]

@@ -11,7 +11,7 @@ namespace interop_test
         {
             Interop.pattern_ffi_slice_delegate(delegate (Sliceu8 x0)
             {
-                var span = x0.GetReadOnlySpan();
+                var span = x0.ReadOnlySpan;
 
                 return span[0];
             });

@@ -258,11 +258,14 @@ impl OverloadWriter for DotNet {
 
     fn write_pattern_slice_overload(&self, w: &mut IndentWriter, h: Helper, _context_type_name: &str, type_string: &str) -> Result<(), Error> {
         if h.config.use_unsafe.any_unsafe() {
-            indented!(w, [_], r#"public ReadOnlySpan<{}> GetReadOnlySpan()"#, type_string)?;
+            indented!(w, [_], r#"public ReadOnlySpan<{}> ReadOnlySpan"#, type_string)?;
             indented!(w, [_], r#"{{"#)?;
-            indented!(w, [_ _], r#"unsafe"#)?;
+            indented!(w, [_ _], r#"get"#)?;
             indented!(w, [_ _], r#"{{"#)?;
-            indented!(w, [_ _ _], r#"return new ReadOnlySpan<{}>(this.data.ToPointer(), (int) this.len);"#, type_string)?;
+            indented!(w, [_ _ _], r#"unsafe"#)?;
+            indented!(w, [_ _ _], r#"{{"#)?;
+            indented!(w, [_ _ _ _], r#"return new ReadOnlySpan<{}>(this.data.ToPointer(), (int) this.len);"#, type_string)?;
+            indented!(w, [_ _ _], r#"}}"#)?;
             indented!(w, [_ _], r#"}}"#)?;
             indented!(w, [_], r#"}}"#)?;
         }
@@ -271,11 +274,14 @@ impl OverloadWriter for DotNet {
 
     fn write_pattern_slice_mut_overload(&self, w: &mut IndentWriter, h: Helper, _context_type_name: &str, type_string: &str) -> Result<(), Error> {
         if h.config.use_unsafe.any_unsafe() {
-            indented!(w, [_], r#"public Span<{}> GetSpan()"#, type_string)?;
+            indented!(w, [_], r#"public Span<{}> Span"#, type_string)?;
             indented!(w, [_], r#"{{"#)?;
-            indented!(w, [_ _], r#"unsafe"#)?;
+            indented!(w, [_ _], r#"get"#)?;
             indented!(w, [_ _], r#"{{"#)?;
-            indented!(w, [_ _ _], r#"return new Span<{}>(this.data.ToPointer(), (int) this.len);"#, type_string)?;
+            indented!(w, [_ _ _], r#"unsafe"#)?;
+            indented!(w, [_ _ _], r#"{{"#)?;
+            indented!(w, [_ _ _ _], r#"return new Span<{}>(this.data.ToPointer(), (int) this.len);"#, type_string)?;
+            indented!(w, [_ _ _], r#"}}"#)?;
             indented!(w, [_ _], r#"}}"#)?;
             indented!(w, [_], r#"}}"#)?;
         }

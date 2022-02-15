@@ -1101,11 +1101,14 @@ namespace My.Company
             this.data = handle;
             this.len = count;
         }
-        public ReadOnlySpan<UseAsciiStringPattern> GetReadOnlySpan()
+        public ReadOnlySpan<UseAsciiStringPattern> ReadOnlySpan
         {
-            unsafe
+            get
             {
-                return new ReadOnlySpan<UseAsciiStringPattern>(this.data.ToPointer(), (int) this.len);
+                unsafe
+                {
+                    return new ReadOnlySpan<UseAsciiStringPattern>(this.data.ToPointer(), (int) this.len);
+                }
             }
         }
         #if UNITY_2018_1_OR_NEWER
@@ -1180,11 +1183,14 @@ namespace My.Company
             this.data = handle;
             this.len = count;
         }
-        public ReadOnlySpan<Vec3f32> GetReadOnlySpan()
+        public ReadOnlySpan<Vec3f32> ReadOnlySpan
         {
-            unsafe
+            get
             {
-                return new ReadOnlySpan<Vec3f32>(this.data.ToPointer(), (int) this.len);
+                unsafe
+                {
+                    return new ReadOnlySpan<Vec3f32>(this.data.ToPointer(), (int) this.len);
+                }
             }
         }
         #if UNITY_2018_1_OR_NEWER
