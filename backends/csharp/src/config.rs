@@ -28,8 +28,6 @@ pub enum CSharpVisibility {
     AsDeclared,
     /// Generates all types as `public class` / `public struct`.
     ForcePublic,
-    /// Generates all types as `private class` / `private struct`.
-    ForcePrivate,
     /// Generates all types as `internal class` / `internal struct`.
     ForceInternal,
 }
@@ -41,7 +39,6 @@ impl CSharpVisibility {
             // behavior which is to make everything public.
             CSharpVisibility::AsDeclared => "public",
             CSharpVisibility::ForcePublic => "public",
-            CSharpVisibility::ForcePrivate => "private",
             CSharpVisibility::ForceInternal => "internal",
         }
     }
