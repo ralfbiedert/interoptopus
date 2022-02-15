@@ -294,13 +294,14 @@ pub trait CSharpWriter {
     fn write_type_definition_named_callback_body(&self, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
         let rval = self.converter().to_typespecifier_in_rval(the_type.fnpointer().signature().rval());
         let name = self.converter().named_callback_to_typename(the_type);
+        let visibility = self.config().visibility_types.to_access_modifier();
 
         let mut params = Vec::new();
         for (i, param) in the_type.fnpointer().signature().params().iter().enumerate() {
             params.push(format!("{} x{}", self.converter().to_typespecifier_in_param(param.the_type()), i));
         }
 
-        indented!(w, r#"public delegate {} {}({});"#, rval, name, params.join(", "))
+        indented!(w, r#"{} delegate {} {}({});"#, visibility, rval, name, params.join(", "))
     }
 
     fn write_type_definition_fn_pointer_annotation(&self, w: &mut IndentWriter, _the_type: &FnPointerType) -> Result<(), Error> {
@@ -310,13 +311,14 @@ pub trait CSharpWriter {
     fn write_type_definition_fn_pointer_body(&self, w: &mut IndentWriter, the_type: &FnPointerType) -> Result<(), Error> {
         let rval = self.converter().to_typespecifier_in_rval(the_type.signature().rval());
         let name = self.converter().fnpointer_to_typename(the_type);
+        let visibility = self.config().visibility_types.to_access_modifier();
 
         let mut params = Vec::new();
         for (i, param) in the_type.signature().params().iter().enumerate() {
             params.push(format!("{} x{}", self.converter().to_typespecifier_in_param(param.the_type()), i));
         }
 
-        indented!(w, r#"public delegate {} {}({});"#, rval, name, params.join(", "))
+        indented!(w, r#"{} delegate {} {}({});"#, visibility, rval, name, params.join(", "))
     }
 
     fn write_type_definition_enum(&self, w: &mut IndentWriter, the_type: &EnumType) -> Result<(), Error> {
