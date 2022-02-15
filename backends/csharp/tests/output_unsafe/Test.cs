@@ -1,15 +1,22 @@
-using System;
-using System.Linq;
-using System.Runtime.InteropServices;
 using My.Company;
 using My.Company.Common;
 using Xunit;
-using Array = My.Company.Array;
 
 namespace interop_test
 {
     public class GeneralTests
     {
+        [Fact]
+        public void pattern_ffi_slice_delegate()
+        {
+            Interop.pattern_ffi_slice_delegate(delegate (Sliceu8 x0)
+            {
+                var span = x0.GetReadOnlySpan();
+
+                return span[0];
+            });
+        }
+
 
     }
 }
