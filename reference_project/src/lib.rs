@@ -7,7 +7,7 @@
 //! Note, many items here are deliberately not documented as testing how and if documentation
 //! is generated is part of the test.
 
-use interoptopus::{constant, extra_type, function, pattern, Library, LibraryBuilder};
+use interoptopus::{constant, extra_type, function, pattern, Inventory, InventoryBuilder};
 
 pub mod constants;
 pub mod functions;
@@ -25,9 +25,9 @@ pub mod patterns {
 }
 pub mod types;
 
-pub fn ffi_inventory() -> Library {
+pub fn ffi_inventory() -> Inventory {
     {
-        LibraryBuilder::new()
+        InventoryBuilder::new()
             // Functions
             .register(function!(functions::primitive_void))
             .register(function!(functions::primitive_void2))
@@ -98,6 +98,6 @@ pub fn ffi_inventory() -> Library {
             // Patterns
             .register(pattern!(patterns::service::SimpleService))
             .register(pattern!(patterns::service::SimpleServiceLifetime))
-            .library()
+            .inventory()
     }
 }

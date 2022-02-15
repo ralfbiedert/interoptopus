@@ -5,7 +5,7 @@ use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{longest_common_prefix, safe_name, sort_types_by_dependencies};
 use interoptopus::writer::IndentWriter;
-use interoptopus::{indented, non_service_functions, Error, Library};
+use interoptopus::{indented, non_service_functions, Error, Inventory};
 
 /// In some places we can write for docs or for actual code generation.
 #[derive(PartialOrd, PartialEq, Copy, Clone, Debug)]
@@ -20,7 +20,7 @@ pub trait PythonWriter {
     fn config(&self) -> &Config;
 
     /// Returns the library to produce bindings for.
-    fn library(&self) -> &Library;
+    fn inventory(&self) -> &Inventory;
 
     /// Returns the library to produce bindings for.
     fn converter(&self) -> &Converter;
@@ -43,7 +43,7 @@ pub trait PythonWriter {
         indented!(w, [_], r#"c_lib = ctypes.cdll.LoadLibrary(path)"#)?;
 
         w.newline()?;
-        for f in self.library().functions() {
+        for f in self.inventory().functions() {
             let args = f
                 .signature()
                 .params()
@@ -55,7 +55,7 @@ pub trait PythonWriter {
         }
 
         w.newline()?;
-        for f in self.library().functions() {
+        for f in self.inventory().functions() {
             let rtype = self.converter().to_ctypes_name(f.signature().rval(), false);
             if !rtype.is_empty() {
                 indented!(w, [_], r#"c_lib.{}.restype = {}"#, f.name(), rtype)?;
@@ -63,7 +63,7 @@ pub trait PythonWriter {
         }
 
         w.newline()?;
-        for f in self.library().functions() {
+        for f in self.inventory().functions() {
             if let CType::Pattern(TypePattern::FFIErrorEnum(e)) = f.signature().rval() {
                 let value = e.success_variant().value();
                 indented!(w, [_], r#"c_lib.{}.errcheck = lambda rval, _fptr, _args: _errcheck(rval, {})"#, f.name(), value)?;
@@ -74,7 +74,7 @@ pub trait PythonWriter {
     }
 
     fn write_constants(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        for c in self.library().constants() {
+        for c in self.inventory().constants() {
             indented!(w, r#"{} = {}"#, c.name(), self.converter().constant_value_to_value(c.value()))?;
         }
 
@@ -82,7 +82,7 @@ pub trait PythonWriter {
     }
 
     fn write_types(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        let all_types = self.library().ctypes().to_vec();
+        let all_types = self.inventory().ctypes().to_vec();
         let sorted_types = sort_types_by_dependencies(all_types);
 
         for t in &sorted_types {
@@ -219,7 +219,7 @@ pub trait PythonWriter {
         indented!(w, r#"class {}:"#, self.config().callback_namespace)?;
         indented!(w, [_], r#""""Helpers to define callbacks.""""#)?;
 
-        for callback in self.library().ctypes().iter().filter_map(|x| match x {
+        for callback in self.inventory().ctypes().iter().filter_map(|x| match x {
             CType::FnPointer(x) => Some(x),
             CType::Pattern(TypePattern::NamedCallback(x)) => Some(x.fnpointer()),
             _ => None,
@@ -237,7 +237,7 @@ pub trait PythonWriter {
     }
 
     fn write_function_proxies(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        for function in non_service_functions(self.library()) {
+        for function in non_service_functions(self.inventory()) {
             self.write_function(w, function, WriteFor::Code)?;
         }
 
@@ -407,7 +407,7 @@ pub trait PythonWriter {
     }
 
     fn write_patterns(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        for pattern in self.library().patterns() {
+        for pattern in self.inventory().patterns() {
             match pattern {
                 LibraryPattern::Service(x) => self.write_pattern_class(w, x)?,
             }

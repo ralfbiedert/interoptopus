@@ -11,9 +11,9 @@ fn generate_bindings(output: &str) -> Result<(), Error> {
         ..Config::default()
     };
 
-    let library = interoptopus_reference_project::ffi_inventory();
+    let inventory = interoptopus_reference_project::ffi_inventory();
 
-    let generator = Generator::new(config, library);
+    let generator = Generator::new(config, inventory);
     generator.write_file(format!("{}/my_header.h", output))?;
 
     // let doc_gen = DocGenerator::new(library, generator);

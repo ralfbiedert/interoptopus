@@ -3,9 +3,9 @@ use crate::patterns::LibraryPattern;
 use crate::util::{ctypes_from_functions_types, extract_namespaces_from_types};
 use std::collections::HashSet;
 
-/// Tells the [`LibraryBuilder`] what to register.
+/// Tells the [`InventoryBuilder`] what to register.
 ///
-/// Most users won't need to touch this enum directly, as its variants are usually created via the [`function`](crate::function), [`constant`](crate::constant), [`extra_type`](crate::ctype) and [`pattern`](crate::pattern) macros.
+/// Most users won't need to touch this enum directly, as its variants are usually created via the [`function`](crate::function), [`constant`](crate::constant), [`extra_type`](crate::extra_type) and [`pattern`](crate::pattern) macros.
 #[derive(Debug)]
 pub enum Symbol {
     Function(Function),
@@ -14,17 +14,15 @@ pub enum Symbol {
     Pattern(LibraryPattern),
 }
 
-/// Produces a [`Library`] inside your inventory function, **start here**.
-///
-///
+/// Produces a [`Inventory`] inside your inventory function, **start here**.
 ///
 /// # Example
 ///
 /// Define an inventory function containing a function, constant, and an extra type.
-/// This function can be called from your unit tests and the returned [`Library`] used to create bindings.
+/// This function can be called from your unit tests and the returned [`Inventory`] used to create bindings.
 ///
 /// ```rust
-/// use interoptopus::{Library, LibraryBuilder, function, constant, extra_type, pattern, ffi_function, ffi_constant, ffi_type};
+/// use interoptopus::{Inventory, InventoryBuilder, function, constant, extra_type, pattern, ffi_function, ffi_constant, ffi_type};
 ///
 /// // First, define some items our DLL uses or needs.
 ///
@@ -44,26 +42,26 @@ pub enum Symbol {
 /// // Then list all items for which to generate bindings. Call this function
 /// // from another crate or unit test and feed the `Library` into a backend to
 /// // generate bindings for a specific language.
-/// pub fn my_inventory() -> Library {
-///     LibraryBuilder::new()
+/// pub fn my_inventory() -> Inventory {
+///     InventoryBuilder::new()
 ///         .register(function!(primitive_void))
 ///         .register(constant!(MY_CONSTANT))
 ///         .register(extra_type!(ExtraType<f32>))
-///         .library()
+///         .inventory()
 /// }
 /// ```
 #[derive(Default, Debug)]
-pub struct LibraryBuilder {
+pub struct InventoryBuilder {
     functions: Vec<Function>,
     ctypes: Vec<CType>,
     constants: Vec<Constant>,
     patterns: Vec<LibraryPattern>,
 }
 
-impl LibraryBuilder {
+impl InventoryBuilder {
     /// Start creating a new library.
     pub fn new() -> Self {
-        LibraryBuilder {
+        InventoryBuilder {
             functions: Vec::new(),
             ctypes: Vec::new(),
             constants: Vec::new(),
@@ -95,15 +93,15 @@ impl LibraryBuilder {
         self
     }
 
-    /// Produce the [`Library`].
-    pub fn library(self) -> Library {
-        Library::new(self.functions, self.constants, self.patterns, self.ctypes)
+    /// Produce the [`Inventory`].
+    pub fn inventory(self) -> Inventory {
+        Inventory::new(self.functions, self.constants, self.patterns, self.ctypes)
     }
 }
 
-/// Represents all FFI-relevant items, produced via [`LibraryBuilder`], ingested by backends.
+/// Represents all FFI-relevant items, produced via [`InventoryBuilder`], ingested by backends.
 #[derive(Clone, Debug, PartialOrd, PartialEq, Default)]
-pub struct Library {
+pub struct Inventory {
     functions: Vec<Function>,
     ctypes: Vec<CType>,
     constants: Vec<Constant>,
@@ -111,8 +109,8 @@ pub struct Library {
     namespaces: Vec<String>,
 }
 
-impl Library {
-    /// Produce a new library for the given functions, constants and patterns.
+impl Inventory {
+    /// Produce a new inventory for the given functions, constants and patterns.
     ///
     /// Type information will be automatically derived from the used fields and parameters.
     fn new(functions: Vec<Function>, constants: Vec<Constant>, patterns: Vec<LibraryPattern>, extra_types: Vec<CType>) -> Self {
@@ -174,9 +172,9 @@ impl Library {
 ///
 /// Useful in backends like Python that can fully encapsulate services and should not expose their
 /// raw methods in the main namespace.
-pub fn non_service_functions(library: &Library) -> Vec<&Function> {
+pub fn non_service_functions(inventory: &Inventory) -> Vec<&Function> {
     let mut service_methods = vec![];
-    for pattern in library.patterns() {
+    for pattern in inventory.patterns() {
         match pattern {
             LibraryPattern::Service(service) => {
                 service_methods.extend_from_slice(service.methods());
@@ -186,10 +184,10 @@ pub fn non_service_functions(library: &Library) -> Vec<&Function> {
         }
     }
 
-    library.functions().iter().filter(|&x| !service_methods.contains(x)).collect()
+    inventory.functions().iter().filter(|&x| !service_methods.contains(x)).collect()
 }
 
-/// Create a single [`Library`](Library) from a number of individual libraries.
+/// Create a single [`Inventory`] from a number of individual inventory.
 ///
 /// This function can be useful when your FFI crate exports different sets of
 /// symbols (e.g., _core_ and _extension_ functions) and you want to create different
@@ -199,31 +197,31 @@ pub fn non_service_functions(library: &Library) -> Vec<&Function> {
 ///
 /// ```
 /// # mod my_crate {
-/// #     use interoptopus::Library;
-/// #     pub fn inventory_core() -> Library { Library::default() }
-/// #     pub fn inventory_ext() -> Library { Library::default() }
+/// #     use interoptopus::Inventory;
+/// #     pub fn inventory_core() -> Inventory { Inventory::default() }
+/// #     pub fn inventory_ext() -> Inventory { Inventory::default() }
 /// # }
-/// use interoptopus::merge_libraries;
+/// use interoptopus::merge_inventories;
 ///
-/// let libraries = [
+/// let inventories = [
 ///     my_crate::inventory_core(),
 ///     my_crate::inventory_ext()
 /// ];
 ///
-/// merge_libraries(&libraries);
+/// merge_inventories(&inventories);
 /// ```
-pub fn merge_libraries(libraries: &[Library]) -> Library {
+pub fn merge_inventories(inventories: &[Inventory]) -> Inventory {
     let mut functions = Vec::new();
     let mut constants = Vec::new();
     let mut patterns = Vec::new();
     let mut types = Vec::new();
 
-    for library in libraries {
-        functions.extend_from_slice(library.functions());
-        constants.extend_from_slice(library.constants());
-        patterns.extend_from_slice(library.patterns());
-        types.extend_from_slice(library.ctypes());
+    for inventory in inventories {
+        functions.extend_from_slice(inventory.functions());
+        constants.extend_from_slice(inventory.constants());
+        patterns.extend_from_slice(inventory.patterns());
+        types.extend_from_slice(inventory.ctypes());
     }
 
-    Library::new(functions, constants, patterns, types)
+    Inventory::new(functions, constants, patterns, types)
 }

@@ -28,7 +28,7 @@
 //! ## Code you write ...
 //!
 //! ```rust
-//! use interoptopus::{ffi_function, ffi_type, Library, LibraryBuilder, function};
+//! use interoptopus::{ffi_function, ffi_type, Inventory, InventoryBuilder, function};
 //!
 //! #[ffi_type]
 //! #[repr(C)]
@@ -45,10 +45,10 @@
 //!
 //! // Define our FFI interface as `ffi_inventory` containing
 //! // a single function `my_function`. Types are inferred.
-//! pub fn ffi_inventory() -> Library {
-//!     LibraryBuilder::new()
+//! pub fn ffi_inventory() -> Inventory {
+//!     InventoryBuilder::new()
 //!         .register(function!(my_function))
-//!         .library()
+//!         .inventory()
 //! }
 //!
 //! ```
@@ -167,7 +167,7 @@
 //! [docs]: https://docs.rs/interoptopus/badge.svg
 //! [docs.rs]: https://docs.rs/interoptopus/
 
-pub use crate::core::{merge_libraries, non_service_functions, Library, LibraryBuilder, Symbol};
+pub use crate::core::{merge_inventories, non_service_functions, Inventory, InventoryBuilder, Symbol};
 pub use error::Error;
 pub use generators::Interop;
 #[cfg(feature = "derive")]
@@ -197,23 +197,23 @@ pub mod lang {
     pub mod rust;
 }
 
-/// Register a function with a [`LibraryBuilder`].
+/// Register a function with an [`InventoryBuilder`].
 ///
 /// You must also annotate the function with [`#[ffi_function]`](crate::ffi_function), and preferably with `#[no_mangle]` and `extern "C"`.
 ///
 /// # Example
 ///
 /// ```rust
-/// use interoptopus::{ffi_function, Library, LibraryBuilder, function};
+/// use interoptopus::{ffi_function, Inventory, InventoryBuilder, function};
 ///
 /// #[ffi_function]
 /// #[no_mangle]
 /// pub extern "C" fn my_function() { }
 ///
-/// pub fn inventory() -> Library {
-///     LibraryBuilder::new()
+/// pub fn inventory() -> Inventory {
+///     InventoryBuilder::new()
 ///         .register(function!(my_function))
-///         .library()
+///         .inventory()
 /// }
 /// ```
 #[macro_export]
@@ -226,22 +226,22 @@ macro_rules! function {
     }};
 }
 
-/// Register a constant with a [`LibraryBuilder`].
+/// Register a constant with an [`InventoryBuilder`].
 ///
 /// You must also annotate the constant with [`#[ffi_constant]`](crate::ffi_constant).
 ///
 /// # Example
 ///
 /// ```rust
-/// use interoptopus::{ffi_constant, Library, LibraryBuilder, constant};
+/// use interoptopus::{ffi_constant, Inventory, InventoryBuilder, constant};
 ///
 /// #[ffi_constant]
 /// pub const MY_CONSTANT: u32 = 123;
 ///
-/// pub fn inventory() -> Library {
-///     LibraryBuilder::new()
+/// pub fn inventory() -> Inventory {
+///     InventoryBuilder::new()
 ///         .register(constant!(MY_CONSTANT))
-///         .library()
+///         .inventory()
 /// }
 /// ```
 #[macro_export]
@@ -254,7 +254,7 @@ macro_rules! constant {
     }};
 }
 
-/// Register an extra type with a [`LibraryBuilder`].
+/// Register an extra type with an [`InventoryBuilder`].
 ///
 /// You must also annotate the type with [`#[ffi_type]`](crate::ffi_type) and `#[repr(C)]`.
 ///
@@ -264,7 +264,7 @@ macro_rules! constant {
 /// # Example
 ///
 /// ```rust
-/// use interoptopus::{ffi_type, Library, LibraryBuilder, extra_type};
+/// use interoptopus::{ffi_type, Inventory, InventoryBuilder, extra_type};
 ///
 /// #[ffi_type]
 /// #[repr(C)]
@@ -272,10 +272,10 @@ macro_rules! constant {
 ///     t: T
 /// };
 ///
-/// pub fn inventory() -> Library {
-///     LibraryBuilder::new()
+/// pub fn inventory() -> Inventory {
+///     InventoryBuilder::new()
 ///         .register(extra_type!(S<f32>))
-///         .library()
+///         .inventory()
 /// }
 #[macro_export]
 macro_rules! extra_type {
@@ -285,7 +285,7 @@ macro_rules! extra_type {
     }};
 }
 
-/// Register a pattern with a [`LibraryBuilder`].
+/// Register a pattern with an [`InventoryBuilder`].
 ///
 /// You only need to register [`LibraryPattern`](crate::patterns::LibraryPattern), as [`TypePattern`](crate::patterns::TypePattern) are detected automatically.
 ///
@@ -295,7 +295,7 @@ macro_rules! extra_type {
 /// Their implementation can be found in the [FFIError](crate::patterns::result::FFIError) example.
 ///
 /// ```rust
-/// use interoptopus::{ffi_type, ffi_service, ffi_service_ctor, Library, LibraryBuilder, pattern};
+/// use interoptopus::{ffi_type, ffi_service, ffi_service_ctor, Inventory, InventoryBuilder, pattern};
 ///
 /// # use std::fmt::{Display, Formatter};
 /// # use interoptopus::patterns::result::FFIError;
@@ -351,10 +351,10 @@ macro_rules! extra_type {
 ///     }
 /// }
 ///
-/// pub fn inventory() -> Library {
-///     LibraryBuilder::new()
+/// pub fn inventory() -> Inventory {
+///     InventoryBuilder::new()
 ///         .register(pattern!(SimpleService))
-///         .library()
+///         .inventory()
 /// }
 #[macro_export]
 macro_rules! pattern {

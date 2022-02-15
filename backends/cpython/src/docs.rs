@@ -4,27 +4,27 @@ use interoptopus::lang::c::{CType, CompositeType, Function};
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::writer::IndentWriter;
 use interoptopus::{indented, non_service_functions};
-use interoptopus::{Error, Library};
+use interoptopus::{Error, Inventory};
 use std::fs::File;
 use std::path::Path;
 
 pub struct DocGenerator<'a, W> {
-    library: &'a Library,
+    inventory: &'a Inventory,
     python_writer: &'a W,
     doc_config: DocConfig,
 }
 
 impl<'a, W: PythonWriter> DocGenerator<'a, W> {
-    pub fn new(library: &'a Library, w: &'a W, config: DocConfig) -> Self {
+    pub fn new(inventory: &'a Inventory, w: &'a W, config: DocConfig) -> Self {
         Self {
-            library,
+            inventory,
             python_writer: w,
             doc_config: config,
         }
     }
 
-    pub fn library(&self) -> &Library {
-        &self.library
+    pub fn inventory(&self) -> &Inventory {
+        &self.inventory
     }
 
     pub fn config(&self) -> &DocConfig {
@@ -38,7 +38,7 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
         indented!(w, r#"### Functions"#)?;
         indented!(w, r#"Freestanding callables inside the module."#)?;
 
-        for the_type in non_service_functions(self.library) {
+        for the_type in non_service_functions(self.inventory) {
             let doc = the_type.meta().documentation().lines().first().cloned().unwrap_or_default();
 
             indented!(w, r#" - **[{}](#{})** - {}"#, the_type.name(), the_type.name(), doc)?;
@@ -48,7 +48,7 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
         indented!(w, r#"### Classes"#)?;
         indented!(w, r#"Methods operating on common state."#)?;
 
-        for pattern in self.library.patterns().iter().filter_map(|x| match x {
+        for pattern in self.inventory.patterns().iter().filter_map(|x| match x {
             LibraryPattern::Service(s) => Some(s),
         }) {
             let prefix = pattern.common_prefix();
@@ -73,7 +73,7 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
         indented!(w, r#"### Enums"#)?;
         indented!(w, r#"Groups of related constants."#)?;
 
-        for the_type in self.library.ctypes().iter().filter_map(|x| match x {
+        for the_type in self.inventory.ctypes().iter().filter_map(|x| match x {
             CType::Enum(e) => Some(e),
             _ => None,
         }) {
@@ -85,7 +85,7 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
         indented!(w, r#"### Data Structs"#)?;
         indented!(w, r#"Composite data used by functions and methods."#)?;
 
-        for the_type in self.library.ctypes().iter() {
+        for the_type in self.inventory.ctypes().iter() {
             match the_type {
                 CType::Composite(c) => {
                     let doc = c.meta().documentation().lines().first().cloned().unwrap_or_default();
@@ -109,7 +109,7 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
     pub fn write_types(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r#"# Types "#)?;
 
-        for the_type in self.library().ctypes() {
+        for the_type in self.inventory().ctypes() {
             match the_type {
                 CType::Composite(e) => self.write_composite(w, e)?,
                 CType::Pattern(p @ TypePattern::Option(_)) => self.write_composite(w, p.fallback_type().as_composite_type().unwrap())?,
@@ -157,7 +157,7 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
     pub fn write_enums(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r#"# Enums "#)?;
 
-        for the_type in self.library().ctypes() {
+        for the_type in self.inventory().ctypes() {
             let the_enum = match the_type {
                 CType::Enum(e) => e,
                 _ => continue,
@@ -197,7 +197,7 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
     pub fn write_functions(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r#"# Functions"#)?;
 
-        for the_type in non_service_functions(self.library()) {
+        for the_type in non_service_functions(self.inventory()) {
             self.write_function(w, the_type)?;
         }
 
@@ -228,7 +228,7 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
     pub fn write_services(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r#"# Services"#)?;
 
-        for pattern in self.library.patterns().iter().filter_map(|x| match x {
+        for pattern in self.inventory.patterns().iter().filter_map(|x| match x {
             LibraryPattern::Service(s) => Some(s),
         }) {
             let prefix = pattern.common_prefix();

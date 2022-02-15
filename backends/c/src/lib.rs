@@ -13,7 +13,7 @@
 //! [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/reference_project/src).
 //!
 //! ```rust
-//! use interoptopus::{ffi_function, ffi_type, Library, LibraryBuilder, function};
+//! use interoptopus::{ffi_function, ffi_type, Inventory, InventoryBuilder, function};
 //!
 //! #[ffi_type]
 //! #[repr(C)]
@@ -28,10 +28,10 @@
 //!     input
 //! }
 //!
-//! pub fn my_inventory() -> Library {
-//!     LibraryBuilder::new()
+//! pub fn my_inventory() -> Inventory {
+//!     InventoryBuilder::new()
 //!         .register(function!(my_function))
-//!         .library()
+//!         .inventory()
 //! }
 //! ```
 //!
@@ -112,7 +112,7 @@
 
 use interoptopus::writer::IndentWriter;
 use interoptopus::Interop;
-use interoptopus::{Error, Library};
+use interoptopus::{Error, Inventory};
 
 mod config;
 mod converter;
@@ -129,15 +129,15 @@ pub use writer::CWriter;
 /// **Start here**, main converter implementing [`Interop`].
 pub struct Generator {
     config: Config,
-    library: Library,
+    inventory: Inventory,
     converter: Converter,
 }
 
 impl Generator {
-    pub fn new(config: Config, library: Library) -> Self {
+    pub fn new(config: Config, inventory: Inventory) -> Self {
         Self {
             config: config.clone(),
-            library,
+            inventory,
             converter: Converter { config },
         }
     }
@@ -154,8 +154,8 @@ impl CWriter for Generator {
         &self.config
     }
 
-    fn library(&self) -> &Library {
-        &self.library
+    fn inventory(&self) -> &Inventory {
+        &self.inventory
     }
 
     fn converter(&self) -> &Converter {

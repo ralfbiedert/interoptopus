@@ -13,21 +13,21 @@
 //! create guards calling this function when loading the DLL.
 //!
 //! ```
-//! use interoptopus::{ffi_function, Library, LibraryBuilder, function};
+//! use interoptopus::{ffi_function, Inventory, InventoryBuilder, function};
 //! use interoptopus::patterns::api_guard::APIVersion;
 //!
 //! // Guard function used by backends.
 //! #[ffi_function]
 //! #[no_mangle]
 //! pub extern "C" fn my_api_guard() -> APIVersion {
-//!     APIVersion::from_library(&my_inventory())
+//!     my_inventory().into()
 //! }
 //!
 //! // Inventory of our exports.
-//! pub fn my_inventory() -> Library {
-//!     LibraryBuilder::new()
+//! pub fn my_inventory() -> Inventory {
+//!     InventoryBuilder::new()
 //!         .register(function!(my_api_guard))
-//!         .library()
+//!         .inventory()
 //! }
 //! ```
 //!
@@ -52,7 +52,7 @@
 use crate::lang::c::CType;
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::TypePattern;
-use crate::Library;
+use crate::Inventory;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
@@ -71,8 +71,8 @@ impl APIVersion {
     }
 
     /// Create a new API version from the given library.
-    pub fn from_library(library: &Library) -> Self {
-        let version = library_hash(&library);
+    pub fn from_inventory(inventory: &Inventory) -> Self {
+        let version = inventory_hash(inventory);
         Self { version }
     }
 }
@@ -83,14 +83,19 @@ unsafe impl CTypeInfo for APIVersion {
     }
 }
 
-/// Returns a unique hash for a library; used by backends.
-pub fn library_hash(library: &Library) -> u64 {
+impl From<Inventory> for APIVersion {
+    fn from(i: Inventory) -> Self {
+        Self::from_inventory(&i)
+    }
+}
+/// Returns a unique hash for an inventory; used by backends.
+pub fn inventory_hash(inventory: &Inventory) -> u64 {
     let mut hasher = DefaultHasher::new();
 
     // TODO: Do we need to hash patterns as well? They should never impact the 'relevant' API surface?
-    let types = library.ctypes();
-    let functions = library.functions();
-    let constants = library.constants();
+    let types = inventory.ctypes();
+    let functions = inventory.functions();
+    let constants = inventory.constants();
 
     // TODO: Should probably exclude documentation & co.
     for t in types {

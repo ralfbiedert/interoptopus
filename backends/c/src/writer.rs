@@ -6,7 +6,7 @@ use interoptopus::lang::c::{CType, CompositeType, Constant, EnumType, Field, FnP
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::sort_types_by_dependencies;
 use interoptopus::writer::IndentWriter;
-use interoptopus::{Error, Library};
+use interoptopus::{Error, Inventory};
 
 /// Writes the C file format, `impl` this trait to customize output.
 pub trait CWriter {
@@ -14,7 +14,7 @@ pub trait CWriter {
     fn config(&self) -> &Config;
 
     /// Returns the library to produce bindings for.
-    fn library(&self) -> &Library;
+    fn inventory(&self) -> &Inventory;
 
     /// Returns the library to produce bindings for.
     fn converter(&self) -> &Converter;
@@ -35,7 +35,7 @@ pub trait CWriter {
     }
 
     fn write_constants(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        for constant in self.library().constants() {
+        for constant in self.inventory().constants() {
             self.write_constant(w, constant)?;
         }
 
@@ -53,7 +53,7 @@ pub trait CWriter {
     }
 
     fn write_functions(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        for function in self.library().functions() {
+        for function in self.inventory().functions() {
             self.write_function(w, function)?;
         }
 
@@ -99,7 +99,7 @@ pub trait CWriter {
     fn write_type_definitions(&self, w: &mut IndentWriter) -> Result<(), Error> {
         let mut known_function_pointers = vec![];
 
-        for the_type in &sort_types_by_dependencies(self.library().ctypes().to_vec()) {
+        for the_type in &sort_types_by_dependencies(self.inventory().ctypes().to_vec()) {
             self.write_type_definition(w, the_type, &mut known_function_pointers)?;
         }
 

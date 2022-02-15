@@ -3,13 +3,13 @@ use crate::converter::{CSharpTypeConverter, Converter};
 use crate::overloads::{Helper, OverloadWriter};
 use heck::ToLowerCamelCase;
 use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, Meta, PrimitiveType, Variant, Visibility};
-use interoptopus::patterns::api_guard::library_hash;
+use interoptopus::patterns::api_guard::inventory_hash;
 use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{is_global_type, longest_common_prefix, IdPrettifier};
 use interoptopus::writer::IndentWriter;
-use interoptopus::{indented, Error, Library};
+use interoptopus::{indented, Error, Inventory};
 
 /// Writes the C# file format, `impl` this trait to customize output.
 pub trait CSharpWriter {
@@ -17,7 +17,7 @@ pub trait CSharpWriter {
     fn config(&self) -> &Config;
 
     /// Returns the library to produce bindings for.
-    fn library(&self) -> &Library;
+    fn inventory(&self) -> &Inventory;
 
     fn converter(&self) -> &Converter;
 
@@ -56,7 +56,7 @@ pub trait CSharpWriter {
             overload.write_imports(w, self.helper())?;
         }
 
-        for namespace_id in self.library().namespaces() {
+        for namespace_id in self.inventory().namespaces() {
             let namespace = self
                 .config()
                 .namespace_mappings
@@ -83,12 +83,12 @@ pub trait CSharpWriter {
 
         // Check if there is a API version marker for us to write
         if let Some(api_guard) = self
-            .library()
+            .inventory()
             .functions()
             .iter()
             .find(|x| matches!(x.signature().rval(), CType::Pattern(TypePattern::APIVersion)))
         {
-            let version = library_hash(self.library());
+            let version = inventory_hash(self.inventory());
             let fn_call = self.converter().function_name_to_csharp_name(api_guard, self.config().rename_symbols);
             indented!(w, [_], r#"var api_version = {}.{}();"#, self.config().class, fn_call)?;
             indented!(w, [_], r#"if (api_version != {}ul)"#, version)?;
@@ -103,7 +103,7 @@ pub trait CSharpWriter {
     }
 
     fn write_constants(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        for constant in self.library().constants() {
+        for constant in self.inventory().constants() {
             if self.should_emit_by_meta(constant.meta()) {
                 self.write_constant(w, constant)?;
                 w.newline()?;
@@ -124,7 +124,7 @@ pub trait CSharpWriter {
     }
 
     fn write_functions(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        for function in self.library().functions() {
+        for function in self.inventory().functions() {
             if self.should_emit_by_meta(function.meta()) {
                 self.write_function(w, function)?;
                 w.newline()?;
@@ -180,7 +180,7 @@ pub trait CSharpWriter {
     }
 
     fn write_type_definitions(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        for the_type in self.library().ctypes() {
+        for the_type in self.inventory().ctypes() {
             self.write_type_definition(w, the_type)?;
         }
 
@@ -507,7 +507,7 @@ pub trait CSharpWriter {
     }
 
     fn write_patterns(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        for pattern in self.library().patterns() {
+        for pattern in self.inventory().patterns() {
             match pattern {
                 LibraryPattern::Service(cls) => {
                     if self.should_emit_by_meta(cls.the_type().meta()) {
@@ -1012,7 +1012,7 @@ pub trait CSharpWriter {
         w.newline()?;
 
         self.write_namespace_context(w, |w| {
-            if self.has_emittable_functions(self.library().functions()) {
+            if self.has_emittable_functions(self.inventory().functions()) {
                 self.write_class_context(w, |w| {
                     self.write_native_lib_string(w)?;
                     w.newline()?;

@@ -1,12 +1,12 @@
-use interoptopus::{constant, function, Library, LibraryBuilder};
+use interoptopus::{constant, function, Inventory, InventoryBuilder};
 
 mod common;
 mod ffi;
 mod thirdparty;
 
-pub fn ffi_inventory() -> Library {
+pub fn ffi_inventory() -> Inventory {
     {
-        LibraryBuilder::new()
+        InventoryBuilder::new()
             .register(function!(ffi::example_api_version))
             .register(function!(ffi::example_always_fails))
             .register(function!(ffi::example_create_context))
@@ -17,6 +17,6 @@ pub fn ffi_inventory() -> Library {
             .register(function!(ffi::example_write_foreign_type))
             .register(function!(ffi::example_double_super_complex_entity))
             .register(constant!(ffi::THE_MAGIC_CONSTANT))
-            .library()
+            .inventory()
     }
 }

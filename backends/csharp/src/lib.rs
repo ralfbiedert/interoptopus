@@ -12,8 +12,8 @@
 //! supported constructs can be found in the
 //! [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/reference_project/src).
 //!
-//! ```rust
-//! use interoptopus::{ffi_function, ffi_type, Library, LibraryBuilder, function};
+//!```rust
+//! use interoptopus::{ffi_function, ffi_type, Inventory, InventoryBuilder, function};
 //!
 //! #[ffi_type]
 //! #[repr(C)]
@@ -28,10 +28,10 @@
 //!     input
 //! }
 //!
-//! pub fn my_inventory() -> Library {
-//!     LibraryBuilder::new()
+//! pub fn my_inventory() -> Inventory {
+//!     InventoryBuilder::new()
 //!         .register(function!(my_function))
-//!         .library()
+//!         .inventory()
 //! }
 //! ```
 //!
@@ -116,7 +116,7 @@
 
 use interoptopus::writer::IndentWriter;
 use interoptopus::Interop;
-use interoptopus::{Error, Library};
+use interoptopus::{Error, Inventory};
 use overloads::OverloadWriter;
 
 mod config;
@@ -133,13 +133,13 @@ pub use writer::CSharpWriter;
 /// **Start here**, main converter implementing [`Interop`].
 pub struct Generator {
     config: Config,
-    library: Library,
+    library: Inventory,
     converter: Converter,
     overload_writer: Vec<Box<dyn OverloadWriter>>,
 }
 
 impl Generator {
-    pub fn new(config: Config, library: Library) -> Self {
+    pub fn new(config: Config, library: Inventory) -> Self {
         Self {
             config,
             library,
@@ -165,7 +165,7 @@ impl CSharpWriter for Generator {
         &self.config
     }
 
-    fn library(&self) -> &Library {
+    fn inventory(&self) -> &Inventory {
         &self.library
     }
 

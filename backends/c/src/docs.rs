@@ -3,22 +3,22 @@ use interoptopus::indented;
 use interoptopus::lang::c::{CType, Function};
 use interoptopus::util::sort_types_by_dependencies;
 use interoptopus::writer::IndentWriter;
-use interoptopus::{Error, Library};
+use interoptopus::{Error, Inventory};
 use std::fs::File;
 use std::path::Path;
 
 pub struct DocGenerator<W> {
-    library: Library,
+    inventory: Inventory,
     c_writer: W,
 }
 
 impl<W: CWriter> DocGenerator<W> {
-    pub fn new(library: Library, w: W) -> Self {
-        Self { library, c_writer: w }
+    pub fn new(inventory: Inventory, w: W) -> Self {
+        Self { inventory, c_writer: w }
     }
 
-    pub fn library(&self) -> &Library {
-        &self.library
+    pub fn inventory(&self) -> &Inventory {
+        &self.inventory
     }
 
     pub fn write_types(&self, w: &mut IndentWriter) -> Result<(), Error> {
@@ -26,7 +26,7 @@ impl<W: CWriter> DocGenerator<W> {
 
         let mut known_function_pointers = vec![];
 
-        for the_type in &sort_types_by_dependencies(self.library().ctypes().to_vec()) {
+        for the_type in &sort_types_by_dependencies(self.inventory().ctypes().to_vec()) {
             self.write_type_definition(w, the_type, &mut known_function_pointers)?;
         }
 
@@ -67,7 +67,7 @@ impl<W: CWriter> DocGenerator<W> {
     pub fn write_functions(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r#"# Functions "#)?;
 
-        for the_type in self.library().functions() {
+        for the_type in self.inventory().functions() {
             self.write_function(w, the_type)?;
         }
 
