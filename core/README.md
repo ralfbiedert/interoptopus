@@ -27,7 +27,7 @@ you actually wanted to expose.
 ### Code you write ...
 
 ```rust
-use interoptopus::{ffi_function, ffi_type, Library, LibraryBuilder, function};
+use interoptopus::{ffi_function, ffi_type, Inventory, InventoryBuilder, function};
 
 #[ffi_type]
 #[repr(C)]
@@ -44,10 +44,10 @@ pub extern "C" fn my_function(input: Vec2) {
 
 // Define our FFI interface as `ffi_inventory` containing
 // a single function `my_function`. Types are inferred.
-pub fn ffi_inventory() -> Library {
-    LibraryBuilder::new()
+pub fn ffi_inventory() -> Inventory {
+    InventoryBuilder::new()
         .register(function!(my_function))
-        .library()
+        .inventory()
 }
 
 ```

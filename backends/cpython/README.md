@@ -13,7 +13,7 @@ supported constructs can be found in the
 [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/reference_project/src).
 
 ```rust
-use interoptopus::{ffi_function, ffi_type, Library, LibraryBuilder, function};
+use interoptopus::{ffi_function, ffi_type, Inventory, InventoryBuilder, function};
 
 #[ffi_type]
 #[repr(C)]
@@ -28,10 +28,10 @@ pub extern "C" fn my_function(input: Vec2) -> Vec2 {
     input
 }
 
-pub fn my_inventory() -> Library {
-    LibraryBuilder::new()
+pub fn my_inventory() -> Inventory {
+    InventoryBuilder::new()
         .register(function!(my_function))
-        .library()
+        .inventory()
 }
 ```
 
