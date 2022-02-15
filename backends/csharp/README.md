@@ -8,8 +8,8 @@ want to generate **C# bindings**, follow the instructions below.
 #### Inside Your Library
 
 Add [**Interoptopus**](https://crates.io/crates/interoptopus) attributes to the library you have
-written, and define an [**inventory**](https://docs.rs/interoptopus/latest/interoptopus/macro.inventory.html)
-function listing all symbols you wish to export. An overview of all supported constructs can be found in the
+written, and define an inventory function listing all symbols you wish to export. An overview of all
+supported constructs can be found in the
 [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/reference_project/src).
 
 ```rust

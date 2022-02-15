@@ -43,7 +43,7 @@ pub extern "C" fn my_function(input: Vec2) {
 }
 
 // Define our FFI interface as `ffi_inventory` containing
-// a single function `my_function`. Type are inferred.
+// a single function `my_function`. Types are inferred.
 pub fn ffi_inventory() -> Library {
     LibraryBuilder::new()
         .register(function!(my_function))
