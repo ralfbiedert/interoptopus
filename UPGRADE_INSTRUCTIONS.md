@@ -5,6 +5,13 @@
 Tips for solving non-trivial breaking changes when upgrading from previous versions.
 
 
+### 0.13 → 0.14
+
+- Removed `inventory!` macro
+  - You now just write a regular function returning an `Inventory`
+  - See the reference project for details 
+
+
 ### 0.12 → 0.13
 
 - Deprecated Python CFFI backend, replace with Python CTypes backend. 
