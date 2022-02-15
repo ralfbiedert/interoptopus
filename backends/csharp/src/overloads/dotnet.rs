@@ -256,7 +256,29 @@ impl OverloadWriter for DotNet {
         Ok(())
     }
 
-    fn write_pattern_slice_overload(&self, _w: &mut IndentWriter, _h: Helper, _context_type_name: &str, _type_string: &str) -> Result<(), Error> {
+    fn write_pattern_slice_overload(&self, w: &mut IndentWriter, h: Helper, _context_type_name: &str, type_string: &str) -> Result<(), Error> {
+        if h.config.use_unsafe.any_unsafe() {
+            indented!(w, [_], r#"public ReadOnlySpan<{}> GetReadOnlySpan()"#, type_string)?;
+            indented!(w, [_], r#"{{"#)?;
+            indented!(w, [_ _], r#"unsafe"#)?;
+            indented!(w, [_ _], r#"{{"#)?;
+            indented!(w, [_ _ _], r#"return new ReadOnlySpan<{}>(this.data.ToPointer(), (int) this.len);"#, type_string)?;
+            indented!(w, [_ _], r#"}}"#)?;
+            indented!(w, [_], r#"}}"#)?;
+        }
+        Ok(())
+    }
+
+    fn write_pattern_slice_mut_overload(&self, w: &mut IndentWriter, h: Helper, _context_type_name: &str, type_string: &str) -> Result<(), Error> {
+        if h.config.use_unsafe.any_unsafe() {
+            indented!(w, [_], r#"public Span<{}> GetSpan()"#, type_string)?;
+            indented!(w, [_], r#"{{"#)?;
+            indented!(w, [_ _], r#"unsafe"#)?;
+            indented!(w, [_ _], r#"{{"#)?;
+            indented!(w, [_ _ _], r#"return new Span<{}>(this.data.ToPointer(), (int) this.len);"#, type_string)?;
+            indented!(w, [_ _], r#"}}"#)?;
+            indented!(w, [_], r#"}}"#)?;
+        }
         Ok(())
     }
 

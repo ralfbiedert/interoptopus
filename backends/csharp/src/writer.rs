@@ -726,6 +726,10 @@ pub trait CSharpWriter {
             overload.write_pattern_slice_overload(w, self.helper(), context_type_name, &type_string)?;
         }
 
+        for overload in self.overloads() {
+            overload.write_pattern_slice_mut_overload(w, self.helper(), context_type_name, &type_string)?;
+        }
+
         // Getter
         indented!(w, [_], r#"public {} this[int i]"#, type_string)?;
         indented!(w, [_], r#"{{"#)?;

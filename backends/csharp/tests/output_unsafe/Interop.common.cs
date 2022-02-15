@@ -54,6 +54,13 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
+        public ReadOnlySpan<Bool> GetReadOnlySpan()
+        {
+            unsafe
+            {
+                return new ReadOnlySpan<Bool>(this.data.ToPointer(), (int) this.len);
+            }
+        }
         #if UNITY_2018_1_OR_NEWER
         public SliceBool(NativeArray<Bool> handle)
         {
@@ -140,6 +147,13 @@ namespace My.Company.Common
         {
             this.data = handle;
             this.len = count;
+        }
+        public ReadOnlySpan<uint> GetReadOnlySpan()
+        {
+            unsafe
+            {
+                return new ReadOnlySpan<uint>(this.data.ToPointer(), (int) this.len);
+            }
         }
         #if UNITY_2018_1_OR_NEWER
         public Sliceu32(NativeArray<uint> handle)
@@ -228,6 +242,13 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
+        public ReadOnlySpan<byte> GetReadOnlySpan()
+        {
+            unsafe
+            {
+                return new ReadOnlySpan<byte>(this.data.ToPointer(), (int) this.len);
+            }
+        }
         #if UNITY_2018_1_OR_NEWER
         public Sliceu8(NativeArray<byte> handle)
         {
@@ -315,6 +336,13 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
+        public ReadOnlySpan<uint> GetReadOnlySpan()
+        {
+            unsafe
+            {
+                return new ReadOnlySpan<uint>(this.data.ToPointer(), (int) this.len);
+            }
+        }
         #if UNITY_2018_1_OR_NEWER
         public SliceMutu32(NativeArray<uint> handle)
         {
@@ -325,6 +353,13 @@ namespace My.Company.Common
             }
         }
         #endif
+        public Span<uint> GetSpan()
+        {
+            unsafe
+            {
+                return new Span<uint>(this.data.ToPointer(), (int) this.len);
+            }
+        }
         public uint this[int i]
         {
             get
@@ -411,6 +446,13 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
+        public ReadOnlySpan<byte> GetReadOnlySpan()
+        {
+            unsafe
+            {
+                return new ReadOnlySpan<byte>(this.data.ToPointer(), (int) this.len);
+            }
+        }
         #if UNITY_2018_1_OR_NEWER
         public SliceMutu8(NativeArray<byte> handle)
         {
@@ -421,6 +463,13 @@ namespace My.Company.Common
             }
         }
         #endif
+        public Span<byte> GetSpan()
+        {
+            unsafe
+            {
+                return new Span<byte>(this.data.ToPointer(), (int) this.len);
+            }
+        }
         public byte this[int i]
         {
             get

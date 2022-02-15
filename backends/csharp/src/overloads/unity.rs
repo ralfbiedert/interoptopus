@@ -299,6 +299,10 @@ impl OverloadWriter for Unity {
         Ok(())
     }
 
+    fn write_pattern_slice_mut_overload(&self, _w: &mut IndentWriter, _h: Helper, _context_type_name: &str, _type_string: &str) -> Result<(), Error> {
+        Ok(())
+    }
+
     fn write_pattern_slice_unsafe_copied_fragment(&self, w: &mut IndentWriter, _h: Helper, type_string: &str) -> Result<(), Error> {
         indented!(w, [_ _ _ _ _], r#"#elif UNITY_2018_1_OR_NEWER"#)?;
         indented!(w, [_ _ _ _ _], r#"UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof({})));"#, type_string)?;

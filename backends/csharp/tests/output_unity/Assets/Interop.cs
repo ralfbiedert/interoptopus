@@ -1101,6 +1101,13 @@ namespace My.Company
             this.data = handle;
             this.len = count;
         }
+        public ReadOnlySpan<UseAsciiStringPattern> GetReadOnlySpan()
+        {
+            unsafe
+            {
+                return new ReadOnlySpan<UseAsciiStringPattern>(this.data.ToPointer(), (int) this.len);
+            }
+        }
         #if UNITY_2018_1_OR_NEWER
         public SliceUseAsciiStringPattern(NativeArray<UseAsciiStringPattern> handle)
         {
@@ -1172,6 +1179,13 @@ namespace My.Company
         {
             this.data = handle;
             this.len = count;
+        }
+        public ReadOnlySpan<Vec3f32> GetReadOnlySpan()
+        {
+            unsafe
+            {
+                return new ReadOnlySpan<Vec3f32>(this.data.ToPointer(), (int) this.len);
+            }
         }
         #if UNITY_2018_1_OR_NEWER
         public SliceVec3f32(NativeArray<Vec3f32> handle)
