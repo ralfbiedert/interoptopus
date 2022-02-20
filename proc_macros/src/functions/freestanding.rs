@@ -93,6 +93,11 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
     let mut generic_params = quote! {};
     let mut phantom_fields = quote! {};
 
+    let _ = item_fn
+        .sig
+        .abi
+        .unwrap_or_else(|| panic!(r#"Function '{}' must have ABI specifier such as 'extern "C"'."#, function_ident_str));
+
     if !generic_parameters.is_empty() {
         generic_params = quote! { < #(#generic_parameters,)* > };
         phantom_fields = quote! {
