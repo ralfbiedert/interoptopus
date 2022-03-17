@@ -166,6 +166,27 @@ impl Inventory {
     pub fn patterns(&self) -> &[LibraryPattern] {
         &self.patterns
     }
+
+    /// Return a new [`Inventory`] filtering any elements contained within any of a number of other
+    /// inventories.
+    ///
+    /// Useful for removing duplicated symbols when generating bindings split across multiple files.
+    pub fn filter(&self, inventories: &[Inventory]) -> Inventory {
+        let filter_inventory = merge_inventories(inventories);
+
+        let functions = self.functions.iter().cloned().filter(|f| !filter_inventory.functions.contains(f)).collect();
+        let constants = self.constants.iter().cloned().filter(|c| !filter_inventory.constants.contains(c)).collect();
+        let patterns = self.patterns.iter().cloned().filter(|p| !filter_inventory.patterns.contains(p)).collect();
+        let ctypes = self.ctypes.iter().cloned().filter(|t| !filter_inventory.ctypes.contains(t)).collect();
+
+        Self {
+            functions,
+            constants,
+            patterns,
+            ctypes,
+            namespaces: self.namespaces.clone(),
+        }
+    }
 }
 
 /// Returns all functions not belonging to a [`service`](crate::patterns::service) pattern.
