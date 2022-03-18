@@ -109,6 +109,15 @@ pub struct Inventory {
     namespaces: Vec<String>,
 }
 
+/// An item which can be contained within an [`Inventory`].
+#[derive(Clone, Debug, PartialEq)]
+pub enum InventoryItem {
+    Function(Function),
+    CType(CType),
+    Constant(Constant),
+    Pattern(LibraryPattern),
+}
+
 impl Inventory {
     /// Produce a new inventory for the given functions, constants and patterns.
     ///
@@ -167,23 +176,45 @@ impl Inventory {
         &self.patterns
     }
 
-    /// Return a new [`Inventory`] filtering any elements contained within any of a number of other
-    /// inventories.
+    /// Return all functions, types, constants and namespaces registered in this [`Inventory`]
+    /// as a vec of [`InventoryItem`]
+    ///
+    pub fn items(&self) -> Vec<InventoryItem> {
+        let items: Vec<Vec<InventoryItem>> = vec![
+            self.functions.clone().into_iter().map(|f| InventoryItem::Function(f)).collect(),
+            self.ctypes.clone().into_iter().map(|t| InventoryItem::CType(t)).collect(),
+            self.constants.clone().into_iter().map(|c| InventoryItem::Constant(c)).collect(),
+            self.patterns.clone().into_iter().map(|p| InventoryItem::Pattern(p)).collect(),
+        ];
+
+        items.into_iter().flatten().collect()
+    }
+
+    /// Return a new [`Inventory`] filtering items by a predicate
     ///
     /// Useful for removing duplicated symbols when generating bindings split across multiple files.
-    pub fn filter(&self, inventories: &[Inventory]) -> Inventory {
-        let filter_inventory = merge_inventories(inventories);
+    pub fn filter<P: FnMut(&InventoryItem) -> bool>(&self, predicate: P) -> Inventory {
+        let filtered_items: Vec<InventoryItem> = self.items().into_iter().filter(predicate).collect();
 
-        let functions = self.functions.iter().cloned().filter(|f| !filter_inventory.functions.contains(f)).collect();
-        let constants = self.constants.iter().cloned().filter(|c| !filter_inventory.constants.contains(c)).collect();
-        let patterns = self.patterns.iter().cloned().filter(|p| !filter_inventory.patterns.contains(p)).collect();
-        let ctypes = self.ctypes.iter().cloned().filter(|t| !filter_inventory.ctypes.contains(t)).collect();
+        let mut functions: Vec<Function> = Vec::new();
+        let mut ctypes: Vec<CType> = Vec::new();
+        let mut constants: Vec<Constant> = Vec::new();
+        let mut patterns: Vec<LibraryPattern> = Vec::new();
+
+        for item in filtered_items {
+            match item {
+                InventoryItem::Function(f) => functions.push(f),
+                InventoryItem::CType(t) => ctypes.push(t),
+                InventoryItem::Constant(c) => constants.push(c),
+                InventoryItem::Pattern(p) => patterns.push(p),
+            }
+        }
 
         Self {
             functions,
+            ctypes,
             constants,
             patterns,
-            ctypes,
             namespaces: self.namespaces.clone(),
         }
     }
