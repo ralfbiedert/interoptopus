@@ -167,7 +167,7 @@
 //! [docs]: https://docs.rs/interoptopus/badge.svg
 //! [docs.rs]: https://docs.rs/interoptopus/
 
-pub use crate::core::{merge_inventories, non_service_functions, Inventory, InventoryBuilder, Symbol};
+pub use crate::core::{merge_inventories, non_service_functions, Inventory, InventoryBuilder, InventoryItem, Symbol};
 pub use error::Error;
 pub use generators::Interop;
 #[cfg(feature = "derive")]

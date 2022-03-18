@@ -1,6 +1,6 @@
 //! Canonical, _almost_-C representation of items in an FFI boundary.
 //!
-//! The types in here are the [`Inventory`] building blocks with which
+//! The types in here are the [`crate::Inventory`] building blocks with which
 //! a C API can be built. In addition, they contain a few extra, non-C elements
 //! (e.g., namespaces, patterns), all of which however can reasonably be mapped to or ignored in C.
 //!
@@ -161,7 +161,7 @@ impl CType {
 
     /// Produces a name unique for that type with respect to this library.
     ///
-    /// The name here is supposed to uniquely determine a type relative to a library ([`Inventory`]),
+    /// The name here is supposed to uniquely determine a type relative to a library ([`crate::Inventory`]),
     /// but it is not guaranteed to be C-compatible and may contain special characters
     /// (e.g., `*const u32`).
     ///

@@ -109,13 +109,17 @@ pub struct Inventory {
     namespaces: Vec<String>,
 }
 
-/// An item which can be contained within an [`Inventory`].
+/// References to items contained within an [`Inventory`].
+///
+/// This enum is primarily used by functions such as [`Inventory::filter`] that need to handle
+/// items of various types.
 #[derive(Clone, Debug, PartialEq)]
-pub enum InventoryItem {
-    Function(Function),
-    CType(CType),
-    Constant(Constant),
-    Pattern(LibraryPattern),
+pub enum InventoryItem<'a> {
+    Function(&'a Function),
+    CType(&'a CType),
+    Constant(&'a Constant),
+    Pattern(&'a LibraryPattern),
+    Namespace(&'a str),
 }
 
 impl Inventory {
@@ -176,46 +180,39 @@ impl Inventory {
         &self.patterns
     }
 
-    /// Return all functions, types, constants and namespaces registered in this [`Inventory`]
-    /// as a vec of [`InventoryItem`]
+    /// Return a new [`Inventory`] filtering items by a predicate.
     ///
-    pub fn items(&self) -> Vec<InventoryItem> {
-        let items: Vec<Vec<InventoryItem>> = vec![
-            self.functions.clone().into_iter().map(|f| InventoryItem::Function(f)).collect(),
-            self.ctypes.clone().into_iter().map(|t| InventoryItem::CType(t)).collect(),
-            self.constants.clone().into_iter().map(|c| InventoryItem::Constant(c)).collect(),
-            self.patterns.clone().into_iter().map(|p| InventoryItem::Pattern(p)).collect(),
-        ];
-
-        items.into_iter().flatten().collect()
-    }
-
-    /// Return a new [`Inventory`] filtering items by a predicate
+    /// Useful for removing duplicate symbols when generating bindings split across multiple files.
     ///
-    /// Useful for removing duplicated symbols when generating bindings split across multiple files.
-    pub fn filter<P: FnMut(&InventoryItem) -> bool>(&self, predicate: P) -> Inventory {
-        let filtered_items: Vec<InventoryItem> = self.items().into_iter().filter(predicate).collect();
-
-        let mut functions: Vec<Function> = Vec::new();
-        let mut ctypes: Vec<CType> = Vec::new();
-        let mut constants: Vec<Constant> = Vec::new();
-        let mut patterns: Vec<LibraryPattern> = Vec::new();
-
-        for item in filtered_items {
-            match item {
-                InventoryItem::Function(f) => functions.push(f),
-                InventoryItem::CType(t) => ctypes.push(t),
-                InventoryItem::Constant(c) => constants.push(c),
-                InventoryItem::Pattern(p) => patterns.push(p),
-            }
-        }
+    /// # Examples
+    ///
+    /// Here we filter an inventory, keeping only types, removing all other items.
+    ///
+    /// ```rust
+    /// # use interoptopus::{Inventory, InventoryItem};
+    /// #
+    /// # let inventory = Inventory::default();
+    /// #
+    /// let filtered = inventory.filter(|x| {
+    ///     match x {
+    ///         InventoryItem::CType(_) => true,
+    ///         _ => false,
+    ///     }
+    /// });
+    /// ```
+    pub fn filter<P: FnMut(InventoryItem) -> bool>(&self, mut predicate: P) -> Inventory {
+        let functions: Vec<Function> = self.functions.iter().filter(|x| predicate(InventoryItem::Function(x))).cloned().collect();
+        let ctypes: Vec<CType> = self.ctypes.iter().filter(|x| predicate(InventoryItem::CType(x))).cloned().collect();
+        let constants: Vec<Constant> = self.constants.iter().filter(|x| predicate(InventoryItem::Constant(x))).cloned().collect();
+        let patterns: Vec<LibraryPattern> = self.patterns.iter().filter(|x| predicate(InventoryItem::Pattern(x))).cloned().collect();
+        let namespaces: Vec<String> = self.namespaces.iter().filter(|x| predicate(InventoryItem::Namespace(x))).cloned().collect();
 
         Self {
             functions,
             ctypes,
             constants,
             patterns,
-            namespaces: self.namespaces.clone(),
+            namespaces,
         }
     }
 }
@@ -239,7 +236,7 @@ pub fn non_service_functions(inventory: &Inventory) -> Vec<&Function> {
     inventory.functions().iter().filter(|&x| !service_methods.contains(x)).collect()
 }
 
-/// Create a single [`Inventory`] from a number of individual inventory.
+/// Create a single [`Inventory`] from a number of individual inventories.
 ///
 /// This function can be useful when your FFI crate exports different sets of
 /// symbols (e.g., _core_ and _extension_ functions) and you want to create different
