@@ -9,7 +9,7 @@ namespace interop_test
         [Fact]
         public void pattern_ffi_slice_delegate()
         {
-            Interop.pattern_ffi_slice_delegate(delegate (Sliceu8 x0)
+            Interop.pattern_ffi_slice_delegate(delegate(Sliceu8 x0)
             {
                 var span = x0.ReadOnlySpan;
 
@@ -17,6 +17,18 @@ namespace interop_test
             });
         }
 
+        // Ensure that the Copied property has the correct length and contents 
+        [Fact]
+        public void ensure_unsafe_copy_length()
+        {
+            const int size = 20;
+            var service = SimpleService.NewWith(20);
+            var res = service.ReturnSliceMut();
 
+            foreach (var r in res.Copied)
+            {
+                Assert.True(r == size);
+            }
+        }
     }
 }
