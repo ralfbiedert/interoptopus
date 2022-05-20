@@ -2,7 +2,7 @@
 name = "interoptopus_proc"
 description = "Macros to produce Interoptopus item info."
 authors = ["Ralf Biedert <rb@xr.io>"]
-version = "0.14.0"
+version = "0.14.2"
 edition = "2018"
 license = "MIT"
 keywords = ["ffi"]
