@@ -288,9 +288,9 @@ impl OverloadWriter for DotNet {
         Ok(())
     }
 
-    fn write_pattern_slice_unsafe_copied_fragment(&self, w: &mut IndentWriter, _h: Helper, _type_string: &str) -> Result<(), Error> {
+    fn write_pattern_slice_unsafe_copied_fragment(&self, w: &mut IndentWriter, _h: Helper, type_string: &str) -> Result<(), Error> {
         indented!(w, [_ _ _ _ _], r#"#elif NETCOREAPP"#)?;
-        indented!(w, [_ _ _ _ _], r#"Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);"#)?;
+        indented!(w, [_ _ _ _ _], r#"Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof({}));"#, type_string)?;
         Ok(())
     }
 }

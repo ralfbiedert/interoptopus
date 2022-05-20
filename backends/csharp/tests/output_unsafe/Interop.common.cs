@@ -97,7 +97,7 @@ namespace My.Company.Common
                     {
                         #if __INTEROPTOPUS_NEVER
                         #elif NETCOREAPP
-                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Bool));
                         #elif UNITY_2018_1_OR_NEWER
                         UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(Bool)));
                         #else
@@ -194,7 +194,7 @@ namespace My.Company.Common
                     {
                         #if __INTEROPTOPUS_NEVER
                         #elif NETCOREAPP
-                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(uint));
                         #elif UNITY_2018_1_OR_NEWER
                         UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(uint)));
                         #else
@@ -291,7 +291,7 @@ namespace My.Company.Common
                     {
                         #if __INTEROPTOPUS_NEVER
                         #elif NETCOREAPP
-                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(byte));
                         #elif UNITY_2018_1_OR_NEWER
                         UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(byte)));
                         #else
@@ -407,7 +407,7 @@ namespace My.Company.Common
                     {
                         #if __FALSE
                         #elif NETCOREAPP
-                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(uint));
                         #elif UNITY_2018_1_OR_NEWER
                         UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(uint)));
                         #else
@@ -523,7 +523,7 @@ namespace My.Company.Common
                     {
                         #if __FALSE
                         #elif NETCOREAPP
-                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(byte));
                         #elif UNITY_2018_1_OR_NEWER
                         UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(byte)));
                         #else

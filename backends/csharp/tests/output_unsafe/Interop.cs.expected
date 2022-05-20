@@ -1226,7 +1226,7 @@ namespace My.Company
                     {
                         #if __INTEROPTOPUS_NEVER
                         #elif NETCOREAPP
-                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint)len);
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Vec3f32));
                         #elif UNITY_2018_1_OR_NEWER
                         UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(Vec3f32)));
                         #else
