@@ -136,7 +136,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
             quote_spanned! { span_function =>
                 #[interoptopus::ffi_function]
                 #[no_mangle]
-                #[allow(unused_mut)]
+                #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
                 #[allow(clippy::needless_lifetimes)]
                 #(
                     #[doc = #doc_lines]
@@ -176,7 +176,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 quote_spanned! { span_function =>
                     #[interoptopus::ffi_function]
                     #[no_mangle]
-                    #[allow(unused_mut)]
+                    #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
                     #[allow(clippy::needless_lifetimes)]
                     #(
                         #[doc = #doc_lines]
@@ -204,7 +204,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 quote_spanned! { span_function =>
                     #[interoptopus::ffi_function]
                     #[no_mangle]
-                    #[allow(unused_mut)]
+                    #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
                     #[allow(clippy::needless_lifetimes)]
                     #(
                         #[doc = #doc_lines]
@@ -222,7 +222,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 quote_spanned! { span_function =>
                     #[interoptopus::ffi_function]
                     #[no_mangle]
-                    #[allow(unused_mut)]
+                    #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
                     #[allow(clippy::needless_lifetimes)]
                     #(
                         #[doc = #doc_lines]
@@ -260,7 +260,7 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         #[interoptopus::ffi_function]
-        #[allow(unused_mut)]
+        #[allow(unused_mut, unsafe_op_in_unsafe_fn, unused_unsafe)]
         #[no_mangle]
         pub unsafe extern "C" fn #ffi_fn_ident(context: &mut *mut #without_lifetimes) -> #error_ident {
             // Checks the _contained_ pointer is not null, which usually means service was not initialized.
