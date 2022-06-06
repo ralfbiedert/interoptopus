@@ -232,7 +232,7 @@ where
 {
     fn type_info() -> CType {
         let sig = FunctionSignature::new(
-            vec![Parameter::new("x0".to_string(), T1::type_info()), Parameter::new("x1".to_string(), T1::type_info())],
+            vec![Parameter::new("x0".to_string(), T1::type_info()), Parameter::new("x1".to_string(), T2::type_info())],
             R::type_info(),
         );
         CType::FnPointer(FnPointerType::new(sig))
@@ -247,7 +247,7 @@ where
 {
     fn type_info() -> CType {
         let sig = FunctionSignature::new(
-            vec![Parameter::new("x0".to_string(), T1::type_info()), Parameter::new("x1".to_string(), T1::type_info())],
+            vec![Parameter::new("x0".to_string(), T1::type_info()), Parameter::new("x1".to_string(), T2::type_info())],
             R::type_info(),
         );
         CType::FnPointer(FnPointerType::new(sig))
@@ -265,8 +265,8 @@ where
         let sig = FunctionSignature::new(
             vec![
                 Parameter::new("x0".to_string(), T1::type_info()),
-                Parameter::new("x1".to_string(), T1::type_info()),
-                Parameter::new("x2".to_string(), T2::type_info()),
+                Parameter::new("x1".to_string(), T2::type_info()),
+                Parameter::new("x2".to_string(), T3::type_info()),
             ],
             R::type_info(),
         );
@@ -285,8 +285,8 @@ where
         let sig = FunctionSignature::new(
             vec![
                 Parameter::new("x0".to_string(), T1::type_info()),
-                Parameter::new("x1".to_string(), T1::type_info()),
-                Parameter::new("x2".to_string(), T2::type_info()),
+                Parameter::new("x1".to_string(), T2::type_info()),
+                Parameter::new("x2".to_string(), T3::type_info()),
             ],
             R::type_info(),
         );
