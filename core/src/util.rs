@@ -31,28 +31,43 @@ pub fn safe_name(name: &str) -> String {
     rval
 }
 
+// TODO: Create a few unit tests for this.
 /// Sorts types so the latter entries will find their dependents earlier in this list.
 pub fn sort_types_by_dependencies(mut types: Vec<CType>) -> Vec<CType> {
     let mut rval = Vec::new();
 
-    // Ugly but was fast to write.
-    // TODO: This is guaranteed to terminate by proof of running it at least once on my machine.
+    // Outer loop keeps iterating while there are still more types to sort.
+    //
+    // Example of input  = [ F(A), D(E), G(?), C(D(E)), A, B(D(E)), E ]
+    //            output = [ G(?), A, E, F(A), D(E), C(D(E)), B(D(E)) ]
+    //
+    // Where A(B) means A depends on B, and ? is a type that cannot be fulfilled by input.
+    //
+    // The idea is to keep iterating `types`, removing all entries that either have no dependencies, or which
+    // have already been satisfied.
     while !types.is_empty() {
-        let mut this_round = Vec::new();
+        // Types which have dependents fulfilled; we're going to fill this.
+        let mut may_add_this_round = Vec::new();
 
+        // Check any top-level type still in the list.
         for t in &types {
-            let embedded = t.embedded_types();
-            let all_exist = embedded.iter().all(|x| {
+            let needed_to_exist = t.embedded_types();
+
+            let t_is_sufficiently_fulfilled = needed_to_exist.iter().all(|x| {
+                // All types exist if they, well, already exist in the output array. In addition, if a type
+                // cannot be fulfilled by the remaining types we also skip it (this can happen when filtering
+                // incomplete type lists which might be fulfilled by 3rd party user code).
                 rval.contains(x) || !types.contains(x)
             });
 
-            if embedded.is_empty() || all_exist {
-                this_round.push(t.clone());
+            // Add `t` if it didn't have any dependencies, or if we already added them.
+            if needed_to_exist.is_empty() || t_is_sufficiently_fulfilled {
+                may_add_this_round.push(t.clone());
             }
         }
 
-        types.retain(|x| !this_round.contains(x));
-        rval.append(&mut this_round);
+        types.retain(|x| !may_add_this_round.contains(x));
+        rval.append(&mut may_add_this_round);
     }
 
     rval
