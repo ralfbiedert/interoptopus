@@ -42,7 +42,9 @@ pub fn sort_types_by_dependencies(mut types: Vec<CType>) -> Vec<CType> {
 
         for t in &types {
             let embedded = t.embedded_types();
-            let all_exist = embedded.iter().all(|x| rval.contains(x));
+            let all_exist = embedded.iter().all(|x| {
+                rval.contains(x) || !types.contains(x)
+            });
 
             if embedded.is_empty() || all_exist {
                 this_round.push(t.clone());
