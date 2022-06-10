@@ -54,6 +54,7 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
+        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public ReadOnlySpan<Bool> ReadOnlySpan
         {
             get
@@ -64,6 +65,7 @@ namespace My.Company.Common
                 }
             }
         }
+        #endif
         #if UNITY_2018_1_OR_NEWER
         public SliceBool(NativeArray<Bool> handle)
         {
@@ -151,6 +153,7 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
+        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public ReadOnlySpan<uint> ReadOnlySpan
         {
             get
@@ -161,6 +164,7 @@ namespace My.Company.Common
                 }
             }
         }
+        #endif
         #if UNITY_2018_1_OR_NEWER
         public Sliceu32(NativeArray<uint> handle)
         {
@@ -248,6 +252,7 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
+        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public ReadOnlySpan<byte> ReadOnlySpan
         {
             get
@@ -258,6 +263,7 @@ namespace My.Company.Common
                 }
             }
         }
+        #endif
         #if UNITY_2018_1_OR_NEWER
         public Sliceu8(NativeArray<byte> handle)
         {
@@ -345,6 +351,7 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
+        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public ReadOnlySpan<uint> ReadOnlySpan
         {
             get
@@ -355,6 +362,7 @@ namespace My.Company.Common
                 }
             }
         }
+        #endif
         #if UNITY_2018_1_OR_NEWER
         public SliceMutu32(NativeArray<uint> handle)
         {
@@ -365,6 +373,7 @@ namespace My.Company.Common
             }
         }
         #endif
+        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public Span<uint> Span
         {
             get
@@ -375,6 +384,7 @@ namespace My.Company.Common
                 }
             }
         }
+        #endif
         public uint this[int i]
         {
             get
@@ -461,6 +471,7 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
+        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public ReadOnlySpan<byte> ReadOnlySpan
         {
             get
@@ -471,6 +482,7 @@ namespace My.Company.Common
                 }
             }
         }
+        #endif
         #if UNITY_2018_1_OR_NEWER
         public SliceMutu8(NativeArray<byte> handle)
         {
@@ -481,6 +493,7 @@ namespace My.Company.Common
             }
         }
         #endif
+        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public Span<byte> Span
         {
             get
@@ -491,6 +504,7 @@ namespace My.Company.Common
                 }
             }
         }
+        #endif
         public byte this[int i]
         {
             get

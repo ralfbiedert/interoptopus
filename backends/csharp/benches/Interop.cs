@@ -1101,6 +1101,7 @@ namespace My.Company
             this.data = handle;
             this.len = count;
         }
+        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public ReadOnlySpan<UseAsciiStringPattern> ReadOnlySpan
         {
             get
@@ -1111,6 +1112,7 @@ namespace My.Company
                 }
             }
         }
+        #endif
         #if UNITY_2018_1_OR_NEWER
         public SliceUseAsciiStringPattern(NativeArray<UseAsciiStringPattern> handle)
         {
@@ -1183,6 +1185,7 @@ namespace My.Company
             this.data = handle;
             this.len = count;
         }
+        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public ReadOnlySpan<Vec3f32> ReadOnlySpan
         {
             get
@@ -1193,6 +1196,7 @@ namespace My.Company
                 }
             }
         }
+        #endif
         #if UNITY_2018_1_OR_NEWER
         public SliceVec3f32(NativeArray<Vec3f32> handle)
         {

@@ -258,6 +258,7 @@ impl OverloadWriter for DotNet {
 
     fn write_pattern_slice_overload(&self, w: &mut IndentWriter, h: Helper, _context_type_name: &str, type_string: &str) -> Result<(), Error> {
         if h.config.use_unsafe.any_unsafe() {
+            indented!(w, [_], r#"#if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)"#)?;
             indented!(w, [_], r#"public ReadOnlySpan<{}> ReadOnlySpan"#, type_string)?;
             indented!(w, [_], r#"{{"#)?;
             indented!(w, [_ _], r#"get"#)?;
@@ -268,12 +269,14 @@ impl OverloadWriter for DotNet {
             indented!(w, [_ _ _], r#"}}"#)?;
             indented!(w, [_ _], r#"}}"#)?;
             indented!(w, [_], r#"}}"#)?;
+            indented!(w, [_], r#"#endif"#)?;
         }
         Ok(())
     }
 
     fn write_pattern_slice_mut_overload(&self, w: &mut IndentWriter, h: Helper, _context_type_name: &str, type_string: &str) -> Result<(), Error> {
         if h.config.use_unsafe.any_unsafe() {
+            indented!(w, [_], r#"#if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)"#)?;
             indented!(w, [_], r#"public Span<{}> Span"#, type_string)?;
             indented!(w, [_], r#"{{"#)?;
             indented!(w, [_ _], r#"get"#)?;
@@ -284,6 +287,7 @@ impl OverloadWriter for DotNet {
             indented!(w, [_ _ _], r#"}}"#)?;
             indented!(w, [_ _], r#"}}"#)?;
             indented!(w, [_], r#"}}"#)?;
+            indented!(w, [_], r#"#endif"#)?;
         }
         Ok(())
     }
