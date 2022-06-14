@@ -294,6 +294,98 @@ where
     }
 }
 
+unsafe impl<'a, T1, T2, T3, T4, R> CTypeInfo for extern "C" fn(T1, T2, T3, T4) -> R
+where
+    T1: CTypeInfo + 'a,
+    T2: CTypeInfo + 'a,
+    T3: CTypeInfo + 'a,
+    T4: CTypeInfo + 'a,
+    R: CTypeInfo + 'a,
+{
+    fn type_info() -> CType {
+        let sig = FunctionSignature::new(
+            vec![
+                Parameter::new("x0".to_string(), T1::type_info()),
+                Parameter::new("x1".to_string(), T2::type_info()),
+                Parameter::new("x2".to_string(), T3::type_info()),
+                Parameter::new("x3".to_string(), T4::type_info()),
+            ],
+            R::type_info(),
+        );
+        CType::FnPointer(FnPointerType::new(sig))
+    }
+}
+
+unsafe impl<'a, T1, T2, T3, T4, R> CTypeInfo for Option<extern "C" fn(T1, T2, T3, T4) -> R>
+where
+    T1: CTypeInfo + 'a,
+    T2: CTypeInfo + 'a,
+    T3: CTypeInfo + 'a,
+    T4: CTypeInfo + 'a,
+    R: CTypeInfo + 'a,
+{
+    fn type_info() -> CType {
+        let sig = FunctionSignature::new(
+            vec![
+                Parameter::new("x0".to_string(), T1::type_info()),
+                Parameter::new("x1".to_string(), T2::type_info()),
+                Parameter::new("x2".to_string(), T3::type_info()),
+                Parameter::new("x3".to_string(), T4::type_info()),
+            ],
+            R::type_info(),
+        );
+        CType::FnPointer(FnPointerType::new(sig))
+    }
+}
+
+unsafe impl<'a, T1, T2, T3, T4, T5, R> CTypeInfo for extern "C" fn(T1, T2, T3, T4, T5) -> R
+where
+    T1: CTypeInfo + 'a,
+    T2: CTypeInfo + 'a,
+    T3: CTypeInfo + 'a,
+    T4: CTypeInfo + 'a,
+    T5: CTypeInfo + 'a,
+    R: CTypeInfo + 'a,
+{
+    fn type_info() -> CType {
+        let sig = FunctionSignature::new(
+            vec![
+                Parameter::new("x0".to_string(), T1::type_info()),
+                Parameter::new("x1".to_string(), T2::type_info()),
+                Parameter::new("x2".to_string(), T3::type_info()),
+                Parameter::new("x3".to_string(), T4::type_info()),
+                Parameter::new("x4".to_string(), T5::type_info()),
+            ],
+            R::type_info(),
+        );
+        CType::FnPointer(FnPointerType::new(sig))
+    }
+}
+
+unsafe impl<'a, T1, T2, T3, T4, T5, R> CTypeInfo for Option<extern "C" fn(T1, T2, T3, T4, T5) -> R>
+where
+    T1: CTypeInfo + 'a,
+    T2: CTypeInfo + 'a,
+    T3: CTypeInfo + 'a,
+    T4: CTypeInfo + 'a,
+    T5: CTypeInfo + 'a,
+    R: CTypeInfo + 'a,
+{
+    fn type_info() -> CType {
+        let sig = FunctionSignature::new(
+            vec![
+                Parameter::new("x0".to_string(), T1::type_info()),
+                Parameter::new("x1".to_string(), T2::type_info()),
+                Parameter::new("x2".to_string(), T3::type_info()),
+                Parameter::new("x3".to_string(), T4::type_info()),
+                Parameter::new("x4".to_string(), T5::type_info()),
+            ],
+            R::type_info(),
+        );
+        CType::FnPointer(FnPointerType::new(sig))
+    }
+}
+
 unsafe impl<T, const N: usize> CTypeInfo for [T; N]
 where
     T: CTypeInfo,
