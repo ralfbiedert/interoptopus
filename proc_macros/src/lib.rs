@@ -444,6 +444,19 @@ pub fn ffi_service_method(_attr: TokenStream, item: TokenStream) -> TokenStream 
     item
 }
 
+/// Inside a [`#[ffi_service]`](macro@crate::ffi_service) block, provide instruction to skip functions.
+///
+/// This is an optional attribute that can be applied to some methods.
+///
+/// Public functions with this attribute will not be included in the bindings.
+///
+/// See the [service module](https://docs.rs/interoptopus/latest/interoptopus/patterns/service/index.html) for an introduction into services.
+///
+#[proc_macro_attribute]
+pub fn ffi_service_skip(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    item
+}
+
 /// On methods and structs, provide a type helper for foreign types.<sup>⚠️</sup>
 ///
 /// When dealing with types outside of your control you will not be able to implement [`CTypeInfo`](https://docs.rs/interoptopus/latest/interoptopus/lang/rust/trait.CTypeInfo.html) for them.

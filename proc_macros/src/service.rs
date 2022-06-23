@@ -35,8 +35,11 @@ pub fn ffi_service(attr: AttributeArgs, input: TokenStream) -> TokenStream {
         if let ImplItem::Method(method) = impl_item {
             match &method.vis {
                 Visibility::Public(_) => {
-                    if let Some(descriptor) = generate_service_method(&attributes, &item, method) {
-                        function_descriptors.push(descriptor);
+                    if method.attrs.iter().any(|x| format!("{:?}", x).contains("ffi_service_skip")) {}
+                    else {
+                        if let Some(descriptor) = generate_service_method(&attributes, &item, method) {
+                            function_descriptors.push(descriptor);
+                        }
                     }
                 }
                 _ => {}
