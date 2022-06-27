@@ -43,14 +43,14 @@ static EMPTY: &[u8] = b"\0";
 #[derive(Debug)]
 pub struct AsciiPointer<'a> {
     ptr: *const c_char,
-    _phandom: PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Default for AsciiPointer<'a> {
     fn default() -> Self {
         Self {
             ptr: null(),
-            _phandom: Default::default(),
+            _phantom: Default::default(),
         }
     }
 }
@@ -59,7 +59,7 @@ impl<'a> AsciiPointer<'a> {
     pub fn empty() -> Self {
         Self {
             ptr: EMPTY.as_ptr().cast(),
-            _phandom: Default::default(),
+            _phantom: Default::default(),
         }
     }
 
@@ -83,7 +83,7 @@ impl<'a> AsciiPointer<'a> {
 
         Ok(Self {
             ptr: ascii_with_nul.as_ptr().cast(),
-            _phandom: Default::default(),
+            _phantom: Default::default(),
         })
     }
 
@@ -91,7 +91,7 @@ impl<'a> AsciiPointer<'a> {
     pub fn from_cstr(cstr: &'a CStr) -> Self {
         Self {
             ptr: cstr.as_ptr(),
-            _phandom: Default::default(),
+            _phantom: Default::default(),
         }
     }
 
