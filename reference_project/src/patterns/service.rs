@@ -3,7 +3,7 @@ use crate::patterns::result::{Error, FFIError};
 use interoptopus::patterns::primitives::FFIBool;
 use interoptopus::patterns::slice::{FFISlice, FFISliceMut};
 use interoptopus::patterns::string::AsciiPointer;
-use interoptopus::{ffi_service, ffi_service_ctor, ffi_service_method, ffi_type};
+use interoptopus::{ffi_service, ffi_service_ctor, ffi_service_ignore, ffi_service_method, ffi_type};
 use std::ffi::CString;
 
 /// Some struct we want to expose as a class.
@@ -66,8 +66,7 @@ impl SimpleService {
     ///
     /// Multiple lines.
     #[ffi_service_method(on_panic = "return_default")]
-    pub fn method_void(&self) {
-    }
+    pub fn method_void(&self) {}
 
     #[ffi_service_method(on_panic = "return_default")]
     pub fn method_mut_self(&mut self, slice: FFISlice<u8>) -> u8 {
@@ -128,6 +127,11 @@ impl SimpleService {
         Ok(())
     }
 
+    #[ffi_service_ignore]
+    pub fn this_is_ignored(&mut self) -> Result<(), Error> {
+        Ok(())
+    }
+
     pub fn method_callback(&mut self, callback: MyCallback) -> Result<(), Error> {
         callback.call(0);
         Ok(())
@@ -139,7 +143,6 @@ impl SimpleService {
         Ok(())
     }
 }
-
 
 // Some struct we want to expose as a class.
 #[ffi_type(opaque)]

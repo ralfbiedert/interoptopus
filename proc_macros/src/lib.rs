@@ -322,7 +322,7 @@ pub fn ffi_service_ctor(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
 
-/// Inside a [`#[ffi_service]`](macro@crate::ffi_service) block, provide special directives to functions.
+/// Inside a [`#[ffi_service]`](macro@crate::ffi_service) block, configure the generated FFI helper.
 ///
 /// This is an optional attribute that can be applied to some methods.
 ///
@@ -444,16 +444,17 @@ pub fn ffi_service_method(_attr: TokenStream, item: TokenStream) -> TokenStream 
     item
 }
 
-/// Inside a [`#[ffi_service]`](macro@crate::ffi_service) block, provide instruction to skip functions.
+/// Inside a [`#[ffi_service]`](macro@crate::ffi_service) block, don't emit code for a method.
 ///
-/// This is an optional attribute that can be applied to some methods.
+/// This is an optional attribute that can be applied to methods.
 ///
-/// Public functions with this attribute will not be included in the bindings.
+/// By default all public methods inside a `#[ffi_service]` section will be exported to FFI. However, public methods with this attribute will not
+/// be ignored instead. This can be useful if you want to add Rust-internal helper methods to your service.
 ///
 /// See the [service module](https://docs.rs/interoptopus/latest/interoptopus/patterns/service/index.html) for an introduction into services.
 ///
 #[proc_macro_attribute]
-pub fn ffi_service_skip(_attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn ffi_service_ignore(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
 

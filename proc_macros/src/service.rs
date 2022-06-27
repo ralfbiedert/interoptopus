@@ -33,16 +33,12 @@ pub fn ffi_service(attr: AttributeArgs, input: TokenStream) -> TokenStream {
 
     for impl_item in &item.items {
         if let ImplItem::Method(method) = impl_item {
-            match &method.vis {
-                Visibility::Public(_) => {
-                    if method.attrs.iter().any(|x| format!("{:?}", x).contains("ffi_service_skip")) {}
-                    else {
-                        if let Some(descriptor) = generate_service_method(&attributes, &item, method) {
-                            function_descriptors.push(descriptor);
-                        }
-                    }
+            if let Visibility::Public(_) = &method.vis {
+                if method.attrs.iter().any(|x| format!("{:?}", x).contains("ffi_service_ignore")) {
+                    // Don't emit code for ignored methods
+                } else if let Some(descriptor) = generate_service_method(&attributes, &item, method) {
+                    function_descriptors.push(descriptor);
                 }
-                _ => {}
             }
         }
     }

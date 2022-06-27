@@ -7,7 +7,7 @@
 //! inter-dependencies.
 //!
 //! That said, services usually translate to classes in languages supporting them, automatically
-//! guard against panics (prevent them from bubbling into C which would be undefined behavior)
+//! guard against panics (preventing them from bubbling into C which would be undefined behavior)
 //! and can provide transparent error handling.
 //!
 //! In short, if your library offers a "service", the _service pattern_ might give you a noticeable
