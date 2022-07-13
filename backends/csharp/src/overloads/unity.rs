@@ -1,6 +1,6 @@
 use crate::overloads::{write_common_service_method_overload, write_function_overloaded_invoke_with_error_handling, Helper};
 use crate::{OverloadWriter, Unsafe};
-use interoptopus::lang::c::{CType, CompositeType, Field, Function, FunctionSignature, Parameter};
+use interoptopus::lang::c::{CType, CompositeType, Field, Function, FunctionSignature, Parameter, Documentation};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::IndentWriter;
@@ -132,6 +132,14 @@ impl Unity {
 
         Ok(())
     }
+
+    fn write_documentation(&self, w: &mut IndentWriter, documentation: &Documentation) -> Result<(), Error> {
+        for line in documentation.lines() {
+            indented!(w, r#"///{}"#, line)?;
+        }
+
+        Ok(())
+    }
 }
 
 impl OverloadWriter for Unity {
@@ -176,6 +184,8 @@ impl OverloadWriter for Unity {
         if !has_overload || !h.config.use_unsafe.any_unsafe() {
             return Ok(());
         }
+
+        self.write_documentation(w, function.meta().documentation())?;
 
         // If we have delegates we need to write a version with IntPtr only
         if self.has_delegate(signature) {
@@ -275,6 +285,9 @@ impl OverloadWriter for Unity {
         w.newline()?;
 
         indented!(w, r#"#if UNITY_2018_1_OR_NEWER"#)?;
+        
+        self.write_documentation(w, function.meta().documentation())?;
+
         write_common_service_method_overload(w, h, function, fn_pretty, |h, p| self.pattern_to_native_in_signature(h, p, function.signature()))?;
         indented!(w, r#"#endif"#)?;
 

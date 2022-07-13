@@ -490,6 +490,12 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_destroy")]
         public static extern FFIError simple_service_destroy(ref IntPtr context);
 
+        /// Destroys the given instance.
+        ///
+        /// # Safety
+        ///
+        /// The passed parameter MUST have been created with the corresponding init function;
+        /// passing any other value results in undefined behavior.
         public static void simple_service_destroy_checked(ref IntPtr context) {
             var rval = simple_service_destroy(ref context);;
             if (rval != FFIError.Ok)
@@ -503,6 +509,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_new_with")]
         public static extern FFIError simple_service_new_with(ref IntPtr context, uint some_value);
 
+        /// The constructor must return a `Result<Self, Error>`.
         public static void simple_service_new_with_checked(ref IntPtr context, uint some_value) {
             var rval = simple_service_new_with(ref context, some_value);;
             if (rval != FFIError.Ok)
@@ -553,6 +560,8 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_result")]
         public static extern FFIError simple_service_method_result(IntPtr context, uint anon1);
 
+        /// Methods returning a Result<(), _> are the default and do not
+        /// need annotations.
         public static void simple_service_method_result_checked(IntPtr context, uint anon1) {
             var rval = simple_service_method_result(context, anon1);;
             if (rval != FFIError.Ok)
@@ -600,6 +609,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_void")]
         public static extern void simple_service_method_mut_self_void(IntPtr context, SliceBool slice);
 
+        /// Single line.
         public static void simple_service_method_mut_self_void(IntPtr context, Bool[] slice) {
             unsafe
             {
@@ -611,6 +621,7 @@ namespace My.Company
             }
         }
 
+        /// Single line.
         #if UNITY_2018_1_OR_NEWER
         public static void simple_service_method_mut_self_void(IntPtr context, NativeArray<Bool> slice) {
             var slice_slice = new SliceBool(slice);
@@ -784,6 +795,12 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lt_destroy")]
         public static extern FFIError simple_service_lt_destroy(ref IntPtr context);
 
+        /// Destroys the given instance.
+        ///
+        /// # Safety
+        ///
+        /// The passed parameter MUST have been created with the corresponding init function;
+        /// passing any other value results in undefined behavior.
         public static void simple_service_lt_destroy_checked(ref IntPtr context) {
             var rval = simple_service_lt_destroy(ref context);;
             if (rval != FFIError.Ok)
@@ -1417,12 +1434,14 @@ namespace My.Company
             Interop.simple_service_method_mut_self_void(_context, slice);
         }
 
+        /// Single line.
         public void MethodMutSelfVoid(Bool[] slice)
         {
             Interop.simple_service_method_mut_self_void(_context, slice);
         }
 
         #if UNITY_2018_1_OR_NEWER
+        /// Single line.
         public void MethodMutSelfVoid(NativeArray<Bool> slice)
         {
             Interop.simple_service_method_mut_self_void(_context, slice);
