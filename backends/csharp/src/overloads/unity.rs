@@ -1,6 +1,6 @@
 use crate::overloads::{write_common_service_method_overload, write_function_overloaded_invoke_with_error_handling, Helper};
 use crate::{OverloadWriter, Unsafe};
-use interoptopus::lang::c::{CType, CompositeType, Field, Function, FunctionSignature, Parameter, Documentation};
+use interoptopus::lang::c::{CType, CompositeType, Field, Function, FunctionSignature, Parameter};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::IndentWriter;
@@ -129,14 +129,6 @@ impl Unity {
         )?;
         indented!(w, r#"public static extern {} {}({});"#, rval, name, params.join(", "))?;
         w.newline()?;
-
-        Ok(())
-    }
-
-    fn write_documentation(&self, w: &mut IndentWriter, documentation: &Documentation) -> Result<(), Error> {
-        for line in documentation.lines() {
-            indented!(w, r#"///{}"#, line)?;
-        }
 
         Ok(())
     }
@@ -285,7 +277,7 @@ impl OverloadWriter for Unity {
         w.newline()?;
 
         indented!(w, r#"#if UNITY_2018_1_OR_NEWER"#)?;
-        
+
         self.write_documentation(w, function.meta().documentation())?;
 
         write_common_service_method_overload(w, h, function, fn_pretty, |h, p| self.pattern_to_native_in_signature(h, p, function.signature()))?;

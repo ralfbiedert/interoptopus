@@ -50,7 +50,7 @@
 //! }
 //!
 
-use interoptopus::lang::c::{CType, CompositeType, Field, Function, Parameter, PrimitiveType};
+use interoptopus::lang::c::{CType, CompositeType, Documentation, Field, Function, Parameter, PrimitiveType};
 use interoptopus::patterns::service::Service;
 use interoptopus::writer::IndentWriter;
 use interoptopus::{indented, Error};
@@ -84,6 +84,14 @@ pub trait OverloadWriter {
     fn write_pattern_slice_mut_overload(&self, w: &mut IndentWriter, h: Helper, context_type_name: &str, type_string: &str) -> Result<(), Error>;
 
     fn write_pattern_slice_unsafe_copied_fragment(&self, w: &mut IndentWriter, h: Helper, type_string: &str) -> Result<(), Error>;
+
+    fn write_documentation(&self, w: &mut IndentWriter, documentation: &Documentation) -> Result<(), Error> {
+        for line in documentation.lines() {
+            indented!(w, r#"///{}"#, line)?;
+        }
+
+        Ok(())
+    }
 }
 
 /// Writes common error handling based on a call's return type.

@@ -1,6 +1,6 @@
 use crate::overloads::{write_common_service_method_overload, write_function_overloaded_invoke_with_error_handling, Helper};
 use crate::{OverloadWriter, Unsafe};
-use interoptopus::lang::c::{CType, CompositeType, Field, Function, FunctionSignature, Parameter, Documentation};
+use interoptopus::lang::c::{CType, CompositeType, Field, Function, FunctionSignature, Parameter};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::IndentWriter;
@@ -90,14 +90,6 @@ impl DotNet {
 
             x => h.converter.to_typespecifier_in_param(x),
         }
-    }
-
-    fn write_documentation(&self, w: &mut IndentWriter, documentation: &Documentation) -> Result<(), Error> {
-        for line in documentation.lines() {
-            indented!(w, r#"///{}"#, line)?;
-        }
-
-        Ok(())
     }
 }
 
