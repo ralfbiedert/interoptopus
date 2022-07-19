@@ -174,6 +174,7 @@ impl OverloadWriter for DotNet {
             params.push(format!("{} {}", native, name));
         }
 
+        w.newline()?;
         self.write_documentation(w, function.meta().documentation())?;
 
         indented!(w, r#"public static {} {}({}) {{"#, rval, this_name, params.join(", "))?;

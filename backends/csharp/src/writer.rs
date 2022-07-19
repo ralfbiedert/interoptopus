@@ -141,7 +141,6 @@ pub trait CSharpWriter {
         self.write_function_declaration(w, function)?;
 
         for overload in self.overloads() {
-            w.newline()?;
             overload.write_function_overload(w, self.helper(), function)?;
         }
 
