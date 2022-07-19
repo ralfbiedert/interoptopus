@@ -177,6 +177,7 @@ impl OverloadWriter for Unity {
             return Ok(());
         }
 
+        w.newline()?;
         self.write_documentation(w, function.meta().documentation())?;
 
         // If we have delegates we need to write a version with IntPtr only
