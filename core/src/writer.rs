@@ -5,6 +5,13 @@ use std::io::Write;
 /// You might not realize how hard it can be to type exactly 4 spaces.
 pub const FOUR_SPACES: &str = "    ";
 
+/// In some places we can write for docs or for actual code generation.
+#[derive(PartialOrd, PartialEq, Copy, Clone, Debug)]
+pub enum WriteFor {
+    Code,
+    Docs,
+}
+
 /// Convenience helper to allow backends to write code with indentation.
 pub struct IndentWriter<'a> {
     one_indent: String,

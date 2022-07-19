@@ -4,15 +4,8 @@ use interoptopus::lang::c::{CType, CompositeType, EnumType, Function, PrimitiveT
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{longest_common_prefix, safe_name, sort_types_by_dependencies};
-use interoptopus::writer::IndentWriter;
+use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, non_service_functions, Error, Inventory};
-
-/// In some places we can write for docs or for actual code generation.
-#[derive(PartialOrd, PartialEq, Copy, Clone, Debug)]
-pub enum WriteFor {
-    Code,
-    Docs,
-}
 
 /// Writes the Python file format, `impl` this trait to customize output.
 pub trait PythonWriter {

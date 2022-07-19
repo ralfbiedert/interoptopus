@@ -1,8 +1,7 @@
-use crate::writer::WriteFor;
 use crate::{DocConfig, PythonWriter};
 use interoptopus::lang::c::{CType, CompositeType, Function};
 use interoptopus::patterns::{LibraryPattern, TypePattern};
-use interoptopus::writer::IndentWriter;
+use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, non_service_functions};
 use interoptopus::{Error, Inventory};
 use std::fs::File;
