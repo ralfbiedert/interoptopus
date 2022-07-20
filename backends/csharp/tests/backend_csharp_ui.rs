@@ -1,9 +1,10 @@
 use interoptopus::testing::assert_file_matches_generated;
 use interoptopus::util::NamespaceMappings;
-use interoptopus::Error;
-use interoptopus::Interop;
+use interoptopus::{Error, Interop};
 use interoptopus_backend_csharp::overloads::{DotNet, Unity};
-use interoptopus_backend_csharp::{run_dotnet_command_if_installed, CSharpVisibility, Config, Generator, Unsafe, WriteTypes};
+use interoptopus_backend_csharp::{
+    run_dotnet_command_if_installed, CSharpVisibility, Config, DocConfig, DocGenerator, Generator, Unsafe, WriteTypes
+};
 use std::path::{Path, PathBuf};
 use tempdir::TempDir;
 
@@ -68,6 +69,13 @@ fn generate_bindings_multi(folder: impl AsRef<Path>, use_unsafe: Unsafe, config:
     Ok(())
 }
 
+fn generate_documentation(output: &str) -> Result<(), Error> {
+    let inventory = interoptopus_reference_project::ffi_inventory();
+    let generator = Generator::new(Config::default(), inventory.clone());
+
+    DocGenerator::new(&inventory, &generator, DocConfig::default()).write_file(output)
+}
+
 #[test]
 #[cfg_attr(miri, ignore)]
 fn bindings_match_reference() -> Result<(), Error> {
@@ -83,6 +91,8 @@ fn bindings_match_reference() -> Result<(), Error> {
 
     assert_file_matches_generated("tests/output_unity/Assets/Interop.cs");
     assert_file_matches_generated("tests/output_unity/Assets/Interop.common.cs");
+
+    generate_documentation("tests/output/reference_project.md")?;
 
     Ok(())
 }

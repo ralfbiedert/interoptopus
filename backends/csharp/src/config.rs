@@ -114,3 +114,10 @@ impl Default for Config {
         }
     }
 }
+
+/// Configures C# documentation generation.
+#[derive(Clone, Debug, Default)]
+pub struct DocConfig {
+    /// Header to append to the generated documentation.
+    pub header: String,
+}

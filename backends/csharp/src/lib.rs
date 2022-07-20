@@ -124,11 +124,13 @@ mod converter;
 pub mod overloads;
 mod testing;
 mod writer;
+mod docs;
 
-pub use config::{CSharpVisibility, Config, Unsafe, WriteTypes};
+pub use config::{CSharpVisibility, Config, Unsafe, WriteTypes, DocConfig};
 pub use converter::{CSharpTypeConverter, Converter};
 pub use testing::run_dotnet_command_if_installed;
 pub use writer::CSharpWriter;
+pub use docs::DocGenerator;
 
 /// **Start here**, main converter implementing [`Interop`].
 pub struct Generator {
