@@ -52,6 +52,7 @@
 
 use interoptopus::lang::c::{CType, CompositeType, Documentation, Field, Function, Parameter, PrimitiveType};
 use interoptopus::patterns::service::Service;
+use interoptopus::patterns::TypePattern;
 use interoptopus::writer::IndentWriter;
 use interoptopus::{indented, Error};
 
@@ -59,8 +60,8 @@ mod dotnet;
 mod unity;
 
 use crate::{CSharpTypeConverter, Config};
+use crate::converter::FunctionNameFlavor;
 pub use dotnet::DotNet;
-use interoptopus::patterns::TypePattern;
 pub use unity::Unity;
 
 #[doc(hidden)]
@@ -164,7 +165,10 @@ fn write_common_service_method_overload<FPatternMap: Fn(&Helper, &Parameter) -> 
         types.push(native);
     }
 
-    let method_to_invoke = h.converter.function_name_to_csharp_name(function, h.config.rename_symbols);
+    let method_to_invoke = h.converter.function_name_to_csharp_name(function, match h.config.rename_symbols {
+        true => FunctionNameFlavor::CSharpMethodNameWithClass,
+        false => FunctionNameFlavor::RawFFIName
+    });
     let extra_args = if to_invoke.is_empty() {
         "".to_string()
     } else {

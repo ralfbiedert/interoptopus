@@ -1,5 +1,6 @@
 use crate::overloads::{write_common_service_method_overload, write_function_overloaded_invoke_with_error_handling, Helper};
 use crate::{OverloadWriter, Unsafe};
+use crate::converter::FunctionNameFlavor;
 use interoptopus::lang::c::{CType, CompositeType, Field, Function, FunctionSignature, Parameter};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::TypePattern;
@@ -108,7 +109,10 @@ impl Unity {
 
     fn write_function_delegate_overload_helper(&self, w: &mut IndentWriter, h: &Helper, function: &Function) -> Result<(), Error> {
         let rval = h.converter.function_rval_to_csharp_typename(function);
-        let name = h.converter.function_name_to_csharp_name(function, h.config.rename_symbols);
+        let name = h.converter.function_name_to_csharp_name(function, match h.config.rename_symbols {
+            true => FunctionNameFlavor::CSharpMethodNameWithClass,
+            false => FunctionNameFlavor::RawFFIName
+        });
 
         let mut params = Vec::new();
         for (_, p) in function.signature().params().iter().enumerate() {
@@ -195,7 +199,10 @@ impl OverloadWriter for Unity {
         let mut to_pin_name = Vec::new();
         let mut to_pin_slice_type = Vec::new();
         let mut to_invoke = Vec::new();
-        let raw_name = h.converter.function_name_to_csharp_name(function, h.config.rename_symbols);
+        let raw_name = h.converter.function_name_to_csharp_name(function, match h.config.rename_symbols {
+            true => FunctionNameFlavor::CSharpMethodNameWithClass,
+            false => FunctionNameFlavor::RawFFIName
+        });
         let this_name = if has_error_enum && !has_overload {
             format!("{}_checked", raw_name)
         } else {
@@ -260,7 +267,10 @@ impl OverloadWriter for Unity {
             }
         }
 
-        let fn_name = h.converter.function_name_to_csharp_name(function, h.config.rename_symbols);
+        let fn_name = h.converter.function_name_to_csharp_name(function, match h.config.rename_symbols {
+            true => FunctionNameFlavor::CSharpMethodNameWithClass,
+            false => FunctionNameFlavor::RawFFIName
+        });
         let call = format!(r#"{}({});"#, fn_name, to_invoke.join(", "));
         write_function_overloaded_invoke_with_error_handling(w, function, &call)?;
 

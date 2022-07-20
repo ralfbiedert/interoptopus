@@ -10,6 +10,16 @@ use interoptopus::util::safe_name;
 #[derive(Copy, Clone)]
 pub struct Converter {}
 
+/// How to convert from Rust function names to C#
+pub enum FunctionNameFlavor<'a> {
+    /// Takes the name as it is written in Rust
+    RawFFIName,
+    /// Converts the name to camel case
+    CSharpMethodNameWithClass,
+    /// Converts the name to camel case and removes the class name
+    CSharpMethodNameWithoutClass(&'a str),
+}
+
 /// Converts Interoptopus types to C# types.
 pub trait CSharpTypeConverter {
     /// Converts a primitive (Rust) type to a native C# type name, e.g., `f32` to `float`.
@@ -200,11 +210,12 @@ pub trait CSharpTypeConverter {
         self.to_typespecifier_in_rval(function.signature().rval())
     }
 
-    fn function_name_to_csharp_name(&self, function: &Function, rename_symbols: bool) -> String {
-        if rename_symbols {
-            function.name().to_upper_camel_case()
-        } else {
-            function.name().to_string()
+    /// Gets the function name in a specific flavor
+    fn function_name_to_csharp_name(&self, function: &Function, flavor: FunctionNameFlavor) -> String {
+        match flavor {
+            FunctionNameFlavor::RawFFIName => function.name().to_string(),
+            FunctionNameFlavor::CSharpMethodNameWithClass => function.name().to_upper_camel_case(),
+            FunctionNameFlavor::CSharpMethodNameWithoutClass(class) => function.name().replace(class, "").to_upper_camel_case(),
         }
     }
 }

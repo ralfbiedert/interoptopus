@@ -1,5 +1,5 @@
 use crate::config::{Config, Unsafe, WriteTypes};
-use crate::converter::{CSharpTypeConverter, Converter};
+use crate::converter::{CSharpTypeConverter, Converter, FunctionNameFlavor};
 use crate::overloads::{Helper, OverloadWriter};
 use heck::ToLowerCamelCase;
 use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, Meta, PrimitiveType, Variant, Visibility};
@@ -7,8 +7,8 @@ use interoptopus::patterns::api_guard::inventory_hash;
 use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
-use interoptopus::util::{is_global_type, longest_common_prefix, IdPrettifier};
-use interoptopus::writer::IndentWriter;
+use interoptopus::util::{is_global_type, longest_common_prefix};
+use interoptopus::writer::{IndentWriter};
 use interoptopus::{indented, Error, Inventory};
 
 /// Writes the C# file format, `impl` this trait to customize output.
@@ -89,7 +89,11 @@ pub trait CSharpWriter {
             .find(|x| matches!(x.signature().rval(), CType::Pattern(TypePattern::APIVersion)))
         {
             let version = inventory_hash(self.inventory());
-            let fn_call = self.converter().function_name_to_csharp_name(api_guard, self.config().rename_symbols);
+            let flavor = match self.config().rename_symbols {
+                true => FunctionNameFlavor::CSharpMethodNameWithClass,
+                false => FunctionNameFlavor::RawFFIName
+            };
+            let fn_call = self.converter().function_name_to_csharp_name(api_guard, flavor);
             indented!(w, [_], r#"var api_version = {}.{}();"#, self.config().class, fn_call)?;
             indented!(w, [_], r#"if (api_version != {}ul)"#, version)?;
             indented!(w, [_], r#"{{"#)?;
@@ -165,7 +169,10 @@ pub trait CSharpWriter {
 
     fn write_function_declaration(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
         let rval = self.converter().function_rval_to_csharp_typename(function);
-        let name = self.converter().function_name_to_csharp_name(function, self.config().rename_symbols);
+        let name = self.converter().function_name_to_csharp_name(function, match self.config().rename_symbols {
+            true => FunctionNameFlavor::CSharpMethodNameWithClass,
+            false => FunctionNameFlavor::RawFFIName
+        });
 
         let mut params = Vec::new();
         for (_, p) in function.signature().params().iter().enumerate() {
@@ -848,9 +855,7 @@ pub trait CSharpWriter {
 
         for ctor in class.constructors() {
             // Ctor
-            let without_common_prefix = ctor.name().replace(&common_prefix, "");
-            let prettified = IdPrettifier::from_rust_lower(&without_common_prefix);
-            let fn_name = prettified.to_camel_case();
+            let fn_name = self.converter().function_name_to_csharp_name(ctor, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix));
             let rval = format!("static {}", context_type_name);
 
             self.write_documentation(w, ctor.meta().documentation())?;
@@ -864,9 +869,7 @@ pub trait CSharpWriter {
 
         for function in class.methods() {
             // Main function
-            let without_common_prefix = function.name().replace(&common_prefix, "");
-            let prettified = IdPrettifier::from_rust_lower(&without_common_prefix);
-            let fn_name = prettified.to_camel_case();
+            let fn_name = self.converter().function_name_to_csharp_name(function, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix));
 
             // Write checked method. These are "normal" methods that accept
             // common C# types.
@@ -935,8 +938,10 @@ pub trait CSharpWriter {
             types.push(native);
         }
 
-        let method_to_invoke = self.converter().function_name_to_csharp_name(function, self.config().rename_symbols);
-        // let method_to_invoke = function.name().to_string();
+        let method_to_invoke = self.converter().function_name_to_csharp_name(function, match self.config().rename_symbols {
+            true => FunctionNameFlavor::CSharpMethodNameWithClass,
+            false => FunctionNameFlavor::RawFFIName
+        });
         let extra_args = if to_invoke.is_empty() {
             "".to_string()
         } else {
