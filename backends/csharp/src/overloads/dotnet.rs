@@ -4,7 +4,7 @@ use crate::converter::FunctionNameFlavor;
 use interoptopus::lang::c::{CType, CompositeType, Field, Function, FunctionSignature, Parameter};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::TypePattern;
-use interoptopus::writer::IndentWriter;
+use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, Error};
 use std::ops::Deref;
 
@@ -106,7 +106,7 @@ impl OverloadWriter for DotNet {
         Ok(())
     }
 
-    fn write_function_overload(&self, w: &mut IndentWriter, h: Helper, function: &Function) -> Result<(), Error> {
+    fn write_function_overload(&self, w: &mut IndentWriter, h: Helper, function: &Function, write_for: WriteFor) -> Result<(), Error> {
         let has_overload = self.has_overloadable(function.signature());
         let has_error_enum = h.converter.has_ffi_error_rval(function.signature());
 
@@ -179,7 +179,10 @@ impl OverloadWriter for DotNet {
         }
 
         w.newline()?;
-        self.write_documentation(w, function.meta().documentation())?;
+
+        if write_for == WriteFor::Code {
+            self.write_documentation(w, function.meta().documentation())?;
+        }
 
         indented!(w, r#"public static {} {}({}) {{"#, rval, this_name, params.join(", "))?;
 
@@ -257,16 +260,18 @@ impl OverloadWriter for DotNet {
         indented!(w, r#"}}"#)
     }
 
-    fn write_service_method_overload(&self, w: &mut IndentWriter, h: Helper, _class: &Service, function: &Function, fn_pretty: &str) -> Result<(), Error> {
+    fn write_service_method_overload(&self, w: &mut IndentWriter, h: Helper, _class: &Service, function: &Function, fn_pretty: &str, write_for: WriteFor) -> Result<(), Error> {
         if !self.has_overloadable(function.signature()) {
             return Ok(());
         }
 
         w.newline()?;
 
-        self.write_documentation(w, function.meta().documentation())?;
+        if write_for == WriteFor::Code {
+            self.write_documentation(w, function.meta().documentation())?;
+        }
 
-        write_common_service_method_overload(w, h, function, fn_pretty, |h, p| self.pattern_to_native_in_signature(h, p, function.signature()))?;
+        write_common_service_method_overload(w, h, function, fn_pretty, |h, p| self.pattern_to_native_in_signature(h, p, function.signature()), write_for)?;
 
         Ok(())
     }

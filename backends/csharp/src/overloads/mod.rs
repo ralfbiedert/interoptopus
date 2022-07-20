@@ -53,7 +53,7 @@
 use interoptopus::lang::c::{CType, CompositeType, Documentation, Field, Function, Parameter, PrimitiveType};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::TypePattern;
-use interoptopus::writer::IndentWriter;
+use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, Error};
 
 mod dotnet;
@@ -76,9 +76,9 @@ pub trait OverloadWriter {
 
     fn write_field_decorators(&self, w: &mut IndentWriter, h: Helper, field: &Field, strct: &CompositeType) -> Result<(), Error>;
 
-    fn write_function_overload(&self, w: &mut IndentWriter, h: Helper, function: &Function) -> Result<(), Error>;
+    fn write_function_overload(&self, w: &mut IndentWriter, h: Helper, function: &Function, write_for: WriteFor) -> Result<(), Error>;
 
-    fn write_service_method_overload(&self, w: &mut IndentWriter, h: Helper, class: &Service, function: &Function, fn_pretty: &str) -> Result<(), Error>;
+    fn write_service_method_overload(&self, w: &mut IndentWriter, h: Helper, class: &Service, function: &Function, fn_pretty: &str, write_for: WriteFor) -> Result<(), Error>;
 
     fn write_pattern_slice_overload(&self, w: &mut IndentWriter, h: Helper, context_type_name: &str, type_string: &str) -> Result<(), Error>;
 
@@ -129,6 +129,7 @@ fn write_common_service_method_overload<FPatternMap: Fn(&Helper, &Parameter) -> 
     function: &Function,
     fn_pretty: &str,
     f_pattern: FPatternMap,
+    write_for: WriteFor
 ) -> Result<(), Error> {
     let mut names = Vec::new();
     let mut to_invoke = Vec::new();
@@ -182,6 +183,11 @@ fn write_common_service_method_overload<FPatternMap: Fn(&Helper, &Parameter) -> 
 
     // Write signature.
     indented!(w, r#"public {} {}({})"#, rval, fn_pretty, arg_tokens.join(", "))?;
+
+    if write_for == WriteFor::Docs {
+        return Ok(());
+    }
+
     indented!(w, r#"{{"#)?;
 
     match function.signature().rval() {

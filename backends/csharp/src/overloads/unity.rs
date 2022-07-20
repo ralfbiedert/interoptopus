@@ -4,7 +4,7 @@ use crate::converter::FunctionNameFlavor;
 use interoptopus::lang::c::{CType, CompositeType, Field, Function, FunctionSignature, Parameter};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::TypePattern;
-use interoptopus::writer::IndentWriter;
+use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, Error};
 use std::ops::Deref;
 
@@ -171,7 +171,7 @@ impl OverloadWriter for Unity {
         Ok(())
     }
 
-    fn write_function_overload(&self, w: &mut IndentWriter, h: Helper, function: &Function) -> Result<(), Error> {
+    fn write_function_overload(&self, w: &mut IndentWriter, h: Helper, function: &Function, write_for: WriteFor) -> Result<(), Error> {
         let signature = function.signature();
         let has_overload = self.has_overloadable(signature);
         let has_error_enum = h.converter.has_ffi_error_rval(signature);
@@ -182,7 +182,10 @@ impl OverloadWriter for Unity {
         }
 
         w.newline()?;
-        self.write_documentation(w, function.meta().documentation())?;
+
+        if write_for == WriteFor::Code {
+            self.write_documentation(w, function.meta().documentation())?;
+        }
 
         // If we have delegates we need to write a version with IntPtr only
         if self.has_delegate(signature) {
@@ -280,7 +283,7 @@ impl OverloadWriter for Unity {
         Ok(())
     }
 
-    fn write_service_method_overload(&self, w: &mut IndentWriter, h: Helper, _class: &Service, function: &Function, fn_pretty: &str) -> Result<(), Error> {
+    fn write_service_method_overload(&self, w: &mut IndentWriter, h: Helper, _class: &Service, function: &Function, fn_pretty: &str, write_for: WriteFor) -> Result<(), Error> {
         if !self.has_overloadable(function.signature()) {
             return Ok(());
         }
@@ -288,10 +291,11 @@ impl OverloadWriter for Unity {
         w.newline()?;
 
         indented!(w, r#"#if UNITY_2018_1_OR_NEWER"#)?;
+        if write_for == WriteFor::Code {
+            self.write_documentation(w, function.meta().documentation())?;
+        }
 
-        self.write_documentation(w, function.meta().documentation())?;
-
-        write_common_service_method_overload(w, h, function, fn_pretty, |h, p| self.pattern_to_native_in_signature(h, p, function.signature()))?;
+        write_common_service_method_overload(w, h, function, fn_pretty, |h, p| self.pattern_to_native_in_signature(h, p, function.signature()), write_for)?;
         indented!(w, r#"#endif"#)?;
 
         Ok(())

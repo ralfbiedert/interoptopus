@@ -8,7 +8,7 @@ use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{is_global_type, longest_common_prefix};
-use interoptopus::writer::{IndentWriter};
+use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, Error, Inventory};
 
 /// Writes the C# file format, `impl` this trait to customize output.
@@ -130,7 +130,7 @@ pub trait CSharpWriter {
     fn write_functions(&self, w: &mut IndentWriter) -> Result<(), Error> {
         for function in self.inventory().functions() {
             if self.should_emit_by_meta(function.meta()) {
-                self.write_function(w, function)?;
+                self.write_function(w, function, WriteFor::Code)?;
                 w.newline()?;
             }
         }
@@ -138,14 +138,16 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_function(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
+    fn write_function(&self, w: &mut IndentWriter, function: &Function, write_for: WriteFor) -> Result<(), Error> {
         self.debug(w, "write_function")?;
-        self.write_documentation(w, function.meta().documentation())?;
-        self.write_function_annotation(w, function)?;
+        if write_for == WriteFor::Code {
+            self.write_documentation(w, function.meta().documentation())?;
+            self.write_function_annotation(w, function)?;
+        }
         self.write_function_declaration(w, function)?;
 
         for overload in self.overloads() {
-            overload.write_function_overload(w, self.helper(), function)?;
+            overload.write_function_overload(w, self.helper(), function, write_for)?;
         }
 
         Ok(())
@@ -202,7 +204,7 @@ pub trait CSharpWriter {
             CType::Primitive(_) => {}
             CType::Array(_) => {}
             CType::Enum(e) => {
-                self.write_type_definition_enum(w, e)?;
+                self.write_type_definition_enum(w, e, WriteFor::Code)?;
                 w.newline()?;
             }
             CType::Opaque(_) => {}
@@ -219,7 +221,7 @@ pub trait CSharpWriter {
             CType::Pattern(x) => match x {
                 TypePattern::AsciiPointer => {}
                 TypePattern::FFIErrorEnum(e) => {
-                    self.write_type_definition_enum(w, e.the_enum())?;
+                    self.write_type_definition_enum(w, e.the_enum(), WriteFor::Code)?;
                     w.newline()?;
                 }
                 TypePattern::Slice(x) => {
@@ -327,25 +329,29 @@ pub trait CSharpWriter {
         indented!(w, r#"{} delegate {} {}({});"#, visibility, rval, name, params.join(", "))
     }
 
-    fn write_type_definition_enum(&self, w: &mut IndentWriter, the_type: &EnumType) -> Result<(), Error> {
+    fn write_type_definition_enum(&self, w: &mut IndentWriter, the_type: &EnumType, write_for: WriteFor) -> Result<(), Error> {
         self.debug(w, "write_type_definition_enum")?;
-        self.write_documentation(w, the_type.meta().documentation())?;
+        if write_for == WriteFor::Code {
+            self.write_documentation(w, the_type.meta().documentation())?;
+        }
         indented!(w, r#"public enum {}"#, the_type.rust_name())?;
         indented!(w, r#"{{"#)?;
         w.indent();
 
         for variant in the_type.variants() {
-            self.write_type_definition_enum_variant(w, variant, the_type)?;
+            self.write_type_definition_enum_variant(w, variant, the_type, write_for)?;
         }
 
         w.unindent();
         indented!(w, r#"}}"#)
     }
 
-    fn write_type_definition_enum_variant(&self, w: &mut IndentWriter, variant: &Variant, _the_type: &EnumType) -> Result<(), Error> {
+    fn write_type_definition_enum_variant(&self, w: &mut IndentWriter, variant: &Variant, _the_type: &EnumType, write_for: WriteFor) -> Result<(), Error> {
         let variant_name = variant.name();
         let variant_value = variant.value();
-        self.write_documentation(w, variant.documentation())?;
+        if write_for == WriteFor::Code {
+            self.write_documentation(w, variant.documentation())?;
+        }
         indented!(w, r#"{} = {},"#, variant_name, variant_value)
     }
 
@@ -353,7 +359,7 @@ pub trait CSharpWriter {
         self.debug(w, "write_type_definition_composite")?;
         self.write_documentation(w, the_type.meta().documentation())?;
         self.write_type_definition_composite_annotation(w, the_type)?;
-        self.write_type_definition_composite_body(w, the_type)
+        self.write_type_definition_composite_body(w, the_type, WriteFor::Code)
     }
 
     fn write_type_definition_composite_annotation(&self, w: &mut IndentWriter, _the_type: &CompositeType) -> Result<(), Error> {
@@ -361,7 +367,7 @@ pub trait CSharpWriter {
         indented!(w, r#"[StructLayout(LayoutKind.Sequential)]"#)
     }
 
-    fn write_type_definition_composite_body(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
+    fn write_type_definition_composite_body(&self, w: &mut IndentWriter, the_type: &CompositeType, write_for: WriteFor) -> Result<(), Error> {
         indented!(
             w,
             r#"{} partial struct {}"#,
@@ -372,10 +378,12 @@ pub trait CSharpWriter {
         w.indent();
 
         for field in the_type.fields() {
-            self.write_documentation(w, field.documentation())?;
+            if write_for == WriteFor::Code {
+                self.write_documentation(w, field.documentation())?;
 
-            for overload in self.overloads() {
-                overload.write_field_decorators(w, self.helper(), field, the_type)?;
+                for overload in self.overloads() {
+                    overload.write_field_decorators(w, self.helper(), field, the_type)?;
+                }
             }
 
             self.write_type_definition_composite_body_field(w, field, the_type)?;
@@ -859,12 +867,12 @@ pub trait CSharpWriter {
             let rval = format!("static {}", context_type_name);
 
             self.write_documentation(w, ctor.meta().documentation())?;
-            self.write_pattern_service_method(w, class, ctor, &rval, &fn_name, true, true)?;
+            self.write_pattern_service_method(w, class, ctor, &rval, &fn_name, true, true, WriteFor::Code)?;
             w.newline()?;
         }
 
         // Dtor
-        self.write_pattern_service_method(w, class, class.destructor(), "void", "Dispose", true, false)?;
+        self.write_pattern_service_method(w, class, class.destructor(), "void", "Dispose", true, false, WriteFor::Code)?;
         w.newline()?;
 
         for function in class.methods() {
@@ -879,10 +887,10 @@ pub trait CSharpWriter {
                 _ => self.converter().to_typespecifier_in_rval(function.signature().rval()),
             };
             self.write_documentation(w, function.meta().documentation())?;
-            self.write_pattern_service_method(w, class, function, &rval, &fn_name, false, false)?;
+            self.write_pattern_service_method(w, class, function, &rval, &fn_name, false, false, WriteFor::Code)?;
 
             for overload in self.overloads() {
-                overload.write_service_method_overload(w, self.helper(), class, function, &fn_name)?;
+                overload.write_service_method_overload(w, self.helper(), class, function, &fn_name, WriteFor::Code)?;
             }
 
             w.newline()?;
@@ -909,6 +917,7 @@ pub trait CSharpWriter {
         fn_name: &str,
         write_contxt_by_ref: bool,
         is_ctor: bool,
+        write_for: WriteFor
     ) -> Result<(), Error> {
         self.debug(w, "write_pattern_service_method")?;
 
@@ -955,6 +964,9 @@ pub trait CSharpWriter {
 
         // Write signature.
         indented!(w, r#"public {} {}({})"#, rval, fn_name, arg_tokens.join(", "))?;
+        if write_for == WriteFor::Docs {
+            return Ok(())
+        }
         indented!(w, r#"{{"#)?;
 
         if is_ctor {
