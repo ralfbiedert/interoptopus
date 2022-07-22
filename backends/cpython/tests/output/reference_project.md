@@ -60,6 +60,9 @@ Freestanding callables inside the module.
  - **[pattern_ffi_option_1](#pattern_ffi_option_1)** - 
  - **[pattern_ffi_option_2](#pattern_ffi_option_2)** - 
  - **[pattern_ffi_bool](#pattern_ffi_bool)** - 
+ - **[pattern_ffi_cchar](#pattern_ffi_cchar)** - 
+ - **[pattern_ffi_cchar_const_pointer](#pattern_ffi_cchar_const_pointer)** - 
+ - **[pattern_ffi_cchar_mut_pointer](#pattern_ffi_cchar_mut_pointer)** - 
  - **[pattern_api_guard](#pattern_api_guard)** - 
  - **[pattern_callback_1](#pattern_callback_1)** - 
  - **[pattern_callback_2](#pattern_callback_2)** - 
@@ -349,7 +352,7 @@ class Tupled(ctypes.Structure):
 class UseAsciiStringPattern(ctypes.Structure):
 
     _fields_ = [
-        ("ascii_string", ctypes.POINTER(ctypes.c_uint8)),
+        ("ascii_string", ctypes.POINTER(ctypes.c_char)),
     ]
 
     def __init__(self, ascii_string: str = None):
@@ -1237,6 +1240,33 @@ def pattern_ffi_option_2(ffi_slice: OptionInner) -> Inner:
 #### Definition 
 ```python
 def pattern_ffi_bool(ffi_bool):
+    ...
+```
+
+---
+
+## pattern_ffi_cchar 
+#### Definition 
+```python
+def pattern_ffi_cchar(ffi_cchar):
+    ...
+```
+
+---
+
+## pattern_ffi_cchar_const_pointer 
+#### Definition 
+```python
+def pattern_ffi_cchar_const_pointer(ffi_cchar: ctypes.POINTER(ctypes.c_char)) -> ctypes.POINTER(ctypes.c_char):
+    ...
+```
+
+---
+
+## pattern_ffi_cchar_mut_pointer 
+#### Definition 
+```python
+def pattern_ffi_cchar_mut_pointer(ffi_cchar: ctypes.POINTER(ctypes.c_char)) -> ctypes.POINTER(ctypes.c_char):
     ...
 ```
 

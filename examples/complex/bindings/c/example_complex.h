@@ -46,7 +46,7 @@ typedef struct supercomplexentity
     vec3 player_1;
     vec3 player_2;
     uint64_t ammo;
-    uint8_t* some_str;
+    const uint8_t* some_str;
     uint32_t str_len;
     } supercomplexentity;
 
@@ -58,8 +58,8 @@ __FUNCTION_ATTR ffierror example_destroy_context(context** context_ptr);
 __FUNCTION_ATTR ffierror example_print_score(context* context);
 __FUNCTION_ATTR ffierror example_return_score(context* context, uint32_t* score);
 __FUNCTION_ATTR ffierror example_update_score_by_callback(context* context, fptr_fn_u32_rval_u32 update);
-__FUNCTION_ATTR ffierror example_write_foreign_type(context* context, thirdpartyvecf32* foreign);
-__FUNCTION_ATTR ffierror example_double_super_complex_entity(context* context, supercomplexentity* incoming, supercomplexentity* outgoing);
+__FUNCTION_ATTR ffierror example_write_foreign_type(context* context, const thirdpartyvecf32* foreign);
+__FUNCTION_ATTR ffierror example_double_super_complex_entity(context* context, const supercomplexentity* incoming, supercomplexentity* outgoing);
 
 #ifdef __cplusplus
 }

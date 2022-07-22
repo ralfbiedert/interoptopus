@@ -76,6 +76,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::SliceMut(_) => false,
                 TypePattern::Option(_) => true,
                 TypePattern::Bool => true,
+                TypePattern::CChar => true,
                 TypePattern::NamedCallback(_) => false
             },
             CType::Array(_) => false, // TODO: should check inner and maybe return true
@@ -116,6 +117,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::Option(e) => self.composite_to_typename(e),
                 TypePattern::NamedCallback(e) => self.named_callback_to_typename(e),
                 TypePattern::Bool => "Bool".to_string(),
+                TypePattern::CChar => "sbyte".to_string(),
                 TypePattern::APIVersion => self.to_typespecifier_in_field(&x.fallback_type(), field, composite),
             },
         }
@@ -134,6 +136,7 @@ pub trait CSharpTypeConverter {
                 CType::Primitive(PrimitiveType::Void) => "IntPtr".to_string(),
                 CType::ReadPointer(_) => "ref IntPtr".to_string(),
                 CType::ReadWritePointer(_) => "ref IntPtr".to_string(),
+                CType::Pattern(TypePattern::CChar) => "ref IntPtr".to_string(),
                 CType::Pattern(TypePattern::Slice(_)) => format!("ref {}", self.to_typespecifier_in_param(z)),
                 CType::Pattern(TypePattern::SliceMut(_)) => format!("ref {}", self.to_typespecifier_in_param(z)),
                 _ => format!("ref {}", self.to_typespecifier_in_param(z)),
@@ -143,6 +146,7 @@ pub trait CSharpTypeConverter {
                 CType::Primitive(PrimitiveType::Void) => "IntPtr".to_string(),
                 CType::ReadPointer(_) => "ref IntPtr".to_string(),
                 CType::ReadWritePointer(_) => "ref IntPtr".to_string(),
+                CType::Pattern(TypePattern::CChar) => "ref IntPtr".to_string(),
                 CType::Pattern(TypePattern::Slice(_)) => format!("ref {}", self.to_typespecifier_in_param(z)),
                 CType::Pattern(TypePattern::SliceMut(_)) => format!("ref {}", self.to_typespecifier_in_param(z)),
                 _ => format!("out {}", self.to_typespecifier_in_param(z)),
@@ -156,6 +160,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::Option(x) => self.composite_to_typename(x),
                 TypePattern::NamedCallback(x) => self.named_callback_to_typename(x),
                 TypePattern::Bool => "Bool".to_string(),
+                TypePattern::CChar => "sbyte".to_string(),
                 TypePattern::APIVersion => self.to_typespecifier_in_param(&x.fallback_type()),
             },
         }
@@ -179,6 +184,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::Option(x) => self.composite_to_typename(x),
                 TypePattern::NamedCallback(x) => self.named_callback_to_typename(x),
                 TypePattern::Bool => "Bool".to_string(),
+                TypePattern::CChar => "sbyte".to_string(),
                 TypePattern::APIVersion => self.to_typespecifier_in_rval(&x.fallback_type()),
             },
         }

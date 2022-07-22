@@ -151,6 +151,7 @@ pub trait CWriter {
                     w.newline()?;
                 }
                 TypePattern::Bool => {}
+                TypePattern::CChar => {}
                 TypePattern::APIVersion => {}
             },
         }

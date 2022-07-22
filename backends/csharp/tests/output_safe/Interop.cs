@@ -18,9 +18,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 10722219666297254147ul)
+            if (api_version != 16709214448368826139ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10722219666297254147). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (16709214448368826139). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -305,6 +305,15 @@ namespace My.Company
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_bool")]
         public static extern Bool pattern_ffi_bool(Bool ffi_bool);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_cchar")]
+        public static extern sbyte pattern_ffi_cchar(sbyte ffi_cchar);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_cchar_const_pointer")]
+        public static extern IntPtr pattern_ffi_cchar_const_pointer(ref IntPtr ffi_cchar);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_cchar_mut_pointer")]
+        public static extern IntPtr pattern_ffi_cchar_mut_pointer(ref IntPtr ffi_cchar);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_api_guard")]
         public static extern ulong pattern_api_guard();

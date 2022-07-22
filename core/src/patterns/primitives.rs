@@ -6,6 +6,7 @@ use crate::patterns::TypePattern;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::ops::Not;
+use std::os::raw::c_char;
 
 /// A single-byte boolean value where `1` means `true`, and `0` is `false`.
 ///
@@ -65,13 +66,55 @@ impl From<FFIBool> for bool {
     }
 }
 
+
+/// A wrapper for the c_char type to differentiate it from a signed 8-bit integer for platforms
+/// that support this type.
+///
+#[repr(transparent)]
+#[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Default, Deserialize, Serialize))]
+#[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Default))]
+pub struct FFICChar {
+    value: c_char,
+}
+
+impl FFICChar {
+    pub const MAX: FFICChar = FFICChar { value: c_char::MAX };
+    pub const MIN: FFICChar = FFICChar { value: c_char::MIN };
+}
+
+unsafe impl CTypeInfo for FFICChar {
+    fn type_info() -> CType {
+        CType::Pattern(TypePattern::CChar)
+    }
+}
+
+impl From<c_char> for FFICChar {
+    fn from(x: c_char) -> Self {
+        FFICChar { value: x }
+    }
+}
+
+impl From<FFICChar> for c_char {
+    fn from(x: FFICChar) -> Self {
+        x.value
+    }
+}
+
 #[cfg(test)]
 mod test {
+    use std::os::raw::c_char;
     use crate::patterns::primitives::FFIBool;
+    use crate::patterns::primitives::FFICChar;
 
     #[test]
     fn bool_works() {
         assert!(FFIBool::TRUE.is());
         assert!(!FFIBool::FALSE.is());
+    }
+
+    #[test]
+    fn cchar_works() {
+        assert!(c_char::from(FFICChar::MAX) == c_char::MAX);
+        assert!(FFICChar::from(c_char::MAX) == FFICChar::MAX);
     }
 }
