@@ -114,6 +114,7 @@ pub enum TypePattern {
     SliceMut(CompositeType),
     Option(CompositeType),
     Bool,
+    CChar,
     NamedCallback(NamedCallback),
 }
 
@@ -124,13 +125,14 @@ impl TypePattern {
     /// This function will never return a [`CType::Pattern`] variant.
     pub fn fallback_type(&self) -> CType {
         match self {
-            TypePattern::AsciiPointer => CType::ReadPointer(Box::new(CType::Primitive(PrimitiveType::U8))),
+            TypePattern::AsciiPointer => CType::ReadPointer(Box::new(CType::Pattern(TypePattern::CChar))),
             TypePattern::FFIErrorEnum(e) => CType::Enum(e.the_enum().clone()),
             TypePattern::Slice(x) => CType::Composite(x.clone()),
             TypePattern::SliceMut(x) => CType::Composite(x.clone()),
             TypePattern::Option(x) => CType::Composite(x.clone()),
             TypePattern::NamedCallback(x) => CType::FnPointer(x.fnpointer().clone()),
             TypePattern::Bool => CType::Primitive(PrimitiveType::U8),
+            TypePattern::CChar => CType::Primitive(PrimitiveType::I8),
             TypePattern::APIVersion => CType::Primitive(PrimitiveType::U64),
         }
     }

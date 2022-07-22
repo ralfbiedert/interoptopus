@@ -60,6 +60,9 @@ Freestanding callables inside the module.
  - **[pattern_ffi_option_1](#pattern_ffi_option_1)** - 
  - **[pattern_ffi_option_2](#pattern_ffi_option_2)** - 
  - **[pattern_ffi_bool](#pattern_ffi_bool)** - 
+ - **[pattern_ffi_cchar](#pattern_ffi_cchar)** - 
+ - **[pattern_ffi_cchar_const_pointer](#pattern_ffi_cchar_const_pointer)** - 
+ - **[pattern_ffi_cchar_mut_pointer](#pattern_ffi_cchar_mut_pointer)** - 
  - **[pattern_api_guard](#pattern_api_guard)** - 
  - **[pattern_callback_1](#pattern_callback_1)** - 
  - **[pattern_callback_2](#pattern_callback_2)** - 
@@ -1107,6 +1110,30 @@ public static extern Inner pattern_ffi_option_2(OptionInner ffi_slice);
 #### Definition 
 ```csharp
 public static extern Bool pattern_ffi_bool(Bool ffi_bool);
+```
+
+---
+
+### <a name="pattern_ffi_cchar">**pattern_ffi_cchar**</a>
+#### Definition 
+```csharp
+public static extern sbyte pattern_ffi_cchar(sbyte ffi_cchar);
+```
+
+---
+
+### <a name="pattern_ffi_cchar_const_pointer">**pattern_ffi_cchar_const_pointer**</a>
+#### Definition 
+```csharp
+public static extern IntPtr pattern_ffi_cchar_const_pointer(ref IntPtr ffi_cchar);
+```
+
+---
+
+### <a name="pattern_ffi_cchar_mut_pointer">**pattern_ffi_cchar_mut_pointer**</a>
+#### Definition 
+```csharp
+public static extern IntPtr pattern_ffi_cchar_mut_pointer(ref IntPtr ffi_cchar);
 ```
 
 ---

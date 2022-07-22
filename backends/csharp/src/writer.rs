@@ -252,6 +252,7 @@ pub trait CSharpWriter {
                     w.newline()?;
                 }
 
+                TypePattern::CChar => {}
                 TypePattern::APIVersion => {}
             },
         }
@@ -515,6 +516,7 @@ pub trait CSharpWriter {
                 TypePattern::SliceMut(x) => self.should_emit_by_meta(x.meta()),
                 TypePattern::Option(x) => self.should_emit_by_meta(x.meta()),
                 TypePattern::Bool => self.config().write_types == WriteTypes::NamespaceAndInteroptopusGlobal,
+                TypePattern::CChar => false,
                 TypePattern::NamedCallback(_) => true,
             },
         }

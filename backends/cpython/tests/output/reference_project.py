@@ -52,9 +52,9 @@ def init_lib(path):
     c_lib.weird_1.argtypes = [Weird1u32, Weird2u8]
     c_lib.visibility.argtypes = [Visibility1, Visibility2]
     c_lib.repr_transparent.argtypes = [Tupled, ctypes.POINTER(Tupled)]
-    c_lib.pattern_ascii_pointer_1.argtypes = [ctypes.POINTER(ctypes.c_uint8)]
+    c_lib.pattern_ascii_pointer_1.argtypes = [ctypes.POINTER(ctypes.c_char)]
     c_lib.pattern_ascii_pointer_2.argtypes = []
-    c_lib.pattern_ascii_pointer_len.argtypes = [ctypes.POINTER(ctypes.c_uint8), UseAsciiStringPattern]
+    c_lib.pattern_ascii_pointer_len.argtypes = [ctypes.POINTER(ctypes.c_char), UseAsciiStringPattern]
     c_lib.pattern_ascii_pointer_return_slice.argtypes = []
     c_lib.pattern_ffi_slice_1.argtypes = [Sliceu32]
     c_lib.pattern_ffi_slice_2.argtypes = [SliceVec3f32, ctypes.c_int32]
@@ -67,13 +67,16 @@ def init_lib(path):
     c_lib.pattern_ffi_option_1.argtypes = [OptionInner]
     c_lib.pattern_ffi_option_2.argtypes = [OptionInner]
     c_lib.pattern_ffi_bool.argtypes = [ctypes.c_uint8]
+    c_lib.pattern_ffi_cchar.argtypes = [ctypes.c_char]
+    c_lib.pattern_ffi_cchar_const_pointer.argtypes = [ctypes.POINTER(ctypes.c_char)]
+    c_lib.pattern_ffi_cchar_mut_pointer.argtypes = [ctypes.POINTER(ctypes.c_char)]
     c_lib.pattern_api_guard.argtypes = []
     c_lib.pattern_callback_1.argtypes = [callbacks.fn_u32_rval_u32, ctypes.c_uint32]
     c_lib.pattern_callback_2.argtypes = [callbacks.fn_pconst]
     c_lib.simple_service_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.simple_service_new_with.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.c_uint32]
     c_lib.simple_service_new_without.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
-    c_lib.simple_service_new_with_string.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.POINTER(ctypes.c_uint8)]
+    c_lib.simple_service_new_with_string.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.POINTER(ctypes.c_char)]
     c_lib.simple_service_new_failing.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.c_uint8]
     c_lib.simple_service_method_result.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
     c_lib.simple_service_method_value.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
@@ -136,7 +139,7 @@ def init_lib(path):
     c_lib.weird_1.restype = ctypes.c_bool
     c_lib.repr_transparent.restype = Tupled
     c_lib.pattern_ascii_pointer_1.restype = ctypes.c_uint32
-    c_lib.pattern_ascii_pointer_2.restype = ctypes.POINTER(ctypes.c_uint8)
+    c_lib.pattern_ascii_pointer_2.restype = ctypes.POINTER(ctypes.c_char)
     c_lib.pattern_ascii_pointer_len.restype = ctypes.c_uint32
     c_lib.pattern_ascii_pointer_return_slice.restype = SliceUseAsciiStringPattern
     c_lib.pattern_ffi_slice_1.restype = ctypes.c_uint32
@@ -146,6 +149,9 @@ def init_lib(path):
     c_lib.pattern_ffi_option_1.restype = OptionInner
     c_lib.pattern_ffi_option_2.restype = Inner
     c_lib.pattern_ffi_bool.restype = ctypes.c_uint8
+    c_lib.pattern_ffi_cchar.restype = ctypes.c_char
+    c_lib.pattern_ffi_cchar_const_pointer.restype = ctypes.POINTER(ctypes.c_char)
+    c_lib.pattern_ffi_cchar_mut_pointer.restype = ctypes.POINTER(ctypes.c_char)
     c_lib.pattern_api_guard.restype = ctypes.c_uint64
     c_lib.pattern_callback_1.restype = ctypes.c_uint32
     c_lib.pattern_callback_2.restype = callbacks.fn_pconst
@@ -164,12 +170,12 @@ def init_lib(path):
     c_lib.simple_service_method_mut_self_no_error.restype = ctypes.c_int
     c_lib.simple_service_return_slice.restype = Sliceu32
     c_lib.simple_service_return_slice_mut.restype = SliceMutu32
-    c_lib.simple_service_return_string.restype = ctypes.POINTER(ctypes.c_uint8)
+    c_lib.simple_service_return_string.restype = ctypes.POINTER(ctypes.c_char)
     c_lib.simple_service_method_void_ffi_error.restype = ctypes.c_int
     c_lib.simple_service_method_callback.restype = ctypes.c_int
     c_lib.simple_service_lt_destroy.restype = ctypes.c_int
     c_lib.simple_service_lt_new_with.restype = ctypes.c_int
-    c_lib.simple_service_lt_return_string_accept_slice.restype = ctypes.POINTER(ctypes.c_uint8)
+    c_lib.simple_service_lt_return_string_accept_slice.restype = ctypes.POINTER(ctypes.c_char)
     c_lib.simple_service_lt_method_void_ffi_error.restype = ctypes.c_int
 
     c_lib.complex_args_1.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
@@ -383,6 +389,15 @@ def pattern_ffi_option_2(ffi_slice: OptionInner) -> Inner:
 
 def pattern_ffi_bool(ffi_bool):
     return c_lib.pattern_ffi_bool(ffi_bool)
+
+def pattern_ffi_cchar(ffi_cchar):
+    return c_lib.pattern_ffi_cchar(ffi_cchar)
+
+def pattern_ffi_cchar_const_pointer(ffi_cchar: ctypes.POINTER(ctypes.c_char)) -> ctypes.POINTER(ctypes.c_char):
+    return c_lib.pattern_ffi_cchar_const_pointer(ffi_cchar)
+
+def pattern_ffi_cchar_mut_pointer(ffi_cchar: ctypes.POINTER(ctypes.c_char)) -> ctypes.POINTER(ctypes.c_char):
+    return c_lib.pattern_ffi_cchar_mut_pointer(ffi_cchar)
 
 def pattern_api_guard():
     return c_lib.pattern_api_guard()
@@ -611,7 +626,7 @@ class UseAsciiStringPattern(ctypes.Structure):
 
     # These fields represent the underlying C data layout
     _fields_ = [
-        ("ascii_string", ctypes.POINTER(ctypes.c_uint8)),
+        ("ascii_string", ctypes.POINTER(ctypes.c_char)),
     ]
 
     def __init__(self, ascii_string: str = None):

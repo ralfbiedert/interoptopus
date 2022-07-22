@@ -1,5 +1,6 @@
 use crate::Config;
 use interoptopus::lang::c::{CType, CompositeType, Constant, ConstantValue, EnumType, FnPointerType, Function, OpaqueType, PrimitiveType, PrimitiveValue, Variant};
+use interoptopus::patterns::TypePattern;
 use interoptopus::util::safe_name;
 
 /// Implements [`CTypeConverter`].
@@ -88,9 +89,10 @@ impl CTypeConverter for Converter {
             CType::Enum(x) => self.enum_to_typename(x),
             CType::Opaque(x) => self.opaque_to_typename(x),
             CType::Composite(x) => self.composite_to_typename(x),
-            CType::ReadPointer(x) => format!("{}*", self.to_type_specifier(x)),
+            CType::ReadPointer(x) => format!("const {}*", self.to_type_specifier(x)),
             CType::ReadWritePointer(x) => format!("{}*", self.to_type_specifier(x)),
             CType::FnPointer(x) => self.fnpointer_to_typename(x),
+            CType::Pattern(TypePattern::CChar) => "char".to_string(),
             CType::Pattern(x) => self.to_type_specifier(&x.fallback_type()),
             // TODO: This should be handled in nicer way so that arrays-of-arrays and other thing work properly
             CType::Array(_) => panic!("Arrays need special handling in the writer."),
