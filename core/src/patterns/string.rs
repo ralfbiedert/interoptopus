@@ -10,20 +10,21 @@
 //!
 //! #[ffi_function]
 //! #[no_mangle]
-//! pub extern "C" fn call_with_string(_string: AsciiPointer)  {
+//! pub extern "C" fn call_with_string(s: AsciiPointer)  {
 //!     //
+//! # s.as_str().unwrap();
 //! }
 //! ```
 //!
 //! Backends supporting this pattern might generate the equivalent to the following pseudo-code:
 //!
 //! ```csharp
-//! void call_with_string(string _string);
+//! void call_with_string(string s);
 //! ```
 //!
 //! Backends not supporting this pattern, and C FFI, will see the equivalent of the following C code:
 //! ```c
-//! void call_with_string(uint8_t* _string);
+//! void call_with_string(uint8_t* s);
 //! ```
 //!
 use crate::lang::c::CType;

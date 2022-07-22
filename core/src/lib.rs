@@ -10,14 +10,13 @@
 //!
 //! The polyglot bindings generator for your library.
 //!
-//! Interoptopus allows _you_ to deliver high-quality system libraries
-//! to your users, and enables _your users_ to easily consume those libraries from the
-//! language of _their_ choice:
+//! Interoptopus allows _you_ to write robust libraries in Rust, and gives _your users_ high quality bindings, automatically:
 //!
 //! - Design a single `.dll` / `.so` in Rust, consume it from any language.
 //! - Use patterns (e.g., classes, strings) in languages that have them.
 //! - Always be fully C compatible.
-//! - Painless workflow, no external tools required.
+//! - Painless workflow, no external tooling required.
+//! - Easy to support more languages, backends fully decoupled from main project.
 //!
 //! We strive to make our generated bindings _zero cost_. They should be as idiomatic
 //! as you could have reasonably written them yourself, but never magic or hiding the interface

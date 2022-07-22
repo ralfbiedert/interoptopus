@@ -60,7 +60,7 @@
 //! are still available as raw bindings.
 //!
 //! - The pattern is not supported and will be **replaced with a fallback type**. Examples include
-//! the [`AsciiPointer`](string) which will become a regular `*const u8` in C.
+//! the [`AsciiPointer`](string) which will become a regular `*const char` in C.
 //!
 //! In other words, regardless of which pattern was used, the involved methods and types will always
 //! be accessible from any language.
