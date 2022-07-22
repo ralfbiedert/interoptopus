@@ -1248,7 +1248,7 @@ def pattern_ffi_bool(ffi_bool):
 ## pattern_ffi_cchar 
 #### Definition 
 ```python
-def pattern_ffi_cchar(ffi_cchar):
+def pattern_ffi_cchar(ffi_cchar: ctypes.c_char) -> ctypes.c_char:
     ...
 ```
 

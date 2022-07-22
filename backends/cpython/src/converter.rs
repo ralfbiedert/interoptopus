@@ -45,6 +45,7 @@ impl Converter {
                 TypePattern::Option(c) => c.rust_name().to_string(),
                 TypePattern::Slice(c) => c.rust_name().to_string(),
                 TypePattern::SliceMut(c) => c.rust_name().to_string(),
+                TypePattern::CChar => "ctypes.c_char".to_string(),
                 _ => "".to_string(),
             },
             _ => "".to_string(),

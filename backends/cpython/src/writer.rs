@@ -276,7 +276,7 @@ pub trait PythonWriter {
                     }
                     TypePattern::AsciiPointer => {
                         indented!(w, [_], r#"if not hasattr({}, "__ctypes_from_outparam__"):"#, arg.name())?;
-                        indented!(w, [_ _], r#"{} = ctypes.cast({}, ctypes.POINTER(ctypes.c_uint8))"#, arg.name(), arg.name())?;
+                        indented!(w, [_ _], r#"{} = ctypes.cast({}, ctypes.POINTER(ctypes.c_char))"#, arg.name(), arg.name())?;
                     }
                     _ => {}
                 },

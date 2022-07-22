@@ -330,7 +330,7 @@ def repr_transparent(x: Tupled, r: ctypes.POINTER(Tupled)) -> Tupled:
 
 def pattern_ascii_pointer_1(x: str) -> int:
     if not hasattr(x, "__ctypes_from_outparam__"):
-        x = ctypes.cast(x, ctypes.POINTER(ctypes.c_uint8))
+        x = ctypes.cast(x, ctypes.POINTER(ctypes.c_char))
     return c_lib.pattern_ascii_pointer_1(x)
 
 def pattern_ascii_pointer_2() -> str:
@@ -339,7 +339,7 @@ def pattern_ascii_pointer_2() -> str:
 
 def pattern_ascii_pointer_len(x: str, y: UseAsciiStringPattern) -> int:
     if not hasattr(x, "__ctypes_from_outparam__"):
-        x = ctypes.cast(x, ctypes.POINTER(ctypes.c_uint8))
+        x = ctypes.cast(x, ctypes.POINTER(ctypes.c_char))
     return c_lib.pattern_ascii_pointer_len(x, y)
 
 def pattern_ascii_pointer_return_slice() -> SliceUseAsciiStringPattern:
@@ -390,7 +390,7 @@ def pattern_ffi_option_2(ffi_slice: OptionInner) -> Inner:
 def pattern_ffi_bool(ffi_bool):
     return c_lib.pattern_ffi_bool(ffi_bool)
 
-def pattern_ffi_cchar(ffi_cchar):
+def pattern_ffi_cchar(ffi_cchar: ctypes.c_char) -> ctypes.c_char:
     return c_lib.pattern_ffi_cchar(ffi_cchar)
 
 def pattern_ffi_cchar_const_pointer(ffi_cchar: ctypes.POINTER(ctypes.c_char)) -> ctypes.POINTER(ctypes.c_char):
@@ -1346,7 +1346,7 @@ class SimpleService:
         """"""
         ctx = ctypes.c_void_p()
         if not hasattr(ascii, "__ctypes_from_outparam__"):
-            ascii = ctypes.cast(ascii, ctypes.POINTER(ctypes.c_uint8))
+            ascii = ctypes.cast(ascii, ctypes.POINTER(ctypes.c_char))
         c_lib.simple_service_new_with_string(ctx, ascii)
         self = SimpleService(SimpleService.__api_lock, ctx)
         return self
