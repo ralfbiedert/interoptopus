@@ -10,7 +10,7 @@ pub extern "C" fn pattern_ffi_bool(ffi_bool: FFIBool) -> FFIBool {
 #[ffi_function]
 #[no_mangle]
 pub extern "C" fn pattern_ffi_cchar(ffi_cchar: FFICChar) -> FFICChar {
-    FFICChar::MIN
+    ffi_cchar
 }
 
 #[ffi_function]

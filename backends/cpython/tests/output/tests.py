@@ -138,6 +138,9 @@ class TestPatterns(unittest.TestCase):
         self.assertEqual(3, r.pattern_ascii_pointer_1(b"111"))
         self.assertEqual(b'', r.pattern_ascii_pointer_2())
 
+    def test_c_char(self):
+        self.assertEqual(b'X', r.pattern_ffi_cchar(b'X'))
+
     def test_slice(self):
         def callback(x):
             self.assertEqual(9, x[-1])
