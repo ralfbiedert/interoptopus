@@ -1,3 +1,16 @@
+/// Style of indentation used in generated C code
+#[derive(Clone, Debug)]
+pub enum CIndentationStyle {
+    // Braces on their own lines, not indented
+    Allman,
+    // Opening brace on same line as declaration, closing brace on own line, not intended
+    KAndR,
+    // Braces on their own lines, intended by two spaces
+    GNU,
+    // Braces on their own lines, intended level with members
+    Whitesmiths,
+}
+
 /// Configures C code generation.
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -15,6 +28,8 @@ pub struct Config {
     pub file_header_comment: String,
     /// How to prefix everything, e.g., `my_company_`, will be capitalized for constants.
     pub prefix: String,
+    // How to indent code
+    pub indentation: CIndentationStyle,
 }
 
 impl Default for Config {
@@ -27,6 +42,7 @@ impl Default for Config {
             custom_defines: "".to_string(),
             function_attribute: "".to_string(),
             prefix: "".to_string(),
+            indentation: CIndentationStyle::Whitesmiths,
         }
     }
 }

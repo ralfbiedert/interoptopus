@@ -20,7 +20,9 @@ typedef struct vec2
     } vec2;
 
 
+/// Function using the type.
 vec2 my_function(vec2 input);
+
 
 #ifdef __cplusplus
 }

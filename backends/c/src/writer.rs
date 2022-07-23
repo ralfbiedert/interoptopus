@@ -1,8 +1,9 @@
+use crate::config::CIndentationStyle;
 use crate::converter::CTypeConverter;
 use crate::converter::Converter;
 use crate::Config;
 use interoptopus::indented;
-use interoptopus::lang::c::{CType, CompositeType, Constant, EnumType, Field, FnPointerType, Function, OpaqueType, Variant};
+use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, OpaqueType, Variant};
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::sort_types_by_dependencies;
 use interoptopus::writer::IndentWriter;
@@ -82,18 +83,30 @@ pub trait CWriter {
             }
         }
 
+        self.write_documentation(w, function.meta().documentation())?;
+
         // Test print line to see if we need to break it
         let line = format!(r#"{}{} {}({});"#, attr, rval, name, params.join(", "));
 
         if line.len() <= max_line {
-            indented!(w, r#"{}{} {}({});"#, attr, rval, name, params.join(", "))
+            indented!(w, r#"{}{} {}({});"#, attr, rval, name, params.join(", "))?
         } else {
             indented!(w, r#"{}{} {}("#, attr, rval, name)?;
             for p in params {
                 indented!(w, [_], r#"{}"#, p)?;
             }
-            indented!(w, [_], r#");"#)
+            indented!(w, [_], r#");"#)?
         }
+
+        w.newline()
+    }
+
+    fn write_documentation(&self, w: &mut IndentWriter, documentation: &Documentation) -> Result<(), Error> {
+        for line in documentation.lines() {
+            indented!(w, r#"///{}"#, line)?;
+        }
+
+        Ok(())
     }
 
     fn write_type_definitions(&self, w: &mut IndentWriter) -> Result<(), Error> {
@@ -183,18 +196,14 @@ pub trait CWriter {
 
     fn write_type_definition_enum(&self, w: &mut IndentWriter, the_type: &EnumType) -> Result<(), Error> {
         let name = self.converter().enum_to_typename(the_type);
-        indented!(w, "typedef enum {}", name)?;
-        indented!(w, [_], "{{")?;
 
-        w.indent();
+        self.write_braced_declaration_opening(w, format!("typedef enum {}", name))?;
 
         for variant in the_type.variants() {
             self.write_type_definition_enum_variant(w, variant, the_type)?;
         }
 
-        w.unindent();
-
-        indented!(w, [_], "}} {};", name)
+        self.write_braced_declaration_closing(w, name)
     }
 
     fn write_type_definition_enum_variant(&self, w: &mut IndentWriter, variant: &Variant, the_enum: &EnumType) -> Result<(), Error> {
@@ -228,16 +237,13 @@ pub trait CWriter {
     fn write_type_definition_composite_body(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
         let name = self.converter().composite_to_typename(the_type);
 
-        indented!(w, r#"typedef struct {}"#, name)?;
-        indented!(w, [_], "{{")?;
+        self.write_braced_declaration_opening(w, format!(r#"typedef struct {}"#, name))?;
 
-        w.indent();
         for field in the_type.fields() {
             self.write_type_definition_composite_body_field(w, field, the_type)?;
         }
-        w.unindent();
 
-        indented!(w, [_], "}} {};", name)
+        self.write_braced_declaration_closing(w, name)
     }
 
     fn write_type_definition_composite_body_field(&self, w: &mut IndentWriter, field: &Field, _the_type: &CompositeType) -> Result<(), Error> {
@@ -318,6 +324,51 @@ pub trait CWriter {
 
             Ok(())
         })?;
+
+        Ok(())
+    }
+
+    fn write_braced_declaration_opening(&self, w: &mut IndentWriter, definition: String) -> Result<(), Error> {
+        match self.config().indentation {
+            CIndentationStyle::Allman => {
+                indented!(w, "{}", definition)?;
+                indented!(w, "{{")?;
+                w.indent();
+            }
+            CIndentationStyle::KAndR => {
+                indented!(w, "{} {{", definition)?;
+                w.indent();
+            }
+            CIndentationStyle::GNU => {
+                indented!(w, "{}", definition)?;
+                indented!(w, "  {{")?;
+                w.indent();
+            }
+            CIndentationStyle::Whitesmiths => {
+                indented!(w, "{}", definition)?;
+                indented!(w, [_], "{{")?;
+                w.indent();
+            }
+        }
+
+        Ok(())
+    }
+
+    fn write_braced_declaration_closing(&self, w: &mut IndentWriter, name: String) -> Result<(), Error> {
+        match self.config().indentation {
+            CIndentationStyle::Allman | CIndentationStyle::KAndR => {
+                w.unindent();
+                indented!(w, "}} {};", name)?;
+            }
+            CIndentationStyle::GNU => {
+                w.unindent();
+                indented!(w, "  }} {};", name)?;
+            }
+            CIndentationStyle::Whitesmiths => {
+                w.unindent();
+                indented!(w, [_], "}} {};", name)?;
+            }
+        }
 
         Ok(())
     }
