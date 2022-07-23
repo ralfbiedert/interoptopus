@@ -51,15 +51,35 @@ typedef struct supercomplexentity
     } supercomplexentity;
 
 
+/// Returns the version of this API.
 __FUNCTION_ATTR uint32_t example_api_version();
+
+/// A function that always fails.
 __FUNCTION_ATTR ffierror example_always_fails();
+
+/// Creates a new instance of this library.
 __FUNCTION_ATTR ffierror example_create_context(context** context_ptr);
+
+/// Deletes an existing instance of this library.
+///
+/// You **must** ensure that `context_ptr` is being called with the context produced by
+/// `example_create_context`, otherwise bad things will happen.
 __FUNCTION_ATTR ffierror example_destroy_context(context** context_ptr);
+
+/// Prints the current player score.
 __FUNCTION_ATTR ffierror example_print_score(context* context);
+
+/// Updates the score.
 __FUNCTION_ATTR ffierror example_return_score(context* context, uint32_t* score);
+
+/// Updates the score.
 __FUNCTION_ATTR ffierror example_update_score_by_callback(context* context, fptr_fn_u32_rval_u32 update);
+
+/// Accepts some foreign types.
 __FUNCTION_ATTR ffierror example_write_foreign_type(context* context, const thirdpartyvecf32* foreign);
+
 __FUNCTION_ATTR ffierror example_double_super_complex_entity(context* context, const supercomplexentity* incoming, supercomplexentity* outgoing);
+
 
 #ifdef __cplusplus
 }
