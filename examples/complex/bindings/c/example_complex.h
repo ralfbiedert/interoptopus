@@ -15,8 +15,10 @@ extern "C" {
 #define __FUNCTION_ATTR __declspec( dllimport )
     
 
+/// Call for a friend.
 const uint32_t THE_MAGIC_CONSTANT = 666;
 
+/// Possible errors in our library.
 typedef enum ffierror
     {
     FFIERROR_OK = 0,
@@ -24,6 +26,7 @@ typedef enum ffierror
     } ffierror;
 
 typedef struct context context;
+
 typedef struct thirdpartyvecf32
     {
     float x;
@@ -32,6 +35,7 @@ typedef struct thirdpartyvecf32
     float w;
     } thirdpartyvecf32;
 
+/// A vector used in our game engine.
 typedef struct vec3
     {
     float x;
@@ -41,6 +45,7 @@ typedef struct vec3
 
 typedef uint32_t (*fptr_fn_u32_rval_u32)(uint32_t x0);
 
+/// A vector used in our game engine.
 typedef struct supercomplexentity
     {
     vec3 player_1;

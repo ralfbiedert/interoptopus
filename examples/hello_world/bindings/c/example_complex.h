@@ -13,6 +13,7 @@ extern "C" {
 
 
 
+/// A simple type in our FFI layer.
 typedef struct vec2
     {
     float x;

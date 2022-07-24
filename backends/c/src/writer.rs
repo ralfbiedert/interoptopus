@@ -1,13 +1,14 @@
-use crate::config::CIndentationStyle;
-use crate::converter::CTypeConverter;
-use crate::converter::Converter;
-use crate::Config;
 use interoptopus::indented;
 use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, OpaqueType, Variant};
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::sort_types_by_dependencies;
 use interoptopus::writer::IndentWriter;
 use interoptopus::{Error, Inventory};
+
+use crate::config::{CDocumentationStyle, CIndentationStyle};
+use crate::converter::CTypeConverter;
+use crate::converter::Converter;
+use crate::Config;
 
 /// Writes the C file format, `impl` this trait to customize output.
 pub trait CWriter {
@@ -50,7 +51,13 @@ pub trait CWriter {
             _ => return Err(Error::Null),
         };
 
-        indented!(w, r#"const {} {} = {};"#, the_type, name, self.converter().constant_value_to_value(constant.value()))
+        if self.config().documentation == CDocumentationStyle::Inline {
+            self.write_documentation(w, constant.meta().documentation());
+        }
+
+        indented!(w, r#"const {} {} = {};"#, the_type, name, self.converter().constant_value_to_value(constant.value()))?;
+
+        Ok(())
     }
 
     fn write_functions(&self, w: &mut IndentWriter) -> Result<(), Error> {
@@ -62,7 +69,17 @@ pub trait CWriter {
     }
 
     fn write_function(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
-        self.write_function_declaration(w, function, 999)
+        if self.config().documentation == CDocumentationStyle::Inline {
+            self.write_documentation(w, function.meta().documentation());
+        }
+
+        self.write_function_declaration(w, function, 999)?;
+
+        if self.config().documentation == CDocumentationStyle::Inline {
+            w.newline()?;
+        }
+
+        Ok(())
     }
 
     fn write_function_declaration(&self, w: &mut IndentWriter, function: &Function, max_line: usize) -> Result<(), Error> {
@@ -83,8 +100,6 @@ pub trait CWriter {
             }
         }
 
-        self.write_documentation(w, function.meta().documentation())?;
-
         // Test print line to see if we need to break it
         let line = format!(r#"{}{} {}({});"#, attr, rval, name, params.join(", "));
 
@@ -98,7 +113,7 @@ pub trait CWriter {
             indented!(w, [_], r#");"#)?
         }
 
-        w.newline()
+        Ok(())
     }
 
     fn write_documentation(&self, w: &mut IndentWriter, documentation: &Documentation) -> Result<(), Error> {
@@ -197,6 +212,10 @@ pub trait CWriter {
     fn write_type_definition_enum(&self, w: &mut IndentWriter, the_type: &EnumType) -> Result<(), Error> {
         let name = self.converter().enum_to_typename(the_type);
 
+        if self.config().documentation == CDocumentationStyle::Inline {
+            self.write_documentation(w, the_type.meta().documentation())?;
+        }
+
         self.write_braced_declaration_opening(w, format!("typedef enum {}", name))?;
 
         for variant in the_type.variants() {
@@ -214,7 +233,17 @@ pub trait CWriter {
     }
 
     fn write_type_definition_opaque(&self, w: &mut IndentWriter, the_type: &OpaqueType) -> Result<(), Error> {
-        self.write_type_definition_opaque_body(w, the_type)
+        if self.config().documentation == CDocumentationStyle::Inline {
+            self.write_documentation(w, the_type.meta().documentation())?;
+        }
+
+        self.write_type_definition_opaque_body(w, the_type)?;
+
+        if self.config().documentation == CDocumentationStyle::Inline {
+            w.newline()?;
+        }
+
+        Ok(())
     }
 
     fn write_type_definition_opaque_body(&self, w: &mut IndentWriter, the_type: &OpaqueType) -> Result<(), Error> {
@@ -223,6 +252,10 @@ pub trait CWriter {
     }
 
     fn write_type_definition_composite(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
+        if self.config().documentation == CDocumentationStyle::Inline {
+            self.write_documentation(w, the_type.meta().documentation());
+        }
+
         let name = self.converter().composite_to_typename(the_type);
 
         if the_type.is_empty() {

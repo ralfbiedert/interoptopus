@@ -1,5 +1,5 @@
 /// Style of indentation used in generated C code
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum CIndentationStyle {
     // Braces on their own lines, not indented
     Allman,
@@ -9,6 +9,15 @@ pub enum CIndentationStyle {
     GNU,
     // Braces on their own lines, intended level with members
     Whitesmiths,
+}
+
+/// Style of documentation in generated C code
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum CDocumentationStyle {
+    // No documentation comments are added to header file
+    None,
+    // Documentation is added inline above relevant declaration
+    Inline,
 }
 
 /// Configures C code generation.
@@ -30,6 +39,8 @@ pub struct Config {
     pub prefix: String,
     // How to indent code
     pub indentation: CIndentationStyle,
+    // How to add code documentation
+    pub documentation: CDocumentationStyle,
 }
 
 impl Default for Config {
@@ -43,6 +54,7 @@ impl Default for Config {
             function_attribute: "".to_string(),
             prefix: "".to_string(),
             indentation: CIndentationStyle::Whitesmiths,
+            documentation: CDocumentationStyle::Inline,
         }
     }
 }

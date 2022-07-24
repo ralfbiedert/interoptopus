@@ -16,6 +16,7 @@ const uint8_t MY_LIBRARY_U8 = 255;
 const float MY_LIBRARY_F32_MIN_POSITIVE = 0.000000000000000000000000000000000000011754944;
 const int32_t MY_LIBRARY_COMPUTED_I32 = -2147483647;
 
+/// Documented enum.
 typedef enum my_library_enumdocumented
     {
     MY_LIBRARY_ENUMDOCUMENTED_A = 0,
@@ -29,11 +30,18 @@ typedef enum my_library_enumrenamed
     } my_library_enumrenamed;
 
 typedef struct my_library_generic2u8 my_library_generic2u8;
+
 typedef struct my_library_generic3 my_library_generic3;
+
 typedef struct my_library_generic4 my_library_generic4;
+
 typedef struct my_library_opaque my_library_opaque;
+
+/// Some struct we want to expose as a class.
 typedef struct my_library_simpleservice my_library_simpleservice;
+
 typedef struct my_library_simpleservicelifetime my_library_simpleservicelifetime;
+
 typedef enum my_library_ffierror
     {
     MY_LIBRARY_FFIERROR_OK = 0,
@@ -62,6 +70,7 @@ typedef struct my_library_someforeigntype
     uint32_t x;
     } my_library_someforeigntype;
 
+/// Documented struct.
 typedef struct my_library_structdocumented
     {
     float x;
@@ -151,36 +160,42 @@ typedef struct my_library_weird2u8
     const uint8_t* r;
     } my_library_weird2u8;
 
+///A pointer to an array of data someone else owns which may not be modified.
 typedef struct my_library_slicebool
     {
     const uint8_t* data;
     uint64_t len;
     } my_library_slicebool;
 
+///A pointer to an array of data someone else owns which may not be modified.
 typedef struct my_library_sliceu32
     {
     const uint32_t* data;
     uint64_t len;
     } my_library_sliceu32;
 
+///A pointer to an array of data someone else owns which may not be modified.
 typedef struct my_library_sliceu8
     {
     const uint8_t* data;
     uint64_t len;
     } my_library_sliceu8;
 
+///A pointer to an array of data someone else owns which may be modified.
 typedef struct my_library_slicemutu32
     {
     const uint32_t* data;
     uint64_t len;
     } my_library_slicemutu32;
 
+///A pointer to an array of data someone else owns which may be modified.
 typedef struct my_library_slicemutu8
     {
     const uint8_t* data;
     uint64_t len;
     } my_library_slicemutu8;
 
+///Option type containing boolean flag and maybe valid data.
 typedef struct my_library_optioninner
     {
     my_library_inner t;
@@ -189,12 +204,14 @@ typedef struct my_library_optioninner
 
 typedef void (*my_library_fptr_fn_pconst)(const void* x0);
 
+///A pointer to an array of data someone else owns which may not be modified.
 typedef struct my_library_sliceuseasciistringpattern
     {
     const my_library_useasciistringpattern* data;
     uint64_t len;
     } my_library_sliceuseasciistringpattern;
 
+///A pointer to an array of data someone else owns which may not be modified.
 typedef struct my_library_slicevec3f32
     {
     const my_library_vec3f32* data;
