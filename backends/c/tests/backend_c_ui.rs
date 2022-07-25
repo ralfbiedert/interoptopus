@@ -1,13 +1,14 @@
 use interoptopus::testing::assert_file_matches_generated;
 use interoptopus::Error;
 use interoptopus::Interop;
-use interoptopus_backend_c::compile_c_app_if_installed;
+use interoptopus_backend_c::{compile_c_app_if_installed, CDocumentationStyle};
 
 fn generate_bindings(output: &str) -> Result<(), Error> {
     use interoptopus_backend_c::{Config, Generator};
 
     let config = Config {
         prefix: "my_library_".to_string(),
+        documentation: CDocumentationStyle::None,
         ..Config::default()
     };
 

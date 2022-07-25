@@ -52,7 +52,7 @@ pub trait CWriter {
         };
 
         if self.config().documentation == CDocumentationStyle::Inline {
-            self.write_documentation(w, constant.meta().documentation());
+            self.write_documentation(w, constant.meta().documentation())?;
         }
 
         indented!(w, r#"const {} {} = {};"#, the_type, name, self.converter().constant_value_to_value(constant.value()))?;
@@ -70,7 +70,7 @@ pub trait CWriter {
 
     fn write_function(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
         if self.config().documentation == CDocumentationStyle::Inline {
-            self.write_documentation(w, function.meta().documentation());
+            self.write_documentation(w, function.meta().documentation())?;
         }
 
         self.write_function_declaration(w, function, 999)?;
@@ -253,7 +253,7 @@ pub trait CWriter {
 
     fn write_type_definition_composite(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
         if self.config().documentation == CDocumentationStyle::Inline {
-            self.write_documentation(w, the_type.meta().documentation());
+            self.write_documentation(w, the_type.meta().documentation())?;
         }
 
         let name = self.converter().composite_to_typename(the_type);
