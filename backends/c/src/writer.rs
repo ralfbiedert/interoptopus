@@ -5,7 +5,7 @@ use interoptopus::util::sort_types_by_dependencies;
 use interoptopus::writer::IndentWriter;
 use interoptopus::{Error, Inventory};
 
-use crate::config::{CDocumentationStyle, CIndentationStyle};
+use crate::config::{CDocumentationStyle, CIndentationStyle, ToNamingStyle};
 use crate::converter::CTypeConverter;
 use crate::converter::Converter;
 use crate::Config;
@@ -92,10 +92,19 @@ pub trait CWriter {
         for (_, p) in function.signature().params().iter().enumerate() {
             match p.the_type() {
                 CType::Array(a) => {
-                    params.push(format!("{} {}[{}]", self.converter().to_type_specifier(a.array_type()), p.name(), a.len(),));
+                    params.push(format!(
+                        "{} {}[{}]",
+                        self.converter().to_type_specifier(a.array_type()),
+                        p.name().to_naming_style(&self.config().function_parameter_naming),
+                        a.len(),
+                    ));
                 }
                 _ => {
-                    params.push(format!("{} {}", self.converter().to_type_specifier(p.the_type()), p.name()));
+                    params.push(format!(
+                        "{} {}",
+                        self.converter().to_type_specifier(p.the_type()),
+                        p.name().to_naming_style(&self.config().function_parameter_naming)
+                    ));
                 }
             }
         }

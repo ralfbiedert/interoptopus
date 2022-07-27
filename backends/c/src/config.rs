@@ -1,3 +1,5 @@
+use heck::{ToLowerCamelCase, ToShoutySnakeCase, ToSnakeCase, ToUpperCamelCase};
+
 /// Style of indentation used in generated C code
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum CIndentationStyle {
@@ -10,6 +12,47 @@ pub enum CIndentationStyle {
     // Braces on their own lines, intended level with members
     Whitesmiths,
 }
+
+/// Style of documentation in generated C code
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum CNamingStyle {
+    /// Names all in lowercase without spacing e.g. 'thetypename'
+    Lowercase,
+    /// Names all in uppercase without spacing e.g. 'THETYPENAME'
+    Uppercase,
+    /// Names in mixed case starting with lowercase without spacing e.g. 'theTypeName'
+    LowerCamelCase,
+    /// Names in mixed case starting with uppercase without spacing e.g. 'TheTypeName'
+    UpperCamelCase,
+    /// Names in lower case with '_' as spacing e.g. 'the_type_name'
+    SnakeCase,
+    /// Names in upper case with '_' as spacing e.g. 'THE_TYPE_NAME'
+    ShoutySnakeCase,
+}
+
+pub(crate) trait ToNamingStyle {
+    fn to_naming_style(&self, style: &CNamingStyle) -> String;
+}
+
+impl ToNamingStyle for String {
+    fn to_naming_style(&self, style: &CNamingStyle) -> String {
+        self.as_str().to_naming_style(style)
+    }
+}
+
+impl ToNamingStyle for &str {
+    fn to_naming_style(&self, style: &CNamingStyle) -> String {
+        match style {
+            CNamingStyle::Lowercase => self.to_lowercase(),
+            CNamingStyle::Uppercase => self.to_uppercase(),
+            CNamingStyle::LowerCamelCase => self.to_lower_camel_case(),
+            CNamingStyle::UpperCamelCase => self.to_upper_camel_case(),
+            CNamingStyle::SnakeCase => self.to_snake_case(),
+            CNamingStyle::ShoutySnakeCase => self.to_shouty_snake_case(),
+        }
+    }
+}
+
 
 /// Style of documentation in generated C code
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -41,6 +84,14 @@ pub struct Config {
     pub indentation: CIndentationStyle,
     // How to add code documentation
     pub documentation: CDocumentationStyle,
+    // How to convert type names
+    pub type_naming: CNamingStyle,
+    // How to convert enum variant names
+    pub enum_variant_naming: CNamingStyle,
+    // How to convert const names
+    pub const_naming: CNamingStyle,
+    // How to convert function parameter names
+    pub function_parameter_naming: CNamingStyle,
 }
 
 impl Default for Config {
@@ -55,6 +106,10 @@ impl Default for Config {
             prefix: "".to_string(),
             indentation: CIndentationStyle::Whitesmiths,
             documentation: CDocumentationStyle::Inline,
+            type_naming: CNamingStyle::Lowercase,
+            enum_variant_naming: CNamingStyle::Uppercase,
+            const_naming: CNamingStyle::Uppercase,
+            function_parameter_naming: CNamingStyle::Lowercase,
         }
     }
 }
