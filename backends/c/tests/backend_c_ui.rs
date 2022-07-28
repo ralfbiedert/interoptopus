@@ -26,7 +26,7 @@ fn docs_inline_config() -> Config {
 }
 
 fn generate_bindings_multi(folder: impl AsRef<Path>, config: Option<Config>) -> Result<(), Error> {
-    let config = config.unwrap_or(Config::default());
+    let config = config.unwrap_or_default();
 
     let file_name = format!("{}/my_header.h", folder.as_ref().to_str().ok_or(Error::FileNotFound)?).replace("..", ".");
 
@@ -52,11 +52,9 @@ fn generate_bindings_multi(folder: impl AsRef<Path>, config: Option<Config>) -> 
 #[cfg_attr(miri, ignore)]
 fn bindings_match_reference() -> Result<(), Error> {
     generate_bindings_multi("tests/output_nodocs/", Some(nodocs_config()))?;
-
     generate_bindings_multi("tests/output_docs_inline/", Some(docs_inline_config()))?;
 
     assert_file_matches_generated("tests/output_nodocs/my_header.h");
-
     assert_file_matches_generated("tests/output_docs_inline/my_header.h");
 
     Ok(())
@@ -66,7 +64,6 @@ fn bindings_match_reference() -> Result<(), Error> {
 #[cfg_attr(miri, ignore)]
 fn bindings_work() -> Result<(), Error> {
     generate_bindings_multi("tests/output_nodocs/", Some(nodocs_config()))?;
-
     generate_bindings_multi("tests/output_docs_inline/", Some(docs_inline_config()))?;
 
     compile_c_app_if_installed("tests/output_nodocs/", "tests/output_nodocs/app.c")?;
