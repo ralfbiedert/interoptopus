@@ -1,5 +1,6 @@
 use interoptopus::indented;
 use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, OpaqueType, Variant};
+use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::sort_types_by_dependencies;
 use interoptopus::writer::IndentWriter;
@@ -168,7 +169,7 @@ pub trait CWriter {
             CType::Pattern(p) => match p {
                 TypePattern::AsciiPointer => {}
                 TypePattern::NamedCallback(e) => {
-                    self.write_type_definition_fn_pointer(w, e.fnpointer(), known_function_pointers)?;
+                    self.write_type_definition_named_callback(w, e)?;
                     w.newline()?;
                 }
                 TypePattern::FFIErrorEnum(e) => {
@@ -214,6 +215,24 @@ pub trait CWriter {
             indented!(w, "{}", fn_pointer)?;
             known_function_pointers.push(fn_pointer);
         }
+
+        Ok(())
+    }
+
+    fn write_type_definition_named_callback(&self, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
+        self.write_type_definition_named_callback_body(w, the_type)
+    }
+
+    fn write_type_definition_named_callback_body(&self, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
+        let rval = self.converter().to_type_specifier(the_type.fnpointer().signature().rval());
+        let name = self.converter().named_callback_to_typename(the_type);
+
+        let mut params = Vec::new();
+        for (i, param) in the_type.fnpointer().signature().params().iter().enumerate() {
+            params.push(format!("{} x{}", self.converter().to_type_specifier(param.the_type()), i));
+        }
+
+        indented!(w, "{}", format!("typedef {} (*{})({});", rval, name, params.join(", ")))?;
 
         Ok(())
     }

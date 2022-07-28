@@ -1,8 +1,10 @@
 use crate::config::ToNamingStyle;
 use crate::Config;
 use interoptopus::lang::c::{CType, CompositeType, Constant, ConstantValue, EnumType, FnPointerType, Function, OpaqueType, PrimitiveType, PrimitiveValue, Variant};
+use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::safe_name;
+use std::fmt::format;
 
 /// Implements [`CTypeConverter`].
 #[derive(Clone)]
@@ -30,6 +32,10 @@ pub trait CTypeConverter {
 
     /// Converts an Rust `fn()` to a C# delegate name such as `InteropDelegate`.
     fn fnpointer_to_typename(&self, x: &FnPointerType) -> String;
+
+    fn named_callback_to_typename(&self, x: &NamedCallback) -> String {
+        format!("{}{}", self.config().prefix, x.name().to_naming_style(&self.config().type_naming))
+    }
 
     /// Converts the `u32` part in a Rust paramter `x: u32` to a C# equivalent. Might convert pointers to `out X` or `ref X`.
     fn to_type_specifier(&self, x: &CType) -> String;
