@@ -829,6 +829,8 @@ public static extern Tupled tupled(Tupled x);
 #### Definition 
 ```csharp
 public static extern FFIError complex_args_1(Vec3f32 a, ref Tupled b);
+
+public static void complex_args_1_checked(Vec3f32 a, ref Tupled b)
 ```
 
 ---
@@ -845,6 +847,9 @@ public static extern IntPtr complex_args_2(SomeForeignType cmplx);
 #### Definition 
 ```csharp
 public static extern byte callback(InteropDelegate_fn_u8_rval_u8 callback, byte value);
+
+public static extern byte callback(IntPtr callback, byte value);
+
 ```
 
 ---
@@ -950,6 +955,8 @@ public static extern Vec namespaced_type(Vec x);
 #### Definition 
 ```csharp
 public static extern FFIError panics();
+
+public static void panics_checked()
 ```
 
 ---
@@ -1030,6 +1037,12 @@ public static extern SliceUseAsciiStringPattern pattern_ascii_pointer_return_sli
 #### Definition 
 ```csharp
 public static extern uint pattern_ffi_slice_1(Sliceu32 ffi_slice);
+
+public static uint pattern_ffi_slice_1(uint[] ffi_slice)
+
+#if UNITY_2018_1_OR_NEWER
+public static uint pattern_ffi_slice_1(NativeArray<uint> ffi_slice)
+#endif
 ```
 
 ---
@@ -1038,6 +1051,12 @@ public static extern uint pattern_ffi_slice_1(Sliceu32 ffi_slice);
 #### Definition 
 ```csharp
 public static extern Vec3f32 pattern_ffi_slice_2(SliceVec3f32 ffi_slice, int i);
+
+public static Vec3f32 pattern_ffi_slice_2(Vec3f32[] ffi_slice, int i)
+
+#if UNITY_2018_1_OR_NEWER
+public static Vec3f32 pattern_ffi_slice_2(NativeArray<Vec3f32> ffi_slice, int i)
+#endif
 ```
 
 ---
@@ -1046,6 +1065,14 @@ public static extern Vec3f32 pattern_ffi_slice_2(SliceVec3f32 ffi_slice, int i);
 #### Definition 
 ```csharp
 public static extern void pattern_ffi_slice_3(SliceMutu8 slice, CallbackSliceMut callback);
+
+public static void pattern_ffi_slice_3(byte[] slice, CallbackSliceMut callback)
+
+public static extern void pattern_ffi_slice_3(SliceMutu8 slice, IntPtr callback);
+
+#if UNITY_2018_1_OR_NEWER
+public static void pattern_ffi_slice_3(NativeArray<byte> slice, IntPtr callback)
+#endif
 ```
 
 ---
@@ -1054,6 +1081,12 @@ public static extern void pattern_ffi_slice_3(SliceMutu8 slice, CallbackSliceMut
 #### Definition 
 ```csharp
 public static extern void pattern_ffi_slice_4(Sliceu8 slice, SliceMutu8 slice2);
+
+public static void pattern_ffi_slice_4(byte[] slice, byte[] slice2)
+
+#if UNITY_2018_1_OR_NEWER
+public static void pattern_ffi_slice_4(NativeArray<byte> slice, NativeArray<byte> slice2)
+#endif
 ```
 
 ---
@@ -1062,6 +1095,12 @@ public static extern void pattern_ffi_slice_4(Sliceu8 slice, SliceMutu8 slice2);
 #### Definition 
 ```csharp
 public static extern void pattern_ffi_slice_5(ref Sliceu8 slice, ref SliceMutu8 slice2);
+
+public static void pattern_ffi_slice_5(byte[] slice, byte[] slice2)
+
+#if UNITY_2018_1_OR_NEWER
+public static void pattern_ffi_slice_5(NativeArray<byte> slice, NativeArray<byte> slice2)
+#endif
 ```
 
 ---
@@ -1070,6 +1109,14 @@ public static extern void pattern_ffi_slice_5(ref Sliceu8 slice, ref SliceMutu8 
 #### Definition 
 ```csharp
 public static extern void pattern_ffi_slice_6(ref SliceMutu8 slice, CallbackU8 callback);
+
+public static void pattern_ffi_slice_6(byte[] slice, CallbackU8 callback)
+
+public static extern void pattern_ffi_slice_6(ref SliceMutu8 slice, IntPtr callback);
+
+#if UNITY_2018_1_OR_NEWER
+public static void pattern_ffi_slice_6(NativeArray<byte> slice, IntPtr callback)
+#endif
 ```
 
 ---
@@ -1078,6 +1125,9 @@ public static extern void pattern_ffi_slice_6(ref SliceMutu8 slice, CallbackU8 c
 #### Definition 
 ```csharp
 public static extern byte pattern_ffi_slice_delegate(CallbackFFISlice callback);
+
+public static extern byte pattern_ffi_slice_delegate(IntPtr callback);
+
 ```
 
 ---
@@ -1086,6 +1136,9 @@ public static extern byte pattern_ffi_slice_delegate(CallbackFFISlice callback);
 #### Definition 
 ```csharp
 public static extern Vec3f32 pattern_ffi_slice_delegate_huge(CallbackHugeVecSlice callback);
+
+public static extern Vec3f32 pattern_ffi_slice_delegate_huge(IntPtr callback);
+
 ```
 
 ---
@@ -1150,6 +1203,9 @@ public static extern ulong pattern_api_guard();
 #### Definition 
 ```csharp
 public static extern uint pattern_callback_1(MyCallback callback, uint x);
+
+public static extern uint pattern_callback_1(IntPtr callback, uint x);
+
 ```
 
 ---
@@ -1158,6 +1214,9 @@ public static extern uint pattern_callback_1(MyCallback callback, uint x);
 #### Definition 
 ```csharp
 public static extern MyCallbackVoid pattern_callback_2(MyCallbackVoid callback);
+
+public static extern MyCallbackVoid pattern_callback_2(IntPtr callback);
+
 ```
 
 ---
@@ -1239,6 +1298,12 @@ public void MethodVoid()
 #### Definition 
 ```csharp
 public byte MethodMutSelf(Sliceu8 slice)
+
+public byte MethodMutSelf(byte[] slice)
+
+#if UNITY_2018_1_OR_NEWER
+public byte MethodMutSelf(NativeArray<byte> slice)
+#endif
 ```
 
 ---
@@ -1249,6 +1314,12 @@ public byte MethodMutSelf(Sliceu8 slice)
 #### Definition 
 ```csharp
 public void MethodMutSelfVoid(SliceBool slice)
+
+public void MethodMutSelfVoid(Bool[] slice)
+
+#if UNITY_2018_1_OR_NEWER
+public void MethodMutSelfVoid(NativeArray<Bool> slice)
+#endif
 ```
 
 ---
@@ -1267,6 +1338,12 @@ public byte MethodMutSelfRef(ref byte x, out byte y)
 #### Definition 
 ```csharp
 public byte MethodMutSelfRefSlice(ref byte x, out byte y, Sliceu8 slice)
+
+public byte MethodMutSelfRefSlice(ref byte x, out byte y, byte[] slice)
+
+#if UNITY_2018_1_OR_NEWER
+public byte MethodMutSelfRefSlice(ref byte x, out byte y, NativeArray<byte> slice)
+#endif
 ```
 
 ---
@@ -1276,6 +1353,12 @@ public byte MethodMutSelfRefSlice(ref byte x, out byte y, Sliceu8 slice)
 #### Definition 
 ```csharp
 public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, Sliceu8 slice, Sliceu8 slice2)
+
+public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, byte[] slice, byte[] slice2)
+
+#if UNITY_2018_1_OR_NEWER
+public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, NativeArray<byte> slice, NativeArray<byte> slice2)
+#endif
 ```
 
 ---
@@ -1285,6 +1368,12 @@ public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, Sliceu8 slice, 
 #### Definition 
 ```csharp
 public void MethodMutSelfFfiError(SliceMutu8 slice)
+
+public void MethodMutSelfFfiError(byte[] slice)
+
+#if UNITY_2018_1_OR_NEWER
+public void MethodMutSelfFfiError(NativeArray<byte> slice)
+#endif
 ```
 
 ---
@@ -1294,6 +1383,12 @@ public void MethodMutSelfFfiError(SliceMutu8 slice)
 #### Definition 
 ```csharp
 public void MethodMutSelfNoError(SliceMutu8 slice)
+
+public void MethodMutSelfNoError(byte[] slice)
+
+#if UNITY_2018_1_OR_NEWER
+public void MethodMutSelfNoError(NativeArray<byte> slice)
+#endif
 ```
 
 ---
@@ -1344,6 +1439,10 @@ public void MethodVoidFfiError()
 #### Definition 
 ```csharp
 public void MethodCallback(MyCallback callback)
+
+#if UNITY_2018_1_OR_NEWER
+public void MethodCallback(IntPtr callback)
+#endif
 ```
 
 ---
@@ -1365,6 +1464,12 @@ public SimpleServiceLifetime NewWith(ref uint some_value)
 #### Definition 
 ```csharp
 public void MethodLt(SliceBool slice)
+
+public void MethodLt(Bool[] slice)
+
+#if UNITY_2018_1_OR_NEWER
+public void MethodLt(NativeArray<Bool> slice)
+#endif
 ```
 
 ---
@@ -1374,6 +1479,12 @@ public void MethodLt(SliceBool slice)
 #### Definition 
 ```csharp
 public void MethodLt2(SliceBool slice)
+
+public void MethodLt2(Bool[] slice)
+
+#if UNITY_2018_1_OR_NEWER
+public void MethodLt2(NativeArray<Bool> slice)
+#endif
 ```
 
 ---
@@ -1383,6 +1494,12 @@ public void MethodLt2(SliceBool slice)
 #### Definition 
 ```csharp
 public string ReturnStringAcceptSlice(Sliceu8 anon1)
+
+public string ReturnStringAcceptSlice(byte[] anon1)
+
+#if UNITY_2018_1_OR_NEWER
+public string ReturnStringAcceptSlice(NativeArray<byte> anon1)
+#endif
 ```
 
 ---

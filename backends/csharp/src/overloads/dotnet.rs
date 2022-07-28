@@ -184,7 +184,13 @@ impl OverloadWriter for DotNet {
             self.write_documentation(w, function.meta().documentation())?;
         }
 
-        indented!(w, r#"public static {} {}({}) {{"#, rval, this_name, params.join(", "))?;
+        indented!(w, r#"public static {} {}({})"#, rval, this_name, params.join(", "))?;
+
+        if write_for == WriteFor::Docs {
+            return Ok(());
+        }
+
+        indented!(w, r#"{{"#)?;
 
         if h.config.use_unsafe.any_unsafe() {
             if !to_pin_name.is_empty() {
