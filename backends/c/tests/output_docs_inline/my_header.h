@@ -135,8 +135,9 @@ typedef struct my_library_weird1u32
 
 typedef uint8_t (*my_library_fptr_fn_u8_rval_u8)(uint8_t x0);
 
+typedef uint8_t (*my_library_callback_u8)(uint8_t x0);
 
-typedef uint32_t (*my_library_fptr_fn_u32_rval_u32)(uint32_t x0);
+typedef uint32_t (*my_library_my_callback)(uint32_t x0);
 
 typedef struct my_library_array
 {
@@ -202,7 +203,7 @@ typedef struct my_library_option_inner
     uint8_t is_some;
 } my_library_option_inner;
 
-typedef void (*my_library_fptr_fn_pconst)(const void* x0);
+typedef void (*my_library_my_callback_void)(const void* x0);
 
 ///A pointer to an array of data someone else owns which may not be modified.
 typedef struct my_library_slice_use_ascii_string_pattern
@@ -218,11 +219,11 @@ typedef struct my_library_slice_vec3f32
     uint64_t len;
 } my_library_slice_vec3f32;
 
-typedef uint8_t (*my_library_fptr_fn_Sliceu8_rval_u8)(my_library_sliceu8 x0);
+typedef uint8_t (*my_library_callback_ffi_slice)(my_library_sliceu8 x0);
 
-typedef void (*my_library_fptr_fn_SliceMutu8)(my_library_slice_mutu8 x0);
+typedef void (*my_library_callback_slice_mut)(my_library_slice_mutu8 x0);
 
-typedef my_library_vec3f32 (*my_library_fptr_fn_SliceVec3f32_rval_Vec3f32)(my_library_slice_vec3f32 x0);
+typedef my_library_vec3f32 (*my_library_callback_huge_vec_slice)(my_library_slice_vec3f32 x0);
 
 
 void primitive_void();
