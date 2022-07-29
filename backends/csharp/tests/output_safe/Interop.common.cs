@@ -352,22 +352,22 @@ namespace My.Company.Common
 
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate byte CallbackFFISlice(Sliceu8 x0);
+    public delegate byte CallbackFFISlice(Sliceu8 slice);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate Vec3f32 CallbackHugeVecSlice(SliceVec3f32 x0);
+    public delegate Vec3f32 CallbackHugeVecSlice(SliceVec3f32 slice);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void CallbackSliceMut(SliceMutu8 x0);
+    public delegate void CallbackSliceMut(SliceMutu8 slice);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate byte CallbackU8(byte x0);
+    public delegate byte CallbackU8(byte value);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint MyCallback(uint x0);
+    public delegate uint MyCallback(uint value);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void MyCallbackVoid(IntPtr x0);
+    public delegate void MyCallbackVoid(IntPtr ptr);
 
 
 

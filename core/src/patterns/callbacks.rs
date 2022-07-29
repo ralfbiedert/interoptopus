@@ -131,20 +131,31 @@ impl NamedCallback {
 /// ```
 #[macro_export]
 macro_rules! callback {
-    ($name:ident($($param:ident: $ty:ty),*) $(-> $rval:ty)?) => {
+    ($name:ident($($param:ident: $ty:ty),*)) => {
+        callback!($name($($param: $ty),*) -> ());
+    };
+    ($name:ident($($param:ident: $ty:ty),*) -> $rval:ty) => {
         #[derive(Default, Clone)]
         #[repr(transparent)]
-        pub struct $name(Option<extern "C" fn($($ty),*) $(-> $rval)?>);
+        pub struct $name(Option<extern "C" fn($($ty),*) -> $rval>);
 
         impl $name {
             /// Will call function if it exists, panic otherwise.
-            pub fn call(&self, $($param: $ty),*) $(-> $rval)? {
+            pub fn call(&self, $($param: $ty),*) -> $rval {
                 self.0.expect("Assumed function would exist but it didn't.")($($param),*)
+            }
+
+            /// Will call function only if it exists
+            pub fn call_if_some(&self, $($param: $ty),*) -> Option<$rval> {
+                match self.0 {
+                    Some(c) => Some(c($($param),*)),
+                    None => None
+                }
             }
         }
 
-        impl From<extern "C" fn($($ty),*) $(-> $rval)?> for $name {
-            fn from(x: extern "C" fn($($ty),*) $(-> $rval)?) -> Self {
+        impl From<extern "C" fn($($ty),*) -> $rval> for $name {
+            fn from(x: extern "C" fn($($ty),*) -> $rval) -> Self {
                 Self(Some(x))
             }
         }
@@ -153,11 +164,7 @@ macro_rules! callback {
             fn type_info() -> interoptopus::lang::c::CType {
                 use interoptopus::lang::rust::CTypeInfo;
 
-                let rval = < () as CTypeInfo >::type_info();
-
-                $(
-                    let rval = < $rval as CTypeInfo >::type_info();
-                )?
+                let rval = < $rval as CTypeInfo >::type_info();
 
                 let params = vec![
                 $(

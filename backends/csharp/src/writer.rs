@@ -91,7 +91,7 @@ pub trait CSharpWriter {
             let version = inventory_hash(self.inventory());
             let flavor = match self.config().rename_symbols {
                 true => FunctionNameFlavor::CSharpMethodNameWithClass,
-                false => FunctionNameFlavor::RawFFIName
+                false => FunctionNameFlavor::RawFFIName,
             };
             let fn_call = self.converter().function_name_to_csharp_name(api_guard, flavor);
             indented!(w, [_], r#"var api_version = {}.{}();"#, self.config().class, fn_call)?;
@@ -171,10 +171,13 @@ pub trait CSharpWriter {
 
     fn write_function_declaration(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
         let rval = self.converter().function_rval_to_csharp_typename(function);
-        let name = self.converter().function_name_to_csharp_name(function, match self.config().rename_symbols {
-            true => FunctionNameFlavor::CSharpMethodNameWithClass,
-            false => FunctionNameFlavor::RawFFIName
-        });
+        let name = self.converter().function_name_to_csharp_name(
+            function,
+            match self.config().rename_symbols {
+                true => FunctionNameFlavor::CSharpMethodNameWithClass,
+                false => FunctionNameFlavor::RawFFIName,
+            },
+        );
 
         let mut params = Vec::new();
         for (_, p) in function.signature().params().iter().enumerate() {
@@ -306,8 +309,8 @@ pub trait CSharpWriter {
         let visibility = self.config().visibility_types.to_access_modifier();
 
         let mut params = Vec::new();
-        for (i, param) in the_type.fnpointer().signature().params().iter().enumerate() {
-            params.push(format!("{} x{}", self.converter().to_typespecifier_in_param(param.the_type()), i));
+        for param in the_type.fnpointer().signature().params().iter() {
+            params.push(format!("{} {}", self.converter().to_typespecifier_in_param(param.the_type()), param.name()));
         }
 
         indented!(w, r#"{} delegate {} {}({});"#, visibility, rval, name, params.join(", "))
@@ -865,7 +868,9 @@ pub trait CSharpWriter {
 
         for ctor in class.constructors() {
             // Ctor
-            let fn_name = self.converter().function_name_to_csharp_name(ctor, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix));
+            let fn_name = self
+                .converter()
+                .function_name_to_csharp_name(ctor, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix));
             let rval = format!("static {}", context_type_name);
 
             self.write_documentation(w, ctor.meta().documentation())?;
@@ -879,7 +884,9 @@ pub trait CSharpWriter {
 
         for function in class.methods() {
             // Main function
-            let fn_name = self.converter().function_name_to_csharp_name(function, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix));
+            let fn_name = self
+                .converter()
+                .function_name_to_csharp_name(function, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix));
 
             // Write checked method. These are "normal" methods that accept
             // common C# types.
