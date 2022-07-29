@@ -1,7 +1,7 @@
 use interoptopus::{callback, ffi_function};
 use std::ffi::c_void;
 
-callback!(MyCallback(x: u32) -> u32);
+callback!(MyCallback(value: u32) -> u32);
 callback!(MyCallbackVoid(ptr: *const c_void));
 
 #[ffi_function]
