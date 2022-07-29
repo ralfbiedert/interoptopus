@@ -228,8 +228,12 @@ pub trait CWriter {
         let name = self.converter().named_callback_to_typename(the_type);
 
         let mut params = Vec::new();
-        for (i, param) in the_type.fnpointer().signature().params().iter().enumerate() {
-            params.push(format!("{} x{}", self.converter().to_type_specifier(param.the_type()), i));
+        for param in the_type.fnpointer().signature().params().iter() {
+            params.push(format!(
+                "{} {}",
+                self.converter().to_type_specifier(param.the_type()),
+                param.name().to_naming_style(&self.config().function_parameter_naming)
+            ));
         }
 
         indented!(w, "{}", format!("typedef {} (*{})({});", rval, name, params.join(", ")))?;

@@ -23,9 +23,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 16709214448368826139ul)
+            if (api_version != 10027021407890840897ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (16709214448368826139). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10027021407890840897). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -1194,22 +1194,22 @@ namespace My.Company
 
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate byte CallbackFFISlice(Sliceu8 x0);
+    public delegate byte CallbackFFISlice(Sliceu8 slice);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate Vec3f32 CallbackHugeVecSlice(SliceVec3f32 x0);
+    public delegate Vec3f32 CallbackHugeVecSlice(SliceVec3f32 slice);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void CallbackSliceMut(SliceMutu8 x0);
+    public delegate void CallbackSliceMut(SliceMutu8 slice);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate byte CallbackU8(byte x0);
+    public delegate byte CallbackU8(byte value);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint MyCallback(uint x0);
+    public delegate uint MyCallback(uint value);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void MyCallbackVoid(IntPtr x0);
+    public delegate void MyCallbackVoid(IntPtr ptr);
 
 
     /// Some struct we want to expose as a class.

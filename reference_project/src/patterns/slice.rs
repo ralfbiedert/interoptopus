@@ -6,7 +6,7 @@ static HUGE_VEC_SLICE: [Vec3f32; 100_000] = [Vec3f32 { x: 0.0, y: 0.0, z: 0.0 };
 
 callback!(CallbackHugeVecSlice(slice: FFISlice<Vec3f32>) -> Vec3f32);
 callback!(CallbackSliceMut(slice: FFISliceMut<'_, u8>) -> ());
-callback!(CallbackU8(x: u8) -> u8);
+callback!(CallbackU8(value: u8) -> u8);
 
 #[ffi_function]
 #[no_mangle]
