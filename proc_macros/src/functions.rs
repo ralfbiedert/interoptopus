@@ -17,7 +17,7 @@ pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
     let rval = ffi_function_freestanding(&attributes, input);
 
     if attributes.debug {
-        println!("{}", rval.to_string());
+        println!("{}", rval);
     }
 
     rval

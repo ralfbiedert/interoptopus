@@ -128,7 +128,7 @@ impl OverloadWriter for DotNet {
         let this_name = if has_error_enum && !has_overload {
             format!("{}_checked", raw_name)
         } else {
-            raw_name.clone()
+            raw_name
         };
 
         let rval = match function.signature().rval() {
@@ -145,9 +145,9 @@ impl OverloadWriter for DotNet {
 
             let mut fallback = || {
                 if native.contains("out ") {
-                    to_invoke.push(format!("out {}", name.to_string()));
+                    to_invoke.push(format!("out {}", name));
                 } else if native.contains("ref ") {
-                    to_invoke.push(format!("ref {}", name.to_string()));
+                    to_invoke.push(format!("ref {}", name));
                 } else {
                     to_invoke.push(name.to_string());
                 }

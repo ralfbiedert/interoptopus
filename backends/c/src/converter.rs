@@ -69,7 +69,7 @@ impl CTypeConverter for Converter {
     }
 
     fn enum_to_typename(&self, x: &EnumType) -> String {
-        format!("{}{}", self.config().prefix, x.rust_name().to_string()).to_naming_style(&self.config.type_naming)
+        format!("{}{}", self.config().prefix, x.rust_name()).to_naming_style(&self.config.type_naming)
     }
 
     fn enum_variant_to_name(&self, the_enum: &EnumType, x: &Variant) -> String {
@@ -77,17 +77,17 @@ impl CTypeConverter for Converter {
             "{}{}_{}",
             self.config().prefix,
             the_enum.rust_name().to_naming_style(&self.config.type_naming),
-            x.name().to_string()
+            x.name()
         )
         .to_naming_style(&self.config.enum_variant_naming)
     }
 
     fn opaque_to_typename(&self, x: &OpaqueType) -> String {
-        format!("{}{}", self.config().prefix, x.rust_name().to_string()).to_naming_style(&self.config.type_naming)
+        format!("{}{}", self.config().prefix, x.rust_name()).to_naming_style(&self.config.type_naming)
     }
 
     fn composite_to_typename(&self, x: &CompositeType) -> String {
-        format!("{}{}", self.config().prefix, x.rust_name().to_string()).to_naming_style(&self.config.type_naming)
+        format!("{}{}", self.config().prefix, x.rust_name()).to_naming_style(&self.config.type_naming)
     }
 
     fn fnpointer_to_typename(&self, x: &FnPointerType) -> String {
@@ -112,7 +112,7 @@ impl CTypeConverter for Converter {
     }
 
     fn const_name_to_name(&self, x: &Constant) -> String {
-        format!("{}{}", self.config().prefix, x.name().to_string()).to_naming_style(&self.config.const_naming)
+        format!("{}{}", self.config().prefix, x.name()).to_naming_style(&self.config.const_naming)
     }
 
     fn constant_value_to_value(&self, value: &ConstantValue) -> String {

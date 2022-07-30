@@ -134,7 +134,7 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
 
             if surrogates.1.contains_key(&name) {
                 let lookup = surrogates.1.get(&name).unwrap();
-                let ident = syn::Ident::new(&lookup, surrogates.0.unwrap());
+                let ident = syn::Ident::new(lookup, surrogates.0.unwrap());
                 args_type.push(quote! { #ident()  })
             } else {
                 args_type.push(quote! { < #token as ::interoptopus::lang::rust::CTypeInfo>::type_info() });

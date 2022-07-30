@@ -197,7 +197,7 @@ pub fn panics_and_errors_to_ffi_enum<E: Debug, FE: FFIError>(f: impl FnOnce() ->
 where
     FE: From<E>,
 {
-    let result: Result<(), E> = match std::panic::catch_unwind(AssertUnwindSafe(|| f())) {
+    let result: Result<(), E> = match std::panic::catch_unwind(AssertUnwindSafe(f)) {
         Ok(x) => x,
         Err(e) => {
             log_error(|| format!("Panic in ({}): {:?}", error_context, e));

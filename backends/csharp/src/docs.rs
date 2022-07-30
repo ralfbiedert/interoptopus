@@ -25,7 +25,7 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
     }
 
     pub fn inventory(&self) -> &Inventory {
-        &self.inventory
+        self.inventory
     }
 
     pub fn config(&self) -> &DocConfig {
@@ -161,7 +161,7 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
 
         indented!(w, r#"#### Definition "#)?;
         indented!(w, r#"```csharp"#)?;
-        self.csharp_writer.write_type_definition_composite_body(w, &composite, WriteFor::Docs)?;
+        self.csharp_writer.write_type_definition_composite_body(w, composite, WriteFor::Docs)?;
         indented!(w, r#"```"#)?;
 
         Ok(())

@@ -80,7 +80,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
         generics.params.push(GenericParam::Lifetime(lt.clone()))
     }
 
-    let ffi_fn_ident = Ident::new(&format!("{}{}", attributes.prefix, orig_fn_ident.to_string()), function.span());
+    let ffi_fn_ident = Ident::new(&format!("{}{}", attributes.prefix, orig_fn_ident), function.span());
     let error_ident = Ident::new(&attributes.error, function.span());
     let without_lifetimes = purge_lifetimes_from_type(&*impl_block.self_ty);
     let doc_lines = extract_doc_lines(&function.attrs);

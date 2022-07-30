@@ -20,11 +20,11 @@ pub fn safe_name(name: &str) -> String {
     rval = rval.replace("fn(", "fn_");
     rval = rval.replace("-> ()", "");
     rval = rval.replace("->", "rval");
-    rval = rval.replace("(", "");
-    rval = rval.replace(")", "");
-    rval = rval.replace("*", "p");
-    rval = rval.replace(",", "_");
-    rval = rval.replace(" ", "_");
+    rval = rval.replace('(', "");
+    rval = rval.replace(')', "");
+    rval = rval.replace('*', "p");
+    rval = rval.replace(',', "_");
+    rval = rval.replace(' ', "_");
 
     rval = rval.trim_end_matches('_').to_string();
 
@@ -135,10 +135,10 @@ pub(crate) fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CTyp
     match start {
         CType::Composite(inner) => {
             for field in inner.fields() {
-                ctypes_from_type_recursive(&field.the_type(), types);
+                ctypes_from_type_recursive(field.the_type(), types);
             }
         }
-        CType::Array(inner) => ctypes_from_type_recursive(&inner.array_type(), types),
+        CType::Array(inner) => ctypes_from_type_recursive(inner.array_type(), types),
         CType::FnPointer(inner) => {
             ctypes_from_type_recursive(inner.signature().rval(), types);
             for param in inner.signature().params() {

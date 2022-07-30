@@ -95,7 +95,7 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
         match generic {
             GenericParam::Lifetime(lt) => {
                 let ident = lt.lifetime.ident.clone();
-                let lt = syn::Lifetime::new(&format!("'{}", ident.to_string()), item.span());
+                let lt = syn::Lifetime::new(&format!("'{}", ident), item.span());
                 generic_parameter_tokens.push(quote! { #lt });
                 generic_struct_tokens.push(quote! { #lt });
             }
@@ -138,7 +138,7 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
     }
 
     for (i, field) in item.fields.iter().enumerate() {
-        let name = field.ident.as_ref().map(|x| x.to_string()).unwrap_or_else(|| format!("x{}", i.to_string()));
+        let name = field.ident.as_ref().map(|x| x.to_string()).unwrap_or_else(|| format!("x{}", i));
 
         if attributes.skip.contains_key(&name) {
             continue;
@@ -176,7 +176,7 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
 
         if surrogates.1.contains_key(&name) {
             let lookup = surrogates.1.get(&name).unwrap();
-            let ident = syn::Ident::new(&lookup, surrogates.0.unwrap());
+            let ident = syn::Ident::new(lookup, surrogates.0.unwrap());
             field_type_info.push(quote! { #ident()  });
             field_types.push(quote! { #ident()  }); // TODO: are these 2 correct?
         } else {

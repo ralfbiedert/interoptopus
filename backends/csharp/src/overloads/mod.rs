@@ -163,9 +163,9 @@ fn write_common_service_method_overload<FPatternMap: Fn(&Helper, &Parameter) -> 
 
         // Forward `ref` and `out` accordingly.
         if native.contains("out ") {
-            to_invoke.push(format!("out {}", name.to_string()));
+            to_invoke.push(format!("out {}", name));
         } else if native.contains("ref ") {
-            to_invoke.push(format!("ref {}", name.to_string()));
+            to_invoke.push(format!("ref {}", name));
         } else {
             to_invoke.push(name.to_string());
         }
