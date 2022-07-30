@@ -97,6 +97,7 @@ impl Converter {
         }
     }
 
+    #[allow(clippy::useless_format)]
     pub fn to_type_hint_in(&self, the_type: &CType) -> String {
         let type_hint = self.to_type_hint(the_type);
         if type_hint.is_empty() {
@@ -106,6 +107,7 @@ impl Converter {
         }
     }
 
+    #[allow(clippy::useless_format)]
     pub fn to_type_hint_out(&self, the_type: &CType) -> String {
         let type_hint = self.to_type_hint(the_type);
         if type_hint.is_empty() {

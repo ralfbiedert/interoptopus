@@ -137,7 +137,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 #[interoptopus::ffi_function]
                 #[no_mangle]
                 #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
-                #[allow(clippy::needless_lifetimes)]
+                #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes)]
                 #(
                     #[doc = #doc_lines]
                 )*
@@ -177,7 +177,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     #[interoptopus::ffi_function]
                     #[no_mangle]
                     #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
-                    #[allow(clippy::needless_lifetimes)]
+                    #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes)]
                     #(
                         #[doc = #doc_lines]
                     )*
@@ -205,7 +205,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     #[interoptopus::ffi_function]
                     #[no_mangle]
                     #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
-                    #[allow(clippy::needless_lifetimes)]
+                    #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes)]
                     #(
                         #[doc = #doc_lines]
                     )*
@@ -223,7 +223,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     #[interoptopus::ffi_function]
                     #[no_mangle]
                     #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
-                    #[allow(clippy::needless_lifetimes)]
+                    #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes)]
                     #(
                         #[doc = #doc_lines]
                     )*
@@ -261,6 +261,7 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
         /// passing any other value results in undefined behavior.
         #[interoptopus::ffi_function]
         #[allow(unused_mut, unsafe_op_in_unsafe_fn, unused_unsafe)]
+        #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes)]
         #[no_mangle]
         pub unsafe extern "C" fn #ffi_fn_ident(context: &mut *mut #without_lifetimes) -> #error_ident {
             // Checks the _contained_ pointer is not null, which usually means service was not initialized.

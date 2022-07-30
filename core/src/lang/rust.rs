@@ -146,7 +146,7 @@ where
     }
 }
 
-unsafe impl<'a, T> CTypeInfo for *const T
+unsafe impl<T> CTypeInfo for *const T
 where
     T: CTypeInfo + Sized + 'static,
 {
@@ -155,7 +155,7 @@ where
     }
 }
 
-unsafe impl<'a, T> CTypeInfo for *mut T
+unsafe impl<T> CTypeInfo for *mut T
 where
     T: CTypeInfo + Sized + 'static,
 {

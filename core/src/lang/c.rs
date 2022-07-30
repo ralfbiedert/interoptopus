@@ -293,6 +293,10 @@ impl ArrayType {
     pub fn len(&self) -> usize {
         self.len
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
 }
 
 /// A (C-style) `enum` containing numbered variants.

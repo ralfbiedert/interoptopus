@@ -76,7 +76,7 @@ mod test {
     }
 
     #[test]
-    fn test_pattern_ffi_slice_3<'a>() {
+    fn test_pattern_ffi_slice_3() {
         let mut data = [0, 1, 2, 3, 4, 5];
 
         let jfc: extern "C" fn(FFISliceMut<'_, u8>) -> () = f;

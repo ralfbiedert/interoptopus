@@ -49,8 +49,8 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
         indented!(w, r#"### Classes"#)?;
         indented!(w, r#"Methods operating on common state."#)?;
 
-        for pattern in self.inventory.patterns().iter().filter_map(|x| match x {
-            LibraryPattern::Service(s) => Some(s),
+        for pattern in self.inventory.patterns().iter().map(|x| match x {
+            LibraryPattern::Service(s) => s,
         }) {
             let prefix = pattern.common_prefix();
             let doc = pattern.the_type().meta().documentation().lines().first().cloned().unwrap_or_default();
@@ -241,8 +241,8 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
     pub fn write_services(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r#"# Classes"#)?;
 
-        for pattern in self.inventory.patterns().iter().filter_map(|x| match x {
-            LibraryPattern::Service(s) => Some(s),
+        for pattern in self.inventory.patterns().iter().map(|x| match x {
+            LibraryPattern::Service(s) => s,
         }) {
             let prefix = pattern.common_prefix();
             let doc = pattern.the_type().meta().documentation().lines();

@@ -23,7 +23,7 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
     }
 
     pub fn inventory(&self) -> &Inventory {
-        &self.inventory
+        self.inventory
     }
 
     pub fn config(&self) -> &DocConfig {
@@ -47,8 +47,8 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
         indented!(w, r#"### Classes"#)?;
         indented!(w, r#"Methods operating on common state."#)?;
 
-        for pattern in self.inventory.patterns().iter().filter_map(|x| match x {
-            LibraryPattern::Service(s) => Some(s),
+        for pattern in self.inventory.patterns().iter().map(|x| match x {
+            LibraryPattern::Service(s) => s,
         }) {
             let prefix = pattern.common_prefix();
             let doc = pattern.the_type().meta().documentation().lines().first().cloned().unwrap_or_default();
@@ -147,7 +147,7 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
 
         indented!(w, r#"#### Definition "#)?;
         indented!(w, r#"```python"#)?;
-        self.python_writer.write_struct(w, &composite, WriteFor::Docs)?;
+        self.python_writer.write_struct(w, composite, WriteFor::Docs)?;
         indented!(w, r#"```"#)?;
 
         Ok(())
@@ -227,8 +227,8 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
     pub fn write_services(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r#"# Services"#)?;
 
-        for pattern in self.inventory.patterns().iter().filter_map(|x| match x {
-            LibraryPattern::Service(s) => Some(s),
+        for pattern in self.inventory.patterns().iter().map(|x| match x {
+            LibraryPattern::Service(s) => s,
         }) {
             let prefix = pattern.common_prefix();
             let doc = pattern.the_type().meta().documentation().lines();

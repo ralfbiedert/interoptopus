@@ -167,11 +167,7 @@ pub trait PythonWriter {
             }
 
             match f.the_type() {
-                CType::Pattern(p) => match p {
-                    // This does not seem to do anything to callback-returned values
-                    // TypePattern::AsciiPointer => indented!(w, [_ _], r#"return ctypes.string_at(ctypes.Structure.__get__(self, "{}"))"#, f.name())?,
-                    _ => indented!(w, [_ _], r#"return ctypes.Structure.__get__(self, "{}")"#, f.name())?,
-                },
+                CType::Pattern(_) => indented!(w, [_ _], r#"return ctypes.Structure.__get__(self, "{}")"#, f.name())?,
                 _ => indented!(w, [_ _], r#"return ctypes.Structure.__get__(self, "{}")"#, f.name())?,
             }
 
@@ -366,7 +362,7 @@ pub trait PythonWriter {
         let data_type = c
             .fields()
             .iter()
-            .find(|x| x.name().contains("t"))
+            .find(|x| x.name().contains('t'))
             .expect("Slice must contain field called 't'.")
             .the_type();
 
@@ -522,13 +518,10 @@ pub trait PythonWriter {
         };
 
         match function.signature().rval() {
-            CType::Pattern(x) => match x {
-                TypePattern::AsciiPointer => {
-                    indented!(w, [_], r#"rval = c_lib.{}({})"#, function.name(), &args)?;
-                    indented!(w, [_], r#"return ctypes.string_at(rval)"#)?;
-                }
-                _ => self.write_success_enum_aware_rval(w, function, &args, true)?,
-            },
+            CType::Pattern(TypePattern::AsciiPointer) => {
+                indented!(w, [_], r#"rval = c_lib.{}({})"#, function.name(), &args)?;
+                indented!(w, [_], r#"return ctypes.string_at(rval)"#)?;
+            }
             _ => self.write_success_enum_aware_rval(w, function, &args, true)?,
         }
 
@@ -552,7 +545,7 @@ pub trait PythonWriter {
                 } else {
                     "".to_string()
                 };
-                format!("{}{}", x.name().to_string(), type_hint)
+                format!("{}{}", x.name(), type_hint)
             })
             .collect::<Vec<_>>()
             .join(", ")
