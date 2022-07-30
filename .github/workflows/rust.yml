@@ -10,10 +10,8 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-
+  Build:
     runs-on: windows-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Python - Install 3.8
@@ -26,11 +24,11 @@ jobs:
         pip install cffi pytest
     - name: Rust - Build
       run: cargo build --verbose
-    - name: Rust - Test
-      run: cargo test --verbose
     - name: Rust - Style
       run: |
         cargo fmt --check
         cargo test --verbose
+    - name: Rust - Test
+      run: cargo test --verbose
 
 
