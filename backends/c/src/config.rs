@@ -53,7 +53,6 @@ impl ToNamingStyle for &str {
     }
 }
 
-
 /// Style of documentation in generated C code
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum CDocumentationStyle {

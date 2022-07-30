@@ -59,8 +59,8 @@ use interoptopus::{indented, Error};
 mod dotnet;
 mod unity;
 
-use crate::{CSharpTypeConverter, Config};
 use crate::converter::FunctionNameFlavor;
+use crate::{CSharpTypeConverter, Config};
 pub use dotnet::DotNet;
 pub use unity::Unity;
 
@@ -78,7 +78,15 @@ pub trait OverloadWriter {
 
     fn write_function_overload(&self, w: &mut IndentWriter, h: Helper, function: &Function, write_for: WriteFor) -> Result<(), Error>;
 
-    fn write_service_method_overload(&self, w: &mut IndentWriter, h: Helper, class: &Service, function: &Function, fn_pretty: &str, write_for: WriteFor) -> Result<(), Error>;
+    fn write_service_method_overload(
+        &self,
+        w: &mut IndentWriter,
+        h: Helper,
+        class: &Service,
+        function: &Function,
+        fn_pretty: &str,
+        write_for: WriteFor,
+    ) -> Result<(), Error>;
 
     fn write_pattern_slice_overload(&self, w: &mut IndentWriter, h: Helper, context_type_name: &str, type_string: &str) -> Result<(), Error>;
 
@@ -129,7 +137,7 @@ fn write_common_service_method_overload<FPatternMap: Fn(&Helper, &Parameter) -> 
     function: &Function,
     fn_pretty: &str,
     f_pattern: FPatternMap,
-    write_for: WriteFor
+    write_for: WriteFor,
 ) -> Result<(), Error> {
     let mut names = Vec::new();
     let mut to_invoke = Vec::new();
@@ -166,10 +174,13 @@ fn write_common_service_method_overload<FPatternMap: Fn(&Helper, &Parameter) -> 
         types.push(native);
     }
 
-    let method_to_invoke = h.converter.function_name_to_csharp_name(function, match h.config.rename_symbols {
-        true => FunctionNameFlavor::CSharpMethodNameWithClass,
-        false => FunctionNameFlavor::RawFFIName
-    });
+    let method_to_invoke = h.converter.function_name_to_csharp_name(
+        function,
+        match h.config.rename_symbols {
+            true => FunctionNameFlavor::CSharpMethodNameWithClass,
+            false => FunctionNameFlavor::RawFFIName,
+        },
+    );
     let extra_args = if to_invoke.is_empty() {
         "".to_string()
     } else {

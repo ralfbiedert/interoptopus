@@ -66,7 +66,6 @@ impl From<FFIBool> for bool {
     }
 }
 
-
 /// A wrapper for the c_char type to differentiate it from a signed 8-bit integer for platforms
 /// that support this type.
 ///
@@ -102,9 +101,9 @@ impl From<FFICChar> for c_char {
 
 #[cfg(test)]
 mod test {
-    use std::os::raw::c_char;
     use crate::patterns::primitives::FFIBool;
     use crate::patterns::primitives::FFICChar;
+    use std::os::raw::c_char;
 
     #[test]
     fn bool_works() {

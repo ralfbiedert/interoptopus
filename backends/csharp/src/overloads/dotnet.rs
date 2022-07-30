@@ -1,6 +1,6 @@
+use crate::converter::FunctionNameFlavor;
 use crate::overloads::{write_common_service_method_overload, write_function_overloaded_invoke_with_error_handling, Helper};
 use crate::{OverloadWriter, Unsafe};
-use crate::converter::FunctionNameFlavor;
 use interoptopus::lang::c::{CType, CompositeType, Field, Function, FunctionSignature, Parameter};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::TypePattern;
@@ -118,10 +118,13 @@ impl OverloadWriter for DotNet {
         let mut to_pin_name = Vec::new();
         let mut to_pin_slice_type = Vec::new();
         let mut to_invoke = Vec::new();
-        let raw_name = h.converter.function_name_to_csharp_name(function, match h.config.rename_symbols {
-            true => FunctionNameFlavor::CSharpMethodNameWithClass,
-            false => FunctionNameFlavor::RawFFIName
-        });
+        let raw_name = h.converter.function_name_to_csharp_name(
+            function,
+            match h.config.rename_symbols {
+                true => FunctionNameFlavor::CSharpMethodNameWithClass,
+                false => FunctionNameFlavor::RawFFIName,
+            },
+        );
         let this_name = if has_error_enum && !has_overload {
             format!("{}_checked", raw_name)
         } else {
@@ -200,10 +203,13 @@ impl OverloadWriter for DotNet {
                 }
             }
 
-            let fn_name = h.converter.function_name_to_csharp_name(function, match h.config.rename_symbols {
-                true => FunctionNameFlavor::CSharpMethodNameWithClass,
-                false => FunctionNameFlavor::RawFFIName
-            });
+            let fn_name = h.converter.function_name_to_csharp_name(
+                function,
+                match h.config.rename_symbols {
+                    true => FunctionNameFlavor::CSharpMethodNameWithClass,
+                    false => FunctionNameFlavor::RawFFIName,
+                },
+            );
             let call = format!(r#"{}({});"#, fn_name, to_invoke.join(", "));
 
             write_function_overloaded_invoke_with_error_handling(w, function, &call)?;
@@ -238,10 +244,13 @@ impl OverloadWriter for DotNet {
                 w.indent();
             }
 
-            let fn_name = h.converter.function_name_to_csharp_name(function, match h.config.rename_symbols {
-                true => FunctionNameFlavor::CSharpMethodNameWithClass,
-                false => FunctionNameFlavor::RawFFIName
-            });
+            let fn_name = h.converter.function_name_to_csharp_name(
+                function,
+                match h.config.rename_symbols {
+                    true => FunctionNameFlavor::CSharpMethodNameWithClass,
+                    false => FunctionNameFlavor::RawFFIName,
+                },
+            );
             let call = format!(r#"{}({});"#, fn_name, to_invoke.join(", "));
             write_function_overloaded_invoke_with_error_handling(w, function, &call)?;
 
@@ -260,7 +269,15 @@ impl OverloadWriter for DotNet {
         indented!(w, r#"}}"#)
     }
 
-    fn write_service_method_overload(&self, w: &mut IndentWriter, h: Helper, _class: &Service, function: &Function, fn_pretty: &str, write_for: WriteFor) -> Result<(), Error> {
+    fn write_service_method_overload(
+        &self,
+        w: &mut IndentWriter,
+        h: Helper,
+        _class: &Service,
+        function: &Function,
+        fn_pretty: &str,
+        write_for: WriteFor,
+    ) -> Result<(), Error> {
         if !self.has_overloadable(function.signature()) {
             return Ok(());
         }
@@ -271,7 +288,14 @@ impl OverloadWriter for DotNet {
             self.write_documentation(w, function.meta().documentation())?;
         }
 
-        write_common_service_method_overload(w, h, function, fn_pretty, |h, p| self.pattern_to_native_in_signature(h, p, function.signature()), write_for)?;
+        write_common_service_method_overload(
+            w,
+            h,
+            function,
+            fn_pretty,
+            |h, p| self.pattern_to_native_in_signature(h, p, function.signature()),
+            write_for,
+        )?;
 
         Ok(())
     }

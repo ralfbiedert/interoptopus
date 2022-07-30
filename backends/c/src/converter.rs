@@ -4,7 +4,6 @@ use interoptopus::lang::c::{CType, CompositeType, Constant, ConstantValue, EnumT
 use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::safe_name;
-use std::fmt::format;
 
 /// Implements [`CTypeConverter`].
 #[derive(Clone)]

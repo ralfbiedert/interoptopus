@@ -28,4 +28,3 @@ pub extern "C" fn pattern_ascii_pointer_len(x: AsciiPointer, y: UseAsciiStringPa
 pub extern "C" fn pattern_ascii_pointer_return_slice() -> FFISlice<'static, UseAsciiStringPattern<'static>> {
     FFISlice::empty()
 }
-

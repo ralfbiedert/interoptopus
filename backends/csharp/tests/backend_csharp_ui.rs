@@ -2,9 +2,7 @@ use interoptopus::testing::assert_file_matches_generated;
 use interoptopus::util::NamespaceMappings;
 use interoptopus::{Error, Interop};
 use interoptopus_backend_csharp::overloads::{DotNet, Unity};
-use interoptopus_backend_csharp::{
-    run_dotnet_command_if_installed, CSharpVisibility, Config, DocConfig, DocGenerator, Generator, Unsafe, WriteTypes
-};
+use interoptopus_backend_csharp::{run_dotnet_command_if_installed, CSharpVisibility, Config, DocConfig, DocGenerator, Generator, Unsafe, WriteTypes};
 use std::path::{Path, PathBuf};
 use tempdir::TempDir;
 

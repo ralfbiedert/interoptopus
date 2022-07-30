@@ -1,4 +1,6 @@
-use crate::{CSharpWriter};
+use crate::config::DocConfig;
+use crate::converter::{CSharpTypeConverter, FunctionNameFlavor};
+use crate::CSharpWriter;
 use interoptopus::lang::c::{CType, CompositeType, Function};
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::writer::{IndentWriter, WriteFor};
@@ -6,8 +8,6 @@ use interoptopus::{indented, non_service_functions};
 use interoptopus::{Error, Inventory};
 use std::fs::File;
 use std::path::Path;
-use crate::config::DocConfig;
-use crate::converter::{CSharpTypeConverter, FunctionNameFlavor};
 
 pub struct DocGenerator<'a, W> {
     inventory: &'a Inventory,
@@ -59,13 +59,19 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
             indented!(w, r#" - **[{}](#{})** - {}"#, name, name, doc)?;
 
             for x in pattern.constructors() {
-                let func_name =  self.csharp_writer.converter().function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
+                let func_name = self
+                    .csharp_writer
+                    .converter()
+                    .function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
                 let target = format!("{}.{}", name, func_name);
                 let doc = x.meta().documentation().lines().first().cloned().unwrap_or_default();
                 indented!(w, r#"     - **[{}](#{})** <sup>**ctor**</sup> - {}"#, func_name, target, doc)?;
             }
             for x in pattern.methods() {
-                let func_name =  self.csharp_writer.converter().function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
+                let func_name = self
+                    .csharp_writer
+                    .converter()
+                    .function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
                 let target = format!("{}.{}", name, func_name);
                 let doc = x.meta().documentation().lines().first().cloned().unwrap_or_default();
                 indented!(w, r#"     - **[{}](#{})** - {}"#, func_name, target, doc)?;
@@ -253,7 +259,10 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
             }
 
             for x in pattern.constructors() {
-                let fname =  self.csharp_writer.converter().function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
+                let fname = self
+                    .csharp_writer
+                    .converter()
+                    .function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
                 let target = format!("{}.{}", class_name, fname);
                 indented!(w, r#"### <a name="{}">**{}**</a> <sup>ctor</sup>"#, target, target)?;
 
@@ -267,7 +276,8 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
                 w.newline()?;
                 indented!(w, r#"#### Definition "#)?;
                 indented!(w, r#"```csharp"#)?;
-                self.csharp_writer.write_pattern_service_method(w, pattern, x, class_name, &fname, true, true, WriteFor::Docs)?;
+                self.csharp_writer
+                    .write_pattern_service_method(w, pattern, x, class_name, &fname, true, true, WriteFor::Docs)?;
                 indented!(w, r#"```"#)?;
                 w.newline()?;
                 indented!(w, r#"---"#)?;
@@ -275,7 +285,10 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
             }
 
             for x in pattern.methods() {
-                let fname =  self.csharp_writer.converter().function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
+                let fname = self
+                    .csharp_writer
+                    .converter()
+                    .function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
                 let target = format!("{}.{}", class_name, fname);
 
                 let rval = match x.signature().rval() {
@@ -297,7 +310,8 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
                 w.newline()?;
                 indented!(w, r#"#### Definition "#)?;
                 indented!(w, r#"```csharp"#)?;
-                self.csharp_writer.write_pattern_service_method(w, pattern, x, &rval, &fname, false, false, WriteFor::Docs)?;
+                self.csharp_writer
+                    .write_pattern_service_method(w, pattern, x, &rval, &fname, false, false, WriteFor::Docs)?;
                 for overload in self.csharp_writer.overloads() {
                     overload.write_service_method_overload(w, self.csharp_writer.helper(), pattern, x, &fname, WriteFor::Docs)?;
                 }
