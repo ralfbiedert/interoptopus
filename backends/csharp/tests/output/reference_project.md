@@ -1198,7 +1198,7 @@ public static extern MyCallbackVoid pattern_callback_2(IntPtr callback);
 # Classes
 ## <a name="SimpleService">**SimpleService**</a>
  Some struct we want to expose as a class.
-### <a name="SimpleService.NewWith">**SimpleService.NewWith**</a> <sup>ctor</sup>
+### <a name="NewWith">**NewWith**</a> <sup>ctor</sup>
  The constructor must return a `Result<Self, Error>`.
 
 #### Definition 
@@ -1208,7 +1208,7 @@ public SimpleService NewWith(uint some_value);
 
 ---
 
-### <a name="SimpleService.NewWithout">**SimpleService.NewWithout**</a> <sup>ctor</sup>
+### <a name="NewWithout">**NewWithout**</a> <sup>ctor</sup>
 
 #### Definition 
 ```csharp
@@ -1217,7 +1217,7 @@ public SimpleService NewWithout();
 
 ---
 
-### <a name="SimpleService.NewWithString">**SimpleService.NewWithString**</a> <sup>ctor</sup>
+### <a name="NewWithString">**NewWithString**</a> <sup>ctor</sup>
 
 #### Definition 
 ```csharp
@@ -1226,7 +1226,7 @@ public SimpleService NewWithString(string ascii);
 
 ---
 
-### <a name="SimpleService.NewFailing">**SimpleService.NewFailing**</a> <sup>ctor</sup>
+### <a name="NewFailing">**NewFailing**</a> <sup>ctor</sup>
 
 #### Definition 
 ```csharp
@@ -1235,7 +1235,7 @@ public SimpleService NewFailing(byte some_value);
 
 ---
 
-### <a name="SimpleService.MethodResult">**SimpleService.MethodResult**</a>
+### <a name="MethodResult">**MethodResult**</a>
  Methods returning a Result<(), _> are the default and do not
  need annotations.
 
@@ -1248,7 +1248,7 @@ public class SimpleService {
 
 ---
 
-### <a name="SimpleService.MethodValue">**SimpleService.MethodValue**</a>
+### <a name="MethodValue">**MethodValue**</a>
 
 #### Definition 
 ```csharp
@@ -1259,7 +1259,7 @@ public class SimpleService {
 
 ---
 
-### <a name="SimpleService.MethodVoid">**SimpleService.MethodVoid**</a>
+### <a name="MethodVoid">**MethodVoid**</a>
  This method should be documented.
 
  Multiple lines.
@@ -1273,7 +1273,7 @@ public class SimpleService {
 
 ---
 
-### <a name="SimpleService.MethodMutSelf">**SimpleService.MethodMutSelf**</a>
+### <a name="MethodMutSelf">**MethodMutSelf**</a>
 
 #### Definition 
 ```csharp
@@ -1288,7 +1288,7 @@ public class SimpleService {
 
 ---
 
-### <a name="SimpleService.MethodMutSelfVoid">**SimpleService.MethodMutSelfVoid**</a>
+### <a name="MethodMutSelfVoid">**MethodMutSelfVoid**</a>
  Single line.
 
 #### Definition 
@@ -1304,7 +1304,7 @@ public class SimpleService {
 
 ---
 
-### <a name="SimpleService.MethodMutSelfRef">**SimpleService.MethodMutSelfRef**</a>
+### <a name="MethodMutSelfRef">**MethodMutSelfRef**</a>
 
 #### Definition 
 ```csharp
@@ -1315,7 +1315,7 @@ public class SimpleService {
 
 ---
 
-### <a name="SimpleService.MethodMutSelfRefSlice">**SimpleService.MethodMutSelfRefSlice**</a>
+### <a name="MethodMutSelfRefSlice">**MethodMutSelfRefSlice**</a>
 
 #### Definition 
 ```csharp
@@ -1330,7 +1330,7 @@ public class SimpleService {
 
 ---
 
-### <a name="SimpleService.MethodMutSelfRefSliceLimited">**SimpleService.MethodMutSelfRefSliceLimited**</a>
+### <a name="MethodMutSelfRefSliceLimited">**MethodMutSelfRefSliceLimited**</a>
 
 #### Definition 
 ```csharp
@@ -1345,7 +1345,7 @@ public class SimpleService {
 
 ---
 
-### <a name="SimpleService.MethodMutSelfFfiError">**SimpleService.MethodMutSelfFfiError**</a>
+### <a name="MethodMutSelfFfiError">**MethodMutSelfFfiError**</a>
 
 #### Definition 
 ```csharp
@@ -1360,7 +1360,7 @@ public class SimpleService {
 
 ---
 
-### <a name="SimpleService.MethodMutSelfNoError">**SimpleService.MethodMutSelfNoError**</a>
+### <a name="MethodMutSelfNoError">**MethodMutSelfNoError**</a>
 
 #### Definition 
 ```csharp
@@ -1375,7 +1375,7 @@ public class SimpleService {
 
 ---
 
-### <a name="SimpleService.ReturnSlice">**SimpleService.ReturnSlice**</a>
+### <a name="ReturnSlice">**ReturnSlice**</a>
  Warning, you _must_ discard the returned slice object before calling into this service
  again, as otherwise undefined behavior might happen.
 
@@ -1388,7 +1388,7 @@ public class SimpleService {
 
 ---
 
-### <a name="SimpleService.ReturnSliceMut">**SimpleService.ReturnSliceMut**</a>
+### <a name="ReturnSliceMut">**ReturnSliceMut**</a>
  Warning, you _must_ discard the returned slice object before calling into this service
  again, as otherwise undefined behavior might happen.
 
@@ -1401,7 +1401,7 @@ public class SimpleService {
 
 ---
 
-### <a name="SimpleService.ReturnString">**SimpleService.ReturnString**</a>
+### <a name="ReturnString">**ReturnString**</a>
  This function has no panic safeguards. If it panics your host app will be in an undefined state.
 
 #### Definition 
@@ -1413,7 +1413,7 @@ public class SimpleService {
 
 ---
 
-### <a name="SimpleService.MethodVoidFfiError">**SimpleService.MethodVoidFfiError**</a>
+### <a name="MethodVoidFfiError">**MethodVoidFfiError**</a>
 
 #### Definition 
 ```csharp
@@ -1424,7 +1424,7 @@ public class SimpleService {
 
 ---
 
-### <a name="SimpleService.MethodCallback">**SimpleService.MethodCallback**</a>
+### <a name="MethodCallback">**MethodCallback**</a>
 
 #### Definition 
 ```csharp
@@ -1441,7 +1441,7 @@ public class SimpleService {
 
 
 ## <a name="SimpleServiceLifetime">**SimpleServiceLifetime**</a>
-### <a name="SimpleServiceLifetime.NewWith">**SimpleServiceLifetime.NewWith**</a> <sup>ctor</sup>
+### <a name="NewWith">**NewWith**</a> <sup>ctor</sup>
 
 #### Definition 
 ```csharp
@@ -1450,7 +1450,7 @@ public SimpleServiceLifetime NewWith(ref uint some_value);
 
 ---
 
-### <a name="SimpleServiceLifetime.MethodLt">**SimpleServiceLifetime.MethodLt**</a>
+### <a name="MethodLt">**MethodLt**</a>
 
 #### Definition 
 ```csharp
@@ -1465,7 +1465,7 @@ public class SimpleServiceLifetime {
 
 ---
 
-### <a name="SimpleServiceLifetime.MethodLt2">**SimpleServiceLifetime.MethodLt2**</a>
+### <a name="MethodLt2">**MethodLt2**</a>
 
 #### Definition 
 ```csharp
@@ -1480,7 +1480,7 @@ public class SimpleServiceLifetime {
 
 ---
 
-### <a name="SimpleServiceLifetime.ReturnStringAcceptSlice">**SimpleServiceLifetime.ReturnStringAcceptSlice**</a>
+### <a name="ReturnStringAcceptSlice">**ReturnStringAcceptSlice**</a>
 
 #### Definition 
 ```csharp
@@ -1495,7 +1495,7 @@ public class SimpleServiceLifetime {
 
 ---
 
-### <a name="SimpleServiceLifetime.MethodVoidFfiError">**SimpleServiceLifetime.MethodVoidFfiError**</a>
+### <a name="MethodVoidFfiError">**MethodVoidFfiError**</a>
 
 #### Definition 
 ```csharp
