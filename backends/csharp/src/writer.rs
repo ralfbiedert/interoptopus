@@ -971,11 +971,15 @@ pub trait CSharpWriter {
         let arg_tokens = names.iter().zip(types.iter()).map(|(n, t)| format!("{} {}", t, n)).collect::<Vec<_>>();
         let fn_call = format!(r#"{}.{}({}{})"#, self.config().class, method_to_invoke, context, extra_args);
 
+
         // Write signature.
-        indented!(w, r#"public {} {}({})"#, rval, fn_name, arg_tokens.join(", "))?;
+        let signature = format!(r#"public {} {}({})"#, rval, fn_name, arg_tokens.join(", "));
         if write_for == WriteFor::Docs {
+            indented!(w, r#"{};"#, signature)?;
             return Ok(())
         }
+
+        indented!(w, "{}", signature)?;
         indented!(w, r#"{{"#)?;
 
         if is_ctor {

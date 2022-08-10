@@ -192,13 +192,14 @@ fn write_common_service_method_overload<FPatternMap: Fn(&Helper, &Parameter) -> 
     let arg_tokens = names.iter().zip(types.iter()).map(|(n, t)| format!("{} {}", t, n)).collect::<Vec<_>>();
     let fn_call = format!(r#"{}.{}({}{})"#, h.config.class, method_to_invoke, context, extra_args);
 
-    // Write signature.
-    indented!(w, r#"public {} {}({})"#, rval, fn_pretty, arg_tokens.join(", "))?;
-
+    let signature = format!(r#"public {} {}({})"#, rval, fn_pretty, arg_tokens.join(", "));
     if write_for == WriteFor::Docs {
+        indented!(w, "{};", signature)?;
         return Ok(());
     }
 
+    // Write signature.
+    indented!(w, "{}", signature)?;
     indented!(w, r#"{{"#)?;
 
     match function.signature().rval() {
