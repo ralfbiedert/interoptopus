@@ -107,7 +107,7 @@ impl Unity {
         }
     }
 
-    fn write_function_delegate_overload_helper(&self, w: &mut IndentWriter, h: &Helper, function: &Function) -> Result<(), Error> {
+    fn write_function_delegate_overload_helper(&self, w: &mut IndentWriter, h: &Helper, function: &Function, write_for: WriteFor) -> Result<(), Error> {
         let rval = h.converter.function_rval_to_csharp_typename(function);
         let name = h.converter.function_name_to_csharp_name(
             function,
@@ -129,16 +129,23 @@ impl Unity {
             params.push(format!("{} {}", the_type, name));
         }
 
-        indented!(
-            w,
-            r#"[DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "{}")]"#,
-            function.name()
-        )?;
+        if write_for == WriteFor::Code {
+            indented!(
+                w,
+                r#"[DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "{}")]"#,
+                function.name()
+            )?;
+        }
+
         indented!(w, r#"public static extern {} {}({});"#, rval, name, params.join(", "))?;
-        w.newline()?;
+
+        if write_for == WriteFor::Code {
+            w.newline()?;
+        }
 
         Ok(())
     }
+
 }
 
 impl OverloadWriter for Unity {
@@ -184,15 +191,14 @@ impl OverloadWriter for Unity {
             return Ok(());
         }
 
-        w.newline()?;
-
         if write_for == WriteFor::Code {
+            w.newline()?;
             self.write_documentation(w, function.meta().documentation())?;
         }
 
         // If we have delegates we need to write a version with IntPtr only
         if self.has_delegate(signature) {
-            self.write_function_delegate_overload_helper(w, &h, function)?;
+            self.write_function_delegate_overload_helper(w, &h, function, write_for)?;
         }
 
         // If we _only_ have function delegates we're done, since no conversion logic will have to take place.
@@ -268,7 +274,15 @@ impl OverloadWriter for Unity {
             params.push(format!("{} {}", native, name));
         }
 
-        indented!(w, r#"public static {} {}({}) {{"#, rval, this_name, params.join(", "))?;
+        let signature = format!(r#"public static {} {}({})"#, rval, this_name, params.join(", "));
+        if write_for == WriteFor::Docs {
+            indented!(w, "{};", signature)?;
+            indented!(w, r#"#endif"#)?;
+            return Ok(());
+        }
+
+        indented!(w, "{}", signature)?;
+        indented!(w, r#"{{"#)?;
 
         if !to_pin_name.is_empty() {
             for (pin_var, slice_struct) in to_pin_name.iter().zip(to_pin_slice_type.iter()) {
@@ -304,9 +318,9 @@ impl OverloadWriter for Unity {
         if !self.has_overloadable(function.signature()) {
             return Ok(());
         }
-
-        w.newline()?;
-
+        if write_for == WriteFor::Code {
+            w.newline()?;
+        }
         indented!(w, r#"#if UNITY_2018_1_OR_NEWER"#)?;
         if write_for == WriteFor::Code {
             self.write_documentation(w, function.meta().documentation())?;

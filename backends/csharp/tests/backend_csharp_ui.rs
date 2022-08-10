@@ -69,7 +69,15 @@ fn generate_bindings_multi(folder: impl AsRef<Path>, use_unsafe: Unsafe, config:
 
 fn generate_documentation(output: &str) -> Result<(), Error> {
     let inventory = interoptopus_reference_project::ffi_inventory();
-    let generator = Generator::new(Config::default(), inventory.clone());
+    let mut generator = Generator::new(
+        Config {
+            use_unsafe: Unsafe::UnsafePlatformMemCpy,
+            ..Config::default()
+        },
+        inventory.clone(),
+    );
+
+    generator.add_overload_writer(DotNet::new()).add_overload_writer(Unity::new());
 
     DocGenerator::new(&inventory, &generator, DocConfig::default()).write_file(output)
 }

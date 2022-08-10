@@ -181,13 +181,21 @@ impl OverloadWriter for DotNet {
             params.push(format!("{} {}", native, name));
         }
 
+
+        let signature = format!(r#"public static {} {}({})"#, rval, this_name, params.join(", "));
+        if write_for == WriteFor::Docs {
+            indented!(w, r#"{};"#, signature)?;
+            return Ok(());
+        }
+
         w.newline()?;
 
         if write_for == WriteFor::Code {
             self.write_documentation(w, function.meta().documentation())?;
         }
 
-        indented!(w, r#"public static {} {}({}) {{"#, rval, this_name, params.join(", "))?;
+        indented!(w, "{}", signature)?;
+        indented!(w, r#"{{"#)?;
 
         if h.config.use_unsafe.any_unsafe() {
             if !to_pin_name.is_empty() {
@@ -282,9 +290,8 @@ impl OverloadWriter for DotNet {
             return Ok(());
         }
 
-        w.newline()?;
-
         if write_for == WriteFor::Code {
+            w.newline()?;
             self.write_documentation(w, function.meta().documentation())?;
         }
 
