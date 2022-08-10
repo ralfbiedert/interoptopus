@@ -58,6 +58,12 @@ impl<'a> IndentWriter<'a> {
         Ok(())
     }
 
+    pub fn unindented(&mut self, f: impl FnOnce(&mut dyn Write) -> std::io::Result<()>) -> Result<(), Error> {
+        f(&mut self.writer)?;
+
+        Ok(())
+    }
+
     pub fn indented_block(&mut self, block: Option<(&str, &str)>, f: impl FnOnce(&mut Self) -> Result<(), Error>) -> Result<(), Error> {
         if let Some(block) = block {
             self.indented(|w| writeln!(w, "{}", block.0))?;
@@ -130,6 +136,30 @@ macro_rules! indented {
     ($w:expr, $x:expr) => {
         {
             $w.indented(|w| writeln!(w, $x))
+        }
+    };
+}
+
+
+/// Writes an unindented line of code. Used in backends.
+#[macro_export]
+macro_rules! unindented {
+    ($w:expr, $x:expr, $($param:expr),*) => {
+        {
+            $w.unindented(|w| writeln!(w, $x, $($param),*))
+        }
+
+    };
+
+    ($w:expr, $x:expr, $($param:expr),*) => {
+        {
+            $w.unindented(|w| writeln!(w, $x, $($param),*))
+        }
+    };
+
+    ($w:expr, $x:expr) => {
+        {
+            $w.unindented(|w| writeln!(w, $x))
         }
     };
 }
