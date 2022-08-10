@@ -5,7 +5,7 @@ use interoptopus::lang::c::{CType, CompositeType, Field, Function, FunctionSigna
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::{IndentWriter, WriteFor};
-use interoptopus::{indented, Error};
+use interoptopus::{indented, Error, unindented};
 use std::ops::Deref;
 
 /// Provides Unity overloads, make sure to use [`Unsafe::UnsafeKeyword`](crate::Unsafe::UnsafeKeyword) or higher.
@@ -206,7 +206,12 @@ impl OverloadWriter for Unity {
             return Ok(());
         };
 
-        indented!(w, r#"#if UNITY_2018_1_OR_NEWER"#)?;
+        if write_for == WriteFor::Code {
+            indented!(w, r#"#if UNITY_2018_1_OR_NEWER"#)?;
+        }
+        else {
+            unindented!(w, r#"#if UNITY_2018_1_OR_NEWER"#)?;
+        }
 
         let mut to_pin_name = Vec::new();
         let mut to_pin_slice_type = Vec::new();
@@ -277,7 +282,7 @@ impl OverloadWriter for Unity {
         let signature = format!(r#"public static {} {}({})"#, rval, this_name, params.join(", "));
         if write_for == WriteFor::Docs {
             indented!(w, "{};", signature)?;
-            indented!(w, r#"#endif"#)?;
+            unindented!(w, r#"#endif"#)?;
             return Ok(());
         }
 
@@ -320,8 +325,11 @@ impl OverloadWriter for Unity {
         }
         if write_for == WriteFor::Code {
             w.newline()?;
+            indented!(w, r#"#if UNITY_2018_1_OR_NEWER"#)?;
         }
-        indented!(w, r#"#if UNITY_2018_1_OR_NEWER"#)?;
+        else {
+            unindented!(w, r#"#if UNITY_2018_1_OR_NEWER"#)?;
+        }
         if write_for == WriteFor::Code {
             self.write_documentation(w, function.meta().documentation())?;
         }
@@ -334,7 +342,14 @@ impl OverloadWriter for Unity {
             |h, p| self.pattern_to_native_in_signature(h, p, function.signature()),
             write_for,
         )?;
-        indented!(w, r#"#endif"#)?;
+
+
+        if write_for == WriteFor::Code {
+            indented!(w, r#"#endif"#)?;
+        }
+        else {
+            unindented!(w, r#"#endif"#)?;
+        }
 
         Ok(())
     }

@@ -1280,9 +1280,9 @@ public class SimpleService {
 public class SimpleService {
     public byte MethodMutSelf(Sliceu8 slice);
     public byte MethodMutSelf(byte[] slice);
-    #if UNITY_2018_1_OR_NEWER
+#if UNITY_2018_1_OR_NEWER
     public byte MethodMutSelf(NativeArray<byte> slice);
-    #endif
+#endif
 }
 ```
 
@@ -1296,9 +1296,9 @@ public class SimpleService {
 public class SimpleService {
     public void MethodMutSelfVoid(SliceBool slice);
     public void MethodMutSelfVoid(Bool[] slice);
-    #if UNITY_2018_1_OR_NEWER
+#if UNITY_2018_1_OR_NEWER
     public void MethodMutSelfVoid(NativeArray<Bool> slice);
-    #endif
+#endif
 }
 ```
 
@@ -1322,9 +1322,9 @@ public class SimpleService {
 public class SimpleService {
     public byte MethodMutSelfRefSlice(ref byte x, out byte y, Sliceu8 slice);
     public byte MethodMutSelfRefSlice(ref byte x, out byte y, byte[] slice);
-    #if UNITY_2018_1_OR_NEWER
+#if UNITY_2018_1_OR_NEWER
     public byte MethodMutSelfRefSlice(ref byte x, out byte y, NativeArray<byte> slice);
-    #endif
+#endif
 }
 ```
 
@@ -1337,9 +1337,9 @@ public class SimpleService {
 public class SimpleService {
     public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, Sliceu8 slice, Sliceu8 slice2);
     public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, byte[] slice, byte[] slice2);
-    #if UNITY_2018_1_OR_NEWER
+#if UNITY_2018_1_OR_NEWER
     public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, NativeArray<byte> slice, NativeArray<byte> slice2);
-    #endif
+#endif
 }
 ```
 
@@ -1352,9 +1352,9 @@ public class SimpleService {
 public class SimpleService {
     public void MethodMutSelfFfiError(SliceMutu8 slice);
     public void MethodMutSelfFfiError(byte[] slice);
-    #if UNITY_2018_1_OR_NEWER
+#if UNITY_2018_1_OR_NEWER
     public void MethodMutSelfFfiError(NativeArray<byte> slice);
-    #endif
+#endif
 }
 ```
 
@@ -1367,9 +1367,9 @@ public class SimpleService {
 public class SimpleService {
     public void MethodMutSelfNoError(SliceMutu8 slice);
     public void MethodMutSelfNoError(byte[] slice);
-    #if UNITY_2018_1_OR_NEWER
+#if UNITY_2018_1_OR_NEWER
     public void MethodMutSelfNoError(NativeArray<byte> slice);
-    #endif
+#endif
 }
 ```
 
@@ -1430,9 +1430,9 @@ public class SimpleService {
 ```csharp
 public class SimpleService {
     public void MethodCallback(MyCallback callback);
-    #if UNITY_2018_1_OR_NEWER
+#if UNITY_2018_1_OR_NEWER
     public void MethodCallback(IntPtr callback);
-    #endif
+#endif
 }
 ```
 
@@ -1457,9 +1457,9 @@ public SimpleServiceLifetime NewWith(ref uint some_value);
 public class SimpleServiceLifetime {
     public void MethodLt(SliceBool slice);
     public void MethodLt(Bool[] slice);
-    #if UNITY_2018_1_OR_NEWER
+#if UNITY_2018_1_OR_NEWER
     public void MethodLt(NativeArray<Bool> slice);
-    #endif
+#endif
 }
 ```
 
@@ -1472,9 +1472,9 @@ public class SimpleServiceLifetime {
 public class SimpleServiceLifetime {
     public void MethodLt2(SliceBool slice);
     public void MethodLt2(Bool[] slice);
-    #if UNITY_2018_1_OR_NEWER
+#if UNITY_2018_1_OR_NEWER
     public void MethodLt2(NativeArray<Bool> slice);
-    #endif
+#endif
 }
 ```
 
@@ -1487,9 +1487,9 @@ public class SimpleServiceLifetime {
 public class SimpleServiceLifetime {
     public string ReturnStringAcceptSlice(Sliceu8 anon1);
     public string ReturnStringAcceptSlice(byte[] anon1);
-    #if UNITY_2018_1_OR_NEWER
+#if UNITY_2018_1_OR_NEWER
     public string ReturnStringAcceptSlice(NativeArray<byte> anon1);
-    #endif
+#endif
 }
 ```
 
