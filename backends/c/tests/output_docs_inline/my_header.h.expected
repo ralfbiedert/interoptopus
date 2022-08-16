@@ -326,17 +326,17 @@ uint32_t pattern_ffi_slice_1(my_library_sliceu32 ffi_slice);
 
 my_library_vec3f32 pattern_ffi_slice_2(my_library_slice_vec3f32 ffi_slice, int32_t i);
 
-void pattern_ffi_slice_3(my_library_slice_mutu8 slice, my_library_fptr_fn_SliceMutu8 callback);
+void pattern_ffi_slice_3(my_library_slice_mutu8 slice, my_library_callback_slice_mut callback);
 
 void pattern_ffi_slice_4(my_library_sliceu8 slice, my_library_slice_mutu8 slice2);
 
 void pattern_ffi_slice_5(const my_library_sliceu8* slice, my_library_slice_mutu8* slice2);
 
-void pattern_ffi_slice_6(const my_library_slice_mutu8* slice, my_library_fptr_fn_u8_rval_u8 callback);
+void pattern_ffi_slice_6(const my_library_slice_mutu8* slice, my_library_callback_u8 callback);
 
-uint8_t pattern_ffi_slice_delegate(my_library_fptr_fn_Sliceu8_rval_u8 callback);
+uint8_t pattern_ffi_slice_delegate(my_library_callback_ffi_slice callback);
 
-my_library_vec3f32 pattern_ffi_slice_delegate_huge(my_library_fptr_fn_SliceVec3f32_rval_Vec3f32 callback);
+my_library_vec3f32 pattern_ffi_slice_delegate_huge(my_library_callback_huge_vec_slice callback);
 
 my_library_option_inner pattern_ffi_option_1(my_library_option_inner ffi_slice);
 
@@ -352,9 +352,9 @@ char* pattern_ffi_cchar_mut_pointer(char* ffi_cchar);
 
 uint64_t pattern_api_guard();
 
-uint32_t pattern_callback_1(my_library_fptr_fn_u32_rval_u32 callback, uint32_t x);
+uint32_t pattern_callback_1(my_library_my_callback callback, uint32_t x);
 
-my_library_fptr_fn_pconst pattern_callback_2(my_library_fptr_fn_pconst callback);
+my_library_my_callback_void pattern_callback_2(my_library_my_callback_void callback);
 
 /// Destroys the given instance.
 ///
@@ -412,7 +412,7 @@ const char* simple_service_return_string(my_library_simple_service* context);
 
 my_library_ffi_error simple_service_method_void_ffi_error(my_library_simple_service* context);
 
-my_library_ffi_error simple_service_method_callback(my_library_simple_service* context, my_library_fptr_fn_u32_rval_u32 callback);
+my_library_ffi_error simple_service_method_callback(my_library_simple_service* context, my_library_my_callback callback);
 
 /// Destroys the given instance.
 ///

@@ -105,6 +105,7 @@ impl CTypeConverter for Converter {
             CType::ReadWritePointer(x) => format!("{}*", self.to_type_specifier(x)),
             CType::FnPointer(x) => self.fnpointer_to_typename(x),
             CType::Pattern(TypePattern::CChar) => "char".to_string(),
+            CType::Pattern(TypePattern::NamedCallback(x)) => self.named_callback_to_typename(x),
             CType::Pattern(x) => self.to_type_specifier(&x.fallback_type()),
             // TODO: This should be handled in nicer way so that arrays-of-arrays and other thing work properly
             CType::Array(_) => panic!("Arrays need special handling in the writer."),
