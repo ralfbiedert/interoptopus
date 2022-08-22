@@ -381,10 +381,10 @@ namespace My.Company
         public static extern sbyte pattern_ffi_cchar(sbyte ffi_cchar);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_cchar_const_pointer")]
-        public static extern IntPtr pattern_ffi_cchar_const_pointer(ref IntPtr ffi_cchar);
+        public static extern IntPtr pattern_ffi_cchar_const_pointer(IntPtr ffi_cchar);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_cchar_mut_pointer")]
-        public static extern IntPtr pattern_ffi_cchar_mut_pointer(ref IntPtr ffi_cchar);
+        public static extern IntPtr pattern_ffi_cchar_mut_pointer(IntPtr ffi_cchar);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_api_guard")]
         public static extern ulong pattern_api_guard();
