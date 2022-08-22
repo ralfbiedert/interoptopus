@@ -1156,7 +1156,7 @@ public static extern sbyte pattern_ffi_cchar(sbyte ffi_cchar);
 ### <a name="pattern_ffi_cchar_const_pointer">**pattern_ffi_cchar_const_pointer**</a>
 #### Definition 
 ```csharp
-public static extern IntPtr pattern_ffi_cchar_const_pointer(ref IntPtr ffi_cchar);
+public static extern IntPtr pattern_ffi_cchar_const_pointer(IntPtr ffi_cchar);
 ```
 
 ---
@@ -1164,7 +1164,7 @@ public static extern IntPtr pattern_ffi_cchar_const_pointer(ref IntPtr ffi_cchar
 ### <a name="pattern_ffi_cchar_mut_pointer">**pattern_ffi_cchar_mut_pointer**</a>
 #### Definition 
 ```csharp
-public static extern IntPtr pattern_ffi_cchar_mut_pointer(ref IntPtr ffi_cchar);
+public static extern IntPtr pattern_ffi_cchar_mut_pointer(IntPtr ffi_cchar);
 ```
 
 ---
