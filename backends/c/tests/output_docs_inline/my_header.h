@@ -203,6 +203,13 @@ typedef struct my_library_option_inner
     uint8_t is_some;
 } my_library_option_inner;
 
+///Option type containing boolean flag and maybe valid data.
+typedef struct my_library_option_vec
+{
+    my_library_vec t;
+    uint8_t is_some;
+} my_library_option_vec;
+
 typedef void (*my_library_my_callback_void)(const void* ptr);
 
 ///A pointer to an array of data someone else owns which may not be modified.
@@ -213,11 +220,25 @@ typedef struct my_library_slice_use_ascii_string_pattern
 } my_library_slice_use_ascii_string_pattern;
 
 ///A pointer to an array of data someone else owns which may not be modified.
+typedef struct my_library_slice_vec
+{
+    const my_library_vec* data;
+    uint64_t len;
+} my_library_slice_vec;
+
+///A pointer to an array of data someone else owns which may not be modified.
 typedef struct my_library_slice_vec3f32
 {
     const my_library_vec3f32* data;
     uint64_t len;
 } my_library_slice_vec3f32;
+
+///A pointer to an array of data someone else owns which may be modified.
+typedef struct my_library_slice_mut_vec
+{
+    const my_library_vec* data;
+    uint64_t len;
+} my_library_slice_mut_vec;
 
 typedef uint8_t (*my_library_callback_ffi_slice)(my_library_sliceu8 slice);
 
@@ -301,6 +322,12 @@ my_library_vec2 ambiguous_2(my_library_vec2 x);
 bool ambiguous_3(my_library_vec1 x, my_library_vec2 y);
 
 my_library_vec namespaced_type(my_library_vec x);
+
+my_library_option_vec namespaced_inner_option(my_library_option_vec x);
+
+my_library_slice_vec namespaced_inner_slice(my_library_slice_vec x);
+
+my_library_slice_mut_vec namespaced_inner_slice_mut(my_library_slice_mut_vec x);
 
 my_library_ffi_error panics();
 

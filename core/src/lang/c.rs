@@ -229,6 +229,17 @@ impl CType {
     pub fn is_void(&self) -> bool {
         matches!(self, CType::Primitive(PrimitiveType::Void))
     }
+
+    /// Returns the namespace of the type.
+    pub fn namespace(&self) -> Option<&str> {
+        match self {
+            CType::Array(t) => t.array_type().namespace(),
+            CType::Enum(t) => Some(t.meta.namespace()),
+            CType::Opaque(t) => Some(t.meta.namespace()),
+            CType::Composite(t) => Some(t.meta.namespace()),
+            _ => None,
+        }
+    }
 }
 
 /// A primitive type that natively exists in C and is FFI safe.

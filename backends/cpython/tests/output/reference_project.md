@@ -39,6 +39,9 @@ Freestanding callables inside the module.
  - **[ambiguous_2](#ambiguous_2)** - 
  - **[ambiguous_3](#ambiguous_3)** - 
  - **[namespaced_type](#namespaced_type)** - 
+ - **[namespaced_inner_option](#namespaced_inner_option)** - 
+ - **[namespaced_inner_slice](#namespaced_inner_slice)** - 
+ - **[namespaced_inner_slice_mut](#namespaced_inner_slice_mut)** - 
  - **[panics](#panics)** - 
  - **[renamed](#renamed)** - 
  - **[sleep](#sleep)** - 
@@ -124,10 +127,12 @@ Composite data used by functions and methods.
  - **[Weird2u8](#Weird2u8)** - 
  - **[SliceBool](#SliceBool)** - A pointer and length of un-owned elements.
  - **[SliceUseAsciiStringPattern](#SliceUseAsciiStringPattern)** - A pointer and length of un-owned elements.
+ - **[SliceVec](#SliceVec)** - A pointer and length of un-owned elements.
  - **[SliceVec3f32](#SliceVec3f32)** - A pointer and length of un-owned elements.
  - **[Sliceu32](#Sliceu32)** - A pointer and length of un-owned elements.
  - **[Sliceu8](#Sliceu8)** - A pointer and length of un-owned elements.
  - **[OptionInner](#OptionInner)** - A boolean flag and optionally data.
+ - **[OptionVec](#OptionVec)** - A boolean flag and optionally data.
 # Types 
 
 
@@ -597,6 +602,30 @@ class SliceUseAsciiStringPattern(ctypes.Structure):
 
 
 
+ ### <a name="SliceVec">**SliceVec**</a>
+
+A pointer to an array of data someone else owns which may not be modified.
+
+#### Fields 
+- **data** - Pointer to start of immutable data. 
+- **len** - Number of elements. 
+#### Definition 
+```python
+class SliceVec(ctypes.Structure):
+
+    _fields_ = [
+        ("data", ctypes.POINTER(Vec)),
+        ("len", ctypes.c_uint64),
+    ]
+
+    def __init__(self, data: ctypes.POINTER(Vec) = None, len: int = None):
+        ...
+```
+
+---
+
+
+
  ### <a name="SliceVec3f32">**SliceVec3f32**</a>
 
 A pointer to an array of data someone else owns which may not be modified.
@@ -686,6 +715,30 @@ class OptionInner(ctypes.Structure):
     ]
 
     def __init__(self, t: Inner = None, is_some: int = None):
+        ...
+```
+
+---
+
+
+
+ ### <a name="OptionVec">**OptionVec**</a>
+
+Option type containing boolean flag and maybe valid data.
+
+#### Fields 
+- **t** - Element that is maybe valid. 
+- **is_some** - Byte where `1` means element `t` is valid. 
+#### Definition 
+```python
+class OptionVec(ctypes.Structure):
+
+    _fields_ = [
+        ("t", Vec),
+        ("is_some", ctypes.c_uint8),
+    ]
+
+    def __init__(self, t: Vec = None, is_some: int = None):
         ...
 ```
 
@@ -1051,6 +1104,33 @@ def ambiguous_3(x: Vec1, y: Vec2) -> bool:
 #### Definition 
 ```python
 def namespaced_type(x: Vec) -> Vec:
+    ...
+```
+
+---
+
+## namespaced_inner_option 
+#### Definition 
+```python
+def namespaced_inner_option(x: OptionVec) -> OptionVec:
+    ...
+```
+
+---
+
+## namespaced_inner_slice 
+#### Definition 
+```python
+def namespaced_inner_slice(x: SliceVec) -> SliceVec:
+    ...
+```
+
+---
+
+## namespaced_inner_slice_mut 
+#### Definition 
+```python
+def namespaced_inner_slice_mut(x: SliceMutVec) -> SliceMutVec:
     ...
 ```
 

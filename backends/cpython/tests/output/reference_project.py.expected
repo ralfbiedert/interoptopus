@@ -46,6 +46,9 @@ def init_lib(path):
     c_lib.ambiguous_2.argtypes = [Vec2]
     c_lib.ambiguous_3.argtypes = [Vec1, Vec2]
     c_lib.namespaced_type.argtypes = [Vec]
+    c_lib.namespaced_inner_option.argtypes = [OptionVec]
+    c_lib.namespaced_inner_slice.argtypes = [SliceVec]
+    c_lib.namespaced_inner_slice_mut.argtypes = [SliceMutVec]
     c_lib.panics.argtypes = []
     c_lib.renamed.argtypes = [StructRenamed]
     c_lib.sleep.argtypes = [ctypes.c_uint64]
@@ -134,6 +137,9 @@ def init_lib(path):
     c_lib.ambiguous_2.restype = Vec2
     c_lib.ambiguous_3.restype = ctypes.c_bool
     c_lib.namespaced_type.restype = Vec
+    c_lib.namespaced_inner_option.restype = OptionVec
+    c_lib.namespaced_inner_slice.restype = SliceVec
+    c_lib.namespaced_inner_slice_mut.restype = SliceMutVec
     c_lib.panics.restype = ctypes.c_int
     c_lib.renamed.restype = ctypes.c_int
     c_lib.weird_1.restype = ctypes.c_bool
@@ -309,6 +315,15 @@ def ambiguous_3(x: Vec1, y: Vec2) -> bool:
 
 def namespaced_type(x: Vec) -> Vec:
     return c_lib.namespaced_type(x)
+
+def namespaced_inner_option(x: OptionVec) -> OptionVec:
+    return c_lib.namespaced_inner_option(x)
+
+def namespaced_inner_slice(x: SliceVec) -> SliceVec:
+    return c_lib.namespaced_inner_slice(x)
+
+def namespaced_inner_slice_mut(x: SliceMutVec) -> SliceMutVec:
+    return c_lib.namespaced_inner_slice_mut(x)
 
 def panics():
     return c_lib.panics()
@@ -1216,6 +1231,31 @@ class OptionInner(ctypes.Structure):
         return self._is_some != 0
 
 
+class OptionVec(ctypes.Structure):
+    """May optionally hold a value."""
+
+    _fields_ = [
+        ("_t", Vec),
+        ("_is_some", ctypes.c_uint8),
+    ]
+
+    @property
+    def value(self) -> Vec:
+        """Returns the value if it exists, or None."""
+        if self._is_some == 1:
+            return self._t
+        else:
+            return None
+
+    def is_some(self) -> bool:
+        """Returns true if the value exists."""
+        return self._is_some == 1
+
+    def is_none(self) -> bool:
+        """Returns true if the value does not exist."""
+        return self._is_some != 0
+
+
 class SliceUseAsciiStringPattern(ctypes.Structure):
     # These fields represent the underlying C data layout
     _fields_ = [
@@ -1258,6 +1298,48 @@ class SliceUseAsciiStringPattern(ctypes.Structure):
         return self[len(self)-1]
 
 
+class SliceVec(ctypes.Structure):
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("data", ctypes.POINTER(Vec)),
+        ("len", ctypes.c_uint64),
+    ]
+
+    def __len__(self):
+        return self.len
+
+    def __getitem__(self, i) -> Vec:
+        return self.data[i]
+
+    def copied(self) -> SliceVec:
+        """Returns a shallow, owned copy of the underlying slice.
+
+        The returned object owns the immediate data, but not the targets of any contained
+        pointers. In other words, if your struct contains any pointers the returned object
+        may only be used as long as these pointers are valid. If the struct did not contain
+        any pointers the returned object is valid indefinitely."""
+        array = (Vec * len(self))()
+        ctypes.memmove(array, self.data, len(self) * ctypes.sizeof(Vec))
+        rval = SliceVec(data=ctypes.cast(array, ctypes.POINTER(Vec)), len=len(self))
+        rval.owned = array  # Store array in returned slice to prevent memory deallocation
+        return rval
+
+    def __iter__(self) -> typing.Iterable[Vec]:
+        return _Iter(self)
+
+    def iter(self) -> typing.Iterable[Vec]:
+        """Convenience method returning a value iterator."""
+        return iter(self)
+
+    def first(self) -> Vec:
+        """Returns the first element of this slice."""
+        return self[0]
+
+    def last(self) -> Vec:
+        """Returns the last element of this slice."""
+        return self[len(self)-1]
+
+
 class SliceVec3f32(ctypes.Structure):
     # These fields represent the underlying C data layout
     _fields_ = [
@@ -1296,6 +1378,51 @@ class SliceVec3f32(ctypes.Structure):
         return self[0]
 
     def last(self) -> Vec3f32:
+        """Returns the last element of this slice."""
+        return self[len(self)-1]
+
+
+class SliceMutVec(ctypes.Structure):
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("data", ctypes.POINTER(Vec)),
+        ("len", ctypes.c_uint64),
+    ]
+
+    def __len__(self):
+        return self.len
+
+    def __getitem__(self, i) -> Vec:
+        return self.data[i]
+
+    def __setitem__(self, i, v: Vec):
+        self.data[i] = v
+
+    def copied(self) -> SliceMutVec:
+        """Returns a shallow, owned copy of the underlying slice.
+
+        The returned object owns the immediate data, but not the targets of any contained
+        pointers. In other words, if your struct contains any pointers the returned object
+        may only be used as long as these pointers are valid. If the struct did not contain
+        any pointers the returned object is valid indefinitely."""
+        array = (Vec * len(self))()
+        ctypes.memmove(array, self.data, len(self) * ctypes.sizeof(Vec))
+        rval = SliceMutVec(data=ctypes.cast(array, ctypes.POINTER(Vec)), len=len(self))
+        rval.owned = array  # Store array in returned slice to prevent memory deallocation
+        return rval
+
+    def __iter__(self) -> typing.Iterable[Vec]:
+        return _Iter(self)
+
+    def iter(self) -> typing.Iterable[Vec]:
+        """Convenience method returning a value iterator."""
+        return iter(self)
+
+    def first(self) -> Vec:
+        """Returns the first element of this slice."""
+        return self[0]
+
+    def last(self) -> Vec:
         """Returns the last element of this slice."""
         return self[len(self)-1]
 

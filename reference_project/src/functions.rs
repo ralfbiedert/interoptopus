@@ -9,6 +9,9 @@ use interoptopus::patterns::result::panics_and_errors_to_ffi_enum;
 use interoptopus::{ffi_function, ffi_surrogates, here};
 use std::ptr::null;
 use std::time::Duration;
+use interoptopus::patterns::option::FFIOption;
+use interoptopus::patterns::slice::FFISlice;
+use interoptopus::patterns::slice::FFISliceMut;
 
 #[ffi_function]
 #[no_mangle]
@@ -248,6 +251,24 @@ pub extern "C" fn ambiguous_3(x: ambiguous1::Vec, y: ambiguous2::Vec) -> bool {
 #[ffi_function]
 #[no_mangle]
 pub extern "C" fn namespaced_type(x: common::Vec) -> common::Vec {
+    x
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn namespaced_inner_option(x: FFIOption<common::Vec>) -> FFIOption<common::Vec> {
+    x
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn namespaced_inner_slice(x: FFISlice<common::Vec>) -> FFISlice<common::Vec> {
+    x
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn namespaced_inner_slice_mut(x: FFISliceMut<common::Vec>) -> FFISliceMut<common::Vec> {
     x
 }
 
