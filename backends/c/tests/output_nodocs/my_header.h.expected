@@ -188,6 +188,12 @@ typedef struct my_library_optioninner
     uint8_t is_some;
     } my_library_optioninner;
 
+typedef struct my_library_optionvec
+    {
+    my_library_vec t;
+    uint8_t is_some;
+    } my_library_optionvec;
+
 typedef void (*my_library_mycallbackvoid)(const void* ptr);
 
 typedef struct my_library_sliceuseasciistringpattern
@@ -196,11 +202,23 @@ typedef struct my_library_sliceuseasciistringpattern
     uint64_t len;
     } my_library_sliceuseasciistringpattern;
 
+typedef struct my_library_slicevec
+    {
+    const my_library_vec* data;
+    uint64_t len;
+    } my_library_slicevec;
+
 typedef struct my_library_slicevec3f32
     {
     const my_library_vec3f32* data;
     uint64_t len;
     } my_library_slicevec3f32;
+
+typedef struct my_library_slicemutvec
+    {
+    const my_library_vec* data;
+    uint64_t len;
+    } my_library_slicemutvec;
 
 typedef uint8_t (*my_library_callbackffislice)(my_library_sliceu8 slice);
 
@@ -245,6 +263,9 @@ my_library_vec1 ambiguous_1(my_library_vec1 x);
 my_library_vec2 ambiguous_2(my_library_vec2 x);
 bool ambiguous_3(my_library_vec1 x, my_library_vec2 y);
 my_library_vec namespaced_type(my_library_vec x);
+my_library_optionvec namespaced_inner_option(my_library_optionvec x);
+my_library_slicevec namespaced_inner_slice(my_library_slicevec x);
+my_library_slicemutvec namespaced_inner_slice_mut(my_library_slicemutvec x);
 my_library_ffierror panics();
 my_library_enumrenamed renamed(my_library_structrenamed x);
 void sleep(uint64_t millis);

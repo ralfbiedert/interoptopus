@@ -130,6 +130,105 @@ namespace My.Company.Common
     ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
+    public partial struct SliceVec
+    {
+        ///Pointer to start of immutable data.
+        #if UNITY_2018_1_OR_NEWER
+        [NativeDisableUnsafePtrRestriction]
+        #endif
+        IntPtr data;
+        ///Number of elements.
+        ulong len;
+    }
+
+    public partial struct SliceVec : IEnumerable<Vec>
+    {
+        public SliceVec(GCHandle handle, ulong count)
+        {
+            this.data = handle.AddrOfPinnedObject();
+            this.len = count;
+        }
+        public SliceVec(IntPtr handle, ulong count)
+        {
+            this.data = handle;
+            this.len = count;
+        }
+        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
+        public ReadOnlySpan<Vec> ReadOnlySpan
+        {
+            get
+            {
+                unsafe
+                {
+                    return new ReadOnlySpan<Vec>(this.data.ToPointer(), (int) this.len);
+                }
+            }
+        }
+        #endif
+        #if UNITY_2018_1_OR_NEWER
+        public SliceVec(NativeArray<Vec> handle)
+        {
+            unsafe
+            {
+                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
+                this.len = (ulong) handle.Length;
+            }
+        }
+        #endif
+        public Vec this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                unsafe
+                {
+                    var d = (Vec*) data.ToPointer();
+                    return d[i];
+                }
+            }
+        }
+        public Vec[] Copied
+        {
+            get
+            {
+                var rval = new Vec[len];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        #if __INTEROPTOPUS_NEVER
+                        #elif NETCOREAPP
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Vec));
+                        #elif UNITY_2018_1_OR_NEWER
+                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(Vec)));
+                        #else
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
+                        #endif
+                    }
+                }
+                return rval;
+            }
+        }
+        public int Count => (int) len;
+        public IEnumerator<Vec> GetEnumerator()
+        {
+            for (var i = 0; i < (int)len; ++i)
+            {
+                yield return this[i];
+            }
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }
+
+
+    ///A pointer to an array of data someone else owns which may not be modified.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
     public partial struct Sliceu32
     {
         ///Pointer to start of immutable data.
@@ -312,6 +411,126 @@ namespace My.Company.Common
         }
         public int Count => (int) len;
         public IEnumerator<byte> GetEnumerator()
+        {
+            for (var i = 0; i < (int)len; ++i)
+            {
+                yield return this[i];
+            }
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }
+
+
+    ///A pointer to an array of data someone else owns which may be modified.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct SliceMutVec
+    {
+        ///Pointer to start of mutable data.
+        #if UNITY_2018_1_OR_NEWER
+        [NativeDisableUnsafePtrRestriction]
+        #endif
+        IntPtr data;
+        ///Number of elements.
+        ulong len;
+    }
+
+    public partial struct SliceMutVec : IEnumerable<Vec>
+    {
+        public SliceMutVec(GCHandle handle, ulong count)
+        {
+            this.data = handle.AddrOfPinnedObject();
+            this.len = count;
+        }
+        public SliceMutVec(IntPtr handle, ulong count)
+        {
+            this.data = handle;
+            this.len = count;
+        }
+        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
+        public ReadOnlySpan<Vec> ReadOnlySpan
+        {
+            get
+            {
+                unsafe
+                {
+                    return new ReadOnlySpan<Vec>(this.data.ToPointer(), (int) this.len);
+                }
+            }
+        }
+        #endif
+        #if UNITY_2018_1_OR_NEWER
+        public SliceMutVec(NativeArray<Vec> handle)
+        {
+            unsafe
+            {
+                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
+                this.len = (ulong) handle.Length;
+            }
+        }
+        #endif
+        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
+        public Span<Vec> Span
+        {
+            get
+            {
+                unsafe
+                {
+                    return new Span<Vec>(this.data.ToPointer(), (int) this.len);
+                }
+            }
+        }
+        #endif
+        public Vec this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                unsafe
+                {
+                    var d = (Vec*) data.ToPointer();
+                    return d[i];
+                }
+            }
+            set
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                unsafe
+                {
+                    var d = (Vec*) data.ToPointer();
+                    d[i] = value;
+                }
+            }
+        }
+        public Vec[] Copied
+        {
+            get
+            {
+                var rval = new Vec[len];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        #if __FALSE
+                        #elif NETCOREAPP
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Vec));
+                        #elif UNITY_2018_1_OR_NEWER
+                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(Vec)));
+                        #else
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
+                        #endif
+                    }
+                }
+                return rval;
+            }
+        }
+        public int Count => (int) len;
+        public IEnumerator<Vec> GetEnumerator()
         {
             for (var i = 0; i < (int)len; ++i)
             {
@@ -561,6 +780,38 @@ namespace My.Company.Common
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
+        }
+    }
+
+
+    ///Option type containing boolean flag and maybe valid data.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct OptionVec
+    {
+        ///Element that is maybe valid.
+        Vec t;
+        ///Byte where `1` means element `t` is valid.
+        byte is_some;
+    }
+
+    public partial struct OptionVec
+    {
+        public static OptionVec FromNullable(Vec? nullable)
+        {
+            var result = new OptionVec();
+            if (nullable.HasValue)
+            {
+                result.is_some = 1;
+                result.t = nullable.Value;
+            }
+
+            return result;
+        }
+
+        public Vec? ToNullable()
+        {
+            return this.is_some == 1 ? this.t : (Vec?)null;
         }
     }
 

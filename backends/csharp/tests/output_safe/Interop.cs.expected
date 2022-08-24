@@ -18,9 +18,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 10027021407890840897ul)
+            if (api_version != 5253872074049475639ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10027021407890840897). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (5253872074049475639). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -151,6 +151,43 @@ namespace My.Company
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "namespaced_type")]
         public static extern Vec namespaced_type(Vec x);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "namespaced_inner_option")]
+        public static extern OptionVec namespaced_inner_option(OptionVec x);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "namespaced_inner_slice")]
+        public static extern SliceVec namespaced_inner_slice(SliceVec x);
+
+        public static SliceVec namespaced_inner_slice(Vec[] x)
+        {
+            var x_pinned = GCHandle.Alloc(x, GCHandleType.Pinned);
+            var x_slice = new SliceVec(x_pinned, (ulong) x.Length);
+            try
+            {
+                return namespaced_inner_slice(x_slice);;
+            }
+            finally
+            {
+                x_pinned.Free();
+            }
+        }
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "namespaced_inner_slice_mut")]
+        public static extern SliceMutVec namespaced_inner_slice_mut(SliceMutVec x);
+
+        public static SliceMutVec namespaced_inner_slice_mut(Vec[] x)
+        {
+            var x_pinned = GCHandle.Alloc(x, GCHandleType.Pinned);
+            var x_slice = new SliceMutVec(x_pinned, (ulong) x.Length);
+            try
+            {
+                return namespaced_inner_slice_mut(x_slice);;
+            }
+            finally
+            {
+                x_pinned.Free();
+            }
+        }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "panics")]
         public static extern FFIError panics();

@@ -39,6 +39,9 @@ Freestanding callables inside the module.
  - **[ambiguous_2](#ambiguous_2)** - 
  - **[ambiguous_3](#ambiguous_3)** - 
  - **[namespaced_type](#namespaced_type)** - 
+ - **[namespaced_inner_option](#namespaced_inner_option)** - 
+ - **[namespaced_inner_slice](#namespaced_inner_slice)** - 
+ - **[namespaced_inner_slice_mut](#namespaced_inner_slice_mut)** - 
  - **[panics](#panics)** - 
  - **[renamed](#renamed)** - 
  - **[sleep](#sleep)** - 
@@ -124,10 +127,12 @@ Composite data used by functions and methods.
  - **[Weird2u8](#Weird2u8)** - 
  - **[SliceBool](#SliceBool)** - A pointer and length of un-owned elements.
  - **[SliceUseAsciiStringPattern](#SliceUseAsciiStringPattern)** - A pointer and length of un-owned elements.
+ - **[SliceVec](#SliceVec)** - A pointer and length of un-owned elements.
  - **[SliceVec3f32](#SliceVec3f32)** - A pointer and length of un-owned elements.
  - **[Sliceu32](#Sliceu32)** - A pointer and length of un-owned elements.
  - **[Sliceu8](#Sliceu8)** - A pointer and length of un-owned elements.
  - **[OptionInner](#OptionInner)** - A boolean flag and optionally data.
+ - **[OptionVec](#OptionVec)** - A boolean flag and optionally data.
 
 ---
 
@@ -535,6 +540,26 @@ public partial struct SliceUseAsciiStringPattern
 
 
 
+ ### <a name="SliceVec">**SliceVec**</a>
+
+A pointer to an array of data someone else owns which may not be modified.
+
+#### Fields 
+- **data** - Pointer to start of immutable data. 
+- **len** - Number of elements. 
+#### Definition 
+```csharp
+public partial struct SliceVec
+{
+    IntPtr data;
+    ulong len;
+}
+```
+
+---
+
+
+
  ### <a name="SliceVec3f32">**SliceVec3f32**</a>
 
 A pointer to an array of data someone else owns which may not be modified.
@@ -607,6 +632,26 @@ Option type containing boolean flag and maybe valid data.
 public partial struct OptionInner
 {
     Inner t;
+    byte is_some;
+}
+```
+
+---
+
+
+
+ ### <a name="OptionVec">**OptionVec**</a>
+
+Option type containing boolean flag and maybe valid data.
+
+#### Fields 
+- **t** - Element that is maybe valid. 
+- **is_some** - Byte where `1` means element `t` is valid. 
+#### Definition 
+```csharp
+public partial struct OptionVec
+{
+    Vec t;
     byte is_some;
 }
 ```
@@ -944,6 +989,38 @@ public static extern bool ambiguous_3(Vec1 x, Vec2 y);
 #### Definition 
 ```csharp
 public static extern Vec namespaced_type(Vec x);
+```
+
+---
+
+### <a name="namespaced_inner_option">**namespaced_inner_option**</a>
+#### Definition 
+```csharp
+public static extern OptionVec namespaced_inner_option(OptionVec x);
+```
+
+---
+
+### <a name="namespaced_inner_slice">**namespaced_inner_slice**</a>
+#### Definition 
+```csharp
+public static extern SliceVec namespaced_inner_slice(SliceVec x);
+public static SliceVec namespaced_inner_slice(Vec[] x);
+#if UNITY_2018_1_OR_NEWER
+public static SliceVec namespaced_inner_slice(NativeArray<Vec> x);
+#endif
+```
+
+---
+
+### <a name="namespaced_inner_slice_mut">**namespaced_inner_slice_mut**</a>
+#### Definition 
+```csharp
+public static extern SliceMutVec namespaced_inner_slice_mut(SliceMutVec x);
+public static SliceMutVec namespaced_inner_slice_mut(Vec[] x);
+#if UNITY_2018_1_OR_NEWER
+public static SliceMutVec namespaced_inner_slice_mut(NativeArray<Vec> x);
+#endif
 ```
 
 ---
