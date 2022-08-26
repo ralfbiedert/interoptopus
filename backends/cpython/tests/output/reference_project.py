@@ -987,7 +987,15 @@ class SliceBool(ctypes.Structure):
         return self.len
 
     def __getitem__(self, i):
-        return self.data[i]
+        if i < 0:
+            index = self.len+i
+        else:
+            index = i
+
+        if index >= self.len:
+            raise IndexError("Index out of range")
+
+        return self.data[index]
 
     def copied(self) -> SliceBool:
         """Returns a shallow, owned copy of the underlying slice.
@@ -1029,7 +1037,15 @@ class Sliceu32(ctypes.Structure):
         return self.len
 
     def __getitem__(self, i) -> int:
-        return self.data[i]
+        if i < 0:
+            index = self.len+i
+        else:
+            index = i
+
+        if index >= self.len:
+            raise IndexError("Index out of range")
+
+        return self.data[index]
 
     def copied(self) -> Sliceu32:
         """Returns a shallow, owned copy of the underlying slice.
@@ -1071,7 +1087,15 @@ class Sliceu8(ctypes.Structure):
         return self.len
 
     def __getitem__(self, i) -> int:
-        return self.data[i]
+        if i < 0:
+            index = self.len+i
+        else:
+            index = i
+
+        if index >= self.len:
+            raise IndexError("Index out of range")
+
+        return self.data[index]
 
     def copied(self) -> Sliceu8:
         """Returns a shallow, owned copy of the underlying slice.
@@ -1120,10 +1144,26 @@ class SliceMutu32(ctypes.Structure):
         return self.len
 
     def __getitem__(self, i) -> int:
-        return self.data[i]
+        if i < 0:
+            index = self.len+i
+        else:
+            index = i
+
+        if index >= self.len:
+            raise IndexError("Index out of range")
+
+        return self.data[index]
 
     def __setitem__(self, i, v: int):
-        self.data[i] = v
+        if i < 0:
+            index = self.len+i
+        else:
+            index = i
+
+        if index >= self.len:
+            raise IndexError("Index out of range")
+
+        self.data[index] = v
 
     def copied(self) -> SliceMutu32:
         """Returns a shallow, owned copy of the underlying slice.
@@ -1165,10 +1205,26 @@ class SliceMutu8(ctypes.Structure):
         return self.len
 
     def __getitem__(self, i) -> int:
-        return self.data[i]
+        if i < 0:
+            index = self.len+i
+        else:
+            index = i
+
+        if index >= self.len:
+            raise IndexError("Index out of range")
+
+        return self.data[index]
 
     def __setitem__(self, i, v: int):
-        self.data[i] = v
+        if i < 0:
+            index = self.len+i
+        else:
+            index = i
+
+        if index >= self.len:
+            raise IndexError("Index out of range")
+
+        self.data[index] = v
 
     def copied(self) -> SliceMutu8:
         """Returns a shallow, owned copy of the underlying slice.
@@ -1267,7 +1323,15 @@ class SliceUseAsciiStringPattern(ctypes.Structure):
         return self.len
 
     def __getitem__(self, i) -> UseAsciiStringPattern:
-        return self.data[i]
+        if i < 0:
+            index = self.len+i
+        else:
+            index = i
+
+        if index >= self.len:
+            raise IndexError("Index out of range")
+
+        return self.data[index]
 
     def copied(self) -> SliceUseAsciiStringPattern:
         """Returns a shallow, owned copy of the underlying slice.
@@ -1309,7 +1373,15 @@ class SliceVec(ctypes.Structure):
         return self.len
 
     def __getitem__(self, i) -> Vec:
-        return self.data[i]
+        if i < 0:
+            index = self.len+i
+        else:
+            index = i
+
+        if index >= self.len:
+            raise IndexError("Index out of range")
+
+        return self.data[index]
 
     def copied(self) -> SliceVec:
         """Returns a shallow, owned copy of the underlying slice.
@@ -1351,7 +1423,15 @@ class SliceVec3f32(ctypes.Structure):
         return self.len
 
     def __getitem__(self, i) -> Vec3f32:
-        return self.data[i]
+        if i < 0:
+            index = self.len+i
+        else:
+            index = i
+
+        if index >= self.len:
+            raise IndexError("Index out of range")
+
+        return self.data[index]
 
     def copied(self) -> SliceVec3f32:
         """Returns a shallow, owned copy of the underlying slice.
@@ -1393,10 +1473,26 @@ class SliceMutVec(ctypes.Structure):
         return self.len
 
     def __getitem__(self, i) -> Vec:
-        return self.data[i]
+        if i < 0:
+            index = self.len+i
+        else:
+            index = i
+
+        if index >= self.len:
+            raise IndexError("Index out of range")
+
+        return self.data[index]
 
     def __setitem__(self, i, v: Vec):
-        self.data[i] = v
+        if i < 0:
+            index = self.len+i
+        else:
+            index = i
+
+        if index >= self.len:
+            raise IndexError("Index out of range")
+
+        self.data[index] = v
 
     def copied(self) -> SliceMutVec:
         """Returns a shallow, owned copy of the underlying slice.

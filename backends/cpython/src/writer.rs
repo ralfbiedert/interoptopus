@@ -307,12 +307,28 @@ pub trait PythonWriter {
         indented!(w, [_ _], r#"return self.len"#)?;
         w.newline()?;
         indented!(w, [_], r#"def __getitem__(self, i){}:"#, hint_out)?;
-        indented!(w, [_ _], r#"return self.data[i]"#)?;
+        indented!(w, [_ _], r#"if i < 0:"#)?;
+        indented!(w, [_ _ _], r#"index = self.len+i"#)?;
+        indented!(w, [_ _], r#"else:"#)?;
+        indented!(w, [_ _ _], r#"index = i"#)?;
+        w.newline()?;
+        indented!(w, [_ _], r#"if index >= self.len:"#)?;
+        indented!(w, [_ _ _], r#"raise IndexError("Index out of range")"#)?;
+        w.newline()?;
+        indented!(w, [_ _], r#"return self.data[index]"#)?;
 
         if mutable {
             w.newline()?;
             indented!(w, [_], r#"def __setitem__(self, i, v{}):"#, hint_in)?;
-            indented!(w, [_ _], r#"self.data[i] = v"#)?;
+            indented!(w, [_ _], r#"if i < 0:"#)?;
+            indented!(w, [_ _ _], r#"index = self.len+i"#)?;
+            indented!(w, [_ _], r#"else:"#)?;
+            indented!(w, [_ _ _], r#"index = i"#)?;
+            w.newline()?;
+            indented!(w, [_ _], r#"if index >= self.len:"#)?;
+            indented!(w, [_ _ _], r#"raise IndexError("Index out of range")"#)?;
+            w.newline()?;
+            indented!(w, [_ _], r#"self.data[index] = v"#)?;
         }
 
         w.newline()?;
