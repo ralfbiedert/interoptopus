@@ -141,11 +141,17 @@ class TestPatterns(unittest.TestCase):
     def test_c_char(self):
         self.assertEqual(b'X', r.pattern_ffi_cchar(b'X'))
 
-    def test_slice(self):
+    def test_slice_callback(self):
         def callback(x):
             self.assertEqual(9, x[-1])
             self.assertEqual(9, x.last())
             self.assertEqual(9, x.bytearray()[-1])
+            try:
+                i = x[10]
+                self.assertFalse(True, "Index out of error should throw exception")
+            except IndexError:
+                pass
+
             return 0
 
         r.pattern_ffi_slice_delegate(callback)
