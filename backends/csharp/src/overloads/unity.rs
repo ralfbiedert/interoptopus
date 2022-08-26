@@ -5,7 +5,7 @@ use interoptopus::lang::c::{CType, CompositeType, Field, Function, FunctionSigna
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::{IndentWriter, WriteFor};
-use interoptopus::{indented, Error, unindented};
+use interoptopus::{indented, unindented, Error};
 use std::ops::Deref;
 
 /// Provides Unity overloads, make sure to use [`Unsafe::UnsafeKeyword`](crate::Unsafe::UnsafeKeyword) or higher.
@@ -145,7 +145,6 @@ impl Unity {
 
         Ok(())
     }
-
 }
 
 impl OverloadWriter for Unity {
@@ -208,8 +207,7 @@ impl OverloadWriter for Unity {
 
         if write_for == WriteFor::Code {
             indented!(w, r#"#if UNITY_2018_1_OR_NEWER"#)?;
-        }
-        else {
+        } else {
             unindented!(w, r#"#if UNITY_2018_1_OR_NEWER"#)?;
         }
 
@@ -326,8 +324,7 @@ impl OverloadWriter for Unity {
         if write_for == WriteFor::Code {
             w.newline()?;
             indented!(w, r#"#if UNITY_2018_1_OR_NEWER"#)?;
-        }
-        else {
+        } else {
             unindented!(w, r#"#if UNITY_2018_1_OR_NEWER"#)?;
         }
         if write_for == WriteFor::Code {
@@ -343,11 +340,9 @@ impl OverloadWriter for Unity {
             write_for,
         )?;
 
-
         if write_for == WriteFor::Code {
             indented!(w, r#"#endif"#)?;
-        }
-        else {
+        } else {
             unindented!(w, r#"#endif"#)?;
         }
 

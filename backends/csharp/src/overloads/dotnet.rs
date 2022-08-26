@@ -181,7 +181,6 @@ impl OverloadWriter for DotNet {
             params.push(format!("{} {}", native, name));
         }
 
-
         let signature = format!(r#"public static {} {}({})"#, rval, this_name, params.join(", "));
         if write_for == WriteFor::Docs {
             indented!(w, r#"{};"#, signature)?;
