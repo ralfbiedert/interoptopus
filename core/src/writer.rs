@@ -140,7 +140,6 @@ macro_rules! indented {
     };
 }
 
-
 /// Writes an unindented line of code. Used in backends.
 #[macro_export]
 macro_rules! unindented {
