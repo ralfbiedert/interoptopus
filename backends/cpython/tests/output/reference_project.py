@@ -320,13 +320,13 @@ def namespaced_inner_option(x: OptionVec) -> OptionVec:
     return c_lib.namespaced_inner_option(x)
 
 def namespaced_inner_slice(x: SliceVec | ctypes.Array[Vec]) -> SliceVec:
-    if hasattr(x, "_length_") and hasattr(x, "_type_") and getattr(x, "_type_") == Vec:
+    if hasattr(x, "_length_") and getattr(x, "_type_", "") == Vec:
         x = SliceVec(data=ctypes.cast(x, ctypes.POINTER(Vec)), len=len(x))
 
     return c_lib.namespaced_inner_slice(x)
 
 def namespaced_inner_slice_mut(x: SliceMutVec | ctypes.Array[Vec]) -> SliceMutVec:
-    if hasattr(x, "_length_") and hasattr(x, "_type_") and getattr(x, "_type_") == Vec:
+    if hasattr(x, "_length_") and getattr(x, "_type_", "") == Vec:
         x = SliceMutVec(data=ctypes.cast(x, ctypes.POINTER(Vec)), len=len(x))
 
     return c_lib.namespaced_inner_slice_mut(x)
@@ -367,19 +367,19 @@ def pattern_ascii_pointer_return_slice() -> SliceUseAsciiStringPattern:
     return c_lib.pattern_ascii_pointer_return_slice()
 
 def pattern_ffi_slice_1(ffi_slice: Sliceu32 | ctypes.Array[ctypes.c_uint32]) -> int:
-    if hasattr(ffi_slice, "_length_") and hasattr(ffi_slice, "_type_") and getattr(ffi_slice, "_type_") == ctypes.c_uint32:
+    if hasattr(ffi_slice, "_length_") and getattr(ffi_slice, "_type_", "") == ctypes.c_uint32:
         ffi_slice = Sliceu32(data=ctypes.cast(ffi_slice, ctypes.POINTER(ctypes.c_uint32)), len=len(ffi_slice))
 
     return c_lib.pattern_ffi_slice_1(ffi_slice)
 
 def pattern_ffi_slice_2(ffi_slice: SliceVec3f32 | ctypes.Array[Vec3f32], i: int) -> Vec3f32:
-    if hasattr(ffi_slice, "_length_") and hasattr(ffi_slice, "_type_") and getattr(ffi_slice, "_type_") == Vec3f32:
+    if hasattr(ffi_slice, "_length_") and getattr(ffi_slice, "_type_", "") == Vec3f32:
         ffi_slice = SliceVec3f32(data=ctypes.cast(ffi_slice, ctypes.POINTER(Vec3f32)), len=len(ffi_slice))
 
     return c_lib.pattern_ffi_slice_2(ffi_slice, i)
 
 def pattern_ffi_slice_3(slice: SliceMutu8 | ctypes.Array[ctypes.c_uint8], callback):
-    if hasattr(slice, "_length_") and hasattr(slice, "_type_") and getattr(slice, "_type_") == ctypes.c_uint8:
+    if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
         slice = SliceMutu8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
     if not hasattr(callback, "__ctypes_from_outparam__"):
@@ -388,10 +388,10 @@ def pattern_ffi_slice_3(slice: SliceMutu8 | ctypes.Array[ctypes.c_uint8], callba
     return c_lib.pattern_ffi_slice_3(slice, callback)
 
 def pattern_ffi_slice_4(slice: Sliceu8 | ctypes.Array[ctypes.c_uint8], slice2: SliceMutu8 | ctypes.Array[ctypes.c_uint8]):
-    if hasattr(slice, "_length_") and hasattr(slice, "_type_") and getattr(slice, "_type_") == ctypes.c_uint8:
+    if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
         slice = Sliceu8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
-    if hasattr(slice2, "_length_") and hasattr(slice2, "_type_") and getattr(slice2, "_type_") == ctypes.c_uint8:
+    if hasattr(slice2, "_length_") and getattr(slice2, "_type_", "") == ctypes.c_uint8:
         slice2 = SliceMutu8(data=ctypes.cast(slice2, ctypes.POINTER(ctypes.c_uint8)), len=len(slice2))
 
     return c_lib.pattern_ffi_slice_4(slice, slice2)
@@ -1622,14 +1622,14 @@ class SimpleService:
 
     def method_mut_self(self, slice: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> int:
         """"""
-        if hasattr(slice, "_length_") and hasattr(slice, "_type_") and getattr(slice, "_type_") == ctypes.c_uint8:
+        if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
             slice = Sliceu8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
         return c_lib.simple_service_method_mut_self(self._ctx, slice)
 
     def method_mut_self_void(self, slice: SliceBool | ctypes.Array[ctypes.c_uint8]):
         """ Single line."""
-        if hasattr(slice, "_length_") and hasattr(slice, "_type_") and getattr(slice, "_type_") == ctypes.c_uint8:
+        if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
             slice = SliceBool(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
         return c_lib.simple_service_method_mut_self_void(self._ctx, slice)
@@ -1640,31 +1640,31 @@ class SimpleService:
 
     def method_mut_self_ref_slice(self, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8), slice: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> int:
         """"""
-        if hasattr(slice, "_length_") and hasattr(slice, "_type_") and getattr(slice, "_type_") == ctypes.c_uint8:
+        if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
             slice = Sliceu8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
         return c_lib.simple_service_method_mut_self_ref_slice(self._ctx, x, y, slice)
 
     def method_mut_self_ref_slice_limited(self, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8), slice: Sliceu8 | ctypes.Array[ctypes.c_uint8], slice2: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> int:
         """"""
-        if hasattr(slice, "_length_") and hasattr(slice, "_type_") and getattr(slice, "_type_") == ctypes.c_uint8:
+        if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
             slice = Sliceu8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
-        if hasattr(slice2, "_length_") and hasattr(slice2, "_type_") and getattr(slice2, "_type_") == ctypes.c_uint8:
+        if hasattr(slice2, "_length_") and getattr(slice2, "_type_", "") == ctypes.c_uint8:
             slice2 = Sliceu8(data=ctypes.cast(slice2, ctypes.POINTER(ctypes.c_uint8)), len=len(slice2))
 
         return c_lib.simple_service_method_mut_self_ref_slice_limited(self._ctx, x, y, slice, slice2)
 
     def method_mut_self_ffi_error(self, slice: SliceMutu8 | ctypes.Array[ctypes.c_uint8]):
         """"""
-        if hasattr(slice, "_length_") and hasattr(slice, "_type_") and getattr(slice, "_type_") == ctypes.c_uint8:
+        if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
             slice = SliceMutu8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
         return c_lib.simple_service_method_mut_self_ffi_error(self._ctx, slice)
 
     def method_mut_self_no_error(self, slice: SliceMutu8 | ctypes.Array[ctypes.c_uint8]):
         """"""
-        if hasattr(slice, "_length_") and hasattr(slice, "_type_") and getattr(slice, "_type_") == ctypes.c_uint8:
+        if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
             slice = SliceMutu8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
         return c_lib.simple_service_method_mut_self_no_error(self._ctx, slice)
@@ -1720,21 +1720,21 @@ class SimpleServiceLifetime:
         c_lib.simple_service_lt_destroy(self._ctx, )
     def method_lt(self, slice: SliceBool | ctypes.Array[ctypes.c_uint8]):
         """"""
-        if hasattr(slice, "_length_") and hasattr(slice, "_type_") and getattr(slice, "_type_") == ctypes.c_uint8:
+        if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
             slice = SliceBool(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
         return c_lib.simple_service_lt_method_lt(self._ctx, slice)
 
     def method_lt2(self, slice: SliceBool | ctypes.Array[ctypes.c_uint8]):
         """"""
-        if hasattr(slice, "_length_") and hasattr(slice, "_type_") and getattr(slice, "_type_") == ctypes.c_uint8:
+        if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
             slice = SliceBool(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
         return c_lib.simple_service_lt_method_lt2(self._ctx, slice)
 
     def return_string_accept_slice(self, anon1: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> str:
         """"""
-        if hasattr(anon1, "_length_") and hasattr(anon1, "_type_") and getattr(anon1, "_type_") == ctypes.c_uint8:
+        if hasattr(anon1, "_length_") and getattr(anon1, "_type_", "") == ctypes.c_uint8:
             anon1 = Sliceu8(data=ctypes.cast(anon1, ctypes.POINTER(ctypes.c_uint8)), len=len(anon1))
 
         rval = c_lib.simple_service_lt_return_string_accept_slice(self._ctx, anon1)

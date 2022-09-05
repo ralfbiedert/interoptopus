@@ -276,11 +276,12 @@ pub trait PythonWriter {
                     },
                     TypePattern::Slice(t) | TypePattern::SliceMut(t) => {
                         let inner = self.converter().to_ctypes_name(
-                            t.fields().iter().find(|i| i.name().eq_ignore_ascii_case("data")).expect("slice must have a data field").the_type().deref_pointer().expect("data must be a pointer type"),
+                            t.fields().iter().find(|i| i.name().eq_ignore_ascii_case("data"))
+                                .expect("slice must have a data field").the_type().deref_pointer().expect("data must be a pointer type"),
                             false);
 
-                        indented!(w, [_], r#"if hasattr({}, "_length_") and hasattr({}, "_type_") and getattr({}, "_type_") == {}:"#,
-                        arg.name(), arg.name(), arg.name(), inner)?;
+                        indented!(w, [_], r#"if hasattr({}, "_length_") and getattr({}, "_type_", "") == {}:"#,
+                        arg.name(), arg.name(), inner)?;
 
                         indented!(w, [_ _], r#"{} = {}(data=ctypes.cast({}, ctypes.POINTER({})), len=len({}))"#,
                                 arg.name(), arg.the_type().name_within_lib(), arg.name(), inner, arg.name())?;
