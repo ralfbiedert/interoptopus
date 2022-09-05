@@ -121,6 +121,24 @@ class TestFunctions(unittest.TestCase):
 
         self.assertFalse(worked)
 
+    def test_slice_from_ctypes_array(self):
+        array = (ctypes.c_uint32 * 10)()
+        returned_length = r.pattern_ffi_slice_1(array)
+        self.assertEqual(len(array), returned_length)
+
+        slice = r.Sliceu32(data=ctypes.cast(array, ctypes.POINTER(ctypes.c_uint32)), len=len(array))
+        returned_length = r.pattern_ffi_slice_1(slice)
+        self.assertEqual(len(slice), returned_length)
+
+    def test_slice_from_ctypes_array_callback(self):
+        array = (ctypes.c_uint8 * 10)()
+
+        def callback(x):
+            self.assertEqual(1, x[0])
+            self.assertEqual(0, x[1])
+
+        r.pattern_ffi_slice_3(array, callback)
+
 
 class TestPatterns(unittest.TestCase):
 
