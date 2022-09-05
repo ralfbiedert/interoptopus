@@ -12,7 +12,7 @@ impl Converter {
         format!(r#""""{}""""#, docs)
     }
 
-    pub fn to_type_hint(&self, the_type: &CType) -> String {
+    pub fn to_type_hint(&self, the_type: &CType, is_parameter: bool) -> String {
         match the_type {
             CType::Primitive(x) => match x {
                 PrimitiveType::Void => "".to_string(),
@@ -43,8 +43,17 @@ impl Converter {
             CType::Pattern(x) => match x {
                 TypePattern::AsciiPointer => "str".to_string(),
                 TypePattern::Option(c) => c.rust_name().to_string(),
-                TypePattern::Slice(c) => c.rust_name().to_string(),
-                TypePattern::SliceMut(c) => c.rust_name().to_string(),
+                TypePattern::Slice(c) | TypePattern::SliceMut(c) => {
+                    let mut res = c.rust_name().to_string();
+                    let inner = self.to_ctypes_name(
+                        c.fields().iter().find(|i| i.name().eq_ignore_ascii_case("data"))
+                            .expect("slice must have a data field").the_type().deref_pointer().expect("data must be a pointer type"),
+                        false);
+                    if is_parameter {
+                        res = format!("{} | ctypes.Array[{}]", res, inner);
+                    }
+                    res
+                }
                 TypePattern::CChar => "ctypes.c_char".to_string(),
                 _ => "".to_string(),
             },
@@ -98,8 +107,8 @@ impl Converter {
     }
 
     #[allow(clippy::useless_format)]
-    pub fn to_type_hint_in(&self, the_type: &CType) -> String {
-        let type_hint = self.to_type_hint(the_type);
+    pub fn to_type_hint_in(&self, the_type: &CType, is_parameter: bool) -> String {
+        let type_hint = self.to_type_hint(the_type, is_parameter);
         if type_hint.is_empty() {
             format!("")
         } else {
@@ -109,7 +118,7 @@ impl Converter {
 
     #[allow(clippy::useless_format)]
     pub fn to_type_hint_out(&self, the_type: &CType) -> String {
-        let type_hint = self.to_type_hint(the_type);
+        let type_hint = self.to_type_hint(the_type, false);
         if type_hint.is_empty() {
             format!("")
         } else {

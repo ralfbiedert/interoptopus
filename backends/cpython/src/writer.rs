@@ -125,7 +125,7 @@ pub trait PythonWriter {
             .fields()
             .iter()
             .map(|x| {
-                let type_hint_in = self.converter().to_type_hint_in(x.the_type());
+                let type_hint_in = self.converter().to_type_hint_in(x.the_type(), false);
 
                 format!("{}{} = None", x.name(), type_hint_in)
             })
@@ -156,7 +156,7 @@ pub trait PythonWriter {
 
             w.newline()?;
 
-            let hint_in = self.converter().to_type_hint_in(f.the_type());
+            let hint_in = self.converter().to_type_hint_in(f.the_type(), false);
             let hint_out = self.converter().to_type_hint_out(f.the_type());
 
             indented!(w, [_], r#"@property"#)?;
@@ -273,7 +273,19 @@ pub trait PythonWriter {
                     TypePattern::AsciiPointer => {
                         indented!(w, [_], r#"if not hasattr({}, "__ctypes_from_outparam__"):"#, arg.name())?;
                         indented!(w, [_ _], r#"{} = ctypes.cast({}, ctypes.POINTER(ctypes.c_char))"#, arg.name(), arg.name())?;
-                    }
+                    },
+                    TypePattern::Slice(t) | TypePattern::SliceMut(t) => {
+                        let inner = self.converter().to_ctypes_name(
+                            t.fields().iter().find(|i| i.name().eq_ignore_ascii_case("data")).expect("slice must have a data field").the_type().deref_pointer().expect("data must be a pointer type"),
+                            false);
+
+                        indented!(w, [_], r#"if hasattr({}, "_length_") and hasattr({}, "_type_") and getattr({}, "_type_") == {}:"#,
+                        arg.name(), arg.name(), arg.name(), inner)?;
+
+                        indented!(w, [_ _], r#"{} = {}(data=ctypes.cast({}, ctypes.POINTER({})), len=len({}))"#,
+                                arg.name(), arg.the_type().name_within_lib(), arg.name(), inner, arg.name())?;
+                        w.newline()?;
+                    },
                     _ => {}
                 },
                 _ => {}
@@ -293,7 +305,7 @@ pub trait PythonWriter {
             .expect("data must be a pointer type");
 
         let data_type_python = self.converter().to_ctypes_name(data_type, true);
-        let hint_in = self.converter().to_type_hint_in(data_type);
+        let hint_in = self.converter().to_type_hint_in(data_type, false);
         let hint_out = self.converter().to_type_hint_out(data_type);
 
         indented!(w, r#"class {}(ctypes.Structure):"#, c.rust_name())?;
@@ -557,7 +569,7 @@ pub trait PythonWriter {
             .skip(skip)
             .map(|x| {
                 let type_hint = if type_hints {
-                    self.converter().to_type_hint_in(x.the_type())
+                    self.converter().to_type_hint_in(x.the_type(), true)
                 } else {
                     "".to_string()
                 };

@@ -1121,7 +1121,7 @@ def namespaced_inner_option(x: OptionVec) -> OptionVec:
 ## namespaced_inner_slice 
 #### Definition 
 ```python
-def namespaced_inner_slice(x: SliceVec) -> SliceVec:
+def namespaced_inner_slice(x: SliceVec | ctypes.Array[Vec]) -> SliceVec:
     ...
 ```
 
@@ -1130,7 +1130,7 @@ def namespaced_inner_slice(x: SliceVec) -> SliceVec:
 ## namespaced_inner_slice_mut 
 #### Definition 
 ```python
-def namespaced_inner_slice_mut(x: SliceMutVec) -> SliceMutVec:
+def namespaced_inner_slice_mut(x: SliceMutVec | ctypes.Array[Vec]) -> SliceMutVec:
     ...
 ```
 
@@ -1229,7 +1229,7 @@ def pattern_ascii_pointer_return_slice() -> SliceUseAsciiStringPattern:
 ## pattern_ffi_slice_1 
 #### Definition 
 ```python
-def pattern_ffi_slice_1(ffi_slice: Sliceu32) -> int:
+def pattern_ffi_slice_1(ffi_slice: Sliceu32 | ctypes.Array[ctypes.c_uint32]) -> int:
     ...
 ```
 
@@ -1238,7 +1238,7 @@ def pattern_ffi_slice_1(ffi_slice: Sliceu32) -> int:
 ## pattern_ffi_slice_2 
 #### Definition 
 ```python
-def pattern_ffi_slice_2(ffi_slice: SliceVec3f32, i: int) -> Vec3f32:
+def pattern_ffi_slice_2(ffi_slice: SliceVec3f32 | ctypes.Array[Vec3f32], i: int) -> Vec3f32:
     ...
 ```
 
@@ -1247,7 +1247,7 @@ def pattern_ffi_slice_2(ffi_slice: SliceVec3f32, i: int) -> Vec3f32:
 ## pattern_ffi_slice_3 
 #### Definition 
 ```python
-def pattern_ffi_slice_3(slice: SliceMutu8, callback):
+def pattern_ffi_slice_3(slice: SliceMutu8 | ctypes.Array[ctypes.c_uint8], callback):
     ...
 ```
 
@@ -1256,7 +1256,7 @@ def pattern_ffi_slice_3(slice: SliceMutu8, callback):
 ## pattern_ffi_slice_4 
 #### Definition 
 ```python
-def pattern_ffi_slice_4(slice: Sliceu8, slice2: SliceMutu8):
+def pattern_ffi_slice_4(slice: Sliceu8 | ctypes.Array[ctypes.c_uint8], slice2: SliceMutu8 | ctypes.Array[ctypes.c_uint8]):
     ...
 ```
 
@@ -1482,7 +1482,7 @@ class SimpleService:
 ```python
 class SimpleService:
 
-    def method_mut_self(self, slice: Sliceu8) -> int:
+    def method_mut_self(self, slice: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> int:
         ...
 ```
 
@@ -1495,7 +1495,7 @@ class SimpleService:
 ```python
 class SimpleService:
 
-    def method_mut_self_void(self, slice: SliceBool):
+    def method_mut_self_void(self, slice: SliceBool | ctypes.Array[ctypes.c_uint8]):
         ...
 ```
 
@@ -1519,7 +1519,7 @@ class SimpleService:
 ```python
 class SimpleService:
 
-    def method_mut_self_ref_slice(self, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8), slice: Sliceu8) -> int:
+    def method_mut_self_ref_slice(self, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8), slice: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> int:
         ...
 ```
 
@@ -1531,7 +1531,7 @@ class SimpleService:
 ```python
 class SimpleService:
 
-    def method_mut_self_ref_slice_limited(self, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8), slice: Sliceu8, slice2: Sliceu8) -> int:
+    def method_mut_self_ref_slice_limited(self, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8), slice: Sliceu8 | ctypes.Array[ctypes.c_uint8], slice2: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> int:
         ...
 ```
 
@@ -1543,7 +1543,7 @@ class SimpleService:
 ```python
 class SimpleService:
 
-    def method_mut_self_ffi_error(self, slice: SliceMutu8):
+    def method_mut_self_ffi_error(self, slice: SliceMutu8 | ctypes.Array[ctypes.c_uint8]):
         ...
 ```
 
@@ -1555,7 +1555,7 @@ class SimpleService:
 ```python
 class SimpleService:
 
-    def method_mut_self_no_error(self, slice: SliceMutu8):
+    def method_mut_self_no_error(self, slice: SliceMutu8 | ctypes.Array[ctypes.c_uint8]):
         ...
 ```
 
@@ -1648,7 +1648,7 @@ class SimpleServiceLifetime:
 ```python
 class SimpleServiceLifetime:
 
-    def method_lt(self, slice: SliceBool):
+    def method_lt(self, slice: SliceBool | ctypes.Array[ctypes.c_uint8]):
         ...
 ```
 
@@ -1660,7 +1660,7 @@ class SimpleServiceLifetime:
 ```python
 class SimpleServiceLifetime:
 
-    def method_lt2(self, slice: SliceBool):
+    def method_lt2(self, slice: SliceBool | ctypes.Array[ctypes.c_uint8]):
         ...
 ```
 
@@ -1672,7 +1672,7 @@ class SimpleServiceLifetime:
 ```python
 class SimpleServiceLifetime:
 
-    def return_string_accept_slice(self, anon1: Sliceu8) -> str:
+    def return_string_accept_slice(self, anon1: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> str:
         ...
 ```
 
