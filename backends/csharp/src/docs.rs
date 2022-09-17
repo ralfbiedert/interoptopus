@@ -156,7 +156,11 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
         indented!(w, r#"#### Fields "#)?;
         for f in composite.fields() {
             let doc = f.documentation().lines().join("\n");
-            indented!(w, r#"- **{}** - {} "#, f.name(), doc)?;
+            let name = self
+                .csharp_writer
+                .converter()
+                .field_name_to_csharp_name(f, self.csharp_writer.config().rename_symbols);
+            indented!(w, r#"- **{}** - {} "#, name, doc)?;
         }
 
         indented!(w, r#"#### Definition "#)?;
