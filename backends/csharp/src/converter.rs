@@ -1,4 +1,4 @@
-use heck::ToUpperCamelCase;
+use heck::{ToLowerCamelCase, ToUpperCamelCase};
 use interoptopus::lang::c::{
     CType, CompositeType, ConstantValue, EnumType, Field, FnPointerType, Function, FunctionSignature, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
 };
@@ -218,6 +218,14 @@ pub trait CSharpTypeConverter {
             FunctionNameFlavor::RawFFIName => function.name().to_string(),
             FunctionNameFlavor::CSharpMethodNameWithClass => function.name().to_upper_camel_case(),
             FunctionNameFlavor::CSharpMethodNameWithoutClass(class) => function.name().replace(class, "").to_upper_camel_case(),
+        }
+    }
+
+    fn field_name_to_csharp_name(&self, field: &Field, rename_symbols: bool) -> String {
+        if rename_symbols {
+            field.name().to_lower_camel_case()
+        } else {
+            field.name().into()
         }
     }
 }
