@@ -1,7 +1,6 @@
 use crate::config::{Config, Unsafe, WriteTypes};
 use crate::converter::{CSharpTypeConverter, Converter, FunctionNameFlavor};
 use crate::overloads::{Helper, OverloadWriter};
-use heck::ToLowerCamelCase;
 use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, Meta, PrimitiveType, Variant, Visibility};
 use interoptopus::patterns::api_guard::inventory_hash;
 use interoptopus::patterns::callbacks::NamedCallback;
@@ -404,11 +403,7 @@ pub trait CSharpWriter {
                     panic!("Unable to generate bindings for arrays in fields if `unroll_struct_arrays` is not enabled.");
                 }
 
-                let field_name = if self.config().rename_symbols {
-                    field.name().to_lower_camel_case()
-                } else {
-                    field.name().into()
-                };
+                let field_name = self.converter().field_name_to_csharp_name(field, self.config().rename_symbols);
                 let type_name = self.converter().to_typespecifier_in_field(a.array_type(), field, the_type);
                 let visibility = match field.visibility() {
                     Visibility::Public => "public ",
@@ -422,11 +417,7 @@ pub trait CSharpWriter {
                 Ok(())
             }
             _ => {
-                let field_name = if self.config().rename_symbols {
-                    field.name().to_lower_camel_case()
-                } else {
-                    field.name().into()
-                };
+                let field_name = self.converter().field_name_to_csharp_name(field, self.config().rename_symbols);
                 let type_name = self.converter().to_typespecifier_in_field(field.the_type(), field, the_type);
                 let visibility = match field.visibility() {
                     Visibility::Public => "public ",
