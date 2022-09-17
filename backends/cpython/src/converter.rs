@@ -46,9 +46,15 @@ impl Converter {
                 TypePattern::Slice(c) | TypePattern::SliceMut(c) => {
                     let mut res = c.rust_name().to_string();
                     let inner = self.to_ctypes_name(
-                        c.fields().iter().find(|i| i.name().eq_ignore_ascii_case("data"))
-                            .expect("slice must have a data field").the_type().deref_pointer().expect("data must be a pointer type"),
-                        false);
+                        c.fields()
+                            .iter()
+                            .find(|i| i.name().eq_ignore_ascii_case("data"))
+                            .expect("slice must have a data field")
+                            .the_type()
+                            .deref_pointer()
+                            .expect("data must be a pointer type"),
+                        false,
+                    );
                     if is_parameter {
                         res = format!("{} | ctypes.Array[{}]", res, inner);
                     }
