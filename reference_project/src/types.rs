@@ -208,7 +208,6 @@ pub struct Visibility1 {
 
 #[ffi_type(visibility(_ = "public"))]
 #[repr(C)]
-
 pub struct Visibility2 {
     pblc1: u8,
     pblc2: u8,
