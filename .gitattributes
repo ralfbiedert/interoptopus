@@ -1,5 +1,6 @@
 # Binary (why did we need this?)
 # *.dll filter=lfs diff=lfs merge=lfs -text
+*.jpg filter=lfs diff=lfs merge=lfs -text
 
 # Source
 *.expected text eol=lf

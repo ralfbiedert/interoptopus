@@ -8,6 +8,7 @@
   As a rule of thumb, if you only need to support a single language (e.g., Python) then 
   `X` might be better; and you'll probably write FFI bindings tailored to that specific runtime 
   anyway.
+
   However, once you target more than one language everything you do needs to have
   a proper C representation and this crate aims to give you the best of both worlds, being both
   universally C-level _and_ reasonably idiomatic in each backend; including Rust.  

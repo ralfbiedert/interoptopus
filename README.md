@@ -5,15 +5,17 @@
 [![Rust](https://img.shields.io/badge/rust-1.53%2B-blue.svg?maxAge=3600)](https://github.com/ralfbiedert/interoptopus)
 [![Rust](https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml/badge.svg?branch=master)](https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml)
 
+![sample_image](https://media.githubusercontent.com/media/ralfbiedert/interoptopus/master/gfx/mascot_stable_diffusion.jpeg)
+
 ## Interoptopus 🐙
 
 The polyglot bindings generator for your library.
 
-Interoptopus allows _you_ to write robust libraries in Rust, and gives _your users_ high quality bindings, automatically:
+Write a robust library in Rust, easily access it from your second-favorite language:
 
-- Design a single `.dll` / `.so` in Rust, consume it from any language.
-- Use patterns (e.g., classes, strings) in languages that have them.
-- Always be fully C compatible.
+- Design a single `.dll` / `.so` in Rust, consume it from anywhere.
+- Get QoL features (e.g., classes, strings) in languages that have them.
+- Always have a sane, C-compatible API.
 - Painless workflow, no external tooling required.
 - Easy to support more languages, backends fully decoupled from main project.
 
@@ -62,7 +64,7 @@ pub fn ffi_inventory() -> Inventory {
 | Other | Write your own backend<sup>2</sup> | - |
 
 <sup>1</sup> For the [reference project](https://github.com/ralfbiedert/interoptopus/tree/master/reference_project/src). <br/>
-<sup>2</sup> Create your own backend in just a few hours. No pull request needed. [Pinkie promise](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md#new-backends).
+<sup>2</sup> Add support for a new language in just a few hours. No pull request needed. [Pinkie promise](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md#new-backends).
 
 
 
