@@ -1230,7 +1230,7 @@ def pattern_ascii_pointer_return_slice() -> SliceUseAsciiStringPattern:
 ## pattern_array_pointer_last_or_default 
 #### Definition 
 ```python
-def pattern_array_pointer_last_or_default(ptr, len: int, default: int) -> int:
+def pattern_array_pointer_last_or_default(ptr, len: int, default_value: int) -> int:
     ...
 ```
 

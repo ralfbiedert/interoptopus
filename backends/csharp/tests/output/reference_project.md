@@ -1110,7 +1110,7 @@ public static extern SliceUseAsciiStringPattern pattern_ascii_pointer_return_sli
 ### <a name="pattern_array_pointer_last_or_default">**pattern_array_pointer_last_or_default**</a>
 #### Definition 
 ```csharp
-public static extern uint pattern_array_pointer_last_or_default(IntPtr ptr, ulong len, uint default);
+public static extern uint pattern_array_pointer_last_or_default(IntPtr ptr, ulong len, uint default_value);
 ```
 
 ---
