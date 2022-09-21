@@ -15,6 +15,7 @@ pub mod functions;
 pub mod patterns {
     // pub mod api_entry;
     pub mod api_guard;
+    pub mod array_pointer;
     pub mod ascii_pointer;
     pub mod callbacks;
     pub mod option;
@@ -78,6 +79,7 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(patterns::ascii_pointer::pattern_ascii_pointer_2))
             .register(function!(patterns::ascii_pointer::pattern_ascii_pointer_len))
             .register(function!(patterns::ascii_pointer::pattern_ascii_pointer_return_slice))
+            .register(function!(patterns::array_pointer::pattern_array_pointer_last_or_default))
             .register(function!(patterns::slice::pattern_ffi_slice_1))
             .register(function!(patterns::slice::pattern_ffi_slice_2))
             .register(function!(patterns::slice::pattern_ffi_slice_3))

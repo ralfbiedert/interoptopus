@@ -52,6 +52,7 @@ Freestanding callables inside the module.
  - **[pattern_ascii_pointer_2](#pattern_ascii_pointer_2)** - 
  - **[pattern_ascii_pointer_len](#pattern_ascii_pointer_len)** - 
  - **[pattern_ascii_pointer_return_slice](#pattern_ascii_pointer_return_slice)** - 
+ - **[pattern_array_pointer_last_or_default](#pattern_array_pointer_last_or_default)** - 
  - **[pattern_ffi_slice_1](#pattern_ffi_slice_1)** - 
  - **[pattern_ffi_slice_2](#pattern_ffi_slice_2)** - 
  - **[pattern_ffi_slice_3](#pattern_ffi_slice_3)** - 
@@ -1221,6 +1222,15 @@ def pattern_ascii_pointer_len(x: str, y: UseAsciiStringPattern) -> int:
 #### Definition 
 ```python
 def pattern_ascii_pointer_return_slice() -> SliceUseAsciiStringPattern:
+    ...
+```
+
+---
+
+## pattern_array_pointer_last_or_default 
+#### Definition 
+```python
+def pattern_array_pointer_last_or_default(ptr, len: int, default: int) -> int:
     ...
 ```
 

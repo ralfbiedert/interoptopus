@@ -52,6 +52,7 @@ Freestanding callables inside the module.
  - **[pattern_ascii_pointer_2](#pattern_ascii_pointer_2)** - 
  - **[pattern_ascii_pointer_len](#pattern_ascii_pointer_len)** - 
  - **[pattern_ascii_pointer_return_slice](#pattern_ascii_pointer_return_slice)** - 
+ - **[pattern_array_pointer_last_or_default](#pattern_array_pointer_last_or_default)** - 
  - **[pattern_ffi_slice_1](#pattern_ffi_slice_1)** - 
  - **[pattern_ffi_slice_2](#pattern_ffi_slice_2)** - 
  - **[pattern_ffi_slice_3](#pattern_ffi_slice_3)** - 
@@ -1102,6 +1103,14 @@ public static extern uint pattern_ascii_pointer_len(string x, UseAsciiStringPatt
 #### Definition 
 ```csharp
 public static extern SliceUseAsciiStringPattern pattern_ascii_pointer_return_slice();
+```
+
+---
+
+### <a name="pattern_array_pointer_last_or_default">**pattern_array_pointer_last_or_default**</a>
+#### Definition 
+```csharp
+public static extern uint pattern_array_pointer_last_or_default(IntPtr ptr, ulong len, uint default);
 ```
 
 ---

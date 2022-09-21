@@ -349,6 +349,8 @@ uint32_t pattern_ascii_pointer_len(const char* x, my_library_use_ascii_string_pa
 
 my_library_slice_use_ascii_string_pattern pattern_ascii_pointer_return_slice();
 
+uint32_t pattern_array_pointer_last_or_default(uint32_t* ptr, uint64_t len, uint32_t default);
+
 uint32_t pattern_ffi_slice_1(my_library_sliceu32 ffi_slice);
 
 my_library_vec3f32 pattern_ffi_slice_2(my_library_slice_vec3f32 ffi_slice, int32_t i);

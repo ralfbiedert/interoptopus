@@ -59,6 +59,7 @@ def init_lib(path):
     c_lib.pattern_ascii_pointer_2.argtypes = []
     c_lib.pattern_ascii_pointer_len.argtypes = [ctypes.POINTER(ctypes.c_char), UseAsciiStringPattern]
     c_lib.pattern_ascii_pointer_return_slice.argtypes = []
+    c_lib.pattern_array_pointer_last_or_default.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint32]
     c_lib.pattern_ffi_slice_1.argtypes = [Sliceu32]
     c_lib.pattern_ffi_slice_2.argtypes = [SliceVec3f32, ctypes.c_int32]
     c_lib.pattern_ffi_slice_3.argtypes = [SliceMutu8, callbacks.fn_SliceMutu8]
@@ -148,6 +149,7 @@ def init_lib(path):
     c_lib.pattern_ascii_pointer_2.restype = ctypes.POINTER(ctypes.c_char)
     c_lib.pattern_ascii_pointer_len.restype = ctypes.c_uint32
     c_lib.pattern_ascii_pointer_return_slice.restype = SliceUseAsciiStringPattern
+    c_lib.pattern_array_pointer_last_or_default.restype = ctypes.c_uint32
     c_lib.pattern_ffi_slice_1.restype = ctypes.c_uint32
     c_lib.pattern_ffi_slice_2.restype = Vec3f32
     c_lib.pattern_ffi_slice_delegate.restype = ctypes.c_uint8
@@ -365,6 +367,9 @@ def pattern_ascii_pointer_len(x: str, y: UseAsciiStringPattern) -> int:
 
 def pattern_ascii_pointer_return_slice() -> SliceUseAsciiStringPattern:
     return c_lib.pattern_ascii_pointer_return_slice()
+
+def pattern_array_pointer_last_or_default(ptr, len: int, default: int) -> int:
+    return c_lib.pattern_array_pointer_last_or_default(ptr, len, default)
 
 def pattern_ffi_slice_1(ffi_slice: Sliceu32 | ctypes.Array[ctypes.c_uint32]) -> int:
     if hasattr(ffi_slice, "_length_") and getattr(ffi_slice, "_type_", "") == ctypes.c_uint32:

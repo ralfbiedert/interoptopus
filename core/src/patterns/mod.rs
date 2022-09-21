@@ -78,6 +78,7 @@ use crate::patterns::service::Service;
 #[doc(hidden)]
 pub mod api_entry;
 pub mod api_guard;
+pub mod array_ptr;
 pub mod callbacks;
 pub mod option;
 pub mod primitives;
@@ -85,6 +86,7 @@ pub mod result;
 pub mod service;
 pub mod slice;
 pub mod string;
+
 
 /// A pattern on a library level, usually involving both methods and types.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -109,6 +111,7 @@ impl From<Service> for LibraryPattern {
 pub enum TypePattern {
     AsciiPointer,
     APIVersion,
+    ArrayPointer(Box<CType>),
     FFIErrorEnum(FFIErrorEnum),
     Slice(CompositeType),
     SliceMut(CompositeType),
@@ -126,6 +129,7 @@ impl TypePattern {
     pub fn fallback_type(&self) -> CType {
         match self {
             TypePattern::AsciiPointer => CType::ReadPointer(Box::new(CType::Pattern(TypePattern::CChar))),
+            TypePattern::ArrayPointer(x) => CType::ReadPointer(x.clone()),
             TypePattern::FFIErrorEnum(e) => CType::Enum(e.the_enum().clone()),
             TypePattern::Slice(x) => CType::Composite(x.clone()),
             TypePattern::SliceMut(x) => CType::Composite(x.clone()),

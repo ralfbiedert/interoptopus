@@ -23,9 +23,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 5253872074049475639ul)
+            if (api_version != 5662904782213269495ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (5253872074049475639). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (5662904782213269495). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -248,6 +248,9 @@ namespace My.Company
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ascii_pointer_return_slice")]
         public static extern SliceUseAsciiStringPattern pattern_ascii_pointer_return_slice();
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_array_pointer_last_or_default")]
+        public static extern uint pattern_array_pointer_last_or_default(IntPtr ptr, ulong len, uint default);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_1")]
         public static extern uint pattern_ffi_slice_1(Sliceu32 ffi_slice);

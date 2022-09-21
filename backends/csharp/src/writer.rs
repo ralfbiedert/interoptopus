@@ -222,6 +222,7 @@ pub trait CSharpWriter {
             CType::ReadWritePointer(_) => {}
             CType::Pattern(x) => match x {
                 TypePattern::AsciiPointer => {}
+                TypePattern::ArrayPointer(_) => {}
                 TypePattern::FFIErrorEnum(e) => {
                     self.write_type_definition_enum(w, e.the_enum(), WriteFor::Code)?;
                     w.newline()?;
@@ -505,6 +506,7 @@ pub trait CSharpWriter {
             CType::Pattern(x) => match x {
                 TypePattern::AsciiPointer => true,
                 TypePattern::APIVersion => true,
+                TypePattern::ArrayPointer(_) => true,
                 TypePattern::FFIErrorEnum(x) => self.should_emit_by_meta(x.the_enum().meta()),
                 TypePattern::Slice(x) => self.should_emit_by_meta(x.meta()),
                 TypePattern::SliceMut(x) => self.should_emit_by_meta(x.meta()),

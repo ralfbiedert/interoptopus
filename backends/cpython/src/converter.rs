@@ -101,6 +101,7 @@ impl Converter {
             CType::Pattern(pattern) => match pattern {
                 TypePattern::AsciiPointer => self.to_ctypes_name(&pattern.fallback_type(), with_type_annotations),
                 TypePattern::APIVersion => "ctypes.c_uint64".to_string(),
+                TypePattern::ArrayPointer(_) => "ctypes.c_void_p".to_string(),
                 TypePattern::FFIErrorEnum(_) => "ctypes.c_int".to_string(),
                 TypePattern::Slice(c) => c.rust_name().to_string(),
                 TypePattern::SliceMut(c) => c.rust_name().to_string(),

@@ -168,6 +168,7 @@ pub trait CWriter {
             CType::ReadWritePointer(_) => {}
             CType::Pattern(p) => match p {
                 TypePattern::AsciiPointer => {}
+                TypePattern::ArrayPointer(_) => {}
                 TypePattern::NamedCallback(e) => {
                     self.write_type_definition_named_callback(w, e)?;
                     w.newline()?;
