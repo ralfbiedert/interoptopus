@@ -53,6 +53,7 @@ Freestanding callables inside the module.
  - **[pattern_ascii_pointer_len](#pattern_ascii_pointer_len)** - 
  - **[pattern_ascii_pointer_return_slice](#pattern_ascii_pointer_return_slice)** - 
  - **[pattern_ffi_slice_1](#pattern_ffi_slice_1)** - 
+ - **[pattern_ffi_slice_1b](#pattern_ffi_slice_1b)** - 
  - **[pattern_ffi_slice_2](#pattern_ffi_slice_2)** - 
  - **[pattern_ffi_slice_3](#pattern_ffi_slice_3)** - 
  - **[pattern_ffi_slice_4](#pattern_ffi_slice_4)** - 
@@ -1230,6 +1231,15 @@ def pattern_ascii_pointer_return_slice() -> SliceUseAsciiStringPattern:
 #### Definition 
 ```python
 def pattern_ffi_slice_1(ffi_slice: Sliceu32 | ctypes.Array[ctypes.c_uint32]) -> int:
+    ...
+```
+
+---
+
+## pattern_ffi_slice_1b 
+#### Definition 
+```python
+def pattern_ffi_slice_1b(ffi_slice: SliceMutu32 | ctypes.Array[ctypes.c_uint32]) -> int:
     ...
 ```
 

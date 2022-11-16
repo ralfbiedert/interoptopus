@@ -23,9 +23,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 5253872074049475639ul)
+            if (api_version != 4238638219687175308ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (5253872074049475639). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (4238638219687175308). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -269,6 +269,29 @@ namespace My.Company
         {
             var ffi_slice_slice = new Sliceu32(ffi_slice);
             return pattern_ffi_slice_1(ffi_slice_slice);;
+        }
+        #endif
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_1b")]
+        public static extern uint pattern_ffi_slice_1b(SliceMutu32 ffi_slice);
+
+        public static uint pattern_ffi_slice_1b(uint[] ffi_slice)
+        {
+            unsafe
+            {
+                fixed (void* ptr_ffi_slice = ffi_slice)
+                {
+                    var ffi_slice_slice = new SliceMutu32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
+                    return pattern_ffi_slice_1b(ffi_slice_slice);;
+                }
+            }
+        }
+
+        #if UNITY_2018_1_OR_NEWER
+        public static uint pattern_ffi_slice_1b(NativeArray<uint> ffi_slice)
+        {
+            var ffi_slice_slice = new SliceMutu32(ffi_slice);
+            return pattern_ffi_slice_1b(ffi_slice_slice);;
         }
         #endif
 

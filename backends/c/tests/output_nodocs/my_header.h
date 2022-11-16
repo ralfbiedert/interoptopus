@@ -277,6 +277,7 @@ const char* pattern_ascii_pointer_2();
 uint32_t pattern_ascii_pointer_len(const char* x, my_library_useasciistringpattern y);
 my_library_sliceuseasciistringpattern pattern_ascii_pointer_return_slice();
 uint32_t pattern_ffi_slice_1(my_library_sliceu32 ffi_slice);
+uint32_t pattern_ffi_slice_1b(my_library_slicemutu32 ffi_slice);
 my_library_vec3f32 pattern_ffi_slice_2(my_library_slicevec3f32 ffi_slice, int32_t i);
 void pattern_ffi_slice_3(my_library_slicemutu8 slice, my_library_callbackslicemut callback);
 void pattern_ffi_slice_4(my_library_sliceu8 slice, my_library_slicemutu8 slice2);

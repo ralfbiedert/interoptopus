@@ -53,6 +53,7 @@ Freestanding callables inside the module.
  - **[pattern_ascii_pointer_len](#pattern_ascii_pointer_len)** - 
  - **[pattern_ascii_pointer_return_slice](#pattern_ascii_pointer_return_slice)** - 
  - **[pattern_ffi_slice_1](#pattern_ffi_slice_1)** - 
+ - **[pattern_ffi_slice_1b](#pattern_ffi_slice_1b)** - 
  - **[pattern_ffi_slice_2](#pattern_ffi_slice_2)** - 
  - **[pattern_ffi_slice_3](#pattern_ffi_slice_3)** - 
  - **[pattern_ffi_slice_4](#pattern_ffi_slice_4)** - 
@@ -1113,6 +1114,18 @@ public static extern uint pattern_ffi_slice_1(Sliceu32 ffi_slice);
 public static uint pattern_ffi_slice_1(uint[] ffi_slice);
 #if UNITY_2018_1_OR_NEWER
 public static uint pattern_ffi_slice_1(NativeArray<uint> ffi_slice);
+#endif
+```
+
+---
+
+### <a name="pattern_ffi_slice_1b">**pattern_ffi_slice_1b**</a>
+#### Definition 
+```csharp
+public static extern uint pattern_ffi_slice_1b(SliceMutu32 ffi_slice);
+public static uint pattern_ffi_slice_1b(uint[] ffi_slice);
+#if UNITY_2018_1_OR_NEWER
+public static uint pattern_ffi_slice_1b(NativeArray<uint> ffi_slice);
 #endif
 ```
 

@@ -16,6 +16,12 @@ pub extern "C" fn pattern_ffi_slice_1(ffi_slice: FFISlice<u32>) -> u32 {
 
 #[ffi_function]
 #[no_mangle]
+pub extern "C" fn pattern_ffi_slice_1b(ffi_slice: FFISliceMut<u32>) -> u32 {
+    ffi_slice.as_slice().len() as u32
+}
+
+#[ffi_function]
+#[no_mangle]
 pub extern "C" fn pattern_ffi_slice_2(ffi_slice: FFISlice<Vec3f32>, i: i32) -> Vec3f32 {
     ffi_slice.as_slice().get(i as usize).copied().unwrap_or(Vec3f32 {
         x: f32::NAN,
