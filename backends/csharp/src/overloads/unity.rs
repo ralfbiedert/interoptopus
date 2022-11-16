@@ -1,6 +1,6 @@
 use crate::converter::FunctionNameFlavor;
 use crate::overloads::{write_common_service_method_overload, write_function_overloaded_invoke_with_error_handling, Helper};
-use crate::{OverloadWriter, Unsafe};
+use crate::OverloadWriter;
 use interoptopus::lang::c::{CType, CompositeType, Field, Function, FunctionSignature, Parameter};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::TypePattern;
@@ -149,16 +149,15 @@ impl Unity {
 
 impl OverloadWriter for Unity {
     fn write_imports(&self, w: &mut IndentWriter, h: Helper) -> Result<(), Error> {
-        if !h.config.use_unsafe.any_unsafe() {
-            panic!("The Unity overload writer requires `Unsafe::UnsafeKeyword` or higher.")
-        }
-
-        if h.config.use_unsafe == Unsafe::UnsafePlatformMemCpy {
+        if h.config.use_unsafe.any_unsafe() {
             indented!(w, r#"#if UNITY_2018_1_OR_NEWER"#)?;
             indented!(w, r#"using Unity.Collections.LowLevel.Unsafe;"#)?;
             indented!(w, r#"using Unity.Collections;"#)?;
             indented!(w, r#"#endif"#)?;
+        } else {
+            panic!("The Unity overload writer requires `Unsafe::UnsafeKeyword` or higher.")
         }
+
         Ok(())
     }
 
@@ -350,7 +349,7 @@ impl OverloadWriter for Unity {
     }
 
     fn write_pattern_slice_overload(&self, w: &mut IndentWriter, h: Helper, context_type_name: &str, type_string: &str) -> Result<(), Error> {
-        if h.config.use_unsafe == Unsafe::UnsafePlatformMemCpy {
+        if h.config.use_unsafe.any_unsafe() {
             // Ctor unity
             indented!(w, [_], r#"#if UNITY_2018_1_OR_NEWER"#)?;
             indented!(w, [_], r#"public {}(NativeArray<{}> handle)"#, context_type_name, type_string)?;
