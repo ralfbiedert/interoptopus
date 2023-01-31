@@ -47,7 +47,7 @@ namespace My.Company
 
         /// Updates the score.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_return_score")]
-        public static extern FFIError example_return_score(IntPtr context, out uint score);
+        public static extern FFIError example_return_score(IntPtr context, ref uint score);
 
         /// Updates the score.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_update_score_by_callback")]
@@ -58,7 +58,7 @@ namespace My.Company
         public static extern FFIError example_write_foreign_type(IntPtr context, ref ThirdPartyVecF32 foreign);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_double_super_complex_entity")]
-        public static extern FFIError example_double_super_complex_entity(IntPtr context, ref SuperComplexEntity incoming, out SuperComplexEntity outgoing);
+        public static extern FFIError example_double_super_complex_entity(IntPtr context, ref SuperComplexEntity incoming, ref SuperComplexEntity outgoing);
 
     }
 

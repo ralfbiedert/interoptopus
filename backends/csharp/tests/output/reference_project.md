@@ -818,7 +818,7 @@ public static extern IntPtr ptr(ref long x);
 Parameter x must point to valid data.
 #### Definition 
 ```csharp
-public static extern IntPtr ptr_mut(out long x);
+public static extern IntPtr ptr_mut(ref long x);
 ```
 
 ---
@@ -842,7 +842,7 @@ public static extern IntPtr ref_simple(ref long x);
 ### <a name="ref_mut_simple">**ref_mut_simple**</a>
 #### Definition 
 ```csharp
-public static extern IntPtr ref_mut_simple(out long x);
+public static extern IntPtr ref_mut_simple(ref long x);
 ```
 
 ---
@@ -858,7 +858,7 @@ public static extern bool ref_option(ref long x);
 ### <a name="ref_mut_option">**ref_mut_option**</a>
 #### Definition 
 ```csharp
-public static extern bool ref_mut_option(out long x);
+public static extern bool ref_mut_option(ref long x);
 ```
 
 ---
@@ -1399,7 +1399,7 @@ public class SimpleService {
 #### Definition 
 ```csharp
 public class SimpleService {
-    public byte MethodMutSelfRef(ref byte x, out byte y);
+    public byte MethodMutSelfRef(ref byte x, ref byte y);
 }
 ```
 
@@ -1410,10 +1410,10 @@ public class SimpleService {
 #### Definition 
 ```csharp
 public class SimpleService {
-    public byte MethodMutSelfRefSlice(ref byte x, out byte y, Sliceu8 slice);
-    public byte MethodMutSelfRefSlice(ref byte x, out byte y, byte[] slice);
+    public byte MethodMutSelfRefSlice(ref byte x, ref byte y, Sliceu8 slice);
+    public byte MethodMutSelfRefSlice(ref byte x, ref byte y, byte[] slice);
 #if UNITY_2018_1_OR_NEWER
-    public byte MethodMutSelfRefSlice(ref byte x, out byte y, NativeArray<byte> slice);
+    public byte MethodMutSelfRefSlice(ref byte x, ref byte y, NativeArray<byte> slice);
 #endif
 }
 ```
@@ -1425,10 +1425,10 @@ public class SimpleService {
 #### Definition 
 ```csharp
 public class SimpleService {
-    public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, Sliceu8 slice, Sliceu8 slice2);
-    public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, byte[] slice, byte[] slice2);
+    public byte MethodMutSelfRefSliceLimited(ref byte x, ref byte y, Sliceu8 slice, Sliceu8 slice2);
+    public byte MethodMutSelfRefSliceLimited(ref byte x, ref byte y, byte[] slice, byte[] slice2);
 #if UNITY_2018_1_OR_NEWER
-    public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, NativeArray<byte> slice, NativeArray<byte> slice2);
+    public byte MethodMutSelfRefSliceLimited(ref byte x, ref byte y, NativeArray<byte> slice, NativeArray<byte> slice2);
 #endif
 }
 ```

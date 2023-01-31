@@ -47,14 +47,16 @@ namespace interop_test
 
                 ammo = 10,
             };
+            uint score = 0;
+            var super2 = new SuperComplexEntity();
 
             IntPtr context_ptr = IntPtr.Zero;
             InteropClass.example_create_context(ref context_ptr);
             InteropClass.example_update_score_by_callback(context_ptr, x => 100);
             InteropClass.example_update_score_by_callback(context_ptr, x => x * 2);
             InteropClass.example_print_score(context_ptr);
-            InteropClass.example_return_score(context_ptr, out var score);
-            InteropClass.example_double_super_complex_entity(context_ptr, ref super1, out var super2);
+            InteropClass.example_return_score(context_ptr, ref score);
+            InteropClass.example_double_super_complex_entity(context_ptr, ref super1, ref super2);
             InteropClass.example_destroy_context(ref context_ptr);
 
             Assert.Equal(score, (uint) 200);

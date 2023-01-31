@@ -77,7 +77,7 @@ namespace My.Company
         ///
         /// Parameter x must point to valid data.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ptr_mut")]
-        public static extern IntPtr ptr_mut(out long x);
+        public static extern IntPtr ptr_mut(ref long x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ptr_ptr")]
         public static extern IntPtr ptr_ptr(ref IntPtr x);
@@ -86,13 +86,13 @@ namespace My.Company
         public static extern IntPtr ref_simple(ref long x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ref_mut_simple")]
-        public static extern IntPtr ref_mut_simple(out long x);
+        public static extern IntPtr ref_mut_simple(ref long x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ref_option")]
         public static extern bool ref_option(ref long x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ref_mut_option")]
-        public static extern bool ref_mut_option(out long x);
+        public static extern bool ref_mut_option(ref long x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tupled")]
         public static extern Tupled tupled(Tupled x);
@@ -522,18 +522,18 @@ namespace My.Company
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref")]
-        public static extern byte simple_service_method_mut_self_ref(IntPtr context, ref byte x, out byte y);
+        public static extern byte simple_service_method_mut_self_ref(IntPtr context, ref byte x, ref byte y);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref_slice")]
-        public static extern byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, Sliceu8 slice);
+        public static extern byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, ref byte y, Sliceu8 slice);
 
-        public static byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, byte[] slice)
+        public static byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, ref byte y, byte[] slice)
         {
             var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
             var slice_slice = new Sliceu8(slice_pinned, (ulong) slice.Length);
             try
             {
-                return simple_service_method_mut_self_ref_slice(context, ref x, out y, slice_slice);;
+                return simple_service_method_mut_self_ref_slice(context, ref x, ref y, slice_slice);;
             }
             finally
             {
@@ -542,9 +542,9 @@ namespace My.Company
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref_slice_limited")]
-        public static extern byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, Sliceu8 slice, Sliceu8 slice2);
+        public static extern byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, ref byte y, Sliceu8 slice, Sliceu8 slice2);
 
-        public static byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, byte[] slice, byte[] slice2)
+        public static byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, ref byte y, byte[] slice, byte[] slice2)
         {
             var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
             var slice_slice = new Sliceu8(slice_pinned, (ulong) slice.Length);
@@ -552,7 +552,7 @@ namespace My.Company
             var slice2_slice = new Sliceu8(slice2_pinned, (ulong) slice2.Length);
             try
             {
-                return simple_service_method_mut_self_ref_slice_limited(context, ref x, out y, slice_slice, slice2_slice);;
+                return simple_service_method_mut_self_ref_slice_limited(context, ref x, ref y, slice_slice, slice2_slice);;
             }
             finally
             {
@@ -1201,29 +1201,29 @@ namespace My.Company
             Interop.simple_service_method_mut_self_void(_context, slice);
         }
 
-        public byte MethodMutSelfRef(ref byte x, out byte y)
+        public byte MethodMutSelfRef(ref byte x, ref byte y)
         {
-            return Interop.simple_service_method_mut_self_ref(_context, ref x, out y);
+            return Interop.simple_service_method_mut_self_ref(_context, ref x, ref y);
         }
 
-        public byte MethodMutSelfRefSlice(ref byte x, out byte y, Sliceu8 slice)
+        public byte MethodMutSelfRefSlice(ref byte x, ref byte y, Sliceu8 slice)
         {
-            return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out y, slice);
+            return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, ref y, slice);
         }
 
-        public byte MethodMutSelfRefSlice(ref byte x, out byte y, byte[] slice)
+        public byte MethodMutSelfRefSlice(ref byte x, ref byte y, byte[] slice)
         {
-            return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out y, slice);
+            return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, ref y, slice);
         }
 
-        public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, Sliceu8 slice, Sliceu8 slice2)
+        public byte MethodMutSelfRefSliceLimited(ref byte x, ref byte y, Sliceu8 slice, Sliceu8 slice2)
         {
-            return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
+            return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, ref y, slice, slice2);
         }
 
-        public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, byte[] slice, byte[] slice2)
+        public byte MethodMutSelfRefSliceLimited(ref byte x, ref byte y, byte[] slice, byte[] slice2)
         {
-            return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
+            return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, ref y, slice, slice2);
         }
 
         public void MethodMutSelfFfiError(SliceMutu8 slice)

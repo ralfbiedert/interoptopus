@@ -145,7 +145,7 @@ pub trait CSharpTypeConverter {
                 CType::Pattern(TypePattern::CChar) => "IntPtr".to_string(),
                 CType::Pattern(TypePattern::Slice(_)) => format!("ref {}", self.to_typespecifier_in_param(z)),
                 CType::Pattern(TypePattern::SliceMut(_)) => format!("ref {}", self.to_typespecifier_in_param(z)),
-                _ => format!("out {}", self.to_typespecifier_in_param(z)),
+                _ => format!("ref {}", self.to_typespecifier_in_param(z)),
             },
             CType::FnPointer(x) => self.fnpointer_to_typename(x),
             CType::Pattern(x) => match x {
