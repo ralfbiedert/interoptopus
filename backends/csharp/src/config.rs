@@ -93,6 +93,8 @@ pub struct Config {
     pub use_unsafe: Unsafe,
     /// Generate functions and field names matching C# conventions, instead of mapping them 1:1 with Rust.
     pub rename_symbols: bool,
+    /// Generate bindings with [SuppressUnmanagedCodeSecurity] attribute
+    pub suppress_unmanaged_code_security: bool,
     /// Also generate markers for easier debugging
     pub debug: bool,
 }
@@ -113,6 +115,7 @@ impl Default for Config {
             write_types: WriteTypes::NamespaceAndInteroptopusGlobal,
             use_unsafe: Unsafe::None,
             rename_symbols: false,
+            suppress_unmanaged_code_security: false,
             debug: false,
         }
     }

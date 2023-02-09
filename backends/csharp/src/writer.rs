@@ -50,6 +50,10 @@ pub trait CSharpWriter {
         indented!(w, r#"using System.Collections;"#)?;
         indented!(w, r#"using System.Collections.Generic;"#)?;
         indented!(w, r#"using System.Runtime.InteropServices;"#)?;
+        
+        if self.config().suppress_unmanaged_code_security {
+            indented!(w, r#"using System.Security;"#)?;
+        }
 
         for overload in self.overloads() {
             overload.write_imports(w, self.helper())?;
@@ -165,7 +169,13 @@ pub trait CSharpWriter {
             w,
             r#"[DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "{}")]"#,
             function.name()
-        )
+        )?;
+
+        if self.config().suppress_unmanaged_code_security {
+            indented!(w, r#"[SuppressUnmanagedCodeSecurity]"#)?;
+        }
+
+        Ok(())
     }
 
     fn write_function_declaration(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
@@ -316,7 +326,13 @@ pub trait CSharpWriter {
     }
 
     fn write_type_definition_fn_pointer_annotation(&self, w: &mut IndentWriter, _the_type: &FnPointerType) -> Result<(), Error> {
-        indented!(w, r#"[UnmanagedFunctionPointer(CallingConvention.Cdecl)]"#)
+        indented!(w, r#"[UnmanagedFunctionPointer(CallingConvention.Cdecl)]"#)?;
+
+        if self.config().suppress_unmanaged_code_security {
+            indented!(w, r#"[SuppressUnmanagedCodeSecurity]"#)?;
+        }
+
+        Ok(())
     }
 
     fn write_type_definition_fn_pointer_body(&self, w: &mut IndentWriter, the_type: &FnPointerType) -> Result<(), Error> {
