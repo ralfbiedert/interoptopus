@@ -41,7 +41,7 @@ impl Converter {
             CType::Enum(_) => "ctypes.c_int".to_string(), // is this correct?
             CType::Composite(x) => x.rust_name().to_string(),
             CType::Pattern(x) => match x {
-                TypePattern::AsciiPointer => "str".to_string(),
+                TypePattern::AsciiPointer => "bytes".to_string(),
                 TypePattern::Option(c) => c.rust_name().to_string(),
                 TypePattern::Slice(c) | TypePattern::SliceMut(c) => {
                     let mut res = c.rust_name().to_string();
