@@ -169,7 +169,7 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
 
                 let mut signature = ::interoptopus::lang::c::FunctionSignature::new(params, #rval);
                 let documentation = ::interoptopus::lang::c::Documentation::from_lines(doc_lines);
-                let meta = ::interoptopus::lang::c::Meta::with_documentation(documentation);
+                let meta = ::interoptopus::lang::c::Meta::with_documentation(documentation, None);
 
                 ::interoptopus::lang::c::Function::new(#function_ident_str.to_string(), signature, meta)
             }

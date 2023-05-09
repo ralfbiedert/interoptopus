@@ -213,6 +213,36 @@ pub struct Visibility2 {
     pblc2: u8,
 }
 
+#[ffi_type]
+#[repr(C)]
+#[repr(packed)]
+pub struct Packed1 {
+    pub x: u8,
+    pub y: u16,
+}
+
+#[ffi_type]
+#[repr(C, packed)]
+pub struct Packed2 {
+    pub x: u8,
+    pub y: u16,
+}
+
+#[ffi_type]
+#[repr(C)]
+#[repr(align(2))]
+pub struct Align1 {
+    pub x: u8,
+    pub y: u16,
+}
+
+#[ffi_type]
+#[repr(C, align(64))]
+pub struct Align2 {
+    pub x: u8,
+    pub y: u16,
+}
+
 // Doesn't need annotations.
 pub type Callbacku8u8 = extern "C" fn(u8) -> u8;
 

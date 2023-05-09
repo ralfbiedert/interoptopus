@@ -109,6 +109,11 @@ pub trait PythonWriter {
             indented!(w, [_], r#""""{}""""#, documentation)?;
         }
 
+        let alignment = c.meta().alignment();
+        if let Some(align) = alignment {
+            indented!(w, [_], r#"_pack_ = {}"#, align)?;
+        }
+
         w.newline()?;
         if write_for == WriteFor::Code {
             indented!(w, [_], r#"# These fields represent the underlying C data layout"#)?;

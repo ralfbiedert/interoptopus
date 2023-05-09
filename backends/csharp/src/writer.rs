@@ -365,9 +365,14 @@ pub trait CSharpWriter {
         self.write_type_definition_composite_body(w, the_type, WriteFor::Code)
     }
 
-    fn write_type_definition_composite_annotation(&self, w: &mut IndentWriter, _the_type: &CompositeType) -> Result<(), Error> {
+    fn write_type_definition_composite_annotation(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
         indented!(w, r#"[Serializable]"#)?;
-        indented!(w, r#"[StructLayout(LayoutKind.Sequential)]"#)
+        let alignment = the_type.meta().alignment();
+        if let Some(align) = alignment {
+            indented!(w, r#"[StructLayout(LayoutKind.Sequential, Pack = {})]"#, align)
+        } else {
+            indented!(w, r#"[StructLayout(LayoutKind.Sequential)]"#)
+        }
     }
 
     fn write_type_definition_composite_body(&self, w: &mut IndentWriter, the_type: &CompositeType, write_for: WriteFor) -> Result<(), Error> {

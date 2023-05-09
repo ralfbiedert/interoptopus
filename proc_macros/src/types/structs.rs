@@ -3,6 +3,7 @@ use crate::types::Attributes;
 use crate::util::extract_doc_lines;
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
+use regex::Regex;
 use syn::spanned::Spanned;
 use syn::{GenericParam, ItemStruct, Type};
 
@@ -13,22 +14,39 @@ pub enum TypeRepr {
     Opaque,
 }
 
-fn type_repr(attributes: &Attributes, item: &ItemStruct) -> TypeRepr {
+fn type_repr(attributes: &Attributes, item: &ItemStruct) -> (TypeRepr, Option<usize>) {
     if attributes.opaque {
-        return TypeRepr::Opaque;
+        return (TypeRepr::Opaque, None);
     }
 
-    let repr = item
+    let mut type_repr = TypeRepr::C;
+    let mut align = None;
+    let align_regex = Regex::new(r"align\((\d+)\)").unwrap();
+
+    for repr in item
         .attrs
         .iter()
-        .find(|x| x.to_token_stream().to_string().contains("repr"))
-        .unwrap_or_else(|| panic!("Struct {} must have `#[repr()] annotation.", item.ident));
-
-    if repr.to_token_stream().to_string().contains("transparent") {
-        TypeRepr::Transparent
-    } else {
-        TypeRepr::C
+        .filter(|x| x.to_token_stream().to_string().contains("repr"))
+    {
+        let repr_tokens = repr.to_token_stream().to_string();
+        if repr_tokens.contains("transparent") {
+            type_repr = TypeRepr::Transparent;
+        } else if repr_tokens.contains("packed") {
+            type_repr = TypeRepr::C;
+            align = Some(1);
+        } else if repr_tokens.contains("align") {
+            type_repr = TypeRepr::C;
+            let align_capture = align_regex
+                .captures(&repr_tokens)
+                .expect("Must have alignment")
+                .get(1)
+                .expect("Must have alignment")
+                .as_str();
+            align = Some(align_capture.parse::<usize>().expect("Must be a number"));
+        }
     }
+
+    (type_repr, align)
 }
 
 // Various Struct examples
@@ -72,7 +90,8 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
     let namespace = attributes.namespace.clone().unwrap_or_else(|| "".to_string());
     let doc_line = extract_doc_lines(&item.attrs).join("\n");
 
-    let type_repr = type_repr(attributes, &item);
+    
+    let (type_repr, align_attr) = type_repr(attributes, &item);
 
     let struct_ident_str = item.ident.to_string();
     let struct_ident = syn::Ident::new(&struct_ident_str, item.ident.span());
@@ -224,6 +243,12 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
         }
     };
 
+    let align = if let Some(x) = align_attr {
+        quote! { Some(#x) }
+    } else {
+        quote! { None }
+    };
+
     match type_repr {
         TypeRepr::C | TypeRepr::Opaque => {
             quote! {
@@ -233,7 +258,7 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
 
                     fn type_info() -> ::interoptopus::lang::c::CType {
                         let documentation = ::interoptopus::lang::c::Documentation::from_line(#doc_line);
-                        let mut meta = ::interoptopus::lang::c::Meta::with_namespace_documentation(#namespace.to_string(), documentation);
+                        let mut meta = ::interoptopus::lang::c::Meta::with_namespace_documentation(#namespace.to_string(), documentation, #align);
                         let mut fields: ::std::vec::Vec<interoptopus::lang::c::Field> = ::std::vec::Vec::new();
                         let mut generics: ::std::vec::Vec<String> = ::std::vec::Vec::new();
 
