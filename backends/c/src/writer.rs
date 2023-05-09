@@ -302,13 +302,23 @@ pub trait CWriter {
     fn write_type_definition_composite_body(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
         let name = self.converter().composite_to_typename(the_type);
 
+        let alignment = the_type.meta().alignment();
+        if let Some(align) = alignment {
+            indented!(w, "#pragma pack(push, {})", align)?;
+        }
+
         self.write_braced_declaration_opening(w, format!(r#"typedef struct {}"#, name))?;
 
         for field in the_type.fields() {
             self.write_type_definition_composite_body_field(w, field, the_type)?;
         }
 
-        self.write_braced_declaration_closing(w, name)
+        self.write_braced_declaration_closing(w, name)?;
+
+        if alignment.is_some() {
+            indented!(w, "#pragma pack(pop)")?;
+        }
+        Ok(())
     }
 
     fn write_type_definition_composite_body_field(&self, w: &mut IndentWriter, field: &Field, _the_type: &CompositeType) -> Result<(), Error> {

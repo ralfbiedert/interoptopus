@@ -490,6 +490,7 @@ impl OpaqueType {
 pub struct Meta {
     documentation: Documentation,
     namespace: String,
+    alignment: Option<usize>,
 }
 
 impl Meta {
@@ -497,12 +498,12 @@ impl Meta {
         Self::default()
     }
 
-    pub fn with_namespace_documentation(namespace: String, documentation: Documentation) -> Self {
-        Self { documentation, namespace }
+    pub fn with_namespace_documentation(namespace: String, documentation: Documentation, alignment: Option<usize>) -> Self {
+        Self { documentation, namespace, alignment }
     }
 
-    pub fn with_documentation(documentation: Documentation) -> Self {
-        Self::with_namespace_documentation(String::new(), documentation)
+    pub fn with_documentation(documentation: Documentation, alignment: Option<usize>) -> Self {
+        Self::with_namespace_documentation(String::new(), documentation, alignment)
     }
 
     pub fn documentation(&self) -> &Documentation {
@@ -517,6 +518,11 @@ impl Meta {
     pub fn is_namespace(&self, namespace: &str) -> bool {
         self.namespace == namespace
     }
+
+    pub fn alignment(&self) -> Option<usize> {
+        self.alignment
+    }
+
 }
 
 /// A named, exported `#[no_mangle] extern "C" fn f()` function.

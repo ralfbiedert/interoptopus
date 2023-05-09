@@ -103,7 +103,7 @@ pub fn ffi_type_enum(attributes: &Attributes, input: TokenStream, item: ItemEnum
 
                 let mut variants = ::std::vec::Vec::new();
                 let documentation = ::interoptopus::lang::c::Documentation::from_line(#doc_line);
-                let mut meta = ::interoptopus::lang::c::Meta::with_namespace_documentation(#namespace.to_string(), documentation);
+                let mut meta = ::interoptopus::lang::c::Meta::with_namespace_documentation(#namespace.to_string(), documentation, None);
 
                 #({
                     variants.push(Self::#variant_idents.variant_info());
