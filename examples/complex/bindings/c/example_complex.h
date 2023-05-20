@@ -21,7 +21,9 @@ const uint32_t THE_MAGIC_CONSTANT = 666;
 /// Possible errors in our library.
 typedef enum ffierror
     {
+    /// All went fine.
     FFIERROR_OK = 0,
+    /// Naughty API call detected.
     FFIERROR_NULLPOINTERPASSED = 10,
     } ffierror;
 
@@ -51,6 +53,7 @@ typedef struct supercomplexentity
     vec3 player_1;
     vec3 player_2;
     uint64_t ammo;
+    /// Point to an ASCII encoded whatnot.
     const uint8_t* some_str;
     uint32_t str_len;
     } supercomplexentity;

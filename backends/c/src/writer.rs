@@ -261,6 +261,10 @@ pub trait CWriter {
         let variant_name = self.converter().enum_variant_to_name(the_enum, variant);
         let variant_value = variant.value();
 
+        if self.config().documentation == CDocumentationStyle::Inline {
+            self.write_documentation(w, variant.documentation())?
+        }
+
         indented!(w, r#"{} = {},"#, variant_name, variant_value)
     }
 
@@ -322,6 +326,10 @@ pub trait CWriter {
     }
 
     fn write_type_definition_composite_body_field(&self, w: &mut IndentWriter, field: &Field, _the_type: &CompositeType) -> Result<(), Error> {
+        if self.config().documentation == CDocumentationStyle::Inline {
+            self.write_documentation(w, field.documentation())?;
+        }
+
         match field.the_type() {
             CType::Array(x) => {
                 let field_name = field.name();

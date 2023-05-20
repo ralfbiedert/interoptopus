@@ -28,7 +28,7 @@ fn bindings_csharp() -> Result<(), Error> {
 #[cfg_attr(miri, ignore)]
 fn bindings_c() -> Result<(), Error> {
     use interoptopus_backend_c::compile_c_app_if_installed;
-    use interoptopus_backend_c::{Config, Generator};
+    use interoptopus_backend_c::{Config, Generator, CDocumentationStyle};
 
     let custom_defines = r"
 // Custom attribute.
@@ -41,6 +41,7 @@ fn bindings_c() -> Result<(), Error> {
             ifndef: "example_complex".to_string(),
             function_attribute: "__FUNCTION_ATTR ".to_string(),
             custom_defines,
+            documentation: CDocumentationStyle::Inline,
             ..Config::default()
         },
         example_complex::ffi_inventory(),
