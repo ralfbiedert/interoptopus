@@ -361,7 +361,7 @@ class UseAsciiStringPattern(ctypes.Structure):
         ("ascii_string", ctypes.POINTER(ctypes.c_char)),
     ]
 
-    def __init__(self, ascii_string: str = None):
+    def __init__(self, ascii_string: bytes = None):
         ...
 ```
 
@@ -1194,7 +1194,7 @@ def repr_transparent(x: Tupled, r: ctypes.POINTER(Tupled)) -> Tupled:
 ## pattern_ascii_pointer_1 
 #### Definition 
 ```python
-def pattern_ascii_pointer_1(x: str) -> int:
+def pattern_ascii_pointer_1(x: bytes) -> int:
     ...
 ```
 
@@ -1203,7 +1203,7 @@ def pattern_ascii_pointer_1(x: str) -> int:
 ## pattern_ascii_pointer_2 
 #### Definition 
 ```python
-def pattern_ascii_pointer_2() -> str:
+def pattern_ascii_pointer_2() -> bytes:
     ...
 ```
 
@@ -1212,7 +1212,7 @@ def pattern_ascii_pointer_2() -> str:
 ## pattern_ascii_pointer_len 
 #### Definition 
 ```python
-def pattern_ascii_pointer_len(x: str, y: UseAsciiStringPattern) -> int:
+def pattern_ascii_pointer_len(x: bytes, y: UseAsciiStringPattern) -> int:
     ...
 ```
 
@@ -1426,7 +1426,7 @@ class SimpleService:
 class SimpleService:
 
     @staticmethod
-    def new_with_string(ascii: str) -> SimpleService:
+    def new_with_string(ascii: bytes) -> SimpleService:
         ...
 ```
 
@@ -1606,7 +1606,7 @@ class SimpleService:
 ```python
 class SimpleService:
 
-    def return_string(self, ) -> str:
+    def return_string(self, ) -> bytes:
         ...
 ```
 
@@ -1682,7 +1682,7 @@ class SimpleServiceLifetime:
 ```python
 class SimpleServiceLifetime:
 
-    def return_string_accept_slice(self, anon1: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> str:
+    def return_string_accept_slice(self, anon1: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> bytes:
         ...
 ```
 

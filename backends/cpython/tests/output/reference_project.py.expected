@@ -351,16 +351,16 @@ def visibility(x: Visibility1, y: Visibility2):
 def repr_transparent(x: Tupled, r: ctypes.POINTER(Tupled)) -> Tupled:
     return c_lib.repr_transparent(x, r)
 
-def pattern_ascii_pointer_1(x: str) -> int:
+def pattern_ascii_pointer_1(x: bytes) -> int:
     if not hasattr(x, "__ctypes_from_outparam__"):
         x = ctypes.cast(x, ctypes.POINTER(ctypes.c_char))
     return c_lib.pattern_ascii_pointer_1(x)
 
-def pattern_ascii_pointer_2() -> str:
+def pattern_ascii_pointer_2() -> bytes:
     rval = c_lib.pattern_ascii_pointer_2()
     return ctypes.string_at(rval)
 
-def pattern_ascii_pointer_len(x: str, y: UseAsciiStringPattern) -> int:
+def pattern_ascii_pointer_len(x: bytes, y: UseAsciiStringPattern) -> int:
     if not hasattr(x, "__ctypes_from_outparam__"):
         x = ctypes.cast(x, ctypes.POINTER(ctypes.c_char))
     return c_lib.pattern_ascii_pointer_len(x, y)
@@ -673,16 +673,16 @@ class UseAsciiStringPattern(ctypes.Structure):
         ("ascii_string", ctypes.POINTER(ctypes.c_char)),
     ]
 
-    def __init__(self, ascii_string: str = None):
+    def __init__(self, ascii_string: bytes = None):
         if ascii_string is not None:
             self.ascii_string = ascii_string
 
     @property
-    def ascii_string(self) -> str:
+    def ascii_string(self) -> bytes:
         return ctypes.Structure.__get__(self, "ascii_string")
 
     @ascii_string.setter
-    def ascii_string(self, value: str):
+    def ascii_string(self, value: bytes):
         return ctypes.Structure.__set__(self, "ascii_string", value)
 
 
@@ -1594,7 +1594,7 @@ class SimpleService:
         return self
 
     @staticmethod
-    def new_with_string(ascii: str) -> SimpleService:
+    def new_with_string(ascii: bytes) -> SimpleService:
         """"""
         ctx = ctypes.c_void_p()
         if not hasattr(ascii, "__ctypes_from_outparam__"):
@@ -1687,7 +1687,7 @@ class SimpleService:
  again, as otherwise undefined behavior might happen."""
         return c_lib.simple_service_return_slice_mut(self._ctx, )
 
-    def return_string(self, ) -> str:
+    def return_string(self, ) -> bytes:
         """ This function has no panic safeguards. If it panics your host app will be in an undefined state."""
         rval = c_lib.simple_service_return_string(self._ctx, )
         return ctypes.string_at(rval)
@@ -1740,7 +1740,7 @@ class SimpleServiceLifetime:
 
         return c_lib.simple_service_lt_method_lt2(self._ctx, slice)
 
-    def return_string_accept_slice(self, anon1: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> str:
+    def return_string_accept_slice(self, anon1: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> bytes:
         """"""
         if hasattr(anon1, "_length_") and getattr(anon1, "_type_", "") == ctypes.c_uint8:
             anon1 = Sliceu8(data=ctypes.cast(anon1, ctypes.POINTER(ctypes.c_uint8)), len=len(anon1))

@@ -19,8 +19,11 @@ const int32_t MY_LIBRARY_COMPUTED_I32 = -2147483647;
 /// Documented enum.
 typedef enum my_library_enum_documented
 {
+    /// Variant A.
     MY_LIBRARY_ENUM_DOCUMENTED_A = 0,
+    /// Variant B.
     MY_LIBRARY_ENUM_DOCUMENTED_B = 1,
+    /// Variant B.
     MY_LIBRARY_ENUM_DOCUMENTED_C = 2,
 } my_library_enum_documented;
 
@@ -73,6 +76,7 @@ typedef struct my_library_some_foreign_type
 /// Documented struct.
 typedef struct my_library_struct_documented
 {
+    /// Documented field.
     float x;
 } my_library_struct_documented;
 
@@ -164,49 +168,63 @@ typedef struct my_library_weird2u8
 ///A pointer to an array of data someone else owns which may not be modified.
 typedef struct my_library_slice_bool
 {
+    ///Pointer to start of immutable data.
     const uint8_t* data;
+    ///Number of elements.
     uint64_t len;
 } my_library_slice_bool;
 
 ///A pointer to an array of data someone else owns which may not be modified.
 typedef struct my_library_sliceu32
 {
+    ///Pointer to start of immutable data.
     const uint32_t* data;
+    ///Number of elements.
     uint64_t len;
 } my_library_sliceu32;
 
 ///A pointer to an array of data someone else owns which may not be modified.
 typedef struct my_library_sliceu8
 {
+    ///Pointer to start of immutable data.
     const uint8_t* data;
+    ///Number of elements.
     uint64_t len;
 } my_library_sliceu8;
 
 ///A pointer to an array of data someone else owns which may be modified.
 typedef struct my_library_slice_mutu32
 {
+    ///Pointer to start of mutable data.
     const uint32_t* data;
+    ///Number of elements.
     uint64_t len;
 } my_library_slice_mutu32;
 
 ///A pointer to an array of data someone else owns which may be modified.
 typedef struct my_library_slice_mutu8
 {
+    ///Pointer to start of mutable data.
     const uint8_t* data;
+    ///Number of elements.
     uint64_t len;
 } my_library_slice_mutu8;
 
 ///Option type containing boolean flag and maybe valid data.
 typedef struct my_library_option_inner
 {
+    ///Element that is maybe valid.
     my_library_inner t;
+    ///Byte where `1` means element `t` is valid.
     uint8_t is_some;
 } my_library_option_inner;
 
 ///Option type containing boolean flag and maybe valid data.
 typedef struct my_library_option_vec
 {
+    ///Element that is maybe valid.
     my_library_vec t;
+    ///Byte where `1` means element `t` is valid.
     uint8_t is_some;
 } my_library_option_vec;
 
@@ -215,28 +233,36 @@ typedef void (*my_library_my_callback_void)(const void* ptr);
 ///A pointer to an array of data someone else owns which may not be modified.
 typedef struct my_library_slice_use_ascii_string_pattern
 {
+    ///Pointer to start of immutable data.
     const my_library_use_ascii_string_pattern* data;
+    ///Number of elements.
     uint64_t len;
 } my_library_slice_use_ascii_string_pattern;
 
 ///A pointer to an array of data someone else owns which may not be modified.
 typedef struct my_library_slice_vec
 {
+    ///Pointer to start of immutable data.
     const my_library_vec* data;
+    ///Number of elements.
     uint64_t len;
 } my_library_slice_vec;
 
 ///A pointer to an array of data someone else owns which may not be modified.
 typedef struct my_library_slice_vec3f32
 {
+    ///Pointer to start of immutable data.
     const my_library_vec3f32* data;
+    ///Number of elements.
     uint64_t len;
 } my_library_slice_vec3f32;
 
 ///A pointer to an array of data someone else owns which may be modified.
 typedef struct my_library_slice_mut_vec
 {
+    ///Pointer to start of mutable data.
     const my_library_vec* data;
+    ///Number of elements.
     uint64_t len;
 } my_library_slice_mut_vec;
 
