@@ -23,11 +23,7 @@ fn type_repr(attributes: &Attributes, item: &ItemStruct) -> (TypeRepr, Option<us
     let mut align = None;
     let align_regex = Regex::new(r"align\((\d+)\)").unwrap();
 
-    for repr in item
-        .attrs
-        .iter()
-        .filter(|x| x.to_token_stream().to_string().contains("repr"))
-    {
+    for repr in item.attrs.iter().filter(|x| x.to_token_stream().to_string().contains("repr")) {
         let repr_tokens = repr.to_token_stream().to_string();
         if repr_tokens.contains("transparent") {
             type_repr = TypeRepr::Transparent;
@@ -87,10 +83,9 @@ fn type_repr(attributes: &Attributes, item: &ItemStruct) -> (TypeRepr, Option<us
 // ```
 //
 pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemStruct) -> TokenStream {
-    let namespace = attributes.namespace.clone().unwrap_or_else(|| "".to_string());
+    let namespace = attributes.namespace.clone().unwrap_or_default();
     let doc_line = extract_doc_lines(&item.attrs).join("\n");
 
-    
     let (type_repr, align_attr) = type_repr(attributes, &item);
 
     let struct_ident_str = item.ident.to_string();

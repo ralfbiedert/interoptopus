@@ -95,6 +95,7 @@ pub trait CSharpTypeConverter {
     }
 
     /// Converts the `u32` part in a Rust field `x: u32` to a C# equivalent. Might convert pointers to `IntPtr`.
+    #[allow(clippy::only_used_in_recursion)]
     fn to_typespecifier_in_field(&self, x: &CType, field: &Field, composite: &CompositeType) -> String {
         match &x {
             CType::Primitive(x) => self.primitive_to_typename(x),

@@ -499,7 +499,11 @@ impl Meta {
     }
 
     pub fn with_namespace_documentation(namespace: String, documentation: Documentation, alignment: Option<usize>) -> Self {
-        Self { documentation, namespace, alignment }
+        Self {
+            documentation,
+            namespace,
+            alignment,
+        }
     }
 
     pub fn with_documentation(documentation: Documentation, alignment: Option<usize>) -> Self {
@@ -522,7 +526,6 @@ impl Meta {
     pub fn alignment(&self) -> Option<usize> {
         self.alignment
     }
-
 }
 
 /// A named, exported `#[no_mangle] extern "C" fn f()` function.

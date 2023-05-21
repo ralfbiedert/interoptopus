@@ -267,7 +267,7 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
                     .csharp_writer
                     .converter()
                     .function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
-                let target = format!("{}", fname);
+                let target = fname.to_string();
                 indented!(w, r#"### <a name="{}">**{}**</a> <sup>ctor</sup>"#, target, target)?;
 
                 let doc = x.meta().documentation().lines();
@@ -293,7 +293,7 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
                     .csharp_writer
                     .converter()
                     .function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
-                let target = format!("{}", fname);
+                let target = fname.to_string();
 
                 let rval = match x.signature().rval() {
                     CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),

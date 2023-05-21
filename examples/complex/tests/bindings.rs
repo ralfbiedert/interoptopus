@@ -28,7 +28,7 @@ fn bindings_csharp() -> Result<(), Error> {
 #[cfg_attr(miri, ignore)]
 fn bindings_c() -> Result<(), Error> {
     use interoptopus_backend_c::compile_c_app_if_installed;
-    use interoptopus_backend_c::{Config, Generator, CDocumentationStyle};
+    use interoptopus_backend_c::{CDocumentationStyle, Config, Generator};
 
     let custom_defines = r"
 // Custom attribute.

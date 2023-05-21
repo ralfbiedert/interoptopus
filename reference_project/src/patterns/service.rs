@@ -70,7 +70,7 @@ impl SimpleService {
 
     #[ffi_service_method(on_panic = "return_default")]
     pub fn method_mut_self(&mut self, slice: FFISlice<u8>) -> u8 {
-        *slice.as_slice().get(0).unwrap_or(&0)
+        *slice.as_slice().first().unwrap_or(&0)
     }
 
     /// Single line.
@@ -88,6 +88,7 @@ impl SimpleService {
     }
 
     #[ffi_service_method(on_panic = "return_default")]
+    #[allow(clippy::needless_lifetimes)]
     pub fn method_mut_self_ref_slice_limited<'a, 'b>(&mut self, x: &u8, _y: &mut u8, _slice: FFISlice<'a, u8>, _slice2: FFISlice<'b, u8>) -> u8 {
         *x
     }

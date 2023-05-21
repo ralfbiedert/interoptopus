@@ -82,7 +82,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
 
     let ffi_fn_ident = Ident::new(&format!("{}{}", attributes.prefix, orig_fn_ident), function.span());
     let error_ident = Ident::new(&attributes.error, function.span());
-    let without_lifetimes = purge_lifetimes_from_type(&*impl_block.self_ty);
+    let without_lifetimes = purge_lifetimes_from_type(&impl_block.self_ty);
     let doc_lines = extract_doc_lines(&function.attrs);
 
     let span_rval = function.sig.output.span();
@@ -121,7 +121,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     inputs.push(quote_spanned!(span_arg=> #arg));
                 }
                 Pat::Wild(_) => {
-                    let new_ident = Ident::new(&*format!("_anon{}", i), arg.span());
+                    let new_ident = Ident::new(&format!("_anon{}", i), arg.span());
                     let ty = &pat.ty;
                     arg_names.push(quote_spanned!(span_arg=> #new_ident));
                     inputs.push(quote_spanned!(span_arg=> #new_ident: #ty));
@@ -248,7 +248,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
 pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> Descriptor {
     let ffi_fn_ident = Ident::new(&format!("{}destroy", attributes.prefix), impl_block.span());
     let error_ident = Ident::new(&attributes.error, impl_block.span());
-    let without_lifetimes = purge_lifetimes_from_type(&*impl_block.self_ty);
+    let without_lifetimes = purge_lifetimes_from_type(&impl_block.self_ty);
 
     let span_service_ty = impl_block.self_ty.span();
 

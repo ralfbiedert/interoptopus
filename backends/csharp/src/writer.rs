@@ -455,15 +455,9 @@ pub trait CSharpWriter {
         indented!(w, r#"}}"#)
     }
 
-    fn write_class_context(&self, class_name: &str, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) ->
-                                                                                                                                   Result<(), Error> {
+    fn write_class_context(&self, class_name: &str, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) -> Result<(), Error> {
         self.debug(w, "write_class_context")?;
-        indented!(
-            w,
-            r#"{} static partial class {}"#,
-            self.config().visibility_types.to_access_modifier(),
-            class_name
-        )?;
+        indented!(w, r#"{} static partial class {}"#, self.config().visibility_types.to_access_modifier(), class_name)?;
         indented!(w, r#"{{"#)?;
         w.indent();
 
@@ -1042,11 +1036,9 @@ pub trait CSharpWriter {
         w.newline()?;
 
         self.write_namespace_context(w, |w| {
-
             if self.config().class_constants.is_none() || self.config().class_constants == Some(self.config().clone().class) {
-
                 if self.has_emittable_functions(self.inventory().functions()) || self.has_emittable_constants(self.inventory().constants()) {
-                    self.write_class_context( &self.config().class, w, |w| {
+                    self.write_class_context(&self.config().class, w, |w| {
                         self.write_native_lib_string(w)?;
                         w.newline()?;
 
@@ -1060,11 +1052,9 @@ pub trait CSharpWriter {
                         Ok(())
                     })?;
                 }
-
             } else {
-
                 if self.has_emittable_constants(self.inventory().constants()) {
-                    self.write_class_context( self.config().class_constants.as_ref().unwrap(), w, |w| {
+                    self.write_class_context(self.config().class_constants.as_ref().unwrap(), w, |w| {
                         self.write_constants(w)?;
                         w.newline()?;
 
@@ -1073,9 +1063,8 @@ pub trait CSharpWriter {
                 }
 
                 if self.has_emittable_functions(self.inventory().functions()) {
-
                     w.newline()?;
-                    self.write_class_context( &self.config().class, w, |w| {
+                    self.write_class_context(&self.config().class, w, |w| {
                         self.write_native_lib_string(w)?;
                         w.newline()?;
 

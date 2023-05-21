@@ -66,7 +66,7 @@ pub extern "C" fn pattern_ffi_slice_5(slice: &FFISlice<u8>, slice2: &mut FFISlic
 #[ffi_function]
 #[no_mangle]
 pub extern "C" fn pattern_ffi_slice_6(slice: &FFISliceMut<u8>, callback: CallbackU8) {
-    callback.call(slice.as_slice().get(0).copied().unwrap_or(0));
+    callback.call(slice.as_slice().first().copied().unwrap_or(0));
 }
 
 // Some extra tests that were hard to do from core crate.

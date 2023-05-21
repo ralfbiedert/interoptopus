@@ -40,7 +40,7 @@ pub fn ffi_type_enum(attributes: &Attributes, input: TokenStream, item: ItemEnum
     let name = item.ident.to_string();
     let ffi_name = attributes.name.clone().unwrap_or_else(|| name.clone());
     let name_ident = syn::Ident::new(&name, span);
-    let namespace = attributes.namespace.clone().unwrap_or_else(|| "".to_string());
+    let namespace = attributes.namespace.clone().unwrap_or_default();
 
     let mut variant_names = Vec::new();
     let mut variant_idents = Vec::new();
