@@ -75,6 +75,8 @@ use crate::patterns::callbacks::NamedCallback;
 use crate::patterns::result::FFIErrorEnum;
 use crate::patterns::service::Service;
 
+use augmented_function::AugmentedFunction;
+
 #[doc(hidden)]
 pub mod api_entry;
 pub mod api_guard;
@@ -85,6 +87,7 @@ pub mod result;
 pub mod service;
 pub mod slice;
 pub mod string;
+pub mod augmented_function;
 
 /// A pattern on a library level, usually involving both methods and types.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -116,6 +119,7 @@ pub enum TypePattern {
     Bool,
     CChar,
     NamedCallback(NamedCallback),
+    AugmentedFunction(AugmentedFunction),
 }
 
 impl TypePattern {
@@ -134,6 +138,7 @@ impl TypePattern {
             TypePattern::Bool => CType::Primitive(PrimitiveType::U8),
             TypePattern::CChar => CType::Primitive(PrimitiveType::I8),
             TypePattern::APIVersion => CType::Primitive(PrimitiveType::U64),
+            TypePattern::AugmentedFunction(f) => f.fallback_type(),
         }
     }
 }
