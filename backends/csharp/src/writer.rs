@@ -203,6 +203,7 @@ pub trait CSharpWriter {
         }
 
         match the_type {
+            CType::Function(_) => todo!(),
             CType::Primitive(_) => {}
             CType::Array(_) => {}
             CType::Enum(e) => {
@@ -498,6 +499,7 @@ pub trait CSharpWriter {
         }
 
         match t {
+            CType::Function(_) => todo!(),
             CType::Primitive(_) => self.config().write_types == WriteTypes::NamespaceAndInteroptopusGlobal,
             CType::Array(_) => false,
             CType::Enum(x) => self.should_emit_by_meta(x.meta()),

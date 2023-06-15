@@ -192,6 +192,9 @@ pub trait CWriter {
                 TypePattern::CChar => {}
                 TypePattern::APIVersion => {}
             },
+            CType::Function(_) =>  {
+                // Currently handled elsewhere
+            }
         }
         Ok(())
     }

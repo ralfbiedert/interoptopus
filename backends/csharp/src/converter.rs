@@ -63,6 +63,7 @@ pub trait CSharpTypeConverter {
     /// Checks if the type is on the C# side blittable, in particular, if it can be accessed via raw pointers and memcopied.
     fn is_blittable(&self, x: &CType) -> bool {
         match x {
+            CType::Function(_) => todo!(),
             CType::Primitive(_) => true,
             CType::Composite(c) => c.fields().iter().all(|x| self.is_blittable(x.the_type())),
             CType::Pattern(x) => match x {
@@ -98,6 +99,7 @@ pub trait CSharpTypeConverter {
     #[allow(clippy::only_used_in_recursion)]
     fn to_typespecifier_in_field(&self, x: &CType, field: &Field, composite: &CompositeType) -> String {
         match &x {
+            CType::Function(_) => todo!(),
             CType::Primitive(x) => self.primitive_to_typename(x),
             CType::Array(_) => panic!("Needs special handling in the writer."),
             CType::Enum(x) => self.enum_to_typename(x),
@@ -123,6 +125,7 @@ pub trait CSharpTypeConverter {
     /// Converts the `u32` part in a Rust paramter `x: u32` to a C# equivalent. Might convert pointers to `out X` or `ref X`.
     fn to_typespecifier_in_param(&self, x: &CType) -> String {
         match &x {
+            CType::Function(_) => todo!(),
             CType::Primitive(x) => self.primitive_to_typename(x),
             CType::Array(_) => todo!(),
             CType::Enum(x) => self.enum_to_typename(x),
@@ -165,6 +168,7 @@ pub trait CSharpTypeConverter {
 
     fn to_typespecifier_in_rval(&self, x: &CType) -> String {
         match &x {
+            CType::Function(_) => todo!(),
             CType::Primitive(x) => self.primitive_to_typename(x),
             CType::Array(_) => todo!(),
             CType::Enum(x) => self.enum_to_typename(x),

@@ -183,6 +183,12 @@ pub(crate) fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CTyp
             TypePattern::CChar => {}
             TypePattern::APIVersion => {}
         },
+        CType::Function(f) => {
+            ctypes_from_type_recursive(f.signature().rval(), types);
+            for param in f.signature().params() {
+                ctypes_from_type_recursive(param.the_type(), types);
+            }
+        }
     }
 }
 
@@ -224,6 +230,7 @@ pub(crate) fn extract_namespaces_from_types(types: &[CType], into: &mut HashSet<
                 TypePattern::CChar => {}
                 TypePattern::NamedCallback(_) => {}
             },
+            CType::Function(_) => {}
         }
     }
 }
@@ -319,6 +326,7 @@ pub fn is_global_type(t: &CType) -> bool {
             TypePattern::CChar => true,
             TypePattern::NamedCallback(_) => false,
         },
+        CType::Function(_) => false,
     }
 }
 

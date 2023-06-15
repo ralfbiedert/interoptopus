@@ -121,6 +121,7 @@ pub enum CType {
     /// Special patterns with primitives existing on C-level but special semantics.
     /// useful to higher level languages.
     Pattern(TypePattern),
+    Function(Box<Function>),
 }
 
 impl Default for CType {
@@ -181,6 +182,7 @@ impl CType {
                 _ => x.fallback_type().name_within_lib(),
             },
             CType::Array(x) => x.rust_name(),
+            CType::Function(f) => f.name().to_owned(),
         }
     }
 
@@ -206,6 +208,7 @@ impl CType {
             CType::ReadWritePointer(x) => Some(x.as_ref()),
             CType::Pattern(_) => None,
             CType::Array(_) => None,
+            CType::Function(_) => None,
         }
     }
 

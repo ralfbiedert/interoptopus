@@ -70,6 +70,7 @@ impl Converter {
     #[allow(clippy::only_used_in_recursion)]
     pub fn to_ctypes_name(&self, the_type: &CType, with_type_annotations: bool) -> String {
         match the_type {
+            CType::Function(_) => todo!(),
             CType::Primitive(x) => match x {
                 PrimitiveType::Void => "".to_string(),
                 PrimitiveType::Bool => "ctypes.c_bool".to_string(),
