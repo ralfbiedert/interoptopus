@@ -191,6 +191,9 @@ pub trait CWriter {
                 TypePattern::Bool => {}
                 TypePattern::CChar => {}
                 TypePattern::APIVersion => {}
+                TypePattern::AugmentedFunction(f) => {
+                    self.write_function(w, &f.fallback_type())?;
+                }
             },
             CType::Function(_) =>  {
                 // Currently handled elsewhere

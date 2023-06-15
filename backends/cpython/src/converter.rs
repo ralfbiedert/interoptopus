@@ -110,6 +110,7 @@ impl Converter {
                 TypePattern::Bool => "ctypes.c_uint8".to_string(),
                 TypePattern::CChar => "ctypes.c_char".to_string(),
                 TypePattern::NamedCallback(x) => format!("callbacks.{}", safe_name(&x.fnpointer().internal_name())),
+                TypePattern::AugmentedFunction(_) => todo!(),
             },
         }
     }

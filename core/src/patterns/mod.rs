@@ -138,7 +138,7 @@ impl TypePattern {
             TypePattern::Bool => CType::Primitive(PrimitiveType::U8),
             TypePattern::CChar => CType::Primitive(PrimitiveType::I8),
             TypePattern::APIVersion => CType::Primitive(PrimitiveType::U64),
-            TypePattern::AugmentedFunction(f) => f.fallback_type(),
+            TypePattern::AugmentedFunction(f) => CType::Function(Box::new(f.fallback_type())),
         }
     }
 }

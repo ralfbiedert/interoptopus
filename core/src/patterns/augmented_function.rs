@@ -39,11 +39,11 @@ impl AugmentedFunctionSignature {
 }
 
 impl AugmentedFunction {
-    pub fn fallback_type(&self) -> CType {
+    pub fn fallback_type(&self) -> Function {
         let f = Function::new(
             self.name.clone(), self.signature.fallback_type(), self.meta.clone()
         );
 
-        CType::Function(Box::new(f))
+        f
     }
 }
