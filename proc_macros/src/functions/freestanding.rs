@@ -64,8 +64,31 @@ pub fn rval_tokens(return_type: &ReturnType) -> TokenStream {
     }
 }
 
-pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStream) -> TokenStream {
-    let item_fn: ItemFn = syn::parse2(input.clone()).expect("Must be item.");
+pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream) -> TokenStream {
+    let input: ItemFn = syn::parse2(input.clone()).expect("Must be item.");
+    if is_augmented(&input) {
+        ffi_function_freestanding_augmented(ffi_attributes, input)
+    } else {
+        ffi_function_freestanding_plain(ffi_attributes, input)
+    }
+}
+
+// Ok sure this code isn't written elegantly at the moment. The idea is just that a function is
+// considered Augmented if it returns a tuple type. We're just checking for that right now
+//
+// Theoretically you could decide to look for some other way to decide if a function is augmented.
+// This is just a temporary example
+fn is_augmented(function: &ItemFn) -> bool {
+    match &function.sig.output {
+        syn::ReturnType::Type(_, ty) => match &**ty {
+            syn::Type::Tuple(syn::TypeTuple{elems, ..}) => elems.len() > 1,
+            _other => false,
+        },
+        _other => false
+    }
+}
+
+pub fn ffi_function_freestanding_plain(_ffi_attributes: &Attributes, item_fn: ItemFn) -> TokenStream {
     let docs = util::extract_doc_lines(&item_fn.attrs);
 
     let mut args_name = Vec::new();
@@ -88,7 +111,7 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
         }
     }
 
-    let function_ident = item_fn.sig.ident;
+    let function_ident = item_fn.sig.ident.clone();
     let function_ident_str = function_ident.to_string();
     let mut generic_params = quote! {};
     let mut phantom_fields = quote! {};
@@ -96,6 +119,7 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
     let _ = item_fn
         .sig
         .abi
+        .clone()
         .unwrap_or_else(|| panic!(r#"Function '{}' must have ABI specifier such as 'extern "C"'."#, function_ident_str));
 
     if !generic_parameters.is_empty() {
@@ -144,6 +168,7 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
         }
     }
 
+   let input = item_fn.to_token_stream();
     let rval = quote! {
         #input
 
@@ -177,4 +202,8 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
     };
 
     rval
+}
+
+pub fn ffi_function_freestanding_augmented(_ffi_attributes: &Attributes, item_fn: ItemFn) -> TokenStream {
+    todo!("augmented function not implemented")
 }
