@@ -23,6 +23,13 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "my_function")]
         public static extern Vec2 my_function(Vec2 input);
 
+        /// Function using the type.
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "my_function2")]
+        public static extern void my_function2(Vec2 input);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "my_function3")]
+        public static extern void my_function3();
+
     }
 
     /// A simple type in our FFI layer.

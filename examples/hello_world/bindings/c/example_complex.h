@@ -24,6 +24,11 @@ typedef struct vec2
 /// Function using the type.
 vec2 my_function(vec2 input);
 
+/// Function using the type.
+void my_function2(vec2 input);
+
+void my_function3();
+
 
 #ifdef __cplusplus
 }
