@@ -27,7 +27,7 @@ vec2 my_function(vec2 input);
 /// Function using the type.
 void my_function2(vec2 input);
 
-void my_function3();
+void my_function3(vec2 input, int32_t* out_param_0, int32_t* out_param_1);
 
 
 #ifdef __cplusplus

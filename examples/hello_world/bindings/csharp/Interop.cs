@@ -28,7 +28,7 @@ namespace My.Company
         public static extern void my_function2(Vec2 input);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "my_function3")]
-        public static extern void my_function3();
+        public static extern void my_function3(Vec2 input, out int out_param_0, out int out_param_1);
 
     }
 

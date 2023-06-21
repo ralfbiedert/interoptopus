@@ -313,10 +313,48 @@ pub fn ffi_function_freestanding_augmented(_ffi_attributes: &Attributes, item_fn
     let function_ident_str = function_ident.to_string();
     let mut generic_params = quote! {};
     let mut phantom_fields = quote! {};
-    let signature = fn_signature_type(augmented_function_signature);
+    let signature = fn_signature_type(augmented_function_signature.clone());
     let mut args_name = Vec::<String>::new();
     let mut args_type = Vec::<TokenStream>::new();
     let docs = Vec::<String>::new();
+    let surrogates = read_surrogates(&item_fn.attrs);
+
+    for arg in &augmented_function_signature.inputs {
+        if let FnArg::Typed(pat) = arg {
+            let name = match pat.pat.as_ref() {
+                Pat::Ident(ident) => ident.ident.to_string(),
+                Pat::Wild(_) => "_ignored".to_string(),
+                _ => {
+                    panic!("Only supports normal identifiers for parameters, e.g., `x: ...`");
+                }
+            };
+
+            let clean_name = name.strip_prefix('_').unwrap_or(&name);
+            args_name.push(clean_name.to_string());
+
+            let token = match util::purge_lifetimes_from_type(pat.ty.as_ref()) {
+                Type::Path(x) => x.path.to_token_stream(),
+                Type::Reference(x) => x.to_token_stream(),
+                Type::Group(x) => x.to_token_stream(),
+                Type::Ptr(x) => x.to_token_stream(),
+                Type::Array(x) => x.to_token_stream(),
+                Type::BareFn(x) => x.to_token_stream(),
+                _ => {
+                    panic!("Unsupported type at interface boundary found for parameter: {:?}.", pat.ty)
+                }
+            };
+
+            if surrogates.1.contains_key(&name) {
+                let lookup = surrogates.1.get(&name).unwrap();
+                let ident = syn::Ident::new(lookup, surrogates.0.unwrap());
+                args_type.push(quote! { #ident()  })
+            } else {
+                args_type.push(quote! { < #token as ::interoptopus::lang::rust::CTypeInfo>::type_info() });
+            }
+        } else {
+            panic!("Does not support methods.")
+        }
+    }
 
     let rval = quote! {
         // write out the original base function
