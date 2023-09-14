@@ -86,7 +86,7 @@ pub unsafe extern "C" fn example_destroy_context(context_ptr: Option<&mut *mut C
     let ctx = context_ptr.unwrap();
 
     {
-        unsafe { Box::from_raw(*ctx) };
+        unsafe { drop(Box::from_raw(*ctx)) };
     }
 
     *ctx = null_mut();
