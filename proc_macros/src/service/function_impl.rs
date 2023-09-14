@@ -270,7 +270,7 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
             }
 
             let result_result = ::std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                unsafe { ::std::boxed::Box::from_raw(*context) };
+                unsafe { drop(::std::boxed::Box::from_raw(*context)) };
             }));
 
             *context = ::std::ptr::null_mut();
