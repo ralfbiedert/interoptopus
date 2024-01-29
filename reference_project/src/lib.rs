@@ -96,6 +96,7 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(patterns::api_guard::pattern_api_guard))
             .register(function!(patterns::callbacks::pattern_callback_1))
             .register(function!(patterns::callbacks::pattern_callback_2))
+            .register(function!(patterns::callbacks::pattern_callback_3))
             // Constants
             .register(constant!(constants::U8))
             .register(constant!(constants::F32_MIN_POSITIVE))

@@ -77,6 +77,7 @@ def init_lib(path):
     c_lib.pattern_api_guard.argtypes = []
     c_lib.pattern_callback_1.argtypes = [callbacks.fn_u32_rval_u32, ctypes.c_uint32]
     c_lib.pattern_callback_2.argtypes = [callbacks.fn_pconst]
+    c_lib.pattern_callback_3.argtypes = [DelegateCallbackMyCallbackContextual, ctypes.c_uint32]
     c_lib.simple_service_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.simple_service_new_with.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.c_uint32]
     c_lib.simple_service_new_without.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
@@ -457,6 +458,9 @@ def pattern_callback_2(callback):
         callback = callbacks.fn_pconst(callback)
 
     return c_lib.pattern_callback_2(callback)
+
+def pattern_callback_3(callback: DelegateCallbackMyCallbackContextual, x: int):
+    return c_lib.pattern_callback_3(callback, x)
 
 
 
@@ -1341,6 +1345,37 @@ class OptionVec(ctypes.Structure):
         return self._is_some != 0
 
 
+class DelegateCallbackMyCallbackContextual(ctypes.Structure):
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("callback", callbacks.fn_pconst__u32),
+        ("context", ctypes.c_void_p),
+    ]
+
+    def __init__(self, callback = None, context: ctypes.c_void_p = None):
+        if callback is not None:
+            self.callback = callback
+        if context is not None:
+            self.context = context
+
+    @property
+    def callback(self):
+        return ctypes.Structure.__get__(self, "callback")
+
+    @callback.setter
+    def callback(self, value):
+        return ctypes.Structure.__set__(self, "callback", value)
+
+    @property
+    def context(self) -> ctypes.c_void_p:
+        return ctypes.Structure.__get__(self, "context")
+
+    @context.setter
+    def context(self, value: ctypes.c_void_p):
+        return ctypes.Structure.__set__(self, "context", value)
+
+
 class SliceUseAsciiStringPattern(ctypes.Structure):
     # These fields represent the underlying C data layout
     _fields_ = [
@@ -1562,6 +1597,7 @@ class callbacks:
     fn_SliceMutu8 = ctypes.CFUNCTYPE(None, SliceMutu8)
     fn_u8_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8)
     fn_u32_rval_u32 = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)
+    fn_pconst__u32 = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_uint32)
     fn_pconst = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
 
 

@@ -194,7 +194,15 @@ typedef struct my_library_optionvec
     uint8_t is_some;
     } my_library_optionvec;
 
+typedef void (*my_library_mycallbackcontextual)(const void* context, uint32_t value);
+
 typedef void (*my_library_mycallbackvoid)(const void* ptr);
+
+typedef struct my_library_delegatecallbackmycallbackcontextual
+    {
+    my_library_mycallbackcontextual callback;
+    const void* context;
+    } my_library_delegatecallbackmycallbackcontextual;
 
 typedef struct my_library_sliceuseasciistringpattern
     {
@@ -294,6 +302,7 @@ char* pattern_ffi_cchar_mut_pointer(char* ffi_cchar);
 uint64_t pattern_api_guard();
 uint32_t pattern_callback_1(my_library_mycallback callback, uint32_t x);
 my_library_mycallbackvoid pattern_callback_2(my_library_mycallbackvoid callback);
+void pattern_callback_3(my_library_delegatecallbackmycallbackcontextual callback, uint32_t x);
 my_library_ffierror simple_service_destroy(my_library_simpleservice** context);
 my_library_ffierror simple_service_new_with(my_library_simpleservice** context, uint32_t some_value);
 my_library_ffierror simple_service_new_without(my_library_simpleservice** context);
