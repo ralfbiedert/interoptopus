@@ -160,6 +160,12 @@ macro_rules! callback {
             }
         }
 
+        impl From<$name> for Option<extern "C" fn($($ty),*) -> $rval> {
+            fn from(x: $name) -> Self {
+                x.0
+            }
+        }
+
         unsafe impl interoptopus::lang::rust::CTypeInfo for $name {
             fn type_info() -> interoptopus::lang::c::CType {
                 use interoptopus::lang::rust::CTypeInfo;
