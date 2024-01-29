@@ -85,19 +85,21 @@ use crate::lang::c::FnPointerType;
 /// Internal helper naming a generated callback type wrapper.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct NamedCallback {
-    name: String,
     fnpointer: FnPointerType,
 }
 
 impl NamedCallback {
     /// Creates a new named callback.
-    pub fn new(name: String, callback: FnPointerType) -> Self {
-        Self { name, fnpointer: callback }
+    pub fn new(callback: FnPointerType) -> Self {
+        if let None = callback.name() {
+            panic!("The pointer provided to a named callback must have a name.")
+        }
+        Self { fnpointer: callback }
     }
 
     /// Gets the type name of this callback.
     pub fn name(&self) -> &str {
-        &self.name
+        &self.fnpointer.name().unwrap()
     }
 
     /// Returns the function pointer type.
@@ -179,8 +181,8 @@ macro_rules! callback {
                 ];
 
                 let sig = interoptopus::lang::c::FunctionSignature::new(params, rval);
-                let fn_pointer = interoptopus::lang::c::FnPointerType::new(sig);
-                let named_callback = interoptopus::patterns::callbacks::NamedCallback::new(stringify!($name).to_string(), fn_pointer);
+                let fn_pointer = interoptopus::lang::c::FnPointerType::new_named(sig, stringify!($name).to_string());
+                let named_callback = interoptopus::patterns::callbacks::NamedCallback::new(fn_pointer);
 
                 interoptopus::lang::c::CType::Pattern(interoptopus::patterns::TypePattern::NamedCallback(named_callback))
             }

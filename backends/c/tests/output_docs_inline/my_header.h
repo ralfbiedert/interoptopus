@@ -228,7 +228,15 @@ typedef struct my_library_option_vec
     uint8_t is_some;
 } my_library_option_vec;
 
+typedef void (*my_library_my_callback_contextual)(const void* context, uint32_t value);
+
 typedef void (*my_library_my_callback_void)(const void* ptr);
+
+typedef struct my_library_delegate_callback_my_callback_contextual
+{
+    my_library_my_callback_contextual callback;
+    const void* context;
+} my_library_delegate_callback_my_callback_contextual;
 
 ///A pointer to an array of data someone else owns which may not be modified.
 typedef struct my_library_slice_use_ascii_string_pattern
@@ -410,6 +418,8 @@ uint64_t pattern_api_guard();
 uint32_t pattern_callback_1(my_library_my_callback callback, uint32_t x);
 
 my_library_my_callback_void pattern_callback_2(my_library_my_callback_void callback);
+
+void pattern_callback_3(my_library_delegate_callback_my_callback_contextual callback, uint32_t x);
 
 /// Destroys the given instance.
 ///

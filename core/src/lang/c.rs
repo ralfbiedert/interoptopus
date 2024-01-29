@@ -173,7 +173,7 @@ impl CType {
             CType::Enum(x) => x.rust_name().to_string(),
             CType::Opaque(x) => x.rust_name().to_string(),
             CType::Composite(x) => x.rust_name().to_string(),
-            CType::FnPointer(x) => x.internal_name(),
+            CType::FnPointer(x) => x.rust_name(),
             CType::ReadPointer(x) => format!("*const {}", x.name_within_lib()),
             CType::ReadWritePointer(x) => format!("*mut {}", x.name_within_lib()),
             CType::Pattern(x) => match x {
@@ -603,17 +603,33 @@ impl Parameter {
 /// Represents `extern "C" fn()` types in Rust and `(*f)().` in C.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct FnPointerType {
+    name: Option<String>,
     signature: Box<FunctionSignature>,
 }
 
 impl FnPointerType {
     pub fn new(signature: FunctionSignature) -> Self {
-        Self { signature: Box::new(signature) }
+        Self {
+            signature: Box::new(signature),
+            name: None,
+        }
+    }
+
+    pub fn new_named(signature: FunctionSignature, name: String) -> Self {
+        Self {
+            signature: Box::new(signature),
+            name: Some(name),
+        }
     }
 
     pub fn signature(&self) -> &FunctionSignature {
         &self.signature
     }
+
+    pub fn name(&self) -> Option<&str> {
+        self.name.as_deref()
+    }
+
 
     pub fn internal_name(&self) -> String {
         let signature = self.signature();
@@ -621,6 +637,10 @@ impl FnPointerType {
         let rval = signature.rval.name_within_lib();
 
         format!("fn({}) -> {}", params, rval)
+    }
+
+    pub fn rust_name(&self) -> String {
+        self.name.clone().unwrap_or_else(|| self.internal_name())
     }
 }
 

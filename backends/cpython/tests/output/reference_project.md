@@ -70,6 +70,7 @@ Freestanding callables inside the module.
  - **[pattern_api_guard](#pattern_api_guard)** - 
  - **[pattern_callback_1](#pattern_callback_1)** - 
  - **[pattern_callback_2](#pattern_callback_2)** - 
+ - **[pattern_callback_3](#pattern_callback_3)** - 
 
 ### Classes
 Methods operating on common state.
@@ -108,6 +109,7 @@ Groups of related constants.
 ### Data Structs
 Composite data used by functions and methods.
  - **[Array](#Array)** - 
+ - **[DelegateCallbackMyCallbackContextual](#DelegateCallbackMyCallbackContextual)** - 
  - **[ExtraTypef32](#ExtraTypef32)** - 
  - **[Genericu32](#Genericu32)** - 
  - **[Genericu8](#Genericu8)** - 
@@ -151,6 +153,29 @@ class Array(ctypes.Structure):
     ]
 
     def __init__(self, data = None):
+        ...
+```
+
+---
+
+
+
+ ### <a name="DelegateCallbackMyCallbackContextual">**DelegateCallbackMyCallbackContextual**</a>
+
+
+#### Fields 
+- **callback** -  
+- **context** -  
+#### Definition 
+```python
+class DelegateCallbackMyCallbackContextual(ctypes.Structure):
+
+    _fields_ = [
+        ("callback", callbacks.fn_pconst__u32),
+        ("context", ctypes.c_void_p),
+    ]
+
+    def __init__(self, callback = None, context: ctypes.c_void_p = None):
         ...
 ```
 
@@ -1384,6 +1409,15 @@ def pattern_callback_1(callback, x: int) -> int:
 #### Definition 
 ```python
 def pattern_callback_2(callback):
+    ...
+```
+
+---
+
+## pattern_callback_3 
+#### Definition 
+```python
+def pattern_callback_3(callback: DelegateCallbackMyCallbackContextual, x: int):
     ...
 ```
 

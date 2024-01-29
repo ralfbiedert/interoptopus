@@ -524,6 +524,9 @@ namespace My.Company.Common
     public delegate uint MyCallback(uint value);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void MyCallbackContextual(IntPtr context, uint value);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MyCallbackVoid(IntPtr ptr);
 
 

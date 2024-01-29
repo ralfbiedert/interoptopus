@@ -70,6 +70,7 @@ Freestanding callables inside the module.
  - **[pattern_api_guard](#pattern_api_guard)** - 
  - **[pattern_callback_1](#pattern_callback_1)** - 
  - **[pattern_callback_2](#pattern_callback_2)** - 
+ - **[pattern_callback_3](#pattern_callback_3)** - 
 
 ### Classes
 Methods operating on common state.
@@ -108,6 +109,7 @@ Groups of related constants.
 ### Data Structs
 Composite data used by functions and methods.
  - **[Array](#Array)** - 
+ - **[DelegateCallbackMyCallbackContextual](#DelegateCallbackMyCallbackContextual)** - 
  - **[ExtraTypef32](#ExtraTypef32)** - 
  - **[Genericu32](#Genericu32)** - 
  - **[Genericu8](#Genericu8)** - 
@@ -165,6 +167,25 @@ public partial struct Array
     public byte data13;
     public byte data14;
     public byte data15;
+}
+```
+
+---
+
+
+
+ ### <a name="DelegateCallbackMyCallbackContextual">**DelegateCallbackMyCallbackContextual**</a>
+
+
+#### Fields 
+- **callback** -  
+- **context** -  
+#### Definition 
+```csharp
+public partial struct DelegateCallbackMyCallbackContextual
+{
+    public MyCallbackContextual callback;
+    public IntPtr context;
 }
 ```
 
@@ -1281,6 +1302,14 @@ public static extern uint pattern_callback_1(IntPtr callback, uint x);
 ```csharp
 public static extern MyCallbackVoid pattern_callback_2(MyCallbackVoid callback);
 public static extern MyCallbackVoid pattern_callback_2(IntPtr callback);
+```
+
+---
+
+### <a name="pattern_callback_3">**pattern_callback_3**</a>
+#### Definition 
+```csharp
+public static extern void pattern_callback_3(DelegateCallbackMyCallbackContextual callback, uint x);
 ```
 
 ---

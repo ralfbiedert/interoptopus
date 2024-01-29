@@ -23,9 +23,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 14231809469346134826ul)
+            if (api_version != 5724515026111002872ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (14231809469346134826). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (5724515026111002872). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -474,6 +474,9 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_2")]
         public static extern MyCallbackVoid pattern_callback_2(IntPtr callback);
 
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_3")]
+        public static extern void pattern_callback_3(DelegateCallbackMyCallbackContextual callback, uint x);
 
         /// Destroys the given instance.
         ///
@@ -942,6 +945,17 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
+    public partial struct DelegateCallbackMyCallbackContextual
+    {
+        public MyCallbackContextual callback;
+        #if UNITY_2018_1_OR_NEWER
+        [NativeDisableUnsafePtrRestriction]
+        #endif
+        public IntPtr context;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
     public partial struct ExtraTypef32
     {
         public float x;
@@ -1322,6 +1336,9 @@ namespace My.Company
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate uint MyCallback(uint value);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void MyCallbackContextual(IntPtr context, uint value);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MyCallbackVoid(IntPtr ptr);
