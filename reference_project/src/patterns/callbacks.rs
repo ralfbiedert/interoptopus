@@ -7,7 +7,7 @@ callback!(MyCallbackContextual(context: *const c_void, value: u32));
 
 impl DelegateResult for MyCallbackContextual {
     type Input = u32;
-    fn complete(&self, ctx: *const c_void, value: Self::Input) {
+    fn call_trait(&self, ctx: *const c_void, value: Self::Input) {
         self.call_if_some(ctx, value);
     }
 }
@@ -24,13 +24,13 @@ where
     DeleResult: DelegateResult,
 {
     pub fn call(&self, value: DeleResult::Input) {
-        self.callback.complete(self.context, value)
+        self.callback.call_trait(self.context, value)
     }
 }
 
 pub trait DelegateResult {
     type Input;
-    fn complete(&self, ctx: *const c_void, value: Self::Input);
+    fn call_trait(&self, ctx: *const c_void, value: Self::Input);
 }
 
 #[ffi_function]
