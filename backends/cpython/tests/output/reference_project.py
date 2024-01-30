@@ -33,7 +33,7 @@ def init_lib(path):
     c_lib.tupled.argtypes = [Tupled]
     c_lib.complex_args_1.argtypes = [Vec3f32, ctypes.POINTER(Tupled)]
     c_lib.complex_args_2.argtypes = [SomeForeignType]
-    c_lib.callback.argtypes = [callbacks.fn_u8_rval_u8, ctypes.c_uint8]
+    c_lib.callback.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8), ctypes.c_uint8]
     c_lib.generic_1a.argtypes = [Genericu32, Phantomu8]
     c_lib.generic_1b.argtypes = [Genericu8, Phantomu8]
     c_lib.generic_1c.argtypes = [ctypes.POINTER(Genericu8), ctypes.POINTER(Genericu8)]
@@ -62,12 +62,12 @@ def init_lib(path):
     c_lib.pattern_ffi_slice_1.argtypes = [Sliceu32]
     c_lib.pattern_ffi_slice_1b.argtypes = [SliceMutu32]
     c_lib.pattern_ffi_slice_2.argtypes = [SliceVec3f32, ctypes.c_int32]
-    c_lib.pattern_ffi_slice_3.argtypes = [SliceMutu8, callbacks.fn_SliceMutu8]
+    c_lib.pattern_ffi_slice_3.argtypes = [SliceMutu8, ctypes.CFUNCTYPE(None, SliceMutu8)]
     c_lib.pattern_ffi_slice_4.argtypes = [Sliceu8, SliceMutu8]
     c_lib.pattern_ffi_slice_5.argtypes = [ctypes.POINTER(Sliceu8), ctypes.POINTER(SliceMutu8)]
-    c_lib.pattern_ffi_slice_6.argtypes = [ctypes.POINTER(SliceMutu8), callbacks.fn_u8_rval_u8]
-    c_lib.pattern_ffi_slice_delegate.argtypes = [callbacks.fn_Sliceu8_rval_u8]
-    c_lib.pattern_ffi_slice_delegate_huge.argtypes = [callbacks.fn_SliceVec3f32_rval_Vec3f32]
+    c_lib.pattern_ffi_slice_6.argtypes = [ctypes.POINTER(SliceMutu8), ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8)]
+    c_lib.pattern_ffi_slice_delegate.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint8, Sliceu8)]
+    c_lib.pattern_ffi_slice_delegate_huge.argtypes = [ctypes.CFUNCTYPE(Vec3f32, SliceVec3f32)]
     c_lib.pattern_ffi_option_1.argtypes = [OptionInner]
     c_lib.pattern_ffi_option_2.argtypes = [OptionInner]
     c_lib.pattern_ffi_bool.argtypes = [ctypes.c_uint8]
@@ -75,8 +75,8 @@ def init_lib(path):
     c_lib.pattern_ffi_cchar_const_pointer.argtypes = [ctypes.POINTER(ctypes.c_char)]
     c_lib.pattern_ffi_cchar_mut_pointer.argtypes = [ctypes.POINTER(ctypes.c_char)]
     c_lib.pattern_api_guard.argtypes = []
-    c_lib.pattern_callback_1.argtypes = [callbacks.fn_u32_rval_u32, ctypes.c_uint32]
-    c_lib.pattern_callback_2.argtypes = [callbacks.fn_pconst]
+    c_lib.pattern_callback_1.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32), ctypes.c_uint32]
+    c_lib.pattern_callback_2.argtypes = [ctypes.CFUNCTYPE(None, ctypes.c_void_p)]
     c_lib.pattern_callback_3.argtypes = [DelegateCallbackMyCallbackContextual, ctypes.c_uint32]
     c_lib.simple_service_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.simple_service_new_with.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.c_uint32]
@@ -97,7 +97,7 @@ def init_lib(path):
     c_lib.simple_service_return_slice_mut.argtypes = [ctypes.c_void_p]
     c_lib.simple_service_return_string.argtypes = [ctypes.c_void_p]
     c_lib.simple_service_method_void_ffi_error.argtypes = [ctypes.c_void_p]
-    c_lib.simple_service_method_callback.argtypes = [ctypes.c_void_p, callbacks.fn_u32_rval_u32]
+    c_lib.simple_service_method_callback.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)]
     c_lib.simple_service_lt_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.simple_service_lt_new_with.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.POINTER(ctypes.c_uint32)]
     c_lib.simple_service_lt_method_lt.argtypes = [ctypes.c_void_p, SliceBool]
@@ -163,7 +163,7 @@ def init_lib(path):
     c_lib.pattern_ffi_cchar_mut_pointer.restype = ctypes.POINTER(ctypes.c_char)
     c_lib.pattern_api_guard.restype = ctypes.c_uint64
     c_lib.pattern_callback_1.restype = ctypes.c_uint32
-    c_lib.pattern_callback_2.restype = callbacks.fn_pconst
+    c_lib.pattern_callback_2.restype = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
     c_lib.simple_service_destroy.restype = ctypes.c_int
     c_lib.simple_service_new_with.restype = ctypes.c_int
     c_lib.simple_service_new_without.restype = ctypes.c_int
@@ -1349,7 +1349,7 @@ class DelegateCallbackMyCallbackContextual(ctypes.Structure):
 
     # These fields represent the underlying C data layout
     _fields_ = [
-        ("callback", callbacks.fn_pconst__u32),
+        ("callback", ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_uint32)),
         ("context", ctypes.c_void_p),
     ]
 

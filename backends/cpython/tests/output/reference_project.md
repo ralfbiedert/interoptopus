@@ -171,7 +171,7 @@ class Array(ctypes.Structure):
 class DelegateCallbackMyCallbackContextual(ctypes.Structure):
 
     _fields_ = [
-        ("callback", callbacks.fn_pconst__u32),
+        ("callback", ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_uint32)),
         ("context", ctypes.c_void_p),
     ]
 
