@@ -40,6 +40,7 @@ pub struct Tupled(pub u8);
 
 #[ffi_type]
 #[repr(transparent)]
+#[allow(dead_code)]
 pub struct Transparent(Tupled);
 
 #[ffi_type]

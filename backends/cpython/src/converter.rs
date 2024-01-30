@@ -1,6 +1,5 @@
 use interoptopus::lang::c::{CType, ConstantValue, Documentation, FnPointerType, PrimitiveType, PrimitiveValue};
 use interoptopus::patterns::TypePattern;
-use interoptopus::util::safe_name;
 use std::ops::Deref;
 
 /// Maps CType constructs to Pythonic constructs.
