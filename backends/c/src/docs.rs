@@ -44,6 +44,7 @@ impl<W: CWriter> DocGenerator<W> {
             CType::ReadPointer(_) => return Ok(()),
             CType::ReadWritePointer(_) => return Ok(()),
             CType::Pattern(_) => return Ok(()),
+            CType::Function(f) => f.meta(),
         };
 
         w.newline()?;

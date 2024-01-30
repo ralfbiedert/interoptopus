@@ -11,6 +11,8 @@ def init_lib(path):
     c_lib = ctypes.cdll.LoadLibrary(path)
 
     c_lib.my_function.argtypes = [Vec2]
+    c_lib.my_function2.argtypes = [Vec2]
+    c_lib.my_function3.argtypes = [Vec2, ctypes.POINTER(ctypes.c_int32), ctypes.POINTER(ctypes.c_int32)]
 
     c_lib.my_function.restype = Vec2
 
@@ -19,6 +21,13 @@ def init_lib(path):
 def my_function(input: Vec2) -> Vec2:
     """ Function using the type."""
     return c_lib.my_function(input)
+
+def my_function2(input: Vec2):
+    """ Function using the type."""
+    return c_lib.my_function2(input)
+
+def my_function3(input: Vec2, out_param_0: ctypes.POINTER(ctypes.c_int32), out_param_1: ctypes.POINTER(ctypes.c_int32)):
+    return c_lib.my_function3(input, out_param_0, out_param_1)
 
 
 

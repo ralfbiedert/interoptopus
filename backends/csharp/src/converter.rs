@@ -63,6 +63,7 @@ pub trait CSharpTypeConverter {
     /// Checks if the type is on the C# side blittable, in particular, if it can be accessed via raw pointers and memcopied.
     fn is_blittable(&self, x: &CType) -> bool {
         match x {
+            CType::Function(_) => todo!(),
             CType::Primitive(_) => true,
             CType::Composite(c) => c.fields().iter().all(|x| self.is_blittable(x.the_type())),
             CType::Pattern(x) => match x {
@@ -75,6 +76,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::Bool => true,
                 TypePattern::CChar => true,
                 TypePattern::NamedCallback(_) => false,
+                TypePattern::AugmentedFunction(_) => todo!(),
             },
             CType::Array(_) => false, // TODO: should check inner and maybe return true
             CType::Enum(_) => true,
@@ -98,6 +100,7 @@ pub trait CSharpTypeConverter {
     #[allow(clippy::only_used_in_recursion)]
     fn to_typespecifier_in_field(&self, x: &CType, field: &Field, composite: &CompositeType) -> String {
         match &x {
+            CType::Function(_) => todo!(),
             CType::Primitive(x) => self.primitive_to_typename(x),
             CType::Array(_) => panic!("Needs special handling in the writer."),
             CType::Enum(x) => self.enum_to_typename(x),
@@ -107,6 +110,7 @@ pub trait CSharpTypeConverter {
             CType::ReadWritePointer(_) => "IntPtr".to_string(),
             CType::FnPointer(x) => self.fnpointer_to_typename(x),
             CType::Pattern(x) => match x {
+                TypePattern::AugmentedFunction(_) => todo!(),
                 TypePattern::AsciiPointer => "string".to_string(),
                 TypePattern::FFIErrorEnum(e) => self.enum_to_typename(e.the_enum()),
                 TypePattern::Slice(e) => self.composite_to_typename(e),
@@ -123,6 +127,7 @@ pub trait CSharpTypeConverter {
     /// Converts the `u32` part in a Rust paramter `x: u32` to a C# equivalent. Might convert pointers to `out X` or `ref X`.
     fn to_typespecifier_in_param(&self, x: &CType) -> String {
         match &x {
+            CType::Function(_) => todo!(),
             CType::Primitive(x) => self.primitive_to_typename(x),
             CType::Array(_) => todo!(),
             CType::Enum(x) => self.enum_to_typename(x),
@@ -150,6 +155,7 @@ pub trait CSharpTypeConverter {
             },
             CType::FnPointer(x) => self.fnpointer_to_typename(x),
             CType::Pattern(x) => match x {
+                TypePattern::AugmentedFunction(_) => todo!(),
                 TypePattern::AsciiPointer => "string".to_string(),
                 TypePattern::FFIErrorEnum(e) => self.enum_to_typename(e.the_enum()),
                 TypePattern::Slice(x) => self.composite_to_typename(x),
@@ -165,6 +171,7 @@ pub trait CSharpTypeConverter {
 
     fn to_typespecifier_in_rval(&self, x: &CType) -> String {
         match &x {
+            CType::Function(_) => todo!(),
             CType::Primitive(x) => self.primitive_to_typename(x),
             CType::Array(_) => todo!(),
             CType::Enum(x) => self.enum_to_typename(x),
@@ -174,6 +181,7 @@ pub trait CSharpTypeConverter {
             CType::ReadWritePointer(_) => "IntPtr".to_string(),
             CType::FnPointer(x) => self.fnpointer_to_typename(x),
             CType::Pattern(x) => match x {
+                TypePattern::AugmentedFunction(_) => todo!(),
                 TypePattern::AsciiPointer => "IntPtr".to_string(),
                 TypePattern::FFIErrorEnum(e) => self.enum_to_typename(e.the_enum()),
                 TypePattern::Slice(x) => self.composite_to_typename(x),

@@ -203,6 +203,7 @@ pub trait CSharpWriter {
         }
 
         match the_type {
+            CType::Function(_) => todo!(),
             CType::Primitive(_) => {}
             CType::Array(_) => {}
             CType::Enum(e) => {
@@ -221,6 +222,7 @@ pub trait CSharpWriter {
             CType::ReadPointer(_) => {}
             CType::ReadWritePointer(_) => {}
             CType::Pattern(x) => match x {
+                TypePattern::AugmentedFunction(_) => todo!(),
                 TypePattern::AsciiPointer => {}
                 TypePattern::FFIErrorEnum(e) => {
                     self.write_type_definition_enum(w, e.the_enum(), WriteFor::Code)?;
@@ -498,6 +500,7 @@ pub trait CSharpWriter {
         }
 
         match t {
+            CType::Function(_) => todo!(),
             CType::Primitive(_) => self.config().write_types == WriteTypes::NamespaceAndInteroptopusGlobal,
             CType::Array(_) => false,
             CType::Enum(x) => self.should_emit_by_meta(x.meta()),
@@ -507,6 +510,7 @@ pub trait CSharpWriter {
             CType::ReadPointer(_) => false,
             CType::ReadWritePointer(_) => false,
             CType::Pattern(x) => match x {
+                TypePattern::AugmentedFunction(_) => todo!(),
                 TypePattern::AsciiPointer => true,
                 TypePattern::APIVersion => true,
                 TypePattern::FFIErrorEnum(x) => self.should_emit_by_meta(x.the_enum().meta()),

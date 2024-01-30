@@ -109,6 +109,7 @@ impl CTypeConverter for Converter {
             CType::Pattern(x) => self.to_type_specifier(&x.fallback_type()),
             // TODO: This should be handled in nicer way so that arrays-of-arrays and other thing work properly
             CType::Array(_) => panic!("Arrays need special handling in the writer."),
+            CType::Function(_) => panic!("functions need special handling in the writer"),
         }
     }
 

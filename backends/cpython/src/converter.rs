@@ -70,6 +70,7 @@ impl Converter {
     #[allow(clippy::only_used_in_recursion)]
     pub fn to_ctypes_name(&self, the_type: &CType, with_type_annotations: bool) -> String {
         match the_type {
+            CType::Function(_) => todo!(),
             CType::Primitive(x) => match x {
                 PrimitiveType::Void => "".to_string(),
                 PrimitiveType::Bool => "ctypes.c_bool".to_string(),
@@ -109,6 +110,7 @@ impl Converter {
                 TypePattern::Bool => "ctypes.c_uint8".to_string(),
                 TypePattern::CChar => "ctypes.c_char".to_string(),
                 TypePattern::NamedCallback(x) => format!("callbacks.{}", safe_name(&x.fnpointer().internal_name())),
+                TypePattern::AugmentedFunction(_) => todo!(),
             },
         }
     }
