@@ -16,7 +16,7 @@ def init_lib(path):
     c_lib.example_destroy_context.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.example_print_score.argtypes = [ctypes.c_void_p]
     c_lib.example_return_score.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint32)]
-    c_lib.example_update_score_by_callback.argtypes = [ctypes.c_void_p, callbacks.fn_u32_rval_u32]
+    c_lib.example_update_score_by_callback.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)]
     c_lib.example_write_foreign_type.argtypes = [ctypes.c_void_p, ctypes.POINTER(ThirdPartyVecF32)]
     c_lib.example_double_super_complex_entity.argtypes = [ctypes.c_void_p, ctypes.POINTER(SuperComplexEntity), ctypes.POINTER(SuperComplexEntity)]
 

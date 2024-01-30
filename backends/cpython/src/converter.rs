@@ -88,7 +88,7 @@ impl Converter {
             CType::Composite(x) => x.rust_name().to_string(),
             CType::Array(x) => format!("{} * {}", self.to_ctypes_name(x.array_type(), with_type_annotations), x.len()),
             CType::Opaque(_) => "ERROR".to_string(),
-            CType::FnPointer(x) => format!("callbacks.{}", safe_name(&x.internal_name())), //self.fnpointer_to_typename(x),
+            CType::FnPointer(x) => self.fnpointer_to_typename(x),
             CType::ReadPointer(x) => match x.deref() {
                 CType::Opaque(_) => "ctypes.c_void_p".to_string(),
                 CType::Primitive(PrimitiveType::Void) => "ctypes.c_void_p".to_string(),
@@ -108,7 +108,7 @@ impl Converter {
                 TypePattern::Option(x) => x.rust_name().to_string(),
                 TypePattern::Bool => "ctypes.c_uint8".to_string(),
                 TypePattern::CChar => "ctypes.c_char".to_string(),
-                TypePattern::NamedCallback(x) => format!("callbacks.{}", safe_name(&x.fnpointer().internal_name())),
+                TypePattern::NamedCallback(x) => self.fnpointer_to_typename(x.fnpointer()),
             },
         }
     }
