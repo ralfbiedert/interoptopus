@@ -23,9 +23,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 5724515026111002872ul)
+            if (api_version != 13188284234067191003ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (5724515026111002872). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (13188284234067191003). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -68,6 +68,12 @@ namespace My.Company
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "primitive_i64")]
         public static extern long primitive_i64(long x);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "boolean_alignment")]
+        public static extern BooleanAlignment boolean_alignment(BooleanAlignment x);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "boolean_alignment2")]
+        public static extern BooleanAlignment boolean_alignment2(bool rval);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "many_args_5")]
         public static extern long many_args_5(long x0, long x1, long x2, long x3, long x4);
@@ -941,6 +947,27 @@ namespace My.Company
         public byte data13;
         public byte data14;
         public byte data15;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct BooleanAlignment
+    {
+        public int a;
+        public short b;
+        public short c;
+        public byte d;
+        public byte e;
+        public byte f;
+        public byte g;
+        public byte h;
+        public byte i;
+        public byte j;
+        public byte k;
+        public ulong id;
+        [MarshalAs(UnmanagedType.I1)]
+        public bool is_valid;
+        public ulong datum;
     }
 
     [Serializable]

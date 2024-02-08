@@ -421,6 +421,17 @@ pub trait CSharpWriter {
 
                 Ok(())
             }
+            CType::Primitive(PrimitiveType::Bool) => {
+                let field_name = self.converter().field_name_to_csharp_name(field, self.config().rename_symbols);
+                let type_name = self.converter().to_typespecifier_in_field(field.the_type(), field, the_type);
+                let visibility = match field.visibility() {
+                    Visibility::Public => "public ",
+                    Visibility::Private => "",
+                };
+
+                indented!(w, r#"[MarshalAs(UnmanagedType.I1)]"#)?;
+                indented!(w, r#"{}{} {};"#, visibility, type_name, field_name)
+            }
             _ => {
                 let field_name = self.converter().field_name_to_csharp_name(field, self.config().rename_symbols);
                 let type_name = self.converter().to_typespecifier_in_field(field.the_type(), field, the_type);

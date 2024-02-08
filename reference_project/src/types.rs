@@ -244,6 +244,26 @@ pub struct Align2 {
     pub y: u16,
 }
 
+#[ffi_type]
+#[derive(Debug, Default, Clone, Copy)]
+#[repr(C)]
+pub struct BooleanAlignment {
+    pub a: i32,
+    pub b: i16,
+    pub c: i16,
+    pub d: u8,
+    pub e: u8,
+    pub f: u8,
+    pub g: u8,
+    pub h: u8,
+    pub i: u8,
+    pub j: u8,
+    pub k: u8,
+    pub id: u64,
+    pub is_valid: bool,
+    pub datum: u64,
+}
+
 // Doesn't need annotations.
 pub type Callbacku8u8 = extern "C" fn(u8) -> u8;
 

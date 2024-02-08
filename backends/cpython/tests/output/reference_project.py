@@ -21,6 +21,8 @@ def init_lib(path):
     c_lib.primitive_i16.argtypes = [ctypes.c_int16]
     c_lib.primitive_i32.argtypes = [ctypes.c_int32]
     c_lib.primitive_i64.argtypes = [ctypes.c_int64]
+    c_lib.boolean_alignment.argtypes = [BooleanAlignment]
+    c_lib.boolean_alignment2.argtypes = [ctypes.c_bool]
     c_lib.many_args_5.argtypes = [ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64]
     c_lib.many_args_10.argtypes = [ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64]
     c_lib.ptr.argtypes = [ctypes.POINTER(ctypes.c_int64)]
@@ -114,6 +116,8 @@ def init_lib(path):
     c_lib.primitive_i16.restype = ctypes.c_int16
     c_lib.primitive_i32.restype = ctypes.c_int32
     c_lib.primitive_i64.restype = ctypes.c_int64
+    c_lib.boolean_alignment.restype = BooleanAlignment
+    c_lib.boolean_alignment2.restype = BooleanAlignment
     c_lib.many_args_5.restype = ctypes.c_int64
     c_lib.many_args_10.restype = ctypes.c_int64
     c_lib.ptr.restype = ctypes.POINTER(ctypes.c_int64)
@@ -236,6 +240,12 @@ def primitive_i32(x: int) -> int:
 
 def primitive_i64(x: int) -> int:
     return c_lib.primitive_i64(x)
+
+def boolean_alignment(x: BooleanAlignment) -> BooleanAlignment:
+    return c_lib.boolean_alignment(x)
+
+def boolean_alignment2(rval: bool) -> BooleanAlignment:
+    return c_lib.boolean_alignment2(rval)
 
 def many_args_5(x0: int, x1: int, x2: int, x3: int, x4: int) -> int:
     return c_lib.many_args_5(x0, x1, x2, x3, x4)
@@ -525,6 +535,169 @@ class FFIError:
     Null = 100
     Panic = 200
     Fail = 300
+
+
+class BooleanAlignment(ctypes.Structure):
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("a", ctypes.c_int32),
+        ("b", ctypes.c_int16),
+        ("c", ctypes.c_int16),
+        ("d", ctypes.c_uint8),
+        ("e", ctypes.c_uint8),
+        ("f", ctypes.c_uint8),
+        ("g", ctypes.c_uint8),
+        ("h", ctypes.c_uint8),
+        ("i", ctypes.c_uint8),
+        ("j", ctypes.c_uint8),
+        ("k", ctypes.c_uint8),
+        ("id", ctypes.c_uint64),
+        ("is_valid", ctypes.c_bool),
+        ("datum", ctypes.c_uint64),
+    ]
+
+    def __init__(self, a: int = None, b: int = None, c: int = None, d: int = None, e: int = None, f: int = None, g: int = None, h: int = None, i: int = None, j: int = None, k: int = None, id: int = None, is_valid: bool = None, datum: int = None):
+        if a is not None:
+            self.a = a
+        if b is not None:
+            self.b = b
+        if c is not None:
+            self.c = c
+        if d is not None:
+            self.d = d
+        if e is not None:
+            self.e = e
+        if f is not None:
+            self.f = f
+        if g is not None:
+            self.g = g
+        if h is not None:
+            self.h = h
+        if i is not None:
+            self.i = i
+        if j is not None:
+            self.j = j
+        if k is not None:
+            self.k = k
+        if id is not None:
+            self.id = id
+        if is_valid is not None:
+            self.is_valid = is_valid
+        if datum is not None:
+            self.datum = datum
+
+    @property
+    def a(self) -> int:
+        return ctypes.Structure.__get__(self, "a")
+
+    @a.setter
+    def a(self, value: int):
+        return ctypes.Structure.__set__(self, "a", value)
+
+    @property
+    def b(self) -> int:
+        return ctypes.Structure.__get__(self, "b")
+
+    @b.setter
+    def b(self, value: int):
+        return ctypes.Structure.__set__(self, "b", value)
+
+    @property
+    def c(self) -> int:
+        return ctypes.Structure.__get__(self, "c")
+
+    @c.setter
+    def c(self, value: int):
+        return ctypes.Structure.__set__(self, "c", value)
+
+    @property
+    def d(self) -> int:
+        return ctypes.Structure.__get__(self, "d")
+
+    @d.setter
+    def d(self, value: int):
+        return ctypes.Structure.__set__(self, "d", value)
+
+    @property
+    def e(self) -> int:
+        return ctypes.Structure.__get__(self, "e")
+
+    @e.setter
+    def e(self, value: int):
+        return ctypes.Structure.__set__(self, "e", value)
+
+    @property
+    def f(self) -> int:
+        return ctypes.Structure.__get__(self, "f")
+
+    @f.setter
+    def f(self, value: int):
+        return ctypes.Structure.__set__(self, "f", value)
+
+    @property
+    def g(self) -> int:
+        return ctypes.Structure.__get__(self, "g")
+
+    @g.setter
+    def g(self, value: int):
+        return ctypes.Structure.__set__(self, "g", value)
+
+    @property
+    def h(self) -> int:
+        return ctypes.Structure.__get__(self, "h")
+
+    @h.setter
+    def h(self, value: int):
+        return ctypes.Structure.__set__(self, "h", value)
+
+    @property
+    def i(self) -> int:
+        return ctypes.Structure.__get__(self, "i")
+
+    @i.setter
+    def i(self, value: int):
+        return ctypes.Structure.__set__(self, "i", value)
+
+    @property
+    def j(self) -> int:
+        return ctypes.Structure.__get__(self, "j")
+
+    @j.setter
+    def j(self, value: int):
+        return ctypes.Structure.__set__(self, "j", value)
+
+    @property
+    def k(self) -> int:
+        return ctypes.Structure.__get__(self, "k")
+
+    @k.setter
+    def k(self, value: int):
+        return ctypes.Structure.__set__(self, "k", value)
+
+    @property
+    def id(self) -> int:
+        return ctypes.Structure.__get__(self, "id")
+
+    @id.setter
+    def id(self, value: int):
+        return ctypes.Structure.__set__(self, "id", value)
+
+    @property
+    def is_valid(self) -> bool:
+        return ctypes.Structure.__get__(self, "is_valid")
+
+    @is_valid.setter
+    def is_valid(self, value: bool):
+        return ctypes.Structure.__set__(self, "is_valid", value)
+
+    @property
+    def datum(self) -> int:
+        return ctypes.Structure.__get__(self, "datum")
+
+    @datum.setter
+    def datum(self, value: int):
+        return ctypes.Structure.__set__(self, "datum", value)
 
 
 class ExtraTypef32(ctypes.Structure):

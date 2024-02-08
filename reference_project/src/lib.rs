@@ -40,6 +40,8 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(functions::primitive_i16))
             .register(function!(functions::primitive_i32))
             .register(function!(functions::primitive_i64))
+            .register(function!(functions::boolean_alignment))
+            .register(function!(functions::boolean_alignment2))
             .register(function!(functions::many_args_5))
             .register(function!(functions::many_args_10))
             .register(function!(functions::ptr))

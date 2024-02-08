@@ -14,6 +14,8 @@ Freestanding callables inside the module.
  - **[primitive_i16](#primitive_i16)** - 
  - **[primitive_i32](#primitive_i32)** - 
  - **[primitive_i64](#primitive_i64)** - 
+ - **[boolean_alignment](#boolean_alignment)** - 
+ - **[boolean_alignment2](#boolean_alignment2)** - 
  - **[many_args_5](#many_args_5)** - 
  - **[many_args_10](#many_args_10)** - 
  - **[ptr](#ptr)** - 
@@ -109,6 +111,7 @@ Groups of related constants.
 ### Data Structs
 Composite data used by functions and methods.
  - **[Array](#Array)** - 
+ - **[BooleanAlignment](#BooleanAlignment)** - 
  - **[DelegateCallbackMyCallbackContextual](#DelegateCallbackMyCallbackContextual)** - 
  - **[ExtraTypef32](#ExtraTypef32)** - 
  - **[Genericu32](#Genericu32)** - 
@@ -153,6 +156,53 @@ class Array(ctypes.Structure):
     ]
 
     def __init__(self, data = None):
+        ...
+```
+
+---
+
+
+
+ ### <a name="BooleanAlignment">**BooleanAlignment**</a>
+
+
+#### Fields 
+- **a** -  
+- **b** -  
+- **c** -  
+- **d** -  
+- **e** -  
+- **f** -  
+- **g** -  
+- **h** -  
+- **i** -  
+- **j** -  
+- **k** -  
+- **id** -  
+- **is_valid** -  
+- **datum** -  
+#### Definition 
+```python
+class BooleanAlignment(ctypes.Structure):
+
+    _fields_ = [
+        ("a", ctypes.c_int32),
+        ("b", ctypes.c_int16),
+        ("c", ctypes.c_int16),
+        ("d", ctypes.c_uint8),
+        ("e", ctypes.c_uint8),
+        ("f", ctypes.c_uint8),
+        ("g", ctypes.c_uint8),
+        ("h", ctypes.c_uint8),
+        ("i", ctypes.c_uint8),
+        ("j", ctypes.c_uint8),
+        ("k", ctypes.c_uint8),
+        ("id", ctypes.c_uint64),
+        ("is_valid", ctypes.c_bool),
+        ("datum", ctypes.c_uint64),
+    ]
+
+    def __init__(self, a: int = None, b: int = None, c: int = None, d: int = None, e: int = None, f: int = None, g: int = None, h: int = None, i: int = None, j: int = None, k: int = None, id: int = None, is_valid: bool = None, datum: int = None):
         ...
 ```
 
@@ -901,6 +951,24 @@ def primitive_i32(x: int) -> int:
 #### Definition 
 ```python
 def primitive_i64(x: int) -> int:
+    ...
+```
+
+---
+
+## boolean_alignment 
+#### Definition 
+```python
+def boolean_alignment(x: BooleanAlignment) -> BooleanAlignment:
+    ...
+```
+
+---
+
+## boolean_alignment2 
+#### Definition 
+```python
+def boolean_alignment2(rval: bool) -> BooleanAlignment:
     ...
 ```
 

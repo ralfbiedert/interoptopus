@@ -14,6 +14,8 @@ Freestanding callables inside the module.
  - **[primitive_i16](#primitive_i16)** - 
  - **[primitive_i32](#primitive_i32)** - 
  - **[primitive_i64](#primitive_i64)** - 
+ - **[boolean_alignment](#boolean_alignment)** - 
+ - **[boolean_alignment2](#boolean_alignment2)** - 
  - **[many_args_5](#many_args_5)** - 
  - **[many_args_10](#many_args_10)** - 
  - **[ptr](#ptr)** - 
@@ -109,6 +111,7 @@ Groups of related constants.
 ### Data Structs
 Composite data used by functions and methods.
  - **[Array](#Array)** - 
+ - **[BooleanAlignment](#BooleanAlignment)** - 
  - **[DelegateCallbackMyCallbackContextual](#DelegateCallbackMyCallbackContextual)** - 
  - **[ExtraTypef32](#ExtraTypef32)** - 
  - **[Genericu32](#Genericu32)** - 
@@ -167,6 +170,50 @@ public partial struct Array
     public byte data13;
     public byte data14;
     public byte data15;
+}
+```
+
+---
+
+
+
+ ### <a name="BooleanAlignment">**BooleanAlignment**</a>
+
+
+#### Fields 
+- **a** -  
+- **b** -  
+- **c** -  
+- **d** -  
+- **e** -  
+- **f** -  
+- **g** -  
+- **h** -  
+- **i** -  
+- **j** -  
+- **k** -  
+- **id** -  
+- **is_valid** -  
+- **datum** -  
+#### Definition 
+```csharp
+public partial struct BooleanAlignment
+{
+    public int a;
+    public short b;
+    public short c;
+    public byte d;
+    public byte e;
+    public byte f;
+    public byte g;
+    public byte h;
+    public byte i;
+    public byte j;
+    public byte k;
+    public ulong id;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool is_valid;
+    public ulong datum;
 }
 ```
 
@@ -805,6 +852,22 @@ public static extern int primitive_i32(int x);
 #### Definition 
 ```csharp
 public static extern long primitive_i64(long x);
+```
+
+---
+
+### <a name="boolean_alignment">**boolean_alignment**</a>
+#### Definition 
+```csharp
+public static extern BooleanAlignment boolean_alignment(BooleanAlignment x);
+```
+
+---
+
+### <a name="boolean_alignment2">**boolean_alignment2**</a>
+#### Definition 
+```csharp
+public static extern BooleanAlignment boolean_alignment2(bool rval);
 ```
 
 ---

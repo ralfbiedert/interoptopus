@@ -42,6 +42,24 @@ typedef enum my_library_ffierror
     MY_LIBRARY_FFIERROR_FAIL = 300,
     } my_library_ffierror;
 
+typedef struct my_library_booleanalignment
+    {
+    int32_t a;
+    int16_t b;
+    int16_t c;
+    uint8_t d;
+    uint8_t e;
+    uint8_t f;
+    uint8_t g;
+    uint8_t h;
+    uint8_t i;
+    uint8_t j;
+    uint8_t k;
+    uint64_t id;
+    bool is_valid;
+    uint64_t datum;
+    } my_library_booleanalignment;
+
 typedef struct my_library_extratypef32
     {
     float x;
@@ -246,6 +264,8 @@ int8_t primitive_i8(int8_t x);
 int16_t primitive_i16(int16_t x);
 int32_t primitive_i32(int32_t x);
 int64_t primitive_i64(int64_t x);
+my_library_booleanalignment boolean_alignment(my_library_booleanalignment x);
+my_library_booleanalignment boolean_alignment2(bool rval);
 int64_t many_args_5(int64_t x0, int64_t x1, int64_t x2, int64_t x3, int64_t x4);
 int64_t many_args_10(int64_t x0, int64_t x1, int64_t x2, int64_t x3, int64_t x4, int64_t x5, int64_t x6, int64_t x7, int64_t x8, int64_t x9);
 const int64_t* ptr(const int64_t* x);
