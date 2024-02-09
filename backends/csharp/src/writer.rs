@@ -402,19 +402,19 @@ pub trait CSharpWriter {
     }
 
     fn write_type_definition_composite_body_field(&self, w: &mut IndentWriter, field: &Field, the_type: &CompositeType) -> Result<(), Error> {
+        let field_name = self.converter().field_name_to_csharp_name(field, self.config().rename_symbols);
+        let visibility = match field.visibility() {
+            Visibility::Public => "public ",
+            Visibility::Private => "",
+        };
+
         match field.the_type() {
             CType::Array(a) => {
                 if !self.config().unroll_struct_arrays {
                     panic!("Unable to generate bindings for arrays in fields if `unroll_struct_arrays` is not enabled.");
                 }
 
-                let field_name = self.converter().field_name_to_csharp_name(field, self.config().rename_symbols);
                 let type_name = self.converter().to_typespecifier_in_field(a.array_type(), field, the_type);
-                let visibility = match field.visibility() {
-                    Visibility::Public => "public ",
-                    Visibility::Private => "",
-                };
-
                 for i in 0..a.len() {
                     indented!(w, r#"{}{} {}{};"#, visibility, type_name, field_name, i)?;
                 }
@@ -422,24 +422,12 @@ pub trait CSharpWriter {
                 Ok(())
             }
             CType::Primitive(PrimitiveType::Bool) => {
-                let field_name = self.converter().field_name_to_csharp_name(field, self.config().rename_symbols);
                 let type_name = self.converter().to_typespecifier_in_field(field.the_type(), field, the_type);
-                let visibility = match field.visibility() {
-                    Visibility::Public => "public ",
-                    Visibility::Private => "",
-                };
-
                 indented!(w, r#"[MarshalAs(UnmanagedType.I1)]"#)?;
                 indented!(w, r#"{}{} {};"#, visibility, type_name, field_name)
             }
             _ => {
-                let field_name = self.converter().field_name_to_csharp_name(field, self.config().rename_symbols);
                 let type_name = self.converter().to_typespecifier_in_field(field.the_type(), field, the_type);
-                let visibility = match field.visibility() {
-                    Visibility::Public => "public ",
-                    Visibility::Private => "",
-                };
-
                 indented!(w, r#"{}{} {};"#, visibility, type_name, field_name)
             }
         }
