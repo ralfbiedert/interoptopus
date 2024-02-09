@@ -16,6 +16,8 @@ Freestanding callables inside the module.
  - **[primitive_i64](#primitive_i64)** - 
  - **[boolean_alignment](#boolean_alignment)** - 
  - **[boolean_alignment2](#boolean_alignment2)** - 
+ - **[aligned_to_packed1](#aligned_to_packed1)** - 
+ - **[aligned_to_packed2](#aligned_to_packed2)** - 
  - **[many_args_5](#many_args_5)** - 
  - **[many_args_10](#many_args_10)** - 
  - **[ptr](#ptr)** - 
@@ -110,6 +112,8 @@ Groups of related constants.
 
 ### Data Structs
 Composite data used by functions and methods.
+ - **[Aligned1](#Aligned1)** - 
+ - **[Aligned2](#Aligned2)** - 
  - **[Array](#Array)** - 
  - **[BooleanAlignment](#BooleanAlignment)** - 
  - **[DelegateCallbackMyCallbackContextual](#DelegateCallbackMyCallbackContextual)** - 
@@ -117,6 +121,8 @@ Composite data used by functions and methods.
  - **[Genericu32](#Genericu32)** - 
  - **[Genericu8](#Genericu8)** - 
  - **[Inner](#Inner)** - 
+ - **[Packed1](#Packed1)** - 
+ - **[Packed2](#Packed2)** - 
  - **[Phantomu8](#Phantomu8)** - 
  - **[SomeForeignType](#SomeForeignType)** - 
  - **[StructDocumented](#StructDocumented)** -  Documented struct.
@@ -143,6 +149,44 @@ Composite data used by functions and methods.
 ---
 
 # Types 
+
+
+ ### <a name="Aligned1">**Aligned1**</a>
+
+
+#### Fields 
+- **x** -  
+- **y** -  
+#### Definition 
+```csharp
+public partial struct Aligned1
+{
+    public byte x;
+    public ushort y;
+}
+```
+
+---
+
+
+
+ ### <a name="Aligned2">**Aligned2**</a>
+
+
+#### Fields 
+- **x** -  
+- **y** -  
+#### Definition 
+```csharp
+public partial struct Aligned2
+{
+    public byte x;
+    public ushort y;
+}
+```
+
+---
+
 
 
  ### <a name="Array">**Array**</a>
@@ -301,6 +345,44 @@ public partial struct Genericu8
 public partial struct Inner
 {
     float x;
+}
+```
+
+---
+
+
+
+ ### <a name="Packed1">**Packed1**</a>
+
+
+#### Fields 
+- **x** -  
+- **y** -  
+#### Definition 
+```csharp
+public partial struct Packed1
+{
+    public byte x;
+    public ushort y;
+}
+```
+
+---
+
+
+
+ ### <a name="Packed2">**Packed2**</a>
+
+
+#### Fields 
+- **x** -  
+- **y** -  
+#### Definition 
+```csharp
+public partial struct Packed2
+{
+    public byte x;
+    public ushort y;
 }
 ```
 
@@ -868,6 +950,22 @@ public static extern BooleanAlignment boolean_alignment(BooleanAlignment x);
 #### Definition 
 ```csharp
 public static extern BooleanAlignment boolean_alignment2(bool rval);
+```
+
+---
+
+### <a name="aligned_to_packed1">**aligned_to_packed1**</a>
+#### Definition 
+```csharp
+public static extern Packed1 aligned_to_packed1(Aligned1 a);
+```
+
+---
+
+### <a name="aligned_to_packed2">**aligned_to_packed2**</a>
+#### Definition 
+```csharp
+public static extern Packed2 aligned_to_packed2(Aligned2 a);
 ```
 
 ---

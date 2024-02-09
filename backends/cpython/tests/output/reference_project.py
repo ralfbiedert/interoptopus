@@ -23,6 +23,8 @@ def init_lib(path):
     c_lib.primitive_i64.argtypes = [ctypes.c_int64]
     c_lib.boolean_alignment.argtypes = [BooleanAlignment]
     c_lib.boolean_alignment2.argtypes = [ctypes.c_bool]
+    c_lib.aligned_to_packed1.argtypes = [Aligned1]
+    c_lib.aligned_to_packed2.argtypes = [Aligned2]
     c_lib.many_args_5.argtypes = [ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64]
     c_lib.many_args_10.argtypes = [ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64]
     c_lib.ptr.argtypes = [ctypes.POINTER(ctypes.c_int64)]
@@ -118,6 +120,8 @@ def init_lib(path):
     c_lib.primitive_i64.restype = ctypes.c_int64
     c_lib.boolean_alignment.restype = BooleanAlignment
     c_lib.boolean_alignment2.restype = BooleanAlignment
+    c_lib.aligned_to_packed1.restype = Packed1
+    c_lib.aligned_to_packed2.restype = Packed2
     c_lib.many_args_5.restype = ctypes.c_int64
     c_lib.many_args_10.restype = ctypes.c_int64
     c_lib.ptr.restype = ctypes.POINTER(ctypes.c_int64)
@@ -246,6 +250,12 @@ def boolean_alignment(x: BooleanAlignment) -> BooleanAlignment:
 
 def boolean_alignment2(rval: bool) -> BooleanAlignment:
     return c_lib.boolean_alignment2(rval)
+
+def aligned_to_packed1(a: Aligned1) -> Packed1:
+    return c_lib.aligned_to_packed1(a)
+
+def aligned_to_packed2(a: Aligned2) -> Packed2:
+    return c_lib.aligned_to_packed2(a)
 
 def many_args_5(x0: int, x1: int, x2: int, x3: int, x4: int) -> int:
     return c_lib.many_args_5(x0, x1, x2, x3, x4)
@@ -537,6 +547,70 @@ class FFIError:
     Fail = 300
 
 
+class Aligned1(ctypes.Structure):
+    _pack_ = 2
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("x", ctypes.c_uint8),
+        ("y", ctypes.c_uint16),
+    ]
+
+    def __init__(self, x: int = None, y: int = None):
+        if x is not None:
+            self.x = x
+        if y is not None:
+            self.y = y
+
+    @property
+    def x(self) -> int:
+        return ctypes.Structure.__get__(self, "x")
+
+    @x.setter
+    def x(self, value: int):
+        return ctypes.Structure.__set__(self, "x", value)
+
+    @property
+    def y(self) -> int:
+        return ctypes.Structure.__get__(self, "y")
+
+    @y.setter
+    def y(self, value: int):
+        return ctypes.Structure.__set__(self, "y", value)
+
+
+class Aligned2(ctypes.Structure):
+    _pack_ = 64
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("x", ctypes.c_uint8),
+        ("y", ctypes.c_uint16),
+    ]
+
+    def __init__(self, x: int = None, y: int = None):
+        if x is not None:
+            self.x = x
+        if y is not None:
+            self.y = y
+
+    @property
+    def x(self) -> int:
+        return ctypes.Structure.__get__(self, "x")
+
+    @x.setter
+    def x(self, value: int):
+        return ctypes.Structure.__set__(self, "x", value)
+
+    @property
+    def y(self) -> int:
+        return ctypes.Structure.__get__(self, "y")
+
+    @y.setter
+    def y(self, value: int):
+        return ctypes.Structure.__set__(self, "y", value)
+
+
 class BooleanAlignment(ctypes.Structure):
 
     # These fields represent the underlying C data layout
@@ -738,6 +812,70 @@ class Inner(ctypes.Structure):
     @x.setter
     def x(self, value: float):
         return ctypes.Structure.__set__(self, "x", value)
+
+
+class Packed1(ctypes.Structure):
+    _pack_ = 1
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("x", ctypes.c_uint8),
+        ("y", ctypes.c_uint16),
+    ]
+
+    def __init__(self, x: int = None, y: int = None):
+        if x is not None:
+            self.x = x
+        if y is not None:
+            self.y = y
+
+    @property
+    def x(self) -> int:
+        return ctypes.Structure.__get__(self, "x")
+
+    @x.setter
+    def x(self, value: int):
+        return ctypes.Structure.__set__(self, "x", value)
+
+    @property
+    def y(self) -> int:
+        return ctypes.Structure.__get__(self, "y")
+
+    @y.setter
+    def y(self, value: int):
+        return ctypes.Structure.__set__(self, "y", value)
+
+
+class Packed2(ctypes.Structure):
+    _pack_ = 1
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("x", ctypes.c_uint8),
+        ("y", ctypes.c_uint16),
+    ]
+
+    def __init__(self, x: int = None, y: int = None):
+        if x is not None:
+            self.x = x
+        if y is not None:
+            self.y = y
+
+    @property
+    def x(self) -> int:
+        return ctypes.Structure.__get__(self, "x")
+
+    @x.setter
+    def x(self, value: int):
+        return ctypes.Structure.__set__(self, "x", value)
+
+    @property
+    def y(self) -> int:
+        return ctypes.Structure.__get__(self, "y")
+
+    @y.setter
+    def y(self, value: int):
+        return ctypes.Structure.__set__(self, "y", value)
 
 
 class Phantomu8(ctypes.Structure):

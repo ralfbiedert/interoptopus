@@ -53,6 +53,22 @@ typedef enum my_library_ffi_error
     MY_LIBRARY_FFI_ERROR_FAIL = 300,
 } my_library_ffi_error;
 
+#pragma pack(push, 2)
+typedef struct my_library_aligned1
+{
+    uint8_t x;
+    uint16_t y;
+} my_library_aligned1;
+#pragma pack(pop)
+
+#pragma pack(push, 64)
+typedef struct my_library_aligned2
+{
+    uint8_t x;
+    uint16_t y;
+} my_library_aligned2;
+#pragma pack(pop)
+
 typedef struct my_library_boolean_alignment
 {
     int32_t a;
@@ -80,6 +96,22 @@ typedef struct my_library_inner
 {
     float x;
 } my_library_inner;
+
+#pragma pack(push, 1)
+typedef struct my_library_packed1
+{
+    uint8_t x;
+    uint16_t y;
+} my_library_packed1;
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+typedef struct my_library_packed2
+{
+    uint8_t x;
+    uint16_t y;
+} my_library_packed2;
+#pragma pack(pop)
 
 typedef struct my_library_phantomu8
 {
@@ -324,6 +356,10 @@ int64_t primitive_i64(int64_t x);
 my_library_boolean_alignment boolean_alignment(my_library_boolean_alignment x);
 
 my_library_boolean_alignment boolean_alignment2(bool rval);
+
+my_library_packed1 aligned_to_packed1(my_library_aligned1 a);
+
+my_library_packed2 aligned_to_packed2(my_library_aligned2 a);
 
 int64_t many_args_5(int64_t x0, int64_t x1, int64_t x2, int64_t x3, int64_t x4);
 

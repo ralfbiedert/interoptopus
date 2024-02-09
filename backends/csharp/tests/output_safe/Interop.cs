@@ -18,9 +18,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 13188284234067191003ul)
+            if (api_version != 11436249209948060651ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (13188284234067191003). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (11436249209948060651). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -69,6 +69,12 @@ namespace My.Company
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "boolean_alignment2")]
         public static extern BooleanAlignment boolean_alignment2(bool rval);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "aligned_to_packed1")]
+        public static extern Packed1 aligned_to_packed1(Aligned1 a);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "aligned_to_packed2")]
+        public static extern Packed2 aligned_to_packed2(Aligned2 a);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "many_args_5")]
         public static extern long many_args_5(long x0, long x1, long x2, long x3, long x4);
@@ -769,6 +775,22 @@ namespace My.Company
     }
 
     [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 2)]
+    public partial struct Aligned1
+    {
+        public byte x;
+        public ushort y;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 64)]
+    public partial struct Aligned2
+    {
+        public byte x;
+        public ushort y;
+    }
+
+    [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public partial struct Array
     {
@@ -845,6 +867,22 @@ namespace My.Company
     public partial struct Inner
     {
         float x;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public partial struct Packed1
+    {
+        public byte x;
+        public ushort y;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public partial struct Packed2
+    {
+        public byte x;
+        public ushort y;
     }
 
     [Serializable]

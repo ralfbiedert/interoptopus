@@ -16,6 +16,8 @@ Freestanding callables inside the module.
  - **[primitive_i64](#primitive_i64)** - 
  - **[boolean_alignment](#boolean_alignment)** - 
  - **[boolean_alignment2](#boolean_alignment2)** - 
+ - **[aligned_to_packed1](#aligned_to_packed1)** - 
+ - **[aligned_to_packed2](#aligned_to_packed2)** - 
  - **[many_args_5](#many_args_5)** - 
  - **[many_args_10](#many_args_10)** - 
  - **[ptr](#ptr)** - 
@@ -110,6 +112,8 @@ Groups of related constants.
 
 ### Data Structs
 Composite data used by functions and methods.
+ - **[Aligned1](#Aligned1)** - 
+ - **[Aligned2](#Aligned2)** - 
  - **[Array](#Array)** - 
  - **[BooleanAlignment](#BooleanAlignment)** - 
  - **[DelegateCallbackMyCallbackContextual](#DelegateCallbackMyCallbackContextual)** - 
@@ -117,6 +121,8 @@ Composite data used by functions and methods.
  - **[Genericu32](#Genericu32)** - 
  - **[Genericu8](#Genericu8)** - 
  - **[Inner](#Inner)** - 
+ - **[Packed1](#Packed1)** - 
+ - **[Packed2](#Packed2)** - 
  - **[Phantomu8](#Phantomu8)** - 
  - **[SomeForeignType](#SomeForeignType)** - 
  - **[StructDocumented](#StructDocumented)** -  Documented struct.
@@ -140,6 +146,54 @@ Composite data used by functions and methods.
  - **[OptionInner](#OptionInner)** - A boolean flag and optionally data.
  - **[OptionVec](#OptionVec)** - A boolean flag and optionally data.
 # Types 
+
+
+ ### <a name="Aligned1">**Aligned1**</a>
+
+
+#### Fields 
+- **x** -  
+- **y** -  
+#### Definition 
+```python
+class Aligned1(ctypes.Structure):
+    _pack_ = 2
+
+    _fields_ = [
+        ("x", ctypes.c_uint8),
+        ("y", ctypes.c_uint16),
+    ]
+
+    def __init__(self, x: int = None, y: int = None):
+        ...
+```
+
+---
+
+
+
+ ### <a name="Aligned2">**Aligned2**</a>
+
+
+#### Fields 
+- **x** -  
+- **y** -  
+#### Definition 
+```python
+class Aligned2(ctypes.Structure):
+    _pack_ = 64
+
+    _fields_ = [
+        ("x", ctypes.c_uint8),
+        ("y", ctypes.c_uint16),
+    ]
+
+    def __init__(self, x: int = None, y: int = None):
+        ...
+```
+
+---
+
 
 
  ### <a name="Array">**Array**</a>
@@ -310,6 +364,54 @@ class Inner(ctypes.Structure):
     ]
 
     def __init__(self, x: float = None):
+        ...
+```
+
+---
+
+
+
+ ### <a name="Packed1">**Packed1**</a>
+
+
+#### Fields 
+- **x** -  
+- **y** -  
+#### Definition 
+```python
+class Packed1(ctypes.Structure):
+    _pack_ = 1
+
+    _fields_ = [
+        ("x", ctypes.c_uint8),
+        ("y", ctypes.c_uint16),
+    ]
+
+    def __init__(self, x: int = None, y: int = None):
+        ...
+```
+
+---
+
+
+
+ ### <a name="Packed2">**Packed2**</a>
+
+
+#### Fields 
+- **x** -  
+- **y** -  
+#### Definition 
+```python
+class Packed2(ctypes.Structure):
+    _pack_ = 1
+
+    _fields_ = [
+        ("x", ctypes.c_uint8),
+        ("y", ctypes.c_uint16),
+    ]
+
+    def __init__(self, x: int = None, y: int = None):
         ...
 ```
 
@@ -969,6 +1071,24 @@ def boolean_alignment(x: BooleanAlignment) -> BooleanAlignment:
 #### Definition 
 ```python
 def boolean_alignment2(rval: bool) -> BooleanAlignment:
+    ...
+```
+
+---
+
+## aligned_to_packed1 
+#### Definition 
+```python
+def aligned_to_packed1(a: Aligned1) -> Packed1:
+    ...
+```
+
+---
+
+## aligned_to_packed2 
+#### Definition 
+```python
+def aligned_to_packed2(a: Aligned2) -> Packed2:
     ...
 ```
 

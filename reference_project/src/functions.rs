@@ -2,8 +2,9 @@
 
 use crate::patterns::result::{Error, FFIError};
 use crate::types::{
-    ambiguous1, ambiguous2, common, some_foreign_type, Array, BooleanAlignment, Callbacku8u8, EnumDocumented, EnumRenamedXYZ, Generic, Generic2, Generic3, Generic4,
-    Opaque, Phantom, SomeForeignType, StructDocumented, StructRenamedXYZ, Transparent, Tupled, Vec3f32, Visibility1, Visibility2, Weird1, Weird2,
+    ambiguous1, ambiguous2, common, some_foreign_type, Aligned1, Aligned2, Array, BooleanAlignment, Callbacku8u8, EnumDocumented, EnumRenamedXYZ, Generic, Generic2,
+    Generic3, Generic4, Opaque, Packed1, Packed2, Phantom, SomeForeignType, StructDocumented, StructRenamedXYZ, Transparent, Tupled, Vec3f32, Visibility1, Visibility2,
+    Weird1, Weird2,
 };
 use interoptopus::patterns::option::FFIOption;
 use interoptopus::patterns::result::panics_and_errors_to_ffi_enum;
@@ -90,6 +91,18 @@ pub extern "C" fn boolean_alignment2(rval: bool) -> BooleanAlignment {
         is_valid: rval,
         ..Default::default()
     }
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn aligned_to_packed1(a: Aligned1) -> Packed1 {
+    Packed1 { x: a.x, y: a.y }
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn aligned_to_packed2(a: Aligned2) -> Packed2 {
+    Packed2 { x: a.x, y: a.y }
 }
 
 #[ffi_function]
