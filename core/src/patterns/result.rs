@@ -221,7 +221,7 @@ pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
     match pan.downcast_ref::<&'static str>() {
         Some(s) => *s,
         None => match pan.downcast_ref::<String>() {
-            Some(s) => &s,
+            Some(s) => s,
             None => "Any { .. }",
         },
     }
