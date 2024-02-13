@@ -201,7 +201,7 @@ where
     let result: Result<(), E> = match std::panic::catch_unwind(AssertUnwindSafe(f)) {
         Ok(x) => x,
         Err(e) => {
-            log_error(|| format!("Panic in ({}): {:#?}", error_context, get_panic_message(e.as_ref())));
+            log_error(|| format!("Panic in ({}): {}", error_context, get_panic_message(e.as_ref())));
             return FE::PANIC;
         }
     };
