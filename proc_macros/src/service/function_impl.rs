@@ -164,7 +164,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                         }
 
                         Err(e) => {
-                            ::interoptopus::util::log_error(|| format!("Panic in ({}): {:?}", stringify!(#ffi_fn_ident), e));
+                            ::interoptopus::util::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::patterns::result::get_panic_message(e.as_ref())));
                             <#error_ident as ::interoptopus::patterns::result::FFIError>::PANIC
                         }
                     }
@@ -193,7 +193,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                         match result_result {
                             Ok(x) => x,
                             Err(e) => {
-                                ::interoptopus::util::log_error(|| format!("Panic in ({}): {:?}", stringify!(#ffi_fn_ident), e));
+                                ::interoptopus::util::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::patterns::result::get_panic_message(e.as_ref())));
                                 <#rval>::default()
                             }
                         }
@@ -278,7 +278,7 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
             match result_result {
                 Ok(_) => <#error_ident as ::interoptopus::patterns::result::FFIError>::SUCCESS,
                 Err(e) => {
-                    ::interoptopus::util::log_error(|| format!("Panic in ({}): {:?}", stringify!(#ffi_fn_ident), e));
+                    ::interoptopus::util::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::patterns::result::get_panic_message(e.as_ref())));
                     <#error_ident as ::interoptopus::patterns::result::FFIError>::PANIC
                 }
             }

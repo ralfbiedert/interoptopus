@@ -30,6 +30,7 @@
 
 use crate::lang::c::{EnumType, Variant};
 use crate::util::log_error;
+use std::any::Any;
 use std::fmt::Debug;
 use std::panic::AssertUnwindSafe;
 
@@ -200,7 +201,7 @@ where
     let result: Result<(), E> = match std::panic::catch_unwind(AssertUnwindSafe(f)) {
         Ok(x) => x,
         Err(e) => {
-            log_error(|| format!("Panic in ({}): {:?}", error_context, e));
+            log_error(|| format!("Panic in ({}): {:#?}", error_context, get_panic_message(e.as_ref())));
             return FE::PANIC;
         }
     };
@@ -212,5 +213,16 @@ where
     match result {
         Ok(_) => FE::SUCCESS,
         Err(e) => FE::from(e),
+    }
+}
+
+/// Extracts a string message from a panic unwind.
+pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
+    match pan.downcast_ref::<&'static str>() {
+        Some(s) => *s,
+        None => match pan.downcast_ref::<String>() {
+            Some(s) => &s,
+            None => "Any { .. }",
+        },
     }
 }
