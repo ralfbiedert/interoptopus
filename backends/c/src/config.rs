@@ -2,14 +2,21 @@ use heck::{ToLowerCamelCase, ToShoutySnakeCase, ToSnakeCase, ToUpperCamelCase};
 
 /// Style of indentation used in generated C code
 #[derive(Clone, Debug, PartialEq, Eq)]
+pub enum CFunctionStyle {
+    Typedefs,
+    ForwardDeclarations,
+}
+
+/// Style of indentation used in generated C code
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum CIndentationStyle {
-    // Braces on their own lines, not indented
+    /// Braces on their own lines, not indented
     Allman,
-    // Opening brace on same line as declaration, closing brace on own line, not intended
+    /// Opening brace on same line as declaration, closing brace on own line, not intended
     KAndR,
-    // Braces on their own lines, intended by two spaces
+    /// Braces on their own lines, intended by two spaces
     GNU,
-    // Braces on their own lines, intended level with members
+    /// Braces on their own lines, intended level with members
     Whitesmiths,
 }
 
@@ -79,18 +86,20 @@ pub struct Config {
     pub file_header_comment: String,
     /// How to prefix everything, e.g., `my_company_`, will be capitalized for constants.
     pub prefix: String,
-    // How to indent code
+    /// How to indent code
     pub indentation: CIndentationStyle,
-    // How to add code documentation
+    /// How to add code documentation
     pub documentation: CDocumentationStyle,
-    // How to convert type names
+    /// How to convert type names
     pub type_naming: CNamingStyle,
-    // How to convert enum variant names
+    /// How to convert enum variant names
     pub enum_variant_naming: CNamingStyle,
-    // How to convert const names
+    /// How to convert const names
     pub const_naming: CNamingStyle,
-    // How to convert function parameter names
+    /// How to convert function parameter names
     pub function_parameter_naming: CNamingStyle,
+    /// How to emit functions
+    pub function_style: CFunctionStyle,
 }
 
 impl Default for Config {
@@ -109,6 +118,7 @@ impl Default for Config {
             enum_variant_naming: CNamingStyle::Uppercase,
             const_naming: CNamingStyle::Uppercase,
             function_parameter_naming: CNamingStyle::Lowercase,
+            function_style: CFunctionStyle::ForwardDeclarations,
         }
     }
 }

@@ -120,7 +120,7 @@ mod docs;
 mod testing;
 mod writer;
 
-pub use config::{CDocumentationStyle, CIndentationStyle, CNamingStyle, Config};
+pub use config::{CDocumentationStyle, CFunctionStyle, CIndentationStyle, CNamingStyle, Config};
 pub use converter::{CTypeConverter, Converter};
 pub use docs::DocGenerator;
 pub use testing::compile_c_app_if_installed;

@@ -1,7 +1,7 @@
 use interoptopus::testing::assert_file_matches_generated;
 use interoptopus::Error;
 use interoptopus::Interop;
-use interoptopus_backend_c::{compile_c_app_if_installed, CDocumentationStyle, CIndentationStyle, CNamingStyle, Config, Generator};
+use interoptopus_backend_c::{compile_c_app_if_installed, CDocumentationStyle, CFunctionStyle, CIndentationStyle, CNamingStyle, Config, Generator};
 use std::path::Path;
 
 fn nodocs_config() -> Config {
@@ -12,7 +12,7 @@ fn nodocs_config() -> Config {
     }
 }
 
-fn docs_inline_config() -> Config {
+fn docs_inline_config(style: CFunctionStyle) -> Config {
     Config {
         prefix: "my_library_".to_string(),
         documentation: CDocumentationStyle::Inline,
@@ -21,6 +21,7 @@ fn docs_inline_config() -> Config {
         function_parameter_naming: CNamingStyle::SnakeCase,
         enum_variant_naming: CNamingStyle::ShoutySnakeCase,
         const_naming: CNamingStyle::ShoutySnakeCase,
+        function_style: style,
         ..Config::default()
     }
 }
@@ -52,10 +53,12 @@ fn generate_bindings_multi(folder: impl AsRef<Path>, config: Option<Config>) -> 
 #[cfg_attr(miri, ignore)]
 fn bindings_match_reference() -> Result<(), Error> {
     generate_bindings_multi("tests/output_nodocs/", Some(nodocs_config()))?;
-    generate_bindings_multi("tests/output_docs_inline/", Some(docs_inline_config()))?;
+    generate_bindings_multi("tests/output_docs_inline/", Some(docs_inline_config(CFunctionStyle::ForwardDeclarations)))?;
+    generate_bindings_multi("tests/output_typedefs/", Some(docs_inline_config(CFunctionStyle::Typedefs)))?;
 
     assert_file_matches_generated("tests/output_nodocs/my_header.h");
     assert_file_matches_generated("tests/output_docs_inline/my_header.h");
+    assert_file_matches_generated("tests/output_typedefs/my_header.h");
 
     Ok(())
 }
@@ -64,9 +67,11 @@ fn bindings_match_reference() -> Result<(), Error> {
 #[cfg_attr(miri, ignore)]
 fn bindings_work() -> Result<(), Error> {
     generate_bindings_multi("tests/output_nodocs/", Some(nodocs_config()))?;
-    generate_bindings_multi("tests/output_docs_inline/", Some(docs_inline_config()))?;
+    generate_bindings_multi("tests/output_docs_inline/", Some(docs_inline_config(CFunctionStyle::ForwardDeclarations)))?;
+    generate_bindings_multi("tests/output_typedefs/", Some(docs_inline_config(CFunctionStyle::Typedefs)))?;
 
     compile_c_app_if_installed("tests/output_nodocs/", "tests/output_nodocs/app.c")?;
     compile_c_app_if_installed("tests/output_docs_inline/", "tests/output_docs_inline/app.c")?;
+    compile_c_app_if_installed("tests/output_typedefs/", "tests/output_typedefs/app.c")?;
     Ok(())
 }

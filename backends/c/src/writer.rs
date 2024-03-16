@@ -6,7 +6,7 @@ use interoptopus::util::sort_types_by_dependencies;
 use interoptopus::writer::IndentWriter;
 use interoptopus::{Error, Inventory};
 
-use crate::config::{CDocumentationStyle, CIndentationStyle, ToNamingStyle};
+use crate::config::{CDocumentationStyle, CFunctionStyle, CIndentationStyle, ToNamingStyle};
 use crate::converter::CTypeConverter;
 use crate::converter::Converter;
 use crate::Config;
@@ -74,7 +74,10 @@ pub trait CWriter {
             self.write_documentation(w, function.meta().documentation())?;
         }
 
-        self.write_function_declaration(w, function, 999)?;
+        match self.config().function_style {
+            CFunctionStyle::Typedefs => self.write_function_as_typedef_declaration(w, function)?,
+            CFunctionStyle::ForwardDeclarations => self.write_function_declaration(w, function, 999)?,
+        }
 
         if self.config().documentation == CDocumentationStyle::Inline {
             w.newline()?;
@@ -122,6 +125,29 @@ pub trait CWriter {
             }
             indented!(w, [_], r#");"#)?
         }
+
+        Ok(())
+    }
+
+    fn write_function_as_typedef_declaration(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
+        let _attr = &self.config().function_attribute;
+        let rval = self.converter().to_type_specifier(function.signature().rval());
+        let name = self.converter().function_name_to_c_name(function);
+
+        let mut params = Vec::new();
+
+        for (_, p) in function.signature().params().iter().enumerate() {
+            match p.the_type() {
+                CType::Array(a) => {
+                    params.push(format!("{} [{}]", self.converter().to_type_specifier(a.array_type()), a.len(),));
+                }
+                _ => {
+                    params.push(format!("{}", self.converter().to_type_specifier(p.the_type()),));
+                }
+            }
+        }
+
+        indented!(w, r#"typedef {} (*{})({});"#, rval, name, params.join(", "))?;
 
         Ok(())
     }
