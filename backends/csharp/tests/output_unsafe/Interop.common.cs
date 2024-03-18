@@ -854,6 +854,9 @@ namespace My.Company.Common
     public delegate void MyCallbackContextual(IntPtr context, uint value);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate uint MyCallbackNamespaced(uint value);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MyCallbackVoid(IntPtr ptr);
 
 

@@ -23,9 +23,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 11436249209948060651ul)
+            if (api_version != 16012698009278542425ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (11436249209948060651). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (16012698009278542425). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -489,6 +489,13 @@ namespace My.Company
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_3")]
         public static extern void pattern_callback_3(DelegateCallbackMyCallbackContextual callback, uint x);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_4")]
+        public static extern uint pattern_callback_4(MyCallbackNamespaced callback, uint x);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_4")]
+        public static extern uint pattern_callback_4(IntPtr callback, uint x);
+
 
         /// Destroys the given instance.
         ///
@@ -1404,6 +1411,9 @@ namespace My.Company
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MyCallbackContextual(IntPtr context, uint value);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate uint MyCallbackNamespaced(uint value);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MyCallbackVoid(IntPtr ptr);

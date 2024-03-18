@@ -2,6 +2,7 @@ use interoptopus::{callback, ffi_function, ffi_type};
 use std::ffi::c_void;
 
 callback!(MyCallback(value: u32) -> u32);
+callback!(MyCallbackNamespaced(value: u32) -> u32, namespace = "common");
 callback!(MyCallbackVoid(ptr: *const c_void));
 callback!(MyCallbackContextual(context: *const c_void, value: u32));
 
@@ -49,4 +50,25 @@ pub extern "C" fn pattern_callback_2(callback: MyCallbackVoid) -> MyCallbackVoid
 #[no_mangle]
 pub extern "C" fn pattern_callback_3(callback: DelegateCallback<MyCallbackContextual>, x: u32) {
     callback.call(x)
+}
+
+#[ffi_function]
+#[no_mangle]
+pub extern "C" fn pattern_callback_4(callback: MyCallbackNamespaced, x: u32) -> u32 {
+    callback.call(x)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{MyCallback, MyCallbackNamespaced};
+    use interoptopus::lang::rust::CTypeInfo;
+
+    #[test]
+    fn namespaces_assigned_correctly() {
+        let ti1 = MyCallback::type_info();
+        let ti2 = MyCallbackNamespaced::type_info();
+
+        assert_eq!(ti1.namespace(), Some(""));
+        assert_eq!(ti2.namespace(), Some("common"));
+    }
 }

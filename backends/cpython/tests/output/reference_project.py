@@ -82,6 +82,7 @@ def init_lib(path):
     c_lib.pattern_callback_1.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32), ctypes.c_uint32]
     c_lib.pattern_callback_2.argtypes = [ctypes.CFUNCTYPE(None, ctypes.c_void_p)]
     c_lib.pattern_callback_3.argtypes = [DelegateCallbackMyCallbackContextual, ctypes.c_uint32]
+    c_lib.pattern_callback_4.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32), ctypes.c_uint32]
     c_lib.simple_service_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.simple_service_new_with.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.c_uint32]
     c_lib.simple_service_new_without.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
@@ -172,6 +173,7 @@ def init_lib(path):
     c_lib.pattern_api_guard.restype = ctypes.c_uint64
     c_lib.pattern_callback_1.restype = ctypes.c_uint32
     c_lib.pattern_callback_2.restype = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
+    c_lib.pattern_callback_4.restype = ctypes.c_uint32
     c_lib.simple_service_destroy.restype = ctypes.c_int
     c_lib.simple_service_new_with.restype = ctypes.c_int
     c_lib.simple_service_new_without.restype = ctypes.c_int
@@ -481,6 +483,12 @@ def pattern_callback_2(callback):
 
 def pattern_callback_3(callback: DelegateCallbackMyCallbackContextual, x: int):
     return c_lib.pattern_callback_3(callback, x)
+
+def pattern_callback_4(callback, x: int) -> int:
+    if not hasattr(callback, "__ctypes_from_outparam__"):
+        callback = callbacks.fn_u32_rval_u32(callback)
+
+    return c_lib.pattern_callback_4(callback, x)
 
 
 
@@ -1909,6 +1917,7 @@ class callbacks:
     fn_u8_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8)
     fn_u32_rval_u32 = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)
     fn_pconst__u32 = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_uint32)
+    fn_u32_rval_u32 = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)
     fn_pconst = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
 
 

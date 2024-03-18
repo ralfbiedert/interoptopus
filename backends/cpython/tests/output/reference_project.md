@@ -75,6 +75,7 @@ Freestanding callables inside the module.
  - **[pattern_callback_1](#pattern_callback_1)** - 
  - **[pattern_callback_2](#pattern_callback_2)** - 
  - **[pattern_callback_3](#pattern_callback_3)** - 
+ - **[pattern_callback_4](#pattern_callback_4)** - 
 
 ### Classes
 Methods operating on common state.
@@ -1606,6 +1607,15 @@ def pattern_callback_2(callback):
 #### Definition 
 ```python
 def pattern_callback_3(callback: DelegateCallbackMyCallbackContextual, x: int):
+    ...
+```
+
+---
+
+## pattern_callback_4 
+#### Definition 
+```python
+def pattern_callback_4(callback, x: int) -> int:
     ...
 ```
 

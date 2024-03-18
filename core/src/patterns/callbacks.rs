@@ -80,26 +80,37 @@
 //! which should generate a helper type that works.
 //!
 
-use crate::lang::c::FnPointerType;
+use crate::lang::c::{FnPointerType, Meta};
 
 /// Internal helper naming a generated callback type wrapper.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct NamedCallback {
     fnpointer: FnPointerType,
+    meta: Meta,
 }
 
 impl NamedCallback {
     /// Creates a new named callback.
     pub fn new(callback: FnPointerType) -> Self {
+        Self::with_meta(callback, Meta::new())
+    }
+
+    /// Creates a new named callback with the given meta.
+    pub fn with_meta(callback: FnPointerType, meta: Meta) -> Self {
         if let None = callback.name() {
             panic!("The pointer provided to a named callback must have a name.")
         }
-        Self { fnpointer: callback }
+        Self { fnpointer: callback, meta }
     }
 
     /// Gets the type name of this callback.
     pub fn name(&self) -> &str {
         &self.fnpointer.name().unwrap()
+    }
+
+    /// Gets the type's meta.
+    pub fn meta(&self) -> &Meta {
+        &self.meta
     }
 
     /// Returns the function pointer type.
@@ -136,7 +147,7 @@ macro_rules! callback {
     ($name:ident($($param:ident: $ty:ty),*)) => {
         callback!($name($($param: $ty),*) -> ());
     };
-    ($name:ident($($param:ident: $ty:ty),*) -> $rval:ty) => {
+    ($name:ident($($param:ident: $ty:ty),*) -> $rval:ty $(, namespace = $ns:expr)?) => {
         #[derive(Default, Clone)]
         #[repr(transparent)]
         pub struct $name(Option<extern "C" fn($($ty),*) -> $rval>);
@@ -171,6 +182,7 @@ macro_rules! callback {
         unsafe impl interoptopus::lang::rust::CTypeInfo for $name {
             fn type_info() -> interoptopus::lang::c::CType {
                 use interoptopus::lang::rust::CTypeInfo;
+                use interoptopus::lang::c::{Meta, Documentation};
 
                 let rval = < $rval as CTypeInfo >::type_info();
 
@@ -180,9 +192,16 @@ macro_rules! callback {
                 )*
                 ];
 
+                let mut namespace = String::new();
+                $(
+                    namespace = String::from($ns);
+                )*
+
+                let meta = Meta::with_namespace_documentation(namespace, Documentation::new(), None);
+
                 let sig = interoptopus::lang::c::FunctionSignature::new(params, rval);
                 let fn_pointer = interoptopus::lang::c::FnPointerType::new_named(sig, stringify!($name).to_string());
-                let named_callback = interoptopus::patterns::callbacks::NamedCallback::new(fn_pointer);
+                let named_callback = interoptopus::patterns::callbacks::NamedCallback::with_meta(fn_pointer, meta);
 
                 interoptopus::lang::c::CType::Pattern(interoptopus::patterns::TypePattern::NamedCallback(named_callback))
             }

@@ -180,6 +180,8 @@ typedef uint8_t (*my_library_callbacku8)(uint8_t value);
 
 typedef uint32_t (*my_library_mycallback)(uint32_t value);
 
+typedef uint32_t (*my_library_mycallbacknamespaced)(uint32_t value);
+
 typedef struct my_library_array
     {
     uint8_t data[16];
@@ -357,6 +359,7 @@ uint64_t pattern_api_guard();
 uint32_t pattern_callback_1(my_library_mycallback callback, uint32_t x);
 my_library_mycallbackvoid pattern_callback_2(my_library_mycallbackvoid callback);
 void pattern_callback_3(my_library_delegatecallbackmycallbackcontextual callback, uint32_t x);
+uint32_t pattern_callback_4(my_library_mycallbacknamespaced callback, uint32_t x);
 my_library_ffierror simple_service_destroy(my_library_simpleservice** context);
 my_library_ffierror simple_service_new_with(my_library_simpleservice** context, uint32_t some_value);
 my_library_ffierror simple_service_new_without(my_library_simpleservice** context);

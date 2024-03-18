@@ -193,6 +193,8 @@ typedef uint8_t (*my_library_callback_u8)(uint8_t value);
 
 typedef uint32_t (*my_library_my_callback)(uint32_t value);
 
+typedef uint32_t (*my_library_my_callback_namespaced)(uint32_t value);
+
 typedef struct my_library_array
 {
     uint8_t data[16];
@@ -478,6 +480,8 @@ typedef uint32_t (*pattern_callback_1)(my_library_my_callback, uint32_t);
 typedef my_library_my_callback_void (*pattern_callback_2)(my_library_my_callback_void);
 
 typedef void (*pattern_callback_3)(my_library_delegate_callback_my_callback_contextual, uint32_t);
+
+typedef uint32_t (*pattern_callback_4)(my_library_my_callback_namespaced, uint32_t);
 
 /// Destroys the given instance.
 ///

@@ -237,6 +237,7 @@ impl CType {
             CType::Enum(t) => Some(t.meta.namespace()),
             CType::Opaque(t) => Some(t.meta.namespace()),
             CType::Composite(t) => Some(t.meta.namespace()),
+            CType::Pattern(TypePattern::NamedCallback(t)) => Some(t.meta().namespace()),
             _ => None,
         }
     }
@@ -629,7 +630,6 @@ impl FnPointerType {
     pub fn name(&self) -> Option<&str> {
         self.name.as_deref()
     }
-
 
     pub fn internal_name(&self) -> String {
         let signature = self.signature();
