@@ -34,6 +34,11 @@ pub trait CWriter {
         indented!(w, r#"#include <stdint.h>"#)?;
         indented!(w, r#"#include <stdbool.h>"#)?;
 
+        // Write any user supplied includes into the file.
+        for include in &self.config().additional_includes {
+            indented!(w, "#include {}", include)?;
+        }
+
         Ok(())
     }
 
