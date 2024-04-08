@@ -39,6 +39,8 @@ fn bindings_c() -> Result<(), Error> {
     Generator::new(
         Config {
             ifndef: "example_complex".to_string(),
+            // Add an unneeded include for testing purposes.
+            additional_includes: vec!["<stdio.h>".into()],
             function_attribute: "__FUNCTION_ATTR ".to_string(),
             custom_defines,
             documentation: CDocumentationStyle::Inline,
