@@ -1,6 +1,8 @@
+use crate::config::ParamSliceType;
 use crate::converter::FunctionNameFlavor;
 use crate::overloads::{write_common_service_method_overload, write_function_overloaded_invoke_with_error_handling, Helper};
 use crate::{OverloadWriter, Unsafe};
+use core::panic;
 use interoptopus::lang::c::{CType, CompositeType, Field, Function, FunctionSignature, Parameter};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::TypePattern;
@@ -12,7 +14,7 @@ use std::ops::Deref;
 ///
 /// In most cases adding this overload provider is the right thing to do, as it generates
 ///
-/// - `my_array[]` support for slices,
+/// - `my_array[]` or `Span<my_array>`/`ReadOnlySpan<my_array>` support for slices,
 /// - much faster (up to 150x) .NET Core slice copies (with [`Unsafe::UnsafePlatformMemCpy`](crate::Unsafe::UnsafePlatformMemCpy)),
 /// - service overloads.
 pub struct DotNet {}
@@ -35,6 +37,17 @@ impl DotNet {
     }
 
     fn pattern_to_native_in_signature(&self, h: &Helper, param: &Parameter, _signature: &FunctionSignature) -> String {
+        if h.config.use_unsafe == Unsafe::None && h.config.param_slice_type == ParamSliceType::Span {
+            panic!("param_slice_type: Span requires unsafe support (use_unsafe must be anything other than None)");
+        }
+
+        let slice_type_name = |mutable: bool, element_type: &CType| -> String {
+            match (h.config.param_slice_type, mutable) {
+                (ParamSliceType::Array, _) => format!("{}[]", h.converter.to_typespecifier_in_param(element_type)),
+                (ParamSliceType::Span, true) => format!("System.Span<{}>", h.converter.to_typespecifier_in_param(element_type)),
+                (ParamSliceType::Span, false) => format!("System.ReadOnlySpan<{}>", h.converter.to_typespecifier_in_param(element_type)),
+            }
+        };
         match param.the_type() {
             CType::Pattern(p) => match p {
                 TypePattern::Slice(p) => {
@@ -46,7 +59,7 @@ impl DotNet {
                         .deref_pointer()
                         .expect("Must be pointer");
 
-                    format!("{}[]", h.converter.to_typespecifier_in_param(element_type))
+                    slice_type_name(false, element_type)
                 }
                 TypePattern::SliceMut(p) => {
                     let element_type = p
@@ -56,7 +69,7 @@ impl DotNet {
                         .the_type()
                         .deref_pointer()
                         .expect("Must be pointer");
-                    format!("{}[]", h.converter.to_typespecifier_in_param(element_type))
+                    slice_type_name(true, element_type)
                 }
                 _ => h.converter.to_typespecifier_in_param(param.the_type()),
             },
@@ -71,7 +84,7 @@ impl DotNet {
                             .deref_pointer()
                             .expect("Must be pointer");
 
-                        format!("{}[]", h.converter.to_typespecifier_in_param(element_type))
+                        slice_type_name(false, element_type)
                     }
                     TypePattern::SliceMut(p) => {
                         let element_type = p
@@ -82,7 +95,7 @@ impl DotNet {
                             .deref_pointer()
                             .expect("Must be pointer");
 
-                        format!("{}[]", h.converter.to_typespecifier_in_param(element_type))
+                        slice_type_name(true, element_type)
                     }
                     _ => h.converter.to_typespecifier_in_param(param.the_type()),
                 },

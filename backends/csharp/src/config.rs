@@ -65,6 +65,15 @@ impl Unsafe {
     }
 }
 
+/// The kind of types to use when generating FFI method overloads.
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum ParamSliceType {
+    /// Slices should be passed in as C# arrays.
+    Array,
+    /// Slices should be passed in as Span and ReadOnlySpan.
+    Span,
+}
+
 /// Configures C# code generation.
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -95,6 +104,9 @@ pub struct Config {
     pub rename_symbols: bool,
     /// Also generate markers for easier debugging
     pub debug: bool,
+    /// If signatures that normally use arrays should instead use span and readonly span.
+    /// Requires use_unsafe, as pinning spans requires the fixed keyword.
+    pub param_slice_type: ParamSliceType,
 }
 
 impl Config {}
@@ -114,6 +126,7 @@ impl Default for Config {
             use_unsafe: Unsafe::None,
             rename_symbols: false,
             debug: false,
+            param_slice_type: ParamSliceType::Array,
         }
     }
 }

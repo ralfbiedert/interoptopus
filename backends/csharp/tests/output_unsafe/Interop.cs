@@ -179,7 +179,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "namespaced_inner_slice")]
         public static extern SliceVec namespaced_inner_slice(SliceVec x);
 
-        public static SliceVec namespaced_inner_slice(Vec[] x)
+        public static SliceVec namespaced_inner_slice(System.ReadOnlySpan<Vec> x)
         {
             unsafe
             {
@@ -202,7 +202,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "namespaced_inner_slice_mut")]
         public static extern SliceMutVec namespaced_inner_slice_mut(SliceMutVec x);
 
-        public static SliceMutVec namespaced_inner_slice_mut(Vec[] x)
+        public static SliceMutVec namespaced_inner_slice_mut(System.Span<Vec> x)
         {
             unsafe
             {
@@ -264,7 +264,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_1")]
         public static extern uint pattern_ffi_slice_1(Sliceu32 ffi_slice);
 
-        public static uint pattern_ffi_slice_1(uint[] ffi_slice)
+        public static uint pattern_ffi_slice_1(System.ReadOnlySpan<uint> ffi_slice)
         {
             unsafe
             {
@@ -287,7 +287,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_1b")]
         public static extern uint pattern_ffi_slice_1b(SliceMutu32 ffi_slice);
 
-        public static uint pattern_ffi_slice_1b(uint[] ffi_slice)
+        public static uint pattern_ffi_slice_1b(System.Span<uint> ffi_slice)
         {
             unsafe
             {
@@ -310,7 +310,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_2")]
         public static extern Vec3f32 pattern_ffi_slice_2(SliceVec3f32 ffi_slice, int i);
 
-        public static Vec3f32 pattern_ffi_slice_2(Vec3f32[] ffi_slice, int i)
+        public static Vec3f32 pattern_ffi_slice_2(System.ReadOnlySpan<Vec3f32> ffi_slice, int i)
         {
             unsafe
             {
@@ -333,7 +333,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_3")]
         public static extern void pattern_ffi_slice_3(SliceMutu8 slice, CallbackSliceMut callback);
 
-        public static void pattern_ffi_slice_3(byte[] slice, CallbackSliceMut callback)
+        public static void pattern_ffi_slice_3(System.Span<byte> slice, CallbackSliceMut callback)
         {
             unsafe
             {
@@ -359,7 +359,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_4")]
         public static extern void pattern_ffi_slice_4(Sliceu8 slice, SliceMutu8 slice2);
 
-        public static void pattern_ffi_slice_4(byte[] slice, byte[] slice2)
+        public static void pattern_ffi_slice_4(System.ReadOnlySpan<byte> slice, System.Span<byte> slice2)
         {
             unsafe
             {
@@ -387,7 +387,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_5")]
         public static extern void pattern_ffi_slice_5(ref Sliceu8 slice, ref SliceMutu8 slice2);
 
-        public static void pattern_ffi_slice_5(byte[] slice, byte[] slice2)
+        public static void pattern_ffi_slice_5(System.ReadOnlySpan<byte> slice, System.Span<byte> slice2)
         {
             unsafe
             {
@@ -415,7 +415,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_6")]
         public static extern void pattern_ffi_slice_6(ref SliceMutu8 slice, CallbackU8 callback);
 
-        public static void pattern_ffi_slice_6(byte[] slice, CallbackU8 callback)
+        public static void pattern_ffi_slice_6(System.Span<byte> slice, CallbackU8 callback)
         {
             unsafe
             {
@@ -592,7 +592,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self")]
         public static extern byte simple_service_method_mut_self(IntPtr context, Sliceu8 slice);
 
-        public static byte simple_service_method_mut_self(IntPtr context, byte[] slice)
+        public static byte simple_service_method_mut_self(IntPtr context, System.ReadOnlySpan<byte> slice)
         {
             unsafe
             {
@@ -617,7 +617,7 @@ namespace My.Company
         public static extern void simple_service_method_mut_self_void(IntPtr context, SliceBool slice);
 
         /// Single line.
-        public static void simple_service_method_mut_self_void(IntPtr context, Bool[] slice)
+        public static void simple_service_method_mut_self_void(IntPtr context, System.ReadOnlySpan<Bool> slice)
         {
             unsafe
             {
@@ -644,7 +644,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref_slice")]
         public static extern byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, Sliceu8 slice);
 
-        public static byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, byte[] slice)
+        public static byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, System.ReadOnlySpan<byte> slice)
         {
             unsafe
             {
@@ -667,7 +667,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref_slice_limited")]
         public static extern byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, Sliceu8 slice, Sliceu8 slice2);
 
-        public static byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, byte[] slice, byte[] slice2)
+        public static byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, System.ReadOnlySpan<byte> slice, System.ReadOnlySpan<byte> slice2)
         {
             unsafe
             {
@@ -695,7 +695,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ffi_error")]
         public static extern FFIError simple_service_method_mut_self_ffi_error(IntPtr context, SliceMutu8 slice);
 
-        public static void simple_service_method_mut_self_ffi_error(IntPtr context, byte[] slice)
+        public static void simple_service_method_mut_self_ffi_error(IntPtr context, System.Span<byte> slice)
         {
             unsafe
             {
@@ -726,7 +726,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_no_error")]
         public static extern FFIError simple_service_method_mut_self_no_error(IntPtr context, SliceMutu8 slice);
 
-        public static void simple_service_method_mut_self_no_error(IntPtr context, byte[] slice)
+        public static void simple_service_method_mut_self_no_error(IntPtr context, System.Span<byte> slice)
         {
             unsafe
             {
@@ -835,7 +835,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lt_method_lt")]
         public static extern void simple_service_lt_method_lt(IntPtr context, SliceBool slice);
 
-        public static void simple_service_lt_method_lt(IntPtr context, Bool[] slice)
+        public static void simple_service_lt_method_lt(IntPtr context, System.ReadOnlySpan<Bool> slice)
         {
             unsafe
             {
@@ -858,7 +858,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lt_method_lt2")]
         public static extern void simple_service_lt_method_lt2(IntPtr context, SliceBool slice);
 
-        public static void simple_service_lt_method_lt2(IntPtr context, Bool[] slice)
+        public static void simple_service_lt_method_lt2(IntPtr context, System.ReadOnlySpan<Bool> slice)
         {
             unsafe
             {
@@ -881,7 +881,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lt_return_string_accept_slice")]
         public static extern IntPtr simple_service_lt_return_string_accept_slice(IntPtr anon0, Sliceu8 anon1);
 
-        public static string simple_service_lt_return_string_accept_slice(IntPtr anon0, byte[] anon1)
+        public static string simple_service_lt_return_string_accept_slice(IntPtr anon0, System.ReadOnlySpan<byte> anon1)
         {
             unsafe
             {
@@ -1499,7 +1499,7 @@ namespace My.Company
             return Interop.simple_service_method_mut_self(_context, slice);
         }
 
-        public byte MethodMutSelf(byte[] slice)
+        public byte MethodMutSelf(System.ReadOnlySpan<byte> slice)
         {
             return Interop.simple_service_method_mut_self(_context, slice);
         }
@@ -1518,7 +1518,7 @@ namespace My.Company
         }
 
         /// Single line.
-        public void MethodMutSelfVoid(Bool[] slice)
+        public void MethodMutSelfVoid(System.ReadOnlySpan<Bool> slice)
         {
             Interop.simple_service_method_mut_self_void(_context, slice);
         }
@@ -1541,7 +1541,7 @@ namespace My.Company
             return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out y, slice);
         }
 
-        public byte MethodMutSelfRefSlice(ref byte x, out byte y, byte[] slice)
+        public byte MethodMutSelfRefSlice(ref byte x, out byte y, System.ReadOnlySpan<byte> slice)
         {
             return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out y, slice);
         }
@@ -1558,7 +1558,7 @@ namespace My.Company
             return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
         }
 
-        public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, byte[] slice, byte[] slice2)
+        public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, System.ReadOnlySpan<byte> slice, System.ReadOnlySpan<byte> slice2)
         {
             return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
         }
@@ -1579,7 +1579,7 @@ namespace My.Company
             }
         }
 
-        public void MethodMutSelfFfiError(byte[] slice)
+        public void MethodMutSelfFfiError(System.Span<byte> slice)
         {
             Interop.simple_service_method_mut_self_ffi_error(_context, slice);
         }
@@ -1600,7 +1600,7 @@ namespace My.Company
             }
         }
 
-        public void MethodMutSelfNoError(byte[] slice)
+        public void MethodMutSelfNoError(System.Span<byte> slice)
         {
             Interop.simple_service_method_mut_self_no_error(_context, slice);
         }
@@ -1693,7 +1693,7 @@ namespace My.Company
             Interop.simple_service_lt_method_lt(_context, slice);
         }
 
-        public void MethodLt(Bool[] slice)
+        public void MethodLt(System.ReadOnlySpan<Bool> slice)
         {
             Interop.simple_service_lt_method_lt(_context, slice);
         }
@@ -1710,7 +1710,7 @@ namespace My.Company
             Interop.simple_service_lt_method_lt2(_context, slice);
         }
 
-        public void MethodLt2(Bool[] slice)
+        public void MethodLt2(System.ReadOnlySpan<Bool> slice)
         {
             Interop.simple_service_lt_method_lt2(_context, slice);
         }
@@ -1728,7 +1728,7 @@ namespace My.Company
             return Marshal.PtrToStringAnsi(s);
         }
 
-        public string ReturnStringAcceptSlice(byte[] anon1)
+        public string ReturnStringAcceptSlice(System.ReadOnlySpan<byte> anon1)
         {
             return Interop.simple_service_lt_return_string_accept_slice(_context, anon1);
         }
