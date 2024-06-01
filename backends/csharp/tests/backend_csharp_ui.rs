@@ -160,7 +160,7 @@ fn config_no_unsafe() -> Result<(), Error> {
         ..Config::default()
     };
 
-    generate_bindings_multi(temp.path(), Unsafe::None, ParamSliceType::Span, Some(config))?;
+    generate_bindings_multi(temp.path(), Unsafe::None, ParamSliceType::Array, Some(config))?;
     write_simple_project_file(temp.path())?;
     run_dotnet_command_if_installed(temp.path(), "build")?;
 
@@ -178,7 +178,7 @@ fn config_unsafe_memcpy() -> Result<(), Error> {
         ..Config::default()
     };
 
-    generate_bindings_multi(temp.path(), Unsafe::None, ParamSliceType::Span, Some(config))?;
+    generate_bindings_multi(temp.path(), Unsafe::None, ParamSliceType::Array, Some(config))?;
     write_simple_project_file(temp.path())?;
     run_dotnet_command_if_installed(temp.path(), "build")?;
 
@@ -198,7 +198,7 @@ fn config_visibility_force_visibility_internal() -> Result<(), Error> {
         ..Config::default()
     };
 
-    generate_bindings_multi(temp.path(), Unsafe::None, ParamSliceType::Span, Some(config))?;
+    generate_bindings_multi(temp.path(), Unsafe::None, ParamSliceType::Array, Some(config))?;
     write_simple_project_file(temp.path())?;
     run_dotnet_command_if_installed(temp.path(), "build")?;
 
@@ -217,7 +217,7 @@ fn config_visibility_force_visibility_public() -> Result<(), Error> {
         ..Config::default()
     };
 
-    generate_bindings_multi(temp.path(), Unsafe::None, ParamSliceType::Span, Some(config))?;
+    generate_bindings_multi(temp.path(), Unsafe::None, ParamSliceType::Array, Some(config))?;
     write_simple_project_file(temp.path())?;
     run_dotnet_command_if_installed(temp.path(), "build")?;
 
