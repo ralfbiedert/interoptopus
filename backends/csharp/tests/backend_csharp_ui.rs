@@ -2,7 +2,7 @@ use interoptopus::testing::assert_file_matches_generated;
 use interoptopus::util::NamespaceMappings;
 use interoptopus::{Error, Interop};
 use interoptopus_backend_csharp::overloads::{DotNet, Unity};
-use interoptopus_backend_csharp::{run_dotnet_command_if_installed, CSharpVisibility, Config, DocConfig, DocGenerator, Generator, Unsafe, WriteTypes};
+use interoptopus_backend_csharp::{run_dotnet_command_if_installed, CSharpVisibility, Config, DocConfig, DocGenerator, Generator, ParamSliceType, Unsafe, WriteTypes};
 use std::path::{Path, PathBuf};
 use tempdir::TempDir;
 
@@ -27,13 +27,14 @@ pub fn write_simple_project_file(path: impl AsRef<Path>) -> Result<(), Error> {
 }
 
 /// Generates runnable bindings for the reference project.
-fn generate_bindings_multi(folder: impl AsRef<Path>, use_unsafe: Unsafe, config: Option<Config>) -> Result<(), Error> {
+fn generate_bindings_multi(folder: impl AsRef<Path>, use_unsafe: Unsafe, param_slice_type: ParamSliceType, config: Option<Config>) -> Result<(), Error> {
     let library = interoptopus_reference_project::ffi_inventory();
 
     let config = config.unwrap_or(Config {
         dll_name: "interoptopus_reference_project".to_string(),
         namespace_mappings: NamespaceMappings::new("My.Company").add("common", "My.Company.Common"),
         visibility_types: CSharpVisibility::AsDeclared,
+        param_slice_type,
         use_unsafe,
         ..Config::default()
     });
@@ -82,12 +83,20 @@ fn generate_documentation(output: &str) -> Result<(), Error> {
     DocGenerator::new(&inventory, &generator, DocConfig::default()).write_file(output)
 }
 
+fn generate_safe() -> Result<(), Error> {
+    generate_bindings_multi("tests/output_safe", Unsafe::None, ParamSliceType::Array, None)
+}
+
+fn generate_unsafe() -> Result<(), Error> {
+    generate_bindings_multi("tests/output_unsafe", Unsafe::UnsafePlatformMemCpy, ParamSliceType::Span, None)
+}
+
 #[test]
 #[cfg_attr(miri, ignore)]
 fn bindings_match_reference() -> Result<(), Error> {
-    generate_bindings_multi("tests/output_safe", Unsafe::None, None)?;
-    generate_bindings_multi("tests/output_unsafe", Unsafe::UnsafePlatformMemCpy, None)?;
-    generate_bindings_multi("tests/output_unity/Assets", Unsafe::UnsafePlatformMemCpy, None)?;
+    generate_safe()?;
+    generate_unsafe()?;
+    generate_bindings_multi("tests/output_unity/Assets", Unsafe::UnsafePlatformMemCpy, ParamSliceType::Array, None)?;
 
     assert_file_matches_generated("tests/output_safe/Interop.cs");
     assert_file_matches_generated("tests/output_safe/Interop.common.cs");
@@ -106,8 +115,8 @@ fn bindings_match_reference() -> Result<(), Error> {
 #[test]
 #[cfg_attr(miri, ignore)]
 fn bindings_work() -> Result<(), Error> {
-    generate_bindings_multi("tests/output_safe", Unsafe::None, None)?;
-    generate_bindings_multi("tests/output_unsafe", Unsafe::UnsafePlatformMemCpy, None)?;
+    generate_safe()?;
+    generate_unsafe()?;
 
     run_dotnet_command_if_installed("tests/output_safe/", "test")?;
     run_dotnet_command_if_installed("tests/output_unsafe/", "test")?;
@@ -117,7 +126,7 @@ fn bindings_work() -> Result<(), Error> {
 #[test]
 #[cfg_attr(miri, ignore)]
 fn prepare_benchmarks() -> Result<(), Error> {
-    generate_bindings_multi("benches", Unsafe::UnsafePlatformMemCpy, None)?;
+    generate_bindings_multi("benches", Unsafe::UnsafePlatformMemCpy, ParamSliceType::Array, None)?;
     Ok(())
 }
 
@@ -133,7 +142,7 @@ fn config_rename_symbols() -> Result<(), Error> {
         ..Config::default()
     };
 
-    generate_bindings_multi(temp.path(), Unsafe::None, Some(config))?;
+    generate_bindings_multi(temp.path(), Unsafe::None, ParamSliceType::Array, Some(config))?;
     write_simple_project_file(temp.path())?;
     run_dotnet_command_if_installed(temp.path(), "build")?;
 
@@ -151,7 +160,7 @@ fn config_no_unsafe() -> Result<(), Error> {
         ..Config::default()
     };
 
-    generate_bindings_multi(temp.path(), Unsafe::None, Some(config))?;
+    generate_bindings_multi(temp.path(), Unsafe::None, ParamSliceType::Span, Some(config))?;
     write_simple_project_file(temp.path())?;
     run_dotnet_command_if_installed(temp.path(), "build")?;
 
@@ -169,7 +178,7 @@ fn config_unsafe_memcpy() -> Result<(), Error> {
         ..Config::default()
     };
 
-    generate_bindings_multi(temp.path(), Unsafe::None, Some(config))?;
+    generate_bindings_multi(temp.path(), Unsafe::None, ParamSliceType::Span, Some(config))?;
     write_simple_project_file(temp.path())?;
     run_dotnet_command_if_installed(temp.path(), "build")?;
 
@@ -189,7 +198,7 @@ fn config_visibility_force_visibility_internal() -> Result<(), Error> {
         ..Config::default()
     };
 
-    generate_bindings_multi(temp.path(), Unsafe::None, Some(config))?;
+    generate_bindings_multi(temp.path(), Unsafe::None, ParamSliceType::Span, Some(config))?;
     write_simple_project_file(temp.path())?;
     run_dotnet_command_if_installed(temp.path(), "build")?;
 
@@ -208,7 +217,7 @@ fn config_visibility_force_visibility_public() -> Result<(), Error> {
         ..Config::default()
     };
 
-    generate_bindings_multi(temp.path(), Unsafe::None, Some(config))?;
+    generate_bindings_multi(temp.path(), Unsafe::None, ParamSliceType::Span, Some(config))?;
     write_simple_project_file(temp.path())?;
     run_dotnet_command_if_installed(temp.path(), "build")?;
 
