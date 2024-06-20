@@ -17,6 +17,7 @@ pub const THE_MAGIC_CONSTANT: SomeType = number_of_the_yeast() - 1;
 #[ffi_type]
 #[repr(C)]
 #[derive(Debug)]
+#[allow(unused)]
 pub struct Input {
     x: u8,
     z: u8,

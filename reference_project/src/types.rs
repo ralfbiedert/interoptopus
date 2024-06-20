@@ -174,6 +174,7 @@ pub struct UseAsciiStringPattern<'a> {
 /// This can also be used for the `class` pattern.
 #[ffi_type(opaque)]
 #[repr(C)]
+#[allow(unused)]
 pub struct SomeContext {
     pub(crate) some_field: u32,
 }

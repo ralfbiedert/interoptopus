@@ -11,4 +11,5 @@ pub struct ThirdPartyVecF32 {
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
+#[allow(unused)]
 pub struct f32x4([f32; 4]);

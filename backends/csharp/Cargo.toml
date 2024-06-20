@@ -12,6 +12,7 @@ repository = "https://github.com/ralfbiedert/interoptopus"
 
 [features]
 unity = []
+serde = []
 
 [dependencies]
 interoptopus = { path = "../../core", version = "0.14.0" }
