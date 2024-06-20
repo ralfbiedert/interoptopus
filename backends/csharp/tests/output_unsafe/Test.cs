@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using My.Company;
 using My.Company.Common;
 using Xunit;
@@ -31,6 +33,20 @@ namespace interop_test
             {
                 Assert.True(r == size);
             }
+        }
+
+        // Ensure that the Copied property has the correct length and contents
+        [Fact]
+        public void namespaced_inner_slice_readonly_span_works()
+        {
+            var vecs = new Vec[10];
+            var span = new ReadOnlySpan<Vec>(vecs);
+
+            vecs[0].x = 2.0;
+
+            var rval = Interop.namespaced_inner_slice(vecs);
+
+            Assert.True(rval[0].x > 1.0);
         }
     }
 }
