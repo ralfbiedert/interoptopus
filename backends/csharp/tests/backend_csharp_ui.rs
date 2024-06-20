@@ -29,10 +29,11 @@ pub fn write_simple_project_file(path: impl AsRef<Path>) -> Result<(), Error> {
 /// Generates runnable bindings for the reference project.
 fn generate_bindings_multi(folder: impl AsRef<Path>, use_unsafe: Unsafe, param_slice_type: ParamSliceType, config: Option<Config>) -> Result<(), Error> {
     let library = interoptopus_reference_project::ffi_inventory();
+    let namespace_mappings = NamespaceMappings::new("My.Company").add("common", "My.Company.Common");
 
     let config = config.unwrap_or(Config {
         dll_name: "interoptopus_reference_project".to_string(),
-        namespace_mappings: NamespaceMappings::new("My.Company").add("common", "My.Company.Common"),
+        namespace_mappings,
         visibility_types: CSharpVisibility::AsDeclared,
         param_slice_type,
         use_unsafe,
