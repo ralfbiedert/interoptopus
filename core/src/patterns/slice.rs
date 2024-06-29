@@ -53,6 +53,14 @@ pub struct FFISlice<'a, T> {
     _phantom: PhantomData<&'a T>,
 }
 
+impl<'a, T> Copy for FFISlice<'a, T> {}
+
+impl<'a, T> Clone for FFISlice<'a, T> {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+
 impl<'a, T> Default for FFISlice<'a, T> {
     fn default() -> Self {
         Self {
@@ -73,7 +81,9 @@ impl<'a, T> FFISlice<'a, T> {
         }
     }
 
-    /// Tries to return a slice if the pointer was not null.
+    /// Returns a safe Rust slice.
+    ///
+    /// If the pointer was not null, the Rust slice will point to that data, otherwise an empty slice is returned.
     pub fn as_slice(&self) -> &'a [T] {
         if self.data.is_null() {
             &[]
@@ -159,7 +169,9 @@ impl<'a, T> FFISliceMut<'a, T> {
         }
     }
 
-    /// Tries to return a slice if the pointer was not null.
+    /// Returns a safe, mutable Rust slice.
+    ///
+    /// If the pointer was not null, the Rust slice will point to that data, otherwise an empty slice is returned.
     pub fn as_slice_mut(&mut self) -> &'a mut [T] {
         if self.data.is_null() {
             &mut []
@@ -170,7 +182,9 @@ impl<'a, T> FFISliceMut<'a, T> {
         }
     }
 
-    /// Tries to return a slice if the pointer was not null.
+    /// Returns a safe Rust slice.
+    ///
+    /// If the pointer was not null, the Rust slice will point to that data, otherwise an empty slice is returned.
     pub fn as_slice(&self) -> &'a [T] {
         if self.data.is_null() {
             &[]
