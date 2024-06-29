@@ -74,10 +74,7 @@ impl<'a, T> FFISlice<'a, T> {
     }
 
     /// Tries to return a slice if the pointer was not null.
-    pub fn as_slice<'b>(&'b self) -> &'b [T]
-    where
-        'a: 'b,
-    {
+    pub fn as_slice(&self) -> &'a [T] {
         if self.data.is_null() {
             &[]
         } else {
@@ -163,10 +160,7 @@ impl<'a, T> FFISliceMut<'a, T> {
     }
 
     /// Tries to return a slice if the pointer was not null.
-    pub fn as_slice_mut<'b>(&'b mut self) -> &'b mut [T]
-    where
-        'a: 'b,
-    {
+    pub fn as_slice_mut(&mut self) -> &'a mut [T] {
         if self.data.is_null() {
             &mut []
         } else {
@@ -177,10 +171,7 @@ impl<'a, T> FFISliceMut<'a, T> {
     }
 
     /// Tries to return a slice if the pointer was not null.
-    pub fn as_slice<'b>(&'b self) -> &'b [T]
-    where
-        'a: 'b,
-    {
+    pub fn as_slice(&self) -> &'a [T] {
         if self.data.is_null() {
             &[]
         } else {
@@ -265,6 +256,23 @@ mod test {
 
         sub[0] = 6;
         some[0] = 5;
+
+        assert_eq!(empty.as_slice(), &[]);
+        assert_eq!(slice, &[5, 6, 2, 3, 5]);
+    }
+
+    #[test]
+    fn multi_borrow_mut_slice() {
+        let slice = &mut [0, 1, 2, 3, 5];
+        let empty = FFISliceMut::<u8>::empty();
+        let target: &mut [u8] = {
+            let mut some = FFISliceMut::<u8>::from_slice(slice.as_mut());
+            some.as_slice_mut()
+        };
+        let sub = &mut target[1..=2];
+
+        sub[0] = 6;
+        target[0] = 5;
 
         assert_eq!(empty.as_slice(), &[]);
         assert_eq!(slice, &[5, 6, 2, 3, 5]);
