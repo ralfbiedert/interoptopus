@@ -142,6 +142,21 @@ impl NamedCallback {
 /// #[repr(transparent)]
 /// pub struct MyCallback(Option<extern "C" fn(FFISlice<u8>) -> u8>);
 /// ```
+///
+/// You can also create the callback from Rust for testing:
+///
+/// ```
+/// use interoptopus::callback;
+///
+/// callback!(MyCallback() -> u8);
+///
+/// extern "C" fn my_rust_callback() -> u8 {
+///     42
+/// }
+///
+/// let callback = MyCallback::new(my_rust_callback);
+/// assert_eq!(42, callback.call());
+/// ```
 #[macro_export]
 macro_rules! callback {
     ($name:ident($($param:ident: $ty:ty),*)) => {
@@ -153,6 +168,11 @@ macro_rules! callback {
         pub struct $name(Option<extern "C" fn($($ty),*) -> $rval>);
 
         impl $name {
+            /// Creates a new instance of the callback using `extern "C" fn`
+            pub fn new(func: extern "C" fn($($ty),*) -> $rval) -> Self {
+                Self(Some(func))
+            }
+
             /// Will call function if it exists, panic otherwise.
             pub fn call(&self, $($param: $ty),*) -> $rval {
                 self.0.expect("Assumed function would exist but it didn't.")($($param),*)
