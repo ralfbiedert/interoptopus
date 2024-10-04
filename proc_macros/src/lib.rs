@@ -12,7 +12,9 @@ mod types;
 mod util;
 
 use proc_macro::TokenStream;
-use syn::{parse_macro_input, AttributeArgs};
+use syn::punctuated::Punctuated;
+use syn::token::Type;
+use syn::{parse_macro_input, Meta, Token};
 
 /// Enable a `struct` or `enum` to appear in generated bindings.
 ///
@@ -75,10 +77,9 @@ use syn::{parse_macro_input, AttributeArgs};
 ///
 #[proc_macro_attribute] // Can now be used as `#[my_attribute]`
 pub fn ffi_type(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let attr = proc_macro2::TokenStream::from(attr);
     let input = proc_macro2::TokenStream::from(item);
-    let attr_args = parse_macro_input!(attr as AttributeArgs);
-
-    let rval = types::ffi_type(attr_args, input);
+    let rval = types::ffi_type(attr, input);
 
     rval.into()
 }
@@ -117,10 +118,10 @@ pub fn ffi_type(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 #[proc_macro_attribute] // Can now be used as `#[my_attribute]`
 pub fn ffi_function(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let attr = proc_macro2::TokenStream::from(attr);
     let input = proc_macro2::TokenStream::from(item);
-    let attr_args = parse_macro_input!(attr as AttributeArgs);
 
-    let rval = functions::ffi_function(attr_args, input);
+    let rval = functions::ffi_function(attr, input);
 
     rval.into()
 }
@@ -149,10 +150,10 @@ pub fn ffi_function(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 #[proc_macro_attribute] // Can now be used as `#[my_attribute]`
 pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let attr = proc_macro2::TokenStream::from(attr);
     let input = proc_macro2::TokenStream::from(item);
-    let attr_args = parse_macro_input!(attr as AttributeArgs);
 
-    let rval = constants::ffi_constant(attr_args, input);
+    let rval = constants::ffi_constant(attr, input);
 
     rval.into()
 }
@@ -240,10 +241,9 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 #[proc_macro_attribute] // Can now be used as `#[my_attribute]`
 pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let attr = proc_macro2::TokenStream::from(attr);
     let input = proc_macro2::TokenStream::from(item);
-    let attr_args = parse_macro_input!(attr as AttributeArgs);
-
-    let rval = service::ffi_service(attr_args, input);
+    let rval = service::ffi_service(attr, input);
 
     rval.into()
 }

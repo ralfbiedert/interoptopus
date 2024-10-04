@@ -1,7 +1,10 @@
 use crate::functions::freestanding::ffi_function_freestanding;
+use darling::ast::NestedMeta;
 use darling::FromMeta;
 use proc_macro2::TokenStream;
-use syn::AttributeArgs;
+use quote::ToTokens;
+use syn::punctuated::Punctuated;
+use syn::{Meta, Token};
 
 mod freestanding;
 
@@ -11,8 +14,9 @@ pub struct Attributes {
     debug: bool,
 }
 
-pub fn ffi_function(attr: AttributeArgs, input: TokenStream) -> TokenStream {
-    let attributes: Attributes = Attributes::from_list(&attr).unwrap();
+pub fn ffi_function(attr: TokenStream, input: TokenStream) -> TokenStream {
+    let nested_meta = NestedMeta::parse_meta_list(attr).unwrap();
+    let attributes: Attributes = Attributes::from_list(&nested_meta).unwrap();
 
     let rval = ffi_function_freestanding(&attributes, input);
 

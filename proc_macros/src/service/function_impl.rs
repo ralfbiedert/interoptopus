@@ -1,11 +1,12 @@
 use crate::service::Attributes;
 use crate::util::{extract_doc_lines, purge_lifetimes_from_type};
+use darling::ast::NestedMeta;
 use darling::FromMeta;
 use proc_macro2::{Ident, TokenStream};
-use quote::quote_spanned;
+use quote::{quote_spanned, ToTokens};
 use std::ops::Deref;
 use syn::spanned::Spanned;
-use syn::{Attribute, FnArg, GenericParam, ImplItemMethod, ItemImpl, Pat, ReturnType};
+use syn::{Attribute, FnArg, GenericParam, ImplItemFn, ItemImpl, Pat, ReturnType};
 
 pub struct Descriptor {
     pub ffi_function_tokens: TokenStream,
@@ -47,8 +48,8 @@ fn method_type(attrs: &[Attribute]) -> MethodType {
         let ctor_attributes = attrs
             .iter()
             .filter_map(|attribute| {
-                let meta = attribute.parse_meta().unwrap();
-                AttributeCtor::from_meta(&meta).ok()
+                let list = NestedMeta::parse_meta_list(attribute.to_token_stream()).unwrap();
+                AttributeCtor::from_nested_meta(list.first().unwrap()).ok()
             })
             .next()
             .unwrap_or_default();
@@ -59,8 +60,8 @@ fn method_type(attrs: &[Attribute]) -> MethodType {
             .iter()
             .filter(|x| format!("{:?}", x).contains("ffi_service_method"))
             .map(|attribute| {
-                let meta = attribute.parse_meta().unwrap();
-                AttributeMethod::from_meta(&meta).unwrap()
+                let list = NestedMeta::parse_meta_list(attribute.to_token_stream()).unwrap();
+                AttributeMethod::from_nested_meta(list.first().unwrap()).ok().unwrap()
             })
             .next()
             .unwrap_or_default();
@@ -69,7 +70,7 @@ fn method_type(attrs: &[Attribute]) -> MethodType {
     }
 }
 
-pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, function: &ImplItemMethod) -> Option<Descriptor> {
+pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, function: &ImplItemFn) -> Option<Descriptor> {
     let orig_fn_ident = &function.sig.ident;
     let service_type = &impl_block.self_ty;
     let mut generics = function.sig.generics.clone();

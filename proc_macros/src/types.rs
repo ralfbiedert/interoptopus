@@ -1,10 +1,12 @@
 use crate::types::enums::ffi_type_enum;
 use crate::types::structs::ffi_type_struct;
+use darling::ast::NestedMeta;
 use darling::FromMeta;
 use proc_macro2::TokenStream;
-use quote::quote;
+use quote::{quote, ToTokens};
 use std::collections::HashMap;
-use syn::{AttributeArgs, Field, ItemEnum, ItemStruct, ItemType, Visibility};
+use syn::punctuated::Punctuated;
+use syn::{Field, ItemEnum, ItemStruct, ItemType, Meta, Token, Visibility};
 
 mod enums;
 mod structs;
@@ -60,8 +62,9 @@ impl Attributes {
     }
 }
 
-pub fn ffi_type(attr: AttributeArgs, input: TokenStream) -> TokenStream {
-    let attributes: Attributes = Attributes::from_list(&attr).unwrap();
+pub fn ffi_type(attr: TokenStream, input: TokenStream) -> TokenStream {
+    let nested_meta = NestedMeta::parse_meta_list(attr).unwrap();
+    let attributes = Attributes::from_list(&nested_meta).unwrap();
 
     let rval = if let Ok(item) = syn::parse2::<ItemStruct>(input.clone()) {
         ffi_type_struct(&attributes, input, item)

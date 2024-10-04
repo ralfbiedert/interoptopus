@@ -1,14 +1,14 @@
+use crate::util::extract_doc_lines;
 use darling::FromMeta;
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{AttributeArgs, ItemConst};
-
-use crate::util::extract_doc_lines;
+use syn::punctuated::Punctuated;
+use syn::{ItemConst, Meta, Token};
 
 #[derive(Debug, FromMeta)]
 pub struct Attributes {}
 
-pub fn ffi_constant(_attr: AttributeArgs, input: TokenStream) -> TokenStream {
+pub fn ffi_constant(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let const_item: ItemConst = syn::parse2(input.clone()).expect("Must be item.");
 
     let const_ident = const_item.ident;

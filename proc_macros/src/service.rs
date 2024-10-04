@@ -1,9 +1,11 @@
 use crate::service::function_impl::{generate_service_dtor, generate_service_method};
+use darling::ast::NestedMeta;
 use darling::FromMeta;
 use function_impl::MethodType;
 use proc_macro2::TokenStream;
-use quote::quote;
-use syn::{AttributeArgs, ImplItem, ItemImpl, Visibility};
+use quote::{quote, ToTokens};
+use syn::punctuated::Punctuated;
+use syn::{ImplItem, ItemImpl, Meta, Token, Visibility};
 
 pub mod function_impl;
 
@@ -23,8 +25,9 @@ impl Attributes {
     pub fn assert_valid(&self) {}
 }
 
-pub fn ffi_service(attr: AttributeArgs, input: TokenStream) -> TokenStream {
-    let attributes: Attributes = Attributes::from_list(&attr).unwrap();
+pub fn ffi_service(attr: TokenStream, input: TokenStream) -> TokenStream {
+    let nested_meta = NestedMeta::parse_meta_list(attr).unwrap();
+    let attributes = Attributes::from_list(&nested_meta).unwrap();
     attributes.assert_valid();
 
     let item = syn::parse2::<ItemImpl>(input.clone()).expect("Must be item.");
@@ -32,7 +35,7 @@ pub fn ffi_service(attr: AttributeArgs, input: TokenStream) -> TokenStream {
     let mut function_descriptors = Vec::new();
 
     for impl_item in &item.items {
-        if let ImplItem::Method(method) = impl_item {
+        if let ImplItem::Fn(method) = impl_item {
             if let Visibility::Public(_) = &method.vis {
                 if method.attrs.iter().any(|x| format!("{:?}", x).contains("ffi_service_ignore")) {
                     // Don't emit code for ignored methods

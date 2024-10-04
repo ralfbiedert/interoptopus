@@ -16,9 +16,9 @@ proc-macro = true
 
 [dependencies]
 proc-macro2 = "1.0.36"
-syn = { version = "1.0.86", features = ["full"] }
+syn = { version = "2.0.79", features = ["full"] }
 quote = "1.0.15"
-darling = "0.13.1"
+darling = "0.20.10"
 regex = "1.5"
 
 [dev-dependencies]
