@@ -11,9 +11,9 @@ pub fn read_surrogates(attributes: &[Attribute]) -> (Option<Span>, HashMap<Strin
         .iter()
         .filter(|x| x.to_token_stream().to_string().contains("ffi_surrogate"))
         .filter_map(|attribute| {
-            let list = NestedMeta::parse_meta_list(attribute.to_token_stream()).unwrap();
-            let rval = HashMap::<String, String>::from_nested_meta(list.first().unwrap()).ok().unwrap();
-            Some((Some(attribute.span()), rval))
+            // let list = NestedMeta::parse_meta_list(attribute.to_token_stream()).unwrap();
+            let list: HashMap<String, String> = FromMeta::from_meta(&attribute.meta).unwrap();
+            Some((Some(attribute.span()), list))
         })
         .next()
         .unwrap_or_default()

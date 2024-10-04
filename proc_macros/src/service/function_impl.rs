@@ -47,10 +47,7 @@ fn method_type(attrs: &[Attribute]) -> MethodType {
     if attrs.iter().any(|x| format!("{:?}", x).contains("ffi_service_ctor")) {
         let ctor_attributes = attrs
             .iter()
-            .filter_map(|attribute| {
-                let list = NestedMeta::parse_meta_list(attribute.to_token_stream()).unwrap();
-                AttributeCtor::from_nested_meta(list.first().unwrap()).ok()
-            })
+            .filter_map(|attribute| AttributeCtor::from_meta(&attribute.meta).ok())
             .next()
             .unwrap_or_default();
 
@@ -59,10 +56,7 @@ fn method_type(attrs: &[Attribute]) -> MethodType {
         let function_attributes = attrs
             .iter()
             .filter(|x| format!("{:?}", x).contains("ffi_service_method"))
-            .map(|attribute| {
-                let list = NestedMeta::parse_meta_list(attribute.to_token_stream()).unwrap();
-                AttributeMethod::from_nested_meta(list.first().unwrap()).ok().unwrap()
-            })
+            .map(|attribute| AttributeMethod::from_meta(&attribute.meta).unwrap())
             .next()
             .unwrap_or_default();
 
