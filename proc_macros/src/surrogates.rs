@@ -1,4 +1,3 @@
-use darling::ast::NestedMeta;
 use darling::FromMeta;
 use darling::ToTokens;
 use proc_macro2::Span;

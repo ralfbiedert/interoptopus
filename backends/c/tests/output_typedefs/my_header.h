@@ -16,14 +16,10 @@ const uint8_t MY_LIBRARY_U8 = 255;
 const float MY_LIBRARY_F32_MIN_POSITIVE = 0.000000000000000000000000000000000000011754944;
 const int32_t MY_LIBRARY_COMPUTED_I32 = -2147483647;
 
-/// Documented enum.
 typedef enum my_library_enum_documented
 {
-    /// Variant A.
     MY_LIBRARY_ENUM_DOCUMENTED_A = 0,
-    /// Variant B.
     MY_LIBRARY_ENUM_DOCUMENTED_B = 1,
-    /// Variant B.
     MY_LIBRARY_ENUM_DOCUMENTED_C = 2,
 } my_library_enum_documented;
 
@@ -40,7 +36,6 @@ typedef struct my_library_generic4 my_library_generic4;
 
 typedef struct my_library_opaque my_library_opaque;
 
-/// Some struct we want to expose as a class.
 typedef struct my_library_simple_service my_library_simple_service;
 
 typedef struct my_library_simple_service_lifetime my_library_simple_service_lifetime;
@@ -123,10 +118,8 @@ typedef struct my_library_some_foreign_type
     uint32_t x;
 } my_library_some_foreign_type;
 
-/// Documented struct.
 typedef struct my_library_struct_documented
 {
-    /// Documented field.
     float x;
 } my_library_struct_documented;
 
@@ -369,9 +362,6 @@ typedef int64_t (*many_args_10)(int64_t, int64_t, int64_t, int64_t, int64_t, int
 
 typedef const int64_t* (*ptr)(const int64_t*);
 
-/// # Safety
-///
-/// Parameter x must point to valid data.
 typedef int64_t* (*ptr_mut)(int64_t*);
 
 typedef const const int64_t** (*ptr_ptr)(const const int64_t**);
@@ -406,7 +396,6 @@ typedef uint8_t (*generic_4)(const my_library_generic4*);
 
 typedef uint8_t (*array_1)(my_library_array);
 
-/// This function has documentation.
 typedef my_library_enum_documented (*documented)(my_library_struct_documented);
 
 typedef my_library_vec1 (*ambiguous_1)(my_library_vec1);
@@ -483,15 +472,8 @@ typedef void (*pattern_callback_3)(my_library_delegate_callback_my_callback_cont
 
 typedef uint32_t (*pattern_callback_4)(my_library_my_callback_namespaced, uint32_t);
 
-/// Destroys the given instance.
-///
-/// # Safety
-///
-/// The passed parameter MUST have been created with the corresponding init function;
-/// passing any other value results in undefined behavior.
 typedef my_library_ffi_error (*simple_service_destroy)(my_library_simple_service**);
 
-/// The constructor must return a `Result<Self, Error>`.
 typedef my_library_ffi_error (*simple_service_new_with)(my_library_simple_service**, uint32_t);
 
 typedef my_library_ffi_error (*simple_service_new_without)(my_library_simple_service**);
@@ -500,20 +482,14 @@ typedef my_library_ffi_error (*simple_service_new_with_string)(my_library_simple
 
 typedef my_library_ffi_error (*simple_service_new_failing)(my_library_simple_service**, uint8_t);
 
-/// Methods returning a Result<(), _> are the default and do not
-/// need annotations.
 typedef my_library_ffi_error (*simple_service_method_result)(const my_library_simple_service*, uint32_t);
 
 typedef uint32_t (*simple_service_method_value)(const my_library_simple_service*, uint32_t);
 
-/// This method should be documented.
-///
-/// Multiple lines.
 typedef void (*simple_service_method_void)(const my_library_simple_service*);
 
 typedef uint8_t (*simple_service_method_mut_self)(my_library_simple_service*, my_library_sliceu8);
 
-/// Single line.
 typedef void (*simple_service_method_mut_self_void)(my_library_simple_service*, my_library_slice_bool);
 
 typedef uint8_t (*simple_service_method_mut_self_ref)(my_library_simple_service*, const uint8_t*, uint8_t*);
@@ -526,27 +502,16 @@ typedef my_library_ffi_error (*simple_service_method_mut_self_ffi_error)(my_libr
 
 typedef my_library_ffi_error (*simple_service_method_mut_self_no_error)(my_library_simple_service*, my_library_slice_mutu8);
 
-/// Warning, you _must_ discard the returned slice object before calling into this service
-/// again, as otherwise undefined behavior might happen.
 typedef my_library_sliceu32 (*simple_service_return_slice)(my_library_simple_service*);
 
-/// Warning, you _must_ discard the returned slice object before calling into this service
-/// again, as otherwise undefined behavior might happen.
 typedef my_library_slice_mutu32 (*simple_service_return_slice_mut)(my_library_simple_service*);
 
-/// This function has no panic safeguards. If it panics your host app will be in an undefined state.
 typedef const char* (*simple_service_return_string)(my_library_simple_service*);
 
 typedef my_library_ffi_error (*simple_service_method_void_ffi_error)(my_library_simple_service*);
 
 typedef my_library_ffi_error (*simple_service_method_callback)(my_library_simple_service*, my_library_my_callback);
 
-/// Destroys the given instance.
-///
-/// # Safety
-///
-/// The passed parameter MUST have been created with the corresponding init function;
-/// passing any other value results in undefined behavior.
 typedef my_library_ffi_error (*simple_service_lt_destroy)(my_library_simple_service_lifetime**);
 
 typedef my_library_ffi_error (*simple_service_lt_new_with)(my_library_simple_service_lifetime**, const uint32_t*);

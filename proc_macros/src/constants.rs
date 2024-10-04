@@ -2,8 +2,7 @@ use crate::util::extract_doc_lines;
 use darling::FromMeta;
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::punctuated::Punctuated;
-use syn::{ItemConst, Meta, Token};
+use syn::ItemConst;
 
 #[derive(Debug, FromMeta)]
 pub struct Attributes {}

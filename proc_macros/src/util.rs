@@ -1,6 +1,6 @@
 use darling::ToTokens;
 use syn::punctuated::Punctuated;
-use syn::{Attribute, GenericArgument, Meta, PathArguments, Type};
+use syn::{Attribute, GenericArgument, PathArguments, Type};
 
 pub fn extract_doc_lines(attributes: &[Attribute]) -> Vec<String> {
     let mut docs = Vec::new();

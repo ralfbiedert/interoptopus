@@ -13,7 +13,6 @@ extern "C" {
 
 
 
-/// A simple type in our FFI layer.
 typedef struct vec2
     {
     float x;
@@ -21,7 +20,6 @@ typedef struct vec2
     } vec2;
 
 
-/// Function using the type.
 vec2 my_function(vec2 input);
 
 

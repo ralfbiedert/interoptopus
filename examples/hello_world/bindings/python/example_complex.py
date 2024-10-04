@@ -17,7 +17,6 @@ def init_lib(path):
 
 
 def my_function(input: Vec2) -> Vec2:
-    """ Function using the type."""
     return c_lib.my_function(input)
 
 
@@ -62,7 +61,6 @@ class _Iter(object):
 
 
 class Vec2(ctypes.Structure):
-    """ A simple type in our FFI layer."""
 
     # These fields represent the underlying C data layout
     _fields_ = [

@@ -3,10 +3,9 @@ use crate::types::structs::ffi_type_struct;
 use darling::ast::NestedMeta;
 use darling::FromMeta;
 use proc_macro2::TokenStream;
-use quote::{quote, ToTokens};
+use quote::quote;
 use std::collections::HashMap;
-use syn::punctuated::Punctuated;
-use syn::{Field, ItemEnum, ItemStruct, ItemType, Meta, Token, Visibility};
+use syn::{Field, ItemEnum, ItemStruct, ItemType, Visibility};
 
 mod enums;
 mod structs;

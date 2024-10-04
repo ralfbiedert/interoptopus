@@ -1,9 +1,8 @@
 use crate::service::Attributes;
 use crate::util::{extract_doc_lines, purge_lifetimes_from_type};
-use darling::ast::NestedMeta;
 use darling::FromMeta;
 use proc_macro2::{Ident, TokenStream};
-use quote::{quote_spanned, ToTokens};
+use quote::quote_spanned;
 use std::ops::Deref;
 use syn::spanned::Spanned;
 use syn::{Attribute, FnArg, GenericParam, ImplItemFn, ItemImpl, Pat, ReturnType};

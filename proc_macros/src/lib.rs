@@ -12,9 +12,6 @@ mod types;
 mod util;
 
 use proc_macro::TokenStream;
-use syn::punctuated::Punctuated;
-use syn::token::Type;
-use syn::{parse_macro_input, Meta, Token};
 
 /// Enable a `struct` or `enum` to appear in generated bindings.
 ///

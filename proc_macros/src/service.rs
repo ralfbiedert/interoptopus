@@ -3,9 +3,8 @@ use darling::ast::NestedMeta;
 use darling::FromMeta;
 use function_impl::MethodType;
 use proc_macro2::TokenStream;
-use quote::{quote, ToTokens};
-use syn::punctuated::Punctuated;
-use syn::{ImplItem, ItemImpl, Meta, Token, Visibility};
+use quote::quote;
+use syn::{ImplItem, ItemImpl, Visibility};
 
 pub mod function_impl;
 

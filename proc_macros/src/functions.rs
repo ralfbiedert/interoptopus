@@ -2,9 +2,6 @@ use crate::functions::freestanding::ffi_function_freestanding;
 use darling::ast::NestedMeta;
 use darling::FromMeta;
 use proc_macro2::TokenStream;
-use quote::ToTokens;
-use syn::punctuated::Punctuated;
-use syn::{Meta, Token};
 
 mod freestanding;
 
