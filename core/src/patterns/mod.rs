@@ -1,4 +1,4 @@
-//! Optional types that translate to binding with better semantics in languages supporting them.
+//! Optional types that translate to binding with better semantics in supported languages.
 //!
 //! Patterns are purely optional. If you want to use a certain pattern in your bindings
 //! you generally define one or more functions that use some of the types contained in this module.
@@ -65,10 +65,16 @@
 //! In other words, regardless of which pattern was used, the involved methods and types will always
 //! be accessible from any language.
 //!
-//! # Status
+//! # Pattern Composition
 //!
-//! Some patterns have seen more testing (and documentation) than others. The ones
-//! marked <sup>🚧</sup> should be considered particularly work-in-progress.
+//! Due do a lack of expressiveness in other languages, pattern composition is often limited. Things that work
+//! easily in Rust (e.g., a nested `FFISlice<FFIOption<AsciiPointer>>`), aren't supported in other languages.
+//! You therefore should rather err on the side of conservatism when designing APIs.
+//!
+//! While we aim to guarantee that 'flat' patterns either work, or gracefully fall-back
+//! to a more primitive representation, nested patterns through generics might simply fail to compile
+//! in certain backends.
+//!
 
 use crate::lang::c::{CType, CompositeType, PrimitiveType};
 use crate::patterns::callbacks::NamedCallback;

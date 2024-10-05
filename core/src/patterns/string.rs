@@ -44,9 +44,9 @@ static EMPTY: &[u8] = b"\0";
 /// # Antipattern
 ///
 /// It's discouraged to use [`FFIOption`](crate::patterns::option::FFIOption) with [`AsciiPointer`]
-/// and some backend might not generate proper bindings (like the C# backend).
+/// and some backend might not generate proper bindings (like C#).
 ///
-/// Instead use [`AsciiPointer`] alone since it already has a pointer that's `null`able.
+/// Instead use [`AsciiPointer`] alone since it already has a pointer that's nullable.
 /// In this case, [`AsciiPointer::as_c_str()`] will return [`None`] and [`AsciiPointer::as_str`]
 /// will return an [`Error::Null`].
 #[repr(transparent)]

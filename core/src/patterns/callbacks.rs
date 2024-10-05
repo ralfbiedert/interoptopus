@@ -43,7 +43,7 @@
 //! of all used parameters (e.g., `InteropDelegate_fn_i32_i32`).
 //!
 //!
-//! # Background
+//! # Why we need the macro `callback!`
 //!
 //! Due to how we generate FFI metadata and how Rust traits work there are some types which
 //! don't work nicely with Interoptopus: function pointers. Practically speaking, the following code _should_ work:
@@ -79,8 +79,40 @@
 //! To fix this, you can replace `pub type CallbackSlice = ...` with a `callback!` call
 //! which should generate a helper type that works.
 //!
-
+//! # How to return callbacks from functions
+//!
+//! Due to another Rust limitation this won't work, despite the `From<>` conversion
+//! "being implemented".
+//!
+//! ```rust,ignore
+//! use interoptopus::{ffi_function, callback};
+//!
+//! callback!(SumFunction(x: i32, y: i32) -> i32);
+//!
+//! #[ffi_function]
+//! #[no_mangle]
+//! pub extern "C" fn return_sum_function() -> SumFunction {
+//!     my_sum_function.into() // Compile error, mismatch between `function item type` and `function pointer type`
+//! }
+//!
+//! extern "C" fn my_sum_function(x: i32, y: i32) -> i32 { x + y }
+//! ```
+//!
+//! Instead, you will have to return function pointers like so:
+//!
+//! ```rust
+//! # use interoptopus::{ffi_function, callback};
+//! # callback!(SumFunction(x: i32, y: i32) -> i32);
+//! # extern "C" fn my_sum_function(x: i32, y: i32) -> i32 { x + y }
+//! #
+//! #[ffi_function]
+//! #[no_mangle]
+//! pub extern "C" fn return_sum_function() -> SumFunction {
+//!     SumFunction(Some(my_sum_function))
+//! }
+//! ```
 use crate::lang::c::{FnPointerType, Meta};
+use interoptopus_proc::ffi_function;
 
 /// Internal helper naming a generated callback type wrapper.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -162,6 +194,7 @@ macro_rules! callback {
     ($name:ident($($param:ident: $ty:ty),*)) => {
         callback!($name($($param: $ty),*) -> ());
     };
+
     ($name:ident($($param:ident: $ty:ty),*) -> $rval:ty $(, namespace = $ns:expr)?) => {
         #[derive(Default, Clone)]
         #[repr(transparent)]
@@ -187,7 +220,7 @@ macro_rules! callback {
             }
         }
 
-        impl From<extern "C" fn($($ty),*) -> $rval> for $name {
+        impl From<for<> extern "C" fn($($ty),*) -> $rval> for $name {
             fn from(x: extern "C" fn($($ty),*) -> $rval) -> Self {
                 Self(Some(x))
             }
