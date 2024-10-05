@@ -22,6 +22,7 @@ pub mod patterns {
     pub mod result;
     pub mod service;
     pub mod slice;
+    pub mod surrogates;
 }
 pub mod types;
 
@@ -55,7 +56,6 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(functions::ref_mut_option))
             .register(function!(functions::tupled))
             .register(function!(functions::complex_args_1))
-            .register(function!(functions::complex_args_2))
             .register(function!(functions::callback))
             .register(function!(functions::generic_1a))
             .register(function!(functions::generic_1b))
@@ -102,6 +102,7 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(patterns::callbacks::pattern_callback_2))
             .register(function!(patterns::callbacks::pattern_callback_3))
             .register(function!(patterns::callbacks::pattern_callback_4))
+            .register(function!(patterns::surrogates::pattern_surrogates_1))
             // Constants
             .register(constant!(constants::U8))
             .register(constant!(constants::F32_MIN_POSITIVE))

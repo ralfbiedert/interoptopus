@@ -7,6 +7,9 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
 - To override visibility for all fields:
     - Previously you had to `#[ffi_type(visibility(_ = "public"))]`
     - Now you do `#[ffi_type(visibility(_all = "public"))]`
+- Surrogates now work through the `Surrogate<T, L>` type.
+    - Previously you needed to specify `#[ffi_surrogates(some_field = "some_foreign_type")]`
+    - Instead, you now make `some_field` of type `Surrogate<Foreign, Local>`
 
 ### 0.13 → 0.14
 

@@ -36,7 +36,6 @@ def init_lib(path):
     c_lib.ref_mut_option.argtypes = [ctypes.POINTER(ctypes.c_int64)]
     c_lib.tupled.argtypes = [Tupled]
     c_lib.complex_args_1.argtypes = [Vec3f32, ctypes.POINTER(Tupled)]
-    c_lib.complex_args_2.argtypes = [SomeForeignType]
     c_lib.callback.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8), ctypes.c_uint8]
     c_lib.generic_1a.argtypes = [Genericu32, Phantomu8]
     c_lib.generic_1b.argtypes = [Genericu8, Phantomu8]
@@ -83,6 +82,7 @@ def init_lib(path):
     c_lib.pattern_callback_2.argtypes = [ctypes.CFUNCTYPE(None, ctypes.c_void_p)]
     c_lib.pattern_callback_3.argtypes = [DelegateCallbackMyCallbackContextual, ctypes.c_uint32]
     c_lib.pattern_callback_4.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32), ctypes.c_uint32]
+    c_lib.pattern_surrogates_1.argtypes = [Local, ctypes.POINTER(Container)]
     c_lib.simple_service_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.simple_service_new_with.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.c_uint32]
     c_lib.simple_service_new_without.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
@@ -134,7 +134,6 @@ def init_lib(path):
     c_lib.ref_mut_option.restype = ctypes.c_bool
     c_lib.tupled.restype = Tupled
     c_lib.complex_args_1.restype = ctypes.c_int
-    c_lib.complex_args_2.restype = ctypes.c_void_p
     c_lib.callback.restype = ctypes.c_uint8
     c_lib.generic_1a.restype = ctypes.c_uint32
     c_lib.generic_1b.restype = ctypes.c_uint8
@@ -294,9 +293,6 @@ def tupled(x: Tupled) -> Tupled:
 
 def complex_args_1(a: Vec3f32, b: ctypes.POINTER(Tupled)):
     return c_lib.complex_args_1(a, b)
-
-def complex_args_2(cmplx: SomeForeignType) -> ctypes.c_void_p:
-    return c_lib.complex_args_2(cmplx)
 
 def callback(callback, value: int) -> int:
     if not hasattr(callback, "__ctypes_from_outparam__"):
@@ -489,6 +485,9 @@ def pattern_callback_4(callback, x: int) -> int:
         callback = callbacks.fn_u32_rval_u32(callback)
 
     return c_lib.pattern_callback_4(callback, x)
+
+def pattern_surrogates_1(s: Local, c: ctypes.POINTER(Container)):
+    return c_lib.pattern_surrogates_1(s, c)
 
 
 
@@ -822,6 +821,26 @@ class Inner(ctypes.Structure):
         return ctypes.Structure.__set__(self, "x", value)
 
 
+class Local(ctypes.Structure):
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("x", ctypes.c_uint32),
+    ]
+
+    def __init__(self, x: int = None):
+        if x is not None:
+            self.x = x
+
+    @property
+    def x(self) -> int:
+        return ctypes.Structure.__get__(self, "x")
+
+    @x.setter
+    def x(self, value: int):
+        return ctypes.Structure.__set__(self, "x", value)
+
+
 class Packed1(ctypes.Structure):
     _pack_ = 1
 
@@ -887,26 +906,6 @@ class Packed2(ctypes.Structure):
 
 
 class Phantomu8(ctypes.Structure):
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("x", ctypes.c_uint32),
-    ]
-
-    def __init__(self, x: int = None):
-        if x is not None:
-            self.x = x
-
-    @property
-    def x(self) -> int:
-        return ctypes.Structure.__get__(self, "x")
-
-    @x.setter
-    def x(self, value: int):
-        return ctypes.Structure.__set__(self, "x", value)
-
-
-class SomeForeignType(ctypes.Structure):
 
     # These fields represent the underlying C data layout
     _fields_ = [
@@ -1244,6 +1243,26 @@ class Array(ctypes.Structure):
     @data.setter
     def data(self, value):
         return ctypes.Structure.__set__(self, "data", value)
+
+
+class Container(ctypes.Structure):
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("foreign", Local),
+    ]
+
+    def __init__(self, foreign: Local = None):
+        if foreign is not None:
+            self.foreign = foreign
+
+    @property
+    def foreign(self) -> Local:
+        return ctypes.Structure.__get__(self, "foreign")
+
+    @foreign.setter
+    def foreign(self, value: Local):
+        return ctypes.Structure.__set__(self, "foreign", value)
 
 
 class Genericu32(ctypes.Structure):

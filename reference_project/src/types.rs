@@ -4,6 +4,7 @@ use interoptopus::lang::c::{CType, CompositeType, Field, PrimitiveType};
 use interoptopus::lang::rust::CTypeInfo;
 use interoptopus::patterns::slice::FFISlice;
 use interoptopus::patterns::string::AsciiPointer;
+use interoptopus::patterns::surrogates::Surrogate;
 use interoptopus::{callback, ffi_surrogates, ffi_type};
 use std::fmt::Debug;
 use std::marker::PhantomData;
@@ -11,18 +12,6 @@ use std::marker::PhantomData;
 pub trait Helper {}
 
 impl Helper for u8 {}
-
-// Let's assume we can't implement `CTypeInfo` for this.
-#[repr(C)]
-pub struct SomeForeignType {
-    x: u32,
-}
-
-// Surrogate we can use instead of `SomeForeignType`
-pub fn some_foreign_type() -> CType {
-    let composite = CompositeType::new("SomeForeignType".to_string(), vec![Field::new("x".to_string(), CType::Primitive(PrimitiveType::U32))]);
-    CType::Composite(composite)
-}
 
 /// Empty structs are only allowed as opaques.
 #[ffi_type(opaque)]
@@ -101,14 +90,6 @@ pub struct Vec3f32 {
     pub x: f32,
     pub y: f32,
     pub z: f32,
-}
-
-#[ffi_type]
-#[ffi_surrogates(foreign1 = "some_foreign_type", foreign2 = "some_foreign_type")]
-#[repr(C)]
-pub struct Container {
-    pub foreign1: SomeForeignType,
-    pub foreign2: SomeForeignType,
 }
 
 #[ffi_type]

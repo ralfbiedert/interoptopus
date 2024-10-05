@@ -2,9 +2,8 @@
 
 use crate::patterns::result::{Error, FFIError};
 use crate::types::{
-    ambiguous1, ambiguous2, common, some_foreign_type, Aligned1, Aligned2, Array, BooleanAlignment, Callbacku8u8, EnumDocumented, EnumRenamedXYZ, Generic, Generic2,
-    Generic3, Generic4, Opaque, Packed1, Packed2, Phantom, SomeForeignType, StructDocumented, StructRenamedXYZ, Transparent, Tupled, Vec3f32, Visibility1, Visibility2,
-    Weird1, Weird2,
+    ambiguous1, ambiguous2, common, Aligned1, Aligned2, Array, BooleanAlignment, Callbacku8u8, EnumDocumented, EnumRenamedXYZ, Generic, Generic2, Generic3, Generic4,
+    Opaque, Packed1, Packed2, Phantom, StructDocumented, StructRenamedXYZ, Transparent, Tupled, Vec3f32, Visibility1, Visibility2, Weird1, Weird2,
 };
 use interoptopus::patterns::option::FFIOption;
 use interoptopus::patterns::result::panics_and_errors_to_ffi_enum;
@@ -181,13 +180,6 @@ pub extern "C" fn repr_transparent(x: Transparent, _r: &Transparent) -> Transpar
 #[no_mangle]
 pub extern "C" fn complex_args_1(_a: Vec3f32, _b: Option<&Tupled>) -> FFIError {
     FFIError::Ok
-}
-
-#[ffi_function]
-#[ffi_surrogates(_cmplx = "some_foreign_type")]
-#[no_mangle]
-pub extern "C" fn complex_args_2(_cmplx: SomeForeignType) -> *const Opaque {
-    null()
 }
 
 #[ffi_function]

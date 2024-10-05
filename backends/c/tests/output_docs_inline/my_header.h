@@ -38,8 +38,6 @@ typedef struct my_library_generic3 my_library_generic3;
 
 typedef struct my_library_generic4 my_library_generic4;
 
-typedef struct my_library_opaque my_library_opaque;
-
 /// Some struct we want to expose as a class.
 typedef struct my_library_simple_service my_library_simple_service;
 
@@ -97,6 +95,11 @@ typedef struct my_library_inner
     float x;
 } my_library_inner;
 
+typedef struct my_library_local
+{
+    uint32_t x;
+} my_library_local;
+
 #pragma pack(push, 1)
 typedef struct my_library_packed1
 {
@@ -117,11 +120,6 @@ typedef struct my_library_phantomu8
 {
     uint32_t x;
 } my_library_phantomu8;
-
-typedef struct my_library_some_foreign_type
-{
-    uint32_t x;
-} my_library_some_foreign_type;
 
 /// Documented struct.
 typedef struct my_library_struct_documented
@@ -199,6 +197,11 @@ typedef struct my_library_array
 {
     uint8_t data[16];
 } my_library_array;
+
+typedef struct my_library_container
+{
+    my_library_local foreign;
+} my_library_container;
 
 typedef struct my_library_genericu32
 {
@@ -388,8 +391,6 @@ my_library_tupled tupled(my_library_tupled x);
 
 my_library_ffi_error complex_args_1(my_library_vec3f32 a, const my_library_tupled* b);
 
-const my_library_opaque* complex_args_2(my_library_some_foreign_type cmplx);
-
 uint8_t callback(my_library_fptr_fn_u8_rval_u8 callback, uint8_t value);
 
 uint32_t generic_1a(my_library_genericu32 x, my_library_phantomu8 y);
@@ -482,6 +483,8 @@ my_library_my_callback_void pattern_callback_2(my_library_my_callback_void callb
 void pattern_callback_3(my_library_delegate_callback_my_callback_contextual callback, uint32_t x);
 
 uint32_t pattern_callback_4(my_library_my_callback_namespaced callback, uint32_t x);
+
+void pattern_surrogates_1(my_library_local s, my_library_container* c);
 
 /// Destroys the given instance.
 ///

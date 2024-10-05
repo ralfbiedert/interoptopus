@@ -29,7 +29,6 @@ Freestanding callables inside the module.
  - **[ref_mut_option](#ref_mut_option)** - 
  - **[tupled](#tupled)** - 
  - **[complex_args_1](#complex_args_1)** - 
- - **[complex_args_2](#complex_args_2)** - 
  - **[callback](#callback)** - 
  - **[generic_1a](#generic_1a)** - 
  - **[generic_1b](#generic_1b)** - 
@@ -76,6 +75,7 @@ Freestanding callables inside the module.
  - **[pattern_callback_2](#pattern_callback_2)** - 
  - **[pattern_callback_3](#pattern_callback_3)** - 
  - **[pattern_callback_4](#pattern_callback_4)** - 
+ - **[pattern_surrogates_1](#pattern_surrogates_1)** - 
 
 ### Classes
 Methods operating on common state.
@@ -117,15 +117,16 @@ Composite data used by functions and methods.
  - **[Aligned2](#Aligned2)** - 
  - **[Array](#Array)** - 
  - **[BooleanAlignment](#BooleanAlignment)** - 
+ - **[Container](#Container)** - 
  - **[DelegateCallbackMyCallbackContextual](#DelegateCallbackMyCallbackContextual)** - 
  - **[ExtraTypef32](#ExtraTypef32)** - 
  - **[Genericu32](#Genericu32)** - 
  - **[Genericu8](#Genericu8)** - 
  - **[Inner](#Inner)** - 
+ - **[Local](#Local)** - 
  - **[Packed1](#Packed1)** - 
  - **[Packed2](#Packed2)** - 
  - **[Phantomu8](#Phantomu8)** - 
- - **[SomeForeignType](#SomeForeignType)** - 
  - **[StructDocumented](#StructDocumented)** -  Documented struct.
  - **[StructRenamed](#StructRenamed)** - 
  - **[Tupled](#Tupled)** - 
@@ -265,6 +266,27 @@ class BooleanAlignment(ctypes.Structure):
 
 
 
+ ### <a name="Container">**Container**</a>
+
+
+#### Fields 
+- **foreign** -  
+#### Definition 
+```python
+class Container(ctypes.Structure):
+
+    _fields_ = [
+        ("foreign", Local),
+    ]
+
+    def __init__(self, foreign: Local = None):
+        ...
+```
+
+---
+
+
+
  ### <a name="DelegateCallbackMyCallbackContextual">**DelegateCallbackMyCallbackContextual**</a>
 
 
@@ -372,6 +394,27 @@ class Inner(ctypes.Structure):
 
 
 
+ ### <a name="Local">**Local**</a>
+
+
+#### Fields 
+- **x** -  
+#### Definition 
+```python
+class Local(ctypes.Structure):
+
+    _fields_ = [
+        ("x", ctypes.c_uint32),
+    ]
+
+    def __init__(self, x: int = None):
+        ...
+```
+
+---
+
+
+
  ### <a name="Packed1">**Packed1**</a>
 
 
@@ -428,27 +471,6 @@ class Packed2(ctypes.Structure):
 #### Definition 
 ```python
 class Phantomu8(ctypes.Structure):
-
-    _fields_ = [
-        ("x", ctypes.c_uint32),
-    ]
-
-    def __init__(self, x: int = None):
-        ...
-```
-
----
-
-
-
- ### <a name="SomeForeignType">**SomeForeignType**</a>
-
-
-#### Fields 
-- **x** -  
-#### Definition 
-```python
-class SomeForeignType(ctypes.Structure):
 
     _fields_ = [
         ("x", ctypes.c_uint32),
@@ -1197,15 +1219,6 @@ def complex_args_1(a: Vec3f32, b: ctypes.POINTER(Tupled)):
 
 ---
 
-## complex_args_2 
-#### Definition 
-```python
-def complex_args_2(cmplx: SomeForeignType) -> ctypes.c_void_p:
-    ...
-```
-
----
-
 ## callback 
 #### Definition 
 ```python
@@ -1616,6 +1629,15 @@ def pattern_callback_3(callback: DelegateCallbackMyCallbackContextual, x: int):
 #### Definition 
 ```python
 def pattern_callback_4(callback, x: int) -> int:
+    ...
+```
+
+---
+
+## pattern_surrogates_1 
+#### Definition 
+```python
+def pattern_surrogates_1(s: Local, c: ctypes.POINTER(Container)):
     ...
 ```
 

@@ -23,9 +23,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 16012698009278542425ul)
+            if (api_version != 17707716988646484993ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (16012698009278542425). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (17707716988646484993). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -125,9 +125,6 @@ namespace My.Company
                 throw new InteropException<FFIError>(rval);
             }
         }
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "complex_args_2")]
-        public static extern IntPtr complex_args_2(SomeForeignType cmplx);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "callback")]
         public static extern byte callback(InteropDelegate_fn_u8_rval_u8 callback, byte value);
@@ -496,6 +493,9 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_4")]
         public static extern uint pattern_callback_4(IntPtr callback, uint x);
 
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_surrogates_1")]
+        public static extern void pattern_surrogates_1(Local s, out Container c);
 
         /// Destroys the given instance.
         ///
@@ -1001,6 +1001,13 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
+    public partial struct Container
+    {
+        public Local foreign;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
     public partial struct DelegateCallbackMyCallbackContextual
     {
         public MyCallbackContextual callback;
@@ -1045,6 +1052,13 @@ namespace My.Company
     }
 
     [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct Local
+    {
+        uint x;
+    }
+
+    [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public partial struct Packed1
     {
@@ -1063,13 +1077,6 @@ namespace My.Company
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public partial struct Phantomu8
-    {
-        public uint x;
-    }
-
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct SomeForeignType
     {
         public uint x;
     }

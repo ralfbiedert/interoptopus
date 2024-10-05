@@ -91,6 +91,7 @@ pub mod result;
 pub mod service;
 pub mod slice;
 pub mod string;
+pub mod surrogates;
 
 /// A pattern on a library level, usually involving both methods and types.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
