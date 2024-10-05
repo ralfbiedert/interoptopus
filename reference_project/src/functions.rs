@@ -3,14 +3,13 @@
 use crate::patterns::result::{Error, FFIError};
 use crate::types::{
     ambiguous1, ambiguous2, common, Aligned1, Aligned2, Array, BooleanAlignment, Callbacku8u8, EnumDocumented, EnumRenamedXYZ, Generic, Generic2, Generic3, Generic4,
-    Opaque, Packed1, Packed2, Phantom, StructDocumented, StructRenamedXYZ, Transparent, Tupled, Vec3f32, Visibility1, Visibility2, Weird1, Weird2,
+    Packed1, Packed2, Phantom, StructDocumented, StructRenamedXYZ, Transparent, Tupled, Vec3f32, Visibility1, Visibility2, Weird1, Weird2,
 };
 use interoptopus::patterns::option::FFIOption;
 use interoptopus::patterns::result::panics_and_errors_to_ffi_enum;
 use interoptopus::patterns::slice::FFISlice;
 use interoptopus::patterns::slice::FFISliceMut;
 use interoptopus::{ffi_function, here};
-use std::ptr::null;
 use std::time::Duration;
 
 #[ffi_function]

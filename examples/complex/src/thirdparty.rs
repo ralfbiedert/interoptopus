@@ -2,6 +2,7 @@
 /// but which you want to use in your ffi signatures nonetheless.
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
+#[allow(dead_code)]
 pub struct ThirdPartyVecF32 {
     pub x: f32,
     pub y: f32,

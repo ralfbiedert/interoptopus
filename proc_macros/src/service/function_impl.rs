@@ -1,11 +1,11 @@
 use crate::service::Attributes;
-use crate::util::{extract_doc_lines, get_type_name, pascal_to_snake_case, purge_lifetimes_from_type};
+use crate::util::{extract_doc_lines, purge_lifetimes_from_type};
 use darling::FromMeta;
 use proc_macro2::{Ident, TokenStream};
 use quote::quote_spanned;
 use std::ops::Deref;
 use syn::spanned::Spanned;
-use syn::{Attribute, FnArg, GenericParam, ImplItemFn, ItemImpl, Pat, ReturnType};
+use syn::{FnArg, GenericParam, ImplItemFn, ItemImpl, Pat, ReturnType};
 
 pub struct Descriptor {
     pub ffi_function_tokens: TokenStream,
@@ -106,7 +106,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
         ReturnType::Type(_, x) => quote_spanned!(span_rval=> #x),
     };
 
-    let method_type = method_type(&function);
+    let method_type = method_type(function);
 
     // Constructor needs extra arg for ptr
     if let MethodType::Constructor(_) = &method_type {

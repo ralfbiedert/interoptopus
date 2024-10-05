@@ -29,17 +29,20 @@ pub struct SuperComplexEntity {
 /// A type containing a third-party type.
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
+#[allow(dead_code)]
 pub struct WithForeignType {
     pub secret_number: u64,
     pub third_party: Option<*const ThirdPartyVecF32>,
 }
 
 // Won't win a beauty contest, but does the job.
+#[allow(dead_code)]
 pub fn third_party_option() -> CType {
     CType::ReadPointer(Box::new(third_party_vec_f32()))
 }
 
 // We can use this function wherever we refer to `ThirdPartyVecF32`.
+#[allow(dead_code)]
 fn third_party_vec_f32() -> CType {
     let fields = vec![
         Field::new("x".to_string(), CType::Primitive(PrimitiveType::F32)),

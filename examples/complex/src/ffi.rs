@@ -1,4 +1,4 @@
-use crate::common::{third_party_option, GameEngine, SuperComplexEntity, Vec3, WithForeignType};
+use crate::common::{GameEngine, SuperComplexEntity, Vec3};
 use interoptopus::{ffi_constant, ffi_function, ffi_type};
 use std::ptr::null_mut;
 

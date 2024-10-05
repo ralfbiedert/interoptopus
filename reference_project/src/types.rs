@@ -1,10 +1,8 @@
 //! All supported type patterns.
 
-use interoptopus::lang::c::{CType, CompositeType, Field, PrimitiveType};
 use interoptopus::lang::rust::CTypeInfo;
 use interoptopus::patterns::slice::FFISlice;
 use interoptopus::patterns::string::CStrPointer;
-use interoptopus::patterns::surrogates::Surrogate;
 use interoptopus::{callback, ffi_type};
 use std::fmt::Debug;
 use std::marker::PhantomData;
@@ -19,6 +17,7 @@ impl Helper for u8 {}
 pub struct Empty {}
 
 #[ffi_type(opaque)]
+#[allow(dead_code)]
 pub struct Opaque {
     _internal: *const Vec3f32,
 }
