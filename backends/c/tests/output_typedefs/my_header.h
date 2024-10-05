@@ -550,17 +550,17 @@ typedef my_library_ffi_error (*simple_service_method_callback)(my_library_simple
 ///
 /// The passed parameter MUST have been created with the corresponding init function;
 /// passing any other value results in undefined behavior.
-typedef my_library_ffi_error (*simple_service_lt_destroy)(my_library_simple_service_lifetime**);
+typedef my_library_ffi_error (*simple_service_lifetime_destroy)(my_library_simple_service_lifetime**);
 
-typedef my_library_ffi_error (*simple_service_lt_new_with)(my_library_simple_service_lifetime**, const uint32_t*);
+typedef my_library_ffi_error (*simple_service_lifetime_new_with)(my_library_simple_service_lifetime**, const uint32_t*);
 
-typedef void (*simple_service_lt_method_lt)(my_library_simple_service_lifetime*, my_library_slice_bool);
+typedef void (*simple_service_lifetime_method_lt)(my_library_simple_service_lifetime*, my_library_slice_bool);
 
-typedef void (*simple_service_lt_method_lt2)(my_library_simple_service_lifetime*, my_library_slice_bool);
+typedef void (*simple_service_lifetime_method_lt2)(my_library_simple_service_lifetime*, my_library_slice_bool);
 
-typedef const char* (*simple_service_lt_return_string_accept_slice)(my_library_simple_service_lifetime*, my_library_sliceu8);
+typedef const char* (*simple_service_lifetime_return_string_accept_slice)(my_library_simple_service_lifetime*, my_library_sliceu8);
 
-typedef my_library_ffi_error (*simple_service_lt_method_void_ffi_error)(my_library_simple_service_lifetime*);
+typedef my_library_ffi_error (*simple_service_lifetime_method_void_ffi_error)(my_library_simple_service_lifetime*);
 
 
 #ifdef __cplusplus

@@ -170,7 +170,7 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// | Parameter |  Explanation |
 /// | --- | ---  |
 /// | `error = "t"` | Use `t` as the [`FFIError`](https://docs.rs/interoptopus/latest/interoptopus/patterns/result/trait.FFIError.html) type, mandatory.
-/// | `prefix  = "p"` | Add `p` to all generated method names.
+/// | `prefix  = "p"` | Add `p` to all generated method names. If not given the prefix will be inferred from the type.
 ///
 /// # Example
 ///
@@ -218,7 +218,7 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// #[ffi_type(opaque)]
 /// pub struct SimpleService { }
 ///
-/// #[ffi_service(error = "MyFFIError", prefix = "simple_service_")]
+/// #[ffi_service(error = "MyFFIError")]
 /// impl SimpleService {
 ///
 ///     #[ffi_service_ctor]
@@ -399,7 +399,7 @@ pub fn ffi_service_ctor(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// #[ffi_type(opaque)]
 /// pub struct SimpleService { }
 ///
-/// #[ffi_service(error = "MyFFIError", prefix = "simple_service_")]
+/// #[ffi_service(error = "MyFFIError")]
 /// impl SimpleService {
 ///
 ///     #[ffi_service_ctor]

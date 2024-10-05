@@ -1,5 +1,5 @@
 use crate::service::Attributes;
-use crate::util::{extract_doc_lines, purge_lifetimes_from_type};
+use crate::util::{extract_doc_lines, get_type_name, pascal_to_snake_case, purge_lifetimes_from_type};
 use darling::FromMeta;
 use proc_macro2::{Ident, TokenStream};
 use quote::quote_spanned;
@@ -69,12 +69,13 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
     let mut generics = function.sig.generics.clone();
     let mut inputs = Vec::new();
     let mut arg_names = Vec::new();
+    let service_prefix = attributes.prefered_service_name(impl_block);
 
     for lt in impl_block.generics.lifetimes() {
         generics.params.push(GenericParam::Lifetime(lt.clone()))
     }
 
-    let ffi_fn_ident = Ident::new(&format!("{}{}", attributes.prefix, orig_fn_ident), function.span());
+    let ffi_fn_ident = Ident::new(&format!("{}{}", service_prefix, orig_fn_ident), function.span());
     let error_ident = Ident::new(&attributes.error, function.span());
     let without_lifetimes = purge_lifetimes_from_type(&impl_block.self_ty);
     let doc_lines = extract_doc_lines(&function.attrs);
@@ -131,7 +132,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 #[interoptopus::ffi_function]
                 #[no_mangle]
                 #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
-                #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes)]
+                #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals)]
                 #(
                     #[doc = #doc_lines]
                 )*
@@ -171,7 +172,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     #[interoptopus::ffi_function]
                     #[no_mangle]
                     #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
-                    #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes)]
+                    #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals)]
                     #(
                         #[doc = #doc_lines]
                     )*
@@ -199,7 +200,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     #[interoptopus::ffi_function]
                     #[no_mangle]
                     #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
-                    #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes)]
+                    #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals)]
                     #(
                         #[doc = #doc_lines]
                     )*
@@ -217,7 +218,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     #[interoptopus::ffi_function]
                     #[no_mangle]
                     #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
-                    #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes)]
+                    #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals)]
                     #(
                         #[doc = #doc_lines]
                     )*
@@ -240,7 +241,8 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
 }
 
 pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> Descriptor {
-    let ffi_fn_ident = Ident::new(&format!("{}destroy", attributes.prefix), impl_block.span());
+    let service_prefix = attributes.prefered_service_name(impl_block);
+    let ffi_fn_ident = Ident::new(&format!("{}destroy", service_prefix), impl_block.span());
     let error_ident = Ident::new(&attributes.error, impl_block.span());
     let without_lifetimes = purge_lifetimes_from_type(&impl_block.self_ty);
 
@@ -255,7 +257,7 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
         /// passing any other value results in undefined behavior.
         #[interoptopus::ffi_function]
         #[allow(unused_mut, unsafe_op_in_unsafe_fn, unused_unsafe)]
-        #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes)]
+        #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals)]
         #[no_mangle]
         pub unsafe extern "C" fn #ffi_fn_ident(context: &mut *mut #without_lifetimes) -> #error_ident {
             // Checks the _contained_ pointer is not null, which usually means service was not initialized.

@@ -23,9 +23,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 17707716988646484993ul)
+            if (api_version != 1526672664801468947ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (17707716988646484993). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (1526672664801468947). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -503,8 +503,8 @@ namespace My.Company
         ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_destroy")]
-        public static extern FFIError simple_service_destroy(ref IntPtr context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_servicedestroy")]
+        public static extern FFIError simple_servicedestroy(ref IntPtr context);
 
         /// Destroys the given instance.
         ///
@@ -512,9 +512,9 @@ namespace My.Company
         ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
-        public static void simple_service_destroy_checked(ref IntPtr context)
+        public static void simple_servicedestroy_checked(ref IntPtr context)
         {
-            var rval = simple_service_destroy(ref context);;
+            var rval = simple_servicedestroy(ref context);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -522,49 +522,49 @@ namespace My.Company
         }
 
         /// The constructor must return a `Result<Self, Error>`.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_new_with")]
-        public static extern FFIError simple_service_new_with(ref IntPtr context, uint some_value);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_servicenew_with")]
+        public static extern FFIError simple_servicenew_with(ref IntPtr context, uint some_value);
 
         /// The constructor must return a `Result<Self, Error>`.
-        public static void simple_service_new_with_checked(ref IntPtr context, uint some_value)
+        public static void simple_servicenew_with_checked(ref IntPtr context, uint some_value)
         {
-            var rval = simple_service_new_with(ref context, some_value);;
+            var rval = simple_servicenew_with(ref context, some_value);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
             }
         }
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_new_without")]
-        public static extern FFIError simple_service_new_without(ref IntPtr context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_servicenew_without")]
+        public static extern FFIError simple_servicenew_without(ref IntPtr context);
 
-        public static void simple_service_new_without_checked(ref IntPtr context)
+        public static void simple_servicenew_without_checked(ref IntPtr context)
         {
-            var rval = simple_service_new_without(ref context);;
+            var rval = simple_servicenew_without(ref context);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
             }
         }
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_new_with_string")]
-        public static extern FFIError simple_service_new_with_string(ref IntPtr context, string ascii);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_servicenew_with_string")]
+        public static extern FFIError simple_servicenew_with_string(ref IntPtr context, string ascii);
 
-        public static void simple_service_new_with_string_checked(ref IntPtr context, string ascii)
+        public static void simple_servicenew_with_string_checked(ref IntPtr context, string ascii)
         {
-            var rval = simple_service_new_with_string(ref context, ascii);;
+            var rval = simple_servicenew_with_string(ref context, ascii);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
             }
         }
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_new_failing")]
-        public static extern FFIError simple_service_new_failing(ref IntPtr context, byte some_value);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_servicenew_failing")]
+        public static extern FFIError simple_servicenew_failing(ref IntPtr context, byte some_value);
 
-        public static void simple_service_new_failing_checked(ref IntPtr context, byte some_value)
+        public static void simple_servicenew_failing_checked(ref IntPtr context, byte some_value)
         {
-            var rval = simple_service_new_failing(ref context, some_value);;
+            var rval = simple_servicenew_failing(ref context, some_value);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -573,108 +573,108 @@ namespace My.Company
 
         /// Methods returning a Result<(), _> are the default and do not
         /// need annotations.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_result")]
-        public static extern FFIError simple_service_method_result(IntPtr context, uint anon1);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_servicemethod_result")]
+        public static extern FFIError simple_servicemethod_result(IntPtr context, uint anon1);
 
         /// Methods returning a Result<(), _> are the default and do not
         /// need annotations.
-        public static void simple_service_method_result_checked(IntPtr context, uint anon1)
+        public static void simple_servicemethod_result_checked(IntPtr context, uint anon1)
         {
-            var rval = simple_service_method_result(context, anon1);;
+            var rval = simple_servicemethod_result(context, anon1);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
             }
         }
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_value")]
-        public static extern uint simple_service_method_value(IntPtr context, uint x);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_servicemethod_value")]
+        public static extern uint simple_servicemethod_value(IntPtr context, uint x);
 
         /// This method should be documented.
         ///
         /// Multiple lines.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_void")]
-        public static extern void simple_service_method_void(IntPtr context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_servicemethod_void")]
+        public static extern void simple_servicemethod_void(IntPtr context);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self")]
-        public static extern byte simple_service_method_mut_self(IntPtr context, Sliceu8 slice);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_servicemethod_mut_self")]
+        public static extern byte simple_servicemethod_mut_self(IntPtr context, Sliceu8 slice);
 
-        public static byte simple_service_method_mut_self(IntPtr context, System.ReadOnlySpan<byte> slice)
+        public static byte simple_servicemethod_mut_self(IntPtr context, System.ReadOnlySpan<byte> slice)
         {
             unsafe
             {
                 fixed (void* ptr_slice = slice)
                 {
                     var slice_slice = new Sliceu8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                    return simple_service_method_mut_self(context, slice_slice);;
+                    return simple_servicemethod_mut_self(context, slice_slice);;
                 }
             }
         }
 
         #if UNITY_2018_1_OR_NEWER
-        public static byte simple_service_method_mut_self(IntPtr context, NativeArray<byte> slice)
+        public static byte simple_servicemethod_mut_self(IntPtr context, NativeArray<byte> slice)
         {
             var slice_slice = new Sliceu8(slice);
-            return simple_service_method_mut_self(context, slice_slice);;
+            return simple_servicemethod_mut_self(context, slice_slice);;
         }
         #endif
 
         /// Single line.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_void")]
-        public static extern void simple_service_method_mut_self_void(IntPtr context, SliceBool slice);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_servicemethod_mut_self_void")]
+        public static extern void simple_servicemethod_mut_self_void(IntPtr context, SliceBool slice);
 
         /// Single line.
-        public static void simple_service_method_mut_self_void(IntPtr context, System.ReadOnlySpan<Bool> slice)
+        public static void simple_servicemethod_mut_self_void(IntPtr context, System.ReadOnlySpan<Bool> slice)
         {
             unsafe
             {
                 fixed (void* ptr_slice = slice)
                 {
                     var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
-                    simple_service_method_mut_self_void(context, slice_slice);;
+                    simple_servicemethod_mut_self_void(context, slice_slice);;
                 }
             }
         }
 
         /// Single line.
         #if UNITY_2018_1_OR_NEWER
-        public static void simple_service_method_mut_self_void(IntPtr context, NativeArray<Bool> slice)
+        public static void simple_servicemethod_mut_self_void(IntPtr context, NativeArray<Bool> slice)
         {
             var slice_slice = new SliceBool(slice);
-            simple_service_method_mut_self_void(context, slice_slice);;
+            simple_servicemethod_mut_self_void(context, slice_slice);;
         }
         #endif
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref")]
-        public static extern byte simple_service_method_mut_self_ref(IntPtr context, ref byte x, out byte y);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_servicemethod_mut_self_ref")]
+        public static extern byte simple_servicemethod_mut_self_ref(IntPtr context, ref byte x, out byte y);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref_slice")]
-        public static extern byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, Sliceu8 slice);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_servicemethod_mut_self_ref_slice")]
+        public static extern byte simple_servicemethod_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, Sliceu8 slice);
 
-        public static byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, System.ReadOnlySpan<byte> slice)
+        public static byte simple_servicemethod_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, System.ReadOnlySpan<byte> slice)
         {
             unsafe
             {
                 fixed (void* ptr_slice = slice)
                 {
                     var slice_slice = new Sliceu8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                    return simple_service_method_mut_self_ref_slice(context, ref x, out y, slice_slice);;
+                    return simple_servicemethod_mut_self_ref_slice(context, ref x, out y, slice_slice);;
                 }
             }
         }
 
         #if UNITY_2018_1_OR_NEWER
-        public static byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, NativeArray<byte> slice)
+        public static byte simple_servicemethod_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, NativeArray<byte> slice)
         {
             var slice_slice = new Sliceu8(slice);
-            return simple_service_method_mut_self_ref_slice(context, ref x, out y, slice_slice);;
+            return simple_servicemethod_mut_self_ref_slice(context, ref x, out y, slice_slice);;
         }
         #endif
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref_slice_limited")]
-        public static extern byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, Sliceu8 slice, Sliceu8 slice2);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_servicemethod_mut_self_ref_slice_limited")]
+        public static extern byte simple_servicemethod_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, Sliceu8 slice, Sliceu8 slice2);
 
-        public static byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, System.ReadOnlySpan<byte> slice, System.ReadOnlySpan<byte> slice2)
+        public static byte simple_servicemethod_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, System.ReadOnlySpan<byte> slice, System.ReadOnlySpan<byte> slice2)
         {
             unsafe
             {
@@ -684,32 +684,32 @@ namespace My.Company
                     fixed (void* ptr_slice2 = slice2)
                     {
                         var slice2_slice = new Sliceu8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
-                        return simple_service_method_mut_self_ref_slice_limited(context, ref x, out y, slice_slice, slice2_slice);;
+                        return simple_servicemethod_mut_self_ref_slice_limited(context, ref x, out y, slice_slice, slice2_slice);;
                     }
                 }
             }
         }
 
         #if UNITY_2018_1_OR_NEWER
-        public static byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, NativeArray<byte> slice, NativeArray<byte> slice2)
+        public static byte simple_servicemethod_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, NativeArray<byte> slice, NativeArray<byte> slice2)
         {
             var slice_slice = new Sliceu8(slice);
             var slice2_slice = new Sliceu8(slice2);
-            return simple_service_method_mut_self_ref_slice_limited(context, ref x, out y, slice_slice, slice2_slice);;
+            return simple_servicemethod_mut_self_ref_slice_limited(context, ref x, out y, slice_slice, slice2_slice);;
         }
         #endif
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ffi_error")]
-        public static extern FFIError simple_service_method_mut_self_ffi_error(IntPtr context, SliceMutu8 slice);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_servicemethod_mut_self_ffi_error")]
+        public static extern FFIError simple_servicemethod_mut_self_ffi_error(IntPtr context, SliceMutu8 slice);
 
-        public static void simple_service_method_mut_self_ffi_error(IntPtr context, System.Span<byte> slice)
+        public static void simple_servicemethod_mut_self_ffi_error(IntPtr context, System.Span<byte> slice)
         {
             unsafe
             {
                 fixed (void* ptr_slice = slice)
                 {
                     var slice_slice = new SliceMutu8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                    var rval = simple_service_method_mut_self_ffi_error(context, slice_slice);;
+                    var rval = simple_servicemethod_mut_self_ffi_error(context, slice_slice);;
                     if (rval != FFIError.Ok)
                     {
                         throw new InteropException<FFIError>(rval);
@@ -719,10 +719,10 @@ namespace My.Company
         }
 
         #if UNITY_2018_1_OR_NEWER
-        public static void simple_service_method_mut_self_ffi_error(IntPtr context, NativeArray<byte> slice)
+        public static void simple_servicemethod_mut_self_ffi_error(IntPtr context, NativeArray<byte> slice)
         {
             var slice_slice = new SliceMutu8(slice);
-            var rval = simple_service_method_mut_self_ffi_error(context, slice_slice);;
+            var rval = simple_servicemethod_mut_self_ffi_error(context, slice_slice);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -730,17 +730,17 @@ namespace My.Company
         }
         #endif
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_no_error")]
-        public static extern FFIError simple_service_method_mut_self_no_error(IntPtr context, SliceMutu8 slice);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_servicemethod_mut_self_no_error")]
+        public static extern FFIError simple_servicemethod_mut_self_no_error(IntPtr context, SliceMutu8 slice);
 
-        public static void simple_service_method_mut_self_no_error(IntPtr context, System.Span<byte> slice)
+        public static void simple_servicemethod_mut_self_no_error(IntPtr context, System.Span<byte> slice)
         {
             unsafe
             {
                 fixed (void* ptr_slice = slice)
                 {
                     var slice_slice = new SliceMutu8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                    var rval = simple_service_method_mut_self_no_error(context, slice_slice);;
+                    var rval = simple_servicemethod_mut_self_no_error(context, slice_slice);;
                     if (rval != FFIError.Ok)
                     {
                         throw new InteropException<FFIError>(rval);
@@ -750,10 +750,10 @@ namespace My.Company
         }
 
         #if UNITY_2018_1_OR_NEWER
-        public static void simple_service_method_mut_self_no_error(IntPtr context, NativeArray<byte> slice)
+        public static void simple_servicemethod_mut_self_no_error(IntPtr context, NativeArray<byte> slice)
         {
             var slice_slice = new SliceMutu8(slice);
-            var rval = simple_service_method_mut_self_no_error(context, slice_slice);;
+            var rval = simple_servicemethod_mut_self_no_error(context, slice_slice);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -763,44 +763,44 @@ namespace My.Company
 
         /// Warning, you _must_ discard the returned slice object before calling into this service
         /// again, as otherwise undefined behavior might happen.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_return_slice")]
-        public static extern Sliceu32 simple_service_return_slice(IntPtr context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_servicereturn_slice")]
+        public static extern Sliceu32 simple_servicereturn_slice(IntPtr context);
 
         /// Warning, you _must_ discard the returned slice object before calling into this service
         /// again, as otherwise undefined behavior might happen.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_return_slice_mut")]
-        public static extern SliceMutu32 simple_service_return_slice_mut(IntPtr context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_servicereturn_slice_mut")]
+        public static extern SliceMutu32 simple_servicereturn_slice_mut(IntPtr context);
 
         /// This function has no panic safeguards. If it panics your host app will be in an undefined state.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_return_string")]
-        public static extern IntPtr simple_service_return_string(IntPtr context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_servicereturn_string")]
+        public static extern IntPtr simple_servicereturn_string(IntPtr context);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_void_ffi_error")]
-        public static extern FFIError simple_service_method_void_ffi_error(IntPtr context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_servicemethod_void_ffi_error")]
+        public static extern FFIError simple_servicemethod_void_ffi_error(IntPtr context);
 
-        public static void simple_service_method_void_ffi_error_checked(IntPtr context)
+        public static void simple_servicemethod_void_ffi_error_checked(IntPtr context)
         {
-            var rval = simple_service_method_void_ffi_error(context);;
+            var rval = simple_servicemethod_void_ffi_error(context);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
             }
         }
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_callback")]
-        public static extern FFIError simple_service_method_callback(IntPtr context, MyCallback callback);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_servicemethod_callback")]
+        public static extern FFIError simple_servicemethod_callback(IntPtr context, MyCallback callback);
 
-        public static void simple_service_method_callback_checked(IntPtr context, MyCallback callback)
+        public static void simple_servicemethod_callback_checked(IntPtr context, MyCallback callback)
         {
-            var rval = simple_service_method_callback(context, callback);;
+            var rval = simple_servicemethod_callback(context, callback);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
             }
         }
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_callback")]
-        public static extern FFIError simple_service_method_callback(IntPtr context, IntPtr callback);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_servicemethod_callback")]
+        public static extern FFIError simple_servicemethod_callback(IntPtr context, IntPtr callback);
 
 
         /// Destroys the given instance.
@@ -809,8 +809,8 @@ namespace My.Company
         ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lt_destroy")]
-        public static extern FFIError simple_service_lt_destroy(ref IntPtr context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lifetimedestroy")]
+        public static extern FFIError simple_service_lifetimedestroy(ref IntPtr context);
 
         /// Destroys the given instance.
         ///
@@ -818,104 +818,104 @@ namespace My.Company
         ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
-        public static void simple_service_lt_destroy_checked(ref IntPtr context)
+        public static void simple_service_lifetimedestroy_checked(ref IntPtr context)
         {
-            var rval = simple_service_lt_destroy(ref context);;
+            var rval = simple_service_lifetimedestroy(ref context);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
             }
         }
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lt_new_with")]
-        public static extern FFIError simple_service_lt_new_with(ref IntPtr context, ref uint some_value);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lifetimenew_with")]
+        public static extern FFIError simple_service_lifetimenew_with(ref IntPtr context, ref uint some_value);
 
-        public static void simple_service_lt_new_with_checked(ref IntPtr context, ref uint some_value)
+        public static void simple_service_lifetimenew_with_checked(ref IntPtr context, ref uint some_value)
         {
-            var rval = simple_service_lt_new_with(ref context, ref some_value);;
+            var rval = simple_service_lifetimenew_with(ref context, ref some_value);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
             }
         }
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lt_method_lt")]
-        public static extern void simple_service_lt_method_lt(IntPtr context, SliceBool slice);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lifetimemethod_lt")]
+        public static extern void simple_service_lifetimemethod_lt(IntPtr context, SliceBool slice);
 
-        public static void simple_service_lt_method_lt(IntPtr context, System.ReadOnlySpan<Bool> slice)
+        public static void simple_service_lifetimemethod_lt(IntPtr context, System.ReadOnlySpan<Bool> slice)
         {
             unsafe
             {
                 fixed (void* ptr_slice = slice)
                 {
                     var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
-                    simple_service_lt_method_lt(context, slice_slice);;
+                    simple_service_lifetimemethod_lt(context, slice_slice);;
                 }
             }
         }
 
         #if UNITY_2018_1_OR_NEWER
-        public static void simple_service_lt_method_lt(IntPtr context, NativeArray<Bool> slice)
+        public static void simple_service_lifetimemethod_lt(IntPtr context, NativeArray<Bool> slice)
         {
             var slice_slice = new SliceBool(slice);
-            simple_service_lt_method_lt(context, slice_slice);;
+            simple_service_lifetimemethod_lt(context, slice_slice);;
         }
         #endif
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lt_method_lt2")]
-        public static extern void simple_service_lt_method_lt2(IntPtr context, SliceBool slice);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lifetimemethod_lt2")]
+        public static extern void simple_service_lifetimemethod_lt2(IntPtr context, SliceBool slice);
 
-        public static void simple_service_lt_method_lt2(IntPtr context, System.ReadOnlySpan<Bool> slice)
+        public static void simple_service_lifetimemethod_lt2(IntPtr context, System.ReadOnlySpan<Bool> slice)
         {
             unsafe
             {
                 fixed (void* ptr_slice = slice)
                 {
                     var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
-                    simple_service_lt_method_lt2(context, slice_slice);;
+                    simple_service_lifetimemethod_lt2(context, slice_slice);;
                 }
             }
         }
 
         #if UNITY_2018_1_OR_NEWER
-        public static void simple_service_lt_method_lt2(IntPtr context, NativeArray<Bool> slice)
+        public static void simple_service_lifetimemethod_lt2(IntPtr context, NativeArray<Bool> slice)
         {
             var slice_slice = new SliceBool(slice);
-            simple_service_lt_method_lt2(context, slice_slice);;
+            simple_service_lifetimemethod_lt2(context, slice_slice);;
         }
         #endif
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lt_return_string_accept_slice")]
-        public static extern IntPtr simple_service_lt_return_string_accept_slice(IntPtr anon0, Sliceu8 anon1);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lifetimereturn_string_accept_slice")]
+        public static extern IntPtr simple_service_lifetimereturn_string_accept_slice(IntPtr anon0, Sliceu8 anon1);
 
-        public static string simple_service_lt_return_string_accept_slice(IntPtr anon0, System.ReadOnlySpan<byte> anon1)
+        public static string simple_service_lifetimereturn_string_accept_slice(IntPtr anon0, System.ReadOnlySpan<byte> anon1)
         {
             unsafe
             {
                 fixed (void* ptr_anon1 = anon1)
                 {
                     var anon1_slice = new Sliceu8(new IntPtr(ptr_anon1), (ulong) anon1.Length);
-                    var s = simple_service_lt_return_string_accept_slice(anon0, anon1_slice);;
+                    var s = simple_service_lifetimereturn_string_accept_slice(anon0, anon1_slice);;
                     return Marshal.PtrToStringAnsi(s);
                 }
             }
         }
 
         #if UNITY_2018_1_OR_NEWER
-        public static string simple_service_lt_return_string_accept_slice(IntPtr anon0, NativeArray<byte> anon1)
+        public static string simple_service_lifetimereturn_string_accept_slice(IntPtr anon0, NativeArray<byte> anon1)
         {
             var anon1_slice = new Sliceu8(anon1);
-            var s = simple_service_lt_return_string_accept_slice(anon0, anon1_slice);;
+            var s = simple_service_lifetimereturn_string_accept_slice(anon0, anon1_slice);;
             return Marshal.PtrToStringAnsi(s);
         }
         #endif
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lt_method_void_ffi_error")]
-        public static extern FFIError simple_service_lt_method_void_ffi_error(IntPtr context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lifetimemethod_void_ffi_error")]
+        public static extern FFIError simple_service_lifetimemethod_void_ffi_error(IntPtr context);
 
-        public static void simple_service_lt_method_void_ffi_error_checked(IntPtr context)
+        public static void simple_service_lifetimemethod_void_ffi_error_checked(IntPtr context)
         {
-            var rval = simple_service_lt_method_void_ffi_error(context);;
+            var rval = simple_service_lifetimemethod_void_ffi_error(context);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -1437,7 +1437,7 @@ namespace My.Company
         public static SimpleService NewWith(uint some_value)
         {
             var self = new SimpleService();
-            var rval = Interop.simple_service_new_with(ref self._context, some_value);
+            var rval = Interop.simple_servicenew_with(ref self._context, some_value);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -1448,7 +1448,7 @@ namespace My.Company
         public static SimpleService NewWithout()
         {
             var self = new SimpleService();
-            var rval = Interop.simple_service_new_without(ref self._context);
+            var rval = Interop.simple_servicenew_without(ref self._context);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -1459,7 +1459,7 @@ namespace My.Company
         public static SimpleService NewWithString(string ascii)
         {
             var self = new SimpleService();
-            var rval = Interop.simple_service_new_with_string(ref self._context, ascii);
+            var rval = Interop.simple_servicenew_with_string(ref self._context, ascii);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -1470,7 +1470,7 @@ namespace My.Company
         public static SimpleService NewFailing(byte some_value)
         {
             var self = new SimpleService();
-            var rval = Interop.simple_service_new_failing(ref self._context, some_value);
+            var rval = Interop.simple_servicenew_failing(ref self._context, some_value);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -1480,7 +1480,7 @@ namespace My.Company
 
         public void Dispose()
         {
-            var rval = Interop.simple_service_destroy(ref _context);
+            var rval = Interop.simple_servicedestroy(ref _context);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -1491,7 +1491,7 @@ namespace My.Company
         /// need annotations.
         public void MethodResult(uint anon1)
         {
-            var rval = Interop.simple_service_method_result(_context, anon1);
+            var rval = Interop.simple_servicemethod_result(_context, anon1);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -1500,7 +1500,7 @@ namespace My.Company
 
         public uint MethodValue(uint x)
         {
-            return Interop.simple_service_method_value(_context, x);
+            return Interop.simple_servicemethod_value(_context, x);
         }
 
         /// This method should be documented.
@@ -1508,88 +1508,88 @@ namespace My.Company
         /// Multiple lines.
         public void MethodVoid()
         {
-            Interop.simple_service_method_void(_context);
+            Interop.simple_servicemethod_void(_context);
         }
 
         public byte MethodMutSelf(Sliceu8 slice)
         {
-            return Interop.simple_service_method_mut_self(_context, slice);
+            return Interop.simple_servicemethod_mut_self(_context, slice);
         }
 
         public byte MethodMutSelf(System.ReadOnlySpan<byte> slice)
         {
-            return Interop.simple_service_method_mut_self(_context, slice);
+            return Interop.simple_servicemethod_mut_self(_context, slice);
         }
 
         #if UNITY_2018_1_OR_NEWER
         public byte MethodMutSelf(NativeArray<byte> slice)
         {
-            return Interop.simple_service_method_mut_self(_context, slice);
+            return Interop.simple_servicemethod_mut_self(_context, slice);
         }
         #endif
 
         /// Single line.
         public void MethodMutSelfVoid(SliceBool slice)
         {
-            Interop.simple_service_method_mut_self_void(_context, slice);
+            Interop.simple_servicemethod_mut_self_void(_context, slice);
         }
 
         /// Single line.
         public void MethodMutSelfVoid(System.ReadOnlySpan<Bool> slice)
         {
-            Interop.simple_service_method_mut_self_void(_context, slice);
+            Interop.simple_servicemethod_mut_self_void(_context, slice);
         }
 
         #if UNITY_2018_1_OR_NEWER
         /// Single line.
         public void MethodMutSelfVoid(NativeArray<Bool> slice)
         {
-            Interop.simple_service_method_mut_self_void(_context, slice);
+            Interop.simple_servicemethod_mut_self_void(_context, slice);
         }
         #endif
 
         public byte MethodMutSelfRef(ref byte x, out byte y)
         {
-            return Interop.simple_service_method_mut_self_ref(_context, ref x, out y);
+            return Interop.simple_servicemethod_mut_self_ref(_context, ref x, out y);
         }
 
         public byte MethodMutSelfRefSlice(ref byte x, out byte y, Sliceu8 slice)
         {
-            return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out y, slice);
+            return Interop.simple_servicemethod_mut_self_ref_slice(_context, ref x, out y, slice);
         }
 
         public byte MethodMutSelfRefSlice(ref byte x, out byte y, System.ReadOnlySpan<byte> slice)
         {
-            return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out y, slice);
+            return Interop.simple_servicemethod_mut_self_ref_slice(_context, ref x, out y, slice);
         }
 
         #if UNITY_2018_1_OR_NEWER
         public byte MethodMutSelfRefSlice(ref byte x, out byte y, NativeArray<byte> slice)
         {
-            return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out y, slice);
+            return Interop.simple_servicemethod_mut_self_ref_slice(_context, ref x, out y, slice);
         }
         #endif
 
         public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, Sliceu8 slice, Sliceu8 slice2)
         {
-            return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
+            return Interop.simple_servicemethod_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
         }
 
         public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, System.ReadOnlySpan<byte> slice, System.ReadOnlySpan<byte> slice2)
         {
-            return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
+            return Interop.simple_servicemethod_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
         }
 
         #if UNITY_2018_1_OR_NEWER
         public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, NativeArray<byte> slice, NativeArray<byte> slice2)
         {
-            return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
+            return Interop.simple_servicemethod_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
         }
         #endif
 
         public void MethodMutSelfFfiError(SliceMutu8 slice)
         {
-            var rval = Interop.simple_service_method_mut_self_ffi_error(_context, slice);
+            var rval = Interop.simple_servicemethod_mut_self_ffi_error(_context, slice);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -1598,19 +1598,19 @@ namespace My.Company
 
         public void MethodMutSelfFfiError(System.Span<byte> slice)
         {
-            Interop.simple_service_method_mut_self_ffi_error(_context, slice);
+            Interop.simple_servicemethod_mut_self_ffi_error(_context, slice);
         }
 
         #if UNITY_2018_1_OR_NEWER
         public void MethodMutSelfFfiError(NativeArray<byte> slice)
         {
-            Interop.simple_service_method_mut_self_ffi_error(_context, slice);
+            Interop.simple_servicemethod_mut_self_ffi_error(_context, slice);
         }
         #endif
 
         public void MethodMutSelfNoError(SliceMutu8 slice)
         {
-            var rval = Interop.simple_service_method_mut_self_no_error(_context, slice);
+            var rval = Interop.simple_servicemethod_mut_self_no_error(_context, slice);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -1619,13 +1619,13 @@ namespace My.Company
 
         public void MethodMutSelfNoError(System.Span<byte> slice)
         {
-            Interop.simple_service_method_mut_self_no_error(_context, slice);
+            Interop.simple_servicemethod_mut_self_no_error(_context, slice);
         }
 
         #if UNITY_2018_1_OR_NEWER
         public void MethodMutSelfNoError(NativeArray<byte> slice)
         {
-            Interop.simple_service_method_mut_self_no_error(_context, slice);
+            Interop.simple_servicemethod_mut_self_no_error(_context, slice);
         }
         #endif
 
@@ -1633,26 +1633,26 @@ namespace My.Company
         /// again, as otherwise undefined behavior might happen.
         public Sliceu32 ReturnSlice()
         {
-            return Interop.simple_service_return_slice(_context);
+            return Interop.simple_servicereturn_slice(_context);
         }
 
         /// Warning, you _must_ discard the returned slice object before calling into this service
         /// again, as otherwise undefined behavior might happen.
         public SliceMutu32 ReturnSliceMut()
         {
-            return Interop.simple_service_return_slice_mut(_context);
+            return Interop.simple_servicereturn_slice_mut(_context);
         }
 
         /// This function has no panic safeguards. If it panics your host app will be in an undefined state.
         public string ReturnString()
         {
-            var s = Interop.simple_service_return_string(_context);
+            var s = Interop.simple_servicereturn_string(_context);
             return Marshal.PtrToStringAnsi(s);
         }
 
         public void MethodVoidFfiError()
         {
-            var rval = Interop.simple_service_method_void_ffi_error(_context);
+            var rval = Interop.simple_servicemethod_void_ffi_error(_context);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -1661,7 +1661,7 @@ namespace My.Company
 
         public void MethodCallback(MyCallback callback)
         {
-            var rval = Interop.simple_service_method_callback(_context, callback);
+            var rval = Interop.simple_servicemethod_callback(_context, callback);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -1671,7 +1671,7 @@ namespace My.Company
         #if UNITY_2018_1_OR_NEWER
         public void MethodCallback(IntPtr callback)
         {
-            Interop.simple_service_method_callback(_context, callback);
+            Interop.simple_servicemethod_callback(_context, callback);
         }
         #endif
 
@@ -1688,7 +1688,7 @@ namespace My.Company
         public static SimpleServiceLifetime NewWith(ref uint some_value)
         {
             var self = new SimpleServiceLifetime();
-            var rval = Interop.simple_service_lt_new_with(ref self._context, ref some_value);
+            var rval = Interop.simple_service_lifetimenew_with(ref self._context, ref some_value);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -1698,7 +1698,7 @@ namespace My.Company
 
         public void Dispose()
         {
-            var rval = Interop.simple_service_lt_destroy(ref _context);
+            var rval = Interop.simple_service_lifetimedestroy(ref _context);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -1707,59 +1707,59 @@ namespace My.Company
 
         public void MethodLt(SliceBool slice)
         {
-            Interop.simple_service_lt_method_lt(_context, slice);
+            Interop.simple_service_lifetimemethod_lt(_context, slice);
         }
 
         public void MethodLt(System.ReadOnlySpan<Bool> slice)
         {
-            Interop.simple_service_lt_method_lt(_context, slice);
+            Interop.simple_service_lifetimemethod_lt(_context, slice);
         }
 
         #if UNITY_2018_1_OR_NEWER
         public void MethodLt(NativeArray<Bool> slice)
         {
-            Interop.simple_service_lt_method_lt(_context, slice);
+            Interop.simple_service_lifetimemethod_lt(_context, slice);
         }
         #endif
 
         public void MethodLt2(SliceBool slice)
         {
-            Interop.simple_service_lt_method_lt2(_context, slice);
+            Interop.simple_service_lifetimemethod_lt2(_context, slice);
         }
 
         public void MethodLt2(System.ReadOnlySpan<Bool> slice)
         {
-            Interop.simple_service_lt_method_lt2(_context, slice);
+            Interop.simple_service_lifetimemethod_lt2(_context, slice);
         }
 
         #if UNITY_2018_1_OR_NEWER
         public void MethodLt2(NativeArray<Bool> slice)
         {
-            Interop.simple_service_lt_method_lt2(_context, slice);
+            Interop.simple_service_lifetimemethod_lt2(_context, slice);
         }
         #endif
 
         public string ReturnStringAcceptSlice(Sliceu8 anon1)
         {
-            var s = Interop.simple_service_lt_return_string_accept_slice(_context, anon1);
+            var s = Interop.simple_service_lifetimereturn_string_accept_slice(_context, anon1);
             return Marshal.PtrToStringAnsi(s);
         }
 
         public string ReturnStringAcceptSlice(System.ReadOnlySpan<byte> anon1)
         {
-            return Interop.simple_service_lt_return_string_accept_slice(_context, anon1);
+            return Interop.simple_service_lifetimereturn_string_accept_slice(_context, anon1);
         }
 
         #if UNITY_2018_1_OR_NEWER
         public string ReturnStringAcceptSlice(NativeArray<byte> anon1)
         {
-            return Interop.simple_service_lt_return_string_accept_slice(_context, anon1);
+            return Interop.simple_service_lifetimereturn_string_accept_slice(_context, anon1);
         }
         #endif
 
         public void MethodVoidFfiError()
         {
-            var rval = Interop.simple_service_lt_method_void_ffi_error(_context);
+            var rval = Interop.simple_service_lifetimemethod_void_ffi_error(_context);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);

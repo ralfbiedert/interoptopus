@@ -11,6 +11,7 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
     - Previously you needed to specify `#[ffi_surrogates(some_field = "some_foreign_type")]`
     - Instead, you now make `some_field` of type `Surrogate<Foreign, Local>`
 - `AsciiPointer` is now called `CStrPointer`, since it can contain non-ASCII data (e.g., when called from C#).
+- In service definitions, providing a `prefix` is generally not needed anymore.
 
 ### 0.13 → 0.14
 

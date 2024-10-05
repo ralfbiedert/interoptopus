@@ -1,5 +1,6 @@
 use crate::macros::darling_parse;
 use crate::service::function_impl::{generate_service_dtor, generate_service_method};
+use crate::util::{get_type_name, pascal_to_snake_case};
 use darling::FromMeta;
 use function_impl::MethodType;
 use proc_macro2::TokenStream;
@@ -18,6 +19,17 @@ pub struct Attributes {
 
     #[darling(default)]
     prefix: String,
+}
+
+impl Attributes {
+    pub fn prefered_service_name(&self, impl_block: &ItemImpl) -> String {
+        if self.prefix.is_empty() {
+            let service_name = get_type_name(impl_block).expect("Must have valid service name");
+            format!("{}_", pascal_to_snake_case(&service_name))
+        } else {
+            self.prefix.clone()
+        }
+    }
 }
 
 pub fn ffi_service(attr: TokenStream, input: TokenStream) -> TokenStream {

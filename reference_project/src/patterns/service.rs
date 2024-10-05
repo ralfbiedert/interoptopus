@@ -16,7 +16,7 @@ pub struct SimpleService {
 }
 
 // Regular implementation of methods.
-#[ffi_service(error = "FFIError", prefix = "simple_service_")]
+#[ffi_service(error = "FFIError")]
 impl SimpleService {
     /// The constructor must return a `Result<Self, Error>`.
     #[ffi_service_ctor]
@@ -151,7 +151,7 @@ pub struct SimpleServiceLifetime<'a> {
     pub some_value: &'a u32,
 }
 
-#[ffi_service(error = "FFIError", prefix = "simple_service_lt_")]
+#[ffi_service(error = "FFIError")]
 impl<'a> SimpleServiceLifetime<'a> {
     #[ffi_service_ctor]
     pub fn new_with(some_value: &'a u32) -> Result<Self, Error> {
