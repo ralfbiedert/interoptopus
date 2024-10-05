@@ -83,32 +83,33 @@ def init_lib(path):
     c_lib.pattern_callback_3.argtypes = [DelegateCallbackMyCallbackContextual, ctypes.c_uint32]
     c_lib.pattern_callback_4.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32), ctypes.c_uint32]
     c_lib.pattern_surrogates_1.argtypes = [Local, ctypes.POINTER(Container)]
-    c_lib.simple_servicedestroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
-    c_lib.simple_servicenew_with.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.c_uint32]
-    c_lib.simple_servicenew_without.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
-    c_lib.simple_servicenew_with_string.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.POINTER(ctypes.c_char)]
-    c_lib.simple_servicenew_failing.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.c_uint8]
-    c_lib.simple_servicemethod_result.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
-    c_lib.simple_servicemethod_value.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
-    c_lib.simple_servicemethod_void.argtypes = [ctypes.c_void_p]
-    c_lib.simple_servicemethod_mut_self.argtypes = [ctypes.c_void_p, Sliceu8]
-    c_lib.simple_servicemethod_mut_self_void.argtypes = [ctypes.c_void_p, SliceBool]
-    c_lib.simple_servicemethod_mut_self_ref.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_uint8)]
-    c_lib.simple_servicemethod_mut_self_ref_slice.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_uint8), Sliceu8]
-    c_lib.simple_servicemethod_mut_self_ref_slice_limited.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_uint8), Sliceu8, Sliceu8]
-    c_lib.simple_servicemethod_mut_self_ffi_error.argtypes = [ctypes.c_void_p, SliceMutu8]
-    c_lib.simple_servicemethod_mut_self_no_error.argtypes = [ctypes.c_void_p, SliceMutu8]
-    c_lib.simple_servicereturn_slice.argtypes = [ctypes.c_void_p]
-    c_lib.simple_servicereturn_slice_mut.argtypes = [ctypes.c_void_p]
-    c_lib.simple_servicereturn_string.argtypes = [ctypes.c_void_p]
-    c_lib.simple_servicemethod_void_ffi_error.argtypes = [ctypes.c_void_p]
-    c_lib.simple_servicemethod_callback.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)]
-    c_lib.simple_service_lifetimedestroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
-    c_lib.simple_service_lifetimenew_with.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.POINTER(ctypes.c_uint32)]
-    c_lib.simple_service_lifetimemethod_lt.argtypes = [ctypes.c_void_p, SliceBool]
-    c_lib.simple_service_lifetimemethod_lt2.argtypes = [ctypes.c_void_p, SliceBool]
-    c_lib.simple_service_lifetimereturn_string_accept_slice.argtypes = [ctypes.c_void_p, Sliceu8]
-    c_lib.simple_service_lifetimemethod_void_ffi_error.argtypes = [ctypes.c_void_p]
+    c_lib.simple_service_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
+    c_lib.simple_service_new_with.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.c_uint32]
+    c_lib.simple_service_new_without.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
+    c_lib.simple_service_new_with_string.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.POINTER(ctypes.c_char)]
+    c_lib.simple_service_new_failing.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.c_uint8]
+    c_lib.simple_service_method_result.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
+    c_lib.simple_service_method_value.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
+    c_lib.simple_service_method_void.argtypes = [ctypes.c_void_p]
+    c_lib.simple_service_method_void2.argtypes = [ctypes.c_void_p]
+    c_lib.simple_service_method_mut_self.argtypes = [ctypes.c_void_p, Sliceu8]
+    c_lib.simple_service_method_mut_self_void.argtypes = [ctypes.c_void_p, SliceBool]
+    c_lib.simple_service_method_mut_self_ref.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_uint8)]
+    c_lib.simple_service_method_mut_self_ref_slice.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_uint8), Sliceu8]
+    c_lib.simple_service_method_mut_self_ref_slice_limited.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_uint8), Sliceu8, Sliceu8]
+    c_lib.simple_service_method_mut_self_ffi_error.argtypes = [ctypes.c_void_p, SliceMutu8]
+    c_lib.simple_service_method_mut_self_no_error.argtypes = [ctypes.c_void_p, SliceMutu8]
+    c_lib.simple_service_return_slice.argtypes = [ctypes.c_void_p]
+    c_lib.simple_service_return_slice_mut.argtypes = [ctypes.c_void_p]
+    c_lib.simple_service_return_string.argtypes = [ctypes.c_void_p]
+    c_lib.simple_service_method_void_ffi_error.argtypes = [ctypes.c_void_p]
+    c_lib.simple_service_method_callback.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)]
+    c_lib.simple_service_lifetime_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
+    c_lib.simple_service_lifetime_new_with.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.POINTER(ctypes.c_uint32)]
+    c_lib.simple_service_lifetime_method_lt.argtypes = [ctypes.c_void_p, SliceBool]
+    c_lib.simple_service_lifetime_method_lt2.argtypes = [ctypes.c_void_p, SliceBool]
+    c_lib.simple_service_lifetime_return_string_accept_slice.argtypes = [ctypes.c_void_p, Sliceu8]
+    c_lib.simple_service_lifetime_method_void_ffi_error.argtypes = [ctypes.c_void_p]
 
     c_lib.primitive_bool.restype = ctypes.c_bool
     c_lib.primitive_u8.restype = ctypes.c_uint8
@@ -173,44 +174,44 @@ def init_lib(path):
     c_lib.pattern_callback_1.restype = ctypes.c_uint32
     c_lib.pattern_callback_2.restype = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
     c_lib.pattern_callback_4.restype = ctypes.c_uint32
-    c_lib.simple_servicedestroy.restype = ctypes.c_int
-    c_lib.simple_servicenew_with.restype = ctypes.c_int
-    c_lib.simple_servicenew_without.restype = ctypes.c_int
-    c_lib.simple_servicenew_with_string.restype = ctypes.c_int
-    c_lib.simple_servicenew_failing.restype = ctypes.c_int
-    c_lib.simple_servicemethod_result.restype = ctypes.c_int
-    c_lib.simple_servicemethod_value.restype = ctypes.c_uint32
-    c_lib.simple_servicemethod_mut_self.restype = ctypes.c_uint8
-    c_lib.simple_servicemethod_mut_self_ref.restype = ctypes.c_uint8
-    c_lib.simple_servicemethod_mut_self_ref_slice.restype = ctypes.c_uint8
-    c_lib.simple_servicemethod_mut_self_ref_slice_limited.restype = ctypes.c_uint8
-    c_lib.simple_servicemethod_mut_self_ffi_error.restype = ctypes.c_int
-    c_lib.simple_servicemethod_mut_self_no_error.restype = ctypes.c_int
-    c_lib.simple_servicereturn_slice.restype = Sliceu32
-    c_lib.simple_servicereturn_slice_mut.restype = SliceMutu32
-    c_lib.simple_servicereturn_string.restype = ctypes.POINTER(ctypes.c_char)
-    c_lib.simple_servicemethod_void_ffi_error.restype = ctypes.c_int
-    c_lib.simple_servicemethod_callback.restype = ctypes.c_int
-    c_lib.simple_service_lifetimedestroy.restype = ctypes.c_int
-    c_lib.simple_service_lifetimenew_with.restype = ctypes.c_int
-    c_lib.simple_service_lifetimereturn_string_accept_slice.restype = ctypes.POINTER(ctypes.c_char)
-    c_lib.simple_service_lifetimemethod_void_ffi_error.restype = ctypes.c_int
+    c_lib.simple_service_destroy.restype = ctypes.c_int
+    c_lib.simple_service_new_with.restype = ctypes.c_int
+    c_lib.simple_service_new_without.restype = ctypes.c_int
+    c_lib.simple_service_new_with_string.restype = ctypes.c_int
+    c_lib.simple_service_new_failing.restype = ctypes.c_int
+    c_lib.simple_service_method_result.restype = ctypes.c_int
+    c_lib.simple_service_method_value.restype = ctypes.c_uint32
+    c_lib.simple_service_method_mut_self.restype = ctypes.c_uint8
+    c_lib.simple_service_method_mut_self_ref.restype = ctypes.c_uint8
+    c_lib.simple_service_method_mut_self_ref_slice.restype = ctypes.c_uint8
+    c_lib.simple_service_method_mut_self_ref_slice_limited.restype = ctypes.c_uint8
+    c_lib.simple_service_method_mut_self_ffi_error.restype = ctypes.c_int
+    c_lib.simple_service_method_mut_self_no_error.restype = ctypes.c_int
+    c_lib.simple_service_return_slice.restype = Sliceu32
+    c_lib.simple_service_return_slice_mut.restype = SliceMutu32
+    c_lib.simple_service_return_string.restype = ctypes.POINTER(ctypes.c_char)
+    c_lib.simple_service_method_void_ffi_error.restype = ctypes.c_int
+    c_lib.simple_service_method_callback.restype = ctypes.c_int
+    c_lib.simple_service_lifetime_destroy.restype = ctypes.c_int
+    c_lib.simple_service_lifetime_new_with.restype = ctypes.c_int
+    c_lib.simple_service_lifetime_return_string_accept_slice.restype = ctypes.POINTER(ctypes.c_char)
+    c_lib.simple_service_lifetime_method_void_ffi_error.restype = ctypes.c_int
 
     c_lib.complex_args_1.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.panics.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.simple_servicedestroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.simple_servicenew_with.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.simple_servicenew_without.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.simple_servicenew_with_string.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.simple_servicenew_failing.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.simple_servicemethod_result.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.simple_servicemethod_mut_self_ffi_error.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.simple_servicemethod_mut_self_no_error.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.simple_servicemethod_void_ffi_error.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.simple_servicemethod_callback.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.simple_service_lifetimedestroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.simple_service_lifetimenew_with.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.simple_service_lifetimemethod_void_ffi_error.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.simple_service_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.simple_service_new_with.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.simple_service_new_without.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.simple_service_new_with_string.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.simple_service_new_failing.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.simple_service_method_result.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.simple_service_method_mut_self_ffi_error.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.simple_service_method_mut_self_no_error.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.simple_service_method_void_ffi_error.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.simple_service_method_callback.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.simple_service_lifetime_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.simple_service_lifetime_new_with.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.simple_service_lifetime_method_void_ffi_error.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
 
 
 def primitive_void():
@@ -1956,7 +1957,7 @@ class SimpleService:
     def new_with(some_value: int) -> SimpleService:
         """ The constructor must return a `Result<Self, Error>`."""
         ctx = ctypes.c_void_p()
-        c_lib.simple_servicenew_with(ctx, some_value)
+        c_lib.simple_service_new_with(ctx, some_value)
         self = SimpleService(SimpleService.__api_lock, ctx)
         return self
 
@@ -1964,7 +1965,7 @@ class SimpleService:
     def new_without() -> SimpleService:
         """"""
         ctx = ctypes.c_void_p()
-        c_lib.simple_servicenew_without(ctx, )
+        c_lib.simple_service_new_without(ctx, )
         self = SimpleService(SimpleService.__api_lock, ctx)
         return self
 
@@ -1974,7 +1975,7 @@ class SimpleService:
         ctx = ctypes.c_void_p()
         if not hasattr(ascii, "__ctypes_from_outparam__"):
             ascii = ctypes.cast(ascii, ctypes.POINTER(ctypes.c_char))
-        c_lib.simple_servicenew_with_string(ctx, ascii)
+        c_lib.simple_service_new_with_string(ctx, ascii)
         self = SimpleService(SimpleService.__api_lock, ctx)
         return self
 
@@ -1982,51 +1983,55 @@ class SimpleService:
     def new_failing(some_value: int) -> SimpleService:
         """"""
         ctx = ctypes.c_void_p()
-        c_lib.simple_servicenew_failing(ctx, some_value)
+        c_lib.simple_service_new_failing(ctx, some_value)
         self = SimpleService(SimpleService.__api_lock, ctx)
         return self
 
     def __del__(self):
-        c_lib.simple_servicedestroy(self._ctx, )
+        c_lib.simple_service_destroy(self._ctx, )
     def method_result(self, anon1: int):
         """ Methods returning a Result<(), _> are the default and do not
  need annotations."""
-        return c_lib.simple_servicemethod_result(self._ctx, anon1)
+        return c_lib.simple_service_method_result(self._ctx, anon1)
 
     def method_value(self, x: int) -> int:
         """"""
-        return c_lib.simple_servicemethod_value(self._ctx, x)
+        return c_lib.simple_service_method_value(self._ctx, x)
 
     def method_void(self, ):
         """ This method should be documented.
 
  Multiple lines."""
-        return c_lib.simple_servicemethod_void(self._ctx, )
+        return c_lib.simple_service_method_void(self._ctx, )
+
+    def method_void2(self, ):
+        """"""
+        return c_lib.simple_service_method_void2(self._ctx, )
 
     def method_mut_self(self, slice: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> int:
         """"""
         if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
             slice = Sliceu8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
-        return c_lib.simple_servicemethod_mut_self(self._ctx, slice)
+        return c_lib.simple_service_method_mut_self(self._ctx, slice)
 
     def method_mut_self_void(self, slice: SliceBool | ctypes.Array[ctypes.c_uint8]):
         """ Single line."""
         if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
             slice = SliceBool(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
-        return c_lib.simple_servicemethod_mut_self_void(self._ctx, slice)
+        return c_lib.simple_service_method_mut_self_void(self._ctx, slice)
 
     def method_mut_self_ref(self, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8)) -> int:
         """"""
-        return c_lib.simple_servicemethod_mut_self_ref(self._ctx, x, y)
+        return c_lib.simple_service_method_mut_self_ref(self._ctx, x, y)
 
     def method_mut_self_ref_slice(self, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8), slice: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> int:
         """"""
         if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
             slice = Sliceu8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
-        return c_lib.simple_servicemethod_mut_self_ref_slice(self._ctx, x, y, slice)
+        return c_lib.simple_service_method_mut_self_ref_slice(self._ctx, x, y, slice)
 
     def method_mut_self_ref_slice_limited(self, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8), slice: Sliceu8 | ctypes.Array[ctypes.c_uint8], slice2: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> int:
         """"""
@@ -2036,47 +2041,47 @@ class SimpleService:
         if hasattr(slice2, "_length_") and getattr(slice2, "_type_", "") == ctypes.c_uint8:
             slice2 = Sliceu8(data=ctypes.cast(slice2, ctypes.POINTER(ctypes.c_uint8)), len=len(slice2))
 
-        return c_lib.simple_servicemethod_mut_self_ref_slice_limited(self._ctx, x, y, slice, slice2)
+        return c_lib.simple_service_method_mut_self_ref_slice_limited(self._ctx, x, y, slice, slice2)
 
     def method_mut_self_ffi_error(self, slice: SliceMutu8 | ctypes.Array[ctypes.c_uint8]):
         """"""
         if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
             slice = SliceMutu8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
-        return c_lib.simple_servicemethod_mut_self_ffi_error(self._ctx, slice)
+        return c_lib.simple_service_method_mut_self_ffi_error(self._ctx, slice)
 
     def method_mut_self_no_error(self, slice: SliceMutu8 | ctypes.Array[ctypes.c_uint8]):
         """"""
         if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
             slice = SliceMutu8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
-        return c_lib.simple_servicemethod_mut_self_no_error(self._ctx, slice)
+        return c_lib.simple_service_method_mut_self_no_error(self._ctx, slice)
 
     def return_slice(self, ) -> Sliceu32:
         """ Warning, you _must_ discard the returned slice object before calling into this service
  again, as otherwise undefined behavior might happen."""
-        return c_lib.simple_servicereturn_slice(self._ctx, )
+        return c_lib.simple_service_return_slice(self._ctx, )
 
     def return_slice_mut(self, ) -> SliceMutu32:
         """ Warning, you _must_ discard the returned slice object before calling into this service
  again, as otherwise undefined behavior might happen."""
-        return c_lib.simple_servicereturn_slice_mut(self._ctx, )
+        return c_lib.simple_service_return_slice_mut(self._ctx, )
 
     def return_string(self, ) -> bytes:
         """ This function has no panic safeguards. If it panics your host app will be in an undefined state."""
-        rval = c_lib.simple_servicereturn_string(self._ctx, )
+        rval = c_lib.simple_service_return_string(self._ctx, )
         return ctypes.string_at(rval)
 
     def method_void_ffi_error(self, ):
         """"""
-        return c_lib.simple_servicemethod_void_ffi_error(self._ctx, )
+        return c_lib.simple_service_method_void_ffi_error(self._ctx, )
 
     def method_callback(self, callback):
         """"""
         if not hasattr(callback, "__ctypes_from_outparam__"):
             callback = callbacks.fn_u32_rval_u32(callback)
 
-        return c_lib.simple_servicemethod_callback(self._ctx, callback)
+        return c_lib.simple_service_method_callback(self._ctx, callback)
 
 
 
@@ -2095,37 +2100,37 @@ class SimpleServiceLifetime:
     def new_with(some_value: ctypes.POINTER(ctypes.c_uint32)) -> SimpleServiceLifetime:
         """"""
         ctx = ctypes.c_void_p()
-        c_lib.simple_service_lifetimenew_with(ctx, some_value)
+        c_lib.simple_service_lifetime_new_with(ctx, some_value)
         self = SimpleServiceLifetime(SimpleServiceLifetime.__api_lock, ctx)
         return self
 
     def __del__(self):
-        c_lib.simple_service_lifetimedestroy(self._ctx, )
+        c_lib.simple_service_lifetime_destroy(self._ctx, )
     def method_lt(self, slice: SliceBool | ctypes.Array[ctypes.c_uint8]):
         """"""
         if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
             slice = SliceBool(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
-        return c_lib.simple_service_lifetimemethod_lt(self._ctx, slice)
+        return c_lib.simple_service_lifetime_method_lt(self._ctx, slice)
 
     def method_lt2(self, slice: SliceBool | ctypes.Array[ctypes.c_uint8]):
         """"""
         if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
             slice = SliceBool(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
-        return c_lib.simple_service_lifetimemethod_lt2(self._ctx, slice)
+        return c_lib.simple_service_lifetime_method_lt2(self._ctx, slice)
 
     def return_string_accept_slice(self, anon1: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> bytes:
         """"""
         if hasattr(anon1, "_length_") and getattr(anon1, "_type_", "") == ctypes.c_uint8:
             anon1 = Sliceu8(data=ctypes.cast(anon1, ctypes.POINTER(ctypes.c_uint8)), len=len(anon1))
 
-        rval = c_lib.simple_service_lifetimereturn_string_accept_slice(self._ctx, anon1)
+        rval = c_lib.simple_service_lifetime_return_string_accept_slice(self._ctx, anon1)
         return ctypes.string_at(rval)
 
     def method_void_ffi_error(self, ):
         """"""
-        return c_lib.simple_service_lifetimemethod_void_ffi_error(self._ctx, )
+        return c_lib.simple_service_lifetime_method_void_ffi_error(self._ctx, )
 
 
 

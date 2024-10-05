@@ -68,6 +68,8 @@ impl SimpleService {
     #[ffi_service_method(on_panic = "return_default")]
     pub fn method_void(&self) {}
 
+    pub fn method_void2(&self) {}
+
     #[ffi_service_method(on_panic = "return_default")]
     pub fn method_mut_self(&mut self, slice: FFISlice<u8>) -> u8 {
         *slice.as_slice().first().unwrap_or(&0)

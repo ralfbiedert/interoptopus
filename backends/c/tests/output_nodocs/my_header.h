@@ -372,6 +372,7 @@ my_library_ffierror simple_service_new_failing(my_library_simpleservice** contex
 my_library_ffierror simple_service_method_result(const my_library_simpleservice* context, uint32_t anon1);
 uint32_t simple_service_method_value(const my_library_simpleservice* context, uint32_t x);
 void simple_service_method_void(const my_library_simpleservice* context);
+void simple_service_method_void2(const my_library_simpleservice* context);
 uint8_t simple_service_method_mut_self(my_library_simpleservice* context, my_library_sliceu8 slice);
 void simple_service_method_mut_self_void(my_library_simpleservice* context, my_library_slicebool slice);
 uint8_t simple_service_method_mut_self_ref(my_library_simpleservice* context, const uint8_t* x, uint8_t* y);

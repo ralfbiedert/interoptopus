@@ -87,6 +87,7 @@ Methods operating on common state.
      - **[method_result](#SimpleService.method_result)** -  Methods returning a Result<(), _> are the default and do not
      - **[method_value](#SimpleService.method_value)** - 
      - **[method_void](#SimpleService.method_void)** -  This method should be documented.
+     - **[method_void2](#SimpleService.method_void2)** - 
      - **[method_mut_self](#SimpleService.method_mut_self)** - 
      - **[method_mut_self_void](#SimpleService.method_mut_self_void)** -  Single line.
      - **[method_mut_self_ref](#SimpleService.method_mut_self_ref)** - 
@@ -1735,6 +1736,18 @@ class SimpleService:
 class SimpleService:
 
     def method_void(self, ):
+        ...
+```
+
+---
+
+### <a name="SimpleService.method_void2">**method_void2**</a>
+
+#### Definition 
+```python
+class SimpleService:
+
+    def method_void2(self, ):
         ...
 ```
 

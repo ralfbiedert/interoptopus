@@ -514,6 +514,8 @@ uint32_t simple_service_method_value(const my_library_simple_service* context, u
 /// Multiple lines.
 void simple_service_method_void(const my_library_simple_service* context);
 
+void simple_service_method_void2(const my_library_simple_service* context);
+
 uint8_t simple_service_method_mut_self(my_library_simple_service* context, my_library_sliceu8 slice);
 
 /// Single line.

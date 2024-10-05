@@ -88,6 +88,7 @@ impl From<Inventory> for APIVersion {
         Self::from_inventory(&i)
     }
 }
+
 /// Returns a unique hash for an inventory; used by backends.
 pub fn inventory_hash(inventory: &Inventory) -> u64 {
     let mut hasher = DefaultHasher::new();

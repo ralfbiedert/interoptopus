@@ -514,6 +514,8 @@ typedef uint32_t (*simple_service_method_value)(const my_library_simple_service*
 /// Multiple lines.
 typedef void (*simple_service_method_void)(const my_library_simple_service*);
 
+typedef void (*simple_service_method_void2)(const my_library_simple_service*);
+
 typedef uint8_t (*simple_service_method_mut_self)(my_library_simple_service*, my_library_sliceu8);
 
 /// Single line.

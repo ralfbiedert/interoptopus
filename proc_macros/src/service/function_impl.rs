@@ -42,16 +42,22 @@ impl Default for AttributeMethod {
 }
 
 /// Inspects all attributes and determines the method type to generate.
-fn method_type(attrs: &[Attribute]) -> MethodType {
-    if attrs.iter().any(|x| format!("{:?}", x).contains("ffi_service_ctor")) {
+fn method_type(function: &ImplItemFn) -> MethodType {
+    let attrs = function.attrs.as_slice();
+
+    // Methods explicitly marked a constructors
+    if function.attrs.iter().any(|x| format!("{:?}", x).contains("ffi_service_ctor")) {
         let ctor_attributes = attrs
             .iter()
             .filter_map(|attribute| AttributeCtor::from_meta(&attribute.meta).ok())
             .next()
             .unwrap_or_default();
 
-        MethodType::Constructor(ctor_attributes)
-    } else {
+        return MethodType::Constructor(ctor_attributes);
+    }
+
+    // Methods explicitly marked a service methods
+    if attrs.iter().any(|x| format!("{:?}", x).contains("ffi_service_method")) {
         let function_attributes = attrs
             .iter()
             .filter(|x| format!("{:?}", x).contains("ffi_service_method"))
@@ -59,17 +65,27 @@ fn method_type(attrs: &[Attribute]) -> MethodType {
             .next()
             .unwrap_or_default();
 
-        MethodType::Method(function_attributes)
+        return MethodType::Method(function_attributes);
+    }
+
+    // If the method wasn't explicitly marked ...
+    match function.sig.output {
+        // If it has default output type, we can get away with "return default"
+        ReturnType::Default => MethodType::Method(AttributeMethod {
+            on_panic: OnPanic::ReturnDefault,
+        }),
+        // Otherwise, use FFI error conversion.
+        ReturnType::Type(_, _) => MethodType::Method(AttributeMethod { on_panic: OnPanic::FfiError }),
     }
 }
 
 pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, function: &ImplItemFn) -> Option<Descriptor> {
     let orig_fn_ident = &function.sig.ident;
     let service_type = &impl_block.self_ty;
+    let service_prefix = attributes.prefered_service_name(impl_block);
     let mut generics = function.sig.generics.clone();
     let mut inputs = Vec::new();
     let mut arg_names = Vec::new();
-    let service_prefix = attributes.prefered_service_name(impl_block);
 
     for lt in impl_block.generics.lifetimes() {
         generics.params.push(GenericParam::Lifetime(lt.clone()))
@@ -90,7 +106,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
         ReturnType::Type(_, x) => quote_spanned!(span_rval=> #x),
     };
 
-    let method_type = method_type(&function.attrs);
+    let method_type = method_type(&function);
 
     // Constructor needs extra arg for ptr
     if let MethodType::Constructor(_) = &method_type {
