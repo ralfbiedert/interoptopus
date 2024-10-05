@@ -49,7 +49,7 @@ impl Attributes {
             };
         }
 
-        if let Some(x) = self.visibility.get("_") {
+        if let Some(x) = self.visibility.get("_all") {
             rval = match x.as_str() {
                 "public" => quote! { interoptopus::lang::c::Visibility::Public },
                 "private" => quote! { interoptopus::lang::c::Visibility::Private },

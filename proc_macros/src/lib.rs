@@ -29,7 +29,7 @@ use proc_macro::TokenStream;
 /// | `skip(x)` | `struct,enum` | Skip field or variant `x` in the definition, e.g., some `x` of [`PhantomData`](std::marker::PhantomData). <sup>⚠️</sup>
 /// | `patterns(p)` | `struct`,`enum` | Mark this type as part of a pattern, see below. <sup>2</sup>
 /// | `opaque` | `struct` | Creates an opaque type without fields. Can only be used behind a pointer. |
-/// | `visibility(x="v")` | `struct` | Override visibility for field `x` as `public` or `private`; `_` means all fields. <sup>2</sup>
+/// | `visibility(x="v")` | `struct` | Override visibility for field `x` as `public` or `private`; `_all` means all fields. <sup>2</sup>
 /// | `debug` | * | Print generated helper code in console.
 ///
 /// <sup>1</sup> While a type's name must be unique (even across modules) backends are free to further transform this name, e.g., by converting
@@ -77,10 +77,7 @@ use proc_macro::TokenStream;
 pub fn ffi_type(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr = proc_macro2::TokenStream::from(attr);
     let input = proc_macro2::TokenStream::from(item);
-
-    let rval = types::ffi_type(attr, input);
-
-    rval.into()
+    types::ffi_type(attr, input).into()
 }
 
 /// Enable an `extern "C"` function to appear in generated bindings.
@@ -119,10 +116,7 @@ pub fn ffi_type(attr: TokenStream, item: TokenStream) -> TokenStream {
 pub fn ffi_function(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr = proc_macro2::TokenStream::from(attr);
     let input = proc_macro2::TokenStream::from(item);
-
-    let rval = functions::ffi_function(attr, input);
-
-    rval.into()
+    functions::ffi_function(attr, input).into()
 }
 
 /// Enables a `const` to appear in generated bindings.
@@ -151,10 +145,7 @@ pub fn ffi_function(attr: TokenStream, item: TokenStream) -> TokenStream {
 pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr = proc_macro2::TokenStream::from(attr);
     let input = proc_macro2::TokenStream::from(item);
-
-    let rval = constants::ffi_constant(attr, input);
-
-    rval.into()
+    constants::ffi_constant(attr, input).into()
 }
 
 /// Creates a FFI service from an `impl Service {}` block.
@@ -242,9 +233,7 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
 pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr = proc_macro2::TokenStream::from(attr);
     let input = proc_macro2::TokenStream::from(item);
-    let rval = service::ffi_service(attr, input);
-
-    rval.into()
+    service::ffi_service(attr, input).into()
 }
 
 /// Inside a [`#[ffi_service]`](macro@crate::ffi_service) block, mark the FFI constructor.

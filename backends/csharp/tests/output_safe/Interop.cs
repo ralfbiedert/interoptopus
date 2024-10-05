@@ -18,9 +18,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 15740821275880904201ul)
+            if (api_version != 16012698009278542425ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (15740821275880904201). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (16012698009278542425). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -969,8 +969,8 @@ namespace My.Company
     [StructLayout(LayoutKind.Sequential)]
     public partial struct Visibility2
     {
-        byte pblc1;
-        byte pblc2;
+        public byte pblc1;
+        public byte pblc2;
     }
 
     [Serializable]

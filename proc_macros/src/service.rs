@@ -1,6 +1,5 @@
 use crate::macros::darling_parse;
 use crate::service::function_impl::{generate_service_dtor, generate_service_method};
-use darling::ast::NestedMeta;
 use darling::FromMeta;
 use function_impl::MethodType;
 use proc_macro2::TokenStream;
