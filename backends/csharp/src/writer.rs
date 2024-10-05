@@ -221,7 +221,7 @@ pub trait CSharpWriter {
             CType::ReadPointer(_) => {}
             CType::ReadWritePointer(_) => {}
             CType::Pattern(x) => match x {
-                TypePattern::AsciiPointer => {}
+                TypePattern::CStrPointer => {}
                 TypePattern::FFIErrorEnum(e) => {
                     self.write_type_definition_enum(w, e.the_enum(), WriteFor::Code)?;
                     w.newline()?;
@@ -506,7 +506,7 @@ pub trait CSharpWriter {
             CType::ReadPointer(_) => false,
             CType::ReadWritePointer(_) => false,
             CType::Pattern(x) => match x {
-                TypePattern::AsciiPointer => true,
+                TypePattern::CStrPointer => true,
                 TypePattern::APIVersion => true,
                 TypePattern::FFIErrorEnum(x) => self.should_emit_by_meta(x.the_enum().meta()),
                 TypePattern::Slice(x) => self.should_emit_by_meta(x.meta()),
@@ -886,7 +886,7 @@ pub trait CSharpWriter {
             // common C# types.
             let rval = match function.signature().rval() {
                 CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
-                CType::Pattern(TypePattern::AsciiPointer) => "string".to_string(),
+                CType::Pattern(TypePattern::CStrPointer) => "string".to_string(),
                 _ => self.converter().to_typespecifier_in_rval(function.signature().rval()),
             };
             self.write_documentation(w, function.meta().documentation())?;
@@ -989,7 +989,7 @@ pub trait CSharpWriter {
                 indented!(w, [_ _], r#"throw new InteropException<{}>(rval);"#, e.the_enum().rust_name())?;
                 indented!(w, [_], r#"}}"#)?;
             }
-            CType::Pattern(TypePattern::AsciiPointer) => {
+            CType::Pattern(TypePattern::CStrPointer) => {
                 indented!(w, [_], r#"var s = {};"#, fn_call)?;
                 indented!(w, [_], r#"return Marshal.PtrToStringAnsi(s);"#)?;
             }

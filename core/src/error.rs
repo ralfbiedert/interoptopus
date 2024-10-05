@@ -9,8 +9,8 @@ pub enum Error {
     /// An operation was requested that is not supported.
     Unsupported,
 
-    /// Given string is not valid Ascii.
-    Ascii,
+    /// Given string is not nul terminated.
+    NulTerminated,
 
     /// Formatting a string failed.
     Format(std::fmt::Error),

@@ -23,16 +23,16 @@
 //!
 //! ```
 //!
-//! you would instead accept an [`AsciiPointer`](crate::patterns::string::AsciiPointer):
+//! you would instead accept an [`CStrPointer`](crate::patterns::string::CStrPointer):
 //!
 //! ```
 //! # use interoptopus::ffi_function;
-//! # use interoptopus::patterns::string::AsciiPointer;
+//! # use interoptopus::patterns::string::CStrPointer;
 //! # use std::ffi::CStr;
 //!
 //! #[ffi_function]
 //! #[no_mangle]
-//! pub extern "C" fn print_ascii(x: AsciiPointer) {
+//! pub extern "C" fn print_ascii(x: CStrPointer) {
 //!    // Call `x.as_str()` and handle Result
 //! }
 //!
@@ -51,7 +51,7 @@
 //!
 //! - The pattern is **supported** and the backend will generate the raw, underlying type and / or
 //! a language-specific abstraction that safely and conveniently handles it. Examples
-//! include converting an [`AsciiPointer`](string) to a C# `string`, or a [`service`](crate::patterns::service)
+//! include converting an [`CStrPointer`](string) to a C# `string`, or a [`service`](crate::patterns::service)
 //! to a Python `class`.
 //!
 //! - The pattern is not supported and will be **omitted, if the pattern was merely an aggregate** of
@@ -60,7 +60,7 @@
 //! are still available as raw bindings.
 //!
 //! - The pattern is not supported and will be **replaced with a fallback type**. Examples include
-//! the [`AsciiPointer`](string) which will become a regular `*const char` in C.
+//! the [`CStrPointer`](string) which will become a regular `*const char` in C.
 //!
 //! In other words, regardless of which pattern was used, the involved methods and types will always
 //! be accessible from any language.
@@ -68,7 +68,7 @@
 //! # Pattern Composition
 //!
 //! Due do a lack of expressiveness in other languages, pattern composition is often limited. Things that work
-//! easily in Rust (e.g., a nested `FFISlice<FFIOption<AsciiPointer>>`), aren't supported in other languages.
+//! easily in Rust (e.g., a nested `FFISlice<FFIOption<CStrPointer>>`), aren't supported in other languages.
 //! You therefore should rather err on the side of conservatism when designing APIs.
 //!
 //! While we aim to guarantee that 'flat' patterns either work, or gracefully fall-back
@@ -114,7 +114,7 @@ impl From<Service> for LibraryPattern {
 /// A pattern on a type level.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum TypePattern {
-    AsciiPointer,
+    CStrPointer,
     APIVersion,
     FFIErrorEnum(FFIErrorEnum),
     Slice(CompositeType),
@@ -132,7 +132,7 @@ impl TypePattern {
     /// This function will never return a [`CType::Pattern`] variant.
     pub fn fallback_type(&self) -> CType {
         match self {
-            TypePattern::AsciiPointer => CType::ReadPointer(Box::new(CType::Pattern(TypePattern::CChar))),
+            TypePattern::CStrPointer => CType::ReadPointer(Box::new(CType::Pattern(TypePattern::CChar))),
             TypePattern::FFIErrorEnum(e) => CType::Enum(e.the_enum().clone()),
             TypePattern::Slice(x) => CType::Composite(x.clone()),
             TypePattern::SliceMut(x) => CType::Composite(x.clone()),

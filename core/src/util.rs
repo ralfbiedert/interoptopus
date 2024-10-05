@@ -155,7 +155,7 @@ pub(crate) fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CTyp
         // entirely new pattern. The exception to this rule are patterns that can embed arbitrary
         // types; which we need to recursively inspect.
         CType::Pattern(x) => match x {
-            TypePattern::AsciiPointer => {}
+            TypePattern::CStrPointer => {}
             TypePattern::FFIErrorEnum(_) => {}
             TypePattern::NamedCallback(x) => {
                 let inner = x.fnpointer();
@@ -206,7 +206,7 @@ pub(crate) fn extract_namespaces_from_types(types: &[CType], into: &mut HashSet<
             CType::ReadPointer(_) => {}
             CType::ReadWritePointer(_) => {}
             CType::Pattern(x) => match x {
-                TypePattern::AsciiPointer => {}
+                TypePattern::CStrPointer => {}
                 TypePattern::APIVersion => {}
                 TypePattern::FFIErrorEnum(x) => {
                     into.insert(x.the_enum().meta().namespace().to_string());
@@ -309,7 +309,7 @@ pub fn is_global_type(t: &CType) -> bool {
         CType::ReadPointer(x) => is_global_type(x),
         CType::ReadWritePointer(x) => is_global_type(x),
         CType::Pattern(x) => match x {
-            TypePattern::AsciiPointer => true,
+            TypePattern::CStrPointer => true,
             TypePattern::APIVersion => false,
             TypePattern::FFIErrorEnum(_) => false,
             TypePattern::Slice(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),

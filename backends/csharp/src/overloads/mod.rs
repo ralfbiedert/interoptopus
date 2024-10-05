@@ -115,7 +115,7 @@ fn write_function_overloaded_invoke_with_error_handling(w: &mut IndentWriter, fu
             indented!(w, [_ _], r#"throw new InteropException<{}>(rval);"#, e.the_enum().rust_name())?;
             indented!(w, [_], r#"}}"#)?;
         }
-        CType::Pattern(TypePattern::AsciiPointer) => {
+        CType::Pattern(TypePattern::CStrPointer) => {
             indented!(w, [_], r#"var s = {};"#, fn_call)?;
             indented!(w, [_], r#"return Marshal.PtrToStringAnsi(s);"#)?;
         }
@@ -147,7 +147,7 @@ fn write_common_service_method_overload<FPatternMap: Fn(&Helper, &Parameter) -> 
     // common C# types.
     let rval = match function.signature().rval() {
         CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
-        CType::Pattern(TypePattern::AsciiPointer) => "string".to_string(),
+        CType::Pattern(TypePattern::CStrPointer) => "string".to_string(),
         _ => h.converter.to_typespecifier_in_rval(function.signature().rval()),
     };
 

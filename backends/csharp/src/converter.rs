@@ -66,7 +66,7 @@ pub trait CSharpTypeConverter {
             CType::Primitive(_) => true,
             CType::Composite(c) => c.fields().iter().all(|x| self.is_blittable(x.the_type())),
             CType::Pattern(x) => match x {
-                TypePattern::AsciiPointer => false,
+                TypePattern::CStrPointer => false,
                 TypePattern::APIVersion => true,
                 TypePattern::FFIErrorEnum(_) => true,
                 TypePattern::Slice(_) => false,
@@ -107,7 +107,7 @@ pub trait CSharpTypeConverter {
             CType::ReadWritePointer(_) => "IntPtr".to_string(),
             CType::FnPointer(x) => self.fnpointer_to_typename(x),
             CType::Pattern(x) => match x {
-                TypePattern::AsciiPointer => "string".to_string(),
+                TypePattern::CStrPointer => "string".to_string(),
                 TypePattern::FFIErrorEnum(e) => self.enum_to_typename(e.the_enum()),
                 TypePattern::Slice(e) => self.composite_to_typename(e),
                 TypePattern::SliceMut(e) => self.composite_to_typename(e),
@@ -150,7 +150,7 @@ pub trait CSharpTypeConverter {
             },
             CType::FnPointer(x) => self.fnpointer_to_typename(x),
             CType::Pattern(x) => match x {
-                TypePattern::AsciiPointer => "string".to_string(),
+                TypePattern::CStrPointer => "string".to_string(),
                 TypePattern::FFIErrorEnum(e) => self.enum_to_typename(e.the_enum()),
                 TypePattern::Slice(x) => self.composite_to_typename(x),
                 TypePattern::SliceMut(x) => self.composite_to_typename(x),
@@ -174,7 +174,7 @@ pub trait CSharpTypeConverter {
             CType::ReadWritePointer(_) => "IntPtr".to_string(),
             CType::FnPointer(x) => self.fnpointer_to_typename(x),
             CType::Pattern(x) => match x {
-                TypePattern::AsciiPointer => "IntPtr".to_string(),
+                TypePattern::CStrPointer => "IntPtr".to_string(),
                 TypePattern::FFIErrorEnum(e) => self.enum_to_typename(e.the_enum()),
                 TypePattern::Slice(x) => self.composite_to_typename(x),
                 TypePattern::SliceMut(x) => self.composite_to_typename(x),

@@ -146,7 +146,7 @@ impl OverloadWriter for DotNet {
 
         let rval = match function.signature().rval() {
             CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
-            CType::Pattern(TypePattern::AsciiPointer) => "string".to_string(),
+            CType::Pattern(TypePattern::CStrPointer) => "string".to_string(),
             _ => h.converter.to_typespecifier_in_rval(function.signature().rval()),
         };
 

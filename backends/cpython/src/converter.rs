@@ -40,7 +40,7 @@ impl Converter {
             CType::Enum(_) => "ctypes.c_int".to_string(), // is this correct?
             CType::Composite(x) => x.rust_name().to_string(),
             CType::Pattern(x) => match x {
-                TypePattern::AsciiPointer => "bytes".to_string(),
+                TypePattern::CStrPointer => "bytes".to_string(),
                 TypePattern::Option(c) => c.rust_name().to_string(),
                 TypePattern::Slice(c) | TypePattern::SliceMut(c) => {
                     let mut res = c.rust_name().to_string();
@@ -99,7 +99,7 @@ impl Converter {
                 _ => format!("ctypes.POINTER({})", self.to_ctypes_name(x, with_type_annotations)),
             },
             CType::Pattern(pattern) => match pattern {
-                TypePattern::AsciiPointer => self.to_ctypes_name(&pattern.fallback_type(), with_type_annotations),
+                TypePattern::CStrPointer => self.to_ctypes_name(&pattern.fallback_type(), with_type_annotations),
                 TypePattern::APIVersion => "ctypes.c_uint64".to_string(),
                 TypePattern::FFIErrorEnum(_) => "ctypes.c_int".to_string(),
                 TypePattern::Slice(c) => c.rust_name().to_string(),

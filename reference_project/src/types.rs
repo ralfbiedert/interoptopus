@@ -3,7 +3,7 @@
 use interoptopus::lang::c::{CType, CompositeType, Field, PrimitiveType};
 use interoptopus::lang::rust::CTypeInfo;
 use interoptopus::patterns::slice::FFISlice;
-use interoptopus::patterns::string::AsciiPointer;
+use interoptopus::patterns::string::CStrPointer;
 use interoptopus::patterns::surrogates::Surrogate;
 use interoptopus::{callback, ffi_type};
 use std::fmt::Debug;
@@ -149,7 +149,7 @@ pub struct ExtraType<T> {
 #[ffi_type]
 #[repr(C)]
 pub struct UseAsciiStringPattern<'a> {
-    pub ascii_string: AsciiPointer<'a>,
+    pub ascii_string: CStrPointer<'a>,
 }
 
 /// This can also be used for the `class` pattern.

@@ -1,18 +1,17 @@
-//! Raw `*const char` pointer on C-level but ASCII `string` like in languages that support it.
+//! Raw `*const char` pointer on C-level but a (ASCII) `string` like in languages that support it.
 //!
 //! # Example
 //!
-//! In your library you can accept ASCII strings like this:
+//! In your library you can accept (ASCII- / C-) strings like this:
 //!
 //! ```
 //! use interoptopus::ffi_function;
-//! use interoptopus::patterns::string::AsciiPointer;
+//! use interoptopus::patterns::string::CStrPointer;
 //!
 //! #[ffi_function]
 //! #[no_mangle]
-//! pub extern "C" fn call_with_string(s: AsciiPointer)  {
+//! pub extern "C" fn call_with_string(s: CStrPointer) {
 //!     //
-//! # s.as_str().unwrap();
 //! }
 //! ```
 //!
@@ -43,20 +42,20 @@ static EMPTY: &[u8] = b"\0";
 ///
 /// # Antipattern
 ///
-/// It's discouraged to use [`FFIOption`](crate::patterns::option::FFIOption) with [`AsciiPointer`]
+/// It's discouraged to use [`FFIOption`](crate::patterns::option::FFIOption) with [`CStrPointer`]
 /// and some backend might not generate proper bindings (like C#).
 ///
-/// Instead use [`AsciiPointer`] alone since it already has a pointer that's nullable.
-/// In this case, [`AsciiPointer::as_c_str()`] will return [`None`] and [`AsciiPointer::as_str`]
+/// Instead use [`CStrPointer`] alone since it already has a pointer that's nullable.
+/// In this case, [`CStrPointer::as_c_str()`] will return [`None`] and [`CStrPointer::as_str`]
 /// will return an [`Error::Null`].
 #[repr(transparent)]
 #[derive(Debug)]
-pub struct AsciiPointer<'a> {
+pub struct CStrPointer<'a> {
     ptr: *const c_char,
     _phantom: PhantomData<&'a ()>,
 }
 
-impl<'a> Default for AsciiPointer<'a> {
+impl<'a> Default for CStrPointer<'a> {
     fn default() -> Self {
         Self {
             ptr: null(),
@@ -65,7 +64,7 @@ impl<'a> Default for AsciiPointer<'a> {
     }
 }
 
-impl<'a> AsciiPointer<'a> {
+impl<'a> CStrPointer<'a> {
     pub fn empty() -> Self {
         Self {
             ptr: EMPTY.as_ptr().cast(),
@@ -73,14 +72,14 @@ impl<'a> AsciiPointer<'a> {
         }
     }
 
-    /// Create an AsciiPointer from a `&[u8]` slice reference.
+    /// Create a `CStrPointer` from a `&[u8]` slice reference.
     ///
-    /// The parameter `ascii_with_nul` must contain nul (`0x0`), but it does not need to contain nul
+    /// The parameter `cstr_with_nul` must contain nul (`0x0`), but it does not need to contain nul
     /// at the end.
-    pub fn from_slice_with_nul(ascii_with_nul: &[u8]) -> Result<Self, Error> {
+    pub fn from_slice_with_nul(cstr_with_nul: &[u8]) -> Result<Self, Error> {
         // Check we actually contain one `0x0`.
-        if !ascii_with_nul.contains(&0) {
-            return Err(Error::Ascii);
+        if !cstr_with_nul.contains(&0) {
+            return Err(Error::NulTerminated);
         }
 
         // Can't do this, C# treats ASCII as extended and bytes > 127 might show up, which
@@ -92,7 +91,7 @@ impl<'a> AsciiPointer<'a> {
         // }
 
         Ok(Self {
-            ptr: ascii_with_nul.as_ptr().cast(),
+            ptr: cstr_with_nul.as_ptr().cast(),
             _phantom: Default::default(),
         })
     }
@@ -121,15 +120,15 @@ impl<'a> AsciiPointer<'a> {
     }
 }
 
-unsafe impl<'a> CTypeInfo for AsciiPointer<'a> {
+unsafe impl<'a> CTypeInfo for CStrPointer<'a> {
     fn type_info() -> CType {
-        CType::Pattern(TypePattern::AsciiPointer)
+        CType::Pattern(TypePattern::CStrPointer)
     }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::patterns::string::AsciiPointer;
+    use crate::patterns::string::CStrPointer;
     use std::ffi::CString;
 
     #[test]
@@ -137,7 +136,7 @@ mod test {
         let s = "hello world";
         let cstr = CString::new(s).unwrap();
 
-        let ptr_some = AsciiPointer::from_cstr(&cstr);
+        let ptr_some = CStrPointer::from_cstr(&cstr);
 
         assert_eq!(s, ptr_some.as_str().unwrap());
     }
@@ -145,7 +144,7 @@ mod test {
     #[test]
     fn from_slice_with_nul_works() {
         let s = b"hello\0world";
-        let ptr_some = AsciiPointer::from_slice_with_nul(&s[..]).unwrap();
+        let ptr_some = CStrPointer::from_slice_with_nul(&s[..]).unwrap();
 
         assert_eq!("hello", ptr_some.as_str().unwrap());
     }
@@ -153,7 +152,7 @@ mod test {
     #[test]
     fn from_slice_with_nul_fails_if_not_nul() {
         let s = b"hello world";
-        let ptr_some = AsciiPointer::from_slice_with_nul(&s[..]);
+        let ptr_some = CStrPointer::from_slice_with_nul(&s[..]);
 
         assert!(ptr_some.is_err());
     }

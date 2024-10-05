@@ -2,7 +2,7 @@ use crate::patterns::callbacks::MyCallback;
 use crate::patterns::result::{Error, FFIError};
 use interoptopus::patterns::primitives::FFIBool;
 use interoptopus::patterns::slice::{FFISlice, FFISliceMut};
-use interoptopus::patterns::string::AsciiPointer;
+use interoptopus::patterns::string::CStrPointer;
 use interoptopus::{ffi_service, ffi_service_ctor, ffi_service_ignore, ffi_service_method, ffi_type};
 use std::ffi::CString;
 
@@ -38,7 +38,7 @@ impl SimpleService {
     }
 
     #[ffi_service_ctor]
-    pub fn new_with_string(ascii: AsciiPointer) -> Result<Self, Error> {
+    pub fn new_with_string(ascii: CStrPointer) -> Result<Self, Error> {
         Ok(Self {
             some_value: 0,
             c_string: ascii.as_c_str().unwrap().into(),
@@ -120,8 +120,8 @@ impl SimpleService {
 
     /// This function has no panic safeguards. If it panics your host app will be in an undefined state.
     #[ffi_service_method(on_panic = "undefined_behavior")]
-    pub fn return_string(&mut self) -> AsciiPointer {
-        AsciiPointer::from_cstr(&self.c_string)
+    pub fn return_string(&mut self) -> CStrPointer {
+        CStrPointer::from_cstr(&self.c_string)
     }
 
     pub fn method_void_ffi_error(&mut self) -> Result<(), Error> {
@@ -166,8 +166,8 @@ impl<'a> SimpleServiceLifetime<'a> {
 
     // Sometimes lifetime params can get confused in low level codegen, so we have to replace `self` with explicit self.
     #[ffi_service_method(on_panic = "return_default")]
-    pub fn return_string_accept_slice<'b>(_: &mut SimpleServiceLifetime<'b>, _: FFISlice<'b, u8>) -> AsciiPointer<'b> {
-        AsciiPointer::empty()
+    pub fn return_string_accept_slice<'b>(_: &mut SimpleServiceLifetime<'b>, _: FFISlice<'b, u8>) -> CStrPointer<'b> {
+        CStrPointer::empty()
     }
 
     pub fn method_void_ffi_error(&mut self) -> Result<(), Error> {

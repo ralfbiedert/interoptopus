@@ -275,7 +275,7 @@ pub trait PythonWriter {
                         indented!(w, [_ _], r#"{} = callbacks.{}({})"#, arg.name(), safe_name(&x.internal_name()), arg.name())?;
                         w.newline()?;
                     }
-                    TypePattern::AsciiPointer => {
+                    TypePattern::CStrPointer => {
                         indented!(w, [_], r#"if not hasattr({}, "__ctypes_from_outparam__"):"#, arg.name())?;
                         indented!(w, [_ _], r#"{} = ctypes.cast({}, ctypes.POINTER(ctypes.c_char))"#, arg.name(), arg.name())?;
                     }
@@ -564,7 +564,7 @@ pub trait PythonWriter {
         };
 
         match function.signature().rval() {
-            CType::Pattern(TypePattern::AsciiPointer) => {
+            CType::Pattern(TypePattern::CStrPointer) => {
                 indented!(w, [_], r#"rval = c_lib.{}({})"#, function.name(), &args)?;
                 indented!(w, [_], r#"return ctypes.string_at(rval)"#)?;
             }
