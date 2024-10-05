@@ -1,4 +1,3 @@
-use crate::surrogates::read_surrogates;
 use crate::types::Attributes;
 use crate::util::extract_doc_lines;
 use proc_macro2::TokenStream;
@@ -91,7 +90,6 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
     let struct_ident_str = item.ident.to_string();
     let struct_ident = syn::Ident::new(&struct_ident_str, item.ident.span());
     let struct_ident_c = attributes.name.clone().unwrap_or(struct_ident_str);
-    let surrogates = read_surrogates(&item.attrs);
 
     let mut field_names = Vec::new();
     let mut field_type_info = Vec::new();
@@ -188,15 +186,8 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
             }
         };
 
-        if surrogates.1.contains_key(&name) {
-            let lookup = surrogates.1.get(&name).unwrap();
-            let ident = syn::Ident::new(lookup, surrogates.0.unwrap());
-            field_type_info.push(quote! { #ident()  });
-            field_types.push(quote! { #ident()  }); // TODO: are these 2 correct?
-        } else {
-            field_type_info.push(quote! { < #token as ::interoptopus::lang::rust::CTypeInfo >::type_info()  });
-            field_types.push(quote! { #token });
-        }
+        field_type_info.push(quote! { < #token as ::interoptopus::lang::rust::CTypeInfo >::type_info()  });
+        field_types.push(quote! { #token });
     }
 
     let rval_builder = if attributes.opaque {

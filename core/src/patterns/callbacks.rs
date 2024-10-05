@@ -112,7 +112,6 @@
 //! }
 //! ```
 use crate::lang::c::{FnPointerType, Meta};
-use interoptopus_proc::ffi_function;
 
 /// Internal helper naming a generated callback type wrapper.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]

@@ -5,7 +5,7 @@ use interoptopus::lang::rust::CTypeInfo;
 use interoptopus::patterns::slice::FFISlice;
 use interoptopus::patterns::string::AsciiPointer;
 use interoptopus::patterns::surrogates::Surrogate;
-use interoptopus::{callback, ffi_surrogates, ffi_type};
+use interoptopus::{callback, ffi_type};
 use std::fmt::Debug;
 use std::marker::PhantomData;
 

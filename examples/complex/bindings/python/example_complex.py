@@ -17,7 +17,6 @@ def init_lib(path):
     c_lib.example_print_score.argtypes = [ctypes.c_void_p]
     c_lib.example_return_score.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint32)]
     c_lib.example_update_score_by_callback.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)]
-    c_lib.example_write_foreign_type.argtypes = [ctypes.c_void_p, ctypes.POINTER(ThirdPartyVecF32)]
     c_lib.example_double_super_complex_entity.argtypes = [ctypes.c_void_p, ctypes.POINTER(SuperComplexEntity), ctypes.POINTER(SuperComplexEntity)]
 
     c_lib.example_api_version.restype = ctypes.c_uint32
@@ -27,7 +26,6 @@ def init_lib(path):
     c_lib.example_print_score.restype = ctypes.c_int
     c_lib.example_return_score.restype = ctypes.c_int
     c_lib.example_update_score_by_callback.restype = ctypes.c_int
-    c_lib.example_write_foreign_type.restype = ctypes.c_int
     c_lib.example_double_super_complex_entity.restype = ctypes.c_int
 
 
@@ -65,10 +63,6 @@ def example_update_score_by_callback(context: ctypes.c_void_p, update) -> ctypes
         update = callbacks.fn_u32_rval_u32(update)
 
     return c_lib.example_update_score_by_callback(context, update)
-
-def example_write_foreign_type(context: ctypes.c_void_p, foreign: ctypes.POINTER(ThirdPartyVecF32)) -> ctypes.c_int:
-    """ Accepts some foreign types."""
-    return c_lib.example_write_foreign_type(context, foreign)
 
 def example_double_super_complex_entity(context: ctypes.c_void_p, incoming: ctypes.POINTER(SuperComplexEntity), outgoing: ctypes.POINTER(SuperComplexEntity)) -> ctypes.c_int:
     return c_lib.example_double_super_complex_entity(context, incoming, outgoing)
@@ -121,59 +115,6 @@ class FFIError:
     Ok = 0
     #  Naughty API call detected.
     NullPointerPassed = 10
-
-
-class ThirdPartyVecF32(ctypes.Structure):
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("x", ctypes.c_float),
-        ("y", ctypes.c_float),
-        ("z", ctypes.c_float),
-        ("w", ctypes.c_float),
-    ]
-
-    def __init__(self, x: float = None, y: float = None, z: float = None, w: float = None):
-        if x is not None:
-            self.x = x
-        if y is not None:
-            self.y = y
-        if z is not None:
-            self.z = z
-        if w is not None:
-            self.w = w
-
-    @property
-    def x(self) -> float:
-        return ctypes.Structure.__get__(self, "x")
-
-    @x.setter
-    def x(self, value: float):
-        return ctypes.Structure.__set__(self, "x", value)
-
-    @property
-    def y(self) -> float:
-        return ctypes.Structure.__get__(self, "y")
-
-    @y.setter
-    def y(self, value: float):
-        return ctypes.Structure.__set__(self, "y", value)
-
-    @property
-    def z(self) -> float:
-        return ctypes.Structure.__get__(self, "z")
-
-    @z.setter
-    def z(self, value: float):
-        return ctypes.Structure.__set__(self, "z", value)
-
-    @property
-    def w(self) -> float:
-        return ctypes.Structure.__get__(self, "w")
-
-    @w.setter
-    def w(self, value: float):
-        return ctypes.Structure.__set__(self, "w", value)
 
 
 class Vec3(ctypes.Structure):

@@ -11,8 +11,13 @@
 //! use interoptopus::{ffi_function, ffi_type};
 //! use interoptopus::patterns::surrogates::{CorrectSurrogate, Surrogate};
 //! #
-//! # pub struct Vec3 {
-//! #    x: u32,
+//! # mod foreign {
+//! #    #[repr(C)]
+//! #    pub struct Vec3 {
+//! #         x: f32,
+//! #         y: f32,
+//! #         z: f32,
+//! #    }
 //! # }
 //!
 //! // Create a LocalVec3 with matching fields to your upstream type.
@@ -26,12 +31,15 @@
 //!
 //! // This marker trait guarantees `LocalVec3` is a valid surrogate
 //! // for `Vec3`. You must ensure this is correct, or you get UB.
-//! unsafe impl CorrectSurrogate<Vec3> for LocalVec3 {}
+//! unsafe impl CorrectSurrogate<foreign::Vec3> for LocalVec3 {}
+//!
+//! // And here we create a nicer alias.
+//! type Vec3 = Surrogate<foreign::Vec3, LocalVec3>;
 //!
 //! #[ffi_function]
 //! #[no_mangle]
-//! pub extern "C" fn do_compute(s: Surrogate<Vec3, LocalVec3>) {
-//!     let vec: Vec3 = s.into_t();
+//! pub extern "C" fn do_compute(s: Vec3) {
+//!     let vec: foreign::Vec3 = s.into_t();
 //! }
 //! ```
 //!
@@ -44,12 +52,17 @@ use crate::lang::c::CType;
 use crate::lang::rust::CTypeInfo;
 use std::marker::PhantomData;
 use std::mem::{transmute, ManuallyDrop};
+use std::ops::Deref;
 
 /// A marker trait for types that are surrogates for other types.
 ///
 /// # Safety
 ///
-/// You must ensure the types match, otherwise undefined behavior will occur.  
+/// You must ensure the types match, otherwise undefined behavior will occur. In particular you
+/// must ensure that:
+///
+/// - Both types `T` and `L` have the same fields in the same order.
+/// - Both types are `repr(C)` and otherwise agree in alignment, layout and size.
 pub unsafe trait CorrectSurrogate<T> {}
 
 /// A type mapper at the FFI boundary.
@@ -67,6 +80,27 @@ unsafe impl<T, L: CTypeInfo + CorrectSurrogate<T>> CTypeInfo for Surrogate<T, L>
 }
 
 impl<T, L: CTypeInfo + CorrectSurrogate<T>> Surrogate<T, L> {
+    /// Creates a new `Surrogate` from a `T`.
+    pub fn from_t(x: T) -> Self {
+        Self {
+            inner: x,
+            _marker: Default::default(),
+        }
+    }
+
+    /// Creates a new `Surrogate` from a `L`.
+    pub fn from_l(x: L) -> Self {
+        let t = unsafe {
+            let this = ManuallyDrop::new(x);
+            std::ptr::read(this.deref() as *const L as *const T)
+        };
+
+        Self {
+            inner: t,
+            _marker: Default::default(),
+        }
+    }
+
     /// Views the type as a `T`.
     pub fn as_t(&self) -> &T {
         &self.inner

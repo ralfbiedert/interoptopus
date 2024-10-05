@@ -9,7 +9,7 @@ use interoptopus::patterns::option::FFIOption;
 use interoptopus::patterns::result::panics_and_errors_to_ffi_enum;
 use interoptopus::patterns::slice::FFISlice;
 use interoptopus::patterns::slice::FFISliceMut;
-use interoptopus::{ffi_function, ffi_surrogates, here};
+use interoptopus::{ffi_function, here};
 use std::ptr::null;
 use std::time::Duration;
 

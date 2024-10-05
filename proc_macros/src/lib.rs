@@ -8,7 +8,6 @@ mod constants;
 mod functions;
 mod macros;
 mod service;
-mod surrogates;
 mod types;
 mod util;
 
@@ -443,64 +442,5 @@ pub fn ffi_service_method(_attr: TokenStream, item: TokenStream) -> TokenStream 
 ///
 #[proc_macro_attribute]
 pub fn ffi_service_ignore(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    item
-}
-
-/// On methods and structs, provide a type helper for foreign types.<sup>⚠️</sup>
-///
-/// When dealing with types outside of your control you will not be able to implement [`CTypeInfo`](https://docs.rs/interoptopus/latest/interoptopus/lang/rust/trait.CTypeInfo.html) for them.
-/// Instead you need a **surrogate**, a helper function which returns that info for the type.
-///
-/// # Surrogate Signature
-///
-/// The surrogate's signature is:
-///
-/// ```rust
-/// use interoptopus::lang::c::CType;
-///
-/// fn some_foreign_type() -> CType {
-///     // Return an appropriate CType
-///     # interoptopus::lang::c::CType::Primitive(interoptopus::lang::c::PrimitiveType::U8)
-/// }
-/// ```
-///
-/// Once defined you can use `#[ffi_surrogates]` to hint at the surrogate in [`#[ffi_type]`](macro@crate::ffi_type) and
-/// [`#[ffi_function]`](macro@crate::ffi_function) helpers.
-///
-/// # Safety
-///
-/// <sup>⚠️</sup> This attribute can lead to undefined behavior when misapplied.
-/// When using surrogates you must ensure the surrogate matches the parameter's type.
-///
-///
-/// # Example
-///
-/// ```
-/// use interoptopus::lang::c::{CType, Field, PrimitiveType, CompositeType};
-/// use interoptopus::{ffi_surrogates, ffi_function};
-///
-/// // A type in a foreign crate you can't use `#[ffi_type]` on.
-/// #[repr(C)]
-/// pub struct SomeForeignType {
-///     x: u32,
-/// }
-///
-/// // Helper function defining the type.
-/// pub fn some_foreign_type() -> CType {
-///     let fields = vec![Field::new("x".to_string(), CType::Primitive(PrimitiveType::U32))];
-///     let composite = CompositeType::new("SomeForeignType".to_string(), fields);
-///     CType::Composite(composite)
-/// }
-///
-/// #[ffi_function]
-/// #[ffi_surrogates(x = "some_foreign_type")]
-/// #[no_mangle]
-/// pub extern "C" fn my_ffi_function(x: SomeForeignType) -> u32 {
-///     x.x
-/// }
-///
-/// ```
-#[proc_macro_attribute]
-pub fn ffi_surrogates(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }

@@ -30,14 +30,6 @@ typedef enum ffierror
 
 typedef struct context context;
 
-typedef struct thirdpartyvecf32
-    {
-    float x;
-    float y;
-    float z;
-    float w;
-    } thirdpartyvecf32;
-
 /// A vector used in our game engine.
 typedef struct vec3
     {
@@ -83,9 +75,6 @@ __FUNCTION_ATTR ffierror example_return_score(context* context, uint32_t* score)
 
 /// Updates the score.
 __FUNCTION_ATTR ffierror example_update_score_by_callback(context* context, fptr_fn_u32_rval_u32 update);
-
-/// Accepts some foreign types.
-__FUNCTION_ATTR ffierror example_write_foreign_type(context* context, const thirdpartyvecf32* foreign);
 
 __FUNCTION_ATTR ffierror example_double_super_complex_entity(context* context, const supercomplexentity* incoming, supercomplexentity* outgoing);
 

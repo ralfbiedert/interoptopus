@@ -4,7 +4,6 @@ use syn::spanned::Spanned;
 use syn::{FnArg, GenericParam, ItemFn, Pat, ReturnType, Signature, Type};
 
 use crate::functions::Attributes;
-use crate::surrogates::read_surrogates;
 use crate::util;
 
 pub fn fn_signature_type(signature: Signature) -> TokenStream {
@@ -75,7 +74,6 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
 
     let signature = fn_signature_type(item_fn.sig.clone());
     let rval = rval_tokens(&item_fn.sig.output);
-    let surrogates = read_surrogates(&item_fn.attrs);
 
     for generic in &item_fn.sig.generics.params {
         match generic {
@@ -132,13 +130,7 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
                 }
             };
 
-            if surrogates.1.contains_key(&name) {
-                let lookup = surrogates.1.get(&name).unwrap();
-                let ident = syn::Ident::new(lookup, surrogates.0.unwrap());
-                args_type.push(quote! { #ident()  })
-            } else {
-                args_type.push(quote! { < #token as ::interoptopus::lang::rust::CTypeInfo>::type_info() });
-            }
+            args_type.push(quote! { < #token as ::interoptopus::lang::rust::CTypeInfo>::type_info() });
         } else {
             panic!("Does not support methods.")
         }

@@ -1,5 +1,5 @@
 use crate::common::{third_party_option, GameEngine, SuperComplexEntity, Vec3, WithForeignType};
-use interoptopus::{ffi_constant, ffi_function, ffi_surrogates, ffi_type};
+use interoptopus::{ffi_constant, ffi_function, ffi_type};
 use std::ptr::null_mut;
 
 type SomeType = u32;
@@ -150,19 +150,6 @@ pub extern "C" fn example_double_super_complex_entity(
     outgoing.player_2.x *= 2.0;
     outgoing.player_2.y *= 2.0;
     outgoing.player_2.z *= 2.0;
-
-    FFIError::Ok
-}
-
-/// Accepts some foreign types.
-#[ffi_function]
-#[ffi_surrogates(foreign = "third_party_option")]
-#[no_mangle]
-pub extern "C" fn example_write_foreign_type(context: Option<&mut Context>, foreign: Option<&WithForeignType>) -> FFIError {
-    let _context = context.unwrap();
-    let foreign = foreign.unwrap();
-
-    dbg!(foreign.third_party.unwrap());
 
     FFIError::Ok
 }

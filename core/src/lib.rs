@@ -174,7 +174,7 @@ pub use error::Error;
 pub use generators::Interop;
 #[cfg(feature = "derive")]
 #[cfg_attr(docsrs, doc(cfg(feature = "derive")))] // does this work?
-pub use interoptopus_proc::{ffi_constant, ffi_function, ffi_service, ffi_service_ctor, ffi_service_ignore, ffi_service_method, ffi_surrogates, ffi_type};
+pub use interoptopus_proc::{ffi_constant, ffi_function, ffi_service, ffi_service_ctor, ffi_service_ignore, ffi_service_method, ffi_type};
 
 mod core;
 mod error;
@@ -192,9 +192,6 @@ pub mod lang {
     //!
     //! Normal users of Interoptopus probably won't have to concern
     //! themselves with any of the items in this module.
-    //! A notable exception to this rule is having to manually implement
-    //! a [`CType`](`c::CType`) surrogate for un-owned types. See the
-    //! [surrogates section in `ffi_type`](crate::ffi_type#surrogates).
     pub mod c;
     pub mod rust;
 }

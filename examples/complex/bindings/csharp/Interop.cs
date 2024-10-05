@@ -53,10 +53,6 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_update_score_by_callback")]
         public static extern FFIError example_update_score_by_callback(IntPtr context, InteropDelegate_fn_u32_rval_u32 update);
 
-        /// Accepts some foreign types.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_write_foreign_type")]
-        public static extern FFIError example_write_foreign_type(IntPtr context, ref ThirdPartyVecF32 foreign);
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_double_super_complex_entity")]
         public static extern FFIError example_double_super_complex_entity(IntPtr context, ref SuperComplexEntity incoming, out SuperComplexEntity outgoing);
 
@@ -82,16 +78,6 @@ namespace My.Company
         /// Point to an ASCII encoded whatnot.
         public IntPtr some_str;
         public uint str_len;
-    }
-
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct ThirdPartyVecF32
-    {
-        public float x;
-        public float y;
-        public float z;
-        public float w;
     }
 
     /// A vector used in our game engine.

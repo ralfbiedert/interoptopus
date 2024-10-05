@@ -20,14 +20,8 @@ pub struct Attributes {
     prefix: String,
 }
 
-impl Attributes {
-    pub fn assert_valid(&self) {}
-}
-
 pub fn ffi_service(attr: TokenStream, input: TokenStream) -> TokenStream {
     let attributes = darling_parse!(Attributes, attr);
-    attributes.assert_valid();
-
     let item = syn::parse2::<ItemImpl>(input.clone()).expect("Must be item.");
     let service_type = &item.self_ty;
     let mut function_descriptors = Vec::new();
