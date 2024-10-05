@@ -38,8 +38,6 @@ typedef struct my_library_generic3 my_library_generic3;
 
 typedef struct my_library_generic4 my_library_generic4;
 
-typedef struct my_library_opaque my_library_opaque;
-
 /// Some struct we want to expose as a class.
 typedef struct my_library_simple_service my_library_simple_service;
 
@@ -97,6 +95,11 @@ typedef struct my_library_inner
     float x;
 } my_library_inner;
 
+typedef struct my_library_local
+{
+    uint32_t x;
+} my_library_local;
+
 #pragma pack(push, 1)
 typedef struct my_library_packed1
 {
@@ -117,11 +120,6 @@ typedef struct my_library_phantomu8
 {
     uint32_t x;
 } my_library_phantomu8;
-
-typedef struct my_library_some_foreign_type
-{
-    uint32_t x;
-} my_library_some_foreign_type;
 
 /// Documented struct.
 typedef struct my_library_struct_documented
@@ -199,6 +197,11 @@ typedef struct my_library_array
 {
     uint8_t data[16];
 } my_library_array;
+
+typedef struct my_library_container
+{
+    my_library_local foreign;
+} my_library_container;
 
 typedef struct my_library_genericu32
 {
@@ -388,8 +391,6 @@ my_library_tupled tupled(my_library_tupled x);
 
 my_library_ffi_error complex_args_1(my_library_vec3f32 a, const my_library_tupled* b);
 
-const my_library_opaque* complex_args_2(my_library_some_foreign_type cmplx);
-
 uint8_t callback(my_library_fptr_fn_u8_rval_u8 callback, uint8_t value);
 
 uint32_t generic_1a(my_library_genericu32 x, my_library_phantomu8 y);
@@ -483,6 +484,8 @@ void pattern_callback_3(my_library_delegate_callback_my_callback_contextual call
 
 uint32_t pattern_callback_4(my_library_my_callback_namespaced callback, uint32_t x);
 
+void pattern_surrogates_1(my_library_local s, my_library_container* c);
+
 /// Destroys the given instance.
 ///
 /// # Safety
@@ -510,6 +513,8 @@ uint32_t simple_service_method_value(const my_library_simple_service* context, u
 ///
 /// Multiple lines.
 void simple_service_method_void(const my_library_simple_service* context);
+
+void simple_service_method_void2(const my_library_simple_service* context);
 
 uint8_t simple_service_method_mut_self(my_library_simple_service* context, my_library_sliceu8 slice);
 
@@ -547,17 +552,17 @@ my_library_ffi_error simple_service_method_callback(my_library_simple_service* c
 ///
 /// The passed parameter MUST have been created with the corresponding init function;
 /// passing any other value results in undefined behavior.
-my_library_ffi_error simple_service_lt_destroy(my_library_simple_service_lifetime** context);
+my_library_ffi_error simple_service_lifetime_destroy(my_library_simple_service_lifetime** context);
 
-my_library_ffi_error simple_service_lt_new_with(my_library_simple_service_lifetime** context, const uint32_t* some_value);
+my_library_ffi_error simple_service_lifetime_new_with(my_library_simple_service_lifetime** context, const uint32_t* some_value);
 
-void simple_service_lt_method_lt(my_library_simple_service_lifetime* context, my_library_slice_bool slice);
+void simple_service_lifetime_method_lt(my_library_simple_service_lifetime* context, my_library_slice_bool slice);
 
-void simple_service_lt_method_lt2(my_library_simple_service_lifetime* context, my_library_slice_bool slice);
+void simple_service_lifetime_method_lt2(my_library_simple_service_lifetime* context, my_library_slice_bool slice);
 
-const char* simple_service_lt_return_string_accept_slice(my_library_simple_service_lifetime* anon0, my_library_sliceu8 anon1);
+const char* simple_service_lifetime_return_string_accept_slice(my_library_simple_service_lifetime* anon0, my_library_sliceu8 anon1);
 
-my_library_ffi_error simple_service_lt_method_void_ffi_error(my_library_simple_service_lifetime* context);
+my_library_ffi_error simple_service_lifetime_method_void_ffi_error(my_library_simple_service_lifetime* context);
 
 
 #ifdef __cplusplus

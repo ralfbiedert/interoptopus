@@ -29,7 +29,6 @@ Freestanding callables inside the module.
  - **[ref_mut_option](#ref_mut_option)** - 
  - **[tupled](#tupled)** - 
  - **[complex_args_1](#complex_args_1)** - 
- - **[complex_args_2](#complex_args_2)** - 
  - **[callback](#callback)** - 
  - **[generic_1a](#generic_1a)** - 
  - **[generic_1b](#generic_1b)** - 
@@ -76,6 +75,7 @@ Freestanding callables inside the module.
  - **[pattern_callback_2](#pattern_callback_2)** - 
  - **[pattern_callback_3](#pattern_callback_3)** - 
  - **[pattern_callback_4](#pattern_callback_4)** - 
+ - **[pattern_surrogates_1](#pattern_surrogates_1)** - 
 
 ### Classes
 Methods operating on common state.
@@ -87,6 +87,7 @@ Methods operating on common state.
      - **[MethodResult](#SimpleService.MethodResult)** -  Methods returning a Result<(), _> are the default and do not
      - **[MethodValue](#SimpleService.MethodValue)** - 
      - **[MethodVoid](#SimpleService.MethodVoid)** -  This method should be documented.
+     - **[MethodVoid2](#SimpleService.MethodVoid2)** - 
      - **[MethodMutSelf](#SimpleService.MethodMutSelf)** - 
      - **[MethodMutSelfVoid](#SimpleService.MethodMutSelfVoid)** -  Single line.
      - **[MethodMutSelfRef](#SimpleService.MethodMutSelfRef)** - 
@@ -117,15 +118,16 @@ Composite data used by functions and methods.
  - **[Aligned2](#Aligned2)** - 
  - **[Array](#Array)** - 
  - **[BooleanAlignment](#BooleanAlignment)** - 
+ - **[Container](#Container)** - 
  - **[DelegateCallbackMyCallbackContextual](#DelegateCallbackMyCallbackContextual)** - 
  - **[ExtraTypef32](#ExtraTypef32)** - 
  - **[Genericu32](#Genericu32)** - 
  - **[Genericu8](#Genericu8)** - 
  - **[Inner](#Inner)** - 
+ - **[Local](#Local)** - 
  - **[Packed1](#Packed1)** - 
  - **[Packed2](#Packed2)** - 
  - **[Phantomu8](#Phantomu8)** - 
- - **[SomeForeignType](#SomeForeignType)** - 
  - **[StructDocumented](#StructDocumented)** -  Documented struct.
  - **[StructRenamed](#StructRenamed)** - 
  - **[Tupled](#Tupled)** - 
@@ -266,6 +268,23 @@ public partial struct BooleanAlignment
 
 
 
+ ### <a name="Container">**Container**</a>
+
+
+#### Fields 
+- **foreign** -  
+#### Definition 
+```csharp
+public partial struct Container
+{
+    public Local foreign;
+}
+```
+
+---
+
+
+
  ### <a name="DelegateCallbackMyCallbackContextual">**DelegateCallbackMyCallbackContextual**</a>
 
 
@@ -353,6 +372,23 @@ public partial struct Inner
 
 
 
+ ### <a name="Local">**Local**</a>
+
+
+#### Fields 
+- **x** -  
+#### Definition 
+```csharp
+public partial struct Local
+{
+    uint x;
+}
+```
+
+---
+
+
+
  ### <a name="Packed1">**Packed1**</a>
 
 
@@ -399,23 +435,6 @@ public partial struct Packed2
 #### Definition 
 ```csharp
 public partial struct Phantomu8
-{
-    public uint x;
-}
-```
-
----
-
-
-
- ### <a name="SomeForeignType">**SomeForeignType**</a>
-
-
-#### Fields 
-- **x** -  
-#### Definition 
-```csharp
-public partial struct SomeForeignType
 {
     public uint x;
 }
@@ -1063,14 +1082,6 @@ public static void complex_args_1_checked(Vec3f32 a, ref Tupled b);
 
 ---
 
-### <a name="complex_args_2">**complex_args_2**</a>
-#### Definition 
-```csharp
-public static extern IntPtr complex_args_2(SomeForeignType cmplx);
-```
-
----
-
 ### <a name="callback">**callback**</a>
 #### Definition 
 ```csharp
@@ -1485,6 +1496,14 @@ public static extern uint pattern_callback_4(IntPtr callback, uint x);
 
 ---
 
+### <a name="pattern_surrogates_1">**pattern_surrogates_1**</a>
+#### Definition 
+```csharp
+public static extern void pattern_surrogates_1(Local s, out Container c);
+```
+
+---
+
 # Classes
 ## <a name="SimpleService">**SimpleService**</a>
  Some struct we want to expose as a class.
@@ -1558,6 +1577,17 @@ public class SimpleService {
 ```csharp
 public class SimpleService {
     public void MethodVoid();
+}
+```
+
+---
+
+### <a name="MethodVoid2">**MethodVoid2**</a>
+
+#### Definition 
+```csharp
+public class SimpleService {
+    public void MethodVoid2();
 }
 ```
 

@@ -70,13 +70,6 @@ class TestFunctions(unittest.TestCase):
         tupled = r.Tupled(x0=100)
         self.assertEqual(200, r.tupled(tupled).x0)
 
-    def test_complex(self):
-        vec = r.Vec3f32()
-        foreign = r.SomeForeignType()
-
-        r.complex_args_1(vec, None)
-        self.assertEqual(None, r.complex_args_2(foreign))
-
     def test_callback(self):
 
         def my_callback(param):

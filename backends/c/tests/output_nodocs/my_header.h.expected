@@ -31,7 +31,6 @@ typedef enum my_library_enumrenamed
 typedef struct my_library_generic2u8 my_library_generic2u8;
 typedef struct my_library_generic3 my_library_generic3;
 typedef struct my_library_generic4 my_library_generic4;
-typedef struct my_library_opaque my_library_opaque;
 typedef struct my_library_simpleservice my_library_simpleservice;
 typedef struct my_library_simpleservicelifetime my_library_simpleservicelifetime;
 typedef enum my_library_ffierror
@@ -86,6 +85,11 @@ typedef struct my_library_inner
     float x;
     } my_library_inner;
 
+typedef struct my_library_local
+    {
+    uint32_t x;
+    } my_library_local;
+
 #pragma pack(push, 1)
 typedef struct my_library_packed1
     {
@@ -106,11 +110,6 @@ typedef struct my_library_phantomu8
     {
     uint32_t x;
     } my_library_phantomu8;
-
-typedef struct my_library_someforeigntype
-    {
-    uint32_t x;
-    } my_library_someforeigntype;
 
 typedef struct my_library_structdocumented
     {
@@ -186,6 +185,11 @@ typedef struct my_library_array
     {
     uint8_t data[16];
     } my_library_array;
+
+typedef struct my_library_container
+    {
+    my_library_local foreign;
+    } my_library_container;
 
 typedef struct my_library_genericu32
     {
@@ -313,7 +317,6 @@ bool ref_option(const int64_t* x);
 bool ref_mut_option(int64_t* x);
 my_library_tupled tupled(my_library_tupled x);
 my_library_ffierror complex_args_1(my_library_vec3f32 a, const my_library_tupled* b);
-const my_library_opaque* complex_args_2(my_library_someforeigntype cmplx);
 uint8_t callback(my_library_fptr_fn_u8_rval_u8 callback, uint8_t value);
 uint32_t generic_1a(my_library_genericu32 x, my_library_phantomu8 y);
 uint8_t generic_1b(my_library_genericu8 x, my_library_phantomu8 y);
@@ -360,6 +363,7 @@ uint32_t pattern_callback_1(my_library_mycallback callback, uint32_t x);
 my_library_mycallbackvoid pattern_callback_2(my_library_mycallbackvoid callback);
 void pattern_callback_3(my_library_delegatecallbackmycallbackcontextual callback, uint32_t x);
 uint32_t pattern_callback_4(my_library_mycallbacknamespaced callback, uint32_t x);
+void pattern_surrogates_1(my_library_local s, my_library_container* c);
 my_library_ffierror simple_service_destroy(my_library_simpleservice** context);
 my_library_ffierror simple_service_new_with(my_library_simpleservice** context, uint32_t some_value);
 my_library_ffierror simple_service_new_without(my_library_simpleservice** context);
@@ -368,6 +372,7 @@ my_library_ffierror simple_service_new_failing(my_library_simpleservice** contex
 my_library_ffierror simple_service_method_result(const my_library_simpleservice* context, uint32_t anon1);
 uint32_t simple_service_method_value(const my_library_simpleservice* context, uint32_t x);
 void simple_service_method_void(const my_library_simpleservice* context);
+void simple_service_method_void2(const my_library_simpleservice* context);
 uint8_t simple_service_method_mut_self(my_library_simpleservice* context, my_library_sliceu8 slice);
 void simple_service_method_mut_self_void(my_library_simpleservice* context, my_library_slicebool slice);
 uint8_t simple_service_method_mut_self_ref(my_library_simpleservice* context, const uint8_t* x, uint8_t* y);
@@ -380,12 +385,12 @@ my_library_slicemutu32 simple_service_return_slice_mut(my_library_simpleservice*
 const char* simple_service_return_string(my_library_simpleservice* context);
 my_library_ffierror simple_service_method_void_ffi_error(my_library_simpleservice* context);
 my_library_ffierror simple_service_method_callback(my_library_simpleservice* context, my_library_mycallback callback);
-my_library_ffierror simple_service_lt_destroy(my_library_simpleservicelifetime** context);
-my_library_ffierror simple_service_lt_new_with(my_library_simpleservicelifetime** context, const uint32_t* some_value);
-void simple_service_lt_method_lt(my_library_simpleservicelifetime* context, my_library_slicebool slice);
-void simple_service_lt_method_lt2(my_library_simpleservicelifetime* context, my_library_slicebool slice);
-const char* simple_service_lt_return_string_accept_slice(my_library_simpleservicelifetime* anon0, my_library_sliceu8 anon1);
-my_library_ffierror simple_service_lt_method_void_ffi_error(my_library_simpleservicelifetime* context);
+my_library_ffierror simple_service_lifetime_destroy(my_library_simpleservicelifetime** context);
+my_library_ffierror simple_service_lifetime_new_with(my_library_simpleservicelifetime** context, const uint32_t* some_value);
+void simple_service_lifetime_method_lt(my_library_simpleservicelifetime* context, my_library_slicebool slice);
+void simple_service_lifetime_method_lt2(my_library_simpleservicelifetime* context, my_library_slicebool slice);
+const char* simple_service_lifetime_return_string_accept_slice(my_library_simpleservicelifetime* anon0, my_library_sliceu8 anon1);
+my_library_ffierror simple_service_lifetime_method_void_ffi_error(my_library_simpleservicelifetime* context);
 
 #ifdef __cplusplus
 }
