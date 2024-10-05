@@ -18,30 +18,42 @@ namespace My.Company
         {
         }
 
+        /// Call for a friend.
         public const uint THE_MAGIC_CONSTANT = (uint) 666;
 
 
+        /// Returns the version of this API.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_api_version")]
         public static extern uint example_api_version();
 
+        /// A function that always fails.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_always_fails")]
         public static extern FFIError example_always_fails();
 
+        /// Creates a new instance of this library.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_create_context")]
         public static extern FFIError example_create_context(ref IntPtr context_ptr);
 
+        /// Deletes an existing instance of this library.
+        ///
+        /// You **must** ensure that `context_ptr` is being called with the context produced by
+        /// `example_create_context`, otherwise bad things will happen.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_destroy_context")]
         public static extern FFIError example_destroy_context(ref IntPtr context_ptr);
 
+        /// Prints the current player score.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_print_score")]
         public static extern FFIError example_print_score(IntPtr context);
 
+        /// Updates the score.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_return_score")]
         public static extern FFIError example_return_score(IntPtr context, out uint score);
 
+        /// Updates the score.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_update_score_by_callback")]
         public static extern FFIError example_update_score_by_callback(IntPtr context, InteropDelegate_fn_u32_rval_u32 update);
 
+        /// Accepts some foreign types.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "example_write_foreign_type")]
         public static extern FFIError example_write_foreign_type(IntPtr context, ref ThirdPartyVecF32 foreign);
 
@@ -50,12 +62,16 @@ namespace My.Company
 
     }
 
+    /// Possible errors in our library.
     public enum FFIError
     {
+        /// All went fine.
         Ok = 0,
+        /// Naughty API call detected.
         NullPointerPassed = 10,
     }
 
+    /// A vector used in our game engine.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public partial struct SuperComplexEntity
@@ -63,6 +79,7 @@ namespace My.Company
         public Vec3 player_1;
         public Vec3 player_2;
         public ulong ammo;
+        /// Point to an ASCII encoded whatnot.
         public IntPtr some_str;
         public uint str_len;
     }
@@ -77,6 +94,7 @@ namespace My.Company
         public float w;
     }
 
+    /// A vector used in our game engine.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public partial struct Vec3

@@ -1,5 +1,5 @@
 use crate::functions::freestanding::ffi_function_freestanding;
-use darling::ast::NestedMeta;
+use crate::macros::darling_parse;
 use darling::FromMeta;
 use proc_macro2::TokenStream;
 
@@ -12,8 +12,7 @@ pub struct Attributes {
 }
 
 pub fn ffi_function(attr: TokenStream, input: TokenStream) -> TokenStream {
-    let nested_meta = NestedMeta::parse_meta_list(attr).unwrap();
-    let attributes: Attributes = Attributes::from_list(&nested_meta).unwrap();
+    let attributes = darling_parse!(Attributes, attr);
 
     let rval = ffi_function_freestanding(&attributes, input);
 

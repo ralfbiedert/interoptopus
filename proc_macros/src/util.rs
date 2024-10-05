@@ -1,26 +1,26 @@
 use darling::ToTokens;
 use syn::punctuated::Punctuated;
-use syn::{Attribute, GenericArgument, PathArguments, Type};
+use syn::{Attribute, Expr, GenericArgument, Lit, Meta, PathArguments, Type};
 
+/// From a let of attributes to an item, extracts the ones that are documentation, as strings.
 pub fn extract_doc_lines(attributes: &[Attribute]) -> Vec<String> {
     let mut docs = Vec::new();
 
     for attr in attributes {
-        // TODO: What is the un-ugly version of this?
-        if &attr.path().to_token_stream().to_string() == "doc" {
-            // TODO TODO
-            // let list = NestedMeta::parse_meta_list(attribute.to_token_stream()).unwrap();
-            // let rval = HashMap::<String, String>::from_nested_meta(list.first().unwrap()).ok().unwrap();
-            // match attr.parse_meta().unwrap() {
-            //     Meta::NameValue(x) => match x.lit {
-            //         syn::Lit::Str(x) => {
-            //             let the_line = x.value().to_string();
-            //             docs.push(the_line);
-            //         }
-            //         _ => panic!("This was a bit unexpected."),
-            //     },
-            //     _ => panic!("This should not fail."),
-            // }
+        if &attr.path().to_token_stream().to_string() != "doc" {
+            continue;
+        }
+
+        if let Meta::NameValue(x) = &attr.meta {
+            match &x.value {
+                Expr::Lit(x) => match &x.lit {
+                    Lit::Str(x) => {
+                        docs.push(x.value());
+                    }
+                    _ => panic!("Unexpected content in doc string: not a string."),
+                },
+                _ => panic!("Unexpected content in doc string: not a literal."),
+            }
         }
     }
 

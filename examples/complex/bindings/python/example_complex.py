@@ -33,30 +33,41 @@ def init_lib(path):
 
 
 def example_api_version() -> int:
+    """ Returns the version of this API."""
     return c_lib.example_api_version()
 
 def example_always_fails() -> ctypes.c_int:
+    """ A function that always fails."""
     return c_lib.example_always_fails()
 
 def example_create_context(context_ptr: ctypes.POINTER(ctypes.c_void_p)) -> ctypes.c_int:
+    """ Creates a new instance of this library."""
     return c_lib.example_create_context(context_ptr)
 
 def example_destroy_context(context_ptr: ctypes.POINTER(ctypes.c_void_p)) -> ctypes.c_int:
+    """ Deletes an existing instance of this library.
+
+ You **must** ensure that `context_ptr` is being called with the context produced by
+ `example_create_context`, otherwise bad things will happen."""
     return c_lib.example_destroy_context(context_ptr)
 
 def example_print_score(context: ctypes.c_void_p) -> ctypes.c_int:
+    """ Prints the current player score."""
     return c_lib.example_print_score(context)
 
 def example_return_score(context: ctypes.c_void_p, score: ctypes.POINTER(ctypes.c_uint32)) -> ctypes.c_int:
+    """ Updates the score."""
     return c_lib.example_return_score(context, score)
 
 def example_update_score_by_callback(context: ctypes.c_void_p, update) -> ctypes.c_int:
+    """ Updates the score."""
     if not hasattr(update, "__ctypes_from_outparam__"):
         update = callbacks.fn_u32_rval_u32(update)
 
     return c_lib.example_update_score_by_callback(context, update)
 
 def example_write_foreign_type(context: ctypes.c_void_p, foreign: ctypes.POINTER(ThirdPartyVecF32)) -> ctypes.c_int:
+    """ Accepts some foreign types."""
     return c_lib.example_write_foreign_type(context, foreign)
 
 def example_double_super_complex_entity(context: ctypes.c_void_p, incoming: ctypes.POINTER(SuperComplexEntity), outgoing: ctypes.POINTER(SuperComplexEntity)) -> ctypes.c_int:
@@ -105,7 +116,10 @@ class _Iter(object):
 
 
 class FFIError:
+    """ Possible errors in our library."""
+    #  All went fine.
     Ok = 0
+    #  Naughty API call detected.
     NullPointerPassed = 10
 
 
@@ -163,6 +177,7 @@ class ThirdPartyVecF32(ctypes.Structure):
 
 
 class Vec3(ctypes.Structure):
+    """ A vector used in our game engine."""
 
     # These fields represent the underlying C data layout
     _fields_ = [
@@ -205,6 +220,7 @@ class Vec3(ctypes.Structure):
 
 
 class SuperComplexEntity(ctypes.Structure):
+    """ A vector used in our game engine."""
 
     # These fields represent the underlying C data layout
     _fields_ = [
@@ -253,10 +269,12 @@ class SuperComplexEntity(ctypes.Structure):
 
     @property
     def some_str(self) -> ctypes.POINTER(ctypes.c_uint8):
+        """ Point to an ASCII encoded whatnot."""
         return ctypes.Structure.__get__(self, "some_str")
 
     @some_str.setter
     def some_str(self, value: ctypes.POINTER(ctypes.c_uint8)):
+        """ Point to an ASCII encoded whatnot."""
         return ctypes.Structure.__set__(self, "some_str", value)
 
     @property

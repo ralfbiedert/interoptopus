@@ -21,7 +21,7 @@ Freestanding callables inside the module.
  - **[many_args_5](#many_args_5)** - 
  - **[many_args_10](#many_args_10)** - 
  - **[ptr](#ptr)** - 
- - **[ptr_mut](#ptr_mut)** - 
+ - **[ptr_mut](#ptr_mut)** -  # Safety
  - **[ptr_ptr](#ptr_ptr)** - 
  - **[ref_simple](#ref_simple)** - 
  - **[ref_mut_simple](#ref_mut_simple)** - 
@@ -38,7 +38,7 @@ Freestanding callables inside the module.
  - **[generic_3](#generic_3)** - 
  - **[generic_4](#generic_4)** - 
  - **[array_1](#array_1)** - 
- - **[documented](#documented)** - 
+ - **[documented](#documented)** -  This function has documentation.
  - **[ambiguous_1](#ambiguous_1)** - 
  - **[ambiguous_2](#ambiguous_2)** - 
  - **[ambiguous_3](#ambiguous_3)** - 
@@ -79,24 +79,24 @@ Freestanding callables inside the module.
 
 ### Classes
 Methods operating on common state.
- - **[SimpleService](#SimpleService)** - 
-     - **[new_with](#SimpleService.new_with)** <sup>**ctor**</sup> - 
+ - **[SimpleService](#SimpleService)** -  Some struct we want to expose as a class.
+     - **[new_with](#SimpleService.new_with)** <sup>**ctor**</sup> -  The constructor must return a `Result<Self, Error>`.
      - **[new_without](#SimpleService.new_without)** <sup>**ctor**</sup> - 
      - **[new_with_string](#SimpleService.new_with_string)** <sup>**ctor**</sup> - 
      - **[new_failing](#SimpleService.new_failing)** <sup>**ctor**</sup> - 
-     - **[method_result](#SimpleService.method_result)** - 
+     - **[method_result](#SimpleService.method_result)** -  Methods returning a Result<(), _> are the default and do not
      - **[method_value](#SimpleService.method_value)** - 
-     - **[method_void](#SimpleService.method_void)** - 
+     - **[method_void](#SimpleService.method_void)** -  This method should be documented.
      - **[method_mut_self](#SimpleService.method_mut_self)** - 
-     - **[method_mut_self_void](#SimpleService.method_mut_self_void)** - 
+     - **[method_mut_self_void](#SimpleService.method_mut_self_void)** -  Single line.
      - **[method_mut_self_ref](#SimpleService.method_mut_self_ref)** - 
      - **[method_mut_self_ref_slice](#SimpleService.method_mut_self_ref_slice)** - 
      - **[method_mut_self_ref_slice_limited](#SimpleService.method_mut_self_ref_slice_limited)** - 
      - **[method_mut_self_ffi_error](#SimpleService.method_mut_self_ffi_error)** - 
      - **[method_mut_self_no_error](#SimpleService.method_mut_self_no_error)** - 
-     - **[return_slice](#SimpleService.return_slice)** - 
-     - **[return_slice_mut](#SimpleService.return_slice_mut)** - 
-     - **[return_string](#SimpleService.return_string)** - 
+     - **[return_slice](#SimpleService.return_slice)** -  Warning, you _must_ discard the returned slice object before calling into this service
+     - **[return_slice_mut](#SimpleService.return_slice_mut)** -  Warning, you _must_ discard the returned slice object before calling into this service
+     - **[return_string](#SimpleService.return_string)** -  This function has no panic safeguards. If it panics your host app will be in an undefined state.
      - **[method_void_ffi_error](#SimpleService.method_void_ffi_error)** - 
      - **[method_callback](#SimpleService.method_callback)** - 
  - **[SimpleServiceLifetime](#SimpleServiceLifetime)** - 
@@ -108,7 +108,7 @@ Methods operating on common state.
 
 ### Enums
 Groups of related constants.
- - **[EnumDocumented](#EnumDocumented)** - 
+ - **[EnumDocumented](#EnumDocumented)** -  Documented enum.
  - **[EnumRenamed](#EnumRenamed)** - 
 
 ### Data Structs
@@ -126,7 +126,7 @@ Composite data used by functions and methods.
  - **[Packed2](#Packed2)** - 
  - **[Phantomu8](#Phantomu8)** - 
  - **[SomeForeignType](#SomeForeignType)** - 
- - **[StructDocumented](#StructDocumented)** - 
+ - **[StructDocumented](#StructDocumented)** -  Documented struct.
  - **[StructRenamed](#StructRenamed)** - 
  - **[Tupled](#Tupled)** - 
  - **[UseAsciiStringPattern](#UseAsciiStringPattern)** - 
@@ -464,9 +464,10 @@ class SomeForeignType(ctypes.Structure):
 
  ### <a name="StructDocumented">**StructDocumented**</a>
 
+Documented struct.
 
 #### Fields 
-- **x** -  
+- **x** -  Documented field. 
 #### Definition 
 ```python
 class StructDocumented(ctypes.Structure):
@@ -927,11 +928,12 @@ class OptionVec(ctypes.Structure):
 
  ### <a name="EnumDocumented">**EnumDocumented**</a>
 
+Documented enum.
 
 #### Variants 
-- **A** -  
-- **B** -  
-- **C** -  
+- **A** -  Variant A. 
+- **B** -  Variant B. 
+- **C** -  Variant B. 
 #### Definition 
 ```python
 class EnumDocumented:
@@ -1121,6 +1123,9 @@ def ptr(x: ctypes.POINTER(ctypes.c_int64)) -> ctypes.POINTER(ctypes.c_int64):
 ---
 
 ## ptr_mut 
+### Safety
+
+Parameter x must point to valid data.
 #### Definition 
 ```python
 def ptr_mut(x: ctypes.POINTER(ctypes.c_int64)) -> ctypes.POINTER(ctypes.c_int64):
@@ -1274,6 +1279,7 @@ def array_1(x: Array) -> int:
 ---
 
 ## documented 
+This function has documentation.
 #### Definition 
 ```python
 def documented(x: StructDocumented) -> ctypes.c_int:
@@ -1617,7 +1623,9 @@ def pattern_callback_4(callback, x: int) -> int:
 
 # Services
 ## <a name="SimpleService">**SimpleService**</a> <sup>ctor</sup>
+ Some struct we want to expose as a class.
 ### <a name="SimpleService.new_with">**new_with**</a> <sup>ctor</sup>
+ The constructor must return a `Result<Self, Error>`.
 
 #### Definition 
 ```python
@@ -1670,6 +1678,8 @@ class SimpleService:
 ---
 
 ### <a name="SimpleService.method_result">**method_result**</a>
+ Methods returning a Result<(), _> are the default and do not
+ need annotations.
 
 #### Definition 
 ```python
@@ -1694,6 +1704,9 @@ class SimpleService:
 ---
 
 ### <a name="SimpleService.method_void">**method_void**</a>
+ This method should be documented.
+
+ Multiple lines.
 
 #### Definition 
 ```python
@@ -1718,6 +1731,7 @@ class SimpleService:
 ---
 
 ### <a name="SimpleService.method_mut_self_void">**method_mut_self_void**</a>
+ Single line.
 
 #### Definition 
 ```python
@@ -1790,6 +1804,8 @@ class SimpleService:
 ---
 
 ### <a name="SimpleService.return_slice">**return_slice**</a>
+ Warning, you _must_ discard the returned slice object before calling into this service
+ again, as otherwise undefined behavior might happen.
 
 #### Definition 
 ```python
@@ -1802,6 +1818,8 @@ class SimpleService:
 ---
 
 ### <a name="SimpleService.return_slice_mut">**return_slice_mut**</a>
+ Warning, you _must_ discard the returned slice object before calling into this service
+ again, as otherwise undefined behavior might happen.
 
 #### Definition 
 ```python
@@ -1814,6 +1832,7 @@ class SimpleService:
 ---
 
 ### <a name="SimpleService.return_string">**return_string**</a>
+ This function has no panic safeguards. If it panics your host app will be in an undefined state.
 
 #### Definition 
 ```python

@@ -9,10 +9,10 @@ pub fn read_surrogates(attributes: &[Attribute]) -> (Option<Span>, HashMap<Strin
     attributes
         .iter()
         .filter(|x| x.to_token_stream().to_string().contains("ffi_surrogate"))
-        .filter_map(|attribute| {
-            // let list = NestedMeta::parse_meta_list(attribute.to_token_stream()).unwrap();
-            let list: HashMap<String, String> = FromMeta::from_meta(&attribute.meta).unwrap();
-            Some((Some(attribute.span()), list))
+        .map(|attribute| {
+            let list: HashMap<String, String> = FromMeta::from_meta(&attribute.meta)
+                .expect(r#"Surrogates must be specified in the form of #[ffi_surrogates(field1 = "function1", field2 = "function2")]."#);
+            (Some(attribute.span()), list)
         })
         .next()
         .unwrap_or_default()

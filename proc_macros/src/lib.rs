@@ -6,6 +6,7 @@ extern crate proc_macro; // Apparently needed to be imported like this.
 
 mod constants;
 mod functions;
+mod macros;
 mod service;
 mod surrogates;
 mod types;
@@ -76,6 +77,7 @@ use proc_macro::TokenStream;
 pub fn ffi_type(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr = proc_macro2::TokenStream::from(attr);
     let input = proc_macro2::TokenStream::from(item);
+
     let rval = types::ffi_type(attr, input);
 
     rval.into()
@@ -420,7 +422,7 @@ pub fn ffi_service_ctor(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     #[ffi_service_method(on_panic = "return_default")]
 ///     #[allow(unconditional_panic)]
 ///     pub fn oops(&self, x: u32) -> u32 {
-///         let array = [0, 1, 2];
+///         let array = vec![0, 1, 2];
 ///
 ///         // This will panic. The method will return 0 instead.
 ///         array[5]

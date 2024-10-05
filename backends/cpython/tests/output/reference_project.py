@@ -269,6 +269,9 @@ def ptr(x: ctypes.POINTER(ctypes.c_int64)) -> ctypes.POINTER(ctypes.c_int64):
     return c_lib.ptr(x)
 
 def ptr_mut(x: ctypes.POINTER(ctypes.c_int64)) -> ctypes.POINTER(ctypes.c_int64):
+    """ # Safety
+
+ Parameter x must point to valid data."""
     return c_lib.ptr_mut(x)
 
 def ptr_ptr(x: ctypes.POINTER(ctypes.POINTER(ctypes.c_int64))) -> ctypes.POINTER(ctypes.POINTER(ctypes.c_int64)):
@@ -323,6 +326,7 @@ def array_1(x: Array) -> int:
     return c_lib.array_1(x)
 
 def documented(x: StructDocumented) -> ctypes.c_int:
+    """ This function has documentation."""
     return c_lib.documented(x)
 
 def ambiguous_1(x: Vec1) -> Vec1:
@@ -531,8 +535,12 @@ class _Iter(object):
 
 
 class EnumDocumented:
+    """ Documented enum."""
+    #  Variant A.
     A = 0
+    #  Variant B.
     B = 1
+    #  Variant B.
     C = 2
 
 
@@ -919,6 +927,7 @@ class SomeForeignType(ctypes.Structure):
 
 
 class StructDocumented(ctypes.Structure):
+    """ Documented struct."""
 
     # These fields represent the underlying C data layout
     _fields_ = [
@@ -931,10 +940,12 @@ class StructDocumented(ctypes.Structure):
 
     @property
     def x(self) -> float:
+        """ Documented field."""
         return ctypes.Structure.__get__(self, "x")
 
     @x.setter
     def x(self, value: float):
+        """ Documented field."""
         return ctypes.Structure.__set__(self, "x", value)
 
 
@@ -1911,6 +1922,7 @@ class callbacks:
 
 
 class SimpleService:
+    """ Some struct we want to expose as a class."""
     __api_lock = object()
 
     def __init__(self, api_lock, ctx):
@@ -1923,7 +1935,7 @@ class SimpleService:
 
     @staticmethod
     def new_with(some_value: int) -> SimpleService:
-        """"""
+        """ The constructor must return a `Result<Self, Error>`."""
         ctx = ctypes.c_void_p()
         c_lib.simple_service_new_with(ctx, some_value)
         self = SimpleService(SimpleService.__api_lock, ctx)
@@ -1958,7 +1970,8 @@ class SimpleService:
     def __del__(self):
         c_lib.simple_service_destroy(self._ctx, )
     def method_result(self, anon1: int):
-        """"""
+        """ Methods returning a Result<(), _> are the default and do not
+ need annotations."""
         return c_lib.simple_service_method_result(self._ctx, anon1)
 
     def method_value(self, x: int) -> int:
@@ -1966,7 +1979,9 @@ class SimpleService:
         return c_lib.simple_service_method_value(self._ctx, x)
 
     def method_void(self, ):
-        """"""
+        """ This method should be documented.
+
+ Multiple lines."""
         return c_lib.simple_service_method_void(self._ctx, )
 
     def method_mut_self(self, slice: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> int:
@@ -1977,7 +1992,7 @@ class SimpleService:
         return c_lib.simple_service_method_mut_self(self._ctx, slice)
 
     def method_mut_self_void(self, slice: SliceBool | ctypes.Array[ctypes.c_uint8]):
-        """"""
+        """ Single line."""
         if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
             slice = SliceBool(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
@@ -2019,15 +2034,17 @@ class SimpleService:
         return c_lib.simple_service_method_mut_self_no_error(self._ctx, slice)
 
     def return_slice(self, ) -> Sliceu32:
-        """"""
+        """ Warning, you _must_ discard the returned slice object before calling into this service
+ again, as otherwise undefined behavior might happen."""
         return c_lib.simple_service_return_slice(self._ctx, )
 
     def return_slice_mut(self, ) -> SliceMutu32:
-        """"""
+        """ Warning, you _must_ discard the returned slice object before calling into this service
+ again, as otherwise undefined behavior might happen."""
         return c_lib.simple_service_return_slice_mut(self._ctx, )
 
     def return_string(self, ) -> bytes:
-        """"""
+        """ This function has no panic safeguards. If it panics your host app will be in an undefined state."""
         rval = c_lib.simple_service_return_string(self._ctx, )
         return ctypes.string_at(rval)
 

@@ -23,9 +23,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 7650673466554859555ul)
+            if (api_version != 15740821275880904201ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (7650673466554859555). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (15740821275880904201). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -90,6 +90,9 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ptr")]
         public static extern IntPtr ptr(ref long x);
 
+        /// # Safety
+        ///
+        /// Parameter x must point to valid data.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ptr_mut")]
         public static extern IntPtr ptr_mut(out long x);
 
@@ -154,6 +157,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "array_1")]
         public static extern byte array_1(Array x);
 
+        /// This function has documentation.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "documented")]
         public static extern EnumDocumented documented(StructDocumented x);
 
@@ -493,9 +497,21 @@ namespace My.Company
         public static extern uint pattern_callback_4(IntPtr callback, uint x);
 
 
+        /// Destroys the given instance.
+        ///
+        /// # Safety
+        ///
+        /// The passed parameter MUST have been created with the corresponding init function;
+        /// passing any other value results in undefined behavior.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_destroy")]
         public static extern FFIError simple_service_destroy(ref IntPtr context);
 
+        /// Destroys the given instance.
+        ///
+        /// # Safety
+        ///
+        /// The passed parameter MUST have been created with the corresponding init function;
+        /// passing any other value results in undefined behavior.
         public static void simple_service_destroy_checked(ref IntPtr context)
         {
             var rval = simple_service_destroy(ref context);;
@@ -505,9 +521,11 @@ namespace My.Company
             }
         }
 
+        /// The constructor must return a `Result<Self, Error>`.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_new_with")]
         public static extern FFIError simple_service_new_with(ref IntPtr context, uint some_value);
 
+        /// The constructor must return a `Result<Self, Error>`.
         public static void simple_service_new_with_checked(ref IntPtr context, uint some_value)
         {
             var rval = simple_service_new_with(ref context, some_value);;
@@ -553,9 +571,13 @@ namespace My.Company
             }
         }
 
+        /// Methods returning a Result<(), _> are the default and do not
+        /// need annotations.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_result")]
         public static extern FFIError simple_service_method_result(IntPtr context, uint anon1);
 
+        /// Methods returning a Result<(), _> are the default and do not
+        /// need annotations.
         public static void simple_service_method_result_checked(IntPtr context, uint anon1)
         {
             var rval = simple_service_method_result(context, anon1);;
@@ -568,6 +590,9 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_value")]
         public static extern uint simple_service_method_value(IntPtr context, uint x);
 
+        /// This method should be documented.
+        ///
+        /// Multiple lines.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_void")]
         public static extern void simple_service_method_void(IntPtr context);
 
@@ -594,9 +619,11 @@ namespace My.Company
         }
         #endif
 
+        /// Single line.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_void")]
         public static extern void simple_service_method_mut_self_void(IntPtr context, SliceBool slice);
 
+        /// Single line.
         public static void simple_service_method_mut_self_void(IntPtr context, System.ReadOnlySpan<Bool> slice)
         {
             unsafe
@@ -609,6 +636,7 @@ namespace My.Company
             }
         }
 
+        /// Single line.
         #if UNITY_2018_1_OR_NEWER
         public static void simple_service_method_mut_self_void(IntPtr context, NativeArray<Bool> slice)
         {
@@ -733,12 +761,17 @@ namespace My.Company
         }
         #endif
 
+        /// Warning, you _must_ discard the returned slice object before calling into this service
+        /// again, as otherwise undefined behavior might happen.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_return_slice")]
         public static extern Sliceu32 simple_service_return_slice(IntPtr context);
 
+        /// Warning, you _must_ discard the returned slice object before calling into this service
+        /// again, as otherwise undefined behavior might happen.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_return_slice_mut")]
         public static extern SliceMutu32 simple_service_return_slice_mut(IntPtr context);
 
+        /// This function has no panic safeguards. If it panics your host app will be in an undefined state.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_return_string")]
         public static extern IntPtr simple_service_return_string(IntPtr context);
 
@@ -770,9 +803,21 @@ namespace My.Company
         public static extern FFIError simple_service_method_callback(IntPtr context, IntPtr callback);
 
 
+        /// Destroys the given instance.
+        ///
+        /// # Safety
+        ///
+        /// The passed parameter MUST have been created with the corresponding init function;
+        /// passing any other value results in undefined behavior.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lt_destroy")]
         public static extern FFIError simple_service_lt_destroy(ref IntPtr context);
 
+        /// Destroys the given instance.
+        ///
+        /// # Safety
+        ///
+        /// The passed parameter MUST have been created with the corresponding init function;
+        /// passing any other value results in undefined behavior.
         public static void simple_service_lt_destroy_checked(ref IntPtr context)
         {
             var rval = simple_service_lt_destroy(ref context);;
@@ -879,10 +924,14 @@ namespace My.Company
 
     }
 
+    /// Documented enum.
     public enum EnumDocumented
     {
+        /// Variant A.
         A = 0,
+        /// Variant B.
         B = 1,
+        /// Variant B.
         C = 2,
     }
 
@@ -1025,10 +1074,12 @@ namespace My.Company
         public uint x;
     }
 
+    /// Documented struct.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public partial struct StructDocumented
     {
+        /// Documented field.
         public float x;
     }
 
@@ -1368,12 +1419,14 @@ namespace My.Company
     public delegate void MyCallbackVoid(IntPtr ptr);
 
 
+    /// Some struct we want to expose as a class.
     public partial class SimpleService : IDisposable
     {
         private IntPtr _context;
 
         private SimpleService() {}
 
+        /// The constructor must return a `Result<Self, Error>`.
         public static SimpleService NewWith(uint some_value)
         {
             var self = new SimpleService();
@@ -1427,6 +1480,8 @@ namespace My.Company
             }
         }
 
+        /// Methods returning a Result<(), _> are the default and do not
+        /// need annotations.
         public void MethodResult(uint anon1)
         {
             var rval = Interop.simple_service_method_result(_context, anon1);
@@ -1441,6 +1496,9 @@ namespace My.Company
             return Interop.simple_service_method_value(_context, x);
         }
 
+        /// This method should be documented.
+        ///
+        /// Multiple lines.
         public void MethodVoid()
         {
             Interop.simple_service_method_void(_context);
@@ -1463,17 +1521,20 @@ namespace My.Company
         }
         #endif
 
+        /// Single line.
         public void MethodMutSelfVoid(SliceBool slice)
         {
             Interop.simple_service_method_mut_self_void(_context, slice);
         }
 
+        /// Single line.
         public void MethodMutSelfVoid(System.ReadOnlySpan<Bool> slice)
         {
             Interop.simple_service_method_mut_self_void(_context, slice);
         }
 
         #if UNITY_2018_1_OR_NEWER
+        /// Single line.
         public void MethodMutSelfVoid(NativeArray<Bool> slice)
         {
             Interop.simple_service_method_mut_self_void(_context, slice);
@@ -1561,16 +1622,21 @@ namespace My.Company
         }
         #endif
 
+        /// Warning, you _must_ discard the returned slice object before calling into this service
+        /// again, as otherwise undefined behavior might happen.
         public Sliceu32 ReturnSlice()
         {
             return Interop.simple_service_return_slice(_context);
         }
 
+        /// Warning, you _must_ discard the returned slice object before calling into this service
+        /// again, as otherwise undefined behavior might happen.
         public SliceMutu32 ReturnSliceMut()
         {
             return Interop.simple_service_return_slice_mut(_context);
         }
 
+        /// This function has no panic safeguards. If it panics your host app will be in an undefined state.
         public string ReturnString()
         {
             var s = Interop.simple_service_return_string(_context);

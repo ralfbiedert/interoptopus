@@ -1,3 +1,4 @@
+use crate::macros::darling_parse;
 use crate::service::function_impl::{generate_service_dtor, generate_service_method};
 use darling::ast::NestedMeta;
 use darling::FromMeta;
@@ -25,8 +26,7 @@ impl Attributes {
 }
 
 pub fn ffi_service(attr: TokenStream, input: TokenStream) -> TokenStream {
-    let nested_meta = NestedMeta::parse_meta_list(attr).unwrap();
-    let attributes = Attributes::from_list(&nested_meta).unwrap();
+    let attributes = darling_parse!(Attributes, attr);
     attributes.assert_valid();
 
     let item = syn::parse2::<ItemImpl>(input.clone()).expect("Must be item.");
