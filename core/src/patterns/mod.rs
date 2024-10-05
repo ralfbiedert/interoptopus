@@ -77,9 +77,11 @@
 //!
 
 use crate::lang::c::{CType, CompositeType, PrimitiveType};
+use crate::lang::rust::CTypeInfo;
 use crate::patterns::callbacks::NamedCallback;
 use crate::patterns::result::FFIErrorEnum;
 use crate::patterns::service::Service;
+use std::ffi::c_char;
 
 #[doc(hidden)]
 pub mod api_entry;
@@ -139,7 +141,7 @@ impl TypePattern {
             TypePattern::Option(x) => CType::Composite(x.clone()),
             TypePattern::NamedCallback(x) => CType::FnPointer(x.fnpointer().clone()),
             TypePattern::Bool => CType::Primitive(PrimitiveType::U8),
-            TypePattern::CChar => CType::Primitive(PrimitiveType::I8),
+            TypePattern::CChar => c_char::type_info(),
             TypePattern::APIVersion => CType::Primitive(PrimitiveType::U64),
         }
     }
