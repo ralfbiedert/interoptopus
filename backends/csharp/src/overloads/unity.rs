@@ -179,6 +179,10 @@ impl OverloadWriter for Unity {
         Ok(())
     }
 
+    fn write_delegate_overload(&self, w: &mut IndentWriter, h: Helper) -> Result<(), Error> {
+        Ok(())
+    }
+
     fn write_function_overload(&self, w: &mut IndentWriter, h: Helper, function: &Function, write_for: WriteFor) -> Result<(), Error> {
         let signature = function.signature();
         let has_overload = self.has_overloadable(signature);

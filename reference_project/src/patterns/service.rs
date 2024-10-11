@@ -68,6 +68,7 @@ impl SimpleService {
     #[ffi_service_method(on_panic = "return_default")]
     pub fn method_void(&self) {}
 
+    /// Regular void functions don't need an annotation.
     pub fn method_void2(&self) {}
 
     #[ffi_service_method(on_panic = "return_default")]
@@ -120,7 +121,8 @@ impl SimpleService {
         FFISliceMut::from_slice(&mut self.data)
     }
 
-    /// This function has no panic safeguards. If it panics your host app will be in an undefined state.
+    /// This function has no panic safeguards. It will be a bit faster to
+    /// call, but if it panics your host app will be in an undefined state.
     #[ffi_service_method(on_panic = "undefined_behavior")]
     pub fn return_string(&mut self) -> CStrPointer {
         CStrPointer::from_cstr(&self.c_string)

@@ -12,7 +12,8 @@ pub enum FFIError {
     Ok = 0,
     Null = 100,
     Panic = 200,
-    Fail = 300,
+    Delegate = 300,
+    Fail = 400,
 }
 
 // This is the error type you use in a Rust library. Again, you are almost
@@ -45,6 +46,14 @@ impl interoptopus::patterns::result::FFIError for FFIError {
     const SUCCESS: Self = Self::Ok;
     const NULL: Self = Self::Null;
     const PANIC: Self = Self::Panic;
+}
+
+impl interoptopus::patterns::result::FFIDelegateError<Error> for FFIError {
+    const DELEGATE: Self = Self::Delegate;
+
+    fn ok(&self) -> Result<(), Error> {
+        todo!()
+    }
 }
 
 // Lazy "Display" implementation so your error can be logged.

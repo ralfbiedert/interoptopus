@@ -119,6 +119,10 @@ impl OverloadWriter for DotNet {
         Ok(())
     }
 
+    fn write_delegate_overload(&self, w: &mut IndentWriter, h: Helper) -> Result<(), Error> {
+        todo!()
+    }
+
     fn write_function_overload(&self, w: &mut IndentWriter, h: Helper, function: &Function, write_for: WriteFor) -> Result<(), Error> {
         let has_overload = self.has_overloadable(function.signature());
         let has_error_enum = h.converter.has_ffi_error_rval(function.signature());

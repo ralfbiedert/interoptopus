@@ -48,7 +48,8 @@ typedef enum my_library_ffi_error
     MY_LIBRARY_FFI_ERROR_OK = 0,
     MY_LIBRARY_FFI_ERROR_NULL = 100,
     MY_LIBRARY_FFI_ERROR_PANIC = 200,
-    MY_LIBRARY_FFI_ERROR_FAIL = 300,
+    MY_LIBRARY_FFI_ERROR_DELEGATE = 300,
+    MY_LIBRARY_FFI_ERROR_FAIL = 400,
 } my_library_ffi_error;
 
 #pragma pack(push, 2)
@@ -193,6 +194,12 @@ typedef uint32_t (*my_library_my_callback)(uint32_t value);
 
 typedef uint32_t (*my_library_my_callback_namespaced)(uint32_t value);
 
+typedef void (*my_library_sum_delegate1)();
+
+typedef int32_t (*my_library_sum_delegate2)(int32_t x, int32_t y);
+
+typedef my_library_ffi_error (*my_library_sum_delegate_return)(int32_t x, int32_t y);
+
 typedef struct my_library_array
 {
     uint8_t data[16];
@@ -246,6 +253,15 @@ typedef struct my_library_sliceu8
     ///Number of elements.
     uint64_t len;
 } my_library_sliceu8;
+
+///A pointer to an array of data someone else owns which may be modified.
+typedef struct my_library_slice_mut_const_i8
+{
+    ///Pointer to start of mutable data.
+    const const char** data;
+    ///Number of elements.
+    uint64_t len;
+} my_library_slice_mut_const_i8;
 
 ///A pointer to an array of data someone else owns which may be modified.
 typedef struct my_library_slice_mutu32
@@ -458,6 +474,8 @@ typedef void (*pattern_ffi_slice_5)(const my_library_sliceu8*, my_library_slice_
 
 typedef void (*pattern_ffi_slice_6)(const my_library_slice_mutu8*, my_library_callback_u8);
 
+typedef void (*pattern_ffi_slice_7)(my_library_slice_mut_const_i8);
+
 typedef uint8_t (*pattern_ffi_slice_delegate)(my_library_callback_ffi_slice);
 
 typedef my_library_vec3f32 (*pattern_ffi_slice_delegate_huge)(my_library_callback_huge_vec_slice);
@@ -483,6 +501,12 @@ typedef my_library_my_callback_void (*pattern_callback_2)(my_library_my_callback
 typedef void (*pattern_callback_3)(my_library_delegate_callback_my_callback_contextual, uint32_t);
 
 typedef uint32_t (*pattern_callback_4)(my_library_my_callback_namespaced, uint32_t);
+
+typedef my_library_sum_delegate1 (*pattern_callback_5)();
+
+typedef my_library_sum_delegate2 (*pattern_callback_6)();
+
+typedef my_library_ffi_error (*pattern_callback_7)(my_library_sum_delegate_return, int32_t);
 
 typedef void (*pattern_surrogates_1)(my_library_local, my_library_container*);
 
@@ -514,6 +538,7 @@ typedef uint32_t (*simple_service_method_value)(const my_library_simple_service*
 /// Multiple lines.
 typedef void (*simple_service_method_void)(const my_library_simple_service*);
 
+/// Regular void functions don't need an annotation.
 typedef void (*simple_service_method_void2)(const my_library_simple_service*);
 
 typedef uint8_t (*simple_service_method_mut_self)(my_library_simple_service*, my_library_sliceu8);
@@ -539,7 +564,8 @@ typedef my_library_sliceu32 (*simple_service_return_slice)(my_library_simple_ser
 /// again, as otherwise undefined behavior might happen.
 typedef my_library_slice_mutu32 (*simple_service_return_slice_mut)(my_library_simple_service*);
 
-/// This function has no panic safeguards. If it panics your host app will be in an undefined state.
+/// This function has no panic safeguards. It will be a bit faster to
+/// call, but if it panics your host app will be in an undefined state.
 typedef const char* (*simple_service_return_string)(my_library_simple_service*);
 
 typedef my_library_ffi_error (*simple_service_method_void_ffi_error)(my_library_simple_service*);

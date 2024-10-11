@@ -38,7 +38,8 @@ typedef enum my_library_ffierror
     MY_LIBRARY_FFIERROR_OK = 0,
     MY_LIBRARY_FFIERROR_NULL = 100,
     MY_LIBRARY_FFIERROR_PANIC = 200,
-    MY_LIBRARY_FFIERROR_FAIL = 300,
+    MY_LIBRARY_FFIERROR_DELEGATE = 300,
+    MY_LIBRARY_FFIERROR_FAIL = 400,
     } my_library_ffierror;
 
 #pragma pack(push, 2)
@@ -181,6 +182,12 @@ typedef uint32_t (*my_library_mycallback)(uint32_t value);
 
 typedef uint32_t (*my_library_mycallbacknamespaced)(uint32_t value);
 
+typedef void (*my_library_sumdelegate1)();
+
+typedef int32_t (*my_library_sumdelegate2)(int32_t x, int32_t y);
+
+typedef my_library_ffierror (*my_library_sumdelegatereturn)(int32_t x, int32_t y);
+
 typedef struct my_library_array
     {
     uint8_t data[16];
@@ -225,6 +232,12 @@ typedef struct my_library_sliceu8
     const uint8_t* data;
     uint64_t len;
     } my_library_sliceu8;
+
+typedef struct my_library_slicemut*const i8
+    {
+    const const char** data;
+    uint64_t len;
+    } my_library_slicemut*const i8;
 
 typedef struct my_library_slicemutu32
     {
@@ -350,6 +363,7 @@ void pattern_ffi_slice_3(my_library_slicemutu8 slice, my_library_callbackslicemu
 void pattern_ffi_slice_4(my_library_sliceu8 slice, my_library_slicemutu8 slice2);
 void pattern_ffi_slice_5(const my_library_sliceu8* slice, my_library_slicemutu8* slice2);
 void pattern_ffi_slice_6(const my_library_slicemutu8* slice, my_library_callbacku8 callback);
+void pattern_ffi_slice_7(my_library_slicemut*const i8 ignored);
 uint8_t pattern_ffi_slice_delegate(my_library_callbackffislice callback);
 my_library_vec3f32 pattern_ffi_slice_delegate_huge(my_library_callbackhugevecslice callback);
 my_library_optioninner pattern_ffi_option_1(my_library_optioninner ffi_slice);
@@ -363,6 +377,9 @@ uint32_t pattern_callback_1(my_library_mycallback callback, uint32_t x);
 my_library_mycallbackvoid pattern_callback_2(my_library_mycallbackvoid callback);
 void pattern_callback_3(my_library_delegatecallbackmycallbackcontextual callback, uint32_t x);
 uint32_t pattern_callback_4(my_library_mycallbacknamespaced callback, uint32_t x);
+my_library_sumdelegate1 pattern_callback_5();
+my_library_sumdelegate2 pattern_callback_6();
+my_library_ffierror pattern_callback_7(my_library_sumdelegatereturn callback, int32_t x);
 void pattern_surrogates_1(my_library_local s, my_library_container* c);
 my_library_ffierror simple_service_destroy(my_library_simpleservice** context);
 my_library_ffierror simple_service_new_with(my_library_simpleservice** context, uint32_t some_value);

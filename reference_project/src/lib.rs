@@ -89,6 +89,7 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(patterns::slice::pattern_ffi_slice_4))
             .register(function!(patterns::slice::pattern_ffi_slice_5))
             .register(function!(patterns::slice::pattern_ffi_slice_6))
+            // .register(function!(patterns::slice::pattern_ffi_slice_7))
             .register(function!(patterns::slice::pattern_ffi_slice_delegate))
             .register(function!(patterns::slice::pattern_ffi_slice_delegate_huge))
             .register(function!(patterns::option::pattern_ffi_option_1))
@@ -102,6 +103,9 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(patterns::callbacks::pattern_callback_2))
             .register(function!(patterns::callbacks::pattern_callback_3))
             .register(function!(patterns::callbacks::pattern_callback_4))
+            .register(function!(patterns::callbacks::pattern_callback_5))
+            .register(function!(patterns::callbacks::pattern_callback_6))
+            .register(function!(patterns::callbacks::pattern_callback_7))
             .register(function!(patterns::surrogates::pattern_surrogates_1))
             // Constants
             .register(constant!(constants::U8))

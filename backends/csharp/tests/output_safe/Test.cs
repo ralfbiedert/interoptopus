@@ -96,6 +96,17 @@ namespace interop_test
         }
 
         [Fact]
+        public void pattern_ffi_callback_exception()
+        {
+
+            Interop.pattern_callback_7(value =>
+            {
+                throw new Exception();
+                return 1 + 1;
+            }, 123);
+        }
+
+        [Fact]
         public void pattern_service_generated()
         {
             var simpleService = SimpleService.NewWith(123);

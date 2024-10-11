@@ -23,9 +23,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 5646035154290656051ul)
+            if (api_version != 14941292285109068616ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (5646035154290656051). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (14941292285109068616). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -435,6 +435,29 @@ namespace My.Company
         }
         #endif
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_7")]
+        public static extern void pattern_ffi_slice_7(SliceMut*const i8 ignored);
+
+        public static void pattern_ffi_slice_7(string[] ignored)
+        {
+            unsafe
+            {
+                fixed (void* ptr_ignored = ignored)
+                {
+                    var ignored_slice = new SliceMut*const i8(new IntPtr(ptr_ignored), (ulong) ignored.Length);
+                    pattern_ffi_slice_7(ignored_slice);;
+                }
+            }
+        }
+
+        #if UNITY_2018_1_OR_NEWER
+        public static void pattern_ffi_slice_7(NativeArray<string> ignored)
+        {
+            var ignored_slice = new SliceMut*const i8(ignored);
+            pattern_ffi_slice_7(ignored_slice);;
+        }
+        #endif
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_delegate")]
         public static extern byte pattern_ffi_slice_delegate(CallbackFFISlice callback);
 
@@ -492,6 +515,28 @@ namespace My.Company
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_4")]
         public static extern uint pattern_callback_4(IntPtr callback, uint x);
+
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_5")]
+        public static extern SumDelegate1 pattern_callback_5();
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_6")]
+        public static extern SumDelegate2 pattern_callback_6();
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_7")]
+        public static extern FFIError pattern_callback_7(SumDelegateReturn callback, int x);
+
+        public static void pattern_callback_7_checked(SumDelegateReturn callback, int x)
+        {
+            var rval = pattern_callback_7(callback, x);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_7")]
+        public static extern FFIError pattern_callback_7(IntPtr callback, int x);
 
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_surrogates_1")]
@@ -596,6 +641,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_void")]
         public static extern void simple_service_method_void(IntPtr context);
 
+        /// Regular void functions don't need an annotation.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_void2")]
         public static extern void simple_service_method_void2(IntPtr context);
 
@@ -774,7 +820,8 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_return_slice_mut")]
         public static extern SliceMutu32 simple_service_return_slice_mut(IntPtr context);
 
-        /// This function has no panic safeguards. If it panics your host app will be in an undefined state.
+        /// This function has no panic safeguards. It will be a bit faster to
+        /// call, but if it panics your host app will be in an undefined state.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_return_string")]
         public static extern IntPtr simple_service_return_string(IntPtr context);
 
@@ -1186,7 +1233,8 @@ namespace My.Company
         Ok = 0,
         Null = 100,
         Panic = 200,
-        Fail = 300,
+        Delegate = 300,
+        Fail = 400,
     }
 
     ///A pointer to an array of data someone else owns which may not be modified.
@@ -1428,6 +1476,15 @@ namespace My.Company
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MyCallbackVoid(IntPtr ptr);
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void SumDelegate1();
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate int SumDelegate2(int x, int y);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate FFIError SumDelegateReturn(int x, int y);
+
 
     /// Some struct we want to expose as a class.
     public partial class SimpleService : IDisposable
@@ -1514,6 +1571,7 @@ namespace My.Company
             Interop.simple_service_method_void(_context);
         }
 
+        /// Regular void functions don't need an annotation.
         public void MethodVoid2()
         {
             Interop.simple_service_method_void2(_context);
@@ -1651,7 +1709,8 @@ namespace My.Company
             return Interop.simple_service_return_slice_mut(_context);
         }
 
-        /// This function has no panic safeguards. If it panics your host app will be in an undefined state.
+        /// This function has no panic safeguards. It will be a bit faster to
+        /// call, but if it panics your host app will be in an undefined state.
         public string ReturnString()
         {
             var s = Interop.simple_service_return_string(_context);

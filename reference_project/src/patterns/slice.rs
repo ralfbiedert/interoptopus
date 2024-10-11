@@ -1,5 +1,6 @@
 use crate::types::{CallbackFFISlice, Vec3f32};
 use interoptopus::patterns::slice::{FFISlice, FFISliceMut};
+use interoptopus::patterns::string::CStrPointer;
 use interoptopus::{callback, ffi_function};
 
 static HUGE_VEC_SLICE: [Vec3f32; 100_000] = [Vec3f32 { x: 0.0, y: 0.0, z: 0.0 }; 100_000];
@@ -68,6 +69,10 @@ pub extern "C" fn pattern_ffi_slice_5(slice: &FFISlice<u8>, slice2: &mut FFISlic
 pub extern "C" fn pattern_ffi_slice_6(slice: &FFISliceMut<u8>, callback: CallbackU8) {
     callback.call(slice.as_slice().first().copied().unwrap_or(0));
 }
+
+// #[ffi_function]
+// #[no_mangle]
+// pub extern "C" fn pattern_ffi_slice_7(_: FFISliceMut<CStrPointer>) {}
 
 // Some extra tests that were hard to do from core crate.
 #[cfg(test)]

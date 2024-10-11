@@ -30,6 +30,7 @@
 
 use crate::lang::c::{EnumType, Variant};
 use crate::util::log_error;
+use crate::Error;
 use std::any::Any;
 use std::fmt::Debug;
 use std::panic::AssertUnwindSafe;
@@ -84,6 +85,12 @@ pub trait FFIError: Sized {
     const NULL: Self;
     /// The panic variant. Once this is observed no further calls should be attempted.
     const PANIC: Self;
+}
+
+pub trait FFIDelegateError<E>: Sized {
+    const DELEGATE: Self;
+
+    fn ok(&self) -> Result<(), E>;
 }
 
 // #[repr(C)]

@@ -62,6 +62,7 @@ Freestanding callables inside the module.
  - **[pattern_ffi_slice_4](#pattern_ffi_slice_4)** - 
  - **[pattern_ffi_slice_5](#pattern_ffi_slice_5)** - 
  - **[pattern_ffi_slice_6](#pattern_ffi_slice_6)** - 
+ - **[pattern_ffi_slice_7](#pattern_ffi_slice_7)** - 
  - **[pattern_ffi_slice_delegate](#pattern_ffi_slice_delegate)** - 
  - **[pattern_ffi_slice_delegate_huge](#pattern_ffi_slice_delegate_huge)** - 
  - **[pattern_ffi_option_1](#pattern_ffi_option_1)** - 
@@ -75,6 +76,9 @@ Freestanding callables inside the module.
  - **[pattern_callback_2](#pattern_callback_2)** - 
  - **[pattern_callback_3](#pattern_callback_3)** - 
  - **[pattern_callback_4](#pattern_callback_4)** - 
+ - **[pattern_callback_5](#pattern_callback_5)** - 
+ - **[pattern_callback_6](#pattern_callback_6)** - 
+ - **[pattern_callback_7](#pattern_callback_7)** - 
  - **[pattern_surrogates_1](#pattern_surrogates_1)** - 
 
 ### Classes
@@ -87,7 +91,7 @@ Methods operating on common state.
      - **[method_result](#SimpleService.method_result)** -  Methods returning a Result<(), _> are the default and do not
      - **[method_value](#SimpleService.method_value)** - 
      - **[method_void](#SimpleService.method_void)** -  This method should be documented.
-     - **[method_void2](#SimpleService.method_void2)** - 
+     - **[method_void2](#SimpleService.method_void2)** -  Regular void functions don't need an annotation.
      - **[method_mut_self](#SimpleService.method_mut_self)** - 
      - **[method_mut_self_void](#SimpleService.method_mut_self_void)** -  Single line.
      - **[method_mut_self_ref](#SimpleService.method_mut_self_ref)** - 
@@ -97,7 +101,7 @@ Methods operating on common state.
      - **[method_mut_self_no_error](#SimpleService.method_mut_self_no_error)** - 
      - **[return_slice](#SimpleService.return_slice)** -  Warning, you _must_ discard the returned slice object before calling into this service
      - **[return_slice_mut](#SimpleService.return_slice_mut)** -  Warning, you _must_ discard the returned slice object before calling into this service
-     - **[return_string](#SimpleService.return_string)** -  This function has no panic safeguards. If it panics your host app will be in an undefined state.
+     - **[return_string](#SimpleService.return_string)** -  This function has no panic safeguards. It will be a bit faster to
      - **[method_void_ffi_error](#SimpleService.method_void_ffi_error)** - 
      - **[method_callback](#SimpleService.method_callback)** - 
  - **[SimpleServiceLifetime](#SimpleServiceLifetime)** - 
@@ -1518,6 +1522,15 @@ def pattern_ffi_slice_6(slice: ctypes.POINTER(SliceMutu8), callback):
 
 ---
 
+## pattern_ffi_slice_7 
+#### Definition 
+```python
+def pattern_ffi_slice_7(ignored: SliceMut*const i8 | ctypes.Array[ctypes.POINTER(ctypes.c_char)]):
+    ...
+```
+
+---
+
 ## pattern_ffi_slice_delegate 
 #### Definition 
 ```python
@@ -1635,6 +1648,33 @@ def pattern_callback_4(callback, x: int) -> int:
 
 ---
 
+## pattern_callback_5 
+#### Definition 
+```python
+def pattern_callback_5():
+    ...
+```
+
+---
+
+## pattern_callback_6 
+#### Definition 
+```python
+def pattern_callback_6():
+    ...
+```
+
+---
+
+## pattern_callback_7 
+#### Definition 
+```python
+def pattern_callback_7(callback, x: int):
+    ...
+```
+
+---
+
 ## pattern_surrogates_1 
 #### Definition 
 ```python
@@ -1742,6 +1782,7 @@ class SimpleService:
 ---
 
 ### <a name="SimpleService.method_void2">**method_void2**</a>
+ Regular void functions don't need an annotation.
 
 #### Definition 
 ```python
@@ -1867,7 +1908,8 @@ class SimpleService:
 ---
 
 ### <a name="SimpleService.return_string">**return_string**</a>
- This function has no panic safeguards. If it panics your host app will be in an undefined state.
+ This function has no panic safeguards. It will be a bit faster to
+ call, but if it panics your host app will be in an undefined state.
 
 #### Definition 
 ```python

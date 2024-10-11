@@ -76,6 +76,8 @@ pub trait OverloadWriter {
 
     fn write_field_decorators(&self, w: &mut IndentWriter, h: Helper, field: &Field, strct: &CompositeType) -> Result<(), Error>;
 
+    fn write_delegate_overload(&self, w: &mut IndentWriter, h: Helper) -> Result<(), Error>;
+
     fn write_function_overload(&self, w: &mut IndentWriter, h: Helper, function: &Function, write_for: WriteFor) -> Result<(), Error>;
 
     fn write_service_method_overload(
