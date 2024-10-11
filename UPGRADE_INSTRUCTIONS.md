@@ -12,6 +12,9 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
     - Instead, you now make `some_field` of type `Surrogate<Foreign, Local>`
 - `AsciiPointer` is now called `CStrPointer`, since it can contain non-ASCII data (e.g., when called from C#).
 - In service definitions, providing a `prefix` is generally not needed anymore.
+- Service methods that return void (`()`) can now be used without a `#[ffi_service_method]` annotation. On a Rust panic
+  they will silently return. If this is not acceptable you must return `Result` or specify a different panic behavior
+  via that attribute.
 
 ### 0.13 → 0.14
 
