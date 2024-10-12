@@ -495,6 +495,7 @@ pub trait CSharpWriter {
         rval
     }
 
+    /// Checks whether for the given type and the current file a type definition should be emitted.
     fn should_emit_by_type(&self, t: &CType) -> bool {
         if self.config().write_types == WriteTypes::All {
             return true;
@@ -522,7 +523,7 @@ pub trait CSharpWriter {
                 TypePattern::Option(x) => self.should_emit_by_meta(x.meta()),
                 TypePattern::Bool => self.config().write_types == WriteTypes::NamespaceAndInteroptopusGlobal,
                 TypePattern::CChar => false,
-                TypePattern::NamedCallback(_) => true,
+                TypePattern::NamedCallback(x) => self.should_emit_by_meta(x.meta()),
             },
         }
     }
