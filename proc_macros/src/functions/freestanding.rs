@@ -132,7 +132,7 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
     }
 
     // Ensure we have the right attributes
-    if item_fn.sig.abi.is_some() {
+    if !item_fn.sig.abi.is_some() {
         item_fn.sig.abi = Some(syn::parse_quote!(extern "C"));
     }
 

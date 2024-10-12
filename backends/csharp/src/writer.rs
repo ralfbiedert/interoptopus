@@ -1,7 +1,7 @@
-use crate::config::{Config, Unsafe, WriteTypes};
+use crate::config::{Config, Unsafe, Unsupported, WriteTypes};
 use crate::converter::{CSharpTypeConverter, Converter, FunctionNameFlavor};
 use crate::overloads::{Helper, OverloadWriter};
-use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, Meta, PrimitiveType, Variant, Visibility};
+use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, Layout, Meta, PrimitiveType, Variant, Visibility};
 use interoptopus::patterns::api_guard::inventory_hash;
 use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::patterns::service::Service;
@@ -367,11 +367,19 @@ pub trait CSharpWriter {
 
     fn write_type_definition_composite_annotation(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
         indented!(w, r#"[Serializable]"#)?;
-        let alignment = the_type.repr().alignment();
-        if let Some(align) = alignment {
-            indented!(w, r#"[StructLayout(LayoutKind.Sequential, Pack = {})]"#, align)
-        } else {
-            indented!(w, r#"[StructLayout(LayoutKind.Sequential)]"#)
+
+        if the_type.repr().alignment().is_some() {
+            let comment = r#"// THIS STRUCT IS BROKEN - C# does not support alignment of entire Rust types that do #[repr(align(...))]"#;
+            match self.config().unsupported {
+                Unsupported::Panic => panic!("{}", comment),
+                Unsupported::Comment => indented!(w, "{}", comment)?,
+            }
+        };
+
+        match the_type.repr().layout() {
+            Layout::C | Layout::Transparent | Layout::Opaque => indented!(w, r#"[StructLayout(LayoutKind.Sequential)]"#),
+            Layout::Packed => indented!(w, r#"[StructLayout(LayoutKind.Sequential, Pack = 1)]"#),
+            Layout::Primitive(_) => panic!("Primitive layout not supported for structs."),
         }
     }
 

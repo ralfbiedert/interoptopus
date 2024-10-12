@@ -42,7 +42,7 @@
 //! #
 //! # impl std::error::Error for Error {}
 //! #
-//! # #[ffi_type(patterns(ffi_error))]
+//! # #[ffi_type(error)]
 //! # pub enum MyFFIError {
 //! #     Ok = 0,
 //! #     NullPassed = 1,

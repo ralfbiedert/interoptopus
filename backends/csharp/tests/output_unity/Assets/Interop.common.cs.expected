@@ -859,6 +859,15 @@ namespace My.Company.Common
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MyCallbackVoid(IntPtr ptr);
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void SumDelegate1();
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate int SumDelegate2(int x, int y);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate FFIError SumDelegateReturn(int x, int y);
+
 
 
     public class InteropException<T> : Exception

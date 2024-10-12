@@ -1,6 +1,6 @@
 use crate::config::Config;
 use crate::converter::Converter;
-use interoptopus::lang::c::{CType, CompositeType, EnumType, Function, PrimitiveType};
+use interoptopus::lang::c::{CType, CompositeType, EnumType, Function, Layout, PrimitiveType};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{longest_common_prefix, safe_name, sort_types_by_dependencies};
@@ -109,9 +109,14 @@ pub trait PythonWriter {
             indented!(w, [_], r#""""{}""""#, documentation)?;
         }
 
+        match c.repr().layout() {
+            Layout::Packed => indented!(w, [_], r#"_pack_ = 1"#)?,
+            _ => {}
+        }
+
         let alignment = c.repr().alignment();
         if let Some(align) = alignment {
-            indented!(w, [_], r#"_pack_ = {}"#, align)?;
+            indented!(w, [_], r#"_align_ = {}"#, align)?;
         }
 
         w.newline()?;

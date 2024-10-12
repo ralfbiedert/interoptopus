@@ -48,24 +48,9 @@ typedef enum my_library_ffi_error
     MY_LIBRARY_FFI_ERROR_OK = 0,
     MY_LIBRARY_FFI_ERROR_NULL = 100,
     MY_LIBRARY_FFI_ERROR_PANIC = 200,
-    MY_LIBRARY_FFI_ERROR_FAIL = 300,
+    MY_LIBRARY_FFI_ERROR_DELEGATE = 300,
+    MY_LIBRARY_FFI_ERROR_FAIL = 400,
 } my_library_ffi_error;
-
-#pragma pack(push, 2)
-typedef struct my_library_aligned1
-{
-    uint8_t x;
-    uint16_t y;
-} my_library_aligned1;
-#pragma pack(pop)
-
-#pragma pack(push, 64)
-typedef struct my_library_aligned2
-{
-    uint8_t x;
-    uint16_t y;
-} my_library_aligned2;
-#pragma pack(pop)
 
 typedef struct my_library_boolean_alignment
 {
@@ -100,21 +85,17 @@ typedef struct my_library_local
     uint32_t x;
 } my_library_local;
 
-#pragma pack(push, 1)
 typedef struct my_library_packed1
 {
     uint8_t x;
     uint16_t y;
 } my_library_packed1;
-#pragma pack(pop)
 
-#pragma pack(push, 1)
 typedef struct my_library_packed2
 {
-    uint8_t x;
     uint16_t y;
+    uint8_t x;
 } my_library_packed2;
-#pragma pack(pop)
 
 typedef struct my_library_phantomu8
 {
@@ -192,6 +173,12 @@ typedef uint8_t (*my_library_callback_u8)(uint8_t value);
 typedef uint32_t (*my_library_my_callback)(uint32_t value);
 
 typedef uint32_t (*my_library_my_callback_namespaced)(uint32_t value);
+
+typedef void (*my_library_sum_delegate1)();
+
+typedef int32_t (*my_library_sum_delegate2)(int32_t x, int32_t y);
+
+typedef my_library_ffi_error (*my_library_sum_delegate_return)(int32_t x, int32_t y);
 
 typedef struct my_library_array
 {
@@ -362,9 +349,7 @@ my_library_boolean_alignment boolean_alignment(my_library_boolean_alignment x);
 
 my_library_boolean_alignment boolean_alignment2(bool rval);
 
-my_library_packed1 aligned_to_packed1(my_library_aligned1 a);
-
-my_library_packed2 aligned_to_packed2(my_library_aligned2 a);
+my_library_packed2 packed_to_packed1(my_library_packed1 a);
 
 int64_t many_args_5(int64_t x0, int64_t x1, int64_t x2, int64_t x3, int64_t x4);
 
@@ -484,6 +469,12 @@ void pattern_callback_3(my_library_delegate_callback_my_callback_contextual call
 
 uint32_t pattern_callback_4(my_library_my_callback_namespaced callback, uint32_t x);
 
+my_library_sum_delegate1 pattern_callback_5();
+
+my_library_sum_delegate2 pattern_callback_6();
+
+my_library_ffi_error pattern_callback_7(my_library_sum_delegate_return callback, int32_t x);
+
 void pattern_surrogates_1(my_library_local s, my_library_container* c);
 
 /// Destroys the given instance.
@@ -514,6 +505,7 @@ uint32_t simple_service_method_value(const my_library_simple_service* context, u
 /// Multiple lines.
 void simple_service_method_void(const my_library_simple_service* context);
 
+/// Regular void functions don't need an annotation.
 void simple_service_method_void2(const my_library_simple_service* context);
 
 uint8_t simple_service_method_mut_self(my_library_simple_service* context, my_library_sliceu8 slice);
@@ -539,7 +531,8 @@ my_library_sliceu32 simple_service_return_slice(my_library_simple_service* conte
 /// again, as otherwise undefined behavior might happen.
 my_library_slice_mutu32 simple_service_return_slice_mut(my_library_simple_service* context);
 
-/// This function has no panic safeguards. If it panics your host app will be in an undefined state.
+/// This function has no panic safeguards. It will be a bit faster to
+/// call, but if it panics your host app will be in an undefined state.
 const char* simple_service_return_string(my_library_simple_service* context);
 
 my_library_ffi_error simple_service_method_void_ffi_error(my_library_simple_service* context);

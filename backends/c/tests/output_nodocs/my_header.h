@@ -42,22 +42,6 @@ typedef enum my_library_ffierror
     MY_LIBRARY_FFIERROR_FAIL = 400,
     } my_library_ffierror;
 
-#pragma pack(push, 2)
-typedef struct my_library_aligned1
-    {
-    uint8_t x;
-    uint16_t y;
-    } my_library_aligned1;
-#pragma pack(pop)
-
-#pragma pack(push, 64)
-typedef struct my_library_aligned2
-    {
-    uint8_t x;
-    uint16_t y;
-    } my_library_aligned2;
-#pragma pack(pop)
-
 typedef struct my_library_booleanalignment
     {
     int32_t a;
@@ -99,8 +83,8 @@ typedef struct my_library_packed1
 
 typedef struct my_library_packed2
     {
-    uint8_t x;
     uint16_t y;
+    uint8_t x;
     } my_library_packed2;
 
 typedef struct my_library_phantomu8
@@ -307,8 +291,7 @@ int32_t primitive_i32(int32_t x);
 int64_t primitive_i64(int64_t x);
 my_library_booleanalignment boolean_alignment(my_library_booleanalignment x);
 my_library_booleanalignment boolean_alignment2(bool rval);
-my_library_packed1 aligned_to_packed1(my_library_aligned1 a);
-my_library_packed2 aligned_to_packed2(my_library_aligned2 a);
+my_library_packed2 packed_to_packed1(my_library_packed1 a);
 int64_t many_args_5(int64_t x0, int64_t x1, int64_t x2, int64_t x3, int64_t x4);
 int64_t many_args_10(int64_t x0, int64_t x1, int64_t x2, int64_t x3, int64_t x4, int64_t x5, int64_t x6, int64_t x7, int64_t x8, int64_t x9);
 const int64_t* ptr(const int64_t* x);

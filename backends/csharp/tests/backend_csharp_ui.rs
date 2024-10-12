@@ -2,7 +2,9 @@ use interoptopus::testing::assert_file_matches_generated;
 use interoptopus::util::NamespaceMappings;
 use interoptopus::{Error, Interop};
 use interoptopus_backend_csharp::overloads::{DotNet, Unity};
-use interoptopus_backend_csharp::{run_dotnet_command_if_installed, CSharpVisibility, Config, DocConfig, DocGenerator, Generator, ParamSliceType, Unsafe, WriteTypes};
+use interoptopus_backend_csharp::{
+    run_dotnet_command_if_installed, CSharpVisibility, Config, DocConfig, DocGenerator, Generator, ParamSliceType, Unsafe, Unsupported, WriteTypes,
+};
 use std::path::{Path, PathBuf};
 use tempdir::TempDir;
 
@@ -35,6 +37,7 @@ fn generate_bindings_multi(folder: impl AsRef<Path>, use_unsafe: Unsafe, param_s
         dll_name: "interoptopus_reference_project".to_string(),
         namespace_mappings,
         visibility_types: CSharpVisibility::AsDeclared,
+        unsupported: Unsupported::Comment,
         param_slice_type,
         use_unsafe,
         ..Config::default()
@@ -138,6 +141,7 @@ fn config_rename_symbols() -> Result<(), Error> {
 
     let config = Config {
         namespace_mappings: NamespaceMappings::new("My.Company").add("common", "My.Company.Common"),
+        unsupported: Unsupported::Comment,
         rename_symbols: true,
         use_unsafe: Unsafe::UnsafeKeyword,
         ..Config::default()
@@ -157,6 +161,7 @@ fn config_no_unsafe() -> Result<(), Error> {
 
     let config = Config {
         namespace_mappings: NamespaceMappings::new("My.Company").add("common", "My.Company.Common"),
+        unsupported: Unsupported::Comment,
         use_unsafe: Unsafe::None,
         ..Config::default()
     };
@@ -175,6 +180,7 @@ fn config_unsafe_memcpy() -> Result<(), Error> {
 
     let config = Config {
         namespace_mappings: NamespaceMappings::new("My.Company").add("common", "My.Company.Common"),
+        unsupported: Unsupported::Comment,
         use_unsafe: Unsafe::UnsafePlatformMemCpy,
         ..Config::default()
     };
@@ -194,7 +200,7 @@ fn config_visibility_force_visibility_internal() -> Result<(), Error> {
     let config = Config {
         namespace_mappings: NamespaceMappings::new("My.Company").add("common", "My.Company.Common"),
         use_unsafe: Unsafe::UnsafeKeyword,
-        // visibility_types: CSharpVisibility::ForcePrivate, // TODO: Totally broken, removed
+        unsupported: Unsupported::Comment,
         visibility_types: CSharpVisibility::ForceInternal,
         ..Config::default()
     };
@@ -214,6 +220,7 @@ fn config_visibility_force_visibility_public() -> Result<(), Error> {
     let config = Config {
         namespace_mappings: NamespaceMappings::new("My.Company").add("common", "My.Company.Common"),
         use_unsafe: Unsafe::UnsafeKeyword,
+        unsupported: Unsupported::Comment,
         visibility_types: CSharpVisibility::ForcePublic,
         ..Config::default()
     };

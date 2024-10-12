@@ -135,7 +135,7 @@
 //!
 //! ## Changelog
 //!
-//! - **v0.15** - Updated to syn2, bug fixes.
+//! - **v0.15** - Updated to syn2, better annotation UX, bug fixes.
 //! - **v0.14** - Better inventory UX.
 //! - **v0.13** - Python backend uses `ctypes` now.
 //! - **v0.12** - Better compat using `#[ffi_service_method]`.
@@ -319,7 +319,7 @@ macro_rules! extra_type {
 /// #
 /// # impl std::error::Error for Error {}
 /// #
-/// # #[ffi_type(patterns(ffi_error))]
+/// # #[ffi_type(error)]
 /// # pub enum MyFFIError {
 /// #     Ok = 0,
 /// #     NullPassed = 1,

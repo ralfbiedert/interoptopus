@@ -16,8 +16,7 @@ Freestanding callables inside the module.
  - **[primitive_i64](#primitive_i64)** - 
  - **[boolean_alignment](#boolean_alignment)** - 
  - **[boolean_alignment2](#boolean_alignment2)** - 
- - **[aligned_to_packed1](#aligned_to_packed1)** - 
- - **[aligned_to_packed2](#aligned_to_packed2)** - 
+ - **[packed_to_packed1](#packed_to_packed1)** - 
  - **[many_args_5](#many_args_5)** - 
  - **[many_args_10](#many_args_10)** - 
  - **[ptr](#ptr)** - 
@@ -75,6 +74,9 @@ Freestanding callables inside the module.
  - **[pattern_callback_2](#pattern_callback_2)** - 
  - **[pattern_callback_3](#pattern_callback_3)** - 
  - **[pattern_callback_4](#pattern_callback_4)** - 
+ - **[pattern_callback_5](#pattern_callback_5)** - 
+ - **[pattern_callback_6](#pattern_callback_6)** - 
+ - **[pattern_callback_7](#pattern_callback_7)** - 
  - **[pattern_surrogates_1](#pattern_surrogates_1)** - 
 
 ### Classes
@@ -87,7 +89,7 @@ Methods operating on common state.
      - **[MethodResult](#SimpleService.MethodResult)** -  Methods returning a Result<(), _> are the default and do not
      - **[MethodValue](#SimpleService.MethodValue)** - 
      - **[MethodVoid](#SimpleService.MethodVoid)** -  This method should be documented.
-     - **[MethodVoid2](#SimpleService.MethodVoid2)** - 
+     - **[MethodVoid2](#SimpleService.MethodVoid2)** -  Regular void functions don't need an annotation.
      - **[MethodMutSelf](#SimpleService.MethodMutSelf)** - 
      - **[MethodMutSelfVoid](#SimpleService.MethodMutSelfVoid)** -  Single line.
      - **[MethodMutSelfRef](#SimpleService.MethodMutSelfRef)** - 
@@ -97,7 +99,7 @@ Methods operating on common state.
      - **[MethodMutSelfNoError](#SimpleService.MethodMutSelfNoError)** - 
      - **[ReturnSlice](#SimpleService.ReturnSlice)** -  Warning, you _must_ discard the returned slice object before calling into this service
      - **[ReturnSliceMut](#SimpleService.ReturnSliceMut)** -  Warning, you _must_ discard the returned slice object before calling into this service
-     - **[ReturnString](#SimpleService.ReturnString)** -  This function has no panic safeguards. If it panics your host app will be in an undefined state.
+     - **[ReturnString](#SimpleService.ReturnString)** -  This function has no panic safeguards. It will be a bit faster to
      - **[MethodVoidFfiError](#SimpleService.MethodVoidFfiError)** - 
      - **[MethodCallback](#SimpleService.MethodCallback)** - 
  - **[SimpleServiceLifetime](#SimpleServiceLifetime)** - 
@@ -114,8 +116,6 @@ Groups of related constants.
 
 ### Data Structs
 Composite data used by functions and methods.
- - **[Aligned1](#Aligned1)** - 
- - **[Aligned2](#Aligned2)** - 
  - **[Array](#Array)** - 
  - **[BooleanAlignment](#BooleanAlignment)** - 
  - **[Container](#Container)** - 
@@ -152,44 +152,6 @@ Composite data used by functions and methods.
 ---
 
 # Types 
-
-
- ### <a name="Aligned1">**Aligned1**</a>
-
-
-#### Fields 
-- **x** -  
-- **y** -  
-#### Definition 
-```csharp
-public partial struct Aligned1
-{
-    public byte x;
-    public ushort y;
-}
-```
-
----
-
-
-
- ### <a name="Aligned2">**Aligned2**</a>
-
-
-#### Fields 
-- **x** -  
-- **y** -  
-#### Definition 
-```csharp
-public partial struct Aligned2
-{
-    public byte x;
-    public ushort y;
-}
-```
-
----
-
 
 
  ### <a name="Array">**Array**</a>
@@ -412,14 +374,14 @@ public partial struct Packed1
 
 
 #### Fields 
-- **x** -  
 - **y** -  
+- **x** -  
 #### Definition 
 ```csharp
 public partial struct Packed2
 {
-    public byte x;
     public ushort y;
+    public byte x;
 }
 ```
 
@@ -974,18 +936,10 @@ public static extern BooleanAlignment boolean_alignment2(bool rval);
 
 ---
 
-### <a name="aligned_to_packed1">**aligned_to_packed1**</a>
+### <a name="packed_to_packed1">**packed_to_packed1**</a>
 #### Definition 
 ```csharp
-public static extern Packed1 aligned_to_packed1(Aligned1 a);
-```
-
----
-
-### <a name="aligned_to_packed2">**aligned_to_packed2**</a>
-#### Definition 
-```csharp
-public static extern Packed2 aligned_to_packed2(Aligned2 a);
+public static extern Packed2 packed_to_packed1(Packed1 a);
 ```
 
 ---
@@ -1496,6 +1450,32 @@ public static extern uint pattern_callback_4(IntPtr callback, uint x);
 
 ---
 
+### <a name="pattern_callback_5">**pattern_callback_5**</a>
+#### Definition 
+```csharp
+public static extern SumDelegate1 pattern_callback_5();
+```
+
+---
+
+### <a name="pattern_callback_6">**pattern_callback_6**</a>
+#### Definition 
+```csharp
+public static extern SumDelegate2 pattern_callback_6();
+```
+
+---
+
+### <a name="pattern_callback_7">**pattern_callback_7**</a>
+#### Definition 
+```csharp
+public static extern FFIError pattern_callback_7(SumDelegateReturn callback, int x);
+public static void pattern_callback_7_checked(SumDelegateReturn callback, int x);
+public static extern FFIError pattern_callback_7(IntPtr callback, int x);
+```
+
+---
+
 ### <a name="pattern_surrogates_1">**pattern_surrogates_1**</a>
 #### Definition 
 ```csharp
@@ -1583,6 +1563,7 @@ public class SimpleService {
 ---
 
 ### <a name="MethodVoid2">**MethodVoid2**</a>
+ Regular void functions don't need an annotation.
 
 #### Definition 
 ```csharp
@@ -1722,7 +1703,8 @@ public class SimpleService {
 ---
 
 ### <a name="ReturnString">**ReturnString**</a>
- This function has no panic safeguards. If it panics your host app will be in an undefined state.
+ This function has no panic safeguards. It will be a bit faster to
+ call, but if it panics your host app will be in an undefined state.
 
 #### Definition 
 ```csharp

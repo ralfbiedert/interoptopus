@@ -1,4 +1,4 @@
-use crate::types::{type_repr_align, Attributes, TypeRepresentation};
+use crate::types::{Attributes, TypeRepresentation};
 use crate::util::extract_doc_lines;
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
@@ -26,7 +26,7 @@ fn derive_variant_info(item: ItemEnum, idents: &[Ident], names: &[String], value
 
 pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: ItemEnum) -> TokenStream {
     let doc_line = extract_doc_lines(&item.attrs).join("\n");
-    let (type_repr, align) = type_repr_align(attributes);
+    let (type_repr, align) = attributes.type_repr_align();
 
     let span = item.ident.span();
     let name = item.ident.to_string();
@@ -72,7 +72,7 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
 
     let variant_infos = derive_variant_info(item.clone(), &variant_idents, &variant_names, &variant_values, &variant_docs);
 
-    let ctype_info_return = if attributes.patterns.contains_key("ffi_error") {
+    let ctype_info_return = if attributes.error {
         quote! {
             use ::interoptopus::patterns::result::FFIError as _;
             let success_variant = Self::SUCCESS.variant_info();

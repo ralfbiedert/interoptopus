@@ -31,15 +31,13 @@ you actually wanted to expose.
 use interoptopus::{ffi_function, ffi_type, Inventory, InventoryBuilder, function};
 
 #[ffi_type]
-#[repr(C)]
 pub struct Vec2 {
     pub x: f32,
     pub y: f32,
 }
 
 #[ffi_function]
-#[no_mangle]
-pub extern "C" fn my_function(input: Vec2) {
+pub fn my_function(input: Vec2) {
     println!("{}", input.x);
 }
 
@@ -136,7 +134,7 @@ Gated behind **feature flags**, these enable:
 
 ### Changelog
 
-- **v0.15** - Updated to syn2, bug fixes.
+- **v0.15** - Updated to syn2, better annotation UX, bug fixes.
 - **v0.14** - Better inventory UX.
 - **v0.13** - Python backend uses `ctypes` now.
 - **v0.12** - Better compat using `#[ffi_service_method]`.

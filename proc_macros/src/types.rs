@@ -33,12 +33,13 @@ pub struct Attributes {
     #[darling(default)]
     u64: bool,
 
+    /// The error pattern.
     #[darling(default)]
-    align: Option<usize>,
+    error: bool,
 
-    #[darling(default)]
-    patterns: HashMap<String, ()>,
-
+    // Disabled for now
+    // #[darling(default)]
+    // align: Option<usize>,
     #[darling(default)]
     skip: HashMap<String, ()>,
 
@@ -53,6 +54,15 @@ pub struct Attributes {
 
     #[darling(default)]
     debug: bool,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum TypeRepresentation {
+    C,
+    Transparent,
+    Packed,
+    Opaque,
+    Primitive(&'static str),
 }
 
 impl Attributes {
@@ -80,30 +90,21 @@ impl Attributes {
 
         rval
     }
-}
 
-#[derive(Debug, Clone, Copy)]
-pub enum TypeRepresentation {
-    C,
-    Transparent,
-    Packed,
-    Opaque,
-    Primitive(&'static str),
-}
+    #[rustfmt::skip]
+    fn type_repr_align(&self) -> (TypeRepresentation, Option<usize>) {
+        let mut rval = (TypeRepresentation::C, None);
 
-#[rustfmt::skip]
-fn type_repr_align(attributes: &Attributes) -> (TypeRepresentation, Option<usize>) {
-    let mut rval = (TypeRepresentation::C, attributes.align);
+        if self.opaque { rval.0 = TypeRepresentation::Opaque; }
+        if self.transparent { rval.0 = TypeRepresentation::Transparent; }
+        if self.packed { rval.0 = TypeRepresentation::Packed; }
+        if self.u8 { rval.0 = TypeRepresentation::Primitive("u8"); }
+        if self.u16 { rval.0 = TypeRepresentation::Primitive("u16"); }
+        if self.u32 { rval.0 = TypeRepresentation::Primitive("u32"); }
+        if self.u64 { rval.0 = TypeRepresentation::Primitive("u64"); }
 
-    if attributes.opaque { rval.0 = TypeRepresentation::Opaque; }
-    if attributes.transparent { rval.0 = TypeRepresentation::Transparent; }
-    if attributes.packed { rval.0 = TypeRepresentation::Packed; }
-    if attributes.u8 { rval.0 = TypeRepresentation::Primitive("u8"); }
-    if attributes.u16 { rval.0 = TypeRepresentation::Primitive("u16"); }
-    if attributes.u32 { rval.0 = TypeRepresentation::Primitive("u32"); }
-    if attributes.u64 { rval.0 = TypeRepresentation::Primitive("u64"); }
-
-    rval
+        rval
+    }
 }
 
 pub fn ffi_type(attr: TokenStream, input: TokenStream) -> TokenStream {

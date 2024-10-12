@@ -23,8 +23,7 @@ def init_lib(path):
     c_lib.primitive_i64.argtypes = [ctypes.c_int64]
     c_lib.boolean_alignment.argtypes = [BooleanAlignment]
     c_lib.boolean_alignment2.argtypes = [ctypes.c_bool]
-    c_lib.aligned_to_packed1.argtypes = [Aligned1]
-    c_lib.aligned_to_packed2.argtypes = [Aligned2]
+    c_lib.packed_to_packed1.argtypes = [Packed1]
     c_lib.many_args_5.argtypes = [ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64]
     c_lib.many_args_10.argtypes = [ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64]
     c_lib.ptr.argtypes = [ctypes.POINTER(ctypes.c_int64)]
@@ -82,6 +81,9 @@ def init_lib(path):
     c_lib.pattern_callback_2.argtypes = [ctypes.CFUNCTYPE(None, ctypes.c_void_p)]
     c_lib.pattern_callback_3.argtypes = [DelegateCallbackMyCallbackContextual, ctypes.c_uint32]
     c_lib.pattern_callback_4.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32), ctypes.c_uint32]
+    c_lib.pattern_callback_5.argtypes = []
+    c_lib.pattern_callback_6.argtypes = []
+    c_lib.pattern_callback_7.argtypes = [ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32), ctypes.c_int32]
     c_lib.pattern_surrogates_1.argtypes = [Local, ctypes.POINTER(Container)]
     c_lib.simple_service_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.simple_service_new_with.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.c_uint32]
@@ -122,8 +124,7 @@ def init_lib(path):
     c_lib.primitive_i64.restype = ctypes.c_int64
     c_lib.boolean_alignment.restype = BooleanAlignment
     c_lib.boolean_alignment2.restype = BooleanAlignment
-    c_lib.aligned_to_packed1.restype = Packed1
-    c_lib.aligned_to_packed2.restype = Packed2
+    c_lib.packed_to_packed1.restype = Packed2
     c_lib.many_args_5.restype = ctypes.c_int64
     c_lib.many_args_10.restype = ctypes.c_int64
     c_lib.ptr.restype = ctypes.POINTER(ctypes.c_int64)
@@ -174,6 +175,9 @@ def init_lib(path):
     c_lib.pattern_callback_1.restype = ctypes.c_uint32
     c_lib.pattern_callback_2.restype = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
     c_lib.pattern_callback_4.restype = ctypes.c_uint32
+    c_lib.pattern_callback_5.restype = ctypes.CFUNCTYPE(None, )
+    c_lib.pattern_callback_6.restype = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_int32, ctypes.c_int32)
+    c_lib.pattern_callback_7.restype = ctypes.c_int
     c_lib.simple_service_destroy.restype = ctypes.c_int
     c_lib.simple_service_new_with.restype = ctypes.c_int
     c_lib.simple_service_new_without.restype = ctypes.c_int
@@ -199,6 +203,7 @@ def init_lib(path):
 
     c_lib.complex_args_1.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.panics.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.pattern_callback_7.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.simple_service_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.simple_service_new_with.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.simple_service_new_without.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
@@ -253,11 +258,8 @@ def boolean_alignment(x: BooleanAlignment) -> BooleanAlignment:
 def boolean_alignment2(rval: bool) -> BooleanAlignment:
     return c_lib.boolean_alignment2(rval)
 
-def aligned_to_packed1(a: Aligned1) -> Packed1:
-    return c_lib.aligned_to_packed1(a)
-
-def aligned_to_packed2(a: Aligned2) -> Packed2:
-    return c_lib.aligned_to_packed2(a)
+def packed_to_packed1(a: Packed1) -> Packed2:
+    return c_lib.packed_to_packed1(a)
 
 def many_args_5(x0: int, x1: int, x2: int, x3: int, x4: int) -> int:
     return c_lib.many_args_5(x0, x1, x2, x3, x4)
@@ -487,6 +489,18 @@ def pattern_callback_4(callback, x: int) -> int:
 
     return c_lib.pattern_callback_4(callback, x)
 
+def pattern_callback_5():
+    return c_lib.pattern_callback_5()
+
+def pattern_callback_6():
+    return c_lib.pattern_callback_6()
+
+def pattern_callback_7(callback, x: int):
+    if not hasattr(callback, "__ctypes_from_outparam__"):
+        callback = callbacks.fn_i32_i32_rval_FFIError(callback)
+
+    return c_lib.pattern_callback_7(callback, x)
+
 def pattern_surrogates_1(s: Local, c: ctypes.POINTER(Container)):
     return c_lib.pattern_surrogates_1(s, c)
 
@@ -552,71 +566,8 @@ class FFIError:
     Ok = 0
     Null = 100
     Panic = 200
-    Fail = 300
-
-
-class Aligned1(ctypes.Structure):
-    _pack_ = 2
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("x", ctypes.c_uint8),
-        ("y", ctypes.c_uint16),
-    ]
-
-    def __init__(self, x: int = None, y: int = None):
-        if x is not None:
-            self.x = x
-        if y is not None:
-            self.y = y
-
-    @property
-    def x(self) -> int:
-        return ctypes.Structure.__get__(self, "x")
-
-    @x.setter
-    def x(self, value: int):
-        return ctypes.Structure.__set__(self, "x", value)
-
-    @property
-    def y(self) -> int:
-        return ctypes.Structure.__get__(self, "y")
-
-    @y.setter
-    def y(self, value: int):
-        return ctypes.Structure.__set__(self, "y", value)
-
-
-class Aligned2(ctypes.Structure):
-    _pack_ = 64
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("x", ctypes.c_uint8),
-        ("y", ctypes.c_uint16),
-    ]
-
-    def __init__(self, x: int = None, y: int = None):
-        if x is not None:
-            self.x = x
-        if y is not None:
-            self.y = y
-
-    @property
-    def x(self) -> int:
-        return ctypes.Structure.__get__(self, "x")
-
-    @x.setter
-    def x(self, value: int):
-        return ctypes.Structure.__set__(self, "x", value)
-
-    @property
-    def y(self) -> int:
-        return ctypes.Structure.__get__(self, "y")
-
-    @y.setter
-    def y(self, value: int):
-        return ctypes.Structure.__set__(self, "y", value)
+    Delegate = 300
+    Fail = 400
 
 
 class BooleanAlignment(ctypes.Structure):
@@ -879,23 +830,15 @@ class Packed2(ctypes.Structure):
 
     # These fields represent the underlying C data layout
     _fields_ = [
-        ("x", ctypes.c_uint8),
         ("y", ctypes.c_uint16),
+        ("x", ctypes.c_uint8),
     ]
 
-    def __init__(self, x: int = None, y: int = None):
-        if x is not None:
-            self.x = x
+    def __init__(self, y: int = None, x: int = None):
         if y is not None:
             self.y = y
-
-    @property
-    def x(self) -> int:
-        return ctypes.Structure.__get__(self, "x")
-
-    @x.setter
-    def x(self, value: int):
-        return ctypes.Structure.__set__(self, "x", value)
+        if x is not None:
+            self.x = x
 
     @property
     def y(self) -> int:
@@ -904,6 +847,14 @@ class Packed2(ctypes.Structure):
     @y.setter
     def y(self, value: int):
         return ctypes.Structure.__set__(self, "y", value)
+
+    @property
+    def x(self) -> int:
+        return ctypes.Structure.__get__(self, "x")
+
+    @x.setter
+    def x(self, value: int):
+        return ctypes.Structure.__set__(self, "x", value)
 
 
 class Phantomu8(ctypes.Structure):
@@ -1939,6 +1890,9 @@ class callbacks:
     fn_pconst__u32 = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_uint32)
     fn_u32_rval_u32 = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)
     fn_pconst = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
+    fn = ctypes.CFUNCTYPE(None, )
+    fn_i32_i32_rval_i32 = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_int32, ctypes.c_int32)
+    fn_i32_i32_rval_FFIError = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32)
 
 
 class SimpleService:
@@ -2005,7 +1959,7 @@ class SimpleService:
         return c_lib.simple_service_method_void(self._ctx, )
 
     def method_void2(self, ):
-        """"""
+        """ Regular void functions don't need an annotation."""
         return c_lib.simple_service_method_void2(self._ctx, )
 
     def method_mut_self(self, slice: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> int:
@@ -2068,7 +2022,8 @@ class SimpleService:
         return c_lib.simple_service_return_slice_mut(self._ctx, )
 
     def return_string(self, ) -> bytes:
-        """ This function has no panic safeguards. If it panics your host app will be in an undefined state."""
+        """ This function has no panic safeguards. It will be a bit faster to
+ call, but if it panics your host app will be in an undefined state."""
         rval = c_lib.simple_service_return_string(self._ctx, )
         return ctypes.string_at(rval)
 

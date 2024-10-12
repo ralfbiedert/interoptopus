@@ -26,8 +26,11 @@ use proc_macro::TokenStream;
 /// | `name="X"` | `struct`,`enum` | Uses `name` as the base interop name instead of the item's Rust name.<sup>1</sup> |
 /// | `namespace="X"` | `struct`,`enum` | Determine which namespace or file item should go. <sup>2</sup>
 /// | `skip(x)` | `struct,enum` | Skip field or variant `x` in the definition, e.g., some `x` of [`PhantomData`](std::marker::PhantomData). <sup>⚠️</sup>
-/// | `patterns(p)` | `struct`,`enum` | Mark this type as part of a pattern, see below. <sup>2</sup>
-/// | `opaque` | `struct` | Creates an opaque type without fields. Can only be used behind a pointer. |
+/// | `opaque` | `struct` | Creates an opaque type without fields. Can only be used behind a pointer. <sup>3</sup> |
+/// | `transparent` | `struct, enum` | The struct or single variant enum will be `#[repr(transparent)]`. <sup>3</sup> |
+/// | `packed` | `struct` | The struct will be `#[repr(packed)]`. <sup>3</sup> |
+/// | `error` | `enum` | The enum will follow the FFIError result pattern. |
+/// | `u8`, ..., `u64` | `enum` | Creates an opaque type without fields. Can only be used behind a pointer. |
 /// | `visibility(x="v")` | `struct` | Override visibility for field `x` as `public` or `private`; `_all` means all fields. <sup>2</sup>
 /// | `debug` | * | Print generated helper code in console.
 ///
@@ -38,6 +41,7 @@ use proc_macro::TokenStream;
 /// <sup>2</sup> Will not be reflected in C backend, but available to languages supporting them,
 /// e.g., C# will emit field visibility and generate classes from service patterns.
 ///
+/// <sup>3</sup> If nothing else is specified the resulting type will become `#[repr(C)]` by default.
 ///
 /// # Types and the Inventory
 ///
@@ -188,7 +192,7 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// #
 /// # impl std::error::Error for Error {}
 /// #
-/// # #[ffi_type(patterns(ffi_error))]
+/// # #[ffi_type(error)]
 /// # pub enum MyFFIError {
 /// #     Ok = 0,
 /// #     NullPassed = 1,
@@ -264,7 +268,7 @@ pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// #
 /// # impl std::error::Error for Error {}
 /// #
-/// # #[ffi_type(patterns(ffi_error))]
+/// # #[ffi_type(error)]
 /// # pub enum MyFFIError {
 /// #     Ok = 0,
 /// #     NullPassed = 1,
@@ -367,7 +371,7 @@ pub fn ffi_service_ctor(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// #
 /// # impl std::error::Error for Error {}
 /// #
-/// # #[ffi_type(patterns(ffi_error))]
+/// # #[ffi_type(error)]
 /// # pub enum MyFFIError {
 /// #     Ok = 0,
 /// #     NullPassed = 1,

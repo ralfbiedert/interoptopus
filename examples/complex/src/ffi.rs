@@ -24,7 +24,7 @@ pub struct Input {
     v: Vec3,
 }
 
-#[ffi_type(opaque, debug)]
+#[ffi_type(opaque)]
 pub struct Context {
     my_game_engine: GameEngine,
 }
@@ -137,7 +137,6 @@ pub extern "C" fn example_return_score(context: Option<&mut Context>, score: Opt
 
 #[no_mangle]
 #[ffi_function]
-// #[ffi_function(xx = "123", tags(csharp::a = "csharp1",))]
 pub extern "C" fn example_double_super_complex_entity(
     context: Option<&mut Context>,
     incoming: Option<&SuperComplexEntity>,

@@ -6,7 +6,7 @@ use std::fmt::{Display, Formatter};
 
 // This is the FFI error enum you want your users to see. You are free to name and implement this
 // almost any way you want.
-#[ffi_type(patterns(ffi_error))]
+#[ffi_type(error)]
 pub enum FFIError {
     Ok = 0,
     Null = 100,

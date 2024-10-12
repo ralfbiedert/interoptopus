@@ -18,9 +18,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 4783779044017237555ul)
+            if (api_version != 15732855954948975242ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (4783779044017237555). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (15732855954948975242). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -70,11 +70,8 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "boolean_alignment2")]
         public static extern BooleanAlignment boolean_alignment2(bool rval);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "aligned_to_packed1")]
-        public static extern Packed1 aligned_to_packed1(Aligned1 a);
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "aligned_to_packed2")]
-        public static extern Packed2 aligned_to_packed2(Aligned2 a);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "packed_to_packed1")]
+        public static extern Packed2 packed_to_packed1(Packed1 a);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "many_args_5")]
         public static extern long many_args_5(long x0, long x1, long x2, long x3, long x4);
@@ -801,22 +798,6 @@ namespace My.Company
     }
 
     [Serializable]
-    [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    public partial struct Aligned1
-    {
-        public byte x;
-        public ushort y;
-    }
-
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential, Pack = 64)]
-    public partial struct Aligned2
-    {
-        public byte x;
-        public ushort y;
-    }
-
-    [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public partial struct Array
     {
@@ -910,7 +891,7 @@ namespace My.Company
     }
 
     [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public partial struct Packed1
     {
         public byte x;
@@ -918,11 +899,11 @@ namespace My.Company
     }
 
     [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public partial struct Packed2
     {
-        public byte x;
         public ushort y;
+        public byte x;
     }
 
     [Serializable]

@@ -99,6 +99,13 @@ class TestFunctions(unittest.TestCase):
             self.assertEqual(11.0, r.ambiguous_2(vec2).z)
             self.assertEqual(True, r.ambiguous_3(vec1, vec2))
 
+    def test_packed(self):
+        p1 = r.Packed1(x=2, y=3)
+        p2 = r.packed_to_packed1(p1)
+
+        self.assertEqual(p1.x, p2.x)
+        self.assertEqual(p1.y, p2.y)
+
     def test_namespaces(self):
         vec = r.Vec(x=10)
 

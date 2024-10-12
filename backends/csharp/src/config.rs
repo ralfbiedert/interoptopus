@@ -11,6 +11,15 @@ pub enum WriteTypes {
     All,
 }
 
+/// How to handle generation of unsupported elements
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum Unsupported {
+    /// Emit a panic during binding generation.
+    Panic,
+    /// Try to finish binding generation. Unsupported items may be broken and a code comment is added.
+    Comment,
+}
+
 impl WriteTypes {
     pub fn write_interoptopus_globals(&self) -> bool {
         match self {
@@ -107,6 +116,8 @@ pub struct Config {
     /// If signatures that normally use arrays should instead use span and readonly span.
     /// Requires use_unsafe, as pinning spans requires the fixed keyword.
     pub param_slice_type: ParamSliceType,
+    /// How to handle unsupported constructs.
+    pub unsupported: Unsupported,
 }
 
 impl Config {}
@@ -127,6 +138,7 @@ impl Default for Config {
             rename_symbols: false,
             debug: false,
             param_slice_type: ParamSliceType::Array,
+            unsupported: Unsupported::Panic,
         }
     }
 }

@@ -1,4 +1,4 @@
-use crate::types::{type_repr_align, Attributes, TypeRepresentation};
+use crate::types::{Attributes, TypeRepresentation};
 use crate::util::extract_doc_lines;
 use proc_macro2::{Span, TokenStream};
 use quote::{quote, ToTokens};
@@ -46,7 +46,7 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
     let namespace = attributes.namespace.clone().unwrap_or_default();
     let doc_line = extract_doc_lines(&item.attrs).join("\n");
 
-    let (type_repr, align) = type_repr_align(attributes);
+    let (type_repr, align) = attributes.type_repr_align();
 
     let struct_ident_str = item.ident.to_string();
     let struct_ident = syn::Ident::new(&struct_ident_str, item.ident.span());
@@ -198,7 +198,7 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
     let attr_repr = match type_repr {
         TypeRepresentation::C => quote! { #[repr(C #attr_align)] },
         TypeRepresentation::Transparent => quote! { #[repr(transparent #attr_align)] },
-        TypeRepresentation::Packed => quote! { #[repr(packed #attr_align)] },
+        TypeRepresentation::Packed => quote! { #[repr(C, packed #attr_align)] },
         TypeRepresentation::Opaque => quote! { #[repr(C #attr_align)] },
         TypeRepresentation::Primitive(x) => quote! { #[repr(#x #attr_align)] },
     };

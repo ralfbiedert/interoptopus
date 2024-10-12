@@ -18,7 +18,10 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
 - Exported functions (`#[ffi_function]`) don't need to specify `#[no_mangle]` or `extern "C"` anymore as these will be
   added automatically.
 - Exported types (`#[ffi_type]`) must not specify `#[repr(...)]` anymore as we will handle that. If you need custom
-  attributes you can, for example, do `#[ffi_type(transparent)]` or `#[ffi_type(align = 64)]`.
+  attributes you can, for example, do `#[ffi_type(transparent)]` or `#[ffi_type(packed)]`.
+- `#[ffi_type(patterns(ffi_error))]` is now `#[ffi_type(error)]`.
+- Setting alignment on types is not supported anymore (for now). You should also stop using alignment on
+  earlier versions as various backends didn't translate that properly.
 
 ### 0.13 → 0.14
 

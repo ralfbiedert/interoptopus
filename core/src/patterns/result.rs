@@ -51,7 +51,7 @@ use std::panic::AssertUnwindSafe;
 /// }
 ///
 /// // The error FFI users should see
-/// #[ffi_type(patterns(ffi_error))]
+/// #[ffi_type(error)]
 /// enum MyFFIError {
 ///     Ok = 0,
 ///     NullPassed = 1,
@@ -153,7 +153,7 @@ impl FFIErrorEnum {
 /// # impl std::error::Error for Error {}
 ///
 /// // The FFI error the library users will see.
-/// #[ffi_type(patterns(ffi_error))]
+/// #[ffi_type(error)]
 /// pub enum MyFFIError {
 ///     Ok = 0,
 ///     Null = 100,
@@ -179,9 +179,8 @@ impl FFIErrorEnum {
 ///
 /// // Now call a function that may panic or throw an error.
 /// #[ffi_function]
-/// #[no_mangle]
 /// #[allow(unreachable_code)]
-/// pub extern "C" fn panics() -> MyFFIError {
+/// pub fn panics() -> MyFFIError {
 ///     panics_and_errors_to_ffi_enum(
 ///         || {
 ///             panic!("Oh no");
