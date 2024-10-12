@@ -69,7 +69,6 @@ def init_lib(path):
     c_lib.pattern_ffi_slice_4.argtypes = [Sliceu8, SliceMutu8]
     c_lib.pattern_ffi_slice_5.argtypes = [ctypes.POINTER(Sliceu8), ctypes.POINTER(SliceMutu8)]
     c_lib.pattern_ffi_slice_6.argtypes = [ctypes.POINTER(SliceMutu8), ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8)]
-    c_lib.pattern_ffi_slice_7.argtypes = [SliceMut*const i8]
     c_lib.pattern_ffi_slice_delegate.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint8, Sliceu8)]
     c_lib.pattern_ffi_slice_delegate_huge.argtypes = [ctypes.CFUNCTYPE(Vec3f32, SliceVec3f32)]
     c_lib.pattern_ffi_option_1.argtypes = [OptionInner]
@@ -440,12 +439,6 @@ def pattern_ffi_slice_6(slice: ctypes.POINTER(SliceMutu8), callback):
         callback = callbacks.fn_u8_rval_u8(callback)
 
     return c_lib.pattern_ffi_slice_6(slice, callback)
-
-def pattern_ffi_slice_7(ignored: SliceMut*const i8 | ctypes.Array[ctypes.POINTER(ctypes.c_char)]):
-    if hasattr(ignored, "_length_") and getattr(ignored, "_type_", "") == ctypes.POINTER(ctypes.c_char):
-        ignored = SliceMut*const i8(data=ctypes.cast(ignored, ctypes.POINTER(ctypes.POINTER(ctypes.c_char))), len=len(ignored))
-
-    return c_lib.pattern_ffi_slice_7(ignored)
 
 def pattern_ffi_slice_delegate(callback) -> int:
     if not hasattr(callback, "__ctypes_from_outparam__"):
@@ -1530,67 +1523,6 @@ class Sliceu8(ctypes.Structure):
         for i in range(len(self)):
             rval[i] = self[i]
         return rval
-
-
-class SliceMut*const i8(ctypes.Structure):
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("data", ctypes.POINTER(ctypes.POINTER(ctypes.c_char))),
-        ("len", ctypes.c_uint64),
-    ]
-
-    def __len__(self):
-        return self.len
-
-    def __getitem__(self, i) -> bytes:
-        if i < 0:
-            index = self.len+i
-        else:
-            index = i
-
-        if index >= self.len:
-            raise IndexError("Index out of range")
-
-        return self.data[index]
-
-    def __setitem__(self, i, v: bytes):
-        if i < 0:
-            index = self.len+i
-        else:
-            index = i
-
-        if index >= self.len:
-            raise IndexError("Index out of range")
-
-        self.data[index] = v
-
-    def copied(self) -> SliceMut*const i8:
-        """Returns a shallow, owned copy of the underlying slice.
-
-        The returned object owns the immediate data, but not the targets of any contained
-        pointers. In other words, if your struct contains any pointers the returned object
-        may only be used as long as these pointers are valid. If the struct did not contain
-        any pointers the returned object is valid indefinitely."""
-        array = (ctypes.POINTER(ctypes.c_char) * len(self))()
-        ctypes.memmove(array, self.data, len(self) * ctypes.sizeof(ctypes.POINTER(ctypes.c_char)))
-        rval = SliceMut*const i8(data=ctypes.cast(array, ctypes.POINTER(ctypes.POINTER(ctypes.c_char))), len=len(self))
-        rval.owned = array  # Store array in returned slice to prevent memory deallocation
-        return rval
-
-    def __iter__(self) -> typing.Iterable[ctypes.POINTER(ctypes.c_char)]:
-        return _Iter(self)
-
-    def iter(self) -> typing.Iterable[ctypes.POINTER(ctypes.c_char)]:
-        """Convenience method returning a value iterator."""
-        return iter(self)
-
-    def first(self) -> bytes:
-        """Returns the first element of this slice."""
-        return self[0]
-
-    def last(self) -> bytes:
-        """Returns the last element of this slice."""
-        return self[len(self)-1]
 
 
 class SliceMutu32(ctypes.Structure):

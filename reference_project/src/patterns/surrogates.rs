@@ -31,7 +31,6 @@ pub struct Container {
 }
 
 #[ffi_function]
-#[no_mangle]
-pub extern "C" fn pattern_surrogates_1(s: SomeForeignType, c: &mut Container) {
+pub fn pattern_surrogates_1(s: SomeForeignType, c: &mut Container) {
     c.foreign = s;
 }

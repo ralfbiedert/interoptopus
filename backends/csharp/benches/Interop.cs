@@ -23,9 +23,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 14941292285109068616ul)
+            if (api_version != 9075871532317752825ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (14941292285109068616). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (9075871532317752825). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -432,29 +432,6 @@ namespace My.Company
         {
             var slice_slice = new SliceMutu8(slice);
             pattern_ffi_slice_6(ref slice_slice, callback);;
-        }
-        #endif
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_7")]
-        public static extern void pattern_ffi_slice_7(SliceMut*const i8 ignored);
-
-        public static void pattern_ffi_slice_7(string[] ignored)
-        {
-            unsafe
-            {
-                fixed (void* ptr_ignored = ignored)
-                {
-                    var ignored_slice = new SliceMut*const i8(new IntPtr(ptr_ignored), (ulong) ignored.Length);
-                    pattern_ffi_slice_7(ignored_slice);;
-                }
-            }
-        }
-
-        #if UNITY_2018_1_OR_NEWER
-        public static void pattern_ffi_slice_7(NativeArray<string> ignored)
-        {
-            var ignored_slice = new SliceMut*const i8(ignored);
-            pattern_ffi_slice_7(ignored_slice);;
         }
         #endif
 

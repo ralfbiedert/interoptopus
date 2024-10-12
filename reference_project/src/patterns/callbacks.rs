@@ -19,44 +19,37 @@ pub struct DelegateCallback<C> {
 }
 
 #[ffi_function]
-#[no_mangle]
-pub extern "C" fn pattern_callback_1(callback: MyCallback, x: u32) -> u32 {
+pub fn pattern_callback_1(callback: MyCallback, x: u32) -> u32 {
     callback.call(x)
 }
 
 #[ffi_function]
-#[no_mangle]
-pub extern "C" fn pattern_callback_2(callback: MyCallbackVoid) -> MyCallbackVoid {
+pub fn pattern_callback_2(callback: MyCallbackVoid) -> MyCallbackVoid {
     callback
 }
 
 #[ffi_function]
-#[no_mangle]
-pub extern "C" fn pattern_callback_3(callback: DelegateCallback<MyCallbackContextual>, x: u32) {
+pub fn pattern_callback_3(callback: DelegateCallback<MyCallbackContextual>, x: u32) {
     callback.callback.call(callback.context, x);
 }
 
 #[ffi_function]
-#[no_mangle]
-pub extern "C" fn pattern_callback_4(callback: MyCallbackNamespaced, x: u32) -> u32 {
+pub fn pattern_callback_4(callback: MyCallbackNamespaced, x: u32) -> u32 {
     callback.call(x)
 }
 
 #[ffi_function]
-#[no_mangle]
-pub extern "C" fn pattern_callback_5() -> SumDelegate1 {
+pub fn pattern_callback_5() -> SumDelegate1 {
     (exposed_sum1 as extern "C" fn()).into() // This is an ugly Rust limitation right now, compare #108
 }
 
 #[ffi_function]
-#[no_mangle]
-pub extern "C" fn pattern_callback_6() -> SumDelegate2 {
+pub fn pattern_callback_6() -> SumDelegate2 {
     SumDelegate2(Some(exposed_sum2)) // Similarly, compare #108
 }
 
 #[ffi_function]
-#[no_mangle]
-pub extern "C" fn pattern_callback_7(callback: SumDelegateReturn, x: i32) -> FFIError {
+pub fn pattern_callback_7(callback: SumDelegateReturn, x: i32) -> FFIError {
     // So the basic requirement here is that during that call
     // the trampoline would catch an exception, then
     // signal-return that an exception happened, then stop resuming
@@ -69,9 +62,9 @@ pub extern "C" fn pattern_callback_7(callback: SumDelegateReturn, x: i32) -> FFI
     }
 }
 
-extern "C" fn exposed_sum1() {}
+pub extern "C" fn exposed_sum1() {}
 
-extern "C" fn exposed_sum2(x: i32, y: i32) -> i32 {
+pub extern "C" fn exposed_sum2(x: i32, y: i32) -> i32 {
     x + y
 }
 

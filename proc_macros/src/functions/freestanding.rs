@@ -64,7 +64,7 @@ pub fn rval_tokens(return_type: &ReturnType) -> TokenStream {
 }
 
 pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStream) -> TokenStream {
-    let item_fn: ItemFn = syn::parse2(input.clone()).expect("Must be item.");
+    let mut item_fn = syn::parse2::<ItemFn>(input).expect("Must be item.");
     let docs = util::extract_doc_lines(&item_fn.attrs);
 
     let mut args_name = Vec::new();
@@ -86,15 +86,10 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
         }
     }
 
-    let function_ident = item_fn.sig.ident;
+    let function_ident = item_fn.sig.ident.clone();
     let function_ident_str = function_ident.to_string();
     let mut generic_params = quote! {};
     let mut phantom_fields = quote! {};
-
-    let _ = item_fn
-        .sig
-        .abi
-        .unwrap_or_else(|| panic!(r#"Function '{}' must have ABI specifier such as 'extern "C"'."#, function_ident_str));
 
     if !generic_parameters.is_empty() {
         generic_params = quote! { < #(#generic_parameters,)* > };
@@ -136,8 +131,17 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
         }
     }
 
+    // Ensure we have the right attributes
+    if item_fn.sig.abi.is_some() {
+        item_fn.sig.abi = Some(syn::parse_quote!(extern "C"));
+    }
+
+    if !item_fn.attrs.iter().any(|attr| attr.path().is_ident("no_mangle")) {
+        item_fn.attrs.push(syn::parse_quote!(#[no_mangle]));
+    }
+
     let rval = quote! {
-        #input
+        #item_fn
 
         #[allow(non_camel_case_types)]
         #[allow(clippy::redundant_pub_crate)]

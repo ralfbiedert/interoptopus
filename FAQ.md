@@ -210,8 +210,10 @@ calls from that language to a C library, I'd say:
 
 ## Safety, Soundness, Undefined Behavior
 
-This library naturally does "unsafe" things and any journey into FFI-land is a little adventure.
-That said, here are some assumptions and quality standards this project is based on:
+This library naturally does "unsafe" things and any journey into FFI-land is a little adventure. That said, here are
+some assumptions and quality standards this project is based on:
+
+### General Safety Considerations
 
 - Safe Rust calling safe Rust code must always be sound, with soundness boundaries
   on the module level, although smaller scopes are preferred. For example, creating a `FFISlice`
@@ -241,6 +243,28 @@ That said, here are some assumptions and quality standards this project is based
 
 **tl;dr**: if it's fishy we probably want to fix it, but we rely on external code calling in 'according to
 documentation'.
+
+### Specific Constructs
+
+- **Around Rust '24 `#[no_mangle]` became unsafe, and you add it automatically, isn't that an issue?**
+
+  Theoretically yes, practically no:
+    - It is true that with `#[no_mangle]` you could cause UB, for example by accidentally writing a
+      `#[no_mangle] fn malloc() -> usize {...}`. Around Rust '24 the
+      attribute was therefore made unsafe. The vast majority (probably all) of safe Rust projects should
+      simply not use the attribute because of that.
+    - In FFI crates though, you _must_ use the attribute to get normal C names, and there is practically no way of
+      knowing
+      which names you are not supposed to use. In other words, even if we made you type
+      `#[ffi_function] #[unsafe(no_mangle)] fn _ZN2io5stdio6_print20h94cd0587c9a534faX3gE() {...}`
+      (compare [this Rust issue](https://github.com/rust-lang/rust/issues/28179)), and even if you tried to be diligent,
+      you still wouldn't have any way of knowing whether what you just typed might cause UB (without using low-level
+      symbol table analyzers after the fact).
+    - By that same logic, there are quite a few other 'safe' things you are not supposed
+      to do from FFI crates, e.g., messing up calling conventions, panicking, or _not_ specifying `#[no_mangle]`
+      some of which can be impossible to guard against.
+    - With all that said, us automatically handling these attributes does not create additional issues, but allows
+      us to prevent some, and makes the library nicer to use.
 
 ## Errors vs. Panics
 

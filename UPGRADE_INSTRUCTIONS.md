@@ -15,6 +15,8 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
 - Service methods that return void (`()`) can now be used without a `#[ffi_service_method]` annotation. On a Rust panic
   they will silently return. If this is not acceptable you must return `Result` or specify a different panic behavior
   via that attribute.
+- Exported functions (`#[ffi_function]`) don't need to specify `#[no_mangle]` or `extern "C"` anymore as these will be
+  added automatically.
 
 ### 0.13 → 0.14
 

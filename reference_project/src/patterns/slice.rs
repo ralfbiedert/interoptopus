@@ -1,6 +1,5 @@
 use crate::types::{CallbackFFISlice, Vec3f32};
 use interoptopus::patterns::slice::{FFISlice, FFISliceMut};
-use interoptopus::patterns::string::CStrPointer;
 use interoptopus::{callback, ffi_function};
 
 static HUGE_VEC_SLICE: [Vec3f32; 100_000] = [Vec3f32 { x: 0.0, y: 0.0, z: 0.0 }; 100_000];
@@ -10,20 +9,17 @@ callback!(CallbackSliceMut(slice: FFISliceMut<'_, u8>) -> ());
 callback!(CallbackU8(value: u8) -> u8);
 
 #[ffi_function]
-#[no_mangle]
-pub extern "C" fn pattern_ffi_slice_1(ffi_slice: FFISlice<u32>) -> u32 {
+pub fn pattern_ffi_slice_1(ffi_slice: FFISlice<u32>) -> u32 {
     ffi_slice.as_slice().len() as u32
 }
 
 #[ffi_function]
-#[no_mangle]
-pub extern "C" fn pattern_ffi_slice_1b(ffi_slice: FFISliceMut<u32>) -> u32 {
+pub fn pattern_ffi_slice_1b(ffi_slice: FFISliceMut<u32>) -> u32 {
     ffi_slice.as_slice().len() as u32
 }
 
 #[ffi_function]
-#[no_mangle]
-pub extern "C" fn pattern_ffi_slice_2(ffi_slice: FFISlice<Vec3f32>, i: i32) -> Vec3f32 {
+pub fn pattern_ffi_slice_2(ffi_slice: FFISlice<Vec3f32>, i: i32) -> Vec3f32 {
     ffi_slice.as_slice().get(i as usize).copied().unwrap_or(Vec3f32 {
         x: f32::NAN,
         y: f32::NAN,
@@ -32,20 +28,17 @@ pub extern "C" fn pattern_ffi_slice_2(ffi_slice: FFISlice<Vec3f32>, i: i32) -> V
 }
 
 #[ffi_function]
-#[no_mangle]
-pub extern "C" fn pattern_ffi_slice_delegate(callback: CallbackFFISlice) -> u8 {
+pub fn pattern_ffi_slice_delegate(callback: CallbackFFISlice) -> u8 {
     callback.call(FFISlice::from_slice(&[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]))
 }
 
 #[ffi_function]
-#[no_mangle]
-pub extern "C" fn pattern_ffi_slice_delegate_huge(callback: CallbackHugeVecSlice) -> Vec3f32 {
+pub fn pattern_ffi_slice_delegate_huge(callback: CallbackHugeVecSlice) -> Vec3f32 {
     callback.call(FFISlice::from_slice(&HUGE_VEC_SLICE))
 }
 
 #[ffi_function]
-#[no_mangle]
-pub extern "C" fn pattern_ffi_slice_3(mut slice: FFISliceMut<u8>, callback: CallbackSliceMut) {
+pub fn pattern_ffi_slice_3(mut slice: FFISliceMut<u8>, callback: CallbackSliceMut) {
     if let [x, ..] = slice.as_slice_mut() {
         *x += 1;
     }
@@ -54,30 +47,27 @@ pub extern "C" fn pattern_ffi_slice_3(mut slice: FFISliceMut<u8>, callback: Call
 }
 
 #[ffi_function]
-#[no_mangle]
-pub extern "C" fn pattern_ffi_slice_4(_slice: FFISlice<u8>, _slice2: FFISliceMut<u8>) {}
+pub fn pattern_ffi_slice_4(_slice: FFISlice<u8>, _slice2: FFISliceMut<u8>) {}
 
 #[ffi_function]
-#[no_mangle]
-pub extern "C" fn pattern_ffi_slice_5(slice: &FFISlice<u8>, slice2: &mut FFISliceMut<u8>) {
+pub fn pattern_ffi_slice_5(slice: &FFISlice<u8>, slice2: &mut FFISliceMut<u8>) {
     let _ = slice.as_slice().len();
     let _ = slice2.as_slice().len();
 }
 
 #[ffi_function]
-#[no_mangle]
-pub extern "C" fn pattern_ffi_slice_6(slice: &FFISliceMut<u8>, callback: CallbackU8) {
+pub fn pattern_ffi_slice_6(slice: &FFISliceMut<u8>, callback: CallbackU8) {
     callback.call(slice.as_slice().first().copied().unwrap_or(0));
 }
 
 // #[ffi_function]
-// #[no_mangle]
-// pub extern "C" fn pattern_ffi_slice_7(_: FFISliceMut<CStrPointer>) {}
+//
+// pub fn pattern_ffi_slice_7(_: FFISliceMut<CStrPointer>) {}
 
 // Some extra tests that were hard to do from core crate.
 #[cfg(test)]
 mod test {
-    use crate::patterns::slice::pattern_ffi_slice_3;
+    use super::pattern_ffi_slice_3;
     use interoptopus::patterns::slice::FFISliceMut;
 
     #[allow(dead_code)]

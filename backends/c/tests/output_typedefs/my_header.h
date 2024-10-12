@@ -255,15 +255,6 @@ typedef struct my_library_sliceu8
 } my_library_sliceu8;
 
 ///A pointer to an array of data someone else owns which may be modified.
-typedef struct my_library_slice_mut_const_i8
-{
-    ///Pointer to start of mutable data.
-    const const char** data;
-    ///Number of elements.
-    uint64_t len;
-} my_library_slice_mut_const_i8;
-
-///A pointer to an array of data someone else owns which may be modified.
 typedef struct my_library_slice_mutu32
 {
     ///Pointer to start of mutable data.
@@ -473,8 +464,6 @@ typedef void (*pattern_ffi_slice_4)(my_library_sliceu8, my_library_slice_mutu8);
 typedef void (*pattern_ffi_slice_5)(const my_library_sliceu8*, my_library_slice_mutu8*);
 
 typedef void (*pattern_ffi_slice_6)(const my_library_slice_mutu8*, my_library_callback_u8);
-
-typedef void (*pattern_ffi_slice_7)(my_library_slice_mut_const_i8);
 
 typedef uint8_t (*pattern_ffi_slice_delegate)(my_library_callback_ffi_slice);
 

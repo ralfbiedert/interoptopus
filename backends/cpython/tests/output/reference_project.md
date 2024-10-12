@@ -62,7 +62,6 @@ Freestanding callables inside the module.
  - **[pattern_ffi_slice_4](#pattern_ffi_slice_4)** - 
  - **[pattern_ffi_slice_5](#pattern_ffi_slice_5)** - 
  - **[pattern_ffi_slice_6](#pattern_ffi_slice_6)** - 
- - **[pattern_ffi_slice_7](#pattern_ffi_slice_7)** - 
  - **[pattern_ffi_slice_delegate](#pattern_ffi_slice_delegate)** - 
  - **[pattern_ffi_slice_delegate_huge](#pattern_ffi_slice_delegate_huge)** - 
  - **[pattern_ffi_option_1](#pattern_ffi_option_1)** - 
@@ -1517,15 +1516,6 @@ def pattern_ffi_slice_5(slice: ctypes.POINTER(Sliceu8), slice2: ctypes.POINTER(S
 #### Definition 
 ```python
 def pattern_ffi_slice_6(slice: ctypes.POINTER(SliceMutu8), callback):
-    ...
-```
-
----
-
-## pattern_ffi_slice_7 
-#### Definition 
-```python
-def pattern_ffi_slice_7(ignored: SliceMut*const i8 | ctypes.Array[ctypes.POINTER(ctypes.c_char)]):
     ...
 ```
 
