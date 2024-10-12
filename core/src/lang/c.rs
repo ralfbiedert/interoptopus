@@ -12,6 +12,7 @@
 use crate::patterns::TypePattern;
 use crate::util::{ctypes_from_type_recursive, IdPrettifier};
 use std::collections::HashSet;
+use std::fmt::Alignment;
 use std::hash::{Hash, Hasher};
 
 // /// If a name like `abc::XXX` is given, strips the `abc::` part.
@@ -316,12 +317,13 @@ impl ArrayType {
 pub struct EnumType {
     name: String,
     variants: Vec<Variant>,
+    repr: Representation,
     meta: Meta,
 }
 
 impl EnumType {
-    pub fn new(name: String, variants: Vec<Variant>, meta: Meta) -> Self {
-        Self { name, variants, meta }
+    pub fn new(name: String, variants: Vec<Variant>, meta: Meta, repr: Representation) -> Self {
+        Self { name, variants, meta, repr }
     }
 
     pub fn rust_name(&self) -> &str {
@@ -338,6 +340,10 @@ impl EnumType {
 
     pub fn meta(&self) -> &Meta {
         &self.meta
+    }
+
+    pub fn repr(&self) -> &Representation {
+        &self.repr
     }
 }
 
@@ -385,6 +391,7 @@ impl Variant {
 pub struct CompositeType {
     name: String,
     fields: Vec<Field>,
+    repr: Representation,
     meta: Meta,
 }
 
@@ -396,7 +403,17 @@ impl CompositeType {
 
     /// Creates a new composite with the given name and type-level documentation.
     pub fn with_meta(name: String, fields: Vec<Field>, meta: Meta) -> Self {
-        Self { name, fields, meta }
+        Self {
+            name,
+            fields,
+            meta,
+            repr: Default::default(),
+        }
+    }
+
+    /// Creates a new composite with the given name and type-level documentation.
+    pub fn with_meta_repr(name: String, fields: Vec<Field>, meta: Meta, repr: Representation) -> Self {
+        Self { name, fields, repr, meta }
     }
 
     /// Gets the type's name `
@@ -416,6 +433,10 @@ impl CompositeType {
     pub fn meta(&self) -> &Meta {
         &self.meta
     }
+
+    pub fn repr(&self) -> &Representation {
+        &self.repr
+    }
 }
 
 /// Doesn't exist in C, but other languages can benefit from accidentally using 'private' fields.
@@ -423,6 +444,47 @@ impl CompositeType {
 pub enum Visibility {
     Public,
     Private,
+}
+
+/// How a struct is laid out in memory.
+#[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub enum Layout {
+    C,
+    Transparent,
+    Packed,
+    Opaque,
+    /// For use with enum discriminant.
+    Primitive(PrimitiveType),
+}
+
+/// How a type is represented in memory.
+#[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub struct Representation {
+    layout: Layout,
+    alignment: Option<usize>,
+}
+
+impl Default for Representation {
+    fn default() -> Self {
+        Self {
+            layout: Layout::C,
+            alignment: None,
+        }
+    }
+}
+
+impl Representation {
+    pub fn new(layout: Layout, alignment: Option<usize>) -> Self {
+        Self { layout, alignment }
+    }
+
+    pub fn layout(&self) -> Layout {
+        self.layout
+    }
+
+    pub fn alignment(&self) -> Option<usize> {
+        self.alignment
+    }
 }
 
 /// Fields of a [`CompositeType`].
@@ -491,7 +553,6 @@ impl OpaqueType {
 pub struct Meta {
     documentation: Documentation,
     namespace: String,
-    alignment: Option<usize>,
 }
 
 impl Meta {
@@ -499,16 +560,12 @@ impl Meta {
         Self::default()
     }
 
-    pub fn with_namespace_documentation(namespace: String, documentation: Documentation, alignment: Option<usize>) -> Self {
-        Self {
-            documentation,
-            namespace,
-            alignment,
-        }
+    pub fn with_namespace_documentation(namespace: String, documentation: Documentation) -> Self {
+        Self { documentation, namespace }
     }
 
-    pub fn with_documentation(documentation: Documentation, alignment: Option<usize>) -> Self {
-        Self::with_namespace_documentation(String::new(), documentation, alignment)
+    pub fn with_documentation(documentation: Documentation) -> Self {
+        Self::with_namespace_documentation(String::new(), documentation)
     }
 
     pub fn documentation(&self) -> &Documentation {
@@ -522,10 +579,6 @@ impl Meta {
     /// Convenience method used in generators
     pub fn is_namespace(&self, namespace: &str) -> bool {
         self.namespace == namespace
-    }
-
-    pub fn alignment(&self) -> Option<usize> {
-        self.alignment
     }
 }
 

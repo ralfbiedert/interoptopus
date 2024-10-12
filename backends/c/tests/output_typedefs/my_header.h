@@ -101,21 +101,17 @@ typedef struct my_library_local
     uint32_t x;
 } my_library_local;
 
-#pragma pack(push, 1)
 typedef struct my_library_packed1
 {
     uint8_t x;
     uint16_t y;
 } my_library_packed1;
-#pragma pack(pop)
 
-#pragma pack(push, 1)
 typedef struct my_library_packed2
 {
     uint8_t x;
     uint16_t y;
 } my_library_packed2;
-#pragma pack(pop)
 
 typedef struct my_library_phantomu8
 {

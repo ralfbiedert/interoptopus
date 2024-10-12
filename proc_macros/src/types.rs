@@ -1,11 +1,12 @@
 use crate::macros::darling_parse;
 use crate::types::enums::ffi_type_enum;
 use crate::types::structs::ffi_type_struct;
-use darling::FromMeta;
+use darling::ast::NestedMeta;
+use darling::{Error, FromMeta};
 use proc_macro2::TokenStream;
 use quote::quote;
 use std::collections::HashMap;
-use syn::{Field, ItemEnum, ItemStruct, ItemType, Visibility};
+use syn::{Expr, Field, ItemEnum, ItemStruct, ItemType, Lit, Meta, Visibility};
 
 mod enums;
 mod structs;
@@ -14,6 +15,27 @@ mod structs;
 pub struct Attributes {
     #[darling(default)]
     opaque: bool,
+
+    #[darling(default)]
+    transparent: bool,
+
+    #[darling(default)]
+    packed: bool,
+
+    #[darling(default)]
+    u8: bool,
+
+    #[darling(default)]
+    u16: bool,
+
+    #[darling(default)]
+    u32: bool,
+
+    #[darling(default)]
+    u64: bool,
+
+    #[darling(default)]
+    align: Option<usize>,
 
     #[darling(default)]
     patterns: HashMap<String, ()>,

@@ -249,8 +249,7 @@ macro_rules! callback {
                     namespace = String::from($ns);
                 )*
 
-                let meta = Meta::with_namespace_documentation(namespace, Documentation::new(), None);
-
+                let meta = Meta::with_namespace_documentation(namespace, Documentation::new());
                 let sig = interoptopus::lang::c::FunctionSignature::new(params, rval);
                 let fn_pointer = interoptopus::lang::c::FnPointerType::new_named(sig, stringify!($name).to_string());
                 let named_callback = interoptopus::patterns::callbacks::NamedCallback::with_meta(fn_pointer, meta);

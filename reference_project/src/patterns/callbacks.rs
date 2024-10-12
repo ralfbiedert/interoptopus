@@ -12,7 +12,6 @@ callback!(SumDelegate2(x: i32, y: i32) -> i32);
 callback!(SumDelegateReturn(x: i32, y: i32) -> FFIError);
 
 #[ffi_type]
-#[repr(C)]
 pub struct DelegateCallback<C> {
     pub callback: C,
     pub context: *const c_void,

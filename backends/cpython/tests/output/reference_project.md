@@ -428,7 +428,6 @@ class Local(ctypes.Structure):
 #### Definition 
 ```python
 class Packed1(ctypes.Structure):
-    _pack_ = 1
 
     _fields_ = [
         ("x", ctypes.c_uint8),
@@ -452,7 +451,6 @@ class Packed1(ctypes.Structure):
 #### Definition 
 ```python
 class Packed2(ctypes.Structure):
-    _pack_ = 1
 
     _fields_ = [
         ("x", ctypes.c_uint8),

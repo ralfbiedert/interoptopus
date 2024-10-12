@@ -13,7 +13,6 @@ impl Helper for u8 {}
 
 /// Empty structs are only allowed as opaques.
 #[ffi_type(opaque)]
-#[repr(C)]
 pub struct Empty {}
 
 #[ffi_type(opaque)]
@@ -23,16 +22,13 @@ pub struct Opaque {
 }
 
 #[ffi_type]
-#[repr(C)]
 pub struct Tupled(pub u8);
 
-#[ffi_type]
-#[repr(transparent)]
+#[ffi_type(transparent)]
 #[allow(dead_code)]
 pub struct Transparent(Tupled);
 
 #[ffi_type]
-#[repr(C)]
 pub struct Generic<'a, T>
 where
     T: 'static,
@@ -42,7 +38,6 @@ where
 }
 
 #[ffi_type(opaque)]
-#[repr(C)]
 pub struct Generic2<T>
 where
     T: CTypeInfo,
@@ -51,13 +46,11 @@ where
 }
 
 #[ffi_type(opaque, name = "Generic3")]
-#[repr(C)]
 pub struct Generic3<T> {
     pub x: T,
 }
 
 #[ffi_type(opaque, name = "Generic4")]
-#[repr(C)]
 pub struct Generic4<T>
 where
     T: Helper,
@@ -66,13 +59,11 @@ where
 }
 
 #[ffi_type(name = "StructRenamed")]
-#[repr(C)]
 pub struct StructRenamedXYZ {
     pub e: EnumRenamedXYZ,
 }
 
 #[ffi_type(skip(p))]
-#[repr(C)]
 pub struct Phantom<'a, T>
 where
     T: 'static,
@@ -83,7 +74,6 @@ where
 }
 
 #[ffi_type]
-#[repr(C)]
 #[derive(Copy, Clone, Default)]
 pub struct Vec3f32 {
     pub x: f32,
@@ -92,13 +82,11 @@ pub struct Vec3f32 {
 }
 
 #[ffi_type]
-#[repr(C)]
 pub struct Array {
     pub data: [u8; 16],
 }
 
 #[ffi_type]
-#[repr(C)]
 pub struct GenericArray<T>
 where
     T: CTypeInfo,
@@ -115,7 +103,6 @@ where
 
 /// Documented enum.
 #[ffi_type]
-#[repr(C)]
 pub enum EnumDocumented {
     /// Variant A.
     A,
@@ -126,41 +113,35 @@ pub enum EnumDocumented {
 }
 
 #[ffi_type(name = "EnumRenamed")]
-#[repr(C)]
 pub enum EnumRenamedXYZ {
     X,
 }
 
 /// Documented struct.
 #[ffi_type]
-#[repr(C)]
 pub struct StructDocumented {
     /// Documented field.
     pub x: f32,
 }
 
 #[ffi_type]
-#[repr(C)]
 pub struct ExtraType<T> {
     pub x: T,
 }
 
 #[ffi_type]
-#[repr(C)]
 pub struct UseAsciiStringPattern<'a> {
     pub ascii_string: CStrPointer<'a>,
 }
 
 /// This can also be used for the `class` pattern.
 #[ffi_type(opaque)]
-#[repr(C)]
 #[allow(unused)]
 pub struct SomeContext {
     pub(crate) some_field: u32,
 }
 
 #[ffi_type]
-#[repr(C)]
 pub struct Weird1<T: Clone>
 where
     T: Copy + Copy,
@@ -169,7 +150,6 @@ where
 }
 
 #[ffi_type]
-#[repr(C)]
 pub struct Weird2<'a, T: Clone, const N: usize>
 where
     T: Copy + Copy + 'a,
@@ -181,7 +161,6 @@ where
 }
 
 #[ffi_type(visibility(pblc = "public", prvt = "private"))]
-#[repr(C)]
 pub struct Visibility1 {
     // Be conservative with naming since some languages don't like `public` as a field.
     pblc: u8,
@@ -189,37 +168,30 @@ pub struct Visibility1 {
 }
 
 #[ffi_type(visibility(_all = "public"))]
-#[repr(C)]
 pub struct Visibility2 {
     pblc1: u8,
     pblc2: u8,
 }
 
-#[ffi_type]
-#[repr(C)]
-#[repr(packed)]
+#[ffi_type(packed)]
 pub struct Packed1 {
     pub x: u8,
     pub y: u16,
 }
 
-#[ffi_type]
-#[repr(C, packed)]
+#[ffi_type(packed)]
 pub struct Packed2 {
     pub x: u8,
     pub y: u16,
 }
 
-#[ffi_type]
-#[repr(C)]
-#[repr(align(2))]
+#[ffi_type(align = 2)]
 pub struct Aligned1 {
     pub x: u8,
     pub y: u16,
 }
 
-#[ffi_type]
-#[repr(C, align(64))]
+#[ffi_type(align = 64)]
 pub struct Aligned2 {
     pub x: u8,
     pub y: u16,
@@ -227,7 +199,6 @@ pub struct Aligned2 {
 
 #[ffi_type]
 #[derive(Debug, Default, Clone, Copy)]
-#[repr(C)]
 pub struct BooleanAlignment {
     pub a: i32,
     pub b: i16,
@@ -257,14 +228,12 @@ pub mod ambiguous1 {
     use interoptopus::ffi_type;
 
     #[ffi_type(name = "Vec1")]
-    #[repr(C)]
     pub struct Vec {
         pub x: f32,
         pub y: f32,
     }
 
     #[ffi_type(name = "Status1")]
-    #[repr(C)]
     pub enum Status {
         X = 1,
         Y = 2,
@@ -275,14 +244,12 @@ pub mod ambiguous2 {
     use interoptopus::ffi_type;
 
     #[ffi_type(name = "Vec2")]
-    #[repr(C)]
     pub struct Vec {
         pub x: f64,
         pub z: f64,
     }
 
     #[ffi_type(name = "Status2")]
-    #[repr(C)]
     pub enum Status {
         X = 100,
         Z = 200,
@@ -293,7 +260,6 @@ pub mod common {
     use interoptopus::ffi_type;
 
     #[ffi_type(namespace = "common")]
-    #[repr(C)]
     pub struct Vec {
         pub x: f64,
         pub z: f64,
@@ -308,11 +274,9 @@ pub mod associated_types {
     }
 
     #[ffi_type]
-    #[repr(C)]
     pub struct Chicken(u8);
 
     #[ffi_type]
-    #[repr(C)]
     pub struct Cow(u16);
 
     impl Helper for Chicken {
@@ -320,7 +284,6 @@ pub mod associated_types {
     }
 
     #[ffi_type]
-    #[repr(C)]
     pub struct FieldsViaAssociatedType {
         pub x: <Chicken as Helper>::X,
     }

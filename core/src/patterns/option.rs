@@ -27,7 +27,7 @@
 //! void set_value(optionu8 x);
 //! ```
 //!
-use crate::lang::c::{CType, CompositeType, Documentation, Field, Meta, PrimitiveType, Visibility};
+use crate::lang::c::{CType, CompositeType, Documentation, Field, Layout, Meta, PrimitiveType, Representation, Visibility};
 use crate::lang::rust::CTypeInfo;
 
 use crate::patterns::primitives::FFIBool;
@@ -145,8 +145,9 @@ where
         ];
 
         let doc = Documentation::from_line("Option type containing boolean flag and maybe valid data.");
-        let meta = Meta::with_namespace_documentation(T::type_info().namespace().map(|e| e.into()).unwrap_or_else(String::new), doc, None);
-        let composite = CompositeType::with_meta(format!("Option{}", T::type_info().name_within_lib()), fields, meta);
+        let repr = Representation::new(Layout::C, None);
+        let meta = Meta::with_namespace_documentation(T::type_info().namespace().map(|e| e.into()).unwrap_or_else(String::new), doc);
+        let composite = CompositeType::with_meta_repr(format!("Option{}", T::type_info().name_within_lib()), fields, meta, repr);
         CType::Pattern(TypePattern::Option(composite))
     }
 }

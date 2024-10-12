@@ -15,7 +15,6 @@ const fn number_of_the_yeast() -> u32 {
 pub const THE_MAGIC_CONSTANT: SomeType = number_of_the_yeast() - 1;
 
 #[ffi_type]
-#[repr(C)]
 #[derive(Debug)]
 #[allow(unused)]
 pub struct Input {
@@ -25,18 +24,25 @@ pub struct Input {
     v: Vec3,
 }
 
-#[ffi_type(opaque)]
+#[ffi_type(opaque, debug)]
 pub struct Context {
     my_game_engine: GameEngine,
 }
 
 /// Possible errors in our library.
+// #[ffi_type]
+// // pub enum FFIError {
+//     /// All went fine.
+//     Ok,
+//
+//     /// Naughty API call detected.
+//     NullPointerPassed = 10,
+// }
+
 #[ffi_type]
-#[repr(C)]
 pub enum FFIError {
     /// All went fine.
     Ok,
-
     /// Naughty API call detected.
     NullPointerPassed = 10,
 }

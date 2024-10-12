@@ -863,7 +863,6 @@ class Local(ctypes.Structure):
 
 
 class Packed1(ctypes.Structure):
-    _pack_ = 1
 
     # These fields represent the underlying C data layout
     _fields_ = [
@@ -895,7 +894,6 @@ class Packed1(ctypes.Structure):
 
 
 class Packed2(ctypes.Structure):
-    _pack_ = 1
 
     # These fields represent the underlying C data layout
     _fields_ = [

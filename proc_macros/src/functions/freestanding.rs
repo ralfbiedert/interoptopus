@@ -64,7 +64,7 @@ pub fn rval_tokens(return_type: &ReturnType) -> TokenStream {
 }
 
 pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStream) -> TokenStream {
-    let mut item_fn = syn::parse2::<ItemFn>(input).expect("Must be item.");
+    let mut item_fn = syn::parse2::<ItemFn>(input).expect("Must be a function.");
     let docs = util::extract_doc_lines(&item_fn.attrs);
 
     let mut args_name = Vec::new();
@@ -165,7 +165,7 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
 
                 let mut signature = ::interoptopus::lang::c::FunctionSignature::new(params, #rval);
                 let documentation = ::interoptopus::lang::c::Documentation::from_lines(doc_lines);
-                let meta = ::interoptopus::lang::c::Meta::with_documentation(documentation, None);
+                let meta = ::interoptopus::lang::c::Meta::with_documentation(documentation);
 
                 ::interoptopus::lang::c::Function::new(#function_ident_str.to_string(), signature, meta)
             }

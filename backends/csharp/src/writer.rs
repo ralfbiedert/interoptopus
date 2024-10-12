@@ -367,7 +367,7 @@ pub trait CSharpWriter {
 
     fn write_type_definition_composite_annotation(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
         indented!(w, r#"[Serializable]"#)?;
-        let alignment = the_type.meta().alignment();
+        let alignment = the_type.repr().alignment();
         if let Some(align) = alignment {
             indented!(w, r#"[StructLayout(LayoutKind.Sequential, Pack = {})]"#, align)
         } else {

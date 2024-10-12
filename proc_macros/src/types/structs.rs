@@ -1,47 +1,32 @@
 use crate::types::Attributes;
 use crate::util::extract_doc_lines;
-use proc_macro2::TokenStream;
+use proc_macro2::{Span, TokenStream};
 use quote::{quote, ToTokens};
-use regex::Regex;
 use syn::spanned::Spanned;
 use syn::{GenericParam, ItemStruct, Type};
 
-#[derive(Debug, Copy, Clone)]
-pub enum TypeRepr {
+#[derive(Debug, Clone, Copy)]
+pub enum TypeRepresentation {
     C,
     Transparent,
+    Packed,
     Opaque,
+    Primitive(&'static str),
 }
 
-fn type_repr(attributes: &Attributes, item: &ItemStruct) -> (TypeRepr, Option<usize>) {
-    if attributes.opaque {
-        return (TypeRepr::Opaque, None);
-    }
+#[rustfmt::skip]
+fn type_repr_align(attributes: &Attributes, _: &ItemStruct) -> (TypeRepresentation, Option<usize>) {
+    let mut rval = (TypeRepresentation::C, attributes.align);
 
-    let mut type_repr = TypeRepr::C;
-    let mut align = None;
-    let align_regex = Regex::new(r"align\((\d+)\)").unwrap();
+    if attributes.opaque { rval.0 = TypeRepresentation::Opaque; }
+    if attributes.transparent { rval.0 = TypeRepresentation::Transparent; }
+    if attributes.packed { rval.0 = TypeRepresentation::Packed; }
+    if attributes.u8 { rval.0 = TypeRepresentation::Primitive("u8"); }
+    if attributes.u16 { rval.0 = TypeRepresentation::Primitive("u16"); }
+    if attributes.u32 { rval.0 = TypeRepresentation::Primitive("u32"); }
+    if attributes.u64 { rval.0 = TypeRepresentation::Primitive("u64"); }
 
-    for repr in item.attrs.iter().filter(|x| x.to_token_stream().to_string().contains("repr")) {
-        let repr_tokens = repr.to_token_stream().to_string();
-        if repr_tokens.contains("transparent") {
-            type_repr = TypeRepr::Transparent;
-        } else if repr_tokens.contains("packed") {
-            type_repr = TypeRepr::C;
-            align = Some(1);
-        } else if repr_tokens.contains("align") {
-            type_repr = TypeRepr::C;
-            let align_capture = align_regex
-                .captures(&repr_tokens)
-                .expect("Must have alignment")
-                .get(1)
-                .expect("Must have alignment")
-                .as_str();
-            align = Some(align_capture.parse::<usize>().expect("Must be a number"));
-        }
-    }
-
-    (type_repr, align)
+    rval
 }
 
 // Various Struct examples
@@ -81,11 +66,11 @@ fn type_repr(attributes: &Attributes, item: &ItemStruct) -> (TypeRepr, Option<us
 //
 // ```
 //
-pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemStruct) -> TokenStream {
+pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, mut item: ItemStruct) -> TokenStream {
     let namespace = attributes.namespace.clone().unwrap_or_default();
     let doc_line = extract_doc_lines(&item.attrs).join("\n");
 
-    let (type_repr, align_attr) = type_repr(attributes, &item);
+    let (type_repr, align) = type_repr_align(attributes, &item);
 
     let struct_ident_str = item.ident.to_string();
     let struct_ident = syn::Ident::new(&struct_ident_str, item.ident.span());
@@ -133,8 +118,8 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
         has_generics = true;
     }
 
-    if let Some(whre) = item.generics.where_clause {
-        for pred in whre.predicates {
+    if let Some(whre) = &item.generics.where_clause {
+        for pred in &whre.predicates {
             generic_where_tokens.push(quote! { #pred });
         }
     }
@@ -190,61 +175,86 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
         field_types.push(quote! { #token });
     }
 
-    let rval_builder = if attributes.opaque {
-        quote! {
-            let mut rval = ::interoptopus::lang::c::OpaqueType::new(name, meta);
-            ::interoptopus::lang::c::CType::Opaque(rval)
-        }
-    } else {
-        quote! {
-            let rval = ::interoptopus::lang::c::CompositeType::with_meta(name, fields, meta);
-            ::interoptopus::lang::c::CType::Composite(rval)
-        }
+    let let_fields = match attributes.opaque {
+        true => quote! {},
+        false => quote! {
+                #({
+                    let documentation = ::interoptopus::lang::c::Documentation::from_line(#field_docs);
+                    let the_type = #field_type_info;
+                    let field = ::interoptopus::lang::c::Field::with_documentation(#field_names.to_string(), the_type, #field_visibilities, documentation);
+                    fields.push(field);
+                })*
+        },
     };
 
-    let let_fields = if attributes.opaque {
-        quote! {}
-    } else {
-        quote! {
-            #({
-                let documentation = ::interoptopus::lang::c::Documentation::from_line(#field_docs);
-                let the_type = #field_type_info;
-                let field = ::interoptopus::lang::c::Field::with_documentation(#field_names.to_string(), the_type, #field_visibilities, documentation);
-                fields.push(field);
-            })*
-        }
-    };
-
-    let let_name = if let Some(name) = &attributes.name {
-        quote! {
-            let name = #name.to_string();
-        }
-    } else {
-        quote! {
+    let let_name = match &attributes.name {
+        Some(name) => quote! { let name = #name.to_string(); },
+        None => quote! {
             #({
                 generics.push(<#generic_params_needing_ctypeinfo_bounds as ::interoptopus::lang::rust::CTypeInfo>::type_info().name_within_lib());
             })*
 
             let name = format!("{}{}", #struct_ident_c.to_string(), generics.join(""));
-        }
+        },
     };
 
-    let align = if let Some(x) = align_attr {
-        quote! { Some(#x) }
-    } else {
-        quote! { None }
+    let attr_align = match align {
+        Some(x) => {
+            let x_lit = syn::LitInt::new(&x.to_string(), Span::call_site());
+            quote! { , align( #x_lit ) }
+        }
+        None => quote! {},
     };
+
+    let align = match align {
+        Some(x) => quote! { Some(#x) },
+        None => quote! { None },
+    };
+
+    let layout = match type_repr {
+        TypeRepresentation::C => quote! { ::interoptopus::lang::c::Layout::C },
+        TypeRepresentation::Transparent => quote! { ::interoptopus::lang::c::Layout::Transparent },
+        TypeRepresentation::Packed => quote! { ::interoptopus::lang::c::Layout::Packed },
+        TypeRepresentation::Opaque => quote! { ::interoptopus::lang::c::Layout::Opaque },
+        TypeRepresentation::Primitive(_) => quote! { compile_error!("ASDJSAKDASJKDASJD") },
+    };
+
+    let attr_repr = match type_repr {
+        TypeRepresentation::C => quote! { #[repr(C #attr_align)] },
+        TypeRepresentation::Transparent => quote! { #[repr(transparent #attr_align)] },
+        TypeRepresentation::Packed => quote! { #[repr(packed #attr_align)] },
+        TypeRepresentation::Opaque => quote! { #[repr(C #attr_align)] },
+        TypeRepresentation::Primitive(x) => quote! { #[repr(#x #attr_align)] },
+    };
+
+    let rval_builder = match attributes.opaque {
+        true => quote! {
+            let mut rval = ::interoptopus::lang::c::OpaqueType::new(name, meta);
+            ::interoptopus::lang::c::CType::Opaque(rval)
+        },
+        false => quote! {
+            let repr = ::interoptopus::lang::c::Representation::new(#layout, #align);
+            let rval = ::interoptopus::lang::c::CompositeType::with_meta_repr(name, fields, meta, repr);
+            ::interoptopus::lang::c::CType::Composite(rval)
+        },
+    };
+
+    if item.attrs.iter().any(|attr| attr.path().is_ident("repr")) {
+        panic!("Since 0.15 you must not add any `#[repr()] attributes to your type; Interoptopus will handle that for you.");
+    } else {
+        item.attrs.push(syn::parse_quote!(#attr_repr));
+    }
 
     match type_repr {
-        TypeRepr::C | TypeRepr::Opaque => {
+        TypeRepresentation::C | TypeRepresentation::Opaque | TypeRepresentation::Packed => {
             quote! {
-                #input
+                #item
 
                 unsafe impl #param_param ::interoptopus::lang::rust::CTypeInfo for #struct_ident #param_struct #param_where {
 
                     fn type_info() -> ::interoptopus::lang::c::CType {
                         let documentation = ::interoptopus::lang::c::Documentation::from_line(#doc_line);
-                        let mut meta = ::interoptopus::lang::c::Meta::with_namespace_documentation(#namespace.to_string(), documentation, #align);
+                        let mut meta = ::interoptopus::lang::c::Meta::with_namespace_documentation(#namespace.to_string(), documentation);
                         let mut fields: ::std::vec::Vec<interoptopus::lang::c::Field> = ::std::vec::Vec::new();
                         let mut generics: ::std::vec::Vec<String> = ::std::vec::Vec::new();
 
@@ -257,11 +267,11 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
                 }
             }
         }
-        TypeRepr::Transparent => {
+        TypeRepresentation::Transparent => {
             let first_field_type = field_types.get(0).expect("Transparent structs must have at least one field");
 
             quote! {
-                #input
+                #item
 
                 unsafe impl #param_param ::interoptopus::lang::rust::CTypeInfo for #struct_ident #param_struct #param_where {
 
@@ -269,6 +279,11 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, item: ItemSt
                         < #first_field_type > :: type_info()
                     }
                 }
+            }
+        }
+        TypeRepresentation::Primitive(_) => {
+            quote! {
+                compile_error!("XXXXXXXX");
             }
         }
     }

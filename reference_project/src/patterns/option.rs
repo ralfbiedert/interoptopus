@@ -2,7 +2,6 @@ use interoptopus::patterns::option::FFIOption;
 use interoptopus::{ffi_function, ffi_type};
 
 #[ffi_type]
-#[repr(C)]
 pub struct Inner {
     x: f32,
 }

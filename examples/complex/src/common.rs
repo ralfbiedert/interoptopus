@@ -5,7 +5,6 @@ use crate::thirdparty::ThirdPartyVecF32;
 
 /// A vector used in our game engine.
 #[ffi_type]
-#[repr(C)]
 #[derive(Copy, Clone, Debug)]
 pub struct Vec3 {
     pub x: f32,
@@ -15,7 +14,6 @@ pub struct Vec3 {
 
 /// A vector used in our game engine.
 #[ffi_type]
-#[repr(C)]
 #[derive(Copy, Clone, Debug)]
 pub struct SuperComplexEntity {
     pub player_1: Vec3,

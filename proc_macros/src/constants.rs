@@ -12,7 +12,6 @@ pub fn ffi_constant(_attr: TokenStream, input: TokenStream) -> TokenStream {
 
     let const_ident = const_item.ident;
     let const_name = const_ident.to_string();
-
     let doc_line = extract_doc_lines(&const_item.attrs).join("\n");
 
     quote! {
@@ -26,7 +25,7 @@ pub fn ffi_constant(_attr: TokenStream, input: TokenStream) -> TokenStream {
             fn constant_info() -> interoptopus::lang::c::Constant {
 
                 let documentation = ::interoptopus::lang::c::Documentation::from_line(#doc_line);
-                let meta = ::interoptopus::lang::c::Meta::with_documentation(documentation, None);
+                let meta = ::interoptopus::lang::c::Meta::with_documentation(documentation);
                 let value = ::interoptopus::lang::c::ConstantValue::from(#const_ident);
 
                 ::interoptopus::lang::c::Constant::new(#const_name.to_string(), value, meta)

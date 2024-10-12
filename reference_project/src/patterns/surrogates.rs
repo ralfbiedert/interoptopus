@@ -11,7 +11,6 @@ mod foreign {
 
 // Instead, we create a local copy of that type with matching fields.
 #[ffi_type]
-#[repr(C)]
 pub struct Local {
     x: u32,
 }
@@ -24,7 +23,6 @@ unsafe impl CorrectSurrogate<foreign::SomeForeignType> for Local {}
 type SomeForeignType = Surrogate<foreign::SomeForeignType, Local>;
 
 #[ffi_type]
-#[repr(C)]
 pub struct Container {
     // We can then use the `Surrogate` type in our interfaces. It wil
     pub foreign: SomeForeignType,

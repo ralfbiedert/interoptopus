@@ -18,9 +18,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 9075871532317752825ul)
+            if (api_version != 4783779044017237555ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (9075871532317752825). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (4783779044017237555). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -910,7 +910,7 @@ namespace My.Company
     }
 
     [Serializable]
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [StructLayout(LayoutKind.Sequential)]
     public partial struct Packed1
     {
         public byte x;
@@ -918,7 +918,7 @@ namespace My.Company
     }
 
     [Serializable]
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [StructLayout(LayoutKind.Sequential)]
     public partial struct Packed2
     {
         public byte x;

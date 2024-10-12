@@ -337,7 +337,7 @@ pub trait CWriter {
     fn write_type_definition_composite_body(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
         let name = self.converter().composite_to_typename(the_type);
 
-        let alignment = the_type.meta().alignment();
+        let alignment = the_type.repr().alignment();
         if let Some(align) = alignment {
             indented!(w, "#pragma pack(push, {})", align)?;
         }
