@@ -49,16 +49,17 @@ pub fn pattern_callback_6() -> SumDelegate2 {
 
 #[ffi_function]
 pub fn pattern_callback_7(c1: SumDelegateReturn, c2: SumDelegateReturn2, x: i32, i: i32, o: &mut i32) -> FFIError {
-    // So the basic requirement here is that during that call
-    // the trampoline would catch an exception, then
-    // signal-return that an exception happened, then stop resuming
-    // what it does and return early itself, and then the function
-    // that actually invoked this one would pick that callback up
-    // and re-throw it.
-
     *o = i - 1;
 
-    c1.call(x, x);
+    // Call both callbacks. In C#, if the callback throws an exception, we might not re-enter
+    // and the rest of this function won't run (incl. not running `drop()` and doing other
+    // cleanup.
+    //
+    // Callbacks that return an `FFIError` can (if enabled in the C# backend) avoid that issue
+    // by doing some exception handling ping-pong; see the interoptopus_backend_csharp
+    // config setting `config.work_around_exception_in_callback_no_reentry`.
+    //
+    c1.call(x, x); // In a real world you'd also want to check the result here.
     c2.call(x, x);
 
     *o = i + 1;
