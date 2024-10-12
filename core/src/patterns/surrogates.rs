@@ -22,7 +22,6 @@
 //!
 //! // Create a LocalVec3 with matching fields to your upstream type.
 //! #[ffi_type]
-//! #[repr(C)]
 //! pub struct LocalVec3 {
 //!     x: f32,
 //!     y: f32,
@@ -37,8 +36,7 @@
 //! type Vec3 = Surrogate<foreign::Vec3, LocalVec3>;
 //!
 //! #[ffi_function]
-//! #[no_mangle]
-//! pub extern "C" fn do_compute(s: Vec3) {
+//! pub fn do_compute(s: Vec3) {
 //!     let vec: foreign::Vec3 = s.into_t();
 //! }
 //! ```

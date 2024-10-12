@@ -32,15 +32,13 @@
 //! use interoptopus::{ffi_function, ffi_type, Inventory, InventoryBuilder, function};
 //!
 //! #[ffi_type]
-//! #[repr(C)]
 //! pub struct Vec2 {
 //!     pub x: f32,
 //!     pub y: f32,
 //! }
 //!
 //! #[ffi_function]
-//! #[no_mangle]
-//! pub extern "C" fn my_function(input: Vec2) {
+//! pub fn my_function(input: Vec2) {
 //!     println!("{}", input.x);
 //! }
 //!
@@ -217,8 +215,7 @@ pub mod lang {
 /// use interoptopus::{ffi_function, Inventory, InventoryBuilder, function};
 ///
 /// #[ffi_function]
-/// #[no_mangle]
-/// pub extern "C" fn my_function() { }
+/// pub fn my_function() { }
 ///
 /// pub fn inventory() -> Inventory {
 ///     InventoryBuilder::new()
@@ -277,7 +274,6 @@ macro_rules! constant {
 /// use interoptopus::{ffi_type, Inventory, InventoryBuilder, extra_type};
 ///
 /// #[ffi_type]
-/// #[repr(C)]
 /// pub struct S<T> {
 ///     t: T
 /// };
@@ -324,7 +320,6 @@ macro_rules! extra_type {
 /// # impl std::error::Error for Error {}
 /// #
 /// # #[ffi_type(patterns(ffi_error))]
-/// # #[repr(C)]
 /// # pub enum MyFFIError {
 /// #     Ok = 0,
 /// #     NullPassed = 1,

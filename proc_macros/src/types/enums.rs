@@ -1,7 +1,6 @@
-use crate::types::Attributes;
+use crate::types::{type_repr_align, Attributes, TypeRepresentation};
 use crate::util::extract_doc_lines;
-use darling::ToTokens;
-use proc_macro2::{Ident, TokenStream};
+use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
 use syn::{Expr, ItemEnum, Lit};
 
@@ -25,8 +24,9 @@ fn derive_variant_info(item: ItemEnum, idents: &[Ident], names: &[String], value
     }
 }
 
-pub fn ffi_type_enum(attributes: &Attributes, input: TokenStream, item: ItemEnum) -> TokenStream {
+pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: ItemEnum) -> TokenStream {
     let doc_line = extract_doc_lines(&item.attrs).join("\n");
+    let (type_repr, align) = type_repr_align(attributes);
 
     let span = item.ident.span();
     let name = item.ident.to_string();
@@ -70,7 +70,7 @@ pub fn ffi_type_enum(attributes: &Attributes, input: TokenStream, item: ItemEnum
         }
     }
 
-    let variant_infos = derive_variant_info(item, &variant_idents, &variant_names, &variant_values, &variant_docs);
+    let variant_infos = derive_variant_info(item.clone(), &variant_idents, &variant_names, &variant_values, &variant_docs);
 
     let ctype_info_return = if attributes.patterns.contains_key("ffi_error") {
         quote! {
@@ -84,8 +84,41 @@ pub fn ffi_type_enum(attributes: &Attributes, input: TokenStream, item: ItemEnum
         quote! { ::interoptopus::lang::c::CType::Enum(rval) }
     };
 
+    let attr_align = match align {
+        Some(x) => {
+            let x_lit = syn::LitInt::new(&x.to_string(), Span::call_site());
+            quote! { , align( #x_lit ) }
+        }
+        None => quote! {},
+    };
+
+    let align = match align {
+        Some(x) => quote! { Some(#x) },
+        None => quote! { None },
+    };
+
+    let layout = match type_repr {
+        TypeRepresentation::C => quote! { ::interoptopus::lang::c::Layout::C },
+        TypeRepresentation::Transparent => quote! { ::interoptopus::lang::c::Layout::Transparent },
+        TypeRepresentation::Primitive(_) => quote! { compile_error!("TODO") },
+        _ => quote! { compile_error!("Unsupported repr for enum") },
+    };
+
+    let attr_repr = match type_repr {
+        TypeRepresentation::C => quote! { #[repr(C #attr_align)] },
+        TypeRepresentation::Transparent => quote! { #[repr(transparent #attr_align)] },
+        TypeRepresentation::Primitive(x) => quote! { #[repr(#x #attr_align)] },
+        _ => quote! { compile_error!("Unsupported repr for enum") },
+    };
+
+    if item.attrs.iter().any(|attr| attr.path().is_ident("repr")) {
+        panic!("Since 0.15 you must not add any `#[repr()] attributes to your enum; Interoptopus will handle that for you.");
+    } else {
+        item.attrs.push(syn::parse_quote!(#attr_repr));
+    }
+
     quote! {
-        #input
+        #item
 
         #variant_infos
 
@@ -101,8 +134,7 @@ pub fn ffi_type_enum(attributes: &Attributes, input: TokenStream, item: ItemEnum
                     variants.push(Self::#variant_idents.variant_info());
                 })*
 
-                let layout = ::interoptopus::lang::c::Layout::C;
-                let repr = ::interoptopus::lang::c::Representation::new(layout, None);
+                let repr = ::interoptopus::lang::c::Representation::new(#layout, #align);
                 let rval = ::interoptopus::lang::c::EnumType::new(#ffi_name.to_string(), variants, meta, repr);
 
                 #ctype_info_return

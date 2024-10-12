@@ -27,14 +27,12 @@ pub enum Symbol {
 /// // First, define some items our DLL uses or needs.
 ///
 /// #[ffi_function]
-/// #[no_mangle]
-/// pub extern "C" fn primitive_void() { }
+/// pub fn primitive_void() { }
 ///
 /// #[ffi_constant]
 /// pub const MY_CONSTANT: u32 = 123;
 ///
 /// #[ffi_type]
-/// #[repr(C)]
 /// pub struct ExtraType<T> {
 ///     x: T
 /// }

@@ -30,7 +30,6 @@
 
 use crate::lang::c::{EnumType, Variant};
 use crate::util::log_error;
-use crate::Error;
 use std::any::Any;
 use std::fmt::Debug;
 use std::panic::AssertUnwindSafe;
@@ -53,7 +52,6 @@ use std::panic::AssertUnwindSafe;
 ///
 /// // The error FFI users should see
 /// #[ffi_type(patterns(ffi_error))]
-/// #[repr(C)]
 /// enum MyFFIError {
 ///     Ok = 0,
 ///     NullPassed = 1,
@@ -156,7 +154,6 @@ impl FFIErrorEnum {
 ///
 /// // The FFI error the library users will see.
 /// #[ffi_type(patterns(ffi_error))]
-/// #[repr(C)]
 /// pub enum MyFFIError {
 ///     Ok = 0,
 ///     Null = 100,

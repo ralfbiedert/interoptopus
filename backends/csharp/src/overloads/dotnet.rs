@@ -119,7 +119,7 @@ impl OverloadWriter for DotNet {
         Ok(())
     }
 
-    fn write_delegate_overload(&self, w: &mut IndentWriter, h: Helper) -> Result<(), Error> {
+    fn write_delegate_overload(&self, _w: &mut IndentWriter, _h: Helper) -> Result<(), Error> {
         todo!()
     }
 

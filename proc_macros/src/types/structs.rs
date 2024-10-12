@@ -1,33 +1,9 @@
-use crate::types::Attributes;
+use crate::types::{type_repr_align, Attributes, TypeRepresentation};
 use crate::util::extract_doc_lines;
 use proc_macro2::{Span, TokenStream};
 use quote::{quote, ToTokens};
 use syn::spanned::Spanned;
 use syn::{GenericParam, ItemStruct, Type};
-
-#[derive(Debug, Clone, Copy)]
-pub enum TypeRepresentation {
-    C,
-    Transparent,
-    Packed,
-    Opaque,
-    Primitive(&'static str),
-}
-
-#[rustfmt::skip]
-fn type_repr_align(attributes: &Attributes, _: &ItemStruct) -> (TypeRepresentation, Option<usize>) {
-    let mut rval = (TypeRepresentation::C, attributes.align);
-
-    if attributes.opaque { rval.0 = TypeRepresentation::Opaque; }
-    if attributes.transparent { rval.0 = TypeRepresentation::Transparent; }
-    if attributes.packed { rval.0 = TypeRepresentation::Packed; }
-    if attributes.u8 { rval.0 = TypeRepresentation::Primitive("u8"); }
-    if attributes.u16 { rval.0 = TypeRepresentation::Primitive("u16"); }
-    if attributes.u32 { rval.0 = TypeRepresentation::Primitive("u32"); }
-    if attributes.u64 { rval.0 = TypeRepresentation::Primitive("u64"); }
-
-    rval
-}
 
 // Various Struct examples
 //
@@ -66,11 +42,11 @@ fn type_repr_align(attributes: &Attributes, _: &ItemStruct) -> (TypeRepresentati
 //
 // ```
 //
-pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, mut item: ItemStruct) -> TokenStream {
+pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: ItemStruct) -> TokenStream {
     let namespace = attributes.namespace.clone().unwrap_or_default();
     let doc_line = extract_doc_lines(&item.attrs).join("\n");
 
-    let (type_repr, align) = type_repr_align(attributes, &item);
+    let (type_repr, align) = type_repr_align(attributes);
 
     let struct_ident_str = item.ident.to_string();
     let struct_ident = syn::Ident::new(&struct_ident_str, item.ident.span());
@@ -216,7 +192,7 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, mut item: It
         TypeRepresentation::Transparent => quote! { ::interoptopus::lang::c::Layout::Transparent },
         TypeRepresentation::Packed => quote! { ::interoptopus::lang::c::Layout::Packed },
         TypeRepresentation::Opaque => quote! { ::interoptopus::lang::c::Layout::Opaque },
-        TypeRepresentation::Primitive(_) => quote! { compile_error!("ASDJSAKDASJKDASJD") },
+        TypeRepresentation::Primitive(_) => quote! { compile_error!("TODO") },
     };
 
     let attr_repr = match type_repr {
@@ -240,7 +216,7 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, mut item: It
     };
 
     if item.attrs.iter().any(|attr| attr.path().is_ident("repr")) {
-        panic!("Since 0.15 you must not add any `#[repr()] attributes to your type; Interoptopus will handle that for you.");
+        panic!("Since 0.15 you must not add any `#[repr()] attributes to your struct; Interoptopus will handle that for you.");
     } else {
         item.attrs.push(syn::parse_quote!(#attr_repr));
     }
@@ -283,7 +259,7 @@ pub fn ffi_type_struct(attributes: &Attributes, input: TokenStream, mut item: It
         }
         TypeRepresentation::Primitive(_) => {
             quote! {
-                compile_error!("XXXXXXXX");
+                compile_error!("Attributes u8, ..., u64 are only allowed on enums.");
             }
         }
     }

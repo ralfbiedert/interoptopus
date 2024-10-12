@@ -1,4 +1,4 @@
-use crate::patterns::result::{Error, FFIError};
+use crate::patterns::result::FFIError;
 use interoptopus::patterns::result::FFIDelegateError;
 use interoptopus::{callback, ffi_function, ffi_type};
 use std::ffi::c_void;

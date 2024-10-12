@@ -64,7 +64,6 @@ use proc_macro::TokenStream;
 ///
 /// #[ffi_type(opaque, name = "MyVec")]
 /// #[derive(Copy, Clone, Debug)]
-/// #[repr(C)]
 /// pub struct Vec2f32 {
 ///     pub x: f32,
 ///     pub y: f32,
@@ -106,8 +105,7 @@ pub fn ffi_type(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use interoptopus::ffi_function;
 ///
 /// #[ffi_function]
-/// #[no_mangle]
-/// pub extern "C" fn my_function(x: u32) -> u32 {
+/// pub fn my_function(x: u32) -> u32 {
 ///     x
 /// }
 /// ```
@@ -191,7 +189,6 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # impl std::error::Error for Error {}
 /// #
 /// # #[ffi_type(patterns(ffi_error))]
-/// # #[repr(C)]
 /// # pub enum MyFFIError {
 /// #     Ok = 0,
 /// #     NullPassed = 1,
@@ -268,7 +265,6 @@ pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # impl std::error::Error for Error {}
 /// #
 /// # #[ffi_type(patterns(ffi_error))]
-/// # #[repr(C)]
 /// # pub enum MyFFIError {
 /// #     Ok = 0,
 /// #     NullPassed = 1,
@@ -295,7 +291,7 @@ pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// #[ffi_type(opaque)]
 /// pub struct SimpleService { }
 ///
-/// #[ffi_service(error = "MyFFIError", prefix = "simple_service_")]
+/// #[ffi_service(error = "MyFFIError")]
 /// impl SimpleService {
 ///
 ///     #[ffi_service_ctor]
@@ -372,7 +368,6 @@ pub fn ffi_service_ctor(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # impl std::error::Error for Error {}
 /// #
 /// # #[ffi_type(patterns(ffi_error))]
-/// # #[repr(C)]
 /// # pub enum MyFFIError {
 /// #     Ok = 0,
 /// #     NullPassed = 1,

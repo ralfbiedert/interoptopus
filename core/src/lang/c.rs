@@ -12,7 +12,6 @@
 use crate::patterns::TypePattern;
 use crate::util::{ctypes_from_type_recursive, IdPrettifier};
 use std::collections::HashSet;
-use std::fmt::Alignment;
 use std::hash::{Hash, Hasher};
 
 // /// If a name like `abc::XXX` is given, strips the `abc::` part.

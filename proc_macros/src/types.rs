@@ -1,12 +1,11 @@
 use crate::macros::darling_parse;
 use crate::types::enums::ffi_type_enum;
 use crate::types::structs::ffi_type_struct;
-use darling::ast::NestedMeta;
-use darling::{Error, FromMeta};
+use darling::FromMeta;
 use proc_macro2::TokenStream;
 use quote::quote;
 use std::collections::HashMap;
-use syn::{Expr, Field, ItemEnum, ItemStruct, ItemType, Lit, Meta, Visibility};
+use syn::{Field, ItemEnum, ItemStruct, ItemType, Visibility};
 
 mod enums;
 mod structs;
@@ -81,6 +80,30 @@ impl Attributes {
 
         rval
     }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum TypeRepresentation {
+    C,
+    Transparent,
+    Packed,
+    Opaque,
+    Primitive(&'static str),
+}
+
+#[rustfmt::skip]
+fn type_repr_align(attributes: &Attributes) -> (TypeRepresentation, Option<usize>) {
+    let mut rval = (TypeRepresentation::C, attributes.align);
+
+    if attributes.opaque { rval.0 = TypeRepresentation::Opaque; }
+    if attributes.transparent { rval.0 = TypeRepresentation::Transparent; }
+    if attributes.packed { rval.0 = TypeRepresentation::Packed; }
+    if attributes.u8 { rval.0 = TypeRepresentation::Primitive("u8"); }
+    if attributes.u16 { rval.0 = TypeRepresentation::Primitive("u16"); }
+    if attributes.u32 { rval.0 = TypeRepresentation::Primitive("u32"); }
+    if attributes.u64 { rval.0 = TypeRepresentation::Primitive("u64"); }
+
+    rval
 }
 
 pub fn ffi_type(attr: TokenStream, input: TokenStream) -> TokenStream {
