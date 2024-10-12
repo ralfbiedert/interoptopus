@@ -10,3 +10,4 @@ members = [
     "examples/hello_world",
     "examples/unity_hot_reload"
 ]
+resolver = "2"

@@ -1,7 +1,7 @@
 [package]
 name = "unity_hot_reload"
 version = "0.1.15"
-edition = "2018"
+edition = "2021"
 publish = false
 
 
