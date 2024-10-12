@@ -11,16 +11,16 @@ using My.Company.Common;
 
 namespace My.Company
 {
-    public static partial class Interop
+    internal static partial class Interop
     {
         public const string NativeLib = "interoptopus_reference_project";
 
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 15732855954948975242ul)
+            if (api_version != 1956134695915137693ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (15732855954948975242). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (1956134695915137693). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -405,15 +405,17 @@ namespace My.Company
         public static extern SumDelegate2 pattern_callback_6();
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_7")]
-        public static extern FFIError pattern_callback_7(SumDelegateReturn callback, int x);
+        public static extern FFIError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o);
 
-        public static void pattern_callback_7_checked(SumDelegateReturn callback, int x)
+        public static void pattern_callback_7_checked(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o)
         {
-            var rval = pattern_callback_7(callback, x);;
+            var c1_safe_delegate = new SumDelegateReturnExceptionSafe(c1);
+            var rval = pattern_callback_7(c1_safe_delegate.Call, c2, x, i, out o);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
             }
+            c1_safe_delegate.Rethrow();
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_surrogates_1")]
@@ -799,7 +801,7 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Array
+    internal partial struct Array
     {
         public byte data0;
         public byte data1;
@@ -821,7 +823,7 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct BooleanAlignment
+    internal partial struct BooleanAlignment
     {
         public int a;
         public short b;
@@ -842,14 +844,14 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Container
+    internal partial struct Container
     {
         public Local foreign;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct DelegateCallbackMyCallbackContextual
+    internal partial struct DelegateCallbackMyCallbackContextual
     {
         public MyCallbackContextual callback;
         public IntPtr context;
@@ -857,42 +859,42 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct ExtraTypef32
+    internal partial struct ExtraTypef32
     {
         public float x;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Genericu32
+    internal partial struct Genericu32
     {
         public IntPtr x;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Genericu8
+    internal partial struct Genericu8
     {
         public IntPtr x;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Inner
+    internal partial struct Inner
     {
         float x;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Local
+    internal partial struct Local
     {
         uint x;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public partial struct Packed1
+    internal partial struct Packed1
     {
         public byte x;
         public ushort y;
@@ -900,7 +902,7 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public partial struct Packed2
+    internal partial struct Packed2
     {
         public ushort y;
         public byte x;
@@ -908,7 +910,7 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Phantomu8
+    internal partial struct Phantomu8
     {
         public uint x;
     }
@@ -916,7 +918,7 @@ namespace My.Company
     /// Documented struct.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct StructDocumented
+    internal partial struct StructDocumented
     {
         /// Documented field.
         public float x;
@@ -924,28 +926,28 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct StructRenamed
+    internal partial struct StructRenamed
     {
         public EnumRenamed e;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Tupled
+    internal partial struct Tupled
     {
         public byte x0;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct UseAsciiStringPattern
+    internal partial struct UseAsciiStringPattern
     {
         public string ascii_string;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Vec1
+    internal partial struct Vec1
     {
         public float x;
         public float y;
@@ -953,7 +955,7 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Vec2
+    internal partial struct Vec2
     {
         public double x;
         public double z;
@@ -961,7 +963,7 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Vec3f32
+    internal partial struct Vec3f32
     {
         public float x;
         public float y;
@@ -970,7 +972,7 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Visibility1
+    internal partial struct Visibility1
     {
         public byte pblc;
         byte prvt;
@@ -978,7 +980,7 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Visibility2
+    internal partial struct Visibility2
     {
         public byte pblc1;
         public byte pblc2;
@@ -986,14 +988,14 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Weird1u32
+    internal partial struct Weird1u32
     {
         uint x;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Weird2u8
+    internal partial struct Weird2u8
     {
         byte t;
         byte a0;
@@ -1005,7 +1007,7 @@ namespace My.Company
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);
+    internal delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);
 
     public enum FFIError
     {
@@ -1019,7 +1021,7 @@ namespace My.Company
     ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct SliceUseAsciiStringPattern
+    internal partial struct SliceUseAsciiStringPattern
     {
         ///Pointer to start of immutable data.
         IntPtr data;
@@ -1027,7 +1029,7 @@ namespace My.Company
         ulong len;
     }
 
-    public partial struct SliceUseAsciiStringPattern : IEnumerable<UseAsciiStringPattern>
+    internal partial struct SliceUseAsciiStringPattern : IEnumerable<UseAsciiStringPattern>
     {
         public SliceUseAsciiStringPattern(GCHandle handle, ulong count)
         {
@@ -1078,7 +1080,7 @@ namespace My.Company
     ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct SliceVec3f32
+    internal partial struct SliceVec3f32
     {
         ///Pointer to start of immutable data.
         IntPtr data;
@@ -1086,7 +1088,7 @@ namespace My.Company
         ulong len;
     }
 
-    public partial struct SliceVec3f32 : IEnumerable<Vec3f32>
+    internal partial struct SliceVec3f32 : IEnumerable<Vec3f32>
     {
         public SliceVec3f32(GCHandle handle, ulong count)
         {
@@ -1137,7 +1139,7 @@ namespace My.Company
     ///Option type containing boolean flag and maybe valid data.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct OptionInner
+    internal partial struct OptionInner
     {
         ///Element that is maybe valid.
         Inner t;
@@ -1145,7 +1147,7 @@ namespace My.Company
         byte is_some;
     }
 
-    public partial struct OptionInner
+    internal partial struct OptionInner
     {
         public static OptionInner FromNullable(Inner? nullable)
         {
@@ -1167,41 +1169,73 @@ namespace My.Company
 
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate byte CallbackFFISlice(Sliceu8 slice);
+    internal delegate byte CallbackFFISlice(Sliceu8 slice);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate Vec3f32 CallbackHugeVecSlice(SliceVec3f32 slice);
+    internal delegate Vec3f32 CallbackHugeVecSlice(SliceVec3f32 slice);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void CallbackSliceMut(SliceMutu8 slice);
+    internal delegate void CallbackSliceMut(SliceMutu8 slice);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate byte CallbackU8(byte value);
+    internal delegate byte CallbackU8(byte value);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint MyCallback(uint value);
+    internal delegate uint MyCallback(uint value);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void MyCallbackContextual(IntPtr context, uint value);
+    internal delegate void MyCallbackContextual(IntPtr context, uint value);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint MyCallbackNamespaced(uint value);
+    internal delegate void MyCallbackVoid(IntPtr ptr);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void MyCallbackVoid(IntPtr ptr);
+    internal delegate void SumDelegate1();
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void SumDelegate1();
+    internal delegate int SumDelegate2(int x, int y);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate int SumDelegate2(int x, int y);
+    internal delegate FFIError SumDelegateReturn(int x, int y);
+
+    // Internal helper that works around an issue where exceptions in callbacks don't reenter Rust.
+    internal class SumDelegateReturnExceptionSafe {
+        private Exception failure = null;
+        private readonly SumDelegateReturn _callback;
+
+        public SumDelegateReturnExceptionSafe(SumDelegateReturn original)
+        {
+            _callback = original;
+        }
+
+        public FFIError Call(int x, int y)
+        {
+            try
+            {
+                return _callback(x, y);
+            }
+            catch (Exception e)
+            {
+                failure = e;
+                return FFIError.Panic;
+            }
+        }
+
+        public void Rethrow()
+        {
+            if (this.failure != null)
+            {
+                throw this.failure;
+            }
+        }
+    }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate FFIError SumDelegateReturn(int x, int y);
+    internal delegate void SumDelegateReturn2(int x, int y);
 
 
     /// Some struct we want to expose as a class.
-    public partial class SimpleService : IDisposable
+    internal partial class SimpleService : IDisposable
     {
         private IntPtr _context;
 
@@ -1410,7 +1444,7 @@ namespace My.Company
     }
 
 
-    public partial class SimpleServiceLifetime : IDisposable
+    internal partial class SimpleServiceLifetime : IDisposable
     {
         private IntPtr _context;
 

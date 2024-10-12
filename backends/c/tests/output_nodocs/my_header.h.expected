@@ -168,6 +168,8 @@ typedef int32_t (*my_library_sumdelegate2)(int32_t x, int32_t y);
 
 typedef my_library_ffierror (*my_library_sumdelegatereturn)(int32_t x, int32_t y);
 
+typedef void (*my_library_sumdelegatereturn2)(int32_t x, int32_t y);
+
 typedef struct my_library_array
     {
     uint8_t data[16];
@@ -351,7 +353,7 @@ void pattern_callback_3(my_library_delegatecallbackmycallbackcontextual callback
 uint32_t pattern_callback_4(my_library_mycallbacknamespaced callback, uint32_t x);
 my_library_sumdelegate1 pattern_callback_5();
 my_library_sumdelegate2 pattern_callback_6();
-my_library_ffierror pattern_callback_7(my_library_sumdelegatereturn callback, int32_t x);
+my_library_ffierror pattern_callback_7(my_library_sumdelegatereturn c1, my_library_sumdelegatereturn2 c2, int32_t x, int32_t i, int32_t* o);
 void pattern_surrogates_1(my_library_local s, my_library_container* c);
 my_library_ffierror simple_service_destroy(my_library_simpleservice** context);
 my_library_ffierror simple_service_new_with(my_library_simpleservice** context, uint32_t some_value);

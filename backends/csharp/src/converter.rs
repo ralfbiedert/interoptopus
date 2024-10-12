@@ -205,7 +205,7 @@ pub trait CSharpTypeConverter {
         }
     }
 
-    fn function_parameter_to_csharp_typename(&self, x: &Parameter, _function: &Function) -> String {
+    fn function_parameter_to_csharp_typename(&self, x: &Parameter) -> String {
         self.to_typespecifier_in_param(x.the_type())
     }
 

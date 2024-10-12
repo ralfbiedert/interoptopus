@@ -2,6 +2,7 @@ use crate::converter::FunctionNameFlavor;
 use crate::overloads::{write_common_service_method_overload, write_function_overloaded_invoke_with_error_handling, Helper};
 use crate::OverloadWriter;
 use interoptopus::lang::c::{CType, CompositeType, Field, Function, FunctionSignature, Parameter};
+use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::{IndentWriter, WriteFor};
@@ -123,7 +124,7 @@ impl Unity {
             let the_type = match p.the_type() {
                 CType::FnPointer(_) => "IntPtr".to_string(),
                 CType::Pattern(TypePattern::NamedCallback(_)) => "IntPtr".to_string(),
-                _ => h.converter.function_parameter_to_csharp_typename(p, function),
+                _ => h.converter.function_parameter_to_csharp_typename(p),
             };
 
             params.push(format!("{} {}", the_type, name));
@@ -179,7 +180,7 @@ impl OverloadWriter for Unity {
         Ok(())
     }
 
-    fn write_delegate_overload(&self, _w: &mut IndentWriter, _h: Helper) -> Result<(), Error> {
+    fn write_callback_overload(&self, _w: &mut IndentWriter, _h: Helper, _the_type: &NamedCallback) -> Result<(), Error> {
         Ok(())
     }
 
@@ -240,7 +241,7 @@ impl OverloadWriter for Unity {
         for (_, p) in function.signature().params().iter().enumerate() {
             let name = p.name();
             let native = self.pattern_to_native_in_signature(&h, p, function.signature());
-            let the_type = h.converter.function_parameter_to_csharp_typename(p, function);
+            let the_type = h.converter.function_parameter_to_csharp_typename(p);
 
             let mut fallback = || {
                 if native.contains("out ") {

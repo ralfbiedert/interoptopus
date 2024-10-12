@@ -113,6 +113,10 @@ pub struct Config {
     pub rename_symbols: bool,
     /// Also generate markers for easier debugging
     pub debug: bool,
+    /// Whether we should attempt to work around issues where a callback back to C# might not
+    /// reenter Rust code when an exception happened. This requires callbacks to return
+    /// an FFIError type.   
+    pub work_around_exception_in_callback_no_reentry: bool,
     /// If signatures that normally use arrays should instead use span and readonly span.
     /// Requires use_unsafe, as pinning spans requires the fixed keyword.
     pub param_slice_type: ParamSliceType,
@@ -137,6 +141,7 @@ impl Default for Config {
             use_unsafe: Unsafe::None,
             rename_symbols: false,
             debug: false,
+            work_around_exception_in_callback_no_reentry: true,
             param_slice_type: ParamSliceType::Array,
             unsupported: Unsupported::Panic,
         }

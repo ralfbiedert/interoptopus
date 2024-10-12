@@ -1,5 +1,4 @@
 use crate::patterns::result::FFIError;
-use interoptopus::patterns::result::FFIDelegateError;
 use interoptopus::{callback, ffi_function, ffi_type};
 use std::ffi::c_void;
 
@@ -10,6 +9,7 @@ callback!(MyCallbackContextual(context: *const c_void, value: u32));
 callback!(SumDelegate1());
 callback!(SumDelegate2(x: i32, y: i32) -> i32);
 callback!(SumDelegateReturn(x: i32, y: i32) -> FFIError);
+callback!(SumDelegateReturn2(x: i32, y: i32));
 
 #[ffi_type]
 pub struct DelegateCallback<C> {
@@ -48,17 +48,22 @@ pub fn pattern_callback_6() -> SumDelegate2 {
 }
 
 #[ffi_function]
-pub fn pattern_callback_7(callback: SumDelegateReturn, x: i32) -> FFIError {
+pub fn pattern_callback_7(c1: SumDelegateReturn, c2: SumDelegateReturn2, x: i32, i: i32, o: &mut i32) -> FFIError {
     // So the basic requirement here is that during that call
     // the trampoline would catch an exception, then
     // signal-return that an exception happened, then stop resuming
     // what it does and return early itself, and then the function
     // that actually invoked this one would pick that callback up
     // and re-throw it.
-    match callback.call(x, x).ok() {
-        Ok(_) => todo!(),
-        Err(_) => todo!(),
-    }
+
+    *o = i - 1;
+
+    c1.call(x, x);
+    c2.call(x, x);
+
+    *o = i + 1;
+
+    FFIError::Ok
 }
 
 pub extern "C" fn exposed_sum1() {}

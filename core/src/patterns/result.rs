@@ -83,12 +83,8 @@ pub trait FFIError: Sized {
     const NULL: Self;
     /// The panic variant. Once this is observed no further calls should be attempted.
     const PANIC: Self;
-}
 
-pub trait FFIDelegateError<E>: Sized {
-    const DELEGATE: Self;
-
-    fn ok(&self) -> Result<(), E>;
+    // fn ok(self) -> Result<(), E>;
 }
 
 // #[repr(C)]
@@ -107,11 +103,16 @@ pub trait FFIDelegateError<E>: Sized {
 pub struct FFIErrorEnum {
     the_enum: EnumType,
     success_variant: Variant,
+    panic_variant: Variant,
 }
 
 impl FFIErrorEnum {
-    pub fn new(the_enum: EnumType, success_variant: Variant) -> Self {
-        Self { the_enum, success_variant }
+    pub fn new(the_enum: EnumType, success_variant: Variant, panic_variant: Variant) -> Self {
+        Self {
+            the_enum,
+            success_variant,
+            panic_variant,
+        }
     }
 
     pub fn the_enum(&self) -> &EnumType {
@@ -120,6 +121,10 @@ impl FFIErrorEnum {
 
     pub fn success_variant(&self) -> &Variant {
         &self.success_variant
+    }
+
+    pub fn panic_variant(&self) -> &Variant {
+        &self.panic_variant
     }
 }
 

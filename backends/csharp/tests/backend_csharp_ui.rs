@@ -36,8 +36,8 @@ fn generate_bindings_multi(folder: impl AsRef<Path>, use_unsafe: Unsafe, param_s
     let config = config.unwrap_or(Config {
         dll_name: "interoptopus_reference_project".to_string(),
         namespace_mappings,
-        visibility_types: CSharpVisibility::AsDeclared,
         unsupported: Unsupported::Comment,
+        visibility_types: CSharpVisibility::ForceInternal,
         param_slice_type,
         use_unsafe,
         ..Config::default()

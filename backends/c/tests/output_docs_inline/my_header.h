@@ -180,6 +180,8 @@ typedef int32_t (*my_library_sum_delegate2)(int32_t x, int32_t y);
 
 typedef my_library_ffi_error (*my_library_sum_delegate_return)(int32_t x, int32_t y);
 
+typedef void (*my_library_sum_delegate_return2)(int32_t x, int32_t y);
+
 typedef struct my_library_array
 {
     uint8_t data[16];
@@ -473,7 +475,7 @@ my_library_sum_delegate1 pattern_callback_5();
 
 my_library_sum_delegate2 pattern_callback_6();
 
-my_library_ffi_error pattern_callback_7(my_library_sum_delegate_return callback, int32_t x);
+my_library_ffi_error pattern_callback_7(my_library_sum_delegate_return c1, my_library_sum_delegate_return2 c2, int32_t x, int32_t i, int32_t* o);
 
 void pattern_surrogates_1(my_library_local s, my_library_container* c);
 

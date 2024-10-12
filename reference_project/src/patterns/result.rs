@@ -7,6 +7,7 @@ use std::fmt::{Display, Formatter};
 // This is the FFI error enum you want your users to see. You are free to name and implement this
 // almost any way you want.
 #[ffi_type(error)]
+#[derive(PartialOrd, PartialEq, Copy, Clone)]
 pub enum FFIError {
     Ok = 0,
     Null = 100,
@@ -45,14 +46,6 @@ impl interoptopus::patterns::result::FFIError for FFIError {
     const SUCCESS: Self = Self::Ok;
     const NULL: Self = Self::Null;
     const PANIC: Self = Self::Panic;
-}
-
-impl interoptopus::patterns::result::FFIDelegateError<Error> for FFIError {
-    const DELEGATE: Self = Self::Delegate;
-
-    fn ok(&self) -> Result<(), Error> {
-        todo!()
-    }
 }
 
 // Lazy "Display" implementation so your error can be logged.

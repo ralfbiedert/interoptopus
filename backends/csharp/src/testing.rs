@@ -20,6 +20,7 @@ pub fn run_dotnet_command_if_installed(path: impl AsRef<Path>, command: &str) ->
     if output.status.success() {
         Ok(output.status.to_string())
     } else {
+        dbg!(output.stdout);
         Err(Error::TestFailed)
     }
 }

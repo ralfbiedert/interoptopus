@@ -83,7 +83,7 @@ def init_lib(path):
     c_lib.pattern_callback_4.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32), ctypes.c_uint32]
     c_lib.pattern_callback_5.argtypes = []
     c_lib.pattern_callback_6.argtypes = []
-    c_lib.pattern_callback_7.argtypes = [ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32), ctypes.c_int32]
+    c_lib.pattern_callback_7.argtypes = [ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32), ctypes.CFUNCTYPE(None, ctypes.c_int32, ctypes.c_int32), ctypes.c_int32, ctypes.c_int32, ctypes.POINTER(ctypes.c_int32)]
     c_lib.pattern_surrogates_1.argtypes = [Local, ctypes.POINTER(Container)]
     c_lib.simple_service_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.simple_service_new_with.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.c_uint32]
@@ -495,11 +495,14 @@ def pattern_callback_5():
 def pattern_callback_6():
     return c_lib.pattern_callback_6()
 
-def pattern_callback_7(callback, x: int):
-    if not hasattr(callback, "__ctypes_from_outparam__"):
-        callback = callbacks.fn_i32_i32_rval_FFIError(callback)
+def pattern_callback_7(c1, c2, x: int, i: int, o: ctypes.POINTER(ctypes.c_int32)):
+    if not hasattr(c1, "__ctypes_from_outparam__"):
+        c1 = callbacks.fn_i32_i32_rval_FFIError(c1)
 
-    return c_lib.pattern_callback_7(callback, x)
+    if not hasattr(c2, "__ctypes_from_outparam__"):
+        c2 = callbacks.fn_i32_i32(c2)
+
+    return c_lib.pattern_callback_7(c1, c2, x, i, o)
 
 def pattern_surrogates_1(s: Local, c: ctypes.POINTER(Container)):
     return c_lib.pattern_surrogates_1(s, c)
@@ -1893,6 +1896,7 @@ class callbacks:
     fn = ctypes.CFUNCTYPE(None, )
     fn_i32_i32_rval_i32 = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_int32, ctypes.c_int32)
     fn_i32_i32_rval_FFIError = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32)
+    fn_i32_i32 = ctypes.CFUNCTYPE(None, ctypes.c_int32, ctypes.c_int32)
 
 
 class SimpleService:

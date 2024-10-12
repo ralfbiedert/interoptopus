@@ -4,10 +4,12 @@ use crate::overloads::{write_common_service_method_overload, write_function_over
 use crate::{OverloadWriter, Unsafe};
 use core::panic;
 use interoptopus::lang::c::{CType, CompositeType, Field, Function, FunctionSignature, Parameter};
+use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, Error};
+use std::iter::zip;
 use std::ops::Deref;
 
 /// **Highly recommended**, provides most convenience methods.
@@ -36,7 +38,7 @@ impl DotNet {
         })
     }
 
-    fn pattern_to_native_in_signature(&self, h: &Helper, param: &Parameter, _signature: &FunctionSignature) -> String {
+    fn pattern_to_native_in_signature(&self, h: &Helper, param: &Parameter) -> String {
         if h.config.use_unsafe == Unsafe::None && h.config.param_slice_type == ParamSliceType::Span {
             panic!("param_slice_type: Span requires unsafe support (use_unsafe must be anything other than None)");
         }
@@ -119,8 +121,64 @@ impl OverloadWriter for DotNet {
         Ok(())
     }
 
-    fn write_delegate_overload(&self, _w: &mut IndentWriter, _h: Helper) -> Result<(), Error> {
-        todo!()
+    fn write_callback_overload(&self, w: &mut IndentWriter, h: Helper, the_type: &NamedCallback) -> Result<(), Error> {
+        if !h.config.work_around_exception_in_callback_no_reentry {
+            return Ok(());
+        }
+
+        let ffi_error = match the_type.fnpointer().signature().rval() {
+            CType::Pattern(TypePattern::FFIErrorEnum(rval)) => rval,
+            _ => return Ok(()),
+        };
+
+        let name = format!("{}ExceptionSafe", the_type.name());
+        let rval = h.converter.to_typespecifier_in_rval(the_type.fnpointer().signature().rval());
+        let mut function_signature = Vec::new();
+        let mut function_param_names = Vec::new();
+
+        for p in the_type.fnpointer().signature().params().iter() {
+            let name = p.name();
+            let the_type = h.converter.function_parameter_to_csharp_typename(p);
+
+            let x = format!("{} {}", the_type, name);
+            function_signature.push(x);
+            function_param_names.push(name);
+        }
+
+        w.newline()?;
+        indented!(w, "// Internal helper that works around an issue where exceptions in callbacks don't reenter Rust.")?;
+        indented!(w, "{} class {} {{", h.config.visibility_types.to_access_modifier(), name)?;
+        indented!(w, [_], "private Exception failure = null;")?;
+        indented!(w, [_], "private readonly {} _callback;", the_type.name())?;
+        w.newline()?;
+        indented!(w, [_], "public {}({} original)", name, the_type.name())?;
+        indented!(w, [_], "{{")?;
+        indented!(w, [_ _], "_callback = original;")?;
+        indented!(w, [_], "}}")?;
+        w.newline()?;
+        indented!(w, [_], "public {} Call({})", rval, function_signature.join(", "))?;
+        indented!(w, [_], "{{")?;
+        indented!(w, [_ _], "try")?;
+        indented!(w, [_ _], "{{")?;
+        indented!(w, [_ _ _], "return _callback({});", function_param_names.join(", "))?;
+        indented!(w, [_ _], "}}")?;
+        indented!(w, [_ _], "catch (Exception e)")?;
+        indented!(w, [_ _], "{{")?;
+        indented!(w, [_ _ _], "failure = e;")?;
+        indented!(w, [_ _ _], "return {}.{};", rval, ffi_error.panic_variant().name())?;
+        indented!(w, [_ _], "}}")?;
+        indented!(w, [_], "}}")?;
+        w.newline()?;
+        indented!(w, [_], "public void Rethrow()")?;
+        indented!(w, [_], "{{")?;
+        indented!(w, [_ _], "if (this.failure != null)")?;
+        indented!(w, [_ _], "{{")?;
+        indented!(w, [_ _ _], "throw this.failure;")?;
+        indented!(w, [_ _], "}}")?;
+        indented!(w, [_], "}}")?;
+        indented!(w, "}}")?;
+
+        Ok(())
     }
 
     fn write_function_overload(&self, w: &mut IndentWriter, h: Helper, function: &Function, write_for: WriteFor) -> Result<(), Error> {
@@ -135,6 +193,9 @@ impl OverloadWriter for DotNet {
         let mut to_pin_name = Vec::new();
         let mut to_pin_slice_type = Vec::new();
         let mut to_invoke = Vec::new();
+        let mut to_wrap_delegates = Vec::new();
+        let mut to_wrap_delegate_types = Vec::new();
+
         let raw_name = h.converter.function_name_to_csharp_name(
             function,
             match h.config.rename_symbols {
@@ -157,8 +218,8 @@ impl OverloadWriter for DotNet {
         let mut params = Vec::new();
         for (_, p) in function.signature().params().iter().enumerate() {
             let name = p.name();
-            let native = self.pattern_to_native_in_signature(&h, p, function.signature());
-            let the_type = h.converter.function_parameter_to_csharp_typename(p, function);
+            let native = self.pattern_to_native_in_signature(&h, p);
+            let the_type = h.converter.function_parameter_to_csharp_typename(p);
 
             let mut fallback = || {
                 if native.contains("out ") {
@@ -176,6 +237,14 @@ impl OverloadWriter for DotNet {
                     to_pin_slice_type.push(the_type);
                     to_invoke.push(format!("{}_slice", name));
                 }
+                CType::Pattern(TypePattern::NamedCallback(callback)) => match callback.fnpointer().signature().rval() {
+                    CType::Pattern(TypePattern::FFIErrorEnum(_)) if h.config.work_around_exception_in_callback_no_reentry => {
+                        to_wrap_delegates.push(name);
+                        to_wrap_delegate_types.push(h.converter.to_typespecifier_in_param(p.the_type()));
+                        to_invoke.push(format!("{}_safe_delegate.Call", name));
+                    }
+                    _ => fallback(),
+                },
                 CType::ReadPointer(x) | CType::ReadWritePointer(x) => match x.deref() {
                     CType::Pattern(x) => match x {
                         TypePattern::Slice(_) => {
@@ -213,6 +282,10 @@ impl OverloadWriter for DotNet {
         indented!(w, "{}", signature)?;
         indented!(w, r#"{{"#)?;
 
+        for (name, ty) in zip(&to_wrap_delegates, &to_wrap_delegate_types) {
+            indented!(w, [_], r#"var {}_safe_delegate = new {}ExceptionSafe({});"#, name, ty, name)?;
+        }
+
         if h.config.use_unsafe.any_unsafe() {
             if !to_pin_name.is_empty() {
                 indented!(w, [_], r#"unsafe"#)?;
@@ -237,6 +310,10 @@ impl OverloadWriter for DotNet {
             let call = format!(r#"{}({});"#, fn_name, to_invoke.join(", "));
 
             write_function_overloaded_invoke_with_error_handling(w, function, &call)?;
+
+            for name in to_wrap_delegates {
+                indented!(w, [_], r#"{}_safe_delegate.Rethrow();"#, name)?;
+            }
 
             if !to_pin_name.is_empty() {
                 for _ in to_pin_name.iter() {
@@ -276,7 +353,12 @@ impl OverloadWriter for DotNet {
                 },
             );
             let call = format!(r#"{}({});"#, fn_name, to_invoke.join(", "));
+
             write_function_overloaded_invoke_with_error_handling(w, function, &call)?;
+
+            for name in to_wrap_delegates {
+                indented!(w, [_], r#"{}_safe_delegate.Rethrow();"#, name)?;
+            }
 
             if !to_pin_name.is_empty() {
                 w.unindent();
@@ -311,14 +393,7 @@ impl OverloadWriter for DotNet {
             self.write_documentation(w, function.meta().documentation())?;
         }
 
-        write_common_service_method_overload(
-            w,
-            h,
-            function,
-            fn_pretty,
-            |h, p| self.pattern_to_native_in_signature(h, p, function.signature()),
-            write_for,
-        )?;
+        write_common_service_method_overload(w, h, function, fn_pretty, |h, p| self.pattern_to_native_in_signature(h, p), write_for)?;
 
         Ok(())
     }

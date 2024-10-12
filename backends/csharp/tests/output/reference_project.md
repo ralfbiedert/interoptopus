@@ -1469,9 +1469,9 @@ public static extern SumDelegate2 pattern_callback_6();
 ### <a name="pattern_callback_7">**pattern_callback_7**</a>
 #### Definition 
 ```csharp
-public static extern FFIError pattern_callback_7(SumDelegateReturn callback, int x);
-public static void pattern_callback_7_checked(SumDelegateReturn callback, int x);
-public static extern FFIError pattern_callback_7(IntPtr callback, int x);
+public static extern FFIError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o);
+public static void pattern_callback_7_checked(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o);
+public static extern FFIError pattern_callback_7(IntPtr c1, IntPtr c2, int x, int i, out int o);
 ```
 
 ---

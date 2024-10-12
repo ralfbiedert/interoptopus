@@ -1599,7 +1599,7 @@ def pattern_callback_6():
 ## pattern_callback_7 
 #### Definition 
 ```python
-def pattern_callback_7(callback, x: int):
+def pattern_callback_7(c1, c2, x: int, i: int, o: ctypes.POINTER(ctypes.c_int32)):
     ...
 ```
 

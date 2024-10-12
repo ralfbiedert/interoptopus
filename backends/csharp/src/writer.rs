@@ -180,7 +180,7 @@ pub trait CSharpWriter {
 
         let mut params = Vec::new();
         for (_, p) in function.signature().params().iter().enumerate() {
-            let the_type = self.converter().function_parameter_to_csharp_typename(p, function);
+            let the_type = self.converter().function_parameter_to_csharp_typename(p);
             let name = p.name();
 
             params.push(format!("{} {}", the_type, name));
@@ -299,6 +299,11 @@ pub trait CSharpWriter {
         self.debug(w, "write_type_definition_named_callback")?;
         self.write_type_definition_fn_pointer_annotation(w, the_type.fnpointer())?;
         self.write_type_definition_named_callback_body(w, the_type)?;
+
+        for overload in self.overloads() {
+            overload.write_callback_overload(w, self.helper(), the_type)?;
+        }
+
         Ok(())
     }
 

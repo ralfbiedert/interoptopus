@@ -14,19 +14,19 @@ namespace My.Company.Common
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Vec
+    internal partial struct Vec
     {
         public double x;
         public double z;
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);
+    internal delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);
 
     ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct SliceBool
+    internal partial struct SliceBool
     {
         ///Pointer to start of immutable data.
         IntPtr data;
@@ -34,7 +34,7 @@ namespace My.Company.Common
         ulong len;
     }
 
-    public partial struct SliceBool : IEnumerable<Bool>
+    internal partial struct SliceBool : IEnumerable<Bool>
     {
         public SliceBool(GCHandle handle, ulong count)
         {
@@ -85,7 +85,7 @@ namespace My.Company.Common
     ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct SliceVec
+    internal partial struct SliceVec
     {
         ///Pointer to start of immutable data.
         IntPtr data;
@@ -93,7 +93,7 @@ namespace My.Company.Common
         ulong len;
     }
 
-    public partial struct SliceVec : IEnumerable<Vec>
+    internal partial struct SliceVec : IEnumerable<Vec>
     {
         public SliceVec(GCHandle handle, ulong count)
         {
@@ -144,7 +144,7 @@ namespace My.Company.Common
     ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Sliceu32
+    internal partial struct Sliceu32
     {
         ///Pointer to start of immutable data.
         IntPtr data;
@@ -152,7 +152,7 @@ namespace My.Company.Common
         ulong len;
     }
 
-    public partial struct Sliceu32 : IEnumerable<uint>
+    internal partial struct Sliceu32 : IEnumerable<uint>
     {
         public Sliceu32(GCHandle handle, ulong count)
         {
@@ -203,7 +203,7 @@ namespace My.Company.Common
     ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Sliceu8
+    internal partial struct Sliceu8
     {
         ///Pointer to start of immutable data.
         IntPtr data;
@@ -211,7 +211,7 @@ namespace My.Company.Common
         ulong len;
     }
 
-    public partial struct Sliceu8 : IEnumerable<byte>
+    internal partial struct Sliceu8 : IEnumerable<byte>
     {
         public Sliceu8(GCHandle handle, ulong count)
         {
@@ -262,7 +262,7 @@ namespace My.Company.Common
     ///A pointer to an array of data someone else owns which may be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct SliceMutVec
+    internal partial struct SliceMutVec
     {
         ///Pointer to start of mutable data.
         IntPtr data;
@@ -270,7 +270,7 @@ namespace My.Company.Common
         ulong len;
     }
 
-    public partial struct SliceMutVec : IEnumerable<Vec>
+    internal partial struct SliceMutVec : IEnumerable<Vec>
     {
         public SliceMutVec(GCHandle handle, ulong count)
         {
@@ -328,7 +328,7 @@ namespace My.Company.Common
     ///A pointer to an array of data someone else owns which may be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct SliceMutu32
+    internal partial struct SliceMutu32
     {
         ///Pointer to start of mutable data.
         IntPtr data;
@@ -336,7 +336,7 @@ namespace My.Company.Common
         ulong len;
     }
 
-    public partial struct SliceMutu32 : IEnumerable<uint>
+    internal partial struct SliceMutu32 : IEnumerable<uint>
     {
         public SliceMutu32(GCHandle handle, ulong count)
         {
@@ -394,7 +394,7 @@ namespace My.Company.Common
     ///A pointer to an array of data someone else owns which may be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct SliceMutu8
+    internal partial struct SliceMutu8
     {
         ///Pointer to start of mutable data.
         IntPtr data;
@@ -402,7 +402,7 @@ namespace My.Company.Common
         ulong len;
     }
 
-    public partial struct SliceMutu8 : IEnumerable<byte>
+    internal partial struct SliceMutu8 : IEnumerable<byte>
     {
         public SliceMutu8(GCHandle handle, ulong count)
         {
@@ -460,7 +460,7 @@ namespace My.Company.Common
     ///Option type containing boolean flag and maybe valid data.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct OptionVec
+    internal partial struct OptionVec
     {
         ///Element that is maybe valid.
         Vec t;
@@ -468,7 +468,7 @@ namespace My.Company.Common
         byte is_some;
     }
 
-    public partial struct OptionVec
+    internal partial struct OptionVec
     {
         public static OptionVec FromNullable(Vec? nullable)
         {
@@ -491,12 +491,12 @@ namespace My.Company.Common
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Bool
+    internal partial struct Bool
     {
         byte value;
     }
 
-    public partial struct Bool
+    internal partial struct Bool
     {
         public static readonly Bool True = new Bool { value =  1 };
         public static readonly Bool False = new Bool { value =  0 };
@@ -509,37 +509,7 @@ namespace My.Company.Common
 
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate byte CallbackFFISlice(Sliceu8 slice);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate Vec3f32 CallbackHugeVecSlice(SliceVec3f32 slice);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void CallbackSliceMut(SliceMutu8 slice);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate byte CallbackU8(byte value);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint MyCallback(uint value);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void MyCallbackContextual(IntPtr context, uint value);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint MyCallbackNamespaced(uint value);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void MyCallbackVoid(IntPtr ptr);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void SumDelegate1();
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate int SumDelegate2(int x, int y);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate FFIError SumDelegateReturn(int x, int y);
+    internal delegate uint MyCallbackNamespaced(uint value);
 
 
 

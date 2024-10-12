@@ -62,6 +62,7 @@ mod unity;
 use crate::converter::FunctionNameFlavor;
 use crate::{CSharpTypeConverter, Config};
 pub use dotnet::DotNet;
+use interoptopus::patterns::callbacks::NamedCallback;
 pub use unity::Unity;
 
 #[doc(hidden)]
@@ -76,7 +77,7 @@ pub trait OverloadWriter {
 
     fn write_field_decorators(&self, w: &mut IndentWriter, h: Helper, field: &Field, strct: &CompositeType) -> Result<(), Error>;
 
-    fn write_delegate_overload(&self, w: &mut IndentWriter, h: Helper) -> Result<(), Error>;
+    fn write_callback_overload(&self, w: &mut IndentWriter, h: Helper, the_type: &NamedCallback) -> Result<(), Error>;
 
     fn write_function_overload(&self, w: &mut IndentWriter, h: Helper, function: &Function, write_for: WriteFor) -> Result<(), Error>;
 
