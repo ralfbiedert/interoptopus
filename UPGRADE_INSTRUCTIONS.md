@@ -4,22 +4,22 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
 
 ### 0.14 → 0.15
 
+- Exported functions (`#[ffi_function]`) don't need to specify `#[no_mangle]` or `extern "C"` anymore as these will be
+  added automatically.
+- Exported types (`#[ffi_type]`) must not specify `#[repr(...)]` anymore as we will handle that. If you need custom
+  attributes you can, for example, do `#[ffi_type(transparent)]` or `#[ffi_type(packed)]`.
+- In service definitions, providing a `prefix` is generally not needed anymore.
+- Service methods that return void (`()`) can now be used without a `#[ffi_service_method]` annotation. On a Rust panic
+  they will silently return. If this is not acceptable you must return `Result` or specify a different panic behavior
+  via that attribute.
+- `#[ffi_type(patterns(ffi_error))]` is now `#[ffi_type(error)]`.
+- `AsciiPointer` is now called `CStrPointer`, since it can contain non-ASCII data (e.g., when called from C#).
 - To override visibility for all fields:
     - Previously you had to `#[ffi_type(visibility(_ = "public"))]`
     - Now you do `#[ffi_type(visibility(_all = "public"))]`
 - Surrogates now work through the `Surrogate<T, L>` type.
     - Previously you needed to specify `#[ffi_surrogates(some_field = "some_foreign_type")]`
     - Instead, you now make `some_field` of type `Surrogate<Foreign, Local>`
-- `AsciiPointer` is now called `CStrPointer`, since it can contain non-ASCII data (e.g., when called from C#).
-- In service definitions, providing a `prefix` is generally not needed anymore.
-- Service methods that return void (`()`) can now be used without a `#[ffi_service_method]` annotation. On a Rust panic
-  they will silently return. If this is not acceptable you must return `Result` or specify a different panic behavior
-  via that attribute.
-- Exported functions (`#[ffi_function]`) don't need to specify `#[no_mangle]` or `extern "C"` anymore as these will be
-  added automatically.
-- Exported types (`#[ffi_type]`) must not specify `#[repr(...)]` anymore as we will handle that. If you need custom
-  attributes you can, for example, do `#[ffi_type(transparent)]` or `#[ffi_type(packed)]`.
-- `#[ffi_type(patterns(ffi_error))]` is now `#[ffi_type(error)]`.
 - Setting alignment on types is not supported anymore (for now). You should also stop using alignment on
   earlier versions as various backends didn't translate that properly.
 
