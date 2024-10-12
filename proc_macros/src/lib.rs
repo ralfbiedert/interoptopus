@@ -17,7 +17,7 @@ use proc_macro::TokenStream;
 ///
 /// This will derive [`CTypeInfo`](https://docs.rs/interoptopus/latest/interoptopus/lang/rust/trait.CTypeInfo.html) based on the _visible_ information in the type definition. This
 /// is the preferred way of enabling FFI types; although in some cases (e.g., when dealing with
-/// types outside of your control) you will have to implement a **surrogate** manually, see below.
+/// types outside your control) you will have to implement a **surrogate** manually, see below.
 ///
 /// A number of attributes are available:
 ///
@@ -149,7 +149,7 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
     constants::ffi_constant(attr, input).into()
 }
 
-/// Creates a FFI service from an `impl Service {}` block.
+/// Creates an FFI service from an `impl Service {}` block.
 ///
 /// See the [service module](https://docs.rs/interoptopus/latest/interoptopus/patterns/service/index.html) for an introduction into services.
 ///
@@ -313,7 +313,7 @@ pub fn ffi_service_ctor(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// This is an optional attribute that can be applied to some methods.
 ///
-/// By default service methods
+/// By default, service methods
 /// must return a `Result<(), Error>` return type that will be mapped to an `FFIError` and
 /// transparently checked in languages supporting the pattern.
 /// However, sometimes you might want to return an actual value. Using this attribute and specifying
@@ -434,7 +434,7 @@ pub fn ffi_service_method(_attr: TokenStream, item: TokenStream) -> TokenStream 
 ///
 /// This is an optional attribute that can be applied to methods.
 ///
-/// By default all public methods inside a `#[ffi_service]` section will be exported to FFI. However, public methods with this attribute will
+/// By default, all public methods inside a `#[ffi_service]` section will be exported to FFI. However, public methods with this attribute will
 /// be ignored instead. This can be useful if you want to add Rust-internal helper methods to your service.
 ///
 /// See the [service module](https://docs.rs/interoptopus/latest/interoptopus/patterns/service/index.html) for an introduction into services.
