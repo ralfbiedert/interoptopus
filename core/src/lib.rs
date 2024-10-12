@@ -135,7 +135,7 @@
 //!
 //! ## Changelog
 //!
-//! - **v0.15** - Updated to syn2, better annotation UX, bug fixes.
+//! - **v0.15** - syn2, better annotations, bug fixes.
 //! - **v0.14** - Better inventory UX.
 //! - **v0.13** - Python backend uses `ctypes` now.
 //! - **v0.12** - Better compat using `#[ffi_service_method]`.
