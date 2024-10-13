@@ -11,7 +11,7 @@
 //! callback!(CallbackSlice(x: FFISlice<u8>) -> u8);
 //!
 //! #[ffi_function]
-//! pub extern "C" fn my_function(callback: CallbackSlice) {
+//! pub fn my_function(callback: CallbackSlice) {
 //!     callback.call(FFISlice::empty());
 //! }
 //!
@@ -106,8 +106,7 @@
 //! # extern "C" fn my_sum_function(x: i32, y: i32) -> i32 { x + y }
 //! #
 //! #[ffi_function]
-//! #[no_mangle]
-//! pub extern "C" fn return_sum_function() -> SumFunction {
+//! pub fn return_sum_function() -> SumFunction {
 //!     SumFunction(Some(my_sum_function))
 //! }
 //! ```
@@ -136,7 +135,7 @@ impl NamedCallback {
 
     /// Gets the type name of this callback.
     pub fn name(&self) -> &str {
-        &self.fnpointer.name().unwrap()
+        self.fnpointer.name().unwrap()
     }
 
     /// Gets the type's meta.

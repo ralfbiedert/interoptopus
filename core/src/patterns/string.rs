@@ -1,4 +1,4 @@
-//! Raw `*const char` pointer on C-level but a (ASCII) `string` like in languages that support it.
+//! Raw `*const char` pointer on C-level but a (ASCII) `string` like in supported languages.
 //!
 //! # Example
 //!

@@ -102,6 +102,8 @@ Methods operating on common state.
      - **[ReturnString](#SimpleService.ReturnString)** -  This function has no panic safeguards. It will be a bit faster to
      - **[MethodVoidFfiError](#SimpleService.MethodVoidFfiError)** - 
      - **[MethodCallback](#SimpleService.MethodCallback)** - 
+     - **[MethodCallbackFfiReturn](#SimpleService.MethodCallbackFfiReturn)** - 
+     - **[MethodCallbackFfiReturnWithSlice](#SimpleService.MethodCallbackFfiReturnWithSlice)** - 
  - **[SimpleServiceLifetime](#SimpleServiceLifetime)** - 
      - **[NewWith](#SimpleServiceLifetime.NewWith)** <sup>**ctor**</sup> - 
      - **[MethodLt](#SimpleServiceLifetime.MethodLt)** - 
@@ -144,6 +146,7 @@ Composite data used by functions and methods.
  - **[SliceUseAsciiStringPattern](#SliceUseAsciiStringPattern)** - A pointer and length of un-owned elements.
  - **[SliceVec](#SliceVec)** - A pointer and length of un-owned elements.
  - **[SliceVec3f32](#SliceVec3f32)** - A pointer and length of un-owned elements.
+ - **[Slicei32](#Slicei32)** - A pointer and length of un-owned elements.
  - **[Sliceu32](#Sliceu32)** - A pointer and length of un-owned elements.
  - **[Sliceu8](#Sliceu8)** - A pointer and length of un-owned elements.
  - **[OptionInner](#OptionInner)** - A boolean flag and optionally data.
@@ -703,6 +706,26 @@ A pointer to an array of data someone else owns which may not be modified.
 #### Definition 
 ```csharp
 public partial struct SliceVec3f32
+{
+    IntPtr data;
+    ulong len;
+}
+```
+
+---
+
+
+
+ ### <a name="Slicei32">**Slicei32**</a>
+
+A pointer to an array of data someone else owns which may not be modified.
+
+#### Fields 
+- **data** - Pointer to start of immutable data. 
+- **len** - Number of elements. 
+#### Definition 
+```csharp
+public partial struct Slicei32
 {
     IntPtr data;
     ulong len;
@@ -1734,6 +1757,35 @@ public class SimpleService {
     public void MethodCallback(MyCallback callback);
 #if UNITY_2018_1_OR_NEWER
     public void MethodCallback(IntPtr callback);
+#endif
+}
+```
+
+---
+
+### <a name="MethodCallbackFfiReturn">**MethodCallbackFfiReturn**</a>
+
+#### Definition 
+```csharp
+public class SimpleService {
+    public void MethodCallbackFfiReturn(SumDelegateReturn callback);
+#if UNITY_2018_1_OR_NEWER
+    public void MethodCallbackFfiReturn(IntPtr callback);
+#endif
+}
+```
+
+---
+
+### <a name="MethodCallbackFfiReturnWithSlice">**MethodCallbackFfiReturnWithSlice**</a>
+
+#### Definition 
+```csharp
+public class SimpleService {
+    public void MethodCallbackFfiReturnWithSlice(SumDelegateReturn callback, Slicei32 input);
+    public void MethodCallbackFfiReturnWithSlice(SumDelegateReturn callback, int[] input);
+#if UNITY_2018_1_OR_NEWER
+    public void MethodCallbackFfiReturnWithSlice(IntPtr callback, NativeArray<int> input);
 #endif
 }
 ```

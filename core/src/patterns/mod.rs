@@ -115,6 +115,7 @@ impl From<Service> for LibraryPattern {
 
 /// A pattern on a type level.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[allow(clippy::large_enum_variant)]
 pub enum TypePattern {
     CStrPointer,
     APIVersion,

@@ -81,22 +81,16 @@ pub trait FFIError: Sized {
     const SUCCESS: Self;
     /// Signals a null pointer was passed where an actual element was needed.
     const NULL: Self;
-    /// The panic variant. Once this is observed no further calls should be attempted.
+    /// This can indicate one of two things:
+    /// - Returned from Rust function this indicates a panic. Once this is observed no further calls
+    ///   should be attempted.
+    /// - Returned from a callback, this indicates "an unusual code flow like a panic" happened
+    ///   in hosting process (e.g., some callback code threw an exception). In that case
+    ///   you should probably attempt to return early and indicate an error.
     const PANIC: Self;
 
     // fn ok(self) -> Result<(), E>;
 }
-
-// #[repr(C)]
-// #[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Default, Deserialize, Serialize))]
-// #[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Default))]
-// pub struct FFIResult<T, E>
-// where
-//     E: FFIError,
-// {
-//     t: T,
-//     e: E,
-// }
 
 /// Internal helper derived for enums that are an [`FFIError`].
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]

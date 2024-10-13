@@ -37,8 +37,7 @@ macro_rules! api_entry {
         }
 
         #[interoptopus::ffi_function]
-        #[no_mangle]
-        pub unsafe extern "C" fn $init(api: *mut $struct) {
+        pub fn $init(api: *mut $struct) {
             if api.is_null() {
                 return;
             }

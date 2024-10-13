@@ -1,7 +1,4 @@
 use interoptopus::ffi_type;
-use interoptopus::lang::c::{CType, CompositeType, Field, PrimitiveType};
-
-use crate::thirdparty::ThirdPartyVecF32;
 
 /// A vector used in our game engine.
 #[ffi_type]
@@ -22,35 +19,6 @@ pub struct SuperComplexEntity {
     /// Point to an ASCII encoded whatnot.
     pub some_str: *const u8,
     pub str_len: u32,
-}
-
-/// A type containing a third-party type.
-#[repr(C)]
-#[derive(Copy, Clone, Debug)]
-#[allow(dead_code)]
-pub struct WithForeignType {
-    pub secret_number: u64,
-    pub third_party: Option<*const ThirdPartyVecF32>,
-}
-
-// Won't win a beauty contest, but does the job.
-#[allow(dead_code)]
-pub fn third_party_option() -> CType {
-    CType::ReadPointer(Box::new(third_party_vec_f32()))
-}
-
-// We can use this function wherever we refer to `ThirdPartyVecF32`.
-#[allow(dead_code)]
-fn third_party_vec_f32() -> CType {
-    let fields = vec![
-        Field::new("x".to_string(), CType::Primitive(PrimitiveType::F32)),
-        Field::new("y".to_string(), CType::Primitive(PrimitiveType::F32)),
-        Field::new("z".to_string(), CType::Primitive(PrimitiveType::F32)),
-        Field::new("w".to_string(), CType::Primitive(PrimitiveType::F32)),
-    ];
-
-    let composite = CompositeType::new("ThirdPartyVecF32".to_string(), fields);
-    CType::Composite(composite)
 }
 
 /// Worst game engine ever.

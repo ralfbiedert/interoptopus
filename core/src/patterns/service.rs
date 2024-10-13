@@ -1,4 +1,4 @@
-//! Bundles function with common receiver into a service or 'class' in object oriented languages.
+//! For building something like a service or 'class' in object oriented languages.
 //!
 //! Services provide a convenient way to manage state and memory between method invocations.
 //! They are similar to classes in object oriented languages, but we refrained from naming them
@@ -127,17 +127,8 @@ pub struct Service {
 
 impl Service {
     pub fn new(constructors: Vec<Function>, destructor: Function, methods: Vec<Function>) -> Self {
-        let the_type = extract_obvious_opaque_from_parameter(
-            constructors
-                .first()
-                .expect("Must have at least one constructor")
-                .signature()
-                .params()
-                .first()
-                .expect("Constructor must have at least one parameter")
-                .the_type(),
-        )
-        .expect("First parameter must point to opaque.");
+        let first_type = &constructors.first().and_then(|x| x.first_param_type()).expect("Must have type");
+        let the_type = extract_obvious_opaque_from_parameter(first_type).expect("First parameter must point to opaque.");
 
         Self {
             the_type,
@@ -153,17 +144,11 @@ impl Service {
     /// This function is mainly called during compile time therefore panicking with a good error
     /// message is beneficial.
     pub fn assert_valid(&self) {
-        let constructor_fist_parameter = self
-            .constructors
-            .first()
-            .expect("Must have at least one constructor")
-            .signature()
-            .params()
-            .get(0)
-            .expect("Constructor for must have at least one parameter.");
+        let constructor_fist_parameter = self.constructors.first().and_then(|x| x.first_param_type()).expect("Must have type");
+        let destructor_first_parameter = self.destructor.first_param_type().expect("Must have type");
 
-        match &constructor_fist_parameter.the_type() {
-            CType::ReadWritePointer(x) => match **x {
+        match constructor_fist_parameter {
+            CType::ReadWritePointer(x) => match *x {
                 CType::ReadWritePointer(ref x) => match **x {
                     CType::Opaque(_) => {}
                     _ => panic!("First parameter must be opaque type"),
@@ -174,15 +159,8 @@ impl Service {
             _ => panic!("First parameter must be RwPointer(RwPointer(Opaque)) type"),
         }
 
-        let destructor_first_parameter = self
-            .destructor
-            .signature()
-            .params()
-            .get(0)
-            .expect("Constructor for must have at least one parameter.");
-
-        match &destructor_first_parameter.the_type() {
-            CType::ReadWritePointer(x) => match **x {
+        match destructor_first_parameter {
+            CType::ReadWritePointer(x) => match *x {
                 CType::ReadWritePointer(ref x) => match **x {
                     CType::Opaque(_) => {}
                     _ => panic!("First parameter must be opaque type"),

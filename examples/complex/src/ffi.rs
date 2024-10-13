@@ -6,13 +6,13 @@ type SomeType = u32;
 
 pub type UpdateScore = extern "C" fn(score: u32) -> u32;
 
-const fn number_of_the_yeast() -> u32 {
+const fn the_neighbor() -> u32 {
     667
 }
 
 /// Call for a friend.
 #[ffi_constant]
-pub const THE_MAGIC_CONSTANT: SomeType = number_of_the_yeast() - 1;
+pub const THE_MAGIC_CONSTANT: SomeType = the_neighbor() - 1;
 
 #[ffi_type]
 #[derive(Debug)]
@@ -30,15 +30,6 @@ pub struct Context {
 }
 
 /// Possible errors in our library.
-// #[ffi_type]
-// // pub enum FFIError {
-//     /// All went fine.
-//     Ok,
-//
-//     /// Naughty API call detected.
-//     NullPointerPassed = 10,
-// }
-
 #[ffi_type]
 pub enum FFIError {
     /// All went fine.
@@ -48,23 +39,20 @@ pub enum FFIError {
 }
 
 /// Returns the version of this API.
-#[no_mangle]
 #[ffi_function]
-pub extern "C" fn example_api_version() -> u32 {
+pub fn example_api_version() -> u32 {
     0x00_01_00_00
 }
 
 /// A function that always fails.
-#[no_mangle]
 #[ffi_function]
-pub extern "C" fn example_always_fails() -> FFIError {
+pub fn example_always_fails() -> FFIError {
     FFIError::NullPointerPassed
 }
 
 /// Creates a new instance of this library.
-#[no_mangle]
 #[ffi_function]
-pub extern "C" fn example_create_context(context_ptr: Option<&mut *mut Context>) -> FFIError {
+pub fn example_create_context(context_ptr: Option<&mut *mut Context>) -> FFIError {
     // DON'T DO THAT IN REAL WORLD ... Instead, define a helper that nicely maps `Result`
     // to `FFIError` and catch any panic unwind.
     let context = context_ptr.unwrap();
@@ -82,10 +70,9 @@ pub extern "C" fn example_create_context(context_ptr: Option<&mut *mut Context>)
 ///
 /// You **must** ensure that `context_ptr` is being called with the context produced by
 /// `example_create_context`, otherwise bad things will happen.
-#[no_mangle]
 #[ffi_function]
 #[allow(unused_unsafe)]
-pub unsafe extern "C" fn example_destroy_context(context_ptr: Option<&mut *mut Context>) -> FFIError {
+pub fn example_destroy_context(context_ptr: Option<&mut *mut Context>) -> FFIError {
     if context_ptr.is_none() {
         return FFIError::NullPointerPassed;
     }
@@ -102,9 +89,8 @@ pub unsafe extern "C" fn example_destroy_context(context_ptr: Option<&mut *mut C
 }
 
 /// Prints the current player score.
-#[no_mangle]
 #[ffi_function]
-pub extern "C" fn example_print_score(context: Option<&mut Context>) -> FFIError {
+pub fn example_print_score(context: Option<&mut Context>) -> FFIError {
     let context = context.unwrap();
 
     dbg!(context.my_game_engine.player_score);
@@ -113,9 +99,8 @@ pub extern "C" fn example_print_score(context: Option<&mut Context>) -> FFIError
 }
 
 /// Updates the score.
-#[no_mangle]
 #[ffi_function]
-pub extern "C" fn example_update_score_by_callback(context: Option<&mut Context>, update: UpdateScore) -> FFIError {
+pub fn example_update_score_by_callback(context: Option<&mut Context>, update: UpdateScore) -> FFIError {
     let context = context.unwrap();
 
     context.my_game_engine.player_score = update(context.my_game_engine.player_score);
@@ -124,9 +109,8 @@ pub extern "C" fn example_update_score_by_callback(context: Option<&mut Context>
 }
 
 /// Updates the score.
-#[no_mangle]
 #[ffi_function]
-pub extern "C" fn example_return_score(context: Option<&mut Context>, score: Option<&mut u32>) -> FFIError {
+pub fn example_return_score(context: Option<&mut Context>, score: Option<&mut u32>) -> FFIError {
     let context = context.unwrap();
     let score = score.unwrap();
 
@@ -135,13 +119,8 @@ pub extern "C" fn example_return_score(context: Option<&mut Context>, score: Opt
     FFIError::Ok
 }
 
-#[no_mangle]
 #[ffi_function]
-pub extern "C" fn example_double_super_complex_entity(
-    context: Option<&mut Context>,
-    incoming: Option<&SuperComplexEntity>,
-    outgoing: Option<&mut SuperComplexEntity>,
-) -> FFIError {
+pub fn example_double_super_complex_entity(context: Option<&mut Context>, incoming: Option<&SuperComplexEntity>, outgoing: Option<&mut SuperComplexEntity>) -> FFIError {
     let _context = context.unwrap();
     let incoming = incoming.unwrap();
     let outgoing = outgoing.unwrap();

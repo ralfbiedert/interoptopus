@@ -2,7 +2,6 @@ use interoptopus::{constant, function, Inventory, InventoryBuilder};
 
 mod common;
 mod ffi;
-mod thirdparty;
 
 pub fn ffi_inventory() -> Inventory {
     {

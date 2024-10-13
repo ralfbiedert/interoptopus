@@ -207,7 +207,7 @@ pub mod lang {
 
 /// Register a function with an [`InventoryBuilder`].
 ///
-/// You must also annotate the function with [`#[ffi_function]`](crate::ffi_function), and preferably with `#[no_mangle]` and `extern "C"`.
+/// You must also annotate the function with [`#[ffi_function]`](crate::ffi_function).
 ///
 /// # Example
 ///

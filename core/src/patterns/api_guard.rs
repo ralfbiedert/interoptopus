@@ -18,8 +18,7 @@
 //!
 //! // Guard function used by backends.
 //! #[ffi_function]
-//! #[no_mangle]
-//! pub extern "C" fn my_api_guard() -> APIVersion {
+//! pub fn my_api_guard() -> APIVersion {
 //!     my_inventory().into()
 //! }
 //!
@@ -93,17 +92,14 @@ impl From<Inventory> for APIVersion {
 pub fn inventory_hash(inventory: &Inventory) -> u64 {
     let mut hasher = DefaultHasher::new();
 
-    // TODO: Do we need to hash patterns as well? They should never impact the 'relevant' API surface?
     let types = inventory.ctypes();
     let functions = inventory.functions();
     let constants = inventory.constants();
 
-    // TODO: Should probably exclude documentation & co.
     for t in types {
         t.hash(&mut hasher);
     }
 
-    // TODO: Should probably exclude documentation & co.
     for f in functions {
         f.hash(&mut hasher);
     }

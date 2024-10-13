@@ -172,10 +172,8 @@ impl<'a> SimpleServiceLifetime<'a> {
         Ok(Self { some_value })
     }
 
-    #[ffi_service_method(on_panic = "return_default")]
     pub fn method_lt(&mut self, _slice: FFISlice<'a, FFIBool>) {}
 
-    #[ffi_service_method(on_panic = "return_default")]
     pub fn method_lt2(&mut self, _slice: FFISlice<FFIBool>) {}
 
     // Sometimes lifetime params can get confused in low level codegen, so we have to replace `self` with explicit self.

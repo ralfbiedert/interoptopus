@@ -128,7 +128,7 @@
   performance overhead of about 30-40ns per pinned slice, but uses only safe C#:
 
   | Construct | ns per call |
-      | --- | --- |
+            | --- | --- |
   | `pattern_ffi_slice_delegate(x => x[0])` | 195 |
   | `pattern_ffi_slice_delegate(x => x.Copied[0])` | 1307 |
   | `pattern_ffi_slice_delegate_huge(x => x[0])` | 190 |
@@ -230,8 +230,7 @@ some assumptions and quality standards this project is based on:
   ASCII data.
 
 - Related to the previous point we generally assume functions and types on both sides are used _appropriately_ w.r.t.
-  Rust's FFI requirements and we trust you do that, e.g., you must declare types `#[repr(C)]` (or similar)
-  and functions `extern "C"`.
+  Rust's FFI requirements and we trust you do that.
 
 - Any `unsafe` code in any abstraction we provide should be "well contained", properly documented
   and reasonably be auditable.

@@ -615,6 +615,10 @@ impl Function {
         IdPrettifier::from_rust_lower(self.name())
     }
 
+    pub fn first_param_type(&self) -> Option<CType> {
+        self.signature().params.first().map(|x| x.the_type.clone())
+    }
+
     pub fn returns_ffi_error(&self) -> bool {
         matches!(self.signature().rval(), CType::Pattern(TypePattern::FFIErrorEnum(_)))
     }
