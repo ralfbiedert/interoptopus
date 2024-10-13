@@ -106,6 +106,8 @@ def init_lib(path):
     c_lib.simple_service_return_string.argtypes = [ctypes.c_void_p]
     c_lib.simple_service_method_void_ffi_error.argtypes = [ctypes.c_void_p]
     c_lib.simple_service_method_callback.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)]
+    c_lib.simple_service_method_callback_ffi_return.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32)]
+    c_lib.simple_service_method_callback_ffi_return_with_slice.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32), Slicei32]
     c_lib.simple_service_lifetime_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.simple_service_lifetime_new_with.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.POINTER(ctypes.c_uint32)]
     c_lib.simple_service_lifetime_method_lt.argtypes = [ctypes.c_void_p, SliceBool]
@@ -196,6 +198,8 @@ def init_lib(path):
     c_lib.simple_service_return_string.restype = ctypes.POINTER(ctypes.c_char)
     c_lib.simple_service_method_void_ffi_error.restype = ctypes.c_int
     c_lib.simple_service_method_callback.restype = ctypes.c_int
+    c_lib.simple_service_method_callback_ffi_return.restype = ctypes.c_int
+    c_lib.simple_service_method_callback_ffi_return_with_slice.restype = ctypes.c_int
     c_lib.simple_service_lifetime_destroy.restype = ctypes.c_int
     c_lib.simple_service_lifetime_new_with.restype = ctypes.c_int
     c_lib.simple_service_lifetime_return_string_accept_slice.restype = ctypes.POINTER(ctypes.c_char)
@@ -214,6 +218,8 @@ def init_lib(path):
     c_lib.simple_service_method_mut_self_no_error.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.simple_service_method_void_ffi_error.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.simple_service_method_callback.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.simple_service_method_callback_ffi_return.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.simple_service_method_callback_ffi_return_with_slice.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.simple_service_lifetime_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.simple_service_lifetime_new_with.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.simple_service_lifetime_method_void_ffi_error.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
@@ -1352,6 +1358,56 @@ class SliceBool(ctypes.Structure):
         return self[len(self)-1]
 
 
+class Slicei32(ctypes.Structure):
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("data", ctypes.POINTER(ctypes.c_int32)),
+        ("len", ctypes.c_uint64),
+    ]
+
+    def __len__(self):
+        return self.len
+
+    def __getitem__(self, i) -> int:
+        if i < 0:
+            index = self.len+i
+        else:
+            index = i
+
+        if index >= self.len:
+            raise IndexError("Index out of range")
+
+        return self.data[index]
+
+    def copied(self) -> Slicei32:
+        """Returns a shallow, owned copy of the underlying slice.
+
+        The returned object owns the immediate data, but not the targets of any contained
+        pointers. In other words, if your struct contains any pointers the returned object
+        may only be used as long as these pointers are valid. If the struct did not contain
+        any pointers the returned object is valid indefinitely."""
+        array = (ctypes.c_int32 * len(self))()
+        ctypes.memmove(array, self.data, len(self) * ctypes.sizeof(ctypes.c_int32))
+        rval = Slicei32(data=ctypes.cast(array, ctypes.POINTER(ctypes.c_int32)), len=len(self))
+        rval.owned = array  # Store array in returned slice to prevent memory deallocation
+        return rval
+
+    def __iter__(self) -> typing.Iterable[ctypes.c_int32]:
+        return _Iter(self)
+
+    def iter(self) -> typing.Iterable[ctypes.c_int32]:
+        """Convenience method returning a value iterator."""
+        return iter(self)
+
+    def first(self) -> int:
+        """Returns the first element of this slice."""
+        return self[0]
+
+    def last(self) -> int:
+        """Returns the last element of this slice."""
+        return self[len(self)-1]
+
+
 class Sliceu32(ctypes.Structure):
     # These fields represent the underlying C data layout
     _fields_ = [
@@ -2041,6 +2097,23 @@ class SimpleService:
             callback = callbacks.fn_u32_rval_u32(callback)
 
         return c_lib.simple_service_method_callback(self._ctx, callback)
+
+    def method_callback_ffi_return(self, callback):
+        """"""
+        if not hasattr(callback, "__ctypes_from_outparam__"):
+            callback = callbacks.fn_i32_i32_rval_FFIError(callback)
+
+        return c_lib.simple_service_method_callback_ffi_return(self._ctx, callback)
+
+    def method_callback_ffi_return_with_slice(self, callback, input: Slicei32 | ctypes.Array[ctypes.c_int32]):
+        """"""
+        if not hasattr(callback, "__ctypes_from_outparam__"):
+            callback = callbacks.fn_i32_i32_rval_FFIError(callback)
+
+        if hasattr(input, "_length_") and getattr(input, "_type_", "") == ctypes.c_int32:
+            input = Slicei32(data=ctypes.cast(input, ctypes.POINTER(ctypes.c_int32)), len=len(input))
+
+        return c_lib.simple_service_method_callback_ffi_return_with_slice(self._ctx, callback, input)
 
 
 

@@ -102,6 +102,8 @@ Methods operating on common state.
      - **[return_string](#SimpleService.return_string)** -  This function has no panic safeguards. It will be a bit faster to
      - **[method_void_ffi_error](#SimpleService.method_void_ffi_error)** - 
      - **[method_callback](#SimpleService.method_callback)** - 
+     - **[method_callback_ffi_return](#SimpleService.method_callback_ffi_return)** - 
+     - **[method_callback_ffi_return_with_slice](#SimpleService.method_callback_ffi_return_with_slice)** - 
  - **[SimpleServiceLifetime](#SimpleServiceLifetime)** - 
      - **[new_with](#SimpleServiceLifetime.new_with)** <sup>**ctor**</sup> - 
      - **[method_lt](#SimpleServiceLifetime.method_lt)** - 
@@ -144,6 +146,7 @@ Composite data used by functions and methods.
  - **[SliceUseAsciiStringPattern](#SliceUseAsciiStringPattern)** - A pointer and length of un-owned elements.
  - **[SliceVec](#SliceVec)** - A pointer and length of un-owned elements.
  - **[SliceVec3f32](#SliceVec3f32)** - A pointer and length of un-owned elements.
+ - **[Slicei32](#Slicei32)** - A pointer and length of un-owned elements.
  - **[Sliceu32](#Sliceu32)** - A pointer and length of un-owned elements.
  - **[Sliceu8](#Sliceu8)** - A pointer and length of un-owned elements.
  - **[OptionInner](#OptionInner)** - A boolean flag and optionally data.
@@ -797,6 +800,30 @@ class SliceVec3f32(ctypes.Structure):
     ]
 
     def __init__(self, data: ctypes.POINTER(Vec3f32) = None, len: int = None):
+        ...
+```
+
+---
+
+
+
+ ### <a name="Slicei32">**Slicei32**</a>
+
+A pointer to an array of data someone else owns which may not be modified.
+
+#### Fields 
+- **data** - Pointer to start of immutable data. 
+- **len** - Number of elements. 
+#### Definition 
+```python
+class Slicei32(ctypes.Structure):
+
+    _fields_ = [
+        ("data", ctypes.POINTER(ctypes.c_int32)),
+        ("len", ctypes.c_uint64),
+    ]
+
+    def __init__(self, data: ctypes.POINTER(ctypes.c_int32) = None, len: int = None):
         ...
 ```
 
@@ -1870,6 +1897,30 @@ class SimpleService:
 class SimpleService:
 
     def method_callback(self, callback):
+        ...
+```
+
+---
+
+### <a name="SimpleService.method_callback_ffi_return">**method_callback_ffi_return**</a>
+
+#### Definition 
+```python
+class SimpleService:
+
+    def method_callback_ffi_return(self, callback):
+        ...
+```
+
+---
+
+### <a name="SimpleService.method_callback_ffi_return_with_slice">**method_callback_ffi_return_with_slice**</a>
+
+#### Definition 
+```python
+class SimpleService:
+
+    def method_callback_ffi_return_with_slice(self, callback, input: Slicei32 | ctypes.Array[ctypes.c_int32]):
         ...
 ```
 

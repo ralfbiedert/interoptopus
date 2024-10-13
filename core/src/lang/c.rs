@@ -194,8 +194,8 @@ impl CType {
         hash_set.iter().cloned().collect()
     }
 
-    /// If this was a pointer type, tries to deref it and return the inner type.
-    pub fn deref_pointer(&self) -> Option<&CType> {
+    /// If this were a pointer, tries to deref it and return the inner type.
+    pub fn try_deref_pointer(&self) -> Option<&CType> {
         match self {
             CType::Primitive(_) => None,
             CType::Enum(_) => None,
@@ -424,6 +424,11 @@ impl CompositeType {
         &self.fields
     }
 
+    /// If this were a wrapper over a pointer type, get the type of what we're pointing go.
+    pub fn try_deref_pointer(&self) -> Option<CType> {
+        self.fields().first()?.the_type().try_deref_pointer().cloned()
+    }
+
     /// True if this struct has no contained fields (which happens to be illegal in C99).
     pub fn is_empty(&self) -> bool {
         self.fields.is_empty()
@@ -608,6 +613,10 @@ impl Function {
 
     pub fn prettifier(&self) -> IdPrettifier {
         IdPrettifier::from_rust_lower(self.name())
+    }
+
+    pub fn returns_ffi_error(&self) -> bool {
+        matches!(self.signature().rval(), CType::Pattern(TypePattern::FFIErrorEnum(_)))
     }
 }
 

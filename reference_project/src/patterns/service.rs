@@ -1,4 +1,4 @@
-use crate::patterns::callbacks::MyCallback;
+use crate::patterns::callbacks::{MyCallback, SumDelegateReturn};
 use crate::patterns::result::{Error, FFIError};
 use interoptopus::patterns::primitives::FFIBool;
 use interoptopus::patterns::slice::{FFISlice, FFISliceMut};
@@ -139,6 +139,16 @@ impl SimpleService {
 
     pub fn method_callback(&mut self, callback: MyCallback) -> Result<(), Error> {
         callback.call(0);
+        Ok(())
+    }
+
+    pub fn method_callback_ffi_return(&mut self, callback: SumDelegateReturn) -> Result<(), Error> {
+        callback.call(0, 0);
+        Ok(())
+    }
+
+    pub fn method_callback_ffi_return_with_slice(&mut self, callback: SumDelegateReturn, input: FFISlice<i32>) -> Result<(), Error> {
+        callback.call(input.as_slice()[0], input.as_slice()[1]);
         Ok(())
     }
 

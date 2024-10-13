@@ -203,6 +203,12 @@ typedef struct my_library_slicebool
     uint64_t len;
     } my_library_slicebool;
 
+typedef struct my_library_slicei32
+    {
+    const int32_t* data;
+    uint64_t len;
+    } my_library_slicei32;
+
 typedef struct my_library_sliceu32
     {
     const uint32_t* data;
@@ -376,6 +382,8 @@ my_library_slicemutu32 simple_service_return_slice_mut(my_library_simpleservice*
 const char* simple_service_return_string(my_library_simpleservice* context);
 my_library_ffierror simple_service_method_void_ffi_error(my_library_simpleservice* context);
 my_library_ffierror simple_service_method_callback(my_library_simpleservice* context, my_library_mycallback callback);
+my_library_ffierror simple_service_method_callback_ffi_return(my_library_simpleservice* context, my_library_sumdelegatereturn callback);
+my_library_ffierror simple_service_method_callback_ffi_return_with_slice(my_library_simpleservice* context, my_library_sumdelegatereturn callback, my_library_slicei32 input);
 my_library_ffierror simple_service_lifetime_destroy(my_library_simpleservicelifetime** context);
 my_library_ffierror simple_service_lifetime_new_with(my_library_simpleservicelifetime** context, const uint32_t* some_value);
 void simple_service_lifetime_method_lt(my_library_simpleservicelifetime* context, my_library_slicebool slice);

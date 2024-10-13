@@ -18,9 +18,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 1956134695915137693ul)
+            if (api_version != 2816784914316739735ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (1956134695915137693). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (2816784914316739735). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -678,6 +678,43 @@ namespace My.Company
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
+            }
+        }
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_callback_ffi_return")]
+        public static extern FFIError simple_service_method_callback_ffi_return(IntPtr context, SumDelegateReturn callback);
+
+        public static void simple_service_method_callback_ffi_return_checked(IntPtr context, SumDelegateReturn callback)
+        {
+            var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
+            var rval = simple_service_method_callback_ffi_return(context, callback_safe_delegate.Call);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+            callback_safe_delegate.Rethrow();
+        }
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_callback_ffi_return_with_slice")]
+        public static extern FFIError simple_service_method_callback_ffi_return_with_slice(IntPtr context, SumDelegateReturn callback, Slicei32 input);
+
+        public static void simple_service_method_callback_ffi_return_with_slice(IntPtr context, SumDelegateReturn callback, int[] input)
+        {
+            var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
+            var input_pinned = GCHandle.Alloc(input, GCHandleType.Pinned);
+            var input_slice = new Slicei32(input_pinned, (ulong) input.Length);
+            try
+            {
+                var rval = simple_service_method_callback_ffi_return_with_slice(context, callback_safe_delegate.Call, input_slice);;
+                if (rval != FFIError.Ok)
+                {
+                    throw new InteropException<FFIError>(rval);
+                }
+                callback_safe_delegate.Rethrow();
+            }
+            finally
+            {
+                input_pinned.Free();
             }
         }
 
@@ -1438,6 +1475,33 @@ namespace My.Company
             {
                 throw new InteropException<FFIError>(rval);
             }
+        }
+
+        public void MethodCallbackFfiReturn(SumDelegateReturn callback)
+        {
+            var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
+            var rval = Interop.simple_service_method_callback_ffi_return(_context, callback_safe_delegate.Call);
+            callback_safe_delegate.Rethrow();
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
+        public void MethodCallbackFfiReturnWithSlice(SumDelegateReturn callback, Slicei32 input)
+        {
+            var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
+            var rval = Interop.simple_service_method_callback_ffi_return_with_slice(_context, callback_safe_delegate.Call, input);
+            callback_safe_delegate.Rethrow();
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
+        public void MethodCallbackFfiReturnWithSlice(SumDelegateReturn callback, int[] input)
+        {
+            Interop.simple_service_method_callback_ffi_return_with_slice(_context, callback, input);
         }
 
         public IntPtr Context => _context;

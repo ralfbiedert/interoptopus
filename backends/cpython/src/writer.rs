@@ -291,7 +291,7 @@ pub trait PythonWriter {
                                 .find(|i| i.name().eq_ignore_ascii_case("data"))
                                 .expect("slice must have a data field")
                                 .the_type()
-                                .deref_pointer()
+                                .try_deref_pointer()
                                 .expect("data must be a pointer type"),
                             false,
                         );
@@ -324,7 +324,7 @@ pub trait PythonWriter {
             .find(|x| x.name().contains("data"))
             .expect("Slice must contain field called 'data'.")
             .the_type()
-            .deref_pointer()
+            .try_deref_pointer()
             .expect("data must be a pointer type");
 
         let data_type_python = self.converter().to_ctypes_name(data_type, true);

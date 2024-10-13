@@ -56,7 +56,7 @@ impl Unity {
                         .get(0)
                         .expect("First parameter must exist")
                         .the_type()
-                        .deref_pointer()
+                        .try_deref_pointer()
                         .expect("Must be pointer");
 
                     format!("NativeArray<{}>", h.converter.to_typespecifier_in_param(element_type))
@@ -67,7 +67,7 @@ impl Unity {
                         .get(0)
                         .expect("First parameter must exist")
                         .the_type()
-                        .deref_pointer()
+                        .try_deref_pointer()
                         .expect("Must be pointer");
                     format!("NativeArray<{}>", h.converter.to_typespecifier_in_param(element_type))
                 }
@@ -82,7 +82,7 @@ impl Unity {
                             .get(0)
                             .expect("First parameter must exist")
                             .the_type()
-                            .deref_pointer()
+                            .try_deref_pointer()
                             .expect("Must be pointer");
 
                         format!("NativeArray<{}>", h.converter.to_typespecifier_in_param(element_type))
@@ -93,7 +93,7 @@ impl Unity {
                             .get(0)
                             .expect("First parameter must exist")
                             .the_type()
-                            .deref_pointer()
+                            .try_deref_pointer()
                             .expect("Must be pointer");
 
                         format!("NativeArray<{}>", h.converter.to_typespecifier_in_param(element_type))
@@ -305,7 +305,7 @@ impl OverloadWriter for Unity {
             },
         );
         let call = format!(r#"{}({});"#, fn_name, to_invoke.join(", "));
-        write_function_overloaded_invoke_with_error_handling(w, function, &call)?;
+        write_function_overloaded_invoke_with_error_handling(w, function, &call, &[])?;
 
         indented!(w, r#"}}"#)?;
         indented!(w, r#"#endif"#)?;

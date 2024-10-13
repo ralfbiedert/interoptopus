@@ -50,7 +50,7 @@ impl Converter {
                             .find(|i| i.name().eq_ignore_ascii_case("data"))
                             .expect("slice must have a data field")
                             .the_type()
-                            .deref_pointer()
+                            .try_deref_pointer()
                             .expect("data must be a pointer type"),
                         false,
                     );

@@ -53,51 +53,24 @@ impl DotNet {
         match param.the_type() {
             CType::Pattern(p) => match p {
                 TypePattern::Slice(p) => {
-                    let element_type = p
-                        .fields()
-                        .get(0)
-                        .expect("First parameter must exist")
-                        .the_type()
-                        .deref_pointer()
-                        .expect("Must be pointer");
-
-                    slice_type_name(false, element_type)
+                    let element_type = p.try_deref_pointer().expect("Must be pointer");
+                    slice_type_name(false, &element_type)
                 }
                 TypePattern::SliceMut(p) => {
-                    let element_type = p
-                        .fields()
-                        .get(0)
-                        .expect("First parameter must exist")
-                        .the_type()
-                        .deref_pointer()
-                        .expect("Must be pointer");
-                    slice_type_name(true, element_type)
+                    let element_type = p.try_deref_pointer().expect("Must be pointer");
+                    slice_type_name(true, &element_type)
                 }
                 _ => h.converter.to_typespecifier_in_param(param.the_type()),
             },
             CType::ReadPointer(x) | CType::ReadWritePointer(x) => match x.deref() {
                 CType::Pattern(x) => match x {
                     TypePattern::Slice(p) => {
-                        let element_type = p
-                            .fields()
-                            .get(0)
-                            .expect("First parameter must exist")
-                            .the_type()
-                            .deref_pointer()
-                            .expect("Must be pointer");
-
-                        slice_type_name(false, element_type)
+                        let element_type = p.try_deref_pointer().expect("Must be pointer");
+                        slice_type_name(false, &element_type)
                     }
                     TypePattern::SliceMut(p) => {
-                        let element_type = p
-                            .fields()
-                            .get(0)
-                            .expect("First parameter must exist")
-                            .the_type()
-                            .deref_pointer()
-                            .expect("Must be pointer");
-
-                        slice_type_name(true, element_type)
+                        let element_type = p.try_deref_pointer().expect("Must be pointer");
+                        slice_type_name(true, &element_type)
                     }
                     _ => h.converter.to_typespecifier_in_param(param.the_type()),
                 },
@@ -309,11 +282,7 @@ impl OverloadWriter for DotNet {
             );
             let call = format!(r#"{}({});"#, fn_name, to_invoke.join(", "));
 
-            write_function_overloaded_invoke_with_error_handling(w, function, &call)?;
-
-            for name in to_wrap_delegates {
-                indented!(w, [_], r#"{}_safe_delegate.Rethrow();"#, name)?;
-            }
+            write_function_overloaded_invoke_with_error_handling(w, function, &call, to_wrap_delegates.as_slice())?;
 
             if !to_pin_name.is_empty() {
                 for _ in to_pin_name.iter() {
@@ -354,7 +323,7 @@ impl OverloadWriter for DotNet {
             );
             let call = format!(r#"{}({});"#, fn_name, to_invoke.join(", "));
 
-            write_function_overloaded_invoke_with_error_handling(w, function, &call)?;
+            write_function_overloaded_invoke_with_error_handling(w, function, &call, &[])?;
 
             for name in to_wrap_delegates {
                 indented!(w, [_], r#"{}_safe_delegate.Rethrow();"#, name)?;

@@ -144,6 +144,65 @@ namespace My.Company.Common
     ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
+    internal partial struct Slicei32
+    {
+        ///Pointer to start of immutable data.
+        IntPtr data;
+        ///Number of elements.
+        ulong len;
+    }
+
+    internal partial struct Slicei32 : IEnumerable<int>
+    {
+        public Slicei32(GCHandle handle, ulong count)
+        {
+            this.data = handle.AddrOfPinnedObject();
+            this.len = count;
+        }
+        public Slicei32(IntPtr handle, ulong count)
+        {
+            this.data = handle;
+            this.len = count;
+        }
+        public int this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                var size = Marshal.SizeOf(typeof(int));
+                var ptr = new IntPtr(data.ToInt64() + i * size);
+                return Marshal.PtrToStructure<int>(ptr);
+            }
+        }
+        public int[] Copied
+        {
+            get
+            {
+                var rval = new int[len];
+                for (var i = 0; i < (int) len; i++) {
+                    rval[i] = this[i];
+                }
+                return rval;
+            }
+        }
+        public int Count => (int) len;
+        public IEnumerator<int> GetEnumerator()
+        {
+            for (var i = 0; i < (int)len; ++i)
+            {
+                yield return this[i];
+            }
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }
+
+
+    ///A pointer to an array of data someone else owns which may not be modified.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
     internal partial struct Sliceu32
     {
         ///Pointer to start of immutable data.

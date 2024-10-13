@@ -219,6 +219,15 @@ typedef struct my_library_slice_bool
 } my_library_slice_bool;
 
 ///A pointer to an array of data someone else owns which may not be modified.
+typedef struct my_library_slicei32
+{
+    ///Pointer to start of immutable data.
+    const int32_t* data;
+    ///Number of elements.
+    uint64_t len;
+} my_library_slicei32;
+
+///A pointer to an array of data someone else owns which may not be modified.
 typedef struct my_library_sliceu32
 {
     ///Pointer to start of immutable data.
@@ -540,6 +549,10 @@ const char* simple_service_return_string(my_library_simple_service* context);
 my_library_ffi_error simple_service_method_void_ffi_error(my_library_simple_service* context);
 
 my_library_ffi_error simple_service_method_callback(my_library_simple_service* context, my_library_my_callback callback);
+
+my_library_ffi_error simple_service_method_callback_ffi_return(my_library_simple_service* context, my_library_sum_delegate_return callback);
+
+my_library_ffi_error simple_service_method_callback_ffi_return_with_slice(my_library_simple_service* context, my_library_sum_delegate_return callback, my_library_slicei32 input);
 
 /// Destroys the given instance.
 ///

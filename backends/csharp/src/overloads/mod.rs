@@ -108,12 +108,15 @@ pub trait OverloadWriter {
 
 /// Writes common error handling based on a call's return type.
 #[rustfmt::skip]
-fn write_function_overloaded_invoke_with_error_handling(w: &mut IndentWriter, function: &Function, fn_call: &str) -> Result<(), Error> {
+fn write_function_overloaded_invoke_with_error_handling(w: &mut IndentWriter, function: &Function, fn_call: &str, rethrow_delegates: &[&str]) -> Result<(), Error> {
 
     match function.signature().rval() {
         CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
             indented!(w, [_], r#"var rval = {};"#, fn_call)?;
-            indented!(w, [_], r#"if (rval != {}.{})"#, e.the_enum().rust_name(), e.success_variant().name())?;
+            for name in rethrow_delegates {
+                indented!(w, [_], r#"{}_safe_delegate.Rethrow();"#, name)?;
+            }
+         indented!(w, [_], r#"if (rval != {}.{})"#, e.the_enum().rust_name(), e.success_variant().name())?;
             indented!(w, [_], r#"{{"#)?;
             indented!(w, [_ _], r#"throw new InteropException<{}>(rval);"#, e.the_enum().rust_name())?;
             indented!(w, [_], r#"}}"#)?;

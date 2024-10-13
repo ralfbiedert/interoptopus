@@ -229,6 +229,105 @@ namespace My.Company.Common
     ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
+    internal partial struct Slicei32
+    {
+        ///Pointer to start of immutable data.
+        #if UNITY_2018_1_OR_NEWER
+        [NativeDisableUnsafePtrRestriction]
+        #endif
+        IntPtr data;
+        ///Number of elements.
+        ulong len;
+    }
+
+    internal partial struct Slicei32 : IEnumerable<int>
+    {
+        public Slicei32(GCHandle handle, ulong count)
+        {
+            this.data = handle.AddrOfPinnedObject();
+            this.len = count;
+        }
+        public Slicei32(IntPtr handle, ulong count)
+        {
+            this.data = handle;
+            this.len = count;
+        }
+        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
+        public ReadOnlySpan<int> ReadOnlySpan
+        {
+            get
+            {
+                unsafe
+                {
+                    return new ReadOnlySpan<int>(this.data.ToPointer(), (int) this.len);
+                }
+            }
+        }
+        #endif
+        #if UNITY_2018_1_OR_NEWER
+        public Slicei32(NativeArray<int> handle)
+        {
+            unsafe
+            {
+                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
+                this.len = (ulong) handle.Length;
+            }
+        }
+        #endif
+        public int this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                unsafe
+                {
+                    var d = (int*) data.ToPointer();
+                    return d[i];
+                }
+            }
+        }
+        public int[] Copied
+        {
+            get
+            {
+                var rval = new int[len];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        #if __INTEROPTOPUS_NEVER
+                        #elif NETCOREAPP
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(int));
+                        #elif UNITY_2018_1_OR_NEWER
+                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(int)));
+                        #else
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
+                        #endif
+                    }
+                }
+                return rval;
+            }
+        }
+        public int Count => (int) len;
+        public IEnumerator<int> GetEnumerator()
+        {
+            for (var i = 0; i < (int)len; ++i)
+            {
+                yield return this[i];
+            }
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }
+
+
+    ///A pointer to an array of data someone else owns which may not be modified.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
     internal partial struct Sliceu32
     {
         ///Pointer to start of immutable data.

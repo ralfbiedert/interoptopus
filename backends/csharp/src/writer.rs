@@ -9,6 +9,7 @@ use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{is_global_type, longest_common_prefix};
 use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, Error, Inventory};
+use std::iter::zip;
 
 /// Writes the C# file format, `impl` this trait to customize output.
 pub trait CSharpWriter {
@@ -599,7 +600,7 @@ pub trait CSharpWriter {
             .find(|x| x.name().contains("data"))
             .expect("Slice must contain field called 'data'.")
             .the_type()
-            .deref_pointer()
+            .try_deref_pointer()
             .expect("data must be a pointer type");
 
         let type_string = self.converter().to_typespecifier_in_rval(data_type);
@@ -721,7 +722,7 @@ pub trait CSharpWriter {
             .find(|x| x.name().contains("data"))
             .expect("Slice must contain field called 'data'.")
             .the_type()
-            .deref_pointer()
+            .try_deref_pointer()
             .expect("data must be a pointer type");
 
         let type_string = self.converter().to_typespecifier_in_rval(data_type);
@@ -924,7 +925,6 @@ pub trait CSharpWriter {
     }
 
     #[allow(clippy::too_many_arguments)]
-    #[rustfmt::skip]
     fn write_pattern_service_method(
         &self,
         w: &mut IndentWriter,
@@ -934,13 +934,15 @@ pub trait CSharpWriter {
         fn_name: &str,
         write_contxt_by_ref: bool,
         is_ctor: bool,
-        write_for: WriteFor
+        write_for: WriteFor,
     ) -> Result<(), Error> {
         self.debug(w, "write_pattern_service_method")?;
 
         let mut names = Vec::new();
         let mut to_invoke = Vec::new();
         let mut types = Vec::new();
+        let mut to_wrap_delegates = Vec::new();
+        let mut to_wrap_delegate_types = Vec::new();
 
         // For every parameter except the first, figure out how we should forward
         // it to the invocation we perform.
@@ -951,23 +953,48 @@ pub trait CSharpWriter {
             // but if we call the unchecked version we want to keep that `Sliceu8` in our signature.
             let native = self.converter().to_typespecifier_in_param(p.the_type());
 
-            // Forward `ref` and `out` accordingly.
-            if native.contains("out ") {
-                to_invoke.push(format!("out {}", name));
-            } else if native.contains("ref ") {
-                to_invoke.push(format!("ref {}", name));
-            } else {
-                to_invoke.push(name.to_string());
+            match p.the_type() {
+                CType::Pattern(TypePattern::NamedCallback(callback)) => match callback.fnpointer().signature().rval() {
+                    CType::Pattern(TypePattern::FFIErrorEnum(_)) if self.config().work_around_exception_in_callback_no_reentry => {
+                        to_wrap_delegates.push(name);
+                        to_wrap_delegate_types.push(self.helper().converter.to_typespecifier_in_param(p.the_type()));
+                        to_invoke.push(format!("{}_safe_delegate.Call", name));
+                    }
+                    _ => {
+                        // Forward `ref` and `out` accordingly.
+                        if native.contains("out ") {
+                            to_invoke.push(format!("out {}", name));
+                        } else if native.contains("ref ") {
+                            to_invoke.push(format!("ref {}", name));
+                        } else {
+                            to_invoke.push(name.to_string());
+                        }
+                    }
+                },
+
+                _ => {
+                    // Forward `ref` and `out` accordingly.
+                    if native.contains("out ") {
+                        to_invoke.push(format!("out {}", name));
+                    } else if native.contains("ref ") {
+                        to_invoke.push(format!("ref {}", name));
+                    } else {
+                        to_invoke.push(name.to_string());
+                    }
+                }
             }
 
             names.push(name);
             types.push(native);
         }
 
-        let method_to_invoke = self.converter().function_name_to_csharp_name(function, match self.config().rename_symbols {
-            true => FunctionNameFlavor::CSharpMethodNameWithClass,
-            false => FunctionNameFlavor::RawFFIName
-        });
+        let method_to_invoke = self.converter().function_name_to_csharp_name(
+            function,
+            match self.config().rename_symbols {
+                true => FunctionNameFlavor::CSharpMethodNameWithClass,
+                false => FunctionNameFlavor::RawFFIName,
+            },
+        );
         let extra_args = if to_invoke.is_empty() {
             "".to_string()
         } else {
@@ -975,16 +1002,23 @@ pub trait CSharpWriter {
         };
 
         // Assemble actual function call.
-        let context = if write_contxt_by_ref { if is_ctor { "ref self._context" } else { "ref _context"} } else { "_context" };
+        let context = if write_contxt_by_ref {
+            if is_ctor {
+                "ref self._context"
+            } else {
+                "ref _context"
+            }
+        } else {
+            "_context"
+        };
         let arg_tokens = names.iter().zip(types.iter()).map(|(n, t)| format!("{} {}", t, n)).collect::<Vec<_>>();
         let fn_call = format!(r#"{}.{}({}{})"#, self.config().class, method_to_invoke, context, extra_args);
-
 
         // Write signature.
         let signature = format!(r#"public {} {}({})"#, rval, fn_name, arg_tokens.join(", "));
         if write_for == WriteFor::Docs {
             indented!(w, r#"{};"#, signature)?;
-            return Ok(())
+            return Ok(());
         }
 
         indented!(w, "{}", signature)?;
@@ -994,10 +1028,17 @@ pub trait CSharpWriter {
             indented!(w, [_], r#"var self = new {}();"#, class.the_type().rust_name())?;
         }
 
+        for (name, ty) in zip(&to_wrap_delegates, &to_wrap_delegate_types) {
+            indented!(w, [_], r#"var {}_safe_delegate = new {}ExceptionSafe({});"#, name, ty, name)?;
+        }
+
         // Determine return value behavior and write function call.
         match function.signature().rval() {
             CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
                 indented!(w, [_], r#"var rval = {};"#, fn_call)?;
+                for name in to_wrap_delegates {
+                    indented!(w, [_], r#"{}_safe_delegate.Rethrow();"#, name)?;
+                }
                 indented!(w, [_], r#"if (rval != {}.{})"#, e.the_enum().rust_name(), e.success_variant().name())?;
                 indented!(w, [_], r#"{{"#)?;
                 indented!(w, [_ _], r#"throw new InteropException<{}>(rval);"#, e.the_enum().rust_name())?;
