@@ -348,6 +348,15 @@ pub fn log_error<S: AsRef<str>, F: Fn() -> S>(f: F) {
 #[inline(always)]
 pub fn log_error<S: AsRef<str>, F: Fn() -> S>(_f: F) {}
 
+/// Capitalizes the first letter of a string.
+pub fn capitalize_first_letter(s: String) -> String {
+    let mut chars = s.chars();
+    match chars.next() {
+        None => String::new(),
+        Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
+    }
+}
+
 #[cfg(test)]
 mod test {
     use crate::util::IdPrettifier;

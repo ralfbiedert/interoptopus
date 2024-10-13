@@ -61,6 +61,7 @@ Freestanding callables inside the module.
  - **[pattern_ffi_slice_4](#pattern_ffi_slice_4)** - 
  - **[pattern_ffi_slice_5](#pattern_ffi_slice_5)** - 
  - **[pattern_ffi_slice_6](#pattern_ffi_slice_6)** - 
+ - **[pattern_ffi_slice_7](#pattern_ffi_slice_7)** - 
  - **[pattern_ffi_slice_delegate](#pattern_ffi_slice_delegate)** - 
  - **[pattern_ffi_slice_delegate_huge](#pattern_ffi_slice_delegate_huge)** - 
  - **[pattern_ffi_option_1](#pattern_ffi_option_1)** - 
@@ -143,12 +144,12 @@ Composite data used by functions and methods.
  - **[Weird1u32](#Weird1u32)** - 
  - **[Weird2u8](#Weird2u8)** - 
  - **[SliceBool](#SliceBool)** - A pointer and length of un-owned elements.
+ - **[SliceI32](#SliceI32)** - A pointer and length of un-owned elements.
+ - **[SliceU32](#SliceU32)** - A pointer and length of un-owned elements.
+ - **[SliceU8](#SliceU8)** - A pointer and length of un-owned elements.
  - **[SliceUseAsciiStringPattern](#SliceUseAsciiStringPattern)** - A pointer and length of un-owned elements.
  - **[SliceVec](#SliceVec)** - A pointer and length of un-owned elements.
  - **[SliceVec3f32](#SliceVec3f32)** - A pointer and length of un-owned elements.
- - **[Slicei32](#Slicei32)** - A pointer and length of un-owned elements.
- - **[Sliceu32](#Sliceu32)** - A pointer and length of un-owned elements.
- - **[Sliceu8](#Sliceu8)** - A pointer and length of un-owned elements.
  - **[OptionInner](#OptionInner)** - A boolean flag and optionally data.
  - **[OptionVec](#OptionVec)** - A boolean flag and optionally data.
 # Types 
@@ -735,6 +736,78 @@ class SliceBool(ctypes.Structure):
 
 
 
+ ### <a name="SliceI32">**SliceI32**</a>
+
+A pointer to an array of data someone else owns which may not be modified.
+
+#### Fields 
+- **data** - Pointer to start of immutable data. 
+- **len** - Number of elements. 
+#### Definition 
+```python
+class SliceI32(ctypes.Structure):
+
+    _fields_ = [
+        ("data", ctypes.POINTER(ctypes.c_int32)),
+        ("len", ctypes.c_uint64),
+    ]
+
+    def __init__(self, data: ctypes.POINTER(ctypes.c_int32) = None, len: int = None):
+        ...
+```
+
+---
+
+
+
+ ### <a name="SliceU32">**SliceU32**</a>
+
+A pointer to an array of data someone else owns which may not be modified.
+
+#### Fields 
+- **data** - Pointer to start of immutable data. 
+- **len** - Number of elements. 
+#### Definition 
+```python
+class SliceU32(ctypes.Structure):
+
+    _fields_ = [
+        ("data", ctypes.POINTER(ctypes.c_uint32)),
+        ("len", ctypes.c_uint64),
+    ]
+
+    def __init__(self, data: ctypes.POINTER(ctypes.c_uint32) = None, len: int = None):
+        ...
+```
+
+---
+
+
+
+ ### <a name="SliceU8">**SliceU8**</a>
+
+A pointer to an array of data someone else owns which may not be modified.
+
+#### Fields 
+- **data** - Pointer to start of immutable data. 
+- **len** - Number of elements. 
+#### Definition 
+```python
+class SliceU8(ctypes.Structure):
+
+    _fields_ = [
+        ("data", ctypes.POINTER(ctypes.c_uint8)),
+        ("len", ctypes.c_uint64),
+    ]
+
+    def __init__(self, data: ctypes.POINTER(ctypes.c_uint8) = None, len: int = None):
+        ...
+```
+
+---
+
+
+
  ### <a name="SliceUseAsciiStringPattern">**SliceUseAsciiStringPattern**</a>
 
 A pointer to an array of data someone else owns which may not be modified.
@@ -800,78 +873,6 @@ class SliceVec3f32(ctypes.Structure):
     ]
 
     def __init__(self, data: ctypes.POINTER(Vec3f32) = None, len: int = None):
-        ...
-```
-
----
-
-
-
- ### <a name="Slicei32">**Slicei32**</a>
-
-A pointer to an array of data someone else owns which may not be modified.
-
-#### Fields 
-- **data** - Pointer to start of immutable data. 
-- **len** - Number of elements. 
-#### Definition 
-```python
-class Slicei32(ctypes.Structure):
-
-    _fields_ = [
-        ("data", ctypes.POINTER(ctypes.c_int32)),
-        ("len", ctypes.c_uint64),
-    ]
-
-    def __init__(self, data: ctypes.POINTER(ctypes.c_int32) = None, len: int = None):
-        ...
-```
-
----
-
-
-
- ### <a name="Sliceu32">**Sliceu32**</a>
-
-A pointer to an array of data someone else owns which may not be modified.
-
-#### Fields 
-- **data** - Pointer to start of immutable data. 
-- **len** - Number of elements. 
-#### Definition 
-```python
-class Sliceu32(ctypes.Structure):
-
-    _fields_ = [
-        ("data", ctypes.POINTER(ctypes.c_uint32)),
-        ("len", ctypes.c_uint64),
-    ]
-
-    def __init__(self, data: ctypes.POINTER(ctypes.c_uint32) = None, len: int = None):
-        ...
-```
-
----
-
-
-
- ### <a name="Sliceu8">**Sliceu8**</a>
-
-A pointer to an array of data someone else owns which may not be modified.
-
-#### Fields 
-- **data** - Pointer to start of immutable data. 
-- **len** - Number of elements. 
-#### Definition 
-```python
-class Sliceu8(ctypes.Structure):
-
-    _fields_ = [
-        ("data", ctypes.POINTER(ctypes.c_uint8)),
-        ("len", ctypes.c_uint64),
-    ]
-
-    def __init__(self, data: ctypes.POINTER(ctypes.c_uint8) = None, len: int = None):
         ...
 ```
 
@@ -1428,7 +1429,7 @@ def pattern_ascii_pointer_return_slice() -> SliceUseAsciiStringPattern:
 ## pattern_ffi_slice_1 
 #### Definition 
 ```python
-def pattern_ffi_slice_1(ffi_slice: Sliceu32 | ctypes.Array[ctypes.c_uint32]) -> int:
+def pattern_ffi_slice_1(ffi_slice: SliceU32 | ctypes.Array[ctypes.c_uint32]) -> int:
     ...
 ```
 
@@ -1437,7 +1438,7 @@ def pattern_ffi_slice_1(ffi_slice: Sliceu32 | ctypes.Array[ctypes.c_uint32]) -> 
 ## pattern_ffi_slice_1b 
 #### Definition 
 ```python
-def pattern_ffi_slice_1b(ffi_slice: SliceMutu32 | ctypes.Array[ctypes.c_uint32]) -> int:
+def pattern_ffi_slice_1b(ffi_slice: SliceMutU32 | ctypes.Array[ctypes.c_uint32]) -> int:
     ...
 ```
 
@@ -1455,7 +1456,7 @@ def pattern_ffi_slice_2(ffi_slice: SliceVec3f32 | ctypes.Array[Vec3f32], i: int)
 ## pattern_ffi_slice_3 
 #### Definition 
 ```python
-def pattern_ffi_slice_3(slice: SliceMutu8 | ctypes.Array[ctypes.c_uint8], callback):
+def pattern_ffi_slice_3(slice: SliceMutU8 | ctypes.Array[ctypes.c_uint8], callback):
     ...
 ```
 
@@ -1464,7 +1465,7 @@ def pattern_ffi_slice_3(slice: SliceMutu8 | ctypes.Array[ctypes.c_uint8], callba
 ## pattern_ffi_slice_4 
 #### Definition 
 ```python
-def pattern_ffi_slice_4(slice: Sliceu8 | ctypes.Array[ctypes.c_uint8], slice2: SliceMutu8 | ctypes.Array[ctypes.c_uint8]):
+def pattern_ffi_slice_4(slice: SliceU8 | ctypes.Array[ctypes.c_uint8], slice2: SliceMutU8 | ctypes.Array[ctypes.c_uint8]):
     ...
 ```
 
@@ -1473,7 +1474,7 @@ def pattern_ffi_slice_4(slice: Sliceu8 | ctypes.Array[ctypes.c_uint8], slice2: S
 ## pattern_ffi_slice_5 
 #### Definition 
 ```python
-def pattern_ffi_slice_5(slice: ctypes.POINTER(Sliceu8), slice2: ctypes.POINTER(SliceMutu8)):
+def pattern_ffi_slice_5(slice: ctypes.POINTER(SliceU8), slice2: ctypes.POINTER(SliceMutU8)):
     ...
 ```
 
@@ -1482,7 +1483,16 @@ def pattern_ffi_slice_5(slice: ctypes.POINTER(Sliceu8), slice2: ctypes.POINTER(S
 ## pattern_ffi_slice_6 
 #### Definition 
 ```python
-def pattern_ffi_slice_6(slice: ctypes.POINTER(SliceMutu8), callback):
+def pattern_ffi_slice_6(slice: ctypes.POINTER(SliceMutU8), callback):
+    ...
+```
+
+---
+
+## pattern_ffi_slice_7 
+#### Definition 
+```python
+def pattern_ffi_slice_7(slices: SliceMutConstPtrI8 | ctypes.Array[ctypes.POINTER(ctypes.c_char)]) -> int:
     ...
 ```
 
@@ -1757,7 +1767,7 @@ class SimpleService:
 ```python
 class SimpleService:
 
-    def method_mut_self(self, slice: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> int:
+    def method_mut_self(self, slice: SliceU8 | ctypes.Array[ctypes.c_uint8]) -> int:
         ...
 ```
 
@@ -1794,7 +1804,7 @@ class SimpleService:
 ```python
 class SimpleService:
 
-    def method_mut_self_ref_slice(self, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8), slice: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> int:
+    def method_mut_self_ref_slice(self, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8), slice: SliceU8 | ctypes.Array[ctypes.c_uint8]) -> int:
         ...
 ```
 
@@ -1806,7 +1816,7 @@ class SimpleService:
 ```python
 class SimpleService:
 
-    def method_mut_self_ref_slice_limited(self, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8), slice: Sliceu8 | ctypes.Array[ctypes.c_uint8], slice2: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> int:
+    def method_mut_self_ref_slice_limited(self, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8), slice: SliceU8 | ctypes.Array[ctypes.c_uint8], slice2: SliceU8 | ctypes.Array[ctypes.c_uint8]) -> int:
         ...
 ```
 
@@ -1818,7 +1828,7 @@ class SimpleService:
 ```python
 class SimpleService:
 
-    def method_mut_self_ffi_error(self, slice: SliceMutu8 | ctypes.Array[ctypes.c_uint8]):
+    def method_mut_self_ffi_error(self, slice: SliceMutU8 | ctypes.Array[ctypes.c_uint8]):
         ...
 ```
 
@@ -1830,7 +1840,7 @@ class SimpleService:
 ```python
 class SimpleService:
 
-    def method_mut_self_no_error(self, slice: SliceMutu8 | ctypes.Array[ctypes.c_uint8]):
+    def method_mut_self_no_error(self, slice: SliceMutU8 | ctypes.Array[ctypes.c_uint8]):
         ...
 ```
 
@@ -1844,7 +1854,7 @@ class SimpleService:
 ```python
 class SimpleService:
 
-    def return_slice(self, ) -> Sliceu32:
+    def return_slice(self, ) -> SliceU32:
         ...
 ```
 
@@ -1858,7 +1868,7 @@ class SimpleService:
 ```python
 class SimpleService:
 
-    def return_slice_mut(self, ) -> SliceMutu32:
+    def return_slice_mut(self, ) -> SliceMutU32:
         ...
 ```
 
@@ -1920,7 +1930,7 @@ class SimpleService:
 ```python
 class SimpleService:
 
-    def method_callback_ffi_return_with_slice(self, callback, input: Slicei32 | ctypes.Array[ctypes.c_int32]):
+    def method_callback_ffi_return_with_slice(self, callback, input: SliceI32 | ctypes.Array[ctypes.c_int32]):
         ...
 ```
 
@@ -1972,7 +1982,7 @@ class SimpleServiceLifetime:
 ```python
 class SimpleServiceLifetime:
 
-    def return_string_accept_slice(self, anon1: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> bytes:
+    def return_string_accept_slice(self, anon1: SliceU8 | ctypes.Array[ctypes.c_uint8]) -> bytes:
         ...
 ```
 

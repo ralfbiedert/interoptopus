@@ -61,6 +61,7 @@ Freestanding callables inside the module.
  - **[pattern_ffi_slice_4](#pattern_ffi_slice_4)** - 
  - **[pattern_ffi_slice_5](#pattern_ffi_slice_5)** - 
  - **[pattern_ffi_slice_6](#pattern_ffi_slice_6)** - 
+ - **[pattern_ffi_slice_7](#pattern_ffi_slice_7)** - 
  - **[pattern_ffi_slice_delegate](#pattern_ffi_slice_delegate)** - 
  - **[pattern_ffi_slice_delegate_huge](#pattern_ffi_slice_delegate_huge)** - 
  - **[pattern_ffi_option_1](#pattern_ffi_option_1)** - 
@@ -143,12 +144,12 @@ Composite data used by functions and methods.
  - **[Weird1u32](#Weird1u32)** - 
  - **[Weird2u8](#Weird2u8)** - 
  - **[SliceBool](#SliceBool)** - A pointer and length of un-owned elements.
+ - **[SliceI32](#SliceI32)** - A pointer and length of un-owned elements.
+ - **[SliceU32](#SliceU32)** - A pointer and length of un-owned elements.
+ - **[SliceU8](#SliceU8)** - A pointer and length of un-owned elements.
  - **[SliceUseAsciiStringPattern](#SliceUseAsciiStringPattern)** - A pointer and length of un-owned elements.
  - **[SliceVec](#SliceVec)** - A pointer and length of un-owned elements.
  - **[SliceVec3f32](#SliceVec3f32)** - A pointer and length of un-owned elements.
- - **[Slicei32](#Slicei32)** - A pointer and length of un-owned elements.
- - **[Sliceu32](#Sliceu32)** - A pointer and length of un-owned elements.
- - **[Sliceu8](#Sliceu8)** - A pointer and length of un-owned elements.
  - **[OptionInner](#OptionInner)** - A boolean flag and optionally data.
  - **[OptionVec](#OptionVec)** - A boolean flag and optionally data.
 
@@ -656,6 +657,66 @@ public partial struct SliceBool
 
 
 
+ ### <a name="SliceI32">**SliceI32**</a>
+
+A pointer to an array of data someone else owns which may not be modified.
+
+#### Fields 
+- **data** - Pointer to start of immutable data. 
+- **len** - Number of elements. 
+#### Definition 
+```csharp
+public partial struct SliceI32
+{
+    IntPtr data;
+    ulong len;
+}
+```
+
+---
+
+
+
+ ### <a name="SliceU32">**SliceU32**</a>
+
+A pointer to an array of data someone else owns which may not be modified.
+
+#### Fields 
+- **data** - Pointer to start of immutable data. 
+- **len** - Number of elements. 
+#### Definition 
+```csharp
+public partial struct SliceU32
+{
+    IntPtr data;
+    ulong len;
+}
+```
+
+---
+
+
+
+ ### <a name="SliceU8">**SliceU8**</a>
+
+A pointer to an array of data someone else owns which may not be modified.
+
+#### Fields 
+- **data** - Pointer to start of immutable data. 
+- **len** - Number of elements. 
+#### Definition 
+```csharp
+public partial struct SliceU8
+{
+    IntPtr data;
+    ulong len;
+}
+```
+
+---
+
+
+
  ### <a name="SliceUseAsciiStringPattern">**SliceUseAsciiStringPattern**</a>
 
 A pointer to an array of data someone else owns which may not be modified.
@@ -706,66 +767,6 @@ A pointer to an array of data someone else owns which may not be modified.
 #### Definition 
 ```csharp
 public partial struct SliceVec3f32
-{
-    IntPtr data;
-    ulong len;
-}
-```
-
----
-
-
-
- ### <a name="Slicei32">**Slicei32**</a>
-
-A pointer to an array of data someone else owns which may not be modified.
-
-#### Fields 
-- **data** - Pointer to start of immutable data. 
-- **len** - Number of elements. 
-#### Definition 
-```csharp
-public partial struct Slicei32
-{
-    IntPtr data;
-    ulong len;
-}
-```
-
----
-
-
-
- ### <a name="Sliceu32">**Sliceu32**</a>
-
-A pointer to an array of data someone else owns which may not be modified.
-
-#### Fields 
-- **data** - Pointer to start of immutable data. 
-- **len** - Number of elements. 
-#### Definition 
-```csharp
-public partial struct Sliceu32
-{
-    IntPtr data;
-    ulong len;
-}
-```
-
----
-
-
-
- ### <a name="Sliceu8">**Sliceu8**</a>
-
-A pointer to an array of data someone else owns which may not be modified.
-
-#### Fields 
-- **data** - Pointer to start of immutable data. 
-- **len** - Number of elements. 
-#### Definition 
-```csharp
-public partial struct Sliceu8
 {
     IntPtr data;
     ulong len;
@@ -1281,7 +1282,7 @@ public static extern SliceUseAsciiStringPattern pattern_ascii_pointer_return_sli
 ### <a name="pattern_ffi_slice_1">**pattern_ffi_slice_1**</a>
 #### Definition 
 ```csharp
-public static extern uint pattern_ffi_slice_1(Sliceu32 ffi_slice);
+public static extern uint pattern_ffi_slice_1(SliceU32 ffi_slice);
 public static uint pattern_ffi_slice_1(uint[] ffi_slice);
 #if UNITY_2018_1_OR_NEWER
 public static uint pattern_ffi_slice_1(NativeArray<uint> ffi_slice);
@@ -1293,7 +1294,7 @@ public static uint pattern_ffi_slice_1(NativeArray<uint> ffi_slice);
 ### <a name="pattern_ffi_slice_1b">**pattern_ffi_slice_1b**</a>
 #### Definition 
 ```csharp
-public static extern uint pattern_ffi_slice_1b(SliceMutu32 ffi_slice);
+public static extern uint pattern_ffi_slice_1b(SliceMutU32 ffi_slice);
 public static uint pattern_ffi_slice_1b(uint[] ffi_slice);
 #if UNITY_2018_1_OR_NEWER
 public static uint pattern_ffi_slice_1b(NativeArray<uint> ffi_slice);
@@ -1317,9 +1318,9 @@ public static Vec3f32 pattern_ffi_slice_2(NativeArray<Vec3f32> ffi_slice, int i)
 ### <a name="pattern_ffi_slice_3">**pattern_ffi_slice_3**</a>
 #### Definition 
 ```csharp
-public static extern void pattern_ffi_slice_3(SliceMutu8 slice, CallbackSliceMut callback);
+public static extern void pattern_ffi_slice_3(SliceMutU8 slice, CallbackSliceMut callback);
 public static void pattern_ffi_slice_3(byte[] slice, CallbackSliceMut callback);
-public static extern void pattern_ffi_slice_3(SliceMutu8 slice, IntPtr callback);
+public static extern void pattern_ffi_slice_3(SliceMutU8 slice, IntPtr callback);
 #if UNITY_2018_1_OR_NEWER
 public static void pattern_ffi_slice_3(NativeArray<byte> slice, IntPtr callback);
 #endif
@@ -1330,7 +1331,7 @@ public static void pattern_ffi_slice_3(NativeArray<byte> slice, IntPtr callback)
 ### <a name="pattern_ffi_slice_4">**pattern_ffi_slice_4**</a>
 #### Definition 
 ```csharp
-public static extern void pattern_ffi_slice_4(Sliceu8 slice, SliceMutu8 slice2);
+public static extern void pattern_ffi_slice_4(SliceU8 slice, SliceMutU8 slice2);
 public static void pattern_ffi_slice_4(byte[] slice, byte[] slice2);
 #if UNITY_2018_1_OR_NEWER
 public static void pattern_ffi_slice_4(NativeArray<byte> slice, NativeArray<byte> slice2);
@@ -1342,7 +1343,7 @@ public static void pattern_ffi_slice_4(NativeArray<byte> slice, NativeArray<byte
 ### <a name="pattern_ffi_slice_5">**pattern_ffi_slice_5**</a>
 #### Definition 
 ```csharp
-public static extern void pattern_ffi_slice_5(ref Sliceu8 slice, ref SliceMutu8 slice2);
+public static extern void pattern_ffi_slice_5(ref SliceU8 slice, ref SliceMutU8 slice2);
 public static void pattern_ffi_slice_5(byte[] slice, byte[] slice2);
 #if UNITY_2018_1_OR_NEWER
 public static void pattern_ffi_slice_5(NativeArray<byte> slice, NativeArray<byte> slice2);
@@ -1354,11 +1355,23 @@ public static void pattern_ffi_slice_5(NativeArray<byte> slice, NativeArray<byte
 ### <a name="pattern_ffi_slice_6">**pattern_ffi_slice_6**</a>
 #### Definition 
 ```csharp
-public static extern void pattern_ffi_slice_6(ref SliceMutu8 slice, CallbackU8 callback);
+public static extern void pattern_ffi_slice_6(ref SliceMutU8 slice, CallbackU8 callback);
 public static void pattern_ffi_slice_6(byte[] slice, CallbackU8 callback);
-public static extern void pattern_ffi_slice_6(ref SliceMutu8 slice, IntPtr callback);
+public static extern void pattern_ffi_slice_6(ref SliceMutU8 slice, IntPtr callback);
 #if UNITY_2018_1_OR_NEWER
 public static void pattern_ffi_slice_6(NativeArray<byte> slice, IntPtr callback);
+#endif
+```
+
+---
+
+### <a name="pattern_ffi_slice_7">**pattern_ffi_slice_7**</a>
+#### Definition 
+```csharp
+public static extern uint pattern_ffi_slice_7(SliceMutConstPtrI8 slices);
+public static uint pattern_ffi_slice_7(string[] slices);
+#if UNITY_2018_1_OR_NEWER
+public static uint pattern_ffi_slice_7(NativeArray<string> slices);
 #endif
 ```
 
@@ -1602,7 +1615,7 @@ public class SimpleService {
 #### Definition 
 ```csharp
 public class SimpleService {
-    public byte MethodMutSelf(Sliceu8 slice);
+    public byte MethodMutSelf(SliceU8 slice);
     public byte MethodMutSelf(byte[] slice);
 #if UNITY_2018_1_OR_NEWER
     public byte MethodMutSelf(NativeArray<byte> slice);
@@ -1644,7 +1657,7 @@ public class SimpleService {
 #### Definition 
 ```csharp
 public class SimpleService {
-    public byte MethodMutSelfRefSlice(ref byte x, out byte y, Sliceu8 slice);
+    public byte MethodMutSelfRefSlice(ref byte x, out byte y, SliceU8 slice);
     public byte MethodMutSelfRefSlice(ref byte x, out byte y, byte[] slice);
 #if UNITY_2018_1_OR_NEWER
     public byte MethodMutSelfRefSlice(ref byte x, out byte y, NativeArray<byte> slice);
@@ -1659,7 +1672,7 @@ public class SimpleService {
 #### Definition 
 ```csharp
 public class SimpleService {
-    public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, Sliceu8 slice, Sliceu8 slice2);
+    public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, SliceU8 slice, SliceU8 slice2);
     public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, byte[] slice, byte[] slice2);
 #if UNITY_2018_1_OR_NEWER
     public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, NativeArray<byte> slice, NativeArray<byte> slice2);
@@ -1674,7 +1687,7 @@ public class SimpleService {
 #### Definition 
 ```csharp
 public class SimpleService {
-    public void MethodMutSelfFfiError(SliceMutu8 slice);
+    public void MethodMutSelfFfiError(SliceMutU8 slice);
     public void MethodMutSelfFfiError(byte[] slice);
 #if UNITY_2018_1_OR_NEWER
     public void MethodMutSelfFfiError(NativeArray<byte> slice);
@@ -1689,7 +1702,7 @@ public class SimpleService {
 #### Definition 
 ```csharp
 public class SimpleService {
-    public void MethodMutSelfNoError(SliceMutu8 slice);
+    public void MethodMutSelfNoError(SliceMutU8 slice);
     public void MethodMutSelfNoError(byte[] slice);
 #if UNITY_2018_1_OR_NEWER
     public void MethodMutSelfNoError(NativeArray<byte> slice);
@@ -1706,7 +1719,7 @@ public class SimpleService {
 #### Definition 
 ```csharp
 public class SimpleService {
-    public Sliceu32 ReturnSlice();
+    public SliceU32 ReturnSlice();
 }
 ```
 
@@ -1719,7 +1732,7 @@ public class SimpleService {
 #### Definition 
 ```csharp
 public class SimpleService {
-    public SliceMutu32 ReturnSliceMut();
+    public SliceMutU32 ReturnSliceMut();
 }
 ```
 
@@ -1782,7 +1795,7 @@ public class SimpleService {
 #### Definition 
 ```csharp
 public class SimpleService {
-    public void MethodCallbackFfiReturnWithSlice(SumDelegateReturn callback, Slicei32 input);
+    public void MethodCallbackFfiReturnWithSlice(SumDelegateReturn callback, SliceI32 input);
     public void MethodCallbackFfiReturnWithSlice(SumDelegateReturn callback, int[] input);
 #if UNITY_2018_1_OR_NEWER
     public void MethodCallbackFfiReturnWithSlice(IntPtr callback, NativeArray<int> input);
@@ -1839,7 +1852,7 @@ public class SimpleServiceLifetime {
 #### Definition 
 ```csharp
 public class SimpleServiceLifetime {
-    public string ReturnStringAcceptSlice(Sliceu8 anon1);
+    public string ReturnStringAcceptSlice(SliceU8 anon1);
     public string ReturnStringAcceptSlice(byte[] anon1);
 #if UNITY_2018_1_OR_NEWER
     public string ReturnStringAcceptSlice(NativeArray<byte> anon1);

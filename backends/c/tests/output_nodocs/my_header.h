@@ -221,6 +221,12 @@ typedef struct my_library_sliceu8
     uint64_t len;
     } my_library_sliceu8;
 
+typedef struct my_library_slicemutconstptri8
+    {
+    const const char** data;
+    uint64_t len;
+    } my_library_slicemutconstptri8;
+
 typedef struct my_library_slicemutu32
     {
     const uint32_t* data;
@@ -344,6 +350,7 @@ void pattern_ffi_slice_3(my_library_slicemutu8 slice, my_library_callbackslicemu
 void pattern_ffi_slice_4(my_library_sliceu8 slice, my_library_slicemutu8 slice2);
 void pattern_ffi_slice_5(const my_library_sliceu8* slice, my_library_slicemutu8* slice2);
 void pattern_ffi_slice_6(const my_library_slicemutu8* slice, my_library_callbacku8 callback);
+uint32_t pattern_ffi_slice_7(my_library_slicemutconstptri8 slices);
 uint8_t pattern_ffi_slice_delegate(my_library_callbackffislice callback);
 my_library_vec3f32 pattern_ffi_slice_delegate_huge(my_library_callbackhugevecslice callback);
 my_library_optioninner pattern_ffi_option_1(my_library_optioninner ffi_slice);

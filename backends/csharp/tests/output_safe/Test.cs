@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using My.Company;
 using My.Company.Common;
@@ -20,7 +21,7 @@ namespace interop_test
         [Fact]
         public void pattern_ffi_slice_delegate()
         {
-            Interop.pattern_ffi_slice_delegate(delegate (Sliceu8 x0)
+            Interop.pattern_ffi_slice_delegate(delegate (SliceU8 x0)
             {
                 Assert.Equal(x0.Count, 10);
                 Assert.Equal(x0[0], 0);
@@ -79,7 +80,7 @@ namespace interop_test
         }
 
         [Fact]
-        public void packed()
+        public void packed_types()
         {
             var p1 = new Packed1
             {
@@ -92,6 +93,16 @@ namespace interop_test
             Assert.Equal(p1.x, p2.x);
             Assert.Equal(p1.y, p2.y);
         }
+        
+        [Fact]
+        public void string_slices()
+        {
+            // TODO - This won't work as C# would need more special marshalling of the individual strings.
+            // List<string> strings = ["a", "bb", "ccc"];
+            // var total_length  = Interop.pattern_ffi_slice_7(strings.ToArray());
+            // Assert.Equal(total_length, 6u);
+        }
+
 
         [Fact]
         public void pattern_ffi_option_nullable()

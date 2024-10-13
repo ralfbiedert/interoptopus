@@ -126,7 +126,7 @@ class TestFunctions(unittest.TestCase):
         returned_length = r.pattern_ffi_slice_1(array)
         self.assertEqual(len(array), returned_length)
 
-        slice = r.Sliceu32(data=ctypes.cast(array, ctypes.POINTER(ctypes.c_uint32)), len=len(array))
+        slice = r.SliceU32(data=ctypes.cast(array, ctypes.POINTER(ctypes.c_uint32)), len=len(array))
         returned_length = r.pattern_ffi_slice_1(slice)
         self.assertEqual(len(slice), returned_length)
 

@@ -46,6 +46,7 @@ pub fn my_function(input: Vec2) {
 pub fn ffi_inventory() -> Inventory {
     InventoryBuilder::new()
         .register(function!(my_function))
+        .validate()
         .inventory()
 }
 

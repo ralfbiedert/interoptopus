@@ -61,14 +61,15 @@ def init_lib(path):
     c_lib.pattern_ascii_pointer_2.argtypes = []
     c_lib.pattern_ascii_pointer_len.argtypes = [ctypes.POINTER(ctypes.c_char), UseAsciiStringPattern]
     c_lib.pattern_ascii_pointer_return_slice.argtypes = []
-    c_lib.pattern_ffi_slice_1.argtypes = [Sliceu32]
-    c_lib.pattern_ffi_slice_1b.argtypes = [SliceMutu32]
+    c_lib.pattern_ffi_slice_1.argtypes = [SliceU32]
+    c_lib.pattern_ffi_slice_1b.argtypes = [SliceMutU32]
     c_lib.pattern_ffi_slice_2.argtypes = [SliceVec3f32, ctypes.c_int32]
-    c_lib.pattern_ffi_slice_3.argtypes = [SliceMutu8, ctypes.CFUNCTYPE(None, SliceMutu8)]
-    c_lib.pattern_ffi_slice_4.argtypes = [Sliceu8, SliceMutu8]
-    c_lib.pattern_ffi_slice_5.argtypes = [ctypes.POINTER(Sliceu8), ctypes.POINTER(SliceMutu8)]
-    c_lib.pattern_ffi_slice_6.argtypes = [ctypes.POINTER(SliceMutu8), ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8)]
-    c_lib.pattern_ffi_slice_delegate.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint8, Sliceu8)]
+    c_lib.pattern_ffi_slice_3.argtypes = [SliceMutU8, ctypes.CFUNCTYPE(None, SliceMutU8)]
+    c_lib.pattern_ffi_slice_4.argtypes = [SliceU8, SliceMutU8]
+    c_lib.pattern_ffi_slice_5.argtypes = [ctypes.POINTER(SliceU8), ctypes.POINTER(SliceMutU8)]
+    c_lib.pattern_ffi_slice_6.argtypes = [ctypes.POINTER(SliceMutU8), ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8)]
+    c_lib.pattern_ffi_slice_7.argtypes = [SliceMutConstPtrI8]
+    c_lib.pattern_ffi_slice_delegate.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint8, SliceU8)]
     c_lib.pattern_ffi_slice_delegate_huge.argtypes = [ctypes.CFUNCTYPE(Vec3f32, SliceVec3f32)]
     c_lib.pattern_ffi_option_1.argtypes = [OptionInner]
     c_lib.pattern_ffi_option_2.argtypes = [OptionInner]
@@ -94,25 +95,25 @@ def init_lib(path):
     c_lib.simple_service_method_value.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
     c_lib.simple_service_method_void.argtypes = [ctypes.c_void_p]
     c_lib.simple_service_method_void2.argtypes = [ctypes.c_void_p]
-    c_lib.simple_service_method_mut_self.argtypes = [ctypes.c_void_p, Sliceu8]
+    c_lib.simple_service_method_mut_self.argtypes = [ctypes.c_void_p, SliceU8]
     c_lib.simple_service_method_mut_self_void.argtypes = [ctypes.c_void_p, SliceBool]
     c_lib.simple_service_method_mut_self_ref.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_uint8)]
-    c_lib.simple_service_method_mut_self_ref_slice.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_uint8), Sliceu8]
-    c_lib.simple_service_method_mut_self_ref_slice_limited.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_uint8), Sliceu8, Sliceu8]
-    c_lib.simple_service_method_mut_self_ffi_error.argtypes = [ctypes.c_void_p, SliceMutu8]
-    c_lib.simple_service_method_mut_self_no_error.argtypes = [ctypes.c_void_p, SliceMutu8]
+    c_lib.simple_service_method_mut_self_ref_slice.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_uint8), SliceU8]
+    c_lib.simple_service_method_mut_self_ref_slice_limited.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_uint8), SliceU8, SliceU8]
+    c_lib.simple_service_method_mut_self_ffi_error.argtypes = [ctypes.c_void_p, SliceMutU8]
+    c_lib.simple_service_method_mut_self_no_error.argtypes = [ctypes.c_void_p, SliceMutU8]
     c_lib.simple_service_return_slice.argtypes = [ctypes.c_void_p]
     c_lib.simple_service_return_slice_mut.argtypes = [ctypes.c_void_p]
     c_lib.simple_service_return_string.argtypes = [ctypes.c_void_p]
     c_lib.simple_service_method_void_ffi_error.argtypes = [ctypes.c_void_p]
     c_lib.simple_service_method_callback.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)]
     c_lib.simple_service_method_callback_ffi_return.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32)]
-    c_lib.simple_service_method_callback_ffi_return_with_slice.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32), Slicei32]
+    c_lib.simple_service_method_callback_ffi_return_with_slice.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32), SliceI32]
     c_lib.simple_service_lifetime_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.simple_service_lifetime_new_with.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.POINTER(ctypes.c_uint32)]
     c_lib.simple_service_lifetime_method_lt.argtypes = [ctypes.c_void_p, SliceBool]
     c_lib.simple_service_lifetime_method_lt2.argtypes = [ctypes.c_void_p, SliceBool]
-    c_lib.simple_service_lifetime_return_string_accept_slice.argtypes = [ctypes.c_void_p, Sliceu8]
+    c_lib.simple_service_lifetime_return_string_accept_slice.argtypes = [ctypes.c_void_p, SliceU8]
     c_lib.simple_service_lifetime_method_void_ffi_error.argtypes = [ctypes.c_void_p]
 
     c_lib.primitive_bool.restype = ctypes.c_bool
@@ -165,6 +166,7 @@ def init_lib(path):
     c_lib.pattern_ffi_slice_1.restype = ctypes.c_uint32
     c_lib.pattern_ffi_slice_1b.restype = ctypes.c_uint32
     c_lib.pattern_ffi_slice_2.restype = Vec3f32
+    c_lib.pattern_ffi_slice_7.restype = ctypes.c_uint32
     c_lib.pattern_ffi_slice_delegate.restype = ctypes.c_uint8
     c_lib.pattern_ffi_slice_delegate_huge.restype = Vec3f32
     c_lib.pattern_ffi_option_1.restype = OptionInner
@@ -193,8 +195,8 @@ def init_lib(path):
     c_lib.simple_service_method_mut_self_ref_slice_limited.restype = ctypes.c_uint8
     c_lib.simple_service_method_mut_self_ffi_error.restype = ctypes.c_int
     c_lib.simple_service_method_mut_self_no_error.restype = ctypes.c_int
-    c_lib.simple_service_return_slice.restype = Sliceu32
-    c_lib.simple_service_return_slice_mut.restype = SliceMutu32
+    c_lib.simple_service_return_slice.restype = SliceU32
+    c_lib.simple_service_return_slice_mut.restype = SliceMutU32
     c_lib.simple_service_return_string.restype = ctypes.POINTER(ctypes.c_char)
     c_lib.simple_service_method_void_ffi_error.restype = ctypes.c_int
     c_lib.simple_service_method_callback.restype = ctypes.c_int
@@ -396,15 +398,15 @@ def pattern_ascii_pointer_len(x: bytes, y: UseAsciiStringPattern) -> int:
 def pattern_ascii_pointer_return_slice() -> SliceUseAsciiStringPattern:
     return c_lib.pattern_ascii_pointer_return_slice()
 
-def pattern_ffi_slice_1(ffi_slice: Sliceu32 | ctypes.Array[ctypes.c_uint32]) -> int:
+def pattern_ffi_slice_1(ffi_slice: SliceU32 | ctypes.Array[ctypes.c_uint32]) -> int:
     if hasattr(ffi_slice, "_length_") and getattr(ffi_slice, "_type_", "") == ctypes.c_uint32:
-        ffi_slice = Sliceu32(data=ctypes.cast(ffi_slice, ctypes.POINTER(ctypes.c_uint32)), len=len(ffi_slice))
+        ffi_slice = SliceU32(data=ctypes.cast(ffi_slice, ctypes.POINTER(ctypes.c_uint32)), len=len(ffi_slice))
 
     return c_lib.pattern_ffi_slice_1(ffi_slice)
 
-def pattern_ffi_slice_1b(ffi_slice: SliceMutu32 | ctypes.Array[ctypes.c_uint32]) -> int:
+def pattern_ffi_slice_1b(ffi_slice: SliceMutU32 | ctypes.Array[ctypes.c_uint32]) -> int:
     if hasattr(ffi_slice, "_length_") and getattr(ffi_slice, "_type_", "") == ctypes.c_uint32:
-        ffi_slice = SliceMutu32(data=ctypes.cast(ffi_slice, ctypes.POINTER(ctypes.c_uint32)), len=len(ffi_slice))
+        ffi_slice = SliceMutU32(data=ctypes.cast(ffi_slice, ctypes.POINTER(ctypes.c_uint32)), len=len(ffi_slice))
 
     return c_lib.pattern_ffi_slice_1b(ffi_slice)
 
@@ -414,36 +416,42 @@ def pattern_ffi_slice_2(ffi_slice: SliceVec3f32 | ctypes.Array[Vec3f32], i: int)
 
     return c_lib.pattern_ffi_slice_2(ffi_slice, i)
 
-def pattern_ffi_slice_3(slice: SliceMutu8 | ctypes.Array[ctypes.c_uint8], callback):
+def pattern_ffi_slice_3(slice: SliceMutU8 | ctypes.Array[ctypes.c_uint8], callback):
     if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
-        slice = SliceMutu8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
+        slice = SliceMutU8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
     if not hasattr(callback, "__ctypes_from_outparam__"):
-        callback = callbacks.fn_SliceMutu8(callback)
+        callback = callbacks.fn_SliceMutU8(callback)
 
     return c_lib.pattern_ffi_slice_3(slice, callback)
 
-def pattern_ffi_slice_4(slice: Sliceu8 | ctypes.Array[ctypes.c_uint8], slice2: SliceMutu8 | ctypes.Array[ctypes.c_uint8]):
+def pattern_ffi_slice_4(slice: SliceU8 | ctypes.Array[ctypes.c_uint8], slice2: SliceMutU8 | ctypes.Array[ctypes.c_uint8]):
     if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
-        slice = Sliceu8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
+        slice = SliceU8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
     if hasattr(slice2, "_length_") and getattr(slice2, "_type_", "") == ctypes.c_uint8:
-        slice2 = SliceMutu8(data=ctypes.cast(slice2, ctypes.POINTER(ctypes.c_uint8)), len=len(slice2))
+        slice2 = SliceMutU8(data=ctypes.cast(slice2, ctypes.POINTER(ctypes.c_uint8)), len=len(slice2))
 
     return c_lib.pattern_ffi_slice_4(slice, slice2)
 
-def pattern_ffi_slice_5(slice: ctypes.POINTER(Sliceu8), slice2: ctypes.POINTER(SliceMutu8)):
+def pattern_ffi_slice_5(slice: ctypes.POINTER(SliceU8), slice2: ctypes.POINTER(SliceMutU8)):
     return c_lib.pattern_ffi_slice_5(slice, slice2)
 
-def pattern_ffi_slice_6(slice: ctypes.POINTER(SliceMutu8), callback):
+def pattern_ffi_slice_6(slice: ctypes.POINTER(SliceMutU8), callback):
     if not hasattr(callback, "__ctypes_from_outparam__"):
         callback = callbacks.fn_u8_rval_u8(callback)
 
     return c_lib.pattern_ffi_slice_6(slice, callback)
 
+def pattern_ffi_slice_7(slices: SliceMutConstPtrI8 | ctypes.Array[ctypes.POINTER(ctypes.c_char)]) -> int:
+    if hasattr(slices, "_length_") and getattr(slices, "_type_", "") == ctypes.POINTER(ctypes.c_char):
+        slices = SliceMutConstPtrI8(data=ctypes.cast(slices, ctypes.POINTER(ctypes.POINTER(ctypes.c_char))), len=len(slices))
+
+    return c_lib.pattern_ffi_slice_7(slices)
+
 def pattern_ffi_slice_delegate(callback) -> int:
     if not hasattr(callback, "__ctypes_from_outparam__"):
-        callback = callbacks.fn_Sliceu8_rval_u8(callback)
+        callback = callbacks.fn_SliceU8_rval_u8(callback)
 
     return c_lib.pattern_ffi_slice_delegate(callback)
 
@@ -482,7 +490,7 @@ def pattern_callback_1(callback, x: int) -> int:
 
 def pattern_callback_2(callback):
     if not hasattr(callback, "__ctypes_from_outparam__"):
-        callback = callbacks.fn_pconst(callback)
+        callback = callbacks.fn_ConstPtr(callback)
 
     return c_lib.pattern_callback_2(callback)
 
@@ -1358,7 +1366,7 @@ class SliceBool(ctypes.Structure):
         return self[len(self)-1]
 
 
-class Slicei32(ctypes.Structure):
+class SliceI32(ctypes.Structure):
     # These fields represent the underlying C data layout
     _fields_ = [
         ("data", ctypes.POINTER(ctypes.c_int32)),
@@ -1379,7 +1387,7 @@ class Slicei32(ctypes.Structure):
 
         return self.data[index]
 
-    def copied(self) -> Slicei32:
+    def copied(self) -> SliceI32:
         """Returns a shallow, owned copy of the underlying slice.
 
         The returned object owns the immediate data, but not the targets of any contained
@@ -1388,7 +1396,7 @@ class Slicei32(ctypes.Structure):
         any pointers the returned object is valid indefinitely."""
         array = (ctypes.c_int32 * len(self))()
         ctypes.memmove(array, self.data, len(self) * ctypes.sizeof(ctypes.c_int32))
-        rval = Slicei32(data=ctypes.cast(array, ctypes.POINTER(ctypes.c_int32)), len=len(self))
+        rval = SliceI32(data=ctypes.cast(array, ctypes.POINTER(ctypes.c_int32)), len=len(self))
         rval.owned = array  # Store array in returned slice to prevent memory deallocation
         return rval
 
@@ -1408,7 +1416,7 @@ class Slicei32(ctypes.Structure):
         return self[len(self)-1]
 
 
-class Sliceu32(ctypes.Structure):
+class SliceU32(ctypes.Structure):
     # These fields represent the underlying C data layout
     _fields_ = [
         ("data", ctypes.POINTER(ctypes.c_uint32)),
@@ -1429,7 +1437,7 @@ class Sliceu32(ctypes.Structure):
 
         return self.data[index]
 
-    def copied(self) -> Sliceu32:
+    def copied(self) -> SliceU32:
         """Returns a shallow, owned copy of the underlying slice.
 
         The returned object owns the immediate data, but not the targets of any contained
@@ -1438,7 +1446,7 @@ class Sliceu32(ctypes.Structure):
         any pointers the returned object is valid indefinitely."""
         array = (ctypes.c_uint32 * len(self))()
         ctypes.memmove(array, self.data, len(self) * ctypes.sizeof(ctypes.c_uint32))
-        rval = Sliceu32(data=ctypes.cast(array, ctypes.POINTER(ctypes.c_uint32)), len=len(self))
+        rval = SliceU32(data=ctypes.cast(array, ctypes.POINTER(ctypes.c_uint32)), len=len(self))
         rval.owned = array  # Store array in returned slice to prevent memory deallocation
         return rval
 
@@ -1458,7 +1466,7 @@ class Sliceu32(ctypes.Structure):
         return self[len(self)-1]
 
 
-class Sliceu8(ctypes.Structure):
+class SliceU8(ctypes.Structure):
     # These fields represent the underlying C data layout
     _fields_ = [
         ("data", ctypes.POINTER(ctypes.c_uint8)),
@@ -1479,7 +1487,7 @@ class Sliceu8(ctypes.Structure):
 
         return self.data[index]
 
-    def copied(self) -> Sliceu8:
+    def copied(self) -> SliceU8:
         """Returns a shallow, owned copy of the underlying slice.
 
         The returned object owns the immediate data, but not the targets of any contained
@@ -1488,7 +1496,7 @@ class Sliceu8(ctypes.Structure):
         any pointers the returned object is valid indefinitely."""
         array = (ctypes.c_uint8 * len(self))()
         ctypes.memmove(array, self.data, len(self) * ctypes.sizeof(ctypes.c_uint8))
-        rval = Sliceu8(data=ctypes.cast(array, ctypes.POINTER(ctypes.c_uint8)), len=len(self))
+        rval = SliceU8(data=ctypes.cast(array, ctypes.POINTER(ctypes.c_uint8)), len=len(self))
         rval.owned = array  # Store array in returned slice to prevent memory deallocation
         return rval
 
@@ -1515,7 +1523,68 @@ class Sliceu8(ctypes.Structure):
         return rval
 
 
-class SliceMutu32(ctypes.Structure):
+class SliceMutConstPtrI8(ctypes.Structure):
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("data", ctypes.POINTER(ctypes.POINTER(ctypes.c_char))),
+        ("len", ctypes.c_uint64),
+    ]
+
+    def __len__(self):
+        return self.len
+
+    def __getitem__(self, i) -> bytes:
+        if i < 0:
+            index = self.len+i
+        else:
+            index = i
+
+        if index >= self.len:
+            raise IndexError("Index out of range")
+
+        return self.data[index]
+
+    def __setitem__(self, i, v: bytes):
+        if i < 0:
+            index = self.len+i
+        else:
+            index = i
+
+        if index >= self.len:
+            raise IndexError("Index out of range")
+
+        self.data[index] = v
+
+    def copied(self) -> SliceMutConstPtrI8:
+        """Returns a shallow, owned copy of the underlying slice.
+
+        The returned object owns the immediate data, but not the targets of any contained
+        pointers. In other words, if your struct contains any pointers the returned object
+        may only be used as long as these pointers are valid. If the struct did not contain
+        any pointers the returned object is valid indefinitely."""
+        array = (ctypes.POINTER(ctypes.c_char) * len(self))()
+        ctypes.memmove(array, self.data, len(self) * ctypes.sizeof(ctypes.POINTER(ctypes.c_char)))
+        rval = SliceMutConstPtrI8(data=ctypes.cast(array, ctypes.POINTER(ctypes.POINTER(ctypes.c_char))), len=len(self))
+        rval.owned = array  # Store array in returned slice to prevent memory deallocation
+        return rval
+
+    def __iter__(self) -> typing.Iterable[ctypes.POINTER(ctypes.c_char)]:
+        return _Iter(self)
+
+    def iter(self) -> typing.Iterable[ctypes.POINTER(ctypes.c_char)]:
+        """Convenience method returning a value iterator."""
+        return iter(self)
+
+    def first(self) -> bytes:
+        """Returns the first element of this slice."""
+        return self[0]
+
+    def last(self) -> bytes:
+        """Returns the last element of this slice."""
+        return self[len(self)-1]
+
+
+class SliceMutU32(ctypes.Structure):
     # These fields represent the underlying C data layout
     _fields_ = [
         ("data", ctypes.POINTER(ctypes.c_uint32)),
@@ -1547,7 +1616,7 @@ class SliceMutu32(ctypes.Structure):
 
         self.data[index] = v
 
-    def copied(self) -> SliceMutu32:
+    def copied(self) -> SliceMutU32:
         """Returns a shallow, owned copy of the underlying slice.
 
         The returned object owns the immediate data, but not the targets of any contained
@@ -1556,7 +1625,7 @@ class SliceMutu32(ctypes.Structure):
         any pointers the returned object is valid indefinitely."""
         array = (ctypes.c_uint32 * len(self))()
         ctypes.memmove(array, self.data, len(self) * ctypes.sizeof(ctypes.c_uint32))
-        rval = SliceMutu32(data=ctypes.cast(array, ctypes.POINTER(ctypes.c_uint32)), len=len(self))
+        rval = SliceMutU32(data=ctypes.cast(array, ctypes.POINTER(ctypes.c_uint32)), len=len(self))
         rval.owned = array  # Store array in returned slice to prevent memory deallocation
         return rval
 
@@ -1576,7 +1645,7 @@ class SliceMutu32(ctypes.Structure):
         return self[len(self)-1]
 
 
-class SliceMutu8(ctypes.Structure):
+class SliceMutU8(ctypes.Structure):
     # These fields represent the underlying C data layout
     _fields_ = [
         ("data", ctypes.POINTER(ctypes.c_uint8)),
@@ -1608,7 +1677,7 @@ class SliceMutu8(ctypes.Structure):
 
         self.data[index] = v
 
-    def copied(self) -> SliceMutu8:
+    def copied(self) -> SliceMutU8:
         """Returns a shallow, owned copy of the underlying slice.
 
         The returned object owns the immediate data, but not the targets of any contained
@@ -1617,7 +1686,7 @@ class SliceMutu8(ctypes.Structure):
         any pointers the returned object is valid indefinitely."""
         array = (ctypes.c_uint8 * len(self))()
         ctypes.memmove(array, self.data, len(self) * ctypes.sizeof(ctypes.c_uint8))
-        rval = SliceMutu8(data=ctypes.cast(array, ctypes.POINTER(ctypes.c_uint8)), len=len(self))
+        rval = SliceMutU8(data=ctypes.cast(array, ctypes.POINTER(ctypes.c_uint8)), len=len(self))
         rval.owned = array  # Store array in returned slice to prevent memory deallocation
         return rval
 
@@ -1941,14 +2010,14 @@ class SliceMutVec(ctypes.Structure):
 class callbacks:
     """Helpers to define callbacks."""
     fn_u8_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8)
-    fn_Sliceu8_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, Sliceu8)
+    fn_SliceU8_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, SliceU8)
     fn_SliceVec3f32_rval_Vec3f32 = ctypes.CFUNCTYPE(Vec3f32, SliceVec3f32)
-    fn_SliceMutu8 = ctypes.CFUNCTYPE(None, SliceMutu8)
+    fn_SliceMutU8 = ctypes.CFUNCTYPE(None, SliceMutU8)
     fn_u8_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8)
     fn_u32_rval_u32 = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)
-    fn_pconst__u32 = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_uint32)
+    fn_ConstPtr_u32 = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_uint32)
     fn_u32_rval_u32 = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)
-    fn_pconst = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
+    fn_ConstPtr = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
     fn = ctypes.CFUNCTYPE(None, )
     fn_i32_i32_rval_i32 = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_int32, ctypes.c_int32)
     fn_i32_i32_rval_FFIError = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32)
@@ -2022,10 +2091,10 @@ class SimpleService:
         """ Regular void functions don't need an annotation."""
         return c_lib.simple_service_method_void2(self._ctx, )
 
-    def method_mut_self(self, slice: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> int:
+    def method_mut_self(self, slice: SliceU8 | ctypes.Array[ctypes.c_uint8]) -> int:
         """"""
         if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
-            slice = Sliceu8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
+            slice = SliceU8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
         return c_lib.simple_service_method_mut_self(self._ctx, slice)
 
@@ -2040,43 +2109,43 @@ class SimpleService:
         """"""
         return c_lib.simple_service_method_mut_self_ref(self._ctx, x, y)
 
-    def method_mut_self_ref_slice(self, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8), slice: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> int:
+    def method_mut_self_ref_slice(self, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8), slice: SliceU8 | ctypes.Array[ctypes.c_uint8]) -> int:
         """"""
         if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
-            slice = Sliceu8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
+            slice = SliceU8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
         return c_lib.simple_service_method_mut_self_ref_slice(self._ctx, x, y, slice)
 
-    def method_mut_self_ref_slice_limited(self, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8), slice: Sliceu8 | ctypes.Array[ctypes.c_uint8], slice2: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> int:
+    def method_mut_self_ref_slice_limited(self, x: ctypes.POINTER(ctypes.c_uint8), y: ctypes.POINTER(ctypes.c_uint8), slice: SliceU8 | ctypes.Array[ctypes.c_uint8], slice2: SliceU8 | ctypes.Array[ctypes.c_uint8]) -> int:
         """"""
         if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
-            slice = Sliceu8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
+            slice = SliceU8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
         if hasattr(slice2, "_length_") and getattr(slice2, "_type_", "") == ctypes.c_uint8:
-            slice2 = Sliceu8(data=ctypes.cast(slice2, ctypes.POINTER(ctypes.c_uint8)), len=len(slice2))
+            slice2 = SliceU8(data=ctypes.cast(slice2, ctypes.POINTER(ctypes.c_uint8)), len=len(slice2))
 
         return c_lib.simple_service_method_mut_self_ref_slice_limited(self._ctx, x, y, slice, slice2)
 
-    def method_mut_self_ffi_error(self, slice: SliceMutu8 | ctypes.Array[ctypes.c_uint8]):
+    def method_mut_self_ffi_error(self, slice: SliceMutU8 | ctypes.Array[ctypes.c_uint8]):
         """"""
         if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
-            slice = SliceMutu8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
+            slice = SliceMutU8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
         return c_lib.simple_service_method_mut_self_ffi_error(self._ctx, slice)
 
-    def method_mut_self_no_error(self, slice: SliceMutu8 | ctypes.Array[ctypes.c_uint8]):
+    def method_mut_self_no_error(self, slice: SliceMutU8 | ctypes.Array[ctypes.c_uint8]):
         """"""
         if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint8:
-            slice = SliceMutu8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
+            slice = SliceMutU8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
         return c_lib.simple_service_method_mut_self_no_error(self._ctx, slice)
 
-    def return_slice(self, ) -> Sliceu32:
+    def return_slice(self, ) -> SliceU32:
         """ Warning, you _must_ discard the returned slice object before calling into this service
  again, as otherwise undefined behavior might happen."""
         return c_lib.simple_service_return_slice(self._ctx, )
 
-    def return_slice_mut(self, ) -> SliceMutu32:
+    def return_slice_mut(self, ) -> SliceMutU32:
         """ Warning, you _must_ discard the returned slice object before calling into this service
  again, as otherwise undefined behavior might happen."""
         return c_lib.simple_service_return_slice_mut(self._ctx, )
@@ -2105,13 +2174,13 @@ class SimpleService:
 
         return c_lib.simple_service_method_callback_ffi_return(self._ctx, callback)
 
-    def method_callback_ffi_return_with_slice(self, callback, input: Slicei32 | ctypes.Array[ctypes.c_int32]):
+    def method_callback_ffi_return_with_slice(self, callback, input: SliceI32 | ctypes.Array[ctypes.c_int32]):
         """"""
         if not hasattr(callback, "__ctypes_from_outparam__"):
             callback = callbacks.fn_i32_i32_rval_FFIError(callback)
 
         if hasattr(input, "_length_") and getattr(input, "_type_", "") == ctypes.c_int32:
-            input = Slicei32(data=ctypes.cast(input, ctypes.POINTER(ctypes.c_int32)), len=len(input))
+            input = SliceI32(data=ctypes.cast(input, ctypes.POINTER(ctypes.c_int32)), len=len(input))
 
         return c_lib.simple_service_method_callback_ffi_return_with_slice(self._ctx, callback, input)
 
@@ -2152,10 +2221,10 @@ class SimpleServiceLifetime:
 
         return c_lib.simple_service_lifetime_method_lt2(self._ctx, slice)
 
-    def return_string_accept_slice(self, anon1: Sliceu8 | ctypes.Array[ctypes.c_uint8]) -> bytes:
+    def return_string_accept_slice(self, anon1: SliceU8 | ctypes.Array[ctypes.c_uint8]) -> bytes:
         """"""
         if hasattr(anon1, "_length_") and getattr(anon1, "_type_", "") == ctypes.c_uint8:
-            anon1 = Sliceu8(data=ctypes.cast(anon1, ctypes.POINTER(ctypes.c_uint8)), len=len(anon1))
+            anon1 = SliceU8(data=ctypes.cast(anon1, ctypes.POINTER(ctypes.c_uint8)), len=len(anon1))
 
         rval = c_lib.simple_service_lifetime_return_string_accept_slice(self._ctx, anon1)
         return ctypes.string_at(rval)

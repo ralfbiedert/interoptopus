@@ -85,6 +85,183 @@ namespace My.Company.Common
     ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
+    internal partial struct SliceI32
+    {
+        ///Pointer to start of immutable data.
+        IntPtr data;
+        ///Number of elements.
+        ulong len;
+    }
+
+    internal partial struct SliceI32 : IEnumerable<int>
+    {
+        public SliceI32(GCHandle handle, ulong count)
+        {
+            this.data = handle.AddrOfPinnedObject();
+            this.len = count;
+        }
+        public SliceI32(IntPtr handle, ulong count)
+        {
+            this.data = handle;
+            this.len = count;
+        }
+        public int this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                var size = Marshal.SizeOf(typeof(int));
+                var ptr = new IntPtr(data.ToInt64() + i * size);
+                return Marshal.PtrToStructure<int>(ptr);
+            }
+        }
+        public int[] Copied
+        {
+            get
+            {
+                var rval = new int[len];
+                for (var i = 0; i < (int) len; i++) {
+                    rval[i] = this[i];
+                }
+                return rval;
+            }
+        }
+        public int Count => (int) len;
+        public IEnumerator<int> GetEnumerator()
+        {
+            for (var i = 0; i < (int)len; ++i)
+            {
+                yield return this[i];
+            }
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }
+
+
+    ///A pointer to an array of data someone else owns which may not be modified.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    internal partial struct SliceU32
+    {
+        ///Pointer to start of immutable data.
+        IntPtr data;
+        ///Number of elements.
+        ulong len;
+    }
+
+    internal partial struct SliceU32 : IEnumerable<uint>
+    {
+        public SliceU32(GCHandle handle, ulong count)
+        {
+            this.data = handle.AddrOfPinnedObject();
+            this.len = count;
+        }
+        public SliceU32(IntPtr handle, ulong count)
+        {
+            this.data = handle;
+            this.len = count;
+        }
+        public uint this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                var size = Marshal.SizeOf(typeof(uint));
+                var ptr = new IntPtr(data.ToInt64() + i * size);
+                return Marshal.PtrToStructure<uint>(ptr);
+            }
+        }
+        public uint[] Copied
+        {
+            get
+            {
+                var rval = new uint[len];
+                for (var i = 0; i < (int) len; i++) {
+                    rval[i] = this[i];
+                }
+                return rval;
+            }
+        }
+        public int Count => (int) len;
+        public IEnumerator<uint> GetEnumerator()
+        {
+            for (var i = 0; i < (int)len; ++i)
+            {
+                yield return this[i];
+            }
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }
+
+
+    ///A pointer to an array of data someone else owns which may not be modified.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    internal partial struct SliceU8
+    {
+        ///Pointer to start of immutable data.
+        IntPtr data;
+        ///Number of elements.
+        ulong len;
+    }
+
+    internal partial struct SliceU8 : IEnumerable<byte>
+    {
+        public SliceU8(GCHandle handle, ulong count)
+        {
+            this.data = handle.AddrOfPinnedObject();
+            this.len = count;
+        }
+        public SliceU8(IntPtr handle, ulong count)
+        {
+            this.data = handle;
+            this.len = count;
+        }
+        public byte this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                var size = Marshal.SizeOf(typeof(byte));
+                var ptr = new IntPtr(data.ToInt64() + i * size);
+                return Marshal.PtrToStructure<byte>(ptr);
+            }
+        }
+        public byte[] Copied
+        {
+            get
+            {
+                var rval = new byte[len];
+                for (var i = 0; i < (int) len; i++) {
+                    rval[i] = this[i];
+                }
+                return rval;
+            }
+        }
+        public int Count => (int) len;
+        public IEnumerator<byte> GetEnumerator()
+        {
+            for (var i = 0; i < (int)len; ++i)
+            {
+                yield return this[i];
+            }
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }
+
+
+    ///A pointer to an array of data someone else owns which may not be modified.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
     internal partial struct SliceVec
     {
         ///Pointer to start of immutable data.
@@ -141,44 +318,51 @@ namespace My.Company.Common
     }
 
 
-    ///A pointer to an array of data someone else owns which may not be modified.
+    ///A pointer to an array of data someone else owns which may be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Slicei32
+    internal partial struct SliceMutConstPtrI8
     {
-        ///Pointer to start of immutable data.
+        ///Pointer to start of mutable data.
         IntPtr data;
         ///Number of elements.
         ulong len;
     }
 
-    internal partial struct Slicei32 : IEnumerable<int>
+    internal partial struct SliceMutConstPtrI8 : IEnumerable<IntPtr>
     {
-        public Slicei32(GCHandle handle, ulong count)
+        public SliceMutConstPtrI8(GCHandle handle, ulong count)
         {
             this.data = handle.AddrOfPinnedObject();
             this.len = count;
         }
-        public Slicei32(IntPtr handle, ulong count)
+        public SliceMutConstPtrI8(IntPtr handle, ulong count)
         {
             this.data = handle;
             this.len = count;
         }
-        public int this[int i]
+        public IntPtr this[int i]
         {
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(int));
+                var size = Marshal.SizeOf(typeof(IntPtr));
                 var ptr = new IntPtr(data.ToInt64() + i * size);
-                return Marshal.PtrToStructure<int>(ptr);
+                return Marshal.PtrToStructure<IntPtr>(ptr);
+            }
+            set
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                var size = Marshal.SizeOf(typeof(IntPtr));
+                var ptr = new IntPtr(data.ToInt64() + i * size);
+                Marshal.StructureToPtr<IntPtr>(value, ptr, false);
             }
         }
-        public int[] Copied
+        public IntPtr[] Copied
         {
             get
             {
-                var rval = new int[len];
+                var rval = new IntPtr[len];
                 for (var i = 0; i < (int) len; i++) {
                     rval[i] = this[i];
                 }
@@ -186,7 +370,7 @@ namespace My.Company.Common
             }
         }
         public int Count => (int) len;
-        public IEnumerator<int> GetEnumerator()
+        public IEnumerator<IntPtr> GetEnumerator()
         {
             for (var i = 0; i < (int)len; ++i)
             {
@@ -200,25 +384,25 @@ namespace My.Company.Common
     }
 
 
-    ///A pointer to an array of data someone else owns which may not be modified.
+    ///A pointer to an array of data someone else owns which may be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Sliceu32
+    internal partial struct SliceMutU32
     {
-        ///Pointer to start of immutable data.
+        ///Pointer to start of mutable data.
         IntPtr data;
         ///Number of elements.
         ulong len;
     }
 
-    internal partial struct Sliceu32 : IEnumerable<uint>
+    internal partial struct SliceMutU32 : IEnumerable<uint>
     {
-        public Sliceu32(GCHandle handle, ulong count)
+        public SliceMutU32(GCHandle handle, ulong count)
         {
             this.data = handle.AddrOfPinnedObject();
             this.len = count;
         }
-        public Sliceu32(IntPtr handle, ulong count)
+        public SliceMutU32(IntPtr handle, ulong count)
         {
             this.data = handle;
             this.len = count;
@@ -231,6 +415,13 @@ namespace My.Company.Common
                 var size = Marshal.SizeOf(typeof(uint));
                 var ptr = new IntPtr(data.ToInt64() + i * size);
                 return Marshal.PtrToStructure<uint>(ptr);
+            }
+            set
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                var size = Marshal.SizeOf(typeof(uint));
+                var ptr = new IntPtr(data.ToInt64() + i * size);
+                Marshal.StructureToPtr<uint>(value, ptr, false);
             }
         }
         public uint[] Copied
@@ -259,25 +450,25 @@ namespace My.Company.Common
     }
 
 
-    ///A pointer to an array of data someone else owns which may not be modified.
+    ///A pointer to an array of data someone else owns which may be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Sliceu8
+    internal partial struct SliceMutU8
     {
-        ///Pointer to start of immutable data.
+        ///Pointer to start of mutable data.
         IntPtr data;
         ///Number of elements.
         ulong len;
     }
 
-    internal partial struct Sliceu8 : IEnumerable<byte>
+    internal partial struct SliceMutU8 : IEnumerable<byte>
     {
-        public Sliceu8(GCHandle handle, ulong count)
+        public SliceMutU8(GCHandle handle, ulong count)
         {
             this.data = handle.AddrOfPinnedObject();
             this.len = count;
         }
-        public Sliceu8(IntPtr handle, ulong count)
+        public SliceMutU8(IntPtr handle, ulong count)
         {
             this.data = handle;
             this.len = count;
@@ -290,6 +481,13 @@ namespace My.Company.Common
                 var size = Marshal.SizeOf(typeof(byte));
                 var ptr = new IntPtr(data.ToInt64() + i * size);
                 return Marshal.PtrToStructure<byte>(ptr);
+            }
+            set
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                var size = Marshal.SizeOf(typeof(byte));
+                var ptr = new IntPtr(data.ToInt64() + i * size);
+                Marshal.StructureToPtr<byte>(value, ptr, false);
             }
         }
         public byte[] Copied
@@ -371,138 +569,6 @@ namespace My.Company.Common
         }
         public int Count => (int) len;
         public IEnumerator<Vec> GetEnumerator()
-        {
-            for (var i = 0; i < (int)len; ++i)
-            {
-                yield return this[i];
-            }
-        }
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
-    }
-
-
-    ///A pointer to an array of data someone else owns which may be modified.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    internal partial struct SliceMutu32
-    {
-        ///Pointer to start of mutable data.
-        IntPtr data;
-        ///Number of elements.
-        ulong len;
-    }
-
-    internal partial struct SliceMutu32 : IEnumerable<uint>
-    {
-        public SliceMutu32(GCHandle handle, ulong count)
-        {
-            this.data = handle.AddrOfPinnedObject();
-            this.len = count;
-        }
-        public SliceMutu32(IntPtr handle, ulong count)
-        {
-            this.data = handle;
-            this.len = count;
-        }
-        public uint this[int i]
-        {
-            get
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(uint));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                return Marshal.PtrToStructure<uint>(ptr);
-            }
-            set
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(uint));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                Marshal.StructureToPtr<uint>(value, ptr, false);
-            }
-        }
-        public uint[] Copied
-        {
-            get
-            {
-                var rval = new uint[len];
-                for (var i = 0; i < (int) len; i++) {
-                    rval[i] = this[i];
-                }
-                return rval;
-            }
-        }
-        public int Count => (int) len;
-        public IEnumerator<uint> GetEnumerator()
-        {
-            for (var i = 0; i < (int)len; ++i)
-            {
-                yield return this[i];
-            }
-        }
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
-    }
-
-
-    ///A pointer to an array of data someone else owns which may be modified.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    internal partial struct SliceMutu8
-    {
-        ///Pointer to start of mutable data.
-        IntPtr data;
-        ///Number of elements.
-        ulong len;
-    }
-
-    internal partial struct SliceMutu8 : IEnumerable<byte>
-    {
-        public SliceMutu8(GCHandle handle, ulong count)
-        {
-            this.data = handle.AddrOfPinnedObject();
-            this.len = count;
-        }
-        public SliceMutu8(IntPtr handle, ulong count)
-        {
-            this.data = handle;
-            this.len = count;
-        }
-        public byte this[int i]
-        {
-            get
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(byte));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                return Marshal.PtrToStructure<byte>(ptr);
-            }
-            set
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(byte));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                Marshal.StructureToPtr<byte>(value, ptr, false);
-            }
-        }
-        public byte[] Copied
-        {
-            get
-            {
-                var rval = new byte[len];
-                for (var i = 0; i < (int) len; i++) {
-                    rval[i] = this[i];
-                }
-                return rval;
-            }
-        }
-        public int Count => (int) len;
-        public IEnumerator<byte> GetEnumerator()
         {
             for (var i = 0; i < (int)len; ++i)
             {

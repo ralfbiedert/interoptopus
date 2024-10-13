@@ -29,6 +29,7 @@ pub fn my_function(input: Vec2) -> Vec2 {
 pub fn my_inventory() -> Inventory {
     InventoryBuilder::new()
         .register(function!(my_function))
+        .validate()
         .inventory()
 }
 ```

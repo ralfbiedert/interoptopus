@@ -130,6 +130,303 @@ namespace My.Company.Common
     ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
+    internal partial struct SliceI32
+    {
+        ///Pointer to start of immutable data.
+        #if UNITY_2018_1_OR_NEWER
+        [NativeDisableUnsafePtrRestriction]
+        #endif
+        IntPtr data;
+        ///Number of elements.
+        ulong len;
+    }
+
+    internal partial struct SliceI32 : IEnumerable<int>
+    {
+        public SliceI32(GCHandle handle, ulong count)
+        {
+            this.data = handle.AddrOfPinnedObject();
+            this.len = count;
+        }
+        public SliceI32(IntPtr handle, ulong count)
+        {
+            this.data = handle;
+            this.len = count;
+        }
+        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
+        public ReadOnlySpan<int> ReadOnlySpan
+        {
+            get
+            {
+                unsafe
+                {
+                    return new ReadOnlySpan<int>(this.data.ToPointer(), (int) this.len);
+                }
+            }
+        }
+        #endif
+        #if UNITY_2018_1_OR_NEWER
+        public SliceI32(NativeArray<int> handle)
+        {
+            unsafe
+            {
+                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
+                this.len = (ulong) handle.Length;
+            }
+        }
+        #endif
+        public int this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                unsafe
+                {
+                    var d = (int*) data.ToPointer();
+                    return d[i];
+                }
+            }
+        }
+        public int[] Copied
+        {
+            get
+            {
+                var rval = new int[len];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        #if __INTEROPTOPUS_NEVER
+                        #elif NETCOREAPP
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(int));
+                        #elif UNITY_2018_1_OR_NEWER
+                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(int)));
+                        #else
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
+                        #endif
+                    }
+                }
+                return rval;
+            }
+        }
+        public int Count => (int) len;
+        public IEnumerator<int> GetEnumerator()
+        {
+            for (var i = 0; i < (int)len; ++i)
+            {
+                yield return this[i];
+            }
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }
+
+
+    ///A pointer to an array of data someone else owns which may not be modified.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    internal partial struct SliceU32
+    {
+        ///Pointer to start of immutable data.
+        #if UNITY_2018_1_OR_NEWER
+        [NativeDisableUnsafePtrRestriction]
+        #endif
+        IntPtr data;
+        ///Number of elements.
+        ulong len;
+    }
+
+    internal partial struct SliceU32 : IEnumerable<uint>
+    {
+        public SliceU32(GCHandle handle, ulong count)
+        {
+            this.data = handle.AddrOfPinnedObject();
+            this.len = count;
+        }
+        public SliceU32(IntPtr handle, ulong count)
+        {
+            this.data = handle;
+            this.len = count;
+        }
+        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
+        public ReadOnlySpan<uint> ReadOnlySpan
+        {
+            get
+            {
+                unsafe
+                {
+                    return new ReadOnlySpan<uint>(this.data.ToPointer(), (int) this.len);
+                }
+            }
+        }
+        #endif
+        #if UNITY_2018_1_OR_NEWER
+        public SliceU32(NativeArray<uint> handle)
+        {
+            unsafe
+            {
+                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
+                this.len = (ulong) handle.Length;
+            }
+        }
+        #endif
+        public uint this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                unsafe
+                {
+                    var d = (uint*) data.ToPointer();
+                    return d[i];
+                }
+            }
+        }
+        public uint[] Copied
+        {
+            get
+            {
+                var rval = new uint[len];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        #if __INTEROPTOPUS_NEVER
+                        #elif NETCOREAPP
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(uint));
+                        #elif UNITY_2018_1_OR_NEWER
+                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(uint)));
+                        #else
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
+                        #endif
+                    }
+                }
+                return rval;
+            }
+        }
+        public int Count => (int) len;
+        public IEnumerator<uint> GetEnumerator()
+        {
+            for (var i = 0; i < (int)len; ++i)
+            {
+                yield return this[i];
+            }
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }
+
+
+    ///A pointer to an array of data someone else owns which may not be modified.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    internal partial struct SliceU8
+    {
+        ///Pointer to start of immutable data.
+        #if UNITY_2018_1_OR_NEWER
+        [NativeDisableUnsafePtrRestriction]
+        #endif
+        IntPtr data;
+        ///Number of elements.
+        ulong len;
+    }
+
+    internal partial struct SliceU8 : IEnumerable<byte>
+    {
+        public SliceU8(GCHandle handle, ulong count)
+        {
+            this.data = handle.AddrOfPinnedObject();
+            this.len = count;
+        }
+        public SliceU8(IntPtr handle, ulong count)
+        {
+            this.data = handle;
+            this.len = count;
+        }
+        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
+        public ReadOnlySpan<byte> ReadOnlySpan
+        {
+            get
+            {
+                unsafe
+                {
+                    return new ReadOnlySpan<byte>(this.data.ToPointer(), (int) this.len);
+                }
+            }
+        }
+        #endif
+        #if UNITY_2018_1_OR_NEWER
+        public SliceU8(NativeArray<byte> handle)
+        {
+            unsafe
+            {
+                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
+                this.len = (ulong) handle.Length;
+            }
+        }
+        #endif
+        public byte this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                unsafe
+                {
+                    var d = (byte*) data.ToPointer();
+                    return d[i];
+                }
+            }
+        }
+        public byte[] Copied
+        {
+            get
+            {
+                var rval = new byte[len];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        #if __INTEROPTOPUS_NEVER
+                        #elif NETCOREAPP
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(byte));
+                        #elif UNITY_2018_1_OR_NEWER
+                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(byte)));
+                        #else
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
+                        #endif
+                    }
+                }
+                return rval;
+            }
+        }
+        public int Count => (int) len;
+        public IEnumerator<byte> GetEnumerator()
+        {
+            for (var i = 0; i < (int)len; ++i)
+            {
+                yield return this[i];
+            }
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }
+
+
+    ///A pointer to an array of data someone else owns which may not be modified.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
     internal partial struct SliceVec
     {
         ///Pointer to start of immutable data.
@@ -226,12 +523,12 @@ namespace My.Company.Common
     }
 
 
-    ///A pointer to an array of data someone else owns which may not be modified.
+    ///A pointer to an array of data someone else owns which may be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Slicei32
+    internal partial struct SliceMutConstPtrI8
     {
-        ///Pointer to start of immutable data.
+        ///Pointer to start of mutable data.
         #if UNITY_2018_1_OR_NEWER
         [NativeDisableUnsafePtrRestriction]
         #endif
@@ -240,32 +537,32 @@ namespace My.Company.Common
         ulong len;
     }
 
-    internal partial struct Slicei32 : IEnumerable<int>
+    internal partial struct SliceMutConstPtrI8 : IEnumerable<IntPtr>
     {
-        public Slicei32(GCHandle handle, ulong count)
+        public SliceMutConstPtrI8(GCHandle handle, ulong count)
         {
             this.data = handle.AddrOfPinnedObject();
             this.len = count;
         }
-        public Slicei32(IntPtr handle, ulong count)
+        public SliceMutConstPtrI8(IntPtr handle, ulong count)
         {
             this.data = handle;
             this.len = count;
         }
         #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
-        public ReadOnlySpan<int> ReadOnlySpan
+        public ReadOnlySpan<IntPtr> ReadOnlySpan
         {
             get
             {
                 unsafe
                 {
-                    return new ReadOnlySpan<int>(this.data.ToPointer(), (int) this.len);
+                    return new ReadOnlySpan<IntPtr>(this.data.ToPointer(), (int) this.len);
                 }
             }
         }
         #endif
         #if UNITY_2018_1_OR_NEWER
-        public Slicei32(NativeArray<int> handle)
+        public SliceMutConstPtrI8(NativeArray<IntPtr> handle)
         {
             unsafe
             {
@@ -274,32 +571,53 @@ namespace My.Company.Common
             }
         }
         #endif
-        public int this[int i]
+        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
+        public Span<IntPtr> Span
+        {
+            get
+            {
+                unsafe
+                {
+                    return new Span<IntPtr>(this.data.ToPointer(), (int) this.len);
+                }
+            }
+        }
+        #endif
+        public IntPtr this[int i]
         {
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
                 unsafe
                 {
-                    var d = (int*) data.ToPointer();
+                    var d = (IntPtr*) data.ToPointer();
                     return d[i];
                 }
             }
+            set
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                unsafe
+                {
+                    var d = (IntPtr*) data.ToPointer();
+                    d[i] = value;
+                }
+            }
         }
-        public int[] Copied
+        public IntPtr[] Copied
         {
             get
             {
-                var rval = new int[len];
+                var rval = new IntPtr[len];
                 unsafe
                 {
                     fixed (void* dst = rval)
                     {
-                        #if __INTEROPTOPUS_NEVER
+                        #if __FALSE
                         #elif NETCOREAPP
-                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(int));
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(IntPtr));
                         #elif UNITY_2018_1_OR_NEWER
-                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(int)));
+                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(IntPtr)));
                         #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
@@ -311,7 +629,7 @@ namespace My.Company.Common
             }
         }
         public int Count => (int) len;
-        public IEnumerator<int> GetEnumerator()
+        public IEnumerator<IntPtr> GetEnumerator()
         {
             for (var i = 0; i < (int)len; ++i)
             {
@@ -325,12 +643,12 @@ namespace My.Company.Common
     }
 
 
-    ///A pointer to an array of data someone else owns which may not be modified.
+    ///A pointer to an array of data someone else owns which may be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Sliceu32
+    internal partial struct SliceMutU32
     {
-        ///Pointer to start of immutable data.
+        ///Pointer to start of mutable data.
         #if UNITY_2018_1_OR_NEWER
         [NativeDisableUnsafePtrRestriction]
         #endif
@@ -339,14 +657,14 @@ namespace My.Company.Common
         ulong len;
     }
 
-    internal partial struct Sliceu32 : IEnumerable<uint>
+    internal partial struct SliceMutU32 : IEnumerable<uint>
     {
-        public Sliceu32(GCHandle handle, ulong count)
+        public SliceMutU32(GCHandle handle, ulong count)
         {
             this.data = handle.AddrOfPinnedObject();
             this.len = count;
         }
-        public Sliceu32(IntPtr handle, ulong count)
+        public SliceMutU32(IntPtr handle, ulong count)
         {
             this.data = handle;
             this.len = count;
@@ -364,12 +682,24 @@ namespace My.Company.Common
         }
         #endif
         #if UNITY_2018_1_OR_NEWER
-        public Sliceu32(NativeArray<uint> handle)
+        public SliceMutU32(NativeArray<uint> handle)
         {
             unsafe
             {
                 this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
                 this.len = (ulong) handle.Length;
+            }
+        }
+        #endif
+        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
+        public Span<uint> Span
+        {
+            get
+            {
+                unsafe
+                {
+                    return new Span<uint>(this.data.ToPointer(), (int) this.len);
+                }
             }
         }
         #endif
@@ -384,6 +714,15 @@ namespace My.Company.Common
                     return d[i];
                 }
             }
+            set
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                unsafe
+                {
+                    var d = (uint*) data.ToPointer();
+                    d[i] = value;
+                }
+            }
         }
         public uint[] Copied
         {
@@ -394,7 +733,7 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
-                        #if __INTEROPTOPUS_NEVER
+                        #if __FALSE
                         #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(uint));
                         #elif UNITY_2018_1_OR_NEWER
@@ -424,12 +763,12 @@ namespace My.Company.Common
     }
 
 
-    ///A pointer to an array of data someone else owns which may not be modified.
+    ///A pointer to an array of data someone else owns which may be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Sliceu8
+    internal partial struct SliceMutU8
     {
-        ///Pointer to start of immutable data.
+        ///Pointer to start of mutable data.
         #if UNITY_2018_1_OR_NEWER
         [NativeDisableUnsafePtrRestriction]
         #endif
@@ -438,14 +777,14 @@ namespace My.Company.Common
         ulong len;
     }
 
-    internal partial struct Sliceu8 : IEnumerable<byte>
+    internal partial struct SliceMutU8 : IEnumerable<byte>
     {
-        public Sliceu8(GCHandle handle, ulong count)
+        public SliceMutU8(GCHandle handle, ulong count)
         {
             this.data = handle.AddrOfPinnedObject();
             this.len = count;
         }
-        public Sliceu8(IntPtr handle, ulong count)
+        public SliceMutU8(IntPtr handle, ulong count)
         {
             this.data = handle;
             this.len = count;
@@ -463,12 +802,24 @@ namespace My.Company.Common
         }
         #endif
         #if UNITY_2018_1_OR_NEWER
-        public Sliceu8(NativeArray<byte> handle)
+        public SliceMutU8(NativeArray<byte> handle)
         {
             unsafe
             {
                 this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
                 this.len = (ulong) handle.Length;
+            }
+        }
+        #endif
+        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
+        public Span<byte> Span
+        {
+            get
+            {
+                unsafe
+                {
+                    return new Span<byte>(this.data.ToPointer(), (int) this.len);
+                }
             }
         }
         #endif
@@ -483,6 +834,15 @@ namespace My.Company.Common
                     return d[i];
                 }
             }
+            set
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                unsafe
+                {
+                    var d = (byte*) data.ToPointer();
+                    d[i] = value;
+                }
+            }
         }
         public byte[] Copied
         {
@@ -493,7 +853,7 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
-                        #if __INTEROPTOPUS_NEVER
+                        #if __FALSE
                         #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(byte));
                         #elif UNITY_2018_1_OR_NEWER
@@ -630,246 +990,6 @@ namespace My.Company.Common
         }
         public int Count => (int) len;
         public IEnumerator<Vec> GetEnumerator()
-        {
-            for (var i = 0; i < (int)len; ++i)
-            {
-                yield return this[i];
-            }
-        }
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
-    }
-
-
-    ///A pointer to an array of data someone else owns which may be modified.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    internal partial struct SliceMutu32
-    {
-        ///Pointer to start of mutable data.
-        #if UNITY_2018_1_OR_NEWER
-        [NativeDisableUnsafePtrRestriction]
-        #endif
-        IntPtr data;
-        ///Number of elements.
-        ulong len;
-    }
-
-    internal partial struct SliceMutu32 : IEnumerable<uint>
-    {
-        public SliceMutu32(GCHandle handle, ulong count)
-        {
-            this.data = handle.AddrOfPinnedObject();
-            this.len = count;
-        }
-        public SliceMutu32(IntPtr handle, ulong count)
-        {
-            this.data = handle;
-            this.len = count;
-        }
-        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
-        public ReadOnlySpan<uint> ReadOnlySpan
-        {
-            get
-            {
-                unsafe
-                {
-                    return new ReadOnlySpan<uint>(this.data.ToPointer(), (int) this.len);
-                }
-            }
-        }
-        #endif
-        #if UNITY_2018_1_OR_NEWER
-        public SliceMutu32(NativeArray<uint> handle)
-        {
-            unsafe
-            {
-                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
-                this.len = (ulong) handle.Length;
-            }
-        }
-        #endif
-        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
-        public Span<uint> Span
-        {
-            get
-            {
-                unsafe
-                {
-                    return new Span<uint>(this.data.ToPointer(), (int) this.len);
-                }
-            }
-        }
-        #endif
-        public uint this[int i]
-        {
-            get
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                unsafe
-                {
-                    var d = (uint*) data.ToPointer();
-                    return d[i];
-                }
-            }
-            set
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                unsafe
-                {
-                    var d = (uint*) data.ToPointer();
-                    d[i] = value;
-                }
-            }
-        }
-        public uint[] Copied
-        {
-            get
-            {
-                var rval = new uint[len];
-                unsafe
-                {
-                    fixed (void* dst = rval)
-                    {
-                        #if __FALSE
-                        #elif NETCOREAPP
-                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(uint));
-                        #elif UNITY_2018_1_OR_NEWER
-                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(uint)));
-                        #else
-                        for (var i = 0; i < (int) len; i++) {
-                            rval[i] = this[i];
-                        }
-                        #endif
-                    }
-                }
-                return rval;
-            }
-        }
-        public int Count => (int) len;
-        public IEnumerator<uint> GetEnumerator()
-        {
-            for (var i = 0; i < (int)len; ++i)
-            {
-                yield return this[i];
-            }
-        }
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
-    }
-
-
-    ///A pointer to an array of data someone else owns which may be modified.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    internal partial struct SliceMutu8
-    {
-        ///Pointer to start of mutable data.
-        #if UNITY_2018_1_OR_NEWER
-        [NativeDisableUnsafePtrRestriction]
-        #endif
-        IntPtr data;
-        ///Number of elements.
-        ulong len;
-    }
-
-    internal partial struct SliceMutu8 : IEnumerable<byte>
-    {
-        public SliceMutu8(GCHandle handle, ulong count)
-        {
-            this.data = handle.AddrOfPinnedObject();
-            this.len = count;
-        }
-        public SliceMutu8(IntPtr handle, ulong count)
-        {
-            this.data = handle;
-            this.len = count;
-        }
-        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
-        public ReadOnlySpan<byte> ReadOnlySpan
-        {
-            get
-            {
-                unsafe
-                {
-                    return new ReadOnlySpan<byte>(this.data.ToPointer(), (int) this.len);
-                }
-            }
-        }
-        #endif
-        #if UNITY_2018_1_OR_NEWER
-        public SliceMutu8(NativeArray<byte> handle)
-        {
-            unsafe
-            {
-                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
-                this.len = (ulong) handle.Length;
-            }
-        }
-        #endif
-        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
-        public Span<byte> Span
-        {
-            get
-            {
-                unsafe
-                {
-                    return new Span<byte>(this.data.ToPointer(), (int) this.len);
-                }
-            }
-        }
-        #endif
-        public byte this[int i]
-        {
-            get
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                unsafe
-                {
-                    var d = (byte*) data.ToPointer();
-                    return d[i];
-                }
-            }
-            set
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                unsafe
-                {
-                    var d = (byte*) data.ToPointer();
-                    d[i] = value;
-                }
-            }
-        }
-        public byte[] Copied
-        {
-            get
-            {
-                var rval = new byte[len];
-                unsafe
-                {
-                    fixed (void* dst = rval)
-                    {
-                        #if __FALSE
-                        #elif NETCOREAPP
-                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(byte));
-                        #elif UNITY_2018_1_OR_NEWER
-                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(byte)));
-                        #else
-                        for (var i = 0; i < (int) len; i++) {
-                            rval[i] = this[i];
-                        }
-                        #endif
-                    }
-                }
-                return rval;
-            }
-        }
-        public int Count => (int) len;
-        public IEnumerator<byte> GetEnumerator()
         {
             for (var i = 0; i < (int)len; ++i)
             {

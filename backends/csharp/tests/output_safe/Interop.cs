@@ -18,9 +18,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 2816784914316739735ul)
+            if (api_version != 4570136964495247137ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (2816784914316739735). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (4570136964495247137). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -235,12 +235,12 @@ namespace My.Company
         public static extern SliceUseAsciiStringPattern pattern_ascii_pointer_return_slice();
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_1")]
-        public static extern uint pattern_ffi_slice_1(Sliceu32 ffi_slice);
+        public static extern uint pattern_ffi_slice_1(SliceU32 ffi_slice);
 
         public static uint pattern_ffi_slice_1(uint[] ffi_slice)
         {
             var ffi_slice_pinned = GCHandle.Alloc(ffi_slice, GCHandleType.Pinned);
-            var ffi_slice_slice = new Sliceu32(ffi_slice_pinned, (ulong) ffi_slice.Length);
+            var ffi_slice_slice = new SliceU32(ffi_slice_pinned, (ulong) ffi_slice.Length);
             try
             {
                 return pattern_ffi_slice_1(ffi_slice_slice);;
@@ -252,12 +252,12 @@ namespace My.Company
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_1b")]
-        public static extern uint pattern_ffi_slice_1b(SliceMutu32 ffi_slice);
+        public static extern uint pattern_ffi_slice_1b(SliceMutU32 ffi_slice);
 
         public static uint pattern_ffi_slice_1b(uint[] ffi_slice)
         {
             var ffi_slice_pinned = GCHandle.Alloc(ffi_slice, GCHandleType.Pinned);
-            var ffi_slice_slice = new SliceMutu32(ffi_slice_pinned, (ulong) ffi_slice.Length);
+            var ffi_slice_slice = new SliceMutU32(ffi_slice_pinned, (ulong) ffi_slice.Length);
             try
             {
                 return pattern_ffi_slice_1b(ffi_slice_slice);;
@@ -286,12 +286,12 @@ namespace My.Company
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_3")]
-        public static extern void pattern_ffi_slice_3(SliceMutu8 slice, CallbackSliceMut callback);
+        public static extern void pattern_ffi_slice_3(SliceMutU8 slice, CallbackSliceMut callback);
 
         public static void pattern_ffi_slice_3(byte[] slice, CallbackSliceMut callback)
         {
             var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new SliceMutu8(slice_pinned, (ulong) slice.Length);
+            var slice_slice = new SliceMutU8(slice_pinned, (ulong) slice.Length);
             try
             {
                 pattern_ffi_slice_3(slice_slice, callback);;
@@ -303,14 +303,14 @@ namespace My.Company
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_4")]
-        public static extern void pattern_ffi_slice_4(Sliceu8 slice, SliceMutu8 slice2);
+        public static extern void pattern_ffi_slice_4(SliceU8 slice, SliceMutU8 slice2);
 
         public static void pattern_ffi_slice_4(byte[] slice, byte[] slice2)
         {
             var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new Sliceu8(slice_pinned, (ulong) slice.Length);
+            var slice_slice = new SliceU8(slice_pinned, (ulong) slice.Length);
             var slice2_pinned = GCHandle.Alloc(slice2, GCHandleType.Pinned);
-            var slice2_slice = new SliceMutu8(slice2_pinned, (ulong) slice2.Length);
+            var slice2_slice = new SliceMutU8(slice2_pinned, (ulong) slice2.Length);
             try
             {
                 pattern_ffi_slice_4(slice_slice, slice2_slice);;
@@ -323,14 +323,14 @@ namespace My.Company
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_5")]
-        public static extern void pattern_ffi_slice_5(ref Sliceu8 slice, ref SliceMutu8 slice2);
+        public static extern void pattern_ffi_slice_5(ref SliceU8 slice, ref SliceMutU8 slice2);
 
         public static void pattern_ffi_slice_5(byte[] slice, byte[] slice2)
         {
             var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new Sliceu8(slice_pinned, (ulong) slice.Length);
+            var slice_slice = new SliceU8(slice_pinned, (ulong) slice.Length);
             var slice2_pinned = GCHandle.Alloc(slice2, GCHandleType.Pinned);
-            var slice2_slice = new SliceMutu8(slice2_pinned, (ulong) slice2.Length);
+            var slice2_slice = new SliceMutU8(slice2_pinned, (ulong) slice2.Length);
             try
             {
                 pattern_ffi_slice_5(ref slice_slice, ref slice2_slice);;
@@ -343,12 +343,12 @@ namespace My.Company
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_6")]
-        public static extern void pattern_ffi_slice_6(ref SliceMutu8 slice, CallbackU8 callback);
+        public static extern void pattern_ffi_slice_6(ref SliceMutU8 slice, CallbackU8 callback);
 
         public static void pattern_ffi_slice_6(byte[] slice, CallbackU8 callback)
         {
             var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new SliceMutu8(slice_pinned, (ulong) slice.Length);
+            var slice_slice = new SliceMutU8(slice_pinned, (ulong) slice.Length);
             try
             {
                 pattern_ffi_slice_6(ref slice_slice, callback);;
@@ -356,6 +356,23 @@ namespace My.Company
             finally
             {
                 slice_pinned.Free();
+            }
+        }
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_7")]
+        public static extern uint pattern_ffi_slice_7(SliceMutConstPtrI8 slices);
+
+        public static uint pattern_ffi_slice_7(string[] slices)
+        {
+            var slices_pinned = GCHandle.Alloc(slices, GCHandleType.Pinned);
+            var slices_slice = new SliceMutConstPtrI8(slices_pinned, (ulong) slices.Length);
+            try
+            {
+                return pattern_ffi_slice_7(slices_slice);;
+            }
+            finally
+            {
+                slices_pinned.Free();
             }
         }
 
@@ -525,12 +542,12 @@ namespace My.Company
         public static extern void simple_service_method_void2(IntPtr context);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self")]
-        public static extern byte simple_service_method_mut_self(IntPtr context, Sliceu8 slice);
+        public static extern byte simple_service_method_mut_self(IntPtr context, SliceU8 slice);
 
         public static byte simple_service_method_mut_self(IntPtr context, byte[] slice)
         {
             var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new Sliceu8(slice_pinned, (ulong) slice.Length);
+            var slice_slice = new SliceU8(slice_pinned, (ulong) slice.Length);
             try
             {
                 return simple_service_method_mut_self(context, slice_slice);;
@@ -564,12 +581,12 @@ namespace My.Company
         public static extern byte simple_service_method_mut_self_ref(IntPtr context, ref byte x, out byte y);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref_slice")]
-        public static extern byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, Sliceu8 slice);
+        public static extern byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, SliceU8 slice);
 
         public static byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, byte[] slice)
         {
             var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new Sliceu8(slice_pinned, (ulong) slice.Length);
+            var slice_slice = new SliceU8(slice_pinned, (ulong) slice.Length);
             try
             {
                 return simple_service_method_mut_self_ref_slice(context, ref x, out y, slice_slice);;
@@ -581,14 +598,14 @@ namespace My.Company
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref_slice_limited")]
-        public static extern byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, Sliceu8 slice, Sliceu8 slice2);
+        public static extern byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, SliceU8 slice, SliceU8 slice2);
 
         public static byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, byte[] slice, byte[] slice2)
         {
             var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new Sliceu8(slice_pinned, (ulong) slice.Length);
+            var slice_slice = new SliceU8(slice_pinned, (ulong) slice.Length);
             var slice2_pinned = GCHandle.Alloc(slice2, GCHandleType.Pinned);
-            var slice2_slice = new Sliceu8(slice2_pinned, (ulong) slice2.Length);
+            var slice2_slice = new SliceU8(slice2_pinned, (ulong) slice2.Length);
             try
             {
                 return simple_service_method_mut_self_ref_slice_limited(context, ref x, out y, slice_slice, slice2_slice);;
@@ -601,12 +618,12 @@ namespace My.Company
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ffi_error")]
-        public static extern FFIError simple_service_method_mut_self_ffi_error(IntPtr context, SliceMutu8 slice);
+        public static extern FFIError simple_service_method_mut_self_ffi_error(IntPtr context, SliceMutU8 slice);
 
         public static void simple_service_method_mut_self_ffi_error(IntPtr context, byte[] slice)
         {
             var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new SliceMutu8(slice_pinned, (ulong) slice.Length);
+            var slice_slice = new SliceMutU8(slice_pinned, (ulong) slice.Length);
             try
             {
                 var rval = simple_service_method_mut_self_ffi_error(context, slice_slice);;
@@ -622,12 +639,12 @@ namespace My.Company
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_no_error")]
-        public static extern FFIError simple_service_method_mut_self_no_error(IntPtr context, SliceMutu8 slice);
+        public static extern FFIError simple_service_method_mut_self_no_error(IntPtr context, SliceMutU8 slice);
 
         public static void simple_service_method_mut_self_no_error(IntPtr context, byte[] slice)
         {
             var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new SliceMutu8(slice_pinned, (ulong) slice.Length);
+            var slice_slice = new SliceMutU8(slice_pinned, (ulong) slice.Length);
             try
             {
                 var rval = simple_service_method_mut_self_no_error(context, slice_slice);;
@@ -645,12 +662,12 @@ namespace My.Company
         /// Warning, you _must_ discard the returned slice object before calling into this service
         /// again, as otherwise undefined behavior might happen.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_return_slice")]
-        public static extern Sliceu32 simple_service_return_slice(IntPtr context);
+        public static extern SliceU32 simple_service_return_slice(IntPtr context);
 
         /// Warning, you _must_ discard the returned slice object before calling into this service
         /// again, as otherwise undefined behavior might happen.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_return_slice_mut")]
-        public static extern SliceMutu32 simple_service_return_slice_mut(IntPtr context);
+        public static extern SliceMutU32 simple_service_return_slice_mut(IntPtr context);
 
         /// This function has no panic safeguards. It will be a bit faster to
         /// call, but if it panics your host app will be in an undefined state.
@@ -696,13 +713,13 @@ namespace My.Company
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_callback_ffi_return_with_slice")]
-        public static extern FFIError simple_service_method_callback_ffi_return_with_slice(IntPtr context, SumDelegateReturn callback, Slicei32 input);
+        public static extern FFIError simple_service_method_callback_ffi_return_with_slice(IntPtr context, SumDelegateReturn callback, SliceI32 input);
 
         public static void simple_service_method_callback_ffi_return_with_slice(IntPtr context, SumDelegateReturn callback, int[] input)
         {
             var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
             var input_pinned = GCHandle.Alloc(input, GCHandleType.Pinned);
-            var input_slice = new Slicei32(input_pinned, (ulong) input.Length);
+            var input_slice = new SliceI32(input_pinned, (ulong) input.Length);
             try
             {
                 var rval = simple_service_method_callback_ffi_return_with_slice(context, callback_safe_delegate.Call, input_slice);;
@@ -789,12 +806,12 @@ namespace My.Company
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lifetime_return_string_accept_slice")]
-        public static extern IntPtr simple_service_lifetime_return_string_accept_slice(IntPtr anon0, Sliceu8 anon1);
+        public static extern IntPtr simple_service_lifetime_return_string_accept_slice(IntPtr anon0, SliceU8 anon1);
 
         public static string simple_service_lifetime_return_string_accept_slice(IntPtr anon0, byte[] anon1)
         {
             var anon1_pinned = GCHandle.Alloc(anon1, GCHandleType.Pinned);
-            var anon1_slice = new Sliceu8(anon1_pinned, (ulong) anon1.Length);
+            var anon1_slice = new SliceU8(anon1_pinned, (ulong) anon1.Length);
             try
             {
                 var s = simple_service_lifetime_return_string_accept_slice(anon0, anon1_slice);;
@@ -1206,13 +1223,13 @@ namespace My.Company
 
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate byte CallbackFFISlice(Sliceu8 slice);
+    internal delegate byte CallbackFFISlice(SliceU8 slice);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate Vec3f32 CallbackHugeVecSlice(SliceVec3f32 slice);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void CallbackSliceMut(SliceMutu8 slice);
+    internal delegate void CallbackSliceMut(SliceMutU8 slice);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate byte CallbackU8(byte value);
@@ -1362,7 +1379,7 @@ namespace My.Company
             Interop.simple_service_method_void2(_context);
         }
 
-        public byte MethodMutSelf(Sliceu8 slice)
+        public byte MethodMutSelf(SliceU8 slice)
         {
             return Interop.simple_service_method_mut_self(_context, slice);
         }
@@ -1389,7 +1406,7 @@ namespace My.Company
             return Interop.simple_service_method_mut_self_ref(_context, ref x, out y);
         }
 
-        public byte MethodMutSelfRefSlice(ref byte x, out byte y, Sliceu8 slice)
+        public byte MethodMutSelfRefSlice(ref byte x, out byte y, SliceU8 slice)
         {
             return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out y, slice);
         }
@@ -1399,7 +1416,7 @@ namespace My.Company
             return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out y, slice);
         }
 
-        public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, Sliceu8 slice, Sliceu8 slice2)
+        public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, SliceU8 slice, SliceU8 slice2)
         {
             return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
         }
@@ -1409,7 +1426,7 @@ namespace My.Company
             return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
         }
 
-        public void MethodMutSelfFfiError(SliceMutu8 slice)
+        public void MethodMutSelfFfiError(SliceMutU8 slice)
         {
             var rval = Interop.simple_service_method_mut_self_ffi_error(_context, slice);
             if (rval != FFIError.Ok)
@@ -1423,7 +1440,7 @@ namespace My.Company
             Interop.simple_service_method_mut_self_ffi_error(_context, slice);
         }
 
-        public void MethodMutSelfNoError(SliceMutu8 slice)
+        public void MethodMutSelfNoError(SliceMutU8 slice)
         {
             var rval = Interop.simple_service_method_mut_self_no_error(_context, slice);
             if (rval != FFIError.Ok)
@@ -1439,14 +1456,14 @@ namespace My.Company
 
         /// Warning, you _must_ discard the returned slice object before calling into this service
         /// again, as otherwise undefined behavior might happen.
-        public Sliceu32 ReturnSlice()
+        public SliceU32 ReturnSlice()
         {
             return Interop.simple_service_return_slice(_context);
         }
 
         /// Warning, you _must_ discard the returned slice object before calling into this service
         /// again, as otherwise undefined behavior might happen.
-        public SliceMutu32 ReturnSliceMut()
+        public SliceMutU32 ReturnSliceMut()
         {
             return Interop.simple_service_return_slice_mut(_context);
         }
@@ -1488,7 +1505,7 @@ namespace My.Company
             }
         }
 
-        public void MethodCallbackFfiReturnWithSlice(SumDelegateReturn callback, Slicei32 input)
+        public void MethodCallbackFfiReturnWithSlice(SumDelegateReturn callback, SliceI32 input)
         {
             var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
             var rval = Interop.simple_service_method_callback_ffi_return_with_slice(_context, callback_safe_delegate.Call, input);
@@ -1554,7 +1571,7 @@ namespace My.Company
             Interop.simple_service_lifetime_method_lt2(_context, slice);
         }
 
-        public string ReturnStringAcceptSlice(Sliceu8 anon1)
+        public string ReturnStringAcceptSlice(SliceU8 anon1)
         {
             var s = Interop.simple_service_lifetime_return_string_accept_slice(_context, anon1);
             return Marshal.PtrToStringAnsi(s);

@@ -219,49 +219,58 @@ typedef struct my_library_slice_bool
 } my_library_slice_bool;
 
 ///A pointer to an array of data someone else owns which may not be modified.
-typedef struct my_library_slicei32
+typedef struct my_library_slice_i32
 {
     ///Pointer to start of immutable data.
     const int32_t* data;
     ///Number of elements.
     uint64_t len;
-} my_library_slicei32;
+} my_library_slice_i32;
 
 ///A pointer to an array of data someone else owns which may not be modified.
-typedef struct my_library_sliceu32
+typedef struct my_library_slice_u32
 {
     ///Pointer to start of immutable data.
     const uint32_t* data;
     ///Number of elements.
     uint64_t len;
-} my_library_sliceu32;
+} my_library_slice_u32;
 
 ///A pointer to an array of data someone else owns which may not be modified.
-typedef struct my_library_sliceu8
+typedef struct my_library_slice_u8
 {
     ///Pointer to start of immutable data.
     const uint8_t* data;
     ///Number of elements.
     uint64_t len;
-} my_library_sliceu8;
+} my_library_slice_u8;
 
 ///A pointer to an array of data someone else owns which may be modified.
-typedef struct my_library_slice_mutu32
+typedef struct my_library_slice_mut_const_ptr_i8
+{
+    ///Pointer to start of mutable data.
+    const const char** data;
+    ///Number of elements.
+    uint64_t len;
+} my_library_slice_mut_const_ptr_i8;
+
+///A pointer to an array of data someone else owns which may be modified.
+typedef struct my_library_slice_mut_u32
 {
     ///Pointer to start of mutable data.
     const uint32_t* data;
     ///Number of elements.
     uint64_t len;
-} my_library_slice_mutu32;
+} my_library_slice_mut_u32;
 
 ///A pointer to an array of data someone else owns which may be modified.
-typedef struct my_library_slice_mutu8
+typedef struct my_library_slice_mut_u8
 {
     ///Pointer to start of mutable data.
     const uint8_t* data;
     ///Number of elements.
     uint64_t len;
-} my_library_slice_mutu8;
+} my_library_slice_mut_u8;
 
 ///Option type containing boolean flag and maybe valid data.
 typedef struct my_library_option_inner
@@ -327,9 +336,9 @@ typedef struct my_library_slice_mut_vec
     uint64_t len;
 } my_library_slice_mut_vec;
 
-typedef uint8_t (*my_library_callback_ffi_slice)(my_library_sliceu8 slice);
+typedef uint8_t (*my_library_callback_ffi_slice)(my_library_slice_u8 slice);
 
-typedef void (*my_library_callback_slice_mut)(my_library_slice_mutu8 slice);
+typedef void (*my_library_callback_slice_mut)(my_library_slice_mut_u8 slice);
 
 typedef my_library_vec3f32 (*my_library_callback_huge_vec_slice)(my_library_slice_vec3f32 slice);
 
@@ -440,19 +449,21 @@ typedef uint32_t (*pattern_ascii_pointer_len)(const char*, my_library_use_ascii_
 
 typedef my_library_slice_use_ascii_string_pattern (*pattern_ascii_pointer_return_slice)();
 
-typedef uint32_t (*pattern_ffi_slice_1)(my_library_sliceu32);
+typedef uint32_t (*pattern_ffi_slice_1)(my_library_slice_u32);
 
-typedef uint32_t (*pattern_ffi_slice_1b)(my_library_slice_mutu32);
+typedef uint32_t (*pattern_ffi_slice_1b)(my_library_slice_mut_u32);
 
 typedef my_library_vec3f32 (*pattern_ffi_slice_2)(my_library_slice_vec3f32, int32_t);
 
-typedef void (*pattern_ffi_slice_3)(my_library_slice_mutu8, my_library_callback_slice_mut);
+typedef void (*pattern_ffi_slice_3)(my_library_slice_mut_u8, my_library_callback_slice_mut);
 
-typedef void (*pattern_ffi_slice_4)(my_library_sliceu8, my_library_slice_mutu8);
+typedef void (*pattern_ffi_slice_4)(my_library_slice_u8, my_library_slice_mut_u8);
 
-typedef void (*pattern_ffi_slice_5)(const my_library_sliceu8*, my_library_slice_mutu8*);
+typedef void (*pattern_ffi_slice_5)(const my_library_slice_u8*, my_library_slice_mut_u8*);
 
-typedef void (*pattern_ffi_slice_6)(const my_library_slice_mutu8*, my_library_callback_u8);
+typedef void (*pattern_ffi_slice_6)(const my_library_slice_mut_u8*, my_library_callback_u8);
+
+typedef uint32_t (*pattern_ffi_slice_7)(my_library_slice_mut_const_ptr_i8);
 
 typedef uint8_t (*pattern_ffi_slice_delegate)(my_library_callback_ffi_slice);
 
@@ -519,28 +530,28 @@ typedef void (*simple_service_method_void)(const my_library_simple_service*);
 /// Regular void functions don't need an annotation.
 typedef void (*simple_service_method_void2)(const my_library_simple_service*);
 
-typedef uint8_t (*simple_service_method_mut_self)(my_library_simple_service*, my_library_sliceu8);
+typedef uint8_t (*simple_service_method_mut_self)(my_library_simple_service*, my_library_slice_u8);
 
 /// Single line.
 typedef void (*simple_service_method_mut_self_void)(my_library_simple_service*, my_library_slice_bool);
 
 typedef uint8_t (*simple_service_method_mut_self_ref)(my_library_simple_service*, const uint8_t*, uint8_t*);
 
-typedef uint8_t (*simple_service_method_mut_self_ref_slice)(my_library_simple_service*, const uint8_t*, uint8_t*, my_library_sliceu8);
+typedef uint8_t (*simple_service_method_mut_self_ref_slice)(my_library_simple_service*, const uint8_t*, uint8_t*, my_library_slice_u8);
 
-typedef uint8_t (*simple_service_method_mut_self_ref_slice_limited)(my_library_simple_service*, const uint8_t*, uint8_t*, my_library_sliceu8, my_library_sliceu8);
+typedef uint8_t (*simple_service_method_mut_self_ref_slice_limited)(my_library_simple_service*, const uint8_t*, uint8_t*, my_library_slice_u8, my_library_slice_u8);
 
-typedef my_library_ffi_error (*simple_service_method_mut_self_ffi_error)(my_library_simple_service*, my_library_slice_mutu8);
+typedef my_library_ffi_error (*simple_service_method_mut_self_ffi_error)(my_library_simple_service*, my_library_slice_mut_u8);
 
-typedef my_library_ffi_error (*simple_service_method_mut_self_no_error)(my_library_simple_service*, my_library_slice_mutu8);
-
-/// Warning, you _must_ discard the returned slice object before calling into this service
-/// again, as otherwise undefined behavior might happen.
-typedef my_library_sliceu32 (*simple_service_return_slice)(my_library_simple_service*);
+typedef my_library_ffi_error (*simple_service_method_mut_self_no_error)(my_library_simple_service*, my_library_slice_mut_u8);
 
 /// Warning, you _must_ discard the returned slice object before calling into this service
 /// again, as otherwise undefined behavior might happen.
-typedef my_library_slice_mutu32 (*simple_service_return_slice_mut)(my_library_simple_service*);
+typedef my_library_slice_u32 (*simple_service_return_slice)(my_library_simple_service*);
+
+/// Warning, you _must_ discard the returned slice object before calling into this service
+/// again, as otherwise undefined behavior might happen.
+typedef my_library_slice_mut_u32 (*simple_service_return_slice_mut)(my_library_simple_service*);
 
 /// This function has no panic safeguards. It will be a bit faster to
 /// call, but if it panics your host app will be in an undefined state.
@@ -552,7 +563,7 @@ typedef my_library_ffi_error (*simple_service_method_callback)(my_library_simple
 
 typedef my_library_ffi_error (*simple_service_method_callback_ffi_return)(my_library_simple_service*, my_library_sum_delegate_return);
 
-typedef my_library_ffi_error (*simple_service_method_callback_ffi_return_with_slice)(my_library_simple_service*, my_library_sum_delegate_return, my_library_slicei32);
+typedef my_library_ffi_error (*simple_service_method_callback_ffi_return_with_slice)(my_library_simple_service*, my_library_sum_delegate_return, my_library_slice_i32);
 
 /// Destroys the given instance.
 ///
@@ -568,7 +579,7 @@ typedef void (*simple_service_lifetime_method_lt)(my_library_simple_service_life
 
 typedef void (*simple_service_lifetime_method_lt2)(my_library_simple_service_lifetime*, my_library_slice_bool);
 
-typedef const char* (*simple_service_lifetime_return_string_accept_slice)(my_library_simple_service_lifetime*, my_library_sliceu8);
+typedef const char* (*simple_service_lifetime_return_string_accept_slice)(my_library_simple_service_lifetime*, my_library_slice_u8);
 
 typedef my_library_ffi_error (*simple_service_lifetime_method_void_ffi_error)(my_library_simple_service_lifetime*);
 

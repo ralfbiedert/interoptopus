@@ -12,7 +12,7 @@ namespace interop_test
         public void pattern_ffi_slice_delegate()
         {
 #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
-            Interop.pattern_ffi_slice_delegate(delegate(Sliceu8 x0)
+            Interop.pattern_ffi_slice_delegate(delegate(SliceU8 x0)
             {
                 var span = x0.ReadOnlySpan;
 

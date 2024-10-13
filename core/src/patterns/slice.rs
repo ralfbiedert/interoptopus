@@ -41,6 +41,7 @@
 use crate::lang::c::{CType, CompositeType, Documentation, Field, Layout, Meta, PrimitiveType, Representation, Visibility};
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::TypePattern;
+use crate::util::capitalize_first_letter;
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
 use std::ptr::{null, null_mut};
@@ -137,7 +138,8 @@ where
         let doc = Documentation::from_line("A pointer to an array of data someone else owns which may not be modified.");
         let repr = Representation::new(Layout::C, None);
         let meta = Meta::with_namespace_documentation(T::type_info().namespace().map(|e| e.into()).unwrap_or_else(String::new), doc);
-        let composite = CompositeType::with_meta_repr(format!("Slice{}", T::type_info().name_within_lib()), fields, meta, repr);
+        let name = capitalize_first_letter(T::type_info().name_within_lib());
+        let composite = CompositeType::with_meta_repr(format!("Slice{}", name), fields, meta, repr);
         CType::Pattern(TypePattern::Slice(composite))
     }
 }
@@ -244,7 +246,8 @@ where
         let doc = Documentation::from_line("A pointer to an array of data someone else owns which may be modified.");
         let repr = Representation::new(Layout::C, None);
         let meta = Meta::with_namespace_documentation(T::type_info().namespace().map(|e| e.into()).unwrap_or_else(String::new), doc);
-        let composite = CompositeType::with_meta_repr(format!("SliceMut{}", T::type_info().name_within_lib()), fields, meta, repr);
+        let name = capitalize_first_letter(T::type_info().name_within_lib());
+        let composite = CompositeType::with_meta_repr(format!("SliceMut{}", name), fields, meta, repr);
         CType::Pattern(TypePattern::SliceMut(composite))
     }
 }

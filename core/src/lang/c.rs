@@ -10,7 +10,7 @@
 //! by a backend**.
 
 use crate::patterns::TypePattern;
-use crate::util::{ctypes_from_type_recursive, IdPrettifier};
+use crate::util::{capitalize_first_letter, ctypes_from_type_recursive, IdPrettifier};
 use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
 
@@ -161,11 +161,9 @@ impl CType {
 
     /// Produces a name unique for that type with respect to this library.
     ///
-    /// The name here is supposed to uniquely determine a type relative to a library ([`crate::Inventory`]),
-    /// but it is not guaranteed to be C-compatible and may contain special characters
-    /// (e.g., `*const u32`).
+    /// The name here is supposed to uniquely determine a type relative to a library ([`crate::Inventory`]).
     ///
-    /// Backends should instead match on the `CType` variant and determine a more appropriate
+    /// Backends may instead match on the `CType` variant and determine a more appropriate
     /// name on a case-by-case basis; including changing a name entirely.
     pub fn name_within_lib(&self) -> String {
         match self {
@@ -174,8 +172,8 @@ impl CType {
             CType::Opaque(x) => x.rust_name().to_string(),
             CType::Composite(x) => x.rust_name().to_string(),
             CType::FnPointer(x) => x.rust_name(),
-            CType::ReadPointer(x) => format!("*const {}", x.name_within_lib()),
-            CType::ReadWritePointer(x) => format!("*mut {}", x.name_within_lib()),
+            CType::ReadPointer(x) => format!("ConstPtr{}", capitalize_first_letter(x.name_within_lib())),
+            CType::ReadWritePointer(x) => format!("MutPtr{}", capitalize_first_letter(x.name_within_lib())),
             CType::Pattern(x) => match x {
                 TypePattern::Bool => "Bool".to_string(),
                 _ => x.fallback_type().name_within_lib(),

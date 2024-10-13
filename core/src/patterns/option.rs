@@ -32,6 +32,7 @@ use crate::lang::rust::CTypeInfo;
 
 use crate::patterns::primitives::FFIBool;
 use crate::patterns::TypePattern;
+use crate::util::capitalize_first_letter;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -147,7 +148,8 @@ where
         let doc = Documentation::from_line("Option type containing boolean flag and maybe valid data.");
         let repr = Representation::new(Layout::C, None);
         let meta = Meta::with_namespace_documentation(T::type_info().namespace().map(|e| e.into()).unwrap_or_else(String::new), doc);
-        let composite = CompositeType::with_meta_repr(format!("Option{}", T::type_info().name_within_lib()), fields, meta, repr);
+        let name = capitalize_first_letter(T::type_info().name_within_lib());
+        let composite = CompositeType::with_meta_repr(format!("Option{}", name), fields, meta, repr);
         CType::Pattern(TypePattern::Option(composite))
     }
 }
