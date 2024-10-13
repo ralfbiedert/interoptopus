@@ -9,6 +9,6 @@ extern "C" fn do_math(x: u32) -> u32 {
 
 pub fn my_inventory() -> Inventory {
     {
-        InventoryBuilder::new().register(function!(do_math)).inventory()
+        InventoryBuilder::new().register(function!(do_math)).validate().inventory()
     }
 }

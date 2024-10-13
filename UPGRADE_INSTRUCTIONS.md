@@ -14,6 +14,7 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
   via that attribute.
 - `#[ffi_type(patterns(ffi_error))]` is now `#[ffi_type(error)]`.
 - `AsciiPointer` is now called `CStrPointer`, since it can contain non-ASCII data (e.g., when called from C#).
+- When using `InventoryBuilder` you should call `.validate().inventory()` now.
 - To override visibility for all fields:
     - Previously you had to `#[ffi_type(visibility(_ = "public"))]`
     - Now you do `#[ffi_type(visibility(_all = "public"))]`

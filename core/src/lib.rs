@@ -47,6 +47,7 @@
 //! pub fn ffi_inventory() -> Inventory {
 //!     InventoryBuilder::new()
 //!         .register(function!(my_function))
+//!         .validate()
 //!         .inventory()
 //! }
 //!
@@ -220,6 +221,7 @@ pub mod lang {
 /// pub fn inventory() -> Inventory {
 ///     InventoryBuilder::new()
 ///         .register(function!(my_function))
+///         .validate()
 ///         .inventory()
 /// }
 /// ```
@@ -248,6 +250,7 @@ macro_rules! function {
 /// pub fn inventory() -> Inventory {
 ///     InventoryBuilder::new()
 ///         .register(constant!(MY_CONSTANT))
+///         .validate()
 ///         .inventory()
 /// }
 /// ```
@@ -281,6 +284,7 @@ macro_rules! constant {
 /// pub fn inventory() -> Inventory {
 ///     InventoryBuilder::new()
 ///         .register(extra_type!(S<f32>))
+///         .validate()
 ///         .inventory()
 /// }
 #[macro_export]
@@ -359,6 +363,7 @@ macro_rules! extra_type {
 /// pub fn inventory() -> Inventory {
 ///     InventoryBuilder::new()
 ///         .register(pattern!(SimpleService))
+///         .validate()
 ///         .inventory()
 /// }
 #[macro_export]

@@ -26,6 +26,7 @@
 //! pub fn my_inventory() -> Inventory {
 //!     InventoryBuilder::new()
 //!         .register(function!(my_api_guard))
+//!         .validate()
 //!         .inventory()
 //! }
 //! ```

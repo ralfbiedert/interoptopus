@@ -14,7 +14,7 @@ pub enum Symbol {
     Pattern(LibraryPattern),
 }
 
-/// Produces a [`Inventory`] inside your inventory function, **start here**.
+/// Produces a [`Inventory`] inside your inventory function, **start here**.🔥
 ///
 /// # Example
 ///
@@ -45,6 +45,7 @@ pub enum Symbol {
 ///         .register(function!(primitive_void))
 ///         .register(constant!(MY_CONSTANT))
 ///         .register(extra_type!(ExtraType<f32>))
+///         .validate()
 ///         .inventory()
 /// }
 /// ```
@@ -91,13 +92,35 @@ impl InventoryBuilder {
         self
     }
 
+    /// Does additional sanity checking, highly recommended.
+    ///
+    /// This method tries to detect FFI issues that are hard to detect otherwise, and would
+    /// cause issues in any backend.
+    ///
+    /// # Panics
+    ///
+    /// If a function, type, or pattern is detected that doesn't make sense in interop
+    /// generation a panic will be raised.   
+    pub fn validate(self) -> Self {
+        for x in &self.functions {
+            let has_opaque_param = x.signature().params().iter().any(|x| x.the_type().as_opaque_type().is_some());
+            let has_opaque_rval = x.signature().rval().as_opaque_type().is_some();
+
+            if has_opaque_param || has_opaque_rval {
+                panic!("Function {} has an opaque parameter or return value. This can cause UB.", x.name());
+            }
+        }
+
+        self
+    }
+
     /// Produce the [`Inventory`].
     pub fn inventory(self) -> Inventory {
         Inventory::new(self.functions, self.constants, self.patterns, self.ctypes)
     }
 }
 
-/// Represents all FFI-relevant items, produced via [`InventoryBuilder`], ingested by backends.
+/// Holds FFI-relevant items, produced via [`InventoryBuilder`], ingested by backends.
 #[derive(Clone, Debug, PartialOrd, PartialEq, Default)]
 pub struct Inventory {
     functions: Vec<Function>,

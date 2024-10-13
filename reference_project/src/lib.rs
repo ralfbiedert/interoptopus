@@ -117,6 +117,7 @@ pub fn ffi_inventory() -> Inventory {
             // Patterns
             .register(pattern!(patterns::service::SimpleService))
             .register(pattern!(patterns::service::SimpleServiceLifetime))
+            .validate()
             .inventory()
     }
 }
