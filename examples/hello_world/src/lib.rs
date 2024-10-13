@@ -16,7 +16,5 @@ pub fn my_function(input: Vec2) -> Vec2 {
 // This will create a function `my_inventory` which can produce
 // an abstract FFI representation (called `Library`) for this crate.
 pub fn my_inventory() -> Inventory {
-    {
-        InventoryBuilder::new().register(function!(my_function)).validate().inventory()
-    }
+    InventoryBuilder::new().register(function!(my_function)).validate().inventory()
 }
