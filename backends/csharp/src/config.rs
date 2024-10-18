@@ -122,6 +122,8 @@ pub struct Config {
     pub param_slice_type: ParamSliceType,
     /// How to handle unsupported constructs.
     pub unsupported: Unsupported,
+    /// The string to use for reporting within FFIError. Use `{error}` to reference the inner error content.
+    pub error_text: String,
 }
 
 impl Config {}
@@ -144,6 +146,7 @@ impl Default for Config {
             work_around_exception_in_callback_no_reentry: true,
             param_slice_type: ParamSliceType::Array,
             unsupported: Unsupported::Panic,
+            error_text: "Something went wrong: {error}".to_string(),
         }
     }
 }
