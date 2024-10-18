@@ -1067,11 +1067,13 @@ pub trait CSharpWriter {
 
     fn write_builtins(&self, w: &mut IndentWriter) -> Result<(), Error> {
         if self.config().write_types.write_interoptopus_globals() {
+            let error_text = &self.config().error_text;
+
             indented!(w, r#"public class InteropException<T> : Exception"#)?;
             indented!(w, r#"{{"#)?;
             indented!(w, [_], r#"public T Error {{ get; private set; }}"#)?;
             w.newline()?;
-            indented!(w, [_], r#"public InteropException(T error): base($"Something went wrong: {{error}}")"#)?;
+            indented!(w, [_], r#"public InteropException(T error): base($"{error_text}")"#)?;
             indented!(w, [_], r#"{{"#)?;
             indented!(w, [_ _], r#"Error = error;"#)?;
             indented!(w, [_], r#"}}"#)?;
