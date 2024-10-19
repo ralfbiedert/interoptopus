@@ -17,4 +17,12 @@ pub trait Interop {
 
         self.write_to(&mut writer)
     }
+
+    /// Convenience method to write FFI bindings to a string.
+    fn write_string(&self) -> Result<String, Error> {
+        let mut vec = Vec::new();
+        let mut writer = IndentWriter::new(&mut vec);
+        self.write_to(&mut writer)?;
+        Ok(String::from_utf8(vec)?)
+    }
 }

@@ -24,6 +24,8 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
     - Instead, you now make `some_field` of type `Surrogate<Foreign, Local>`
 - Setting alignment on types is not supported anymore (for now). You should also stop using alignment on
   earlier versions as various backends didn't translate that properly.
+- Backend-related testing functions were moved into an internal `tests` project, as the code was mostly specific to our
+  project needs anyway.
 
 ### 0.13 → 0.14
 

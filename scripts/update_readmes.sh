@@ -9,11 +9,11 @@ function update_readme() {
     cargo readme --no-license --no-title > README.md
 }
 
-update_readme "core"
-update_readme "proc_macros"
-update_readme "backends/c"
-update_readme "backends/csharp"
-update_readme "backends/cpython"
-update_readme "reference_project"
+update_readme "crates/core"
+update_readme "crates/proc_macros"
+update_readme "crates/backend_c"
+update_readme "crates/backend_csharp"
+update_readme "crates/backend_cpython"
+update_readme "crates/reference_project"
 
 cp "$PROJECT_ROOT"/core/README.md "$PROJECT_ROOT"

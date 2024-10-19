@@ -55,7 +55,7 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(functions::ref_mut_simple))
             .register(function!(functions::ref_option))
             .register(function!(functions::ref_mut_option))
-            .register(function!(functions::tupled))
+            .register(function!(functions::call_tupled))
             .register(function!(functions::complex_args_1))
             .register(function!(functions::callback))
             .register(function!(functions::generic_1a))

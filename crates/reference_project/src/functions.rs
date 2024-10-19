@@ -147,7 +147,7 @@ pub fn ref_mut_option(x: Option<&mut i64>) -> bool {
 }
 
 #[ffi_function]
-pub fn tupled(x: Tupled) -> Tupled {
+pub fn call_tupled(x: Tupled) -> Tupled {
     Tupled(x.0 * 2)
 }
 

@@ -1,3 +1,4 @@
+use derive_builder::Builder;
 use heck::{ToLowerCamelCase, ToShoutySnakeCase, ToSnakeCase, ToUpperCamelCase};
 
 /// Style of indentation used in generated C code
@@ -70,7 +71,8 @@ pub enum CDocumentationStyle {
 }
 
 /// Configures C code generation.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Builder)]
+#[builder(default)]
 pub struct Config {
     /// Whether to write conditional directives like `#ifndef _X`.
     pub directives: bool,

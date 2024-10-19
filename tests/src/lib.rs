@@ -1,14 +1,21 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+pub mod backend_c;
+pub mod backend_cpython;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub use tempfile::tempdir;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+/// Set this to `true` if you want to update bindings.
+pub static UPDATE_BINDINGS: bool = true;
+
+#[macro_export]
+macro_rules! validate_output {
+    ($folder:expr, $file:expr, $generated:expr) => {
+        let file = format!("{}/{}", $folder, $file);
+
+        if $crate::UPDATE_BINDINGS {
+            std::fs::write(file, $generated).unwrap();
+        } else {
+            let expected = std::fs::read_to_string(file)?;
+            assert_eq!($generated, expected);
+        }
+    };
 }

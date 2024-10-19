@@ -1,5 +1,8 @@
+use derive_builder::Builder;
+
 /// Configures Python code generation.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Builder)]
+#[builder(default)]
 pub struct Config {
     /// How to name the function responsible for loading the DLL, e.g., `init_api`.
     pub init_api_function_name: String,

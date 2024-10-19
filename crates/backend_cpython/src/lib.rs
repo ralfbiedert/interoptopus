@@ -139,13 +139,11 @@ use interoptopus::{Error, Inventory};
 mod config;
 mod converter;
 mod docs;
-mod testing;
 mod writer;
 
-pub use config::{Config, DocConfig};
+pub use config::{Config, ConfigBuilder, DocConfig};
 pub use converter::Converter;
 pub use docs::DocGenerator;
-pub use testing::run_python_if_installed;
 pub use writer::PythonWriter;
 
 /// **Start here**, main converter implementing [`Interop`].

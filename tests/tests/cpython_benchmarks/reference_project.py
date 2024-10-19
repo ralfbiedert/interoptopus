@@ -33,7 +33,7 @@ def init_lib(path):
     c_lib.ref_mut_simple.argtypes = [ctypes.POINTER(ctypes.c_int64)]
     c_lib.ref_option.argtypes = [ctypes.POINTER(ctypes.c_int64)]
     c_lib.ref_mut_option.argtypes = [ctypes.POINTER(ctypes.c_int64)]
-    c_lib.tupled.argtypes = [Tupled]
+    c_lib.call_tupled.argtypes = [Tupled]
     c_lib.complex_args_1.argtypes = [Vec3f32, ctypes.POINTER(Tupled)]
     c_lib.callback.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8), ctypes.c_uint8]
     c_lib.generic_1a.argtypes = [Genericu32, Phantomu8]
@@ -137,7 +137,7 @@ def init_lib(path):
     c_lib.ref_mut_simple.restype = ctypes.POINTER(ctypes.c_int64)
     c_lib.ref_option.restype = ctypes.c_bool
     c_lib.ref_mut_option.restype = ctypes.c_bool
-    c_lib.tupled.restype = Tupled
+    c_lib.call_tupled.restype = Tupled
     c_lib.complex_args_1.restype = ctypes.c_int
     c_lib.callback.restype = ctypes.c_uint8
     c_lib.generic_1a.restype = ctypes.c_uint32
@@ -299,8 +299,8 @@ def ref_option(x: ctypes.POINTER(ctypes.c_int64)) -> bool:
 def ref_mut_option(x: ctypes.POINTER(ctypes.c_int64)) -> bool:
     return c_lib.ref_mut_option(x)
 
-def tupled(x: Tupled) -> Tupled:
-    return c_lib.tupled(x)
+def call_tupled(x: Tupled) -> Tupled:
+    return c_lib.call_tupled(x)
 
 def complex_args_1(a: Vec3f32, b: ctypes.POINTER(Tupled)):
     return c_lib.complex_args_1(a, b)

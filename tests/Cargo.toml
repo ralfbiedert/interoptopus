@@ -5,3 +5,11 @@ edition = "2021"
 publish = false
 
 [dependencies]
+interoptopus_backend_csharp = { path = "../crates/backend_csharp" }
+interoptopus_backend_c = { path = "../crates/backend_c" }
+interoptopus_backend_cpython = { path = "../crates/backend_cpython" }
+interoptopus_reference_project = { path = "../crates/reference_project" }
+interoptopus = { path = "../crates/core" }
+anyhow = "1.0.90"
+cc = "1.1.31"
+tempfile = "3.13.0"
