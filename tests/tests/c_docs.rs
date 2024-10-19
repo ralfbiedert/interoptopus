@@ -1,8 +1,15 @@
 use anyhow::Error;
-use interoptopus::Interop;
+use interoptopus::{ffi_function, function, Interop, Inventory, InventoryBuilder};
 use interoptopus_backend_c::{CDocumentationStyle, ConfigBuilder, Generator};
-use interoptopus_reference_project::ffi_inventory;
 use tests::{compile_output_c, validate_output};
+
+/// Documented
+#[ffi_function]
+fn sample_function() {}
+
+fn ffi_inventory() -> Inventory {
+    InventoryBuilder::new().register(function!(sample_function)).inventory()
+}
 
 #[test]
 fn inline() -> Result<(), Error> {

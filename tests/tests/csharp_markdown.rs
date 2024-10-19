@@ -1,8 +1,16 @@
 use anyhow::Error;
+use interoptopus::{ffi_function, function, Inventory, InventoryBuilder};
 use interoptopus_backend_csharp::{ConfigBuilder, DocConfig, DocGenerator, Generator, ParamSliceType};
-use interoptopus_reference_project::ffi_inventory;
 use tests::backend_csharp::common_namespace_mappings;
 use tests::validate_output;
+
+/// Has documentation
+#[ffi_function]
+fn with_documentation() {}
+
+fn ffi_inventory() -> Inventory {
+    InventoryBuilder::new().register(function!(with_documentation)).inventory()
+}
 
 #[test]
 fn can_produce_markdown() -> Result<(), Error> {
