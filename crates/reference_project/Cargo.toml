@@ -9,6 +9,7 @@ keywords = ["ffi"]
 categories = ["api-bindings", "development-tools::ffi"]
 documentation = "https://docs.rs/interoptopus_reference_project/"
 repository = "https://github.com/ralfbiedert/interoptopus"
+publish = false
 
 [lib]
 path = "src/lib.rs"

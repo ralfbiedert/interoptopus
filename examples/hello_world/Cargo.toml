@@ -8,9 +8,9 @@ publish = false
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-interoptopus = { path = "../../core" }
+interoptopus = { path = "../../crates/core" }
 
 [dev-dependencies]
-interoptopus_backend_csharp = { path = "../../backends/csharp" }
-interoptopus_backend_c = { path = "../../backends/c" }
-interoptopus_backend_cpython = { path = "../../backends/cpython" }
+interoptopus_backend_csharp = { path = "../../crates/backend_csharp" }
+interoptopus_backend_c = { path = "../../crates/backend_c" }
+interoptopus_backend_cpython = { path = "../../crates/backend_cpython" }

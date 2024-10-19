@@ -1,13 +1,14 @@
 [workspace]
 members = [
-    "core",
-    "backends/c",
-    "backends/cpython",
-    "backends/csharp",
-    "proc_macros",
-    "reference_project",
+    "crates/core",
+    "crates/backend_c",
+    "crates/backend_cpython",
+    "crates/backend_csharp",
+    "crates/proc_macros",
+    "crates/reference_project",
     "examples/complex",
     "examples/hello_world",
-    "examples/unity_hot_reload"
+    "examples/unity_hot_reload",
+    "tests"
 ]
 resolver = "2"

@@ -9,5 +9,5 @@ publish = false
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-interoptopus = { path = "../../core" }
-interoptopus_backend_csharp = { path = "../../backends/csharp" }
+interoptopus = { path = "../../crates/core" }
+interoptopus_backend_csharp = { path = "../../crates/backend_csharp" }

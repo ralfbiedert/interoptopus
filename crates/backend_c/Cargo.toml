@@ -12,10 +12,10 @@ repository = "https://github.com/ralfbiedert/interoptopus"
 
 
 [dependencies]
-interoptopus = { path = "../../core", version = "0.14.0" }
+interoptopus = { path = "../core", version = "0.14.0" }
 cc = { version = "1.0.72", optional = true }
 heck = "0.4.0"
 
 [dev-dependencies]
-interoptopus = { path = "../../core" }
-interoptopus_reference_project = { path = "../../reference_project" }
+interoptopus = { path = "../core" }
+interoptopus_reference_project = { path = "../reference_project" }
