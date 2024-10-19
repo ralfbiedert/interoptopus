@@ -10,7 +10,7 @@ want to generate **CPython bindings** for Python 3.7+, follow the instructions b
 Add [**Interoptopus**](https://crates.io/crates/interoptopus) attributes to the library you have
 written, and define an inventory function listing all symbols you wish to export. An overview of all
 supported constructs can be found in the
-[**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/reference_project/src).
+[**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src).
 
 ```rust
 use interoptopus::{ffi_function, ffi_type, Inventory, InventoryBuilder, function};

@@ -57,12 +57,12 @@ pub fn ffi_inventory() -> Inventory {
 
 | Language | Crate | Sample Output<sup>1</sup> |
 | --- | --- | --- |
-| C# | [**interoptopus_backend_csharp**](https://crates.io/crates/interoptopus_backend_csharp) | [Interop.cs](https://github.com/ralfbiedert/interoptopus/blob/master/backends/csharp/tests/output_safe/Interop.cs) |
-| C | [**interoptopus_backend_c**](https://crates.io/crates/interoptopus_backend_c) | [my_header.h](https://github.com/ralfbiedert/interoptopus/blob/master/backends/c/tests/output_nodocs/my_header.h) |
-| Python | [**interoptopus_backend_cpython**](https://crates.io/crates/interoptopus_backend_cpython) | [reference.py](https://github.com/ralfbiedert/interoptopus/blob/master/backends/cpython/tests/output/reference_project.py) |
+| C# | [**interoptopus_backend_csharp**](https://crates.io/crates/interoptopus_backend_csharp) | [Interop.cs](https://github.com/ralfbiedert/interoptopus/blob/master/tests/tests/csharp_reference_project_safe/Interop.cs) |
+| C | [**interoptopus_backend_c**](https://crates.io/crates/interoptopus_backend_c) | [my_header.h](https://github.com/ralfbiedert/interoptopus/blob/master/tests/tests/c_reference_project/reference_project.h) |
+| Python | [**interoptopus_backend_cpython**](https://crates.io/crates/interoptopus_backend_cpython) | [reference.py](https://github.com/ralfbiedert/interoptopus/blob/master/tests/tests/cpython_reference_project/reference_project.py) |
 | Other | Write your own backend<sup>2</sup> | - |
 
-<sup>1</sup> For the [reference project](https://github.com/ralfbiedert/interoptopus/tree/master/reference_project/src). <br/>
+<sup>1</sup> For the [reference project](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src). <br/>
 <sup>2</sup> Add support for a new language in just a few hours. No pull request needed. [Pinkie promise](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md#new-backends).
 
 
@@ -88,11 +88,11 @@ For a "production-ready" project you generally want to follow these 3 steps:
 
 ### Supported Rust Constructs
 
-See the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/reference_project/src) for an overview:
-- [functions](https://github.com/ralfbiedert/interoptopus/blob/master/reference_project/src/functions.rs) (`extern "C"` functions and delegates)
-- [types](https://github.com/ralfbiedert/interoptopus/blob/master/reference_project/src/types.rs) (composites, enums, opaques, references, ...)
-- [constants](https://github.com/ralfbiedert/interoptopus/blob/master/reference_project/src/constants.rs) (primitive constants; results of const evaluation)
-- [patterns](https://github.com/ralfbiedert/interoptopus/tree/master/reference_project/src/patterns) (ASCII pointers, options, slices, classes, ...)
+See the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src) for an overview:
+- [functions](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/functions.rs) (`extern "C"` functions and delegates)
+- [types](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/types.rs) (composites, enums, opaques, references, ...)
+- [constants](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/constants.rs) (primitive constants; results of const evaluation)
+- [patterns](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/patterns) (ASCII pointers, options, slices, classes, ...)
 
 
 ### Performance 🏁
@@ -108,8 +108,8 @@ can help you design better APIs.
 
 Detailed call cost tables can be found here: <sup>🔥</sup>
 
-- [**C# call overhead**](https://github.com/ralfbiedert/interoptopus/blob/master/backends/csharp/benches/BENCHMARK_RESULTS.md)
-- [**Python call overhead**](https://github.com/ralfbiedert/interoptopus/blob/master/backends/cpython/tests/output/BENCHMARK_RESULTS.md)
+- [**C# call overhead**](https://github.com/ralfbiedert/interoptopus/blob/master/tests/tests/csharp_benchmarks/RESULTS.md)
+- [**Python call overhead**](https://github.com/ralfbiedert/interoptopus/blob/master/tests/tests/cpython_benchmarks/RESULTS.md)
 
 For a quick overview, this table lists the most common call types in _ns / call_:
 

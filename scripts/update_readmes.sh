@@ -16,4 +16,4 @@ update_readme "crates/backend_csharp"
 update_readme "crates/backend_cpython"
 update_readme "crates/reference_project"
 
-cp "$PROJECT_ROOT"/core/README.md "$PROJECT_ROOT"
+cp "$PROJECT_ROOT"/crates/core/README.md "$PROJECT_ROOT"
