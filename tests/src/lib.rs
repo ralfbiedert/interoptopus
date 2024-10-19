@@ -1,5 +1,6 @@
 pub mod backend_c;
 pub mod backend_cpython;
+pub mod backend_csharp;
 
 pub use tempfile::tempdir;
 

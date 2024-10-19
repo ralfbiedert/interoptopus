@@ -356,4 +356,11 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
 
         self.write_to(&mut writer)
     }
+
+    pub fn write_string(&self) -> Result<String, Error> {
+        let mut vec = Vec::new();
+        let mut writer = IndentWriter::new(&mut vec);
+        self.write_to(&mut writer)?;
+        Ok(String::from_utf8(vec)?)
+    }
 }

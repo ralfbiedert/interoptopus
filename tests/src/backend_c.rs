@@ -28,7 +28,7 @@ pub fn compile_c_app_if_installed(app: impl AsRef<Path>) -> Result<(), Error> {
 }
 
 #[macro_export]
-macro_rules! compile_output {
+macro_rules! compile_output_c {
     ($generated:expr) => {{
         if !$crate::UPDATE_BINDINGS {
             let temp_dir = $crate::tempdir()?;

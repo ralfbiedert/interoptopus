@@ -2,7 +2,7 @@ use anyhow::Error;
 use interoptopus::Interop;
 use interoptopus_backend_c::{CDocumentationStyle, ConfigBuilder, Generator};
 use interoptopus_reference_project::ffi_inventory;
-use tests::{compile_output, validate_output};
+use tests::{compile_output_c, validate_output};
 
 #[test]
 fn inline() -> Result<(), Error> {
@@ -11,7 +11,7 @@ fn inline() -> Result<(), Error> {
     let generated = Generator::new(config, inventory).write_string()?;
 
     validate_output!("tests", "c_docs_inline.h", generated.as_str());
-    compile_output!(generated.as_str());
+    compile_output_c!(generated.as_str());
 
     Ok(())
 }
@@ -23,7 +23,7 @@ fn none() -> Result<(), Error> {
     let generated = Generator::new(config, inventory).write_string()?;
 
     validate_output!("tests", "c_docs_none.h", generated.as_str());
-    compile_output!(generated.as_str());
+    compile_output_c!(generated.as_str());
 
     Ok(())
 }

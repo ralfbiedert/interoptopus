@@ -1,3 +1,4 @@
+use derive_builder::Builder;
 use interoptopus::util::NamespaceMappings;
 
 /// The types to write for the given recorder.
@@ -75,6 +76,7 @@ impl Unsafe {
 }
 
 /// The kind of types to use when generating FFI method overloads.
+// TODO - THIS SHOULD BE DotNet config
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum ParamSliceType {
     /// Slices should be passed in as C# arrays.
@@ -84,7 +86,8 @@ pub enum ParamSliceType {
 }
 
 /// Configures C# code generation.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Builder)]
+#[builder(default)]
 pub struct Config {
     /// The file header, e.g., `// (c) My Company`.
     pub file_header_comment: String,
