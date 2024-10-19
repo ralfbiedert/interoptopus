@@ -1,0 +1,10 @@
+[package]
+name = "core_library_ffi_build"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[build-dependencies]
+interoptopus = { path = "../../../crates/core" }
+interoptopus_backend_csharp = { path = "../../../crates/backend_csharp" }
+core_library_ffi = { path = "../core_library_ffi" }

@@ -10,11 +10,11 @@ using My.Company;
 
 namespace My.Company
 {
-    public static partial class InteropClass
+    public static partial class Interop
     {
-        public const string NativeLib = "example_hello_world";
+        public const string NativeLib = "library";
 
-        static InteropClass()
+        static Interop()
         {
         }
 

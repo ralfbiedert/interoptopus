@@ -6,8 +6,10 @@ members = [
     "crates/backend_csharp",
     "crates/proc_macros",
     "crates/reference_project",
-    "examples/complex",
     "examples/hello_world",
+    "examples/real_project_layout/core_library",
+    "examples/real_project_layout/core_library_ffi",
+    "examples/real_project_layout/core_library_ffi_build",
     "examples/unity_hot_reload",
     "tests"
 ]

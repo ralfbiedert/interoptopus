@@ -13,8 +13,25 @@ pub fn my_function(input: Vec2) -> Vec2 {
     input
 }
 
-// This will create a function `my_inventory` which can produce
-// an abstract FFI representation (called `Library`) for this crate.
-pub fn my_inventory() -> Inventory {
-    InventoryBuilder::new().register(function!(my_function)).validate().inventory()
+// Helper to produce an `Inventory`, describing what our FFI library contains.
+#[rustfmt::skip]
+#[allow(unused)]
+fn my_inventory() -> Inventory {
+    InventoryBuilder::new()
+        .register(function!(my_function))
+        .validate()
+        .inventory()
+}
+
+// We just trick a unit test into producing our bindings, here for C#
+#[test]
+fn generate_bindings() {
+    use interoptopus::Interop;
+    use interoptopus_backend_csharp::ConfigBuilder;
+    use interoptopus_backend_csharp::Generator;
+
+    let inventory = my_inventory();
+    let config = ConfigBuilder::default().build().unwrap();
+
+    Generator::new(config, inventory).write_file("bindings/Interop.cs").unwrap();
 }

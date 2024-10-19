@@ -1,5 +1,5 @@
 [package]
-name = "example_hello_world"
+name = "hello_world"
 version = "0.1.1"
 edition = "2021"
 publish = false
@@ -12,5 +12,3 @@ interoptopus = { path = "../../crates/core" }
 
 [dev-dependencies]
 interoptopus_backend_csharp = { path = "../../crates/backend_csharp" }
-interoptopus_backend_c = { path = "../../crates/backend_c" }
-interoptopus_backend_cpython = { path = "../../crates/backend_cpython" }
