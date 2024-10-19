@@ -11,6 +11,6 @@ documentation = "https://docs.rs/interoptopus_backend_c/"
 repository = "https://github.com/ralfbiedert/interoptopus"
 
 [dependencies]
-interoptopus = { path = "../core", version = "0.14.0" }
-heck = "0.5.0"
-derive_builder = "0.20.2"
+interoptopus = { path = "../core" }
+heck = { workspace = true }
+derive_builder = { workspace = true }

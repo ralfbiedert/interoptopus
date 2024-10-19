@@ -12,3 +12,9 @@ members = [
     "tests"
 ]
 resolver = "2"
+
+[workspace.dependencies]
+derive_builder = "0.20.2"
+heck = "0.5.0"
+log = "0.4.14"
+serde = "1.0.203"

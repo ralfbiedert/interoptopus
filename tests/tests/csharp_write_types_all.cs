@@ -5,11 +5,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using My.Companny;
-using My.Companny.Common;
+using My.Company;
+using My.Company.Common;
 #pragma warning restore 0105
 
-namespace My.Companny
+namespace My.Company
 {
     public static partial class Interop
     {
@@ -1672,6 +1672,8 @@ namespace My.Companny
 
         public IntPtr Context => _context;
     }
+
+
 
     public class InteropException<T> : Exception
     {

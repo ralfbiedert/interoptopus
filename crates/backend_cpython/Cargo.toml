@@ -11,5 +11,5 @@ repository = "https://github.com/ralfbiedert/interoptopus"
 
 [dependencies]
 interoptopus = { path = "../core", version = "0.14.0" }
-derive_builder = "0.20.2"
+derive_builder = { workspace = true }
 

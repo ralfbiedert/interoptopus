@@ -9,11 +9,11 @@ using System.Runtime.InteropServices;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Collections;
 #endif
-using My.Companny;
-using My.Companny.Common;
+using My.Company;
+using My.Company.Common;
 #pragma warning restore 0105
 
-namespace My.Companny
+namespace My.Company
 {
     public static partial class Interop
     {

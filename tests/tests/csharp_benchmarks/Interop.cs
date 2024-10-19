@@ -6,26 +6,22 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
-#if UNITY_2018_1_OR_NEWER
-using Unity.Collections.LowLevel.Unsafe;
-using Unity.Collections;
-#endif
 using My.Company;
 using My.Company.Common;
 #pragma warning restore 0105
 
 namespace My.Company
 {
-    internal static partial class Interop
+    public static partial class Interop
     {
         public const string NativeLib = "interoptopus_reference_project";
 
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 4570136964495247137ul)
+            if (api_version != 9887987910494554084ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (4570136964495247137). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (9887987910494554084). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -108,8 +104,8 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ref_mut_option")]
         public static extern bool ref_mut_option(out long x);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "tupled")]
-        public static extern Tupled tupled(Tupled x);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "call_tupled")]
+        public static extern Tupled call_tupled(Tupled x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "complex_args_1")]
         public static extern FFIError complex_args_1(Vec3f32 a, ref Tupled b);
@@ -125,10 +121,6 @@ namespace My.Company
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "callback")]
         public static extern byte callback(InteropDelegate_fn_u8_rval_u8 callback, byte value);
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "callback")]
-        public static extern byte callback(IntPtr callback, byte value);
-
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "generic_1a")]
         public static extern uint generic_1a(Genericu32 x, Phantomu8 y);
@@ -173,7 +165,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "namespaced_inner_slice")]
         public static extern SliceVec namespaced_inner_slice(SliceVec x);
 
-        public static SliceVec namespaced_inner_slice(System.ReadOnlySpan<Vec> x)
+        public static SliceVec namespaced_inner_slice(Vec[] x)
         {
             unsafe
             {
@@ -185,18 +177,10 @@ namespace My.Company
             }
         }
 
-        #if UNITY_2018_1_OR_NEWER
-        public static SliceVec namespaced_inner_slice(NativeArray<Vec> x)
-        {
-            var x_slice = new SliceVec(x);
-            return namespaced_inner_slice(x_slice);;
-        }
-        #endif
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "namespaced_inner_slice_mut")]
         public static extern SliceMutVec namespaced_inner_slice_mut(SliceMutVec x);
 
-        public static SliceMutVec namespaced_inner_slice_mut(System.Span<Vec> x)
+        public static SliceMutVec namespaced_inner_slice_mut(Vec[] x)
         {
             unsafe
             {
@@ -207,14 +191,6 @@ namespace My.Company
                 }
             }
         }
-
-        #if UNITY_2018_1_OR_NEWER
-        public static SliceMutVec namespaced_inner_slice_mut(NativeArray<Vec> x)
-        {
-            var x_slice = new SliceMutVec(x);
-            return namespaced_inner_slice_mut(x_slice);;
-        }
-        #endif
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "panics")]
         public static extern FFIError panics();
@@ -258,7 +234,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_1")]
         public static extern uint pattern_ffi_slice_1(SliceU32 ffi_slice);
 
-        public static uint pattern_ffi_slice_1(System.ReadOnlySpan<uint> ffi_slice)
+        public static uint pattern_ffi_slice_1(uint[] ffi_slice)
         {
             unsafe
             {
@@ -270,18 +246,10 @@ namespace My.Company
             }
         }
 
-        #if UNITY_2018_1_OR_NEWER
-        public static uint pattern_ffi_slice_1(NativeArray<uint> ffi_slice)
-        {
-            var ffi_slice_slice = new SliceU32(ffi_slice);
-            return pattern_ffi_slice_1(ffi_slice_slice);;
-        }
-        #endif
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_1b")]
         public static extern uint pattern_ffi_slice_1b(SliceMutU32 ffi_slice);
 
-        public static uint pattern_ffi_slice_1b(System.Span<uint> ffi_slice)
+        public static uint pattern_ffi_slice_1b(uint[] ffi_slice)
         {
             unsafe
             {
@@ -293,18 +261,10 @@ namespace My.Company
             }
         }
 
-        #if UNITY_2018_1_OR_NEWER
-        public static uint pattern_ffi_slice_1b(NativeArray<uint> ffi_slice)
-        {
-            var ffi_slice_slice = new SliceMutU32(ffi_slice);
-            return pattern_ffi_slice_1b(ffi_slice_slice);;
-        }
-        #endif
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_2")]
         public static extern Vec3f32 pattern_ffi_slice_2(SliceVec3f32 ffi_slice, int i);
 
-        public static Vec3f32 pattern_ffi_slice_2(System.ReadOnlySpan<Vec3f32> ffi_slice, int i)
+        public static Vec3f32 pattern_ffi_slice_2(Vec3f32[] ffi_slice, int i)
         {
             unsafe
             {
@@ -316,18 +276,10 @@ namespace My.Company
             }
         }
 
-        #if UNITY_2018_1_OR_NEWER
-        public static Vec3f32 pattern_ffi_slice_2(NativeArray<Vec3f32> ffi_slice, int i)
-        {
-            var ffi_slice_slice = new SliceVec3f32(ffi_slice);
-            return pattern_ffi_slice_2(ffi_slice_slice, i);;
-        }
-        #endif
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_3")]
         public static extern void pattern_ffi_slice_3(SliceMutU8 slice, CallbackSliceMut callback);
 
-        public static void pattern_ffi_slice_3(System.Span<byte> slice, CallbackSliceMut callback)
+        public static void pattern_ffi_slice_3(byte[] slice, CallbackSliceMut callback)
         {
             unsafe
             {
@@ -339,21 +291,10 @@ namespace My.Company
             }
         }
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_3")]
-        public static extern void pattern_ffi_slice_3(SliceMutU8 slice, IntPtr callback);
-
-        #if UNITY_2018_1_OR_NEWER
-        public static void pattern_ffi_slice_3(NativeArray<byte> slice, IntPtr callback)
-        {
-            var slice_slice = new SliceMutU8(slice);
-            pattern_ffi_slice_3(slice_slice, callback);;
-        }
-        #endif
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_4")]
         public static extern void pattern_ffi_slice_4(SliceU8 slice, SliceMutU8 slice2);
 
-        public static void pattern_ffi_slice_4(System.ReadOnlySpan<byte> slice, System.Span<byte> slice2)
+        public static void pattern_ffi_slice_4(byte[] slice, byte[] slice2)
         {
             unsafe
             {
@@ -369,19 +310,10 @@ namespace My.Company
             }
         }
 
-        #if UNITY_2018_1_OR_NEWER
-        public static void pattern_ffi_slice_4(NativeArray<byte> slice, NativeArray<byte> slice2)
-        {
-            var slice_slice = new SliceU8(slice);
-            var slice2_slice = new SliceMutU8(slice2);
-            pattern_ffi_slice_4(slice_slice, slice2_slice);;
-        }
-        #endif
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_5")]
         public static extern void pattern_ffi_slice_5(ref SliceU8 slice, ref SliceMutU8 slice2);
 
-        public static void pattern_ffi_slice_5(System.ReadOnlySpan<byte> slice, System.Span<byte> slice2)
+        public static void pattern_ffi_slice_5(byte[] slice, byte[] slice2)
         {
             unsafe
             {
@@ -397,19 +329,10 @@ namespace My.Company
             }
         }
 
-        #if UNITY_2018_1_OR_NEWER
-        public static void pattern_ffi_slice_5(NativeArray<byte> slice, NativeArray<byte> slice2)
-        {
-            var slice_slice = new SliceU8(slice);
-            var slice2_slice = new SliceMutU8(slice2);
-            pattern_ffi_slice_5(ref slice_slice, ref slice2_slice);;
-        }
-        #endif
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_6")]
         public static extern void pattern_ffi_slice_6(ref SliceMutU8 slice, CallbackU8 callback);
 
-        public static void pattern_ffi_slice_6(System.Span<byte> slice, CallbackU8 callback)
+        public static void pattern_ffi_slice_6(byte[] slice, CallbackU8 callback)
         {
             unsafe
             {
@@ -421,21 +344,10 @@ namespace My.Company
             }
         }
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_6")]
-        public static extern void pattern_ffi_slice_6(ref SliceMutU8 slice, IntPtr callback);
-
-        #if UNITY_2018_1_OR_NEWER
-        public static void pattern_ffi_slice_6(NativeArray<byte> slice, IntPtr callback)
-        {
-            var slice_slice = new SliceMutU8(slice);
-            pattern_ffi_slice_6(ref slice_slice, callback);;
-        }
-        #endif
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_7")]
         public static extern uint pattern_ffi_slice_7(SliceMutConstPtrI8 slices);
 
-        public static uint pattern_ffi_slice_7(System.Span<string> slices)
+        public static uint pattern_ffi_slice_7(string[] slices)
         {
             unsafe
             {
@@ -447,27 +359,11 @@ namespace My.Company
             }
         }
 
-        #if UNITY_2018_1_OR_NEWER
-        public static uint pattern_ffi_slice_7(NativeArray<string> slices)
-        {
-            var slices_slice = new SliceMutConstPtrI8(slices);
-            return pattern_ffi_slice_7(slices_slice);;
-        }
-        #endif
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_delegate")]
         public static extern byte pattern_ffi_slice_delegate(CallbackFFISlice callback);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_delegate")]
-        public static extern byte pattern_ffi_slice_delegate(IntPtr callback);
-
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_delegate_huge")]
         public static extern Vec3f32 pattern_ffi_slice_delegate_huge(CallbackHugeVecSlice callback);
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_delegate_huge")]
-        public static extern Vec3f32 pattern_ffi_slice_delegate_huge(IntPtr callback);
-
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_option_1")]
         public static extern OptionInner pattern_ffi_option_1(OptionInner ffi_slice);
@@ -493,26 +389,14 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_1")]
         public static extern uint pattern_callback_1(MyCallback callback, uint x);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_1")]
-        public static extern uint pattern_callback_1(IntPtr callback, uint x);
-
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_2")]
         public static extern MyCallbackVoid pattern_callback_2(MyCallbackVoid callback);
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_2")]
-        public static extern MyCallbackVoid pattern_callback_2(IntPtr callback);
-
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_3")]
         public static extern void pattern_callback_3(DelegateCallbackMyCallbackContextual callback, uint x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_4")]
         public static extern uint pattern_callback_4(MyCallbackNamespaced callback, uint x);
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_4")]
-        public static extern uint pattern_callback_4(IntPtr callback, uint x);
-
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_5")]
         public static extern SumDelegate1 pattern_callback_5();
@@ -533,10 +417,6 @@ namespace My.Company
                 throw new InteropException<FFIError>(rval);
             }
         }
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_7")]
-        public static extern FFIError pattern_callback_7(IntPtr c1, IntPtr c2, int x, int i, out int o);
-
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_surrogates_1")]
         public static extern void pattern_surrogates_1(Local s, out Container c);
@@ -647,7 +527,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self")]
         public static extern byte simple_service_method_mut_self(IntPtr context, SliceU8 slice);
 
-        public static byte simple_service_method_mut_self(IntPtr context, System.ReadOnlySpan<byte> slice)
+        public static byte simple_service_method_mut_self(IntPtr context, byte[] slice)
         {
             unsafe
             {
@@ -659,20 +539,12 @@ namespace My.Company
             }
         }
 
-        #if UNITY_2018_1_OR_NEWER
-        public static byte simple_service_method_mut_self(IntPtr context, NativeArray<byte> slice)
-        {
-            var slice_slice = new SliceU8(slice);
-            return simple_service_method_mut_self(context, slice_slice);;
-        }
-        #endif
-
         /// Single line.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_void")]
         public static extern void simple_service_method_mut_self_void(IntPtr context, SliceBool slice);
 
         /// Single line.
-        public static void simple_service_method_mut_self_void(IntPtr context, System.ReadOnlySpan<Bool> slice)
+        public static void simple_service_method_mut_self_void(IntPtr context, Bool[] slice)
         {
             unsafe
             {
@@ -684,22 +556,13 @@ namespace My.Company
             }
         }
 
-        /// Single line.
-        #if UNITY_2018_1_OR_NEWER
-        public static void simple_service_method_mut_self_void(IntPtr context, NativeArray<Bool> slice)
-        {
-            var slice_slice = new SliceBool(slice);
-            simple_service_method_mut_self_void(context, slice_slice);;
-        }
-        #endif
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref")]
         public static extern byte simple_service_method_mut_self_ref(IntPtr context, ref byte x, out byte y);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref_slice")]
         public static extern byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, SliceU8 slice);
 
-        public static byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, System.ReadOnlySpan<byte> slice)
+        public static byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, byte[] slice)
         {
             unsafe
             {
@@ -711,18 +574,10 @@ namespace My.Company
             }
         }
 
-        #if UNITY_2018_1_OR_NEWER
-        public static byte simple_service_method_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, NativeArray<byte> slice)
-        {
-            var slice_slice = new SliceU8(slice);
-            return simple_service_method_mut_self_ref_slice(context, ref x, out y, slice_slice);;
-        }
-        #endif
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ref_slice_limited")]
         public static extern byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, SliceU8 slice, SliceU8 slice2);
 
-        public static byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, System.ReadOnlySpan<byte> slice, System.ReadOnlySpan<byte> slice2)
+        public static byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, byte[] slice, byte[] slice2)
         {
             unsafe
             {
@@ -738,19 +593,10 @@ namespace My.Company
             }
         }
 
-        #if UNITY_2018_1_OR_NEWER
-        public static byte simple_service_method_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, NativeArray<byte> slice, NativeArray<byte> slice2)
-        {
-            var slice_slice = new SliceU8(slice);
-            var slice2_slice = new SliceU8(slice2);
-            return simple_service_method_mut_self_ref_slice_limited(context, ref x, out y, slice_slice, slice2_slice);;
-        }
-        #endif
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_ffi_error")]
         public static extern FFIError simple_service_method_mut_self_ffi_error(IntPtr context, SliceMutU8 slice);
 
-        public static void simple_service_method_mut_self_ffi_error(IntPtr context, System.Span<byte> slice)
+        public static void simple_service_method_mut_self_ffi_error(IntPtr context, byte[] slice)
         {
             unsafe
             {
@@ -766,22 +612,10 @@ namespace My.Company
             }
         }
 
-        #if UNITY_2018_1_OR_NEWER
-        public static void simple_service_method_mut_self_ffi_error(IntPtr context, NativeArray<byte> slice)
-        {
-            var slice_slice = new SliceMutU8(slice);
-            var rval = simple_service_method_mut_self_ffi_error(context, slice_slice);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
-        #endif
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_mut_self_no_error")]
         public static extern FFIError simple_service_method_mut_self_no_error(IntPtr context, SliceMutU8 slice);
 
-        public static void simple_service_method_mut_self_no_error(IntPtr context, System.Span<byte> slice)
+        public static void simple_service_method_mut_self_no_error(IntPtr context, byte[] slice)
         {
             unsafe
             {
@@ -796,18 +630,6 @@ namespace My.Company
                 }
             }
         }
-
-        #if UNITY_2018_1_OR_NEWER
-        public static void simple_service_method_mut_self_no_error(IntPtr context, NativeArray<byte> slice)
-        {
-            var slice_slice = new SliceMutU8(slice);
-            var rval = simple_service_method_mut_self_no_error(context, slice_slice);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
-        #endif
 
         /// Warning, you _must_ discard the returned slice object before calling into this service
         /// again, as otherwise undefined behavior might happen.
@@ -848,10 +670,6 @@ namespace My.Company
             }
         }
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_callback")]
-        public static extern FFIError simple_service_method_callback(IntPtr context, IntPtr callback);
-
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_callback_ffi_return")]
         public static extern FFIError simple_service_method_callback_ffi_return(IntPtr context, SumDelegateReturn callback);
 
@@ -866,14 +684,10 @@ namespace My.Company
             }
         }
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_callback_ffi_return")]
-        public static extern FFIError simple_service_method_callback_ffi_return(IntPtr context, IntPtr callback);
-
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_callback_ffi_return_with_slice")]
         public static extern FFIError simple_service_method_callback_ffi_return_with_slice(IntPtr context, SumDelegateReturn callback, SliceI32 input);
 
-        public static void simple_service_method_callback_ffi_return_with_slice(IntPtr context, SumDelegateReturn callback, System.ReadOnlySpan<int> input)
+        public static void simple_service_method_callback_ffi_return_with_slice(IntPtr context, SumDelegateReturn callback, int[] input)
         {
             var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
             unsafe
@@ -890,21 +704,6 @@ namespace My.Company
                 }
             }
         }
-
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_method_callback_ffi_return_with_slice")]
-        public static extern FFIError simple_service_method_callback_ffi_return_with_slice(IntPtr context, IntPtr callback, SliceI32 input);
-
-        #if UNITY_2018_1_OR_NEWER
-        public static void simple_service_method_callback_ffi_return_with_slice(IntPtr context, IntPtr callback, NativeArray<int> input)
-        {
-            var input_slice = new SliceI32(input);
-            var rval = simple_service_method_callback_ffi_return_with_slice(context, callback, input_slice);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
-        #endif
 
         /// Destroys the given instance.
         ///
@@ -945,7 +744,7 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lifetime_method_lt")]
         public static extern void simple_service_lifetime_method_lt(IntPtr context, SliceBool slice);
 
-        public static void simple_service_lifetime_method_lt(IntPtr context, System.ReadOnlySpan<Bool> slice)
+        public static void simple_service_lifetime_method_lt(IntPtr context, Bool[] slice)
         {
             unsafe
             {
@@ -957,18 +756,10 @@ namespace My.Company
             }
         }
 
-        #if UNITY_2018_1_OR_NEWER
-        public static void simple_service_lifetime_method_lt(IntPtr context, NativeArray<Bool> slice)
-        {
-            var slice_slice = new SliceBool(slice);
-            simple_service_lifetime_method_lt(context, slice_slice);;
-        }
-        #endif
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lifetime_method_lt2")]
         public static extern void simple_service_lifetime_method_lt2(IntPtr context, SliceBool slice);
 
-        public static void simple_service_lifetime_method_lt2(IntPtr context, System.ReadOnlySpan<Bool> slice)
+        public static void simple_service_lifetime_method_lt2(IntPtr context, Bool[] slice)
         {
             unsafe
             {
@@ -980,18 +771,10 @@ namespace My.Company
             }
         }
 
-        #if UNITY_2018_1_OR_NEWER
-        public static void simple_service_lifetime_method_lt2(IntPtr context, NativeArray<Bool> slice)
-        {
-            var slice_slice = new SliceBool(slice);
-            simple_service_lifetime_method_lt2(context, slice_slice);;
-        }
-        #endif
-
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lifetime_return_string_accept_slice")]
         public static extern IntPtr simple_service_lifetime_return_string_accept_slice(IntPtr anon0, SliceU8 anon1);
 
-        public static string simple_service_lifetime_return_string_accept_slice(IntPtr anon0, System.ReadOnlySpan<byte> anon1)
+        public static string simple_service_lifetime_return_string_accept_slice(IntPtr anon0, byte[] anon1)
         {
             unsafe
             {
@@ -1003,15 +786,6 @@ namespace My.Company
                 }
             }
         }
-
-        #if UNITY_2018_1_OR_NEWER
-        public static string simple_service_lifetime_return_string_accept_slice(IntPtr anon0, NativeArray<byte> anon1)
-        {
-            var anon1_slice = new SliceU8(anon1);
-            var s = simple_service_lifetime_return_string_accept_slice(anon0, anon1_slice);;
-            return Marshal.PtrToStringAnsi(s);
-        }
-        #endif
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "simple_service_lifetime_method_void_ffi_error")]
         public static extern FFIError simple_service_lifetime_method_void_ffi_error(IntPtr context);
@@ -1045,7 +819,7 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Array
+    public partial struct Array
     {
         public byte data0;
         public byte data1;
@@ -1067,7 +841,7 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct BooleanAlignment
+    public partial struct BooleanAlignment
     {
         public int a;
         public short b;
@@ -1088,66 +862,57 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Container
+    public partial struct Container
     {
         public Local foreign;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct DelegateCallbackMyCallbackContextual
+    public partial struct DelegateCallbackMyCallbackContextual
     {
         public MyCallbackContextual callback;
-        #if UNITY_2018_1_OR_NEWER
-        [NativeDisableUnsafePtrRestriction]
-        #endif
         public IntPtr context;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct ExtraTypef32
+    public partial struct ExtraTypef32
     {
         public float x;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Genericu32
+    public partial struct Genericu32
     {
-        #if UNITY_2018_1_OR_NEWER
-        [NativeDisableUnsafePtrRestriction]
-        #endif
         public IntPtr x;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Genericu8
+    public partial struct Genericu8
     {
-        #if UNITY_2018_1_OR_NEWER
-        [NativeDisableUnsafePtrRestriction]
-        #endif
         public IntPtr x;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Inner
+    public partial struct Inner
     {
         float x;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Local
+    public partial struct Local
     {
         uint x;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    internal partial struct Packed1
+    public partial struct Packed1
     {
         public byte x;
         public ushort y;
@@ -1155,7 +920,7 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    internal partial struct Packed2
+    public partial struct Packed2
     {
         public ushort y;
         public byte x;
@@ -1163,7 +928,7 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Phantomu8
+    public partial struct Phantomu8
     {
         public uint x;
     }
@@ -1171,7 +936,7 @@ namespace My.Company
     /// Documented struct.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct StructDocumented
+    public partial struct StructDocumented
     {
         /// Documented field.
         public float x;
@@ -1179,28 +944,28 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct StructRenamed
+    public partial struct StructRenamed
     {
         public EnumRenamed e;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Tupled
+    public partial struct Tupled
     {
         public byte x0;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct UseAsciiStringPattern
+    public partial struct UseAsciiStringPattern
     {
         public string ascii_string;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Vec1
+    public partial struct Vec1
     {
         public float x;
         public float y;
@@ -1208,7 +973,7 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Vec2
+    public partial struct Vec2
     {
         public double x;
         public double z;
@@ -1216,7 +981,7 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Vec3f32
+    public partial struct Vec3f32
     {
         public float x;
         public float y;
@@ -1225,7 +990,7 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Visibility1
+    public partial struct Visibility1
     {
         public byte pblc;
         byte prvt;
@@ -1233,7 +998,7 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Visibility2
+    public partial struct Visibility2
     {
         public byte pblc1;
         public byte pblc2;
@@ -1241,14 +1006,14 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Weird1u32
+    public partial struct Weird1u32
     {
         uint x;
     }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Weird2u8
+    public partial struct Weird2u8
     {
         byte t;
         byte a0;
@@ -1256,14 +1021,11 @@ namespace My.Company
         byte a2;
         byte a3;
         byte a4;
-        #if UNITY_2018_1_OR_NEWER
-        [NativeDisableUnsafePtrRestriction]
-        #endif
         IntPtr r;
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);
+    public delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);
 
     public enum FFIError
     {
@@ -1277,18 +1039,15 @@ namespace My.Company
     ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct SliceUseAsciiStringPattern
+    public partial struct SliceUseAsciiStringPattern
     {
         ///Pointer to start of immutable data.
-        #if UNITY_2018_1_OR_NEWER
-        [NativeDisableUnsafePtrRestriction]
-        #endif
         IntPtr data;
         ///Number of elements.
         ulong len;
     }
 
-    internal partial struct SliceUseAsciiStringPattern : IEnumerable<UseAsciiStringPattern>
+    public partial struct SliceUseAsciiStringPattern : IEnumerable<UseAsciiStringPattern>
     {
         public SliceUseAsciiStringPattern(GCHandle handle, ulong count)
         {
@@ -1309,16 +1068,6 @@ namespace My.Company
                 {
                     return new ReadOnlySpan<UseAsciiStringPattern>(this.data.ToPointer(), (int) this.len);
                 }
-            }
-        }
-        #endif
-        #if UNITY_2018_1_OR_NEWER
-        public SliceUseAsciiStringPattern(NativeArray<UseAsciiStringPattern> handle)
-        {
-            unsafe
-            {
-                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
-                this.len = (ulong) handle.Length;
             }
         }
         #endif
@@ -1361,18 +1110,15 @@ namespace My.Company
     ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct SliceVec3f32
+    public partial struct SliceVec3f32
     {
         ///Pointer to start of immutable data.
-        #if UNITY_2018_1_OR_NEWER
-        [NativeDisableUnsafePtrRestriction]
-        #endif
         IntPtr data;
         ///Number of elements.
         ulong len;
     }
 
-    internal partial struct SliceVec3f32 : IEnumerable<Vec3f32>
+    public partial struct SliceVec3f32 : IEnumerable<Vec3f32>
     {
         public SliceVec3f32(GCHandle handle, ulong count)
         {
@@ -1393,16 +1139,6 @@ namespace My.Company
                 {
                     return new ReadOnlySpan<Vec3f32>(this.data.ToPointer(), (int) this.len);
                 }
-            }
-        }
-        #endif
-        #if UNITY_2018_1_OR_NEWER
-        public SliceVec3f32(NativeArray<Vec3f32> handle)
-        {
-            unsafe
-            {
-                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
-                this.len = (ulong) handle.Length;
             }
         }
         #endif
@@ -1430,8 +1166,6 @@ namespace My.Company
                         #if __INTEROPTOPUS_NEVER
                         #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Vec3f32));
-                        #elif UNITY_2018_1_OR_NEWER
-                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(Vec3f32)));
                         #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
@@ -1460,7 +1194,7 @@ namespace My.Company
     ///Option type containing boolean flag and maybe valid data.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct OptionInner
+    public partial struct OptionInner
     {
         ///Element that is maybe valid.
         Inner t;
@@ -1468,7 +1202,7 @@ namespace My.Company
         byte is_some;
     }
 
-    internal partial struct OptionInner
+    public partial struct OptionInner
     {
         public static OptionInner FromNullable(Inner? nullable)
         {
@@ -1490,37 +1224,37 @@ namespace My.Company
 
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate byte CallbackFFISlice(SliceU8 slice);
+    public delegate byte CallbackFFISlice(SliceU8 slice);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate Vec3f32 CallbackHugeVecSlice(SliceVec3f32 slice);
+    public delegate Vec3f32 CallbackHugeVecSlice(SliceVec3f32 slice);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void CallbackSliceMut(SliceMutU8 slice);
+    public delegate void CallbackSliceMut(SliceMutU8 slice);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate byte CallbackU8(byte value);
+    public delegate byte CallbackU8(byte value);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate uint MyCallback(uint value);
+    public delegate uint MyCallback(uint value);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void MyCallbackContextual(IntPtr context, uint value);
+    public delegate void MyCallbackContextual(IntPtr context, uint value);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void MyCallbackVoid(IntPtr ptr);
+    public delegate void MyCallbackVoid(IntPtr ptr);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void SumDelegate1();
+    public delegate void SumDelegate1();
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate int SumDelegate2(int x, int y);
+    public delegate int SumDelegate2(int x, int y);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate FFIError SumDelegateReturn(int x, int y);
+    public delegate FFIError SumDelegateReturn(int x, int y);
 
     // Internal helper that works around an issue where exceptions in callbacks don't reenter Rust.
-    internal class SumDelegateReturnExceptionSafe {
+    public class SumDelegateReturnExceptionSafe {
         private Exception failure = null;
         private readonly SumDelegateReturn _callback;
 
@@ -1552,11 +1286,11 @@ namespace My.Company
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate void SumDelegateReturn2(int x, int y);
+    public delegate void SumDelegateReturn2(int x, int y);
 
 
     /// Some struct we want to expose as a class.
-    internal partial class SimpleService : IDisposable
+    public partial class SimpleService : IDisposable
     {
         private IntPtr _context;
 
@@ -1651,17 +1385,10 @@ namespace My.Company
             return Interop.simple_service_method_mut_self(_context, slice);
         }
 
-        public byte MethodMutSelf(System.ReadOnlySpan<byte> slice)
+        public byte MethodMutSelf(byte[] slice)
         {
             return Interop.simple_service_method_mut_self(_context, slice);
         }
-
-        #if UNITY_2018_1_OR_NEWER
-        public byte MethodMutSelf(NativeArray<byte> slice)
-        {
-            return Interop.simple_service_method_mut_self(_context, slice);
-        }
-        #endif
 
         /// Single line.
         public void MethodMutSelfVoid(SliceBool slice)
@@ -1670,18 +1397,10 @@ namespace My.Company
         }
 
         /// Single line.
-        public void MethodMutSelfVoid(System.ReadOnlySpan<Bool> slice)
+        public void MethodMutSelfVoid(Bool[] slice)
         {
             Interop.simple_service_method_mut_self_void(_context, slice);
         }
-
-        #if UNITY_2018_1_OR_NEWER
-        /// Single line.
-        public void MethodMutSelfVoid(NativeArray<Bool> slice)
-        {
-            Interop.simple_service_method_mut_self_void(_context, slice);
-        }
-        #endif
 
         public byte MethodMutSelfRef(ref byte x, out byte y)
         {
@@ -1693,34 +1412,20 @@ namespace My.Company
             return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out y, slice);
         }
 
-        public byte MethodMutSelfRefSlice(ref byte x, out byte y, System.ReadOnlySpan<byte> slice)
+        public byte MethodMutSelfRefSlice(ref byte x, out byte y, byte[] slice)
         {
             return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out y, slice);
         }
-
-        #if UNITY_2018_1_OR_NEWER
-        public byte MethodMutSelfRefSlice(ref byte x, out byte y, NativeArray<byte> slice)
-        {
-            return Interop.simple_service_method_mut_self_ref_slice(_context, ref x, out y, slice);
-        }
-        #endif
 
         public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, SliceU8 slice, SliceU8 slice2)
         {
             return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
         }
 
-        public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, System.ReadOnlySpan<byte> slice, System.ReadOnlySpan<byte> slice2)
+        public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, byte[] slice, byte[] slice2)
         {
             return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
         }
-
-        #if UNITY_2018_1_OR_NEWER
-        public byte MethodMutSelfRefSliceLimited(ref byte x, out byte y, NativeArray<byte> slice, NativeArray<byte> slice2)
-        {
-            return Interop.simple_service_method_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
-        }
-        #endif
 
         public void MethodMutSelfFfiError(SliceMutU8 slice)
         {
@@ -1731,17 +1436,10 @@ namespace My.Company
             }
         }
 
-        public void MethodMutSelfFfiError(System.Span<byte> slice)
+        public void MethodMutSelfFfiError(byte[] slice)
         {
             Interop.simple_service_method_mut_self_ffi_error(_context, slice);
         }
-
-        #if UNITY_2018_1_OR_NEWER
-        public void MethodMutSelfFfiError(NativeArray<byte> slice)
-        {
-            Interop.simple_service_method_mut_self_ffi_error(_context, slice);
-        }
-        #endif
 
         public void MethodMutSelfNoError(SliceMutU8 slice)
         {
@@ -1752,17 +1450,10 @@ namespace My.Company
             }
         }
 
-        public void MethodMutSelfNoError(System.Span<byte> slice)
+        public void MethodMutSelfNoError(byte[] slice)
         {
             Interop.simple_service_method_mut_self_no_error(_context, slice);
         }
-
-        #if UNITY_2018_1_OR_NEWER
-        public void MethodMutSelfNoError(NativeArray<byte> slice)
-        {
-            Interop.simple_service_method_mut_self_no_error(_context, slice);
-        }
-        #endif
 
         /// Warning, you _must_ discard the returned slice object before calling into this service
         /// again, as otherwise undefined behavior might happen.
@@ -1804,13 +1495,6 @@ namespace My.Company
             }
         }
 
-        #if UNITY_2018_1_OR_NEWER
-        public void MethodCallback(IntPtr callback)
-        {
-            Interop.simple_service_method_callback(_context, callback);
-        }
-        #endif
-
         public void MethodCallbackFfiReturn(SumDelegateReturn callback)
         {
             var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
@@ -1821,13 +1505,6 @@ namespace My.Company
                 throw new InteropException<FFIError>(rval);
             }
         }
-
-        #if UNITY_2018_1_OR_NEWER
-        public void MethodCallbackFfiReturn(IntPtr callback)
-        {
-            Interop.simple_service_method_callback_ffi_return(_context, callback);
-        }
-        #endif
 
         public void MethodCallbackFfiReturnWithSlice(SumDelegateReturn callback, SliceI32 input)
         {
@@ -1840,23 +1517,16 @@ namespace My.Company
             }
         }
 
-        public void MethodCallbackFfiReturnWithSlice(SumDelegateReturn callback, System.ReadOnlySpan<int> input)
+        public void MethodCallbackFfiReturnWithSlice(SumDelegateReturn callback, int[] input)
         {
             Interop.simple_service_method_callback_ffi_return_with_slice(_context, callback, input);
         }
-
-        #if UNITY_2018_1_OR_NEWER
-        public void MethodCallbackFfiReturnWithSlice(IntPtr callback, NativeArray<int> input)
-        {
-            Interop.simple_service_method_callback_ffi_return_with_slice(_context, callback, input);
-        }
-        #endif
 
         public IntPtr Context => _context;
     }
 
 
-    internal partial class SimpleServiceLifetime : IDisposable
+    public partial class SimpleServiceLifetime : IDisposable
     {
         private IntPtr _context;
 
@@ -1887,34 +1557,20 @@ namespace My.Company
             Interop.simple_service_lifetime_method_lt(_context, slice);
         }
 
-        public void MethodLt(System.ReadOnlySpan<Bool> slice)
+        public void MethodLt(Bool[] slice)
         {
             Interop.simple_service_lifetime_method_lt(_context, slice);
         }
-
-        #if UNITY_2018_1_OR_NEWER
-        public void MethodLt(NativeArray<Bool> slice)
-        {
-            Interop.simple_service_lifetime_method_lt(_context, slice);
-        }
-        #endif
 
         public void MethodLt2(SliceBool slice)
         {
             Interop.simple_service_lifetime_method_lt2(_context, slice);
         }
 
-        public void MethodLt2(System.ReadOnlySpan<Bool> slice)
+        public void MethodLt2(Bool[] slice)
         {
             Interop.simple_service_lifetime_method_lt2(_context, slice);
         }
-
-        #if UNITY_2018_1_OR_NEWER
-        public void MethodLt2(NativeArray<Bool> slice)
-        {
-            Interop.simple_service_lifetime_method_lt2(_context, slice);
-        }
-        #endif
 
         public string ReturnStringAcceptSlice(SliceU8 anon1)
         {
@@ -1922,17 +1578,10 @@ namespace My.Company
             return Marshal.PtrToStringAnsi(s);
         }
 
-        public string ReturnStringAcceptSlice(System.ReadOnlySpan<byte> anon1)
+        public string ReturnStringAcceptSlice(byte[] anon1)
         {
             return Interop.simple_service_lifetime_return_string_accept_slice(_context, anon1);
         }
-
-        #if UNITY_2018_1_OR_NEWER
-        public string ReturnStringAcceptSlice(NativeArray<byte> anon1)
-        {
-            return Interop.simple_service_lifetime_return_string_accept_slice(_context, anon1);
-        }
-        #endif
 
         public void MethodVoidFfiError()
         {

@@ -6,10 +6,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
-#if UNITY_2018_1_OR_NEWER
-using Unity.Collections.LowLevel.Unsafe;
-using Unity.Collections;
-#endif
 using My.Company;
 using My.Company.Common;
 #pragma warning restore 0105
@@ -19,30 +15,27 @@ namespace My.Company.Common
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Vec
+    public partial struct Vec
     {
         public double x;
         public double z;
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);
+    public delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);
 
     ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct SliceBool
+    public partial struct SliceBool
     {
         ///Pointer to start of immutable data.
-        #if UNITY_2018_1_OR_NEWER
-        [NativeDisableUnsafePtrRestriction]
-        #endif
         IntPtr data;
         ///Number of elements.
         ulong len;
     }
 
-    internal partial struct SliceBool : IEnumerable<Bool>
+    public partial struct SliceBool : IEnumerable<Bool>
     {
         public SliceBool(GCHandle handle, ulong count)
         {
@@ -63,16 +56,6 @@ namespace My.Company.Common
                 {
                     return new ReadOnlySpan<Bool>(this.data.ToPointer(), (int) this.len);
                 }
-            }
-        }
-        #endif
-        #if UNITY_2018_1_OR_NEWER
-        public SliceBool(NativeArray<Bool> handle)
-        {
-            unsafe
-            {
-                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
-                this.len = (ulong) handle.Length;
             }
         }
         #endif
@@ -100,8 +83,6 @@ namespace My.Company.Common
                         #if __INTEROPTOPUS_NEVER
                         #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Bool));
-                        #elif UNITY_2018_1_OR_NEWER
-                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(Bool)));
                         #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
@@ -130,18 +111,15 @@ namespace My.Company.Common
     ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct SliceI32
+    public partial struct SliceI32
     {
         ///Pointer to start of immutable data.
-        #if UNITY_2018_1_OR_NEWER
-        [NativeDisableUnsafePtrRestriction]
-        #endif
         IntPtr data;
         ///Number of elements.
         ulong len;
     }
 
-    internal partial struct SliceI32 : IEnumerable<int>
+    public partial struct SliceI32 : IEnumerable<int>
     {
         public SliceI32(GCHandle handle, ulong count)
         {
@@ -162,16 +140,6 @@ namespace My.Company.Common
                 {
                     return new ReadOnlySpan<int>(this.data.ToPointer(), (int) this.len);
                 }
-            }
-        }
-        #endif
-        #if UNITY_2018_1_OR_NEWER
-        public SliceI32(NativeArray<int> handle)
-        {
-            unsafe
-            {
-                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
-                this.len = (ulong) handle.Length;
             }
         }
         #endif
@@ -199,8 +167,6 @@ namespace My.Company.Common
                         #if __INTEROPTOPUS_NEVER
                         #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(int));
-                        #elif UNITY_2018_1_OR_NEWER
-                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(int)));
                         #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
@@ -229,18 +195,15 @@ namespace My.Company.Common
     ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct SliceU32
+    public partial struct SliceU32
     {
         ///Pointer to start of immutable data.
-        #if UNITY_2018_1_OR_NEWER
-        [NativeDisableUnsafePtrRestriction]
-        #endif
         IntPtr data;
         ///Number of elements.
         ulong len;
     }
 
-    internal partial struct SliceU32 : IEnumerable<uint>
+    public partial struct SliceU32 : IEnumerable<uint>
     {
         public SliceU32(GCHandle handle, ulong count)
         {
@@ -261,16 +224,6 @@ namespace My.Company.Common
                 {
                     return new ReadOnlySpan<uint>(this.data.ToPointer(), (int) this.len);
                 }
-            }
-        }
-        #endif
-        #if UNITY_2018_1_OR_NEWER
-        public SliceU32(NativeArray<uint> handle)
-        {
-            unsafe
-            {
-                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
-                this.len = (ulong) handle.Length;
             }
         }
         #endif
@@ -298,8 +251,6 @@ namespace My.Company.Common
                         #if __INTEROPTOPUS_NEVER
                         #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(uint));
-                        #elif UNITY_2018_1_OR_NEWER
-                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(uint)));
                         #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
@@ -328,18 +279,15 @@ namespace My.Company.Common
     ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct SliceU8
+    public partial struct SliceU8
     {
         ///Pointer to start of immutable data.
-        #if UNITY_2018_1_OR_NEWER
-        [NativeDisableUnsafePtrRestriction]
-        #endif
         IntPtr data;
         ///Number of elements.
         ulong len;
     }
 
-    internal partial struct SliceU8 : IEnumerable<byte>
+    public partial struct SliceU8 : IEnumerable<byte>
     {
         public SliceU8(GCHandle handle, ulong count)
         {
@@ -360,16 +308,6 @@ namespace My.Company.Common
                 {
                     return new ReadOnlySpan<byte>(this.data.ToPointer(), (int) this.len);
                 }
-            }
-        }
-        #endif
-        #if UNITY_2018_1_OR_NEWER
-        public SliceU8(NativeArray<byte> handle)
-        {
-            unsafe
-            {
-                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
-                this.len = (ulong) handle.Length;
             }
         }
         #endif
@@ -397,8 +335,6 @@ namespace My.Company.Common
                         #if __INTEROPTOPUS_NEVER
                         #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(byte));
-                        #elif UNITY_2018_1_OR_NEWER
-                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(byte)));
                         #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
@@ -427,18 +363,15 @@ namespace My.Company.Common
     ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct SliceVec
+    public partial struct SliceVec
     {
         ///Pointer to start of immutable data.
-        #if UNITY_2018_1_OR_NEWER
-        [NativeDisableUnsafePtrRestriction]
-        #endif
         IntPtr data;
         ///Number of elements.
         ulong len;
     }
 
-    internal partial struct SliceVec : IEnumerable<Vec>
+    public partial struct SliceVec : IEnumerable<Vec>
     {
         public SliceVec(GCHandle handle, ulong count)
         {
@@ -459,16 +392,6 @@ namespace My.Company.Common
                 {
                     return new ReadOnlySpan<Vec>(this.data.ToPointer(), (int) this.len);
                 }
-            }
-        }
-        #endif
-        #if UNITY_2018_1_OR_NEWER
-        public SliceVec(NativeArray<Vec> handle)
-        {
-            unsafe
-            {
-                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
-                this.len = (ulong) handle.Length;
             }
         }
         #endif
@@ -496,8 +419,6 @@ namespace My.Company.Common
                         #if __INTEROPTOPUS_NEVER
                         #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Vec));
-                        #elif UNITY_2018_1_OR_NEWER
-                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(Vec)));
                         #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
@@ -526,18 +447,15 @@ namespace My.Company.Common
     ///A pointer to an array of data someone else owns which may be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct SliceMutConstPtrI8
+    public partial struct SliceMutConstPtrI8
     {
         ///Pointer to start of mutable data.
-        #if UNITY_2018_1_OR_NEWER
-        [NativeDisableUnsafePtrRestriction]
-        #endif
         IntPtr data;
         ///Number of elements.
         ulong len;
     }
 
-    internal partial struct SliceMutConstPtrI8 : IEnumerable<IntPtr>
+    public partial struct SliceMutConstPtrI8 : IEnumerable<IntPtr>
     {
         public SliceMutConstPtrI8(GCHandle handle, ulong count)
         {
@@ -558,16 +476,6 @@ namespace My.Company.Common
                 {
                     return new ReadOnlySpan<IntPtr>(this.data.ToPointer(), (int) this.len);
                 }
-            }
-        }
-        #endif
-        #if UNITY_2018_1_OR_NEWER
-        public SliceMutConstPtrI8(NativeArray<IntPtr> handle)
-        {
-            unsafe
-            {
-                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
-                this.len = (ulong) handle.Length;
             }
         }
         #endif
@@ -616,8 +524,6 @@ namespace My.Company.Common
                         #if __FALSE
                         #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(IntPtr));
-                        #elif UNITY_2018_1_OR_NEWER
-                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(IntPtr)));
                         #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
@@ -646,18 +552,15 @@ namespace My.Company.Common
     ///A pointer to an array of data someone else owns which may be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct SliceMutU32
+    public partial struct SliceMutU32
     {
         ///Pointer to start of mutable data.
-        #if UNITY_2018_1_OR_NEWER
-        [NativeDisableUnsafePtrRestriction]
-        #endif
         IntPtr data;
         ///Number of elements.
         ulong len;
     }
 
-    internal partial struct SliceMutU32 : IEnumerable<uint>
+    public partial struct SliceMutU32 : IEnumerable<uint>
     {
         public SliceMutU32(GCHandle handle, ulong count)
         {
@@ -678,16 +581,6 @@ namespace My.Company.Common
                 {
                     return new ReadOnlySpan<uint>(this.data.ToPointer(), (int) this.len);
                 }
-            }
-        }
-        #endif
-        #if UNITY_2018_1_OR_NEWER
-        public SliceMutU32(NativeArray<uint> handle)
-        {
-            unsafe
-            {
-                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
-                this.len = (ulong) handle.Length;
             }
         }
         #endif
@@ -736,8 +629,6 @@ namespace My.Company.Common
                         #if __FALSE
                         #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(uint));
-                        #elif UNITY_2018_1_OR_NEWER
-                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(uint)));
                         #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
@@ -766,18 +657,15 @@ namespace My.Company.Common
     ///A pointer to an array of data someone else owns which may be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct SliceMutU8
+    public partial struct SliceMutU8
     {
         ///Pointer to start of mutable data.
-        #if UNITY_2018_1_OR_NEWER
-        [NativeDisableUnsafePtrRestriction]
-        #endif
         IntPtr data;
         ///Number of elements.
         ulong len;
     }
 
-    internal partial struct SliceMutU8 : IEnumerable<byte>
+    public partial struct SliceMutU8 : IEnumerable<byte>
     {
         public SliceMutU8(GCHandle handle, ulong count)
         {
@@ -798,16 +686,6 @@ namespace My.Company.Common
                 {
                     return new ReadOnlySpan<byte>(this.data.ToPointer(), (int) this.len);
                 }
-            }
-        }
-        #endif
-        #if UNITY_2018_1_OR_NEWER
-        public SliceMutU8(NativeArray<byte> handle)
-        {
-            unsafe
-            {
-                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
-                this.len = (ulong) handle.Length;
             }
         }
         #endif
@@ -856,8 +734,6 @@ namespace My.Company.Common
                         #if __FALSE
                         #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(byte));
-                        #elif UNITY_2018_1_OR_NEWER
-                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(byte)));
                         #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
@@ -886,18 +762,15 @@ namespace My.Company.Common
     ///A pointer to an array of data someone else owns which may be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct SliceMutVec
+    public partial struct SliceMutVec
     {
         ///Pointer to start of mutable data.
-        #if UNITY_2018_1_OR_NEWER
-        [NativeDisableUnsafePtrRestriction]
-        #endif
         IntPtr data;
         ///Number of elements.
         ulong len;
     }
 
-    internal partial struct SliceMutVec : IEnumerable<Vec>
+    public partial struct SliceMutVec : IEnumerable<Vec>
     {
         public SliceMutVec(GCHandle handle, ulong count)
         {
@@ -918,16 +791,6 @@ namespace My.Company.Common
                 {
                     return new ReadOnlySpan<Vec>(this.data.ToPointer(), (int) this.len);
                 }
-            }
-        }
-        #endif
-        #if UNITY_2018_1_OR_NEWER
-        public SliceMutVec(NativeArray<Vec> handle)
-        {
-            unsafe
-            {
-                this.data = new IntPtr(NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(handle));
-                this.len = (ulong) handle.Length;
             }
         }
         #endif
@@ -976,8 +839,6 @@ namespace My.Company.Common
                         #if __FALSE
                         #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Vec));
-                        #elif UNITY_2018_1_OR_NEWER
-                        UnsafeUtility.MemCpy(dst, data.ToPointer(), (long) (len * (ulong) sizeof(Vec)));
                         #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
@@ -1006,7 +867,7 @@ namespace My.Company.Common
     ///Option type containing boolean flag and maybe valid data.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct OptionVec
+    public partial struct OptionVec
     {
         ///Element that is maybe valid.
         Vec t;
@@ -1014,7 +875,7 @@ namespace My.Company.Common
         byte is_some;
     }
 
-    internal partial struct OptionVec
+    public partial struct OptionVec
     {
         public static OptionVec FromNullable(Vec? nullable)
         {
@@ -1037,12 +898,12 @@ namespace My.Company.Common
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct Bool
+    public partial struct Bool
     {
         byte value;
     }
 
-    internal partial struct Bool
+    public partial struct Bool
     {
         public static readonly Bool True = new Bool { value =  1 };
         public static readonly Bool False = new Bool { value =  0 };
@@ -1055,7 +916,7 @@ namespace My.Company.Common
 
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate uint MyCallbackNamespaced(uint value);
+    public delegate uint MyCallbackNamespaced(uint value);
 
 
 

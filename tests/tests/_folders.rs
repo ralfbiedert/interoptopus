@@ -1,5 +1,6 @@
 mod cpython_benchmarks;
 mod cpython_reference_project;
+mod csharp_benchmarks;
 mod csharp_reference_project_safe;
 mod csharp_reference_project_unity;
 mod csharp_reference_project_unsafe;
