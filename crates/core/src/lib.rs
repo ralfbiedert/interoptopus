@@ -71,21 +71,10 @@
 //! ## Getting Started 🍼
 //!
 //! If you want to ...
-//! - **create a new API** see the [**hello world**](https://github.com/ralfbiedert/interoptopus/tree/master/examples/hello_world),
-//! - **understand what's possible**, see the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/reference_project/src),
-//! - **support a new language**, [**copy the C backend**](https://github.com/ralfbiedert/interoptopus/tree/master/backends/c).
-//!
-//! For a "production-ready" project you generally want to follow these 3 steps:
-//!
-//! - Write a Rust crate, such as `my_library` and solve your problem in a Rust-idiomatic way.
-//! - Add a crate `my_library_ffi`, which holds interop types and C-style definitions for your library similar to the examples above.
-//!     - For example, for a `my_library::Container` you probably want to a FFI sibling `my_library_ffi::Container`.
-//!     - While this might seem like extra work (it is) it gives you fine-grained access to what you expose. Once your project reaches a certain size, this will be invaluable.
-//!     - You'll probably want to add some conversion methods between your types, and FFI exposed methods to allow your interop users
-//!       to interact with these types in a controlled fashion.
-//! - Add a crate `my_library_interop`. Inside there reference the backends for which you want to create interop definitions
-//!   (either in some unit tests, a `main.rs` or `build.rs`), and invoke the interop generation when needed; again, compare examples above.
-//!
+//! - **get started** see the [**hello world**](https://github.com/ralfbiedert/interoptopus/tree/master/examples/hello_world),
+//! - **productify your project**, see the [**real project layout**](https://github.com/ralfbiedert/interoptopus/tree/master/examples/real_project_layout),
+//! - **understand what's possible**, see the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src),
+//! - **support a new language**, [**copy the C backend**](https://github.com/ralfbiedert/interoptopus/tree/master/crates/backend_c).
 //!
 //! ## Supported Rust Constructs
 //!
