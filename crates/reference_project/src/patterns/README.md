@@ -10,4 +10,4 @@ Advanced "convenience patterns" that will make your life easier, esp. from C# an
 | [`result.rs`](result.rs)               | How to use Rust's `Result<>` over FFI.                    |
 | [`slice.rs`](slice.rs)                 | Receiving slices over FFI.                                |
 | [`surrogates.rs`](surrogates.rs)       | Exporting types over FFI you don't control.               |
-| [`services/`](services/`)              | How to export "classes" to C# / Python. 🔥                |
+| [`services/`](services/)               | How to export "classes" to C# / Python. 🔥                |
