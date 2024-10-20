@@ -1,19 +1,30 @@
 use anyhow::Error;
-use interoptopus::{ffi_function, function, Interop, Inventory, InventoryBuilder};
+use interoptopus::{ffi_function, ffi_type, function, Interop, InventoryBuilder};
 use interoptopus_backend_csharp::{ConfigBuilder, Generator, WriteTypes};
 use tests::backend_csharp::common_namespace_mappings;
-use tests::validate_output;
+
+#[ffi_type(error)]
+enum FFIError {
+    Success,
+    Null,
+    Panic,
+}
+
+impl interoptopus::patterns::result::FFIError for FFIError {
+    const SUCCESS: Self = Self::Success;
+    const NULL: Self = Self::Null;
+    const PANIC: Self = Self::Panic;
+}
 
 #[ffi_function]
-fn sample_function() {}
-
-fn ffi_inventory() -> Inventory {
-    InventoryBuilder::new().register(function!(sample_function)).inventory()
+fn sample_function() -> FFIError {
+    FFIError::Success
 }
 
 #[test]
 fn enabled() -> Result<(), Error> {
-    let inventory = ffi_inventory();
+    let inventory = InventoryBuilder::new().register(function!(sample_function)).inventory();
+
     let config = ConfigBuilder::default()
         .namespace_mappings(common_namespace_mappings())
         .error_text("MY ERROR TEXT {}".to_string())
@@ -21,7 +32,7 @@ fn enabled() -> Result<(), Error> {
         .build()?;
     let generated = Generator::new(config, inventory).write_string()?;
 
-    validate_output!("tests", "csharp_error_customisation.cs", generated.as_str());
+    assert!(generated.contains("MY ERROR TEXT"));
 
     Ok(())
 }

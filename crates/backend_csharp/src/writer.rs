@@ -496,6 +496,10 @@ pub trait CSharpWriter {
         constants.iter().any(|x| self.should_emit_by_meta(x.meta()))
     }
 
+    fn has_ffi_error(&self, functions: &[Function]) -> bool {
+        functions.iter().any(|x| x.returns_ffi_error())
+    }
+
     fn should_emit_by_meta(&self, meta: &Meta) -> bool {
         let rval = meta.namespace() == self.config().namespace_id;
         rval
@@ -1066,7 +1070,7 @@ pub trait CSharpWriter {
     }
 
     fn write_builtins(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        if self.config().write_types.write_interoptopus_globals() {
+        if self.config().write_types.write_interoptopus_globals() && self.has_ffi_error(self.inventory().functions()) {
             let error_text = &self.config().error_text;
 
             indented!(w, r#"public class InteropException<T> : Exception"#)?;
