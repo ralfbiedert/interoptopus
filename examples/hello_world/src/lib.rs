@@ -1,4 +1,4 @@
-use interoptopus::{ffi_function, ffi_type, function, Inventory, InventoryBuilder};
+use interoptopus::{ffi_function, ffi_type};
 
 /// A simple type in our FFI layer.
 #[ffi_type]
@@ -13,25 +13,23 @@ pub fn my_function(input: Vec2) -> Vec2 {
     input
 }
 
-// Helper to produce an `Inventory`, describing what our FFI library contains.
-#[rustfmt::skip]
-#[allow(unused)]
-fn my_inventory() -> Inventory {
-    InventoryBuilder::new()
-        .register(function!(my_function))
-        .validate()
-        .inventory()
-}
-
 // We just trick a unit test into producing our bindings, here for C#
 #[test]
+#[rustfmt::skip]
 fn generate_bindings() {
-    use interoptopus::Interop;
-    use interoptopus_backend_csharp::ConfigBuilder;
-    use interoptopus_backend_csharp::Generator;
+    use interoptopus::{function, Interop, InventoryBuilder};
+    use interoptopus_backend_csharp::{Generator, Config};
 
-    let inventory = my_inventory();
-    let config = ConfigBuilder::default().build().unwrap();
+    // In a real project this should be a freestanding `my_inventory()` function inside
+    // your FFI or build crate.
+    let inventory = InventoryBuilder::new()
+        .register(function!(my_function))
+        .validate()
+        .inventory();
 
-    Generator::new(config, inventory).write_file("bindings/Interop.cs").unwrap();
+    let config = Config::default();
+
+    Generator::new(config, inventory)
+        .write_file("bindings/Interop.cs")
+        .unwrap();
 }

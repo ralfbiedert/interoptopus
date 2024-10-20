@@ -14,20 +14,6 @@ pub struct GameEngine {
     engine: core_library::engine::GameEngine,
 }
 
-// Our FFI `Vec2` type.
-#[ffi_type]
-pub struct Vec2 {
-    pub x: f32,
-    pub y: f32,
-}
-
-impl Vec2 {
-    // Helper method to deal with the conversion.
-    fn into_native(self) -> core_library::engine::Vec2 {
-        core_library::engine::Vec2 { x: self.x, y: self.y }
-    }
-}
-
 // FFI-compatible implementation of our service.
 #[ffi_service(error = "FFIError")]
 impl GameEngine {
@@ -47,5 +33,19 @@ impl GameEngine {
     #[ffi_service_method(on_panic = "return_default")]
     pub fn num_objects(&self) -> u32 {
         self.engine.num_objects()
+    }
+}
+
+// Our FFI `Vec2` type.
+#[ffi_type]
+pub struct Vec2 {
+    pub x: f32,
+    pub y: f32,
+}
+
+impl Vec2 {
+    // Helper method to deal with the conversion.
+    fn into_native(self) -> core_library::engine::Vec2 {
+        core_library::engine::Vec2 { x: self.x, y: self.y }
     }
 }
