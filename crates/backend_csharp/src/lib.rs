@@ -122,13 +122,11 @@ mod config;
 mod converter;
 mod docs;
 pub mod overloads;
-mod testing;
 mod writer;
 
 pub use config::{CSharpVisibility, Config, ConfigBuilder, DocConfig, Unsafe, Unsupported, WriteTypes};
 pub use converter::{CSharpTypeConverter, Converter};
 pub use docs::DocGenerator;
-pub use testing::run_dotnet_command_if_installed;
 pub use writer::CSharpWriter;
 
 /// **Start here**, main converter implementing [`Interop`].
