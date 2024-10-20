@@ -20,7 +20,16 @@ pub mod patterns {
     pub mod option;
     pub mod primitives;
     pub mod result;
-    pub mod service;
+    pub mod services {
+        pub mod basic;
+        pub mod callbacks;
+        pub mod ignored;
+        pub mod lifetimes;
+        pub mod multiple_ctors;
+        pub mod on_panic;
+        pub mod slices;
+        pub mod strings;
+    }
     pub mod slice;
     pub mod surrogates;
 }
@@ -115,8 +124,14 @@ pub fn ffi_inventory() -> Inventory {
             // Extra Types
             .register(extra_type!(types::ExtraType<f32>))
             // Patterns
-            .register(pattern!(patterns::service::SimpleService))
-            .register(pattern!(patterns::service::SimpleServiceLifetime))
+            .register(pattern!(patterns::services::basic::BasicService))
+            .register(pattern!(patterns::services::on_panic::ServiceOnPanic))
+            .register(pattern!(patterns::services::callbacks::ServiceCallbacks))
+            .register(pattern!(patterns::services::ignored::ServiceIgnoringMethods))
+            .register(pattern!(patterns::services::multiple_ctors::ServiceMultipleCtors))
+            .register(pattern!(patterns::services::lifetimes::ServiceUsingLifetimes))
+            .register(pattern!(patterns::services::slices::ServiceVariousSlices))
+            .register(pattern!(patterns::services::strings::ServiceStrings))
             .validate()
             .inventory()
     }

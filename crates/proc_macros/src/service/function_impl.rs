@@ -30,14 +30,26 @@ pub enum OnPanic {
     UndefinedBehavior,
 }
 
+impl Default for OnPanic {
+    fn default() -> Self {
+        Self::FfiError
+    }
+}
+
 #[derive(Debug, FromMeta)]
 pub struct AttributeMethod {
+    #[darling(default)]
+    ignore: bool,
+    #[darling(default)]
     on_panic: OnPanic,
 }
 
 impl Default for AttributeMethod {
     fn default() -> Self {
-        Self { on_panic: OnPanic::FfiError }
+        Self {
+            ignore: false,
+            on_panic: OnPanic::FfiError,
+        }
     }
 }
 
@@ -72,10 +84,14 @@ fn method_type(function: &ImplItemFn) -> MethodType {
     match function.sig.output {
         // If it has default output type, we can get away with "return default"
         ReturnType::Default => MethodType::Method(AttributeMethod {
+            ignore: false,
             on_panic: OnPanic::ReturnDefault,
         }),
         // Otherwise, use FFI error conversion.
-        ReturnType::Type(_, _) => MethodType::Method(AttributeMethod { on_panic: OnPanic::FfiError }),
+        ReturnType::Type(_, _) => MethodType::Method(AttributeMethod {
+            ignore: false,
+            on_panic: OnPanic::FfiError,
+        }),
     }
 }
 
@@ -108,10 +124,11 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
 
     let method_type = method_type(function);
 
-    // Constructor needs extra arg for ptr
-    if let MethodType::Constructor(_) = &method_type {
-        inputs.push(quote_spanned!(span_service_ty=> context: &mut *mut #service_type));
-    }
+    match method_type {
+        MethodType::Constructor(_) => inputs.push(quote_spanned!(span_service_ty=> context: &mut *mut #service_type)),
+        MethodType::Method(method) if method.ignore => return None,
+        _ => {}
+    };
 
     for (i, arg) in function.sig.inputs.iter().enumerate() {
         let span_arg = arg.span();

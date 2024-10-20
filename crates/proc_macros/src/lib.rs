@@ -327,7 +327,8 @@ pub fn ffi_service_ctor(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// | Parameter |  Explanation |
 /// | --- | ---  |
-/// | `on_panic` | Determines what will happen on a panic (`ffi_error`, `return_default`, `undefined_behavior`) and, as a side effect, _also_ determine how return values will be handled. See below.
+/// | `ignore` | Don't emit to FFI. |
+/// | `on_panic` | Determines what will happen on a panic (`ffi_error`, `return_default`, `undefined_behavior`) and, as a side effect, _also_ determine how return values will be handled. See below. |
 ///
 ///
 /// ## Wrapping Behavior
@@ -427,19 +428,5 @@ pub fn ffi_service_ctor(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 #[proc_macro_attribute]
 pub fn ffi_service_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    item
-}
-
-/// Inside a [`#[ffi_service]`](macro@crate::ffi_service) block, don't emit code for a method.
-///
-/// This is an optional attribute that can be applied to methods.
-///
-/// By default, all public methods inside a `#[ffi_service]` section will be exported to FFI. However, public methods with this attribute will
-/// be ignored instead. This can be useful if you want to add Rust-internal helper methods to your service.
-///
-/// See the [service module](https://docs.rs/interoptopus/latest/interoptopus/patterns/service/index.html) for an introduction into services.
-///
-#[proc_macro_attribute]
-pub fn ffi_service_ignore(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }

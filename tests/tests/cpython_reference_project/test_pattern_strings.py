@@ -7,7 +7,7 @@ r.init_lib(common.DLL)
 
 class TestFunctions(unittest.TestCase):
     def test_service_new_string(self):
-        service = r.SimpleService.new_with_string(b"abc")
+        service = r.ServiceStrings.new()
 
     def test_ascii_pointer(self):
         self.assertEqual(3, r.pattern_ascii_pointer_1(b"111"))

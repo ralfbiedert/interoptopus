@@ -32,6 +32,8 @@ typedef enum enumrenamed
     ENUMRENAMED_X = 0,
     } enumrenamed;
 
+typedef struct basicservice basicservice;
+
 typedef struct generic2u8 generic2u8;
 
 typedef struct generic3 generic3;
@@ -39,9 +41,25 @@ typedef struct generic3 generic3;
 typedef struct generic4 generic4;
 
 /// Some struct we want to expose as a class.
-typedef struct simpleservice simpleservice;
+typedef struct servicecallbacks servicecallbacks;
 
-typedef struct simpleservicelifetime simpleservicelifetime;
+typedef struct serviceignoringmethods serviceignoringmethods;
+
+/// Some struct we want to expose as a class.
+typedef struct servicemultiplectors servicemultiplectors;
+
+/// Some struct we want to expose as a class.
+typedef struct serviceonpanic serviceonpanic;
+
+/// Some struct we want to expose as a class.
+typedef struct servicestrings servicestrings;
+
+/// Services can use lifetimes. However, they are more dangerous to use
+/// via FFI, since you will not get any help tracking lifetimes there.
+typedef struct serviceusinglifetimes serviceusinglifetimes;
+
+/// Some struct we want to expose as a class.
+typedef struct servicevariousslices servicevariousslices;
 
 typedef enum ffierror
     {
@@ -505,65 +523,9 @@ void pattern_surrogates_1(local s, container* c);
 ///
 /// The passed parameter MUST have been created with the corresponding init function;
 /// passing any other value results in undefined behavior.
-ffierror simple_service_destroy(simpleservice** context);
+ffierror basic_service_destroy(basicservice** context);
 
-/// The constructor must return a `Result<Self, Error>`.
-ffierror simple_service_new_with(simpleservice** context, uint32_t some_value);
-
-ffierror simple_service_new_without(simpleservice** context);
-
-ffierror simple_service_new_with_string(simpleservice** context, const char* ascii);
-
-ffierror simple_service_new_failing(simpleservice** context, uint8_t some_value);
-
-/// Methods returning a Result<(), _> are the default and do not
-/// need annotations.
-ffierror simple_service_method_result(const simpleservice* context, uint32_t anon1);
-
-uint32_t simple_service_method_value(const simpleservice* context, uint32_t x);
-
-/// This method should be documented.
-///
-/// Multiple lines.
-void simple_service_method_void(const simpleservice* context);
-
-/// Regular void functions don't need an annotation.
-void simple_service_method_void2(const simpleservice* context);
-
-uint8_t simple_service_method_mut_self(simpleservice* context, sliceu8 slice);
-
-/// Single line.
-void simple_service_method_mut_self_void(simpleservice* context, slicebool slice);
-
-uint8_t simple_service_method_mut_self_ref(simpleservice* context, const uint8_t* x, uint8_t* y);
-
-uint8_t simple_service_method_mut_self_ref_slice(simpleservice* context, const uint8_t* x, uint8_t* y, sliceu8 slice);
-
-uint8_t simple_service_method_mut_self_ref_slice_limited(simpleservice* context, const uint8_t* x, uint8_t* y, sliceu8 slice, sliceu8 slice2);
-
-ffierror simple_service_method_mut_self_ffi_error(simpleservice* context, slicemutu8 slice);
-
-ffierror simple_service_method_mut_self_no_error(simpleservice* context, slicemutu8 slice);
-
-/// Warning, you _must_ discard the returned slice object before calling into this service
-/// again, as otherwise undefined behavior might happen.
-sliceu32 simple_service_return_slice(simpleservice* context);
-
-/// Warning, you _must_ discard the returned slice object before calling into this service
-/// again, as otherwise undefined behavior might happen.
-slicemutu32 simple_service_return_slice_mut(simpleservice* context);
-
-/// This function has no panic safeguards. It will be a bit faster to
-/// call, but if it panics your host app will be in an undefined state.
-const char* simple_service_return_string(simpleservice* context);
-
-ffierror simple_service_method_void_ffi_error(simpleservice* context);
-
-ffierror simple_service_method_callback(simpleservice* context, mycallback callback);
-
-ffierror simple_service_method_callback_ffi_return(simpleservice* context, sumdelegatereturn callback);
-
-ffierror simple_service_method_callback_ffi_return_with_slice(simpleservice* context, sumdelegatereturn callback, slicei32 input);
+ffierror basic_service_new(basicservice** context);
 
 /// Destroys the given instance.
 ///
@@ -571,17 +533,125 @@ ffierror simple_service_method_callback_ffi_return_with_slice(simpleservice* con
 ///
 /// The passed parameter MUST have been created with the corresponding init function;
 /// passing any other value results in undefined behavior.
-ffierror simple_service_lifetime_destroy(simpleservicelifetime** context);
+ffierror service_on_panic_destroy(serviceonpanic** context);
 
-ffierror simple_service_lifetime_new_with(simpleservicelifetime** context, const uint32_t* some_value);
+ffierror service_on_panic_new(serviceonpanic** context);
 
-void simple_service_lifetime_method_lt(simpleservicelifetime* context, slicebool slice);
+/// Methods returning a Result<(), _> are the default and do not
+/// need annotations.
+ffierror service_on_panic_return_result(const serviceonpanic* context, uint32_t anon1);
 
-void simple_service_lifetime_method_lt2(simpleservicelifetime* context, slicebool slice);
+/// Methods returning a value need an `on_panic` annotation.
+uint32_t service_on_panic_return_default_value(const serviceonpanic* context, uint32_t x);
 
-const char* simple_service_lifetime_return_string_accept_slice(simpleservicelifetime* anon0, sliceu8 anon1);
+/// This function has no panic safeguards. It will be a bit faster to
+/// call, but if it panics your host app will be in an undefined state.
+const char* service_on_panic_return_ub_on_panic(serviceonpanic* context);
 
-ffierror simple_service_lifetime_method_void_ffi_error(simpleservicelifetime* context);
+/// Destroys the given instance.
+///
+/// # Safety
+///
+/// The passed parameter MUST have been created with the corresponding init function;
+/// passing any other value results in undefined behavior.
+ffierror service_callbacks_destroy(servicecallbacks** context);
+
+ffierror service_callbacks_new(servicecallbacks** context);
+
+ffierror service_callbacks_callback_simple(servicecallbacks* context, mycallback callback);
+
+ffierror service_callbacks_callback_ffi_return(servicecallbacks* context, sumdelegatereturn callback);
+
+ffierror service_callbacks_callback_with_slice(servicecallbacks* context, sumdelegatereturn callback, slicei32 input);
+
+/// Destroys the given instance.
+///
+/// # Safety
+///
+/// The passed parameter MUST have been created with the corresponding init function;
+/// passing any other value results in undefined behavior.
+ffierror service_ignoring_methods_destroy(serviceignoringmethods** context);
+
+ffierror service_ignoring_methods_new(serviceignoringmethods** context);
+
+/// Destroys the given instance.
+///
+/// # Safety
+///
+/// The passed parameter MUST have been created with the corresponding init function;
+/// passing any other value results in undefined behavior.
+ffierror service_multiple_ctors_destroy(servicemultiplectors** context);
+
+ffierror service_multiple_ctors_new_with(servicemultiplectors** context, uint32_t some_value);
+
+ffierror service_multiple_ctors_new_without(servicemultiplectors** context);
+
+ffierror service_multiple_ctors_new_with_string(servicemultiplectors** context, const char* anon0);
+
+ffierror service_multiple_ctors_new_failing(servicemultiplectors** context, uint8_t some_value);
+
+/// Destroys the given instance.
+///
+/// # Safety
+///
+/// The passed parameter MUST have been created with the corresponding init function;
+/// passing any other value results in undefined behavior.
+ffierror service_using_lifetimes_destroy(serviceusinglifetimes** context);
+
+ffierror service_using_lifetimes_new_with(serviceusinglifetimes** context, const uint32_t* some_value);
+
+void service_using_lifetimes_lifetime_1(serviceusinglifetimes* context, slicebool slice);
+
+void service_using_lifetimes_lifetime_2(serviceusinglifetimes* context, slicebool slice);
+
+const char* service_using_lifetimes_return_string_accept_slice(serviceusinglifetimes* anon0, sliceu8 anon1);
+
+/// Destroys the given instance.
+///
+/// # Safety
+///
+/// The passed parameter MUST have been created with the corresponding init function;
+/// passing any other value results in undefined behavior.
+ffierror service_various_slices_destroy(servicevariousslices** context);
+
+ffierror service_various_slices_new(servicevariousslices** context);
+
+uint8_t service_various_slices_mut_self(servicevariousslices* context, sliceu8 slice);
+
+/// Single line.
+void service_various_slices_mut_self_void(servicevariousslices* context, slicebool slice);
+
+uint8_t service_various_slices_mut_self_ref(servicevariousslices* context, const uint8_t* x, uint8_t* y);
+
+uint8_t service_various_slices_mut_self_ref_slice(servicevariousslices* context, const uint8_t* x, uint8_t* y, sliceu8 slice);
+
+uint8_t service_various_slices_mut_self_ref_slice_limited(servicevariousslices* context, const uint8_t* x, uint8_t* y, sliceu8 slice, sliceu8 slice2);
+
+ffierror service_various_slices_mut_self_ffi_error(servicevariousslices* context, slicemutu8 slice);
+
+ffierror service_various_slices_mut_self_no_error(servicevariousslices* context, slicemutu8 slice);
+
+/// Warning, you _must_ discard the returned slice object before calling into this service
+/// again, as otherwise undefined behavior might happen.
+sliceu32 service_various_slices_return_slice(servicevariousslices* context);
+
+/// Warning, you _must_ discard the returned slice object before calling into this service
+/// again, as otherwise undefined behavior might happen.
+slicemutu32 service_various_slices_return_slice_mut(servicevariousslices* context);
+
+/// Destroys the given instance.
+///
+/// # Safety
+///
+/// The passed parameter MUST have been created with the corresponding init function;
+/// passing any other value results in undefined behavior.
+ffierror service_strings_destroy(servicestrings** context);
+
+ffierror service_strings_new(servicestrings** context);
+
+void service_strings_pass_string(servicestrings* context, const char* anon1);
+
+const char* service_strings_return_string(servicestrings* context);
 
 
 #ifdef __cplusplus

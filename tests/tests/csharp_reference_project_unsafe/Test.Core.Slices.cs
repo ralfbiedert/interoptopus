@@ -22,13 +22,12 @@ public class TestCoreSlices
     [Fact]
     public void ensure_unsafe_copy_length()
     {
-        const int size = 20;
-        var service = SimpleService.NewWith(20);
+        var service = ServiceVariousSlices.New();
         var res = service.ReturnSliceMut();
 
         foreach (var r in res.Copied)
         {
-            Assert.True(r == size);
+            Assert.Equal(r, 123u);
         }
     }
 
