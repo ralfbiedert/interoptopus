@@ -98,6 +98,8 @@ def init_lib(path):
     c_lib.service_callbacks_callback_simple.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)]
     c_lib.service_callbacks_callback_ffi_return.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32)]
     c_lib.service_callbacks_callback_with_slice.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32), SliceI32]
+    c_lib.service_callbacks_set_delegate_table.argtypes = [ctypes.c_void_p, ctypes.POINTER(DelegateTable)]
+    c_lib.service_callbacks_invoke_delegates.argtypes = [ctypes.c_void_p]
     c_lib.service_ignoring_methods_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.service_ignoring_methods_new.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.service_multiple_ctors_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
@@ -204,6 +206,7 @@ def init_lib(path):
     c_lib.service_callbacks_callback_simple.restype = ctypes.c_int
     c_lib.service_callbacks_callback_ffi_return.restype = ctypes.c_int
     c_lib.service_callbacks_callback_with_slice.restype = ctypes.c_int
+    c_lib.service_callbacks_invoke_delegates.restype = ctypes.c_int
     c_lib.service_ignoring_methods_destroy.restype = ctypes.c_int
     c_lib.service_ignoring_methods_new.restype = ctypes.c_int
     c_lib.service_multiple_ctors_destroy.restype = ctypes.c_int
@@ -241,6 +244,7 @@ def init_lib(path):
     c_lib.service_callbacks_callback_simple.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_callbacks_callback_ffi_return.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_callbacks_callback_with_slice.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.service_callbacks_invoke_delegates.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_ignoring_methods_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_ignoring_methods_new.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_multiple_ctors_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
@@ -1825,6 +1829,103 @@ class DelegateCallbackMyCallbackContextual(ctypes.Structure):
         return ctypes.Structure.__set__(self, "context", value)
 
 
+class DelegateTable(ctypes.Structure):
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("my_callback", ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)),
+        ("my_callback_namespaced", ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)),
+        ("my_callback_void", ctypes.CFUNCTYPE(None, ctypes.c_void_p)),
+        ("my_callback_contextual", ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_uint32)),
+        ("sum_delegate_1", ctypes.CFUNCTYPE(None, )),
+        ("sum_delegate_2", ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_int32, ctypes.c_int32)),
+        ("sum_delegate_return", ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32)),
+        ("sum_delegate_return_2", ctypes.CFUNCTYPE(None, ctypes.c_int32, ctypes.c_int32)),
+    ]
+
+    def __init__(self, my_callback = None, my_callback_namespaced = None, my_callback_void = None, my_callback_contextual = None, sum_delegate_1 = None, sum_delegate_2 = None, sum_delegate_return = None, sum_delegate_return_2 = None):
+        if my_callback is not None:
+            self.my_callback = my_callback
+        if my_callback_namespaced is not None:
+            self.my_callback_namespaced = my_callback_namespaced
+        if my_callback_void is not None:
+            self.my_callback_void = my_callback_void
+        if my_callback_contextual is not None:
+            self.my_callback_contextual = my_callback_contextual
+        if sum_delegate_1 is not None:
+            self.sum_delegate_1 = sum_delegate_1
+        if sum_delegate_2 is not None:
+            self.sum_delegate_2 = sum_delegate_2
+        if sum_delegate_return is not None:
+            self.sum_delegate_return = sum_delegate_return
+        if sum_delegate_return_2 is not None:
+            self.sum_delegate_return_2 = sum_delegate_return_2
+
+    @property
+    def my_callback(self):
+        return ctypes.Structure.__get__(self, "my_callback")
+
+    @my_callback.setter
+    def my_callback(self, value):
+        return ctypes.Structure.__set__(self, "my_callback", value)
+
+    @property
+    def my_callback_namespaced(self):
+        return ctypes.Structure.__get__(self, "my_callback_namespaced")
+
+    @my_callback_namespaced.setter
+    def my_callback_namespaced(self, value):
+        return ctypes.Structure.__set__(self, "my_callback_namespaced", value)
+
+    @property
+    def my_callback_void(self):
+        return ctypes.Structure.__get__(self, "my_callback_void")
+
+    @my_callback_void.setter
+    def my_callback_void(self, value):
+        return ctypes.Structure.__set__(self, "my_callback_void", value)
+
+    @property
+    def my_callback_contextual(self):
+        return ctypes.Structure.__get__(self, "my_callback_contextual")
+
+    @my_callback_contextual.setter
+    def my_callback_contextual(self, value):
+        return ctypes.Structure.__set__(self, "my_callback_contextual", value)
+
+    @property
+    def sum_delegate_1(self):
+        return ctypes.Structure.__get__(self, "sum_delegate_1")
+
+    @sum_delegate_1.setter
+    def sum_delegate_1(self, value):
+        return ctypes.Structure.__set__(self, "sum_delegate_1", value)
+
+    @property
+    def sum_delegate_2(self):
+        return ctypes.Structure.__get__(self, "sum_delegate_2")
+
+    @sum_delegate_2.setter
+    def sum_delegate_2(self, value):
+        return ctypes.Structure.__set__(self, "sum_delegate_2", value)
+
+    @property
+    def sum_delegate_return(self):
+        return ctypes.Structure.__get__(self, "sum_delegate_return")
+
+    @sum_delegate_return.setter
+    def sum_delegate_return(self, value):
+        return ctypes.Structure.__set__(self, "sum_delegate_return", value)
+
+    @property
+    def sum_delegate_return_2(self):
+        return ctypes.Structure.__get__(self, "sum_delegate_return_2")
+
+    @sum_delegate_return_2.setter
+    def sum_delegate_return_2(self, value):
+        return ctypes.Structure.__set__(self, "sum_delegate_return_2", value)
+
+
 class SliceUseAsciiStringPattern(ctypes.Structure):
     # These fields represent the underlying C data layout
     _fields_ = [
@@ -2162,6 +2263,14 @@ class ServiceCallbacks:
             input = SliceI32(data=ctypes.cast(input, ctypes.POINTER(ctypes.c_int32)), len=len(input))
 
         return c_lib.service_callbacks_callback_with_slice(self._ctx, callback, input)
+
+    def set_delegate_table(self, table: ctypes.POINTER(DelegateTable)):
+        """"""
+        return c_lib.service_callbacks_set_delegate_table(self._ctx, table)
+
+    def invoke_delegates(self, ):
+        """"""
+        return c_lib.service_callbacks_invoke_delegates(self._ctx, )
 
 
 

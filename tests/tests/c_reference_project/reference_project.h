@@ -318,6 +318,18 @@ typedef struct delegatecallbackmycallbackcontextual
     const void* context;
     } delegatecallbackmycallbackcontextual;
 
+typedef struct delegatetable
+    {
+    mycallback my_callback;
+    mycallbacknamespaced my_callback_namespaced;
+    mycallbackvoid my_callback_void;
+    mycallbackcontextual my_callback_contextual;
+    sumdelegate1 sum_delegate_1;
+    sumdelegate2 sum_delegate_2;
+    sumdelegatereturn sum_delegate_return;
+    sumdelegatereturn2 sum_delegate_return_2;
+    } delegatetable;
+
 ///A pointer to an array of data someone else owns which may not be modified.
 typedef struct sliceuseasciistringpattern
     {
@@ -563,6 +575,10 @@ ffierror service_callbacks_callback_simple(servicecallbacks* context, mycallback
 ffierror service_callbacks_callback_ffi_return(servicecallbacks* context, sumdelegatereturn callback);
 
 ffierror service_callbacks_callback_with_slice(servicecallbacks* context, sumdelegatereturn callback, slicei32 input);
+
+void service_callbacks_set_delegate_table(servicecallbacks* context, const delegatetable* table);
+
+ffierror service_callbacks_invoke_delegates(const servicecallbacks* context);
 
 /// Destroys the given instance.
 ///

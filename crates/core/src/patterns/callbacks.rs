@@ -194,7 +194,7 @@ macro_rules! callback {
     };
 
     ($name:ident($($param:ident: $ty:ty),*) -> $rval:ty $(, namespace = $ns:expr)?) => {
-        #[derive(Default, Clone)]
+        #[derive(Default, Clone, Copy)]
         #[repr(transparent)]
         pub struct $name(Option<extern "C" fn($($ty),*) -> $rval>);
 

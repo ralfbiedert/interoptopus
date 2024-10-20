@@ -18,9 +18,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 10924706755081691550ul)
+            if (api_version != 5600732245307200640ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10924706755081691550). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (5600732245307200640). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -620,6 +620,21 @@ namespace My.Company
             }
         }
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_set_delegate_table")]
+        public static extern void service_callbacks_set_delegate_table(IntPtr context, ref DelegateTable table);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_invoke_delegates")]
+        public static extern FFIError service_callbacks_invoke_delegates(IntPtr context);
+
+        public static void service_callbacks_invoke_delegates_checked(IntPtr context)
+        {
+            var rval = service_callbacks_invoke_delegates(context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
         /// Destroys the given instance.
         ///
         /// # Safety
@@ -1096,6 +1111,20 @@ namespace My.Company
     {
         public MyCallbackContextual callback;
         public IntPtr context;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct DelegateTable
+    {
+        public MyCallback my_callback;
+        public MyCallbackNamespaced my_callback_namespaced;
+        public MyCallbackVoid my_callback_void;
+        public MyCallbackContextual my_callback_contextual;
+        public SumDelegate1 sum_delegate_1;
+        public SumDelegate2 sum_delegate_2;
+        public SumDelegateReturn sum_delegate_return;
+        public SumDelegateReturn2 sum_delegate_return_2;
     }
 
     [Serializable]
@@ -2075,6 +2104,20 @@ namespace My.Company
         public void CallbackWithSlice(SumDelegateReturn callback, int[] input)
         {
             Interop.service_callbacks_callback_with_slice(_context, callback, input);
+        }
+
+        public void SetDelegateTable(ref DelegateTable table)
+        {
+            Interop.service_callbacks_set_delegate_table(_context, ref table);
+        }
+
+        public void InvokeDelegates()
+        {
+            var rval = Interop.service_callbacks_invoke_delegates(_context);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
         }
 
         public IntPtr Context => _context;
