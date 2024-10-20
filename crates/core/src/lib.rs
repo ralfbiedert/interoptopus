@@ -125,7 +125,7 @@
 //!
 //! ## Changelog
 //!
-//! - **v0.15** - syn2, better annotations, bug fixes.
+//! - **v0.15** - Massive cleanup, bugfix, UX overhaul (+syn2).
 //! - **v0.14** - Better inventory UX.
 //! - **v0.13** - Python backend uses `ctypes` now.
 //! - **v0.12** - Better compat using `#[ffi_service_method]`.
@@ -173,7 +173,7 @@ pub use error::Error;
 pub use generators::Interop;
 #[cfg(feature = "derive")]
 #[cfg_attr(docsrs, doc(cfg(feature = "derive")))] // does this work?
-pub use interoptopus_proc::{ffi_constant, ffi_function, ffi_service, ffi_service_ctor,  ffi_service_method, ffi_type};
+pub use interoptopus_proc::{ffi_constant, ffi_function, ffi_service, ffi_service_ctor, ffi_service_method, ffi_type};
 
 mod core;
 mod error;
