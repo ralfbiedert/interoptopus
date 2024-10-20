@@ -1,8 +1,8 @@
 use anyhow::Error;
 use interoptopus::patterns::slice::FFISlice;
 use interoptopus::{ffi_function, function, Interop, Inventory, InventoryBuilder};
-use interoptopus_backend_csharp::overloads::DotNet;
-use interoptopus_backend_csharp::{ConfigBuilder, Generator, ParamSliceType, Unsafe};
+use interoptopus_backend_csharp::overloads::{DotNet, ParamSliceType};
+use interoptopus_backend_csharp::{ConfigBuilder, Generator, Unsafe};
 use tests::backend_csharp::common_namespace_mappings;
 use tests::validate_output;
 
@@ -19,9 +19,9 @@ fn span() -> Result<(), Error> {
     let config = ConfigBuilder::default()
         .namespace_mappings(common_namespace_mappings())
         .use_unsafe(Unsafe::UnsafePlatformMemCpy)
-        .param_slice_type(ParamSliceType::Span)
         .build()?;
-    let generated = Generator::new(config, inventory).add_overload_writer(DotNet::new()).write_string()?;
+    let dotnet = DotNet::new().param_slice_type(ParamSliceType::Span).build();
+    let generated = Generator::new(config, inventory).add_overload_writer(dotnet).write_string()?;
 
     validate_output!("tests", "csharp_slice_type_span.cs", generated.as_str());
 
@@ -34,9 +34,9 @@ fn array() -> Result<(), Error> {
     let config = ConfigBuilder::default()
         .namespace_mappings(common_namespace_mappings())
         .use_unsafe(Unsafe::UnsafePlatformMemCpy)
-        .param_slice_type(ParamSliceType::Array)
         .build()?;
-    let generated = Generator::new(config, inventory).add_overload_writer(DotNet::new()).write_string()?;
+    let dotnet = DotNet::new().param_slice_type(ParamSliceType::Array).build();
+    let generated = Generator::new(config, inventory).add_overload_writer(dotnet).write_string()?;
 
     validate_output!("tests", "csharp_slice_type_array.cs", generated.as_str());
 

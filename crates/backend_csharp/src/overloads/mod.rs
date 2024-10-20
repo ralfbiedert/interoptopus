@@ -61,7 +61,7 @@ mod unity;
 
 use crate::converter::FunctionNameFlavor;
 use crate::{CSharpTypeConverter, Config};
-pub use dotnet::DotNet;
+pub use dotnet::{DotNet, ParamSliceType};
 use interoptopus::patterns::callbacks::NamedCallback;
 pub use unity::Unity;
 

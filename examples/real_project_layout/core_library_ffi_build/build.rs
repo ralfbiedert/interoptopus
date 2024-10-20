@@ -12,7 +12,7 @@ use interoptopus_backend_csharp::{ConfigBuilder, Generator};
 // to produce the bindings (since `cargo test` does not imply `cargo build`).
 fn main() {
     let inventory = ffi_inventory();
-    let overload = DotNet::new();
+    let overload = DotNet::new().build();
     let config = ConfigBuilder::default().build().unwrap();
 
     Generator::new(config, inventory)

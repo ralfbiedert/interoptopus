@@ -75,16 +75,6 @@ impl Unsafe {
     }
 }
 
-/// The kind of types to use when generating FFI method overloads.
-// TODO - THIS SHOULD BE DotNet config
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
-pub enum ParamSliceType {
-    /// Slices should be passed in as C# arrays.
-    Array,
-    /// Slices should be passed in as Span and ReadOnlySpan.
-    Span,
-}
-
 /// Configures C# code generation.
 #[derive(Clone, Debug, Builder)]
 #[builder(default)]
@@ -120,9 +110,6 @@ pub struct Config {
     /// reenter Rust code when an exception happened. This requires callbacks to return
     /// an FFIError type.   
     pub work_around_exception_in_callback_no_reentry: bool,
-    /// If signatures that normally use arrays should instead use span and readonly span.
-    /// Requires use_unsafe, as pinning spans requires the fixed keyword.
-    pub param_slice_type: ParamSliceType,
     /// How to handle unsupported constructs.
     pub unsupported: Unsupported,
     /// The string to use for reporting within FFIError. Use `{error}` to reference the inner error content.
@@ -147,7 +134,6 @@ impl Default for Config {
             rename_symbols: false,
             debug: false,
             work_around_exception_in_callback_no_reentry: true,
-            param_slice_type: ParamSliceType::Array,
             unsupported: Unsupported::Panic,
             error_text: "Something went wrong: {error}".to_string(),
         }

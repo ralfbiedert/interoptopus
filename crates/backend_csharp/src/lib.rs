@@ -125,7 +125,7 @@ pub mod overloads;
 mod testing;
 mod writer;
 
-pub use config::{CSharpVisibility, Config, ConfigBuilder, DocConfig, ParamSliceType, Unsafe, Unsupported, WriteTypes};
+pub use config::{CSharpVisibility, Config, ConfigBuilder, DocConfig, Unsafe, Unsupported, WriteTypes};
 pub use converter::{CSharpTypeConverter, Converter};
 pub use docs::DocGenerator;
 pub use testing::run_dotnet_command_if_installed;

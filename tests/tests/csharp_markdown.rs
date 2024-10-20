@@ -1,6 +1,6 @@
 use anyhow::Error;
 use interoptopus::{ffi_function, function, InventoryBuilder};
-use interoptopus_backend_csharp::{ConfigBuilder, DocConfig, DocGenerator, Generator, ParamSliceType};
+use interoptopus_backend_csharp::{ConfigBuilder, DocConfig, DocGenerator, Generator};
 use tests::backend_csharp::common_namespace_mappings;
 
 /// Has documentation
@@ -11,10 +11,7 @@ fn with_documentation() {}
 fn can_produce_markdown() -> Result<(), Error> {
     let inventory = InventoryBuilder::new().register(function!(with_documentation)).inventory();
 
-    let config = ConfigBuilder::default()
-        .namespace_mappings(common_namespace_mappings())
-        .param_slice_type(ParamSliceType::Span)
-        .build()?;
+    let config = ConfigBuilder::default().namespace_mappings(common_namespace_mappings()).build()?;
     let generator = Generator::new(config, inventory.clone());
 
     let doc_config = DocConfig::default();

@@ -17,12 +17,18 @@ use std::ops::Deref;
 /// - fast memcpy for slices,
 /// - handling of the `ref Slice` pattern for Burst,
 /// - IntPtr overloads for callbacks, making them Burst compatible.
+#[derive(Clone, Debug, Default)]
 pub struct Unity {}
 
 impl Unity {
-    /// Creates a new Unity overload generator.
-    pub fn new() -> Box<Self> {
-        Box::new(Self {})
+    /// Creates a new .NET overload generator.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Creates a new .NET overload generator.
+    pub fn new_built() -> Box<Self> {
+        Self::new().build()
     }
 
     fn has_overloadable(&self, signature: &FunctionSignature) -> bool {
@@ -145,6 +151,10 @@ impl Unity {
         }
 
         Ok(())
+    }
+
+    pub fn build(self) -> Box<Self> {
+        Box::new(self)
     }
 }
 

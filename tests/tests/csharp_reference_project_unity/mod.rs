@@ -23,8 +23,11 @@ fn reference_benchmarks_prerequisites() -> Result<(), Error> {
         .write_types(WriteTypes::Namespace)
         .build()?;
 
-    let generated_common = Generator::new(config_common, ffi_inventory()).add_overload_writer(Unity::new()).write_string()?;
-    let generated_other = Generator::new(config_other, ffi_inventory()).add_overload_writer(Unity::new()).write_string()?;
+    let generated_common = Generator::new(config_common, ffi_inventory())
+        .add_overload_writer(Unity::new_built())
+        .write_string()?;
+
+    let generated_other = Generator::new(config_other, ffi_inventory()).add_overload_writer(Unity::new_built()).write_string()?;
 
     validate_output!("tests/csharp_reference_project_unity", "Interop.common.cs", generated_common.as_str());
     validate_output!("tests/csharp_reference_project_unity", "Interop.cs", generated_other.as_str());

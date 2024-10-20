@@ -1,4 +1,3 @@
-use crate::config::ParamSliceType;
 use crate::converter::FunctionNameFlavor;
 use crate::overloads::{write_common_service_method_overload, write_function_overloaded_invoke_with_error_handling, Helper};
 use crate::{OverloadWriter, Unsafe};
@@ -12,6 +11,22 @@ use interoptopus::{indented, Error};
 use std::iter::zip;
 use std::ops::Deref;
 
+/// The kind of types to use when generating FFI method overloads.
+// TODO - THIS SHOULD BE DotNet config
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum ParamSliceType {
+    /// Slices should be passed in as C# arrays.
+    Array,
+    /// Slices should be passed in as Span and ReadOnlySpan.
+    Span,
+}
+
+impl Default for ParamSliceType {
+    fn default() -> Self {
+        Self::Array
+    }
+}
+
 /// **Highly recommended**, provides most convenience methods.
 ///
 /// In most cases adding this overload provider is the right thing to do, as it generates
@@ -19,12 +34,27 @@ use std::ops::Deref;
 /// - `my_array[]` or `Span<my_array>`/`ReadOnlySpan<my_array>` support for slices,
 /// - much faster (up to 150x) .NET Core slice copies (with [`Unsafe::UnsafePlatformMemCpy`](crate::Unsafe::UnsafePlatformMemCpy)),
 /// - service overloads.
-pub struct DotNet {}
+#[derive(Clone, Debug, Default)]
+pub struct DotNet {
+    /// If signatures that normally use arrays should instead use span and readonly span.
+    /// Requires use_unsafe, as pinning spans requires the fixed keyword.
+    param_slice_type: ParamSliceType,
+}
 
 impl DotNet {
     /// Creates a new .NET overload generator.
-    pub fn new() -> Box<Self> {
-        Box::new(Self {})
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Creates a new .NET overload generator.
+    pub fn new_built() -> Box<Self> {
+        Self::new().build()
+    }
+
+    pub fn param_slice_type(mut self, param_slice_type: ParamSliceType) -> Self {
+        self.param_slice_type = param_slice_type;
+        self
     }
 
     fn has_overloadable(&self, signature: &FunctionSignature) -> bool {
@@ -39,12 +69,12 @@ impl DotNet {
     }
 
     fn pattern_to_native_in_signature(&self, h: &Helper, param: &Parameter) -> String {
-        if h.config.use_unsafe == Unsafe::None && h.config.param_slice_type == ParamSliceType::Span {
+        if h.config.use_unsafe == Unsafe::None && self.param_slice_type == ParamSliceType::Span {
             panic!("param_slice_type: Span requires unsafe support (use_unsafe must be anything other than None)");
         }
 
         let slice_type_name = |mutable: bool, element_type: &CType| -> String {
-            match (h.config.param_slice_type, mutable) {
+            match (self.param_slice_type, mutable) {
                 (ParamSliceType::Array, _) => format!("{}[]", h.converter.to_typespecifier_in_param(element_type)),
                 (ParamSliceType::Span, true) => format!("System.Span<{}>", h.converter.to_typespecifier_in_param(element_type)),
                 (ParamSliceType::Span, false) => format!("System.ReadOnlySpan<{}>", h.converter.to_typespecifier_in_param(element_type)),
@@ -79,6 +109,10 @@ impl DotNet {
 
             x => h.converter.to_typespecifier_in_param(x),
         }
+    }
+
+    pub fn build(self) -> Box<Self> {
+        Box::new(self)
     }
 }
 

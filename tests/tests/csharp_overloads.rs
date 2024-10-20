@@ -9,7 +9,7 @@ use tests::validate_output;
 #[test]
 fn dotnet() -> Result<(), Error> {
     let inventory = ffi_inventory();
-    let overload = DotNet::new();
+    let overload = DotNet::new().build();
     let config = ConfigBuilder::default().namespace_mappings(common_namespace_mappings()).build()?;
     let generated = Generator::new(config, inventory).add_overload_writer(overload).write_string()?;
 
@@ -21,7 +21,7 @@ fn dotnet() -> Result<(), Error> {
 #[test]
 fn unity() -> Result<(), Error> {
     let inventory = ffi_inventory();
-    let overload = Unity::new();
+    let overload = Unity::new_built();
     let config = ConfigBuilder::default()
         .namespace_mappings(common_namespace_mappings())
         .use_unsafe(Unsafe::UnsafeKeyword)

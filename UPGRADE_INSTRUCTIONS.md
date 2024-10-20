@@ -13,6 +13,8 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
   they will silently return. If this is not acceptable you must return `Result` or specify a different panic behavior
   via that attribute.
 - `#[ffi_type(patterns(ffi_error))]` is now `#[ffi_type(error)]`.
+- If you used the C# `DotNet` or `Unity` overload writer, these helpers now take their own configuration
+  where appropriate. If you previously only did `DotNet::new()` this became `DotNet::new_built()`.
 - `AsciiPointer` is now called `CStrPointer`, since it can contain non-ASCII data (e.g., when called from C#).
 - We fixed capitalization in some backends, e.g., a `Sliceu8` is now `SliceU8`.
 - When using `InventoryBuilder` you should call `.validate().inventory()` now.
