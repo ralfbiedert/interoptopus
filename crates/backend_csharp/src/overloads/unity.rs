@@ -50,7 +50,7 @@ impl Unity {
         signature
             .params()
             .iter()
-            .any(|x| matches!(x.the_type(), CType::FnPointer(_) | CType::Pattern(TypePattern::NamedCallback(_))))
+            .any(|x| matches!(x.the_type(), CType::FnPointer(_) | CType::Pattern(TypePattern::InstantCallback(_))))
     }
 
     fn pattern_to_native_in_signature(&self, h: &Helper, param: &Parameter, _signature: &FunctionSignature) -> String {
@@ -77,7 +77,7 @@ impl Unity {
                         .expect("Must be pointer");
                     format!("NativeArray<{}>", h.converter.to_typespecifier_in_param(element_type))
                 }
-                TypePattern::NamedCallback(_) => "IntPtr".to_string(),
+                TypePattern::InstantCallback(_) => "IntPtr".to_string(),
                 _ => h.converter.to_typespecifier_in_param(param.the_type()),
             },
             CType::ReadPointer(x) | CType::ReadWritePointer(x) => match x.deref() {
@@ -129,7 +129,7 @@ impl Unity {
             let name = p.name();
             let the_type = match p.the_type() {
                 CType::FnPointer(_) => "IntPtr".to_string(),
-                CType::Pattern(TypePattern::NamedCallback(_)) => "IntPtr".to_string(),
+                CType::Pattern(TypePattern::InstantCallback(_)) => "IntPtr".to_string(),
                 _ => h.converter.function_parameter_to_csharp_typename(p),
             };
 

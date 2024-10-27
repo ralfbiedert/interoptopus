@@ -22,7 +22,8 @@ pub mod patterns {
     pub mod result;
     pub mod services {
         pub mod basic;
-        pub mod callbacks;
+        pub mod callbacks_immediate;
+        pub mod callbacks_table;
         pub mod ignored;
         pub mod lifetimes;
         pub mod multiple_ctors;
@@ -116,6 +117,7 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(patterns::callbacks::pattern_callback_5))
             .register(function!(patterns::callbacks::pattern_callback_6))
             .register(function!(patterns::callbacks::pattern_callback_7))
+            // .register(function!(patterns::callbacks::pattern_callback_8))
             .register(function!(patterns::surrogates::pattern_surrogates_1))
             // Constants
             .register(constant!(constants::U8))
@@ -126,7 +128,8 @@ pub fn ffi_inventory() -> Inventory {
             // Patterns
             .register(pattern!(patterns::services::basic::BasicService))
             .register(pattern!(patterns::services::on_panic::ServiceOnPanic))
-            .register(pattern!(patterns::services::callbacks::ServiceCallbacks))
+            .register(pattern!(patterns::services::callbacks_immediate::ServiceCallbacksImmediate))
+            .register(pattern!(patterns::services::callbacks_table::ServiceCallbacksTable))
             .register(pattern!(patterns::services::ignored::ServiceIgnoringMethods))
             .register(pattern!(patterns::services::multiple_ctors::ServiceMultipleCtors))
             .register(pattern!(patterns::services::lifetimes::ServiceUsingLifetimes))

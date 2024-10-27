@@ -95,11 +95,12 @@ def init_lib(path):
     c_lib.service_on_panic_return_ub_on_panic.argtypes = [ctypes.c_void_p]
     c_lib.service_callbacks_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.service_callbacks_new.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
+    c_lib.service_callbacks_new_with_table.argtypes = [ctypes.POINTER(ctypes.c_void_p), DelegateTable]
     c_lib.service_callbacks_callback_simple.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)]
     c_lib.service_callbacks_callback_ffi_return.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32)]
     c_lib.service_callbacks_callback_with_slice.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32), SliceI32]
-    c_lib.service_callbacks_set_delegate_table.argtypes = [ctypes.c_void_p, ctypes.POINTER(DelegateTable)]
-    c_lib.service_callbacks_invoke_delegates.argtypes = [ctypes.c_void_p]
+    c_lib.service_callbacks_set_callback_table.argtypes = [ctypes.c_void_p, ctypes.POINTER(DelegateTable)]
+    c_lib.service_callbacks_invoke_callbacks.argtypes = [ctypes.c_void_p]
     c_lib.service_ignoring_methods_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.service_ignoring_methods_new.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.service_multiple_ctors_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
@@ -203,10 +204,11 @@ def init_lib(path):
     c_lib.service_on_panic_return_ub_on_panic.restype = ctypes.POINTER(ctypes.c_char)
     c_lib.service_callbacks_destroy.restype = ctypes.c_int
     c_lib.service_callbacks_new.restype = ctypes.c_int
+    c_lib.service_callbacks_new_with_table.restype = ctypes.c_int
     c_lib.service_callbacks_callback_simple.restype = ctypes.c_int
     c_lib.service_callbacks_callback_ffi_return.restype = ctypes.c_int
     c_lib.service_callbacks_callback_with_slice.restype = ctypes.c_int
-    c_lib.service_callbacks_invoke_delegates.restype = ctypes.c_int
+    c_lib.service_callbacks_invoke_callbacks.restype = ctypes.c_int
     c_lib.service_ignoring_methods_destroy.restype = ctypes.c_int
     c_lib.service_ignoring_methods_new.restype = ctypes.c_int
     c_lib.service_multiple_ctors_destroy.restype = ctypes.c_int
@@ -241,10 +243,11 @@ def init_lib(path):
     c_lib.service_on_panic_return_result.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_callbacks_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_callbacks_new.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.service_callbacks_new_with_table.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_callbacks_callback_simple.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_callbacks_callback_ffi_return.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_callbacks_callback_with_slice.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.service_callbacks_invoke_delegates.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.service_callbacks_invoke_callbacks.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_ignoring_methods_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_ignoring_methods_new.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_multiple_ctors_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
@@ -2238,6 +2241,14 @@ class ServiceCallbacks:
         self = ServiceCallbacks(ServiceCallbacks.__api_lock, ctx)
         return self
 
+    @staticmethod
+    def new_with_table(table: DelegateTable) -> ServiceCallbacks:
+        """"""
+        ctx = ctypes.c_void_p()
+        c_lib.service_callbacks_new_with_table(ctx, table)
+        self = ServiceCallbacks(ServiceCallbacks.__api_lock, ctx)
+        return self
+
     def __del__(self):
         c_lib.service_callbacks_destroy(self._ctx, )
     def callback_simple(self, callback):
@@ -2264,13 +2275,13 @@ class ServiceCallbacks:
 
         return c_lib.service_callbacks_callback_with_slice(self._ctx, callback, input)
 
-    def set_delegate_table(self, table: ctypes.POINTER(DelegateTable)):
+    def set_callback_table(self, table: ctypes.POINTER(DelegateTable)):
         """"""
-        return c_lib.service_callbacks_set_delegate_table(self._ctx, table)
+        return c_lib.service_callbacks_set_callback_table(self._ctx, table)
 
-    def invoke_delegates(self, ):
+    def invoke_callbacks(self, ):
         """"""
-        return c_lib.service_callbacks_invoke_delegates(self._ctx, )
+        return c_lib.service_callbacks_invoke_callbacks(self._ctx, )
 
 
 

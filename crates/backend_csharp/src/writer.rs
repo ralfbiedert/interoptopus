@@ -245,7 +245,12 @@ pub trait CSharpWriter {
                     self.write_pattern_option(w, x)?;
                     w.newline()?;
                 }
-                TypePattern::NamedCallback(x) => {
+                TypePattern::InstantCallback(x) => {
+                    // Handle this better way
+                    self.write_type_definition_named_callback(w, x)?;
+                    w.newline()?;
+                }
+                TypePattern::RetainedCallback(x) => {
                     // Handle this better way
                     self.write_type_definition_named_callback(w, x)?;
                     w.newline()?;
@@ -533,7 +538,8 @@ pub trait CSharpWriter {
                 TypePattern::Option(x) => self.should_emit_by_meta(x.meta()),
                 TypePattern::Bool => self.config().write_types == WriteTypes::NamespaceAndInteroptopusGlobal,
                 TypePattern::CChar => false,
-                TypePattern::NamedCallback(x) => self.should_emit_by_meta(x.meta()),
+                TypePattern::InstantCallback(x) => self.should_emit_by_meta(x.meta()),
+                TypePattern::RetainedCallback(x) => self.should_emit_by_meta(x.meta()),
             },
         }
     }
@@ -958,7 +964,7 @@ pub trait CSharpWriter {
             let native = self.converter().to_typespecifier_in_param(p.the_type());
 
             match p.the_type() {
-                CType::Pattern(TypePattern::NamedCallback(callback)) => match callback.fnpointer().signature().rval() {
+                CType::Pattern(TypePattern::InstantCallback(callback)) => match callback.fnpointer().signature().rval() {
                     CType::Pattern(TypePattern::FFIErrorEnum(_)) if self.config().work_around_exception_in_callback_no_reentry => {
                         to_wrap_delegates.push(name);
                         to_wrap_delegate_types.push(self.helper().converter.to_typespecifier_in_param(p.the_type()));

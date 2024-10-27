@@ -18,9 +18,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 5600732245307200640ul)
+            if (api_version != 6449109651297636659ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (5600732245307200640). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (6449109651297636659). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -571,6 +571,18 @@ namespace My.Company
             }
         }
 
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_new_with_table")]
+        public static extern FFIError service_callbacks_new_with_table(ref IntPtr context, DelegateTable table);
+
+        public static void service_callbacks_new_with_table_checked(ref IntPtr context, DelegateTable table)
+        {
+            var rval = service_callbacks_new_with_table(ref context, table);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_callback_simple")]
         public static extern FFIError service_callbacks_callback_simple(IntPtr context, MyCallback callback);
 
@@ -620,15 +632,15 @@ namespace My.Company
             }
         }
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_set_delegate_table")]
-        public static extern void service_callbacks_set_delegate_table(IntPtr context, ref DelegateTable table);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_set_callback_table")]
+        public static extern void service_callbacks_set_callback_table(IntPtr context, ref DelegateTable table);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_invoke_delegates")]
-        public static extern FFIError service_callbacks_invoke_delegates(IntPtr context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_invoke_callbacks")]
+        public static extern FFIError service_callbacks_invoke_callbacks(IntPtr context);
 
-        public static void service_callbacks_invoke_delegates_checked(IntPtr context)
+        public static void service_callbacks_invoke_callbacks_checked(IntPtr context)
         {
-            var rval = service_callbacks_invoke_delegates(context);;
+            var rval = service_callbacks_invoke_callbacks(context);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -1608,6 +1620,17 @@ namespace My.Company
             return self;
         }
 
+        public static ServiceCallbacks NewWithTable(DelegateTable table)
+        {
+            var self = new ServiceCallbacks();
+            var rval = Interop.service_callbacks_new_with_table(ref self._context, table);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+            return self;
+        }
+
         public void Dispose()
         {
             var rval = Interop.service_callbacks_destroy(ref _context);
@@ -1653,14 +1676,14 @@ namespace My.Company
             Interop.service_callbacks_callback_with_slice(_context, callback, input);
         }
 
-        public void SetDelegateTable(ref DelegateTable table)
+        public void SetCallbackTable(ref DelegateTable table)
         {
-            Interop.service_callbacks_set_delegate_table(_context, ref table);
+            Interop.service_callbacks_set_callback_table(_context, ref table);
         }
 
-        public void InvokeDelegates()
+        public void InvokeCallbacks()
         {
-            var rval = Interop.service_callbacks_invoke_delegates(_context);
+            var rval = Interop.service_callbacks_invoke_callbacks(_context);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);

@@ -157,7 +157,14 @@ pub(crate) fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CTyp
         CType::Pattern(x) => match x {
             TypePattern::CStrPointer => {}
             TypePattern::FFIErrorEnum(_) => {}
-            TypePattern::NamedCallback(x) => {
+            TypePattern::InstantCallback(x) => {
+                let inner = x.fnpointer();
+                ctypes_from_type_recursive(inner.signature().rval(), types);
+                for param in inner.signature().params() {
+                    ctypes_from_type_recursive(param.the_type(), types);
+                }
+            }
+            TypePattern::RetainedCallback(x) => {
                 let inner = x.fnpointer();
                 ctypes_from_type_recursive(inner.signature().rval(), types);
                 for param in inner.signature().params() {
@@ -222,7 +229,8 @@ pub(crate) fn extract_namespaces_from_types(types: &[CType], into: &mut HashSet<
                 }
                 TypePattern::Bool => {}
                 TypePattern::CChar => {}
-                TypePattern::NamedCallback(_) => {}
+                TypePattern::InstantCallback(_) => {}
+                TypePattern::RetainedCallback(_) => {}
             },
         }
     }
@@ -317,7 +325,8 @@ pub fn is_global_type(t: &CType) -> bool {
             TypePattern::Option(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),
             TypePattern::Bool => true,
             TypePattern::CChar => true,
-            TypePattern::NamedCallback(_) => false,
+            TypePattern::InstantCallback(_) => false,
+            TypePattern::RetainedCallback(_) => false,
         },
     }
 }

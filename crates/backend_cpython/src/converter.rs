@@ -107,7 +107,8 @@ impl Converter {
                 TypePattern::Option(x) => x.rust_name().to_string(),
                 TypePattern::Bool => "ctypes.c_uint8".to_string(),
                 TypePattern::CChar => "ctypes.c_char".to_string(),
-                TypePattern::NamedCallback(x) => self.fnpointer_to_typename(x.fnpointer()),
+                TypePattern::InstantCallback(x) => self.fnpointer_to_typename(x.fnpointer()),
+                TypePattern::RetainedCallback(x) => self.fnpointer_to_typename(x.fnpointer()),
             },
         }
     }

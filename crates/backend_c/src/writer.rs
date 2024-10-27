@@ -198,7 +198,11 @@ pub trait CWriter {
             CType::ReadWritePointer(_) => {}
             CType::Pattern(p) => match p {
                 TypePattern::CStrPointer => {}
-                TypePattern::NamedCallback(e) => {
+                TypePattern::InstantCallback(e) => {
+                    self.write_type_definition_named_callback(w, e)?;
+                    w.newline()?;
+                }
+                TypePattern::RetainedCallback(e) => {
                     self.write_type_definition_named_callback(w, e)?;
                     w.newline()?;
                 }

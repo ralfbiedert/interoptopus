@@ -244,7 +244,7 @@ impl OverloadWriter for DotNet {
                     to_pin_slice_type.push(the_type);
                     to_invoke.push(format!("{}_slice", name));
                 }
-                CType::Pattern(TypePattern::NamedCallback(callback)) => match callback.fnpointer().signature().rval() {
+                CType::Pattern(TypePattern::InstantCallback(callback)) => match callback.fnpointer().signature().rval() {
                     CType::Pattern(TypePattern::FFIErrorEnum(_)) if h.config.work_around_exception_in_callback_no_reentry => {
                         to_wrap_delegates.push(name);
                         to_wrap_delegate_types.push(h.converter.to_typespecifier_in_param(p.the_type()));

@@ -219,7 +219,7 @@ pub trait PythonWriter {
 
         for callback in self.inventory().ctypes().iter().filter_map(|x| match x {
             CType::FnPointer(x) => Some(x),
-            CType::Pattern(TypePattern::NamedCallback(x)) => Some(x.fnpointer()),
+            CType::Pattern(TypePattern::InstantCallback(x)) => Some(x.fnpointer()),
             _ => None,
         }) {
             indented!(
@@ -273,7 +273,7 @@ pub trait PythonWriter {
                     w.newline()?;
                 }
                 CType::Pattern(pattern) => match pattern {
-                    TypePattern::NamedCallback(x) => {
+                    TypePattern::InstantCallback(x) => {
                         let x = x.fnpointer();
                         indented!(w, [_], r#"if not hasattr({}, "__ctypes_from_outparam__"):"#, arg.name())?;
                         indented!(w, [_ _], r#"{} = callbacks.{}({})"#, arg.name(), safe_name(&x.internal_name()), arg.name())?;

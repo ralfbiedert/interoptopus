@@ -7,22 +7,26 @@ using Xunit;
 
 public class TestPatternDelegateTable
 {
-    void CreatePatternDelegateTable(ServiceCallbacks service)
+    DelegateTable NewTable()
     {
         var sum_delegate_return = new SumDelegateReturnExceptionSafe((x, y) => FFIError.Ok);
-
-        var table = new DelegateTable
+        return new DelegateTable
         {
             my_callback = value => 1,
             sum_delegate_1 = () => { },
             sum_delegate_2 = (x, y) => x + y,
             sum_delegate_return = sum_delegate_return.Call
         };
-        service.SetDelegateTable(ref table);
+    }
+
+    void CreatePatternDelegateTable(ServiceCallbacks service)
+    {
+        var table = NewTable();
+        service.SetCallbackTable(ref table);
     }
 
     [Fact]
-    public void pattern_ffi_slice_delegate()
+    public void set_delegates()
     {
         var service = ServiceCallbacks.New();
 
@@ -34,7 +38,15 @@ public class TestPatternDelegateTable
         //
         // GC.Collect();
 
-        service.InvokeDelegates();
+        service.InvokeCallbacks();
     }
 
+
+    [Fact]
+    public void new_with_delegates()
+    {
+        var table = NewTable();
+        var service = ServiceCallbacks.NewWithTable(table);
+        service.InvokeCallbacks();
+    }
 }

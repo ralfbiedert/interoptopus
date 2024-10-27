@@ -16,6 +16,10 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
 - If you used the C# `DotNet` or `Unity` overload writer, these helpers now take their own configuration
   where appropriate. If you previously only did `DotNet::new()` this became `DotNet::new_built()`.
 - `AsciiPointer` is now called `CStrPointer`, since it can contain non-ASCII data (e.g., when called from C#).
+- `callback!` has been removed because of unclear semantics in managed languages. It has been replaced with
+  `callback_immediate!` and `callback_retained!`. Use the former for callbacks you intend to use only during the
+  current method, use the latter for callbacks you intend to store (which is safer, but might cause some  
+  additional overhead inside a hosting runtime).
 - We fixed capitalization in some backends, e.g., a `Sliceu8` is now `SliceU8`.
 - When using `InventoryBuilder` you should call `.validate().inventory()` now.
 - To override visibility for all fields:

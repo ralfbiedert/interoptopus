@@ -235,7 +235,7 @@ impl CType {
             CType::Enum(t) => Some(t.meta.namespace()),
             CType::Opaque(t) => Some(t.meta.namespace()),
             CType::Composite(t) => Some(t.meta.namespace()),
-            CType::Pattern(TypePattern::NamedCallback(t)) => Some(t.meta().namespace()),
+            CType::Pattern(TypePattern::InstantCallback(t)) => Some(t.meta().namespace()),
             _ => None,
         }
     }

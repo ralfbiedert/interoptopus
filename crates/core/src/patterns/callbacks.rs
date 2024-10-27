@@ -1,40 +1,54 @@
-//! Useful when `extern "C" fn()` delegate types give compile errors.
+//! Useful for short- and long-lived callbacks.
+//!
+//! Callbacks are supported in two flavors:
+//!
+//! - **Immediate callbacks** for use only within the current function.    
+//! - **Retained callbacks** that are stored inside a service and invoked later.
+//!  
+//! Under the hood both callback types are just (named) function pointers or delegates.
+//!
+//! However, some backends
+//! might produce different code, depending on the callback's intended use. Immediate callbacks
+//! are likely a bit faster and more memory efficient, while retained callbacks might instruct
+//! a hosting runtime to generate and store auxiliary wrapper data.
+//!
+//! ⚠️ You are strongly advised to only use callbacks according to their designation. If you
+//! stored immediate callbacks past their method call you might get undefined behavior; if
+//! you used retained callbacks in an "immediate hot loop" you might run out of memory.
+//!
+//!
 //!
 //! # Example
 //!
-//! If you want to accept user-provided callbacks or "delegates":
+//! If you want to accept a user-provided callback for immediate use:
 //!
 //!```
-//! use interoptopus::{ffi_function, callback};
-//! use interoptopus::patterns::slice::FFISlice;
+//! use interoptopus::{ffi_function, callback_immediate};
 //!
-//! callback!(CallbackSlice(x: FFISlice<u8>) -> u8);
+//! callback_immediate!(Callback(x: u8));
 //!
 //! #[ffi_function]
-//! pub fn my_function(callback: CallbackSlice) {
-//!     callback.call(FFISlice::empty());
+//! pub fn my_function(callback: Callback) {
+//!     callback.call(123);
 //! }
-//!
 //! ```
 //! Backends supporting this pattern might generate the equivalent to the following pseudo-code:
 //!
 //! ```csharp
-//! public delegate uint CallbackSlice(Sliceu8 x0);
-//!
-//! void my_function(CallbackSlice callback);
+//! public delegate void Callback(byte x0);
+//! void my_function(Callback callback);
 //! ```
 //!
 //! Backends not supporting this pattern, and C FFI, will see the equivalent of the following C code:
 //! ```c
-//! typedef void (*fptr_fn_Sliceu8)(my_library_slicemutu8 x0);
-//!
-//! void my_function(fptr_fn_Sliceu8 callback);
+//! typedef void (*fptr_fn_u8)(my_library_u8 x0);
+//! void my_function(fptr_fn_u8 callback);
 //! ```
 //!
 //!
 //! # Code Generation
 //!
-//! The macro [**`callback`**](crate::callback) enables two use cases:
+//! The macro [**`callback`**](crate::callback_immediate) enables two use cases:
 //!
 //! - On the **Rust** side it will generate a new function-pointer type with better compatibility
 //!   with respect to lifetimes in signatures, and accepting an unlimited number of args.
@@ -42,42 +56,53 @@
 //!   produced (e.g., `MyCallback`), instead of one where it's name is just a generic concatenation
 //!   of all used parameters (e.g., `InteropDelegate_fn_i32_i32`).
 //!
+//! # Immediate Callback Lifetimes ⚠️
 //!
-//! # Why we need the macro `callback!`
+//! As mentioned, immediate callbacks passed to functions or methods are assumed to live
+//! only for the duration of that call, while retained callbacks can be stored.
+//! Immediate callbacks come with a "hidden" lifetime parameter that exists to prevent you
+//! from accidentally storing the function. In normal use this parameter
+//! can be elided like so:
 //!
-//! Due to how we generate FFI metadata and how Rust traits work there are some types which
-//! don't work nicely with Interoptopus: function pointers. Practically speaking, the following code _should_ work:
+//!```
+//! use interoptopus::{ffi_function, callback_immediate};
 //!
-//! ```ignore
-//! use interoptopus::ffi_function;
-//! use interoptopus::patterns::slice::FFISlice;
-//!
-//! pub type CallbackSlice = extern "C" fn(FFISlice<u8>);
+//! callback_immediate!(Callback());
 //!
 //! #[ffi_function]
-//! pub extern "C" fn my_function(callback: CallbackSlice) {
-//!     callback(FFISlice::empty());
-//! }
+//! pub fn my_function(callback: Callback) { }
+//!```
+//! However, if your function takes other parameters by reference, you might have
+//! to specify it explicitly:
 //!
-//! ```
+//!```
+//! # use interoptopus::{ffi_function, callback_immediate};
+//! # callback_immediate!(Callback());
+//! #[ffi_function]
+//! pub fn my_function<'a>(x: &'a u8, callback: Callback<'a>) { }
+//!```
 //!
-//! The intention is to provide a FFI function `my_function`, accepting
-//! a callback, which in turn accepts an `FFISlice<'a, u8>`.
-//! Although this is valid FFI code to write, a compile error is returned, which may look like this:
+//! Likewise, returning a Rust function can be achieved by specifying a `'static` lifetime:
 //!
-//! ```text
-//! error: implementation of `CTypeInfo` is not general enough
-//!    [...]
-//!    = note: ...`CTypeInfo` would have to be implemented for the type `for<'r> extern "C" fn(FFISlice<'r, u8>)`
-//!    = note: ...but `CTypeInfo` is actually implemented for the type `extern "C" fn(FFISlice<'0, u8>)`, for some specific lifetime `'0`
-//!    = note: this error originates in an attribute macro (in Nightly builds, run with -Z macro-backtrace for more info)
-//! ```
+//!```
+//! # use interoptopus::{ffi_function, callback_immediate};
+//! # callback_immediate!(Callback());
+//! #[ffi_function]
+//! pub fn my_function() -> Callback<'static> { todo!() }
+//!```
 //!
-//! The reasons for this are somewhat technical, but it boils down to us being unable to generally
-//! implement [`CTypeInfo`](crate::lang::rust::CTypeInfo) for _all_ types you may want to use;
-//! [`FFISlice`](crate::patterns::slice::FFISlice) here being one of them.
-//! To fix this, you can replace `pub type CallbackSlice = ...` with a `callback!` call
-//! which should generate a helper type that works.
+//! With that said, nothing would stop you from accepting an immediate callback with a `'static`
+//! lifetime, and subsequently storing it inside your Rust code. The result of that would be
+//! "unspecified behavior". In some backends, with some function pointers, this might work, while
+//! in others you could end up with undefined behavior in case you invoked that callback some time
+//! later.
+//!
+//!```ignore
+//! # use interoptopus::{ffi_function, callback_immediate};
+//! # callback_immediate!(Callback());
+//! #[ffi_function]
+//! pub fn my_function(callback: Callback<'static>) { }
+//!```
 //!
 //! # How to return callbacks from functions
 //!
@@ -85,13 +110,13 @@
 //! "being implemented".
 //!
 //! ```rust,ignore
-//! use interoptopus::{ffi_function, callback};
+//! use interoptopus::{ffi_function, callback_immediate};
 //!
-//! callback!(SumFunction(x: i32, y: i32) -> i32);
+//! callback_immediate!(SumFunction(x: i32, y: i32) -> i32);
 //!
 //! #[ffi_function]
 //! #[no_mangle]
-//! pub extern "C" fn return_sum_function() -> SumFunction {
+//! pub fn return_sum_function() -> SumFunction<'static> {
 //!     my_sum_function.into() // Compile error, mismatch between `function item type` and `function pointer type`
 //! }
 //!
@@ -100,16 +125,17 @@
 //!
 //! Instead, you will have to return function pointers like so:
 //!
-//! ```rust
-//! # use interoptopus::{ffi_function, callback};
-//! # callback!(SumFunction(x: i32, y: i32) -> i32);
+//!```rust
+//! # use interoptopus::{ffi_function, callback_immediate};
+//! # callback_immediate!(SumFunction(x: i32, y: i32) -> i32);
 //! # extern "C" fn my_sum_function(x: i32, y: i32) -> i32 { x + y }
 //! #
 //! #[ffi_function]
-//! pub fn return_sum_function() -> SumFunction {
-//!     SumFunction(Some(my_sum_function))
+//! pub fn return_sum_function() -> SumFunction<'static> {
+//!     SumFunction::new(my_sum_function)
 //! }
 //! ```
+
 use crate::lang::c::{FnPointerType, Meta};
 
 /// Internal helper naming a generated callback type wrapper.
@@ -159,10 +185,10 @@ impl NamedCallback {
 /// This defines a type `MyCallback` with a parameter `slice` returning an `u8`.
 ///
 /// ```
-/// use interoptopus::callback;
+/// use interoptopus::callback_immediate;
 /// use interoptopus::patterns::slice::FFISlice;
 ///
-/// callback!(MyCallback(slice: FFISlice<u8>) -> u8);
+/// callback_immediate!(MyCallback(slice: FFISlice<u8>) -> u8);
 /// ```
 ///
 /// The generated type definition similar to:
@@ -176,9 +202,9 @@ impl NamedCallback {
 /// You can also create the callback from Rust for testing:
 ///
 /// ```
-/// use interoptopus::callback;
+/// use interoptopus::callback_immediate;
 ///
-/// callback!(MyCallback() -> u8);
+/// callback_immediate!(MyCallback() -> u8);
 ///
 /// extern "C" fn my_rust_callback() -> u8 {
 ///     42
@@ -188,9 +214,9 @@ impl NamedCallback {
 /// assert_eq!(42, callback.call());
 /// ```
 #[macro_export]
-macro_rules! callback {
+macro_rules! callback_retained {
     ($name:ident($($param:ident: $ty:ty),*)) => {
-        callback!($name($($param: $ty),*) -> ());
+        callback_retained!($name($($param: $ty),*) -> ());
     };
 
     ($name:ident($($param:ident: $ty:ty),*) -> $rval:ty $(, namespace = $ns:expr)?) => {
@@ -230,10 +256,91 @@ macro_rules! callback {
             }
         }
 
-        unsafe impl interoptopus::lang::rust::CTypeInfo for $name {
-            fn type_info() -> interoptopus::lang::c::CType {
-                use interoptopus::lang::rust::CTypeInfo;
-                use interoptopus::lang::c::{Meta, Documentation};
+        unsafe impl ::interoptopus::lang::rust::CTypeInfo for $name {
+            fn type_info() -> ::interoptopus::lang::c::CType {
+                use ::interoptopus::lang::rust::CTypeInfo;
+                use ::interoptopus::lang::c::{Meta, Documentation};
+
+                let rval = < $rval as CTypeInfo >::type_info();
+
+                let params = vec![
+                $(
+                    interoptopus::lang::c::Parameter::new(stringify!($param).to_string(), < $ty as CTypeInfo >::type_info()),
+                )*
+                ];
+
+                let mut namespace = String::new();
+                $(
+                    namespace = String::from($ns);
+                )*
+
+                let meta = Meta::with_namespace_documentation(namespace, Documentation::new());
+                let sig = ::interoptopus::lang::c::FunctionSignature::new(params, rval);
+                let fn_pointer = ::interoptopus::lang::c::FnPointerType::new_named(sig, stringify!($name).to_string());
+                let named_callback = ::interoptopus::patterns::callbacks::NamedCallback::with_meta(fn_pointer, meta);
+
+                ::interoptopus::lang::c::CType::Pattern(::interoptopus::patterns::TypePattern::RetainedCallback(named_callback))
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! callback_immediate {
+    ($name:ident($($param:ident: $ty:ty),*)) => {
+        callback_immediate!($name($($param: $ty),*) -> ());
+    };
+
+    ($name:ident($($param:ident: $ty:ty),*) -> $rval:ty $(, namespace = $ns:expr)?) => {
+        #[derive(Default, Clone, Copy)]
+        #[repr(transparent)]
+        pub struct $name<'a> {
+            ptr: Option<extern "C" fn($($ty),*) -> $rval>,
+            lt: ::std::marker::PhantomData<&'a ()> // TODO: Fix this w.r.t lt subtyping
+        }
+
+        impl<'a> $name<'a> {
+            /// Creates a new instance of the callback using `extern "C" fn`
+            pub fn new(func: extern "C" fn($($ty),*) -> $rval) -> Self {
+                Self {
+                    ptr: Some(func),
+                    lt: ::std::marker::PhantomData::default()
+                }
+            }
+
+            /// Will call function if it exists, panic otherwise.
+            pub fn call(&self, $($param: $ty),*) -> $rval {
+                self.ptr.expect("Assumed function would exist but it didn't.")($($param),*)
+            }
+
+            /// Will call function only if it exists
+            pub fn call_if_some(&self, $($param: $ty),*) -> Option<$rval> {
+                match self.ptr {
+                    Some(c) => Some(c($($param),*)),
+                    None => None
+                }
+            }
+        }
+
+        impl<'a> From<for<> extern "C" fn($($ty),*) -> $rval> for $name<'a> {
+            fn from(x: extern "C" fn($($ty),*) -> $rval) -> Self {
+                Self {
+                    ptr: Some(x),
+                    lt: ::std::marker::PhantomData::default()
+                }
+            }
+        }
+
+        impl<'a> From<$name<'a>> for Option<extern "C" fn($($ty),*) -> $rval> {
+            fn from(x: $name) -> Self {
+                x.ptr
+            }
+        }
+
+        unsafe impl<'a> ::interoptopus::lang::rust::CTypeInfo for $name<'a> {
+            fn type_info() -> ::interoptopus::lang::c::CType {
+                use ::interoptopus::lang::rust::CTypeInfo;
+                use ::interoptopus::lang::c::{Meta, Documentation};
 
                 let rval = < $rval as CTypeInfo >::type_info();
 
@@ -253,7 +360,7 @@ macro_rules! callback {
                 let fn_pointer = interoptopus::lang::c::FnPointerType::new_named(sig, stringify!($name).to_string());
                 let named_callback = interoptopus::patterns::callbacks::NamedCallback::with_meta(fn_pointer, meta);
 
-                interoptopus::lang::c::CType::Pattern(interoptopus::patterns::TypePattern::NamedCallback(named_callback))
+                interoptopus::lang::c::CType::Pattern(interoptopus::patterns::TypePattern::InstantCallback(named_callback))
             }
         }
     };

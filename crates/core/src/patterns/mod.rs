@@ -125,7 +125,8 @@ pub enum TypePattern {
     Option(CompositeType),
     Bool,
     CChar,
-    NamedCallback(NamedCallback),
+    InstantCallback(NamedCallback),
+    RetainedCallback(NamedCallback),
 }
 
 impl TypePattern {
@@ -140,7 +141,8 @@ impl TypePattern {
             TypePattern::Slice(x) => CType::Composite(x.clone()),
             TypePattern::SliceMut(x) => CType::Composite(x.clone()),
             TypePattern::Option(x) => CType::Composite(x.clone()),
-            TypePattern::NamedCallback(x) => CType::FnPointer(x.fnpointer().clone()),
+            TypePattern::InstantCallback(x) => CType::FnPointer(x.fnpointer().clone()),
+            TypePattern::RetainedCallback(x) => CType::FnPointer(x.fnpointer().clone()),
             TypePattern::Bool => CType::Primitive(PrimitiveType::U8),
             TypePattern::CChar => c_char::type_info(),
             TypePattern::APIVersion => CType::Primitive(PrimitiveType::U64),

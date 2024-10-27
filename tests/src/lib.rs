@@ -5,7 +5,7 @@ pub mod backend_csharp;
 pub use tempfile::tempdir;
 
 /// Set this to `true` if you want to update bindings.
-pub static UPDATE_BINDINGS: bool = false;
+pub static UPDATE_BINDINGS: bool = true;
 
 #[macro_export]
 macro_rules! validate_output {

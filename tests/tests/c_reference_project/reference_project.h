@@ -570,15 +570,17 @@ ffierror service_callbacks_destroy(servicecallbacks** context);
 
 ffierror service_callbacks_new(servicecallbacks** context);
 
+ffierror service_callbacks_new_with_table(servicecallbacks** context, delegatetable table);
+
 ffierror service_callbacks_callback_simple(servicecallbacks* context, mycallback callback);
 
 ffierror service_callbacks_callback_ffi_return(servicecallbacks* context, sumdelegatereturn callback);
 
 ffierror service_callbacks_callback_with_slice(servicecallbacks* context, sumdelegatereturn callback, slicei32 input);
 
-void service_callbacks_set_delegate_table(servicecallbacks* context, const delegatetable* table);
+void service_callbacks_set_callback_table(servicecallbacks* context, const delegatetable* table);
 
-ffierror service_callbacks_invoke_delegates(const servicecallbacks* context);
+ffierror service_callbacks_invoke_callbacks(const servicecallbacks* context);
 
 /// Destroys the given instance.
 ///
