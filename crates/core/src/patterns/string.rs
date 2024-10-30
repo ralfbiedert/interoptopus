@@ -76,7 +76,7 @@ impl<'a> CStrPointer<'a> {
     ///
     /// The parameter `cstr_with_nul` must contain nul (`0x0`), but it does not need to contain nul
     /// at the end.
-    pub fn from_slice_with_nul(cstr_with_nul: &[u8]) -> Result<Self, Error> {
+    pub fn from_slice_with_nul(cstr_with_nul: &'a [u8]) -> Result<CStrPointer<'a>, Error> {
         // Check we actually contain one `0x0`.
         if !cstr_with_nul.contains(&0) {
             return Err(Error::NulTerminated);
@@ -97,7 +97,7 @@ impl<'a> CStrPointer<'a> {
     }
 
     /// Create a pointer from a CStr.
-    pub fn from_cstr(cstr: &'a CStr) -> Self {
+    pub fn from_cstr(cstr: &'a CStr) -> CStrPointer<'a> {
         Self {
             ptr: cstr.as_ptr(),
             _phantom: Default::default(),
