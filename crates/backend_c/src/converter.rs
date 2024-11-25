@@ -12,11 +12,9 @@ pub struct Converter {
 }
 
 impl Converter {
-	pub fn new(config: Config) -> Self {
-		Self {
-			config
-		}
-	}
+    pub fn new(config: Config) -> Self {
+        Self { config }
+    }
 }
 
 /// Converts Interoptopus types to C types.
