@@ -29,7 +29,7 @@ pub fn run_dotnet_command_if_installed(path: impl AsRef<Path>, command: &str) ->
 }
 
 #[cfg(not(target_os = "windows"))]
-pub fn compile_c_app_if_installed(app: impl AsRef<Path>) -> Result<(), Error> {
+pub fn compile_c_app_if_installed(_app: impl AsRef<Path>) -> Result<(), anyhow::Error> {
     Ok(())
 }
 
