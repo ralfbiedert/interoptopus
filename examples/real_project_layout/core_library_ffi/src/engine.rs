@@ -34,6 +34,11 @@ impl GameEngine {
     pub fn num_objects(&self) -> u32 {
         self.engine.num_objects()
     }
+
+    #[ffi_service_method(ignore)]
+    pub fn test(_test: u32) -> Result<(), Error> {
+        Ok(())
+    }
 }
 
 // Our FFI `Vec2` type.
