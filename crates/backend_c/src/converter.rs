@@ -11,6 +11,14 @@ pub struct Converter {
     pub(crate) config: Config,
 }
 
+impl Converter {
+	pub fn new(config: Config) -> Self {
+		Self {
+			config
+		}
+	}
+}
+
 /// Converts Interoptopus types to C types.
 pub trait CTypeConverter {
     fn config(&self) -> &Config;
