@@ -136,7 +136,7 @@ impl Generator {
         Self {
             config: config.clone(),
             inventory,
-            converter: Converter { config },
+            converter: Converter::new(config),
         }
     }
 }
