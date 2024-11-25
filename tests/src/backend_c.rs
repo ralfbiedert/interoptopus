@@ -2,7 +2,6 @@
 
 use anyhow::Error;
 use std::path::Path;
-use tempfile::tempdir;
 
 /// Compile the given C app, ignore and succeed otherwise.
 #[cfg(target_os = "windows")]
@@ -23,7 +22,7 @@ pub fn compile_c_app_if_installed(file: impl AsRef<Path>) -> Result<(), Error> {
 }
 
 #[cfg(not(target_os = "windows"))]
-pub fn compile_c_app_if_installed(app: impl AsRef<Path>) -> Result<(), Error> {
+pub fn compile_c_app_if_installed(_app: impl AsRef<Path>) -> Result<(), Error> {
     Ok(())
 }
 
