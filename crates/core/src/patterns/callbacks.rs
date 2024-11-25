@@ -37,10 +37,10 @@
 //! The macro [**`callback`**](crate::callback) enables two use cases:
 //!
 //! - On the **Rust** side it will generate a new function-pointer type with better compatibility
-//! with respect to lifetimes in signatures, and accepting an unlimited number of args.
-//!- On the **FFI side** a _properly named_ callback (delegate, function pointer ...) type can be
-//! produced (e.g., `MyCallback`), instead of one where it's name is just a generic concatenation
-//! of all used parameters (e.g., `InteropDelegate_fn_i32_i32`).
+//!   with respect to lifetimes in signatures, and accepting an unlimited number of args.
+//! - On the **FFI side** a _properly named_ callback (delegate, function pointer ...) type can be
+//!   produced (e.g., `MyCallback`), instead of one where it's name is just a generic concatenation
+//!   of all used parameters (e.g., `InteropDelegate_fn_i32_i32`).
 //!
 //!
 //! # Why we need the macro `callback!`
@@ -127,7 +127,7 @@ impl NamedCallback {
 
     /// Creates a new named callback with the given meta.
     pub fn with_meta(callback: FnPointerType, meta: Meta) -> Self {
-        if let None = callback.name() {
+        if callback.name().is_none() {
             panic!("The pointer provided to a named callback must have a name.")
         }
         Self { fnpointer: callback, meta }

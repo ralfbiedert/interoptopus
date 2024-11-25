@@ -50,24 +50,24 @@
 //! That means a backend will handle a pattern in one of three ways:
 //!
 //! - The pattern is **supported** and the backend will generate the raw, underlying type and / or
-//! a language-specific abstraction that safely and conveniently handles it. Examples
-//! include converting an [`CStrPointer`](string) to a C# `string`, or a [`service`](crate::patterns::service)
-//! to a Python `class`.
+//!   a language-specific abstraction that safely and conveniently handles it. Examples
+//!   include converting an [`CStrPointer`](string) to a C# `string`, or a [`service`](crate::patterns::service)
+//!   to a Python `class`.
 //!
 //! - The pattern is not supported and will be **omitted, if the pattern was merely an aggregate** of
-//! existing items. Examples include the [`service`](crate::patterns::service) pattern in C which will not
-//! be emitted. However, this will not pose a problem as all constituent types and methods (functions)
-//! are still available as raw bindings.
+//!   existing items. Examples include the [`service`](crate::patterns::service) pattern in C which will not
+//!   be emitted. However, this will not pose a problem as all constituent types and methods (functions)
+//!   are still available as raw bindings.
 //!
 //! - The pattern is not supported and will be **replaced with a fallback type**. Examples include
-//! the [`CStrPointer`](string) which will become a regular `*const char` in C.
+//!   the [`CStrPointer`](string) which will become a regular `*const char` in C.
 //!
 //! In other words, regardless of which pattern was used, the involved methods and types will always
 //! be accessible from any language.
 //!
 //! # Pattern Composition
 //!
-//! Due do a lack of expressiveness in other languages, pattern composition is often limited. Things that work
+//! Due to a lack of expressiveness in other languages, pattern composition is often limited. Things that work
 //! easily in Rust (e.g., a nested `FFISlice<FFIOption<CStrPointer>>`), aren't supported in other languages.
 //! You therefore should rather err on the side of conservatism when designing APIs.
 //!

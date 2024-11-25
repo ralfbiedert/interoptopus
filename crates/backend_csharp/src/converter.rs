@@ -91,7 +91,7 @@ pub trait CSharpTypeConverter {
 
     /// Converts an Rust `fn()` to a C# delegate name such as `InteropDelegate`.
     fn fnpointer_to_typename(&self, x: &FnPointerType) -> String {
-        vec!["InteropDelegate".to_string(), safe_name(&x.internal_name())].join("_")
+        ["InteropDelegate".to_string(), safe_name(&x.internal_name())].join("_")
     }
 
     /// Converts the `u32` part in a Rust field `x: u32` to a C# equivalent. Might convert pointers to `IntPtr`.

@@ -223,7 +223,7 @@ impl OverloadWriter for DotNet {
         };
 
         let mut params = Vec::new();
-        for (_, p) in function.signature().params().iter().enumerate() {
+        for p in function.signature().params().iter() {
             let name = p.name();
             let native = self.pattern_to_native_in_signature(&h, p);
             let the_type = h.converter.function_parameter_to_csharp_typename(p);

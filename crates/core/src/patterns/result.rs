@@ -196,10 +196,7 @@ impl FFIErrorEnum {
 /// (and probably gracefully shutdown or restart), as any subsequent call risks causing a
 /// process abort.
 #[allow(unused_variables)]
-pub fn panics_and_errors_to_ffi_enum<E: Debug, FE: FFIError>(f: impl FnOnce() -> Result<(), E>, error_context: &str) -> FE
-where
-    FE: From<E>,
-{
+pub fn panics_and_errors_to_ffi_enum<E: Debug, FE: FFIError + From<E>>(f: impl FnOnce() -> Result<(), E>, error_context: &str) -> FE {
     let result: Result<(), E> = match std::panic::catch_unwind(AssertUnwindSafe(f)) {
         Ok(x) => x,
         Err(e) => {
@@ -221,7 +218,7 @@ where
 /// Extracts a string message from a panic unwind.
 pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
     match pan.downcast_ref::<&'static str>() {
-        Some(s) => *s,
+        Some(s) => s,
         None => match pan.downcast_ref::<String>() {
             Some(s) => s,
             None => "Any { .. }",

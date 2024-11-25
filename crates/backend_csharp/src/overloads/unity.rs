@@ -59,7 +59,7 @@ impl Unity {
                 TypePattern::Slice(p) => {
                     let element_type = p
                         .fields()
-                        .get(0)
+                        .first()
                         .expect("First parameter must exist")
                         .the_type()
                         .try_deref_pointer()
@@ -70,7 +70,7 @@ impl Unity {
                 TypePattern::SliceMut(p) => {
                     let element_type = p
                         .fields()
-                        .get(0)
+                        .first()
                         .expect("First parameter must exist")
                         .the_type()
                         .try_deref_pointer()
@@ -85,7 +85,7 @@ impl Unity {
                     TypePattern::Slice(p) => {
                         let element_type = p
                             .fields()
-                            .get(0)
+                            .first()
                             .expect("First parameter must exist")
                             .the_type()
                             .try_deref_pointer()
@@ -96,7 +96,7 @@ impl Unity {
                     TypePattern::SliceMut(p) => {
                         let element_type = p
                             .fields()
-                            .get(0)
+                            .first()
                             .expect("First parameter must exist")
                             .the_type()
                             .try_deref_pointer()
@@ -125,7 +125,7 @@ impl Unity {
         );
 
         let mut params = Vec::new();
-        for (_, p) in function.signature().params().iter().enumerate() {
+        for p in function.signature().params().iter() {
             let name = p.name();
             let the_type = match p.the_type() {
                 CType::FnPointer(_) => "IntPtr".to_string(),
@@ -248,7 +248,7 @@ impl OverloadWriter for Unity {
         };
 
         let mut params = Vec::new();
-        for (_, p) in function.signature().params().iter().enumerate() {
+        for p in function.signature().params().iter() {
             let name = p.name();
             let native = self.pattern_to_native_in_signature(&h, p, function.signature());
             let the_type = h.converter.function_parameter_to_csharp_typename(p);

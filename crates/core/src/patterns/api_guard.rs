@@ -45,7 +45,7 @@
 //!
 //! - is based on the signatures of the involved functions, types and constants,
 //! - is expected to change when the API changes, e.g., functions, types, fields, ... are added
-//! changed or removed,
+//!   changed or removed,
 //! - will even react to benign API changes (e.g., just adding functions),
 //! - might even react to documentation changes (subject to change; feedback welcome).
 //!

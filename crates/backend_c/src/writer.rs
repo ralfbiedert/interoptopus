@@ -98,7 +98,7 @@ pub trait CWriter {
 
         let mut params = Vec::new();
 
-        for (_, p) in function.signature().params().iter().enumerate() {
+        for p in function.signature().params().iter() {
             match p.the_type() {
                 CType::Array(a) => {
                     params.push(format!(
@@ -141,17 +141,16 @@ pub trait CWriter {
 
         let mut params = Vec::new();
 
-        for (_, p) in function.signature().params().iter().enumerate() {
+        for p in function.signature().params().iter() {
             match p.the_type() {
                 CType::Array(a) => {
                     params.push(format!("{} [{}]", self.converter().to_type_specifier(a.array_type()), a.len(),));
                 }
                 _ => {
-                    params.push(format!("{}", self.converter().to_type_specifier(p.the_type()),));
+                    params.push(self.converter().to_type_specifier(p.the_type()).to_string());
                 }
             }
         }
-
         indented!(w, r#"typedef {} (*{})({});"#, rval, name, params.join(", "))?;
 
         Ok(())

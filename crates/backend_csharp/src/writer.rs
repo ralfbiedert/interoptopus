@@ -180,7 +180,7 @@ pub trait CSharpWriter {
         );
 
         let mut params = Vec::new();
-        for (_, p) in function.signature().params().iter().enumerate() {
+        for p in function.signature().params().iter() {
             let the_type = self.converter().function_parameter_to_csharp_typename(p);
             let name = p.name();
 

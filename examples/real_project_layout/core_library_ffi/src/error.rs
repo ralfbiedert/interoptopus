@@ -20,10 +20,8 @@ pub enum Error {
 }
 
 impl From<interoptopus::Error> for Error {
-    fn from(x: interoptopus::Error) -> Self {
-        match x {
-            _ => Self::Bad,
-        }
+    fn from(_: interoptopus::Error) -> Self {
+        Self::Bad
     }
 }
 

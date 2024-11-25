@@ -155,12 +155,12 @@
 //!
 //! - Submit small bug fixes directly. Major changes should be issues first.
 //! - Anything that makes previously working bindings change behavior or stop compiling
-//! is a major change;
+//!   is a major change;
 //! - This doesn't mean we're opposed to breaking stuff just that
-//! we'd like to talk about it before it happens.
+//!   we'd like to talk about it before it happens.
 //! - New features or patterns must be materialized in the reference project and accompanied by
-//! an interop test (i.e., a backend test running C# / Python against a DLL invoking that code)
-//! in at least one included backend.
+//!   an interop test (i.e., a backend test running C# / Python against a DLL invoking that code)
+//!   in at least one included backend.
 //!
 //! [Latest Version]: https://img.shields.io/crates/v/interoptopus.svg
 //! [crates.io]: https://crates.io/crates/interoptopus

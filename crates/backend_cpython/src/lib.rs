@@ -132,6 +132,8 @@
 //!
 //! ```
 
+#![allow(clippy::test_attr_in_doctest)]
+
 use interoptopus::writer::IndentWriter;
 use interoptopus::Interop;
 use interoptopus::{Error, Inventory};

@@ -98,7 +98,7 @@ impl CTypeConverter for Converter {
 
     fn fnpointer_to_typename(&self, x: &FnPointerType) -> String {
         let prefixed = format!("{}fptr", self.config().prefix);
-        vec![prefixed, safe_name(&x.internal_name())].join("_")
+        [prefixed, safe_name(&x.internal_name())].join("_")
     }
 
     fn to_type_specifier(&self, x: &CType) -> String {
