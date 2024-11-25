@@ -880,7 +880,10 @@ namespace My.Company.Common
 
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint MyCallbackNamespaced(uint value);
+    public delegate uint CallbackNamespaced(uint value);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate uint CallbackNamespacedRetained(uint value);
 
 
 

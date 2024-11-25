@@ -80,11 +80,11 @@ def init_lib(path):
     c_lib.pattern_api_guard.argtypes = []
     c_lib.pattern_callback_1.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32), ctypes.c_uint32]
     c_lib.pattern_callback_2.argtypes = [ctypes.CFUNCTYPE(None, ctypes.c_void_p)]
-    c_lib.pattern_callback_3.argtypes = [DelegateCallbackMyCallbackContextual, ctypes.c_uint32]
+    c_lib.pattern_callback_3.argtypes = [DelegateCallbackCallbackContextual, ctypes.c_uint32]
     c_lib.pattern_callback_4.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32), ctypes.c_uint32]
     c_lib.pattern_callback_5.argtypes = []
     c_lib.pattern_callback_6.argtypes = []
-    c_lib.pattern_callback_7.argtypes = [ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32), ctypes.CFUNCTYPE(None, ctypes.c_int32, ctypes.c_int32), ctypes.c_int32, ctypes.c_int32, ctypes.POINTER(ctypes.c_int32)]
+    c_lib.pattern_callback_7.argtypes = [ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32), ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32), ctypes.c_int32, ctypes.c_int32, ctypes.POINTER(ctypes.c_int32)]
     c_lib.pattern_surrogates_1.argtypes = [Local, ctypes.POINTER(Container)]
     c_lib.basic_service_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.basic_service_new.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
@@ -93,14 +93,16 @@ def init_lib(path):
     c_lib.service_on_panic_return_result.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
     c_lib.service_on_panic_return_default_value.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
     c_lib.service_on_panic_return_ub_on_panic.argtypes = [ctypes.c_void_p]
-    c_lib.service_callbacks_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
-    c_lib.service_callbacks_new.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
-    c_lib.service_callbacks_new_with_table.argtypes = [ctypes.POINTER(ctypes.c_void_p), DelegateTable]
-    c_lib.service_callbacks_callback_simple.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)]
-    c_lib.service_callbacks_callback_ffi_return.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32)]
-    c_lib.service_callbacks_callback_with_slice.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32), SliceI32]
-    c_lib.service_callbacks_set_callback_table.argtypes = [ctypes.c_void_p, ctypes.POINTER(DelegateTable)]
-    c_lib.service_callbacks_invoke_callbacks.argtypes = [ctypes.c_void_p]
+    c_lib.service_callbacks_immediate_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
+    c_lib.service_callbacks_immediate_new.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
+    c_lib.service_callbacks_immediate_callback_simple.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)]
+    c_lib.service_callbacks_immediate_callback_ffi_return.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32)]
+    c_lib.service_callbacks_immediate_callback_with_slice.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32), SliceI32]
+    c_lib.service_callbacks_table_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
+    c_lib.service_callbacks_table_new.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
+    c_lib.service_callbacks_table_new_with_table.argtypes = [ctypes.POINTER(ctypes.c_void_p), DelegateTable]
+    c_lib.service_callbacks_table_set_callback_table.argtypes = [ctypes.c_void_p, ctypes.POINTER(DelegateTable)]
+    c_lib.service_callbacks_table_invoke_callbacks.argtypes = [ctypes.c_void_p]
     c_lib.service_ignoring_methods_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.service_ignoring_methods_new.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.service_multiple_ctors_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
@@ -202,13 +204,15 @@ def init_lib(path):
     c_lib.service_on_panic_return_result.restype = ctypes.c_int
     c_lib.service_on_panic_return_default_value.restype = ctypes.c_uint32
     c_lib.service_on_panic_return_ub_on_panic.restype = ctypes.POINTER(ctypes.c_char)
-    c_lib.service_callbacks_destroy.restype = ctypes.c_int
-    c_lib.service_callbacks_new.restype = ctypes.c_int
-    c_lib.service_callbacks_new_with_table.restype = ctypes.c_int
-    c_lib.service_callbacks_callback_simple.restype = ctypes.c_int
-    c_lib.service_callbacks_callback_ffi_return.restype = ctypes.c_int
-    c_lib.service_callbacks_callback_with_slice.restype = ctypes.c_int
-    c_lib.service_callbacks_invoke_callbacks.restype = ctypes.c_int
+    c_lib.service_callbacks_immediate_destroy.restype = ctypes.c_int
+    c_lib.service_callbacks_immediate_new.restype = ctypes.c_int
+    c_lib.service_callbacks_immediate_callback_simple.restype = ctypes.c_int
+    c_lib.service_callbacks_immediate_callback_ffi_return.restype = ctypes.c_int
+    c_lib.service_callbacks_immediate_callback_with_slice.restype = ctypes.c_int
+    c_lib.service_callbacks_table_destroy.restype = ctypes.c_int
+    c_lib.service_callbacks_table_new.restype = ctypes.c_int
+    c_lib.service_callbacks_table_new_with_table.restype = ctypes.c_int
+    c_lib.service_callbacks_table_invoke_callbacks.restype = ctypes.c_int
     c_lib.service_ignoring_methods_destroy.restype = ctypes.c_int
     c_lib.service_ignoring_methods_new.restype = ctypes.c_int
     c_lib.service_multiple_ctors_destroy.restype = ctypes.c_int
@@ -241,13 +245,15 @@ def init_lib(path):
     c_lib.service_on_panic_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_on_panic_new.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_on_panic_return_result.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.service_callbacks_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.service_callbacks_new.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.service_callbacks_new_with_table.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.service_callbacks_callback_simple.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.service_callbacks_callback_ffi_return.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.service_callbacks_callback_with_slice.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.service_callbacks_invoke_callbacks.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.service_callbacks_immediate_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.service_callbacks_immediate_new.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.service_callbacks_immediate_callback_simple.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.service_callbacks_immediate_callback_ffi_return.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.service_callbacks_immediate_callback_with_slice.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.service_callbacks_table_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.service_callbacks_table_new.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.service_callbacks_table_new_with_table.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.service_callbacks_table_invoke_callbacks.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_ignoring_methods_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_ignoring_methods_new.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_multiple_ctors_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
@@ -532,7 +538,7 @@ def pattern_callback_2(callback):
 
     return c_lib.pattern_callback_2(callback)
 
-def pattern_callback_3(callback: DelegateCallbackMyCallbackContextual, x: int):
+def pattern_callback_3(callback: DelegateCallbackCallbackContextual, x: int):
     return c_lib.pattern_callback_3(callback, x)
 
 def pattern_callback_4(callback, x: int) -> int:
@@ -552,7 +558,7 @@ def pattern_callback_7(c1, c2, x: int, i: int, o: ctypes.POINTER(ctypes.c_int32)
         c1 = callbacks.fn_i32_i32_rval_FFIError(c1)
 
     if not hasattr(c2, "__ctypes_from_outparam__"):
-        c2 = callbacks.fn_i32_i32(c2)
+        c2 = callbacks.fn_i32_i32_rval_FFIError(c2)
 
     return c_lib.pattern_callback_7(c1, c2, x, i, o)
 
@@ -1272,6 +1278,48 @@ class Container(ctypes.Structure):
         return ctypes.Structure.__set__(self, "foreign", value)
 
 
+class DelegateTable(ctypes.Structure):
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("error", ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32)),
+        ("callback", ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)),
+        ("namespaced", ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)),
+    ]
+
+    def __init__(self, error = None, callback = None, namespaced = None):
+        if error is not None:
+            self.error = error
+        if callback is not None:
+            self.callback = callback
+        if namespaced is not None:
+            self.namespaced = namespaced
+
+    @property
+    def error(self):
+        return ctypes.Structure.__get__(self, "error")
+
+    @error.setter
+    def error(self, value):
+        return ctypes.Structure.__set__(self, "error", value)
+
+    @property
+    def callback(self):
+        return ctypes.Structure.__get__(self, "callback")
+
+    @callback.setter
+    def callback(self, value):
+        return ctypes.Structure.__set__(self, "callback", value)
+
+    @property
+    def namespaced(self):
+        return ctypes.Structure.__get__(self, "namespaced")
+
+    @namespaced.setter
+    def namespaced(self, value):
+        return ctypes.Structure.__set__(self, "namespaced", value)
+
+
 class Genericu32(ctypes.Structure):
 
     # These fields represent the underlying C data layout
@@ -1801,7 +1849,7 @@ class OptionVec(ctypes.Structure):
         return self._is_some != 0
 
 
-class DelegateCallbackMyCallbackContextual(ctypes.Structure):
+class DelegateCallbackCallbackContextual(ctypes.Structure):
 
     # These fields represent the underlying C data layout
     _fields_ = [
@@ -1830,103 +1878,6 @@ class DelegateCallbackMyCallbackContextual(ctypes.Structure):
     @context.setter
     def context(self, value: ctypes.c_void_p):
         return ctypes.Structure.__set__(self, "context", value)
-
-
-class DelegateTable(ctypes.Structure):
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("my_callback", ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)),
-        ("my_callback_namespaced", ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)),
-        ("my_callback_void", ctypes.CFUNCTYPE(None, ctypes.c_void_p)),
-        ("my_callback_contextual", ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_uint32)),
-        ("sum_delegate_1", ctypes.CFUNCTYPE(None, )),
-        ("sum_delegate_2", ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_int32, ctypes.c_int32)),
-        ("sum_delegate_return", ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32)),
-        ("sum_delegate_return_2", ctypes.CFUNCTYPE(None, ctypes.c_int32, ctypes.c_int32)),
-    ]
-
-    def __init__(self, my_callback = None, my_callback_namespaced = None, my_callback_void = None, my_callback_contextual = None, sum_delegate_1 = None, sum_delegate_2 = None, sum_delegate_return = None, sum_delegate_return_2 = None):
-        if my_callback is not None:
-            self.my_callback = my_callback
-        if my_callback_namespaced is not None:
-            self.my_callback_namespaced = my_callback_namespaced
-        if my_callback_void is not None:
-            self.my_callback_void = my_callback_void
-        if my_callback_contextual is not None:
-            self.my_callback_contextual = my_callback_contextual
-        if sum_delegate_1 is not None:
-            self.sum_delegate_1 = sum_delegate_1
-        if sum_delegate_2 is not None:
-            self.sum_delegate_2 = sum_delegate_2
-        if sum_delegate_return is not None:
-            self.sum_delegate_return = sum_delegate_return
-        if sum_delegate_return_2 is not None:
-            self.sum_delegate_return_2 = sum_delegate_return_2
-
-    @property
-    def my_callback(self):
-        return ctypes.Structure.__get__(self, "my_callback")
-
-    @my_callback.setter
-    def my_callback(self, value):
-        return ctypes.Structure.__set__(self, "my_callback", value)
-
-    @property
-    def my_callback_namespaced(self):
-        return ctypes.Structure.__get__(self, "my_callback_namespaced")
-
-    @my_callback_namespaced.setter
-    def my_callback_namespaced(self, value):
-        return ctypes.Structure.__set__(self, "my_callback_namespaced", value)
-
-    @property
-    def my_callback_void(self):
-        return ctypes.Structure.__get__(self, "my_callback_void")
-
-    @my_callback_void.setter
-    def my_callback_void(self, value):
-        return ctypes.Structure.__set__(self, "my_callback_void", value)
-
-    @property
-    def my_callback_contextual(self):
-        return ctypes.Structure.__get__(self, "my_callback_contextual")
-
-    @my_callback_contextual.setter
-    def my_callback_contextual(self, value):
-        return ctypes.Structure.__set__(self, "my_callback_contextual", value)
-
-    @property
-    def sum_delegate_1(self):
-        return ctypes.Structure.__get__(self, "sum_delegate_1")
-
-    @sum_delegate_1.setter
-    def sum_delegate_1(self, value):
-        return ctypes.Structure.__set__(self, "sum_delegate_1", value)
-
-    @property
-    def sum_delegate_2(self):
-        return ctypes.Structure.__get__(self, "sum_delegate_2")
-
-    @sum_delegate_2.setter
-    def sum_delegate_2(self, value):
-        return ctypes.Structure.__set__(self, "sum_delegate_2", value)
-
-    @property
-    def sum_delegate_return(self):
-        return ctypes.Structure.__get__(self, "sum_delegate_return")
-
-    @sum_delegate_return.setter
-    def sum_delegate_return(self, value):
-        return ctypes.Structure.__set__(self, "sum_delegate_return", value)
-
-    @property
-    def sum_delegate_return_2(self):
-        return ctypes.Structure.__get__(self, "sum_delegate_return_2")
-
-    @sum_delegate_return_2.setter
-    def sum_delegate_return_2(self, value):
-        return ctypes.Structure.__set__(self, "sum_delegate_return_2", value)
 
 
 class SliceUseAsciiStringPattern(ctypes.Structure):
@@ -2145,18 +2096,17 @@ class SliceMutVec(ctypes.Structure):
 class callbacks:
     """Helpers to define callbacks."""
     fn_u8_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8)
-    fn_SliceU8_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, SliceU8)
-    fn_SliceVec3f32_rval_Vec3f32 = ctypes.CFUNCTYPE(Vec3f32, SliceVec3f32)
-    fn_SliceMutU8 = ctypes.CFUNCTYPE(None, SliceMutU8)
-    fn_u8_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8)
     fn_u32_rval_u32 = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)
     fn_ConstPtr_u32 = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_uint32)
+    fn_i32_i32_rval_FFIError = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32)
+    fn_SliceU8_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, SliceU8)
+    fn_SliceVec3f32_rval_Vec3f32 = ctypes.CFUNCTYPE(Vec3f32, SliceVec3f32)
     fn_u32_rval_u32 = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)
-    fn_ConstPtr = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
+    fn_SliceMutU8 = ctypes.CFUNCTYPE(None, SliceMutU8)
     fn = ctypes.CFUNCTYPE(None, )
     fn_i32_i32_rval_i32 = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_int32, ctypes.c_int32)
-    fn_i32_i32_rval_FFIError = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32)
-    fn_i32_i32 = ctypes.CFUNCTYPE(None, ctypes.c_int32, ctypes.c_int32)
+    fn_u8_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8)
+    fn_ConstPtr = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
 
 
 class BasicService:
@@ -2221,12 +2171,12 @@ class ServiceOnPanic:
 
 
 
-class ServiceCallbacks:
+class ServiceCallbacksImmediate:
     """ Some struct we want to expose as a class."""
     __api_lock = object()
 
     def __init__(self, api_lock, ctx):
-        assert(api_lock == ServiceCallbacks.__api_lock), "You must create this with a static constructor." 
+        assert(api_lock == ServiceCallbacksImmediate.__api_lock), "You must create this with a static constructor." 
         self._ctx = ctx
 
     @property
@@ -2234,36 +2184,28 @@ class ServiceCallbacks:
         return self._ctx
 
     @staticmethod
-    def new() -> ServiceCallbacks:
+    def new() -> ServiceCallbacksImmediate:
         """"""
         ctx = ctypes.c_void_p()
-        c_lib.service_callbacks_new(ctx, )
-        self = ServiceCallbacks(ServiceCallbacks.__api_lock, ctx)
-        return self
-
-    @staticmethod
-    def new_with_table(table: DelegateTable) -> ServiceCallbacks:
-        """"""
-        ctx = ctypes.c_void_p()
-        c_lib.service_callbacks_new_with_table(ctx, table)
-        self = ServiceCallbacks(ServiceCallbacks.__api_lock, ctx)
+        c_lib.service_callbacks_immediate_new(ctx, )
+        self = ServiceCallbacksImmediate(ServiceCallbacksImmediate.__api_lock, ctx)
         return self
 
     def __del__(self):
-        c_lib.service_callbacks_destroy(self._ctx, )
+        c_lib.service_callbacks_immediate_destroy(self._ctx, )
     def callback_simple(self, callback):
         """"""
         if not hasattr(callback, "__ctypes_from_outparam__"):
             callback = callbacks.fn_u32_rval_u32(callback)
 
-        return c_lib.service_callbacks_callback_simple(self._ctx, callback)
+        return c_lib.service_callbacks_immediate_callback_simple(self._ctx, callback)
 
     def callback_ffi_return(self, callback):
         """"""
         if not hasattr(callback, "__ctypes_from_outparam__"):
             callback = callbacks.fn_i32_i32_rval_FFIError(callback)
 
-        return c_lib.service_callbacks_callback_ffi_return(self._ctx, callback)
+        return c_lib.service_callbacks_immediate_callback_ffi_return(self._ctx, callback)
 
     def callback_with_slice(self, callback, input: SliceI32 | ctypes.Array[ctypes.c_int32]):
         """"""
@@ -2273,15 +2215,47 @@ class ServiceCallbacks:
         if hasattr(input, "_length_") and getattr(input, "_type_", "") == ctypes.c_int32:
             input = SliceI32(data=ctypes.cast(input, ctypes.POINTER(ctypes.c_int32)), len=len(input))
 
-        return c_lib.service_callbacks_callback_with_slice(self._ctx, callback, input)
+        return c_lib.service_callbacks_immediate_callback_with_slice(self._ctx, callback, input)
 
+
+
+class ServiceCallbacksTable:
+    """ Some struct we want to expose as a class."""
+    __api_lock = object()
+
+    def __init__(self, api_lock, ctx):
+        assert(api_lock == ServiceCallbacksTable.__api_lock), "You must create this with a static constructor." 
+        self._ctx = ctx
+
+    @property
+    def _as_parameter_(self):
+        return self._ctx
+
+    @staticmethod
+    def new() -> ServiceCallbacksTable:
+        """"""
+        ctx = ctypes.c_void_p()
+        c_lib.service_callbacks_table_new(ctx, )
+        self = ServiceCallbacksTable(ServiceCallbacksTable.__api_lock, ctx)
+        return self
+
+    @staticmethod
+    def new_with_table(table: DelegateTable) -> ServiceCallbacksTable:
+        """"""
+        ctx = ctypes.c_void_p()
+        c_lib.service_callbacks_table_new_with_table(ctx, table)
+        self = ServiceCallbacksTable(ServiceCallbacksTable.__api_lock, ctx)
+        return self
+
+    def __del__(self):
+        c_lib.service_callbacks_table_destroy(self._ctx, )
     def set_callback_table(self, table: ctypes.POINTER(DelegateTable)):
         """"""
-        return c_lib.service_callbacks_set_callback_table(self._ctx, table)
+        return c_lib.service_callbacks_table_set_callback_table(self._ctx, table)
 
     def invoke_callbacks(self, ):
         """"""
-        return c_lib.service_callbacks_invoke_callbacks(self._ctx, )
+        return c_lib.service_callbacks_table_invoke_callbacks(self._ctx, )
 
 
 

@@ -18,9 +18,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 6449109651297636659ul)
+            if (api_version != 6267872400365709685ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (6449109651297636659). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (6267872400365709685). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -240,25 +240,25 @@ namespace My.Company
         public static extern ulong pattern_api_guard();
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_1")]
-        public static extern uint pattern_callback_1(MyCallback callback, uint x);
+        public static extern uint pattern_callback_1(Callback callback, uint x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_2")]
-        public static extern MyCallbackVoid pattern_callback_2(MyCallbackVoid callback);
+        public static extern CallbackVoid pattern_callback_2(CallbackVoid callback);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_3")]
-        public static extern void pattern_callback_3(DelegateCallbackMyCallbackContextual callback, uint x);
+        public static extern void pattern_callback_3(DelegateCallbackCallbackContextual callback, uint x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_4")]
-        public static extern uint pattern_callback_4(MyCallbackNamespaced callback, uint x);
+        public static extern uint pattern_callback_4(CallbackNamespaced callback, uint x);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_5")]
-        public static extern SumDelegate1 pattern_callback_5();
+        public static extern CallbackSum1 pattern_callback_5();
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_6")]
-        public static extern SumDelegate2 pattern_callback_6();
+        public static extern CallbackSum2 pattern_callback_6();
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_7")]
-        public static extern FFIError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o);
+        public static extern FFIError pattern_callback_7(CallbackError c1, CallbackError c2, int x, int i, out int o);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_surrogates_1")]
         public static extern void pattern_surrogates_1(Local s, out Container c);
@@ -307,29 +307,41 @@ namespace My.Company
         ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_destroy")]
-        public static extern FFIError service_callbacks_destroy(ref IntPtr context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_immediate_destroy")]
+        public static extern FFIError service_callbacks_immediate_destroy(ref IntPtr context);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_new")]
-        public static extern FFIError service_callbacks_new(ref IntPtr context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_immediate_new")]
+        public static extern FFIError service_callbacks_immediate_new(ref IntPtr context);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_new_with_table")]
-        public static extern FFIError service_callbacks_new_with_table(ref IntPtr context, DelegateTable table);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_immediate_callback_simple")]
+        public static extern FFIError service_callbacks_immediate_callback_simple(IntPtr context, Callback callback);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_callback_simple")]
-        public static extern FFIError service_callbacks_callback_simple(IntPtr context, MyCallback callback);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_immediate_callback_ffi_return")]
+        public static extern FFIError service_callbacks_immediate_callback_ffi_return(IntPtr context, CallbackError callback);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_callback_ffi_return")]
-        public static extern FFIError service_callbacks_callback_ffi_return(IntPtr context, SumDelegateReturn callback);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_immediate_callback_with_slice")]
+        public static extern FFIError service_callbacks_immediate_callback_with_slice(IntPtr context, CallbackError callback, SliceI32 input);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_callback_with_slice")]
-        public static extern FFIError service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, SliceI32 input);
+        /// Destroys the given instance.
+        ///
+        /// # Safety
+        ///
+        /// The passed parameter MUST have been created with the corresponding init function;
+        /// passing any other value results in undefined behavior.
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_table_destroy")]
+        public static extern FFIError service_callbacks_table_destroy(ref IntPtr context);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_set_callback_table")]
-        public static extern void service_callbacks_set_callback_table(IntPtr context, ref DelegateTable table);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_table_new")]
+        public static extern FFIError service_callbacks_table_new(ref IntPtr context);
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_invoke_callbacks")]
-        public static extern FFIError service_callbacks_invoke_callbacks(IntPtr context);
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_table_new_with_table")]
+        public static extern FFIError service_callbacks_table_new_with_table(ref IntPtr context, DelegateTable table);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_table_set_callback_table")]
+        public static extern void service_callbacks_table_set_callback_table(IntPtr context, ref DelegateTable table);
+
+        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_table_invoke_callbacks")]
+        public static extern FFIError service_callbacks_table_invoke_callbacks(IntPtr context);
 
         /// Destroys the given instance.
         ///
@@ -517,9 +529,9 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct DelegateCallbackMyCallbackContextual
+    public partial struct DelegateCallbackCallbackContextual
     {
-        public MyCallbackContextual callback;
+        public CallbackContextual callback;
         public IntPtr context;
     }
 
@@ -527,14 +539,9 @@ namespace My.Company
     [StructLayout(LayoutKind.Sequential)]
     public partial struct DelegateTable
     {
-        public MyCallback my_callback;
-        public MyCallbackNamespaced my_callback_namespaced;
-        public MyCallbackVoid my_callback_void;
-        public MyCallbackContextual my_callback_contextual;
-        public SumDelegate1 sum_delegate_1;
-        public SumDelegate2 sum_delegate_2;
-        public SumDelegateReturn sum_delegate_return;
-        public SumDelegateReturn2 sum_delegate_return_2;
+        CallbackErrorRetained error;
+        CallbackRetained callback;
+        CallbackNamespacedRetained namespaced;
     }
 
     [Serializable]
@@ -1467,40 +1474,46 @@ namespace My.Company
 
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate uint Callback(uint value);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void CallbackContextual(IntPtr context, uint value);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate FFIError CallbackError(int x, int y);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte CallbackFFISlice(SliceU8 slice);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate Vec3f32 CallbackHugeVecSlice(SliceVec3f32 slice);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate uint CallbackNamespaced(uint value);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void CallbackSliceMut(SliceMutU8 slice);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void CallbackSum1();
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate int CallbackSum2(int x, int y);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte CallbackU8(byte value);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint MyCallback(uint value);
+    public delegate void CallbackVoid(IntPtr ptr);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void MyCallbackContextual(IntPtr context, uint value);
+    public delegate FFIError CallbackErrorRetained(int x, int y);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint MyCallbackNamespaced(uint value);
+    public delegate uint CallbackNamespacedRetained(uint value);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void MyCallbackVoid(IntPtr ptr);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void SumDelegate1();
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate int SumDelegate2(int x, int y);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate FFIError SumDelegateReturn(int x, int y);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void SumDelegateReturn2(int x, int y);
+    public delegate uint CallbackRetained(uint value);
 
 
     public partial class BasicService : IDisposable
@@ -1590,27 +1603,16 @@ namespace My.Company
 
 
     /// Some struct we want to expose as a class.
-    public partial class ServiceCallbacks : IDisposable
+    public partial class ServiceCallbacksImmediate : IDisposable
     {
         private IntPtr _context;
 
-        private ServiceCallbacks() {}
+        private ServiceCallbacksImmediate() {}
 
-        public static ServiceCallbacks New()
+        public static ServiceCallbacksImmediate New()
         {
-            var self = new ServiceCallbacks();
-            var rval = Interop.service_callbacks_new(ref self._context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-            return self;
-        }
-
-        public static ServiceCallbacks NewWithTable(DelegateTable table)
-        {
-            var self = new ServiceCallbacks();
-            var rval = Interop.service_callbacks_new_with_table(ref self._context, table);
+            var self = new ServiceCallbacksImmediate();
+            var rval = Interop.service_callbacks_immediate_new(ref self._context);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -1620,26 +1622,26 @@ namespace My.Company
 
         public void Dispose()
         {
-            var rval = Interop.service_callbacks_destroy(ref _context);
+            var rval = Interop.service_callbacks_immediate_destroy(ref _context);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
             }
         }
 
-        public void CallbackSimple(MyCallback callback)
+        public void CallbackSimple(Callback callback)
         {
-            var rval = Interop.service_callbacks_callback_simple(_context, callback);
+            var rval = Interop.service_callbacks_immediate_callback_simple(_context, callback);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
             }
         }
 
-        public void CallbackFfiReturn(SumDelegateReturn callback)
+        public void CallbackFfiReturn(CallbackError callback)
         {
-            var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
-            var rval = Interop.service_callbacks_callback_ffi_return(_context, callback_safe_delegate.Call);
+            var callback_safe_delegate = new CallbackErrorExceptionSafe(callback);
+            var rval = Interop.service_callbacks_immediate_callback_ffi_return(_context, callback_safe_delegate.Call);
             callback_safe_delegate.Rethrow();
             if (rval != FFIError.Ok)
             {
@@ -1647,11 +1649,53 @@ namespace My.Company
             }
         }
 
-        public void CallbackWithSlice(SumDelegateReturn callback, SliceI32 input)
+        public void CallbackWithSlice(CallbackError callback, SliceI32 input)
         {
-            var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
-            var rval = Interop.service_callbacks_callback_with_slice(_context, callback_safe_delegate.Call, input);
+            var callback_safe_delegate = new CallbackErrorExceptionSafe(callback);
+            var rval = Interop.service_callbacks_immediate_callback_with_slice(_context, callback_safe_delegate.Call, input);
             callback_safe_delegate.Rethrow();
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
+        public IntPtr Context => _context;
+    }
+
+
+    /// Some struct we want to expose as a class.
+    public partial class ServiceCallbacksTable : IDisposable
+    {
+        private IntPtr _context;
+
+        private ServiceCallbacksTable() {}
+
+        public static ServiceCallbacksTable New()
+        {
+            var self = new ServiceCallbacksTable();
+            var rval = Interop.service_callbacks_table_new(ref self._context);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+            return self;
+        }
+
+        public static ServiceCallbacksTable NewWithTable(DelegateTable table)
+        {
+            var self = new ServiceCallbacksTable();
+            var rval = Interop.service_callbacks_table_new_with_table(ref self._context, table);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+            return self;
+        }
+
+        public void Dispose()
+        {
+            var rval = Interop.service_callbacks_table_destroy(ref _context);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -1660,12 +1704,12 @@ namespace My.Company
 
         public void SetCallbackTable(ref DelegateTable table)
         {
-            Interop.service_callbacks_set_callback_table(_context, ref table);
+            Interop.service_callbacks_table_set_callback_table(_context, ref table);
         }
 
         public void InvokeCallbacks()
         {
-            var rval = Interop.service_callbacks_invoke_callbacks(_context);
+            var rval = Interop.service_callbacks_table_invoke_callbacks(_context);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);

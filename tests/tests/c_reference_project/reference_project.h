@@ -41,7 +41,10 @@ typedef struct generic3 generic3;
 typedef struct generic4 generic4;
 
 /// Some struct we want to expose as a class.
-typedef struct servicecallbacks servicecallbacks;
+typedef struct servicecallbacksimmediate servicecallbacksimmediate;
+
+/// Some struct we want to expose as a class.
+typedef struct servicecallbackstable servicecallbackstable;
 
 typedef struct serviceignoringmethods serviceignoringmethods;
 
@@ -186,19 +189,23 @@ typedef struct weird1u32
 
 typedef uint8_t (*fptr_fn_u8_rval_u8)(uint8_t x0);
 
+typedef uint32_t (*callback)(uint32_t value);
+
+typedef ffierror (*callbackerror)(int32_t x, int32_t y);
+
+typedef uint32_t (*callbacknamespaced)(uint32_t value);
+
+typedef void (*callbacksum1)();
+
+typedef int32_t (*callbacksum2)(int32_t x, int32_t y);
+
 typedef uint8_t (*callbacku8)(uint8_t value);
 
-typedef uint32_t (*mycallback)(uint32_t value);
+typedef ffierror (*callbackerrorretained)(int32_t x, int32_t y);
 
-typedef uint32_t (*mycallbacknamespaced)(uint32_t value);
+typedef uint32_t (*callbacknamespacedretained)(uint32_t value);
 
-typedef void (*sumdelegate1)();
-
-typedef int32_t (*sumdelegate2)(int32_t x, int32_t y);
-
-typedef ffierror (*sumdelegatereturn)(int32_t x, int32_t y);
-
-typedef void (*sumdelegatereturn2)(int32_t x, int32_t y);
+typedef uint32_t (*callbackretained)(uint32_t value);
 
 typedef struct array
     {
@@ -209,6 +216,13 @@ typedef struct container
     {
     local foreign;
     } container;
+
+typedef struct delegatetable
+    {
+    fptr_fn_i32_i32_rval_FFIError error;
+    fptr_fn_u32_rval_u32 callback;
+    fptr_fn_u32_rval_u32 namespaced;
+    } delegatetable;
 
 typedef struct genericu32
     {
@@ -308,27 +322,15 @@ typedef struct optionvec
     uint8_t is_some;
     } optionvec;
 
-typedef void (*mycallbackcontextual)(const void* context, uint32_t value);
+typedef void (*callbackcontextual)(const void* context, uint32_t value);
 
-typedef void (*mycallbackvoid)(const void* ptr);
+typedef void (*callbackvoid)(const void* ptr);
 
-typedef struct delegatecallbackmycallbackcontextual
+typedef struct delegatecallbackcallbackcontextual
     {
-    mycallbackcontextual callback;
+    callbackcontextual callback;
     const void* context;
-    } delegatecallbackmycallbackcontextual;
-
-typedef struct delegatetable
-    {
-    mycallback my_callback;
-    mycallbacknamespaced my_callback_namespaced;
-    mycallbackvoid my_callback_void;
-    mycallbackcontextual my_callback_contextual;
-    sumdelegate1 sum_delegate_1;
-    sumdelegate2 sum_delegate_2;
-    sumdelegatereturn sum_delegate_return;
-    sumdelegatereturn2 sum_delegate_return_2;
-    } delegatetable;
+    } delegatecallbackcallbackcontextual;
 
 ///A pointer to an array of data someone else owns which may not be modified.
 typedef struct sliceuseasciistringpattern
@@ -513,19 +515,19 @@ char* pattern_ffi_cchar_mut_pointer(char* ffi_cchar);
 
 uint64_t pattern_api_guard();
 
-uint32_t pattern_callback_1(mycallback callback, uint32_t x);
+uint32_t pattern_callback_1(callback callback, uint32_t x);
 
-mycallbackvoid pattern_callback_2(mycallbackvoid callback);
+callbackvoid pattern_callback_2(callbackvoid callback);
 
-void pattern_callback_3(delegatecallbackmycallbackcontextual callback, uint32_t x);
+void pattern_callback_3(delegatecallbackcallbackcontextual callback, uint32_t x);
 
-uint32_t pattern_callback_4(mycallbacknamespaced callback, uint32_t x);
+uint32_t pattern_callback_4(callbacknamespaced callback, uint32_t x);
 
-sumdelegate1 pattern_callback_5();
+callbacksum1 pattern_callback_5();
 
-sumdelegate2 pattern_callback_6();
+callbacksum2 pattern_callback_6();
 
-ffierror pattern_callback_7(sumdelegatereturn c1, sumdelegatereturn2 c2, int32_t x, int32_t i, int32_t* o);
+ffierror pattern_callback_7(callbackerror c1, callbackerror c2, int32_t x, int32_t i, int32_t* o);
 
 void pattern_surrogates_1(local s, container* c);
 
@@ -566,21 +568,31 @@ const char* service_on_panic_return_ub_on_panic(serviceonpanic* context);
 ///
 /// The passed parameter MUST have been created with the corresponding init function;
 /// passing any other value results in undefined behavior.
-ffierror service_callbacks_destroy(servicecallbacks** context);
+ffierror service_callbacks_immediate_destroy(servicecallbacksimmediate** context);
 
-ffierror service_callbacks_new(servicecallbacks** context);
+ffierror service_callbacks_immediate_new(servicecallbacksimmediate** context);
 
-ffierror service_callbacks_new_with_table(servicecallbacks** context, delegatetable table);
+ffierror service_callbacks_immediate_callback_simple(servicecallbacksimmediate* context, callback callback);
 
-ffierror service_callbacks_callback_simple(servicecallbacks* context, mycallback callback);
+ffierror service_callbacks_immediate_callback_ffi_return(servicecallbacksimmediate* context, callbackerror callback);
 
-ffierror service_callbacks_callback_ffi_return(servicecallbacks* context, sumdelegatereturn callback);
+ffierror service_callbacks_immediate_callback_with_slice(servicecallbacksimmediate* context, callbackerror callback, slicei32 input);
 
-ffierror service_callbacks_callback_with_slice(servicecallbacks* context, sumdelegatereturn callback, slicei32 input);
+/// Destroys the given instance.
+///
+/// # Safety
+///
+/// The passed parameter MUST have been created with the corresponding init function;
+/// passing any other value results in undefined behavior.
+ffierror service_callbacks_table_destroy(servicecallbackstable** context);
 
-void service_callbacks_set_callback_table(servicecallbacks* context, const delegatetable* table);
+ffierror service_callbacks_table_new(servicecallbackstable** context);
 
-ffierror service_callbacks_invoke_callbacks(const servicecallbacks* context);
+ffierror service_callbacks_table_new_with_table(servicecallbackstable** context, delegatetable table);
+
+void service_callbacks_table_set_callback_table(servicecallbackstable* context, const delegatetable* table);
+
+ffierror service_callbacks_table_invoke_callbacks(const servicecallbackstable* context);
 
 /// Destroys the given instance.
 ///
