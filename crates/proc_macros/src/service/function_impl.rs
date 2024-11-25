@@ -5,7 +5,7 @@ use proc_macro2::{Ident, TokenStream};
 use quote::quote_spanned;
 use std::ops::Deref;
 use syn::spanned::Spanned;
-use syn::{FnArg, GenericParam, ImplItemFn, ItemImpl, Pat, ReturnType};
+use syn::{FnArg, GenericParam, ImplItemFn, ItemImpl, Pat, PatType, ReturnType, Type, TypeGroup, TypeReference};
 
 pub struct Descriptor {
     pub ffi_function_tokens: TokenStream,
@@ -130,6 +130,48 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
         _ => {}
     };
 
+    let service_purged_type = Box::new(crate::util::purge_lifetimes_from_type(service_type));
+
+    let receiver_type = if matches!(method_type, MethodType::Constructor(..)) {
+        service_purged_type.clone()
+    } else {
+        function
+            .sig
+            .inputs
+            .first()
+            .map(|fn_arg| match fn_arg {
+                FnArg::Receiver(..) => service_purged_type.clone(),
+                FnArg::Typed(PatType { ty, .. }) => {
+                    let ty = match &**ty {
+                        Type::Reference(TypeReference { elem, .. }) => elem,
+                        Type::Group(TypeGroup { elem, .. }) => elem,
+                        _ => ty,
+                    };
+                    Box::new(crate::util::purge_lifetimes_from_type(ty))
+                }
+            })
+            .unwrap_or(service_purged_type.clone())
+    };
+
+    let type_eq_check = quote_spanned! {receiver_type.span() =>
+        const _: fn() = || {
+            trait TypeEq {
+                type This;
+            }
+
+            impl<T> TypeEq for T {
+                type This = Self;
+            }
+
+            fn assert_type_eq_all<T, U>()
+            where
+                T: TypeEq<This = U>
+                {}
+
+            assert_type_eq_all::<#service_purged_type, #receiver_type>();
+        };
+    };
+
     for (i, arg) in function.sig.inputs.iter().enumerate() {
         let span_arg = arg.span();
         match arg {
@@ -202,6 +244,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
         MethodType::Method(x) => match x.on_panic {
             OnPanic::ReturnDefault => {
                 quote_spanned! { span_function =>
+                    #type_eq_check
                     #[interoptopus::ffi_function]
                     #[no_mangle]
                     #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
@@ -230,6 +273,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
             }
             OnPanic::UndefinedBehavior => {
                 quote_spanned! { span_function =>
+                    #type_eq_check
                     #[interoptopus::ffi_function]
                     #[no_mangle]
                     #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
@@ -248,6 +292,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 };
 
                 quote_spanned! { span_function =>
+                    #type_eq_check
                     #[interoptopus::ffi_function]
                     #[no_mangle]
                     #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
