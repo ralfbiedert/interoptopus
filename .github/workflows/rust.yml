@@ -13,22 +13,23 @@ jobs:
   Build:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Python - Install 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'
-    - name: Python - Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install cffi pytest
-    - name: Rust - Build
-      run: cargo build --verbose
-    - name: Rust - Style
-      run: |
-        cargo fmt --check
-        cargo test --verbose
-    - name: Rust - Test
-      run: cargo test --verbose
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Python - Install 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: Python - Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install cffi pytest
+      - name: Rust - Build
+        run: cargo build --verbose
+      - name: Rust - Style
+        run: cargo fmt --check
+      - name: Rust - Clippy
+        run: cargo clippy -- -D warnings
+      - name: Rust - Test
+        run: cargo test --verbose
 
 
