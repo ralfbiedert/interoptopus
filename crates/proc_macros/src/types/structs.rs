@@ -244,7 +244,7 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
             }
         }
         TypeRepresentation::Transparent => {
-            let first_field_type = field_types.get(0).expect("Transparent structs must have at least one field");
+            let first_field_type = field_types.first().expect("Transparent structs must have at least one field");
 
             quote! {
                 #item
