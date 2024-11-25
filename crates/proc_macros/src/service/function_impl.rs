@@ -130,7 +130,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
         _ => {}
     };
 
-    let service_purged_type = Box::new(crate::util::purge_lifetimes_from_type(service_type));
+    let service_purged_type = Box::new(purge_lifetimes_from_type(service_type));
 
     let receiver_type = if matches!(method_type, MethodType::Constructor(..)) {
         service_purged_type.clone()

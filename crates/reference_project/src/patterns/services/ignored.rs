@@ -21,4 +21,10 @@ impl ServiceIgnoringMethods {
     fn not_exposed<T>(&mut self, _: T) -> Result<(), Error> {
         Ok(())
     }
+
+    // Service methods without `self` are not valid for code generation and must be ignored.
+    #[ffi_service_method(ignore)]
+    pub fn test(_test: u32) -> Result<(), Error> {
+        Ok(())
+    }
 }
