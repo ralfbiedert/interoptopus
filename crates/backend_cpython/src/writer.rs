@@ -109,7 +109,9 @@ pub trait PythonWriter {
             indented!(w, [_], r#""""{}""""#, documentation)?;
         }
 
-        if c.repr().layout() == Layout::Packed { indented!(w, [_], r#"_pack_ = 1"#)? }
+        if c.repr().layout() == Layout::Packed {
+            indented!(w, [_], r#"_pack_ = 1"#)?
+        }
 
         let alignment = c.repr().alignment();
         if let Some(align) = alignment {
