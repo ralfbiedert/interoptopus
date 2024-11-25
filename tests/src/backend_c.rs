@@ -7,7 +7,7 @@ use std::path::Path;
 #[cfg(target_os = "windows")]
 pub fn compile_c_app_if_installed(file: impl AsRef<Path>) -> Result<(), Error> {
     let file = Path::new("tests").join(file);
-    let temp_dir = tempdir()?;
+    let temp_dir = tempfile::tempdir()?;
 
     cc::Build::new()
         .file(file)
