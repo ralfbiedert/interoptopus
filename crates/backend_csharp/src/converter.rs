@@ -75,6 +75,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::Bool => true,
                 TypePattern::CChar => true,
                 TypePattern::NamedCallback(_) => false,
+                _ => panic!("Pattern not explicitly handled"),
             },
             CType::Array(_) => false, // TODO: should check inner and maybe return true
             CType::Enum(_) => true,
@@ -116,6 +117,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::Bool => "Bool".to_string(),
                 TypePattern::CChar => "sbyte".to_string(),
                 TypePattern::APIVersion => self.to_typespecifier_in_field(&x.fallback_type(), field, composite),
+                _ => panic!("Pattern not explicitly handled"),
             },
         }
     }
@@ -159,6 +161,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::Bool => "Bool".to_string(),
                 TypePattern::CChar => "sbyte".to_string(),
                 TypePattern::APIVersion => self.to_typespecifier_in_param(&x.fallback_type()),
+                _ => panic!("Pattern not explicitly handled"),
             },
         }
     }
@@ -183,6 +186,7 @@ pub trait CSharpTypeConverter {
                 TypePattern::Bool => "Bool".to_string(),
                 TypePattern::CChar => "sbyte".to_string(),
                 TypePattern::APIVersion => self.to_typespecifier_in_rval(&x.fallback_type()),
+                _ => panic!("Pattern not explicitly handled"),
             },
         }
     }

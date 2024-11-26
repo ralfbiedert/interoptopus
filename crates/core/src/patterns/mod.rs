@@ -97,6 +97,7 @@ pub mod surrogates;
 
 /// A pattern on a library level, usually involving both methods and types.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[non_exhaustive]
 pub enum LibraryPattern {
     Service(Service),
 }
@@ -116,6 +117,7 @@ impl From<Service> for LibraryPattern {
 /// A pattern on a type level.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 #[allow(clippy::large_enum_variant)]
+#[non_exhaustive]
 pub enum TypePattern {
     CStrPointer,
     APIVersion,

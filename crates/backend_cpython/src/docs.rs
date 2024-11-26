@@ -49,6 +49,7 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
 
         for pattern in self.inventory.patterns().iter().map(|x| match x {
             LibraryPattern::Service(s) => s,
+            _ => panic!("Pattern not explicitly handled"),
         }) {
             let prefix = pattern.common_prefix();
             let doc = pattern.the_type().meta().documentation().lines().first().cloned().unwrap_or_default();
@@ -229,6 +230,7 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
 
         for pattern in self.inventory.patterns().iter().map(|x| match x {
             LibraryPattern::Service(s) => s,
+            _ => panic!("Pattern not explicitly handled"),
         }) {
             let prefix = pattern.common_prefix();
             let doc = pattern.the_type().meta().documentation().lines();

@@ -257,6 +257,7 @@ pub trait CSharpWriter {
 
                 TypePattern::CChar => {}
                 TypePattern::APIVersion => {}
+                _ => panic!("Pattern not explicitly handled"),
             },
         }
         Ok(())
@@ -534,6 +535,7 @@ pub trait CSharpWriter {
                 TypePattern::Bool => self.config().write_types == WriteTypes::NamespaceAndInteroptopusGlobal,
                 TypePattern::CChar => false,
                 TypePattern::NamedCallback(x) => self.should_emit_by_meta(x.meta()),
+                _ => panic!("Pattern not explicitly handled"),
             },
         }
     }
@@ -546,6 +548,7 @@ pub trait CSharpWriter {
                         self.write_pattern_service(w, cls)?
                     }
                 }
+                _ => panic!("Pattern not explicitly handled"),
             }
         }
 

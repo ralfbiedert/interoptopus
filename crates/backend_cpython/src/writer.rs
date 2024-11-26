@@ -449,6 +449,7 @@ pub trait PythonWriter {
         for pattern in self.inventory().patterns() {
             match pattern {
                 LibraryPattern::Service(x) => self.write_pattern_class(w, x)?,
+                _ => panic!("Pattern not explicitly handled"),
             }
         }
 

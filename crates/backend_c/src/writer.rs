@@ -221,6 +221,7 @@ pub trait CWriter {
                 TypePattern::Bool => {}
                 TypePattern::CChar => {}
                 TypePattern::APIVersion => {}
+                _ => panic!("Pattern not explicitly handled"),
             },
         }
         Ok(())

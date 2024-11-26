@@ -108,6 +108,7 @@ impl Converter {
                 TypePattern::Bool => "ctypes.c_uint8".to_string(),
                 TypePattern::CChar => "ctypes.c_char".to_string(),
                 TypePattern::NamedCallback(x) => self.fnpointer_to_typename(x.fnpointer()),
+                _ => panic!("Pattern not explicitly handled"),
             },
         }
     }
