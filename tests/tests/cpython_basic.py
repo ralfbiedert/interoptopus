@@ -100,8 +100,8 @@ def init_lib(path):
     c_lib.service_callbacks_immediate_callback_with_slice.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32), SliceI32]
     c_lib.service_callbacks_table_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.service_callbacks_table_new.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
-    c_lib.service_callbacks_table_new_with_table.argtypes = [ctypes.POINTER(ctypes.c_void_p), DelegateTable]
-    c_lib.service_callbacks_table_set_callback_table.argtypes = [ctypes.c_void_p, ctypes.POINTER(DelegateTable)]
+    c_lib.service_callbacks_table_new_with_table.argtypes = [ctypes.POINTER(ctypes.c_void_p), CallbackTable]
+    c_lib.service_callbacks_table_set_callback_table.argtypes = [ctypes.c_void_p, ctypes.POINTER(CallbackTable)]
     c_lib.service_callbacks_table_invoke_callbacks.argtypes = [ctypes.c_void_p]
     c_lib.service_ignoring_methods_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.service_ignoring_methods_new.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
@@ -1258,27 +1258,7 @@ class Array(ctypes.Structure):
         return ctypes.Structure.__set__(self, "data", value)
 
 
-class Container(ctypes.Structure):
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("foreign", Local),
-    ]
-
-    def __init__(self, foreign: Local = None):
-        if foreign is not None:
-            self.foreign = foreign
-
-    @property
-    def foreign(self) -> Local:
-        return ctypes.Structure.__get__(self, "foreign")
-
-    @foreign.setter
-    def foreign(self, value: Local):
-        return ctypes.Structure.__set__(self, "foreign", value)
-
-
-class DelegateTable(ctypes.Structure):
+class CallbackTable(ctypes.Structure):
 
     # These fields represent the underlying C data layout
     _fields_ = [
@@ -1318,6 +1298,26 @@ class DelegateTable(ctypes.Structure):
     @namespaced.setter
     def namespaced(self, value):
         return ctypes.Structure.__set__(self, "namespaced", value)
+
+
+class Container(ctypes.Structure):
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("foreign", Local),
+    ]
+
+    def __init__(self, foreign: Local = None):
+        if foreign is not None:
+            self.foreign = foreign
+
+    @property
+    def foreign(self) -> Local:
+        return ctypes.Structure.__get__(self, "foreign")
+
+    @foreign.setter
+    def foreign(self, value: Local):
+        return ctypes.Structure.__set__(self, "foreign", value)
 
 
 class Genericu32(ctypes.Structure):
@@ -2240,7 +2240,7 @@ class ServiceCallbacksTable:
         return self
 
     @staticmethod
-    def new_with_table(table: DelegateTable) -> ServiceCallbacksTable:
+    def new_with_table(table: CallbackTable) -> ServiceCallbacksTable:
         """"""
         ctx = ctypes.c_void_p()
         c_lib.service_callbacks_table_new_with_table(ctx, table)
@@ -2249,7 +2249,7 @@ class ServiceCallbacksTable:
 
     def __del__(self):
         c_lib.service_callbacks_table_destroy(self._ctx, )
-    def set_callback_table(self, table: ctypes.POINTER(DelegateTable)):
+    def set_callback_table(self, table: ctypes.POINTER(CallbackTable)):
         """"""
         return c_lib.service_callbacks_table_set_callback_table(self._ctx, table)
 

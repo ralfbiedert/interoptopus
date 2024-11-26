@@ -1,25 +1,19 @@
-using System;
-using System.Linq;
-using System.Threading;
 using My.Company;
-using My.Company.Common;
 using Xunit;
 
-public class TestPatternDelegateTable
+public class TestPatternServicesCallbacks
 {
-    DelegateTable NewTable()
+    CallbackTable NewTable()
     {
-        var sum_delegate_return = new SumDelegateReturnExceptionSafe((x, y) => FFIError.Ok);
-        return new DelegateTable
+        return new CallbackTable
         {
-            my_callback = value => 1,
-            sum_delegate_1 = () => { },
-            sum_delegate_2 = (x, y) => x + y,
-            sum_delegate_return = sum_delegate_return.Call
+            error = (x, y) => FFIError.Ok,
+            callback = (x) => x,
+            namespaced = (x) => x
         };
     }
 
-    void CreatePatternDelegateTable(ServiceCallbacks service)
+    void CreatePatternDelegateTable(ServiceCallbacksTable service)
     {
         var table = NewTable();
         service.SetCallbackTable(ref table);
@@ -28,7 +22,7 @@ public class TestPatternDelegateTable
     [Fact]
     public void set_delegates()
     {
-        var service = ServiceCallbacks.New();
+        var service = ServiceCallbacksTable.New();
 
         CreatePatternDelegateTable(service); // TODO
         // ^-- this might run at risk of our delegates getting GC'ed if we don't add
@@ -46,7 +40,7 @@ public class TestPatternDelegateTable
     public void new_with_delegates()
     {
         var table = NewTable();
-        var service = ServiceCallbacks.NewWithTable(table);
+        var service = ServiceCallbacksTable.NewWithTable(table);
         service.InvokeCallbacks();
     }
 }

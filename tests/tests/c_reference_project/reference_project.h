@@ -212,17 +212,17 @@ typedef struct array
     uint8_t data[16];
     } array;
 
-typedef struct container
-    {
-    local foreign;
-    } container;
-
-typedef struct delegatetable
+typedef struct callbacktable
     {
     fptr_fn_i32_i32_rval_FFIError error;
     fptr_fn_u32_rval_u32 callback;
     fptr_fn_u32_rval_u32 namespaced;
-    } delegatetable;
+    } callbacktable;
+
+typedef struct container
+    {
+    local foreign;
+    } container;
 
 typedef struct genericu32
     {
@@ -588,9 +588,9 @@ ffierror service_callbacks_table_destroy(servicecallbackstable** context);
 
 ffierror service_callbacks_table_new(servicecallbackstable** context);
 
-ffierror service_callbacks_table_new_with_table(servicecallbackstable** context, delegatetable table);
+ffierror service_callbacks_table_new_with_table(servicecallbackstable** context, callbacktable table);
 
-void service_callbacks_table_set_callback_table(servicecallbackstable* context, const delegatetable* table);
+void service_callbacks_table_set_callback_table(servicecallbackstable* context, const callbacktable* table);
 
 ffierror service_callbacks_table_invoke_callbacks(const servicecallbackstable* context);
 

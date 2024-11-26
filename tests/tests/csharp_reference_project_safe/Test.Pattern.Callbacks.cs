@@ -4,7 +4,7 @@ using My.Company;
 using My.Company.Common;
 using Xunit;
 
-public class TestPatternDelegates
+public class TestPatternCallbacks
 {
     [Fact]
     public void pattern_ffi_slice_delegate()
@@ -45,7 +45,7 @@ public class TestPatternDelegates
             throw new Exception("We handled this");
         }
 
-        void C2(int x, int y)
+        FFIError C2(int x, int y)
         {
             // This callback looks very similar. However, it does not come with special handling
             // support. When this throws, the .NET runtime will NOT(!!!) unwind back through
@@ -55,6 +55,7 @@ public class TestPatternDelegates
             // memory loss or worse.
 
             // throw new Exception("Unchecked callback which we didn't handle. Comment this out and see the test fail.");
+            return FFIError.Ok;
         };
 
         try

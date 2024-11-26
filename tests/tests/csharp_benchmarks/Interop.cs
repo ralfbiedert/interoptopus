@@ -19,9 +19,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 6267872400365709685ul)
+            if (api_version != 17926881729731394933ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (6267872400365709685). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (17926881729731394933). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -640,9 +640,9 @@ namespace My.Company
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_table_new_with_table")]
-        public static extern FFIError service_callbacks_table_new_with_table(ref IntPtr context, DelegateTable table);
+        public static extern FFIError service_callbacks_table_new_with_table(ref IntPtr context, CallbackTable table);
 
-        public static void service_callbacks_table_new_with_table_checked(ref IntPtr context, DelegateTable table)
+        public static void service_callbacks_table_new_with_table_checked(ref IntPtr context, CallbackTable table)
         {
             var rval = service_callbacks_table_new_with_table(ref context, table);;
             if (rval != FFIError.Ok)
@@ -652,7 +652,7 @@ namespace My.Company
         }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_table_set_callback_table")]
-        public static extern void service_callbacks_table_set_callback_table(IntPtr context, ref DelegateTable table);
+        public static extern void service_callbacks_table_set_callback_table(IntPtr context, ref CallbackTable table);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_table_invoke_callbacks")]
         public static extern FFIError service_callbacks_table_invoke_callbacks(IntPtr context);
@@ -1114,6 +1114,15 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
+    public partial struct CallbackTable
+    {
+        public CallbackErrorRetained error;
+        public CallbackRetained callback;
+        public CallbackNamespacedRetained namespaced;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
     public partial struct Container
     {
         public Local foreign;
@@ -1125,15 +1134,6 @@ namespace My.Company
     {
         public CallbackContextual callback;
         public IntPtr context;
-    }
-
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct DelegateTable
-    {
-        CallbackErrorRetained error;
-        CallbackRetained callback;
-        CallbackNamespacedRetained namespaced;
     }
 
     [Serializable]
@@ -1756,7 +1756,7 @@ namespace My.Company
             return self;
         }
 
-        public static ServiceCallbacksTable NewWithTable(DelegateTable table)
+        public static ServiceCallbacksTable NewWithTable(CallbackTable table)
         {
             var self = new ServiceCallbacksTable();
             var rval = Interop.service_callbacks_table_new_with_table(ref self._context, table);
@@ -1776,7 +1776,7 @@ namespace My.Company
             }
         }
 
-        public void SetCallbackTable(ref DelegateTable table)
+        public void SetCallbackTable(ref CallbackTable table)
         {
             Interop.service_callbacks_table_set_callback_table(_context, ref table);
         }
