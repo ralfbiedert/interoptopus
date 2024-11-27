@@ -21,42 +21,6 @@ impl Converter {
 pub trait CTypeConverter {
     fn config(&self) -> &Config;
 
-    /// Converts a primitive (Rust) type to a native C# type name, e.g., `f32` to `float`.
-    fn primitive_to_typename(&self, x: &PrimitiveType) -> String;
-
-    /// Converts a Rust enum name such as `Error` to a C# enum name `Error`.
-    fn enum_to_typename(&self, x: &EnumType) -> String;
-
-    fn enum_variant_to_name(&self, the_enum: &EnumType, x: &Variant) -> String;
-
-    /// TODO Converts an opaque Rust struct `Context` to a C# struct ``.
-    fn opaque_to_typename(&self, opaque: &OpaqueType) -> String;
-
-    /// Converts an Rust struct name `Vec2` to a C# struct name `Vec2`.
-    fn composite_to_typename(&self, x: &CompositeType) -> String;
-
-    /// Converts an Rust `fn()` to a C# delegate name such as `InteropDelegate`.
-    fn fnpointer_to_typename(&self, x: &FnPointerType) -> String;
-
-    fn named_callback_to_typename(&self, x: &NamedCallback) -> String {
-        format!("{}{}", self.config().prefix, x.name().to_naming_style(&self.config().type_naming))
-    }
-
-    /// Converts the `u32` part in a Rust paramter `x: u32` to a C# equivalent. Might convert pointers to `out X` or `ref X`.
-    fn to_type_specifier(&self, x: &CType) -> String;
-
-    fn const_name_to_name(&self, x: &Constant) -> String;
-
-    fn constant_value_to_value(&self, value: &ConstantValue) -> String;
-
-    fn function_name_to_c_name(&self, function: &Function) -> String;
-}
-
-impl CTypeConverter for Converter {
-    fn config(&self) -> &Config {
-        &self.config
-    }
-
     fn primitive_to_typename(&self, x: &PrimitiveType) -> String {
         match x {
             PrimitiveType::Void => "void".to_string(),
@@ -75,30 +39,34 @@ impl CTypeConverter for Converter {
     }
 
     fn enum_to_typename(&self, x: &EnumType) -> String {
-        format!("{}{}", self.config().prefix, x.rust_name()).to_naming_style(&self.config.type_naming)
+        format!("{}{}", self.config().prefix, x.rust_name()).to_naming_style(&self.config().type_naming)
     }
 
     fn enum_variant_to_name(&self, the_enum: &EnumType, x: &Variant) -> String {
         format!(
             "{}{}_{}",
             self.config().prefix,
-            the_enum.rust_name().to_naming_style(&self.config.type_naming),
+            the_enum.rust_name().to_naming_style(&self.config().type_naming),
             x.name()
         )
-        .to_naming_style(&self.config.enum_variant_naming)
+        .to_naming_style(&self.config().enum_variant_naming)
     }
 
     fn opaque_to_typename(&self, x: &OpaqueType) -> String {
-        format!("{}{}", self.config().prefix, x.rust_name()).to_naming_style(&self.config.type_naming)
+        format!("{}{}", self.config().prefix, x.rust_name()).to_naming_style(&self.config().type_naming)
     }
 
     fn composite_to_typename(&self, x: &CompositeType) -> String {
-        format!("{}{}", self.config().prefix, x.rust_name()).to_naming_style(&self.config.type_naming)
+        format!("{}{}", self.config().prefix, x.rust_name()).to_naming_style(&self.config().type_naming)
     }
 
     fn fnpointer_to_typename(&self, x: &FnPointerType) -> String {
         let prefixed = format!("{}fptr", self.config().prefix);
         [prefixed, safe_name(&x.internal_name())].join("_")
+    }
+
+    fn named_callback_to_typename(&self, x: &NamedCallback) -> String {
+        format!("{}{}", self.config().prefix, x.name().to_naming_style(&self.config().type_naming))
     }
 
     fn to_type_specifier(&self, x: &CType) -> String {
@@ -119,7 +87,7 @@ impl CTypeConverter for Converter {
     }
 
     fn const_name_to_name(&self, x: &Constant) -> String {
-        format!("{}{}", self.config().prefix, x.name()).to_naming_style(&self.config.const_naming)
+        format!("{}{}", self.config().prefix, x.name()).to_naming_style(&self.config().const_naming)
     }
 
     fn constant_value_to_value(&self, value: &ConstantValue) -> String {
@@ -142,5 +110,11 @@ impl CTypeConverter for Converter {
 
     fn function_name_to_c_name(&self, function: &Function) -> String {
         function.name().to_string()
+    }
+}
+
+impl CTypeConverter for Converter {
+    fn config(&self) -> &Config {
+        &self.config
     }
 }
