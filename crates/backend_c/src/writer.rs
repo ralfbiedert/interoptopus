@@ -8,11 +8,12 @@ use interoptopus::{Error, Inventory};
 
 use crate::config::{CDocumentationStyle, CFunctionStyle, CIndentationStyle, ToNamingStyle};
 use crate::converter::CTypeConverter;
-use crate::converter::Converter;
 use crate::Config;
 
 /// Writes the C file format, `impl` this trait to customize output.
 pub trait CWriter {
+    type Converter: CTypeConverter;
+
     /// Returns the user config.
     fn config(&self) -> &Config;
 
@@ -20,7 +21,7 @@ pub trait CWriter {
     fn inventory(&self) -> &Inventory;
 
     /// Returns the library to produce bindings for.
-    fn converter(&self) -> &Converter;
+    fn converter(&self) -> &Self::Converter;
 
     fn write_custom_defines(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, "{}", &self.config().custom_defines)

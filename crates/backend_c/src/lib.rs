@@ -149,6 +149,8 @@ impl Interop for Generator {
 }
 
 impl CWriter for Generator {
+    type Converter = Converter;
+
     fn config(&self) -> &Config {
         &self.config
     }
