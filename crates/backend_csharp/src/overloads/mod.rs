@@ -57,13 +57,11 @@ use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, Error};
 
 mod dotnet;
-mod unity;
 
 use crate::converter::FunctionNameFlavor;
 use crate::{CSharpTypeConverter, Config};
 pub use dotnet::{DotNet, ParamSliceType};
 use interoptopus::patterns::callbacks::NamedCallback;
-pub use unity::Unity;
 
 #[doc(hidden)]
 pub struct Helper<'a> {
