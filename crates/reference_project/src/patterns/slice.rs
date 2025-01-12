@@ -61,18 +61,19 @@ pub fn pattern_ffi_slice_6(slice: &FFISliceMut<u8>, callback: CallbackU8) {
     callback.call(slice.as_slice().first().copied().unwrap_or(0));
 }
 
-#[ffi_function]
-pub fn pattern_ffi_slice_7(slices: FFISliceMut<CStrPointer>) -> u32 {
-    let mut sum = 0;
-
-    for s in slices.as_slice() {
-        if let Ok(s) = s.as_str() {
-            sum += s.chars().count() as u32;
-        }
-    }
-
-    sum
-}
+// UNSUPPORTED FOR NOW - Unclear how to handle string slices in C# with LibraryImport
+// #[ffi_function]
+// pub fn pattern_ffi_slice_7(slices: FFISliceMut<CStrPointer>) -> u32 {
+//     let mut sum = 0;
+//
+//     for s in slices.as_slice() {
+//         if let Ok(s) = s.as_str() {
+//             sum += s.chars().count() as u32;
+//         }
+//     }
+//
+//     sum
+// }
 
 // Some extra tests that were hard to do from core crate.
 #[cfg(test)]

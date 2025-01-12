@@ -19,9 +19,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 7754963775653255763ul)
+            if (api_version != 6541958231137371810ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (7754963775653255763). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (6541958231137371810). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -163,7 +163,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice")]
         public static partial SliceVec namespaced_inner_slice(SliceVec x);
 
-        public static SliceVec namespaced_inner_slice(Vec[] x)
+        public static SliceVec namespaced_inner_slice(System.ReadOnlySpan<Vec> x)
         {
             unsafe
             {
@@ -178,7 +178,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice_mut")]
         public static partial SliceMutVec namespaced_inner_slice_mut(SliceMutVec x);
 
-        public static SliceMutVec namespaced_inner_slice_mut(Vec[] x)
+        public static SliceMutVec namespaced_inner_slice_mut(System.Span<Vec> x)
         {
             unsafe
             {
@@ -230,7 +230,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1")]
         public static partial uint pattern_ffi_slice_1(SliceU32 ffi_slice);
 
-        public static uint pattern_ffi_slice_1(uint[] ffi_slice)
+        public static uint pattern_ffi_slice_1(System.ReadOnlySpan<uint> ffi_slice)
         {
             unsafe
             {
@@ -245,7 +245,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1b")]
         public static partial uint pattern_ffi_slice_1b(SliceMutU32 ffi_slice);
 
-        public static uint pattern_ffi_slice_1b(uint[] ffi_slice)
+        public static uint pattern_ffi_slice_1b(System.Span<uint> ffi_slice)
         {
             unsafe
             {
@@ -260,7 +260,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_2")]
         public static partial Vec3f32 pattern_ffi_slice_2(SliceVec3f32 ffi_slice, int i);
 
-        public static Vec3f32 pattern_ffi_slice_2(Vec3f32[] ffi_slice, int i)
+        public static Vec3f32 pattern_ffi_slice_2(System.ReadOnlySpan<Vec3f32> ffi_slice, int i)
         {
             unsafe
             {
@@ -275,7 +275,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_3")]
         public static partial void pattern_ffi_slice_3(SliceMutU8 slice, CallbackSliceMut callback);
 
-        public static void pattern_ffi_slice_3(byte[] slice, CallbackSliceMut callback)
+        public static void pattern_ffi_slice_3(System.Span<byte> slice, CallbackSliceMut callback)
         {
             unsafe
             {
@@ -290,7 +290,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_4")]
         public static partial void pattern_ffi_slice_4(SliceU8 slice, SliceMutU8 slice2);
 
-        public static void pattern_ffi_slice_4(byte[] slice, byte[] slice2)
+        public static void pattern_ffi_slice_4(System.ReadOnlySpan<byte> slice, System.Span<byte> slice2)
         {
             unsafe
             {
@@ -309,7 +309,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_5")]
         public static partial void pattern_ffi_slice_5(ref SliceU8 slice, ref SliceMutU8 slice2);
 
-        public static void pattern_ffi_slice_5(byte[] slice, byte[] slice2)
+        public static void pattern_ffi_slice_5(System.ReadOnlySpan<byte> slice, System.Span<byte> slice2)
         {
             unsafe
             {
@@ -328,7 +328,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_6")]
         public static partial void pattern_ffi_slice_6(ref SliceMutU8 slice, CallbackU8 callback);
 
-        public static void pattern_ffi_slice_6(byte[] slice, CallbackU8 callback)
+        public static void pattern_ffi_slice_6(System.Span<byte> slice, CallbackU8 callback)
         {
             unsafe
             {
@@ -336,21 +336,6 @@ namespace My.Company
                 {
                     var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                     pattern_ffi_slice_6(ref slice_slice, callback);;
-                }
-            }
-        }
-
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_7")]
-        public static partial uint pattern_ffi_slice_7(SliceMutConstPtrI8 slices);
-
-        public static uint pattern_ffi_slice_7([MarshalAs(UnmanagedType.LPStr)] string[] slices)
-        {
-            unsafe
-            {
-                fixed (void* ptr_slices = slices)
-                {
-                    var slices_slice = new SliceMutConstPtrI8(new IntPtr(ptr_slices), (ulong) slices.Length);
-                    return pattern_ffi_slice_7(slices_slice);;
                 }
             }
         }
@@ -576,7 +561,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_with_slice")]
         public static partial FFIError service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, SliceI32 input);
 
-        public static void service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, int[] input)
+        public static void service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, System.ReadOnlySpan<int> input)
         {
             var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
             unsafe
@@ -753,7 +738,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_lifetime_1")]
         public static partial void service_using_lifetimes_lifetime_1(IntPtr context, SliceBool slice);
 
-        public static void service_using_lifetimes_lifetime_1(IntPtr context, Bool[] slice)
+        public static void service_using_lifetimes_lifetime_1(IntPtr context, System.ReadOnlySpan<Bool> slice)
         {
             unsafe
             {
@@ -768,7 +753,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_lifetime_2")]
         public static partial void service_using_lifetimes_lifetime_2(IntPtr context, SliceBool slice);
 
-        public static void service_using_lifetimes_lifetime_2(IntPtr context, Bool[] slice)
+        public static void service_using_lifetimes_lifetime_2(IntPtr context, System.ReadOnlySpan<Bool> slice)
         {
             unsafe
             {
@@ -783,7 +768,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_return_string_accept_slice")]
         public static partial IntPtr service_using_lifetimes_return_string_accept_slice(IntPtr anon0, SliceU8 anon1);
 
-        public static string service_using_lifetimes_return_string_accept_slice(IntPtr anon0, byte[] anon1)
+        public static string service_using_lifetimes_return_string_accept_slice(IntPtr anon0, System.ReadOnlySpan<byte> anon1)
         {
             unsafe
             {
@@ -835,7 +820,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self")]
         public static partial byte service_various_slices_mut_self(IntPtr context, SliceU8 slice);
 
-        public static byte service_various_slices_mut_self(IntPtr context, byte[] slice)
+        public static byte service_various_slices_mut_self(IntPtr context, System.ReadOnlySpan<byte> slice)
         {
             unsafe
             {
@@ -852,7 +837,7 @@ namespace My.Company
         public static partial void service_various_slices_mut_self_void(IntPtr context, SliceBool slice);
 
         /// Single line.
-        public static void service_various_slices_mut_self_void(IntPtr context, Bool[] slice)
+        public static void service_various_slices_mut_self_void(IntPtr context, System.ReadOnlySpan<Bool> slice)
         {
             unsafe
             {
@@ -870,7 +855,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice")]
         public static partial byte service_various_slices_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, SliceU8 slice);
 
-        public static byte service_various_slices_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, byte[] slice)
+        public static byte service_various_slices_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, System.ReadOnlySpan<byte> slice)
         {
             unsafe
             {
@@ -885,7 +870,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice_limited")]
         public static partial byte service_various_slices_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, SliceU8 slice, SliceU8 slice2);
 
-        public static byte service_various_slices_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, byte[] slice, byte[] slice2)
+        public static byte service_various_slices_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, System.ReadOnlySpan<byte> slice, System.ReadOnlySpan<byte> slice2)
         {
             unsafe
             {
@@ -904,7 +889,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ffi_error")]
         public static partial FFIError service_various_slices_mut_self_ffi_error(IntPtr context, SliceMutU8 slice);
 
-        public static void service_various_slices_mut_self_ffi_error(IntPtr context, byte[] slice)
+        public static void service_various_slices_mut_self_ffi_error(IntPtr context, System.Span<byte> slice)
         {
             unsafe
             {
@@ -923,7 +908,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_no_error")]
         public static partial FFIError service_various_slices_mut_self_no_error(IntPtr context, SliceMutU8 slice);
 
-        public static void service_various_slices_mut_self_no_error(IntPtr context, byte[] slice)
+        public static void service_various_slices_mut_self_no_error(IntPtr context, System.Span<byte> slice)
         {
             unsafe
             {
@@ -1222,7 +1207,6 @@ namespace My.Company
             this.data = handle;
             this.len = count;
         }
-        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public ReadOnlySpan<UseAsciiStringPattern> ReadOnlySpan
         {
             get
@@ -1233,7 +1217,6 @@ namespace My.Company
                 }
             }
         }
-        #endif
         public UseAsciiStringPattern this[int i]
         {
             get
@@ -1293,7 +1276,6 @@ namespace My.Company
             this.data = handle;
             this.len = count;
         }
-        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public ReadOnlySpan<Vec3f32> ReadOnlySpan
         {
             get
@@ -1304,7 +1286,6 @@ namespace My.Company
                 }
             }
         }
-        #endif
         public Vec3f32 this[int i]
         {
             get
@@ -1326,14 +1307,10 @@ namespace My.Company
                 {
                     fixed (void* dst = rval)
                     {
-                        #if __INTEROPTOPUS_NEVER
-                        #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Vec3f32));
-                        #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
                         }
-                        #endif
                     }
                 }
                 return rval;
@@ -1593,7 +1570,7 @@ namespace My.Company
             }
         }
 
-        public void CallbackWithSlice(SumDelegateReturn callback, int[] input)
+        public void CallbackWithSlice(SumDelegateReturn callback, System.ReadOnlySpan<int> input)
         {
             Interop.service_callbacks_callback_with_slice(_context, callback, input);
         }
@@ -1738,7 +1715,7 @@ namespace My.Company
             Interop.service_using_lifetimes_lifetime_1(_context, slice);
         }
 
-        public void Lifetime1(Bool[] slice)
+        public void Lifetime1(System.ReadOnlySpan<Bool> slice)
         {
             Interop.service_using_lifetimes_lifetime_1(_context, slice);
         }
@@ -1748,7 +1725,7 @@ namespace My.Company
             Interop.service_using_lifetimes_lifetime_2(_context, slice);
         }
 
-        public void Lifetime2(Bool[] slice)
+        public void Lifetime2(System.ReadOnlySpan<Bool> slice)
         {
             Interop.service_using_lifetimes_lifetime_2(_context, slice);
         }
@@ -1759,7 +1736,7 @@ namespace My.Company
             return Marshal.PtrToStringAnsi(s);
         }
 
-        public string ReturnStringAcceptSlice(byte[] anon1)
+        public string ReturnStringAcceptSlice(System.ReadOnlySpan<byte> anon1)
         {
             return Interop.service_using_lifetimes_return_string_accept_slice(_context, anon1);
         }
@@ -1800,7 +1777,7 @@ namespace My.Company
             return Interop.service_various_slices_mut_self(_context, slice);
         }
 
-        public byte MutSelf(byte[] slice)
+        public byte MutSelf(System.ReadOnlySpan<byte> slice)
         {
             return Interop.service_various_slices_mut_self(_context, slice);
         }
@@ -1812,7 +1789,7 @@ namespace My.Company
         }
 
         /// Single line.
-        public void MutSelfVoid(Bool[] slice)
+        public void MutSelfVoid(System.ReadOnlySpan<Bool> slice)
         {
             Interop.service_various_slices_mut_self_void(_context, slice);
         }
@@ -1827,7 +1804,7 @@ namespace My.Company
             return Interop.service_various_slices_mut_self_ref_slice(_context, ref x, out y, slice);
         }
 
-        public byte MutSelfRefSlice(ref byte x, out byte y, byte[] slice)
+        public byte MutSelfRefSlice(ref byte x, out byte y, System.ReadOnlySpan<byte> slice)
         {
             return Interop.service_various_slices_mut_self_ref_slice(_context, ref x, out y, slice);
         }
@@ -1837,7 +1814,7 @@ namespace My.Company
             return Interop.service_various_slices_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
         }
 
-        public byte MutSelfRefSliceLimited(ref byte x, out byte y, byte[] slice, byte[] slice2)
+        public byte MutSelfRefSliceLimited(ref byte x, out byte y, System.ReadOnlySpan<byte> slice, System.ReadOnlySpan<byte> slice2)
         {
             return Interop.service_various_slices_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
         }
@@ -1851,7 +1828,7 @@ namespace My.Company
             }
         }
 
-        public void MutSelfFfiError(byte[] slice)
+        public void MutSelfFfiError(System.Span<byte> slice)
         {
             Interop.service_various_slices_mut_self_ffi_error(_context, slice);
         }
@@ -1865,7 +1842,7 @@ namespace My.Company
             }
         }
 
-        public void MutSelfNoError(byte[] slice)
+        public void MutSelfNoError(System.Span<byte> slice)
         {
             Interop.service_various_slices_mut_self_no_error(_context, slice);
         }

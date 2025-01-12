@@ -246,15 +246,6 @@ typedef struct sliceu8
     } sliceu8;
 
 ///A pointer to an array of data someone else owns which may be modified.
-typedef struct slicemutconstptri8
-    {
-    ///Pointer to start of mutable data.
-    const const char** data;
-    ///Number of elements.
-    uint64_t len;
-    } slicemutconstptri8;
-
-///A pointer to an array of data someone else owns which may be modified.
 typedef struct slicemutu32
     {
     ///Pointer to start of mutable data.
@@ -448,8 +439,6 @@ void pattern_ffi_slice_4(sliceu8 slice, slicemutu8 slice2);
 void pattern_ffi_slice_5(const sliceu8* slice, slicemutu8* slice2);
 
 void pattern_ffi_slice_6(const slicemutu8* slice, callbacku8 callback);
-
-uint32_t pattern_ffi_slice_7(slicemutconstptri8 slices);
 
 uint8_t pattern_ffi_slice_delegate(callbackffislice callback);
 

@@ -65,7 +65,6 @@ def init_lib(path):
     c_lib.pattern_ffi_slice_4.argtypes = [SliceU8, SliceMutU8]
     c_lib.pattern_ffi_slice_5.argtypes = [ctypes.POINTER(SliceU8), ctypes.POINTER(SliceMutU8)]
     c_lib.pattern_ffi_slice_6.argtypes = [ctypes.POINTER(SliceMutU8), ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8)]
-    c_lib.pattern_ffi_slice_7.argtypes = [SliceMutConstPtrI8]
     c_lib.pattern_ffi_slice_delegate.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint8, SliceU8)]
     c_lib.pattern_ffi_slice_delegate_huge.argtypes = [ctypes.CFUNCTYPE(Vec3f32, SliceVec3f32)]
     c_lib.pattern_ffi_option_1.argtypes = [OptionInner]
@@ -170,7 +169,6 @@ def init_lib(path):
     c_lib.pattern_ffi_slice_1.restype = ctypes.c_uint32
     c_lib.pattern_ffi_slice_1b.restype = ctypes.c_uint32
     c_lib.pattern_ffi_slice_2.restype = Vec3f32
-    c_lib.pattern_ffi_slice_7.restype = ctypes.c_uint32
     c_lib.pattern_ffi_slice_delegate.restype = ctypes.c_uint8
     c_lib.pattern_ffi_slice_delegate_huge.restype = Vec3f32
     c_lib.pattern_ffi_option_1.restype = OptionInner
@@ -458,12 +456,6 @@ def pattern_ffi_slice_6(slice: ctypes.POINTER(SliceMutU8), callback):
         callback = callbacks.fn_u8_rval_u8(callback)
 
     return c_lib.pattern_ffi_slice_6(slice, callback)
-
-def pattern_ffi_slice_7(slices: SliceMutConstPtrI8 | ctypes.Array[ctypes.POINTER(ctypes.c_char)]) -> int:
-    if hasattr(slices, "_length_") and getattr(slices, "_type_", "") == ctypes.POINTER(ctypes.c_char):
-        slices = SliceMutConstPtrI8(data=ctypes.cast(slices, ctypes.POINTER(ctypes.POINTER(ctypes.c_char))), len=len(slices))
-
-    return c_lib.pattern_ffi_slice_7(slices)
 
 def pattern_ffi_slice_delegate(callback) -> int:
     if not hasattr(callback, "__ctypes_from_outparam__"):
@@ -1371,67 +1363,6 @@ class SliceU8(ctypes.Structure):
         for i in range(len(self)):
             rval[i] = self[i]
         return rval
-
-
-class SliceMutConstPtrI8(ctypes.Structure):
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("data", ctypes.POINTER(ctypes.POINTER(ctypes.c_char))),
-        ("len", ctypes.c_uint64),
-    ]
-
-    def __len__(self):
-        return self.len
-
-    def __getitem__(self, i) -> bytes:
-        if i < 0:
-            index = self.len+i
-        else:
-            index = i
-
-        if index >= self.len:
-            raise IndexError("Index out of range")
-
-        return self.data[index]
-
-    def __setitem__(self, i, v: bytes):
-        if i < 0:
-            index = self.len+i
-        else:
-            index = i
-
-        if index >= self.len:
-            raise IndexError("Index out of range")
-
-        self.data[index] = v
-
-    def copied(self) -> SliceMutConstPtrI8:
-        """Returns a shallow, owned copy of the underlying slice.
-
-        The returned object owns the immediate data, but not the targets of any contained
-        pointers. In other words, if your struct contains any pointers the returned object
-        may only be used as long as these pointers are valid. If the struct did not contain
-        any pointers the returned object is valid indefinitely."""
-        array = (ctypes.POINTER(ctypes.c_char) * len(self))()
-        ctypes.memmove(array, self.data, len(self) * ctypes.sizeof(ctypes.POINTER(ctypes.c_char)))
-        rval = SliceMutConstPtrI8(data=ctypes.cast(array, ctypes.POINTER(ctypes.POINTER(ctypes.c_char))), len=len(self))
-        rval.owned = array  # Store array in returned slice to prevent memory deallocation
-        return rval
-
-    def __iter__(self) -> typing.Iterable[ctypes.POINTER(ctypes.c_char)]:
-        return _Iter(self)
-
-    def iter(self) -> typing.Iterable[ctypes.POINTER(ctypes.c_char)]:
-        """Convenience method returning a value iterator."""
-        return iter(self)
-
-    def first(self) -> bytes:
-        """Returns the first element of this slice."""
-        return self[0]
-
-    def last(self) -> bytes:
-        """Returns the last element of this slice."""
-        return self[len(self)-1]
 
 
 class SliceMutU32(ctypes.Structure):

@@ -1,6 +1,6 @@
 use anyhow::Error;
 use interoptopus::Interop;
-use interoptopus_backend_csharp::{ConfigBuilder, Generator, Unsafe, WriteTypes};
+use interoptopus_backend_csharp::{ConfigBuilder, Generator, WriteTypes};
 use interoptopus_reference_project::ffi_inventory;
 use tests::backend_csharp::common_namespace_mappings;
 use tests::validate_output;
@@ -10,14 +10,12 @@ fn reference_benchmarks_prerequisites() -> Result<(), Error> {
     let config_common = ConfigBuilder::default()
         .namespace_id("common".to_string())
         .namespace_mappings(common_namespace_mappings())
-        .use_unsafe(Unsafe::UnsafePlatformMemCpy)
         .dll_name("interoptopus_reference_project".to_string())
         .write_types(WriteTypes::NamespaceAndInteroptopusGlobal)
         .build()?;
 
     let config_other = ConfigBuilder::default()
         .namespace_mappings(common_namespace_mappings())
-        .use_unsafe(Unsafe::UnsafePlatformMemCpy)
         .dll_name("interoptopus_reference_project".to_string())
         .write_types(WriteTypes::Namespace)
         .build()?;

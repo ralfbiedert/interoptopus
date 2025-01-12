@@ -1,15 +1,6 @@
 use derive_builder::Builder;
 use interoptopus::util::NamespaceMappings;
 
-/// The kind of types to use when generating FFI method overloads.
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
-pub enum ParamSliceType {
-    /// Slices should be passed in as C# arrays.
-    Array,
-    /// Slices should be passed in as Span and ReadOnlySpan.
-    Span,
-}
-
 /// The types to write for the given recorder.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum WriteTypes {
@@ -63,27 +54,6 @@ impl CSharpVisibility {
     }
 }
 
-/// Whether and how `unsafe` in generated C# should be emitted.
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
-pub enum Unsafe {
-    /// Do not use C# `unsafe`.
-    None,
-    /// Use `unsafe` for performance optimizations (Unity compatible).
-    UnsafeKeyword,
-    /// Also use `unsafe` for slice copies.
-    UnsafePlatformMemCpy,
-}
-
-impl Unsafe {
-    pub fn any_unsafe(self) -> bool {
-        match self {
-            Unsafe::None => false,
-            Unsafe::UnsafeKeyword => true,
-            Unsafe::UnsafePlatformMemCpy => true,
-        }
-    }
-}
-
 /// Configures C# code generation.
 #[derive(Clone, Debug, Builder)]
 #[builder(default)]
@@ -109,8 +79,6 @@ pub struct Config {
     pub unroll_struct_arrays: bool,
     /// Which types to write.
     pub write_types: WriteTypes,
-    /// If enabled bindings will use C# `unsafe` for increased performance; but will need to be enabled in C# project settings to work.
-    pub use_unsafe: Unsafe,
     /// Generate functions and field names matching C# conventions, instead of mapping them 1:1 with Rust.
     pub rename_symbols: bool,
     /// Also generate markers for easier debugging
@@ -123,8 +91,6 @@ pub struct Config {
     pub unsupported: Unsupported,
     /// The string to use for reporting within FFIError. Use `{error}` to reference the inner error content.
     pub error_text: String,
-    /// How arrays should be handled as parameters.
-    pub param_slice_type: ParamSliceType,
 }
 
 impl Config {}
@@ -141,13 +107,11 @@ impl Default for Config {
             visibility_types: CSharpVisibility::AsDeclared,
             unroll_struct_arrays: true,
             write_types: WriteTypes::NamespaceAndInteroptopusGlobal,
-            use_unsafe: Unsafe::None,
             rename_symbols: false,
             debug: false,
             work_around_exception_in_callback_no_reentry: true,
             unsupported: Unsupported::Panic,
             error_text: "Something went wrong: {error}".to_string(),
-            param_slice_type: ParamSliceType::Array,
         }
     }
 }

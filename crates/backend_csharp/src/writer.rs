@@ -1,4 +1,4 @@
-use crate::config::{Config, ParamSliceType, Unsafe, Unsupported, WriteTypes};
+use crate::config::{Config, Unsupported, WriteTypes};
 use crate::converter::{CSharpTypeConverter, Converter, FunctionNameFlavor};
 use interoptopus::lang::c::{
     CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, Layout, Meta, Parameter, PrimitiveType, Variant, Visibility,
@@ -44,10 +44,7 @@ pub trait CSharpWriter {
         indented!(w, r#"using System.Collections;"#)?;
         indented!(w, r#"using System.Collections.Generic;"#)?;
         indented!(w, r#"using System.Runtime.InteropServices;"#)?;
-
-        if self.config().use_unsafe == Unsafe::UnsafePlatformMemCpy {
-            indented!(w, r#"using System.Runtime.CompilerServices;"#)?;
-        }
+        indented!(w, r#"using System.Runtime.CompilerServices;"#)?;
 
         for namespace_id in self.inventory().namespaces() {
             let namespace = self
@@ -287,86 +284,38 @@ pub trait CSharpWriter {
             indented!(w, [_], r#"var {}_safe_delegate = new {}ExceptionSafe({});"#, name, ty, name)?;
         }
 
-        if self.config().use_unsafe.any_unsafe() {
-            if !to_pin_name.is_empty() {
-                indented!(w, [_], r#"unsafe"#)?;
+        if !to_pin_name.is_empty() {
+            indented!(w, [_], r#"unsafe"#)?;
+            indented!(w, [_], r#"{{"#)?;
+            w.indent();
+
+            for (pin_var, slice_struct) in to_pin_name.iter().zip(to_pin_slice_type.iter()) {
+                indented!(w, [_], r#"fixed (void* ptr_{} = {})"#, pin_var, pin_var)?;
                 indented!(w, [_], r#"{{"#)?;
+                indented!(w, [_ _], r#"var {}_slice = new {}(new IntPtr(ptr_{}), (ulong) {}.Length);"#, pin_var, slice_struct, pin_var, pin_var)?;
                 w.indent();
-
-                for (pin_var, slice_struct) in to_pin_name.iter().zip(to_pin_slice_type.iter()) {
-                    indented!(w, [_], r#"fixed (void* ptr_{} = {})"#, pin_var, pin_var)?;
-                    indented!(w, [_], r#"{{"#)?;
-                    indented!(w, [_ _], r#"var {}_slice = new {}(new IntPtr(ptr_{}), (ulong) {}.Length);"#, pin_var, slice_struct, pin_var, pin_var)?;
-                    w.indent();
-                }
             }
+        }
 
-            let fn_name = self.converter().function_name_to_csharp_name(
-                function,
-                match self.config().rename_symbols {
-                    true => FunctionNameFlavor::CSharpMethodNameWithClass,
-                    false => FunctionNameFlavor::RawFFIName,
-                },
-            );
-            let call = format!(r#"{}({});"#, fn_name, to_invoke.join(", "));
+        let fn_name = self.converter().function_name_to_csharp_name(
+            function,
+            match self.config().rename_symbols {
+                true => FunctionNameFlavor::CSharpMethodNameWithClass,
+                false => FunctionNameFlavor::RawFFIName,
+            },
+        );
+        let call = format!(r#"{}({});"#, fn_name, to_invoke.join(", "));
 
-            self.write_function_overloaded_invoke_with_error_handling(w, function, &call, to_wrap_delegates.as_slice())?;
+        self.write_function_overloaded_invoke_with_error_handling(w, function, &call, to_wrap_delegates.as_slice())?;
 
-            if !to_pin_name.is_empty() {
-                for _ in to_pin_name.iter() {
-                    w.unindent();
-                    indented!(w, [_], r#"}}"#)?;
-                }
-
+        if !to_pin_name.is_empty() {
+            for _ in to_pin_name.iter() {
                 w.unindent();
                 indented!(w, [_], r#"}}"#)?;
             }
-        } else {
-            if !to_pin_name.is_empty() {
-                for (pin_var, slice_struct) in to_pin_name.iter().zip(to_pin_slice_type.iter()) {
-                    indented!(w, [_], r#"var {}_pinned = GCHandle.Alloc({}, GCHandleType.Pinned);"#, pin_var, pin_var)?;
-                    indented!(
-                        w,
-                        [_],
-                        r#"var {}_slice = new {}({}_pinned, (ulong) {}.Length);"#,
-                        pin_var,
-                        slice_struct,
-                        pin_var,
-                        pin_var
-                    )?;
-                }
 
-                indented!(w, [_], r#"try"#)?;
-                indented!(w, [_], r#"{{"#)?;
-
-                w.indent();
-            }
-
-            let fn_name = self.converter().function_name_to_csharp_name(
-                function,
-                match self.config().rename_symbols {
-                    true => FunctionNameFlavor::CSharpMethodNameWithClass,
-                    false => FunctionNameFlavor::RawFFIName,
-                },
-            );
-            let call = format!(r#"{}({});"#, fn_name, to_invoke.join(", "));
-
-            self.write_function_overloaded_invoke_with_error_handling(w, function, &call, &[])?;
-
-            for name in to_wrap_delegates {
-                indented!(w, [_], r#"{}_safe_delegate.Rethrow();"#, name)?;
-            }
-
-            if !to_pin_name.is_empty() {
-                w.unindent();
-                indented!(w, [_], r#"}}"#)?;
-                indented!(w, [_], r#"finally"#)?;
-                indented!(w, [_], r#"{{"#)?;
-                for pin in &to_pin_name {
-                    indented!(w, [_ _], r#"{}_pinned.Free();"#, pin)?;
-                }
-                indented!(w, [_], r#"}}"#)?;
-            }
+            w.unindent();
+            indented!(w, [_], r#"}}"#)?;
         }
 
         indented!(w, r#"}}"#)
@@ -913,7 +862,7 @@ pub trait CSharpWriter {
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"if (i >= Count) throw new IndexOutOfRangeException();"#)?;
 
-        if self.config().use_unsafe.any_unsafe() && is_blittable {
+        if is_blittable {
             indented!(w, [_ _ _], r#"unsafe"#)?;
             indented!(w, [_ _ _], r#"{{"#)?;
             indented!(w, [_ _ _ _], r#"var d = ({}*) data.ToPointer();"#, type_string)?;
@@ -935,19 +884,15 @@ pub trait CSharpWriter {
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"var rval = new {}[len];"#, type_string)?;
 
-        if self.config().use_unsafe == Unsafe::UnsafePlatformMemCpy && is_blittable {
+        if is_blittable {
             indented!(w, [_ _ _], r#"unsafe"#)?;
             indented!(w, [_ _ _], r#"{{"#)?;
             indented!(w, [_ _ _ _ ], r#"fixed (void* dst = rval)"#)?;
             indented!(w, [_ _ _ _ ], r#"{{"#)?;
-            indented!(w, [_ _ _ _ _], r#"#if __INTEROPTOPUS_NEVER"#)?;
-            indented!(w, [_ _ _ _ _], r#"#elif NETCOREAPP"#)?;
             indented!(w, [_ _ _ _ _], r#"Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof({}));"#, type_string)?;
-            indented!(w, [_ _ _ _ _], r#"#else"#)?;
             indented!(w, [_ _ _ _ _], r#"for (var i = 0; i < (int) len; i++) {{"#)?;
             indented!(w, [_ _ _ _ _ _], r#"rval[i] = this[i];"#)?;
             indented!(w, [_ _ _ _ _], r#"}}"#)?;
-            indented!(w, [_ _ _ _ _], r#"#endif"#)?;
             indented!(w, [_ _ _ _ ], r#"}}"#)?;
             indented!(w, [_ _ _], r#"}}"#)?;
         } else {
@@ -984,38 +929,30 @@ pub trait CSharpWriter {
     }
 
     fn write_pattern_slice_overload(&self, w: &mut IndentWriter, _context_type_name: &str, type_string: &str) -> Result<(), Error> {
-        if self.config().use_unsafe.any_unsafe() {
-            indented!(w, [_], r#"#if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)"#)?;
-            indented!(w, [_], r#"public ReadOnlySpan<{}> ReadOnlySpan"#, type_string)?;
-            indented!(w, [_], r#"{{"#)?;
-            indented!(w, [_ _], r#"get"#)?;
-            indented!(w, [_ _], r#"{{"#)?;
-            indented!(w, [_ _ _], r#"unsafe"#)?;
-            indented!(w, [_ _ _], r#"{{"#)?;
-            indented!(w, [_ _ _ _], r#"return new ReadOnlySpan<{}>(this.data.ToPointer(), (int) this.len);"#, type_string)?;
-            indented!(w, [_ _ _], r#"}}"#)?;
-            indented!(w, [_ _], r#"}}"#)?;
-            indented!(w, [_], r#"}}"#)?;
-            indented!(w, [_], r#"#endif"#)?;
-        }
+        indented!(w, [_], r#"public ReadOnlySpan<{}> ReadOnlySpan"#, type_string)?;
+        indented!(w, [_], r#"{{"#)?;
+        indented!(w, [_ _], r#"get"#)?;
+        indented!(w, [_ _], r#"{{"#)?;
+        indented!(w, [_ _ _], r#"unsafe"#)?;
+        indented!(w, [_ _ _], r#"{{"#)?;
+        indented!(w, [_ _ _ _], r#"return new ReadOnlySpan<{}>(this.data.ToPointer(), (int) this.len);"#, type_string)?;
+        indented!(w, [_ _ _], r#"}}"#)?;
+        indented!(w, [_ _], r#"}}"#)?;
+        indented!(w, [_], r#"}}"#)?;
         Ok(())
     }
 
     fn write_pattern_slice_mut_overload(&self, w: &mut IndentWriter, _context_type_name: &str, type_string: &str) -> Result<(), Error> {
-        if self.config().use_unsafe.any_unsafe() {
-            indented!(w, [_], r#"#if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)"#)?;
-            indented!(w, [_], r#"public Span<{}> Span"#, type_string)?;
-            indented!(w, [_], r#"{{"#)?;
-            indented!(w, [_ _], r#"get"#)?;
-            indented!(w, [_ _], r#"{{"#)?;
-            indented!(w, [_ _ _], r#"unsafe"#)?;
-            indented!(w, [_ _ _], r#"{{"#)?;
-            indented!(w, [_ _ _ _], r#"return new Span<{}>(this.data.ToPointer(), (int) this.len);"#, type_string)?;
-            indented!(w, [_ _ _], r#"}}"#)?;
-            indented!(w, [_ _], r#"}}"#)?;
-            indented!(w, [_], r#"}}"#)?;
-            indented!(w, [_], r#"#endif"#)?;
-        }
+        indented!(w, [_], r#"public Span<{}> Span"#, type_string)?;
+        indented!(w, [_], r#"{{"#)?;
+        indented!(w, [_ _], r#"get"#)?;
+        indented!(w, [_ _], r#"{{"#)?;
+        indented!(w, [_ _ _], r#"unsafe"#)?;
+        indented!(w, [_ _ _], r#"{{"#)?;
+        indented!(w, [_ _ _ _], r#"return new Span<{}>(this.data.ToPointer(), (int) this.len);"#, type_string)?;
+        indented!(w, [_ _ _], r#"}}"#)?;
+        indented!(w, [_ _], r#"}}"#)?;
+        indented!(w, [_], r#"}}"#)?;
         Ok(())
     }
 
@@ -1065,32 +1002,21 @@ pub trait CSharpWriter {
         indented!(w, [_ _], r#"get"#)?;
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"if (i >= Count) throw new IndexOutOfRangeException();"#)?;
-        if self.config().use_unsafe.any_unsafe() {
-            indented!(w, [_ _ _], r#"unsafe"#)?;
-            indented!(w, [_ _ _], r#"{{"#)?;
-            indented!(w, [_ _ _ _], r#"var d = ({}*) data.ToPointer();"#, type_string)?;
-            indented!(w, [_ _ _ _], r#"return d[i];"#)?;
-            indented!(w, [_ _ _], r#"}}"#)?;
-        } else {
-            indented!(w, [_ _ _], r#"var size = Marshal.SizeOf(typeof({}));"#, type_string)?;
-            indented!(w, [_ _ _], r#"var ptr = new IntPtr(data.ToInt64() + i * size);"#)?;
-            indented!(w, [_ _ _], r#"return Marshal.PtrToStructure<{}>(ptr);"#, type_string)?;
-        }
+        indented!(w, [_ _ _], r#"unsafe"#)?;
+        indented!(w, [_ _ _], r#"{{"#)?;
+        indented!(w, [_ _ _ _], r#"var d = ({}*) data.ToPointer();"#, type_string)?;
+        indented!(w, [_ _ _ _], r#"return d[i];"#)?;
+        indented!(w, [_ _ _], r#"}}"#)?;
         indented!(w, [_ _], r#"}}"#)?;
         indented!(w, [_ _], r#"set"#)?;
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"if (i >= Count) throw new IndexOutOfRangeException();"#)?;
-        if self.config().use_unsafe.any_unsafe() {
-            indented!(w, [_ _ _], r#"unsafe"#)?;
-            indented!(w, [_ _ _], r#"{{"#)?;
-            indented!(w, [_ _ _ _], r#"var d = ({}*) data.ToPointer();"#, type_string)?;
-            indented!(w, [_ _ _ _], r#"d[i] = value;"#)?;
-            indented!(w, [_ _ _], r#"}}"#)?;
-        } else {
-            indented!(w, [_ _ _], r#"var size = Marshal.SizeOf(typeof({}));"#, type_string)?;
-            indented!(w, [_ _ _], r#"var ptr = new IntPtr(data.ToInt64() + i * size);"#)?;
-            indented!(w, [_ _ _], r#"Marshal.StructureToPtr<{}>(value, ptr, false);"#, type_string)?;
-        }
+        indented!(w, [_ _ _], r#"unsafe"#)?;
+        indented!(w, [_ _ _], r#"{{"#)?;
+        indented!(w, [_ _ _ _], r#"var d = ({}*) data.ToPointer();"#, type_string)?;
+        indented!(w, [_ _ _ _], r#"d[i] = value;"#)?;
+        indented!(w, [_ _ _], r#"}}"#)?;
+
         indented!(w, [_ _], r#"}}"#)?;
         indented!(w, [_], r#"}}"#)?;
 
@@ -1100,28 +1026,16 @@ pub trait CSharpWriter {
         indented!(w, [_ _], r#"get"#)?;
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"var rval = new {}[len];"#, type_string)?;
-
-        if self.config().use_unsafe == Unsafe::UnsafePlatformMemCpy {
-            indented!(w, [_ _ _], r#"unsafe"#)?;
-            indented!(w, [_ _ _], r#"{{"#)?;
-            indented!(w, [_ _ _ _ ], r#"fixed (void* dst = rval)"#)?;
-            indented!(w, [_ _ _ _ ], r#"{{"#)?;
-            indented!(w, [_ _ _ _ _], r#"#if __FALSE"#)?;
-            indented!(w, [_ _ _ _ _], r#"#elif NETCOREAPP"#)?;
-            indented!(w, [_ _ _ _ _], r#"Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof({}));"#, type_string)?;
-            indented!(w, [_ _ _ _ _], r#"#else"#)?;
-            indented!(w, [_ _ _ _ _], r#"for (var i = 0; i < (int) len; i++) {{"#)?;
-            indented!(w, [_ _ _ _ _ _], r#"rval[i] = this[i];"#)?;
-            indented!(w, [_ _ _ _ _], r#"}}"#)?;
-            indented!(w, [_ _ _ _ _], r#"#endif"#)?;
-            indented!(w, [_ _ _ _ ], r#"}}"#)?;
-            indented!(w, [_ _ _], r#"}}"#)?;
-        } else {
-            indented!(w, [_ _ _], r#"for (var i = 0; i < (int) len; i++) {{"#)?;
-            indented!(w, [_ _ _ _], r#"rval[i] = this[i];"#)?;
-            indented!(w, [_ _ _], r#"}}"#)?;
-        }
-
+        indented!(w, [_ _ _], r#"unsafe"#)?;
+        indented!(w, [_ _ _], r#"{{"#)?;
+        indented!(w, [_ _ _ _ ], r#"fixed (void* dst = rval)"#)?;
+        indented!(w, [_ _ _ _ ], r#"{{"#)?;
+        indented!(w, [_ _ _ _ _], r#"Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof({}));"#, type_string)?;
+        indented!(w, [_ _ _ _ _], r#"for (var i = 0; i < (int) len; i++) {{"#)?;
+        indented!(w, [_ _ _ _ _ _], r#"rval[i] = this[i];"#)?;
+        indented!(w, [_ _ _ _ _], r#"}}"#)?;
+        indented!(w, [_ _ _ _ ], r#"}}"#)?;
+        indented!(w, [_ _ _], r#"}}"#)?;
         indented!(w, [_ _ _], r#"return rval;"#)?;
         indented!(w, [_ _], r#"}}"#)?;
         indented!(w, [_], r#"}}"#)?;
@@ -1450,15 +1364,11 @@ pub trait CSharpWriter {
     }
 
     fn pattern_to_native_in_signature(&self, param: &Parameter) -> String {
-        if self.config().use_unsafe == Unsafe::None && self.config().param_slice_type == ParamSliceType::Span {
-            panic!("param_slice_type: Span requires unsafe support (use_unsafe must be anything other than None)");
-        }
-
         let slice_type_name = |mutable: bool, element_type: &CType| -> String {
-            match (self.config().param_slice_type, mutable) {
-                (ParamSliceType::Array, _) => format!("{}[]", self.converter().to_typespecifier_in_param(element_type)),
-                (ParamSliceType::Span, true) => format!("System.Span<{}>", self.converter().to_typespecifier_in_param(element_type)),
-                (ParamSliceType::Span, false) => format!("System.ReadOnlySpan<{}>", self.converter().to_typespecifier_in_param(element_type)),
+            if mutable {
+                format!("System.Span<{}>", self.converter().to_typespecifier_in_param(element_type))
+            } else {
+                format!("System.ReadOnlySpan<{}>", self.converter().to_typespecifier_in_param(element_type))
             }
         };
         match param.the_type() {

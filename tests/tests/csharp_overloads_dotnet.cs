@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 using My.Company;
 using My.Company.Common;
 #pragma warning restore 0105
@@ -18,9 +19,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 7754963775653255763ul)
+            if (api_version != 6541958231137371810ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (7754963775653255763). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (6541958231137371810). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -162,34 +163,30 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice")]
         public static partial SliceVec namespaced_inner_slice(SliceVec x);
 
-        public static SliceVec namespaced_inner_slice(Vec[] x)
+        public static SliceVec namespaced_inner_slice(System.ReadOnlySpan<Vec> x)
         {
-            var x_pinned = GCHandle.Alloc(x, GCHandleType.Pinned);
-            var x_slice = new SliceVec(x_pinned, (ulong) x.Length);
-            try
+            unsafe
             {
-                return namespaced_inner_slice(x_slice);;
-            }
-            finally
-            {
-                x_pinned.Free();
+                fixed (void* ptr_x = x)
+                {
+                    var x_slice = new SliceVec(new IntPtr(ptr_x), (ulong) x.Length);
+                    return namespaced_inner_slice(x_slice);;
+                }
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice_mut")]
         public static partial SliceMutVec namespaced_inner_slice_mut(SliceMutVec x);
 
-        public static SliceMutVec namespaced_inner_slice_mut(Vec[] x)
+        public static SliceMutVec namespaced_inner_slice_mut(System.Span<Vec> x)
         {
-            var x_pinned = GCHandle.Alloc(x, GCHandleType.Pinned);
-            var x_slice = new SliceMutVec(x_pinned, (ulong) x.Length);
-            try
+            unsafe
             {
-                return namespaced_inner_slice_mut(x_slice);;
-            }
-            finally
-            {
-                x_pinned.Free();
+                fixed (void* ptr_x = x)
+                {
+                    var x_slice = new SliceMutVec(new IntPtr(ptr_x), (ulong) x.Length);
+                    return namespaced_inner_slice_mut(x_slice);;
+                }
             }
         }
 
@@ -233,142 +230,113 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1")]
         public static partial uint pattern_ffi_slice_1(SliceU32 ffi_slice);
 
-        public static uint pattern_ffi_slice_1(uint[] ffi_slice)
+        public static uint pattern_ffi_slice_1(System.ReadOnlySpan<uint> ffi_slice)
         {
-            var ffi_slice_pinned = GCHandle.Alloc(ffi_slice, GCHandleType.Pinned);
-            var ffi_slice_slice = new SliceU32(ffi_slice_pinned, (ulong) ffi_slice.Length);
-            try
+            unsafe
             {
-                return pattern_ffi_slice_1(ffi_slice_slice);;
-            }
-            finally
-            {
-                ffi_slice_pinned.Free();
+                fixed (void* ptr_ffi_slice = ffi_slice)
+                {
+                    var ffi_slice_slice = new SliceU32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
+                    return pattern_ffi_slice_1(ffi_slice_slice);;
+                }
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1b")]
         public static partial uint pattern_ffi_slice_1b(SliceMutU32 ffi_slice);
 
-        public static uint pattern_ffi_slice_1b(uint[] ffi_slice)
+        public static uint pattern_ffi_slice_1b(System.Span<uint> ffi_slice)
         {
-            var ffi_slice_pinned = GCHandle.Alloc(ffi_slice, GCHandleType.Pinned);
-            var ffi_slice_slice = new SliceMutU32(ffi_slice_pinned, (ulong) ffi_slice.Length);
-            try
+            unsafe
             {
-                return pattern_ffi_slice_1b(ffi_slice_slice);;
-            }
-            finally
-            {
-                ffi_slice_pinned.Free();
+                fixed (void* ptr_ffi_slice = ffi_slice)
+                {
+                    var ffi_slice_slice = new SliceMutU32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
+                    return pattern_ffi_slice_1b(ffi_slice_slice);;
+                }
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_2")]
         public static partial Vec3f32 pattern_ffi_slice_2(SliceVec3f32 ffi_slice, int i);
 
-        public static Vec3f32 pattern_ffi_slice_2(Vec3f32[] ffi_slice, int i)
+        public static Vec3f32 pattern_ffi_slice_2(System.ReadOnlySpan<Vec3f32> ffi_slice, int i)
         {
-            var ffi_slice_pinned = GCHandle.Alloc(ffi_slice, GCHandleType.Pinned);
-            var ffi_slice_slice = new SliceVec3f32(ffi_slice_pinned, (ulong) ffi_slice.Length);
-            try
+            unsafe
             {
-                return pattern_ffi_slice_2(ffi_slice_slice, i);;
-            }
-            finally
-            {
-                ffi_slice_pinned.Free();
+                fixed (void* ptr_ffi_slice = ffi_slice)
+                {
+                    var ffi_slice_slice = new SliceVec3f32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
+                    return pattern_ffi_slice_2(ffi_slice_slice, i);;
+                }
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_3")]
         public static partial void pattern_ffi_slice_3(SliceMutU8 slice, CallbackSliceMut callback);
 
-        public static void pattern_ffi_slice_3(byte[] slice, CallbackSliceMut callback)
+        public static void pattern_ffi_slice_3(System.Span<byte> slice, CallbackSliceMut callback)
         {
-            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new SliceMutU8(slice_pinned, (ulong) slice.Length);
-            try
+            unsafe
             {
-                pattern_ffi_slice_3(slice_slice, callback);;
-            }
-            finally
-            {
-                slice_pinned.Free();
+                fixed (void* ptr_slice = slice)
+                {
+                    var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                    pattern_ffi_slice_3(slice_slice, callback);;
+                }
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_4")]
         public static partial void pattern_ffi_slice_4(SliceU8 slice, SliceMutU8 slice2);
 
-        public static void pattern_ffi_slice_4(byte[] slice, byte[] slice2)
+        public static void pattern_ffi_slice_4(System.ReadOnlySpan<byte> slice, System.Span<byte> slice2)
         {
-            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new SliceU8(slice_pinned, (ulong) slice.Length);
-            var slice2_pinned = GCHandle.Alloc(slice2, GCHandleType.Pinned);
-            var slice2_slice = new SliceMutU8(slice2_pinned, (ulong) slice2.Length);
-            try
+            unsafe
             {
-                pattern_ffi_slice_4(slice_slice, slice2_slice);;
-            }
-            finally
-            {
-                slice_pinned.Free();
-                slice2_pinned.Free();
+                fixed (void* ptr_slice = slice)
+                {
+                    var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                    fixed (void* ptr_slice2 = slice2)
+                    {
+                        var slice2_slice = new SliceMutU8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
+                        pattern_ffi_slice_4(slice_slice, slice2_slice);;
+                    }
+                }
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_5")]
         public static partial void pattern_ffi_slice_5(ref SliceU8 slice, ref SliceMutU8 slice2);
 
-        public static void pattern_ffi_slice_5(byte[] slice, byte[] slice2)
+        public static void pattern_ffi_slice_5(System.ReadOnlySpan<byte> slice, System.Span<byte> slice2)
         {
-            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new SliceU8(slice_pinned, (ulong) slice.Length);
-            var slice2_pinned = GCHandle.Alloc(slice2, GCHandleType.Pinned);
-            var slice2_slice = new SliceMutU8(slice2_pinned, (ulong) slice2.Length);
-            try
+            unsafe
             {
-                pattern_ffi_slice_5(ref slice_slice, ref slice2_slice);;
-            }
-            finally
-            {
-                slice_pinned.Free();
-                slice2_pinned.Free();
+                fixed (void* ptr_slice = slice)
+                {
+                    var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                    fixed (void* ptr_slice2 = slice2)
+                    {
+                        var slice2_slice = new SliceMutU8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
+                        pattern_ffi_slice_5(ref slice_slice, ref slice2_slice);;
+                    }
+                }
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_6")]
         public static partial void pattern_ffi_slice_6(ref SliceMutU8 slice, CallbackU8 callback);
 
-        public static void pattern_ffi_slice_6(byte[] slice, CallbackU8 callback)
+        public static void pattern_ffi_slice_6(System.Span<byte> slice, CallbackU8 callback)
         {
-            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new SliceMutU8(slice_pinned, (ulong) slice.Length);
-            try
+            unsafe
             {
-                pattern_ffi_slice_6(ref slice_slice, callback);;
-            }
-            finally
-            {
-                slice_pinned.Free();
-            }
-        }
-
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_7")]
-        public static partial uint pattern_ffi_slice_7(SliceMutConstPtrI8 slices);
-
-        public static uint pattern_ffi_slice_7([MarshalAs(UnmanagedType.LPStr)] string[] slices)
-        {
-            var slices_pinned = GCHandle.Alloc(slices, GCHandleType.Pinned);
-            var slices_slice = new SliceMutConstPtrI8(slices_pinned, (ulong) slices.Length);
-            try
-            {
-                return pattern_ffi_slice_7(slices_slice);;
-            }
-            finally
-            {
-                slices_pinned.Free();
+                fixed (void* ptr_slice = slice)
+                {
+                    var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                    pattern_ffi_slice_6(ref slice_slice, callback);;
+                }
             }
         }
 
@@ -421,11 +389,11 @@ namespace My.Company
         {
             var c1_safe_delegate = new SumDelegateReturnExceptionSafe(c1);
             var rval = pattern_callback_7(c1_safe_delegate.Call, c2, x, i, out o);;
+            c1_safe_delegate.Rethrow();
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
             }
-            c1_safe_delegate.Rethrow();
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_surrogates_1")]
@@ -583,33 +551,31 @@ namespace My.Company
         {
             var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
             var rval = service_callbacks_callback_ffi_return(context, callback_safe_delegate.Call);;
+            callback_safe_delegate.Rethrow();
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
             }
-            callback_safe_delegate.Rethrow();
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_with_slice")]
         public static partial FFIError service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, SliceI32 input);
 
-        public static void service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, int[] input)
+        public static void service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, System.ReadOnlySpan<int> input)
         {
             var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
-            var input_pinned = GCHandle.Alloc(input, GCHandleType.Pinned);
-            var input_slice = new SliceI32(input_pinned, (ulong) input.Length);
-            try
+            unsafe
             {
-                var rval = service_callbacks_callback_with_slice(context, callback_safe_delegate.Call, input_slice);;
-                if (rval != FFIError.Ok)
+                fixed (void* ptr_input = input)
                 {
-                    throw new InteropException<FFIError>(rval);
+                    var input_slice = new SliceI32(new IntPtr(ptr_input), (ulong) input.Length);
+                    var rval = service_callbacks_callback_with_slice(context, callback_safe_delegate.Call, input_slice);;
+                    callback_safe_delegate.Rethrow();
+                    if (rval != FFIError.Ok)
+                    {
+                        throw new InteropException<FFIError>(rval);
+                    }
                 }
-                callback_safe_delegate.Rethrow();
-            }
-            finally
-            {
-                input_pinned.Free();
             }
         }
 
@@ -772,52 +738,46 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_lifetime_1")]
         public static partial void service_using_lifetimes_lifetime_1(IntPtr context, SliceBool slice);
 
-        public static void service_using_lifetimes_lifetime_1(IntPtr context, Bool[] slice)
+        public static void service_using_lifetimes_lifetime_1(IntPtr context, System.ReadOnlySpan<Bool> slice)
         {
-            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new SliceBool(slice_pinned, (ulong) slice.Length);
-            try
+            unsafe
             {
-                service_using_lifetimes_lifetime_1(context, slice_slice);;
-            }
-            finally
-            {
-                slice_pinned.Free();
+                fixed (void* ptr_slice = slice)
+                {
+                    var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
+                    service_using_lifetimes_lifetime_1(context, slice_slice);;
+                }
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_lifetime_2")]
         public static partial void service_using_lifetimes_lifetime_2(IntPtr context, SliceBool slice);
 
-        public static void service_using_lifetimes_lifetime_2(IntPtr context, Bool[] slice)
+        public static void service_using_lifetimes_lifetime_2(IntPtr context, System.ReadOnlySpan<Bool> slice)
         {
-            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new SliceBool(slice_pinned, (ulong) slice.Length);
-            try
+            unsafe
             {
-                service_using_lifetimes_lifetime_2(context, slice_slice);;
-            }
-            finally
-            {
-                slice_pinned.Free();
+                fixed (void* ptr_slice = slice)
+                {
+                    var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
+                    service_using_lifetimes_lifetime_2(context, slice_slice);;
+                }
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_return_string_accept_slice")]
         public static partial IntPtr service_using_lifetimes_return_string_accept_slice(IntPtr anon0, SliceU8 anon1);
 
-        public static string service_using_lifetimes_return_string_accept_slice(IntPtr anon0, byte[] anon1)
+        public static string service_using_lifetimes_return_string_accept_slice(IntPtr anon0, System.ReadOnlySpan<byte> anon1)
         {
-            var anon1_pinned = GCHandle.Alloc(anon1, GCHandleType.Pinned);
-            var anon1_slice = new SliceU8(anon1_pinned, (ulong) anon1.Length);
-            try
+            unsafe
             {
-                var s = service_using_lifetimes_return_string_accept_slice(anon0, anon1_slice);;
-                return Marshal.PtrToStringAnsi(s);
-            }
-            finally
-            {
-                anon1_pinned.Free();
+                fixed (void* ptr_anon1 = anon1)
+                {
+                    var anon1_slice = new SliceU8(new IntPtr(ptr_anon1), (ulong) anon1.Length);
+                    var s = service_using_lifetimes_return_string_accept_slice(anon0, anon1_slice);;
+                    return Marshal.PtrToStringAnsi(s);
+                }
             }
         }
 
@@ -860,17 +820,15 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self")]
         public static partial byte service_various_slices_mut_self(IntPtr context, SliceU8 slice);
 
-        public static byte service_various_slices_mut_self(IntPtr context, byte[] slice)
+        public static byte service_various_slices_mut_self(IntPtr context, System.ReadOnlySpan<byte> slice)
         {
-            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new SliceU8(slice_pinned, (ulong) slice.Length);
-            try
+            unsafe
             {
-                return service_various_slices_mut_self(context, slice_slice);;
-            }
-            finally
-            {
-                slice_pinned.Free();
+                fixed (void* ptr_slice = slice)
+                {
+                    var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                    return service_various_slices_mut_self(context, slice_slice);;
+                }
             }
         }
 
@@ -879,17 +837,15 @@ namespace My.Company
         public static partial void service_various_slices_mut_self_void(IntPtr context, SliceBool slice);
 
         /// Single line.
-        public static void service_various_slices_mut_self_void(IntPtr context, Bool[] slice)
+        public static void service_various_slices_mut_self_void(IntPtr context, System.ReadOnlySpan<Bool> slice)
         {
-            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new SliceBool(slice_pinned, (ulong) slice.Length);
-            try
+            unsafe
             {
-                service_various_slices_mut_self_void(context, slice_slice);;
-            }
-            finally
-            {
-                slice_pinned.Free();
+                fixed (void* ptr_slice = slice)
+                {
+                    var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
+                    service_various_slices_mut_self_void(context, slice_slice);;
+                }
             }
         }
 
@@ -899,79 +855,72 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice")]
         public static partial byte service_various_slices_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, SliceU8 slice);
 
-        public static byte service_various_slices_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, byte[] slice)
+        public static byte service_various_slices_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, System.ReadOnlySpan<byte> slice)
         {
-            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new SliceU8(slice_pinned, (ulong) slice.Length);
-            try
+            unsafe
             {
-                return service_various_slices_mut_self_ref_slice(context, ref x, out y, slice_slice);;
-            }
-            finally
-            {
-                slice_pinned.Free();
+                fixed (void* ptr_slice = slice)
+                {
+                    var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                    return service_various_slices_mut_self_ref_slice(context, ref x, out y, slice_slice);;
+                }
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice_limited")]
         public static partial byte service_various_slices_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, SliceU8 slice, SliceU8 slice2);
 
-        public static byte service_various_slices_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, byte[] slice, byte[] slice2)
+        public static byte service_various_slices_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, System.ReadOnlySpan<byte> slice, System.ReadOnlySpan<byte> slice2)
         {
-            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new SliceU8(slice_pinned, (ulong) slice.Length);
-            var slice2_pinned = GCHandle.Alloc(slice2, GCHandleType.Pinned);
-            var slice2_slice = new SliceU8(slice2_pinned, (ulong) slice2.Length);
-            try
+            unsafe
             {
-                return service_various_slices_mut_self_ref_slice_limited(context, ref x, out y, slice_slice, slice2_slice);;
-            }
-            finally
-            {
-                slice_pinned.Free();
-                slice2_pinned.Free();
+                fixed (void* ptr_slice = slice)
+                {
+                    var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                    fixed (void* ptr_slice2 = slice2)
+                    {
+                        var slice2_slice = new SliceU8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
+                        return service_various_slices_mut_self_ref_slice_limited(context, ref x, out y, slice_slice, slice2_slice);;
+                    }
+                }
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ffi_error")]
         public static partial FFIError service_various_slices_mut_self_ffi_error(IntPtr context, SliceMutU8 slice);
 
-        public static void service_various_slices_mut_self_ffi_error(IntPtr context, byte[] slice)
+        public static void service_various_slices_mut_self_ffi_error(IntPtr context, System.Span<byte> slice)
         {
-            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new SliceMutU8(slice_pinned, (ulong) slice.Length);
-            try
+            unsafe
             {
-                var rval = service_various_slices_mut_self_ffi_error(context, slice_slice);;
-                if (rval != FFIError.Ok)
+                fixed (void* ptr_slice = slice)
                 {
-                    throw new InteropException<FFIError>(rval);
+                    var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                    var rval = service_various_slices_mut_self_ffi_error(context, slice_slice);;
+                    if (rval != FFIError.Ok)
+                    {
+                        throw new InteropException<FFIError>(rval);
+                    }
                 }
-            }
-            finally
-            {
-                slice_pinned.Free();
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_no_error")]
         public static partial FFIError service_various_slices_mut_self_no_error(IntPtr context, SliceMutU8 slice);
 
-        public static void service_various_slices_mut_self_no_error(IntPtr context, byte[] slice)
+        public static void service_various_slices_mut_self_no_error(IntPtr context, System.Span<byte> slice)
         {
-            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
-            var slice_slice = new SliceMutU8(slice_pinned, (ulong) slice.Length);
-            try
+            unsafe
             {
-                var rval = service_various_slices_mut_self_no_error(context, slice_slice);;
-                if (rval != FFIError.Ok)
+                fixed (void* ptr_slice = slice)
                 {
-                    throw new InteropException<FFIError>(rval);
+                    var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                    var rval = service_various_slices_mut_self_no_error(context, slice_slice);;
+                    if (rval != FFIError.Ok)
+                    {
+                        throw new InteropException<FFIError>(rval);
+                    }
                 }
-            }
-            finally
-            {
-                slice_pinned.Free();
             }
         }
 
@@ -1258,14 +1207,26 @@ namespace My.Company
             this.data = handle;
             this.len = count;
         }
+        public ReadOnlySpan<Bool> ReadOnlySpan
+        {
+            get
+            {
+                unsafe
+                {
+                    return new ReadOnlySpan<Bool>(this.data.ToPointer(), (int) this.len);
+                }
+            }
+        }
         public Bool this[int i]
         {
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(Bool));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                return Marshal.PtrToStructure<Bool>(ptr);
+                unsafe
+                {
+                    var d = (Bool*) data.ToPointer();
+                    return d[i];
+                }
             }
         }
         public Bool[] Copied
@@ -1273,8 +1234,15 @@ namespace My.Company
             get
             {
                 var rval = new Bool[len];
-                for (var i = 0; i < (int) len; i++) {
-                    rval[i] = this[i];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Bool));
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
+                    }
                 }
                 return rval;
             }
@@ -1317,14 +1285,26 @@ namespace My.Company
             this.data = handle;
             this.len = count;
         }
+        public ReadOnlySpan<int> ReadOnlySpan
+        {
+            get
+            {
+                unsafe
+                {
+                    return new ReadOnlySpan<int>(this.data.ToPointer(), (int) this.len);
+                }
+            }
+        }
         public int this[int i]
         {
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(int));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                return Marshal.PtrToStructure<int>(ptr);
+                unsafe
+                {
+                    var d = (int*) data.ToPointer();
+                    return d[i];
+                }
             }
         }
         public int[] Copied
@@ -1332,8 +1312,15 @@ namespace My.Company
             get
             {
                 var rval = new int[len];
-                for (var i = 0; i < (int) len; i++) {
-                    rval[i] = this[i];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(int));
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
+                    }
                 }
                 return rval;
             }
@@ -1376,14 +1363,26 @@ namespace My.Company
             this.data = handle;
             this.len = count;
         }
+        public ReadOnlySpan<uint> ReadOnlySpan
+        {
+            get
+            {
+                unsafe
+                {
+                    return new ReadOnlySpan<uint>(this.data.ToPointer(), (int) this.len);
+                }
+            }
+        }
         public uint this[int i]
         {
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(uint));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                return Marshal.PtrToStructure<uint>(ptr);
+                unsafe
+                {
+                    var d = (uint*) data.ToPointer();
+                    return d[i];
+                }
             }
         }
         public uint[] Copied
@@ -1391,8 +1390,15 @@ namespace My.Company
             get
             {
                 var rval = new uint[len];
-                for (var i = 0; i < (int) len; i++) {
-                    rval[i] = this[i];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(uint));
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
+                    }
                 }
                 return rval;
             }
@@ -1435,14 +1441,26 @@ namespace My.Company
             this.data = handle;
             this.len = count;
         }
+        public ReadOnlySpan<byte> ReadOnlySpan
+        {
+            get
+            {
+                unsafe
+                {
+                    return new ReadOnlySpan<byte>(this.data.ToPointer(), (int) this.len);
+                }
+            }
+        }
         public byte this[int i]
         {
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(byte));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                return Marshal.PtrToStructure<byte>(ptr);
+                unsafe
+                {
+                    var d = (byte*) data.ToPointer();
+                    return d[i];
+                }
             }
         }
         public byte[] Copied
@@ -1450,8 +1468,15 @@ namespace My.Company
             get
             {
                 var rval = new byte[len];
-                for (var i = 0; i < (int) len; i++) {
-                    rval[i] = this[i];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(byte));
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
+                    }
                 }
                 return rval;
             }
@@ -1493,6 +1518,16 @@ namespace My.Company
         {
             this.data = handle;
             this.len = count;
+        }
+        public ReadOnlySpan<UseAsciiStringPattern> ReadOnlySpan
+        {
+            get
+            {
+                unsafe
+                {
+                    return new ReadOnlySpan<UseAsciiStringPattern>(this.data.ToPointer(), (int) this.len);
+                }
+            }
         }
         public UseAsciiStringPattern this[int i]
         {
@@ -1553,14 +1588,26 @@ namespace My.Company
             this.data = handle;
             this.len = count;
         }
+        public ReadOnlySpan<Vec3f32> ReadOnlySpan
+        {
+            get
+            {
+                unsafe
+                {
+                    return new ReadOnlySpan<Vec3f32>(this.data.ToPointer(), (int) this.len);
+                }
+            }
+        }
         public Vec3f32 this[int i]
         {
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(Vec3f32));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                return Marshal.PtrToStructure<Vec3f32>(ptr);
+                unsafe
+                {
+                    var d = (Vec3f32*) data.ToPointer();
+                    return d[i];
+                }
             }
         }
         public Vec3f32[] Copied
@@ -1568,80 +1615,21 @@ namespace My.Company
             get
             {
                 var rval = new Vec3f32[len];
-                for (var i = 0; i < (int) len; i++) {
-                    rval[i] = this[i];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Vec3f32));
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
+                    }
                 }
                 return rval;
             }
         }
         public int Count => (int) len;
         public IEnumerator<Vec3f32> GetEnumerator()
-        {
-            for (var i = 0; i < (int)len; ++i)
-            {
-                yield return this[i];
-            }
-        }
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
-    }
-
-
-    ///A pointer to an array of data someone else owns which may be modified.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct SliceMutConstPtrI8
-    {
-        ///Pointer to start of mutable data.
-        IntPtr data;
-        ///Number of elements.
-        ulong len;
-    }
-
-    public partial struct SliceMutConstPtrI8 : IEnumerable<IntPtr>
-    {
-        public SliceMutConstPtrI8(GCHandle handle, ulong count)
-        {
-            this.data = handle.AddrOfPinnedObject();
-            this.len = count;
-        }
-        public SliceMutConstPtrI8(IntPtr handle, ulong count)
-        {
-            this.data = handle;
-            this.len = count;
-        }
-        public IntPtr this[int i]
-        {
-            get
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(IntPtr));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                return Marshal.PtrToStructure<IntPtr>(ptr);
-            }
-            set
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(IntPtr));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                Marshal.StructureToPtr<IntPtr>(value, ptr, false);
-            }
-        }
-        public IntPtr[] Copied
-        {
-            get
-            {
-                var rval = new IntPtr[len];
-                for (var i = 0; i < (int) len; i++) {
-                    rval[i] = this[i];
-                }
-                return rval;
-            }
-        }
-        public int Count => (int) len;
-        public IEnumerator<IntPtr> GetEnumerator()
         {
             for (var i = 0; i < (int)len; ++i)
             {
@@ -1678,21 +1666,45 @@ namespace My.Company
             this.data = handle;
             this.len = count;
         }
+        public ReadOnlySpan<uint> ReadOnlySpan
+        {
+            get
+            {
+                unsafe
+                {
+                    return new ReadOnlySpan<uint>(this.data.ToPointer(), (int) this.len);
+                }
+            }
+        }
+        public Span<uint> Span
+        {
+            get
+            {
+                unsafe
+                {
+                    return new Span<uint>(this.data.ToPointer(), (int) this.len);
+                }
+            }
+        }
         public uint this[int i]
         {
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(uint));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                return Marshal.PtrToStructure<uint>(ptr);
+                unsafe
+                {
+                    var d = (uint*) data.ToPointer();
+                    return d[i];
+                }
             }
             set
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(uint));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                Marshal.StructureToPtr<uint>(value, ptr, false);
+                unsafe
+                {
+                    var d = (uint*) data.ToPointer();
+                    d[i] = value;
+                }
             }
         }
         public uint[] Copied
@@ -1700,8 +1712,15 @@ namespace My.Company
             get
             {
                 var rval = new uint[len];
-                for (var i = 0; i < (int) len; i++) {
-                    rval[i] = this[i];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(uint));
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
+                    }
                 }
                 return rval;
             }
@@ -1744,21 +1763,45 @@ namespace My.Company
             this.data = handle;
             this.len = count;
         }
+        public ReadOnlySpan<byte> ReadOnlySpan
+        {
+            get
+            {
+                unsafe
+                {
+                    return new ReadOnlySpan<byte>(this.data.ToPointer(), (int) this.len);
+                }
+            }
+        }
+        public Span<byte> Span
+        {
+            get
+            {
+                unsafe
+                {
+                    return new Span<byte>(this.data.ToPointer(), (int) this.len);
+                }
+            }
+        }
         public byte this[int i]
         {
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(byte));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                return Marshal.PtrToStructure<byte>(ptr);
+                unsafe
+                {
+                    var d = (byte*) data.ToPointer();
+                    return d[i];
+                }
             }
             set
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var size = Marshal.SizeOf(typeof(byte));
-                var ptr = new IntPtr(data.ToInt64() + i * size);
-                Marshal.StructureToPtr<byte>(value, ptr, false);
+                unsafe
+                {
+                    var d = (byte*) data.ToPointer();
+                    d[i] = value;
+                }
             }
         }
         public byte[] Copied
@@ -1766,8 +1809,15 @@ namespace My.Company
             get
             {
                 var rval = new byte[len];
-                for (var i = 0; i < (int) len; i++) {
-                    rval[i] = this[i];
+                unsafe
+                {
+                    fixed (void* dst = rval)
+                    {
+                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(byte));
+                        for (var i = 0; i < (int) len; i++) {
+                            rval[i] = this[i];
+                        }
+                    }
                 }
                 return rval;
             }
@@ -2045,7 +2095,7 @@ namespace My.Company
             }
         }
 
-        public void CallbackWithSlice(SumDelegateReturn callback, int[] input)
+        public void CallbackWithSlice(SumDelegateReturn callback, System.ReadOnlySpan<int> input)
         {
             Interop.service_callbacks_callback_with_slice(_context, callback, input);
         }
@@ -2190,7 +2240,7 @@ namespace My.Company
             Interop.service_using_lifetimes_lifetime_1(_context, slice);
         }
 
-        public void Lifetime1(Bool[] slice)
+        public void Lifetime1(System.ReadOnlySpan<Bool> slice)
         {
             Interop.service_using_lifetimes_lifetime_1(_context, slice);
         }
@@ -2200,7 +2250,7 @@ namespace My.Company
             Interop.service_using_lifetimes_lifetime_2(_context, slice);
         }
 
-        public void Lifetime2(Bool[] slice)
+        public void Lifetime2(System.ReadOnlySpan<Bool> slice)
         {
             Interop.service_using_lifetimes_lifetime_2(_context, slice);
         }
@@ -2211,7 +2261,7 @@ namespace My.Company
             return Marshal.PtrToStringAnsi(s);
         }
 
-        public string ReturnStringAcceptSlice(byte[] anon1)
+        public string ReturnStringAcceptSlice(System.ReadOnlySpan<byte> anon1)
         {
             return Interop.service_using_lifetimes_return_string_accept_slice(_context, anon1);
         }
@@ -2252,7 +2302,7 @@ namespace My.Company
             return Interop.service_various_slices_mut_self(_context, slice);
         }
 
-        public byte MutSelf(byte[] slice)
+        public byte MutSelf(System.ReadOnlySpan<byte> slice)
         {
             return Interop.service_various_slices_mut_self(_context, slice);
         }
@@ -2264,7 +2314,7 @@ namespace My.Company
         }
 
         /// Single line.
-        public void MutSelfVoid(Bool[] slice)
+        public void MutSelfVoid(System.ReadOnlySpan<Bool> slice)
         {
             Interop.service_various_slices_mut_self_void(_context, slice);
         }
@@ -2279,7 +2329,7 @@ namespace My.Company
             return Interop.service_various_slices_mut_self_ref_slice(_context, ref x, out y, slice);
         }
 
-        public byte MutSelfRefSlice(ref byte x, out byte y, byte[] slice)
+        public byte MutSelfRefSlice(ref byte x, out byte y, System.ReadOnlySpan<byte> slice)
         {
             return Interop.service_various_slices_mut_self_ref_slice(_context, ref x, out y, slice);
         }
@@ -2289,7 +2339,7 @@ namespace My.Company
             return Interop.service_various_slices_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
         }
 
-        public byte MutSelfRefSliceLimited(ref byte x, out byte y, byte[] slice, byte[] slice2)
+        public byte MutSelfRefSliceLimited(ref byte x, out byte y, System.ReadOnlySpan<byte> slice, System.ReadOnlySpan<byte> slice2)
         {
             return Interop.service_various_slices_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
         }
@@ -2303,7 +2353,7 @@ namespace My.Company
             }
         }
 
-        public void MutSelfFfiError(byte[] slice)
+        public void MutSelfFfiError(System.Span<byte> slice)
         {
             Interop.service_various_slices_mut_self_ffi_error(_context, slice);
         }
@@ -2317,7 +2367,7 @@ namespace My.Company
             }
         }
 
-        public void MutSelfNoError(byte[] slice)
+        public void MutSelfNoError(System.Span<byte> slice)
         {
             Interop.service_various_slices_mut_self_no_error(_context, slice);
         }

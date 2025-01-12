@@ -123,7 +123,7 @@ mod converter;
 mod docs;
 mod writer;
 
-pub use config::{CSharpVisibility, Config, ConfigBuilder, DocConfig, ParamSliceType, Unsafe, Unsupported, WriteTypes};
+pub use config::{CSharpVisibility, Config, ConfigBuilder, DocConfig, Unsupported, WriteTypes};
 pub use converter::{CSharpTypeConverter, Converter};
 pub use docs::DocGenerator;
 pub use writer::CSharpWriter;

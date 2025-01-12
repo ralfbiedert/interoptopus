@@ -1,7 +1,7 @@
 use anyhow::Error;
 use interoptopus::patterns::slice::FFISlice;
 use interoptopus::{ffi_function, function, Interop, Inventory, InventoryBuilder};
-use interoptopus_backend_csharp::{ConfigBuilder, Generator, ParamSliceType, Unsafe};
+use interoptopus_backend_csharp::{ConfigBuilder, Generator};
 use tests::backend_csharp::common_namespace_mappings;
 use tests::validate_output;
 
@@ -13,31 +13,12 @@ fn ffi_inventory() -> Inventory {
 }
 
 #[test]
-fn span() -> Result<(), Error> {
+fn spans_work() -> Result<(), Error> {
     let inventory = ffi_inventory();
-    let config = ConfigBuilder::default()
-        .namespace_mappings(common_namespace_mappings())
-        .use_unsafe(Unsafe::UnsafePlatformMemCpy)
-        .param_slice_type(ParamSliceType::Span)
-        .build()?;
+    let config = ConfigBuilder::default().namespace_mappings(common_namespace_mappings()).build()?;
     let generated = Generator::new(config, inventory).write_string()?;
 
-    validate_output!("tests", "csharp_slice_type_span.cs", generated.as_str());
-
-    Ok(())
-}
-
-#[test]
-fn array() -> Result<(), Error> {
-    let inventory = ffi_inventory();
-    let config = ConfigBuilder::default()
-        .namespace_mappings(common_namespace_mappings())
-        .use_unsafe(Unsafe::UnsafePlatformMemCpy)
-        .param_slice_type(ParamSliceType::Array)
-        .build()?;
-    let generated = Generator::new(config, inventory).write_string()?;
-
-    validate_output!("tests", "csharp_slice_type_array.cs", generated.as_str());
+    validate_output!("tests", "csharp_slice_type.cs", generated.as_str());
 
     Ok(())
 }

@@ -47,7 +47,6 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
-        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public ReadOnlySpan<Bool> ReadOnlySpan
         {
             get
@@ -58,7 +57,6 @@ namespace My.Company.Common
                 }
             }
         }
-        #endif
         public Bool this[int i]
         {
             get
@@ -80,14 +78,10 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
-                        #if __INTEROPTOPUS_NEVER
-                        #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Bool));
-                        #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
                         }
-                        #endif
                     }
                 }
                 return rval;
@@ -131,7 +125,6 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
-        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public ReadOnlySpan<int> ReadOnlySpan
         {
             get
@@ -142,7 +135,6 @@ namespace My.Company.Common
                 }
             }
         }
-        #endif
         public int this[int i]
         {
             get
@@ -164,14 +156,10 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
-                        #if __INTEROPTOPUS_NEVER
-                        #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(int));
-                        #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
                         }
-                        #endif
                     }
                 }
                 return rval;
@@ -215,7 +203,6 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
-        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public ReadOnlySpan<uint> ReadOnlySpan
         {
             get
@@ -226,7 +213,6 @@ namespace My.Company.Common
                 }
             }
         }
-        #endif
         public uint this[int i]
         {
             get
@@ -248,14 +234,10 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
-                        #if __INTEROPTOPUS_NEVER
-                        #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(uint));
-                        #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
                         }
-                        #endif
                     }
                 }
                 return rval;
@@ -299,7 +281,6 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
-        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public ReadOnlySpan<byte> ReadOnlySpan
         {
             get
@@ -310,7 +291,6 @@ namespace My.Company.Common
                 }
             }
         }
-        #endif
         public byte this[int i]
         {
             get
@@ -332,14 +312,10 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
-                        #if __INTEROPTOPUS_NEVER
-                        #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(byte));
-                        #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
                         }
-                        #endif
                     }
                 }
                 return rval;
@@ -383,7 +359,6 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
-        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public ReadOnlySpan<Vec> ReadOnlySpan
         {
             get
@@ -394,7 +369,6 @@ namespace My.Company.Common
                 }
             }
         }
-        #endif
         public Vec this[int i]
         {
             get
@@ -416,14 +390,10 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
-                        #if __INTEROPTOPUS_NEVER
-                        #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Vec));
-                        #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
                         }
-                        #endif
                     }
                 }
                 return rval;
@@ -431,111 +401,6 @@ namespace My.Company.Common
         }
         public int Count => (int) len;
         public IEnumerator<Vec> GetEnumerator()
-        {
-            for (var i = 0; i < (int)len; ++i)
-            {
-                yield return this[i];
-            }
-        }
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
-    }
-
-
-    ///A pointer to an array of data someone else owns which may be modified.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct SliceMutConstPtrI8
-    {
-        ///Pointer to start of mutable data.
-        IntPtr data;
-        ///Number of elements.
-        ulong len;
-    }
-
-    public partial struct SliceMutConstPtrI8 : IEnumerable<IntPtr>
-    {
-        public SliceMutConstPtrI8(GCHandle handle, ulong count)
-        {
-            this.data = handle.AddrOfPinnedObject();
-            this.len = count;
-        }
-        public SliceMutConstPtrI8(IntPtr handle, ulong count)
-        {
-            this.data = handle;
-            this.len = count;
-        }
-        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
-        public ReadOnlySpan<IntPtr> ReadOnlySpan
-        {
-            get
-            {
-                unsafe
-                {
-                    return new ReadOnlySpan<IntPtr>(this.data.ToPointer(), (int) this.len);
-                }
-            }
-        }
-        #endif
-        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
-        public Span<IntPtr> Span
-        {
-            get
-            {
-                unsafe
-                {
-                    return new Span<IntPtr>(this.data.ToPointer(), (int) this.len);
-                }
-            }
-        }
-        #endif
-        public IntPtr this[int i]
-        {
-            get
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                unsafe
-                {
-                    var d = (IntPtr*) data.ToPointer();
-                    return d[i];
-                }
-            }
-            set
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                unsafe
-                {
-                    var d = (IntPtr*) data.ToPointer();
-                    d[i] = value;
-                }
-            }
-        }
-        public IntPtr[] Copied
-        {
-            get
-            {
-                var rval = new IntPtr[len];
-                unsafe
-                {
-                    fixed (void* dst = rval)
-                    {
-                        #if __FALSE
-                        #elif NETCOREAPP
-                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(IntPtr));
-                        #else
-                        for (var i = 0; i < (int) len; i++) {
-                            rval[i] = this[i];
-                        }
-                        #endif
-                    }
-                }
-                return rval;
-            }
-        }
-        public int Count => (int) len;
-        public IEnumerator<IntPtr> GetEnumerator()
         {
             for (var i = 0; i < (int)len; ++i)
             {
@@ -572,7 +437,6 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
-        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public ReadOnlySpan<uint> ReadOnlySpan
         {
             get
@@ -583,8 +447,6 @@ namespace My.Company.Common
                 }
             }
         }
-        #endif
-        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public Span<uint> Span
         {
             get
@@ -595,7 +457,6 @@ namespace My.Company.Common
                 }
             }
         }
-        #endif
         public uint this[int i]
         {
             get
@@ -626,14 +487,10 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
-                        #if __FALSE
-                        #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(uint));
-                        #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
                         }
-                        #endif
                     }
                 }
                 return rval;
@@ -677,7 +534,6 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
-        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public ReadOnlySpan<byte> ReadOnlySpan
         {
             get
@@ -688,8 +544,6 @@ namespace My.Company.Common
                 }
             }
         }
-        #endif
-        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public Span<byte> Span
         {
             get
@@ -700,7 +554,6 @@ namespace My.Company.Common
                 }
             }
         }
-        #endif
         public byte this[int i]
         {
             get
@@ -731,14 +584,10 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
-                        #if __FALSE
-                        #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(byte));
-                        #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
                         }
-                        #endif
                     }
                 }
                 return rval;
@@ -782,7 +631,6 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
-        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public ReadOnlySpan<Vec> ReadOnlySpan
         {
             get
@@ -793,8 +641,6 @@ namespace My.Company.Common
                 }
             }
         }
-        #endif
-        #if (NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER || NETCOREAPP2_1_OR_GREATER)
         public Span<Vec> Span
         {
             get
@@ -805,7 +651,6 @@ namespace My.Company.Common
                 }
             }
         }
-        #endif
         public Vec this[int i]
         {
             get
@@ -836,14 +681,10 @@ namespace My.Company.Common
                 {
                     fixed (void* dst = rval)
                     {
-                        #if __FALSE
-                        #elif NETCOREAPP
                         Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Vec));
-                        #else
                         for (var i = 0; i < (int) len; i++) {
                             rval[i] = this[i];
                         }
-                        #endif
                     }
                 }
                 return rval;
