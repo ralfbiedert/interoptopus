@@ -29,3 +29,5 @@ perf = { level = "deny", priority = -1 }
 style = { level = "deny", priority = -1 }
 pedantic = { level = "deny", priority = -1 }
 nursery = { level = "deny", priority = -1 } # We might want to disable this if it causes issues.
+
+option_if_let_else = "allow" # trips up on `darling`

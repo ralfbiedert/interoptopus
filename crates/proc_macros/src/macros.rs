@@ -1,4 +1,4 @@
-/// Parse a TokenStream for an attribute into the corresponding `darling` struct.
+/// Parse a `TokenStream` for an attribute into the corresponding `darling` struct.
 macro_rules! darling_parse {
     ($t:ty, $args:expr) => {{
         use darling::ast::NestedMeta;

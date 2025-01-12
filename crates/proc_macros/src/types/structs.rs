@@ -42,6 +42,7 @@ use syn::{GenericParam, ItemStruct, Type};
 //
 // ```
 //
+#[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
 pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: ItemStruct) -> TokenStream {
     let namespace = attributes.namespace.clone().unwrap_or_default();
     let doc_line = extract_doc_lines(&item.attrs).join("\n");
@@ -111,7 +112,7 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
     }
 
     for (i, field) in item.fields.iter().enumerate() {
-        let name = field.ident.as_ref().map(|x| x.to_string()).unwrap_or_else(|| format!("x{}", i));
+        let name = field.ident.as_ref().map_or_else(|| format!("x{i}"), ToString::to_string);
 
         if attributes.skip.contains_key(&name) {
             continue;
@@ -125,25 +126,26 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
 
         let token = match &field.ty {
             Type::Path(x) => {
-                if let Some(qself) = &x.qself {
-                    let ty = &qself.ty;
+                x.qself.as_ref().map_or_else(
+                    || x.path.to_token_stream(),
+                    |qself| {
+                        let ty = &qself.ty;
 
-                    // Ok, I really don't know if this is kosher. After some debugging it seems to work,
-                    // but this is probably brittle AF.
+                        // Ok, I really don't know if this is kosher. After some debugging it seems to work,
+                        // but this is probably brittle AF.
 
-                    let first = x.path.segments.first().expect("Must have last path segment.");
-                    let middle = x.path.segments.iter().skip(1).rev().skip(1).rev().collect::<Vec<_>>();
-                    let last = x.path.segments.last().expect("Must have last path segment.");
-                    quote! { < #ty as #first #(:: #middle)*> :: #last }
-                } else {
-                    x.path.to_token_stream()
-                }
+                        let first = x.path.segments.first().expect("Must have last path segment.");
+                        let middle = x.path.segments.iter().skip(1).rev().skip(1).rev().collect::<Vec<_>>();
+                        let last = x.path.segments.last().expect("Must have last path segment.");
+                        quote! { < #ty as #first #(:: #middle)*> :: #last }
+                    },
+                )
             }
             Type::Ptr(x) => x.to_token_stream(),
             Type::Array(x) => x.to_token_stream(),
             Type::Reference(x) => x.to_token_stream(),
             _ => {
-                panic!("Unknown token: {:?}", field);
+                panic!("Unknown token: {field:?}");
             }
         };
 
@@ -151,41 +153,41 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
         field_types.push(quote! { #token });
     }
 
-    let let_fields = match attributes.opaque {
-        true => quote! {},
-        false => quote! {
+    let let_fields = if attributes.opaque {
+        quote! {}
+    } else {
+        quote! {
                 #({
                     let documentation = ::interoptopus::lang::c::Documentation::from_line(#field_docs);
                     let the_type = #field_type_info;
                     let field = ::interoptopus::lang::c::Field::with_documentation(#field_names.to_string(), the_type, #field_visibilities, documentation);
                     fields.push(field);
                 })*
-        },
+        }
     };
 
-    let let_name = match &attributes.name {
-        Some(name) => quote! { let name = #name.to_string(); },
-        None => quote! {
-            #({
-                generics.push(<#generic_params_needing_ctypeinfo_bounds as ::interoptopus::lang::rust::CTypeInfo>::type_info().name_within_lib());
-            })*
+    let let_name = attributes.name.as_ref().map_or_else(
+        || {
+            quote! {
+                #({
+                    generics.push(<#generic_params_needing_ctypeinfo_bounds as ::interoptopus::lang::rust::CTypeInfo>::type_info().name_within_lib());
+                })*
 
-            let name = format!("{}{}", #struct_ident_c.to_string(), generics.join(""));
+                let name = format!("{}{}", #struct_ident_c.to_string(), generics.join(""));
+            }
         },
-    };
+        |name| quote! { let name = #name.to_string(); },
+    );
 
-    let attr_align = match align {
-        Some(x) => {
+    let attr_align = align.map_or_else(
+        || quote! {},
+        |x| {
             let x_lit = syn::LitInt::new(&x.to_string(), Span::call_site());
             quote! { , align( #x_lit ) }
-        }
-        None => quote! {},
-    };
+        },
+    );
 
-    let align = match align {
-        Some(x) => quote! { Some(#x) },
-        None => quote! { None },
-    };
+    let align = align.map_or_else(|| quote! { None }, |x| quote! { Some(#x) });
 
     let layout = match type_repr {
         TypeRepresentation::C => quote! { ::interoptopus::lang::c::Layout::C },
@@ -196,23 +198,23 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
     };
 
     let attr_repr = match type_repr {
-        TypeRepresentation::C => quote! { #[repr(C #attr_align)] },
+        TypeRepresentation::C | TypeRepresentation::Opaque => quote! { #[repr(C #attr_align)] },
         TypeRepresentation::Transparent => quote! { #[repr(transparent #attr_align)] },
         TypeRepresentation::Packed => quote! { #[repr(C, packed #attr_align)] },
-        TypeRepresentation::Opaque => quote! { #[repr(C #attr_align)] },
         TypeRepresentation::Primitive(x) => quote! { #[repr(#x #attr_align)] },
     };
 
-    let rval_builder = match attributes.opaque {
-        true => quote! {
+    let rval_builder = if attributes.opaque {
+        quote! {
             let mut rval = ::interoptopus::lang::c::OpaqueType::new(name, meta);
             ::interoptopus::lang::c::CType::Opaque(rval)
-        },
-        false => quote! {
+        }
+    } else {
+        quote! {
             let repr = ::interoptopus::lang::c::Representation::new(#layout, #align);
             let rval = ::interoptopus::lang::c::CompositeType::with_meta_repr(name, fields, meta, repr);
             ::interoptopus::lang::c::CType::Composite(rval)
-        },
+        }
     };
 
     if item.attrs.iter().any(|attr| attr.path().is_ident("repr")) {

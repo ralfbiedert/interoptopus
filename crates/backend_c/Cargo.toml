@@ -10,6 +10,10 @@ license = "MIT"
 documentation = "https://docs.rs/interoptopus_backend_c/"
 repository = "https://github.com/ralfbiedert/interoptopus"
 
+[lints]
+workspace = true
+
+
 [dependencies]
 interoptopus = { path = "../core" }
 heck = { workspace = true }

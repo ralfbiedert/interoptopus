@@ -11,6 +11,9 @@ categories = ["api-bindings", "development-tools::ffi"]
 documentation = "https://docs.rs/interoptopus_proc/"
 repository = "https://github.com/ralfbiedert/interoptopus"
 
+[lints]
+workspace = true
+
 [lib]
 path = "src/lib.rs"
 proc-macro = true

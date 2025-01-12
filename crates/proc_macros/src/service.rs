@@ -32,7 +32,7 @@ impl Attributes {
     }
 }
 
-pub fn ffi_service(attr: TokenStream, input: TokenStream) -> TokenStream {
+pub fn ffi_service(attr: TokenStream, input: &TokenStream) -> TokenStream {
     let attributes = darling_parse!(Attributes, attr);
     let item = syn::parse2::<ItemImpl>(input.clone()).expect("Must be item.");
     let service_type = &item.self_ty;

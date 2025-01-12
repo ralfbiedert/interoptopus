@@ -67,9 +67,10 @@ pub enum TypeRepresentation {
 
 impl Attributes {
     pub fn visibility_for_field(&self, field: &Field, name: &str) -> TokenStream {
-        let mut rval = match &field.vis {
-            Visibility::Public(_) => quote! { interoptopus::lang::c::Visibility::Public },
-            _ => quote! { interoptopus::lang::c::Visibility::Private },
+        let mut rval = if let Visibility::Public(_) = &field.vis {
+            quote! { interoptopus::lang::c::Visibility::Public }
+        } else {
+            quote! { interoptopus::lang::c::Visibility::Private }
         };
 
         if let Some(x) = self.visibility.get(name) {
@@ -92,7 +93,7 @@ impl Attributes {
     }
 
     #[rustfmt::skip]
-    fn type_repr_align(&self) -> (TypeRepresentation, Option<usize>) {
+    const fn type_repr_align(&self) -> (TypeRepresentation, Option<usize>) {
         let mut rval = (TypeRepresentation::C, None);
 
         if self.opaque { rval.0 = TypeRepresentation::Opaque; }
@@ -121,7 +122,7 @@ pub fn ffi_type(attr: TokenStream, input: TokenStream) -> TokenStream {
     };
 
     if attributes.debug {
-        println!("{}", rval);
+        println!("{rval}");
     }
 
     rval

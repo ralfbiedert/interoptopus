@@ -4,7 +4,7 @@ use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
 use syn::{Expr, ItemEnum, Lit};
 
-fn derive_variant_info(item: ItemEnum, idents: &[Ident], names: &[String], values: &[i32], docs: &[String]) -> TokenStream {
+fn derive_variant_info(item: &ItemEnum, idents: &[Ident], names: &[String], values: &[i32], docs: &[String]) -> TokenStream {
     let name = item.ident.to_string();
     let name_ident = syn::Ident::new(&name, item.ident.span());
 
@@ -70,7 +70,7 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
         }
     }
 
-    let variant_infos = derive_variant_info(item.clone(), &variant_idents, &variant_names, &variant_values, &variant_docs);
+    let variant_infos = derive_variant_info(&item, &variant_idents, &variant_names, &variant_values, &variant_docs);
 
     let ctype_info_return = if attributes.error {
         quote! {
@@ -85,18 +85,15 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
         quote! { ::interoptopus::lang::c::CType::Enum(rval) }
     };
 
-    let attr_align = match align {
-        Some(x) => {
+    let attr_align = align.map_or_else(
+        || quote! {},
+        |x| {
             let x_lit = syn::LitInt::new(&x.to_string(), Span::call_site());
             quote! { , align( #x_lit ) }
-        }
-        None => quote! {},
-    };
+        },
+    );
 
-    let align = match align {
-        Some(x) => quote! { Some(#x) },
-        None => quote! { None },
-    };
+    let align = align.map_or_else(|| quote! { None }, |x| quote! { Some(#x) });
 
     let layout = match type_repr {
         TypeRepresentation::C => quote! { ::interoptopus::lang::c::Layout::C },

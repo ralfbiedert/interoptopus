@@ -6,7 +6,7 @@ use syn::{FnArg, GenericParam, ItemFn, Pat, ReturnType, Signature, Type};
 use crate::functions::Attributes;
 use crate::util;
 
-pub fn fn_signature_type(signature: Signature) -> TokenStream {
+pub fn fn_signature_type(signature: &Signature) -> TokenStream {
     let rval = &signature.output;
     let abi = &signature.abi;
     let mut inputs = Vec::new();
@@ -55,7 +55,7 @@ pub fn rval_tokens(return_type: &ReturnType) -> TokenStream {
                 quote_spanned!(span=> < #token as ::interoptopus::lang::rust::CTypeInfo>::type_info())
             }
             _ => {
-                panic!("Unsupported type at interface boundary found for rval: {:?}.", x)
+                panic!("Unsupported type at interface boundary found for rval: {x:?}.")
             }
         }
     } else {
@@ -72,7 +72,7 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
     let mut generic_parameters = Vec::new();
     let mut generic_ident = Vec::new();
 
-    let signature = fn_signature_type(item_fn.sig.clone());
+    let signature = fn_signature_type(&item_fn.sig);
     let rval = rval_tokens(&item_fn.sig.output);
 
     for generic in &item_fn.sig.generics.params {

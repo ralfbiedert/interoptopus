@@ -29,7 +29,7 @@ use proc_macro::TokenStream;
 /// | `opaque` | `struct` | Creates an opaque type without fields. Can only be used behind a pointer. <sup>3</sup> |
 /// | `transparent` | `struct, enum` | The struct or single variant enum will be `#[repr(transparent)]`. <sup>3</sup> |
 /// | `packed` | `struct` | The struct will be `#[repr(packed)]`. <sup>3</sup> |
-/// | `error` | `enum` | The enum will follow the FFIError result pattern. |
+/// | `error` | `enum` | The enum will follow the `FFIError` result pattern. |
 /// | `u8`, ..., `u64` | `enum` | Creates an opaque type without fields. Can only be used behind a pointer. |
 /// | `visibility(x="v")` | `struct` | Override visibility for field `x` as `public` or `private`; `_all` means all fields. <sup>2</sup>
 /// | `debug` | * | Print generated helper code in console.
@@ -146,7 +146,7 @@ pub fn ffi_function(attr: TokenStream, item: TokenStream) -> TokenStream {
 pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr = proc_macro2::TokenStream::from(attr);
     let input = proc_macro2::TokenStream::from(item);
-    constants::ffi_constant(attr, input).into()
+    constants::ffi_constant(attr, &input).into()
 }
 
 /// Creates an FFI service from an `impl Service {}` block.
@@ -233,7 +233,7 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
 pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr = proc_macro2::TokenStream::from(attr);
     let input = proc_macro2::TokenStream::from(item);
-    service::ffi_service(attr, input).into()
+    service::ffi_service(attr, &input).into()
 }
 
 /// Inside a [`#[ffi_service]`](macro@crate::ffi_service) block, mark the FFI constructor.

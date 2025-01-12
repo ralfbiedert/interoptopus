@@ -9,6 +9,9 @@ categories = ["api-bindings", "development-tools::ffi"]
 documentation = "https://docs.rs/interoptopus_backend_cpython/"
 repository = "https://github.com/ralfbiedert/interoptopus"
 
+[lints]
+workspace = true
+
 [dependencies]
 interoptopus = { path = "../core", version = "0.14.0" }
 derive_builder = { workspace = true }

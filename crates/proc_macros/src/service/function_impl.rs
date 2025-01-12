@@ -58,21 +58,17 @@ fn method_type(function: &ImplItemFn) -> MethodType {
     let attrs = function.attrs.as_slice();
 
     // Methods explicitly marked a constructors
-    if function.attrs.iter().any(|x| format!("{:?}", x).contains("ffi_service_ctor")) {
-        let ctor_attributes = attrs
-            .iter()
-            .filter_map(|attribute| AttributeCtor::from_meta(&attribute.meta).ok())
-            .next()
-            .unwrap_or_default();
+    if function.attrs.iter().any(|x| format!("{x:?}").contains("ffi_service_ctor")) {
+        let ctor_attributes = attrs.iter().find_map(|attribute| AttributeCtor::from_meta(&attribute.meta).ok()).unwrap_or_default();
 
         return MethodType::Constructor(ctor_attributes);
     }
 
     // Methods explicitly marked a service methods
-    if attrs.iter().any(|x| format!("{:?}", x).contains("ffi_service_method")) {
+    if attrs.iter().any(|x| format!("{x:?}").contains("ffi_service_method")) {
         let function_attributes = attrs
             .iter()
-            .filter(|x| format!("{:?}", x).contains("ffi_service_method"))
+            .filter(|x| format!("{x:?}").contains("ffi_service_method"))
             .map(|attribute| AttributeMethod::from_meta(&attribute.meta).unwrap())
             .next()
             .unwrap_or_default();
@@ -95,6 +91,7 @@ fn method_type(function: &ImplItemFn) -> MethodType {
     }
 }
 
+#[allow(clippy::too_many_lines, clippy::cognitive_complexity, clippy::match_same_arms)]
 pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, function: &ImplItemFn) -> Option<Descriptor> {
     let orig_fn_ident = &function.sig.ident;
     let service_type = &impl_block.self_ty;
@@ -104,10 +101,10 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
     let mut arg_names = Vec::new();
 
     for lt in impl_block.generics.lifetimes() {
-        generics.params.push(GenericParam::Lifetime(lt.clone()))
+        generics.params.push(GenericParam::Lifetime(lt.clone()));
     }
 
-    let ffi_fn_ident = Ident::new(&format!("{}{}", service_prefix, orig_fn_ident), function.span());
+    let ffi_fn_ident = Ident::new(&format!("{service_prefix}{orig_fn_ident}"), function.span());
     let error_ident = Ident::new(&attributes.error, function.span());
     let without_lifetimes = purge_lifetimes_from_type(&impl_block.self_ty);
     let doc_lines = extract_doc_lines(&function.attrs);
@@ -150,7 +147,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     Box::new(crate::util::purge_lifetimes_from_type(ty))
                 }
             })
-            .unwrap_or(service_purged_type.clone())
+            .unwrap_or_else(|| service_purged_type.clone())
     };
 
     let type_eq_check = quote_spanned! {receiver_type.span() =>
@@ -191,12 +188,12 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     inputs.push(quote_spanned!(span_arg=> #arg));
                 }
                 Pat::Wild(_) => {
-                    let new_ident = Ident::new(&format!("_anon{}", i), arg.span());
+                    let new_ident = Ident::new(&format!("_anon{i}"), arg.span());
                     let ty = &pat.ty;
                     arg_names.push(quote_spanned!(span_arg=> #new_ident));
                     inputs.push(quote_spanned!(span_arg=> #new_ident: #ty));
                 }
-                _ => panic!("Unknown pattern {:?}", pat),
+                _ => panic!("Unknown pattern {pat:?}"),
             },
         }
     }

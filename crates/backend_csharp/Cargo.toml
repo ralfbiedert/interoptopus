@@ -10,6 +10,9 @@ categories = ["api-bindings", "development-tools::ffi"]
 documentation = "https://docs.rs/interoptopus_backend_csharp/"
 repository = "https://github.com/ralfbiedert/interoptopus"
 
+[lints]
+workspace = true
+
 [features]
 serde = []
 

@@ -7,7 +7,7 @@ use syn::ItemConst;
 #[derive(Debug, FromMeta)]
 pub struct Attributes {}
 
-pub fn ffi_constant(_attr: TokenStream, input: TokenStream) -> TokenStream {
+pub fn ffi_constant(_attr: TokenStream, input: &TokenStream) -> TokenStream {
     let const_item: ItemConst = syn::parse2(input.clone()).expect("Must be item.");
 
     let const_ident = const_item.ident;
