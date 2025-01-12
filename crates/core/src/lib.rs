@@ -1,10 +1,10 @@
 #![cfg_attr(docsrs, feature(doc_cfg))] // does this work?
 //!
-//! [![Latest Version]][crates.io]
-//! [![docs]][docs.rs]
-//! ![MIT]
-//! [![Rust](https://img.shields.io/badge/rust-1.53%2B-blue.svg?maxAge=3600)](https://github.com/ralfbiedert/interoptopus)
-//! [![Rust](https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml/badge.svg?branch=master)](https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml)
+//! [![crates.io-badge]][crates.io-url]
+//! [![docs.rs-badge]][docs.rs-url]
+//! ![license-badge]
+//! [![rust-version-badge]][rust-version-url]
+//! [![rust-build-badge]][rust-build-url]
 //!
 //! ![sample_image](https://media.githubusercontent.com/media/ralfbiedert/interoptopus/master/gfx/mascot_stable_diffusion.jpg)
 //!
@@ -162,11 +162,15 @@
 //!   an interop test (i.e., a backend test running C# / Python against a DLL invoking that code)
 //!   in at least one included backend.
 //!
-//! [Latest Version]: https://img.shields.io/crates/v/interoptopus.svg
-//! [crates.io]: https://crates.io/crates/interoptopus
-//! [MIT]: https://img.shields.io/badge/license-MIT-blue.svg
-//! [docs]: https://docs.rs/interoptopus/badge.svg
-//! [docs.rs]: https://docs.rs/interoptopus/
+//! [crates.io-badge]: https://img.shields.io/crates/v/interoptopus.svg
+//! [crates.io-url]: https://crates.io/crates/interoptopus
+//! [license-badge]: https://img.shields.io/badge/license-MIT-blue.svg
+//! [docs.rs-badge]: https://docs.rs/interoptopus/badge.svg
+//! [docs.rs-url]: https://docs.rs/interoptopus/
+//! [rust-version-badge]: https://img.shields.io/badge/rust-1.83%2B-blue.svg?maxAge=3600
+//! [rust-version-url]: https://github.com/ralfbiedert/interoptopus
+//! [rust-build-badge]: https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml/badge.svg
+//! [rust-build-url]: https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml
 
 pub use crate::core::{merge_inventories, non_service_functions, Inventory, InventoryBuilder, InventoryItem, Symbol};
 pub use error::Error;

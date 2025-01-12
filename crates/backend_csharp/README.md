@@ -57,7 +57,6 @@ use interoptopus::{Error, Interop};
 #[test]
 fn bindings_csharp() -> Result<(), Error> {
     use interoptopus_backend_csharp::{Config, Generator};
-    use interoptopus_backend_csharp::overloads::{DotNet, Unity};
 
     let config = Config {
         dll_name: "example_library".to_string(),
@@ -66,7 +65,6 @@ fn bindings_csharp() -> Result<(), Error> {
     };
 
     Generator::new(config, example_library_ffi::my_inventory())
-        .add_overload_writer(DotNet::new())
         //.add_overload_writer(Unity::new())
         .write_file("bindings/csharp/Interop.cs")?;
 
@@ -98,7 +96,7 @@ namespace My.Company
         public const string NativeLib = "example_library";
 
         /// Function using the type.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "my_function")]
+        [LibraryImport(NativeLib, EntryPoint = "my_function")]
         public static extern Vec2 my_function(Vec2 input);
     }
 
