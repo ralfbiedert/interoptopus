@@ -126,7 +126,10 @@ pub trait CSharpTypeConverter {
     /// Converts the `u32` part in a Rust paramter `x: u32` to a C# equivalent. Might convert pointers to `out X` or `ref X`.
     fn to_typespecifier_in_param(&self, x: &CType) -> String {
         match &x {
-            CType::Primitive(x) => self.primitive_to_typename(x),
+            CType::Primitive(x) => match x {
+                PrimitiveType::Bool => "[MarshalAs(UnmanagedType.U1)] bool".to_string(),
+                _ => self.primitive_to_typename(x),
+            },
             CType::Array(_) => todo!(),
             CType::Enum(x) => self.enum_to_typename(x),
             CType::Opaque(x) => self.opaque_to_typename(x),
@@ -153,7 +156,7 @@ pub trait CSharpTypeConverter {
             },
             CType::FnPointer(x) => self.fnpointer_to_typename(x),
             CType::Pattern(x) => match x {
-                TypePattern::CStrPointer => "string".to_string(),
+                TypePattern::CStrPointer => "[MarshalAs(UnmanagedType.LPStr)] string".to_string(),
                 TypePattern::FFIErrorEnum(e) => self.enum_to_typename(e.the_enum()),
                 TypePattern::Slice(x) => self.composite_to_typename(x),
                 TypePattern::SliceMut(x) => self.composite_to_typename(x),

@@ -152,11 +152,13 @@ pub trait CSharpWriter {
     }
 
     fn write_function_annotation(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
-        indented!(
-            w,
-            r#"[DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "{}")]"#,
-            function.name()
-        )
+        indented!(w, r#"[LibraryImport(NativeLib, EntryPoint = "{}")]"#, function.name())?;
+
+        if *function.signature().rval() == CType::Primitive(PrimitiveType::Bool) {
+            indented!(w, r#"[return: MarshalAs(UnmanagedType.U1)]"#)?;
+        }
+
+        Ok(())
     }
 
     fn write_function_declaration(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
@@ -177,7 +179,7 @@ pub trait CSharpWriter {
             params.push(format!("{} {}", the_type, name));
         }
 
-        indented!(w, r#"public static extern {} {}({});"#, rval, name, params.join(", "))
+        indented!(w, r#"public static partial {} {}({});"#, rval, name, params.join(", "))
     }
 
     fn write_function_overload(&self, w: &mut IndentWriter, function: &Function, write_for: WriteFor) -> Result<(), Error> {

@@ -19,8 +19,8 @@ namespace My.Company
         }
 
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "start_server")]
-        public static extern void start_server(string server_name);
+        [LibraryImport(NativeLib, EntryPoint = "start_server")]
+        public static partial void start_server([MarshalAs(UnmanagedType.LPStr)] string server_name);
 
         /// Destroys the given instance.
         ///
@@ -28,8 +28,8 @@ namespace My.Company
         ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "game_engine_destroy")]
-        public static extern FFIError game_engine_destroy(ref IntPtr context);
+        [LibraryImport(NativeLib, EntryPoint = "game_engine_destroy")]
+        public static partial FFIError game_engine_destroy(ref IntPtr context);
 
         /// Destroys the given instance.
         ///
@@ -46,8 +46,8 @@ namespace My.Company
             }
         }
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "game_engine_new")]
-        public static extern FFIError game_engine_new(ref IntPtr context);
+        [LibraryImport(NativeLib, EntryPoint = "game_engine_new")]
+        public static partial FFIError game_engine_new(ref IntPtr context);
 
         public static void game_engine_new_checked(ref IntPtr context)
         {
@@ -58,10 +58,10 @@ namespace My.Company
             }
         }
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "game_engine_place_object")]
-        public static extern FFIError game_engine_place_object(IntPtr context, string name, Vec2 position);
+        [LibraryImport(NativeLib, EntryPoint = "game_engine_place_object")]
+        public static partial FFIError game_engine_place_object(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position);
 
-        public static void game_engine_place_object_checked(IntPtr context, string name, Vec2 position)
+        public static void game_engine_place_object_checked(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position)
         {
             var rval = game_engine_place_object(context, name, position);;
             if (rval != FFIError.Ok)
@@ -70,8 +70,8 @@ namespace My.Company
             }
         }
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "game_engine_num_objects")]
-        public static extern uint game_engine_num_objects(IntPtr context);
+        [LibraryImport(NativeLib, EntryPoint = "game_engine_num_objects")]
+        public static partial uint game_engine_num_objects(IntPtr context);
 
     }
 
@@ -119,7 +119,7 @@ namespace My.Company
             }
         }
 
-        public void PlaceObject(string name, Vec2 position)
+        public void PlaceObject([MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position)
         {
             var rval = Interop.game_engine_place_object(_context, name, position);
             if (rval != FFIError.Ok)

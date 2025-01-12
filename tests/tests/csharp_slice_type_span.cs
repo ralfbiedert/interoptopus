@@ -20,8 +20,8 @@ namespace My.Company
         }
 
 
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "sample_function")]
-        public static extern void sample_function(SliceU8 ignored);
+        [LibraryImport(NativeLib, EntryPoint = "sample_function")]
+        public static partial void sample_function(SliceU8 ignored);
 
         public static void sample_function(System.ReadOnlySpan<byte> ignored)
         {

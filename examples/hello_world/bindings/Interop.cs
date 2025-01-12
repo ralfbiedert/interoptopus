@@ -20,8 +20,8 @@ namespace My.Company
 
 
         /// Function using the type.
-        [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "my_function")]
-        public static extern Vec2 my_function(Vec2 input);
+        [LibraryImport(NativeLib, EntryPoint = "my_function")]
+        public static partial Vec2 my_function(Vec2 input);
 
     }
 
