@@ -107,7 +107,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "complex_args_1")]
         public static partial FFIError complex_args_1(Vec3f32 a, ref Tupled b);
 
-        public static void complex_args_1_checked(Vec3f32 a, ref Tupled b)
+        public static unsafe void complex_args_1_checked(Vec3f32 a, ref Tupled b)
         {
             var rval = complex_args_1(a, ref b);;
             if (rval != FFIError.Ok)
@@ -163,37 +163,31 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice")]
         public static partial SliceVec namespaced_inner_slice(SliceVec x);
 
-        public static SliceVec namespaced_inner_slice(System.ReadOnlySpan<Vec> x)
+        public static unsafe SliceVec namespaced_inner_slice(System.ReadOnlySpan<Vec> x)
         {
-            unsafe
+            fixed (void* ptr_x = x)
             {
-                fixed (void* ptr_x = x)
-                {
-                    var x_slice = new SliceVec(new IntPtr(ptr_x), (ulong) x.Length);
-                    return namespaced_inner_slice(x_slice);;
-                }
+                var x_slice = new SliceVec(new IntPtr(ptr_x), (ulong) x.Length);
+                return namespaced_inner_slice(x_slice);;
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice_mut")]
         public static partial SliceMutVec namespaced_inner_slice_mut(SliceMutVec x);
 
-        public static SliceMutVec namespaced_inner_slice_mut(System.Span<Vec> x)
+        public static unsafe SliceMutVec namespaced_inner_slice_mut(System.Span<Vec> x)
         {
-            unsafe
+            fixed (void* ptr_x = x)
             {
-                fixed (void* ptr_x = x)
-                {
-                    var x_slice = new SliceMutVec(new IntPtr(ptr_x), (ulong) x.Length);
-                    return namespaced_inner_slice_mut(x_slice);;
-                }
+                var x_slice = new SliceMutVec(new IntPtr(ptr_x), (ulong) x.Length);
+                return namespaced_inner_slice_mut(x_slice);;
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "panics")]
         public static partial FFIError panics();
 
-        public static void panics_checked()
+        public static unsafe void panics_checked()
         {
             var rval = panics();;
             if (rval != FFIError.Ok)
@@ -230,78 +224,63 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1")]
         public static partial uint pattern_ffi_slice_1(SliceU32 ffi_slice);
 
-        public static uint pattern_ffi_slice_1(System.ReadOnlySpan<uint> ffi_slice)
+        public static unsafe uint pattern_ffi_slice_1(System.ReadOnlySpan<uint> ffi_slice)
         {
-            unsafe
+            fixed (void* ptr_ffi_slice = ffi_slice)
             {
-                fixed (void* ptr_ffi_slice = ffi_slice)
-                {
-                    var ffi_slice_slice = new SliceU32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
-                    return pattern_ffi_slice_1(ffi_slice_slice);;
-                }
+                var ffi_slice_slice = new SliceU32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
+                return pattern_ffi_slice_1(ffi_slice_slice);;
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1b")]
         public static partial uint pattern_ffi_slice_1b(SliceMutU32 ffi_slice);
 
-        public static uint pattern_ffi_slice_1b(System.Span<uint> ffi_slice)
+        public static unsafe uint pattern_ffi_slice_1b(System.Span<uint> ffi_slice)
         {
-            unsafe
+            fixed (void* ptr_ffi_slice = ffi_slice)
             {
-                fixed (void* ptr_ffi_slice = ffi_slice)
-                {
-                    var ffi_slice_slice = new SliceMutU32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
-                    return pattern_ffi_slice_1b(ffi_slice_slice);;
-                }
+                var ffi_slice_slice = new SliceMutU32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
+                return pattern_ffi_slice_1b(ffi_slice_slice);;
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_2")]
         public static partial Vec3f32 pattern_ffi_slice_2(SliceVec3f32 ffi_slice, int i);
 
-        public static Vec3f32 pattern_ffi_slice_2(System.ReadOnlySpan<Vec3f32> ffi_slice, int i)
+        public static unsafe Vec3f32 pattern_ffi_slice_2(System.ReadOnlySpan<Vec3f32> ffi_slice, int i)
         {
-            unsafe
+            fixed (void* ptr_ffi_slice = ffi_slice)
             {
-                fixed (void* ptr_ffi_slice = ffi_slice)
-                {
-                    var ffi_slice_slice = new SliceVec3f32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
-                    return pattern_ffi_slice_2(ffi_slice_slice, i);;
-                }
+                var ffi_slice_slice = new SliceVec3f32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
+                return pattern_ffi_slice_2(ffi_slice_slice, i);;
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_3")]
         public static partial void pattern_ffi_slice_3(SliceMutU8 slice, CallbackSliceMut callback);
 
-        public unsafe static void pattern_ffi_slice_3(System.Span<byte> slice, CallbackSliceMut callback)
+        public static unsafe void pattern_ffi_slice_3(System.Span<byte> slice, CallbackSliceMut callback)
         {
-            unsafe
+            fixed (void* ptr_slice = slice)
             {
-                fixed (void* ptr_slice = slice)
-                {
-                    var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                    pattern_ffi_slice_3(slice_slice, callback);;
-                }
+                var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                pattern_ffi_slice_3(slice_slice, callback);;
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_4")]
         public static partial void pattern_ffi_slice_4(SliceU8 slice, SliceMutU8 slice2);
 
-        public static void pattern_ffi_slice_4(System.ReadOnlySpan<byte> slice, System.Span<byte> slice2)
+        public static unsafe void pattern_ffi_slice_4(System.ReadOnlySpan<byte> slice, System.Span<byte> slice2)
         {
-            unsafe
+            fixed (void* ptr_slice = slice)
             {
-                fixed (void* ptr_slice = slice)
+                var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                fixed (void* ptr_slice2 = slice2)
                 {
-                    var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                    fixed (void* ptr_slice2 = slice2)
-                    {
-                        var slice2_slice = new SliceMutU8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
-                        pattern_ffi_slice_4(slice_slice, slice2_slice);;
-                    }
+                    var slice2_slice = new SliceMutU8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
+                    pattern_ffi_slice_4(slice_slice, slice2_slice);;
                 }
             }
         }
@@ -309,18 +288,15 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_5")]
         public static partial void pattern_ffi_slice_5(ref SliceU8 slice, ref SliceMutU8 slice2);
 
-        public static void pattern_ffi_slice_5(System.ReadOnlySpan<byte> slice, System.Span<byte> slice2)
+        public static unsafe void pattern_ffi_slice_5(System.ReadOnlySpan<byte> slice, System.Span<byte> slice2)
         {
-            unsafe
+            fixed (void* ptr_slice = slice)
             {
-                fixed (void* ptr_slice = slice)
+                var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                fixed (void* ptr_slice2 = slice2)
                 {
-                    var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                    fixed (void* ptr_slice2 = slice2)
-                    {
-                        var slice2_slice = new SliceMutU8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
-                        pattern_ffi_slice_5(ref slice_slice, ref slice2_slice);;
-                    }
+                    var slice2_slice = new SliceMutU8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
+                    pattern_ffi_slice_5(ref slice_slice, ref slice2_slice);;
                 }
             }
         }
@@ -328,15 +304,12 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_6")]
         public static partial void pattern_ffi_slice_6(ref SliceMutU8 slice, CallbackU8 callback);
 
-        public static void pattern_ffi_slice_6(System.Span<byte> slice, CallbackU8 callback)
+        public static unsafe void pattern_ffi_slice_6(System.Span<byte> slice, CallbackU8 callback)
         {
-            unsafe
+            fixed (void* ptr_slice = slice)
             {
-                fixed (void* ptr_slice = slice)
-                {
-                    var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                    pattern_ffi_slice_6(ref slice_slice, callback);;
-                }
+                var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                pattern_ffi_slice_6(ref slice_slice, callback);;
             }
         }
 
@@ -385,7 +358,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_7")]
         public static partial FFIError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o);
 
-        public static void pattern_callback_7_checked(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o)
+        public static unsafe void pattern_callback_7_checked(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o)
         {
             var c1_safe_delegate = new SumDelegateReturnExceptionSafe(c1);
             var rval = pattern_callback_7(c1_safe_delegate.Call, c2, x, i, out o);;
@@ -414,7 +387,7 @@ namespace My.Company
         ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
-        public static void basic_service_destroy_checked(ref IntPtr context)
+        public static unsafe void basic_service_destroy_checked(ref IntPtr context)
         {
             var rval = basic_service_destroy(ref context);;
             if (rval != FFIError.Ok)
@@ -426,7 +399,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "basic_service_new")]
         public static partial FFIError basic_service_new(ref IntPtr context);
 
-        public static void basic_service_new_checked(ref IntPtr context)
+        public static unsafe void basic_service_new_checked(ref IntPtr context)
         {
             var rval = basic_service_new(ref context);;
             if (rval != FFIError.Ok)
@@ -450,7 +423,7 @@ namespace My.Company
         ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
-        public static void service_on_panic_destroy_checked(ref IntPtr context)
+        public static unsafe void service_on_panic_destroy_checked(ref IntPtr context)
         {
             var rval = service_on_panic_destroy(ref context);;
             if (rval != FFIError.Ok)
@@ -462,7 +435,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_new")]
         public static partial FFIError service_on_panic_new(ref IntPtr context);
 
-        public static void service_on_panic_new_checked(ref IntPtr context)
+        public static unsafe void service_on_panic_new_checked(ref IntPtr context)
         {
             var rval = service_on_panic_new(ref context);;
             if (rval != FFIError.Ok)
@@ -478,7 +451,7 @@ namespace My.Company
 
         /// Methods returning a Result<(), _> are the default and do not
         /// need annotations.
-        public static void service_on_panic_return_result_checked(IntPtr context, uint anon1)
+        public static unsafe void service_on_panic_return_result_checked(IntPtr context, uint anon1)
         {
             var rval = service_on_panic_return_result(context, anon1);;
             if (rval != FFIError.Ok)
@@ -511,7 +484,7 @@ namespace My.Company
         ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
-        public static void service_callbacks_destroy_checked(ref IntPtr context)
+        public static unsafe void service_callbacks_destroy_checked(ref IntPtr context)
         {
             var rval = service_callbacks_destroy(ref context);;
             if (rval != FFIError.Ok)
@@ -523,7 +496,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_new")]
         public static partial FFIError service_callbacks_new(ref IntPtr context);
 
-        public static void service_callbacks_new_checked(ref IntPtr context)
+        public static unsafe void service_callbacks_new_checked(ref IntPtr context)
         {
             var rval = service_callbacks_new(ref context);;
             if (rval != FFIError.Ok)
@@ -535,7 +508,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_simple")]
         public static partial FFIError service_callbacks_callback_simple(IntPtr context, MyCallback callback);
 
-        public static void service_callbacks_callback_simple_checked(IntPtr context, MyCallback callback)
+        public static unsafe void service_callbacks_callback_simple_checked(IntPtr context, MyCallback callback)
         {
             var rval = service_callbacks_callback_simple(context, callback);;
             if (rval != FFIError.Ok)
@@ -547,7 +520,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_ffi_return")]
         public static partial FFIError service_callbacks_callback_ffi_return(IntPtr context, SumDelegateReturn callback);
 
-        public static void service_callbacks_callback_ffi_return_checked(IntPtr context, SumDelegateReturn callback)
+        public static unsafe void service_callbacks_callback_ffi_return_checked(IntPtr context, SumDelegateReturn callback)
         {
             var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
             var rval = service_callbacks_callback_ffi_return(context, callback_safe_delegate.Call);;
@@ -561,20 +534,17 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_with_slice")]
         public static partial FFIError service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, SliceI32 input);
 
-        public static void service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, System.ReadOnlySpan<int> input)
+        public static unsafe void service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, System.ReadOnlySpan<int> input)
         {
             var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
-            unsafe
+            fixed (void* ptr_input = input)
             {
-                fixed (void* ptr_input = input)
+                var input_slice = new SliceI32(new IntPtr(ptr_input), (ulong) input.Length);
+                var rval = service_callbacks_callback_with_slice(context, callback_safe_delegate.Call, input_slice);;
+                callback_safe_delegate.Rethrow();
+                if (rval != FFIError.Ok)
                 {
-                    var input_slice = new SliceI32(new IntPtr(ptr_input), (ulong) input.Length);
-                    var rval = service_callbacks_callback_with_slice(context, callback_safe_delegate.Call, input_slice);;
-                    callback_safe_delegate.Rethrow();
-                    if (rval != FFIError.Ok)
-                    {
-                        throw new InteropException<FFIError>(rval);
-                    }
+                    throw new InteropException<FFIError>(rval);
                 }
             }
         }
@@ -582,7 +552,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_invoke_delegates")]
         public static partial FFIError service_callbacks_invoke_delegates(IntPtr context);
 
-        public static void service_callbacks_invoke_delegates_checked(IntPtr context)
+        public static unsafe void service_callbacks_invoke_delegates_checked(IntPtr context)
         {
             var rval = service_callbacks_invoke_delegates(context);;
             if (rval != FFIError.Ok)
@@ -606,7 +576,7 @@ namespace My.Company
         ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
-        public static void service_ignoring_methods_destroy_checked(ref IntPtr context)
+        public static unsafe void service_ignoring_methods_destroy_checked(ref IntPtr context)
         {
             var rval = service_ignoring_methods_destroy(ref context);;
             if (rval != FFIError.Ok)
@@ -618,7 +588,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_new")]
         public static partial FFIError service_ignoring_methods_new(ref IntPtr context);
 
-        public static void service_ignoring_methods_new_checked(ref IntPtr context)
+        public static unsafe void service_ignoring_methods_new_checked(ref IntPtr context)
         {
             var rval = service_ignoring_methods_new(ref context);;
             if (rval != FFIError.Ok)
@@ -642,7 +612,7 @@ namespace My.Company
         ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
-        public static void service_multiple_ctors_destroy_checked(ref IntPtr context)
+        public static unsafe void service_multiple_ctors_destroy_checked(ref IntPtr context)
         {
             var rval = service_multiple_ctors_destroy(ref context);;
             if (rval != FFIError.Ok)
@@ -654,7 +624,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with")]
         public static partial FFIError service_multiple_ctors_new_with(ref IntPtr context, uint some_value);
 
-        public static void service_multiple_ctors_new_with_checked(ref IntPtr context, uint some_value)
+        public static unsafe void service_multiple_ctors_new_with_checked(ref IntPtr context, uint some_value)
         {
             var rval = service_multiple_ctors_new_with(ref context, some_value);;
             if (rval != FFIError.Ok)
@@ -666,7 +636,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_without")]
         public static partial FFIError service_multiple_ctors_new_without(ref IntPtr context);
 
-        public static void service_multiple_ctors_new_without_checked(ref IntPtr context)
+        public static unsafe void service_multiple_ctors_new_without_checked(ref IntPtr context)
         {
             var rval = service_multiple_ctors_new_without(ref context);;
             if (rval != FFIError.Ok)
@@ -678,7 +648,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with_string")]
         public static partial FFIError service_multiple_ctors_new_with_string(ref IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string anon0);
 
-        public static void service_multiple_ctors_new_with_string_checked(ref IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string anon0)
+        public static unsafe void service_multiple_ctors_new_with_string_checked(ref IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string anon0)
         {
             var rval = service_multiple_ctors_new_with_string(ref context, anon0);;
             if (rval != FFIError.Ok)
@@ -690,7 +660,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_failing")]
         public static partial FFIError service_multiple_ctors_new_failing(ref IntPtr context, byte some_value);
 
-        public static void service_multiple_ctors_new_failing_checked(ref IntPtr context, byte some_value)
+        public static unsafe void service_multiple_ctors_new_failing_checked(ref IntPtr context, byte some_value)
         {
             var rval = service_multiple_ctors_new_failing(ref context, some_value);;
             if (rval != FFIError.Ok)
@@ -714,7 +684,7 @@ namespace My.Company
         ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
-        public static void service_using_lifetimes_destroy_checked(ref IntPtr context)
+        public static unsafe void service_using_lifetimes_destroy_checked(ref IntPtr context)
         {
             var rval = service_using_lifetimes_destroy(ref context);;
             if (rval != FFIError.Ok)
@@ -726,7 +696,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_new_with")]
         public static partial FFIError service_using_lifetimes_new_with(ref IntPtr context, ref uint some_value);
 
-        public static void service_using_lifetimes_new_with_checked(ref IntPtr context, ref uint some_value)
+        public static unsafe void service_using_lifetimes_new_with_checked(ref IntPtr context, ref uint some_value)
         {
             var rval = service_using_lifetimes_new_with(ref context, ref some_value);;
             if (rval != FFIError.Ok)
@@ -738,46 +708,37 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_lifetime_1")]
         public static partial void service_using_lifetimes_lifetime_1(IntPtr context, SliceBool slice);
 
-        public static void service_using_lifetimes_lifetime_1(IntPtr context, System.ReadOnlySpan<Bool> slice)
+        public static unsafe void service_using_lifetimes_lifetime_1(IntPtr context, System.ReadOnlySpan<Bool> slice)
         {
-            unsafe
+            fixed (void* ptr_slice = slice)
             {
-                fixed (void* ptr_slice = slice)
-                {
-                    var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
-                    service_using_lifetimes_lifetime_1(context, slice_slice);;
-                }
+                var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
+                service_using_lifetimes_lifetime_1(context, slice_slice);;
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_lifetime_2")]
         public static partial void service_using_lifetimes_lifetime_2(IntPtr context, SliceBool slice);
 
-        public static void service_using_lifetimes_lifetime_2(IntPtr context, System.ReadOnlySpan<Bool> slice)
+        public static unsafe void service_using_lifetimes_lifetime_2(IntPtr context, System.ReadOnlySpan<Bool> slice)
         {
-            unsafe
+            fixed (void* ptr_slice = slice)
             {
-                fixed (void* ptr_slice = slice)
-                {
-                    var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
-                    service_using_lifetimes_lifetime_2(context, slice_slice);;
-                }
+                var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
+                service_using_lifetimes_lifetime_2(context, slice_slice);;
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_return_string_accept_slice")]
         public static partial IntPtr service_using_lifetimes_return_string_accept_slice(IntPtr anon0, SliceU8 anon1);
 
-        public static string service_using_lifetimes_return_string_accept_slice(IntPtr anon0, System.ReadOnlySpan<byte> anon1)
+        public static unsafe string service_using_lifetimes_return_string_accept_slice(IntPtr anon0, System.ReadOnlySpan<byte> anon1)
         {
-            unsafe
+            fixed (void* ptr_anon1 = anon1)
             {
-                fixed (void* ptr_anon1 = anon1)
-                {
-                    var anon1_slice = new SliceU8(new IntPtr(ptr_anon1), (ulong) anon1.Length);
-                    var s = service_using_lifetimes_return_string_accept_slice(anon0, anon1_slice);;
-                    return Marshal.PtrToStringAnsi(s);
-                }
+                var anon1_slice = new SliceU8(new IntPtr(ptr_anon1), (ulong) anon1.Length);
+                var s = service_using_lifetimes_return_string_accept_slice(anon0, anon1_slice);;
+                return Marshal.PtrToStringAnsi(s);
             }
         }
 
@@ -796,7 +757,7 @@ namespace My.Company
         ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
-        public static void service_various_slices_destroy_checked(ref IntPtr context)
+        public static unsafe void service_various_slices_destroy_checked(ref IntPtr context)
         {
             var rval = service_various_slices_destroy(ref context);;
             if (rval != FFIError.Ok)
@@ -808,7 +769,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_new")]
         public static partial FFIError service_various_slices_new(ref IntPtr context);
 
-        public static void service_various_slices_new_checked(ref IntPtr context)
+        public static unsafe void service_various_slices_new_checked(ref IntPtr context)
         {
             var rval = service_various_slices_new(ref context);;
             if (rval != FFIError.Ok)
@@ -820,15 +781,12 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self")]
         public static partial byte service_various_slices_mut_self(IntPtr context, SliceU8 slice);
 
-        public static byte service_various_slices_mut_self(IntPtr context, System.ReadOnlySpan<byte> slice)
+        public static unsafe byte service_various_slices_mut_self(IntPtr context, System.ReadOnlySpan<byte> slice)
         {
-            unsafe
+            fixed (void* ptr_slice = slice)
             {
-                fixed (void* ptr_slice = slice)
-                {
-                    var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                    return service_various_slices_mut_self(context, slice_slice);;
-                }
+                var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                return service_various_slices_mut_self(context, slice_slice);;
             }
         }
 
@@ -837,15 +795,12 @@ namespace My.Company
         public static partial void service_various_slices_mut_self_void(IntPtr context, SliceBool slice);
 
         /// Single line.
-        public static void service_various_slices_mut_self_void(IntPtr context, System.ReadOnlySpan<Bool> slice)
+        public static unsafe void service_various_slices_mut_self_void(IntPtr context, System.ReadOnlySpan<Bool> slice)
         {
-            unsafe
+            fixed (void* ptr_slice = slice)
             {
-                fixed (void* ptr_slice = slice)
-                {
-                    var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
-                    service_various_slices_mut_self_void(context, slice_slice);;
-                }
+                var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
+                service_various_slices_mut_self_void(context, slice_slice);;
             }
         }
 
@@ -855,33 +810,27 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice")]
         public static partial byte service_various_slices_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, SliceU8 slice);
 
-        public static byte service_various_slices_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, System.ReadOnlySpan<byte> slice)
+        public static unsafe byte service_various_slices_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, System.ReadOnlySpan<byte> slice)
         {
-            unsafe
+            fixed (void* ptr_slice = slice)
             {
-                fixed (void* ptr_slice = slice)
-                {
-                    var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                    return service_various_slices_mut_self_ref_slice(context, ref x, out y, slice_slice);;
-                }
+                var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                return service_various_slices_mut_self_ref_slice(context, ref x, out y, slice_slice);;
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice_limited")]
         public static partial byte service_various_slices_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, SliceU8 slice, SliceU8 slice2);
 
-        public static byte service_various_slices_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, System.ReadOnlySpan<byte> slice, System.ReadOnlySpan<byte> slice2)
+        public static unsafe byte service_various_slices_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, System.ReadOnlySpan<byte> slice, System.ReadOnlySpan<byte> slice2)
         {
-            unsafe
+            fixed (void* ptr_slice = slice)
             {
-                fixed (void* ptr_slice = slice)
+                var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                fixed (void* ptr_slice2 = slice2)
                 {
-                    var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                    fixed (void* ptr_slice2 = slice2)
-                    {
-                        var slice2_slice = new SliceU8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
-                        return service_various_slices_mut_self_ref_slice_limited(context, ref x, out y, slice_slice, slice2_slice);;
-                    }
+                    var slice2_slice = new SliceU8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
+                    return service_various_slices_mut_self_ref_slice_limited(context, ref x, out y, slice_slice, slice2_slice);;
                 }
             }
         }
@@ -889,18 +838,15 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ffi_error")]
         public static partial FFIError service_various_slices_mut_self_ffi_error(IntPtr context, SliceMutU8 slice);
 
-        public static void service_various_slices_mut_self_ffi_error(IntPtr context, System.Span<byte> slice)
+        public static unsafe void service_various_slices_mut_self_ffi_error(IntPtr context, System.Span<byte> slice)
         {
-            unsafe
+            fixed (void* ptr_slice = slice)
             {
-                fixed (void* ptr_slice = slice)
+                var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                var rval = service_various_slices_mut_self_ffi_error(context, slice_slice);;
+                if (rval != FFIError.Ok)
                 {
-                    var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                    var rval = service_various_slices_mut_self_ffi_error(context, slice_slice);;
-                    if (rval != FFIError.Ok)
-                    {
-                        throw new InteropException<FFIError>(rval);
-                    }
+                    throw new InteropException<FFIError>(rval);
                 }
             }
         }
@@ -908,18 +854,15 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_no_error")]
         public static partial FFIError service_various_slices_mut_self_no_error(IntPtr context, SliceMutU8 slice);
 
-        public static void service_various_slices_mut_self_no_error(IntPtr context, System.Span<byte> slice)
+        public static unsafe void service_various_slices_mut_self_no_error(IntPtr context, System.Span<byte> slice)
         {
-            unsafe
+            fixed (void* ptr_slice = slice)
             {
-                fixed (void* ptr_slice = slice)
+                var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                var rval = service_various_slices_mut_self_no_error(context, slice_slice);;
+                if (rval != FFIError.Ok)
                 {
-                    var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                    var rval = service_various_slices_mut_self_no_error(context, slice_slice);;
-                    if (rval != FFIError.Ok)
-                    {
-                        throw new InteropException<FFIError>(rval);
-                    }
+                    throw new InteropException<FFIError>(rval);
                 }
             }
         }
@@ -949,7 +892,7 @@ namespace My.Company
         ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
-        public static void service_strings_destroy_checked(ref IntPtr context)
+        public static unsafe void service_strings_destroy_checked(ref IntPtr context)
         {
             var rval = service_strings_destroy(ref context);;
             if (rval != FFIError.Ok)
@@ -961,7 +904,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_strings_new")]
         public static partial FFIError service_strings_new(ref IntPtr context);
 
-        public static void service_strings_new_checked(ref IntPtr context)
+        public static unsafe void service_strings_new_checked(ref IntPtr context)
         {
             var rval = service_strings_new(ref context);;
             if (rval != FFIError.Ok)
@@ -1207,7 +1150,7 @@ namespace My.Company
             this.data = handle;
             this.len = count;
         }
-        public ReadOnlySpan<UseAsciiStringPattern> ReadOnlySpan
+        public unsafe ReadOnlySpan<UseAsciiStringPattern> ReadOnlySpan
         {
             get
             {
@@ -1217,7 +1160,7 @@ namespace My.Company
                 }
             }
         }
-        public UseAsciiStringPattern this[int i]
+        public unsafe UseAsciiStringPattern this[int i]
         {
             get
             {
@@ -1227,7 +1170,7 @@ namespace My.Company
                 return Marshal.PtrToStructure<UseAsciiStringPattern>(ptr);
             }
         }
-        public UseAsciiStringPattern[] Copied
+        public unsafe UseAsciiStringPattern[] Copied
         {
             get
             {
@@ -1276,7 +1219,7 @@ namespace My.Company
             this.data = handle;
             this.len = count;
         }
-        public ReadOnlySpan<Vec3f32> ReadOnlySpan
+        public unsafe ReadOnlySpan<Vec3f32> ReadOnlySpan
         {
             get
             {
@@ -1286,31 +1229,25 @@ namespace My.Company
                 }
             }
         }
-        public Vec3f32 this[int i]
+        public unsafe Vec3f32 this[int i]
         {
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                unsafe
-                {
-                    var d = (Vec3f32*) data.ToPointer();
-                    return d[i];
-                }
+                var d = (Vec3f32*) data.ToPointer();
+                return d[i];
             }
         }
-        public Vec3f32[] Copied
+        public unsafe Vec3f32[] Copied
         {
             get
             {
                 var rval = new Vec3f32[len];
-                unsafe
+                fixed (void* dst = rval)
                 {
-                    fixed (void* dst = rval)
-                    {
-                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Vec3f32));
-                        for (var i = 0; i < (int) len; i++) {
-                            rval[i] = this[i];
-                        }
+                    Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Vec3f32));
+                    for (var i = 0; i < (int) len; i++) {
+                        rval[i] = this[i];
                     }
                 }
                 return rval;

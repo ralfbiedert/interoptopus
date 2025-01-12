@@ -23,15 +23,12 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "sample_function")]
         public static partial void sample_function(SliceU8 ignored);
 
-        public static void sample_function(System.ReadOnlySpan<byte> ignored)
+        public static unsafe void sample_function(System.ReadOnlySpan<byte> ignored)
         {
-            unsafe
+            fixed (void* ptr_ignored = ignored)
             {
-                fixed (void* ptr_ignored = ignored)
-                {
-                    var ignored_slice = new SliceU8(new IntPtr(ptr_ignored), (ulong) ignored.Length);
-                    sample_function(ignored_slice);;
-                }
+                var ignored_slice = new SliceU8(new IntPtr(ptr_ignored), (ulong) ignored.Length);
+                sample_function(ignored_slice);;
             }
         }
 
@@ -60,7 +57,7 @@ namespace My.Company
             this.data = handle;
             this.len = count;
         }
-        public ReadOnlySpan<byte> ReadOnlySpan
+        public unsafe ReadOnlySpan<byte> ReadOnlySpan
         {
             get
             {
@@ -70,31 +67,25 @@ namespace My.Company
                 }
             }
         }
-        public byte this[int i]
+        public unsafe byte this[int i]
         {
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                unsafe
-                {
-                    var d = (byte*) data.ToPointer();
-                    return d[i];
-                }
+                var d = (byte*) data.ToPointer();
+                return d[i];
             }
         }
-        public byte[] Copied
+        public unsafe byte[] Copied
         {
             get
             {
                 var rval = new byte[len];
-                unsafe
+                fixed (void* dst = rval)
                 {
-                    fixed (void* dst = rval)
-                    {
-                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(byte));
-                        for (var i = 0; i < (int) len; i++) {
-                            rval[i] = this[i];
-                        }
+                    Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(byte));
+                    for (var i = 0; i < (int) len; i++) {
+                        rval[i] = this[i];
                     }
                 }
                 return rval;

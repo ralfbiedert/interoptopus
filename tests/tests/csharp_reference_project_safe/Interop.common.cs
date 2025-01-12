@@ -47,7 +47,7 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
-        public ReadOnlySpan<Bool> ReadOnlySpan
+        public unsafe ReadOnlySpan<Bool> ReadOnlySpan
         {
             get
             {
@@ -57,31 +57,25 @@ namespace My.Company.Common
                 }
             }
         }
-        public Bool this[int i]
+        public unsafe Bool this[int i]
         {
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                unsafe
-                {
-                    var d = (Bool*) data.ToPointer();
-                    return d[i];
-                }
+                var d = (Bool*) data.ToPointer();
+                return d[i];
             }
         }
-        public Bool[] Copied
+        public unsafe Bool[] Copied
         {
             get
             {
                 var rval = new Bool[len];
-                unsafe
+                fixed (void* dst = rval)
                 {
-                    fixed (void* dst = rval)
-                    {
-                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Bool));
-                        for (var i = 0; i < (int) len; i++) {
-                            rval[i] = this[i];
-                        }
+                    Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Bool));
+                    for (var i = 0; i < (int) len; i++) {
+                        rval[i] = this[i];
                     }
                 }
                 return rval;
@@ -125,7 +119,7 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
-        public ReadOnlySpan<int> ReadOnlySpan
+        public unsafe ReadOnlySpan<int> ReadOnlySpan
         {
             get
             {
@@ -135,31 +129,25 @@ namespace My.Company.Common
                 }
             }
         }
-        public int this[int i]
+        public unsafe int this[int i]
         {
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                unsafe
-                {
-                    var d = (int*) data.ToPointer();
-                    return d[i];
-                }
+                var d = (int*) data.ToPointer();
+                return d[i];
             }
         }
-        public int[] Copied
+        public unsafe int[] Copied
         {
             get
             {
                 var rval = new int[len];
-                unsafe
+                fixed (void* dst = rval)
                 {
-                    fixed (void* dst = rval)
-                    {
-                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(int));
-                        for (var i = 0; i < (int) len; i++) {
-                            rval[i] = this[i];
-                        }
+                    Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(int));
+                    for (var i = 0; i < (int) len; i++) {
+                        rval[i] = this[i];
                     }
                 }
                 return rval;
@@ -203,7 +191,7 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
-        public ReadOnlySpan<uint> ReadOnlySpan
+        public unsafe ReadOnlySpan<uint> ReadOnlySpan
         {
             get
             {
@@ -213,31 +201,25 @@ namespace My.Company.Common
                 }
             }
         }
-        public uint this[int i]
+        public unsafe uint this[int i]
         {
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                unsafe
-                {
-                    var d = (uint*) data.ToPointer();
-                    return d[i];
-                }
+                var d = (uint*) data.ToPointer();
+                return d[i];
             }
         }
-        public uint[] Copied
+        public unsafe uint[] Copied
         {
             get
             {
                 var rval = new uint[len];
-                unsafe
+                fixed (void* dst = rval)
                 {
-                    fixed (void* dst = rval)
-                    {
-                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(uint));
-                        for (var i = 0; i < (int) len; i++) {
-                            rval[i] = this[i];
-                        }
+                    Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(uint));
+                    for (var i = 0; i < (int) len; i++) {
+                        rval[i] = this[i];
                     }
                 }
                 return rval;
@@ -281,7 +263,7 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
-        public ReadOnlySpan<byte> ReadOnlySpan
+        public unsafe ReadOnlySpan<byte> ReadOnlySpan
         {
             get
             {
@@ -291,31 +273,25 @@ namespace My.Company.Common
                 }
             }
         }
-        public byte this[int i]
+        public unsafe byte this[int i]
         {
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                unsafe
-                {
-                    var d = (byte*) data.ToPointer();
-                    return d[i];
-                }
+                var d = (byte*) data.ToPointer();
+                return d[i];
             }
         }
-        public byte[] Copied
+        public unsafe byte[] Copied
         {
             get
             {
                 var rval = new byte[len];
-                unsafe
+                fixed (void* dst = rval)
                 {
-                    fixed (void* dst = rval)
-                    {
-                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(byte));
-                        for (var i = 0; i < (int) len; i++) {
-                            rval[i] = this[i];
-                        }
+                    Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(byte));
+                    for (var i = 0; i < (int) len; i++) {
+                        rval[i] = this[i];
                     }
                 }
                 return rval;
@@ -359,7 +335,7 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
-        public ReadOnlySpan<Vec> ReadOnlySpan
+        public unsafe ReadOnlySpan<Vec> ReadOnlySpan
         {
             get
             {
@@ -369,31 +345,25 @@ namespace My.Company.Common
                 }
             }
         }
-        public Vec this[int i]
+        public unsafe Vec this[int i]
         {
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                unsafe
-                {
-                    var d = (Vec*) data.ToPointer();
-                    return d[i];
-                }
+                var d = (Vec*) data.ToPointer();
+                return d[i];
             }
         }
-        public Vec[] Copied
+        public unsafe Vec[] Copied
         {
             get
             {
                 var rval = new Vec[len];
-                unsafe
+                fixed (void* dst = rval)
                 {
-                    fixed (void* dst = rval)
-                    {
-                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Vec));
-                        for (var i = 0; i < (int) len; i++) {
-                            rval[i] = this[i];
-                        }
+                    Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Vec));
+                    for (var i = 0; i < (int) len; i++) {
+                        rval[i] = this[i];
                     }
                 }
                 return rval;
@@ -437,7 +407,7 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
-        public ReadOnlySpan<uint> ReadOnlySpan
+        public unsafe ReadOnlySpan<uint> ReadOnlySpan
         {
             get
             {
@@ -447,7 +417,7 @@ namespace My.Company.Common
                 }
             }
         }
-        public Span<uint> Span
+        public unsafe Span<uint> Span
         {
             get
             {
@@ -457,40 +427,31 @@ namespace My.Company.Common
                 }
             }
         }
-        public uint this[int i]
+        public unsafe uint this[int i]
         {
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                unsafe
-                {
-                    var d = (uint*) data.ToPointer();
-                    return d[i];
-                }
+                var d = (uint*) data.ToPointer();
+                return d[i];
             }
             set
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                unsafe
-                {
-                    var d = (uint*) data.ToPointer();
-                    d[i] = value;
-                }
+                var d = (uint*) data.ToPointer();
+                d[i] = value;
             }
         }
-        public uint[] Copied
+        public unsafe uint[] Copied
         {
             get
             {
                 var rval = new uint[len];
-                unsafe
+                fixed (void* dst = rval)
                 {
-                    fixed (void* dst = rval)
-                    {
-                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(uint));
-                        for (var i = 0; i < (int) len; i++) {
-                            rval[i] = this[i];
-                        }
+                    Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(uint));
+                    for (var i = 0; i < (int) len; i++) {
+                        rval[i] = this[i];
                     }
                 }
                 return rval;
@@ -534,7 +495,7 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
-        public ReadOnlySpan<byte> ReadOnlySpan
+        public unsafe ReadOnlySpan<byte> ReadOnlySpan
         {
             get
             {
@@ -544,7 +505,7 @@ namespace My.Company.Common
                 }
             }
         }
-        public Span<byte> Span
+        public unsafe Span<byte> Span
         {
             get
             {
@@ -554,40 +515,31 @@ namespace My.Company.Common
                 }
             }
         }
-        public byte this[int i]
+        public unsafe byte this[int i]
         {
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                unsafe
-                {
-                    var d = (byte*) data.ToPointer();
-                    return d[i];
-                }
+                var d = (byte*) data.ToPointer();
+                return d[i];
             }
             set
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                unsafe
-                {
-                    var d = (byte*) data.ToPointer();
-                    d[i] = value;
-                }
+                var d = (byte*) data.ToPointer();
+                d[i] = value;
             }
         }
-        public byte[] Copied
+        public unsafe byte[] Copied
         {
             get
             {
                 var rval = new byte[len];
-                unsafe
+                fixed (void* dst = rval)
                 {
-                    fixed (void* dst = rval)
-                    {
-                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(byte));
-                        for (var i = 0; i < (int) len; i++) {
-                            rval[i] = this[i];
-                        }
+                    Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(byte));
+                    for (var i = 0; i < (int) len; i++) {
+                        rval[i] = this[i];
                     }
                 }
                 return rval;
@@ -631,7 +583,7 @@ namespace My.Company.Common
             this.data = handle;
             this.len = count;
         }
-        public ReadOnlySpan<Vec> ReadOnlySpan
+        public unsafe ReadOnlySpan<Vec> ReadOnlySpan
         {
             get
             {
@@ -641,7 +593,7 @@ namespace My.Company.Common
                 }
             }
         }
-        public Span<Vec> Span
+        public unsafe Span<Vec> Span
         {
             get
             {
@@ -651,40 +603,31 @@ namespace My.Company.Common
                 }
             }
         }
-        public Vec this[int i]
+        public unsafe Vec this[int i]
         {
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                unsafe
-                {
-                    var d = (Vec*) data.ToPointer();
-                    return d[i];
-                }
+                var d = (Vec*) data.ToPointer();
+                return d[i];
             }
             set
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                unsafe
-                {
-                    var d = (Vec*) data.ToPointer();
-                    d[i] = value;
-                }
+                var d = (Vec*) data.ToPointer();
+                d[i] = value;
             }
         }
-        public Vec[] Copied
+        public unsafe Vec[] Copied
         {
             get
             {
                 var rval = new Vec[len];
-                unsafe
+                fixed (void* dst = rval)
                 {
-                    fixed (void* dst = rval)
-                    {
-                        Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Vec));
-                        for (var i = 0; i < (int) len; i++) {
-                            rval[i] = this[i];
-                        }
+                    Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Vec));
+                    for (var i = 0; i < (int) len; i++) {
+                        rval[i] = this[i];
                     }
                 }
                 return rval;

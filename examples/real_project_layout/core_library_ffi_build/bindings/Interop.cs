@@ -38,7 +38,7 @@ namespace My.Company
         ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
-        public static void game_engine_destroy_checked(ref IntPtr context)
+        public static unsafe void game_engine_destroy_checked(ref IntPtr context)
         {
             var rval = game_engine_destroy(ref context);;
             if (rval != FFIError.Ok)
@@ -50,7 +50,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "game_engine_new")]
         public static partial FFIError game_engine_new(ref IntPtr context);
 
-        public static void game_engine_new_checked(ref IntPtr context)
+        public static unsafe void game_engine_new_checked(ref IntPtr context)
         {
             var rval = game_engine_new(ref context);;
             if (rval != FFIError.Ok)
@@ -62,7 +62,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "game_engine_place_object")]
         public static partial FFIError game_engine_place_object(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position);
 
-        public static void game_engine_place_object_checked(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position)
+        public static unsafe void game_engine_place_object_checked(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position)
         {
             var rval = game_engine_place_object(context, name, position);;
             if (rval != FFIError.Ok)

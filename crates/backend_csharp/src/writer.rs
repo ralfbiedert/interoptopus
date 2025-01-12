@@ -265,7 +265,7 @@ pub trait CSharpWriter {
             params.push(format!("{} {}", native, name));
         }
 
-        let signature = format!(r#"public static {} {}({})"#, rval, this_name, params.join(", "));
+        let signature = format!(r#"public static unsafe {} {}({})"#, rval, this_name, params.join(", "));
         if write_for == WriteFor::Docs {
             indented!(w, r#"{};"#, signature)?;
             return Ok(());
@@ -285,10 +285,6 @@ pub trait CSharpWriter {
         }
 
         if !to_pin_name.is_empty() {
-            indented!(w, [_], r#"unsafe"#)?;
-            indented!(w, [_], r#"{{"#)?;
-            w.indent();
-
             for (pin_var, slice_struct) in to_pin_name.iter().zip(to_pin_slice_type.iter()) {
                 indented!(w, [_], r#"fixed (void* ptr_{} = {})"#, pin_var, pin_var)?;
                 indented!(w, [_], r#"{{"#)?;
@@ -313,9 +309,6 @@ pub trait CSharpWriter {
                 w.unindent();
                 indented!(w, [_], r#"}}"#)?;
             }
-
-            w.unindent();
-            indented!(w, [_], r#"}}"#)?;
         }
 
         indented!(w, r#"}}"#)
@@ -856,18 +849,15 @@ pub trait CSharpWriter {
         self.write_pattern_slice_overload(w, context_type_name, &type_string)?;
 
         // Getter
-        indented!(w, [_], r#"public {} this[int i]"#, type_string)?;
+        indented!(w, [_], r#"public unsafe {} this[int i]"#, type_string)?;
         indented!(w, [_], r#"{{"#)?;
         indented!(w, [_ _], r#"get"#)?;
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"if (i >= Count) throw new IndexOutOfRangeException();"#)?;
 
         if is_blittable {
-            indented!(w, [_ _ _], r#"unsafe"#)?;
-            indented!(w, [_ _ _], r#"{{"#)?;
-            indented!(w, [_ _ _ _], r#"var d = ({}*) data.ToPointer();"#, type_string)?;
-            indented!(w, [_ _ _ _], r#"return d[i];"#)?;
-            indented!(w, [_ _ _], r#"}}"#)?;
+            indented!(w, [_ _ _], r#"var d = ({}*) data.ToPointer();"#, type_string)?;
+            indented!(w, [_ _ _], r#"return d[i];"#)?;
         } else {
             indented!(w, [_ _ _], r#"var size = Marshal.SizeOf(typeof({}));"#, type_string)?;
             indented!(w, [_ _ _], r#"var ptr = new IntPtr(data.ToInt64() + i * size);"#)?;
@@ -878,23 +868,20 @@ pub trait CSharpWriter {
         indented!(w, [_], r#"}}"#)?;
 
         // Copied
-        indented!(w, [_], r#"public {}[] Copied"#, type_string)?;
+        indented!(w, [_], r#"public unsafe {}[] Copied"#, type_string)?;
         indented!(w, [_], r#"{{"#)?;
         indented!(w, [_ _], r#"get"#)?;
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"var rval = new {}[len];"#, type_string)?;
 
         if is_blittable {
-            indented!(w, [_ _ _], r#"unsafe"#)?;
-            indented!(w, [_ _ _], r#"{{"#)?;
-            indented!(w, [_ _ _ _ ], r#"fixed (void* dst = rval)"#)?;
-            indented!(w, [_ _ _ _ ], r#"{{"#)?;
-            indented!(w, [_ _ _ _ _], r#"Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof({}));"#, type_string)?;
-            indented!(w, [_ _ _ _ _], r#"for (var i = 0; i < (int) len; i++) {{"#)?;
-            indented!(w, [_ _ _ _ _ _], r#"rval[i] = this[i];"#)?;
-            indented!(w, [_ _ _ _ _], r#"}}"#)?;
-            indented!(w, [_ _ _ _ ], r#"}}"#)?;
-            indented!(w, [_ _ _], r#"}}"#)?;
+            indented!(w, [_ _ _ ], r#"fixed (void* dst = rval)"#)?;
+            indented!(w, [_ _ _ ], r#"{{"#)?;
+            indented!(w, [_ _ _ _], r#"Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof({}));"#, type_string)?;
+            indented!(w, [_ _ _ _], r#"for (var i = 0; i < (int) len; i++) {{"#)?;
+            indented!(w, [_ _ _ _ _], r#"rval[i] = this[i];"#)?;
+            indented!(w, [_ _ _ _], r#"}}"#)?;
+            indented!(w, [_ _ _ ], r#"}}"#)?;
         } else {
             indented!(w, [_ _ _], r#"for (var i = 0; i < (int) len; i++) {{"#)?;
             indented!(w, [_ _ _ _], r#"rval[i] = this[i];"#)?;
@@ -929,7 +916,7 @@ pub trait CSharpWriter {
     }
 
     fn write_pattern_slice_overload(&self, w: &mut IndentWriter, _context_type_name: &str, type_string: &str) -> Result<(), Error> {
-        indented!(w, [_], r#"public ReadOnlySpan<{}> ReadOnlySpan"#, type_string)?;
+        indented!(w, [_], r#"public unsafe ReadOnlySpan<{}> ReadOnlySpan"#, type_string)?;
         indented!(w, [_], r#"{{"#)?;
         indented!(w, [_ _], r#"get"#)?;
         indented!(w, [_ _], r#"{{"#)?;
@@ -943,7 +930,7 @@ pub trait CSharpWriter {
     }
 
     fn write_pattern_slice_mut_overload(&self, w: &mut IndentWriter, _context_type_name: &str, type_string: &str) -> Result<(), Error> {
-        indented!(w, [_], r#"public Span<{}> Span"#, type_string)?;
+        indented!(w, [_], r#"public unsafe Span<{}> Span"#, type_string)?;
         indented!(w, [_], r#"{{"#)?;
         indented!(w, [_ _], r#"get"#)?;
         indented!(w, [_ _], r#"{{"#)?;
@@ -997,45 +984,35 @@ pub trait CSharpWriter {
         self.write_pattern_slice_mut_overload(w, context_type_name, &type_string)?;
 
         // Getter
-        indented!(w, [_], r#"public {} this[int i]"#, type_string)?;
+        indented!(w, [_], r#"public unsafe {} this[int i]"#, type_string)?;
         indented!(w, [_], r#"{{"#)?;
         indented!(w, [_ _], r#"get"#)?;
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"if (i >= Count) throw new IndexOutOfRangeException();"#)?;
-        indented!(w, [_ _ _], r#"unsafe"#)?;
-        indented!(w, [_ _ _], r#"{{"#)?;
-        indented!(w, [_ _ _ _], r#"var d = ({}*) data.ToPointer();"#, type_string)?;
-        indented!(w, [_ _ _ _], r#"return d[i];"#)?;
-        indented!(w, [_ _ _], r#"}}"#)?;
+        indented!(w, [_ _ _], r#"var d = ({}*) data.ToPointer();"#, type_string)?;
+        indented!(w, [_ _ _], r#"return d[i];"#)?;
         indented!(w, [_ _], r#"}}"#)?;
         indented!(w, [_ _], r#"set"#)?;
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"if (i >= Count) throw new IndexOutOfRangeException();"#)?;
-        indented!(w, [_ _ _], r#"unsafe"#)?;
-        indented!(w, [_ _ _], r#"{{"#)?;
-        indented!(w, [_ _ _ _], r#"var d = ({}*) data.ToPointer();"#, type_string)?;
-        indented!(w, [_ _ _ _], r#"d[i] = value;"#)?;
-        indented!(w, [_ _ _], r#"}}"#)?;
-
+        indented!(w, [_ _ _], r#"var d = ({}*) data.ToPointer();"#, type_string)?;
+        indented!(w, [_ _ _], r#"d[i] = value;"#)?;
         indented!(w, [_ _], r#"}}"#)?;
         indented!(w, [_], r#"}}"#)?;
 
         // Copied
-        indented!(w, [_], r#"public {}[] Copied"#, type_string)?;
+        indented!(w, [_], r#"public unsafe {}[] Copied"#, type_string)?;
         indented!(w, [_], r#"{{"#)?;
         indented!(w, [_ _], r#"get"#)?;
         indented!(w, [_ _], r#"{{"#)?;
         indented!(w, [_ _ _], r#"var rval = new {}[len];"#, type_string)?;
-        indented!(w, [_ _ _], r#"unsafe"#)?;
-        indented!(w, [_ _ _], r#"{{"#)?;
-        indented!(w, [_ _ _ _ ], r#"fixed (void* dst = rval)"#)?;
-        indented!(w, [_ _ _ _ ], r#"{{"#)?;
-        indented!(w, [_ _ _ _ _], r#"Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof({}));"#, type_string)?;
-        indented!(w, [_ _ _ _ _], r#"for (var i = 0; i < (int) len; i++) {{"#)?;
-        indented!(w, [_ _ _ _ _ _], r#"rval[i] = this[i];"#)?;
-        indented!(w, [_ _ _ _ _], r#"}}"#)?;
-        indented!(w, [_ _ _ _ ], r#"}}"#)?;
-        indented!(w, [_ _ _], r#"}}"#)?;
+        indented!(w, [_ _ _ ], r#"fixed (void* dst = rval)"#)?;
+        indented!(w, [_ _ _ ], r#"{{"#)?;
+        indented!(w, [_ _ _ _], r#"Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof({}));"#, type_string)?;
+        indented!(w, [_ _ _ _], r#"for (var i = 0; i < (int) len; i++) {{"#)?;
+        indented!(w, [_ _ _ _ _], r#"rval[i] = this[i];"#)?;
+        indented!(w, [_ _ _ _], r#"}}"#)?;
+        indented!(w, [_ _ _ ], r#"}}"#)?;
         indented!(w, [_ _ _], r#"return rval;"#)?;
         indented!(w, [_ _], r#"}}"#)?;
         indented!(w, [_], r#"}}"#)?;
