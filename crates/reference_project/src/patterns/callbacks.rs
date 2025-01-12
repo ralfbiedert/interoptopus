@@ -27,10 +27,11 @@ pub fn pattern_callback_2(callback: MyCallbackVoid) -> MyCallbackVoid {
     callback
 }
 
-#[ffi_function]
-pub fn pattern_callback_3(callback: DelegateCallback<MyCallbackContextual>, x: u32) {
-    callback.callback.call(callback.context, x);
-}
+// UNSUPPORTED FOR NOW - Gives errors in C# when using LibraryImport
+// #[ffi_function]
+// pub fn pattern_callback_3(callback: DelegateCallback<MyCallbackContextual>, x: u32) {
+//     callback.callback.call(callback.context, x);
+// }
 
 #[ffi_function]
 pub fn pattern_callback_4(callback: MyCallbackNamespaced, x: u32) -> u32 {

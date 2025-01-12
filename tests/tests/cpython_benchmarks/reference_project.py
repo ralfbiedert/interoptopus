@@ -21,8 +21,6 @@ def init_lib(path):
     c_lib.primitive_i16.argtypes = [ctypes.c_int16]
     c_lib.primitive_i32.argtypes = [ctypes.c_int32]
     c_lib.primitive_i64.argtypes = [ctypes.c_int64]
-    c_lib.boolean_alignment.argtypes = [BooleanAlignment]
-    c_lib.boolean_alignment2.argtypes = [ctypes.c_bool]
     c_lib.packed_to_packed1.argtypes = [Packed1]
     c_lib.many_args_5.argtypes = [ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64]
     c_lib.many_args_10.argtypes = [ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64, ctypes.c_int64]
@@ -59,7 +57,6 @@ def init_lib(path):
     c_lib.repr_transparent.argtypes = [Tupled, ctypes.POINTER(Tupled)]
     c_lib.pattern_ascii_pointer_1.argtypes = [ctypes.POINTER(ctypes.c_char)]
     c_lib.pattern_ascii_pointer_2.argtypes = []
-    c_lib.pattern_ascii_pointer_len.argtypes = [ctypes.POINTER(ctypes.c_char), UseAsciiStringPattern]
     c_lib.pattern_ascii_pointer_return_slice.argtypes = []
     c_lib.pattern_ffi_slice_1.argtypes = [SliceU32]
     c_lib.pattern_ffi_slice_1b.argtypes = [SliceMutU32]
@@ -80,7 +77,6 @@ def init_lib(path):
     c_lib.pattern_api_guard.argtypes = []
     c_lib.pattern_callback_1.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32), ctypes.c_uint32]
     c_lib.pattern_callback_2.argtypes = [ctypes.CFUNCTYPE(None, ctypes.c_void_p)]
-    c_lib.pattern_callback_3.argtypes = [DelegateCallbackMyCallbackContextual, ctypes.c_uint32]
     c_lib.pattern_callback_4.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32), ctypes.c_uint32]
     c_lib.pattern_callback_5.argtypes = []
     c_lib.pattern_callback_6.argtypes = []
@@ -98,7 +94,6 @@ def init_lib(path):
     c_lib.service_callbacks_callback_simple.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)]
     c_lib.service_callbacks_callback_ffi_return.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32)]
     c_lib.service_callbacks_callback_with_slice.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32), SliceI32]
-    c_lib.service_callbacks_set_delegate_table.argtypes = [ctypes.c_void_p, ctypes.POINTER(DelegateTable)]
     c_lib.service_callbacks_invoke_delegates.argtypes = [ctypes.c_void_p]
     c_lib.service_ignoring_methods_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.service_ignoring_methods_new.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
@@ -137,8 +132,6 @@ def init_lib(path):
     c_lib.primitive_i16.restype = ctypes.c_int16
     c_lib.primitive_i32.restype = ctypes.c_int32
     c_lib.primitive_i64.restype = ctypes.c_int64
-    c_lib.boolean_alignment.restype = BooleanAlignment
-    c_lib.boolean_alignment2.restype = BooleanAlignment
     c_lib.packed_to_packed1.restype = Packed2
     c_lib.many_args_5.restype = ctypes.c_int64
     c_lib.many_args_10.restype = ctypes.c_int64
@@ -173,7 +166,6 @@ def init_lib(path):
     c_lib.repr_transparent.restype = Tupled
     c_lib.pattern_ascii_pointer_1.restype = ctypes.c_uint32
     c_lib.pattern_ascii_pointer_2.restype = ctypes.POINTER(ctypes.c_char)
-    c_lib.pattern_ascii_pointer_len.restype = ctypes.c_uint32
     c_lib.pattern_ascii_pointer_return_slice.restype = SliceUseAsciiStringPattern
     c_lib.pattern_ffi_slice_1.restype = ctypes.c_uint32
     c_lib.pattern_ffi_slice_1b.restype = ctypes.c_uint32
@@ -294,12 +286,6 @@ def primitive_i32(x: int) -> int:
 
 def primitive_i64(x: int) -> int:
     return c_lib.primitive_i64(x)
-
-def boolean_alignment(x: BooleanAlignment) -> BooleanAlignment:
-    return c_lib.boolean_alignment(x)
-
-def boolean_alignment2(rval: bool) -> BooleanAlignment:
-    return c_lib.boolean_alignment2(rval)
 
 def packed_to_packed1(a: Packed1) -> Packed2:
     return c_lib.packed_to_packed1(a)
@@ -425,11 +411,6 @@ def pattern_ascii_pointer_2() -> bytes:
     rval = c_lib.pattern_ascii_pointer_2()
     return ctypes.string_at(rval)
 
-def pattern_ascii_pointer_len(x: bytes, y: UseAsciiStringPattern) -> int:
-    if not hasattr(x, "__ctypes_from_outparam__"):
-        x = ctypes.cast(x, ctypes.POINTER(ctypes.c_char))
-    return c_lib.pattern_ascii_pointer_len(x, y)
-
 def pattern_ascii_pointer_return_slice() -> SliceUseAsciiStringPattern:
     return c_lib.pattern_ascii_pointer_return_slice()
 
@@ -529,9 +510,6 @@ def pattern_callback_2(callback):
 
     return c_lib.pattern_callback_2(callback)
 
-def pattern_callback_3(callback: DelegateCallbackMyCallbackContextual, x: int):
-    return c_lib.pattern_callback_3(callback, x)
-
 def pattern_callback_4(callback, x: int) -> int:
     if not hasattr(callback, "__ctypes_from_outparam__"):
         callback = callbacks.fn_u32_rval_u32(callback)
@@ -620,169 +598,6 @@ class FFIError:
     Panic = 200
     Delegate = 300
     Fail = 400
-
-
-class BooleanAlignment(ctypes.Structure):
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("a", ctypes.c_int32),
-        ("b", ctypes.c_int16),
-        ("c", ctypes.c_int16),
-        ("d", ctypes.c_uint8),
-        ("e", ctypes.c_uint8),
-        ("f", ctypes.c_uint8),
-        ("g", ctypes.c_uint8),
-        ("h", ctypes.c_uint8),
-        ("i", ctypes.c_uint8),
-        ("j", ctypes.c_uint8),
-        ("k", ctypes.c_uint8),
-        ("id", ctypes.c_uint64),
-        ("is_valid", ctypes.c_bool),
-        ("datum", ctypes.c_uint64),
-    ]
-
-    def __init__(self, a: int = None, b: int = None, c: int = None, d: int = None, e: int = None, f: int = None, g: int = None, h: int = None, i: int = None, j: int = None, k: int = None, id: int = None, is_valid: bool = None, datum: int = None):
-        if a is not None:
-            self.a = a
-        if b is not None:
-            self.b = b
-        if c is not None:
-            self.c = c
-        if d is not None:
-            self.d = d
-        if e is not None:
-            self.e = e
-        if f is not None:
-            self.f = f
-        if g is not None:
-            self.g = g
-        if h is not None:
-            self.h = h
-        if i is not None:
-            self.i = i
-        if j is not None:
-            self.j = j
-        if k is not None:
-            self.k = k
-        if id is not None:
-            self.id = id
-        if is_valid is not None:
-            self.is_valid = is_valid
-        if datum is not None:
-            self.datum = datum
-
-    @property
-    def a(self) -> int:
-        return ctypes.Structure.__get__(self, "a")
-
-    @a.setter
-    def a(self, value: int):
-        return ctypes.Structure.__set__(self, "a", value)
-
-    @property
-    def b(self) -> int:
-        return ctypes.Structure.__get__(self, "b")
-
-    @b.setter
-    def b(self, value: int):
-        return ctypes.Structure.__set__(self, "b", value)
-
-    @property
-    def c(self) -> int:
-        return ctypes.Structure.__get__(self, "c")
-
-    @c.setter
-    def c(self, value: int):
-        return ctypes.Structure.__set__(self, "c", value)
-
-    @property
-    def d(self) -> int:
-        return ctypes.Structure.__get__(self, "d")
-
-    @d.setter
-    def d(self, value: int):
-        return ctypes.Structure.__set__(self, "d", value)
-
-    @property
-    def e(self) -> int:
-        return ctypes.Structure.__get__(self, "e")
-
-    @e.setter
-    def e(self, value: int):
-        return ctypes.Structure.__set__(self, "e", value)
-
-    @property
-    def f(self) -> int:
-        return ctypes.Structure.__get__(self, "f")
-
-    @f.setter
-    def f(self, value: int):
-        return ctypes.Structure.__set__(self, "f", value)
-
-    @property
-    def g(self) -> int:
-        return ctypes.Structure.__get__(self, "g")
-
-    @g.setter
-    def g(self, value: int):
-        return ctypes.Structure.__set__(self, "g", value)
-
-    @property
-    def h(self) -> int:
-        return ctypes.Structure.__get__(self, "h")
-
-    @h.setter
-    def h(self, value: int):
-        return ctypes.Structure.__set__(self, "h", value)
-
-    @property
-    def i(self) -> int:
-        return ctypes.Structure.__get__(self, "i")
-
-    @i.setter
-    def i(self, value: int):
-        return ctypes.Structure.__set__(self, "i", value)
-
-    @property
-    def j(self) -> int:
-        return ctypes.Structure.__get__(self, "j")
-
-    @j.setter
-    def j(self, value: int):
-        return ctypes.Structure.__set__(self, "j", value)
-
-    @property
-    def k(self) -> int:
-        return ctypes.Structure.__get__(self, "k")
-
-    @k.setter
-    def k(self, value: int):
-        return ctypes.Structure.__set__(self, "k", value)
-
-    @property
-    def id(self) -> int:
-        return ctypes.Structure.__get__(self, "id")
-
-    @id.setter
-    def id(self, value: int):
-        return ctypes.Structure.__set__(self, "id", value)
-
-    @property
-    def is_valid(self) -> bool:
-        return ctypes.Structure.__get__(self, "is_valid")
-
-    @is_valid.setter
-    def is_valid(self, value: bool):
-        return ctypes.Structure.__set__(self, "is_valid", value)
-
-    @property
-    def datum(self) -> int:
-        return ctypes.Structure.__get__(self, "datum")
-
-    @datum.setter
-    def datum(self, value: int):
-        return ctypes.Structure.__set__(self, "datum", value)
 
 
 class ExtraTypef32(ctypes.Structure):
@@ -1798,134 +1613,6 @@ class OptionVec(ctypes.Structure):
         return self._is_some != 0
 
 
-class DelegateCallbackMyCallbackContextual(ctypes.Structure):
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("callback", ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_uint32)),
-        ("context", ctypes.c_void_p),
-    ]
-
-    def __init__(self, callback = None, context: ctypes.c_void_p = None):
-        if callback is not None:
-            self.callback = callback
-        if context is not None:
-            self.context = context
-
-    @property
-    def callback(self):
-        return ctypes.Structure.__get__(self, "callback")
-
-    @callback.setter
-    def callback(self, value):
-        return ctypes.Structure.__set__(self, "callback", value)
-
-    @property
-    def context(self) -> ctypes.c_void_p:
-        return ctypes.Structure.__get__(self, "context")
-
-    @context.setter
-    def context(self, value: ctypes.c_void_p):
-        return ctypes.Structure.__set__(self, "context", value)
-
-
-class DelegateTable(ctypes.Structure):
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("my_callback", ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)),
-        ("my_callback_namespaced", ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)),
-        ("my_callback_void", ctypes.CFUNCTYPE(None, ctypes.c_void_p)),
-        ("my_callback_contextual", ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_uint32)),
-        ("sum_delegate_1", ctypes.CFUNCTYPE(None, )),
-        ("sum_delegate_2", ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_int32, ctypes.c_int32)),
-        ("sum_delegate_return", ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32)),
-        ("sum_delegate_return_2", ctypes.CFUNCTYPE(None, ctypes.c_int32, ctypes.c_int32)),
-    ]
-
-    def __init__(self, my_callback = None, my_callback_namespaced = None, my_callback_void = None, my_callback_contextual = None, sum_delegate_1 = None, sum_delegate_2 = None, sum_delegate_return = None, sum_delegate_return_2 = None):
-        if my_callback is not None:
-            self.my_callback = my_callback
-        if my_callback_namespaced is not None:
-            self.my_callback_namespaced = my_callback_namespaced
-        if my_callback_void is not None:
-            self.my_callback_void = my_callback_void
-        if my_callback_contextual is not None:
-            self.my_callback_contextual = my_callback_contextual
-        if sum_delegate_1 is not None:
-            self.sum_delegate_1 = sum_delegate_1
-        if sum_delegate_2 is not None:
-            self.sum_delegate_2 = sum_delegate_2
-        if sum_delegate_return is not None:
-            self.sum_delegate_return = sum_delegate_return
-        if sum_delegate_return_2 is not None:
-            self.sum_delegate_return_2 = sum_delegate_return_2
-
-    @property
-    def my_callback(self):
-        return ctypes.Structure.__get__(self, "my_callback")
-
-    @my_callback.setter
-    def my_callback(self, value):
-        return ctypes.Structure.__set__(self, "my_callback", value)
-
-    @property
-    def my_callback_namespaced(self):
-        return ctypes.Structure.__get__(self, "my_callback_namespaced")
-
-    @my_callback_namespaced.setter
-    def my_callback_namespaced(self, value):
-        return ctypes.Structure.__set__(self, "my_callback_namespaced", value)
-
-    @property
-    def my_callback_void(self):
-        return ctypes.Structure.__get__(self, "my_callback_void")
-
-    @my_callback_void.setter
-    def my_callback_void(self, value):
-        return ctypes.Structure.__set__(self, "my_callback_void", value)
-
-    @property
-    def my_callback_contextual(self):
-        return ctypes.Structure.__get__(self, "my_callback_contextual")
-
-    @my_callback_contextual.setter
-    def my_callback_contextual(self, value):
-        return ctypes.Structure.__set__(self, "my_callback_contextual", value)
-
-    @property
-    def sum_delegate_1(self):
-        return ctypes.Structure.__get__(self, "sum_delegate_1")
-
-    @sum_delegate_1.setter
-    def sum_delegate_1(self, value):
-        return ctypes.Structure.__set__(self, "sum_delegate_1", value)
-
-    @property
-    def sum_delegate_2(self):
-        return ctypes.Structure.__get__(self, "sum_delegate_2")
-
-    @sum_delegate_2.setter
-    def sum_delegate_2(self, value):
-        return ctypes.Structure.__set__(self, "sum_delegate_2", value)
-
-    @property
-    def sum_delegate_return(self):
-        return ctypes.Structure.__get__(self, "sum_delegate_return")
-
-    @sum_delegate_return.setter
-    def sum_delegate_return(self, value):
-        return ctypes.Structure.__set__(self, "sum_delegate_return", value)
-
-    @property
-    def sum_delegate_return_2(self):
-        return ctypes.Structure.__get__(self, "sum_delegate_return_2")
-
-    @sum_delegate_return_2.setter
-    def sum_delegate_return_2(self, value):
-        return ctypes.Structure.__set__(self, "sum_delegate_return_2", value)
-
-
 class SliceUseAsciiStringPattern(ctypes.Structure):
     # These fields represent the underlying C data layout
     _fields_ = [
@@ -2147,7 +1834,6 @@ class callbacks:
     fn_SliceMutU8 = ctypes.CFUNCTYPE(None, SliceMutU8)
     fn_u8_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8)
     fn_u32_rval_u32 = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)
-    fn_ConstPtr_u32 = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_uint32)
     fn_u32_rval_u32 = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)
     fn_ConstPtr = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
     fn = ctypes.CFUNCTYPE(None, )
@@ -2263,10 +1949,6 @@ class ServiceCallbacks:
             input = SliceI32(data=ctypes.cast(input, ctypes.POINTER(ctypes.c_int32)), len=len(input))
 
         return c_lib.service_callbacks_callback_with_slice(self._ctx, callback, input)
-
-    def set_delegate_table(self, table: ctypes.POINTER(DelegateTable)):
-        """"""
-        return c_lib.service_callbacks_set_delegate_table(self._ctx, table)
 
     def invoke_delegates(self, ):
         """"""

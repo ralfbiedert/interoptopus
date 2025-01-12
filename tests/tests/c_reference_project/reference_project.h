@@ -70,24 +70,6 @@ typedef enum ffierror
     FFIERROR_FAIL = 400,
     } ffierror;
 
-typedef struct booleanalignment
-    {
-    int32_t a;
-    int16_t b;
-    int16_t c;
-    uint8_t d;
-    uint8_t e;
-    uint8_t f;
-    uint8_t g;
-    uint8_t h;
-    uint8_t i;
-    uint8_t j;
-    uint8_t k;
-    uint64_t id;
-    bool is_valid;
-    uint64_t datum;
-    } booleanalignment;
-
 typedef struct extratypef32
     {
     float x;
@@ -308,27 +290,7 @@ typedef struct optionvec
     uint8_t is_some;
     } optionvec;
 
-typedef void (*mycallbackcontextual)(const void* context, uint32_t value);
-
 typedef void (*mycallbackvoid)(const void* ptr);
-
-typedef struct delegatecallbackmycallbackcontextual
-    {
-    mycallbackcontextual callback;
-    const void* context;
-    } delegatecallbackmycallbackcontextual;
-
-typedef struct delegatetable
-    {
-    mycallback my_callback;
-    mycallbacknamespaced my_callback_namespaced;
-    mycallbackvoid my_callback_void;
-    mycallbackcontextual my_callback_contextual;
-    sumdelegate1 sum_delegate_1;
-    sumdelegate2 sum_delegate_2;
-    sumdelegatereturn sum_delegate_return;
-    sumdelegatereturn2 sum_delegate_return_2;
-    } delegatetable;
 
 ///A pointer to an array of data someone else owns which may not be modified.
 typedef struct sliceuseasciistringpattern
@@ -394,10 +356,6 @@ int16_t primitive_i16(int16_t x);
 int32_t primitive_i32(int32_t x);
 
 int64_t primitive_i64(int64_t x);
-
-booleanalignment boolean_alignment(booleanalignment x);
-
-booleanalignment boolean_alignment2(bool rval);
 
 packed2 packed_to_packed1(packed1 a);
 
@@ -475,8 +433,6 @@ uint32_t pattern_ascii_pointer_1(const char* x);
 
 const char* pattern_ascii_pointer_2();
 
-uint32_t pattern_ascii_pointer_len(const char* x, useasciistringpattern y);
-
 sliceuseasciistringpattern pattern_ascii_pointer_return_slice();
 
 uint32_t pattern_ffi_slice_1(sliceu32 ffi_slice);
@@ -516,8 +472,6 @@ uint64_t pattern_api_guard();
 uint32_t pattern_callback_1(mycallback callback, uint32_t x);
 
 mycallbackvoid pattern_callback_2(mycallbackvoid callback);
-
-void pattern_callback_3(delegatecallbackmycallbackcontextual callback, uint32_t x);
 
 uint32_t pattern_callback_4(mycallbacknamespaced callback, uint32_t x);
 
@@ -575,8 +529,6 @@ ffierror service_callbacks_callback_simple(servicecallbacks* context, mycallback
 ffierror service_callbacks_callback_ffi_return(servicecallbacks* context, sumdelegatereturn callback);
 
 ffierror service_callbacks_callback_with_slice(servicecallbacks* context, sumdelegatereturn callback, slicei32 input);
-
-void service_callbacks_set_delegate_table(servicecallbacks* context, const delegatetable* table);
 
 ffierror service_callbacks_invoke_delegates(const servicecallbacks* context);
 

@@ -2,8 +2,8 @@
 
 use crate::patterns::result::{Error, FFIError};
 use crate::types::{
-    ambiguous1, ambiguous2, common, Array, BooleanAlignment, Callbacku8u8, EnumDocumented, EnumRenamedXYZ, Generic, Generic2, Generic3, Generic4, Packed1, Packed2,
-    Phantom, StructDocumented, StructRenamedXYZ, Transparent, Tupled, Vec3f32, Visibility1, Visibility2, Weird1, Weird2,
+    ambiguous1, ambiguous2, common, Array, Callbacku8u8, EnumDocumented, EnumRenamedXYZ, Generic, Generic2, Generic3, Generic4, Packed1, Packed2, Phantom,
+    StructDocumented, StructRenamedXYZ, Transparent, Tupled, Vec3f32, Visibility1, Visibility2, Weird1, Weird2,
 };
 use interoptopus::patterns::option::FFIOption;
 use interoptopus::patterns::result::panics_and_errors_to_ffi_enum;
@@ -64,19 +64,20 @@ pub fn primitive_i64(x: i64) -> i64 {
     -x
 }
 
-#[ffi_function]
-pub fn boolean_alignment(mut x: BooleanAlignment) -> BooleanAlignment {
-    x.is_valid = !x.is_valid;
-    x
-}
-
-#[ffi_function]
-pub fn boolean_alignment2(rval: bool) -> BooleanAlignment {
-    BooleanAlignment {
-        is_valid: rval,
-        ..Default::default()
-    }
-}
+// UNSUPPORTED FOR NOW - Unclear how to handle BooleanAlignment in C# with LibraryImport
+// #[ffi_function]
+// pub fn boolean_alignment(mut x: BooleanAlignment) -> BooleanAlignment {
+//     x.is_valid = !x.is_valid;
+//     x
+// }
+//
+// #[ffi_function]
+// pub fn boolean_alignment2(rval: bool) -> BooleanAlignment {
+//     BooleanAlignment {
+//         is_valid: rval,
+//         ..Default::default()
+//     }
+// }
 
 // #[ffi_function]
 // pub fn aligned_to_packed1(a: Aligned1) -> Packed1 {

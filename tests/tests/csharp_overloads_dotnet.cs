@@ -18,9 +18,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 5600732245307200640ul)
+            if (api_version != 7754963775653255763ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (5600732245307200640). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (7754963775653255763). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -64,12 +64,6 @@ namespace My.Company
 
         [LibraryImport(NativeLib, EntryPoint = "primitive_i64")]
         public static partial long primitive_i64(long x);
-
-        [LibraryImport(NativeLib, EntryPoint = "boolean_alignment")]
-        public static partial BooleanAlignment boolean_alignment(BooleanAlignment x);
-
-        [LibraryImport(NativeLib, EntryPoint = "boolean_alignment2")]
-        public static partial BooleanAlignment boolean_alignment2([MarshalAs(UnmanagedType.U1)] bool rval);
 
         [LibraryImport(NativeLib, EntryPoint = "packed_to_packed1")]
         public static partial Packed2 packed_to_packed1(Packed1 a);
@@ -232,9 +226,6 @@ namespace My.Company
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_2")]
         public static partial IntPtr pattern_ascii_pointer_2();
-
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_len")]
-        public static partial uint pattern_ascii_pointer_len([MarshalAs(UnmanagedType.LPStr)] string x, UseAsciiStringPattern y);
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_return_slice")]
         public static partial SliceUseAsciiStringPattern pattern_ascii_pointer_return_slice();
@@ -413,9 +404,6 @@ namespace My.Company
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_2")]
         public static partial MyCallbackVoid pattern_callback_2(MyCallbackVoid callback);
-
-        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_3")]
-        public static partial void pattern_callback_3(DelegateCallbackMyCallbackContextual callback, uint x);
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_4")]
         public static partial uint pattern_callback_4(MyCallbackNamespaced callback, uint x);
@@ -624,9 +612,6 @@ namespace My.Company
                 input_pinned.Free();
             }
         }
-
-        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_set_delegate_table")]
-        public static partial void service_callbacks_set_delegate_table(IntPtr context, ref DelegateTable table);
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_invoke_delegates")]
         public static partial FFIError service_callbacks_invoke_delegates(IntPtr context);
@@ -1084,52 +1069,9 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct BooleanAlignment
-    {
-        public int a;
-        public short b;
-        public short c;
-        public byte d;
-        public byte e;
-        public byte f;
-        public byte g;
-        public byte h;
-        public byte i;
-        public byte j;
-        public byte k;
-        public ulong id;
-        [MarshalAs(UnmanagedType.I1)]
-        public bool is_valid;
-        public ulong datum;
-    }
-
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct Container
     {
         public Local foreign;
-    }
-
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct DelegateCallbackMyCallbackContextual
-    {
-        public MyCallbackContextual callback;
-        public IntPtr context;
-    }
-
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct DelegateTable
-    {
-        public MyCallback my_callback;
-        public MyCallbackNamespaced my_callback_namespaced;
-        public MyCallbackVoid my_callback_void;
-        public MyCallbackContextual my_callback_contextual;
-        public SumDelegate1 sum_delegate_1;
-        public SumDelegate2 sum_delegate_2;
-        public SumDelegateReturn sum_delegate_return;
-        public SumDelegateReturn2 sum_delegate_return_2;
     }
 
     [Serializable]
@@ -1912,9 +1854,6 @@ namespace My.Company
     public delegate uint MyCallback(uint value);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void MyCallbackContextual(IntPtr context, uint value);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MyCallbackVoid(IntPtr ptr);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -2109,11 +2048,6 @@ namespace My.Company
         public void CallbackWithSlice(SumDelegateReturn callback, int[] input)
         {
             Interop.service_callbacks_callback_with_slice(_context, callback, input);
-        }
-
-        public void SetDelegateTable(ref DelegateTable table)
-        {
-            Interop.service_callbacks_set_delegate_table(_context, ref table);
         }
 
         public void InvokeDelegates()
