@@ -1,6 +1,6 @@
 use anyhow::Error;
 use interoptopus::Interop;
-use interoptopus_backend_csharp::{ConfigBuilder, Generator, Unsafe};
+use interoptopus_backend_csharp::{ConfigBuilder, Generator};
 use interoptopus_reference_project::ffi_inventory;
 use tests::backend_csharp::common_namespace_mappings;
 use tests::validate_output;

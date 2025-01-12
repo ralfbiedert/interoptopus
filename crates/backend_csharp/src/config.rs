@@ -2,7 +2,6 @@ use derive_builder::Builder;
 use interoptopus::util::NamespaceMappings;
 
 /// The kind of types to use when generating FFI method overloads.
-// TODO - THIS SHOULD BE DotNet config
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum ParamSliceType {
     /// Slices should be passed in as C# arrays.
@@ -124,8 +123,7 @@ pub struct Config {
     pub unsupported: Unsupported,
     /// The string to use for reporting within FFIError. Use `{error}` to reference the inner error content.
     pub error_text: String,
-
-    /// TODO: CAn this be rewmoved?
+    /// How arrays should be handled as parameters.
     pub param_slice_type: ParamSliceType,
 }
 
