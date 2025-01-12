@@ -109,6 +109,15 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "complex_args_1")]
         public static extern FFIError complex_args_1(Vec3f32 a, ref Tupled b);
 
+        public static void complex_args_1_checked(Vec3f32 a, ref Tupled b)
+        {
+            var rval = complex_args_1(a, ref b);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "callback")]
         public static extern byte callback(InteropDelegate_fn_u8_rval_u8 callback, byte value);
 
@@ -155,11 +164,48 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "namespaced_inner_slice")]
         public static extern SliceVec namespaced_inner_slice(SliceVec x);
 
+        public static SliceVec namespaced_inner_slice(Vec[] x)
+        {
+            var x_pinned = GCHandle.Alloc(x, GCHandleType.Pinned);
+            var x_slice = new SliceVec(x_pinned, (ulong) x.Length);
+            try
+            {
+                return namespaced_inner_slice(x_slice);;
+            }
+            finally
+            {
+                x_pinned.Free();
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "namespaced_inner_slice_mut")]
         public static extern SliceMutVec namespaced_inner_slice_mut(SliceMutVec x);
 
+        public static SliceMutVec namespaced_inner_slice_mut(Vec[] x)
+        {
+            var x_pinned = GCHandle.Alloc(x, GCHandleType.Pinned);
+            var x_slice = new SliceMutVec(x_pinned, (ulong) x.Length);
+            try
+            {
+                return namespaced_inner_slice_mut(x_slice);;
+            }
+            finally
+            {
+                x_pinned.Free();
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "panics")]
         public static extern FFIError panics();
+
+        public static void panics_checked()
+        {
+            var rval = panics();;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "renamed")]
         public static extern EnumRenamed renamed(StructRenamed x);
@@ -191,26 +237,144 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_1")]
         public static extern uint pattern_ffi_slice_1(SliceU32 ffi_slice);
 
+        public static uint pattern_ffi_slice_1(uint[] ffi_slice)
+        {
+            var ffi_slice_pinned = GCHandle.Alloc(ffi_slice, GCHandleType.Pinned);
+            var ffi_slice_slice = new SliceU32(ffi_slice_pinned, (ulong) ffi_slice.Length);
+            try
+            {
+                return pattern_ffi_slice_1(ffi_slice_slice);;
+            }
+            finally
+            {
+                ffi_slice_pinned.Free();
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_1b")]
         public static extern uint pattern_ffi_slice_1b(SliceMutU32 ffi_slice);
+
+        public static uint pattern_ffi_slice_1b(uint[] ffi_slice)
+        {
+            var ffi_slice_pinned = GCHandle.Alloc(ffi_slice, GCHandleType.Pinned);
+            var ffi_slice_slice = new SliceMutU32(ffi_slice_pinned, (ulong) ffi_slice.Length);
+            try
+            {
+                return pattern_ffi_slice_1b(ffi_slice_slice);;
+            }
+            finally
+            {
+                ffi_slice_pinned.Free();
+            }
+        }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_2")]
         public static extern Vec3f32 pattern_ffi_slice_2(SliceVec3f32 ffi_slice, int i);
 
+        public static Vec3f32 pattern_ffi_slice_2(Vec3f32[] ffi_slice, int i)
+        {
+            var ffi_slice_pinned = GCHandle.Alloc(ffi_slice, GCHandleType.Pinned);
+            var ffi_slice_slice = new SliceVec3f32(ffi_slice_pinned, (ulong) ffi_slice.Length);
+            try
+            {
+                return pattern_ffi_slice_2(ffi_slice_slice, i);;
+            }
+            finally
+            {
+                ffi_slice_pinned.Free();
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_3")]
         public static extern void pattern_ffi_slice_3(SliceMutU8 slice, CallbackSliceMut callback);
+
+        public static void pattern_ffi_slice_3(byte[] slice, CallbackSliceMut callback)
+        {
+            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
+            var slice_slice = new SliceMutU8(slice_pinned, (ulong) slice.Length);
+            try
+            {
+                pattern_ffi_slice_3(slice_slice, callback);;
+            }
+            finally
+            {
+                slice_pinned.Free();
+            }
+        }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_4")]
         public static extern void pattern_ffi_slice_4(SliceU8 slice, SliceMutU8 slice2);
 
+        public static void pattern_ffi_slice_4(byte[] slice, byte[] slice2)
+        {
+            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
+            var slice_slice = new SliceU8(slice_pinned, (ulong) slice.Length);
+            var slice2_pinned = GCHandle.Alloc(slice2, GCHandleType.Pinned);
+            var slice2_slice = new SliceMutU8(slice2_pinned, (ulong) slice2.Length);
+            try
+            {
+                pattern_ffi_slice_4(slice_slice, slice2_slice);;
+            }
+            finally
+            {
+                slice_pinned.Free();
+                slice2_pinned.Free();
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_5")]
         public static extern void pattern_ffi_slice_5(ref SliceU8 slice, ref SliceMutU8 slice2);
+
+        public static void pattern_ffi_slice_5(byte[] slice, byte[] slice2)
+        {
+            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
+            var slice_slice = new SliceU8(slice_pinned, (ulong) slice.Length);
+            var slice2_pinned = GCHandle.Alloc(slice2, GCHandleType.Pinned);
+            var slice2_slice = new SliceMutU8(slice2_pinned, (ulong) slice2.Length);
+            try
+            {
+                pattern_ffi_slice_5(ref slice_slice, ref slice2_slice);;
+            }
+            finally
+            {
+                slice_pinned.Free();
+                slice2_pinned.Free();
+            }
+        }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_6")]
         public static extern void pattern_ffi_slice_6(ref SliceMutU8 slice, CallbackU8 callback);
 
+        public static void pattern_ffi_slice_6(byte[] slice, CallbackU8 callback)
+        {
+            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
+            var slice_slice = new SliceMutU8(slice_pinned, (ulong) slice.Length);
+            try
+            {
+                pattern_ffi_slice_6(ref slice_slice, callback);;
+            }
+            finally
+            {
+                slice_pinned.Free();
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_7")]
         public static extern uint pattern_ffi_slice_7(SliceMutConstPtrI8 slices);
+
+        public static uint pattern_ffi_slice_7(string[] slices)
+        {
+            var slices_pinned = GCHandle.Alloc(slices, GCHandleType.Pinned);
+            var slices_slice = new SliceMutConstPtrI8(slices_pinned, (ulong) slices.Length);
+            try
+            {
+                return pattern_ffi_slice_7(slices_slice);;
+            }
+            finally
+            {
+                slices_pinned.Free();
+            }
+        }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_ffi_slice_delegate")]
         public static extern byte pattern_ffi_slice_delegate(CallbackFFISlice callback);
@@ -260,6 +424,17 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_callback_7")]
         public static extern FFIError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o);
 
+        public static void pattern_callback_7_checked(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o)
+        {
+            var c1_safe_delegate = new SumDelegateReturnExceptionSafe(c1);
+            var rval = pattern_callback_7(c1_safe_delegate.Call, c2, x, i, out o);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+            c1_safe_delegate.Rethrow();
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "pattern_surrogates_1")]
         public static extern void pattern_surrogates_1(Local s, out Container c);
 
@@ -272,8 +447,32 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "basic_service_destroy")]
         public static extern FFIError basic_service_destroy(ref IntPtr context);
 
+        /// Destroys the given instance.
+        ///
+        /// # Safety
+        ///
+        /// The passed parameter MUST have been created with the corresponding init function;
+        /// passing any other value results in undefined behavior.
+        public static void basic_service_destroy_checked(ref IntPtr context)
+        {
+            var rval = basic_service_destroy(ref context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "basic_service_new")]
         public static extern FFIError basic_service_new(ref IntPtr context);
+
+        public static void basic_service_new_checked(ref IntPtr context)
+        {
+            var rval = basic_service_new(ref context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
 
         /// Destroys the given instance.
         ///
@@ -284,13 +483,48 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_on_panic_destroy")]
         public static extern FFIError service_on_panic_destroy(ref IntPtr context);
 
+        /// Destroys the given instance.
+        ///
+        /// # Safety
+        ///
+        /// The passed parameter MUST have been created with the corresponding init function;
+        /// passing any other value results in undefined behavior.
+        public static void service_on_panic_destroy_checked(ref IntPtr context)
+        {
+            var rval = service_on_panic_destroy(ref context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_on_panic_new")]
         public static extern FFIError service_on_panic_new(ref IntPtr context);
+
+        public static void service_on_panic_new_checked(ref IntPtr context)
+        {
+            var rval = service_on_panic_new(ref context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
 
         /// Methods returning a Result<(), _> are the default and do not
         /// need annotations.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_on_panic_return_result")]
         public static extern FFIError service_on_panic_return_result(IntPtr context, uint anon1);
+
+        /// Methods returning a Result<(), _> are the default and do not
+        /// need annotations.
+        public static void service_on_panic_return_result_checked(IntPtr context, uint anon1)
+        {
+            var rval = service_on_panic_return_result(context, anon1);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
 
         /// Methods returning a value need an `on_panic` annotation.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_on_panic_return_default_value")]
@@ -310,23 +544,96 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_destroy")]
         public static extern FFIError service_callbacks_destroy(ref IntPtr context);
 
+        /// Destroys the given instance.
+        ///
+        /// # Safety
+        ///
+        /// The passed parameter MUST have been created with the corresponding init function;
+        /// passing any other value results in undefined behavior.
+        public static void service_callbacks_destroy_checked(ref IntPtr context)
+        {
+            var rval = service_callbacks_destroy(ref context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_new")]
         public static extern FFIError service_callbacks_new(ref IntPtr context);
+
+        public static void service_callbacks_new_checked(ref IntPtr context)
+        {
+            var rval = service_callbacks_new(ref context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_callback_simple")]
         public static extern FFIError service_callbacks_callback_simple(IntPtr context, MyCallback callback);
 
+        public static void service_callbacks_callback_simple_checked(IntPtr context, MyCallback callback)
+        {
+            var rval = service_callbacks_callback_simple(context, callback);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_callback_ffi_return")]
         public static extern FFIError service_callbacks_callback_ffi_return(IntPtr context, SumDelegateReturn callback);
 
+        public static void service_callbacks_callback_ffi_return_checked(IntPtr context, SumDelegateReturn callback)
+        {
+            var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
+            var rval = service_callbacks_callback_ffi_return(context, callback_safe_delegate.Call);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+            callback_safe_delegate.Rethrow();
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_callback_with_slice")]
         public static extern FFIError service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, SliceI32 input);
+
+        public static void service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, int[] input)
+        {
+            var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
+            var input_pinned = GCHandle.Alloc(input, GCHandleType.Pinned);
+            var input_slice = new SliceI32(input_pinned, (ulong) input.Length);
+            try
+            {
+                var rval = service_callbacks_callback_with_slice(context, callback_safe_delegate.Call, input_slice);;
+                if (rval != FFIError.Ok)
+                {
+                    throw new InteropException<FFIError>(rval);
+                }
+                callback_safe_delegate.Rethrow();
+            }
+            finally
+            {
+                input_pinned.Free();
+            }
+        }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_set_delegate_table")]
         public static extern void service_callbacks_set_delegate_table(IntPtr context, ref DelegateTable table);
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_callbacks_invoke_delegates")]
         public static extern FFIError service_callbacks_invoke_delegates(IntPtr context);
+
+        public static void service_callbacks_invoke_delegates_checked(IntPtr context)
+        {
+            var rval = service_callbacks_invoke_delegates(context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
 
         /// Destroys the given instance.
         ///
@@ -337,8 +644,32 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_ignoring_methods_destroy")]
         public static extern FFIError service_ignoring_methods_destroy(ref IntPtr context);
 
+        /// Destroys the given instance.
+        ///
+        /// # Safety
+        ///
+        /// The passed parameter MUST have been created with the corresponding init function;
+        /// passing any other value results in undefined behavior.
+        public static void service_ignoring_methods_destroy_checked(ref IntPtr context)
+        {
+            var rval = service_ignoring_methods_destroy(ref context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_ignoring_methods_new")]
         public static extern FFIError service_ignoring_methods_new(ref IntPtr context);
+
+        public static void service_ignoring_methods_new_checked(ref IntPtr context)
+        {
+            var rval = service_ignoring_methods_new(ref context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
 
         /// Destroys the given instance.
         ///
@@ -349,17 +680,68 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_multiple_ctors_destroy")]
         public static extern FFIError service_multiple_ctors_destroy(ref IntPtr context);
 
+        /// Destroys the given instance.
+        ///
+        /// # Safety
+        ///
+        /// The passed parameter MUST have been created with the corresponding init function;
+        /// passing any other value results in undefined behavior.
+        public static void service_multiple_ctors_destroy_checked(ref IntPtr context)
+        {
+            var rval = service_multiple_ctors_destroy(ref context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_multiple_ctors_new_with")]
         public static extern FFIError service_multiple_ctors_new_with(ref IntPtr context, uint some_value);
+
+        public static void service_multiple_ctors_new_with_checked(ref IntPtr context, uint some_value)
+        {
+            var rval = service_multiple_ctors_new_with(ref context, some_value);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_multiple_ctors_new_without")]
         public static extern FFIError service_multiple_ctors_new_without(ref IntPtr context);
 
+        public static void service_multiple_ctors_new_without_checked(ref IntPtr context)
+        {
+            var rval = service_multiple_ctors_new_without(ref context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_multiple_ctors_new_with_string")]
         public static extern FFIError service_multiple_ctors_new_with_string(ref IntPtr context, string anon0);
 
+        public static void service_multiple_ctors_new_with_string_checked(ref IntPtr context, string anon0)
+        {
+            var rval = service_multiple_ctors_new_with_string(ref context, anon0);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_multiple_ctors_new_failing")]
         public static extern FFIError service_multiple_ctors_new_failing(ref IntPtr context, byte some_value);
+
+        public static void service_multiple_ctors_new_failing_checked(ref IntPtr context, byte some_value)
+        {
+            var rval = service_multiple_ctors_new_failing(ref context, some_value);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
 
         /// Destroys the given instance.
         ///
@@ -370,17 +752,84 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_using_lifetimes_destroy")]
         public static extern FFIError service_using_lifetimes_destroy(ref IntPtr context);
 
+        /// Destroys the given instance.
+        ///
+        /// # Safety
+        ///
+        /// The passed parameter MUST have been created with the corresponding init function;
+        /// passing any other value results in undefined behavior.
+        public static void service_using_lifetimes_destroy_checked(ref IntPtr context)
+        {
+            var rval = service_using_lifetimes_destroy(ref context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_using_lifetimes_new_with")]
         public static extern FFIError service_using_lifetimes_new_with(ref IntPtr context, ref uint some_value);
+
+        public static void service_using_lifetimes_new_with_checked(ref IntPtr context, ref uint some_value)
+        {
+            var rval = service_using_lifetimes_new_with(ref context, ref some_value);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_using_lifetimes_lifetime_1")]
         public static extern void service_using_lifetimes_lifetime_1(IntPtr context, SliceBool slice);
 
+        public static void service_using_lifetimes_lifetime_1(IntPtr context, Bool[] slice)
+        {
+            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
+            var slice_slice = new SliceBool(slice_pinned, (ulong) slice.Length);
+            try
+            {
+                service_using_lifetimes_lifetime_1(context, slice_slice);;
+            }
+            finally
+            {
+                slice_pinned.Free();
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_using_lifetimes_lifetime_2")]
         public static extern void service_using_lifetimes_lifetime_2(IntPtr context, SliceBool slice);
 
+        public static void service_using_lifetimes_lifetime_2(IntPtr context, Bool[] slice)
+        {
+            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
+            var slice_slice = new SliceBool(slice_pinned, (ulong) slice.Length);
+            try
+            {
+                service_using_lifetimes_lifetime_2(context, slice_slice);;
+            }
+            finally
+            {
+                slice_pinned.Free();
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_using_lifetimes_return_string_accept_slice")]
         public static extern IntPtr service_using_lifetimes_return_string_accept_slice(IntPtr anon0, SliceU8 anon1);
+
+        public static string service_using_lifetimes_return_string_accept_slice(IntPtr anon0, byte[] anon1)
+        {
+            var anon1_pinned = GCHandle.Alloc(anon1, GCHandleType.Pinned);
+            var anon1_slice = new SliceU8(anon1_pinned, (ulong) anon1.Length);
+            try
+            {
+                var s = service_using_lifetimes_return_string_accept_slice(anon0, anon1_slice);;
+                return Marshal.PtrToStringAnsi(s);
+            }
+            finally
+            {
+                anon1_pinned.Free();
+            }
+        }
 
         /// Destroys the given instance.
         ///
@@ -391,15 +840,68 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_various_slices_destroy")]
         public static extern FFIError service_various_slices_destroy(ref IntPtr context);
 
+        /// Destroys the given instance.
+        ///
+        /// # Safety
+        ///
+        /// The passed parameter MUST have been created with the corresponding init function;
+        /// passing any other value results in undefined behavior.
+        public static void service_various_slices_destroy_checked(ref IntPtr context)
+        {
+            var rval = service_various_slices_destroy(ref context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_various_slices_new")]
         public static extern FFIError service_various_slices_new(ref IntPtr context);
+
+        public static void service_various_slices_new_checked(ref IntPtr context)
+        {
+            var rval = service_various_slices_new(ref context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_various_slices_mut_self")]
         public static extern byte service_various_slices_mut_self(IntPtr context, SliceU8 slice);
 
+        public static byte service_various_slices_mut_self(IntPtr context, byte[] slice)
+        {
+            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
+            var slice_slice = new SliceU8(slice_pinned, (ulong) slice.Length);
+            try
+            {
+                return service_various_slices_mut_self(context, slice_slice);;
+            }
+            finally
+            {
+                slice_pinned.Free();
+            }
+        }
+
         /// Single line.
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_various_slices_mut_self_void")]
         public static extern void service_various_slices_mut_self_void(IntPtr context, SliceBool slice);
+
+        /// Single line.
+        public static void service_various_slices_mut_self_void(IntPtr context, Bool[] slice)
+        {
+            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
+            var slice_slice = new SliceBool(slice_pinned, (ulong) slice.Length);
+            try
+            {
+                service_various_slices_mut_self_void(context, slice_slice);;
+            }
+            finally
+            {
+                slice_pinned.Free();
+            }
+        }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_various_slices_mut_self_ref")]
         public static extern byte service_various_slices_mut_self_ref(IntPtr context, ref byte x, out byte y);
@@ -407,14 +909,81 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_various_slices_mut_self_ref_slice")]
         public static extern byte service_various_slices_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, SliceU8 slice);
 
+        public static byte service_various_slices_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, byte[] slice)
+        {
+            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
+            var slice_slice = new SliceU8(slice_pinned, (ulong) slice.Length);
+            try
+            {
+                return service_various_slices_mut_self_ref_slice(context, ref x, out y, slice_slice);;
+            }
+            finally
+            {
+                slice_pinned.Free();
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_various_slices_mut_self_ref_slice_limited")]
         public static extern byte service_various_slices_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, SliceU8 slice, SliceU8 slice2);
+
+        public static byte service_various_slices_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, byte[] slice, byte[] slice2)
+        {
+            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
+            var slice_slice = new SliceU8(slice_pinned, (ulong) slice.Length);
+            var slice2_pinned = GCHandle.Alloc(slice2, GCHandleType.Pinned);
+            var slice2_slice = new SliceU8(slice2_pinned, (ulong) slice2.Length);
+            try
+            {
+                return service_various_slices_mut_self_ref_slice_limited(context, ref x, out y, slice_slice, slice2_slice);;
+            }
+            finally
+            {
+                slice_pinned.Free();
+                slice2_pinned.Free();
+            }
+        }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_various_slices_mut_self_ffi_error")]
         public static extern FFIError service_various_slices_mut_self_ffi_error(IntPtr context, SliceMutU8 slice);
 
+        public static void service_various_slices_mut_self_ffi_error(IntPtr context, byte[] slice)
+        {
+            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
+            var slice_slice = new SliceMutU8(slice_pinned, (ulong) slice.Length);
+            try
+            {
+                var rval = service_various_slices_mut_self_ffi_error(context, slice_slice);;
+                if (rval != FFIError.Ok)
+                {
+                    throw new InteropException<FFIError>(rval);
+                }
+            }
+            finally
+            {
+                slice_pinned.Free();
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_various_slices_mut_self_no_error")]
         public static extern FFIError service_various_slices_mut_self_no_error(IntPtr context, SliceMutU8 slice);
+
+        public static void service_various_slices_mut_self_no_error(IntPtr context, byte[] slice)
+        {
+            var slice_pinned = GCHandle.Alloc(slice, GCHandleType.Pinned);
+            var slice_slice = new SliceMutU8(slice_pinned, (ulong) slice.Length);
+            try
+            {
+                var rval = service_various_slices_mut_self_no_error(context, slice_slice);;
+                if (rval != FFIError.Ok)
+                {
+                    throw new InteropException<FFIError>(rval);
+                }
+            }
+            finally
+            {
+                slice_pinned.Free();
+            }
+        }
 
         /// Warning, you _must_ discard the returned slice object before calling into this service
         /// again, as otherwise undefined behavior might happen.
@@ -435,8 +1004,32 @@ namespace My.Company
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_strings_destroy")]
         public static extern FFIError service_strings_destroy(ref IntPtr context);
 
+        /// Destroys the given instance.
+        ///
+        /// # Safety
+        ///
+        /// The passed parameter MUST have been created with the corresponding init function;
+        /// passing any other value results in undefined behavior.
+        public static void service_strings_destroy_checked(ref IntPtr context)
+        {
+            var rval = service_strings_destroy(ref context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_strings_new")]
         public static extern FFIError service_strings_new(ref IntPtr context);
+
+        public static void service_strings_new_checked(ref IntPtr context)
+        {
+            var rval = service_strings_new(ref context);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
 
         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "service_strings_pass_string")]
         public static extern void service_strings_pass_string(IntPtr context, string anon1);
@@ -875,6 +1468,38 @@ namespace My.Company
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate FFIError SumDelegateReturn(int x, int y);
 
+    // Internal helper that works around an issue where exceptions in callbacks don't reenter Rust.
+    public class SumDelegateReturnExceptionSafe {
+        private Exception failure = null;
+        private readonly SumDelegateReturn _callback;
+
+        public SumDelegateReturnExceptionSafe(SumDelegateReturn original)
+        {
+            _callback = original;
+        }
+
+        public FFIError Call(int x, int y)
+        {
+            try
+            {
+                return _callback(x, y);
+            }
+            catch (Exception e)
+            {
+                failure = e;
+                return FFIError.Panic;
+            }
+        }
+
+        public void Rethrow()
+        {
+            if (this.failure != null)
+            {
+                throw this.failure;
+            }
+        }
+    }
+
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void SumDelegateReturn2(int x, int y);
 
@@ -1023,6 +1648,11 @@ namespace My.Company
             }
         }
 
+        public void CallbackWithSlice(SumDelegateReturn callback, int[] input)
+        {
+            Interop.service_callbacks_callback_with_slice(_context, callback, input);
+        }
+
         public void SetDelegateTable(ref DelegateTable table)
         {
             Interop.service_callbacks_set_delegate_table(_context, ref table);
@@ -1168,7 +1798,17 @@ namespace My.Company
             Interop.service_using_lifetimes_lifetime_1(_context, slice);
         }
 
+        public void Lifetime1(Bool[] slice)
+        {
+            Interop.service_using_lifetimes_lifetime_1(_context, slice);
+        }
+
         public void Lifetime2(SliceBool slice)
+        {
+            Interop.service_using_lifetimes_lifetime_2(_context, slice);
+        }
+
+        public void Lifetime2(Bool[] slice)
         {
             Interop.service_using_lifetimes_lifetime_2(_context, slice);
         }
@@ -1177,6 +1817,11 @@ namespace My.Company
         {
             var s = Interop.service_using_lifetimes_return_string_accept_slice(_context, anon1);
             return Marshal.PtrToStringAnsi(s);
+        }
+
+        public string ReturnStringAcceptSlice(byte[] anon1)
+        {
+            return Interop.service_using_lifetimes_return_string_accept_slice(_context, anon1);
         }
 
         public IntPtr Context => _context;
@@ -1215,8 +1860,19 @@ namespace My.Company
             return Interop.service_various_slices_mut_self(_context, slice);
         }
 
+        public byte MutSelf(byte[] slice)
+        {
+            return Interop.service_various_slices_mut_self(_context, slice);
+        }
+
         /// Single line.
         public void MutSelfVoid(SliceBool slice)
+        {
+            Interop.service_various_slices_mut_self_void(_context, slice);
+        }
+
+        /// Single line.
+        public void MutSelfVoid(Bool[] slice)
         {
             Interop.service_various_slices_mut_self_void(_context, slice);
         }
@@ -1231,7 +1887,17 @@ namespace My.Company
             return Interop.service_various_slices_mut_self_ref_slice(_context, ref x, out y, slice);
         }
 
+        public byte MutSelfRefSlice(ref byte x, out byte y, byte[] slice)
+        {
+            return Interop.service_various_slices_mut_self_ref_slice(_context, ref x, out y, slice);
+        }
+
         public byte MutSelfRefSliceLimited(ref byte x, out byte y, SliceU8 slice, SliceU8 slice2)
+        {
+            return Interop.service_various_slices_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
+        }
+
+        public byte MutSelfRefSliceLimited(ref byte x, out byte y, byte[] slice, byte[] slice2)
         {
             return Interop.service_various_slices_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
         }
@@ -1245,6 +1911,11 @@ namespace My.Company
             }
         }
 
+        public void MutSelfFfiError(byte[] slice)
+        {
+            Interop.service_various_slices_mut_self_ffi_error(_context, slice);
+        }
+
         public void MutSelfNoError(SliceMutU8 slice)
         {
             var rval = Interop.service_various_slices_mut_self_no_error(_context, slice);
@@ -1252,6 +1923,11 @@ namespace My.Company
             {
                 throw new InteropException<FFIError>(rval);
             }
+        }
+
+        public void MutSelfNoError(byte[] slice)
+        {
+            Interop.service_various_slices_mut_self_no_error(_context, slice);
         }
 
         /// Warning, you _must_ discard the returned slice object before calling into this service

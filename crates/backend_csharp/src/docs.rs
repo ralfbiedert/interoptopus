@@ -320,9 +320,8 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
                 w.indent();
                 self.csharp_writer
                     .write_pattern_service_method(w, pattern, x, &rval, &fname, false, false, WriteFor::Docs)?;
-                for overload in self.csharp_writer.overloads() {
-                    overload.write_service_method_overload(w, self.csharp_writer.helper(), pattern, x, &fname, WriteFor::Docs)?;
-                }
+
+                self.csharp_writer.write_service_method_overload(w, pattern, x, &fname, WriteFor::Docs)?;
                 w.unindent();
                 indented!(w, r#"}}"#)?;
                 indented!(w, r#"```"#)?;

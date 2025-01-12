@@ -1,3 +1,5 @@
+use crate::config::ParamSliceType;
+use crate::{Config, Unsafe};
 use heck::{ToLowerCamelCase, ToUpperCamelCase};
 use interoptopus::lang::c::{
     CType, CompositeType, ConstantValue, EnumType, Field, FnPointerType, Function, FunctionSignature, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
@@ -5,6 +7,7 @@ use interoptopus::lang::c::{
 use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::safe_name;
+use std::ops::Deref;
 
 /// Implements [`CSharpTypeConverter`].
 #[derive(Copy, Clone)]
@@ -189,6 +192,17 @@ pub trait CSharpTypeConverter {
                 _ => panic!("Pattern not explicitly handled"),
             },
         }
+    }
+
+    fn has_overloadable(&self, signature: &FunctionSignature) -> bool {
+        signature.params().iter().any(|x| match x.the_type() {
+            CType::ReadPointer(x) | CType::ReadWritePointer(x) => match x.deref() {
+                CType::Pattern(x) => matches!(x, TypePattern::Slice(_) | TypePattern::SliceMut(_)),
+                _ => false,
+            },
+            CType::Pattern(x) => matches!(x, TypePattern::Slice(_) | TypePattern::SliceMut(_)),
+            _ => false,
+        })
     }
 
     fn constant_value_to_value(&self, value: &ConstantValue) -> String {

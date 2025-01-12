@@ -1,6 +1,5 @@
 use core_library_ffi::ffi_inventory;
 use interoptopus::Interop;
-use interoptopus_backend_csharp::overloads::DotNet;
 use interoptopus_backend_csharp::{ConfigBuilder, Generator};
 
 // By adding the interop generation logic into a `build.rs` that depends on
@@ -12,11 +11,9 @@ use interoptopus_backend_csharp::{ConfigBuilder, Generator};
 // to produce the bindings (since `cargo test` does not imply `cargo build`).
 fn main() {
     let inventory = ffi_inventory();
-    let overload = DotNet::new().build();
     let config = ConfigBuilder::default().build().unwrap();
 
     Generator::new(config, inventory)
-        .add_overload_writer(overload)
         // You might also want to consider writing to `OUT_DIR` instead, since
         // writing to any other place from a `build.rs` is discouraged (we do
         // it here to simplify our example).

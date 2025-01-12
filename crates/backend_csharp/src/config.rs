@@ -1,6 +1,16 @@
 use derive_builder::Builder;
 use interoptopus::util::NamespaceMappings;
 
+/// The kind of types to use when generating FFI method overloads.
+// TODO - THIS SHOULD BE DotNet config
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum ParamSliceType {
+    /// Slices should be passed in as C# arrays.
+    Array,
+    /// Slices should be passed in as Span and ReadOnlySpan.
+    Span,
+}
+
 /// The types to write for the given recorder.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum WriteTypes {
@@ -114,6 +124,9 @@ pub struct Config {
     pub unsupported: Unsupported,
     /// The string to use for reporting within FFIError. Use `{error}` to reference the inner error content.
     pub error_text: String,
+
+    /// TODO: CAn this be rewmoved?
+    pub param_slice_type: ParamSliceType,
 }
 
 impl Config {}
@@ -136,6 +149,7 @@ impl Default for Config {
             work_around_exception_in_callback_no_reentry: true,
             unsupported: Unsupported::Panic,
             error_text: "Something went wrong: {error}".to_string(),
+            param_slice_type: ParamSliceType::Array,
         }
     }
 }

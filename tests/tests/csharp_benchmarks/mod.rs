@@ -1,6 +1,5 @@
 use anyhow::Error;
 use interoptopus::Interop;
-use interoptopus_backend_csharp::overloads::DotNet;
 use interoptopus_backend_csharp::{ConfigBuilder, Generator, Unsafe, WriteTypes};
 use interoptopus_reference_project::ffi_inventory;
 use tests::backend_csharp::common_namespace_mappings;
@@ -23,13 +22,8 @@ fn reference_benchmarks_prerequisites() -> Result<(), Error> {
         .write_types(WriteTypes::Namespace)
         .build()?;
 
-    let generated_common = Generator::new(config_common, ffi_inventory())
-        .add_overload_writer(DotNet::new_built())
-        .write_string()?;
-
-    let generated_other = Generator::new(config_other, ffi_inventory())
-        .add_overload_writer(DotNet::new_built())
-        .write_string()?;
+    let generated_common = Generator::new(config_common, ffi_inventory()).write_string()?;
+    let generated_other = Generator::new(config_other, ffi_inventory()).write_string()?;
 
     validate_output!("tests/csharp_benchmarks", "Interop.common.cs", generated_common.as_str());
     validate_output!("tests/csharp_benchmarks", "Interop.cs", generated_other.as_str());

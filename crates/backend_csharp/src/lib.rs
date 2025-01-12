@@ -57,7 +57,6 @@
 //! #[test]
 //! fn bindings_csharp() -> Result<(), Error> {
 //!     use interoptopus_backend_csharp::{Config, Generator};
-//!     use interoptopus_backend_csharp::overloads::{DotNet, Unity};
 //!
 //!     let config = Config {
 //!         dll_name: "example_library".to_string(),
@@ -118,15 +117,13 @@
 use interoptopus::writer::IndentWriter;
 use interoptopus::Interop;
 use interoptopus::{Error, Inventory};
-use overloads::OverloadWriter;
 
 mod config;
 mod converter;
 mod docs;
-pub mod overloads;
 mod writer;
 
-pub use config::{CSharpVisibility, Config, ConfigBuilder, DocConfig, Unsafe, Unsupported, WriteTypes};
+pub use config::{CSharpVisibility, Config, ConfigBuilder, DocConfig, ParamSliceType, Unsafe, Unsupported, WriteTypes};
 pub use converter::{CSharpTypeConverter, Converter};
 pub use docs::DocGenerator;
 pub use writer::CSharpWriter;
@@ -136,7 +133,6 @@ pub struct Generator {
     config: Config,
     library: Inventory,
     converter: Converter,
-    overload_writer: Vec<Box<dyn OverloadWriter>>,
 }
 
 impl Generator {
@@ -145,13 +141,7 @@ impl Generator {
             config,
             library,
             converter: Converter {},
-            overload_writer: vec![],
         }
-    }
-
-    pub fn add_overload_writer(&mut self, writer: Box<dyn OverloadWriter>) -> &mut Self {
-        self.overload_writer.push(writer);
-        self
     }
 }
 
@@ -172,9 +162,5 @@ impl CSharpWriter for Generator {
 
     fn converter(&self) -> &Converter {
         &self.converter
-    }
-
-    fn overloads(&self) -> &[Box<dyn OverloadWriter>] {
-        self.overload_writer.as_slice()
     }
 }
