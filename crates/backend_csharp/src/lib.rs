@@ -65,7 +65,6 @@
 //!     };
 //!
 //!     Generator::new(config, example_library_ffi::my_inventory())
-//!         .add_overload_writer(DotNet::new())
 //!         //.add_overload_writer(Unity::new())
 //!         .write_file("bindings/csharp/Interop.cs")?;
 //!
@@ -97,7 +96,7 @@
 //!         public const string NativeLib = "example_library";
 //!
 //!         /// Function using the type.
-//!         [DllImport(NativeLib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "my_function")]
+//!         [LibraryImport(NativeLib, EntryPoint = "my_function")]
 //!         public static extern Vec2 my_function(Vec2 input);
 //!     }
 //!

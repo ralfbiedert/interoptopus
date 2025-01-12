@@ -23,10 +23,10 @@ fn reference_benchmarks_prerequisites() -> Result<(), Error> {
     let generated_common = Generator::new(config_common, ffi_inventory()).write_string()?;
     let generated_other = Generator::new(config_other, ffi_inventory()).write_string()?;
 
-    validate_output!("tests/csharp_reference_project_safe", "Interop.common.cs", generated_common.as_str());
-    validate_output!("tests/csharp_reference_project_safe", "Interop.cs", generated_other.as_str());
+    validate_output!("tests/csharp_reference_project", "Interop.common.cs", generated_common.as_str());
+    validate_output!("tests/csharp_reference_project", "Interop.cs", generated_other.as_str());
 
-    run_dotnet_command_if_installed("tests/csharp_reference_project_safe", "test")?;
+    run_dotnet_command_if_installed("tests/csharp_reference_project", "test")?;
 
     Ok(())
 }
