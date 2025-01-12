@@ -55,7 +55,7 @@ pub struct CStrPointer<'a> {
     _phantom: PhantomData<&'a ()>,
 }
 
-impl<'a> Default for CStrPointer<'a> {
+impl Default for CStrPointer<'_> {
     fn default() -> Self {
         Self {
             ptr: null(),
@@ -120,7 +120,7 @@ impl<'a> CStrPointer<'a> {
     }
 }
 
-unsafe impl<'a> CTypeInfo for CStrPointer<'a> {
+unsafe impl CTypeInfo for CStrPointer<'_> {
     fn type_info() -> CType {
         CType::Pattern(TypePattern::CStrPointer)
     }

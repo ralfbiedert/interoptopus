@@ -54,15 +54,15 @@ pub struct FFISlice<'a, T> {
     _phantom: PhantomData<&'a T>,
 }
 
-impl<'a, T> Copy for FFISlice<'a, T> {}
+impl<T> Copy for FFISlice<'_, T> {}
 
-impl<'a, T> Clone for FFISlice<'a, T> {
+impl<T> Clone for FFISlice<'_, T> {
     fn clone(&self) -> Self {
         *self
     }
 }
 
-impl<'a, T> Default for FFISlice<'a, T> {
+impl<T> Default for FFISlice<'_, T> {
     fn default() -> Self {
         Self {
             data: null(),
@@ -102,7 +102,7 @@ impl<'a, T> From<&'a [T]> for FFISlice<'a, T> {
     }
 }
 
-impl<'a, T> FFISlice<'a, T>
+impl<T> FFISlice<'_, T>
 where
     T: 'static,
 {
@@ -113,7 +113,7 @@ where
     }
 }
 
-impl<'a, T> Deref for FFISlice<'a, T> {
+impl<T> Deref for FFISlice<'_, T> {
     type Target = [T];
 
     fn deref(&self) -> &Self::Target {
@@ -121,7 +121,7 @@ impl<'a, T> Deref for FFISlice<'a, T> {
     }
 }
 
-unsafe impl<'a, T> CTypeInfo for FFISlice<'a, T>
+unsafe impl<T> CTypeInfo for FFISlice<'_, T>
 where
     T: CTypeInfo,
 {
@@ -152,7 +152,7 @@ pub struct FFISliceMut<'a, T> {
     _phantom: PhantomData<&'a mut T>,
 }
 
-impl<'a, T> Default for FFISliceMut<'a, T> {
+impl<T> Default for FFISliceMut<'_, T> {
     fn default() -> Self {
         Self {
             data: null_mut(),
@@ -199,7 +199,7 @@ impl<'a, T> FFISliceMut<'a, T> {
     }
 }
 
-impl<'a, T> FFISliceMut<'a, T>
+impl<T> FFISliceMut<'_, T>
 where
     T: 'static,
 {
@@ -216,7 +216,7 @@ impl<'a, T> From<&'a mut [T]> for FFISliceMut<'a, T> {
     }
 }
 
-impl<'a, T> Deref for FFISliceMut<'a, T> {
+impl<T> Deref for FFISliceMut<'_, T> {
     type Target = [T];
 
     fn deref(&self) -> &Self::Target {
@@ -224,13 +224,13 @@ impl<'a, T> Deref for FFISliceMut<'a, T> {
     }
 }
 
-impl<'a, T> DerefMut for FFISliceMut<'a, T> {
+impl<T> DerefMut for FFISliceMut<'_, T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.as_slice_mut()
     }
 }
 
-unsafe impl<'a, T> CTypeInfo for FFISliceMut<'a, T>
+unsafe impl<T> CTypeInfo for FFISliceMut<'_, T>
 where
     T: CTypeInfo,
 {

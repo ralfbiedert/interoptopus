@@ -6,6 +6,7 @@ keywords = ["ffi", "code-generation", "bindings"]
 categories = ["api-bindings", "development-tools::ffi"]
 version = "0.14.27"
 edition = "2021"
+rust-version = "1.83"
 license = "MIT"
 documentation = "https://docs.rs/interoptopus/"
 repository = "https://github.com/ralfbiedert/interoptopus"
