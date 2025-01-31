@@ -45,7 +45,7 @@ pub enum ConstantValue {
 impl ConstantValue {
     pub(crate) fn fucking_hash_it_already<H: Hasher>(&self, h: &mut H) {
         match self {
-            ConstantValue::Primitive(x) => match x {
+            Self::Primitive(x) => match x {
                 PrimitiveValue::Bool(x) => x.hash(h),
                 PrimitiveValue::U8(x) => x.hash(h),
                 PrimitiveValue::U16(x) => x.hash(h),
@@ -71,24 +71,29 @@ pub struct Constant {
 }
 
 impl Constant {
-    pub fn new(name: String, value: ConstantValue, meta: Meta) -> Self {
+    #[must_use]
+    pub const fn new(name: String, value: ConstantValue, meta: Meta) -> Self {
         Self { name, value, meta }
     }
 
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
-    pub fn value(&self) -> &ConstantValue {
+    #[must_use]
+    pub const fn value(&self) -> &ConstantValue {
         &self.value
     }
 
-    pub fn meta(&self) -> &Meta {
+    #[must_use]
+    pub const fn meta(&self) -> &Meta {
         &self.meta
     }
 
     /// Returns the type of this constant.
-    pub fn the_type(&self) -> CType {
+    #[must_use]
+    pub const fn the_type(&self) -> CType {
         match &self.value {
             ConstantValue::Primitive(x) => CType::Primitive(match x {
                 PrimitiveValue::Bool(_) => PrimitiveType::Bool,
@@ -130,9 +135,10 @@ impl Default for CType {
 }
 
 impl CType {
-    pub fn size_of(&self) -> usize {
+    #[must_use]
+    pub const fn size_of(&self) -> usize {
         match self {
-            CType::Primitive(p) => match p {
+            Self::Primitive(p) => match p {
                 PrimitiveType::Void => 0,
                 PrimitiveType::Bool => 1,
                 PrimitiveType::U8 => 1,
@@ -151,10 +157,12 @@ impl CType {
         }
     }
 
+    #[must_use]
     pub fn align_of(&self) -> usize {
         unimplemented!()
     }
 
+    #[must_use]
     pub const fn void() -> Self {
         Self::Primitive(PrimitiveType::Void)
     }
@@ -165,26 +173,28 @@ impl CType {
     ///
     /// Backends may instead match on the `CType` variant and determine a more appropriate
     /// name on a case-by-case basis; including changing a name entirely.
+    #[must_use]
     pub fn name_within_lib(&self) -> String {
         match self {
-            CType::Primitive(x) => x.rust_name().to_string(),
-            CType::Enum(x) => x.rust_name().to_string(),
-            CType::Opaque(x) => x.rust_name().to_string(),
-            CType::Composite(x) => x.rust_name().to_string(),
-            CType::FnPointer(x) => x.rust_name(),
-            CType::ReadPointer(x) => format!("ConstPtr{}", capitalize_first_letter(x.name_within_lib())),
-            CType::ReadWritePointer(x) => format!("MutPtr{}", capitalize_first_letter(x.name_within_lib())),
-            CType::Pattern(x) => match x {
+            Self::Primitive(x) => x.rust_name().to_string(),
+            Self::Enum(x) => x.rust_name().to_string(),
+            Self::Opaque(x) => x.rust_name().to_string(),
+            Self::Composite(x) => x.rust_name().to_string(),
+            Self::FnPointer(x) => x.rust_name(),
+            Self::ReadPointer(x) => format!("ConstPtr{}", capitalize_first_letter(x.name_within_lib().as_str())),
+            Self::ReadWritePointer(x) => format!("MutPtr{}", capitalize_first_letter(x.name_within_lib().as_str())),
+            Self::Pattern(x) => match x {
                 TypePattern::Bool => "Bool".to_string(),
                 _ => x.fallback_type().name_within_lib(),
             },
-            CType::Array(x) => x.rust_name(),
+            Self::Array(x) => x.rust_name(),
         }
     }
 
     /// Lists all _other_ types this type refers to.
-    pub fn embedded_types(&self) -> Vec<CType> {
-        let mut hash_set: HashSet<CType> = HashSet::new();
+    #[must_use]
+    pub fn embedded_types(&self) -> Vec<Self> {
+        let mut hash_set: HashSet<Self> = HashSet::new();
 
         ctypes_from_type_recursive(self, &mut hash_set);
 
@@ -193,49 +203,54 @@ impl CType {
     }
 
     /// If this were a pointer, tries to deref it and return the inner type.
-    pub fn try_deref_pointer(&self) -> Option<&CType> {
+    #[must_use]
+    pub fn try_deref_pointer(&self) -> Option<&Self> {
         match self {
-            CType::Primitive(_) => None,
-            CType::Enum(_) => None,
-            CType::Opaque(_) => None,
-            CType::Composite(_) => None,
-            CType::FnPointer(_) => None,
-            CType::ReadPointer(x) => Some(x.as_ref()),
-            CType::ReadWritePointer(x) => Some(x.as_ref()),
-            CType::Pattern(_) => None,
-            CType::Array(_) => None,
+            Self::Primitive(_) => None,
+            Self::Enum(_) => None,
+            Self::Opaque(_) => None,
+            Self::Composite(_) => None,
+            Self::FnPointer(_) => None,
+            Self::ReadPointer(x) => Some(x.as_ref()),
+            Self::ReadWritePointer(x) => Some(x.as_ref()),
+            Self::Pattern(_) => None,
+            Self::Array(_) => None,
         }
     }
 
     /// Convenience method attempting to convert the contained type as a composite.
-    pub fn as_composite_type(&self) -> Option<&CompositeType> {
+    #[must_use]
+    pub const fn as_composite_type(&self) -> Option<&CompositeType> {
         match self {
-            CType::Composite(x) => Some(x),
+            Self::Composite(x) => Some(x),
             _ => None,
         }
     }
 
     /// Convenience method attempting to convert the contained type as an opaque.
-    pub fn as_opaque_type(&self) -> Option<&OpaqueType> {
+    #[must_use]
+    pub const fn as_opaque_type(&self) -> Option<&OpaqueType> {
         match self {
-            CType::Opaque(x) => Some(x),
+            Self::Opaque(x) => Some(x),
             _ => None,
         }
     }
 
     /// Checks if this is a [`PrimitiveType::Void`].
-    pub fn is_void(&self) -> bool {
-        matches!(self, CType::Primitive(PrimitiveType::Void))
+    #[must_use]
+    pub const fn is_void(&self) -> bool {
+        matches!(self, Self::Primitive(PrimitiveType::Void))
     }
 
     /// Returns the namespace of the type.
+    #[must_use]
     pub fn namespace(&self) -> Option<&str> {
         match self {
-            CType::Array(t) => t.array_type().namespace(),
-            CType::Enum(t) => Some(t.meta.namespace()),
-            CType::Opaque(t) => Some(t.meta.namespace()),
-            CType::Composite(t) => Some(t.meta.namespace()),
-            CType::Pattern(TypePattern::NamedCallback(t)) => Some(t.meta().namespace()),
+            Self::Array(t) => t.array_type().namespace(),
+            Self::Enum(t) => Some(t.meta.namespace()),
+            Self::Opaque(t) => Some(t.meta.namespace()),
+            Self::Composite(t) => Some(t.meta.namespace()),
+            Self::Pattern(TypePattern::NamedCallback(t)) => Some(t.meta().namespace()),
             _ => None,
         }
     }
@@ -259,20 +274,21 @@ pub enum PrimitiveType {
 }
 
 impl PrimitiveType {
-    pub fn rust_name(&self) -> &str {
+    #[must_use]
+    pub const fn rust_name(&self) -> &str {
         match self {
-            PrimitiveType::Void => "()",
-            PrimitiveType::Bool => "bool",
-            PrimitiveType::U8 => "u8",
-            PrimitiveType::U16 => "u16",
-            PrimitiveType::U32 => "u32",
-            PrimitiveType::U64 => "u64",
-            PrimitiveType::I8 => "i8",
-            PrimitiveType::I16 => "i16",
-            PrimitiveType::I32 => "i32",
-            PrimitiveType::I64 => "i64",
-            PrimitiveType::F32 => "f32",
-            PrimitiveType::F64 => "f64",
+            Self::Void => "()",
+            Self::Bool => "bool",
+            Self::U8 => "u8",
+            Self::U16 => "u16",
+            Self::U32 => "u32",
+            Self::U64 => "u64",
+            Self::I8 => "i8",
+            Self::I16 => "i16",
+            Self::I32 => "i32",
+            Self::I64 => "i64",
+            Self::F32 => "f32",
+            Self::F64 => "f64",
         }
     }
 }
@@ -285,6 +301,7 @@ pub struct ArrayType {
 }
 
 impl ArrayType {
+    #[must_use]
     pub fn new(array_type: CType, len: usize) -> Self {
         Self {
             array_type: Box::new(array_type),
@@ -292,19 +309,23 @@ impl ArrayType {
         }
     }
 
+    #[must_use]
     pub fn rust_name(&self) -> String {
         format!("{}[{}]", self.array_type.name_within_lib(), self.len)
     }
 
-    pub fn array_type(&self) -> &CType {
+    #[must_use]
+    pub const fn array_type(&self) -> &CType {
         &self.array_type
     }
 
-    pub fn len(&self) -> usize {
+    #[must_use]
+    pub const fn len(&self) -> usize {
         self.len
     }
 
-    pub fn is_empty(&self) -> bool {
+    #[must_use]
+    pub const fn is_empty(&self) -> bool {
         self.len == 0
     }
 }
@@ -319,27 +340,33 @@ pub struct EnumType {
 }
 
 impl EnumType {
-    pub fn new(name: String, variants: Vec<Variant>, meta: Meta, repr: Representation) -> Self {
-        Self { name, variants, meta, repr }
+    #[must_use]
+    pub const fn new(name: String, variants: Vec<Variant>, meta: Meta, repr: Representation) -> Self {
+        Self { name, variants, repr, meta }
     }
 
+    #[must_use]
     pub fn rust_name(&self) -> &str {
         &self.name
     }
 
+    #[must_use]
     pub fn variants(&self) -> &[Variant] {
         &self.variants
     }
 
+    #[must_use]
     pub fn variant_by_name(&self, name: &str) -> Option<Variant> {
         self.variants.iter().find(|x| x.name == name).cloned()
     }
 
-    pub fn meta(&self) -> &Meta {
+    #[must_use]
+    pub const fn meta(&self) -> &Meta {
         &self.meta
     }
 
-    pub fn repr(&self) -> &Representation {
+    #[must_use]
+    pub const fn repr(&self) -> &Representation {
         &self.repr
     }
 }
@@ -353,19 +380,23 @@ pub struct Variant {
 }
 
 impl Variant {
-    pub fn new(name: String, value: usize, documentation: Documentation) -> Self {
+    #[must_use]
+    pub const fn new(name: String, value: usize, documentation: Documentation) -> Self {
         Self { name, value, documentation }
     }
 
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
-    pub fn value(&self) -> usize {
+    #[must_use]
+    pub const fn value(&self) -> usize {
         self.value
     }
 
-    pub fn documentation(&self) -> &Documentation {
+    #[must_use]
+    pub const fn documentation(&self) -> &Documentation {
         &self.documentation
     }
 }
@@ -394,49 +425,58 @@ pub struct CompositeType {
 
 impl CompositeType {
     /// Creates a new composite with the given name and fields and no documentation.
+    #[must_use]
     pub fn new(name: String, fields: Vec<Field>) -> Self {
         Self::with_meta(name, fields, Meta::new())
     }
 
     /// Creates a new composite with the given name and type-level documentation.
+    #[must_use]
     pub fn with_meta(name: String, fields: Vec<Field>, meta: Meta) -> Self {
         Self {
             name,
             fields,
             meta,
-            repr: Default::default(),
+            repr: Representation::default(),
         }
     }
 
     /// Creates a new composite with the given name and type-level documentation.
-    pub fn with_meta_repr(name: String, fields: Vec<Field>, meta: Meta, repr: Representation) -> Self {
+    #[must_use]
+    pub const fn with_meta_repr(name: String, fields: Vec<Field>, meta: Meta, repr: Representation) -> Self {
         Self { name, fields, repr, meta }
     }
 
-    /// Gets the type's name `
+    /// Gets the type's name.
+    #[must_use]
     pub fn rust_name(&self) -> &str {
         &self.name
     }
 
+    #[must_use]
     pub fn fields(&self) -> &[Field] {
         &self.fields
     }
 
     /// If this were a wrapper over a pointer type, get the type of what we're pointing go.
+    #[must_use]
     pub fn try_deref_pointer(&self) -> Option<CType> {
         self.fields().first()?.the_type().try_deref_pointer().cloned()
     }
 
     /// True if this struct has no contained fields (which happens to be illegal in C99).
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.fields.is_empty()
     }
 
-    pub fn meta(&self) -> &Meta {
+    #[must_use]
+    pub const fn meta(&self) -> &Meta {
         &self.meta
     }
 
-    pub fn repr(&self) -> &Representation {
+    #[must_use]
+    pub const fn repr(&self) -> &Representation {
         &self.repr
     }
 }
@@ -476,15 +516,18 @@ impl Default for Representation {
 }
 
 impl Representation {
-    pub fn new(layout: Layout, alignment: Option<usize>) -> Self {
+    #[must_use]
+    pub const fn new(layout: Layout, alignment: Option<usize>) -> Self {
         Self { layout, alignment }
     }
 
-    pub fn layout(&self) -> Layout {
+    #[must_use]
+    pub const fn layout(&self) -> Layout {
         self.layout
     }
 
-    pub fn alignment(&self) -> Option<usize> {
+    #[must_use]
+    pub const fn alignment(&self) -> Option<usize> {
         self.alignment
     }
 }
@@ -499,11 +542,13 @@ pub struct Field {
 }
 
 impl Field {
+    #[must_use]
     pub fn new(name: String, the_type: CType) -> Self {
         Self::with_documentation(name, the_type, Visibility::Public, Documentation::new())
     }
 
-    pub fn with_documentation(name: String, the_type: CType, visibility: Visibility, documentation: Documentation) -> Self {
+    #[must_use]
+    pub const fn with_documentation(name: String, the_type: CType, visibility: Visibility, documentation: Documentation) -> Self {
         Self {
             name,
             visibility,
@@ -512,19 +557,23 @@ impl Field {
         }
     }
 
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
-    pub fn the_type(&self) -> &CType {
+    #[must_use]
+    pub const fn the_type(&self) -> &CType {
         &self.the_type
     }
 
-    pub fn visibility(&self) -> &Visibility {
+    #[must_use]
+    pub const fn visibility(&self) -> &Visibility {
         &self.visibility
     }
 
-    pub fn documentation(&self) -> &Documentation {
+    #[must_use]
+    pub const fn documentation(&self) -> &Documentation {
         &self.documentation
     }
 }
@@ -537,15 +586,18 @@ pub struct OpaqueType {
 }
 
 impl OpaqueType {
-    pub fn new(name: String, meta: Meta) -> Self {
+    #[must_use]
+    pub const fn new(name: String, meta: Meta) -> Self {
         Self { name, meta }
     }
 
+    #[must_use]
     pub fn rust_name(&self) -> &str {
         &self.name
     }
 
-    pub fn meta(&self) -> &Meta {
+    #[must_use]
+    pub const fn meta(&self) -> &Meta {
         &self.meta
     }
 }
@@ -558,27 +610,33 @@ pub struct Meta {
 }
 
 impl Meta {
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
 
-    pub fn with_namespace_documentation(namespace: String, documentation: Documentation) -> Self {
+    #[must_use]
+    pub const fn with_namespace_documentation(namespace: String, documentation: Documentation) -> Self {
         Self { documentation, namespace }
     }
 
-    pub fn with_documentation(documentation: Documentation) -> Self {
+    #[must_use]
+    pub const fn with_documentation(documentation: Documentation) -> Self {
         Self::with_namespace_documentation(String::new(), documentation)
     }
 
-    pub fn documentation(&self) -> &Documentation {
+    #[must_use]
+    pub const fn documentation(&self) -> &Documentation {
         &self.documentation
     }
 
+    #[must_use]
     pub fn namespace(&self) -> &str {
         &self.namespace
     }
 
     /// Convenience method used in generators
+    #[must_use]
     pub fn is_namespace(&self, namespace: &str) -> bool {
         self.namespace == namespace
     }
@@ -593,31 +651,38 @@ pub struct Function {
 }
 
 impl Function {
-    pub fn new(name: String, signature: FunctionSignature, meta: Meta) -> Self {
+    #[must_use]
+    pub const fn new(name: String, signature: FunctionSignature, meta: Meta) -> Self {
         Self { name, meta, signature }
     }
 
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
-    pub fn signature(&self) -> &FunctionSignature {
+    #[must_use]
+    pub const fn signature(&self) -> &FunctionSignature {
         &self.signature
     }
 
-    pub fn meta(&self) -> &Meta {
+    #[must_use]
+    pub const fn meta(&self) -> &Meta {
         &self.meta
     }
 
+    #[must_use]
     pub fn prettifier(&self) -> IdPrettifier {
         IdPrettifier::from_rust_lower(self.name())
     }
 
+    #[must_use]
     pub fn first_param_type(&self) -> Option<CType> {
         self.signature().params.first().map(|x| x.the_type.clone())
     }
 
-    pub fn returns_ffi_error(&self) -> bool {
+    #[must_use]
+    pub const fn returns_ffi_error(&self) -> bool {
         matches!(self.signature().rval(), CType::Pattern(TypePattern::FFIErrorEnum(_)))
     }
 }
@@ -630,15 +695,18 @@ pub struct FunctionSignature {
 }
 
 impl FunctionSignature {
-    pub fn new(params: Vec<Parameter>, rval: CType) -> Self {
+    #[must_use]
+    pub const fn new(params: Vec<Parameter>, rval: CType) -> Self {
         Self { params, rval }
     }
 
+    #[must_use]
     pub fn params(&self) -> &[Parameter] {
         &self.params
     }
 
-    pub fn rval(&self) -> &CType {
+    #[must_use]
+    pub const fn rval(&self) -> &CType {
         &self.rval
     }
 }
@@ -651,15 +719,18 @@ pub struct Parameter {
 }
 
 impl Parameter {
-    pub fn new(name: String, the_type: CType) -> Self {
+    #[must_use]
+    pub const fn new(name: String, the_type: CType) -> Self {
         Self { name, the_type }
     }
 
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
-    pub fn the_type(&self) -> &CType {
+    #[must_use]
+    pub const fn the_type(&self) -> &CType {
         &self.the_type
     }
 }
@@ -672,6 +743,7 @@ pub struct FnPointerType {
 }
 
 impl FnPointerType {
+    #[must_use]
     pub fn new(signature: FunctionSignature) -> Self {
         Self {
             signature: Box::new(signature),
@@ -679,6 +751,7 @@ impl FnPointerType {
         }
     }
 
+    #[must_use]
     pub fn new_named(signature: FunctionSignature, name: String) -> Self {
         Self {
             signature: Box::new(signature),
@@ -686,22 +759,26 @@ impl FnPointerType {
         }
     }
 
-    pub fn signature(&self) -> &FunctionSignature {
+    #[must_use]
+    pub const fn signature(&self) -> &FunctionSignature {
         &self.signature
     }
 
+    #[must_use]
     pub fn name(&self) -> Option<&str> {
         self.name.as_deref()
     }
 
+    #[must_use]
     pub fn internal_name(&self) -> String {
         let signature = self.signature();
         let params = signature.params.iter().map(|x| x.the_type().name_within_lib()).collect::<Vec<_>>().join(",");
         let rval = signature.rval.name_within_lib();
 
-        format!("fn({}) -> {}", params, rval)
+        format!("fn({params}) -> {rval}")
     }
 
+    #[must_use]
     pub fn rust_name(&self) -> String {
         self.name.clone().unwrap_or_else(|| self.internal_name())
     }
@@ -714,24 +791,28 @@ pub struct Documentation {
 }
 
 impl Documentation {
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
 
+    #[must_use]
     pub fn from_line(joined_line: &str) -> Self {
         if joined_line.is_empty() {
-            Documentation::new()
+            Self::new()
         } else {
-            Documentation {
-                lines: joined_line.split('\n').map(|x| x.to_string()).collect(),
+            Self {
+                lines: joined_line.split('\n').map(std::string::ToString::to_string).collect(),
             }
         }
     }
 
-    pub fn from_lines(lines: Vec<String>) -> Self {
-        Documentation { lines }
+    #[must_use]
+    pub const fn from_lines(lines: Vec<String>) -> Self {
+        Self { lines }
     }
 
+    #[must_use]
     pub fn lines(&self) -> &[String] {
         &self.lines
     }

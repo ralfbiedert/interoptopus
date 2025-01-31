@@ -50,7 +50,6 @@ use crate::lang::c::CType;
 use crate::lang::rust::CTypeInfo;
 use std::marker::PhantomData;
 use std::mem::{transmute, ManuallyDrop};
-use std::ops::Deref;
 
 /// A marker trait for types that are surrogates for other types.
 ///
@@ -79,28 +78,25 @@ unsafe impl<T, L: CTypeInfo + CorrectSurrogate<T>> CTypeInfo for Surrogate<T, L>
 
 impl<T, L: CTypeInfo + CorrectSurrogate<T>> Surrogate<T, L> {
     /// Creates a new `Surrogate` from a `T`.
-    pub fn from_t(x: T) -> Self {
-        Self {
-            inner: x,
-            _marker: Default::default(),
-        }
+    pub const fn from_t(x: T) -> Self {
+        Self { inner: x, _marker: PhantomData }
     }
 
     /// Creates a new `Surrogate` from a `L`.
     pub fn from_l(x: L) -> Self {
         let t = unsafe {
             let this = ManuallyDrop::new(x);
-            std::ptr::read(this.deref() as *const L as *const T)
+            std::ptr::read(std::ptr::from_ref::<L>(&*this).cast::<T>())
         };
 
         Self {
             inner: t,
-            _marker: Default::default(),
+            _marker: PhantomData::default(),
         }
     }
 
     /// Views the type as a `T`.
-    pub fn as_t(&self) -> &T {
+    pub const fn as_t(&self) -> &T {
         &self.inner
     }
 
@@ -110,12 +106,14 @@ impl<T, L: CTypeInfo + CorrectSurrogate<T>> Surrogate<T, L> {
     }
 
     /// Views the type as a `L`.
+    #[allow(clippy::transmute_ptr_to_ptr)]
     pub fn as_l(&self) -> &L {
         // Safety: this should be guaranteed through the `CorrectSurrogate` trait.
         unsafe { transmute(&self.inner) }
     }
 
     /// Views the type mutably as a `L`.
+    #[allow(clippy::transmute_ptr_to_ptr)]
     pub fn as_l_mut(&mut self) -> &mut L {
         // Safety: this should be guaranteed through the `CorrectSurrogate` trait.
         unsafe { transmute(&mut self.inner) }
@@ -131,7 +129,7 @@ impl<T, L: CTypeInfo + CorrectSurrogate<T>> Surrogate<T, L> {
         // Safety: this should be guaranteed through the `CorrectSurrogate` trait.
         unsafe {
             let this = ManuallyDrop::new(self);
-            std::ptr::read(&this.inner as *const T as *const L)
+            std::ptr::read(std::ptr::from_ref::<T>(&this.inner).cast::<L>())
         }
     }
 }

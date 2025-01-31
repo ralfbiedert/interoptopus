@@ -1,9 +1,9 @@
-//! Generates CPython bindings for [Interoptopus](https://github.com/ralfbiedert/interoptopus).
+//! Generates `CPython` bindings for [Interoptopus](https://github.com/ralfbiedert/interoptopus).
 //!
 //! # Usage
 //!
 //! Assuming you have written a crate containing your FFI logic called `example_library_ffi` and
-//! want to generate **CPython bindings** for Python 3.7+, follow the instructions below.
+//! want to generate **`CPython` bindings** for Python 3.7+, follow the instructions below.
 //!
 //! ### Inside Your Library
 //!
@@ -156,7 +156,8 @@ pub struct Generator {
 }
 
 impl Generator {
-    pub fn new(config: Config, library: Inventory) -> Self {
+    #[must_use]
+    pub const fn new(config: Config, library: Inventory) -> Self {
         Self {
             config,
             library,

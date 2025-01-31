@@ -42,7 +42,7 @@ use syn::{GenericParam, ItemStruct, Type};
 //
 // ```
 //
-#[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
+#[allow(clippy::too_many_lines, clippy::cognitive_complexity, clippy::useless_let_if_seq)]
 pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: ItemStruct) -> TokenStream {
     let namespace = attributes.namespace.clone().unwrap_or_default();
     let doc_line = extract_doc_lines(&item.attrs).join("\n");
@@ -69,7 +69,7 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
         match generic {
             GenericParam::Lifetime(lt) => {
                 let ident = lt.lifetime.ident.clone();
-                let lt = syn::Lifetime::new(&format!("'{}", ident), item.span());
+                let lt = syn::Lifetime::new(&format!("'{ident}"), item.span());
                 generic_parameter_tokens.push(quote! { #lt });
                 generic_struct_tokens.push(quote! { #lt });
             }

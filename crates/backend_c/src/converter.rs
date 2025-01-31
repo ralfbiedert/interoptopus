@@ -12,7 +12,8 @@ pub struct Converter {
 }
 
 impl Converter {
-    pub fn new(config: Config) -> Self {
+    #[must_use]
+    pub const fn new(config: Config) -> Self {
         Self { config }
     }
 }
@@ -93,17 +94,17 @@ pub trait CTypeConverter {
     fn constant_value_to_value(&self, value: &ConstantValue) -> String {
         match value {
             ConstantValue::Primitive(x) => match x {
-                PrimitiveValue::Bool(x) => format!("{}", x),
-                PrimitiveValue::U8(x) => format!("{}", x),
-                PrimitiveValue::U16(x) => format!("{}", x),
-                PrimitiveValue::U32(x) => format!("{}", x),
-                PrimitiveValue::U64(x) => format!("{}", x),
-                PrimitiveValue::I8(x) => format!("{}", x),
-                PrimitiveValue::I16(x) => format!("{}", x),
-                PrimitiveValue::I32(x) => format!("{}", x),
-                PrimitiveValue::I64(x) => format!("{}", x),
-                PrimitiveValue::F32(x) => format!("{}", x),
-                PrimitiveValue::F64(x) => format!("{}", x),
+                PrimitiveValue::Bool(x) => format!("{x}"),
+                PrimitiveValue::U8(x) => format!("{x}"),
+                PrimitiveValue::U16(x) => format!("{x}"),
+                PrimitiveValue::U32(x) => format!("{x}"),
+                PrimitiveValue::U64(x) => format!("{x}"),
+                PrimitiveValue::I8(x) => format!("{x}"),
+                PrimitiveValue::I16(x) => format!("{x}"),
+                PrimitiveValue::I32(x) => format!("{x}"),
+                PrimitiveValue::I64(x) => format!("{x}"),
+                PrimitiveValue::F32(x) => format!("{x}"),
+                PrimitiveValue::F64(x) => format!("{x}"),
             },
         }
     }

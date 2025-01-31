@@ -59,16 +59,17 @@ impl Default for CStrPointer<'_> {
     fn default() -> Self {
         Self {
             ptr: null(),
-            _phantom: Default::default(),
+            _phantom: PhantomData::default(),
         }
     }
 }
 
 impl<'a> CStrPointer<'a> {
+    #[must_use]
     pub fn empty() -> Self {
         Self {
             ptr: EMPTY.as_ptr().cast(),
-            _phantom: Default::default(),
+            _phantom: PhantomData::default(),
         }
     }
 
@@ -76,7 +77,10 @@ impl<'a> CStrPointer<'a> {
     ///
     /// The parameter `cstr_with_nul` must contain nul (`0x0`), but it does not need to contain nul
     /// at the end.
-    pub fn from_slice_with_nul(cstr_with_nul: &'a [u8]) -> Result<CStrPointer<'a>, Error> {
+    ///
+    /// # Errors
+    /// Can fail if the string contains a nul.
+    pub fn from_slice_with_nul(cstr_with_nul: &'a [u8]) -> Result<Self, Error> {
         // Check we actually contain one `0x0`.
         if !cstr_with_nul.contains(&0) {
             return Err(Error::NulTerminated);
@@ -92,19 +96,21 @@ impl<'a> CStrPointer<'a> {
 
         Ok(Self {
             ptr: cstr_with_nul.as_ptr().cast(),
-            _phantom: Default::default(),
+            _phantom: PhantomData::default(),
         })
     }
 
-    /// Create a pointer from a CStr.
-    pub fn from_cstr(cstr: &'a CStr) -> CStrPointer<'a> {
+    /// Create a pointer from a `CStr`.
+    #[must_use]
+    pub fn from_cstr(cstr: &'a CStr) -> Self {
         Self {
             ptr: cstr.as_ptr(),
-            _phantom: Default::default(),
+            _phantom: PhantomData::default(),
         }
     }
 
     /// Create a [`CStr`] for the pointer.
+    #[must_use]
     pub fn as_c_str(&self) -> Option<&'a CStr> {
         if self.ptr.is_null() {
             None
@@ -115,6 +121,9 @@ impl<'a> CStrPointer<'a> {
     }
 
     /// Attempts to return a Rust `str`.
+    ///
+    /// # Errors
+    /// Can fail if the string was null.
     pub fn as_str(&self) -> Result<&'a str, Error> {
         Ok(self.as_c_str().ok_or(Error::Null)?.to_str()?)
     }

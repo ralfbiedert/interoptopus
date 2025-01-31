@@ -135,17 +135,17 @@ impl TypePattern {
     /// C-equivalent fallback type.
     ///
     /// This function will never return a [`CType::Pattern`] variant.
-    pub fn fallback_type(&self) -> CType {
+    #[must_use] pub fn fallback_type(&self) -> CType {
         match self {
-            TypePattern::CStrPointer => CType::ReadPointer(Box::new(CType::Pattern(TypePattern::CChar))),
-            TypePattern::FFIErrorEnum(e) => CType::Enum(e.the_enum().clone()),
-            TypePattern::Slice(x) => CType::Composite(x.clone()),
-            TypePattern::SliceMut(x) => CType::Composite(x.clone()),
-            TypePattern::Option(x) => CType::Composite(x.clone()),
-            TypePattern::NamedCallback(x) => CType::FnPointer(x.fnpointer().clone()),
-            TypePattern::Bool => CType::Primitive(PrimitiveType::U8),
-            TypePattern::CChar => c_char::type_info(),
-            TypePattern::APIVersion => CType::Primitive(PrimitiveType::U64),
+            Self::CStrPointer => CType::ReadPointer(Box::new(CType::Pattern(Self::CChar))),
+            Self::FFIErrorEnum(e) => CType::Enum(e.the_enum().clone()),
+            Self::Slice(x) => CType::Composite(x.clone()),
+            Self::SliceMut(x) => CType::Composite(x.clone()),
+            Self::Option(x) => CType::Composite(x.clone()),
+            Self::NamedCallback(x) => CType::FnPointer(x.fnpointer().clone()),
+            Self::Bool => CType::Primitive(PrimitiveType::U8),
+            Self::CChar => c_char::type_info(),
+            Self::APIVersion => CType::Primitive(PrimitiveType::U64),
         }
     }
 }

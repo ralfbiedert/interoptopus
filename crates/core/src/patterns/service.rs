@@ -18,13 +18,13 @@
 //! To define a service you need the following parts:
 //!
 //! - An `opaque` type; the instance of a service
-//! - A Rust `Error` type mappable to an [FFIError](crate::patterns::result::FFIError) enum via `From<Error>`
+//! - A Rust `Error` type mappable to an [`FFIError`](crate::patterns::result::FFIError) enum via `From<Error>`
 //! - Some methods on the opaque type.
 //!
 //! # Example
 //!
 //! In this example we define a service called `SimpleService` with a constructor and two methods.
-//! The type `MyFFIError` is not shown, but implemented as in the [FFIError](crate::patterns::result::FFIError) example.
+//! The type `MyFFIError` is not shown, but implemented as in the [`FFIError`](crate::patterns::result::FFIError) example.
 //!
 //! ```
 //! # use std::fmt::{Display, Formatter};
@@ -126,8 +126,16 @@ pub struct Service {
 }
 
 impl Service {
+    /// Creates a new service definition.
+    ///
+    /// # Panics
+    /// Expect the first ctor parameter to be a type.
+    #[must_use]
     pub fn new(constructors: Vec<Function>, destructor: Function, methods: Vec<Function>) -> Self {
-        let first_type = &constructors.first().and_then(|x| x.first_param_type()).expect("Must have type");
+        let first_type = &constructors
+            .first()
+            .and_then(super::super::lang::c::Function::first_param_type)
+            .expect("Must have type");
         let the_type = extract_obvious_opaque_from_parameter(first_type).expect("First parameter must point to opaque.");
 
         Self {
@@ -143,8 +151,15 @@ impl Service {
     ///
     /// This function is mainly called during compile time therefore panicking with a good error
     /// message is beneficial.
+    ///
+    /// # Panics
+    /// Expect the first ctor parameter to be a type.
     pub fn assert_valid(&self) {
-        let constructor_fist_parameter = self.constructors.first().and_then(|x| x.first_param_type()).expect("Must have type");
+        let constructor_fist_parameter = self
+            .constructors
+            .first()
+            .and_then(super::super::lang::c::Function::first_param_type)
+            .expect("Must have type");
         let destructor_first_parameter = self.destructor.first_param_type().expect("Must have type");
 
         match constructor_fist_parameter {
@@ -171,7 +186,7 @@ impl Service {
             _ => panic!("First parameter must be RwPointer(RwPointer(Opaque)) type"),
         }
 
-        for constructor in self.constructors.iter() {
+        for constructor in &self.constructors {
             match constructor.signature().rval() {
                 CType::Pattern(TypePattern::FFIErrorEnum(_)) => {}
                 _ => panic!("Constructor must return a `ffi_error` type pattern."),
@@ -184,23 +199,28 @@ impl Service {
         }
     }
 
-    pub fn the_type(&self) -> &OpaqueType {
+    #[must_use]
+    pub const fn the_type(&self) -> &OpaqueType {
         &self.the_type
     }
 
+    #[must_use]
     pub fn constructors(&self) -> &[Function] {
         &self.constructors
     }
 
-    pub fn destructor(&self) -> &Function {
+    #[must_use]
+    pub const fn destructor(&self) -> &Function {
         &self.destructor
     }
 
+    #[must_use]
     pub fn methods(&self) -> &[Function] {
         &self.methods
     }
 
     /// Returns the longest common prefix all methods of this service share.
+    #[must_use]
     pub fn common_prefix(&self) -> String {
         let mut all_methods = self.methods().to_vec();
         all_methods.extend_from_slice(self.constructors());

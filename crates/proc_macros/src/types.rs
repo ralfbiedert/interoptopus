@@ -11,6 +11,8 @@ mod enums;
 mod structs;
 
 #[derive(Debug, FromMeta, Clone)]
+#[allow(clippy::zero_sized_map_values)]
+#[allow(clippy::struct_excessive_bools)]
 pub struct Attributes {
     #[darling(default)]
     opaque: bool,

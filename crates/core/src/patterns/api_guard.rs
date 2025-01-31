@@ -59,19 +59,19 @@ use std::hash::{Hash, Hasher};
 /// Holds the API version hash of the given library.
 #[repr(transparent)]
 #[allow(dead_code)]
-#[derive(Debug, Default, PartialOrd, PartialEq, Copy, Clone)]
+#[derive(Debug, Default, PartialOrd, PartialEq, Eq, Copy, Clone)]
 pub struct APIVersion {
     version: u64,
 }
 
 impl APIVersion {
     /// Create a new API version from the given hash.
-    pub fn new(version: u64) -> Self {
+    #[must_use] pub const fn new(version: u64) -> Self {
         Self { version }
     }
 
     /// Create a new API version from the given library.
-    pub fn from_inventory(inventory: &Inventory) -> Self {
+    #[must_use] pub fn from_inventory(inventory: &Inventory) -> Self {
         let version = inventory_hash(inventory);
         Self { version }
     }
@@ -90,7 +90,7 @@ impl From<Inventory> for APIVersion {
 }
 
 /// Returns a unique hash for an inventory; used by backends.
-pub fn inventory_hash(inventory: &Inventory) -> u64 {
+#[must_use] pub fn inventory_hash(inventory: &Inventory) -> u64 {
     let mut hasher = DefaultHasher::new();
 
     let types = inventory.ctypes();

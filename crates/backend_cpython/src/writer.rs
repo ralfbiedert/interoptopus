@@ -19,21 +19,21 @@ pub trait PythonWriter {
     fn converter(&self) -> &Converter;
 
     fn write_imports(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        indented!(w, r#"from __future__ import annotations"#)?;
-        indented!(w, r#"import ctypes"#)?;
-        indented!(w, r#"import typing"#)?;
+        indented!(w, r"from __future__ import annotations")?;
+        indented!(w, r"import ctypes")?;
+        indented!(w, r"import typing")?;
         w.newline()?;
         indented!(w, r#"T = typing.TypeVar("T")"#)?;
         Ok(())
     }
 
     fn write_api_load_fuction(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        indented!(w, r#"c_lib = None"#)?;
+        indented!(w, r"c_lib = None")?;
         w.newline()?;
-        indented!(w, r#"def init_lib(path):"#)?;
-        indented!(w, [_], r#""""Initializes the native library. Must be called at least once before anything else.""""#)?;
-        indented!(w, [_], r#"global c_lib"#)?;
-        indented!(w, [_], r#"c_lib = ctypes.cdll.LoadLibrary(path)"#)?;
+        indented!(w, r"def init_lib(path):")?;
+        indented!(w, [()], r#""""Initializes the native library. Must be called at least once before anything else.""""#)?;
+        indented!(w, [()], r"global c_lib")?;
+        indented!(w, [()], r"c_lib = ctypes.cdll.LoadLibrary(path)")?;
 
         w.newline()?;
         for f in self.inventory().functions() {
@@ -44,14 +44,14 @@ pub trait PythonWriter {
                 .map(|x| self.converter().to_ctypes_name(x.the_type(), false))
                 .collect::<Vec<_>>();
 
-            indented!(w, [_], r#"c_lib.{}.argtypes = [{}]"#, f.name(), args.join(", "))?;
+            indented!(w, [()], r"c_lib.{}.argtypes = [{}]", f.name(), args.join(", "))?;
         }
 
         w.newline()?;
         for f in self.inventory().functions() {
             let rtype = self.converter().to_ctypes_name(f.signature().rval(), false);
             if !rtype.is_empty() {
-                indented!(w, [_], r#"c_lib.{}.restype = {}"#, f.name(), rtype)?;
+                indented!(w, [()], r"c_lib.{}.restype = {}", f.name(), rtype)?;
             }
         }
 
@@ -59,7 +59,7 @@ pub trait PythonWriter {
         for f in self.inventory().functions() {
             if let CType::Pattern(TypePattern::FFIErrorEnum(e)) = f.signature().rval() {
                 let value = e.success_variant().value();
-                indented!(w, [_], r#"c_lib.{}.errcheck = lambda rval, _fptr, _args: _errcheck(rval, {})"#, f.name(), value)?;
+                indented!(w, [()], r"c_lib.{}.errcheck = lambda rval, _fptr, _args: _errcheck(rval, {})", f.name(), value)?;
             }
         }
 
@@ -68,7 +68,7 @@ pub trait PythonWriter {
 
     fn write_constants(&self, w: &mut IndentWriter) -> Result<(), Error> {
         for c in self.inventory().constants() {
-            indented!(w, r#"{} = {}"#, c.name(), self.converter().constant_value_to_value(c.value()))?;
+            indented!(w, r"{} = {}", c.name(), self.converter().constant_value_to_value(c.value()))?;
         }
 
         Ok(())
@@ -104,30 +104,30 @@ pub trait PythonWriter {
     fn write_struct(&self, w: &mut IndentWriter, c: &CompositeType, write_for: WriteFor) -> Result<(), Error> {
         let documentation = c.meta().documentation().lines().join("\n");
 
-        indented!(w, r#"class {}(ctypes.Structure):"#, c.rust_name())?;
+        indented!(w, r"class {}(ctypes.Structure):", c.rust_name())?;
         if !documentation.is_empty() && write_for == WriteFor::Code {
-            indented!(w, [_], r#""""{}""""#, documentation)?;
+            indented!(w, [()], r#""""{}""""#, documentation)?;
         }
 
         if c.repr().layout() == Layout::Packed {
-            indented!(w, [_], r#"_pack_ = 1"#)?
+            indented!(w, [()], r"_pack_ = 1")?;
         }
 
         let alignment = c.repr().alignment();
         if let Some(align) = alignment {
-            indented!(w, [_], r#"_align_ = {}"#, align)?;
+            indented!(w, [()], r"_align_ = {}", align)?;
         }
 
         w.newline()?;
         if write_for == WriteFor::Code {
-            indented!(w, [_], r#"# These fields represent the underlying C data layout"#)?;
+            indented!(w, [()], r"# These fields represent the underlying C data layout")?;
         }
-        indented!(w, [_], r#"_fields_ = ["#)?;
+        indented!(w, [()], r"_fields_ = [")?;
         for f in c.fields() {
             let type_name = self.converter().to_ctypes_name(f.the_type(), true);
-            indented!(w, [_ _], r#"("{}", {}),"#, f.name(), type_name)?;
+            indented!(w, [()()], r#"("{}", {}),"#, f.name(), type_name)?;
         }
-        indented!(w, [_], r#"]"#)?;
+        indented!(w, [()], r"]")?;
 
         // Ctor
         let extra_args = c
@@ -143,15 +143,15 @@ pub trait PythonWriter {
 
         if !c.fields().is_empty() {
             w.newline()?;
-            indented!(w, [_], r#"def __init__(self, {}):"#, extra_args)?;
+            indented!(w, [()], r"def __init__(self, {}):", extra_args)?;
 
             if write_for == WriteFor::Code {
-                for field in c.fields().iter() {
-                    indented!(w, [_ _], r#"if {} is not None:"#, field.name())?;
-                    indented!(w, [_ _ _], r#"self.{} = {}"#, field.name(), field.name())?;
+                for field in c.fields() {
+                    indented!(w, [()()], r"if {} is not None:", field.name())?;
+                    indented!(w, [()()()], r"self.{} = {}", field.name(), field.name())?;
                 }
             } else {
-                indented!(w, [_ _], r#"..."#)?;
+                indented!(w, [()()], r"...")?;
             }
         }
 
@@ -168,26 +168,26 @@ pub trait PythonWriter {
             let hint_in = self.converter().to_type_hint_in(f.the_type(), false);
             let hint_out = self.converter().to_type_hint_out(f.the_type());
 
-            indented!(w, [_], r#"@property"#)?;
-            indented!(w, [_], r#"def {}(self){}:"#, f.name(), hint_out)?;
+            indented!(w, [()], r"@property")?;
+            indented!(w, [()], r"def {}(self){}:", f.name(), hint_out)?;
 
             if !documentation.is_empty() {
-                indented!(w, [_ _], r#""""{}""""#, documentation)?;
+                indented!(w, [()()], r#""""{}""""#, documentation)?;
             }
 
             match f.the_type() {
-                CType::Pattern(_) => indented!(w, [_ _], r#"return ctypes.Structure.__get__(self, "{}")"#, f.name())?,
-                _ => indented!(w, [_ _], r#"return ctypes.Structure.__get__(self, "{}")"#, f.name())?,
+                CType::Pattern(_) => indented!(w, [()()], r#"return ctypes.Structure.__get__(self, "{}")"#, f.name())?,
+                _ => indented!(w, [()()], r#"return ctypes.Structure.__get__(self, "{}")"#, f.name())?,
             }
 
             w.newline()?;
 
-            indented!(w, [_], r#"@{}.setter"#, f.name())?;
-            indented!(w, [_], r#"def {}(self, value{}):"#, f.name(), hint_in)?;
+            indented!(w, [()], r"@{}.setter", f.name())?;
+            indented!(w, [()], r"def {}(self, value{}):", f.name(), hint_in)?;
             if !documentation.is_empty() {
-                indented!(w, [_ _], r#""""{}""""#, documentation)?;
+                indented!(w, [()()], r#""""{}""""#, documentation)?;
             }
-            indented!(w, [_ _], r#"return ctypes.Structure.__set__(self, "{}", value)"#, f.name())?;
+            indented!(w, [()()], r#"return ctypes.Structure.__set__(self, "{}", value)"#, f.name())?;
         }
 
         Ok(())
@@ -196,26 +196,26 @@ pub trait PythonWriter {
     fn write_enum(&self, w: &mut IndentWriter, e: &EnumType, write_for: WriteFor) -> Result<(), Error> {
         let documentation = e.meta().documentation().lines().join("\n");
 
-        indented!(w, r#"class {}:"#, e.rust_name())?;
+        indented!(w, r"class {}:", e.rust_name())?;
         if !documentation.is_empty() && write_for == WriteFor::Code {
-            indented!(w, [_], r#""""{}""""#, documentation)?;
+            indented!(w, [()], r#""""{}""""#, documentation)?;
         }
 
         for v in e.variants() {
             if write_for == WriteFor::Code {
                 for line in v.documentation().lines() {
-                    indented!(w, [_], r#"# {}"#, line)?;
+                    indented!(w, [()], r"# {}", line)?;
                 }
             }
-            indented!(w, [_], r#"{} = {}"#, v.name(), v.value())?;
+            indented!(w, [()], r"{} = {}", v.name(), v.value())?;
         }
 
         Ok(())
     }
 
     fn write_callback_helpers(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        indented!(w, r#"class {}:"#, self.config().callback_namespace)?;
-        indented!(w, [_], r#""""Helpers to define callbacks.""""#)?;
+        indented!(w, r"class {}:", self.config().callback_namespace)?;
+        indented!(w, [()], r#""""Helpers to define callbacks.""""#)?;
 
         for callback in self.inventory().ctypes().iter().filter_map(|x| match x {
             CType::FnPointer(x) => Some(x),
@@ -224,8 +224,8 @@ pub trait PythonWriter {
         }) {
             indented!(
                 w,
-                [_],
-                r#"{} = {}"#,
+                [()],
+                r"{} = {}",
                 safe_name(&callback.internal_name()),
                 self.converter().fnpointer_to_typename(callback)
             )?;
@@ -247,18 +247,18 @@ pub trait PythonWriter {
         let args = self.function_args_to_string(function, true, false);
         let documentation = function.meta().documentation().lines().join("\n");
 
-        indented!(w, r#"def {}({}){}:"#, function.name(), args, rval_sig)?;
+        indented!(w, r"def {}({}){}:", function.name(), args, rval_sig)?;
 
         if write_for == WriteFor::Code {
             if !documentation.is_empty() {
-                indented!(w, [_], r#""""{}""""#, documentation)?;
+                indented!(w, [()], r#""""{}""""#, documentation)?;
             }
 
             self.write_param_helpers(w, function)?;
             self.write_library_call(w, function, None)?;
             w.newline()?;
         } else {
-            indented!(w, [_], r#"..."#)?;
+            indented!(w, [()], r"...")?;
         }
 
         Ok(())
@@ -268,20 +268,20 @@ pub trait PythonWriter {
         for arg in function.signature().params() {
             match arg.the_type() {
                 CType::FnPointer(x) => {
-                    indented!(w, [_], r#"if not hasattr({}, "__ctypes_from_outparam__"):"#, arg.name())?;
-                    indented!(w, [_ _], r#"{} = callbacks.{}({})"#, arg.name(), safe_name(&x.internal_name()), arg.name())?;
+                    indented!(w, [()], r#"if not hasattr({}, "__ctypes_from_outparam__"):"#, arg.name())?;
+                    indented!(w, [()()], r"{} = callbacks.{}({})", arg.name(), safe_name(&x.internal_name()), arg.name())?;
                     w.newline()?;
                 }
                 CType::Pattern(pattern) => match pattern {
                     TypePattern::NamedCallback(x) => {
                         let x = x.fnpointer();
-                        indented!(w, [_], r#"if not hasattr({}, "__ctypes_from_outparam__"):"#, arg.name())?;
-                        indented!(w, [_ _], r#"{} = callbacks.{}({})"#, arg.name(), safe_name(&x.internal_name()), arg.name())?;
+                        indented!(w, [()], r#"if not hasattr({}, "__ctypes_from_outparam__"):"#, arg.name())?;
+                        indented!(w, [()()], r"{} = callbacks.{}({})", arg.name(), safe_name(&x.internal_name()), arg.name())?;
                         w.newline()?;
                     }
                     TypePattern::CStrPointer => {
-                        indented!(w, [_], r#"if not hasattr({}, "__ctypes_from_outparam__"):"#, arg.name())?;
-                        indented!(w, [_ _], r#"{} = ctypes.cast({}, ctypes.POINTER(ctypes.c_char))"#, arg.name(), arg.name())?;
+                        indented!(w, [()], r#"if not hasattr({}, "__ctypes_from_outparam__"):"#, arg.name())?;
+                        indented!(w, [()()], r"{} = ctypes.cast({}, ctypes.POINTER(ctypes.c_char))", arg.name(), arg.name())?;
                     }
                     TypePattern::Slice(t) | TypePattern::SliceMut(t) => {
                         let inner = self.converter().to_ctypes_name(
@@ -297,15 +297,23 @@ pub trait PythonWriter {
 
                         indented!(
                             w,
-                            [_],
+                            [()],
                             r#"if hasattr({}, "_length_") and getattr({}, "_type_", "") == {}:"#,
                             arg.name(),
                             arg.name(),
                             inner
                         )?;
 
-                        indented!(w, [_ _], r#"{} = {}(data=ctypes.cast({}, ctypes.POINTER({})), len=len({}))"#,
-                                arg.name(), arg.the_type().name_within_lib(), arg.name(), inner, arg.name())?;
+                        indented!(
+                            w,
+                            [()()],
+                            r"{} = {}(data=ctypes.cast({}, ctypes.POINTER({})), len=len({}))",
+                            arg.name(),
+                            arg.the_type().name_within_lib(),
+                            arg.name(),
+                            inner,
+                            arg.name()
+                        )?;
                         w.newline()?;
                     }
                     _ => {}
@@ -330,79 +338,89 @@ pub trait PythonWriter {
         let hint_in = self.converter().to_type_hint_in(data_type, false);
         let hint_out = self.converter().to_type_hint_out(data_type);
 
-        indented!(w, r#"class {}(ctypes.Structure):"#, c.rust_name())?;
-        indented!(w, [_], r#"# These fields represent the underlying C data layout"#)?;
-        indented!(w, [_], r#"_fields_ = ["#)?;
-        indented!(w, [_], r#"    ("data", ctypes.POINTER({})),"#, data_type_python)?;
-        indented!(w, [_], r#"    ("len", ctypes.c_uint64),"#)?;
-        indented!(w, [_], r#"]"#)?;
+        indented!(w, r"class {}(ctypes.Structure):", c.rust_name())?;
+        indented!(w, [()], r"# These fields represent the underlying C data layout")?;
+        indented!(w, [()], r"_fields_ = [")?;
+        indented!(w, [()], r#"    ("data", ctypes.POINTER({})),"#, data_type_python)?;
+        indented!(w, [()], r#"    ("len", ctypes.c_uint64),"#)?;
+        indented!(w, [()], r"]")?;
         w.newline()?;
-        indented!(w, [_], r#"def __len__(self):"#)?;
-        indented!(w, [_ _], r#"return self.len"#)?;
+        indented!(w, [()], r"def __len__(self):")?;
+        indented!(w, [()()], r"return self.len")?;
         w.newline()?;
-        indented!(w, [_], r#"def __getitem__(self, i){}:"#, hint_out)?;
-        indented!(w, [_ _], r#"if i < 0:"#)?;
-        indented!(w, [_ _ _], r#"index = self.len+i"#)?;
-        indented!(w, [_ _], r#"else:"#)?;
-        indented!(w, [_ _ _], r#"index = i"#)?;
+        indented!(w, [()], r"def __getitem__(self, i){}:", hint_out)?;
+        indented!(w, [()()], r"if i < 0:")?;
+        indented!(w, [()()()], r"index = self.len+i")?;
+        indented!(w, [()()], r"else:")?;
+        indented!(w, [()()()], r"index = i")?;
         w.newline()?;
-        indented!(w, [_ _], r#"if index >= self.len:"#)?;
-        indented!(w, [_ _ _], r#"raise IndexError("Index out of range")"#)?;
+        indented!(w, [()()], r"if index >= self.len:")?;
+        indented!(w, [()()()], r#"raise IndexError("Index out of range")"#)?;
         w.newline()?;
-        indented!(w, [_ _], r#"return self.data[index]"#)?;
+        indented!(w, [()()], r"return self.data[index]")?;
 
         if mutable {
             w.newline()?;
-            indented!(w, [_], r#"def __setitem__(self, i, v{}):"#, hint_in)?;
-            indented!(w, [_ _], r#"if i < 0:"#)?;
-            indented!(w, [_ _ _], r#"index = self.len+i"#)?;
-            indented!(w, [_ _], r#"else:"#)?;
-            indented!(w, [_ _ _], r#"index = i"#)?;
+            indented!(w, [()], r"def __setitem__(self, i, v{}):", hint_in)?;
+            indented!(w, [()()], r"if i < 0:")?;
+            indented!(w, [()()()], r"index = self.len+i")?;
+            indented!(w, [()()], r"else:")?;
+            indented!(w, [()()()], r"index = i")?;
             w.newline()?;
-            indented!(w, [_ _], r#"if index >= self.len:"#)?;
-            indented!(w, [_ _ _], r#"raise IndexError("Index out of range")"#)?;
+            indented!(w, [()()], r"if index >= self.len:")?;
+            indented!(w, [()()()], r#"raise IndexError("Index out of range")"#)?;
             w.newline()?;
-            indented!(w, [_ _], r#"self.data[index] = v"#)?;
+            indented!(w, [()()], r"self.data[index] = v")?;
         }
 
         w.newline()?;
-        indented!(w, [_], r#"def copied(self) -> {}:"#, c.rust_name())?;
-        indented!(w, [_ _], r#""""Returns a shallow, owned copy of the underlying slice.
+        indented!(w, [()], r"def copied(self) -> {}:", c.rust_name())?;
+        indented!(
+            w,
+            [()()],
+            r#""""Returns a shallow, owned copy of the underlying slice.
 
         The returned object owns the immediate data, but not the targets of any contained
         pointers. In other words, if your struct contains any pointers the returned object
         may only be used as long as these pointers are valid. If the struct did not contain
-        any pointers the returned object is valid indefinitely.""""#)?;
-        indented!(w, [_ _], r#"array = ({} * len(self))()"#, data_type_python)?;
-        indented!(w, [_ _], r#"ctypes.memmove(array, self.data, len(self) * ctypes.sizeof({}))"#, data_type_python)?;
-        indented!(w, [_ _], r#"rval = {}(data=ctypes.cast(array, ctypes.POINTER({})), len=len(self))"#, c.rust_name(), data_type_python)?;
-        indented!(w, [_ _], r#"rval.owned = array  # Store array in returned slice to prevent memory deallocation"#)?;
-        indented!(w, [_ _], r#"return rval"#)?;
+        any pointers the returned object is valid indefinitely.""""#
+        )?;
+        indented!(w, [()()], r"array = ({} * len(self))()", data_type_python)?;
+        indented!(w, [()()], r"ctypes.memmove(array, self.data, len(self) * ctypes.sizeof({}))", data_type_python)?;
+        indented!(
+            w,
+            [()()],
+            r"rval = {}(data=ctypes.cast(array, ctypes.POINTER({})), len=len(self))",
+            c.rust_name(),
+            data_type_python
+        )?;
+        indented!(w, [()()], r"rval.owned = array  # Store array in returned slice to prevent memory deallocation")?;
+        indented!(w, [()()], r"return rval")?;
         w.newline()?;
-        indented!(w, [_], r#"def __iter__(self) -> typing.Iterable[{}]:"#, data_type_python)?;
-        indented!(w, [_ _], r#"return _Iter(self)"#)?;
+        indented!(w, [()], r"def __iter__(self) -> typing.Iterable[{}]:", data_type_python)?;
+        indented!(w, [()()], r"return _Iter(self)")?;
         w.newline()?;
-        indented!(w, [_], r#"def iter(self) -> typing.Iterable[{}]:"#, data_type_python)?;
-        indented!(w, [_ _], r#""""Convenience method returning a value iterator.""""#)?;
-        indented!(w, [_ _], r#"return iter(self)"#)?;
+        indented!(w, [()], r"def iter(self) -> typing.Iterable[{}]:", data_type_python)?;
+        indented!(w, [()()], r#""""Convenience method returning a value iterator.""""#)?;
+        indented!(w, [()()], r"return iter(self)")?;
         w.newline()?;
-        indented!(w, [_], r#"def first(self){}:"#, hint_out)?;
-        indented!(w, [_ _], r#""""Returns the first element of this slice.""""#)?;
-        indented!(w, [_ _], r#"return self[0]"#)?;
+        indented!(w, [()], r"def first(self){}:", hint_out)?;
+        indented!(w, [()()], r#""""Returns the first element of this slice.""""#)?;
+        indented!(w, [()()], r"return self[0]")?;
         w.newline()?;
-        indented!(w, [_], r#"def last(self){}:"#, hint_out)?;
-        indented!(w, [_ _], r#""""Returns the last element of this slice.""""#)?;
-        indented!(w, [_ _], r#"return self[len(self)-1]"#)?;
+        indented!(w, [()], r"def last(self){}:", hint_out)?;
+        indented!(w, [()()], r#""""Returns the last element of this slice.""""#)?;
+        indented!(w, [()()], r"return self[len(self)-1]")?;
 
         // Only write this for byte-like types right now
         if data_type.size_of() == 1 {
             w.newline()?;
-            indented!(w, [_], r#"def bytearray(self):"#)?;
-            indented!(w, [_ _], r#""""Returns a bytearray with the content of this slice.""""#)?;
-            indented!(w, [_ _], r#"rval = bytearray(len(self))"#)?;
-            indented!(w, [_ _], r#"for i in range(len(self)):"#)?;
-            indented!(w, [_ _ _], r#"rval[i] = self[i]"#)?;
-            indented!(w, [_ _], r#"return rval"#)?;
+            indented!(w, [()], r"def bytearray(self):")?;
+            indented!(w, [()()], r#""""Returns a bytearray with the content of this slice.""""#)?;
+            indented!(w, [()()], r"rval = bytearray(len(self))")?;
+            indented!(w, [()()], r"for i in range(len(self)):")?;
+            indented!(w, [()()()], r"rval[i] = self[i]")?;
+            indented!(w, [()()], r"return rval")?;
         }
 
         Ok(())
@@ -418,29 +436,29 @@ pub trait PythonWriter {
 
         let data_type_python = self.converter().to_ctypes_name(data_type, true);
 
-        indented!(w, r#"class {}(ctypes.Structure):"#, c.rust_name())?;
-        indented!(w, [_], r#""""May optionally hold a value.""""#)?;
+        indented!(w, r"class {}(ctypes.Structure):", c.rust_name())?;
+        indented!(w, [()], r#""""May optionally hold a value.""""#)?;
         w.newline()?;
-        indented!(w, [_], r#"_fields_ = ["#)?;
-        indented!(w, [_], r#"    ("_t", {}),"#, data_type_python)?;
-        indented!(w, [_], r#"    ("_is_some", ctypes.c_uint8),"#)?;
-        indented!(w, [_], r#"]"#)?;
+        indented!(w, [()], r"_fields_ = [")?;
+        indented!(w, [()], r#"    ("_t", {}),"#, data_type_python)?;
+        indented!(w, [()], r#"    ("_is_some", ctypes.c_uint8),"#)?;
+        indented!(w, [()], r"]")?;
         w.newline()?;
-        indented!(w, [_], r#"@property"#)?;
-        indented!(w, [_], r#"def value(self) -> {}:"#, data_type_python)?;
-        indented!(w, [_ _], r#""""Returns the value if it exists, or None.""""#)?;
-        indented!(w, [_ _], r#"if self._is_some == 1:"#)?;
-        indented!(w, [_ _ _], r#"return self._t"#)?;
-        indented!(w, [_ _], r#"else:"#)?;
-        indented!(w, [_ _ _], r#"return None"#)?;
+        indented!(w, [()], r"@property")?;
+        indented!(w, [()], r"def value(self) -> {}:", data_type_python)?;
+        indented!(w, [()()], r#""""Returns the value if it exists, or None.""""#)?;
+        indented!(w, [()()], r"if self._is_some == 1:")?;
+        indented!(w, [()()()], r"return self._t")?;
+        indented!(w, [()()], r"else:")?;
+        indented!(w, [()()()], r"return None")?;
         w.newline()?;
-        indented!(w, [_], r#"def is_some(self) -> bool:"#)?;
-        indented!(w, [_ _], r#""""Returns true if the value exists.""""#)?;
-        indented!(w, [_ _], r#"return self._is_some == 1"#)?;
+        indented!(w, [()], r"def is_some(self) -> bool:")?;
+        indented!(w, [()()], r#""""Returns true if the value exists.""""#)?;
+        indented!(w, [()()], r"return self._is_some == 1")?;
         w.newline()?;
-        indented!(w, [_], r#"def is_none(self) -> bool:"#)?;
-        indented!(w, [_ _], r#""""Returns true if the value does not exist.""""#)?;
-        indented!(w, [_ _], r#"return self._is_some != 0"#)?;
+        indented!(w, [()], r"def is_none(self) -> bool:")?;
+        indented!(w, [()()], r#""""Returns true if the value does not exist.""""#)?;
+        indented!(w, [()()], r"return self._is_some != 0")?;
 
         Ok(())
     }
@@ -466,19 +484,24 @@ pub trait PythonWriter {
         let _common_prefix = longest_common_prefix(&all_functions);
         let documentation = class.the_type().meta().documentation().lines().join("\n");
 
-        indented!(w, r#"class {}:"#, context_type_name)?;
+        indented!(w, r"class {}:", context_type_name)?;
         if !documentation.is_empty() {
-            indented!(w, [_], r#""""{}""""#, documentation)?;
+            indented!(w, [()], r#""""{}""""#, documentation)?;
         }
-        indented!(w, [_], r#"__api_lock = object()"#)?;
+        indented!(w, [()], r"__api_lock = object()")?;
         w.newline()?;
-        indented!(w, [_], r#"def __init__(self, api_lock, ctx):"#)?;
-        indented!(w, [_ _], r#"assert(api_lock == {}.__api_lock), "You must create this with a static constructor." "#, context_type_name)?;
-        indented!(w, [_ _], r#"self._ctx = ctx"#)?;
+        indented!(w, [()], r"def __init__(self, api_lock, ctx):")?;
+        indented!(
+            w,
+            [()()],
+            r#"assert(api_lock == {}.__api_lock), "You must create this with a static constructor." "#,
+            context_type_name
+        )?;
+        indented!(w, [()()], r"self._ctx = ctx")?;
         w.newline()?;
-        indented!(w, [_], r#"@property"#)?;
-        indented!(w, [_], r#"def _as_parameter_(self):"#)?;
-        indented!(w, [_ _], r#"return self._ctx"#)?;
+        indented!(w, [()], r"@property")?;
+        indented!(w, [()], r"def _as_parameter_(self):")?;
+        indented!(w, [()()], r"return self._ctx")?;
         w.newline()?;
 
         for ctor in class.constructors() {
@@ -486,7 +509,7 @@ pub trait PythonWriter {
         }
 
         // Dtor
-        indented!(w, [_], r#"def __del__(self):"#)?;
+        indented!(w, [()], r"def __del__(self):")?;
         // indented!(w, [_ _], r#"global _api, ffi"#)?;
         w.indent();
         self.write_success_enum_aware_rval(w, class.destructor(), &self.get_method_args(class.destructor(), "self._ctx"), false)?;
@@ -511,21 +534,21 @@ pub trait PythonWriter {
         let common_prefix = longest_common_prefix(&all_functions);
 
         let ctor_args = self.function_args_to_string(ctor, true, true);
-        indented!(w, [_], r#"@staticmethod"#)?;
-        indented!(w, [_], r#"def {}({}) -> {}:"#, ctor.name().replace(&common_prefix, ""), ctor_args, context_type_name)?;
+        indented!(w, [()], r"@staticmethod")?;
+        indented!(w, [()], r"def {}({}) -> {}:", ctor.name().replace(&common_prefix, ""), ctor_args, context_type_name)?;
 
         if write_for == WriteFor::Docs {
             return Ok(());
         }
 
-        indented!(w, [_ _], r#"{}"#, self.converter().documentation(ctor.meta().documentation()))?;
-        indented!(w, [_ _], r#"ctx = ctypes.c_void_p()"#)?;
+        indented!(w, [()()], r"{}", self.converter().documentation(ctor.meta().documentation()))?;
+        indented!(w, [()()], r"ctx = ctypes.c_void_p()")?;
         w.indent();
         self.write_param_helpers(w, ctor)?;
         self.write_success_enum_aware_rval(w, ctor, &self.get_method_args(ctor, "ctx"), false)?;
         w.unindent();
-        indented!(w, [_ _], r#"self = {}({}.__api_lock, ctx)"#, context_type_name, context_type_name)?;
-        indented!(w, [_ _], r#"return self"#)?;
+        indented!(w, [()()], r"self = {}({}.__api_lock, ctx)", context_type_name, context_type_name)?;
+        indented!(w, [()()], r"return self")?;
         w.newline()?;
 
         Ok(())
@@ -541,13 +564,13 @@ pub trait PythonWriter {
         let args = self.function_args_to_string(function, true, true);
         let type_hint_out = self.converter().to_type_hint_out(function.signature().rval());
 
-        indented!(w, [_], r#"def {}(self, {}){}:"#, function.name().replace(&common_prefix, ""), &args, type_hint_out)?;
+        indented!(w, [()], r"def {}(self, {}){}:", function.name().replace(&common_prefix, ""), &args, type_hint_out)?;
 
         if write_for == WriteFor::Docs {
             return Ok(());
         }
 
-        indented!(w, [_ _], r#"{}"#, self.converter().documentation(function.meta().documentation()))?;
+        indented!(w, [()()], r"{}", self.converter().documentation(function.meta().documentation()))?;
 
         w.indent();
         self.write_param_helpers(w, function)?;
@@ -570,8 +593,8 @@ pub trait PythonWriter {
 
         match function.signature().rval() {
             CType::Pattern(TypePattern::CStrPointer) => {
-                indented!(w, [_], r#"rval = c_lib.{}({})"#, function.name(), &args)?;
-                indented!(w, [_], r#"return ctypes.string_at(rval)"#)?;
+                indented!(w, [()], r"rval = c_lib.{}({})", function.name(), &args)?;
+                indented!(w, [()], r"return ctypes.string_at(rval)")?;
             }
             _ => self.write_success_enum_aware_rval(w, function, &args, true)?,
         }
@@ -584,7 +607,7 @@ pub trait PythonWriter {
     }
 
     fn function_args_to_string(&self, function: &Function, type_hints: bool, skip_first: bool) -> String {
-        let skip = if skip_first { 1 } else { 0 };
+        let skip = usize::from(skip_first);
         function
             .signature()
             .params()
@@ -594,7 +617,7 @@ pub trait PythonWriter {
                 let type_hint = if type_hints {
                     self.converter().to_type_hint_in(x.the_type(), true)
                 } else {
-                    "".to_string()
+                    String::new()
                 };
                 format!("{}{}", x.name(), type_hint)
             })
@@ -604,16 +627,16 @@ pub trait PythonWriter {
 
     fn write_success_enum_aware_rval(&self, w: &mut IndentWriter, function: &Function, args: &str, ret: bool) -> Result<(), Error> {
         if ret {
-            indented!(w, [_], r#"return c_lib.{}({})"#, function.name(), &args)?;
+            indented!(w, [()], r"return c_lib.{}({})", function.name(), &args)?;
         } else {
-            indented!(w, [_], r#"c_lib.{}({})"#, function.name(), &args)?;
+            indented!(w, [()], r"c_lib.{}({})", function.name(), &args)?;
         }
         Ok(())
     }
 
     fn get_method_args(&self, function: &Function, ctx: &str) -> String {
         let mut args = self.function_args_to_string(function, false, true);
-        args.insert_str(0, &format!("{}, ", ctx));
+        args.insert_str(0, &format!("{ctx}, "));
         args
     }
 
@@ -642,48 +665,48 @@ pub trait PythonWriter {
         // w.newline()?;
         // w.newline()?;
 
-        indented!(w, r#"TRUE = ctypes.c_uint8(1)"#)?;
-        indented!(w, r#"FALSE = ctypes.c_uint8(0)"#)?;
+        indented!(w, r"TRUE = ctypes.c_uint8(1)")?;
+        indented!(w, r"FALSE = ctypes.c_uint8(0)")?;
         w.newline()?;
         w.newline()?;
 
-        indented!(w, r#"def _errcheck(returned, success):"#)?;
-        indented!(w, [_], r#""""Checks for FFIErrors and converts them to an exception.""""#)?;
-        indented!(w, [_], r#"if returned == success: return"#)?;
-        indented!(w, [_], r#"else: raise Exception(f"Function returned error: {{returned}}")"#)?;
+        indented!(w, r"def _errcheck(returned, success):")?;
+        indented!(w, [()], r#""""Checks for FFIErrors and converts them to an exception.""""#)?;
+        indented!(w, [()], r"if returned == success: return")?;
+        indented!(w, [()], r#"else: raise Exception(f"Function returned error: {{returned}}")"#)?;
         w.newline()?;
         w.newline()?;
 
-        indented!(w, r#"class CallbackVars(object):"#)?;
+        indented!(w, r"class CallbackVars(object):")?;
         indented!(
             w,
-            [_],
+            [()],
             r#""""Helper to be used `lambda x: setattr(cv, "x", x)` when getting values from callbacks.""""#
         )?;
-        indented!(w, [_], r#"def __str__(self):"#)?;
-        indented!(w, [_ _], r#"rval = """#)?;
-        indented!(w, [_ _], r#"for var in  filter(lambda x: "__" not in x, dir(self)):"#)?;
-        indented!(w, [_ _ _], r#"rval += f"{{var}}: {{getattr(self, var)}}""#)?;
-        indented!(w, [_ _], r#"return rval"#)?;
+        indented!(w, [()], r"def __str__(self):")?;
+        indented!(w, [()()], r#"rval = """#)?;
+        indented!(w, [()()], r#"for var in  filter(lambda x: "__" not in x, dir(self)):"#)?;
+        indented!(w, [()()()], r#"rval += f"{{var}}: {{getattr(self, var)}}""#)?;
+        indented!(w, [()()], r"return rval")?;
         w.newline()?;
         w.newline()?;
 
-        indented!(w, r#"class _Iter(object):"#)?;
-        indented!(w, [_], r#""""Helper for slice iterators.""""#)?;
-        indented!(w, [_], r#"def __init__(self, target):"#)?;
-        indented!(w, [_ _], r#"self.i = 0"#)?;
-        indented!(w, [_ _], r#"self.target = target"#)?;
+        indented!(w, r"class _Iter(object):")?;
+        indented!(w, [()], r#""""Helper for slice iterators.""""#)?;
+        indented!(w, [()], r"def __init__(self, target):")?;
+        indented!(w, [()()], r"self.i = 0")?;
+        indented!(w, [()()], r"self.target = target")?;
         w.newline()?;
-        indented!(w, [_], r#"def __iter__(self):"#)?;
-        indented!(w, [_ _], r#"self.i = 0"#)?;
-        indented!(w, [_ _], r#"return self"#)?;
+        indented!(w, [()], r"def __iter__(self):")?;
+        indented!(w, [()()], r"self.i = 0")?;
+        indented!(w, [()()], r"return self")?;
         w.newline()?;
-        indented!(w, [_], r#"def __next__(self):"#)?;
-        indented!(w, [_ _], r#"if self.i >= self.target.len:"#)?;
-        indented!(w, [_ _ _], r#"raise StopIteration()"#)?;
-        indented!(w, [_ _], r#"rval = self.target[self.i]"#)?;
-        indented!(w, [_ _], r#"self.i += 1"#)?;
-        indented!(w, [_ _], r#"return rval"#)?;
+        indented!(w, [()], r"def __next__(self):")?;
+        indented!(w, [()()], r"if self.i >= self.target.len:")?;
+        indented!(w, [()()()], r"raise StopIteration()")?;
+        indented!(w, [()()], r"rval = self.target[self.i]")?;
+        indented!(w, [()()], r"self.i += 1")?;
+        indented!(w, [()()], r"return rval")?;
         w.newline()?;
         w.newline()?;
 

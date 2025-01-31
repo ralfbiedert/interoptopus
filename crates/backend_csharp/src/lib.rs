@@ -135,7 +135,8 @@ pub struct Generator {
 }
 
 impl Generator {
-    pub fn new(config: Config, library: Inventory) -> Self {
+    #[must_use]
+    pub const fn new(config: Config, library: Inventory) -> Self {
         Self {
             config,
             library,

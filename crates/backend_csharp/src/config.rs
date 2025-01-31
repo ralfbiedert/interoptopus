@@ -6,7 +6,7 @@ use interoptopus::util::NamespaceMappings;
 pub enum WriteTypes {
     /// Only write items defined in the library for this namespace.
     Namespace,
-    /// Write types in this namespace and global interoptopus types (e.g., FFIBool)
+    /// Write types in this namespace and global interoptopus types (e.g., `FFIBool`)
     NamespaceAndInteroptopusGlobal,
     /// Write every type in the library, regardless of namespace association.
     All,
@@ -22,16 +22,17 @@ pub enum Unsupported {
 }
 
 impl WriteTypes {
-    pub fn write_interoptopus_globals(&self) -> bool {
+    #[must_use]
+    pub const fn write_interoptopus_globals(&self) -> bool {
         match self {
-            WriteTypes::Namespace => false,
-            WriteTypes::NamespaceAndInteroptopusGlobal => true,
-            WriteTypes::All => true,
+            Self::Namespace => false,
+            Self::NamespaceAndInteroptopusGlobal => true,
+            Self::All => true,
         }
     }
 }
 
-/// The access modifiers for generated CSharp types
+/// The access modifiers for generated `CSharp` types
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum CSharpVisibility {
     /// Mimics Rust visibility.
@@ -43,13 +44,14 @@ pub enum CSharpVisibility {
 }
 
 impl CSharpVisibility {
-    pub fn to_access_modifier(&self) -> &'static str {
+    #[must_use]
+    pub const fn to_access_modifier(&self) -> &'static str {
         match self {
             // TODO: `AsDeclared` should ultimately use the declared visibility but for now copy the previous
             // behavior which is to make everything public.
-            CSharpVisibility::AsDeclared => "public",
-            CSharpVisibility::ForcePublic => "public",
-            CSharpVisibility::ForceInternal => "internal",
+            Self::AsDeclared => "public",
+            Self::ForcePublic => "public",
+            Self::ForceInternal => "internal",
         }
     }
 }
@@ -57,6 +59,7 @@ impl CSharpVisibility {
 /// Configures C# code generation.
 #[derive(Clone, Debug, Builder)]
 #[builder(default)]
+#[allow(clippy::struct_excessive_bools)]
 pub struct Config {
     /// The file header, e.g., `// (c) My Company`.
     pub file_header_comment: String,
@@ -85,11 +88,11 @@ pub struct Config {
     pub debug: bool,
     /// Whether we should attempt to work around issues where a callback back to C# might not
     /// reenter Rust code when an exception happened. This requires callbacks to return
-    /// an FFIError type.   
+    /// an `FFIError` type.   
     pub work_around_exception_in_callback_no_reentry: bool,
     /// How to handle unsupported constructs.
     pub unsupported: Unsupported,
-    /// The string to use for reporting within FFIError. Use `{error}` to reference the inner error content.
+    /// The string to use for reporting within `FFIError`. Use `{error}` to reference the inner error content.
     pub error_text: String,
 }
 
@@ -103,7 +106,7 @@ impl Default for Config {
             class_constants: None,
             dll_name: "library".to_string(),
             namespace_mappings: NamespaceMappings::new("My.Company"),
-            namespace_id: "".to_string(),
+            namespace_id: String::new(),
             visibility_types: CSharpVisibility::AsDeclared,
             unroll_struct_arrays: true,
             write_types: WriteTypes::NamespaceAndInteroptopusGlobal,

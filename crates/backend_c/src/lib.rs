@@ -133,6 +133,7 @@ pub struct Generator {
 }
 
 impl Generator {
+    #[must_use]
     pub fn new(config: Config, inventory: Inventory) -> Self {
         Self {
             config: config.clone(),

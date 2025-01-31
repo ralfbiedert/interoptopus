@@ -1,20 +1,21 @@
 use interoptopus::lang::c::{CType, ConstantValue, Documentation, FnPointerType, PrimitiveType, PrimitiveValue};
 use interoptopus::patterns::TypePattern;
-use std::ops::Deref;
 
-/// Maps CType constructs to Pythonic constructs.
+/// Maps `CType` constructs to Pythonic constructs.
 pub struct Converter {}
 
 impl Converter {
+    #[must_use]
     pub fn documentation(&self, documentation: &Documentation) -> String {
         let docs: String = documentation.lines().join("\n");
-        format!(r#""""{}""""#, docs)
+        format!(r#""""{docs}""""#)
     }
 
+    #[must_use]
     pub fn to_type_hint(&self, the_type: &CType, is_parameter: bool) -> String {
         match the_type {
             CType::Primitive(x) => match x {
-                PrimitiveType::Void => "".to_string(),
+                PrimitiveType::Void => String::new(),
                 PrimitiveType::Bool => "bool".to_string(),
                 PrimitiveType::U8 => "int".to_string(),
                 PrimitiveType::U16 => "int".to_string(),
@@ -27,12 +28,12 @@ impl Converter {
                 PrimitiveType::F32 => "float".to_string(),
                 PrimitiveType::F64 => "float".to_string(),
             },
-            CType::ReadPointer(x) => match x.deref() {
+            CType::ReadPointer(x) => match &**x {
                 CType::Opaque(_) => "ctypes.c_void_p".to_string(),
                 CType::Primitive(PrimitiveType::Void) => "ctypes.c_void_p".to_string(),
                 _ => format!("ctypes.POINTER({})", self.to_ctypes_name(x, true)),
             },
-            CType::ReadWritePointer(x) => match x.deref() {
+            CType::ReadWritePointer(x) => match &**x {
                 CType::Opaque(_) => "ctypes.c_void_p".to_string(),
                 CType::Primitive(PrimitiveType::Void) => "ctypes.c_void_p".to_string(),
                 _ => format!("ctypes.POINTER({})", self.to_ctypes_name(x, true)),
@@ -55,22 +56,23 @@ impl Converter {
                         false,
                     );
                     if is_parameter {
-                        res = format!("{} | ctypes.Array[{}]", res, inner);
+                        res = format!("{res} | ctypes.Array[{inner}]");
                     }
                     res
                 }
                 TypePattern::CChar => "ctypes.c_char".to_string(),
-                _ => "".to_string(),
+                _ => String::new(),
             },
-            _ => "".to_string(),
+            _ => String::new(),
         }
     }
 
     #[allow(clippy::only_used_in_recursion)]
+    #[must_use]
     pub fn to_ctypes_name(&self, the_type: &CType, with_type_annotations: bool) -> String {
         match the_type {
             CType::Primitive(x) => match x {
-                PrimitiveType::Void => "".to_string(),
+                PrimitiveType::Void => String::new(),
                 PrimitiveType::Bool => "ctypes.c_bool".to_string(),
                 PrimitiveType::U8 => "ctypes.c_uint8".to_string(),
                 PrimitiveType::U16 => "ctypes.c_uint16".to_string(),
@@ -88,12 +90,12 @@ impl Converter {
             CType::Array(x) => format!("{} * {}", self.to_ctypes_name(x.array_type(), with_type_annotations), x.len()),
             CType::Opaque(_) => "ERROR".to_string(),
             CType::FnPointer(x) => self.fnpointer_to_typename(x),
-            CType::ReadPointer(x) => match x.deref() {
+            CType::ReadPointer(x) => match &**x {
                 CType::Opaque(_) => "ctypes.c_void_p".to_string(),
                 CType::Primitive(PrimitiveType::Void) => "ctypes.c_void_p".to_string(),
                 _ => format!("ctypes.POINTER({})", self.to_ctypes_name(x, with_type_annotations)),
             },
-            CType::ReadWritePointer(x) => match x.deref() {
+            CType::ReadWritePointer(x) => match &**x {
                 CType::Opaque(_) => "ctypes.c_void_p".to_string(),
                 CType::Primitive(PrimitiveType::Void) => "ctypes.c_void_p".to_string(),
                 _ => format!("ctypes.POINTER({})", self.to_ctypes_name(x, with_type_annotations)),
@@ -114,43 +116,47 @@ impl Converter {
     }
 
     #[allow(clippy::useless_format)]
+    #[must_use]
     pub fn to_type_hint_in(&self, the_type: &CType, is_parameter: bool) -> String {
         let type_hint = self.to_type_hint(the_type, is_parameter);
         if type_hint.is_empty() {
             format!("")
         } else {
-            format!(": {}", type_hint)
+            format!(": {type_hint}")
         }
     }
 
     #[allow(clippy::useless_format)]
+    #[must_use]
     pub fn to_type_hint_out(&self, the_type: &CType) -> String {
         let type_hint = self.to_type_hint(the_type, false);
         if type_hint.is_empty() {
             format!("")
         } else {
-            format!(" -> {}", type_hint)
+            format!(" -> {type_hint}")
         }
     }
 
+    #[must_use]
     pub fn constant_value_to_value(&self, value: &ConstantValue) -> String {
         match value {
             ConstantValue::Primitive(x) => match x {
-                PrimitiveValue::Bool(x) => format!("{}", x),
-                PrimitiveValue::U8(x) => format!("{}", x),
-                PrimitiveValue::U16(x) => format!("{}", x),
-                PrimitiveValue::U32(x) => format!("{}", x),
-                PrimitiveValue::U64(x) => format!("{}", x),
-                PrimitiveValue::I8(x) => format!("{}", x),
-                PrimitiveValue::I16(x) => format!("{}", x),
-                PrimitiveValue::I32(x) => format!("{}", x),
-                PrimitiveValue::I64(x) => format!("{}", x),
-                PrimitiveValue::F32(x) => format!("{}", x),
-                PrimitiveValue::F64(x) => format!("{}", x),
+                PrimitiveValue::Bool(x) => format!("{x}"),
+                PrimitiveValue::U8(x) => format!("{x}"),
+                PrimitiveValue::U16(x) => format!("{x}"),
+                PrimitiveValue::U32(x) => format!("{x}"),
+                PrimitiveValue::U64(x) => format!("{x}"),
+                PrimitiveValue::I8(x) => format!("{x}"),
+                PrimitiveValue::I16(x) => format!("{x}"),
+                PrimitiveValue::I32(x) => format!("{x}"),
+                PrimitiveValue::I64(x) => format!("{x}"),
+                PrimitiveValue::F32(x) => format!("{x}"),
+                PrimitiveValue::F64(x) => format!("{x}"),
             },
         }
     }
 
+    #[must_use]
     pub fn fnpointer_to_typename(&self, fn_pointer: &FnPointerType) -> String {
         let rval = match fn_pointer.signature().rval() {
             CType::Primitive(PrimitiveType::Void) => "None".to_string(),

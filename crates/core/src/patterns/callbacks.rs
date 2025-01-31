@@ -121,30 +121,41 @@ pub struct NamedCallback {
 
 impl NamedCallback {
     /// Creates a new named callback.
+    #[must_use]
     pub fn new(callback: FnPointerType) -> Self {
         Self::with_meta(callback, Meta::new())
     }
 
     /// Creates a new named callback with the given meta.
+    ///
+    /// # Panics
+    ///
+    /// The provided pointer must have a name.
+    #[must_use]
     pub fn with_meta(callback: FnPointerType, meta: Meta) -> Self {
-        if callback.name().is_none() {
-            panic!("The pointer provided to a named callback must have a name.")
-        }
+        assert!(callback.name().is_some(), "The pointer provided to a named callback must have a name.");
         Self { fnpointer: callback, meta }
     }
 
     /// Gets the type name of this callback.
+    ///
+    /// # Panics
+    ///
+    /// Assumes the given pointer has a name.
+    #[must_use]
     pub fn name(&self) -> &str {
         self.fnpointer.name().unwrap()
     }
 
     /// Gets the type's meta.
-    pub fn meta(&self) -> &Meta {
+    #[must_use]
+    pub const fn meta(&self) -> &Meta {
         &self.meta
     }
 
     /// Returns the function pointer type.
-    pub fn fnpointer(&self) -> &FnPointerType {
+    #[must_use]
+    pub const fn fnpointer(&self) -> &FnPointerType {
         &self.fnpointer
     }
 }

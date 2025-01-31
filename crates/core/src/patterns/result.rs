@@ -101,7 +101,7 @@ pub struct FFIErrorEnum {
 }
 
 impl FFIErrorEnum {
-    pub fn new(the_enum: EnumType, success_variant: Variant, panic_variant: Variant) -> Self {
+    #[must_use] pub const fn new(the_enum: EnumType, success_variant: Variant, panic_variant: Variant) -> Self {
         Self {
             the_enum,
             success_variant,
@@ -109,15 +109,15 @@ impl FFIErrorEnum {
         }
     }
 
-    pub fn the_enum(&self) -> &EnumType {
+    #[must_use] pub const fn the_enum(&self) -> &EnumType {
         &self.the_enum
     }
 
-    pub fn success_variant(&self) -> &Variant {
+    #[must_use] pub const fn success_variant(&self) -> &Variant {
         &self.success_variant
     }
 
-    pub fn panic_variant(&self) -> &Variant {
+    #[must_use] pub const fn panic_variant(&self) -> &Variant {
         &self.panic_variant
     }
 }
@@ -206,11 +206,11 @@ pub fn panics_and_errors_to_ffi_enum<E: Debug, FE: FFIError + From<E>>(f: impl F
     };
 
     if let Err(e) = &result {
-        log_error(|| format!("Error in ({}): {:?}", error_context, e));
+        log_error(|| format!("Error in ({error_context}): {e:?}"));
     }
 
     match result {
-        Ok(_) => FE::SUCCESS,
+        Ok(()) => FE::SUCCESS,
         Err(e) => FE::from(e),
     }
 }

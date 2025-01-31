@@ -13,22 +13,24 @@ use std::os::raw::c_char;
 /// Other values (`2` ..= `255`) will also map to `false`(!) and [`FFIBool::is_strange`] will
 /// signal `true`, but no undefined behavior will be triggered.
 #[repr(transparent)]
-#[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Default, Deserialize, Serialize))]
-#[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Default))]
+#[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Eq, Default, Deserialize, Serialize))]
+#[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Eq, Default))]
 pub struct FFIBool {
     value: u8,
 }
 
 impl FFIBool {
-    pub const TRUE: FFIBool = FFIBool { value: 1 };
-    pub const FALSE: FFIBool = FFIBool { value: 0 };
+    pub const TRUE: Self = Self { value: 1 };
+    pub const FALSE: Self = Self { value: 0 };
 
+    #[must_use]
     pub fn is(self) -> bool {
         self.into()
     }
 
     /// If a value not `0` or `1` was found.
-    pub fn is_strange(self) -> bool {
+    #[must_use]
+    pub const fn is_strange(self) -> bool {
         self.value > 1
     }
 }
@@ -40,12 +42,13 @@ unsafe impl CTypeInfo for FFIBool {
 }
 
 impl Not for FFIBool {
-    type Output = FFIBool;
+    type Output = Self;
 
     fn not(self) -> Self::Output {
-        match self.is() {
-            true => FFIBool::FALSE,
-            false => FFIBool::TRUE,
+        if self.is() {
+            Self::FALSE
+        } else {
+            Self::TRUE
         }
     }
 }
@@ -66,19 +69,19 @@ impl From<FFIBool> for bool {
     }
 }
 
-/// A wrapper for the c_char type to differentiate it from a signed 8-bit integer for platforms
+/// A wrapper for the `c_char` type to differentiate it from a signed 8-bit integer for platforms
 /// that support this type.
 ///
 #[repr(transparent)]
-#[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Default, Deserialize, Serialize))]
-#[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Default))]
+#[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Eq, Default, Deserialize, Serialize))]
+#[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Eq, Default))]
 pub struct FFICChar {
     value: c_char,
 }
 
 impl FFICChar {
-    pub const MAX: FFICChar = FFICChar { value: c_char::MAX };
-    pub const MIN: FFICChar = FFICChar { value: c_char::MIN };
+    pub const MAX: Self = Self { value: c_char::MAX };
+    pub const MIN: Self = Self { value: c_char::MIN };
 }
 
 unsafe impl CTypeInfo for FFICChar {
@@ -89,7 +92,7 @@ unsafe impl CTypeInfo for FFICChar {
 
 impl From<c_char> for FFICChar {
     fn from(x: c_char) -> Self {
-        FFICChar { value: x }
+        Self { value: x }
     }
 }
 

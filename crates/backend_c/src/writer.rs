@@ -32,8 +32,8 @@ pub trait CWriter {
     }
 
     fn write_imports(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        indented!(w, r#"#include <stdint.h>"#)?;
-        indented!(w, r#"#include <stdbool.h>"#)?;
+        indented!(w, r"#include <stdint.h>")?;
+        indented!(w, r"#include <stdbool.h>")?;
 
         // Write any user supplied includes into the file.
         for include in &self.config().additional_includes {
@@ -62,7 +62,7 @@ pub trait CWriter {
             self.write_documentation(w, constant.meta().documentation())?;
         }
 
-        indented!(w, r#"const {} {} = {};"#, the_type, name, self.converter().constant_value_to_value(constant.value()))?;
+        indented!(w, r"const {} {} = {};", the_type, name, self.converter().constant_value_to_value(constant.value()))?;
 
         Ok(())
     }
@@ -99,7 +99,7 @@ pub trait CWriter {
 
         let mut params = Vec::new();
 
-        for p in function.signature().params().iter() {
+        for p in function.signature().params() {
             match p.the_type() {
                 CType::Array(a) => {
                     params.push(format!(
@@ -120,16 +120,16 @@ pub trait CWriter {
         }
 
         // Test print line to see if we need to break it
-        let line = format!(r#"{}{} {}({});"#, attr, rval, name, params.join(", "));
+        let line = format!(r"{}{} {}({});", attr, rval, name, params.join(", "));
 
         if line.len() <= max_line {
-            indented!(w, r#"{}{} {}({});"#, attr, rval, name, params.join(", "))?
+            indented!(w, r"{}{} {}({});", attr, rval, name, params.join(", "))?;
         } else {
-            indented!(w, r#"{}{} {}("#, attr, rval, name)?;
+            indented!(w, r"{}{} {}(", attr, rval, name)?;
             for p in params {
-                indented!(w, [_], r#"{}"#, p)?;
+                indented!(w, [()], r"{}", p)?;
             }
-            indented!(w, [_], r#");"#)?
+            indented!(w, [()], r");")?;
         }
 
         Ok(())
@@ -142,7 +142,7 @@ pub trait CWriter {
 
         let mut params = Vec::new();
 
-        for p in function.signature().params().iter() {
+        for p in function.signature().params() {
             match p.the_type() {
                 CType::Array(a) => {
                     params.push(format!("{} [{}]", self.converter().to_type_specifier(a.array_type()), a.len(),));
@@ -152,14 +152,14 @@ pub trait CWriter {
                 }
             }
         }
-        indented!(w, r#"typedef {} (*{})({});"#, rval, name, params.join(", "))?;
+        indented!(w, r"typedef {} (*{})({});", rval, name, params.join(", "))?;
 
         Ok(())
     }
 
     fn write_documentation(&self, w: &mut IndentWriter, documentation: &Documentation) -> Result<(), Error> {
         for line in documentation.lines() {
-            indented!(w, r#"///{}"#, line)?;
+            indented!(w, r"///{}", line)?;
         }
 
         Ok(())
@@ -260,7 +260,7 @@ pub trait CWriter {
         let name = self.converter().named_callback_to_typename(the_type);
 
         let mut params = Vec::new();
-        for param in the_type.fnpointer().signature().params().iter() {
+        for param in the_type.fnpointer().signature().params() {
             params.push(format!(
                 "{} {}",
                 self.converter().to_type_specifier(param.the_type()),
@@ -280,7 +280,7 @@ pub trait CWriter {
             self.write_documentation(w, the_type.meta().documentation())?;
         }
 
-        self.write_braced_declaration_opening(w, format!("typedef enum {}", name))?;
+        self.write_braced_declaration_opening(w, format!("typedef enum {name}"))?;
 
         for variant in the_type.variants() {
             self.write_type_definition_enum_variant(w, variant, the_type)?;
@@ -294,10 +294,10 @@ pub trait CWriter {
         let variant_value = variant.value();
 
         if self.config().documentation == CDocumentationStyle::Inline {
-            self.write_documentation(w, variant.documentation())?
+            self.write_documentation(w, variant.documentation())?;
         }
 
-        indented!(w, r#"{} = {},"#, variant_name, variant_value)
+        indented!(w, r"{} = {},", variant_name, variant_value)
     }
 
     fn write_type_definition_opaque(&self, w: &mut IndentWriter, the_type: &OpaqueType) -> Result<(), Error> {
@@ -316,7 +316,7 @@ pub trait CWriter {
 
     fn write_type_definition_opaque_body(&self, w: &mut IndentWriter, the_type: &OpaqueType) -> Result<(), Error> {
         let name = self.converter().opaque_to_typename(the_type);
-        indented!(w, r#"typedef struct {} {};"#, name, name)
+        indented!(w, r"typedef struct {} {};", name, name)
     }
 
     fn write_type_definition_composite(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
@@ -328,7 +328,7 @@ pub trait CWriter {
 
         if the_type.is_empty() {
             // C doesn't allow us writing empty structs.
-            indented!(w, r#"typedef struct {} {};"#, name, name)?;
+            indented!(w, r"typedef struct {} {};", name, name)?;
             Ok(())
         } else {
             self.write_type_definition_composite_body(w, the_type)
@@ -343,7 +343,7 @@ pub trait CWriter {
             indented!(w, "#pragma pack(push, {})", align)?;
         }
 
-        self.write_braced_declaration_opening(w, format!(r#"typedef struct {}"#, name))?;
+        self.write_braced_declaration_opening(w, format!(r"typedef struct {name}"))?;
 
         for field in the_type.fields() {
             self.write_type_definition_composite_body_field(w, field, the_type)?;
@@ -362,24 +362,22 @@ pub trait CWriter {
             self.write_documentation(w, field.documentation())?;
         }
 
-        match field.the_type() {
-            CType::Array(x) => {
-                let field_name = field.name();
-                let type_name = self.converter().to_type_specifier(x.array_type());
-                indented!(w, r#"{} {}[{}];"#, type_name, field_name, x.len())
-            }
-            _ => {
-                let field_name = field.name();
-                let type_name = self.converter().to_type_specifier(field.the_type());
-                indented!(w, r#"{} {};"#, type_name, field_name)
-            }
+        let field_name = field.name();
+
+        if let CType::Array(x) = field.the_type() {
+            let type_name = self.converter().to_type_specifier(x.array_type());
+            indented!(w, r"{} {}[{}];", type_name, field_name, x.len())
+        } else {
+            let field_name = field.name();
+            let type_name = self.converter().to_type_specifier(field.the_type());
+            indented!(w, r"{} {};", type_name, field_name)
         }
     }
 
     fn write_ifndef(&self, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) -> Result<(), Error> {
         if self.config().directives {
-            indented!(w, r#"#ifndef {}"#, self.config().ifndef)?;
-            indented!(w, r#"#define {}"#, self.config().ifndef)?;
+            indented!(w, r"#ifndef {}", self.config().ifndef)?;
+            indented!(w, r"#define {}", self.config().ifndef)?;
             w.newline()?;
         }
 
@@ -387,7 +385,7 @@ pub trait CWriter {
 
         if self.config().directives {
             w.newline()?;
-            indented!(w, r#"#endif /* {} */"#, self.config().ifndef)?;
+            indented!(w, r"#endif /* {} */", self.config().ifndef)?;
         }
 
         Ok(())
@@ -395,9 +393,9 @@ pub trait CWriter {
 
     fn write_ifdefcpp(&self, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) -> Result<(), Error> {
         if self.config().directives {
-            indented!(w, r#"#ifdef __cplusplus"#)?;
+            indented!(w, r"#ifdef __cplusplus")?;
             indented!(w, r#"extern "C" {{"#)?;
-            indented!(w, r#"#endif"#)?;
+            indented!(w, r"#endif")?;
             w.newline()?;
         }
 
@@ -405,9 +403,9 @@ pub trait CWriter {
 
         if self.config().directives {
             w.newline()?;
-            indented!(w, r#"#ifdef __cplusplus"#)?;
-            indented!(w, r#"}}"#)?;
-            indented!(w, r#"#endif"#)?;
+            indented!(w, r"#ifdef __cplusplus")?;
+            indented!(w, r"}}")?;
+            indented!(w, r"#endif")?;
         }
         Ok(())
     }
@@ -461,7 +459,7 @@ pub trait CWriter {
             }
             CIndentationStyle::Whitesmiths => {
                 indented!(w, "{}", definition)?;
-                indented!(w, [_], "{{")?;
+                indented!(w, [()], "{{")?;
                 w.indent();
             }
         }
@@ -481,7 +479,7 @@ pub trait CWriter {
             }
             CIndentationStyle::Whitesmiths => {
                 w.unindent();
-                indented!(w, [_], "}} {};", name)?;
+                indented!(w, [()], "}} {};", name)?;
             }
         }
 

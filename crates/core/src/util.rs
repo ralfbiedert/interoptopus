@@ -14,6 +14,7 @@ use std::iter::FromIterator;
 ///
 /// assert_eq!(safe_name("fn(u32) -> u8"), "fn_u32_rval_u8");
 /// ```
+#[must_use]
 pub fn safe_name(name: &str) -> String {
     let mut rval = name.to_string();
 
@@ -33,6 +34,7 @@ pub fn safe_name(name: &str) -> String {
 
 // TODO: Create a few unit tests for this.
 /// Sorts types so the latter entries will find their dependents earlier in this list.
+#[must_use]
 pub fn sort_types_by_dependencies(mut types: Vec<CType>) -> Vec<CType> {
     let mut rval = Vec::new();
 
@@ -90,6 +92,7 @@ pub fn sort_types_by_dependencies(mut types: Vec<CType>) -> Vec<CType> {
 ///
 /// assert_eq!(longest_common_prefix(&functions), "my_lib_".to_string());
 /// ```
+#[must_use]
 pub fn longest_common_prefix(functions: &[Function]) -> String {
     let funcs_as_chars = functions.iter().map(|x| x.name().chars().collect::<Vec<_>>()).collect::<Vec<_>>();
 
@@ -98,7 +101,7 @@ pub fn longest_common_prefix(functions: &[Function]) -> String {
     if let Some(first) = funcs_as_chars.first() {
         for (i, c) in first.iter().enumerate() {
             for function in &funcs_as_chars {
-                if !function.get(i).map(|x| x == c).unwrap_or(false) {
+                if function.get(i).is_none_or(|x| x != c) {
                     return String::from_iter(&longest_common);
                 }
             }
@@ -236,28 +239,33 @@ pub struct NamespaceMappings {
 
 impl NamespaceMappings {
     /// Creates a new mapping, assinging namespace id `""` to `default`.
+    #[must_use]
     pub fn new(default: &str) -> Self {
         let mut mappings = HashMap::new();
-        mappings.insert("".to_string(), default.to_string());
+        mappings.insert(String::new(), default.to_string());
         mappings.insert("_global".to_string(), default.to_string());
 
         Self { mappings }
     }
 
     /// Adds a mapping between namespace `id` to string `value`.
+    #[must_use]
     pub fn add(mut self, id: &str, value: &str) -> Self {
         self.mappings.insert(id.to_string(), value.to_string());
         self
     }
 
     /// Returns the default namespace mapping
+    #[must_use]
+    #[allow(clippy::missing_panics_doc)]
     pub fn default_namespace(&self) -> &str {
         self.get("").expect("This must exist")
     }
 
     /// Obtains a mapping for the given ID.
+    #[must_use]
     pub fn get(&self, id: &str) -> Option<&str> {
-        self.mappings.get(id).map(|x| x.as_str())
+        self.mappings.get(id).map(String::as_str)
     }
 }
 
@@ -268,12 +276,14 @@ pub struct IdPrettifier {
 
 impl IdPrettifier {
     /// Creates a new prettifier from a `my_name` identifier.
+    #[must_use]
     pub fn from_rust_lower(id: &str) -> Self {
         Self {
-            tokens: id.split('_').map(|x| x.to_string()).collect(),
+            tokens: id.split('_').map(std::string::ToString::to_string).collect(),
         }
     }
 
+    #[must_use]
     pub fn to_camel_case(&self) -> String {
         self.tokens
             .iter()
@@ -283,8 +293,7 @@ impl IdPrettifier {
                     .map(|(i, x)| if i == 0 { x.to_ascii_uppercase() } else { x })
                     .collect::<String>()
             })
-            .collect::<Vec<_>>()
-            .join("")
+            .collect::<String>()
     }
 }
 
@@ -298,6 +307,7 @@ impl IdPrettifier {
 /// will inform them whether the underlying type should be shared.
 ///
 ///
+#[must_use]
 pub fn is_global_type(t: &CType) -> bool {
     match t {
         CType::Primitive(_) => true,
@@ -338,7 +348,7 @@ macro_rules! here {
 
 /// Logs an error if compiled with feature `log`.
 #[cfg(feature = "log")]
-#[inline(always)]
+#[inline]
 pub fn log_error<S: AsRef<str>, F: Fn() -> S>(f: F) {
     log::error!("{}", f().as_ref());
 }
@@ -349,7 +359,8 @@ pub fn log_error<S: AsRef<str>, F: Fn() -> S>(f: F) {
 pub fn log_error<S: AsRef<str>, F: Fn() -> S>(_f: F) {}
 
 /// Capitalizes the first letter of a string.
-pub fn capitalize_first_letter(s: String) -> String {
+#[must_use]
+pub fn capitalize_first_letter(s: &str) -> String {
     let mut chars = s.chars();
     match chars.next() {
         None => String::new(),

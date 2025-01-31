@@ -13,16 +13,16 @@ pub struct DocGenerator<W> {
 }
 
 impl<W: CWriter> DocGenerator<W> {
-    pub fn new(inventory: Inventory, w: W) -> Self {
+    pub const fn new(inventory: Inventory, w: W) -> Self {
         Self { inventory, c_writer: w }
     }
 
-    pub fn inventory(&self) -> &Inventory {
+    pub const fn inventory(&self) -> &Inventory {
         &self.inventory
     }
 
     pub fn write_types(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        indented!(w, r#"# Types "#)?;
+        indented!(w, r"# Types ")?;
 
         let mut known_function_pointers = vec![];
 
@@ -49,23 +49,23 @@ impl<W: CWriter> DocGenerator<W> {
         w.newline()?;
         w.newline()?;
 
-        indented!(w, r#"## {} "#, the_type.name_within_lib())?;
+        indented!(w, r"## {} ", the_type.name_within_lib())?;
         w.newline()?;
 
         for line in meta.documentation().lines() {
-            indented!(w, r#"{}"#, line.trim())?;
+            indented!(w, r"{}", line.trim())?;
             w.newline()?;
         }
 
-        indented!(w, r#"```"#)?;
+        indented!(w, r"```")?;
         self.c_writer.write_type_definition(w, the_type, known_function_pointers)?;
-        indented!(w, r#"```"#)?;
+        indented!(w, r"```")?;
 
         Ok(())
     }
 
     pub fn write_functions(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        indented!(w, r#"# Functions "#)?;
+        indented!(w, r"# Functions ")?;
 
         for the_type in self.inventory().functions() {
             self.write_function(w, the_type)?;
@@ -75,19 +75,19 @@ impl<W: CWriter> DocGenerator<W> {
     }
 
     fn write_function(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
-        indented!(w, r#"## {} "#, function.name())?;
+        indented!(w, r"## {} ", function.name())?;
 
         for line in function.meta().documentation().lines() {
             if line.trim().starts_with('#') {
                 write!(w.writer(), "##")?;
             }
-            indented!(w, r#"{}"#, line.trim())?;
+            indented!(w, r"{}", line.trim())?;
             w.newline()?;
         }
 
-        indented!(w, r#"```"#)?;
+        indented!(w, r"```")?;
         self.c_writer.write_function_declaration(w, function, 80)?;
-        indented!(w, r#"```"#)?;
+        indented!(w, r"```")?;
 
         w.newline()?;
 

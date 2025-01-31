@@ -74,17 +74,19 @@ impl<T> Default for FFISlice<'_, T> {
 
 impl<'a, T> FFISlice<'a, T> {
     /// Create new Self from a normal slice.
-    pub fn from_slice(slice: &'a [T]) -> Self {
+    pub const fn from_slice(slice: &'a [T]) -> Self {
         FFISlice {
             data: slice.as_ptr(),
             len: slice.len() as u64,
-            _phantom: Default::default(),
+            _phantom: PhantomData,
         }
     }
 
     /// Returns a safe Rust slice.
     ///
     /// If the pointer was not null, the Rust slice will point to that data, otherwise an empty slice is returned.
+    #[must_use]
+    #[allow(clippy::cast_possible_truncation)]
     pub fn as_slice(&self) -> &'a [T] {
         if self.data.is_null() {
             &[]
@@ -107,7 +109,8 @@ where
     T: 'static,
 {
     /// Creates a new empty slice.
-    pub fn empty() -> Self {
+    #[must_use]
+    pub const fn empty() -> Self {
         let x: &'static [T] = &[];
         Self::from_slice(x)
     }
@@ -137,9 +140,9 @@ where
 
         let doc = Documentation::from_line("A pointer to an array of data someone else owns which may not be modified.");
         let repr = Representation::new(Layout::C, None);
-        let meta = Meta::with_namespace_documentation(T::type_info().namespace().map(|e| e.into()).unwrap_or_else(String::new), doc);
-        let name = capitalize_first_letter(T::type_info().name_within_lib());
-        let composite = CompositeType::with_meta_repr(format!("Slice{}", name), fields, meta, repr);
+        let meta = Meta::with_namespace_documentation(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
+        let name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
+        let composite = CompositeType::with_meta_repr(format!("Slice{name}"), fields, meta, repr);
         CType::Pattern(TypePattern::Slice(composite))
     }
 }
@@ -168,13 +171,14 @@ impl<'a, T> FFISliceMut<'a, T> {
         FFISliceMut {
             data: slice.as_mut_ptr(),
             len: slice.len() as u64,
-            _phantom: Default::default(),
+            _phantom: PhantomData::default(),
         }
     }
 
     /// Returns a safe, mutable Rust slice.
     ///
     /// If the pointer was not null, the Rust slice will point to that data, otherwise an empty slice is returned.
+    #[allow(clippy::cast_possible_truncation)]
     pub fn as_slice_mut(&mut self) -> &'a mut [T] {
         if self.data.is_null() {
             &mut []
@@ -188,6 +192,8 @@ impl<'a, T> FFISliceMut<'a, T> {
     /// Returns a safe Rust slice.
     ///
     /// If the pointer was not null, the Rust slice will point to that data, otherwise an empty slice is returned.
+    #[must_use]
+    #[allow(clippy::cast_possible_truncation)]
     pub fn as_slice(&self) -> &'a [T] {
         if self.data.is_null() {
             &[]
@@ -204,6 +210,7 @@ where
     T: 'static,
 {
     /// Creates a new empty slice.
+    #[must_use]
     pub fn empty() -> Self {
         let x: &'static mut [T] = &mut [];
         Self::from_slice(x)
@@ -245,9 +252,9 @@ where
 
         let doc = Documentation::from_line("A pointer to an array of data someone else owns which may be modified.");
         let repr = Representation::new(Layout::C, None);
-        let meta = Meta::with_namespace_documentation(T::type_info().namespace().map(|e| e.into()).unwrap_or_else(String::new), doc);
-        let name = capitalize_first_letter(T::type_info().name_within_lib());
-        let composite = CompositeType::with_meta_repr(format!("SliceMut{}", name), fields, meta, repr);
+        let meta = Meta::with_namespace_documentation(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
+        let name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
+        let composite = CompositeType::with_meta_repr(format!("SliceMut{name}"), fields, meta, repr);
         CType::Pattern(TypePattern::SliceMut(composite))
     }
 }

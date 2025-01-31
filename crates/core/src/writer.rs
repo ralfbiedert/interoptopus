@@ -6,7 +6,7 @@ use std::io::Write;
 pub const FOUR_SPACES: &str = "    ";
 
 /// In some places we can write for docs or for actual code generation.
-#[derive(PartialOrd, PartialEq, Copy, Clone, Debug)]
+#[derive(PartialOrd, PartialEq, Eq, Copy, Clone, Debug)]
 pub enum WriteFor {
     Code,
     Docs,
@@ -19,15 +19,14 @@ pub struct IndentWriter<'a> {
     writer: &'a mut dyn Write,
 }
 
+#[allow(clippy::missing_errors_doc)]
 impl<'a> IndentWriter<'a> {
-    pub fn indent(&mut self) {
+    pub const fn indent(&mut self) {
         self.current_level += 1;
     }
 
-    pub fn unindent(&mut self) {
-        if self.current_level == 0 {
-            panic!("Tried to un-indent past start of line.")
-        }
+    pub const fn unindent(&mut self) {
+        assert!((self.current_level != 0), "Tried to un-indent past start of line.");
 
         self.current_level -= 1;
     }

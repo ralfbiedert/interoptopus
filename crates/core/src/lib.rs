@@ -6,7 +6,7 @@
 //! [![rust-version-badge]][rust-version-url]
 //! [![rust-build-badge]][rust-build-url]
 //!
-//! ![sample_image](https://media.githubusercontent.com/media/ralfbiedert/interoptopus/master/gfx/mascot_stable_diffusion.jpg)
+//! ![`sample_image`](https://media.githubusercontent.com/media/ralfbiedert/interoptopus/master/gfx/mascot_stable_diffusion.jpg)
 //!
 //! # Interoptopus 🐙
 //!
@@ -15,7 +15,7 @@
 //! Write a robust library in Rust, easily access it from your second-favorite language:
 //!
 //! - Design a single `.dll` / `.so` in Rust, consume it from anywhere.
-//! - Get QoL features (e.g., classes, strings) in languages that have them.
+//! - Get `QoL` features (e.g., classes, strings) in languages that have them.
 //! - Always have a sane, C-compatible API.
 //! - Painless workflow, no external tooling required.
 //! - Easy to support more languages, backends fully decoupled from main project.
@@ -295,7 +295,7 @@ macro_rules! extra_type {
 /// # Example
 ///
 /// Note, as this example focuses on the `pattern` macro it omits the definition of `Error` and `MyFFIError`.
-/// Their implementation can be found in the [FFIError](crate::patterns::result::FFIError) example.
+/// Their implementation can be found in the [`FFIError`](crate::patterns::result::FFIError) example.
 ///
 /// ```rust
 /// use interoptopus::{ffi_type, ffi_service, ffi_service_ctor, Inventory, InventoryBuilder, pattern};

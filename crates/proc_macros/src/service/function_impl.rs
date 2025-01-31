@@ -91,7 +91,15 @@ fn method_type(function: &ImplItemFn) -> MethodType {
     }
 }
 
-#[allow(clippy::too_many_lines, clippy::cognitive_complexity, clippy::match_same_arms)]
+#[allow(
+    clippy::too_many_lines,
+    clippy::cognitive_complexity,
+    clippy::match_same_arms,
+    clippy::explicit_deref_methods,
+    clippy::redundant_clone,
+    clippy::bind_instead_of_map,
+    clippy::or_fun_call
+)]
 pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, function: &ImplItemFn) -> Option<Descriptor> {
     let orig_fn_ident = &function.sig.ident;
     let service_type = &impl_block.self_ty;
@@ -125,7 +133,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
         MethodType::Constructor(_) => inputs.push(quote_spanned!(span_service_ty=> context: &mut *mut #service_type)),
         MethodType::Method(method) if method.ignore => return None,
         _ => {}
-    };
+    }
 
     let service_purged_type = Box::new(purge_lifetimes_from_type(service_type));
 
@@ -136,18 +144,18 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
             .sig
             .inputs
             .first()
-            .map(|fn_arg| match fn_arg {
-                FnArg::Receiver(..) => service_purged_type.clone(),
+            .and_then(|fn_arg| match fn_arg {
+                FnArg::Receiver(..) => Some(service_purged_type.clone()),
                 FnArg::Typed(PatType { ty, .. }) => {
                     let ty = match &**ty {
                         Type::Reference(TypeReference { elem, .. }) => elem,
                         Type::Group(TypeGroup { elem, .. }) => elem,
                         _ => ty,
                     };
-                    Box::new(crate::util::purge_lifetimes_from_type(ty))
+                    Some(Box::new(purge_lifetimes_from_type(ty)))
                 }
             })
-            .unwrap_or_else(|| service_purged_type.clone())
+            .unwrap_or(service_purged_type.clone())
     };
 
     let type_eq_check = quote_spanned! {receiver_type.span() =>
@@ -317,7 +325,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
 
 pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> Descriptor {
     let service_prefix = attributes.prefered_service_name(impl_block);
-    let ffi_fn_ident = Ident::new(&format!("{}destroy", service_prefix), impl_block.span());
+    let ffi_fn_ident = Ident::new(&format!("{service_prefix}destroy"), impl_block.span());
     let error_ident = Ident::new(&attributes.error, impl_block.span());
     let without_lifetimes = purge_lifetimes_from_type(&impl_block.self_ty);
 

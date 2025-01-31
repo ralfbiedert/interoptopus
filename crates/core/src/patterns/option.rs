@@ -43,8 +43,8 @@ use serde::{Deserialize, Serialize};
 /// The option will be considered `Some` if and only if `is_some` is `1`. All
 /// other values mean `None`.
 #[repr(C)]
-#[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Default, Deserialize, Serialize))]
-#[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Default))]
+#[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Eq, Default, Deserialize, Serialize))]
+#[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Eq, Default))]
 pub struct FFIOption<T> {
     t: T,
     is_some: FFIBool,
@@ -57,23 +57,26 @@ impl<T> FFIOption<T> {
 
     #[allow(clippy::missing_const_for_fn)]
     pub fn into_option(self) -> Option<T> {
-        match self.is_some.is() {
-            true => Option::Some(self.t),
-            false => Option::None,
+        if self.is_some.is() {
+            Some(self.t)
+        } else {
+            None
         }
     }
 
     pub fn as_ref(&self) -> Option<&T> {
-        match self.is_some.is() {
-            true => Option::Some(&self.t),
-            false => Option::None,
+        if self.is_some.is() {
+            Some(&self.t)
+        } else {
+            None
         }
     }
 
     pub fn as_mut(&mut self) -> Option<&mut T> {
-        match self.is_some.is() {
-            true => Option::Some(&mut self.t),
-            false => Option::None,
+        if self.is_some.is() {
+            Some(&mut self.t)
+        } else {
+            None
         }
     }
 
@@ -115,6 +118,7 @@ impl<T> FFIOption<T> {
 }
 
 impl<T: Default> FFIOption<T> {
+    #[must_use]
     pub fn none() -> Self {
         Self {
             is_some: FFIBool::FALSE,
@@ -147,9 +151,9 @@ where
 
         let doc = Documentation::from_line("Option type containing boolean flag and maybe valid data.");
         let repr = Representation::new(Layout::C, None);
-        let meta = Meta::with_namespace_documentation(T::type_info().namespace().map(|e| e.into()).unwrap_or_else(String::new), doc);
-        let name = capitalize_first_letter(T::type_info().name_within_lib());
-        let composite = CompositeType::with_meta_repr(format!("Option{}", name), fields, meta, repr);
+        let meta = Meta::with_namespace_documentation(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
+        let name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
+        let composite = CompositeType::with_meta_repr(format!("Option{name}"), fields, meta, repr);
         CType::Pattern(TypePattern::Option(composite))
     }
 }

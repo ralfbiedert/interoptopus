@@ -5,7 +5,6 @@ use interoptopus::lang::c::{
 use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::safe_name;
-use std::ops::Deref;
 
 /// Implements [`CSharpTypeConverter`].
 #[derive(Copy, Clone)]
@@ -46,7 +45,7 @@ pub trait CSharpTypeConverter {
         x.rust_name().to_string()
     }
 
-    /// TODO Converts an opaque Rust struct `Context` to a C# struct ``.
+    /// TODO Converts an opaque Rust struct `Context` to a C# struct.
     fn opaque_to_typename(&self, _: &OpaqueType) -> String {
         // x.name().to_string()
         "IntPtr".to_string()
@@ -197,7 +196,7 @@ pub trait CSharpTypeConverter {
 
     fn has_overloadable(&self, signature: &FunctionSignature) -> bool {
         signature.params().iter().any(|x| match x.the_type() {
-            CType::ReadPointer(x) | CType::ReadWritePointer(x) => match x.deref() {
+            CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {
                 CType::Pattern(x) => matches!(x, TypePattern::Slice(_) | TypePattern::SliceMut(_)),
                 _ => false,
             },
@@ -209,17 +208,17 @@ pub trait CSharpTypeConverter {
     fn constant_value_to_value(&self, value: &ConstantValue) -> String {
         match value {
             ConstantValue::Primitive(x) => match x {
-                PrimitiveValue::Bool(x) => format!("{}", x),
-                PrimitiveValue::U8(x) => format!("{}", x),
-                PrimitiveValue::U16(x) => format!("{}", x),
-                PrimitiveValue::U32(x) => format!("{}", x),
-                PrimitiveValue::U64(x) => format!("{}", x),
-                PrimitiveValue::I8(x) => format!("{}", x),
-                PrimitiveValue::I16(x) => format!("{}", x),
-                PrimitiveValue::I32(x) => format!("{}", x),
-                PrimitiveValue::I64(x) => format!("{}", x),
-                PrimitiveValue::F32(x) => format!("{}", x),
-                PrimitiveValue::F64(x) => format!("{}", x),
+                PrimitiveValue::Bool(x) => format!("{x}"),
+                PrimitiveValue::U8(x) => format!("{x}"),
+                PrimitiveValue::U16(x) => format!("{x}"),
+                PrimitiveValue::U32(x) => format!("{x}"),
+                PrimitiveValue::U64(x) => format!("{x}"),
+                PrimitiveValue::I8(x) => format!("{x}"),
+                PrimitiveValue::I16(x) => format!("{x}"),
+                PrimitiveValue::I32(x) => format!("{x}"),
+                PrimitiveValue::I64(x) => format!("{x}"),
+                PrimitiveValue::F32(x) => format!("{x}"),
+                PrimitiveValue::F64(x) => format!("{x}"),
             },
         }
     }

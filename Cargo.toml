@@ -31,3 +31,8 @@ pedantic = { level = "deny", priority = -1 }
 nursery = { level = "deny", priority = -1 } # We might want to disable this if it causes issues.
 
 option_if_let_else = "allow" # trips up on `darling`
+match_same_arms = "allow" # too many
+missing_const_for_fn = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+default_constructed_unit_structs = "allow"
