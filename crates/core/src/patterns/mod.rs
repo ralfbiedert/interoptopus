@@ -135,7 +135,8 @@ impl TypePattern {
     /// C-equivalent fallback type.
     ///
     /// This function will never return a [`CType::Pattern`] variant.
-    #[must_use] pub fn fallback_type(&self) -> CType {
+    #[must_use]
+    pub fn fallback_type(&self) -> CType {
         match self {
             Self::CStrPointer => CType::ReadPointer(Box::new(CType::Pattern(Self::CChar))),
             Self::FFIErrorEnum(e) => CType::Enum(e.the_enum().clone()),

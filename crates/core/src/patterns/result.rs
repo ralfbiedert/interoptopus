@@ -101,7 +101,8 @@ pub struct FFIErrorEnum {
 }
 
 impl FFIErrorEnum {
-    #[must_use] pub const fn new(the_enum: EnumType, success_variant: Variant, panic_variant: Variant) -> Self {
+    #[must_use]
+    pub const fn new(the_enum: EnumType, success_variant: Variant, panic_variant: Variant) -> Self {
         Self {
             the_enum,
             success_variant,
@@ -109,15 +110,18 @@ impl FFIErrorEnum {
         }
     }
 
-    #[must_use] pub const fn the_enum(&self) -> &EnumType {
+    #[must_use]
+    pub const fn the_enum(&self) -> &EnumType {
         &self.the_enum
     }
 
-    #[must_use] pub const fn success_variant(&self) -> &Variant {
+    #[must_use]
+    pub const fn success_variant(&self) -> &Variant {
         &self.success_variant
     }
 
-    #[must_use] pub const fn panic_variant(&self) -> &Variant {
+    #[must_use]
+    pub const fn panic_variant(&self) -> &Variant {
         &self.panic_variant
     }
 }

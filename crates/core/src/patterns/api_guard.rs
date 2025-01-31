@@ -66,12 +66,14 @@ pub struct APIVersion {
 
 impl APIVersion {
     /// Create a new API version from the given hash.
-    #[must_use] pub const fn new(version: u64) -> Self {
+    #[must_use]
+    pub const fn new(version: u64) -> Self {
         Self { version }
     }
 
     /// Create a new API version from the given library.
-    #[must_use] pub fn from_inventory(inventory: &Inventory) -> Self {
+    #[must_use]
+    pub fn from_inventory(inventory: &Inventory) -> Self {
         let version = inventory_hash(inventory);
         Self { version }
     }
@@ -90,7 +92,8 @@ impl From<Inventory> for APIVersion {
 }
 
 /// Returns a unique hash for an inventory; used by backends.
-#[must_use] pub fn inventory_hash(inventory: &Inventory) -> u64 {
+#[must_use]
+pub fn inventory_hash(inventory: &Inventory) -> u64 {
     let mut hasher = DefaultHasher::new();
 
     let types = inventory.ctypes();
