@@ -3,7 +3,7 @@ using My.Company;
 using My.Company.Common;
 using Xunit;
 
-public class TestPatternServices
+public class TestPatternServicesSlices
 {
     [Fact]
     public void service_slices()
@@ -23,14 +23,5 @@ public class TestPatternServices
         var lt = ServiceUsingLifetimes.NewWith(ref value);
         var s3 = lt.ReturnStringAcceptSlice(System.Array.Empty<byte>());
         var s4 = lt.ReturnStringAcceptSlice(System.Array.Empty<byte>());
-    }
-
-    [Fact]
-    public void service_lifetimes()
-    {
-        var service_slices = ServiceStrings.New();
-
-        var s1 = service_slices.ReturnString();
-        var s2 = service_slices.ReturnString();
     }
 }
