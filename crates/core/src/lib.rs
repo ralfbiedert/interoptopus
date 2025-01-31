@@ -174,14 +174,14 @@
 
 pub use crate::core::{merge_inventories, non_service_functions, Inventory, InventoryBuilder, InventoryItem, Symbol};
 pub use error::Error;
-pub use generators::Interop;
+pub use backend::Generate;
 #[cfg(feature = "derive")]
 #[cfg_attr(docsrs, doc(cfg(feature = "derive")))] // does this work?
 pub use interoptopus_proc::{ffi_constant, ffi_function, ffi_service, ffi_service_ctor, ffi_service_method, ffi_type};
 
 mod core;
 mod error;
-mod generators;
+mod backend;
 pub mod patterns;
 pub mod testing;
 pub mod util;

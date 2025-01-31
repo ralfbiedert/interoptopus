@@ -1,4 +1,4 @@
-use crate::CWriter;
+use crate::Generator;
 use interoptopus::indented;
 use interoptopus::lang::c::{CType, Function};
 use interoptopus::util::sort_types_by_dependencies;
@@ -7,16 +7,18 @@ use interoptopus::{Error, Inventory};
 use std::fs::File;
 use std::path::Path;
 
-pub struct DocGenerator<W> {
+pub struct DocGenerator<'a> {
+    generator: &'a Generator,
     inventory: Inventory,
-    c_writer: W,
 }
 
-impl<W: CWriter> DocGenerator<W> {
-    pub const fn new(inventory: Inventory, w: W) -> Self {
-        Self { inventory, c_writer: w }
+impl<'a> DocGenerator<'a> {
+    #[must_use]
+    pub const fn new(inventory: Inventory, generator: &'a Generator) -> Self {
+        Self { generator, inventory }
     }
 
+    #[must_use]
     pub const fn inventory(&self) -> &Inventory {
         &self.inventory
     }
@@ -58,7 +60,7 @@ impl<W: CWriter> DocGenerator<W> {
         }
 
         indented!(w, r"```")?;
-        self.c_writer.write_type_definition(w, the_type, known_function_pointers)?;
+        self.generator.write_type_definition(w, the_type, known_function_pointers)?;
         indented!(w, r"```")?;
 
         Ok(())
@@ -86,7 +88,7 @@ impl<W: CWriter> DocGenerator<W> {
         }
 
         indented!(w, r"```")?;
-        self.c_writer.write_function_declaration(w, function, 80)?;
+        self.generator.write_function_declaration(w, function, 80)?;
         indented!(w, r"```")?;
 
         w.newline()?;

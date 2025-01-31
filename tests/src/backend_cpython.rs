@@ -5,7 +5,7 @@ use std::process::Command;
 
 /// If `python` is installed, run the given file from `path`, ignore and succeed otherwise.
 pub fn run_python_if_installed<P: AsRef<Path>>(path: P, file: &str) -> Result<String, Error> {
-    let child = match Command::new("python").arg(file).current_dir(path).spawn() {
+    let child = match Command::new("/c/Users/rb/.miniconda3/python").arg(file).current_dir(path).spawn() {
         Ok(x) => x,
         Err(x @ std::io::Error { .. }) if x.kind() == ErrorKind::NotFound => {
             return Ok("Python not found, skipped".to_string());

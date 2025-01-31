@@ -1,4 +1,4 @@
-use crate::{DocConfig, PythonWriter};
+use crate::{DocConfig, Generator};
 use interoptopus::lang::c::{CType, CompositeType, Function};
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::writer::{IndentWriter, WriteFor};
@@ -7,17 +7,18 @@ use interoptopus::{Error, Inventory};
 use std::fs::File;
 use std::path::Path;
 
-pub struct DocGenerator<'a, W> {
+pub struct DocGenerator<'a> {
     inventory: &'a Inventory,
-    python_writer: &'a W,
+    generator: &'a Generator,
     doc_config: DocConfig,
 }
 
-impl<'a, W: PythonWriter> DocGenerator<'a, W> {
-    pub const fn new(inventory: &'a Inventory, w: &'a W, config: DocConfig) -> Self {
+impl<'a> DocGenerator<'a> {
+    #[must_use]
+    pub const fn new(inventory: &'a Inventory, generator: &'a Generator, config: DocConfig) -> Self {
         Self {
             inventory,
-            python_writer: w,
+            generator,
             doc_config: config,
         }
     }
@@ -150,7 +151,7 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
 
         indented!(w, r"#### Definition ")?;
         indented!(w, r"```python")?;
-        self.python_writer.write_struct(w, composite, WriteFor::Docs)?;
+        self.generator.write_struct(w, composite, WriteFor::Docs)?;
         indented!(w, r"```")?;
 
         Ok(())
@@ -182,7 +183,7 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
 
             indented!(w, r"#### Definition ")?;
             indented!(w, r"```python")?;
-            self.python_writer.write_enum(w, the_enum, WriteFor::Docs)?;
+            self.generator.write_enum(w, the_enum, WriteFor::Docs)?;
             indented!(w, r"```")?;
             w.newline()?;
             indented!(w, r"---")?;
@@ -214,7 +215,7 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
 
         indented!(w, r"#### Definition ")?;
         indented!(w, r"```python")?;
-        self.python_writer.write_function(w, function, WriteFor::Docs)?;
+        self.generator.write_function(w, function, WriteFor::Docs)?;
         indented!(w, r"```")?;
         w.newline()?;
         indented!(w, r"---")?;
@@ -262,7 +263,7 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
                 indented!(w, r"```python")?;
                 indented!(w, r"class {}:", class_name)?;
                 w.newline()?;
-                self.python_writer.write_pattern_class_ctor(w, pattern, x, WriteFor::Docs)?;
+                self.generator.write_pattern_class_ctor(w, pattern, x, WriteFor::Docs)?;
                 indented!(w, [()()], r"...")?;
                 indented!(w, r"```")?;
                 w.newline()?;
@@ -288,7 +289,7 @@ impl<'a, W: PythonWriter> DocGenerator<'a, W> {
                 indented!(w, r"```python")?;
                 indented!(w, r"class {}:", class_name)?;
                 w.newline()?;
-                self.python_writer.write_pattern_class_method(w, pattern, x, WriteFor::Docs)?;
+                self.generator.write_pattern_class_method(w, pattern, x, WriteFor::Docs)?;
                 indented!(w, [()()], r"...")?;
                 indented!(w, r"```")?;
                 w.newline()?;

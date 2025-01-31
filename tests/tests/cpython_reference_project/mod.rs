@@ -1,5 +1,5 @@
 use anyhow::Error;
-use interoptopus::Interop;
+use interoptopus::Generate;
 use interoptopus_backend_cpython::{ConfigBuilder, Generator};
 use interoptopus_reference_project::ffi_inventory;
 use tests::backend_cpython::run_python_if_installed;
@@ -9,7 +9,7 @@ use tests::validate_output;
 fn reference_tests_work() -> Result<(), Error> {
     let inventory = ffi_inventory();
     let config = ConfigBuilder::default().build()?;
-    let generated = Generator::new(config, inventory).write_string()?;
+    let generated = Generator::new(config, inventory).to_string()?;
 
     validate_output!("tests/cpython_reference_project", "reference_project.py", generated.as_str());
 

@@ -1,6 +1,6 @@
 use crate::config::DocConfig;
 use crate::converter::{CSharpTypeConverter, FunctionNameFlavor};
-use crate::CSharpWriter;
+use crate::Generator;
 use interoptopus::lang::c::{CType, CompositeType, Function};
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::writer::{IndentWriter, WriteFor};
@@ -9,17 +9,18 @@ use interoptopus::{Error, Inventory};
 use std::fs::File;
 use std::path::Path;
 
-pub struct DocGenerator<'a, W> {
+pub struct DocGenerator<'a> {
     inventory: &'a Inventory,
-    csharp_writer: &'a W,
+    generator: &'a Generator,
     doc_config: DocConfig,
 }
 
-impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
-    pub const fn new(inventory: &'a Inventory, w: &'a W, config: DocConfig) -> Self {
+impl<'a> DocGenerator<'a> {
+    #[must_use]
+    pub const fn new(inventory: &'a Inventory, generator: &'a Generator, config: DocConfig) -> Self {
         Self {
             inventory,
-            csharp_writer: w,
+            generator,
             doc_config: config,
         }
     }
@@ -63,7 +64,7 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
 
             for x in pattern.constructors() {
                 let func_name = self
-                    .csharp_writer
+                    .generator
                     .converter()
                     .function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
                 let target = format!("{name}.{func_name}");
@@ -72,7 +73,7 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
             }
             for x in pattern.methods() {
                 let func_name = self
-                    .csharp_writer
+                    .generator
                     .converter()
                     .function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
                 let target = format!("{name}.{func_name}");
@@ -159,16 +160,13 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
         indented!(w, r"#### Fields ")?;
         for f in composite.fields() {
             let doc = f.documentation().lines().join("\n");
-            let name = self
-                .csharp_writer
-                .converter()
-                .field_name_to_csharp_name(f, self.csharp_writer.config().rename_symbols);
+            let name = self.generator.converter().field_name_to_csharp_name(f, self.generator.config().rename_symbols);
             indented!(w, r"- **{}** - {} ", name, doc)?;
         }
 
         indented!(w, r"#### Definition ")?;
         indented!(w, r"```csharp")?;
-        self.csharp_writer.write_type_definition_composite_body(w, composite, WriteFor::Docs)?;
+        self.generator.write_type_definition_composite_body(w, composite, WriteFor::Docs)?;
         indented!(w, r"```")?;
 
         Ok(())
@@ -200,7 +198,7 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
 
             indented!(w, r"#### Definition ")?;
             indented!(w, r"```csharp")?;
-            self.csharp_writer.write_type_definition_enum(w, the_enum, WriteFor::Docs)?;
+            self.generator.write_type_definition_enum(w, the_enum, WriteFor::Docs)?;
             indented!(w, r"```")?;
             w.newline()?;
             indented!(w, r"---")?;
@@ -232,7 +230,7 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
 
         indented!(w, r"#### Definition ")?;
         indented!(w, r"```csharp")?;
-        self.csharp_writer.write_function(w, function, WriteFor::Docs)?;
+        self.generator.write_function(w, function, WriteFor::Docs)?;
         indented!(w, r"```")?;
         w.newline()?;
         indented!(w, r"---")?;
@@ -264,7 +262,7 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
 
             for x in pattern.constructors() {
                 let fname = self
-                    .csharp_writer
+                    .generator
                     .converter()
                     .function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
                 let target = fname.to_string();
@@ -280,7 +278,7 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
                 w.newline()?;
                 indented!(w, r"#### Definition ")?;
                 indented!(w, r"```csharp")?;
-                self.csharp_writer
+                self.generator
                     .write_pattern_service_method(w, pattern, x, class_name, &fname, true, true, WriteFor::Docs)?;
                 indented!(w, r"```")?;
                 w.newline()?;
@@ -290,7 +288,7 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
 
             for x in pattern.methods() {
                 let fname = self
-                    .csharp_writer
+                    .generator
                     .converter()
                     .function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
                 let target = fname.to_string();
@@ -298,7 +296,7 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
                 let rval = match x.signature().rval() {
                     CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
                     CType::Pattern(TypePattern::CStrPointer) => "string".to_string(),
-                    _ => self.csharp_writer.converter().to_typespecifier_in_rval(x.signature().rval()),
+                    _ => self.generator.converter().to_typespecifier_in_rval(x.signature().rval()),
                 };
 
                 indented!(w, r#"### <a name="{}">**{}**</a>"#, target, target)?;
@@ -314,12 +312,12 @@ impl<'a, W: CSharpWriter> DocGenerator<'a, W> {
                 w.newline()?;
                 indented!(w, r"#### Definition ")?;
                 indented!(w, r"```csharp")?;
-                indented!(w, r"{} class {} {{", self.csharp_writer.config().visibility_types.to_access_modifier(), class_name)?;
+                indented!(w, r"{} class {} {{", self.generator.config().visibility_types.to_access_modifier(), class_name)?;
                 w.indent();
-                self.csharp_writer
+                self.generator
                     .write_pattern_service_method(w, pattern, x, &rval, &fname, false, false, WriteFor::Docs)?;
 
-                self.csharp_writer.write_service_method_overload(w, pattern, x, &fname, WriteFor::Docs)?;
+                self.generator.write_service_method_overload(w, pattern, x, &fname, WriteFor::Docs)?;
                 w.unindent();
                 indented!(w, r"}}")?;
                 indented!(w, r"```")?;

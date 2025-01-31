@@ -9,33 +9,41 @@ use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{is_global_type, longest_common_prefix};
 use interoptopus::writer::{IndentWriter, WriteFor};
-use interoptopus::{indented, Error, Inventory};
+use interoptopus::{indented, Error, Generate, Inventory};
 use std::iter::zip;
 
+/// **Start here**, main converter implementing [`Generate`].
+pub struct Generator {
+    config: Config,
+    inventory: Inventory,
+    converter: Converter,
+}
+
 /// Writes the C# file format, `impl` this trait to customize output.
-pub trait CSharpWriter {
-    /// Returns the user config.
-    fn config(&self) -> &Config;
+impl Generator {
+    #[must_use]
+    pub const fn new(config: Config, inventory: Inventory) -> Self {
+        Self {
+            config,
+            inventory,
+            converter: Converter {},
+        }
+    }
 
-    /// Returns the library to produce bindings for.
-    fn inventory(&self) -> &Inventory;
-
-    fn converter(&self) -> &Converter;
-
-    fn write_file_header_comments(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        indented!(w, r"{}", &self.config().file_header_comment)?;
+    pub fn write_file_header_comments(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        indented!(w, r"{}", &self.config.file_header_comment)?;
         Ok(())
     }
 
-    fn debug(&self, w: &mut IndentWriter, marker: &str) -> Result<(), Error> {
-        if !self.config().debug {
+    pub fn debug(&self, w: &mut IndentWriter, marker: &str) -> Result<(), Error> {
+        if !self.config.debug {
             return Ok(());
         }
 
         indented!(w, r"// Debug - {} ", marker)
     }
 
-    fn write_imports(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    pub fn write_imports(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.debug(w, "write_imports")?;
 
         indented!(w, r"#pragma warning disable 0105")?;
@@ -47,9 +55,9 @@ pub trait CSharpWriter {
         indented!(w, r"using System.Runtime.InteropServices.Marshalling;")?;
         indented!(w, r"using System.Runtime.CompilerServices;")?;
 
-        for namespace_id in self.inventory().namespaces() {
+        for namespace_id in self.inventory.namespaces() {
             let namespace = self
-                .config()
+                .config
                 .namespace_mappings
                 .get(namespace_id)
                 .unwrap_or_else(|| panic!("Must have namespace for '{namespace_id}' ID"));
@@ -61,32 +69,32 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_native_lib_string(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    pub fn write_native_lib_string(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.debug(w, "write_native_lib_string")?;
-        indented!(w, r#"public const string NativeLib = "{}";"#, self.config().dll_name)
+        indented!(w, r#"public const string NativeLib = "{}";"#, self.config.dll_name)
     }
 
-    fn write_abi_guard(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    pub fn write_abi_guard(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.debug(w, "write_abi_guard")?;
 
-        indented!(w, r"static {}()", self.config().class)?;
+        indented!(w, r"static {}()", self.config.class)?;
         indented!(w, r"{{")?;
 
         // Check if there is a API version marker for us to write
         if let Some(api_guard) = self
-            .inventory()
+            .inventory
             .functions()
             .iter()
             .find(|x| matches!(x.signature().rval(), CType::Pattern(TypePattern::APIVersion)))
         {
-            let version = inventory_hash(self.inventory());
-            let flavor = if self.config().rename_symbols {
+            let version = inventory_hash(&self.inventory);
+            let flavor = if self.config.rename_symbols {
                 FunctionNameFlavor::CSharpMethodNameWithClass
             } else {
                 FunctionNameFlavor::RawFFIName
             };
-            let fn_call = self.converter().function_name_to_csharp_name(api_guard, flavor);
-            indented!(w, [()], r"var api_version = {}.{}();", self.config().class, fn_call)?;
+            let fn_call = self.converter.function_name_to_csharp_name(api_guard, flavor);
+            indented!(w, [()], r"var api_version = {}.{}();", self.config.class, fn_call)?;
             indented!(w, [()], r"if (api_version != {}ul)", version)?;
             indented!(w, [()], r"{{")?;
             indented!(
@@ -103,8 +111,8 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_constants(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        for constant in self.inventory().constants() {
+    pub fn write_constants(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        for constant in self.inventory.constants() {
             if self.should_emit_by_meta(constant.meta()) {
                 self.write_constant(w, constant)?;
                 w.newline()?;
@@ -114,18 +122,18 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_constant(&self, w: &mut IndentWriter, constant: &Constant) -> Result<(), Error> {
+    pub fn write_constant(&self, w: &mut IndentWriter, constant: &Constant) -> Result<(), Error> {
         self.debug(w, "write_constant")?;
-        let rval = self.converter().to_typespecifier_in_rval(&constant.the_type());
+        let rval = self.converter.to_typespecifier_in_rval(&constant.the_type());
         let name = constant.name();
-        let value = self.converter().constant_value_to_value(constant.value());
+        let value = self.converter.constant_value_to_value(constant.value());
 
         self.write_documentation(w, constant.meta().documentation())?;
         indented!(w, r"public const {} {} = ({}) {};", rval, name, rval, value)
     }
 
-    fn write_functions(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        for function in self.inventory().functions() {
+    pub fn write_functions(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        for function in self.inventory.functions() {
             if self.should_emit_by_meta(function.meta()) {
                 self.write_function(w, function, WriteFor::Code)?;
                 w.newline()?;
@@ -135,7 +143,7 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_function(&self, w: &mut IndentWriter, function: &Function, write_for: WriteFor) -> Result<(), Error> {
+    pub fn write_function(&self, w: &mut IndentWriter, function: &Function, write_for: WriteFor) -> Result<(), Error> {
         self.debug(w, "write_function")?;
         if write_for == WriteFor::Code {
             self.write_documentation(w, function.meta().documentation())?;
@@ -147,7 +155,7 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_documentation(&self, w: &mut IndentWriter, documentation: &Documentation) -> Result<(), Error> {
+    pub fn write_documentation(&self, w: &mut IndentWriter, documentation: &Documentation) -> Result<(), Error> {
         for line in documentation.lines() {
             indented!(w, r"///{}", line)?;
         }
@@ -155,7 +163,7 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_function_annotation(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
+    pub fn write_function_annotation(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
         indented!(w, r#"[LibraryImport(NativeLib, EntryPoint = "{}")]"#, function.name())?;
 
         if *function.signature().rval() == CType::Primitive(PrimitiveType::Bool) {
@@ -165,11 +173,11 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_function_declaration(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
-        let rval = self.converter().function_rval_to_csharp_typename(function);
-        let name = self.converter().function_name_to_csharp_name(
+    pub fn write_function_declaration(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
+        let rval = self.converter.function_rval_to_csharp_typename(function);
+        let name = self.converter.function_name_to_csharp_name(
             function,
-            if self.config().rename_symbols {
+            if self.config.rename_symbols {
                 FunctionNameFlavor::CSharpMethodNameWithClass
             } else {
                 FunctionNameFlavor::RawFFIName
@@ -178,7 +186,7 @@ pub trait CSharpWriter {
 
         let mut params = Vec::new();
         for p in function.signature().params() {
-            let the_type = self.converter().function_parameter_to_csharp_typename(p);
+            let the_type = self.converter.function_parameter_to_csharp_typename(p);
             let name = p.name();
 
             params.push(format!("{the_type} {name}"));
@@ -188,9 +196,9 @@ pub trait CSharpWriter {
     }
 
     #[allow(clippy::too_many_lines)]
-    fn write_function_overload(&self, w: &mut IndentWriter, function: &Function, write_for: WriteFor) -> Result<(), Error> {
-        let has_overload = self.converter().has_overloadable(function.signature());
-        let has_error_enum = self.converter().has_ffi_error_rval(function.signature());
+    pub fn write_function_overload(&self, w: &mut IndentWriter, function: &Function, write_for: WriteFor) -> Result<(), Error> {
+        let has_overload = self.converter.has_overloadable(function.signature());
+        let has_error_enum = self.converter.has_ffi_error_rval(function.signature());
 
         // If there is nothing to write, don't do it
         if !has_overload && !has_error_enum {
@@ -203,9 +211,9 @@ pub trait CSharpWriter {
         let mut to_wrap_delegates = Vec::new();
         let mut to_wrap_delegate_types = Vec::new();
 
-        let raw_name = self.converter().function_name_to_csharp_name(
+        let raw_name = self.converter.function_name_to_csharp_name(
             function,
-            if self.config().rename_symbols {
+            if self.config.rename_symbols {
                 FunctionNameFlavor::CSharpMethodNameWithClass
             } else {
                 FunctionNameFlavor::RawFFIName
@@ -220,14 +228,14 @@ pub trait CSharpWriter {
         let rval = match function.signature().rval() {
             CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
             CType::Pattern(TypePattern::CStrPointer) => "string".to_string(),
-            _ => self.converter().to_typespecifier_in_rval(function.signature().rval()),
+            _ => self.converter.to_typespecifier_in_rval(function.signature().rval()),
         };
 
         let mut params = Vec::new();
         for p in function.signature().params() {
             let name = p.name();
             let native = self.pattern_to_native_in_signature(p);
-            let the_type = self.converter().function_parameter_to_csharp_typename(p);
+            let the_type = self.converter.function_parameter_to_csharp_typename(p);
 
             let mut fallback = || {
                 if native.contains("out ") {
@@ -246,9 +254,9 @@ pub trait CSharpWriter {
                     to_invoke.push(format!("{name}_slice"));
                 }
                 CType::Pattern(TypePattern::NamedCallback(callback)) => match callback.fnpointer().signature().rval() {
-                    CType::Pattern(TypePattern::FFIErrorEnum(_)) if self.config().work_around_exception_in_callback_no_reentry => {
+                    CType::Pattern(TypePattern::FFIErrorEnum(_)) if self.config.work_around_exception_in_callback_no_reentry => {
                         to_wrap_delegates.push(name);
-                        to_wrap_delegate_types.push(self.converter().to_typespecifier_in_param(p.the_type()));
+                        to_wrap_delegate_types.push(self.converter.to_typespecifier_in_param(p.the_type()));
                         to_invoke.push(format!("{name}_safe_delegate.Call"));
                     }
                     _ => fallback(),
@@ -311,9 +319,9 @@ pub trait CSharpWriter {
             }
         }
 
-        let fn_name = self.converter().function_name_to_csharp_name(
+        let fn_name = self.converter.function_name_to_csharp_name(
             function,
-            if self.config().rename_symbols {
+            if self.config.rename_symbols {
                 FunctionNameFlavor::CSharpMethodNameWithClass
             } else {
                 FunctionNameFlavor::RawFFIName
@@ -334,7 +342,7 @@ pub trait CSharpWriter {
     }
 
     /// Writes common error handling based on a call's return type.
-    fn write_function_overloaded_invoke_with_error_handling(
+    pub fn write_function_overloaded_invoke_with_error_handling(
         &self,
         w: &mut IndentWriter,
         function: &Function,
@@ -367,15 +375,15 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_type_definitions(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        for the_type in self.inventory().ctypes() {
+    pub fn write_type_definitions(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        for the_type in self.inventory.ctypes() {
             self.write_type_definition(w, the_type)?;
         }
 
         Ok(())
     }
 
-    fn write_type_definition(&self, w: &mut IndentWriter, the_type: &CType) -> Result<(), Error> {
+    pub fn write_type_definition(&self, w: &mut IndentWriter, the_type: &CType) -> Result<(), Error> {
         if !self.should_emit_by_type(the_type) {
             return Ok(());
         }
@@ -440,20 +448,20 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_type_definition_ffibool(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    pub fn write_type_definition_ffibool(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.debug(w, "write_type_definition_ffibool")?;
 
-        let type_name = self.converter().to_typespecifier_in_param(&CType::Pattern(TypePattern::Bool));
+        let type_name = self.converter.to_typespecifier_in_param(&CType::Pattern(TypePattern::Bool));
 
         indented!(w, r"[Serializable]")?;
         indented!(w, r"[StructLayout(LayoutKind.Sequential)]")?;
-        indented!(w, r"{} partial struct {}", self.config().visibility_types.to_access_modifier(), type_name)?;
+        indented!(w, r"{} partial struct {}", self.config.visibility_types.to_access_modifier(), type_name)?;
         indented!(w, r"{{")?;
         indented!(w, [()], r"byte value;")?;
         indented!(w, r"}}")?;
         w.newline()?;
 
-        indented!(w, r"{} partial struct {}", self.config().visibility_types.to_access_modifier(), type_name)?;
+        indented!(w, r"{} partial struct {}", self.config.visibility_types.to_access_modifier(), type_name)?;
         indented!(w, r"{{")?;
         indented!(w, [()], r"public static readonly {} True = new Bool {{ value =  1 }};", type_name)?;
         indented!(w, [()], r"public static readonly {} False = new Bool {{ value =  0 }};", type_name)?;
@@ -467,14 +475,14 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_type_definition_fn_pointer(&self, w: &mut IndentWriter, the_type: &FnPointerType) -> Result<(), Error> {
+    pub fn write_type_definition_fn_pointer(&self, w: &mut IndentWriter, the_type: &FnPointerType) -> Result<(), Error> {
         self.debug(w, "write_type_definition_fn_pointer")?;
         self.write_type_definition_fn_pointer_annotation(w, the_type)?;
         self.write_type_definition_fn_pointer_body(w, the_type)?;
         Ok(())
     }
 
-    fn write_type_definition_named_callback(&self, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
+    pub fn write_type_definition_named_callback(&self, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
         self.debug(w, "write_type_definition_named_callback")?;
         self.write_type_definition_fn_pointer_annotation(w, the_type.fnpointer())?;
         self.write_type_definition_named_callback_body(w, the_type)?;
@@ -482,8 +490,8 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_callback_overload(&self, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
-        if !self.config().work_around_exception_in_callback_no_reentry {
+    pub fn write_callback_overload(&self, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
+        if !self.config.work_around_exception_in_callback_no_reentry {
             return Ok(());
         }
 
@@ -492,13 +500,13 @@ pub trait CSharpWriter {
         };
 
         let name = format!("{}ExceptionSafe", the_type.name());
-        let rval = self.converter().to_typespecifier_in_rval(the_type.fnpointer().signature().rval());
+        let rval = self.converter.to_typespecifier_in_rval(the_type.fnpointer().signature().rval());
         let mut function_signature = Vec::new();
         let mut function_param_names = Vec::new();
 
         for p in the_type.fnpointer().signature().params() {
             let name = p.name();
-            let the_type = self.converter().function_parameter_to_csharp_typename(p);
+            let the_type = self.converter.function_parameter_to_csharp_typename(p);
 
             let x = format!("{the_type} {name}");
             function_signature.push(x);
@@ -507,7 +515,7 @@ pub trait CSharpWriter {
 
         w.newline()?;
         indented!(w, "// Internal helper that works around an issue where exceptions in callbacks don't reenter Rust.")?;
-        indented!(w, "{} class {} {{", self.config().visibility_types.to_access_modifier(), name)?;
+        indented!(w, "{} class {} {{", self.config.visibility_types.to_access_modifier(), name)?;
         indented!(w, [()], "private Exception failure = null;")?;
         indented!(w, [()], "private readonly {} _callback;", the_type.name())?;
         w.newline()?;
@@ -541,37 +549,37 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_type_definition_named_callback_body(&self, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
-        let rval = self.converter().to_typespecifier_in_rval(the_type.fnpointer().signature().rval());
-        let name = self.converter().named_callback_to_typename(the_type);
-        let visibility = self.config().visibility_types.to_access_modifier();
+    pub fn write_type_definition_named_callback_body(&self, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
+        let rval = self.converter.to_typespecifier_in_rval(the_type.fnpointer().signature().rval());
+        let name = self.converter.named_callback_to_typename(the_type);
+        let visibility = self.config.visibility_types.to_access_modifier();
 
         let mut params = Vec::new();
         for param in the_type.fnpointer().signature().params() {
-            params.push(format!("{} {}", self.converter().to_typespecifier_in_param(param.the_type()), param.name()));
+            params.push(format!("{} {}", self.converter.to_typespecifier_in_param(param.the_type()), param.name()));
         }
 
         indented!(w, r"{} delegate {} {}({});", visibility, rval, name, params.join(", "))
     }
 
-    fn write_type_definition_fn_pointer_annotation(&self, w: &mut IndentWriter, _the_type: &FnPointerType) -> Result<(), Error> {
+    pub fn write_type_definition_fn_pointer_annotation(&self, w: &mut IndentWriter, _the_type: &FnPointerType) -> Result<(), Error> {
         indented!(w, r"[UnmanagedFunctionPointer(CallingConvention.Cdecl)]")
     }
 
-    fn write_type_definition_fn_pointer_body(&self, w: &mut IndentWriter, the_type: &FnPointerType) -> Result<(), Error> {
-        let rval = self.converter().to_typespecifier_in_rval(the_type.signature().rval());
-        let name = self.converter().fnpointer_to_typename(the_type);
-        let visibility = self.config().visibility_types.to_access_modifier();
+    pub fn write_type_definition_fn_pointer_body(&self, w: &mut IndentWriter, the_type: &FnPointerType) -> Result<(), Error> {
+        let rval = self.converter.to_typespecifier_in_rval(the_type.signature().rval());
+        let name = self.converter.fnpointer_to_typename(the_type);
+        let visibility = self.config.visibility_types.to_access_modifier();
 
         let mut params = Vec::new();
         for (i, param) in the_type.signature().params().iter().enumerate() {
-            params.push(format!("{} x{}", self.converter().to_typespecifier_in_param(param.the_type()), i));
+            params.push(format!("{} x{}", self.converter.to_typespecifier_in_param(param.the_type()), i));
         }
 
         indented!(w, r"{} delegate {} {}({});", visibility, rval, name, params.join(", "))
     }
 
-    fn write_type_definition_enum(&self, w: &mut IndentWriter, the_type: &EnumType, write_for: WriteFor) -> Result<(), Error> {
+    pub fn write_type_definition_enum(&self, w: &mut IndentWriter, the_type: &EnumType, write_for: WriteFor) -> Result<(), Error> {
         self.debug(w, "write_type_definition_enum")?;
         if write_for == WriteFor::Code {
             self.write_documentation(w, the_type.meta().documentation())?;
@@ -588,7 +596,7 @@ pub trait CSharpWriter {
         indented!(w, r"}}")
     }
 
-    fn write_type_definition_enum_variant(&self, w: &mut IndentWriter, variant: &Variant, _the_type: &EnumType, write_for: WriteFor) -> Result<(), Error> {
+    pub fn write_type_definition_enum_variant(&self, w: &mut IndentWriter, variant: &Variant, _the_type: &EnumType, write_for: WriteFor) -> Result<(), Error> {
         let variant_name = variant.name();
         let variant_value = variant.value();
         if write_for == WriteFor::Code {
@@ -597,7 +605,7 @@ pub trait CSharpWriter {
         indented!(w, r"{} = {},", variant_name, variant_value)
     }
 
-    fn write_type_definition_composite(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
+    pub fn write_type_definition_composite(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
         self.debug(w, "write_type_definition_composite")?;
         self.write_documentation(w, the_type.meta().documentation())?;
         self.write_type_definition_composite_annotation(w, the_type)?;
@@ -861,12 +869,12 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_type_definition_composite_annotation(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
+    pub fn write_type_definition_composite_annotation(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
         indented!(w, r"[Serializable]")?;
 
         if the_type.repr().alignment().is_some() {
             let comment = r"// THIS STRUCT IS BROKEN - C# does not support alignment of entire Rust types that do #[repr(align(...))]";
-            match self.config().unsupported {
+            match self.config.unsupported {
                 Unsupported::Panic => panic!("{}", comment),
                 Unsupported::Comment => indented!(w, "{}", comment)?,
             }
@@ -889,8 +897,8 @@ pub trait CSharpWriter {
         }
     }
 
-    fn write_type_definition_composite_body(&self, w: &mut IndentWriter, the_type: &CompositeType, write_for: WriteFor) -> Result<(), Error> {
-        indented!(w, r"{} partial struct {}", self.config().visibility_types.to_access_modifier(), the_type.rust_name())?;
+    pub fn write_type_definition_composite_body(&self, w: &mut IndentWriter, the_type: &CompositeType, write_for: WriteFor) -> Result<(), Error> {
+        indented!(w, r"{} partial struct {}", self.config.visibility_types.to_access_modifier(), the_type.rust_name())?;
         indented!(w, r"{{")?;
         w.indent();
 
@@ -906,8 +914,8 @@ pub trait CSharpWriter {
         indented!(w, r"}}")
     }
 
-    fn write_type_definition_composite_body_field(&self, w: &mut IndentWriter, field: &Field, the_type: &CompositeType) -> Result<(), Error> {
-        let field_name = self.converter().field_name_to_csharp_name(field, self.config().rename_symbols);
+    pub fn write_type_definition_composite_body_field(&self, w: &mut IndentWriter, field: &Field, the_type: &CompositeType) -> Result<(), Error> {
+        let field_name = self.converter.field_name_to_csharp_name(field, self.config.rename_symbols);
         let visibility = match field.visibility() {
             Visibility::Public => "public ",
             Visibility::Private if self.should_emit_marshaller_for_composite(the_type) => "internal ",
@@ -943,23 +951,24 @@ pub trait CSharpWriter {
                 indented!(w, r"{}{} {};", visibility, type_name, field_name)
             }
             _ => {
-                let type_name = self.converter().to_typespecifier_in_field(field.the_type(), field, the_type);
+                let type_name = self.converter.to_typespecifier_in_field(field.the_type(), field, the_type);
                 indented!(w, r"{}{} {};", visibility, type_name, field_name)
             }
         }
     }
 
-    fn namespace_for_id(&self, id: &str) -> String {
-        self.config()
+    #[must_use]
+    pub fn namespace_for_id(&self, id: &str) -> String {
+        self.config
             .namespace_mappings
             .get(id)
             .unwrap_or_else(|| panic!("Found a namespace not mapped '{id}'. You should specify this one in the config."))
             .to_string()
     }
 
-    fn write_namespace_context(&self, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) -> Result<(), Error> {
+    pub fn write_namespace_context(&self, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) -> Result<(), Error> {
         self.debug(w, "write_namespace_context")?;
-        indented!(w, r"namespace {}", self.namespace_for_id(&self.config().namespace_id))?;
+        indented!(w, r"namespace {}", self.namespace_for_id(&self.config.namespace_id))?;
         indented!(w, r"{{")?;
         w.indent();
 
@@ -970,9 +979,9 @@ pub trait CSharpWriter {
         indented!(w, r"}}")
     }
 
-    fn write_class_context(&self, class_name: &str, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) -> Result<(), Error> {
+    pub fn write_class_context(&self, class_name: &str, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) -> Result<(), Error> {
         self.debug(w, "write_class_context")?;
-        indented!(w, r"{} static partial class {}", self.config().visibility_types.to_access_modifier(), class_name)?;
+        indented!(w, r"{} static partial class {}", self.config.visibility_types.to_access_modifier(), class_name)?;
         indented!(w, r"{{")?;
         w.indent();
 
@@ -982,10 +991,11 @@ pub trait CSharpWriter {
         indented!(w, r"}}")
     }
 
-    fn should_emit_delegate(&self) -> bool {
-        match self.config().write_types {
+    #[must_use]
+    pub fn should_emit_delegate(&self) -> bool {
+        match self.config.write_types {
             WriteTypes::Namespace => false,
-            WriteTypes::NamespaceAndInteroptopusGlobal => self.config().namespace_id.is_empty(),
+            WriteTypes::NamespaceAndInteroptopusGlobal => self.config.namespace_id.is_empty(),
             WriteTypes::All => true,
         }
     }
@@ -1013,31 +1023,34 @@ pub trait CSharpWriter {
         functions.iter().any(|x| self.should_emit_by_meta(x.meta()))
     }
 
-    fn has_emittable_constants(&self, constants: &[Constant]) -> bool {
+    #[must_use]
+    pub fn has_emittable_constants(&self, constants: &[Constant]) -> bool {
         constants.iter().any(|x| self.should_emit_by_meta(x.meta()))
     }
 
-    fn has_ffi_error(&self, functions: &[Function]) -> bool {
+    pub fn has_ffi_error(&self, functions: &[Function]) -> bool {
         functions.iter().any(interoptopus::lang::c::Function::returns_ffi_error)
     }
 
-    fn should_emit_by_meta(&self, meta: &Meta) -> bool {
-        let rval = meta.namespace() == self.config().namespace_id;
+    #[must_use]
+    pub fn should_emit_by_meta(&self, meta: &Meta) -> bool {
+        let rval = meta.namespace() == self.config.namespace_id;
         rval
     }
 
     /// Checks whether for the given type and the current file a type definition should be emitted.
-    fn should_emit_by_type(&self, t: &CType) -> bool {
-        if self.config().write_types == WriteTypes::All {
+    #[must_use]
+    pub fn should_emit_by_type(&self, t: &CType) -> bool {
+        if self.config.write_types == WriteTypes::All {
             return true;
         }
 
         if is_global_type(t) {
-            return self.config().write_types == WriteTypes::NamespaceAndInteroptopusGlobal;
+            return self.config.write_types == WriteTypes::NamespaceAndInteroptopusGlobal;
         }
 
         match t {
-            CType::Primitive(_) => self.config().write_types == WriteTypes::NamespaceAndInteroptopusGlobal,
+            CType::Primitive(_) => self.config.write_types == WriteTypes::NamespaceAndInteroptopusGlobal,
             CType::Array(_) => false,
             CType::Enum(x) => self.should_emit_by_meta(x.meta()),
             CType::Opaque(x) => self.should_emit_by_meta(x.meta()),
@@ -1052,7 +1065,7 @@ pub trait CSharpWriter {
                 TypePattern::Slice(x) => self.should_emit_by_meta(x.meta()),
                 TypePattern::SliceMut(x) => self.should_emit_by_meta(x.meta()),
                 TypePattern::Option(x) => self.should_emit_by_meta(x.meta()),
-                TypePattern::Bool => self.config().write_types == WriteTypes::NamespaceAndInteroptopusGlobal,
+                TypePattern::Bool => self.config.write_types == WriteTypes::NamespaceAndInteroptopusGlobal,
                 TypePattern::CChar => false,
                 TypePattern::NamedCallback(x) => self.should_emit_by_meta(x.meta()),
                 _ => panic!("Pattern not explicitly handled"),
@@ -1060,8 +1073,8 @@ pub trait CSharpWriter {
         }
     }
 
-    fn write_patterns(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        for pattern in self.inventory().patterns() {
+    pub fn write_patterns(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        for pattern in self.inventory.patterns() {
             match pattern {
                 LibraryPattern::Service(cls) => {
                     if self.should_emit_by_meta(cls.the_type().meta()) {
@@ -1075,7 +1088,7 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_pattern_option(&self, w: &mut IndentWriter, slice: &CompositeType) -> Result<(), Error> {
+    pub fn write_pattern_option(&self, w: &mut IndentWriter, slice: &CompositeType) -> Result<(), Error> {
         self.debug(w, "write_pattern_option")?;
 
         let context_type_name = slice.rust_name();
@@ -1086,10 +1099,10 @@ pub trait CSharpWriter {
             .expect("Option must contain field called 't'.")
             .the_type();
 
-        let type_string = self.converter().to_typespecifier_in_rval(data_type);
-        let is_some = if self.config().rename_symbols { "isSome" } else { "is_some" };
+        let type_string = self.converter.to_typespecifier_in_rval(data_type);
+        let is_some = if self.config.rename_symbols { "isSome" } else { "is_some" };
 
-        indented!(w, r"{} partial struct {}", self.config().visibility_types.to_access_modifier(), context_type_name)?;
+        indented!(w, r"{} partial struct {}", self.config.visibility_types.to_access_modifier(), context_type_name)?;
         indented!(w, r"{{")?;
 
         // FromNullable
@@ -1117,7 +1130,7 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_pattern_slice(&self, w: &mut IndentWriter, slice: &CompositeType) -> Result<(), Error> {
+    pub fn write_pattern_slice(&self, w: &mut IndentWriter, slice: &CompositeType) -> Result<(), Error> {
         self.debug(w, "write_pattern_slice")?;
 
         let context_type_name = slice.rust_name();
@@ -1130,13 +1143,13 @@ pub trait CSharpWriter {
             .try_deref_pointer()
             .expect("data must be a pointer type");
 
-        let type_string = self.converter().to_typespecifier_in_rval(data_type);
-        let is_blittable = self.converter().is_blittable(data_type);
+        let type_string = self.converter.to_typespecifier_in_rval(data_type);
+        let is_blittable = self.converter.is_blittable(data_type);
 
         indented!(
             w,
             r"{} partial struct {} : IEnumerable<{}>",
-            self.config().visibility_types.to_access_modifier(),
+            self.config.visibility_types.to_access_modifier(),
             context_type_name,
             type_string
         )?;
@@ -1230,7 +1243,7 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_pattern_slice_overload(&self, w: &mut IndentWriter, _context_type_name: &str, type_string: &str) -> Result<(), Error> {
+    pub fn write_pattern_slice_overload(&self, w: &mut IndentWriter, _context_type_name: &str, type_string: &str) -> Result<(), Error> {
         indented!(w, [()], r"public unsafe ReadOnlySpan<{}> ReadOnlySpan", type_string)?;
         indented!(w, [()], r"{{")?;
         indented!(w, [()()], r"get")?;
@@ -1244,7 +1257,7 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_pattern_slice_mut_overload(&self, w: &mut IndentWriter, _context_type_name: &str, type_string: &str) -> Result<(), Error> {
+    pub fn write_pattern_slice_mut_overload(&self, w: &mut IndentWriter, _context_type_name: &str, type_string: &str) -> Result<(), Error> {
         indented!(w, [()], r"public unsafe Span<{}> Span", type_string)?;
         indented!(w, [()], r"{{")?;
         indented!(w, [()()], r"get")?;
@@ -1258,7 +1271,7 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_pattern_slice_mut(&self, w: &mut IndentWriter, slice: &CompositeType) -> Result<(), Error> {
+    pub fn write_pattern_slice_mut(&self, w: &mut IndentWriter, slice: &CompositeType) -> Result<(), Error> {
         self.debug(w, "write_pattern_slice_mut")?;
         let context_type_name = slice.rust_name();
         let data_type = slice
@@ -1270,12 +1283,12 @@ pub trait CSharpWriter {
             .try_deref_pointer()
             .expect("data must be a pointer type");
 
-        let type_string = self.converter().to_typespecifier_in_rval(data_type);
+        let type_string = self.converter.to_typespecifier_in_rval(data_type);
 
         indented!(
             w,
             r"{} partial struct {} : IEnumerable<{}>",
-            self.config().visibility_types.to_access_modifier(),
+            self.config.visibility_types.to_access_modifier(),
             context_type_name,
             type_string
         )?;
@@ -1361,7 +1374,7 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_pattern_service(&self, w: &mut IndentWriter, class: &Service) -> Result<(), Error> {
+    pub fn write_pattern_service(&self, w: &mut IndentWriter, class: &Service) -> Result<(), Error> {
         self.debug(w, "write_pattern_service")?;
         let mut all_functions = class.constructors().to_vec();
         all_functions.extend_from_slice(class.methods());
@@ -1374,7 +1387,7 @@ pub trait CSharpWriter {
         indented!(
             w,
             r"{} partial class {} : IDisposable",
-            self.config().visibility_types.to_access_modifier(),
+            self.config.visibility_types.to_access_modifier(),
             context_type_name
         )?;
         indented!(w, r"{{")?;
@@ -1387,7 +1400,7 @@ pub trait CSharpWriter {
         for ctor in class.constructors() {
             // Ctor
             let fn_name = self
-                .converter()
+                .converter
                 .function_name_to_csharp_name(ctor, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix));
             let rval = format!("static {context_type_name}");
 
@@ -1403,7 +1416,7 @@ pub trait CSharpWriter {
         for function in class.methods() {
             // Main function
             let fn_name = self
-                .converter()
+                .converter
                 .function_name_to_csharp_name(function, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix));
 
             // Write checked method. These are "normal" methods that accept
@@ -1411,7 +1424,7 @@ pub trait CSharpWriter {
             let rval = match function.signature().rval() {
                 CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
                 CType::Pattern(TypePattern::CStrPointer) => "string".to_string(),
-                _ => self.converter().to_typespecifier_in_rval(function.signature().rval()),
+                _ => self.converter.to_typespecifier_in_rval(function.signature().rval()),
             };
             self.write_documentation(w, function.meta().documentation())?;
             self.write_pattern_service_method(w, class, function, &rval, &fn_name, false, false, WriteFor::Code)?;
@@ -1431,7 +1444,7 @@ pub trait CSharpWriter {
     }
 
     #[allow(clippy::too_many_arguments, clippy::too_many_lines)]
-    fn write_pattern_service_method(
+    pub fn write_pattern_service_method(
         &self,
         w: &mut IndentWriter,
         class: &Service,
@@ -1457,13 +1470,13 @@ pub trait CSharpWriter {
 
             // If we call the checked function we want to resolve a `SliceU8` to a `byte[]`,
             // but if we call the unchecked version we want to keep that `Sliceu8` in our signature.
-            let native = self.converter().to_typespecifier_in_param(p.the_type());
+            let native = self.converter.to_typespecifier_in_param(p.the_type());
 
             match p.the_type() {
                 CType::Pattern(TypePattern::NamedCallback(callback)) => match callback.fnpointer().signature().rval() {
-                    CType::Pattern(TypePattern::FFIErrorEnum(_)) if self.config().work_around_exception_in_callback_no_reentry => {
+                    CType::Pattern(TypePattern::FFIErrorEnum(_)) if self.config.work_around_exception_in_callback_no_reentry => {
                         to_wrap_delegates.push(name);
-                        to_wrap_delegate_types.push(self.converter().to_typespecifier_in_param(p.the_type()));
+                        to_wrap_delegate_types.push(self.converter.to_typespecifier_in_param(p.the_type()));
                         to_invoke.push(format!("{name}_safe_delegate.Call"));
                     }
                     _ => {
@@ -1494,9 +1507,9 @@ pub trait CSharpWriter {
             types.push(native);
         }
 
-        let method_to_invoke = self.converter().function_name_to_csharp_name(
+        let method_to_invoke = self.converter.function_name_to_csharp_name(
             function,
-            if self.config().rename_symbols {
+            if self.config.rename_symbols {
                 FunctionNameFlavor::CSharpMethodNameWithClass
             } else {
                 FunctionNameFlavor::RawFFIName
@@ -1519,7 +1532,7 @@ pub trait CSharpWriter {
             "_context"
         };
         let arg_tokens = names.iter().zip(types.iter()).map(|(n, t)| format!("{t} {n}")).collect::<Vec<_>>();
-        let fn_call = format!(r"{}.{}({}{})", self.config().class, method_to_invoke, context, extra_args);
+        let fn_call = format!(r"{}.{}({}{})", self.config.class, method_to_invoke, context, extra_args);
 
         // Write signature.
         let signature = format!(r"public {} {}({})", rval, fn_name, arg_tokens.join(", "));
@@ -1573,7 +1586,7 @@ pub trait CSharpWriter {
     }
 
     /// Writes common service overload code
-    fn write_common_service_method_overload<FPatternMap: Fn(&Parameter) -> String>(
+    pub fn write_common_service_method_overload<FPatternMap: Fn(&Parameter) -> String>(
         &self,
         w: &mut IndentWriter,
         function: &Function,
@@ -1590,7 +1603,7 @@ pub trait CSharpWriter {
         let rval = match function.signature().rval() {
             CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
             CType::Pattern(TypePattern::CStrPointer) => "string".to_string(),
-            _ => self.converter().to_typespecifier_in_rval(function.signature().rval()),
+            _ => self.converter.to_typespecifier_in_rval(function.signature().rval()),
         };
 
         // For every parameter except the first, figure out how we should forward
@@ -1616,9 +1629,9 @@ pub trait CSharpWriter {
             types.push(native);
         }
 
-        let method_to_invoke = self.converter().function_name_to_csharp_name(
+        let method_to_invoke = self.converter.function_name_to_csharp_name(
             function,
-            if self.config().rename_symbols {
+            if self.config.rename_symbols {
                 FunctionNameFlavor::CSharpMethodNameWithClass
             } else {
                 FunctionNameFlavor::RawFFIName
@@ -1633,7 +1646,7 @@ pub trait CSharpWriter {
         // Assemble actual function call.
         let context = "_context";
         let arg_tokens = names.iter().zip(types.iter()).map(|(n, t)| format!("{t} {n}")).collect::<Vec<_>>();
-        let fn_call = format!(r"{}.{}({}{})", self.config().class, method_to_invoke, context, extra_args);
+        let fn_call = format!(r"{}.{}({}{})", self.config.class, method_to_invoke, context, extra_args);
 
         let signature = format!(r"public {} {}({})", rval, fn_pretty, arg_tokens.join(", "));
         if write_for == WriteFor::Docs {
@@ -1662,12 +1675,13 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn pattern_to_native_in_signature(&self, param: &Parameter) -> String {
+    #[must_use]
+    pub fn pattern_to_native_in_signature(&self, param: &Parameter) -> String {
         let slice_type_name = |mutable: bool, element_type: &CType| -> String {
             if mutable {
-                format!("System.Span<{}>", self.converter().to_typespecifier_in_param(element_type))
+                format!("System.Span<{}>", self.converter.to_typespecifier_in_param(element_type))
             } else {
-                format!("System.ReadOnlySpan<{}>", self.converter().to_typespecifier_in_param(element_type))
+                format!("System.ReadOnlySpan<{}>", self.converter.to_typespecifier_in_param(element_type))
             }
         };
         match param.the_type() {
@@ -1680,7 +1694,7 @@ pub trait CSharpWriter {
                     let element_type = p.try_deref_pointer().expect("Must be pointer");
                     slice_type_name(true, &element_type)
                 }
-                _ => self.converter().to_typespecifier_in_param(param.the_type()),
+                _ => self.converter.to_typespecifier_in_param(param.the_type()),
             },
             CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {
                 CType::Pattern(x) => match x {
@@ -1692,17 +1706,17 @@ pub trait CSharpWriter {
                         let element_type = p.try_deref_pointer().expect("Must be pointer");
                         slice_type_name(true, &element_type)
                     }
-                    _ => self.converter().to_typespecifier_in_param(param.the_type()),
+                    _ => self.converter.to_typespecifier_in_param(param.the_type()),
                 },
-                _ => self.converter().to_typespecifier_in_param(param.the_type()),
+                _ => self.converter.to_typespecifier_in_param(param.the_type()),
             },
 
-            x => self.converter().to_typespecifier_in_param(x),
+            x => self.converter.to_typespecifier_in_param(x),
         }
     }
 
-    fn write_service_method_overload(&self, w: &mut IndentWriter, _class: &Service, function: &Function, fn_pretty: &str, write_for: WriteFor) -> Result<(), Error> {
-        if !self.converter().has_overloadable(function.signature()) {
+    pub fn write_service_method_overload(&self, w: &mut IndentWriter, _class: &Service, function: &Function, fn_pretty: &str, write_for: WriteFor) -> Result<(), Error> {
+        if !self.converter.has_overloadable(function.signature()) {
             return Ok(());
         }
 
@@ -1716,9 +1730,9 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_builtins(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        if self.config().write_types.write_interoptopus_globals() && self.has_ffi_error(self.inventory().functions()) {
-            let error_text = &self.config().error_text;
+    pub fn write_builtins(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        if self.config.write_types.write_interoptopus_globals() && self.has_ffi_error(self.inventory.functions()) {
+            let error_text = &self.config.error_text;
 
             indented!(w, r"public class InteropException<T> : Exception")?;
             indented!(w, r"{{")?;
@@ -1735,7 +1749,7 @@ pub trait CSharpWriter {
         Ok(())
     }
 
-    fn write_all(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    pub fn write_all(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.write_file_header_comments(w)?;
         w.newline()?;
 
@@ -1743,9 +1757,9 @@ pub trait CSharpWriter {
         w.newline()?;
 
         self.write_namespace_context(w, |w| {
-            if self.config().class_constants.is_none() || self.config().class_constants == Some(self.config().clone().class) {
-                if self.has_emittable_functions(self.inventory().functions()) || self.has_emittable_constants(self.inventory().constants()) {
-                    self.write_class_context(&self.config().class, w, |w| {
+            if self.config.class_constants.is_none() || self.config.class_constants == Some(self.config.clone().class) {
+                if self.has_emittable_functions(self.inventory.functions()) || self.has_emittable_constants(self.inventory.constants()) {
+                    self.write_class_context(&self.config.class, w, |w| {
                         self.write_native_lib_string(w)?;
                         w.newline()?;
 
@@ -1760,8 +1774,8 @@ pub trait CSharpWriter {
                     })?;
                 }
             } else {
-                if self.has_emittable_constants(self.inventory().constants()) {
-                    self.write_class_context(self.config().class_constants.as_ref().unwrap(), w, |w| {
+                if self.has_emittable_constants(self.inventory.constants()) {
+                    self.write_class_context(self.config.class_constants.as_ref().unwrap(), w, |w| {
                         self.write_constants(w)?;
                         w.newline()?;
 
@@ -1769,9 +1783,9 @@ pub trait CSharpWriter {
                     })?;
                 }
 
-                if self.has_emittable_functions(self.inventory().functions()) {
+                if self.has_emittable_functions(self.inventory.functions()) {
                     w.newline()?;
-                    self.write_class_context(&self.config().class, w, |w| {
+                    self.write_class_context(&self.config.class, w, |w| {
                         self.write_native_lib_string(w)?;
                         w.newline()?;
 
@@ -1797,5 +1811,21 @@ pub trait CSharpWriter {
         })?;
 
         Ok(())
+    }
+
+    #[must_use]
+    pub fn converter(&self) -> &Converter {
+        &self.converter
+    }
+
+    #[must_use]
+    pub fn config(&self) -> &Config {
+        &self.config
+    }
+}
+
+impl Generate for Generator {
+    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        self.write_all(w)
     }
 }

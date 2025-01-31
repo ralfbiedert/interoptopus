@@ -52,11 +52,11 @@
 //!
 //!```
 //! use interoptopus::util::NamespaceMappings;
-//! use interoptopus::{Error, Interop};
+//! use interoptopus::{Error, Generate};
 //!
 //! #[test]
 //! fn bindings_csharp() -> Result<(), Error> {
-//!     use interoptopus_backend_csharp::{Config, Generator};
+//!     use interoptopus_backend_csharp::{Config, Generate};
 //!
 //!     let config = Config {
 //!         dll_name: "example_library".to_string(),
@@ -113,54 +113,12 @@
 
 #![allow(clippy::test_attr_in_doctest)]
 
-use interoptopus::writer::IndentWriter;
-use interoptopus::Interop;
-use interoptopus::{Error, Inventory};
-
 mod config;
 mod converter;
 mod docs;
-mod writer;
+mod generator;
 
 pub use config::{CSharpVisibility, Config, ConfigBuilder, DocConfig, Unsupported, WriteTypes};
 pub use converter::{CSharpTypeConverter, Converter};
 pub use docs::DocGenerator;
-pub use writer::CSharpWriter;
-
-/// **Start here**, main converter implementing [`Interop`].
-pub struct Generator {
-    config: Config,
-    library: Inventory,
-    converter: Converter,
-}
-
-impl Generator {
-    #[must_use]
-    pub const fn new(config: Config, library: Inventory) -> Self {
-        Self {
-            config,
-            library,
-            converter: Converter {},
-        }
-    }
-}
-
-impl Interop for Generator {
-    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        self.write_all(w)
-    }
-}
-
-impl CSharpWriter for Generator {
-    fn config(&self) -> &Config {
-        &self.config
-    }
-
-    fn inventory(&self) -> &Inventory {
-        &self.library
-    }
-
-    fn converter(&self) -> &Converter {
-        &self.converter
-    }
-}
+pub use generator::Generator;

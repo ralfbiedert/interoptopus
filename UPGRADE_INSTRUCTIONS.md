@@ -28,6 +28,12 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
   earlier versions as various backends didn't translate that properly.
 - Backend-related testing functions were moved into an internal `tests` project, as the code was mostly specific to our
   project needs anyway.
+- The core generation trait was renamed from `Interop` to `GenerateInterop`.
+
+#### All Backends
+
+- The type structure has been greatly simplified. Each backend now only has a single entry struct `Generator` you have
+  to deal with.
 
 #### C# Backend
 

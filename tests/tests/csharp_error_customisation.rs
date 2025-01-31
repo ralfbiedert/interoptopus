@@ -1,5 +1,5 @@
 use anyhow::Error;
-use interoptopus::{ffi_function, ffi_type, function, Interop, InventoryBuilder};
+use interoptopus::{ffi_function, ffi_type, function, Generate, InventoryBuilder};
 use interoptopus_backend_csharp::{ConfigBuilder, Generator, WriteTypes};
 use tests::backend_csharp::common_namespace_mappings;
 
@@ -30,7 +30,7 @@ fn enabled() -> Result<(), Error> {
         .error_text("MY ERROR TEXT {}".to_string())
         .write_types(WriteTypes::All)
         .build()?;
-    let generated = Generator::new(config, inventory).write_string()?;
+    let generated = Generator::new(config, inventory).to_string()?;
 
     assert!(generated.contains("MY ERROR TEXT"));
 

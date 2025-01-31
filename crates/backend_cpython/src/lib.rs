@@ -52,11 +52,11 @@
 //!
 //! ```
 //! use interoptopus::util::NamespaceMappings;
-//! use interoptopus::{Error, Interop};
+//! use interoptopus::{Error, Generate};
 //!
 //! #[test]
 //! fn bindings_cpython_cffi() -> Result<(), Error> {
-//!     use interoptopus_backend_cpython::{Config, Generator};
+//!     use interoptopus_backend_cpython::{Config, Generate};
 //!
 //!     let library = example_library_ffi::my_inventory();
 //!
@@ -134,54 +134,12 @@
 
 #![allow(clippy::test_attr_in_doctest)]
 
-use interoptopus::writer::IndentWriter;
-use interoptopus::Interop;
-use interoptopus::{Error, Inventory};
-
 mod config;
 mod converter;
 mod docs;
-mod writer;
+mod generator;
 
 pub use config::{Config, ConfigBuilder, DocConfig};
 pub use converter::Converter;
 pub use docs::DocGenerator;
-pub use writer::PythonWriter;
-
-/// **Start here**, main converter implementing [`Interop`].
-pub struct Generator {
-    config: Config,
-    library: Inventory,
-    converter: Converter,
-}
-
-impl Generator {
-    #[must_use]
-    pub const fn new(config: Config, library: Inventory) -> Self {
-        Self {
-            config,
-            library,
-            converter: Converter {},
-        }
-    }
-}
-
-impl Interop for Generator {
-    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        self.write_all(w)
-    }
-}
-
-impl PythonWriter for Generator {
-    fn config(&self) -> &Config {
-        &self.config
-    }
-
-    fn inventory(&self) -> &Inventory {
-        &self.library
-    }
-
-    fn converter(&self) -> &Converter {
-        &self.converter
-    }
-}
+pub use generator::Generator;

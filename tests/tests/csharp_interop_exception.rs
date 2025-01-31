@@ -1,5 +1,5 @@
 use anyhow::Error;
-use interoptopus::{ffi_function, ffi_type, function, Interop, InventoryBuilder};
+use interoptopus::{ffi_function, ffi_type, function, Generate, InventoryBuilder};
 use interoptopus_backend_csharp::{ConfigBuilder, Generator, WriteTypes};
 
 #[ffi_type(error)]
@@ -27,7 +27,7 @@ fn doesnt_return_error() {}
 fn has_exception() -> Result<(), Error> {
     let inventory = InventoryBuilder::new().register(function!(return_error)).inventory();
     let config = ConfigBuilder::default().write_types(WriteTypes::All).build()?;
-    let generated = Generator::new(config, inventory).write_string()?;
+    let generated = Generator::new(config, inventory).to_string()?;
 
     assert!(generated.contains("InteropException"));
 
@@ -38,7 +38,7 @@ fn has_exception() -> Result<(), Error> {
 fn no_exception() -> Result<(), Error> {
     let inventory = InventoryBuilder::new().register(function!(doesnt_return_error)).inventory();
     let config = ConfigBuilder::default().write_types(WriteTypes::All).build()?;
-    let generated = Generator::new(config, inventory).write_string()?;
+    let generated = Generator::new(config, inventory).to_string()?;
 
     assert!(!generated.contains("InteropException"));
 

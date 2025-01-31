@@ -52,7 +52,7 @@
 //!
 //! ```
 //! use interoptopus::util::NamespaceMappings;
-//! use interoptopus::{Error, Interop};
+//! use interoptopus::{Error, Generate};
 //!
 //! #[test]
 //! fn bindings_c() -> Result<(), Error> {
@@ -111,56 +111,12 @@
 //! ```
 #![allow(clippy::test_attr_in_doctest)]
 
-use interoptopus::writer::IndentWriter;
-use interoptopus::Interop;
-use interoptopus::{Error, Inventory};
-
 mod config;
 mod converter;
 mod docs;
-mod writer;
+mod generator;
 
 pub use config::{CDocumentationStyle, CFunctionStyle, CIndentationStyle, CNamingStyle, Config, ConfigBuilder};
 pub use converter::{CTypeConverter, Converter};
 pub use docs::DocGenerator;
-pub use writer::CWriter;
-
-/// **Start here**, main converter implementing [`Interop`].
-pub struct Generator {
-    config: Config,
-    inventory: Inventory,
-    converter: Converter,
-}
-
-impl Generator {
-    #[must_use]
-    pub fn new(config: Config, inventory: Inventory) -> Self {
-        Self {
-            config: config.clone(),
-            inventory,
-            converter: Converter::new(config),
-        }
-    }
-}
-
-impl Interop for Generator {
-    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        self.write_all(w)
-    }
-}
-
-impl CWriter for Generator {
-    type Converter = Converter;
-
-    fn config(&self) -> &Config {
-        &self.config
-    }
-
-    fn inventory(&self) -> &Inventory {
-        &self.inventory
-    }
-
-    fn converter(&self) -> &Converter {
-        &self.converter
-    }
-}
+pub use generator::Generator;
