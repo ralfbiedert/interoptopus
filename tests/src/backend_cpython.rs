@@ -18,6 +18,8 @@ pub fn run_python_if_installed<P: AsRef<Path>>(path: P, file: &str) -> Result<St
     if output.status.success() {
         Ok(String::from_utf8(output.stdout)?)
     } else {
-        Err(Error::TestFailed)
+        let stdout = String::from_utf8(output.stdout)?;
+        let stderr = String::from_utf8(output.stderr)?;
+        Err(Error::TestFailed(stdout, stderr))
     }
 }

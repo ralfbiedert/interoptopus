@@ -65,6 +65,9 @@ def init_lib(path):
     c_lib.repr_transparent.argtypes = [Tupled, ctypes.POINTER(Tupled)]
     c_lib.pattern_ascii_pointer_1.argtypes = [ctypes.POINTER(ctypes.c_char)]
     c_lib.pattern_ascii_pointer_2.argtypes = []
+    c_lib.pattern_ascii_pointer_3.argtypes = [ctypes.POINTER(ctypes.c_char)]
+    c_lib.pattern_ascii_pointer_4.argtypes = [ctypes.POINTER(ctypes.c_char), ctypes.c_uint32]
+    c_lib.pattern_ascii_pointer_5.argtypes = [ctypes.POINTER(ctypes.c_char), ctypes.c_uint32]
     c_lib.pattern_ascii_pointer_return_slice.argtypes = []
     c_lib.pattern_ffi_slice_1.argtypes = [SliceU32]
     c_lib.pattern_ffi_slice_1b.argtypes = [SliceMutU32]
@@ -179,6 +182,9 @@ def init_lib(path):
     c_lib.repr_transparent.restype = Tupled
     c_lib.pattern_ascii_pointer_1.restype = ctypes.c_uint32
     c_lib.pattern_ascii_pointer_2.restype = ctypes.POINTER(ctypes.c_char)
+    c_lib.pattern_ascii_pointer_3.restype = ctypes.POINTER(ctypes.c_char)
+    c_lib.pattern_ascii_pointer_4.restype = ctypes.POINTER(ctypes.c_char)
+    c_lib.pattern_ascii_pointer_5.restype = ctypes.c_uint8
     c_lib.pattern_ascii_pointer_return_slice.restype = SliceUseAsciiStringPattern
     c_lib.pattern_ffi_slice_1.restype = ctypes.c_uint32
     c_lib.pattern_ffi_slice_1b.restype = ctypes.c_uint32
@@ -446,6 +452,23 @@ def pattern_ascii_pointer_1(x: bytes) -> int:
 def pattern_ascii_pointer_2() -> bytes:
     rval = c_lib.pattern_ascii_pointer_2()
     return ctypes.string_at(rval)
+
+def pattern_ascii_pointer_3(x: bytes) -> bytes:
+    if not hasattr(x, "__ctypes_from_outparam__"):
+        x = ctypes.cast(x, ctypes.POINTER(ctypes.c_char))
+    rval = c_lib.pattern_ascii_pointer_3(x)
+    return ctypes.string_at(rval)
+
+def pattern_ascii_pointer_4(x: bytes, l: int) -> bytes:
+    if not hasattr(x, "__ctypes_from_outparam__"):
+        x = ctypes.cast(x, ctypes.POINTER(ctypes.c_char))
+    rval = c_lib.pattern_ascii_pointer_4(x, l)
+    return ctypes.string_at(rval)
+
+def pattern_ascii_pointer_5(x: bytes, i: int) -> int:
+    if not hasattr(x, "__ctypes_from_outparam__"):
+        x = ctypes.cast(x, ctypes.POINTER(ctypes.c_char))
+    return c_lib.pattern_ascii_pointer_5(x, i)
 
 def pattern_ascii_pointer_return_slice() -> SliceUseAsciiStringPattern:
     return c_lib.pattern_ascii_pointer_return_slice()

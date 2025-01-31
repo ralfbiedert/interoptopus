@@ -455,6 +455,12 @@ uint32_t pattern_ascii_pointer_1(const char* x);
 
 const char* pattern_ascii_pointer_2();
 
+const char* pattern_ascii_pointer_3(const char* x);
+
+const char* pattern_ascii_pointer_4(const char* x, uint32_t l);
+
+uint8_t pattern_ascii_pointer_5(const char* x, uint32_t i);
+
 sliceuseasciistringpattern pattern_ascii_pointer_return_slice();
 
 uint32_t pattern_ffi_slice_1(sliceu32 ffi_slice);

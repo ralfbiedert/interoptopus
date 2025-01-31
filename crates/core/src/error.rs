@@ -28,7 +28,7 @@ pub enum Error {
     CommandNotFound,
 
     /// A test failed to execute.
-    TestFailed,
+    TestFailed(String, String),
 
     /// A specified file was not found.
     FileNotFound,
@@ -61,7 +61,7 @@ impl From<std::string::FromUtf8Error> for Error {
 impl Display for Error {
     // TODO: This should be nicer.
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Interoptopus failed: {}!", self)
+        write!(f, "Interoptopus failed: {self:?}!")
     }
 }
 
