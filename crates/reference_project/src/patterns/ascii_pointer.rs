@@ -13,13 +13,34 @@ pub fn pattern_ascii_pointer_2() -> CStrPointer<'static> {
     CStrPointer::empty()
 }
 
-// UNSUPPORTED FOR NOW - Unclear how to handle in C# with LibraryImport
-// #[ffi_function]
-// pub fn pattern_ascii_pointer_len(x: CStrPointer, y: UseAsciiStringPattern) -> u32 {
-//     let x1 = x.as_str().map(|x| x.len()).unwrap_or(0);
-//     let x2 = y.ascii_string.as_str().map(|x| x.len()).unwrap_or(0);
-//     (x1 + x2) as u32
-// }
+// NOTE: In some languages (C#) this can be a bad idea, because
+// your input parameter will be automatically marshalled, but once
+// the call returns that marshalling will stop, and by the time
+// you use the output parameter again that helper struct got
+// deallocated.
+#[ffi_function]
+pub fn pattern_ascii_pointer_3(x: CStrPointer) -> CStrPointer {
+    x
+}
+
+#[ffi_function]
+pub fn pattern_ascii_pointer_4(x: CStrPointer, l: u32) -> CStrPointer {
+    let bytes = x.as_c_str().unwrap().to_bytes();
+    CStrPointer::from_slice_with_nul(&bytes[l as usize..]).unwrap()
+}
+
+#[ffi_function]
+pub fn pattern_ascii_pointer_5(x: CStrPointer, i: u32) -> u8 {
+    let bytes = x.as_c_str().unwrap().to_bytes();
+    bytes[i as usize]
+}
+
+#[ffi_function]
+pub fn pattern_ascii_pointer_len(x: CStrPointer, y: UseAsciiStringPattern) -> u32 {
+    let x1 = x.as_str().map(|x| x.len()).unwrap_or(0);
+    let x2 = y.ascii_string.as_str().map(|x| x.len()).unwrap_or(0);
+    (x1 + x2) as u32
+}
 
 #[ffi_function]
 pub fn pattern_ascii_pointer_return_slice() -> FFISlice<'static, UseAsciiStringPattern<'static>> {
