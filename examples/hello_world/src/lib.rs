@@ -17,7 +17,7 @@ pub fn my_function(input: Vec2) -> Vec2 {
 #[test]
 #[rustfmt::skip]
 fn generate_bindings() {
-    use interoptopus::{function, Generate, InventoryBuilder};
+    use interoptopus::{function, Bindings, InventoryBuilder};
     use interoptopus_backend_csharp::{Config, Generator};
 
     // In a real project this should be a freestanding `my_inventory()` function inside

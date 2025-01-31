@@ -1,6 +1,6 @@
 use anyhow::Error;
 use interoptopus::patterns::slice::FFISlice;
-use interoptopus::{ffi_function, function, Generate, Inventory, InventoryBuilder};
+use interoptopus::{ffi_function, function, Bindings, Inventory, InventoryBuilder};
 use interoptopus_backend_csharp::{ConfigBuilder, Generator};
 use tests::backend_csharp::common_namespace_mappings;
 use tests::validate_output;

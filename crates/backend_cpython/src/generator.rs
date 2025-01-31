@@ -5,9 +5,9 @@ use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{longest_common_prefix, safe_name, sort_types_by_dependencies};
 use interoptopus::writer::{IndentWriter, WriteFor};
-use interoptopus::{indented, non_service_functions, Error, Generate, Inventory};
+use interoptopus::{indented, non_service_functions, Bindings, Error, Inventory};
 
-/// **Start here**, main converter implementing [`Generate`].
+/// **Start here**, main converter implementing [`Bindings`].
 pub struct Generator {
     config: Config,
     inventory: Inventory,
@@ -755,7 +755,7 @@ impl Generator {
     }
 }
 
-impl Generate for Generator {
+impl Bindings for Generator {
     fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.write_all(w)
     }

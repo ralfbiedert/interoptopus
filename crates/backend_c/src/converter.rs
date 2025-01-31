@@ -22,7 +22,7 @@ impl Converter {
 pub trait CTypeConverter {
     fn config(&self) -> &Config;
 
-    fn primitive_to_typename(&self, x: &PrimitiveType) -> String {
+    fn primitive_to_typename(&self, x: PrimitiveType) -> String {
         match x {
             PrimitiveType::Void => "void".to_string(),
             PrimitiveType::Bool => "bool".to_string(),
@@ -72,7 +72,7 @@ pub trait CTypeConverter {
 
     fn to_type_specifier(&self, x: &CType) -> String {
         match x {
-            CType::Primitive(x) => self.primitive_to_typename(x),
+            CType::Primitive(x) => self.primitive_to_typename(*x),
             CType::Enum(x) => self.enum_to_typename(x),
             CType::Opaque(x) => self.opaque_to_typename(x),
             CType::Composite(x) => self.composite_to_typename(x),

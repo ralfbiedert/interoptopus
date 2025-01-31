@@ -1,5 +1,5 @@
 use anyhow::Error;
-use interoptopus::{ffi_function, ffi_type, function, Generate, InventoryBuilder};
+use interoptopus::{ffi_function, ffi_type, function, Bindings, InventoryBuilder};
 use interoptopus_backend_csharp::{ConfigBuilder, Generator, WriteTypes};
 use tests::backend_csharp::common_namespace_mappings;
 

@@ -1,15 +1,16 @@
-use interoptopus::lang::c::{CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, OpaqueType, Variant};
+use crate::config::{Documentation, Functions, Indentation, ToNamingStyle};
+use crate::converter::{CTypeConverter, Converter};
+use crate::Config;
+use interoptopus::lang::c;
+use interoptopus::lang::c::{CType, CompositeType, Constant, EnumType, Field, FnPointerType, Function, OpaqueType, Variant};
 use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::sort_types_by_dependencies;
 use interoptopus::writer::IndentWriter;
-use interoptopus::{indented, Generate};
+use interoptopus::{indented, Bindings};
 use interoptopus::{Error, Inventory};
 
-use crate::config::{CDocumentationStyle, CFunctionStyle, CIndentationStyle, ToNamingStyle};
-use crate::converter::CTypeConverter;
-use crate::{Config, Converter};
-
+/// Generates C header files, **start here**.
 pub struct Generator {
     config: Config,
     inventory: Inventory,
@@ -27,15 +28,15 @@ impl Generator {
         }
     }
 
-    pub fn write_custom_defines(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_custom_defines(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, "{}", &self.config.custom_defines)
     }
 
-    pub fn write_file_header_comments(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_file_header_comments(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, "{}", &self.config.file_header_comment)
     }
 
-    pub fn write_imports(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_imports(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"#include <stdint.h>")?;
         indented!(w, r"#include <stdbool.h>")?;
 
@@ -47,7 +48,7 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_constants(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_constants(&self, w: &mut IndentWriter) -> Result<(), Error> {
         for constant in self.inventory.constants() {
             self.write_constant(w, constant)?;
         }
@@ -55,14 +56,14 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_constant(&self, w: &mut IndentWriter, constant: &Constant) -> Result<(), Error> {
+    fn write_constant(&self, w: &mut IndentWriter, constant: &Constant) -> Result<(), Error> {
         let name = self.converter.const_name_to_name(constant);
         let the_type = match constant.the_type() {
-            CType::Primitive(x) => self.converter.primitive_to_typename(&x),
+            CType::Primitive(x) => self.converter.primitive_to_typename(x),
             _ => return Err(Error::Null),
         };
 
-        if self.config.documentation == CDocumentationStyle::Inline {
+        if self.config.documentation == Documentation::Inline {
             self.write_documentation(w, constant.meta().documentation())?;
         }
 
@@ -71,7 +72,7 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_functions(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_functions(&self, w: &mut IndentWriter) -> Result<(), Error> {
         for function in self.inventory.functions() {
             self.write_function(w, function)?;
         }
@@ -79,24 +80,24 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_function(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
-        if self.config.documentation == CDocumentationStyle::Inline {
+    fn write_function(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
+        if self.config.documentation == Documentation::Inline {
             self.write_documentation(w, function.meta().documentation())?;
         }
 
         match self.config.function_style {
-            CFunctionStyle::Typedefs => self.write_function_as_typedef_declaration(w, function)?,
-            CFunctionStyle::ForwardDeclarations => self.write_function_declaration(w, function, 999)?,
+            Functions::Typedefs => self.write_function_as_typedef_declaration(w, function)?,
+            Functions::ForwardDeclarations => self.write_function_declaration(w, function, 999)?,
         }
 
-        if self.config.documentation == CDocumentationStyle::Inline {
+        if self.config.documentation == crate::Documentation::Inline {
             w.newline()?;
         }
 
         Ok(())
     }
 
-    pub fn write_function_declaration(&self, w: &mut IndentWriter, function: &Function, max_line: usize) -> Result<(), Error> {
+    pub(crate) fn write_function_declaration(&self, w: &mut IndentWriter, function: &Function, max_line: usize) -> Result<(), Error> {
         let attr = &self.config.function_attribute;
         let rval = self.converter.to_type_specifier(function.signature().rval());
         let name = self.converter.function_name_to_c_name(function);
@@ -139,7 +140,7 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_function_as_typedef_declaration(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
+    fn write_function_as_typedef_declaration(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
         let rval = self.converter.to_type_specifier(function.signature().rval());
         let name = self.converter.function_name_to_c_name(function);
 
@@ -160,7 +161,8 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_documentation(&self, w: &mut IndentWriter, documentation: &Documentation) -> Result<(), Error> {
+    #[allow(clippy::unused_self)]
+    fn write_documentation(&self, w: &mut IndentWriter, documentation: &c::Documentation) -> Result<(), Error> {
         for line in documentation.lines() {
             indented!(w, r"///{}", line)?;
         }
@@ -168,7 +170,7 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_type_definitions(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_type_definitions(&self, w: &mut IndentWriter) -> Result<(), Error> {
         let mut known_function_pointers = vec![];
 
         for the_type in &sort_types_by_dependencies(self.inventory.ctypes().to_vec()) {
@@ -178,7 +180,7 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_type_definition(&self, w: &mut IndentWriter, the_type: &CType, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
+    pub(crate) fn write_type_definition(&self, w: &mut IndentWriter, the_type: &CType, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
         match the_type {
             CType::Primitive(_) => {}
             CType::Array(_) => {}
@@ -231,11 +233,11 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_type_definition_fn_pointer(&self, w: &mut IndentWriter, the_type: &FnPointerType, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
+    fn write_type_definition_fn_pointer(&self, w: &mut IndentWriter, the_type: &FnPointerType, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
         self.write_type_definition_fn_pointer_body(w, the_type, known_function_pointers)
     }
 
-    pub fn write_type_definition_fn_pointer_body(&self, w: &mut IndentWriter, the_type: &FnPointerType, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
+    fn write_type_definition_fn_pointer_body(&self, w: &mut IndentWriter, the_type: &FnPointerType, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
         let rval = self.converter.to_type_specifier(the_type.signature().rval());
         let name = self.converter.fnpointer_to_typename(the_type);
 
@@ -254,11 +256,11 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_type_definition_named_callback(&self, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
+    fn write_type_definition_named_callback(&self, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
         self.write_type_definition_named_callback_body(w, the_type)
     }
 
-    pub fn write_type_definition_named_callback_body(&self, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
+    fn write_type_definition_named_callback_body(&self, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
         let rval = self.converter.to_type_specifier(the_type.fnpointer().signature().rval());
         let name = self.converter.named_callback_to_typename(the_type);
 
@@ -276,10 +278,10 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_type_definition_enum(&self, w: &mut IndentWriter, the_type: &EnumType) -> Result<(), Error> {
+    fn write_type_definition_enum(&self, w: &mut IndentWriter, the_type: &EnumType) -> Result<(), Error> {
         let name = self.converter.enum_to_typename(the_type);
 
-        if self.config.documentation == CDocumentationStyle::Inline {
+        if self.config.documentation == Documentation::Inline {
             self.write_documentation(w, the_type.meta().documentation())?;
         }
 
@@ -292,38 +294,38 @@ impl Generator {
         self.write_braced_declaration_closing(w, name.as_str())
     }
 
-    pub fn write_type_definition_enum_variant(&self, w: &mut IndentWriter, variant: &Variant, the_enum: &EnumType) -> Result<(), Error> {
+    fn write_type_definition_enum_variant(&self, w: &mut IndentWriter, variant: &Variant, the_enum: &EnumType) -> Result<(), Error> {
         let variant_name = self.converter.enum_variant_to_name(the_enum, variant);
         let variant_value = variant.value();
 
-        if self.config.documentation == CDocumentationStyle::Inline {
+        if self.config.documentation == Documentation::Inline {
             self.write_documentation(w, variant.documentation())?;
         }
 
         indented!(w, r"{} = {},", variant_name, variant_value)
     }
 
-    pub fn write_type_definition_opaque(&self, w: &mut IndentWriter, the_type: &OpaqueType) -> Result<(), Error> {
-        if self.config.documentation == CDocumentationStyle::Inline {
+    fn write_type_definition_opaque(&self, w: &mut IndentWriter, the_type: &OpaqueType) -> Result<(), Error> {
+        if self.config.documentation == Documentation::Inline {
             self.write_documentation(w, the_type.meta().documentation())?;
         }
 
         self.write_type_definition_opaque_body(w, the_type)?;
 
-        if self.config.documentation == CDocumentationStyle::Inline {
+        if self.config.documentation == Documentation::Inline {
             w.newline()?;
         }
 
         Ok(())
     }
 
-    pub fn write_type_definition_opaque_body(&self, w: &mut IndentWriter, the_type: &OpaqueType) -> Result<(), Error> {
+    fn write_type_definition_opaque_body(&self, w: &mut IndentWriter, the_type: &OpaqueType) -> Result<(), Error> {
         let name = self.converter.opaque_to_typename(the_type);
         indented!(w, r"typedef struct {} {};", name, name)
     }
 
-    pub fn write_type_definition_composite(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
-        if self.config.documentation == CDocumentationStyle::Inline {
+    fn write_type_definition_composite(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
+        if self.config.documentation == crate::Documentation::Inline {
             self.write_documentation(w, the_type.meta().documentation())?;
         }
 
@@ -338,7 +340,7 @@ impl Generator {
         }
     }
 
-    pub fn write_type_definition_composite_body(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
+    fn write_type_definition_composite_body(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
         let name = self.converter.composite_to_typename(the_type);
 
         let alignment = the_type.repr().alignment();
@@ -360,8 +362,8 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_type_definition_composite_body_field(&self, w: &mut IndentWriter, field: &Field, _the_type: &CompositeType) -> Result<(), Error> {
-        if self.config.documentation == CDocumentationStyle::Inline {
+    fn write_type_definition_composite_body_field(&self, w: &mut IndentWriter, field: &Field, _the_type: &CompositeType) -> Result<(), Error> {
+        if self.config.documentation == crate::Documentation::Inline {
             self.write_documentation(w, field.documentation())?;
         }
 
@@ -377,7 +379,7 @@ impl Generator {
         }
     }
 
-    pub fn write_ifndef(&self, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) -> Result<(), Error> {
+    fn write_ifndef(&self, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) -> Result<(), Error> {
         if self.config.directives {
             indented!(w, r"#ifndef {}", self.config.ifndef)?;
             indented!(w, r"#define {}", self.config.ifndef)?;
@@ -394,7 +396,7 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_ifdefcpp(&self, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) -> Result<(), Error> {
+    fn write_ifdefcpp(&self, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) -> Result<(), Error> {
         if self.config.directives {
             indented!(w, r"#ifdef __cplusplus")?;
             indented!(w, r#"extern "C" {{"#)?;
@@ -413,7 +415,7 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_all(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_all(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.write_file_header_comments(w)?;
         w.newline()?;
 
@@ -444,23 +446,23 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_braced_declaration_opening(&self, w: &mut IndentWriter, definition: &str) -> Result<(), Error> {
+    fn write_braced_declaration_opening(&self, w: &mut IndentWriter, definition: &str) -> Result<(), Error> {
         match self.config.indentation {
-            CIndentationStyle::Allman => {
+            Indentation::Allman => {
                 indented!(w, "{}", definition)?;
                 indented!(w, "{{")?;
                 w.indent();
             }
-            CIndentationStyle::KAndR => {
+            Indentation::KAndR => {
                 indented!(w, "{} {{", definition)?;
                 w.indent();
             }
-            CIndentationStyle::GNU => {
+            Indentation::GNU => {
                 indented!(w, "{}", definition)?;
                 indented!(w, "  {{")?;
                 w.indent();
             }
-            CIndentationStyle::Whitesmiths => {
+            Indentation::Whitesmiths => {
                 indented!(w, "{}", definition)?;
                 indented!(w, [()], "{{")?;
                 w.indent();
@@ -470,17 +472,17 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_braced_declaration_closing(&self, w: &mut IndentWriter, name: &str) -> Result<(), Error> {
+    fn write_braced_declaration_closing(&self, w: &mut IndentWriter, name: &str) -> Result<(), Error> {
         match self.config.indentation {
-            CIndentationStyle::Allman | CIndentationStyle::KAndR => {
+            Indentation::Allman | Indentation::KAndR => {
                 w.unindent();
                 indented!(w, "}} {};", name)?;
             }
-            CIndentationStyle::GNU => {
+            Indentation::GNU => {
                 w.unindent();
                 indented!(w, "  }} {};", name)?;
             }
-            CIndentationStyle::Whitesmiths => {
+            Indentation::Whitesmiths => {
                 w.unindent();
                 indented!(w, [()], "}} {};", name)?;
             }
@@ -490,7 +492,7 @@ impl Generator {
     }
 }
 
-impl Generate for Generator {
+impl Bindings for Generator {
     fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.write_all(w)
     }

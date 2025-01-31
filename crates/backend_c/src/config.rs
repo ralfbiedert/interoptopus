@@ -1,16 +1,16 @@
 use derive_builder::Builder;
 use heck::{ToLowerCamelCase, ToShoutySnakeCase, ToSnakeCase, ToUpperCamelCase};
 
-/// Style of indentation used in generated C code
+/// Function style used in generated C code
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub enum CFunctionStyle {
+pub enum Functions {
     Typedefs,
     ForwardDeclarations,
 }
 
-/// Style of indentation used in generated C code
+/// Indentation style used in generated C code
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub enum CIndentationStyle {
+pub enum Indentation {
     /// Braces on their own lines, not indented
     Allman,
     /// Opening brace on same line as declaration, closing brace on own line, not intended
@@ -21,9 +21,9 @@ pub enum CIndentationStyle {
     Whitesmiths,
 }
 
-/// Style of documentation in generated C code
+/// Naming style used in generated C code
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub enum CNamingStyle {
+pub enum Naming {
     /// Names all in lowercase without spacing e.g. 'thetypename'
     Lowercase,
     /// Names all in uppercase without spacing e.g. 'THETYPENAME'
@@ -39,31 +39,31 @@ pub enum CNamingStyle {
 }
 
 pub trait ToNamingStyle {
-    fn to_naming_style(&self, style: &CNamingStyle) -> String;
+    fn to_naming_style(&self, style: &Naming) -> String;
 }
 
 impl ToNamingStyle for String {
-    fn to_naming_style(&self, style: &CNamingStyle) -> String {
+    fn to_naming_style(&self, style: &Naming) -> String {
         self.as_str().to_naming_style(style)
     }
 }
 
 impl ToNamingStyle for &str {
-    fn to_naming_style(&self, style: &CNamingStyle) -> String {
+    fn to_naming_style(&self, style: &Naming) -> String {
         match style {
-            CNamingStyle::Lowercase => self.to_lowercase(),
-            CNamingStyle::Uppercase => self.to_uppercase(),
-            CNamingStyle::LowerCamelCase => self.to_lower_camel_case(),
-            CNamingStyle::UpperCamelCase => self.to_upper_camel_case(),
-            CNamingStyle::SnakeCase => self.to_snake_case(),
-            CNamingStyle::ShoutySnakeCase => self.to_shouty_snake_case(),
+            Naming::Lowercase => self.to_lowercase(),
+            Naming::Uppercase => self.to_uppercase(),
+            Naming::LowerCamelCase => self.to_lower_camel_case(),
+            Naming::UpperCamelCase => self.to_upper_camel_case(),
+            Naming::SnakeCase => self.to_snake_case(),
+            Naming::ShoutySnakeCase => self.to_shouty_snake_case(),
         }
     }
 }
 
-/// Style of documentation in generated C code
+/// Documentation style used in generated C code
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub enum CDocumentationStyle {
+pub enum Documentation {
     // No documentation comments are added to header file
     None,
     // Documentation is added inline above relevant declaration
@@ -91,19 +91,19 @@ pub struct Config {
     /// How to prefix everything, e.g., `my_company_`, will be capitalized for constants.
     pub prefix: String,
     /// How to indent code
-    pub indentation: CIndentationStyle,
+    pub indentation: Indentation,
     /// How to add code documentation
-    pub documentation: CDocumentationStyle,
+    pub documentation: Documentation,
     /// How to convert type names
-    pub type_naming: CNamingStyle,
+    pub type_naming: Naming,
     /// How to convert enum variant names
-    pub enum_variant_naming: CNamingStyle,
+    pub enum_variant_naming: Naming,
     /// How to convert const names
-    pub const_naming: CNamingStyle,
+    pub const_naming: Naming,
     /// How to convert function parameter names
-    pub function_parameter_naming: CNamingStyle,
+    pub function_parameter_naming: Naming,
     /// How to emit functions
-    pub function_style: CFunctionStyle,
+    pub function_style: Functions,
 }
 
 impl Default for Config {
@@ -117,13 +117,13 @@ impl Default for Config {
             custom_defines: String::new(),
             function_attribute: String::new(),
             prefix: String::new(),
-            indentation: CIndentationStyle::Whitesmiths,
-            documentation: CDocumentationStyle::Inline,
-            type_naming: CNamingStyle::Lowercase,
-            enum_variant_naming: CNamingStyle::Uppercase,
-            const_naming: CNamingStyle::Uppercase,
-            function_parameter_naming: CNamingStyle::Lowercase,
-            function_style: CFunctionStyle::ForwardDeclarations,
+            indentation: Indentation::Whitesmiths,
+            documentation: Documentation::Inline,
+            type_naming: Naming::Lowercase,
+            enum_variant_naming: Naming::Uppercase,
+            const_naming: Naming::Uppercase,
+            function_parameter_naming: Naming::Lowercase,
+            function_style: Functions::ForwardDeclarations,
         }
     }
 }

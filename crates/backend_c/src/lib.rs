@@ -52,7 +52,7 @@
 //!
 //! ```
 //! use interoptopus::util::NamespaceMappings;
-//! use interoptopus::{Error, Generate};
+//! use interoptopus::{Error, Bindings};
 //!
 //! #[test]
 //! fn bindings_c() -> Result<(), Error> {
@@ -116,7 +116,6 @@ mod converter;
 mod docs;
 mod generator;
 
-pub use config::{CDocumentationStyle, CFunctionStyle, CIndentationStyle, CNamingStyle, Config, ConfigBuilder};
-pub use converter::{CTypeConverter, Converter};
+pub use config::{Config, ConfigBuilder, Documentation, Functions, Indentation, Naming};
 pub use docs::DocGenerator;
 pub use generator::Generator;

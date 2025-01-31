@@ -1,12 +1,11 @@
 use crate::Generator;
-use interoptopus::indented;
 use interoptopus::lang::c::{CType, Function};
 use interoptopus::util::sort_types_by_dependencies;
 use interoptopus::writer::IndentWriter;
+use interoptopus::{indented, Bindings};
 use interoptopus::{Error, Inventory};
-use std::fs::File;
-use std::path::Path;
 
+/// Writes documentation for C bindings.
 pub struct DocGenerator<'a> {
     generator: &'a Generator,
     inventory: Inventory,
@@ -19,11 +18,11 @@ impl<'a> DocGenerator<'a> {
     }
 
     #[must_use]
-    pub const fn inventory(&self) -> &Inventory {
+    pub(crate) const fn inventory(&self) -> &Inventory {
         &self.inventory
     }
 
-    pub fn write_types(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_types(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"# Types ")?;
 
         let mut known_function_pointers = vec![];
@@ -35,7 +34,7 @@ impl<'a> DocGenerator<'a> {
         Ok(())
     }
 
-    pub fn write_type_definition(&self, w: &mut IndentWriter, the_type: &CType, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
+    fn write_type_definition(&self, w: &mut IndentWriter, the_type: &CType, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
         let meta = match the_type {
             CType::Primitive(_) => return Ok(()),
             CType::Array(_) => return Ok(()),
@@ -66,7 +65,7 @@ impl<'a> DocGenerator<'a> {
         Ok(())
     }
 
-    pub fn write_functions(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_functions(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"# Functions ")?;
 
         for the_type in self.inventory().functions() {
@@ -96,7 +95,7 @@ impl<'a> DocGenerator<'a> {
         Ok(())
     }
 
-    pub fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.write_types(w)?;
         self.write_functions(w)?;
 
@@ -104,11 +103,10 @@ impl<'a> DocGenerator<'a> {
 
         Ok(())
     }
+}
 
-    pub fn write_file<P: AsRef<Path>>(&self, file_name: P) -> Result<(), Error> {
-        let mut file = File::create(file_name)?;
-        let mut writer = IndentWriter::new(&mut file);
-
-        self.write_to(&mut writer)
+impl Bindings for DocGenerator<'_> {
+    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        self.write_to(w)
     }
 }

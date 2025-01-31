@@ -9,10 +9,10 @@ use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{is_global_type, longest_common_prefix};
 use interoptopus::writer::{IndentWriter, WriteFor};
-use interoptopus::{indented, Error, Generate, Inventory};
+use interoptopus::{indented, Bindings, Error, Inventory};
 use std::iter::zip;
 
-/// **Start here**, main converter implementing [`Generate`].
+/// **Start here**, main converter implementing [`Bindings`].
 pub struct Generator {
     config: Config,
     inventory: Inventory,
@@ -1824,7 +1824,7 @@ impl Generator {
     }
 }
 
-impl Generate for Generator {
+impl Bindings for Generator {
     fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.write_all(w)
     }

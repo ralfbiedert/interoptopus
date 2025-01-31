@@ -52,7 +52,7 @@
 //!
 //! ```
 //! use interoptopus::util::NamespaceMappings;
-//! use interoptopus::{Error, Generate};
+//! use interoptopus::{Error, Bindings};
 //!
 //! #[test]
 //! fn bindings_cpython_cffi() -> Result<(), Error> {

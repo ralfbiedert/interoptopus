@@ -6,7 +6,7 @@ use std::path::Path;
 /// Main entry point for backends to generate language bindings.
 ///
 /// This trait will be implemented by each backend and is the main way to interface with a generator.
-pub trait Generate {
+pub trait Bindings {
     /// Generates FFI binding code and writes them to the [`IndentWriter`].
     ///
     /// # Errors
