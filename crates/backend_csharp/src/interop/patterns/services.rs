@@ -151,7 +151,7 @@ pub fn write_pattern_service_method(
     // Assemble actual function call.
     let context = if write_contxt_by_ref {
         if is_ctor {
-            "ref i._context"
+            "ref self._context"
         } else {
             "ref _context"
         }
