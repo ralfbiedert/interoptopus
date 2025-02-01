@@ -766,10 +766,21 @@ pub trait CSharpWriter {
                 indented!(w, "fixed(char* s = managed.{})", field_name)?;
                 indented!(w, "{{")?;
                 w.indent();
-                indented!(w, r"if(Encoding.UTF8.GetByteCount(managed.{0}, 0, managed.{0}.Length) + 1 > {1})", field_name, a.len())?;
+                indented!(
+                    w,
+                    r"if(Encoding.UTF8.GetByteCount(managed.{0}, 0, managed.{0}.Length) + 1 > {1})",
+                    field_name,
+                    a.len()
+                )?;
                 indented!(w, r"{{")?;
                 w.indent();
-                indented!(w, r#"throw new InvalidOperationException($"The managed string field '{{nameof({0}.{1})}}' cannot be encoded to fit the fixed size array of {2}.");"#, the_type.rust_name(), field_name, a.len())?;
+                indented!(
+                    w,
+                    r#"throw new InvalidOperationException($"The managed string field '{{nameof({0}.{1})}}' cannot be encoded to fit the fixed size array of {2}.");"#,
+                    the_type.rust_name(),
+                    field_name,
+                    a.len()
+                )?;
                 w.unindent();
                 indented!(w, r"}}")?;
                 indented!(
@@ -785,15 +796,16 @@ pub trait CSharpWriter {
                 indented!(w, r"if(managed.{}.Length > {})", field_name, a.len())?;
                 indented!(w, r"{{")?;
                 w.indent();
-                indented!(w, r#"throw new InvalidOperationException($"The managed array field '{{nameof({0}.{1})}}' has {{managed.{1}.Length}} elements, exceeding the fixed size array of {2}.");"#, the_type.rust_name(), field_name, a.len())?;
-                w.unindent();
-                indented!(w, r"}}")?;
                 indented!(
                     w,
-                    r"var source = new ReadOnlySpan<{0}>(managed.{1}, 0, managed.{1}.Length);",
-                    type_name,
-                    field_name
+                    r#"throw new InvalidOperationException($"The managed array field '{{nameof({0}.{1})}}' has {{managed.{1}.Length}} elements, exceeding the fixed size array of {2}.");"#,
+                    the_type.rust_name(),
+                    field_name,
+                    a.len()
                 )?;
+                w.unindent();
+                indented!(w, r"}}")?;
+                indented!(w, r"var source = new ReadOnlySpan<{0}>(managed.{1}, 0, managed.{1}.Length);", type_name, field_name)?;
                 indented!(w, r"var dest = new Span<{0}>(result.{1}, {2});", type_name, field_name, a.len())?;
                 indented!(w, r"source.CopyTo(dest);")?;
             }
