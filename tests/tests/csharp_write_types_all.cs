@@ -1002,13 +1002,17 @@ namespace My.Company
             {
                 if(managed.data != null)
                 {
-                    if(managed.data.Length > 16)
+                    if(managed.data.Length != 16)
                     {
                         throw new InvalidOperationException($"The managed array field '{nameof(Array.data)}' has {managed.data.Length} elements, exceeding the fixed size array of 16.");
                     }
                     var source_data = new ReadOnlySpan<byte>(managed.data, 0, managed.data.Length);
                     var dest = new Span<byte>(result.data, 16);
                     source_data.CopyTo(dest);
+                }
+                else
+                {
+                    throw new InvalidOperationException($"The managed field cannot be null.");
                 }
             }
 
@@ -1118,6 +1122,10 @@ namespace My.Company
                         result.str[written] = 0;
                     }
                 }
+                else
+                {
+                    throw new InvalidOperationException($"The managed field cannot be null.");
+                }
 
                 if(managed.str_2 != null)
                 {
@@ -1130,6 +1138,10 @@ namespace My.Company
                         var written = Encoding.UTF8.GetBytes(s, managed.str_2.Length, result.str_2, 31);
                         result.str_2[written] = 0;
                     }
+                }
+                else
+                {
+                    throw new InvalidOperationException($"The managed field cannot be null.");
                 }
             }
 
@@ -1282,7 +1294,7 @@ namespace My.Company
             {
                 if(managed.field_array != null)
                 {
-                    if(managed.field_array.Length > 5)
+                    if(managed.field_array.Length != 5)
                     {
                         throw new InvalidOperationException($"The managed array field '{nameof(NestedArray.field_array)}' has {managed.field_array.Length} elements, exceeding the fixed size array of 5.");
                     }
@@ -1290,16 +1302,24 @@ namespace My.Company
                     var dest = new Span<ushort>(result.field_array, 5);
                     source_field_array.CopyTo(dest);
                 }
+                else
+                {
+                    throw new InvalidOperationException($"The managed field cannot be null.");
+                }
 
                 if(managed.field_array_2 != null)
                 {
-                    if(managed.field_array_2.Length > 5)
+                    if(managed.field_array_2.Length != 5)
                     {
                         throw new InvalidOperationException($"The managed array field '{nameof(NestedArray.field_array_2)}' has {managed.field_array_2.Length} elements, exceeding the fixed size array of 5.");
                     }
                     var source_field_array_2 = new ReadOnlySpan<ushort>(managed.field_array_2, 0, managed.field_array_2.Length);
                     var dest = new Span<ushort>(result.field_array_2, 5);
                     source_field_array_2.CopyTo(dest);
+                }
+                else
+                {
+                    throw new InvalidOperationException($"The managed field cannot be null.");
                 }
             }
 
@@ -1476,13 +1496,17 @@ namespace My.Company
             {
                 if(managed.a != null)
                 {
-                    if(managed.a.Length > 5)
+                    if(managed.a.Length != 5)
                     {
                         throw new InvalidOperationException($"The managed array field '{nameof(Weird2u8.a)}' has {managed.a.Length} elements, exceeding the fixed size array of 5.");
                     }
                     var source_a = new ReadOnlySpan<byte>(managed.a, 0, managed.a.Length);
                     var dest = new Span<byte>(result.a, 5);
                     source_a.CopyTo(dest);
+                }
+                else
+                {
+                    throw new InvalidOperationException($"The managed field cannot be null.");
                 }
             }
 

@@ -1,27 +1,29 @@
 using My.Company;
 using Xunit;
 
-public class TestCharArray
+public class TestArrayChars
 {
     [Fact]
-    public void Test_char_array_1()
+    public void char_array_1()
     {
         var result = Interop.char_array_1();
         Assert.Equal("Hello, World!", result.str);
     }
 
     [Fact]
-    public void Test_char_array_2()
+    public void char_array_2()
     {
         var result = Interop.char_array_2(new CharArray
         {
-            str = "Hello, World!"
+            str = "Hello",
+            str_2 = "World"
         });
-        Assert.Equal("Hello, World!", result.str);
+        Assert.Equal("Hello", result.str);
+        Assert.Equal("World", result.str_2);
     }
 
     [Fact]
-    public void Test_char_array_2_throws()
+    public void char_array_2_throws()
     {
         Assert.Throws<System.InvalidOperationException>(() => Interop.char_array_2(new CharArray
         {
@@ -30,11 +32,12 @@ public class TestCharArray
     }
 
     [Fact]
-    public void Test_char_array_3()
+    public void char_array_3()
     {
         var arr = new CharArray
         {
-            str = "Hello, World!"
+            str = "Hello",
+            str_2 = "World"
         };
         var result = Interop.char_array_3(ref arr);
         Assert.Equal((byte)'H', result);

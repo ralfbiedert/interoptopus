@@ -203,7 +203,7 @@ pub fn write_type_definition_composite_to_unmanaged_marshal_field(
             w.unindent();
             indented!(w, r"}}")?;
         } else {
-            indented!(w, r"if(managed.{}.Length > {})", field_name, a.len())?;
+            indented!(w, r"if(managed.{}.Length != {})", field_name, a.len())?;
             indented!(w, r"{{")?;
             w.indent();
             indented!(
@@ -225,6 +225,10 @@ pub fn write_type_definition_composite_to_unmanaged_marshal_field(
             indented!(w, r"source_{}.CopyTo(dest);", field_name)?;
         }
         w.unindent();
+        indented!(w, r"}}")?;
+        indented!(w, "else")?;
+        indented!(w, r"{{")?;
+        indented!(w, [()], r#"throw new InvalidOperationException($"The managed field cannot be null.");"#)?;
         indented!(w, r"}}")?;
     }
     Ok(())

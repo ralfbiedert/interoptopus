@@ -2,10 +2,10 @@ using System.Linq;
 using My.Company;
 using Xunit;
 
-public class TestNestedArray
+public class TestArrayNested
 {
     [Fact]
-    public void Test_nested_array_1()
+    public void nested_array_1()
     {
         var result = Interop.nested_array_1();
         Assert.Equal(EnumRenamed.X, result.field_enum);
@@ -22,7 +22,7 @@ public class TestNestedArray
     }
 
     [Fact]
-    public void Test_nested_array_2()
+    public void nested_array_2()
     {
         Interop.nested_array_2(out var result);
         Assert.Equal(EnumRenamed.X, result.field_enum);
@@ -39,15 +39,33 @@ public class TestNestedArray
     }
 
     [Fact]
-    public void Test_nested_array_3()
+    public void nested_array_3()
     {
         var result = Interop.nested_array_3(new NestedArray
         {
+            field_array = new ushort[] { 1, 2, 3, 4, 5 },
+            field_array_2 = new ushort[] { 1, 2, 3, 4, 5 },
             field_struct = new Array
             {
                 data = Enumerable.Range(1, 16).Select(i => (byte)i).ToArray()
             }
         });
         Assert.Equal(2, result);
+    }
+
+    [Fact]
+    public void nested_array_3_throws()
+    {
+        Assert.Throws<System.InvalidOperationException>(() =>
+        {
+            Interop.nested_array_3(new NestedArray
+            {
+                field_array = new ushort[] { 1, 2, 3 },
+                field_struct = new Array
+                {
+                    data = Enumerable.Range(1, 16).Select(i => (byte)i).ToArray()
+                }
+            });
+        });
     }
 }
