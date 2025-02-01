@@ -122,18 +122,18 @@ pub fn write_type_definition_composite_to_managed_marshal_field(
             indented!(w, r"result.{0}{1} = unmanaged.{0}[{1}];", field_name, i)?;
         }
     } else if matches!(a.array_type(), CType::Pattern(TypePattern::CChar)) {
-        indented!(w, r"var source = new ReadOnlySpan<byte>(unmanaged.{}, {});", field_name, a.len())?;
-        indented!(w, r"var terminatorIndex = source.IndexOf<byte>(0);")?;
+        indented!(w, r"var source_{0} = new ReadOnlySpan<byte>(unmanaged.{0}, {1});", field_name, a.len())?;
+        indented!(w, r"var terminatorIndex = source_{}.IndexOf<byte>(0);", field_name)?;
         indented!(
             w,
-            r"result.{} = Encoding.UTF8.GetString(source.Slice(0, terminatorIndex == -1 ? Math.Min(source.Length, {}) : terminatorIndex));",
+            r"result.{0} = Encoding.UTF8.GetString(source_{0}.Slice(0, terminatorIndex == -1 ? Math.Min(source_{0}.Length, {1}) : terminatorIndex));",
             field_name,
             a.len()
         )?;
     } else {
-        indented!(w, r"var source = new Span<{}>(unmanaged.{}, {});", type_name, field_name, a.len())?;
+        indented!(w, r"var source_{1} = new Span<{0}>(unmanaged.{1}, {2});", type_name, field_name, a.len())?;
         indented!(w, r"var arr_{} = new {}[{}];", field_name, type_name, a.len())?;
-        indented!(w, r"source.CopyTo(arr_{}.AsSpan());", field_name)?;
+        indented!(w, r"source_{0}.CopyTo(arr_{0}.AsSpan());", field_name)?;
         indented!(w, r"result.{0} = arr_{0};", field_name)?;
     }
     Ok(())
@@ -215,9 +215,9 @@ pub fn write_type_definition_composite_to_unmanaged_marshal_field(
             )?;
             w.unindent();
             indented!(w, r"}}")?;
-            indented!(w, r"var source = new ReadOnlySpan<{0}>(managed.{1}, 0, managed.{1}.Length);", type_name, field_name)?;
+            indented!(w, r"var source_{1} = new ReadOnlySpan<{0}>(managed.{1}, 0, managed.{1}.Length);", type_name, field_name)?;
             indented!(w, r"var dest = new Span<{0}>(result.{1}, {2});", type_name, field_name, a.len())?;
-            indented!(w, r"source.CopyTo(dest);")?;
+            indented!(w, r"source_{}.CopyTo(dest);", field_name)?;
         }
         w.unindent();
         indented!(w, r"}}")?;
@@ -345,13 +345,6 @@ pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWri
             }
 
             Ok(())
-        }
-        CType::Primitive(PrimitiveType::Bool) => {
-            let type_name = to_typespecifier_in_field(field.the_type(), field, the_type);
-            if !i.should_emit_marshaller_for_composite(the_type) {
-                indented!(w, r"[MarshalAs(UnmanagedType.I1)]")?;
-            }
-            indented!(w, r"{}{} {};", visibility, type_name, field_name)
         }
         _ => {
             let type_name = to_typespecifier_in_field(field.the_type(), field, the_type);

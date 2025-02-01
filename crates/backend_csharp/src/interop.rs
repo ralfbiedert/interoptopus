@@ -19,7 +19,7 @@ use crate::interop::patterns::abi_guard::write_abi_guard;
 use crate::interop::patterns::write_patterns;
 use crate::interop::types::write_type_definitions;
 use derive_builder::Builder;
-use interoptopus::lang::c::{CType, CompositeType, Constant, Function, Meta};
+use interoptopus::lang::c::{CType, CompositeType, Constant, Function, Meta, PrimitiveType};
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::{is_global_type, NamespaceMappings};
 use interoptopus::writer::IndentWriter;
@@ -186,7 +186,7 @@ impl Interop {
         composite
             .fields()
             .iter()
-            .any(|f| matches!(f.the_type(), CType::Composite(_)) || self.should_emit_marshaller(f.the_type()))
+            .any(|f| matches!(f.the_type(), CType::Composite(_) | CType::Primitive(PrimitiveType::Bool)) || self.should_emit_marshaller(f.the_type()))
     }
 
     fn should_emit_marshaller(&self, ctype: &CType) -> bool {

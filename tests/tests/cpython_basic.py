@@ -49,6 +49,7 @@ def init_lib(path):
     c_lib.char_array_1.argtypes = []
     c_lib.char_array_2.argtypes = [CharArray]
     c_lib.char_array_3.argtypes = [ctypes.POINTER(CharArray)]
+    c_lib.bool_field.argtypes = [BoolField]
     c_lib.documented.argtypes = [StructDocumented]
     c_lib.ambiguous_1.argtypes = [Vec1]
     c_lib.ambiguous_2.argtypes = [Vec2]
@@ -168,6 +169,7 @@ def init_lib(path):
     c_lib.char_array_1.restype = CharArray
     c_lib.char_array_2.restype = CharArray
     c_lib.char_array_3.restype = ctypes.c_uint8
+    c_lib.bool_field.restype = ctypes.c_bool
     c_lib.documented.restype = ctypes.c_int
     c_lib.ambiguous_1.restype = Vec1
     c_lib.ambiguous_2.restype = Vec2
@@ -394,6 +396,9 @@ def char_array_2(arr: CharArray) -> CharArray:
 
 def char_array_3(arr: ctypes.POINTER(CharArray)) -> int:
     return c_lib.char_array_3(arr)
+
+def bool_field(x: BoolField) -> bool:
+    return c_lib.bool_field(x)
 
 def documented(x: StructDocumented) -> ctypes.c_int:
     """ This function has documentation."""
@@ -651,6 +656,26 @@ class FFIError:
     Panic = 200
     Delegate = 300
     Fail = 400
+
+
+class BoolField(ctypes.Structure):
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("val", ctypes.c_bool),
+    ]
+
+    def __init__(self, val: bool = None):
+        if val is not None:
+            self.val = val
+
+    @property
+    def val(self) -> bool:
+        return ctypes.Structure.__get__(self, "val")
+
+    @val.setter
+    def val(self, value: bool):
+        return ctypes.Structure.__set__(self, "val", value)
 
 
 class ExtraTypef32(ctypes.Structure):
@@ -1634,10 +1659,11 @@ class NestedArray(ctypes.Structure):
         ("field_bool", ctypes.c_bool),
         ("field_int", ctypes.c_int32),
         ("field_array", ctypes.c_uint16 * 5),
+        ("field_array_2", ctypes.c_uint16 * 5),
         ("field_struct", Array),
     ]
 
-    def __init__(self, field_enum: ctypes.c_int = None, field_vec: Vec3f32 = None, field_bool: bool = None, field_int: int = None, field_array = None, field_struct: Array = None):
+    def __init__(self, field_enum: ctypes.c_int = None, field_vec: Vec3f32 = None, field_bool: bool = None, field_int: int = None, field_array = None, field_array_2 = None, field_struct: Array = None):
         if field_enum is not None:
             self.field_enum = field_enum
         if field_vec is not None:
@@ -1648,6 +1674,8 @@ class NestedArray(ctypes.Structure):
             self.field_int = field_int
         if field_array is not None:
             self.field_array = field_array
+        if field_array_2 is not None:
+            self.field_array_2 = field_array_2
         if field_struct is not None:
             self.field_struct = field_struct
 
@@ -1690,6 +1718,14 @@ class NestedArray(ctypes.Structure):
     @field_array.setter
     def field_array(self, value):
         return ctypes.Structure.__set__(self, "field_array", value)
+
+    @property
+    def field_array_2(self):
+        return ctypes.Structure.__get__(self, "field_array_2")
+
+    @field_array_2.setter
+    def field_array_2(self, value):
+        return ctypes.Structure.__set__(self, "field_array_2", value)
 
     @property
     def field_struct(self) -> Array:
