@@ -48,7 +48,7 @@
 //!     InventoryBuilder::new()
 //!         .register(function!(my_function))
 //!         .validate()
-//!         .inventory()
+//!         .build()
 //! }
 //!
 //! ```
@@ -215,7 +215,7 @@ pub mod lang {
 ///     InventoryBuilder::new()
 ///         .register(function!(my_function))
 ///         .validate()
-///         .inventory()
+///         .build()
 /// }
 /// ```
 #[macro_export]
@@ -244,7 +244,7 @@ macro_rules! function {
 ///     InventoryBuilder::new()
 ///         .register(constant!(MY_CONSTANT))
 ///         .validate()
-///         .inventory()
+///         .build()
 /// }
 /// ```
 #[macro_export]
@@ -278,7 +278,7 @@ macro_rules! constant {
 ///     InventoryBuilder::new()
 ///         .register(extra_type!(S<f32>))
 ///         .validate()
-///         .inventory()
+///         .build()
 /// }
 #[macro_export]
 macro_rules! extra_type {
@@ -357,7 +357,7 @@ macro_rules! extra_type {
 ///     InventoryBuilder::new()
 ///         .register(pattern!(SimpleService))
 ///         .validate()
-///         .inventory()
+///         .build()
 /// }
 #[macro_export]
 macro_rules! pattern {

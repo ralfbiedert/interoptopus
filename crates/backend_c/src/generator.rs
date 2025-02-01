@@ -524,37 +524,6 @@ impl Interop {
         Ok(())
     }
 
-    fn write_all(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        self.write_file_header_comments(w)?;
-        w.newline()?;
-
-        self.write_ifndef(w, |w| {
-            self.write_ifdefcpp(w, |w| {
-                if self.imports {
-                    self.write_imports(w)?;
-                    w.newline()?;
-                }
-
-                self.write_custom_defines(w)?;
-                w.newline()?;
-
-                self.write_constants(w)?;
-                w.newline()?;
-
-                self.write_type_definitions(w)?;
-                w.newline()?;
-
-                self.write_functions(w)?;
-
-                Ok(())
-            })?;
-
-            Ok(())
-        })?;
-
-        Ok(())
-    }
-
     fn write_braced_declaration_opening(&self, w: &mut IndentWriter, definition: &str) -> Result<(), Error> {
         match self.indentation {
             Indentation::Allman => {
@@ -599,10 +568,41 @@ impl Interop {
 
         Ok(())
     }
+
+    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        self.write_file_header_comments(w)?;
+        w.newline()?;
+
+        self.write_ifndef(w, |w| {
+            self.write_ifdefcpp(w, |w| {
+                if self.imports {
+                    self.write_imports(w)?;
+                    w.newline()?;
+                }
+
+                self.write_custom_defines(w)?;
+                w.newline()?;
+
+                self.write_constants(w)?;
+                w.newline()?;
+
+                self.write_type_definitions(w)?;
+                w.newline()?;
+
+                self.write_functions(w)?;
+
+                Ok(())
+            })?;
+
+            Ok(())
+        })?;
+
+        Ok(())
+    }
 }
 
 impl Bindings for Interop {
     fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        self.write_all(w)
+        self.write_to(w)
     }
 }

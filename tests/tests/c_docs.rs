@@ -8,7 +8,7 @@ use tests::{compile_output_c, validate_output};
 fn sample_function() {}
 
 fn ffi_inventory() -> Inventory {
-    InventoryBuilder::new().register(function!(sample_function)).inventory()
+    InventoryBuilder::new().register(function!(sample_function)).build()
 }
 
 #[test]

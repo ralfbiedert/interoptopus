@@ -708,7 +708,7 @@ impl Interop {
         Ok(())
     }
 
-    fn write_all(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.write_imports(w)?;
         self.write_api_load_fuction(w)?;
         w.newline()?;
@@ -739,6 +739,6 @@ impl Interop {
 
 impl Bindings for Interop {
     fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        self.write_all(w)
+        self.write_to(w)
     }
 }

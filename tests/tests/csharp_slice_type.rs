@@ -1,7 +1,7 @@
 use anyhow::Error;
 use interoptopus::patterns::slice::FFISlice;
 use interoptopus::{ffi_function, function, Bindings, Inventory, InventoryBuilder};
-use interoptopus_backend_csharp::{ConfigBuilder, Generator};
+use interoptopus_backend_csharp::InteropBuilder;
 use tests::backend_csharp::common_namespace_mappings;
 use tests::validate_output;
 
@@ -9,14 +9,16 @@ use tests::validate_output;
 fn sample_function(_: FFISlice<u8>) {}
 
 fn ffi_inventory() -> Inventory {
-    InventoryBuilder::new().register(function!(sample_function)).inventory()
+    InventoryBuilder::new().register(function!(sample_function)).build()
 }
 
 #[test]
 fn spans_work() -> Result<(), Error> {
-    let inventory = ffi_inventory();
-    let config = ConfigBuilder::default().namespace_mappings(common_namespace_mappings()).build()?;
-    let generated = Generator::new(config, inventory).to_string()?;
+    let generated = InteropBuilder::default()
+        .inventory(ffi_inventory())
+        .namespace_mappings(common_namespace_mappings())
+        .build()?
+        .to_string()?;
 
     validate_output!("tests", "csharp_slice_type.cs", generated.as_str());
 

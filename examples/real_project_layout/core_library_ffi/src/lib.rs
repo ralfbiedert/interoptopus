@@ -19,5 +19,5 @@ pub fn ffi_inventory() -> Inventory {
         .register(function!(start_server))
         .register(pattern!(engine::GameEngine))
         .validate()
-        .inventory()
+        .build()
 }

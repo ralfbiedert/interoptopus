@@ -46,7 +46,7 @@ pub enum Symbol {
 ///         .register(constant!(MY_CONSTANT))
 ///         .register(extra_type!(ExtraType<f32>))
 ///         .validate()
-///         .inventory()
+///         .build()
 /// }
 /// ```
 #[derive(Default, Debug)]
@@ -121,7 +121,7 @@ impl InventoryBuilder {
 
     /// Produce the [`Inventory`].
     #[must_use]
-    pub fn inventory(self) -> Inventory {
+    pub fn build(self) -> Inventory {
         Inventory::new(self.functions, self.constants, self.patterns, self.ctypes.as_slice())
     }
 }

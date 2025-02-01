@@ -144,6 +144,6 @@ pub fn ffi_inventory() -> Inventory {
             .register(pattern!(patterns::services::slices::ServiceVariousSlices))
             .register(pattern!(patterns::services::strings::ServiceStrings))
             .validate()
-            .inventory()
+            .build()
     }
 }

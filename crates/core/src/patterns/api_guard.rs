@@ -27,7 +27,7 @@
 //!     InventoryBuilder::new()
 //!         .register(function!(my_api_guard))
 //!         .validate()
-//!         .inventory()
+//!         .build()
 //! }
 //! ```
 //!

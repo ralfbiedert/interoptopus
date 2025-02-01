@@ -1,48 +1,38 @@
-use crate::config::DocConfig;
-use crate::converter::{CSharpTypeConverter, FunctionNameFlavor};
-use crate::Generator;
+use crate::converter::{field_name_to_csharp_name, function_name_to_csharp_name, to_typespecifier_in_rval};
+use crate::generator::FunctionNameFlavor;
+use crate::Interop;
 use interoptopus::lang::c::{CType, CompositeType, Function};
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::writer::{IndentWriter, WriteFor};
-use interoptopus::{indented, non_service_functions};
-use interoptopus::{Error, Inventory};
-use std::fs::File;
-use std::path::Path;
+use interoptopus::Error;
+use interoptopus::{indented, non_service_functions, Bindings};
 
-pub struct DocGenerator<'a> {
-    inventory: &'a Inventory,
-    generator: &'a Generator,
-    doc_config: DocConfig,
+/// Configures C# documentation generation.
+#[derive(Clone, Debug, Default)]
+pub struct DocConfig {
+    /// Header to append to the generated documentation.
+    pub header: String,
 }
 
-impl<'a> DocGenerator<'a> {
+pub struct Documentation<'a> {
+    interop: &'a Interop,
+    config: DocConfig,
+}
+
+impl<'a> Documentation<'a> {
     #[must_use]
-    pub const fn new(inventory: &'a Inventory, generator: &'a Generator, config: DocConfig) -> Self {
-        Self {
-            inventory,
-            generator,
-            doc_config: config,
-        }
+    pub const fn new(interop: &'a Interop, config: DocConfig) -> Self {
+        Self { interop, config }
     }
 
-    #[must_use]
-    pub const fn inventory(&self) -> &Inventory {
-        self.inventory
-    }
-
-    #[must_use]
-    pub const fn config(&self) -> &DocConfig {
-        &self.doc_config
-    }
-
-    pub fn write_toc(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_toc(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"## API Overview")?;
 
         w.newline()?;
         indented!(w, r"### Functions")?;
         indented!(w, r"Freestanding callables inside the module.")?;
 
-        for the_type in non_service_functions(self.inventory) {
+        for the_type in non_service_functions(&self.interop.inventory) {
             let doc = the_type.meta().documentation().lines().first().cloned().unwrap_or_default();
 
             indented!(w, r" - **[{}](#{})** - {}", the_type.name(), the_type.name(), doc)?;
@@ -52,7 +42,7 @@ impl<'a> DocGenerator<'a> {
         indented!(w, r"### Classes")?;
         indented!(w, r"Methods operating on common state.")?;
 
-        for pattern in self.inventory.patterns().iter().map(|x| match x {
+        for pattern in self.interop.inventory.patterns().iter().map(|x| match x {
             LibraryPattern::Service(s) => s,
             _ => panic!("Pattern not explicitly handled"),
         }) {
@@ -63,19 +53,13 @@ impl<'a> DocGenerator<'a> {
             indented!(w, r" - **[{}](#{})** - {}", name, name, doc)?;
 
             for x in pattern.constructors() {
-                let func_name = self
-                    .generator
-                    .converter()
-                    .function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
+                let func_name = function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
                 let target = format!("{name}.{func_name}");
                 let doc = x.meta().documentation().lines().first().cloned().unwrap_or_default();
                 indented!(w, r"     - **[{}](#{})** <sup>**ctor**</sup> - {}", func_name, target, doc)?;
             }
             for x in pattern.methods() {
-                let func_name = self
-                    .generator
-                    .converter()
-                    .function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
+                let func_name = function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
                 let target = format!("{name}.{func_name}");
                 let doc = x.meta().documentation().lines().first().cloned().unwrap_or_default();
                 indented!(w, r"     - **[{}](#{})** - {}", func_name, target, doc)?;
@@ -86,7 +70,7 @@ impl<'a> DocGenerator<'a> {
         indented!(w, r"### Enums")?;
         indented!(w, r"Groups of related constants.")?;
 
-        for the_type in self.inventory.ctypes().iter().filter_map(|x| match x {
+        for the_type in self.interop.inventory.ctypes().iter().filter_map(|x| match x {
             CType::Enum(e) => Some(e),
             _ => None,
         }) {
@@ -98,7 +82,7 @@ impl<'a> DocGenerator<'a> {
         indented!(w, r"### Data Structs")?;
         indented!(w, r"Composite data used by functions and methods.")?;
 
-        for the_type in self.inventory.ctypes() {
+        for the_type in self.interop.inventory.ctypes() {
             match the_type {
                 CType::Composite(c) => {
                     let doc = c.meta().documentation().lines().first().cloned().unwrap_or_default();
@@ -123,10 +107,10 @@ impl<'a> DocGenerator<'a> {
         Ok(())
     }
 
-    pub fn write_types(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_types(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"# Types ")?;
 
-        for the_type in self.inventory().ctypes() {
+        for the_type in self.interop.inventory.ctypes() {
             match the_type {
                 CType::Composite(e) => self.write_composite(w, e)?,
                 CType::Pattern(p @ TypePattern::Option(_)) => self.write_composite(w, p.fallback_type().as_composite_type().unwrap())?,
@@ -142,7 +126,7 @@ impl<'a> DocGenerator<'a> {
         Ok(())
     }
 
-    pub fn write_composite(&self, w: &mut IndentWriter, composite: &CompositeType) -> Result<(), Error> {
+    fn write_composite(&self, w: &mut IndentWriter, composite: &CompositeType) -> Result<(), Error> {
         let meta = composite.meta();
 
         w.newline()?;
@@ -160,22 +144,22 @@ impl<'a> DocGenerator<'a> {
         indented!(w, r"#### Fields ")?;
         for f in composite.fields() {
             let doc = f.documentation().lines().join("\n");
-            let name = self.generator.converter().field_name_to_csharp_name(f, self.generator.config().rename_symbols);
+            let name = field_name_to_csharp_name(f, self.interop.rename_symbols);
             indented!(w, r"- **{}** - {} ", name, doc)?;
         }
 
         indented!(w, r"#### Definition ")?;
         indented!(w, r"```csharp")?;
-        self.generator.write_type_definition_composite_body(w, composite, WriteFor::Docs)?;
+        self.interop.write_type_definition_composite_body(w, composite, WriteFor::Docs)?;
         indented!(w, r"```")?;
 
         Ok(())
     }
 
-    pub fn write_enums(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_enums(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"# Enums ")?;
 
-        for the_type in self.inventory().ctypes() {
+        for the_type in self.interop.inventory.ctypes() {
             let CType::Enum(the_enum) = the_type else { continue };
             let meta = the_enum.meta();
 
@@ -198,7 +182,7 @@ impl<'a> DocGenerator<'a> {
 
             indented!(w, r"#### Definition ")?;
             indented!(w, r"```csharp")?;
-            self.generator.write_type_definition_enum(w, the_enum, WriteFor::Docs)?;
+            self.interop.write_type_definition_enum(w, the_enum, WriteFor::Docs)?;
             indented!(w, r"```")?;
             w.newline()?;
             indented!(w, r"---")?;
@@ -208,10 +192,10 @@ impl<'a> DocGenerator<'a> {
         Ok(())
     }
 
-    pub fn write_functions(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_functions(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"# Functions")?;
 
-        for the_type in non_service_functions(self.inventory()) {
+        for the_type in non_service_functions(&self.interop.inventory) {
             self.write_function(w, the_type)?;
         }
 
@@ -230,7 +214,7 @@ impl<'a> DocGenerator<'a> {
 
         indented!(w, r"#### Definition ")?;
         indented!(w, r"```csharp")?;
-        self.generator.write_function(w, function, WriteFor::Docs)?;
+        self.interop.write_function(w, function, WriteFor::Docs)?;
         indented!(w, r"```")?;
         w.newline()?;
         indented!(w, r"---")?;
@@ -239,10 +223,10 @@ impl<'a> DocGenerator<'a> {
         Ok(())
     }
 
-    pub fn write_services(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_services(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"# Classes")?;
 
-        for pattern in self.inventory.patterns().iter().map(|x| match x {
+        for pattern in self.interop.inventory.patterns().iter().map(|x| match x {
             LibraryPattern::Service(s) => s,
             _ => panic!("Pattern not explicitly handled"),
         }) {
@@ -261,10 +245,7 @@ impl<'a> DocGenerator<'a> {
             }
 
             for x in pattern.constructors() {
-                let fname = self
-                    .generator
-                    .converter()
-                    .function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
+                let fname = function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
                 let target = fname.to_string();
                 indented!(w, r#"### <a name="{}">**{}**</a> <sup>ctor</sup>"#, target, target)?;
 
@@ -278,7 +259,7 @@ impl<'a> DocGenerator<'a> {
                 w.newline()?;
                 indented!(w, r"#### Definition ")?;
                 indented!(w, r"```csharp")?;
-                self.generator
+                self.interop
                     .write_pattern_service_method(w, pattern, x, class_name, &fname, true, true, WriteFor::Docs)?;
                 indented!(w, r"```")?;
                 w.newline()?;
@@ -287,16 +268,13 @@ impl<'a> DocGenerator<'a> {
             }
 
             for x in pattern.methods() {
-                let fname = self
-                    .generator
-                    .converter()
-                    .function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
+                let fname = function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
                 let target = fname.to_string();
 
                 let rval = match x.signature().rval() {
                     CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
                     CType::Pattern(TypePattern::CStrPointer) => "string".to_string(),
-                    _ => self.generator.converter().to_typespecifier_in_rval(x.signature().rval()),
+                    _ => to_typespecifier_in_rval(x.signature().rval()),
                 };
 
                 indented!(w, r#"### <a name="{}">**{}**</a>"#, target, target)?;
@@ -312,12 +290,12 @@ impl<'a> DocGenerator<'a> {
                 w.newline()?;
                 indented!(w, r"#### Definition ")?;
                 indented!(w, r"```csharp")?;
-                indented!(w, r"{} class {} {{", self.generator.config().visibility_types.to_access_modifier(), class_name)?;
+                indented!(w, r"{} class {} {{", self.interop.visibility_types.to_access_modifier(), class_name)?;
                 w.indent();
-                self.generator
+                self.interop
                     .write_pattern_service_method(w, pattern, x, &rval, &fname, false, false, WriteFor::Docs)?;
 
-                self.generator.write_service_method_overload(w, pattern, x, &fname, WriteFor::Docs)?;
+                self.interop.write_service_method_overload(w, pattern, x, &fname, WriteFor::Docs)?;
                 w.unindent();
                 indented!(w, r"}}")?;
                 indented!(w, r"```")?;
@@ -333,8 +311,8 @@ impl<'a> DocGenerator<'a> {
         Ok(())
     }
 
-    pub fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        writeln!(w.writer(), "{}", self.config().header)?;
+    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        writeln!(w.writer(), "{}", self.config.header)?;
 
         self.write_toc(w)?;
         self.write_types(w)?;
@@ -346,18 +324,10 @@ impl<'a> DocGenerator<'a> {
 
         Ok(())
     }
+}
 
-    pub fn write_file<P: AsRef<Path>>(&self, file_name: P) -> Result<(), Error> {
-        let mut file = File::create(file_name)?;
-        let mut writer = IndentWriter::new(&mut file);
-
-        self.write_to(&mut writer)
-    }
-
-    pub fn write_string(&self) -> Result<String, Error> {
-        let mut vec = Vec::new();
-        let mut writer = IndentWriter::new(&mut vec);
-        self.write_to(&mut writer)?;
-        Ok(String::from_utf8(vec)?)
+impl Bindings for Documentation<'_> {
+    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        self.write_to(w)
     }
 }

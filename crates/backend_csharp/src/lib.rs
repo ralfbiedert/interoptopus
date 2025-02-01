@@ -30,7 +30,7 @@
 //!     InventoryBuilder::new()
 //!         .register(function!(my_function))
 //!         .validate()
-//!         .inventory()
+//!         .build()
 //! }
 //! ```
 //!
@@ -113,12 +113,9 @@
 
 #![allow(clippy::test_attr_in_doctest)]
 
-mod config;
 mod converter;
 mod docs;
 mod generator;
 
-pub use config::{CSharpVisibility, Config, ConfigBuilder, DocConfig, Unsupported, WriteTypes};
-pub use converter::{CSharpTypeConverter, Converter};
-pub use docs::DocGenerator;
-pub use generator::Generator;
+pub use docs::{DocConfig, Documentation};
+pub use generator::{FunctionNameFlavor, Interop, InteropBuilder, InteropBuilderError, Unsupported, Visibility, WriteTypes};

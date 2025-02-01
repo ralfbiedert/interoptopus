@@ -1,6 +1,6 @@
 use anyhow::Error;
 use interoptopus::{ffi_function, ffi_type, function, Bindings, InventoryBuilder};
-use interoptopus_backend_csharp::{ConfigBuilder, Generator, WriteTypes};
+use interoptopus_backend_csharp::{InteropBuilder, WriteTypes};
 
 #[ffi_type(error)]
 enum FFIError {
@@ -25,9 +25,8 @@ fn doesnt_return_error() {}
 
 #[test]
 fn has_exception() -> Result<(), Error> {
-    let inventory = InventoryBuilder::new().register(function!(return_error)).inventory();
-    let config = ConfigBuilder::default().write_types(WriteTypes::All).build()?;
-    let generated = Generator::new(config, inventory).to_string()?;
+    let inventory = InventoryBuilder::new().register(function!(return_error)).build();
+    let generated = InteropBuilder::default().inventory(inventory).write_types(WriteTypes::All).build()?.to_string()?;
 
     assert!(generated.contains("InteropException"));
 
@@ -36,9 +35,8 @@ fn has_exception() -> Result<(), Error> {
 
 #[test]
 fn no_exception() -> Result<(), Error> {
-    let inventory = InventoryBuilder::new().register(function!(doesnt_return_error)).inventory();
-    let config = ConfigBuilder::default().write_types(WriteTypes::All).build()?;
-    let generated = Generator::new(config, inventory).to_string()?;
+    let inventory = InventoryBuilder::new().register(function!(doesnt_return_error)).build();
+    let generated = InteropBuilder::default().inventory(inventory).write_types(WriteTypes::All).build()?.to_string()?;
 
     assert!(!generated.contains("InteropException"));
 

@@ -31,7 +31,7 @@
 //!     InventoryBuilder::new()
 //!         .register(function!(my_function))
 //!         .validate()
-//!         .inventory()
+//!         .build()
 //! }
 //! ```
 //!
