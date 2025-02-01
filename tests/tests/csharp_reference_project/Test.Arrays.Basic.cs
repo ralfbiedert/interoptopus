@@ -17,6 +17,7 @@ public class TestArrayBasic
     [Theory]
     [InlineData(new byte[] { })]
     [InlineData(new byte[] { 1, 2, 3 })]
+    [InlineData(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 })]
     [InlineData(null)]
     public void array_1_throws(byte[] array)
     {
