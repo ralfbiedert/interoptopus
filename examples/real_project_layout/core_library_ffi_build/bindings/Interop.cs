@@ -2,9 +2,11 @@
 
 #pragma warning disable 0105
 using System;
+using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 using System.Runtime.CompilerServices;
 using My.Company;
 #pragma warning restore 0105
@@ -18,6 +20,7 @@ namespace My.Company
         static Interop()
         {
         }
+
 
 
         [LibraryImport(NativeLib, EntryPoint = "start_server")]

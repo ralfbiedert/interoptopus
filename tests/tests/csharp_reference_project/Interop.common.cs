@@ -2,9 +2,11 @@
 
 #pragma warning disable 0105
 using System;
+using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 using System.Runtime.CompilerServices;
 using My.Company;
 using My.Company.Common;
@@ -650,14 +652,56 @@ namespace My.Company.Common
 
     ///Option type containing boolean flag and maybe valid data.
     [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
+    [NativeMarshalling(typeof(OptionVecMarshaller))]
     public partial struct OptionVec
     {
         ///Element that is maybe valid.
-        Vec t;
+        internal Vec t;
         ///Byte where `1` means element `t` is valid.
-        byte is_some;
+        internal byte is_some;
     }
+
+    [CustomMarshaller(typeof(OptionVec), MarshalMode.Default, typeof(OptionVecMarshaller))]
+    internal static class OptionVecMarshaller
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public Vec t;
+            public byte is_some;
+        }
+
+        public static Unmanaged ConvertToUnmanaged(OptionVec managed)
+        {
+            var result = new Unmanaged
+            {
+                t = managed.t,
+                is_some = managed.is_some,
+            };
+
+            unsafe
+            {
+            }
+
+            return result;
+        }
+
+        public static OptionVec ConvertToManaged(Unmanaged unmanaged)
+        {
+            var result = new OptionVec()
+            {
+                t = unmanaged.t,
+                is_some = unmanaged.is_some,
+            };
+
+            unsafe
+            {
+            }
+
+            return result;
+        }
+    }
+
 
     public partial struct OptionVec
     {

@@ -2,9 +2,11 @@
 
 #pragma warning disable 0105
 using System;
+using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 using System.Runtime.CompilerServices;
 using My.Company;
 using My.Company.Common;
@@ -19,9 +21,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 6541958231137371810ul)
+            if (api_version != 12952263558137678611ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (6541958231137371810). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (12952263558137678611). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -139,6 +141,30 @@ namespace My.Company
 
         [LibraryImport(NativeLib, EntryPoint = "array_1")]
         public static partial byte array_1(Array x);
+
+        [LibraryImport(NativeLib, EntryPoint = "array_2")]
+        public static partial Array array_2();
+
+        [LibraryImport(NativeLib, EntryPoint = "array_3")]
+        public static partial void array_3(out Array arr);
+
+        [LibraryImport(NativeLib, EntryPoint = "nested_array_1")]
+        public static partial NestedArray nested_array_1();
+
+        [LibraryImport(NativeLib, EntryPoint = "nested_array_2")]
+        public static partial void nested_array_2(out NestedArray result);
+
+        [LibraryImport(NativeLib, EntryPoint = "nested_array_3")]
+        public static partial byte nested_array_3(NestedArray input);
+
+        [LibraryImport(NativeLib, EntryPoint = "char_array_1")]
+        public static partial CharArray char_array_1();
+
+        [LibraryImport(NativeLib, EntryPoint = "char_array_2")]
+        public static partial CharArray char_array_2(CharArray arr);
+
+        [LibraryImport(NativeLib, EntryPoint = "char_array_3")]
+        public static partial byte char_array_3(ref CharArray arr);
 
         /// This function has documentation.
         [LibraryImport(NativeLib, EntryPoint = "documented")]
@@ -961,10 +987,87 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
+    public partial struct CharArray
+    {
+        public sbyte str0;
+        public sbyte str1;
+        public sbyte str2;
+        public sbyte str3;
+        public sbyte str4;
+        public sbyte str5;
+        public sbyte str6;
+        public sbyte str7;
+        public sbyte str8;
+        public sbyte str9;
+        public sbyte str10;
+        public sbyte str11;
+        public sbyte str12;
+        public sbyte str13;
+        public sbyte str14;
+        public sbyte str15;
+        public sbyte str16;
+        public sbyte str17;
+        public sbyte str18;
+        public sbyte str19;
+        public sbyte str20;
+        public sbyte str21;
+        public sbyte str22;
+        public sbyte str23;
+        public sbyte str24;
+        public sbyte str25;
+        public sbyte str26;
+        public sbyte str27;
+        public sbyte str28;
+        public sbyte str29;
+        public sbyte str30;
+        public sbyte str31;
+    }
+
+    [Serializable]
+    [NativeMarshalling(typeof(ContainerMarshaller))]
     public partial struct Container
     {
         public Local foreign;
     }
+
+    [CustomMarshaller(typeof(Container), MarshalMode.Default, typeof(ContainerMarshaller))]
+    internal static class ContainerMarshaller
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public Local foreign;
+        }
+
+        public static Unmanaged ConvertToUnmanaged(Container managed)
+        {
+            var result = new Unmanaged
+            {
+                foreign = managed.foreign,
+            };
+
+            unsafe
+            {
+            }
+
+            return result;
+        }
+
+        public static Container ConvertToManaged(Unmanaged unmanaged)
+        {
+            var result = new Container()
+            {
+                foreign = unmanaged.foreign,
+            };
+
+            unsafe
+            {
+            }
+
+            return result;
+        }
+    }
+
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
@@ -1000,6 +1103,84 @@ namespace My.Company
     {
         uint x;
     }
+
+    [Serializable]
+    [NativeMarshalling(typeof(NestedArrayMarshaller))]
+    public partial struct NestedArray
+    {
+        public EnumRenamed field_enum;
+        public Vec3f32 field_vec;
+        public bool field_bool;
+        public int field_int;
+        public ushort field_array0;
+        public ushort field_array1;
+        public ushort field_array2;
+        public ushort field_array3;
+        public ushort field_array4;
+        public Array field_struct;
+    }
+
+    [CustomMarshaller(typeof(NestedArray), MarshalMode.Default, typeof(NestedArrayMarshaller))]
+    internal static class NestedArrayMarshaller
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public EnumRenamed field_enum;
+            public Vec3f32 field_vec;
+            public sbyte field_bool;
+            public int field_int;
+            public fixed ushort field_array[5];
+            public Array field_struct;
+        }
+
+        public static Unmanaged ConvertToUnmanaged(NestedArray managed)
+        {
+            var result = new Unmanaged
+            {
+                field_enum = managed.field_enum,
+                field_vec = managed.field_vec,
+                field_bool = Convert.ToSByte(managed.field_bool),
+                field_int = managed.field_int,
+                field_struct = managed.field_struct,
+            };
+
+            unsafe
+            {
+                result.field_array[0] = managed.field_array0;
+                result.field_array[1] = managed.field_array1;
+                result.field_array[2] = managed.field_array2;
+                result.field_array[3] = managed.field_array3;
+                result.field_array[4] = managed.field_array4;
+            }
+
+            return result;
+        }
+
+        public static NestedArray ConvertToManaged(Unmanaged unmanaged)
+        {
+            var result = new NestedArray()
+            {
+                field_enum = unmanaged.field_enum,
+                field_vec = unmanaged.field_vec,
+                field_bool = Convert.ToBoolean(unmanaged.field_bool),
+                field_int = unmanaged.field_int,
+                field_struct = unmanaged.field_struct,
+            };
+
+            unsafe
+            {
+                result.field_array0 = unmanaged.field_array[0];
+                result.field_array1 = unmanaged.field_array[1];
+                result.field_array2 = unmanaged.field_array[2];
+                result.field_array3 = unmanaged.field_array[3];
+                result.field_array4 = unmanaged.field_array[4];
+            }
+
+            return result;
+        }
+    }
+
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -1734,14 +1915,56 @@ namespace My.Company
 
     ///Option type containing boolean flag and maybe valid data.
     [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
+    [NativeMarshalling(typeof(OptionInnerMarshaller))]
     public partial struct OptionInner
     {
         ///Element that is maybe valid.
-        Inner t;
+        internal Inner t;
         ///Byte where `1` means element `t` is valid.
-        byte is_some;
+        internal byte is_some;
     }
+
+    [CustomMarshaller(typeof(OptionInner), MarshalMode.Default, typeof(OptionInnerMarshaller))]
+    internal static class OptionInnerMarshaller
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public Inner t;
+            public byte is_some;
+        }
+
+        public static Unmanaged ConvertToUnmanaged(OptionInner managed)
+        {
+            var result = new Unmanaged
+            {
+                t = managed.t,
+                is_some = managed.is_some,
+            };
+
+            unsafe
+            {
+            }
+
+            return result;
+        }
+
+        public static OptionInner ConvertToManaged(Unmanaged unmanaged)
+        {
+            var result = new OptionInner()
+            {
+                t = unmanaged.t,
+                is_some = unmanaged.is_some,
+            };
+
+            unsafe
+            {
+            }
+
+            return result;
+        }
+    }
+
 
     public partial struct OptionInner
     {
