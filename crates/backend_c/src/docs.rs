@@ -1,3 +1,4 @@
+use crate::interop::{write_function_declaration, write_type_definition};
 use crate::Interop;
 use interoptopus::lang::c::{CType, Function};
 use interoptopus::util::sort_types_by_dependencies;
@@ -53,7 +54,7 @@ impl<'a> Markdown<'a> {
         }
 
         indented!(w, r"```")?;
-        self.interop.write_type_definition(w, the_type, known_function_pointers)?;
+        write_type_definition(&self.interop, w, the_type, known_function_pointers)?;
         indented!(w, r"```")?;
 
         Ok(())
@@ -81,7 +82,7 @@ impl<'a> Markdown<'a> {
         }
 
         indented!(w, r"```")?;
-        self.interop.write_function_declaration(w, function, 80)?;
+        write_function_declaration(&self.interop, w, function, 80)?;
         indented!(w, r"```")?;
 
         w.newline()?;
