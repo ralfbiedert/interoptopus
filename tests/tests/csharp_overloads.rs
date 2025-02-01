@@ -7,7 +7,7 @@ use tests::validate_output;
 
 #[test]
 fn dotnet() -> Result<(), Error> {
-    let generated = InteropBuilder::default()
+    let generated = InteropBuilder::new()
         .inventory(ffi_inventory())
         .namespace_mappings(common_namespace_mappings())
         .build()?

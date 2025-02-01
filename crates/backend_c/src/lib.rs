@@ -115,5 +115,5 @@ mod converters;
 mod docs;
 mod generator;
 
-pub use docs::Documentation;
+pub use docs::Markdown;
 pub use generator::{DocStyle, Functions, Indentation, Interop, InteropBuilder, NameCase};

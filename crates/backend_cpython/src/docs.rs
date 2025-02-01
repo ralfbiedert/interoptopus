@@ -7,19 +7,20 @@ use interoptopus::{Bindings, Error};
 
 /// Configures Python documentation generation.
 #[derive(Clone, Debug, Default)]
-pub struct DocConfig {
+pub struct MarkdownConfig {
     /// Header to append to the generated documentation.
     pub header: String,
 }
 
-pub struct Documentation<'a> {
+/// Produces Python API documentation.
+pub struct Markdown<'a> {
     interop: &'a Interop,
-    doc_config: DocConfig,
+    doc_config: MarkdownConfig,
 }
 
-impl<'a> Documentation<'a> {
+impl<'a> Markdown<'a> {
     #[must_use]
-    pub const fn new(interop: &'a Interop, doc_config: DocConfig) -> Self {
+    pub const fn new(interop: &'a Interop, doc_config: MarkdownConfig) -> Self {
         Self { interop, doc_config }
     }
 
@@ -309,7 +310,7 @@ impl<'a> Documentation<'a> {
     }
 }
 
-impl Bindings for Documentation<'_> {
+impl Bindings for Markdown<'_> {
     fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.write_to(w)
     }

@@ -138,5 +138,5 @@ mod converter;
 mod docs;
 mod generator;
 
-pub use docs::Documentation;
+pub use docs::Markdown;
 pub use generator::{Interop, InteropBuilder, InteropBuilderError};

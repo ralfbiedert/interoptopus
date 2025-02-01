@@ -7,7 +7,7 @@ use tests::validate_output;
 
 #[test]
 fn all() -> Result<(), Error> {
-    let generated = InteropBuilder::default()
+    let generated = InteropBuilder::new()
         .inventory(ffi_inventory())
         .namespace_mappings(common_namespace_mappings())
         .write_types(WriteTypes::All)
@@ -21,7 +21,7 @@ fn all() -> Result<(), Error> {
 
 #[test]
 fn namespace() -> Result<(), Error> {
-    let generated = InteropBuilder::default()
+    let generated = InteropBuilder::new()
         .inventory(ffi_inventory())
         .namespace_mappings(common_namespace_mappings())
         .write_types(WriteTypes::Namespace)
@@ -35,7 +35,7 @@ fn namespace() -> Result<(), Error> {
 
 #[test]
 fn namespace_and_global() -> Result<(), Error> {
-    let generated = InteropBuilder::default()
+    let generated = InteropBuilder::new()
         .inventory(ffi_inventory())
         .namespace_mappings(common_namespace_mappings())
         .write_types(WriteTypes::NamespaceAndInteroptopusGlobal)

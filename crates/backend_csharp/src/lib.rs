@@ -117,5 +117,5 @@ mod converter;
 mod docs;
 mod generator;
 
-pub use docs::{DocConfig, Documentation};
+pub use docs::{Markdown, MarkdownConfig};
 pub use generator::{FunctionNameFlavor, Interop, InteropBuilder, InteropBuilderError, Unsupported, Visibility, WriteTypes};

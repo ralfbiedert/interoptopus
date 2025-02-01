@@ -5,12 +5,12 @@ use interoptopus::writer::IndentWriter;
 use interoptopus::Error;
 use interoptopus::{indented, Bindings};
 
-/// Writes documentation for C bindings.
-pub struct Documentation<'a> {
+/// Produces C API documentation.
+pub struct Markdown<'a> {
     interop: &'a Interop,
 }
 
-impl<'a> Documentation<'a> {
+impl<'a> Markdown<'a> {
     #[must_use]
     pub const fn new(interop: &'a Interop) -> Self {
         Self { interop }
@@ -99,7 +99,7 @@ impl<'a> Documentation<'a> {
     }
 }
 
-impl Bindings for Documentation<'_> {
+impl Bindings for Markdown<'_> {
     fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.write_to(w)
     }

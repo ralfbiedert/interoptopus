@@ -25,7 +25,7 @@ fn sample_function() -> FFIError {
 fn enabled() -> Result<(), Error> {
     let inventory = InventoryBuilder::new().register(function!(sample_function)).build();
 
-    let generated = InteropBuilder::default()
+    let generated = InteropBuilder::new()
         .inventory(inventory)
         .namespace_mappings(common_namespace_mappings())
         .error_text("MY ERROR TEXT {}".to_string())

@@ -13,7 +13,7 @@ fn ffi_inventory() -> Inventory {
 
 #[test]
 fn inline() -> Result<(), Error> {
-    let generated = InteropBuilder::default()
+    let generated = InteropBuilder::new()
         .inventory(ffi_inventory())
         .documentation(DocStyle::Inline)
         .build()?
@@ -27,11 +27,7 @@ fn inline() -> Result<(), Error> {
 
 #[test]
 fn none() -> Result<(), Error> {
-    let generated = InteropBuilder::default()
-        .inventory(ffi_inventory())
-        .documentation(DocStyle::None)
-        .build()?
-        .to_string()?;
+    let generated = InteropBuilder::new().inventory(ffi_inventory()).documentation(DocStyle::None).build()?.to_string()?;
 
     validate_output!("tests", "c_docs_none.h", generated.as_str());
     compile_output_c!(generated.as_str());

@@ -10,7 +10,7 @@ use interoptopus_backend_csharp::InteropBuilder;
 // to run both `cargo build` to produce the `.dll` and `cargo test`
 // to produce the bindings (since `cargo test` does not imply `cargo build`).
 fn main() {
-    InteropBuilder::default()
+    InteropBuilder::new()
         .inventory(ffi_inventory())
         // You might also want to consider writing to `OUT_DIR` instead, since
         // writing to any other place from a `build.rs` is discouraged (we do

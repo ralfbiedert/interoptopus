@@ -26,7 +26,7 @@ fn doesnt_return_error() {}
 #[test]
 fn has_exception() -> Result<(), Error> {
     let inventory = InventoryBuilder::new().register(function!(return_error)).build();
-    let generated = InteropBuilder::default().inventory(inventory).write_types(WriteTypes::All).build()?.to_string()?;
+    let generated = InteropBuilder::new().inventory(inventory).write_types(WriteTypes::All).build()?.to_string()?;
 
     assert!(generated.contains("InteropException"));
 
@@ -36,7 +36,7 @@ fn has_exception() -> Result<(), Error> {
 #[test]
 fn no_exception() -> Result<(), Error> {
     let inventory = InventoryBuilder::new().register(function!(doesnt_return_error)).build();
-    let generated = InteropBuilder::default().inventory(inventory).write_types(WriteTypes::All).build()?.to_string()?;
+    let generated = InteropBuilder::new().inventory(inventory).write_types(WriteTypes::All).build()?.to_string()?;
 
     assert!(!generated.contains("InteropException"));
 

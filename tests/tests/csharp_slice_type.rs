@@ -14,7 +14,7 @@ fn ffi_inventory() -> Inventory {
 
 #[test]
 fn spans_work() -> Result<(), Error> {
-    let generated = InteropBuilder::default()
+    let generated = InteropBuilder::new()
         .inventory(ffi_inventory())
         .namespace_mappings(common_namespace_mappings())
         .build()?

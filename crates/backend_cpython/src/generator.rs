@@ -7,7 +7,7 @@ use interoptopus::util::{longest_common_prefix, safe_name, sort_types_by_depende
 use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, non_service_functions, Bindings, Error, Inventory};
 
-/// **Start here**, main converter implementing [`Bindings`].
+/// Generates Python `ctypes` files, **get this with [`InteropBuilder`]**.🐙
 #[derive(Clone, Debug, Default, Builder)]
 #[builder(default)]
 pub struct Interop {
@@ -18,14 +18,8 @@ pub struct Interop {
     pub(crate) inventory: Inventory,
 }
 
-/// Writes the Python file format, `impl` this trait to customize output.
 #[allow(clippy::unused_self)]
 impl Interop {
-    #[must_use]
-    pub fn new(inventory: Inventory) -> Self {
-        Self { inventory, ..Self::default() }
-    }
-
     fn write_imports(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"from __future__ import annotations")?;
         indented!(w, r"import ctypes")?;
@@ -740,5 +734,13 @@ impl Interop {
 impl Bindings for Interop {
     fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.write_to(w)
+    }
+}
+
+impl InteropBuilder {
+    /// Creates a new builder instance, **start here**.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
     }
 }

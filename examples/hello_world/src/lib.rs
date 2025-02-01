@@ -28,7 +28,7 @@ fn generate_bindings() {
         .build();
 
 
-    InteropBuilder::default()
+    InteropBuilder::new()
         .inventory(inventory)
         .build().unwrap()
         .write_file("bindings/Interop.cs")

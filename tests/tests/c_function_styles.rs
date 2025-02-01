@@ -13,7 +13,7 @@ fn ffi_inventory() -> Inventory {
 
 #[test]
 fn forward() -> Result<(), Error> {
-    let generated = InteropBuilder::default()
+    let generated = InteropBuilder::new()
         .inventory(ffi_inventory())
         .function_style(Functions::ForwardDeclarations)
         .build()?
@@ -27,7 +27,7 @@ fn forward() -> Result<(), Error> {
 
 #[test]
 fn typedef() -> Result<(), Error> {
-    let generated = InteropBuilder::default()
+    let generated = InteropBuilder::new()
         .inventory(interoptopus_reference_project::ffi_inventory())
         .function_style(Functions::Typedefs)
         .build()?

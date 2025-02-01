@@ -6,7 +6,7 @@ use tests::{compile_output_c, validate_output};
 
 #[test]
 fn inline() -> Result<(), Error> {
-    let generated = InteropBuilder::default()
+    let generated = InteropBuilder::new()
         .inventory(ffi_inventory())
         .documentation(DocStyle::Inline)
         .build()?

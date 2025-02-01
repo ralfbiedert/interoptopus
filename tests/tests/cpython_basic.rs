@@ -7,7 +7,7 @@ use tests::validate_output;
 
 #[test]
 fn bindings_work() -> Result<(), Error> {
-    let generated = InteropBuilder::default().inventory(ffi_inventory()).build()?.to_string()?;
+    let generated = InteropBuilder::new().inventory(ffi_inventory()).build()?.to_string()?;
 
     validate_output!("tests", "cpython_basic.py", generated.as_str());
     run_python_if_installed("tests", "cpython_basic.py")?;

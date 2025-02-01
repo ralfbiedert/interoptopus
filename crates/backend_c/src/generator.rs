@@ -13,7 +13,7 @@ use interoptopus::writer::IndentWriter;
 use interoptopus::{indented, Bindings};
 use interoptopus::{Error, Inventory};
 
-/// Function style used in generated C code
+/// How to lay out functions.
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
 pub enum Functions {
     Typedefs,
@@ -21,7 +21,7 @@ pub enum Functions {
     ForwardDeclarations,
 }
 
-/// Indentation style used in generated C code
+/// How to indent (Allman, K&R, ...)
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
 pub enum Indentation {
     /// Braces on their own lines, not indented
@@ -35,7 +35,7 @@ pub enum Indentation {
     Whitesmiths,
 }
 
-/// Naming style used in generated C code
+/// Naming style, like lower or UPPER case.
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
 pub enum NameCase {
     /// Names all in lowercase without spacing e.g. 'thetypename'
@@ -86,7 +86,7 @@ pub enum DocStyle {
     Inline,
 }
 
-/// Generates C header files, **start here**.
+/// Generates C header files, **get this with [`InteropBuilder`]**.🐙
 #[derive(Clone, Debug, Builder, Default)]
 #[builder(default)]
 pub struct Interop {
@@ -126,13 +126,7 @@ pub struct Interop {
     pub(crate) inventory: Inventory,
 }
 
-/// Writes the C file format, `impl` this trait to customize output.
 impl Interop {
-    #[must_use]
-    pub fn new(inventory: Inventory) -> Self {
-        Self { inventory, ..Self::default() }
-    }
-
     pub(crate) fn inventory(&self) -> &Inventory {
         &self.inventory
     }
@@ -604,5 +598,13 @@ impl Interop {
 impl Bindings for Interop {
     fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.write_to(w)
+    }
+}
+
+impl InteropBuilder {
+    /// Creates a new builder instance, **start here**.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
     }
 }

@@ -105,7 +105,7 @@ impl Default for Interop {
     }
 }
 
-/// **Start here**, main converter implementing [`Bindings`].
+/// Generates C# interop files, **get this with [`InteropBuilder`]**.🐙
 #[derive(Clone, Debug, Builder)]
 #[builder(default)]
 #[allow(clippy::struct_excessive_bools)]
@@ -146,14 +146,8 @@ pub struct Interop {
     pub(crate) inventory: Inventory,
 }
 
-/// Writes the C# file format, `impl` this trait to customize output.
 #[allow(clippy::unused_self)]
 impl Interop {
-    #[must_use]
-    pub fn new(inventory: Inventory) -> Self {
-        Self { inventory, ..Self::default() }
-    }
-
     fn write_file_header_comments(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"{}", &self.file_header_comment)?;
         Ok(())
@@ -1940,5 +1934,13 @@ impl Interop {
 impl Bindings for Interop {
     fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.write_all(w)
+    }
+}
+
+impl InteropBuilder {
+    /// Creates a new builder instance, **start here**.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
     }
 }
