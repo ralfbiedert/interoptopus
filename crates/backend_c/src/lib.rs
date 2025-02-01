@@ -56,9 +56,9 @@
 //!
 //! #[test]
 //! fn bindings_c() -> Result<(), Error> {
-//!     use interoptopus_backend_c::{Config, Generator};
+//!     use interoptopus_backend_c::{Config, Interop};
 //!
-//!     Generator::new(
+//!     Interop::new(
 //!         Config {
 //!             ifndef: "example_library".to_string(),
 //!             ..Config::default()
@@ -111,11 +111,9 @@
 //! ```
 #![allow(clippy::test_attr_in_doctest)]
 
-mod config;
 mod converter;
 mod docs;
 mod generator;
 
-pub use config::{Config, ConfigBuilder, Documentation, Functions, Indentation, Naming};
 pub use docs::DocGenerator;
-pub use generator::Generator;
+pub use generator::{Documentation, Functions, Indentation, Interop, InteropBuilder, TypeNames};

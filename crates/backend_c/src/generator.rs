@@ -1,6 +1,6 @@
-use crate::config::{Documentation, Functions, Indentation, ToNamingStyle};
-use crate::converter::{CTypeConverter, Converter};
-use crate::Config;
+use crate::converter::Converter;
+use derive_builder::Builder;
+use heck::{ToLowerCamelCase, ToShoutySnakeCase, ToSnakeCase, ToUpperCamelCase};
 use interoptopus::lang::c;
 use interoptopus::lang::c::{CType, CompositeType, Constant, EnumType, Field, FnPointerType, Function, OpaqueType, Variant};
 use interoptopus::patterns::callbacks::NamedCallback;
@@ -10,30 +10,137 @@ use interoptopus::writer::IndentWriter;
 use interoptopus::{indented, Bindings};
 use interoptopus::{Error, Inventory};
 
+/// Function style used in generated C code
+#[derive(Clone, Debug, PartialEq, Eq, Default)]
+pub enum Functions {
+    Typedefs,
+    #[default]
+    ForwardDeclarations,
+}
+
+/// Indentation style used in generated C code
+#[derive(Clone, Debug, PartialEq, Eq, Default)]
+pub enum Indentation {
+    /// Braces on their own lines, not indented
+    Allman,
+    /// Opening brace on same line as declaration, closing brace on own line, not intended
+    KAndR,
+    /// Braces on their own lines, intended by two spaces
+    GNU,
+    /// Braces on their own lines, intended level with members
+    #[default]
+    Whitesmiths,
+}
+
+/// Naming style used in generated C code
+#[derive(Clone, Debug, PartialEq, Eq, Default)]
+pub enum TypeNames {
+    /// Names all in lowercase without spacing e.g. 'thetypename'
+    Lowercase,
+    /// Names all in uppercase without spacing e.g. 'THETYPENAME'
+    #[default]
+    Uppercase,
+    /// Names in mixed case starting with lowercase without spacing e.g. 'theTypeName'
+    LowerCamelCase,
+    /// Names in mixed case starting with uppercase without spacing e.g. '`TheTypeName`'
+    UpperCamelCase,
+    /// Names in lower case with '_' as spacing e.g. '`the_type_name`'
+    SnakeCase,
+    /// Names in upper case with '_' as spacing e.g. '`THE_TYPE_NAME`'
+    ShoutySnakeCase,
+}
+
+pub trait ToNamingStyle {
+    fn to_naming_style(&self, style: &TypeNames) -> String;
+}
+
+impl ToNamingStyle for String {
+    fn to_naming_style(&self, style: &TypeNames) -> String {
+        self.as_str().to_naming_style(style)
+    }
+}
+
+impl ToNamingStyle for &str {
+    fn to_naming_style(&self, style: &TypeNames) -> String {
+        match style {
+            TypeNames::Lowercase => self.to_lowercase(),
+            TypeNames::Uppercase => self.to_uppercase(),
+            TypeNames::LowerCamelCase => self.to_lower_camel_case(),
+            TypeNames::UpperCamelCase => self.to_upper_camel_case(),
+            TypeNames::SnakeCase => self.to_snake_case(),
+            TypeNames::ShoutySnakeCase => self.to_shouty_snake_case(),
+        }
+    }
+}
+
+/// Documentation style used in generated C code
+#[derive(Clone, Debug, PartialEq, Eq, Default)]
+pub enum Documentation {
+    // No documentation comments are added to header file
+    None,
+    // Documentation is added inline above relevant declaration
+    #[default]
+    Inline,
+}
+
 /// Generates C header files, **start here**.
-pub struct Generator {
-    config: Config,
+#[derive(Clone, Debug, Builder, Default)]
+#[builder(default)]
+pub struct Interop {
+    /// Whether to write conditional directives like `#ifndef _X`.
+    #[builder(default = "true")]
+    directives: bool,
+    /// Whether to write `#include <>` directives.
+    #[builder(default = "true")]
+    imports: bool,
+    /// Additional `#include` lines in the form of `<item.h>` or `"item.h"`.
+    additional_includes: Vec<String>,
+    /// The `_X` in `#ifndef _X` to be used.
+    #[builder(default = "\"interoptopus_generated\".to_string()")]
+    ifndef: String,
+    /// Multiline string with custom `#define` values.
+    custom_defines: String,
+    /// Prefix to be applied to any function, e.g., `__DLLATTR`.
+    function_attribute: String,
+    /// Comment at the very beginning of the file, e.g., `// (c) My Company.`
+    file_header_comment: String,
+    /// How to prefix everything, e.g., `my_company_`, will be capitalized for constants.
+    pub(crate) prefix: String,
+    /// How to indent code
+    indentation: Indentation,
+    /// How to add code documentation
+    documentation: Documentation,
+    /// How to convert type names
+    pub(crate) type_naming: TypeNames,
+    /// How to convert enum variant names
+    pub(crate) enum_variant_naming: TypeNames,
+    /// How to convert const names
+    pub(crate) const_naming: TypeNames,
+    /// How to convert function parameter names
+    function_parameter_naming: TypeNames,
+    /// How to emit functions
+    function_style: Functions,
     inventory: Inventory,
     converter: Converter,
 }
 
 /// Writes the C file format, `impl` this trait to customize output.
-impl Generator {
+impl Interop {
     #[must_use]
-    pub fn new(config: Config, inventory: Inventory) -> Self {
-        Self {
-            config: config.clone(),
-            inventory,
-            converter: Converter::new(config),
-        }
+    pub fn new(inventory: Inventory) -> Self {
+        Self { inventory, ..Self::default() }
+    }
+
+    pub(crate) fn inventory(&self) -> &Inventory {
+        &self.inventory
     }
 
     fn write_custom_defines(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        indented!(w, "{}", &self.config.custom_defines)
+        indented!(w, "{}", &self.custom_defines)
     }
 
     fn write_file_header_comments(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        indented!(w, "{}", &self.config.file_header_comment)
+        indented!(w, "{}", &self.file_header_comment)
     }
 
     fn write_imports(&self, w: &mut IndentWriter) -> Result<(), Error> {
@@ -41,7 +148,7 @@ impl Generator {
         indented!(w, r"#include <stdbool.h>")?;
 
         // Write any user supplied includes into the file.
-        for include in &self.config.additional_includes {
+        for include in &self.additional_includes {
             indented!(w, "#include {}", include)?;
         }
 
@@ -57,13 +164,13 @@ impl Generator {
     }
 
     fn write_constant(&self, w: &mut IndentWriter, constant: &Constant) -> Result<(), Error> {
-        let name = self.converter.const_name_to_name(constant);
+        let name = self.converter.const_name_to_name(self, constant);
         let the_type = match constant.the_type() {
             CType::Primitive(x) => self.converter.primitive_to_typename(x),
             _ => return Err(Error::Null),
         };
 
-        if self.config.documentation == Documentation::Inline {
+        if self.documentation == Documentation::Inline {
             self.write_documentation(w, constant.meta().documentation())?;
         }
 
@@ -81,16 +188,16 @@ impl Generator {
     }
 
     fn write_function(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
-        if self.config.documentation == Documentation::Inline {
+        if self.documentation == Documentation::Inline {
             self.write_documentation(w, function.meta().documentation())?;
         }
 
-        match self.config.function_style {
+        match self.function_style {
             Functions::Typedefs => self.write_function_as_typedef_declaration(w, function)?,
             Functions::ForwardDeclarations => self.write_function_declaration(w, function, 999)?,
         }
 
-        if self.config.documentation == crate::Documentation::Inline {
+        if self.documentation == Documentation::Inline {
             w.newline()?;
         }
 
@@ -98,8 +205,8 @@ impl Generator {
     }
 
     pub(crate) fn write_function_declaration(&self, w: &mut IndentWriter, function: &Function, max_line: usize) -> Result<(), Error> {
-        let attr = &self.config.function_attribute;
-        let rval = self.converter.to_type_specifier(function.signature().rval());
+        let attr = &self.function_attribute;
+        let rval = self.converter.to_type_specifier(self, function.signature().rval());
         let name = self.converter.function_name_to_c_name(function);
 
         let mut params = Vec::new();
@@ -109,16 +216,16 @@ impl Generator {
                 CType::Array(a) => {
                     params.push(format!(
                         "{} {}[{}]",
-                        self.converter.to_type_specifier(a.array_type()),
-                        p.name().to_naming_style(&self.config.function_parameter_naming),
+                        self.converter.to_type_specifier(self, a.array_type()),
+                        p.name().to_naming_style(&self.function_parameter_naming),
                         a.len(),
                     ));
                 }
                 _ => {
                     params.push(format!(
                         "{} {}",
-                        self.converter.to_type_specifier(p.the_type()),
-                        p.name().to_naming_style(&self.config.function_parameter_naming)
+                        self.converter.to_type_specifier(self, p.the_type()),
+                        p.name().to_naming_style(&self.function_parameter_naming)
                     ));
                 }
             }
@@ -141,7 +248,7 @@ impl Generator {
     }
 
     fn write_function_as_typedef_declaration(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
-        let rval = self.converter.to_type_specifier(function.signature().rval());
+        let rval = self.converter.to_type_specifier(self, function.signature().rval());
         let name = self.converter.function_name_to_c_name(function);
 
         let mut params = Vec::new();
@@ -149,10 +256,10 @@ impl Generator {
         for p in function.signature().params() {
             match p.the_type() {
                 CType::Array(a) => {
-                    params.push(format!("{} [{}]", self.converter.to_type_specifier(a.array_type()), a.len(),));
+                    params.push(format!("{} [{}]", self.converter.to_type_specifier(self, a.array_type()), a.len(),));
                 }
                 _ => {
-                    params.push(self.converter.to_type_specifier(p.the_type()).to_string());
+                    params.push(self.converter.to_type_specifier(self, p.the_type()).to_string());
                 }
             }
         }
@@ -238,12 +345,12 @@ impl Generator {
     }
 
     fn write_type_definition_fn_pointer_body(&self, w: &mut IndentWriter, the_type: &FnPointerType, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
-        let rval = self.converter.to_type_specifier(the_type.signature().rval());
-        let name = self.converter.fnpointer_to_typename(the_type);
+        let rval = self.converter.to_type_specifier(self, the_type.signature().rval());
+        let name = self.converter.fnpointer_to_typename(self, the_type);
 
         let mut params = Vec::new();
         for (i, param) in the_type.signature().params().iter().enumerate() {
-            params.push(format!("{} x{}", self.converter.to_type_specifier(param.the_type()), i));
+            params.push(format!("{} x{}", self.converter.to_type_specifier(self, param.the_type()), i));
         }
 
         let fn_pointer = format!("typedef {} (*{})({});", rval, name, params.join(", "));
@@ -261,15 +368,15 @@ impl Generator {
     }
 
     fn write_type_definition_named_callback_body(&self, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
-        let rval = self.converter.to_type_specifier(the_type.fnpointer().signature().rval());
-        let name = self.converter.named_callback_to_typename(the_type);
+        let rval = self.converter.to_type_specifier(self, the_type.fnpointer().signature().rval());
+        let name = self.converter.named_callback_to_typename(self, the_type);
 
         let mut params = Vec::new();
         for param in the_type.fnpointer().signature().params() {
             params.push(format!(
                 "{} {}",
-                self.converter.to_type_specifier(param.the_type()),
-                param.name().to_naming_style(&self.config.function_parameter_naming)
+                self.converter.to_type_specifier(self, param.the_type()),
+                param.name().to_naming_style(&self.function_parameter_naming)
             ));
         }
 
@@ -279,9 +386,9 @@ impl Generator {
     }
 
     fn write_type_definition_enum(&self, w: &mut IndentWriter, the_type: &EnumType) -> Result<(), Error> {
-        let name = self.converter.enum_to_typename(the_type);
+        let name = self.converter.enum_to_typename(self, the_type);
 
-        if self.config.documentation == Documentation::Inline {
+        if self.documentation == Documentation::Inline {
             self.write_documentation(w, the_type.meta().documentation())?;
         }
 
@@ -295,10 +402,10 @@ impl Generator {
     }
 
     fn write_type_definition_enum_variant(&self, w: &mut IndentWriter, variant: &Variant, the_enum: &EnumType) -> Result<(), Error> {
-        let variant_name = self.converter.enum_variant_to_name(the_enum, variant);
+        let variant_name = self.converter.enum_variant_to_name(self, the_enum, variant);
         let variant_value = variant.value();
 
-        if self.config.documentation == Documentation::Inline {
+        if self.documentation == Documentation::Inline {
             self.write_documentation(w, variant.documentation())?;
         }
 
@@ -306,13 +413,13 @@ impl Generator {
     }
 
     fn write_type_definition_opaque(&self, w: &mut IndentWriter, the_type: &OpaqueType) -> Result<(), Error> {
-        if self.config.documentation == Documentation::Inline {
+        if self.documentation == Documentation::Inline {
             self.write_documentation(w, the_type.meta().documentation())?;
         }
 
         self.write_type_definition_opaque_body(w, the_type)?;
 
-        if self.config.documentation == Documentation::Inline {
+        if self.documentation == Documentation::Inline {
             w.newline()?;
         }
 
@@ -320,16 +427,16 @@ impl Generator {
     }
 
     fn write_type_definition_opaque_body(&self, w: &mut IndentWriter, the_type: &OpaqueType) -> Result<(), Error> {
-        let name = self.converter.opaque_to_typename(the_type);
+        let name = self.converter.opaque_to_typename(self, the_type);
         indented!(w, r"typedef struct {} {};", name, name)
     }
 
     fn write_type_definition_composite(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
-        if self.config.documentation == crate::Documentation::Inline {
+        if self.documentation == Documentation::Inline {
             self.write_documentation(w, the_type.meta().documentation())?;
         }
 
-        let name = self.converter.composite_to_typename(the_type);
+        let name = self.converter.composite_to_typename(self, the_type);
 
         if the_type.is_empty() {
             // C doesn't allow us writing empty structs.
@@ -341,7 +448,7 @@ impl Generator {
     }
 
     fn write_type_definition_composite_body(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
-        let name = self.converter.composite_to_typename(the_type);
+        let name = self.converter.composite_to_typename(self, the_type);
 
         let alignment = the_type.repr().alignment();
         if let Some(align) = alignment {
@@ -363,41 +470,41 @@ impl Generator {
     }
 
     fn write_type_definition_composite_body_field(&self, w: &mut IndentWriter, field: &Field, _the_type: &CompositeType) -> Result<(), Error> {
-        if self.config.documentation == crate::Documentation::Inline {
+        if self.documentation == Documentation::Inline {
             self.write_documentation(w, field.documentation())?;
         }
 
         let field_name = field.name();
 
         if let CType::Array(x) = field.the_type() {
-            let type_name = self.converter.to_type_specifier(x.array_type());
+            let type_name = self.converter.to_type_specifier(self, x.array_type());
             indented!(w, r"{} {}[{}];", type_name, field_name, x.len())
         } else {
             let field_name = field.name();
-            let type_name = self.converter.to_type_specifier(field.the_type());
+            let type_name = self.converter.to_type_specifier(self, field.the_type());
             indented!(w, r"{} {};", type_name, field_name)
         }
     }
 
     fn write_ifndef(&self, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) -> Result<(), Error> {
-        if self.config.directives {
-            indented!(w, r"#ifndef {}", self.config.ifndef)?;
-            indented!(w, r"#define {}", self.config.ifndef)?;
+        if self.directives {
+            indented!(w, r"#ifndef {}", self.ifndef)?;
+            indented!(w, r"#define {}", self.ifndef)?;
             w.newline()?;
         }
 
         f(w)?;
 
-        if self.config.directives {
+        if self.directives {
             w.newline()?;
-            indented!(w, r"#endif /* {} */", self.config.ifndef)?;
+            indented!(w, r"#endif /* {} */", self.ifndef)?;
         }
 
         Ok(())
     }
 
     fn write_ifdefcpp(&self, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) -> Result<(), Error> {
-        if self.config.directives {
+        if self.directives {
             indented!(w, r"#ifdef __cplusplus")?;
             indented!(w, r#"extern "C" {{"#)?;
             indented!(w, r"#endif")?;
@@ -406,7 +513,7 @@ impl Generator {
 
         f(w)?;
 
-        if self.config.directives {
+        if self.directives {
             w.newline()?;
             indented!(w, r"#ifdef __cplusplus")?;
             indented!(w, r"}}")?;
@@ -421,7 +528,7 @@ impl Generator {
 
         self.write_ifndef(w, |w| {
             self.write_ifdefcpp(w, |w| {
-                if self.config.imports {
+                if self.imports {
                     self.write_imports(w)?;
                     w.newline()?;
                 }
@@ -447,7 +554,7 @@ impl Generator {
     }
 
     fn write_braced_declaration_opening(&self, w: &mut IndentWriter, definition: &str) -> Result<(), Error> {
-        match self.config.indentation {
+        match self.indentation {
             Indentation::Allman => {
                 indented!(w, "{}", definition)?;
                 indented!(w, "{{")?;
@@ -473,7 +580,7 @@ impl Generator {
     }
 
     fn write_braced_declaration_closing(&self, w: &mut IndentWriter, name: &str) -> Result<(), Error> {
-        match self.config.indentation {
+        match self.indentation {
             Indentation::Allman | Indentation::KAndR => {
                 w.unindent();
                 indented!(w, "}} {};", name)?;
@@ -492,7 +599,7 @@ impl Generator {
     }
 }
 
-impl Bindings for Generator {
+impl Bindings for Interop {
     fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.write_all(w)
     }

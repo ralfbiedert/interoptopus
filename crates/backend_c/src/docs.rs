@@ -1,25 +1,19 @@
-use crate::Generator;
+use crate::Interop;
 use interoptopus::lang::c::{CType, Function};
 use interoptopus::util::sort_types_by_dependencies;
 use interoptopus::writer::IndentWriter;
+use interoptopus::Error;
 use interoptopus::{indented, Bindings};
-use interoptopus::{Error, Inventory};
 
 /// Writes documentation for C bindings.
 pub struct DocGenerator<'a> {
-    generator: &'a Generator,
-    inventory: Inventory,
+    generator: &'a Interop,
 }
 
 impl<'a> DocGenerator<'a> {
     #[must_use]
-    pub const fn new(inventory: Inventory, generator: &'a Generator) -> Self {
-        Self { generator, inventory }
-    }
-
-    #[must_use]
-    pub(crate) const fn inventory(&self) -> &Inventory {
-        &self.inventory
+    pub const fn new(generator: &'a Interop) -> Self {
+        Self { generator }
     }
 
     fn write_types(&self, w: &mut IndentWriter) -> Result<(), Error> {
@@ -27,7 +21,7 @@ impl<'a> DocGenerator<'a> {
 
         let mut known_function_pointers = vec![];
 
-        for the_type in &sort_types_by_dependencies(self.inventory().ctypes().to_vec()) {
+        for the_type in &sort_types_by_dependencies(self.generator.inventory().ctypes().to_vec()) {
             self.write_type_definition(w, the_type, &mut known_function_pointers)?;
         }
 
@@ -68,7 +62,7 @@ impl<'a> DocGenerator<'a> {
     fn write_functions(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"# Functions ")?;
 
-        for the_type in self.inventory().functions() {
+        for the_type in self.generator.inventory().functions() {
             self.write_function(w, the_type)?;
         }
 
