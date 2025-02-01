@@ -14,7 +14,7 @@ fn ffi_inventory() -> Inventory {
 #[test]
 fn forward() -> Result<(), Error> {
     let generated = InteropBuilder::default()
-        .inventory(interoptopus_reference_project::ffi_inventory())
+        .inventory(ffi_inventory())
         .function_style(Functions::ForwardDeclarations)
         .build()?
         .to_string()?;

@@ -889,6 +889,7 @@ impl Generator {
         Ok(())
     }
 
+    #[allow(clippy::unused_self)]
     fn write_type_definition_composite_layout_annotation(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
         match the_type.repr().layout() {
             Layout::C | Layout::Transparent | Layout::Opaque => indented!(w, r"[StructLayout(LayoutKind.Sequential)]"),
@@ -1015,6 +1016,7 @@ impl Generator {
         }
     }
 
+    #[allow(dead_code)]
     fn has_emittable_marshallers(&self, types: &[CType]) -> bool {
         types.iter().any(|x| self.should_emit_marshaller(x))
     }
