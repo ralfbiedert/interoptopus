@@ -115,7 +115,7 @@
 
 mod converter;
 mod docs;
-mod interop;
+pub(crate) mod interop;
 
 pub use docs::{Markdown, MarkdownConfig};
 pub use interop::{FunctionNameFlavor, Interop, InteropBuilder, InteropBuilderError, Unsupported, Visibility, WriteTypes};

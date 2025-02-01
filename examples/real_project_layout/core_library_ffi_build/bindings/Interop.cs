@@ -105,7 +105,7 @@ namespace My.Company
         public static GameEngine New()
         {
             var self = new GameEngine();
-            var rval = Interop.game_engine_new(ref self._context);
+            var rval = Interop.game_engine_new(ref i._context);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);

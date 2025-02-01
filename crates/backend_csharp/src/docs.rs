@@ -1,4 +1,7 @@
 use crate::converter::{field_name_to_csharp_name, function_name_to_csharp_name, to_typespecifier_in_rval};
+use crate::interop::functions::write_function;
+use crate::interop::patterns::services::{write_pattern_service_method, write_service_method_overload};
+use crate::interop::types::{write_type_definition_composite_body, write_type_definition_enum};
 use crate::interop::FunctionNameFlavor;
 use crate::Interop;
 use interoptopus::lang::c::{CType, CompositeType, Function};
@@ -151,7 +154,7 @@ impl<'a> Markdown<'a> {
 
         indented!(w, r"#### Definition ")?;
         indented!(w, r"```csharp")?;
-        self.interop.write_type_definition_composite_body(w, composite, WriteFor::Docs)?;
+        write_type_definition_composite_body(self.interop, w, composite, WriteFor::Docs)?;
         indented!(w, r"```")?;
 
         Ok(())
@@ -183,7 +186,7 @@ impl<'a> Markdown<'a> {
 
             indented!(w, r"#### Definition ")?;
             indented!(w, r"```csharp")?;
-            self.interop.write_type_definition_enum(w, the_enum, WriteFor::Docs)?;
+            write_type_definition_enum(self.interop, w, the_enum, WriteFor::Docs)?;
             indented!(w, r"```")?;
             w.newline()?;
             indented!(w, r"---")?;
@@ -215,7 +218,7 @@ impl<'a> Markdown<'a> {
 
         indented!(w, r"#### Definition ")?;
         indented!(w, r"```csharp")?;
-        self.interop.write_function(w, function, WriteFor::Docs)?;
+        write_function(self.interop, w, function, WriteFor::Docs)?;
         indented!(w, r"```")?;
         w.newline()?;
         indented!(w, r"---")?;
@@ -260,8 +263,7 @@ impl<'a> Markdown<'a> {
                 w.newline()?;
                 indented!(w, r"#### Definition ")?;
                 indented!(w, r"```csharp")?;
-                self.interop
-                    .write_pattern_service_method(w, pattern, x, class_name, &fname, true, true, WriteFor::Docs)?;
+                write_pattern_service_method(self.interop, w, pattern, x, class_name, &fname, true, true, WriteFor::Docs)?;
                 indented!(w, r"```")?;
                 w.newline()?;
                 indented!(w, r"---")?;
@@ -293,10 +295,8 @@ impl<'a> Markdown<'a> {
                 indented!(w, r"```csharp")?;
                 indented!(w, r"{} class {} {{", self.interop.visibility_types.to_access_modifier(), class_name)?;
                 w.indent();
-                self.interop
-                    .write_pattern_service_method(w, pattern, x, &rval, &fname, false, false, WriteFor::Docs)?;
-
-                self.interop.write_service_method_overload(w, pattern, x, &fname, WriteFor::Docs)?;
+                write_pattern_service_method(self.interop, w, pattern, x, &rval, &fname, false, false, WriteFor::Docs)?;
+                write_service_method_overload(self.interop, w, pattern, x, &fname, WriteFor::Docs)?;
                 w.unindent();
                 indented!(w, r"}}")?;
                 indented!(w, r"```")?;

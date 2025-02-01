@@ -1,0 +1,67 @@
+pub mod abi_guard;
+pub mod options;
+pub mod services;
+pub mod slices;
+
+use crate::converter::to_typespecifier_in_param;
+use crate::interop::patterns::services::write_pattern_service;
+use crate::Interop;
+use interoptopus::lang::c::{CType, Parameter};
+use interoptopus::patterns::{LibraryPattern, TypePattern};
+use interoptopus::writer::IndentWriter;
+use interoptopus::Error;
+
+pub fn write_patterns(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
+    for pattern in i.inventory.patterns() {
+        match pattern {
+            LibraryPattern::Service(cls) => {
+                if i.should_emit_by_meta(cls.the_type().meta()) {
+                    write_pattern_service(i, w, cls)?;
+                }
+            }
+            _ => panic!("Pattern not explicitly handled"),
+        }
+    }
+
+    Ok(())
+}
+
+#[must_use]
+pub fn pattern_to_native_in_signature(param: &Parameter) -> String {
+    let slice_type_name = |mutable: bool, element_type: &CType| -> String {
+        if mutable {
+            format!("System.Span<{}>", to_typespecifier_in_param(element_type))
+        } else {
+            format!("System.ReadOnlySpan<{}>", to_typespecifier_in_param(element_type))
+        }
+    };
+    match param.the_type() {
+        CType::Pattern(p) => match p {
+            TypePattern::Slice(p) => {
+                let element_type = p.try_deref_pointer().expect("Must be pointer");
+                slice_type_name(false, &element_type)
+            }
+            TypePattern::SliceMut(p) => {
+                let element_type = p.try_deref_pointer().expect("Must be pointer");
+                slice_type_name(true, &element_type)
+            }
+            _ => to_typespecifier_in_param(param.the_type()),
+        },
+        CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {
+            CType::Pattern(x) => match x {
+                TypePattern::Slice(p) => {
+                    let element_type = p.try_deref_pointer().expect("Must be pointer");
+                    slice_type_name(false, &element_type)
+                }
+                TypePattern::SliceMut(p) => {
+                    let element_type = p.try_deref_pointer().expect("Must be pointer");
+                    slice_type_name(true, &element_type)
+                }
+                _ => to_typespecifier_in_param(param.the_type()),
+            },
+            _ => to_typespecifier_in_param(param.the_type()),
+        },
+
+        x => to_typespecifier_in_param(x),
+    }
+}

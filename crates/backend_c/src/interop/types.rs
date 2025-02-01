@@ -32,7 +32,6 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &CType
         CType::Opaque(o) => {
             write_type_definition_opaque(i, w, o)?;
         }
-
         CType::Composite(c) => {
             write_type_definition_composite(i, w, c)?;
             w.newline()?;
