@@ -134,12 +134,9 @@
 
 #![allow(clippy::test_attr_in_doctest)]
 
-mod config;
 mod converter;
 mod docs;
 mod generator;
 
-pub use config::{Config, ConfigBuilder, DocConfig};
-pub use converter::Converter;
-pub use docs::DocGenerator;
-pub use generator::Generator;
+pub use docs::Documentation;
+pub use generator::{Interop, InteropBuilder, InteropBuilderError};

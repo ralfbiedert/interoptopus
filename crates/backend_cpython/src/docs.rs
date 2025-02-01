@@ -1,46 +1,36 @@
-use crate::{DocConfig, Generator};
+use crate::Interop;
 use interoptopus::lang::c::{CType, CompositeType, Function};
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, non_service_functions};
-use interoptopus::{Error, Inventory};
-use std::fs::File;
-use std::path::Path;
+use interoptopus::{Bindings, Error};
 
-pub struct DocGenerator<'a> {
-    inventory: &'a Inventory,
-    generator: &'a Generator,
+/// Configures Python documentation generation.
+#[derive(Clone, Debug, Default)]
+pub struct DocConfig {
+    /// Header to append to the generated documentation.
+    pub header: String,
+}
+
+pub struct Documentation<'a> {
+    interop: &'a Interop,
     doc_config: DocConfig,
 }
 
-impl<'a> DocGenerator<'a> {
+impl<'a> Documentation<'a> {
     #[must_use]
-    pub const fn new(inventory: &'a Inventory, generator: &'a Generator, config: DocConfig) -> Self {
-        Self {
-            inventory,
-            generator,
-            doc_config: config,
-        }
+    pub const fn new(interop: &'a Interop, doc_config: DocConfig) -> Self {
+        Self { interop, doc_config }
     }
 
-    #[must_use]
-    pub const fn inventory(&self) -> &Inventory {
-        self.inventory
-    }
-
-    #[must_use]
-    pub const fn config(&self) -> &DocConfig {
-        &self.doc_config
-    }
-
-    pub fn write_toc(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_toc(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"## API Overview")?;
 
         w.newline()?;
         indented!(w, r"### Functions")?;
         indented!(w, r"Freestanding callables inside the module.")?;
 
-        for the_type in non_service_functions(self.inventory) {
+        for the_type in non_service_functions(&self.interop.inventory) {
             let doc = the_type.meta().documentation().lines().first().cloned().unwrap_or_default();
 
             indented!(w, r" - **[{}](#{})** - {}", the_type.name(), the_type.name(), doc)?;
@@ -50,7 +40,7 @@ impl<'a> DocGenerator<'a> {
         indented!(w, r"### Classes")?;
         indented!(w, r"Methods operating on common state.")?;
 
-        for pattern in self.inventory.patterns().iter().map(|x| match x {
+        for pattern in self.interop.inventory.patterns().iter().map(|x| match x {
             LibraryPattern::Service(s) => s,
             _ => panic!("Pattern not explicitly handled"),
         }) {
@@ -76,7 +66,7 @@ impl<'a> DocGenerator<'a> {
         indented!(w, r"### Enums")?;
         indented!(w, r"Groups of related constants.")?;
 
-        for the_type in self.inventory.ctypes().iter().filter_map(|x| match x {
+        for the_type in self.interop.inventory.ctypes().iter().filter_map(|x| match x {
             CType::Enum(e) => Some(e),
             _ => None,
         }) {
@@ -88,7 +78,7 @@ impl<'a> DocGenerator<'a> {
         indented!(w, r"### Data Structs")?;
         indented!(w, r"Composite data used by functions and methods.")?;
 
-        for the_type in self.inventory.ctypes() {
+        for the_type in self.interop.inventory.ctypes() {
             match the_type {
                 CType::Composite(c) => {
                     let doc = c.meta().documentation().lines().first().cloned().unwrap_or_default();
@@ -109,10 +99,10 @@ impl<'a> DocGenerator<'a> {
         Ok(())
     }
 
-    pub fn write_types(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_types(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"# Types ")?;
 
-        for the_type in self.inventory().ctypes() {
+        for the_type in self.interop.inventory.ctypes() {
             match the_type {
                 CType::Composite(e) => self.write_composite(w, e)?,
                 CType::Pattern(p @ TypePattern::Option(_)) => self.write_composite(w, p.fallback_type().as_composite_type().unwrap())?,
@@ -128,7 +118,7 @@ impl<'a> DocGenerator<'a> {
         Ok(())
     }
 
-    pub fn write_composite(&self, w: &mut IndentWriter, composite: &CompositeType) -> Result<(), Error> {
+    fn write_composite(&self, w: &mut IndentWriter, composite: &CompositeType) -> Result<(), Error> {
         let meta = composite.meta();
 
         w.newline()?;
@@ -151,16 +141,16 @@ impl<'a> DocGenerator<'a> {
 
         indented!(w, r"#### Definition ")?;
         indented!(w, r"```python")?;
-        self.generator.write_struct(w, composite, WriteFor::Docs)?;
+        self.interop.write_struct(w, composite, WriteFor::Docs)?;
         indented!(w, r"```")?;
 
         Ok(())
     }
 
-    pub fn write_enums(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_enums(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"# Enums ")?;
 
-        for the_type in self.inventory().ctypes() {
+        for the_type in self.interop.inventory.ctypes() {
             let CType::Enum(the_enum) = the_type else { continue };
             let meta = the_enum.meta();
 
@@ -183,7 +173,7 @@ impl<'a> DocGenerator<'a> {
 
             indented!(w, r"#### Definition ")?;
             indented!(w, r"```python")?;
-            self.generator.write_enum(w, the_enum, WriteFor::Docs)?;
+            self.interop.write_enum(w, the_enum, WriteFor::Docs)?;
             indented!(w, r"```")?;
             w.newline()?;
             indented!(w, r"---")?;
@@ -193,10 +183,10 @@ impl<'a> DocGenerator<'a> {
         Ok(())
     }
 
-    pub fn write_functions(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_functions(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"# Functions")?;
 
-        for the_type in non_service_functions(self.inventory()) {
+        for the_type in non_service_functions(&self.interop.inventory) {
             self.write_function(w, the_type)?;
         }
 
@@ -215,7 +205,7 @@ impl<'a> DocGenerator<'a> {
 
         indented!(w, r"#### Definition ")?;
         indented!(w, r"```python")?;
-        self.generator.write_function(w, function, WriteFor::Docs)?;
+        self.interop.write_function(w, function, WriteFor::Docs)?;
         indented!(w, r"```")?;
         w.newline()?;
         indented!(w, r"---")?;
@@ -224,10 +214,10 @@ impl<'a> DocGenerator<'a> {
         Ok(())
     }
 
-    pub fn write_services(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_services(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"# Services")?;
 
-        for pattern in self.inventory.patterns().iter().map(|x| match x {
+        for pattern in self.interop.inventory.patterns().iter().map(|x| match x {
             LibraryPattern::Service(s) => s,
             _ => panic!("Pattern not explicitly handled"),
         }) {
@@ -263,7 +253,7 @@ impl<'a> DocGenerator<'a> {
                 indented!(w, r"```python")?;
                 indented!(w, r"class {}:", class_name)?;
                 w.newline()?;
-                self.generator.write_pattern_class_ctor(w, pattern, x, WriteFor::Docs)?;
+                self.interop.write_pattern_class_ctor(w, pattern, x, WriteFor::Docs)?;
                 indented!(w, [()()], r"...")?;
                 indented!(w, r"```")?;
                 w.newline()?;
@@ -289,7 +279,7 @@ impl<'a> DocGenerator<'a> {
                 indented!(w, r"```python")?;
                 indented!(w, r"class {}:", class_name)?;
                 w.newline()?;
-                self.generator.write_pattern_class_method(w, pattern, x, WriteFor::Docs)?;
+                self.interop.write_pattern_class_method(w, pattern, x, WriteFor::Docs)?;
                 indented!(w, [()()], r"...")?;
                 indented!(w, r"```")?;
                 w.newline()?;
@@ -304,8 +294,8 @@ impl<'a> DocGenerator<'a> {
         Ok(())
     }
 
-    pub fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        writeln!(w.writer(), "{}", self.config().header)?;
+    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        writeln!(w.writer(), "{}", self.doc_config.header)?;
 
         self.write_toc(w)?;
         self.write_types(w)?;
@@ -317,11 +307,10 @@ impl<'a> DocGenerator<'a> {
 
         Ok(())
     }
+}
 
-    pub fn write_file<P: AsRef<Path>>(&self, file_name: P) -> Result<(), Error> {
-        let mut file = File::create(file_name)?;
-        let mut writer = IndentWriter::new(&mut file);
-
-        self.write_to(&mut writer)
+impl Bindings for Documentation<'_> {
+    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        self.write_to(w)
     }
 }

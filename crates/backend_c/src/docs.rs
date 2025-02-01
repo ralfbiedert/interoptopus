@@ -6,11 +6,11 @@ use interoptopus::Error;
 use interoptopus::{indented, Bindings};
 
 /// Writes documentation for C bindings.
-pub struct DocGenerator<'a> {
+pub struct Documentation<'a> {
     interop: &'a Interop,
 }
 
-impl<'a> DocGenerator<'a> {
+impl<'a> Documentation<'a> {
     #[must_use]
     pub const fn new(interop: &'a Interop) -> Self {
         Self { interop }
@@ -99,7 +99,7 @@ impl<'a> DocGenerator<'a> {
     }
 }
 
-impl Bindings for DocGenerator<'_> {
+impl Bindings for Documentation<'_> {
     fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.write_to(w)
     }

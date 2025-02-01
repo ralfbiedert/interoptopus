@@ -1,6 +1,6 @@
-use crate::config::Config;
-use crate::converter::Converter;
-use interoptopus::lang::c::{CType, CompositeType, EnumType, Function, Layout, PrimitiveType};
+use crate::converter::{constant_value_to_value, documentation, fnpointer_to_typename, to_ctypes_name, to_type_hint_in, to_type_hint_out};
+use derive_builder::Builder;
+use interoptopus::lang::c::{CType, CompositeType, EnumType, Function, Layout};
 use interoptopus::patterns::service::Service;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::{longest_common_prefix, safe_name, sort_types_by_dependencies};
@@ -8,24 +8,25 @@ use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, non_service_functions, Bindings, Error, Inventory};
 
 /// **Start here**, main converter implementing [`Bindings`].
-pub struct Generator {
-    config: Config,
-    inventory: Inventory,
-    converter: Converter,
+#[derive(Clone, Debug, Default, Builder)]
+#[builder(default)]
+pub struct Interop {
+    /// Namespace for callback helpers, e.g., `callbacks`.
+    #[builder(default = "\"callbacks\".to_string()")]
+    callback_namespace: String,
+
+    pub(crate) inventory: Inventory,
 }
 
 /// Writes the Python file format, `impl` this trait to customize output.
-impl Generator {
+#[allow(clippy::unused_self)]
+impl Interop {
     #[must_use]
-    pub const fn new(config: Config, inventory: Inventory) -> Self {
-        Self {
-            config,
-            inventory,
-            converter: Converter {},
-        }
+    pub fn new(inventory: Inventory) -> Self {
+        Self { inventory, ..Self::default() }
     }
 
-    pub fn write_imports(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_imports(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"from __future__ import annotations")?;
         indented!(w, r"import ctypes")?;
         indented!(w, r"import typing")?;
@@ -34,7 +35,7 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_api_load_fuction(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_api_load_fuction(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"c_lib = None")?;
         w.newline()?;
         indented!(w, r"def init_lib(path):")?;
@@ -44,19 +45,14 @@ impl Generator {
 
         w.newline()?;
         for f in self.inventory.functions() {
-            let args = f
-                .signature()
-                .params()
-                .iter()
-                .map(|x| self.converter.to_ctypes_name(x.the_type(), false))
-                .collect::<Vec<_>>();
+            let args = f.signature().params().iter().map(|x| to_ctypes_name(x.the_type(), false)).collect::<Vec<_>>();
 
             indented!(w, [()], r"c_lib.{}.argtypes = [{}]", f.name(), args.join(", "))?;
         }
 
         w.newline()?;
         for f in self.inventory.functions() {
-            let rtype = self.converter.to_ctypes_name(f.signature().rval(), false);
+            let rtype = to_ctypes_name(f.signature().rval(), false);
             if !rtype.is_empty() {
                 indented!(w, [()], r"c_lib.{}.restype = {}", f.name(), rtype)?;
             }
@@ -73,15 +69,15 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_constants(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_constants(&self, w: &mut IndentWriter) -> Result<(), Error> {
         for c in self.inventory.constants() {
-            indented!(w, r"{} = {}", c.name(), self.converter.constant_value_to_value(c.value()))?;
+            indented!(w, r"{} = {}", c.name(), constant_value_to_value(c.value()))?;
         }
 
         Ok(())
     }
 
-    pub fn write_types(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_types(&self, w: &mut IndentWriter) -> Result<(), Error> {
         let all_types = self.inventory.ctypes().to_vec();
         let sorted_types = sort_types_by_dependencies(all_types);
 
@@ -108,7 +104,7 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_struct(&self, w: &mut IndentWriter, c: &CompositeType, write_for: WriteFor) -> Result<(), Error> {
+    pub(crate) fn write_struct(&self, w: &mut IndentWriter, c: &CompositeType, write_for: WriteFor) -> Result<(), Error> {
         let documentation = c.meta().documentation().lines().join("\n");
 
         indented!(w, r"class {}(ctypes.Structure):", c.rust_name())?;
@@ -131,7 +127,7 @@ impl Generator {
         }
         indented!(w, [()], r"_fields_ = [")?;
         for f in c.fields() {
-            let type_name = self.converter.to_ctypes_name(f.the_type(), true);
+            let type_name = to_ctypes_name(f.the_type(), true);
             indented!(w, [()()], r#"("{}", {}),"#, f.name(), type_name)?;
         }
         indented!(w, [()], r"]")?;
@@ -141,7 +137,7 @@ impl Generator {
             .fields()
             .iter()
             .map(|x| {
-                let type_hint_in = self.converter.to_type_hint_in(x.the_type(), false);
+                let type_hint_in = to_type_hint_in(x.the_type(), false);
 
                 format!("{}{} = None", x.name(), type_hint_in)
             })
@@ -172,8 +168,8 @@ impl Generator {
 
             w.newline()?;
 
-            let hint_in = self.converter.to_type_hint_in(f.the_type(), false);
-            let hint_out = self.converter.to_type_hint_out(f.the_type());
+            let hint_in = to_type_hint_in(f.the_type(), false);
+            let hint_out = to_type_hint_out(f.the_type());
 
             indented!(w, [()], r"@property")?;
             indented!(w, [()], r"def {}(self){}:", f.name(), hint_out)?;
@@ -200,7 +196,7 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_enum(&self, w: &mut IndentWriter, e: &EnumType, write_for: WriteFor) -> Result<(), Error> {
+    pub(crate) fn write_enum(&self, w: &mut IndentWriter, e: &EnumType, write_for: WriteFor) -> Result<(), Error> {
         let documentation = e.meta().documentation().lines().join("\n");
 
         indented!(w, r"class {}:", e.rust_name())?;
@@ -220,8 +216,8 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_callback_helpers(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        indented!(w, r"class {}:", self.config.callback_namespace)?;
+    fn write_callback_helpers(&self, w: &mut IndentWriter) -> Result<(), Error> {
+        indented!(w, r"class {}:", self.callback_namespace)?;
         indented!(w, [()], r#""""Helpers to define callbacks.""""#)?;
 
         for callback in self.inventory.ctypes().iter().filter_map(|x| match x {
@@ -229,19 +225,13 @@ impl Generator {
             CType::Pattern(TypePattern::NamedCallback(x)) => Some(x.fnpointer()),
             _ => None,
         }) {
-            indented!(
-                w,
-                [()],
-                r"{} = {}",
-                safe_name(&callback.internal_name()),
-                self.converter.fnpointer_to_typename(callback)
-            )?;
+            indented!(w, [()], r"{} = {}", safe_name(&callback.internal_name()), fnpointer_to_typename(callback))?;
         }
 
         Ok(())
     }
 
-    pub fn write_function_proxies(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_function_proxies(&self, w: &mut IndentWriter) -> Result<(), Error> {
         for function in non_service_functions(&self.inventory) {
             self.write_function(w, function, WriteFor::Code)?;
         }
@@ -249,8 +239,8 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_function(&self, w: &mut IndentWriter, function: &Function, write_for: WriteFor) -> Result<(), Error> {
-        let rval_sig = self.converter.to_type_hint_out(function.signature().rval());
+    pub(crate) fn write_function(&self, w: &mut IndentWriter, function: &Function, write_for: WriteFor) -> Result<(), Error> {
+        let rval_sig = to_type_hint_out(function.signature().rval());
         let args = self.function_args_to_string(function, true, false);
         let documentation = function.meta().documentation().lines().join("\n");
 
@@ -271,7 +261,7 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_param_helpers(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
+    fn write_param_helpers(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
         for arg in function.signature().params() {
             match arg.the_type() {
                 CType::FnPointer(x) => {
@@ -291,7 +281,7 @@ impl Generator {
                         indented!(w, [()()], r"{} = ctypes.cast({}, ctypes.POINTER(ctypes.c_char))", arg.name(), arg.name())?;
                     }
                     TypePattern::Slice(t) | TypePattern::SliceMut(t) => {
-                        let inner = self.converter.to_ctypes_name(
+                        let inner = to_ctypes_name(
                             t.fields()
                                 .iter()
                                 .find(|i| i.name().eq_ignore_ascii_case("data"))
@@ -331,7 +321,7 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_slice(&self, w: &mut IndentWriter, c: &CompositeType, mutable: bool) -> Result<(), Error> {
+    fn write_slice(&self, w: &mut IndentWriter, c: &CompositeType, mutable: bool) -> Result<(), Error> {
         let data_type = c
             .fields()
             .iter()
@@ -341,9 +331,9 @@ impl Generator {
             .try_deref_pointer()
             .expect("data must be a pointer type");
 
-        let data_type_python = self.converter.to_ctypes_name(data_type, true);
-        let hint_in = self.converter.to_type_hint_in(data_type, false);
-        let hint_out = self.converter.to_type_hint_out(data_type);
+        let data_type_python = to_ctypes_name(data_type, true);
+        let hint_in = to_type_hint_in(data_type, false);
+        let hint_out = to_type_hint_out(data_type);
 
         indented!(w, r"class {}(ctypes.Structure):", c.rust_name())?;
         indented!(w, [()], r"# These fields represent the underlying C data layout")?;
@@ -433,7 +423,7 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_option(&self, w: &mut IndentWriter, c: &CompositeType) -> Result<(), Error> {
+    fn write_option(&self, w: &mut IndentWriter, c: &CompositeType) -> Result<(), Error> {
         let data_type = c
             .fields()
             .iter()
@@ -441,7 +431,7 @@ impl Generator {
             .expect("Slice must contain field called 't'.")
             .the_type();
 
-        let data_type_python = self.converter.to_ctypes_name(data_type, true);
+        let data_type_python = to_ctypes_name(data_type, true);
 
         indented!(w, r"class {}(ctypes.Structure):", c.rust_name())?;
         indented!(w, [()], r#""""May optionally hold a value.""""#)?;
@@ -470,7 +460,7 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_patterns(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_patterns(&self, w: &mut IndentWriter) -> Result<(), Error> {
         for pattern in self.inventory.patterns() {
             match pattern {
                 LibraryPattern::Service(x) => self.write_pattern_class(w, x)?,
@@ -481,7 +471,7 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_pattern_class(&self, w: &mut IndentWriter, class: &Service) -> Result<(), Error> {
+    fn write_pattern_class(&self, w: &mut IndentWriter, class: &Service) -> Result<(), Error> {
         let context_type_name = class.the_type().rust_name();
 
         let mut all_functions = class.constructors().to_vec();
@@ -532,7 +522,7 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_pattern_class_ctor(&self, w: &mut IndentWriter, class: &Service, ctor: &Function, write_for: WriteFor) -> Result<(), Error> {
+    pub(crate) fn write_pattern_class_ctor(&self, w: &mut IndentWriter, class: &Service, ctor: &Function, write_for: WriteFor) -> Result<(), Error> {
         let context_type_name = class.the_type().rust_name();
         let mut all_functions = class.constructors().to_vec();
         all_functions.extend_from_slice(class.methods());
@@ -548,7 +538,7 @@ impl Generator {
             return Ok(());
         }
 
-        indented!(w, [()()], r"{}", self.converter.documentation(ctor.meta().documentation()))?;
+        indented!(w, [()()], r"{}", documentation(ctor.meta().documentation()))?;
         indented!(w, [()()], r"ctx = ctypes.c_void_p()")?;
         w.indent();
         self.write_param_helpers(w, ctor)?;
@@ -561,7 +551,7 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_pattern_class_method(&self, w: &mut IndentWriter, class: &Service, function: &Function, write_for: WriteFor) -> Result<(), Error> {
+    pub(crate) fn write_pattern_class_method(&self, w: &mut IndentWriter, class: &Service, function: &Function, write_for: WriteFor) -> Result<(), Error> {
         let mut all_functions = class.constructors().to_vec();
         all_functions.extend_from_slice(class.methods());
         all_functions.push(class.destructor().clone());
@@ -569,7 +559,7 @@ impl Generator {
         let common_prefix = longest_common_prefix(&all_functions);
 
         let args = self.function_args_to_string(function, true, true);
-        let type_hint_out = self.converter.to_type_hint_out(function.signature().rval());
+        let type_hint_out = to_type_hint_out(function.signature().rval());
 
         indented!(w, [()], r"def {}(self, {}){}:", function.name().replace(&common_prefix, ""), &args, type_hint_out)?;
 
@@ -577,7 +567,7 @@ impl Generator {
             return Ok(());
         }
 
-        indented!(w, [()()], r"{}", self.converter.documentation(function.meta().documentation()))?;
+        indented!(w, [()()], r"{}", documentation(function.meta().documentation()))?;
 
         w.indent();
         self.write_param_helpers(w, function)?;
@@ -589,7 +579,7 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_library_call(&self, w: &mut IndentWriter, function: &Function, class_str: Option<&str>) -> Result<(), Error> {
+    fn write_library_call(&self, w: &mut IndentWriter, function: &Function, class_str: Option<&str>) -> Result<(), Error> {
         let args = match class_str {
             None => self.function_args_to_string(function, false, false),
             Some(class) => {
@@ -614,7 +604,7 @@ impl Generator {
     }
 
     #[must_use]
-    pub fn function_args_to_string(&self, function: &Function, type_hints: bool, skip_first: bool) -> String {
+    fn function_args_to_string(&self, function: &Function, type_hints: bool, skip_first: bool) -> String {
         let skip = usize::from(skip_first);
         function
             .signature()
@@ -622,18 +612,14 @@ impl Generator {
             .iter()
             .skip(skip)
             .map(|x| {
-                let type_hint = if type_hints {
-                    self.converter.to_type_hint_in(x.the_type(), true)
-                } else {
-                    String::new()
-                };
+                let type_hint = if type_hints { to_type_hint_in(x.the_type(), true) } else { String::new() };
                 format!("{}{}", x.name(), type_hint)
             })
             .collect::<Vec<_>>()
             .join(", ")
     }
 
-    pub fn write_success_enum_aware_rval(&self, w: &mut IndentWriter, function: &Function, args: &str, ret: bool) -> Result<(), Error> {
+    fn write_success_enum_aware_rval(&self, w: &mut IndentWriter, function: &Function, args: &str, ret: bool) -> Result<(), Error> {
         if ret {
             indented!(w, [()], r"return c_lib.{}({})", function.name(), &args)?;
         } else {
@@ -643,13 +629,13 @@ impl Generator {
     }
 
     #[must_use]
-    pub fn get_method_args(&self, function: &Function, ctx: &str) -> String {
+    fn get_method_args(&self, function: &Function, ctx: &str) -> String {
         let mut args = self.function_args_to_string(function, false, true);
         args.insert_str(0, &format!("{ctx}, "));
         args
     }
 
-    pub fn write_utils(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_utils(&self, w: &mut IndentWriter) -> Result<(), Error> {
         // indented!(w, r#"class Slice(ctypes.Structure, typing.Generic[T]):"#)?;
         // indented!(w, [_], r#"# These fields represent the underlying C data layout"#)?;
         // indented!(w, [_], r#"_fields_ = ["#)?;
@@ -722,11 +708,7 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_utils_primitive(&self, _: &mut IndentWriter, _: PrimitiveType) -> Result<(), Error> {
-        Ok(())
-    }
-
-    pub fn write_all(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    fn write_all(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.write_imports(w)?;
         self.write_api_load_fuction(w)?;
         w.newline()?;
@@ -755,7 +737,7 @@ impl Generator {
     }
 }
 
-impl Bindings for Generator {
+impl Bindings for Interop {
     fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.write_all(w)
     }

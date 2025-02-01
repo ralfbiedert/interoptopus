@@ -1,6 +1,6 @@
 use anyhow::Error;
 use interoptopus::{ffi_function, function, Bindings, Inventory, InventoryBuilder};
-use interoptopus_backend_c::{Documentation, InteropBuilder};
+use interoptopus_backend_c::{DocStyle, InteropBuilder};
 use tests::{compile_output_c, validate_output};
 
 /// Documented
@@ -15,7 +15,7 @@ fn ffi_inventory() -> Inventory {
 fn inline() -> Result<(), Error> {
     let generated = InteropBuilder::default()
         .inventory(ffi_inventory())
-        .documentation(Documentation::Inline)
+        .documentation(DocStyle::Inline)
         .build()?
         .to_string()?;
 
@@ -29,7 +29,7 @@ fn inline() -> Result<(), Error> {
 fn none() -> Result<(), Error> {
     let generated = InteropBuilder::default()
         .inventory(ffi_inventory())
-        .documentation(Documentation::None)
+        .documentation(DocStyle::None)
         .build()?
         .to_string()?;
 

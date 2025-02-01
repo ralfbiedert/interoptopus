@@ -78,7 +78,7 @@ impl ToNamingStyle for &str {
 
 /// Documentation style used in generated C code
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
-pub enum Documentation {
+pub enum DocStyle {
     // No documentation comments are added to header file
     None,
     // Documentation is added inline above relevant declaration
@@ -112,7 +112,7 @@ pub struct Interop {
     /// How to indent code
     indentation: Indentation,
     /// How to add code documentation
-    documentation: Documentation,
+    documentation: DocStyle,
     /// How to convert type names
     pub(crate) type_naming: NameCase,
     /// How to convert enum variant names
@@ -172,7 +172,7 @@ impl Interop {
             _ => return Err(Error::Null),
         };
 
-        if self.documentation == Documentation::Inline {
+        if self.documentation == DocStyle::Inline {
             self.write_documentation(w, constant.meta().documentation())?;
         }
 
@@ -190,7 +190,7 @@ impl Interop {
     }
 
     fn write_function(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
-        if self.documentation == Documentation::Inline {
+        if self.documentation == DocStyle::Inline {
             self.write_documentation(w, function.meta().documentation())?;
         }
 
@@ -199,7 +199,7 @@ impl Interop {
             Functions::ForwardDeclarations => self.write_function_declaration(w, function, 999)?,
         }
 
-        if self.documentation == Documentation::Inline {
+        if self.documentation == DocStyle::Inline {
             w.newline()?;
         }
 
@@ -390,7 +390,7 @@ impl Interop {
     fn write_type_definition_enum(&self, w: &mut IndentWriter, the_type: &EnumType) -> Result<(), Error> {
         let name = enum_to_typename(self, the_type);
 
-        if self.documentation == Documentation::Inline {
+        if self.documentation == DocStyle::Inline {
             self.write_documentation(w, the_type.meta().documentation())?;
         }
 
@@ -407,7 +407,7 @@ impl Interop {
         let variant_name = enum_variant_to_name(self, the_enum, variant);
         let variant_value = variant.value();
 
-        if self.documentation == Documentation::Inline {
+        if self.documentation == DocStyle::Inline {
             self.write_documentation(w, variant.documentation())?;
         }
 
@@ -415,13 +415,13 @@ impl Interop {
     }
 
     fn write_type_definition_opaque(&self, w: &mut IndentWriter, the_type: &OpaqueType) -> Result<(), Error> {
-        if self.documentation == Documentation::Inline {
+        if self.documentation == DocStyle::Inline {
             self.write_documentation(w, the_type.meta().documentation())?;
         }
 
         self.write_type_definition_opaque_body(w, the_type)?;
 
-        if self.documentation == Documentation::Inline {
+        if self.documentation == DocStyle::Inline {
             w.newline()?;
         }
 
@@ -434,7 +434,7 @@ impl Interop {
     }
 
     fn write_type_definition_composite(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
-        if self.documentation == Documentation::Inline {
+        if self.documentation == DocStyle::Inline {
             self.write_documentation(w, the_type.meta().documentation())?;
         }
 
@@ -472,7 +472,7 @@ impl Interop {
     }
 
     fn write_type_definition_composite_body_field(&self, w: &mut IndentWriter, field: &Field, _the_type: &CompositeType) -> Result<(), Error> {
-        if self.documentation == Documentation::Inline {
+        if self.documentation == DocStyle::Inline {
             self.write_documentation(w, field.documentation())?;
         }
 
