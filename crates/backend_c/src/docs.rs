@@ -54,7 +54,7 @@ impl<'a> Markdown<'a> {
         }
 
         indented!(w, r"```")?;
-        write_type_definition(&self.interop, w, the_type, known_function_pointers)?;
+        write_type_definition(self.interop, w, the_type, known_function_pointers)?;
         indented!(w, r"```")?;
 
         Ok(())
@@ -82,7 +82,7 @@ impl<'a> Markdown<'a> {
         }
 
         indented!(w, r"```")?;
-        write_function_declaration(&self.interop, w, function, 80)?;
+        write_function_declaration(self.interop, w, function, 80)?;
         indented!(w, r"```")?;
 
         w.newline()?;

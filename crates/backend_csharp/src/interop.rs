@@ -1,12 +1,12 @@
-pub(crate) mod builtins;
-pub(crate) mod class;
-pub(crate) mod constants;
-pub(crate) mod docs;
-pub(crate) mod functions;
-pub(crate) mod imports;
-pub(crate) mod namespace;
-pub(crate) mod patterns;
-pub(crate) mod types;
+pub mod builtins;
+pub mod class;
+pub mod constants;
+pub mod docs;
+pub mod functions;
+pub mod imports;
+pub mod namespace;
+pub mod patterns;
+pub mod types;
 
 use crate::interop::builtins::write_builtins;
 use crate::interop::class::{write_class_context, write_native_lib_string};
