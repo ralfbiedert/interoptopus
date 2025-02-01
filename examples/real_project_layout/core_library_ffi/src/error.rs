@@ -1,5 +1,5 @@
 // This file just implements the "error" pattern so that services
-// work. Have a look in the documentation.
+// work. Have a look at the documentation.
 
 use interoptopus::ffi_type;
 use std::fmt::{Display, Formatter};

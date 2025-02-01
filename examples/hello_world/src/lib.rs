@@ -27,10 +27,8 @@ fn generate_bindings() {
         .validate()
         .build();
 
-
     InteropBuilder::new()
         .inventory(inventory)
         .build().unwrap()
-        .write_file("bindings/Interop.cs")
-        .unwrap();
+        .write_file("bindings/Interop.cs").unwrap()
 }

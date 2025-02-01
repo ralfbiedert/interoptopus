@@ -19,11 +19,10 @@ path = "src/lib.rs"
 proc-macro = true
 
 [dependencies]
-proc-macro2 = "1.0.36"
-syn = { version = "2.0.79", features = ["full"] }
-quote = "1.0.15"
-darling = "0.20.10"
-regex = "1.5"
+proc-macro2.workspace = true
+syn = { workspace = true, features = ["full"] }
+quote.workspace = true
+darling.workspace = true
 
 [dev-dependencies]
 interoptopus = { path = "../core" }
