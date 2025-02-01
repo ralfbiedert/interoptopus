@@ -1,5 +1,5 @@
 use crate::converter::{field_name_to_csharp_name, function_name_to_csharp_name, to_typespecifier_in_rval};
-use crate::generator::FunctionNameFlavor;
+use crate::interop::FunctionNameFlavor;
 use crate::Interop;
 use interoptopus::lang::c::{CType, CompositeType, Function};
 use interoptopus::patterns::{LibraryPattern, TypePattern};

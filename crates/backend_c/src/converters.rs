@@ -1,4 +1,4 @@
-use crate::generator::ToNamingStyle;
+use crate::interop::ToNamingStyle;
 use crate::Interop;
 use interoptopus::lang::c::{CType, CompositeType, Constant, ConstantValue, EnumType, FnPointerType, Function, OpaqueType, PrimitiveType, PrimitiveValue, Variant};
 use interoptopus::patterns::callbacks::NamedCallback;

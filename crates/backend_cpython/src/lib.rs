@@ -136,7 +136,7 @@
 
 mod converter;
 mod docs;
-mod generator;
+mod interop;
 
 pub use docs::Markdown;
-pub use generator::{Interop, InteropBuilder, InteropBuilderError};
+pub use interop::{Interop, InteropBuilder, InteropBuilderError};

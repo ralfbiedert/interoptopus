@@ -1,4 +1,4 @@
-use crate::generator::FunctionNameFlavor;
+use crate::interop::FunctionNameFlavor;
 use heck::{ToLowerCamelCase, ToUpperCamelCase};
 use interoptopus::lang::c::{
     CType, CompositeType, ConstantValue, EnumType, Field, FnPointerType, Function, FunctionSignature, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,

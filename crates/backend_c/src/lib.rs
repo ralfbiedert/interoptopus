@@ -113,7 +113,7 @@
 
 mod converters;
 mod docs;
-mod generator;
+mod interop;
 
 pub use docs::Markdown;
-pub use generator::{DocStyle, Functions, Indentation, Interop, InteropBuilder, NameCase};
+pub use interop::{DocStyle, Functions, Indentation, Interop, InteropBuilder, NameCase};
