@@ -108,7 +108,7 @@ impl Default for Config {
             namespace_mappings: NamespaceMappings::new("My.Company"),
             namespace_id: String::new(),
             visibility_types: CSharpVisibility::AsDeclared,
-            unroll_struct_arrays: true,
+            unroll_struct_arrays: false,
             write_types: WriteTypes::NamespaceAndInteroptopusGlobal,
             rename_symbols: false,
             debug: false,

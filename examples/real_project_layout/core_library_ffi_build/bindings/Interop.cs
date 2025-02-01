@@ -22,7 +22,6 @@ namespace My.Company
         }
 
 
-
         [LibraryImport(NativeLib, EntryPoint = "start_server")]
         public static partial void start_server([MarshalAs(UnmanagedType.LPStr)] string server_name);
 
