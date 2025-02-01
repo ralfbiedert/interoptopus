@@ -2,9 +2,11 @@
 
 #pragma warning disable 0105
 using System;
+using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 using System.Runtime.CompilerServices;
 using My.Company;
 using My.Company.Common;
@@ -19,9 +21,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 8321870495936976822ul)
+            if (api_version != 10789183016542361715ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (8321870495936976822). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10789183016542361715). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -139,6 +141,30 @@ namespace My.Company
 
         [LibraryImport(NativeLib, EntryPoint = "array_1")]
         public static partial byte array_1(Array x);
+
+        [LibraryImport(NativeLib, EntryPoint = "array_2")]
+        public static partial Array array_2();
+
+        [LibraryImport(NativeLib, EntryPoint = "array_3")]
+        public static partial void array_3(out Array arr);
+
+        [LibraryImport(NativeLib, EntryPoint = "nested_array_1")]
+        public static partial NestedArray nested_array_1();
+
+        [LibraryImport(NativeLib, EntryPoint = "nested_array_2")]
+        public static partial void nested_array_2(out NestedArray result);
+
+        [LibraryImport(NativeLib, EntryPoint = "nested_array_3")]
+        public static partial byte nested_array_3(NestedArray input);
+
+        [LibraryImport(NativeLib, EntryPoint = "char_array_1")]
+        public static partial CharArray char_array_1();
+
+        [LibraryImport(NativeLib, EntryPoint = "char_array_2")]
+        public static partial CharArray char_array_2(CharArray arr);
+
+        [LibraryImport(NativeLib, EntryPoint = "char_array_3")]
+        public static partial byte char_array_3(ref CharArray arr);
 
         /// This function has documentation.
         [LibraryImport(NativeLib, EntryPoint = "documented")]
@@ -947,25 +973,10 @@ namespace My.Company
     }
 
     [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
+    [NativeMarshalling(typeof(ArrayMarshaller))]
     public partial struct Array
     {
-        public byte data0;
-        public byte data1;
-        public byte data2;
-        public byte data3;
-        public byte data4;
-        public byte data5;
-        public byte data6;
-        public byte data7;
-        public byte data8;
-        public byte data9;
-        public byte data10;
-        public byte data11;
-        public byte data12;
-        public byte data13;
-        public byte data14;
-        public byte data15;
+        public byte[] data;
     }
 
     [CustomMarshaller(typeof(Array), MarshalMode.Default, typeof(ArrayMarshaller))]
@@ -1084,6 +1095,45 @@ namespace My.Company
     {
         public Local foreign;
     }
+
+    [CustomMarshaller(typeof(Container), MarshalMode.Default, typeof(ContainerMarshaller))]
+    internal static class ContainerMarshaller
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public Local foreign;
+        }
+
+        public static Unmanaged ConvertToUnmanaged(Container managed)
+        {
+            var result = new Unmanaged
+            {
+                foreign = managed.foreign,
+            };
+
+            unsafe
+            {
+            }
+
+            return result;
+        }
+
+        public static Container ConvertToManaged(Unmanaged unmanaged)
+        {
+            var result = new Container()
+            {
+                foreign = unmanaged.foreign,
+            };
+
+            unsafe
+            {
+            }
+
+            return result;
+        }
+    }
+
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
@@ -1300,16 +1350,12 @@ namespace My.Company
     }
 
     [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
+    [NativeMarshalling(typeof(Weird2u8Marshaller))]
     public partial struct Weird2u8
     {
-        byte t;
-        byte a0;
-        byte a1;
-        byte a2;
-        byte a3;
-        byte a4;
-        IntPtr r;
+        internal byte t;
+        internal byte[] a;
+        internal IntPtr r;
     }
 
     [CustomMarshaller(typeof(Weird2u8), MarshalMode.Default, typeof(Weird2u8Marshaller))]
@@ -1988,14 +2034,56 @@ namespace My.Company
 
     ///Option type containing boolean flag and maybe valid data.
     [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
+    [NativeMarshalling(typeof(OptionInnerMarshaller))]
     public partial struct OptionInner
     {
         ///Element that is maybe valid.
-        Inner t;
+        internal Inner t;
         ///Byte where `1` means element `t` is valid.
-        byte is_some;
+        internal byte is_some;
     }
+
+    [CustomMarshaller(typeof(OptionInner), MarshalMode.Default, typeof(OptionInnerMarshaller))]
+    internal static class OptionInnerMarshaller
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public Inner t;
+            public byte is_some;
+        }
+
+        public static Unmanaged ConvertToUnmanaged(OptionInner managed)
+        {
+            var result = new Unmanaged
+            {
+                t = managed.t,
+                is_some = managed.is_some,
+            };
+
+            unsafe
+            {
+            }
+
+            return result;
+        }
+
+        public static OptionInner ConvertToManaged(Unmanaged unmanaged)
+        {
+            var result = new OptionInner()
+            {
+                t = unmanaged.t,
+                is_some = unmanaged.is_some,
+            };
+
+            unsafe
+            {
+            }
+
+            return result;
+        }
+    }
+
 
     public partial struct OptionInner
     {

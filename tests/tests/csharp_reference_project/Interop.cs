@@ -21,9 +21,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 8321870495936976822ul)
+            if (api_version != 10789183016542361715ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (8321870495936976822). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10789183016542361715). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 

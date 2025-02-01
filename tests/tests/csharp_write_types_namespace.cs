@@ -21,9 +21,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 12952263558137678611ul)
+            if (api_version != 10789183016542361715ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (12952263558137678611). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10789183016542361715). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -243,6 +243,15 @@ namespace My.Company
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_2")]
         public static partial IntPtr pattern_ascii_pointer_2();
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_3")]
+        public static partial IntPtr pattern_ascii_pointer_3([MarshalAs(UnmanagedType.LPStr)] string x);
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_4")]
+        public static partial IntPtr pattern_ascii_pointer_4([MarshalAs(UnmanagedType.LPStr)] string x, uint l);
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_5")]
+        public static partial byte pattern_ascii_pointer_5([MarshalAs(UnmanagedType.LPStr)] string x, uint i);
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_return_slice")]
         public static partial SliceUseAsciiStringPattern pattern_ascii_pointer_return_slice();
