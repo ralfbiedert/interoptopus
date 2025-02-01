@@ -964,64 +964,113 @@ namespace My.Company
     }
 
     [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
+    [NativeMarshalling(typeof(ArrayMarshaller))]
     public partial struct Array
     {
-        public byte data0;
-        public byte data1;
-        public byte data2;
-        public byte data3;
-        public byte data4;
-        public byte data5;
-        public byte data6;
-        public byte data7;
-        public byte data8;
-        public byte data9;
-        public byte data10;
-        public byte data11;
-        public byte data12;
-        public byte data13;
-        public byte data14;
-        public byte data15;
+        public byte[] data;
     }
 
+    [CustomMarshaller(typeof(Array), MarshalMode.Default, typeof(ArrayMarshaller))]
+    internal static class ArrayMarshaller
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public fixed byte data[16];
+        }
+
+        public static Unmanaged ConvertToUnmanaged(Array managed)
+        {
+            var result = new Unmanaged
+            {
+            };
+
+            unsafe
+            {
+                if(managed.data != null)
+                {
+                    var source = new ReadOnlySpan<byte>(managed.data, 0, Math.Min(16, managed.data.Length));
+                    var dest = new Span<byte>(result.data, 16);
+                    source.CopyTo(dest);
+                }
+            }
+
+            return result;
+        }
+
+        public static Array ConvertToManaged(Unmanaged unmanaged)
+        {
+            var result = new Array()
+            {
+            };
+
+            unsafe
+            {
+                var source = new Span<byte>(unmanaged.data, 16);
+                var arr_data = new byte[16];
+                source.CopyTo(arr_data.AsSpan());
+                result.data = arr_data;
+            }
+
+            return result;
+        }
+    }
+
+
     [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
+    [NativeMarshalling(typeof(CharArrayMarshaller))]
     public partial struct CharArray
     {
-        public sbyte str0;
-        public sbyte str1;
-        public sbyte str2;
-        public sbyte str3;
-        public sbyte str4;
-        public sbyte str5;
-        public sbyte str6;
-        public sbyte str7;
-        public sbyte str8;
-        public sbyte str9;
-        public sbyte str10;
-        public sbyte str11;
-        public sbyte str12;
-        public sbyte str13;
-        public sbyte str14;
-        public sbyte str15;
-        public sbyte str16;
-        public sbyte str17;
-        public sbyte str18;
-        public sbyte str19;
-        public sbyte str20;
-        public sbyte str21;
-        public sbyte str22;
-        public sbyte str23;
-        public sbyte str24;
-        public sbyte str25;
-        public sbyte str26;
-        public sbyte str27;
-        public sbyte str28;
-        public sbyte str29;
-        public sbyte str30;
-        public sbyte str31;
+        public string str;
     }
+
+    [CustomMarshaller(typeof(CharArray), MarshalMode.Default, typeof(CharArrayMarshaller))]
+    internal static class CharArrayMarshaller
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public fixed byte str[32];
+        }
+
+        public static Unmanaged ConvertToUnmanaged(CharArray managed)
+        {
+            var result = new Unmanaged
+            {
+            };
+
+            unsafe
+            {
+                if(managed.str != null)
+                {
+                    fixed(char* s = managed.str)
+                    {
+                        var written = Encoding.UTF8.GetBytes(s, managed.str.Length, result.str, 31);
+                        result.str[written] = 0;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public static CharArray ConvertToManaged(Unmanaged unmanaged)
+        {
+            var result = new CharArray()
+            {
+            };
+
+            unsafe
+            {
+                var source = new ReadOnlySpan<byte>(unmanaged.str, 32);
+                var terminatorIndex = source.IndexOf<byte>(0);
+                result.str = Encoding.UTF8.GetString(source.Slice(0, terminatorIndex == -1 ? Math.Min(source.Length, 32) : terminatorIndex));
+            }
+
+            return result;
+        }
+    }
+
 
     [Serializable]
     [NativeMarshalling(typeof(ContainerMarshaller))]
@@ -1112,11 +1161,7 @@ namespace My.Company
         public Vec3f32 field_vec;
         public bool field_bool;
         public int field_int;
-        public ushort field_array0;
-        public ushort field_array1;
-        public ushort field_array2;
-        public ushort field_array3;
-        public ushort field_array4;
+        public ushort[] field_array;
         public Array field_struct;
     }
 
@@ -1131,7 +1176,7 @@ namespace My.Company
             public sbyte field_bool;
             public int field_int;
             public fixed ushort field_array[5];
-            public Array field_struct;
+            public ArrayMarshaller.Unmanaged field_struct;
         }
 
         public static Unmanaged ConvertToUnmanaged(NestedArray managed)
@@ -1142,16 +1187,17 @@ namespace My.Company
                 field_vec = managed.field_vec,
                 field_bool = Convert.ToSByte(managed.field_bool),
                 field_int = managed.field_int,
-                field_struct = managed.field_struct,
+                field_struct = ArrayMarshaller.ConvertToUnmanaged(managed.field_struct),
             };
 
             unsafe
             {
-                result.field_array[0] = managed.field_array0;
-                result.field_array[1] = managed.field_array1;
-                result.field_array[2] = managed.field_array2;
-                result.field_array[3] = managed.field_array3;
-                result.field_array[4] = managed.field_array4;
+                if(managed.field_array != null)
+                {
+                    var source = new ReadOnlySpan<ushort>(managed.field_array, 0, Math.Min(5, managed.field_array.Length));
+                    var dest = new Span<ushort>(result.field_array, 5);
+                    source.CopyTo(dest);
+                }
             }
 
             return result;
@@ -1165,16 +1211,15 @@ namespace My.Company
                 field_vec = unmanaged.field_vec,
                 field_bool = Convert.ToBoolean(unmanaged.field_bool),
                 field_int = unmanaged.field_int,
-                field_struct = unmanaged.field_struct,
+                field_struct = ArrayMarshaller.ConvertToManaged(unmanaged.field_struct),
             };
 
             unsafe
             {
-                result.field_array0 = unmanaged.field_array[0];
-                result.field_array1 = unmanaged.field_array[1];
-                result.field_array2 = unmanaged.field_array[2];
-                result.field_array3 = unmanaged.field_array[3];
-                result.field_array4 = unmanaged.field_array[4];
+                var source = new Span<ushort>(unmanaged.field_array, 5);
+                var arr_field_array = new ushort[5];
+                source.CopyTo(arr_field_array.AsSpan());
+                result.field_array = arr_field_array;
             }
 
             return result;
@@ -1284,17 +1329,66 @@ namespace My.Company
     }
 
     [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
+    [NativeMarshalling(typeof(Weird2u8Marshaller))]
     public partial struct Weird2u8
     {
-        byte t;
-        byte a0;
-        byte a1;
-        byte a2;
-        byte a3;
-        byte a4;
-        IntPtr r;
+        internal byte t;
+        internal byte[] a;
+        internal IntPtr r;
     }
+
+    [CustomMarshaller(typeof(Weird2u8), MarshalMode.Default, typeof(Weird2u8Marshaller))]
+    internal static class Weird2u8Marshaller
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public byte t;
+            public fixed byte a[5];
+            public IntPtr r;
+        }
+
+        public static Unmanaged ConvertToUnmanaged(Weird2u8 managed)
+        {
+            var result = new Unmanaged
+            {
+                t = managed.t,
+                r = managed.r,
+            };
+
+            unsafe
+            {
+                if(managed.a != null)
+                {
+                    var source = new ReadOnlySpan<byte>(managed.a, 0, Math.Min(5, managed.a.Length));
+                    var dest = new Span<byte>(result.a, 5);
+                    source.CopyTo(dest);
+                }
+            }
+
+            return result;
+        }
+
+        public static Weird2u8 ConvertToManaged(Unmanaged unmanaged)
+        {
+            var result = new Weird2u8()
+            {
+                t = unmanaged.t,
+                r = unmanaged.r,
+            };
+
+            unsafe
+            {
+                var source = new Span<byte>(unmanaged.a, 5);
+                var arr_a = new byte[5];
+                source.CopyTo(arr_a.AsSpan());
+                result.a = arr_a;
+            }
+
+            return result;
+        }
+    }
+
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);
