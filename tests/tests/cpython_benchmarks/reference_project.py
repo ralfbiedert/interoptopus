@@ -1147,11 +1147,14 @@ class CharArray(ctypes.Structure):
     # These fields represent the underlying C data layout
     _fields_ = [
         ("str", ctypes.c_char * 32),
+        ("str_2", ctypes.c_char * 32),
     ]
 
-    def __init__(self, str = None):
+    def __init__(self, str = None, str_2 = None):
         if str is not None:
             self.str = str
+        if str_2 is not None:
+            self.str_2 = str_2
 
     @property
     def str(self):
@@ -1160,6 +1163,14 @@ class CharArray(ctypes.Structure):
     @str.setter
     def str(self, value):
         return ctypes.Structure.__set__(self, "str", value)
+
+    @property
+    def str_2(self):
+        return ctypes.Structure.__get__(self, "str_2")
+
+    @str_2.setter
+    def str_2(self, value):
+        return ctypes.Structure.__set__(self, "str_2", value)
 
 
 class Container(ctypes.Structure):

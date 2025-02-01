@@ -21,9 +21,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 5676777239214057195ul)
+            if (api_version != 5403378736106778954ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (5676777239214057195). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (5403378736106778954). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -1085,6 +1085,7 @@ namespace My.Company
     public partial struct CharArray
     {
         public string str;
+        public string str_2;
     }
 
     [CustomMarshaller(typeof(CharArray), MarshalMode.Default, typeof(CharArrayMarshaller))]
@@ -1094,6 +1095,7 @@ namespace My.Company
         public unsafe struct Unmanaged
         {
             public fixed byte str[32];
+            public fixed byte str_2[32];
         }
 
         public static Unmanaged ConvertToUnmanaged(CharArray managed)
@@ -1116,6 +1118,19 @@ namespace My.Company
                         result.str[written] = 0;
                     }
                 }
+
+                if(managed.str_2 != null)
+                {
+                    fixed(char* s = managed.str_2)
+                    {
+                        if(Encoding.UTF8.GetByteCount(managed.str_2, 0, managed.str_2.Length) + 1 > 32)
+                        {
+                            throw new InvalidOperationException($"The managed string field '{nameof(CharArray.str_2)}' cannot be encoded to fit the fixed size array of 32.");
+                        }
+                        var written = Encoding.UTF8.GetBytes(s, managed.str_2.Length, result.str_2, 31);
+                        result.str_2[written] = 0;
+                    }
+                }
             }
 
             return result;
@@ -1130,8 +1145,12 @@ namespace My.Company
             unsafe
             {
                 var source_str = new ReadOnlySpan<byte>(unmanaged.str, 32);
-                var terminatorIndex = source_str.IndexOf<byte>(0);
-                result.str = Encoding.UTF8.GetString(source_str.Slice(0, terminatorIndex == -1 ? Math.Min(source_str.Length, 32) : terminatorIndex));
+                var terminatorIndex_str = source_str.IndexOf<byte>(0);
+                result.str = Encoding.UTF8.GetString(source_str.Slice(0, terminatorIndex_str == -1 ? Math.Min(source_str.Length, 32) : terminatorIndex_str));
+
+                var source_str_2 = new ReadOnlySpan<byte>(unmanaged.str_2, 32);
+                var terminatorIndex_str_2 = source_str_2.IndexOf<byte>(0);
+                result.str_2 = Encoding.UTF8.GetString(source_str_2.Slice(0, terminatorIndex_str_2 == -1 ? Math.Min(source_str_2.Length, 32) : terminatorIndex_str_2));
             }
 
             return result;

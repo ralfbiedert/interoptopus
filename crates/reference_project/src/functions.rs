@@ -250,6 +250,7 @@ pub fn nested_array_3(input: NestedArray) -> u8 {
 pub fn char_array_1() -> CharArray {
     let mut result = CharArray {
         str: FixedString { data: [0; 32] },
+        str_2: FixedString { data: [0; 32] },
     };
 
     result.str.data[..14].copy_from_slice(b"Hello, World!\0");

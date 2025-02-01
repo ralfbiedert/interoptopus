@@ -123,10 +123,10 @@ pub fn write_type_definition_composite_to_managed_marshal_field(
         }
     } else if matches!(a.array_type(), CType::Pattern(TypePattern::CChar)) {
         indented!(w, r"var source_{0} = new ReadOnlySpan<byte>(unmanaged.{0}, {1});", field_name, a.len())?;
-        indented!(w, r"var terminatorIndex = source_{}.IndexOf<byte>(0);", field_name)?;
+        indented!(w, r"var terminatorIndex_{0} = source_{0}.IndexOf<byte>(0);", field_name)?;
         indented!(
             w,
-            r"result.{0} = Encoding.UTF8.GetString(source_{0}.Slice(0, terminatorIndex == -1 ? Math.Min(source_{0}.Length, {1}) : terminatorIndex));",
+            r"result.{0} = Encoding.UTF8.GetString(source_{0}.Slice(0, terminatorIndex_{0} == -1 ? Math.Min(source_{0}.Length, {1}) : terminatorIndex_{0}));",
             field_name,
             a.len()
         )?;

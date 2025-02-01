@@ -195,6 +195,7 @@ typedef struct ARRAY
 typedef struct CHARARRAY
     {
     char str[32];
+    char str_2[32];
     } CHARARRAY;
 
 typedef struct CONTAINER

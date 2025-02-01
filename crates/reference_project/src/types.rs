@@ -113,6 +113,7 @@ unsafe impl<const N: usize> CTypeInfo for FixedString<N> {
 #[ffi_type]
 pub struct CharArray {
     pub str: FixedString<32>,
+    pub str_2: FixedString<32>,
 }
 
 #[ffi_type]
