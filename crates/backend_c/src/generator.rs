@@ -1,4 +1,7 @@
-use crate::converter::Converter;
+use crate::converters::{
+    composite_to_typename, const_name_to_name, constant_value_to_value, enum_to_typename, enum_variant_to_name, fnpointer_to_typename, function_name_to_c_name,
+    named_callback_to_typename, opaque_to_typename, primitive_to_typename, to_type_specifier,
+};
 use derive_builder::Builder;
 use heck::{ToLowerCamelCase, ToShoutySnakeCase, ToSnakeCase, ToUpperCamelCase};
 use interoptopus::lang::c;
@@ -120,8 +123,7 @@ pub struct Interop {
     function_parameter_naming: TypeNames,
     /// How to emit functions
     function_style: Functions,
-    inventory: Inventory,
-    converter: Converter,
+    pub(crate) inventory: Inventory,
 }
 
 /// Writes the C file format, `impl` this trait to customize output.
@@ -164,9 +166,9 @@ impl Interop {
     }
 
     fn write_constant(&self, w: &mut IndentWriter, constant: &Constant) -> Result<(), Error> {
-        let name = self.converter.const_name_to_name(self, constant);
+        let name = const_name_to_name(self, constant);
         let the_type = match constant.the_type() {
-            CType::Primitive(x) => self.converter.primitive_to_typename(x),
+            CType::Primitive(x) => primitive_to_typename(x),
             _ => return Err(Error::Null),
         };
 
@@ -174,7 +176,7 @@ impl Interop {
             self.write_documentation(w, constant.meta().documentation())?;
         }
 
-        indented!(w, r"const {} {} = {};", the_type, name, self.converter.constant_value_to_value(constant.value()))?;
+        indented!(w, r"const {} {} = {};", the_type, name, constant_value_to_value(constant.value()))?;
 
         Ok(())
     }
@@ -206,8 +208,8 @@ impl Interop {
 
     pub(crate) fn write_function_declaration(&self, w: &mut IndentWriter, function: &Function, max_line: usize) -> Result<(), Error> {
         let attr = &self.function_attribute;
-        let rval = self.converter.to_type_specifier(self, function.signature().rval());
-        let name = self.converter.function_name_to_c_name(function);
+        let rval = to_type_specifier(self, function.signature().rval());
+        let name = function_name_to_c_name(function);
 
         let mut params = Vec::new();
 
@@ -216,7 +218,7 @@ impl Interop {
                 CType::Array(a) => {
                     params.push(format!(
                         "{} {}[{}]",
-                        self.converter.to_type_specifier(self, a.array_type()),
+                        to_type_specifier(self, a.array_type()),
                         p.name().to_naming_style(&self.function_parameter_naming),
                         a.len(),
                     ));
@@ -224,7 +226,7 @@ impl Interop {
                 _ => {
                     params.push(format!(
                         "{} {}",
-                        self.converter.to_type_specifier(self, p.the_type()),
+                        to_type_specifier(self, p.the_type()),
                         p.name().to_naming_style(&self.function_parameter_naming)
                     ));
                 }
@@ -248,18 +250,18 @@ impl Interop {
     }
 
     fn write_function_as_typedef_declaration(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
-        let rval = self.converter.to_type_specifier(self, function.signature().rval());
-        let name = self.converter.function_name_to_c_name(function);
+        let rval = to_type_specifier(self, function.signature().rval());
+        let name = function_name_to_c_name(function);
 
         let mut params = Vec::new();
 
         for p in function.signature().params() {
             match p.the_type() {
                 CType::Array(a) => {
-                    params.push(format!("{} [{}]", self.converter.to_type_specifier(self, a.array_type()), a.len(),));
+                    params.push(format!("{} [{}]", to_type_specifier(self, a.array_type()), a.len(),));
                 }
                 _ => {
-                    params.push(self.converter.to_type_specifier(self, p.the_type()).to_string());
+                    params.push(to_type_specifier(self, p.the_type()).to_string());
                 }
             }
         }
@@ -345,12 +347,12 @@ impl Interop {
     }
 
     fn write_type_definition_fn_pointer_body(&self, w: &mut IndentWriter, the_type: &FnPointerType, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
-        let rval = self.converter.to_type_specifier(self, the_type.signature().rval());
-        let name = self.converter.fnpointer_to_typename(self, the_type);
+        let rval = to_type_specifier(self, the_type.signature().rval());
+        let name = fnpointer_to_typename(self, the_type);
 
         let mut params = Vec::new();
         for (i, param) in the_type.signature().params().iter().enumerate() {
-            params.push(format!("{} x{}", self.converter.to_type_specifier(self, param.the_type()), i));
+            params.push(format!("{} x{}", to_type_specifier(self, param.the_type()), i));
         }
 
         let fn_pointer = format!("typedef {} (*{})({});", rval, name, params.join(", "));
@@ -368,14 +370,14 @@ impl Interop {
     }
 
     fn write_type_definition_named_callback_body(&self, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
-        let rval = self.converter.to_type_specifier(self, the_type.fnpointer().signature().rval());
-        let name = self.converter.named_callback_to_typename(self, the_type);
+        let rval = to_type_specifier(self, the_type.fnpointer().signature().rval());
+        let name = named_callback_to_typename(self, the_type);
 
         let mut params = Vec::new();
         for param in the_type.fnpointer().signature().params() {
             params.push(format!(
                 "{} {}",
-                self.converter.to_type_specifier(self, param.the_type()),
+                to_type_specifier(self, param.the_type()),
                 param.name().to_naming_style(&self.function_parameter_naming)
             ));
         }
@@ -386,7 +388,7 @@ impl Interop {
     }
 
     fn write_type_definition_enum(&self, w: &mut IndentWriter, the_type: &EnumType) -> Result<(), Error> {
-        let name = self.converter.enum_to_typename(self, the_type);
+        let name = enum_to_typename(self, the_type);
 
         if self.documentation == Documentation::Inline {
             self.write_documentation(w, the_type.meta().documentation())?;
@@ -402,7 +404,7 @@ impl Interop {
     }
 
     fn write_type_definition_enum_variant(&self, w: &mut IndentWriter, variant: &Variant, the_enum: &EnumType) -> Result<(), Error> {
-        let variant_name = self.converter.enum_variant_to_name(self, the_enum, variant);
+        let variant_name = enum_variant_to_name(self, the_enum, variant);
         let variant_value = variant.value();
 
         if self.documentation == Documentation::Inline {
@@ -427,7 +429,7 @@ impl Interop {
     }
 
     fn write_type_definition_opaque_body(&self, w: &mut IndentWriter, the_type: &OpaqueType) -> Result<(), Error> {
-        let name = self.converter.opaque_to_typename(self, the_type);
+        let name = opaque_to_typename(self, the_type);
         indented!(w, r"typedef struct {} {};", name, name)
     }
 
@@ -436,7 +438,7 @@ impl Interop {
             self.write_documentation(w, the_type.meta().documentation())?;
         }
 
-        let name = self.converter.composite_to_typename(self, the_type);
+        let name = composite_to_typename(self, the_type);
 
         if the_type.is_empty() {
             // C doesn't allow us writing empty structs.
@@ -448,7 +450,7 @@ impl Interop {
     }
 
     fn write_type_definition_composite_body(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
-        let name = self.converter.composite_to_typename(self, the_type);
+        let name = composite_to_typename(self, the_type);
 
         let alignment = the_type.repr().alignment();
         if let Some(align) = alignment {
@@ -477,11 +479,11 @@ impl Interop {
         let field_name = field.name();
 
         if let CType::Array(x) = field.the_type() {
-            let type_name = self.converter.to_type_specifier(self, x.array_type());
+            let type_name = to_type_specifier(self, x.array_type());
             indented!(w, r"{} {}[{}];", type_name, field_name, x.len())
         } else {
             let field_name = field.name();
-            let type_name = self.converter.to_type_specifier(self, field.the_type());
+            let type_name = to_type_specifier(self, field.the_type());
             indented!(w, r"{} {};", type_name, field_name)
         }
     }

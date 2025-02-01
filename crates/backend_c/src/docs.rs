@@ -7,13 +7,13 @@ use interoptopus::{indented, Bindings};
 
 /// Writes documentation for C bindings.
 pub struct DocGenerator<'a> {
-    generator: &'a Interop,
+    interop: &'a Interop,
 }
 
 impl<'a> DocGenerator<'a> {
     #[must_use]
-    pub const fn new(generator: &'a Interop) -> Self {
-        Self { generator }
+    pub const fn new(interop: &'a Interop) -> Self {
+        Self { interop }
     }
 
     fn write_types(&self, w: &mut IndentWriter) -> Result<(), Error> {
@@ -21,7 +21,7 @@ impl<'a> DocGenerator<'a> {
 
         let mut known_function_pointers = vec![];
 
-        for the_type in &sort_types_by_dependencies(self.generator.inventory().ctypes().to_vec()) {
+        for the_type in &sort_types_by_dependencies(self.interop.inventory().ctypes().to_vec()) {
             self.write_type_definition(w, the_type, &mut known_function_pointers)?;
         }
 
@@ -53,7 +53,7 @@ impl<'a> DocGenerator<'a> {
         }
 
         indented!(w, r"```")?;
-        self.generator.write_type_definition(w, the_type, known_function_pointers)?;
+        self.interop.write_type_definition(w, the_type, known_function_pointers)?;
         indented!(w, r"```")?;
 
         Ok(())
@@ -62,7 +62,7 @@ impl<'a> DocGenerator<'a> {
     fn write_functions(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"# Functions ")?;
 
-        for the_type in self.generator.inventory().functions() {
+        for the_type in self.interop.inventory().functions() {
             self.write_function(w, the_type)?;
         }
 
@@ -81,7 +81,7 @@ impl<'a> DocGenerator<'a> {
         }
 
         indented!(w, r"```")?;
-        self.generator.write_function_declaration(w, function, 80)?;
+        self.interop.write_function_declaration(w, function, 80)?;
         indented!(w, r"```")?;
 
         w.newline()?;

@@ -111,7 +111,7 @@
 //! ```
 #![allow(clippy::test_attr_in_doctest)]
 
-mod converter;
+mod converters;
 mod docs;
 mod generator;
 
