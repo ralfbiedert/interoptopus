@@ -23,11 +23,11 @@ pub fn primitive_to_typename(x: PrimitiveType) -> String {
 }
 
 pub fn enum_to_typename(g: &Interop, x: &EnumType) -> String {
-    format!("{}{}", g.prefix, x.rust_name()).to_naming_style(&g.type_naming)
+    format!("{}{}", g.prefix, x.rust_name()).to_naming_style(&g.enum_variant_naming)
 }
 
 pub fn enum_variant_to_name(g: &Interop, the_enum: &EnumType, x: &Variant) -> String {
-    format!("{}{}_{}", g.prefix, the_enum.rust_name().to_naming_style(&g.type_naming), x.name()).to_naming_style(&g.enum_variant_naming)
+    format!("{}{}_{}", g.prefix, the_enum.rust_name().to_naming_style(&g.enum_variant_naming), x.name()).to_naming_style(&g.enum_variant_naming)
 }
 
 pub fn opaque_to_typename(g: &Interop, x: &OpaqueType) -> String {

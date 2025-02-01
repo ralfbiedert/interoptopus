@@ -116,4 +116,4 @@ mod docs;
 mod generator;
 
 pub use docs::DocGenerator;
-pub use generator::{Documentation, Functions, Indentation, Interop, InteropBuilder, TypeNames};
+pub use generator::{Documentation, Functions, Indentation, Interop, InteropBuilder, NameCase};

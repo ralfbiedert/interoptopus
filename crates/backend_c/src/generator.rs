@@ -37,41 +37,41 @@ pub enum Indentation {
 
 /// Naming style used in generated C code
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
-pub enum TypeNames {
+pub enum NameCase {
     /// Names all in lowercase without spacing e.g. 'thetypename'
-    Lowercase,
+    Lower,
     /// Names all in uppercase without spacing e.g. 'THETYPENAME'
     #[default]
-    Uppercase,
+    Upper,
     /// Names in mixed case starting with lowercase without spacing e.g. 'theTypeName'
-    LowerCamelCase,
+    LowerCamel,
     /// Names in mixed case starting with uppercase without spacing e.g. '`TheTypeName`'
-    UpperCamelCase,
+    UpperCamel,
     /// Names in lower case with '_' as spacing e.g. '`the_type_name`'
-    SnakeCase,
+    Snake,
     /// Names in upper case with '_' as spacing e.g. '`THE_TYPE_NAME`'
-    ShoutySnakeCase,
+    ShoutySnake,
 }
 
 pub trait ToNamingStyle {
-    fn to_naming_style(&self, style: &TypeNames) -> String;
+    fn to_naming_style(&self, style: &NameCase) -> String;
 }
 
 impl ToNamingStyle for String {
-    fn to_naming_style(&self, style: &TypeNames) -> String {
+    fn to_naming_style(&self, style: &NameCase) -> String {
         self.as_str().to_naming_style(style)
     }
 }
 
 impl ToNamingStyle for &str {
-    fn to_naming_style(&self, style: &TypeNames) -> String {
+    fn to_naming_style(&self, style: &NameCase) -> String {
         match style {
-            TypeNames::Lowercase => self.to_lowercase(),
-            TypeNames::Uppercase => self.to_uppercase(),
-            TypeNames::LowerCamelCase => self.to_lower_camel_case(),
-            TypeNames::UpperCamelCase => self.to_upper_camel_case(),
-            TypeNames::SnakeCase => self.to_snake_case(),
-            TypeNames::ShoutySnakeCase => self.to_shouty_snake_case(),
+            NameCase::Lower => self.to_lowercase(),
+            NameCase::Upper => self.to_uppercase(),
+            NameCase::LowerCamel => self.to_lower_camel_case(),
+            NameCase::UpperCamel => self.to_upper_camel_case(),
+            NameCase::Snake => self.to_snake_case(),
+            NameCase::ShoutySnake => self.to_shouty_snake_case(),
         }
     }
 }
@@ -114,13 +114,13 @@ pub struct Interop {
     /// How to add code documentation
     documentation: Documentation,
     /// How to convert type names
-    pub(crate) type_naming: TypeNames,
+    pub(crate) type_naming: NameCase,
     /// How to convert enum variant names
-    pub(crate) enum_variant_naming: TypeNames,
+    pub(crate) enum_variant_naming: NameCase,
     /// How to convert const names
-    pub(crate) const_naming: TypeNames,
+    pub(crate) const_naming: NameCase,
     /// How to convert function parameter names
-    function_parameter_naming: TypeNames,
+    function_parameter_naming: NameCase,
     /// How to emit functions
     function_style: Functions,
     pub(crate) inventory: Inventory,

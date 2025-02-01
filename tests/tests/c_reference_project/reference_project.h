@@ -187,12 +187,12 @@ typedef struct ARRAY
     uint8_t data[16];
     } ARRAY;
 
-typedef struct chararray
+typedef struct CHARARRAY
     {
     char str[32];
-    } chararray;
+    } CHARARRAY;
 
-typedef struct container
+typedef struct CONTAINER
     {
     LOCAL foreign;
     } CONTAINER;
@@ -288,15 +288,15 @@ typedef struct OPTIONVEC
 
 typedef void (*MYCALLBACKVOID)(const void* PTR);
 
-typedef struct nestedarray
+typedef struct NESTEDARRAY
     {
-    enumrenamed field_enum;
-    vec3f32 field_vec;
+    ENUMRENAMED field_enum;
+    VEC3F32 field_vec;
     bool field_bool;
     int32_t field_int;
     uint16_t field_array[5];
-    array field_struct;
-    } nestedarray;
+    ARRAY field_struct;
+    } NESTEDARRAY;
 
 ///A pointer to an array of data someone else owns which may not be modified.
 typedef struct SLICEUSEASCIISTRINGPATTERN
@@ -406,21 +406,21 @@ uint8_t generic_4(const GENERIC4* X);
 
 uint8_t array_1(ARRAY X);
 
-array array_2();
+ARRAY array_2();
 
-void array_3(array* arr);
+void array_3(ARRAY* ARR);
 
-nestedarray nested_array_1();
+NESTEDARRAY nested_array_1();
 
-void nested_array_2(nestedarray* result);
+void nested_array_2(NESTEDARRAY* RESULT);
 
-uint8_t nested_array_3(nestedarray input);
+uint8_t nested_array_3(NESTEDARRAY INPUT);
 
-chararray char_array_1();
+CHARARRAY char_array_1();
 
-chararray char_array_2(chararray arr);
+CHARARRAY char_array_2(CHARARRAY ARR);
 
-uint8_t char_array_3(const chararray* arr);
+uint8_t char_array_3(const CHARARRAY* ARR);
 
 /// This function has documentation.
 ENUMDOCUMENTED documented(STRUCTDOCUMENTED X);
