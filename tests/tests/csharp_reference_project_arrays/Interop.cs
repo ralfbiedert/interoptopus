@@ -16,7 +16,7 @@ namespace My.Company
 {
     public static partial class Interop
     {
-        public const string NativeLib = "library";
+        public const string NativeLib = "interoptopus_reference_project";
 
         static Interop()
         {
@@ -964,64 +964,113 @@ namespace My.Company
     }
 
     [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
+    [NativeMarshalling(typeof(ArrayMarshaller))]
     public partial struct Array
     {
-        public byte data0;
-        public byte data1;
-        public byte data2;
-        public byte data3;
-        public byte data4;
-        public byte data5;
-        public byte data6;
-        public byte data7;
-        public byte data8;
-        public byte data9;
-        public byte data10;
-        public byte data11;
-        public byte data12;
-        public byte data13;
-        public byte data14;
-        public byte data15;
+        public byte[] data;
     }
 
+    [CustomMarshaller(typeof(Array), MarshalMode.Default, typeof(ArrayMarshaller))]
+    internal static class ArrayMarshaller
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public fixed byte data[16];
+        }
+
+        public static Unmanaged ConvertToUnmanaged(Array managed)
+        {
+            var result = new Unmanaged
+            {
+            };
+
+            unsafe
+            {
+                if(managed.data != null)
+                {
+                    var source = new ReadOnlySpan<byte>(managed.data, 0, Math.Min(16, managed.data.Length));
+                    var dest = new Span<byte>(result.data, 16);
+                    source.CopyTo(dest);
+                }
+            }
+
+            return result;
+        }
+
+        public static Array ConvertToManaged(Unmanaged unmanaged)
+        {
+            var result = new Array()
+            {
+            };
+
+            unsafe
+            {
+                var source = new Span<byte>(unmanaged.data, 16);
+                var arr_data = new byte[16];
+                source.CopyTo(arr_data.AsSpan());
+                result.data = arr_data;
+            }
+
+            return result;
+        }
+    }
+
+
     [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
+    [NativeMarshalling(typeof(CharArrayMarshaller))]
     public partial struct CharArray
     {
-        public sbyte str0;
-        public sbyte str1;
-        public sbyte str2;
-        public sbyte str3;
-        public sbyte str4;
-        public sbyte str5;
-        public sbyte str6;
-        public sbyte str7;
-        public sbyte str8;
-        public sbyte str9;
-        public sbyte str10;
-        public sbyte str11;
-        public sbyte str12;
-        public sbyte str13;
-        public sbyte str14;
-        public sbyte str15;
-        public sbyte str16;
-        public sbyte str17;
-        public sbyte str18;
-        public sbyte str19;
-        public sbyte str20;
-        public sbyte str21;
-        public sbyte str22;
-        public sbyte str23;
-        public sbyte str24;
-        public sbyte str25;
-        public sbyte str26;
-        public sbyte str27;
-        public sbyte str28;
-        public sbyte str29;
-        public sbyte str30;
-        public sbyte str31;
+        public string str;
     }
+
+    [CustomMarshaller(typeof(CharArray), MarshalMode.Default, typeof(CharArrayMarshaller))]
+    internal static class CharArrayMarshaller
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public fixed byte str[32];
+        }
+
+        public static Unmanaged ConvertToUnmanaged(CharArray managed)
+        {
+            var result = new Unmanaged
+            {
+            };
+
+            unsafe
+            {
+                if(managed.str != null)
+                {
+                    fixed(char* s = managed.str)
+                    {
+                        var written = Encoding.UTF8.GetBytes(s, managed.str.Length, result.str, 31);
+                        result.str[written] = 0;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public static CharArray ConvertToManaged(Unmanaged unmanaged)
+        {
+            var result = new CharArray()
+            {
+            };
+
+            unsafe
+            {
+                var source = new ReadOnlySpan<byte>(unmanaged.str, 32);
+                var terminatorIndex = source.IndexOf<byte>(0);
+                result.str = Encoding.UTF8.GetString(source.Slice(0, terminatorIndex == -1 ? Math.Min(source.Length, 32) : terminatorIndex));
+            }
+
+            return result;
+        }
+    }
+
 
     [Serializable]
     [NativeMarshalling(typeof(ContainerMarshaller))]
@@ -1112,11 +1161,7 @@ namespace My.Company
         public Vec3f32 field_vec;
         public bool field_bool;
         public int field_int;
-        public ushort field_array0;
-        public ushort field_array1;
-        public ushort field_array2;
-        public ushort field_array3;
-        public ushort field_array4;
+        public ushort[] field_array;
         public Array field_struct;
     }
 
@@ -1131,7 +1176,7 @@ namespace My.Company
             public sbyte field_bool;
             public int field_int;
             public fixed ushort field_array[5];
-            public Array field_struct;
+            public ArrayMarshaller.Unmanaged field_struct;
         }
 
         public static Unmanaged ConvertToUnmanaged(NestedArray managed)
@@ -1142,16 +1187,17 @@ namespace My.Company
                 field_vec = managed.field_vec,
                 field_bool = Convert.ToSByte(managed.field_bool),
                 field_int = managed.field_int,
-                field_struct = managed.field_struct,
+                field_struct = ArrayMarshaller.ConvertToUnmanaged(managed.field_struct),
             };
 
             unsafe
             {
-                result.field_array[0] = managed.field_array0;
-                result.field_array[1] = managed.field_array1;
-                result.field_array[2] = managed.field_array2;
-                result.field_array[3] = managed.field_array3;
-                result.field_array[4] = managed.field_array4;
+                if(managed.field_array != null)
+                {
+                    var source = new ReadOnlySpan<ushort>(managed.field_array, 0, Math.Min(5, managed.field_array.Length));
+                    var dest = new Span<ushort>(result.field_array, 5);
+                    source.CopyTo(dest);
+                }
             }
 
             return result;
@@ -1165,16 +1211,15 @@ namespace My.Company
                 field_vec = unmanaged.field_vec,
                 field_bool = Convert.ToBoolean(unmanaged.field_bool),
                 field_int = unmanaged.field_int,
-                field_struct = unmanaged.field_struct,
+                field_struct = ArrayMarshaller.ConvertToManaged(unmanaged.field_struct),
             };
 
             unsafe
             {
-                result.field_array0 = unmanaged.field_array[0];
-                result.field_array1 = unmanaged.field_array[1];
-                result.field_array2 = unmanaged.field_array[2];
-                result.field_array3 = unmanaged.field_array[3];
-                result.field_array4 = unmanaged.field_array[4];
+                var source = new Span<ushort>(unmanaged.field_array, 5);
+                var arr_field_array = new ushort[5];
+                source.CopyTo(arr_field_array.AsSpan());
+                result.field_array = arr_field_array;
             }
 
             return result;
@@ -1237,14 +1282,6 @@ namespace My.Company
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct Vec
-    {
-        public double x;
-        public double z;
-    }
-
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct Vec1
     {
         public float x;
@@ -1292,17 +1329,66 @@ namespace My.Company
     }
 
     [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
+    [NativeMarshalling(typeof(Weird2u8Marshaller))]
     public partial struct Weird2u8
     {
-        byte t;
-        byte a0;
-        byte a1;
-        byte a2;
-        byte a3;
-        byte a4;
-        IntPtr r;
+        internal byte t;
+        internal byte[] a;
+        internal IntPtr r;
     }
+
+    [CustomMarshaller(typeof(Weird2u8), MarshalMode.Default, typeof(Weird2u8Marshaller))]
+    internal static class Weird2u8Marshaller
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public byte t;
+            public fixed byte a[5];
+            public IntPtr r;
+        }
+
+        public static Unmanaged ConvertToUnmanaged(Weird2u8 managed)
+        {
+            var result = new Unmanaged
+            {
+                t = managed.t,
+                r = managed.r,
+            };
+
+            unsafe
+            {
+                if(managed.a != null)
+                {
+                    var source = new ReadOnlySpan<byte>(managed.a, 0, Math.Min(5, managed.a.Length));
+                    var dest = new Span<byte>(result.a, 5);
+                    source.CopyTo(dest);
+                }
+            }
+
+            return result;
+        }
+
+        public static Weird2u8 ConvertToManaged(Unmanaged unmanaged)
+        {
+            var result = new Weird2u8()
+            {
+                t = unmanaged.t,
+                r = unmanaged.r,
+            };
+
+            unsafe
+            {
+                var source = new Span<byte>(unmanaged.a, 5);
+                var arr_a = new byte[5];
+                source.CopyTo(arr_a.AsSpan());
+                result.a = arr_a;
+            }
+
+            return result;
+        }
+    }
+
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);
@@ -1315,294 +1401,6 @@ namespace My.Company
         Delegate = 300,
         Fail = 400,
     }
-
-    ///A pointer to an array of data someone else owns which may not be modified.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct SliceBool
-    {
-        ///Pointer to start of immutable data.
-        IntPtr data;
-        ///Number of elements.
-        ulong len;
-    }
-
-    public partial struct SliceBool : IEnumerable<Bool>
-    {
-        public SliceBool(GCHandle handle, ulong count)
-        {
-            this.data = handle.AddrOfPinnedObject();
-            this.len = count;
-        }
-        public SliceBool(IntPtr handle, ulong count)
-        {
-            this.data = handle;
-            this.len = count;
-        }
-        public unsafe ReadOnlySpan<Bool> ReadOnlySpan
-        {
-            get
-            {
-                unsafe
-                {
-                    return new ReadOnlySpan<Bool>(this.data.ToPointer(), (int) this.len);
-                }
-            }
-        }
-        public unsafe Bool this[int i]
-        {
-            get
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                var d = (Bool*) data.ToPointer();
-                return d[i];
-            }
-        }
-        public unsafe Bool[] Copied
-        {
-            get
-            {
-                var rval = new Bool[len];
-                fixed (void* dst = rval)
-                {
-                    Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Bool));
-                    for (var i = 0; i < (int) len; i++) {
-                        rval[i] = this[i];
-                    }
-                }
-                return rval;
-            }
-        }
-        public int Count => (int) len;
-        public IEnumerator<Bool> GetEnumerator()
-        {
-            for (var i = 0; i < (int)len; ++i)
-            {
-                yield return this[i];
-            }
-        }
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
-    }
-
-
-    ///A pointer to an array of data someone else owns which may not be modified.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct SliceI32
-    {
-        ///Pointer to start of immutable data.
-        IntPtr data;
-        ///Number of elements.
-        ulong len;
-    }
-
-    public partial struct SliceI32 : IEnumerable<int>
-    {
-        public SliceI32(GCHandle handle, ulong count)
-        {
-            this.data = handle.AddrOfPinnedObject();
-            this.len = count;
-        }
-        public SliceI32(IntPtr handle, ulong count)
-        {
-            this.data = handle;
-            this.len = count;
-        }
-        public unsafe ReadOnlySpan<int> ReadOnlySpan
-        {
-            get
-            {
-                unsafe
-                {
-                    return new ReadOnlySpan<int>(this.data.ToPointer(), (int) this.len);
-                }
-            }
-        }
-        public unsafe int this[int i]
-        {
-            get
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                var d = (int*) data.ToPointer();
-                return d[i];
-            }
-        }
-        public unsafe int[] Copied
-        {
-            get
-            {
-                var rval = new int[len];
-                fixed (void* dst = rval)
-                {
-                    Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(int));
-                    for (var i = 0; i < (int) len; i++) {
-                        rval[i] = this[i];
-                    }
-                }
-                return rval;
-            }
-        }
-        public int Count => (int) len;
-        public IEnumerator<int> GetEnumerator()
-        {
-            for (var i = 0; i < (int)len; ++i)
-            {
-                yield return this[i];
-            }
-        }
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
-    }
-
-
-    ///A pointer to an array of data someone else owns which may not be modified.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct SliceU32
-    {
-        ///Pointer to start of immutable data.
-        IntPtr data;
-        ///Number of elements.
-        ulong len;
-    }
-
-    public partial struct SliceU32 : IEnumerable<uint>
-    {
-        public SliceU32(GCHandle handle, ulong count)
-        {
-            this.data = handle.AddrOfPinnedObject();
-            this.len = count;
-        }
-        public SliceU32(IntPtr handle, ulong count)
-        {
-            this.data = handle;
-            this.len = count;
-        }
-        public unsafe ReadOnlySpan<uint> ReadOnlySpan
-        {
-            get
-            {
-                unsafe
-                {
-                    return new ReadOnlySpan<uint>(this.data.ToPointer(), (int) this.len);
-                }
-            }
-        }
-        public unsafe uint this[int i]
-        {
-            get
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                var d = (uint*) data.ToPointer();
-                return d[i];
-            }
-        }
-        public unsafe uint[] Copied
-        {
-            get
-            {
-                var rval = new uint[len];
-                fixed (void* dst = rval)
-                {
-                    Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(uint));
-                    for (var i = 0; i < (int) len; i++) {
-                        rval[i] = this[i];
-                    }
-                }
-                return rval;
-            }
-        }
-        public int Count => (int) len;
-        public IEnumerator<uint> GetEnumerator()
-        {
-            for (var i = 0; i < (int)len; ++i)
-            {
-                yield return this[i];
-            }
-        }
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
-    }
-
-
-    ///A pointer to an array of data someone else owns which may not be modified.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct SliceU8
-    {
-        ///Pointer to start of immutable data.
-        IntPtr data;
-        ///Number of elements.
-        ulong len;
-    }
-
-    public partial struct SliceU8 : IEnumerable<byte>
-    {
-        public SliceU8(GCHandle handle, ulong count)
-        {
-            this.data = handle.AddrOfPinnedObject();
-            this.len = count;
-        }
-        public SliceU8(IntPtr handle, ulong count)
-        {
-            this.data = handle;
-            this.len = count;
-        }
-        public unsafe ReadOnlySpan<byte> ReadOnlySpan
-        {
-            get
-            {
-                unsafe
-                {
-                    return new ReadOnlySpan<byte>(this.data.ToPointer(), (int) this.len);
-                }
-            }
-        }
-        public unsafe byte this[int i]
-        {
-            get
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                var d = (byte*) data.ToPointer();
-                return d[i];
-            }
-        }
-        public unsafe byte[] Copied
-        {
-            get
-            {
-                var rval = new byte[len];
-                fixed (void* dst = rval)
-                {
-                    Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(byte));
-                    for (var i = 0; i < (int) len; i++) {
-                        rval[i] = this[i];
-                    }
-                }
-                return rval;
-            }
-        }
-        public int Count => (int) len;
-        public IEnumerator<byte> GetEnumerator()
-        {
-            for (var i = 0; i < (int)len; ++i)
-            {
-                yield return this[i];
-            }
-        }
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
-    }
-
 
     ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
@@ -1676,78 +1474,6 @@ namespace My.Company
     ///A pointer to an array of data someone else owns which may not be modified.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct SliceVec
-    {
-        ///Pointer to start of immutable data.
-        IntPtr data;
-        ///Number of elements.
-        ulong len;
-    }
-
-    public partial struct SliceVec : IEnumerable<Vec>
-    {
-        public SliceVec(GCHandle handle, ulong count)
-        {
-            this.data = handle.AddrOfPinnedObject();
-            this.len = count;
-        }
-        public SliceVec(IntPtr handle, ulong count)
-        {
-            this.data = handle;
-            this.len = count;
-        }
-        public unsafe ReadOnlySpan<Vec> ReadOnlySpan
-        {
-            get
-            {
-                unsafe
-                {
-                    return new ReadOnlySpan<Vec>(this.data.ToPointer(), (int) this.len);
-                }
-            }
-        }
-        public unsafe Vec this[int i]
-        {
-            get
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                var d = (Vec*) data.ToPointer();
-                return d[i];
-            }
-        }
-        public unsafe Vec[] Copied
-        {
-            get
-            {
-                var rval = new Vec[len];
-                fixed (void* dst = rval)
-                {
-                    Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Vec));
-                    for (var i = 0; i < (int) len; i++) {
-                        rval[i] = this[i];
-                    }
-                }
-                return rval;
-            }
-        }
-        public int Count => (int) len;
-        public IEnumerator<Vec> GetEnumerator()
-        {
-            for (var i = 0; i < (int)len; ++i)
-            {
-                yield return this[i];
-            }
-        }
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
-    }
-
-
-    ///A pointer to an array of data someone else owns which may not be modified.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct SliceVec3f32
     {
         ///Pointer to start of immutable data.
@@ -1804,270 +1530,6 @@ namespace My.Company
         }
         public int Count => (int) len;
         public IEnumerator<Vec3f32> GetEnumerator()
-        {
-            for (var i = 0; i < (int)len; ++i)
-            {
-                yield return this[i];
-            }
-        }
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
-    }
-
-
-    ///A pointer to an array of data someone else owns which may be modified.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct SliceMutU32
-    {
-        ///Pointer to start of mutable data.
-        IntPtr data;
-        ///Number of elements.
-        ulong len;
-    }
-
-    public partial struct SliceMutU32 : IEnumerable<uint>
-    {
-        public SliceMutU32(GCHandle handle, ulong count)
-        {
-            this.data = handle.AddrOfPinnedObject();
-            this.len = count;
-        }
-        public SliceMutU32(IntPtr handle, ulong count)
-        {
-            this.data = handle;
-            this.len = count;
-        }
-        public unsafe ReadOnlySpan<uint> ReadOnlySpan
-        {
-            get
-            {
-                unsafe
-                {
-                    return new ReadOnlySpan<uint>(this.data.ToPointer(), (int) this.len);
-                }
-            }
-        }
-        public unsafe Span<uint> Span
-        {
-            get
-            {
-                unsafe
-                {
-                    return new Span<uint>(this.data.ToPointer(), (int) this.len);
-                }
-            }
-        }
-        public unsafe uint this[int i]
-        {
-            get
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                var d = (uint*) data.ToPointer();
-                return d[i];
-            }
-            set
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                var d = (uint*) data.ToPointer();
-                d[i] = value;
-            }
-        }
-        public unsafe uint[] Copied
-        {
-            get
-            {
-                var rval = new uint[len];
-                fixed (void* dst = rval)
-                {
-                    Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(uint));
-                    for (var i = 0; i < (int) len; i++) {
-                        rval[i] = this[i];
-                    }
-                }
-                return rval;
-            }
-        }
-        public int Count => (int) len;
-        public IEnumerator<uint> GetEnumerator()
-        {
-            for (var i = 0; i < (int)len; ++i)
-            {
-                yield return this[i];
-            }
-        }
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
-    }
-
-
-    ///A pointer to an array of data someone else owns which may be modified.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct SliceMutU8
-    {
-        ///Pointer to start of mutable data.
-        IntPtr data;
-        ///Number of elements.
-        ulong len;
-    }
-
-    public partial struct SliceMutU8 : IEnumerable<byte>
-    {
-        public SliceMutU8(GCHandle handle, ulong count)
-        {
-            this.data = handle.AddrOfPinnedObject();
-            this.len = count;
-        }
-        public SliceMutU8(IntPtr handle, ulong count)
-        {
-            this.data = handle;
-            this.len = count;
-        }
-        public unsafe ReadOnlySpan<byte> ReadOnlySpan
-        {
-            get
-            {
-                unsafe
-                {
-                    return new ReadOnlySpan<byte>(this.data.ToPointer(), (int) this.len);
-                }
-            }
-        }
-        public unsafe Span<byte> Span
-        {
-            get
-            {
-                unsafe
-                {
-                    return new Span<byte>(this.data.ToPointer(), (int) this.len);
-                }
-            }
-        }
-        public unsafe byte this[int i]
-        {
-            get
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                var d = (byte*) data.ToPointer();
-                return d[i];
-            }
-            set
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                var d = (byte*) data.ToPointer();
-                d[i] = value;
-            }
-        }
-        public unsafe byte[] Copied
-        {
-            get
-            {
-                var rval = new byte[len];
-                fixed (void* dst = rval)
-                {
-                    Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(byte));
-                    for (var i = 0; i < (int) len; i++) {
-                        rval[i] = this[i];
-                    }
-                }
-                return rval;
-            }
-        }
-        public int Count => (int) len;
-        public IEnumerator<byte> GetEnumerator()
-        {
-            for (var i = 0; i < (int)len; ++i)
-            {
-                yield return this[i];
-            }
-        }
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
-    }
-
-
-    ///A pointer to an array of data someone else owns which may be modified.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct SliceMutVec
-    {
-        ///Pointer to start of mutable data.
-        IntPtr data;
-        ///Number of elements.
-        ulong len;
-    }
-
-    public partial struct SliceMutVec : IEnumerable<Vec>
-    {
-        public SliceMutVec(GCHandle handle, ulong count)
-        {
-            this.data = handle.AddrOfPinnedObject();
-            this.len = count;
-        }
-        public SliceMutVec(IntPtr handle, ulong count)
-        {
-            this.data = handle;
-            this.len = count;
-        }
-        public unsafe ReadOnlySpan<Vec> ReadOnlySpan
-        {
-            get
-            {
-                unsafe
-                {
-                    return new ReadOnlySpan<Vec>(this.data.ToPointer(), (int) this.len);
-                }
-            }
-        }
-        public unsafe Span<Vec> Span
-        {
-            get
-            {
-                unsafe
-                {
-                    return new Span<Vec>(this.data.ToPointer(), (int) this.len);
-                }
-            }
-        }
-        public unsafe Vec this[int i]
-        {
-            get
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                var d = (Vec*) data.ToPointer();
-                return d[i];
-            }
-            set
-            {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                var d = (Vec*) data.ToPointer();
-                d[i] = value;
-            }
-        }
-        public unsafe Vec[] Copied
-        {
-            get
-            {
-                var rval = new Vec[len];
-                fixed (void* dst = rval)
-                {
-                    Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof(Vec));
-                    for (var i = 0; i < (int) len; i++) {
-                        rval[i] = this[i];
-                    }
-                }
-                return rval;
-            }
-        }
-        public int Count => (int) len;
-        public IEnumerator<Vec> GetEnumerator()
         {
             for (var i = 0; i < (int)len; ++i)
             {
@@ -2155,99 +1617,6 @@ namespace My.Company
     }
 
 
-    ///Option type containing boolean flag and maybe valid data.
-    [Serializable]
-    [NativeMarshalling(typeof(OptionVecMarshaller))]
-    public partial struct OptionVec
-    {
-        ///Element that is maybe valid.
-        internal Vec t;
-        ///Byte where `1` means element `t` is valid.
-        internal byte is_some;
-    }
-
-    [CustomMarshaller(typeof(OptionVec), MarshalMode.Default, typeof(OptionVecMarshaller))]
-    internal static class OptionVecMarshaller
-    {
-        [StructLayout(LayoutKind.Sequential)]
-        public unsafe struct Unmanaged
-        {
-            public Vec t;
-            public byte is_some;
-        }
-
-        public static Unmanaged ConvertToUnmanaged(OptionVec managed)
-        {
-            var result = new Unmanaged
-            {
-                t = managed.t,
-                is_some = managed.is_some,
-            };
-
-            unsafe
-            {
-            }
-
-            return result;
-        }
-
-        public static OptionVec ConvertToManaged(Unmanaged unmanaged)
-        {
-            var result = new OptionVec()
-            {
-                t = unmanaged.t,
-                is_some = unmanaged.is_some,
-            };
-
-            unsafe
-            {
-            }
-
-            return result;
-        }
-    }
-
-
-    public partial struct OptionVec
-    {
-        public static OptionVec FromNullable(Vec? nullable)
-        {
-            var result = new OptionVec();
-            if (nullable.HasValue)
-            {
-                result.is_some = 1;
-                result.t = nullable.Value;
-            }
-
-            return result;
-        }
-
-        public Vec? ToNullable()
-        {
-            return this.is_some == 1 ? this.t : (Vec?)null;
-        }
-    }
-
-
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct Bool
-    {
-        byte value;
-    }
-
-    public partial struct Bool
-    {
-        public static readonly Bool True = new Bool { value =  1 };
-        public static readonly Bool False = new Bool { value =  0 };
-        public Bool(bool b)
-        {
-            value = (byte) (b ? 1 : 0);
-        }
-        public bool Is => value == 1;
-    }
-
-
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte CallbackFFISlice(SliceU8 slice);
 
@@ -2262,9 +1631,6 @@ namespace My.Company
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate uint MyCallback(uint value);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint MyCallbackNamespaced(uint value);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MyCallbackVoid(IntPtr ptr);
@@ -2795,15 +2161,5 @@ namespace My.Company
     }
 
 
-
-    public class InteropException<T> : Exception
-    {
-        public T Error { get; private set; }
-
-        public InteropException(T error): base($"Something went wrong: {error}")
-        {
-            Error = error;
-        }
-    }
 
 }

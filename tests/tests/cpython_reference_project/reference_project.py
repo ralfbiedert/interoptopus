@@ -41,6 +41,14 @@ def init_lib(path):
     c_lib.generic_3.argtypes = [ctypes.c_void_p]
     c_lib.generic_4.argtypes = [ctypes.c_void_p]
     c_lib.array_1.argtypes = [Array]
+    c_lib.array_2.argtypes = []
+    c_lib.array_3.argtypes = [ctypes.POINTER(Array)]
+    c_lib.nested_array_1.argtypes = []
+    c_lib.nested_array_2.argtypes = [ctypes.POINTER(NestedArray)]
+    c_lib.nested_array_3.argtypes = [NestedArray]
+    c_lib.char_array_1.argtypes = []
+    c_lib.char_array_2.argtypes = [CharArray]
+    c_lib.char_array_3.argtypes = [ctypes.POINTER(CharArray)]
     c_lib.documented.argtypes = [StructDocumented]
     c_lib.ambiguous_1.argtypes = [Vec1]
     c_lib.ambiguous_2.argtypes = [Vec2]
@@ -151,6 +159,12 @@ def init_lib(path):
     c_lib.generic_3.restype = ctypes.c_uint8
     c_lib.generic_4.restype = ctypes.c_uint8
     c_lib.array_1.restype = ctypes.c_uint8
+    c_lib.array_2.restype = Array
+    c_lib.nested_array_1.restype = NestedArray
+    c_lib.nested_array_3.restype = ctypes.c_uint8
+    c_lib.char_array_1.restype = CharArray
+    c_lib.char_array_2.restype = CharArray
+    c_lib.char_array_3.restype = ctypes.c_uint8
     c_lib.documented.restype = ctypes.c_int
     c_lib.ambiguous_1.restype = Vec1
     c_lib.ambiguous_2.restype = Vec2
@@ -350,6 +364,30 @@ def generic_4(x: ctypes.c_void_p) -> int:
 
 def array_1(x: Array) -> int:
     return c_lib.array_1(x)
+
+def array_2() -> Array:
+    return c_lib.array_2()
+
+def array_3(arr: ctypes.POINTER(Array)):
+    return c_lib.array_3(arr)
+
+def nested_array_1() -> NestedArray:
+    return c_lib.nested_array_1()
+
+def nested_array_2(result: ctypes.POINTER(NestedArray)):
+    return c_lib.nested_array_2(result)
+
+def nested_array_3(input: NestedArray) -> int:
+    return c_lib.nested_array_3(input)
+
+def char_array_1() -> CharArray:
+    return c_lib.char_array_1()
+
+def char_array_2(arr: CharArray) -> CharArray:
+    return c_lib.char_array_2(arr)
+
+def char_array_3(arr: ctypes.POINTER(CharArray)) -> int:
+    return c_lib.char_array_3(arr)
 
 def documented(x: StructDocumented) -> ctypes.c_int:
     """ This function has documentation."""
@@ -1056,6 +1094,26 @@ class Array(ctypes.Structure):
         return ctypes.Structure.__set__(self, "data", value)
 
 
+class CharArray(ctypes.Structure):
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("str", ctypes.c_char * 32),
+    ]
+
+    def __init__(self, str = None):
+        if str is not None:
+            self.str = str
+
+    @property
+    def str(self):
+        return ctypes.Structure.__get__(self, "str")
+
+    @str.setter
+    def str(self, value):
+        return ctypes.Structure.__set__(self, "str", value)
+
+
 class Container(ctypes.Structure):
 
     # These fields represent the underlying C data layout
@@ -1542,6 +1600,81 @@ class OptionVec(ctypes.Structure):
     def is_none(self) -> bool:
         """Returns true if the value does not exist."""
         return self._is_some != 0
+
+
+class NestedArray(ctypes.Structure):
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("field_enum", ctypes.c_int),
+        ("field_vec", Vec3f32),
+        ("field_bool", ctypes.c_bool),
+        ("field_int", ctypes.c_int32),
+        ("field_array", ctypes.c_uint16 * 5),
+        ("field_struct", Array),
+    ]
+
+    def __init__(self, field_enum: ctypes.c_int = None, field_vec: Vec3f32 = None, field_bool: bool = None, field_int: int = None, field_array = None, field_struct: Array = None):
+        if field_enum is not None:
+            self.field_enum = field_enum
+        if field_vec is not None:
+            self.field_vec = field_vec
+        if field_bool is not None:
+            self.field_bool = field_bool
+        if field_int is not None:
+            self.field_int = field_int
+        if field_array is not None:
+            self.field_array = field_array
+        if field_struct is not None:
+            self.field_struct = field_struct
+
+    @property
+    def field_enum(self) -> ctypes.c_int:
+        return ctypes.Structure.__get__(self, "field_enum")
+
+    @field_enum.setter
+    def field_enum(self, value: ctypes.c_int):
+        return ctypes.Structure.__set__(self, "field_enum", value)
+
+    @property
+    def field_vec(self) -> Vec3f32:
+        return ctypes.Structure.__get__(self, "field_vec")
+
+    @field_vec.setter
+    def field_vec(self, value: Vec3f32):
+        return ctypes.Structure.__set__(self, "field_vec", value)
+
+    @property
+    def field_bool(self) -> bool:
+        return ctypes.Structure.__get__(self, "field_bool")
+
+    @field_bool.setter
+    def field_bool(self, value: bool):
+        return ctypes.Structure.__set__(self, "field_bool", value)
+
+    @property
+    def field_int(self) -> int:
+        return ctypes.Structure.__get__(self, "field_int")
+
+    @field_int.setter
+    def field_int(self, value: int):
+        return ctypes.Structure.__set__(self, "field_int", value)
+
+    @property
+    def field_array(self):
+        return ctypes.Structure.__get__(self, "field_array")
+
+    @field_array.setter
+    def field_array(self, value):
+        return ctypes.Structure.__set__(self, "field_array", value)
+
+    @property
+    def field_struct(self) -> Array:
+        return ctypes.Structure.__get__(self, "field_struct")
+
+    @field_struct.setter
+    def field_struct(self, value: Array):
+        return ctypes.Structure.__set__(self, "field_struct", value)
 
 
 class SliceUseAsciiStringPattern(ctypes.Structure):

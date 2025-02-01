@@ -187,6 +187,11 @@ typedef struct array
     uint8_t data[16];
     } array;
 
+typedef struct chararray
+    {
+    char str[32];
+    } chararray;
+
 typedef struct container
     {
     local foreign;
@@ -282,6 +287,16 @@ typedef struct optionvec
     } optionvec;
 
 typedef void (*mycallbackvoid)(const void* ptr);
+
+typedef struct nestedarray
+    {
+    enumrenamed field_enum;
+    vec3f32 field_vec;
+    bool field_bool;
+    int32_t field_int;
+    uint16_t field_array[5];
+    array field_struct;
+    } nestedarray;
 
 ///A pointer to an array of data someone else owns which may not be modified.
 typedef struct sliceuseasciistringpattern
@@ -390,6 +405,22 @@ uint8_t generic_3(const generic3* x);
 uint8_t generic_4(const generic4* x);
 
 uint8_t array_1(array x);
+
+array array_2();
+
+void array_3(array* arr);
+
+nestedarray nested_array_1();
+
+void nested_array_2(nestedarray* result);
+
+uint8_t nested_array_3(nestedarray input);
+
+chararray char_array_1();
+
+chararray char_array_2(chararray arr);
+
+uint8_t char_array_3(const chararray* arr);
 
 /// This function has documentation.
 enumdocumented documented(structdocumented x);

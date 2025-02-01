@@ -1,7 +1,7 @@
 use crate::config::{Config, Unsupported, WriteTypes};
 use crate::converter::{CSharpTypeConverter, Converter, FunctionNameFlavor};
 use interoptopus::lang::c::{
-    CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, Layout, Meta, Parameter, PrimitiveType, Variant, Visibility,
+    ArrayType, CType, CompositeType, Constant, Documentation, EnumType, Field, FnPointerType, Function, Layout, Meta, Parameter, PrimitiveType, Variant, Visibility,
 };
 use interoptopus::patterns::api_guard::inventory_hash;
 use interoptopus::patterns::callbacks::NamedCallback;
@@ -40,9 +40,11 @@ pub trait CSharpWriter {
 
         indented!(w, r"#pragma warning disable 0105")?;
         indented!(w, r"using System;")?;
+        indented!(w, r"using System.Text;")?;
         indented!(w, r"using System.Collections;")?;
         indented!(w, r"using System.Collections.Generic;")?;
         indented!(w, r"using System.Runtime.InteropServices;")?;
+        indented!(w, r"using System.Runtime.InteropServices.Marshalling;")?;
         indented!(w, r"using System.Runtime.CompilerServices;")?;
 
         for namespace_id in self.inventory().namespaces() {
@@ -599,7 +601,241 @@ pub trait CSharpWriter {
         self.debug(w, "write_type_definition_composite")?;
         self.write_documentation(w, the_type.meta().documentation())?;
         self.write_type_definition_composite_annotation(w, the_type)?;
-        self.write_type_definition_composite_body(w, the_type, WriteFor::Code)
+        self.write_type_definition_composite_body(w, the_type, WriteFor::Code)?;
+        self.write_type_definition_composite_marshaller(w, the_type)
+    }
+
+    fn write_type_definition_composite_marshaller(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
+        self.debug(w, "write_type_marshaller")?;
+
+        if self.should_emit_marshaller_for_composite(the_type) {
+            w.newline()?;
+            indented!(
+                w,
+                r"[CustomMarshaller(typeof({}), MarshalMode.Default, typeof({}Marshaller))]",
+                the_type.rust_name(),
+                the_type.rust_name()
+            )?;
+            indented!(w, r"internal static class {}Marshaller", the_type.rust_name())?;
+            indented!(w, r"{{")?;
+            w.indent();
+            self.write_type_definition_composite_layout_annotation(w, the_type)?;
+            indented!(w, r"public unsafe struct Unmanaged")?;
+            indented!(w, r"{{")?;
+            w.indent();
+            for field in the_type.fields() {
+                self.write_type_definition_composite_unmanaged_body_field(w, field, the_type)?;
+            }
+            w.unindent();
+            indented!(w, r"}}")?;
+            w.unindent();
+            w.newline()?;
+            w.indent();
+            indented!(w, r"public static Unmanaged ConvertToUnmanaged({} managed)", the_type.rust_name())?;
+            indented!(w, r"{{")?;
+            w.indent();
+            indented!(w, r"var result = new Unmanaged")?;
+            indented!(w, r"{{")?;
+            w.indent();
+            for field in the_type.fields().iter().filter(|t| !matches!(t.the_type(), CType::Array(_))) {
+                self.write_type_definition_composite_to_unmanaged_inline_field(w, field)?;
+            }
+            w.unindent();
+            indented!(w, r"}};")?;
+            w.newline()?;
+            indented!(w, r"unsafe")?;
+            indented!(w, r"{{")?;
+            w.indent();
+            for (i, field) in the_type.fields().iter().filter(|t| matches!(t.the_type(), CType::Array(_))).enumerate() {
+                if i > 0 {
+                    w.newline()?;
+                }
+                if let CType::Array(a) = field.the_type() {
+                    self.write_type_definition_composite_to_unmanaged_marshal_field(w, the_type, field, a)?;
+                }
+            }
+            w.unindent();
+            indented!(w, r"}}")?;
+            w.newline()?;
+            indented!(w, r"return result;")?;
+            w.unindent();
+            indented!(w, r"}}")?;
+            w.newline()?;
+            indented!(w, r"public static {0} ConvertToManaged(Unmanaged unmanaged)", the_type.rust_name())?;
+            indented!(w, r"{{")?;
+            w.indent();
+            indented!(w, r"var result = new {0}()", the_type.rust_name())?;
+            indented!(w, r"{{")?;
+            w.indent();
+            for field in the_type.fields().iter().filter(|t| !matches!(t.the_type(), CType::Array(_))) {
+                self.write_type_definition_composite_to_managed_inline_field(w, field)?;
+            }
+            w.unindent();
+            indented!(w, r"}};")?;
+            w.newline()?;
+            indented!(w, r"unsafe")?;
+            indented!(w, r"{{")?;
+            w.indent();
+            for (i, field) in the_type.fields().iter().filter(|t| matches!(t.the_type(), CType::Array(_))).enumerate() {
+                if i > 0 {
+                    w.newline()?;
+                }
+                if let CType::Array(a) = field.the_type() {
+                    self.write_type_definition_composite_to_managed_marshal_field(w, the_type, field, a)?;
+                }
+            }
+            w.unindent();
+            indented!(w, r"}}")?;
+            w.newline()?;
+            indented!(w, r"return result;")?;
+            w.unindent();
+            indented!(w, r"}}")?;
+            w.unindent();
+            indented!(w, r"}}")?;
+            w.newline()?;
+        }
+
+        Ok(())
+    }
+
+    fn write_type_definition_composite_to_managed_marshal_field(
+        &self,
+        w: &mut IndentWriter,
+        the_type: &CompositeType,
+        field: &Field,
+        a: &ArrayType,
+    ) -> Result<(), Error> {
+        let field_name = self.converter().field_name_to_csharp_name(field, self.config().rename_symbols);
+        let type_name = self.converter().to_typespecifier_in_field(a.array_type(), field, the_type);
+        if self.config().unroll_struct_arrays {
+            for i in 0..a.len() {
+                indented!(w, r"result.{0}{1} = unmanaged.{0}[{1}];", field_name, i)?;
+            }
+        } else if matches!(a.array_type(), CType::Pattern(TypePattern::CChar)) {
+            indented!(w, r"var source = new ReadOnlySpan<byte>(unmanaged.{}, {});", field_name, a.len())?;
+            indented!(w, r"var terminatorIndex = source.IndexOf<byte>(0);")?;
+            indented!(
+                w,
+                r"result.{} = Encoding.UTF8.GetString(source.Slice(0, terminatorIndex == -1 ? Math.Min(source.Length, {}) : terminatorIndex));",
+                field_name,
+                a.len()
+            )?;
+        } else {
+            indented!(w, r"var source = new Span<{}>(unmanaged.{}, {});", type_name, field_name, a.len())?;
+            indented!(w, r"var arr_{} = new {}[{}];", field_name, type_name, a.len())?;
+            indented!(w, r"source.CopyTo(arr_{}.AsSpan());", field_name)?;
+            indented!(w, r"result.{0} = arr_{0};", field_name)?;
+        }
+        Ok(())
+    }
+
+    fn write_type_definition_composite_to_managed_inline_field(&self, w: &mut IndentWriter, field: &Field) -> Result<(), Error> {
+        let field_name = self.converter().field_name_to_csharp_name(field, self.config().rename_symbols);
+        match field.the_type() {
+            CType::Primitive(PrimitiveType::Bool) => {
+                indented!(w, r"{0} = Convert.ToBoolean(unmanaged.{0}),", field_name)?;
+            }
+            CType::Composite(composite) if self.should_emit_marshaller_for_composite(composite) => {
+                indented!(w, r"{0} = {1}Marshaller.ConvertToManaged(unmanaged.{0}),", field_name, composite.rust_name())?;
+            }
+            _ => {
+                indented!(w, r"{0} = unmanaged.{0},", field_name)?;
+            }
+        }
+        Ok(())
+    }
+
+    fn write_type_definition_composite_to_unmanaged_marshal_field(
+        &self,
+        w: &mut IndentWriter,
+        the_type: &CompositeType,
+        field: &Field,
+        a: &ArrayType,
+    ) -> Result<(), Error> {
+        let field_name = self.converter().field_name_to_csharp_name(field, self.config().rename_symbols);
+        let type_name = self.converter().to_typespecifier_in_field(a.array_type(), field, the_type);
+        if self.config().unroll_struct_arrays {
+            for i in 0..a.len() {
+                indented!(w, r"result.{0}[{1}] = managed.{0}{1};", field_name, i)?;
+            }
+        } else {
+            indented!(w, r"if(managed.{} != null)", field_name)?;
+            indented!(w, r"{{")?;
+            w.indent();
+            if matches!(a.array_type(), CType::Pattern(TypePattern::CChar)) {
+                indented!(w, "fixed(char* s = managed.{})", field_name)?;
+                indented!(w, "{{")?;
+                w.indent();
+                indented!(
+                    w,
+                    r"var written = Encoding.UTF8.GetBytes(s, managed.{0}.Length, result.{0}, {1});",
+                    field_name,
+                    a.len() - 1
+                )?;
+                indented!(w, r"result.{}[written] = 0;", field_name)?;
+                w.unindent();
+                indented!(w, r"}}")?;
+            } else {
+                indented!(
+                    w,
+                    r"var source = new ReadOnlySpan<{0}>(managed.{1}, 0, Math.Min({2}, managed.{1}.Length));",
+                    type_name,
+                    field_name,
+                    a.len()
+                )?;
+                indented!(w, r"var dest = new Span<{0}>(result.{1}, {2});", type_name, field_name, a.len())?;
+                indented!(w, r"source.CopyTo(dest);")?;
+            }
+            w.unindent();
+            indented!(w, r"}}")?;
+        }
+        Ok(())
+    }
+
+    fn write_type_definition_composite_to_unmanaged_inline_field(&self, w: &mut IndentWriter, field: &Field) -> Result<(), Error> {
+        let field_name = self.converter().field_name_to_csharp_name(field, self.config().rename_symbols);
+        match field.the_type() {
+            CType::Primitive(PrimitiveType::Bool) => {
+                indented!(w, r"{0} = Convert.ToSByte(managed.{0}),", field_name)?;
+            }
+            CType::Composite(composite) if self.should_emit_marshaller_for_composite(composite) => {
+                indented!(w, r"{0} = {1}Marshaller.ConvertToUnmanaged(managed.{0}),", field_name, composite.rust_name())?;
+            }
+            _ => {
+                indented!(w, r"{0} = managed.{0},", field_name)?;
+            }
+        }
+        Ok(())
+    }
+
+    fn write_type_definition_composite_unmanaged_body_field(&self, w: &mut IndentWriter, field: &Field, the_type: &CompositeType) -> Result<(), Error> {
+        let field_name = self.converter().field_name_to_csharp_name(field, self.config().rename_symbols);
+        match field.the_type() {
+            CType::Array(a) => {
+                let type_name = self.converter().to_typespecifier_in_field(a.array_type(), field, the_type);
+                let size = a.len();
+                if matches!(a.array_type(), CType::Pattern(TypePattern::CChar)) {
+                    indented!(w, r"public fixed byte {}[{}];", field_name, size)?;
+                } else {
+                    indented!(w, r"public fixed {} {}[{}];", type_name, field_name, size)?;
+                }
+            }
+            CType::Primitive(PrimitiveType::Bool) => {
+                indented!(w, r"public sbyte {};", field_name)?;
+            }
+            CType::Composite(composite) => {
+                if self.should_emit_marshaller_for_composite(composite) {
+                    indented!(w, r"public {}Marshaller.Unmanaged {};", composite.rust_name(), field_name)?;
+                } else {
+                    indented!(w, r"public {} {};", composite.rust_name(), field_name)?;
+                }
+            }
+            _ => {
+                let type_name = self.converter().to_typespecifier_in_field(field.the_type(), field, the_type);
+                indented!(w, r"public {} {};", type_name, field_name)?;
+            }
+        }
+        Ok(())
     }
 
     fn write_type_definition_composite_annotation(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
@@ -613,6 +849,16 @@ pub trait CSharpWriter {
             }
         }
 
+        if self.should_emit_marshaller_for_composite(the_type) {
+            indented!(w, r"[NativeMarshalling(typeof({}Marshaller))]", the_type.rust_name())?;
+        } else {
+            self.write_type_definition_composite_layout_annotation(w, the_type)?;
+        }
+
+        Ok(())
+    }
+
+    fn write_type_definition_composite_layout_annotation(&self, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
         match the_type.repr().layout() {
             Layout::C | Layout::Transparent | Layout::Opaque => indented!(w, r"[StructLayout(LayoutKind.Sequential)]"),
             Layout::Packed => indented!(w, r"[StructLayout(LayoutKind.Sequential, Pack = 1)]"),
@@ -641,26 +887,36 @@ pub trait CSharpWriter {
         let field_name = self.converter().field_name_to_csharp_name(field, self.config().rename_symbols);
         let visibility = match field.visibility() {
             Visibility::Public => "public ",
+            Visibility::Private if self.should_emit_marshaller_for_composite(the_type) => "internal ",
             Visibility::Private => "",
         };
 
         match field.the_type() {
             CType::Array(a) => {
-                assert!(
-                    self.config().unroll_struct_arrays,
-                    "Unable to generate bindings for arrays in fields if `unroll_struct_arrays` is not enabled."
-                );
+                if self.config().unroll_struct_arrays {
+                    let type_name = self.converter().to_typespecifier_in_field(a.array_type(), field, the_type);
+                    for i in 0..a.len() {
+                        indented!(w, r"{}{} {}{};", visibility, type_name, field_name, i)?;
+                    }
+                } else {
+                    assert!(self.converter().is_blittable(a.array_type()), "Array type is not blittable: {:?}", a.array_type());
 
-                let type_name = self.converter().to_typespecifier_in_field(a.array_type(), field, the_type);
-                for i in 0..a.len() {
-                    indented!(w, r"{}{} {}{};", visibility, type_name, field_name, i)?;
+                    let type_name = if matches!(a.array_type(), CType::Pattern(TypePattern::CChar)) {
+                        "string".to_string()
+                    } else {
+                        format!("{}[]", self.converter().to_typespecifier_in_field(a.array_type(), field, the_type))
+                    };
+
+                    indented!(w, r"{}{} {};", visibility, type_name, field_name)?;
                 }
 
                 Ok(())
             }
             CType::Primitive(PrimitiveType::Bool) => {
                 let type_name = self.converter().to_typespecifier_in_field(field.the_type(), field, the_type);
-                indented!(w, r"[MarshalAs(UnmanagedType.I1)]")?;
+                if !self.should_emit_marshaller_for_composite(the_type) {
+                    indented!(w, r"[MarshalAs(UnmanagedType.I1)]")?;
+                }
                 indented!(w, r"{}{} {};", visibility, type_name, field_name)
             }
             _ => {
@@ -709,6 +965,25 @@ pub trait CSharpWriter {
             WriteTypes::NamespaceAndInteroptopusGlobal => self.config().namespace_id.is_empty(),
             WriteTypes::All => true,
         }
+    }
+
+    fn should_emit_marshaller_for_composite(&self, composite: &CompositeType) -> bool {
+        composite
+            .fields()
+            .iter()
+            .any(|f| matches!(f.the_type(), CType::Composite(_)) || self.should_emit_marshaller(f.the_type()))
+    }
+
+    fn should_emit_marshaller(&self, ctype: &CType) -> bool {
+        match ctype {
+            CType::Array(_) => !self.config().unroll_struct_arrays,
+            CType::Composite(x) => self.should_emit_marshaller_for_composite(x),
+            _ => false,
+        }
+    }
+
+    fn has_emittable_marshallers(&self, types: &[CType]) -> bool {
+        types.iter().any(|x| self.should_emit_marshaller(x))
     }
 
     fn has_emittable_functions(&self, functions: &[Function]) -> bool {
