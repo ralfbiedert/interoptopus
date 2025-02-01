@@ -1,3 +1,6 @@
+use crate::interop::functions::write_function;
+use crate::interop::patterns::{write_pattern_class_ctor, write_pattern_class_method};
+use crate::interop::types::{write_enum, write_struct};
 use crate::Interop;
 use interoptopus::lang::c::{CType, CompositeType, Function};
 use interoptopus::patterns::{LibraryPattern, TypePattern};
@@ -142,7 +145,7 @@ impl<'a> Markdown<'a> {
 
         indented!(w, r"#### Definition ")?;
         indented!(w, r"```python")?;
-        self.interop.write_struct(w, composite, WriteFor::Docs)?;
+        write_struct(self.interop, w, composite, WriteFor::Docs)?;
         indented!(w, r"```")?;
 
         Ok(())
@@ -174,7 +177,7 @@ impl<'a> Markdown<'a> {
 
             indented!(w, r"#### Definition ")?;
             indented!(w, r"```python")?;
-            self.interop.write_enum(w, the_enum, WriteFor::Docs)?;
+            write_enum(self.interop, w, the_enum, WriteFor::Docs)?;
             indented!(w, r"```")?;
             w.newline()?;
             indented!(w, r"---")?;
@@ -206,7 +209,7 @@ impl<'a> Markdown<'a> {
 
         indented!(w, r"#### Definition ")?;
         indented!(w, r"```python")?;
-        self.interop.write_function(w, function, WriteFor::Docs)?;
+        write_function(self.interop, w, function, WriteFor::Docs)?;
         indented!(w, r"```")?;
         w.newline()?;
         indented!(w, r"---")?;
@@ -254,7 +257,7 @@ impl<'a> Markdown<'a> {
                 indented!(w, r"```python")?;
                 indented!(w, r"class {}:", class_name)?;
                 w.newline()?;
-                self.interop.write_pattern_class_ctor(w, pattern, x, WriteFor::Docs)?;
+                write_pattern_class_ctor(self.interop, w, pattern, x, WriteFor::Docs)?;
                 indented!(w, [()()], r"...")?;
                 indented!(w, r"```")?;
                 w.newline()?;
@@ -280,7 +283,7 @@ impl<'a> Markdown<'a> {
                 indented!(w, r"```python")?;
                 indented!(w, r"class {}:", class_name)?;
                 w.newline()?;
-                self.interop.write_pattern_class_method(w, pattern, x, WriteFor::Docs)?;
+                write_pattern_class_method(self.interop, w, pattern, x, WriteFor::Docs)?;
                 indented!(w, [()()], r"...")?;
                 indented!(w, r"```")?;
                 w.newline()?;
