@@ -95,6 +95,7 @@ pub struct NestedArray {
     pub field_bool: bool,
     pub field_int: i32,
     pub field_array: [u16; 5],
+    pub field_array_2: [u16; 5],
     pub field_struct: Array,
 }
 
@@ -120,6 +121,11 @@ where
     T: CTypeInfo,
 {
     pub data: [T; 16],
+}
+
+#[ffi_type]
+pub struct BoolField {
+    pub val: bool,
 }
 
 // TODO

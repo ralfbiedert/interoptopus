@@ -82,6 +82,7 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(functions::char_array_1))
             .register(function!(functions::char_array_2))
             .register(function!(functions::char_array_3))
+            .register(function!(functions::bool_field))
             .register(function!(functions::documented))
             .register(function!(functions::ambiguous_1))
             .register(function!(functions::ambiguous_2))

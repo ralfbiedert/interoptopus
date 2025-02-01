@@ -21,9 +21,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 10789183016542361715ul)
+            if (api_version != 5676777239214057195ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10789183016542361715). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (5676777239214057195). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -165,6 +165,10 @@ namespace My.Company
 
         [LibraryImport(NativeLib, EntryPoint = "char_array_3")]
         public static partial byte char_array_3(ref CharArray arr);
+
+        [LibraryImport(NativeLib, EntryPoint = "bool_field")]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static partial bool bool_field(BoolField x);
 
         /// This function has documentation.
         [LibraryImport(NativeLib, EntryPoint = "documented")]
@@ -1002,9 +1006,9 @@ namespace My.Company
                     {
                         throw new InvalidOperationException($"The managed array field '{nameof(Array.data)}' has {managed.data.Length} elements, exceeding the fixed size array of 16.");
                     }
-                    var source = new ReadOnlySpan<byte>(managed.data, 0, managed.data.Length);
+                    var source_data = new ReadOnlySpan<byte>(managed.data, 0, managed.data.Length);
                     var dest = new Span<byte>(result.data, 16);
-                    source.CopyTo(dest);
+                    source_data.CopyTo(dest);
                 }
             }
 
@@ -1019,10 +1023,56 @@ namespace My.Company
 
             unsafe
             {
-                var source = new Span<byte>(unmanaged.data, 16);
+                var source_data = new Span<byte>(unmanaged.data, 16);
                 var arr_data = new byte[16];
-                source.CopyTo(arr_data.AsSpan());
+                source_data.CopyTo(arr_data.AsSpan());
                 result.data = arr_data;
+            }
+
+            return result;
+        }
+    }
+
+
+    [Serializable]
+    [NativeMarshalling(typeof(BoolFieldMarshaller))]
+    public partial struct BoolField
+    {
+        public bool val;
+    }
+
+    [CustomMarshaller(typeof(BoolField), MarshalMode.Default, typeof(BoolFieldMarshaller))]
+    internal static class BoolFieldMarshaller
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public sbyte val;
+        }
+
+        public static Unmanaged ConvertToUnmanaged(BoolField managed)
+        {
+            var result = new Unmanaged
+            {
+                val = Convert.ToSByte(managed.val),
+            };
+
+            unsafe
+            {
+            }
+
+            return result;
+        }
+
+        public static BoolField ConvertToManaged(Unmanaged unmanaged)
+        {
+            var result = new BoolField()
+            {
+                val = Convert.ToBoolean(unmanaged.val),
+            };
+
+            unsafe
+            {
             }
 
             return result;
@@ -1079,9 +1129,9 @@ namespace My.Company
 
             unsafe
             {
-                var source = new ReadOnlySpan<byte>(unmanaged.str, 32);
-                var terminatorIndex = source.IndexOf<byte>(0);
-                result.str = Encoding.UTF8.GetString(source.Slice(0, terminatorIndex == -1 ? Math.Min(source.Length, 32) : terminatorIndex));
+                var source_str = new ReadOnlySpan<byte>(unmanaged.str, 32);
+                var terminatorIndex = source_str.IndexOf<byte>(0);
+                result.str = Encoding.UTF8.GetString(source_str.Slice(0, terminatorIndex == -1 ? Math.Min(source_str.Length, 32) : terminatorIndex));
             }
 
             return result;
@@ -1179,6 +1229,7 @@ namespace My.Company
         public bool field_bool;
         public int field_int;
         public ushort[] field_array;
+        public ushort[] field_array_2;
         public Array field_struct;
     }
 
@@ -1193,6 +1244,7 @@ namespace My.Company
             public sbyte field_bool;
             public int field_int;
             public fixed ushort field_array[5];
+            public fixed ushort field_array_2[5];
             public ArrayMarshaller.Unmanaged field_struct;
         }
 
@@ -1215,9 +1267,20 @@ namespace My.Company
                     {
                         throw new InvalidOperationException($"The managed array field '{nameof(NestedArray.field_array)}' has {managed.field_array.Length} elements, exceeding the fixed size array of 5.");
                     }
-                    var source = new ReadOnlySpan<ushort>(managed.field_array, 0, managed.field_array.Length);
+                    var source_field_array = new ReadOnlySpan<ushort>(managed.field_array, 0, managed.field_array.Length);
                     var dest = new Span<ushort>(result.field_array, 5);
-                    source.CopyTo(dest);
+                    source_field_array.CopyTo(dest);
+                }
+
+                if(managed.field_array_2 != null)
+                {
+                    if(managed.field_array_2.Length > 5)
+                    {
+                        throw new InvalidOperationException($"The managed array field '{nameof(NestedArray.field_array_2)}' has {managed.field_array_2.Length} elements, exceeding the fixed size array of 5.");
+                    }
+                    var source_field_array_2 = new ReadOnlySpan<ushort>(managed.field_array_2, 0, managed.field_array_2.Length);
+                    var dest = new Span<ushort>(result.field_array_2, 5);
+                    source_field_array_2.CopyTo(dest);
                 }
             }
 
@@ -1237,10 +1300,15 @@ namespace My.Company
 
             unsafe
             {
-                var source = new Span<ushort>(unmanaged.field_array, 5);
+                var source_field_array = new Span<ushort>(unmanaged.field_array, 5);
                 var arr_field_array = new ushort[5];
-                source.CopyTo(arr_field_array.AsSpan());
+                source_field_array.CopyTo(arr_field_array.AsSpan());
                 result.field_array = arr_field_array;
+
+                var source_field_array_2 = new Span<ushort>(unmanaged.field_array_2, 5);
+                var arr_field_array_2 = new ushort[5];
+                source_field_array_2.CopyTo(arr_field_array_2.AsSpan());
+                result.field_array_2 = arr_field_array_2;
             }
 
             return result;
@@ -1385,9 +1453,9 @@ namespace My.Company
                     {
                         throw new InvalidOperationException($"The managed array field '{nameof(Weird2u8.a)}' has {managed.a.Length} elements, exceeding the fixed size array of 5.");
                     }
-                    var source = new ReadOnlySpan<byte>(managed.a, 0, managed.a.Length);
+                    var source_a = new ReadOnlySpan<byte>(managed.a, 0, managed.a.Length);
                     var dest = new Span<byte>(result.a, 5);
-                    source.CopyTo(dest);
+                    source_a.CopyTo(dest);
                 }
             }
 
@@ -1404,9 +1472,9 @@ namespace My.Company
 
             unsafe
             {
-                var source = new Span<byte>(unmanaged.a, 5);
+                var source_a = new Span<byte>(unmanaged.a, 5);
                 var arr_a = new byte[5];
-                source.CopyTo(arr_a.AsSpan());
+                source_a.CopyTo(arr_a.AsSpan());
                 result.a = arr_a;
             }
 

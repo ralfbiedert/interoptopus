@@ -70,6 +70,11 @@ typedef enum FFIERROR
     FFIERROR_FAIL = 400,
     } FFIERROR;
 
+typedef struct BOOLFIELD
+    {
+    bool val;
+    } BOOLFIELD;
+
 typedef struct EXTRATYPEF32
     {
     float x;
@@ -295,6 +300,7 @@ typedef struct NESTEDARRAY
     bool field_bool;
     int32_t field_int;
     uint16_t field_array[5];
+    uint16_t field_array_2[5];
     ARRAY field_struct;
     } NESTEDARRAY;
 
@@ -421,6 +427,8 @@ typedef CHARARRAY (*char_array_1)();
 typedef CHARARRAY (*char_array_2)(CHARARRAY);
 
 typedef uint8_t (*char_array_3)(const CHARARRAY*);
+
+typedef bool (*bool_field)(BOOLFIELD);
 
 /// This function has documentation.
 typedef ENUMDOCUMENTED (*documented)(STRUCTDOCUMENTED);

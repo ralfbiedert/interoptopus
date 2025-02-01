@@ -1,10 +1,7 @@
 //! Functions using all supported type patterns.
 
 use crate::patterns::result::{Error, FFIError};
-use crate::types::{
-    ambiguous1, ambiguous2, common, Array, Callbacku8u8, CharArray, EnumDocumented, EnumRenamedXYZ, FixedString, Generic, Generic2, Generic3, Generic4, NestedArray,
-    Packed1, Packed2, Phantom, StructDocumented, StructRenamedXYZ, Transparent, Tupled, Vec3f32, Visibility1, Visibility2, Weird1, Weird2,
-};
+use crate::types::{ambiguous1, ambiguous2, common, Array, BoolField, Callbacku8u8, CharArray, EnumDocumented, EnumRenamedXYZ, FixedString, Generic, Generic2, Generic3, Generic4, NestedArray, Packed1, Packed2, Phantom, StructDocumented, StructRenamedXYZ, Transparent, Tupled, Vec3f32, Visibility1, Visibility2, Weird1, Weird2};
 use interoptopus::patterns::option::FFIOption;
 use interoptopus::patterns::result::panics_and_errors_to_ffi_enum;
 use interoptopus::patterns::slice::FFISlice;
@@ -222,6 +219,7 @@ pub fn nested_array_1() -> NestedArray {
         field_bool: true,
         field_int: 42,
         field_array: [1, 2, 3, 4, 5],
+        field_array_2: [6, 7, 8, 9, 10],
         field_struct: Array {
             data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
         },
@@ -264,6 +262,11 @@ pub fn char_array_2(arr: CharArray) -> CharArray {
 #[ffi_function]
 pub fn char_array_3(arr: &CharArray) -> u8 {
     arr.str.data[0]
+}
+
+#[ffi_function]
+pub fn bool_field(x: BoolField) -> bool {
+    x.val
 }
 
 #[ffi_function]
