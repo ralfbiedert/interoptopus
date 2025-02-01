@@ -32,8 +32,9 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
 
 #### All Backends
 
-- The type structure has been greatly simplified. Each backend now only has a single entry struct `Generator` you have
-  to deal with.
+- The type structure has been greatly simplified. Each backend now only has a single entry struct `InteropBuilder` you
+  have to deal with.
+- Documentation generators were generally renamed to `Markdown` since that's what they emit.
 
 #### C# Backend
 
@@ -51,6 +52,7 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
   you should set `<AllowUnsafeBlocks>true</AllowUnsafeBlocks>`. This greatly simplified some code, and if you haven't
   used unsafe before you'll get a massive speed boost. If you shipped safe bindings to customers without a `.csproj`
   file so far, you should now ship them with a `.csproj` file that enables that flag instead.
+- Arrays are properly supported!
 
 ### 0.13 → 0.14
 
