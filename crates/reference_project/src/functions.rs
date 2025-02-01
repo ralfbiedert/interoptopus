@@ -1,7 +1,10 @@
 //! Functions using all supported type patterns.
 
 use crate::patterns::result::{Error, FFIError};
-use crate::types::{ambiguous1, ambiguous2, common, Array, BoolField, Callbacku8u8, CharArray, EnumDocumented, EnumRenamedXYZ, FixedString, Generic, Generic2, Generic3, Generic4, NestedArray, Packed1, Packed2, Phantom, StructDocumented, StructRenamedXYZ, Transparent, Tupled, Vec3f32, Visibility1, Visibility2, Weird1, Weird2};
+use crate::types::{
+    ambiguous1, ambiguous2, common, Array, BoolField, Callbacku8u8, CharArray, EnumDocumented, EnumRenamedXYZ, FixedString, Generic, Generic2, Generic3, Generic4,
+    NestedArray, Packed1, Packed2, Phantom, StructDocumented, StructRenamedXYZ, Transparent, Tupled, Vec3f32, Visibility1, Visibility2, Weird1, Weird2,
+};
 use interoptopus::patterns::option::FFIOption;
 use interoptopus::patterns::result::panics_and_errors_to_ffi_enum;
 use interoptopus::patterns::slice::FFISlice;

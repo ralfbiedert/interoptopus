@@ -215,7 +215,12 @@ pub fn write_type_definition_composite_to_unmanaged_marshal_field(
             )?;
             w.unindent();
             indented!(w, r"}}")?;
-            indented!(w, r"var source_{1} = new ReadOnlySpan<{0}>(managed.{1}, 0, managed.{1}.Length);", type_name, field_name)?;
+            indented!(
+                w,
+                r"var source_{1} = new ReadOnlySpan<{0}>(managed.{1}, 0, managed.{1}.Length);",
+                type_name,
+                field_name
+            )?;
             indented!(w, r"var dest = new Span<{0}>(result.{1}, {2});", type_name, field_name, a.len())?;
             indented!(w, r"source_{}.CopyTo(dest);", field_name)?;
         }
@@ -325,30 +330,27 @@ pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWri
         c::Visibility::Private => "",
     };
 
-    match field.the_type() {
-        CType::Array(a) => {
-            if i.unroll_struct_arrays {
-                let type_name = to_typespecifier_in_field(a.array_type(), field, the_type);
-                for i in 0..a.len() {
-                    indented!(w, r"{}{} {}{};", visibility, type_name, field_name, i)?;
-                }
-            } else {
-                assert!(is_blittable(a.array_type()), "Array type is not blittable: {:?}", a.array_type());
-
-                let type_name = if matches!(a.array_type(), CType::Pattern(TypePattern::CChar)) {
-                    "string".to_string()
-                } else {
-                    format!("{}[]", to_typespecifier_in_field(a.array_type(), field, the_type))
-                };
-
-                indented!(w, r"{}{} {};", visibility, type_name, field_name)?;
+    if let CType::Array(a) = field.the_type() {
+        if i.unroll_struct_arrays {
+            let type_name = to_typespecifier_in_field(a.array_type(), field, the_type);
+            for i in 0..a.len() {
+                indented!(w, r"{}{} {}{};", visibility, type_name, field_name, i)?;
             }
+        } else {
+            assert!(is_blittable(a.array_type()), "Array type is not blittable: {:?}", a.array_type());
 
-            Ok(())
+            let type_name = if matches!(a.array_type(), CType::Pattern(TypePattern::CChar)) {
+                "string".to_string()
+            } else {
+                format!("{}[]", to_typespecifier_in_field(a.array_type(), field, the_type))
+            };
+
+            indented!(w, r"{}{} {};", visibility, type_name, field_name)?;
         }
-        _ => {
-            let type_name = to_typespecifier_in_field(field.the_type(), field, the_type);
-            indented!(w, r"{}{} {};", visibility, type_name, field_name)
-        }
+
+        Ok(())
+    } else {
+        let type_name = to_typespecifier_in_field(field.the_type(), field, the_type);
+        indented!(w, r"{}{} {};", visibility, type_name, field_name)
     }
 }
