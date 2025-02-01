@@ -1,7 +1,8 @@
 use crate::converter::{field_name_to_csharp_name, function_name_to_csharp_name, to_typespecifier_in_rval};
 use crate::interop::functions::write_function;
 use crate::interop::patterns::services::{write_pattern_service_method, write_service_method_overload};
-use crate::interop::types::{write_type_definition_composite_body, write_type_definition_enum};
+use crate::interop::types::composite::write_type_definition_composite_body;
+use crate::interop::types::enums::write_type_definition_enum;
 use crate::interop::FunctionNameFlavor;
 use crate::Interop;
 use interoptopus::lang::c::{CType, CompositeType, Function};
