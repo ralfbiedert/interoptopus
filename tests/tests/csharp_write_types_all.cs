@@ -989,7 +989,11 @@ namespace My.Company
             {
                 if(managed.data != null)
                 {
-                    var source = new ReadOnlySpan<byte>(managed.data, 0, Math.Min(16, managed.data.Length));
+                    if(managed.data.Length > 16)
+                    {
+                        throw new InvalidOperationException($"The managed array field '{nameof(Array.data)}' has {managed.data.Length} elements, exceeding the fixed size array of 16.");
+                    }
+                    var source = new ReadOnlySpan<byte>(managed.data, 0, managed.data.Length);
                     var dest = new Span<byte>(result.data, 16);
                     source.CopyTo(dest);
                 }
@@ -1045,6 +1049,10 @@ namespace My.Company
                 {
                     fixed(char* s = managed.str)
                     {
+                        if(Encoding.UTF8.GetByteCount(managed.str, 0, managed.str.Length) + 1 > 32)
+                        {
+                            throw new InvalidOperationException($"The managed string field '{nameof(CharArray.str)}' cannot be encoded to fit the fixed size array of 32.");
+                        }
                         var written = Encoding.UTF8.GetBytes(s, managed.str.Length, result.str, 31);
                         result.str[written] = 0;
                     }
@@ -1194,7 +1202,11 @@ namespace My.Company
             {
                 if(managed.field_array != null)
                 {
-                    var source = new ReadOnlySpan<ushort>(managed.field_array, 0, Math.Min(5, managed.field_array.Length));
+                    if(managed.field_array.Length > 5)
+                    {
+                        throw new InvalidOperationException($"The managed array field '{nameof(NestedArray.field_array)}' has {managed.field_array.Length} elements, exceeding the fixed size array of 5.");
+                    }
+                    var source = new ReadOnlySpan<ushort>(managed.field_array, 0, managed.field_array.Length);
                     var dest = new Span<ushort>(result.field_array, 5);
                     source.CopyTo(dest);
                 }
@@ -1368,7 +1380,11 @@ namespace My.Company
             {
                 if(managed.a != null)
                 {
-                    var source = new ReadOnlySpan<byte>(managed.a, 0, Math.Min(5, managed.a.Length));
+                    if(managed.a.Length > 5)
+                    {
+                        throw new InvalidOperationException($"The managed array field '{nameof(Weird2u8.a)}' has {managed.a.Length} elements, exceeding the fixed size array of 5.");
+                    }
+                    var source = new ReadOnlySpan<byte>(managed.a, 0, managed.a.Length);
                     var dest = new Span<byte>(result.a, 5);
                     source.CopyTo(dest);
                 }
