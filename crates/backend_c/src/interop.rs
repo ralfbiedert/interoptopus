@@ -109,26 +109,37 @@ pub struct Interop {
     #[builder(default = "\"interoptopus_generated\".to_string()")]
     ifndef: String,
     /// Multiline string with custom `#define` values.
+    #[builder(setter(into))]
     custom_defines: String,
     /// Prefix to be applied to any function, e.g., `__DLLATTR`.
+    #[builder(setter(into))]
     function_attribute: String,
     /// Comment at the very beginning of the file, e.g., `// (c) My Company.`
+    #[builder(setter(into))]
     file_header_comment: String,
     /// How to prefix everything, e.g., `my_company_`, will be capitalized for constants.
+    #[builder(setter(into))]
     pub(crate) prefix: String,
     /// How to indent code
+    #[builder(setter(into))]
     indentation: Indentation,
     /// How to add code documentation
+    #[builder(setter(into))]
     documentation: DocStyle,
     /// How to convert type names
+    #[builder(setter(into))]
     pub(crate) type_naming: NameCase,
     /// How to convert enum variant names
+    #[builder(setter(into))]
     pub(crate) enum_variant_naming: NameCase,
     /// How to convert const names
+    #[builder(setter(into))]
     pub(crate) const_naming: NameCase,
     /// How to convert function parameter names
+    #[builder(setter(into))]
     function_parameter_naming: NameCase,
     /// How to emit functions
+    #[builder(setter(into))]
     function_style: Functions,
     pub(crate) inventory: Inventory,
 }

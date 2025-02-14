@@ -119,18 +119,25 @@ impl Default for Interop {
 #[allow(clippy::struct_excessive_bools)]
 pub struct Interop {
     /// The file header, e.g., `// (c) My Company`.
+    #[builder(setter(into))]
     file_header_comment: String,
     /// Name of static class for Interop methods, e.g., `Interop`.
+    #[builder(setter(into))]
     class: String,
     /// Name of static class for Interop constants, e.g., `Interop`. If [None] then [Self.class] is used
+    #[builder(setter(into))]
     class_constants: Option<String>,
     /// DLL to load, e.g., `my_library`.
+    #[builder(setter(into))]
     dll_name: String,
     /// Maps which namespace id belongs into which FQN (e.g., "common" => "MyCompany.Common").
+    #[builder(setter(into))]
     namespace_mappings: NamespaceMappings,
     /// Namespace ID of _this_ namespace to write (default "").
+    #[builder(setter(into))]
     namespace_id: String,
     /// Sets the visibility access modifiers for generated types.
+    #[builder(setter(into))]
     pub(crate) visibility_types: Visibility,
     /// Whether, say, a `x: [u8; 3]` should become 3 `x0: u8, ...` instead.
     ///
@@ -138,6 +145,7 @@ pub struct Interop {
     /// open issue w.r.t Unity-sans-unsafe support and feedback would be greatly welcome!
     unroll_struct_arrays: bool,
     /// Which types to write.
+    #[builder(setter(into))]
     write_types: WriteTypes,
     /// Generate functions and field names matching C# conventions, instead of mapping them 1:1 with Rust.
     pub(crate) rename_symbols: bool,
@@ -148,8 +156,10 @@ pub struct Interop {
     /// an `FFIError` type.
     work_around_exception_in_callback_no_reentry: bool,
     /// How to handle unsupported constructs.
+    #[builder(setter(into))]
     unsupported: Unsupported,
     /// The string to use for reporting within `FFIError`. Use `{error}` to reference the inner error content.
+    #[builder(setter(into))]
     error_text: String,
     pub(crate) inventory: Inventory,
 }
