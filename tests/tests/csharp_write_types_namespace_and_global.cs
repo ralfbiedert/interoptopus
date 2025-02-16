@@ -400,15 +400,6 @@ namespace My.Company
             );
         }
 
-        public static unsafe void pattern_ffi_slice_8(System.Span<CharArray> slice, CallbackCharArray2 callback)
-        {
-            fixed (void* ptr_slice = slice)
-            {
-                var slice_slice = new SliceMut<CharArray>(new IntPtr(ptr_slice), (ulong) slice.Length);
-                pattern_ffi_slice_8(ref slice_slice, callback);;
-            }
-        }
-
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_delegate")]
         private static partial byte pattern_ffi_slice_delegate(CallbackFFISliceNative callback);
         public static byte pattern_ffi_slice_delegate(CallbackFFISlice callback)

@@ -8,7 +8,7 @@ pub mod namespace;
 pub mod patterns;
 pub mod types;
 
-use crate::converter::{to_slice_marshaller, to_typespecifier_in_param};
+use crate::converter::{get_slice_type, to_slice_marshaller, to_typespecifier_in_param};
 use crate::interop::builtins::write_builtins;
 use crate::interop::class::{write_class_context, write_native_lib_string};
 use crate::interop::constants::write_constants;
@@ -281,10 +281,21 @@ impl Interop {
 
     fn has_overloadable(&self, signature: &FunctionSignature) -> bool {
         signature.params().iter().any(|x| match x.the_type() {
-            CType::ReadPointer(x) | CType::ReadWritePointer(x) => {
-                matches!(&**x, CType::Pattern(TypePattern::Slice(x) | TypePattern::SliceMut(x)) if !self.should_emit_marshaller_for_composite(x))
-            }
-            CType::Pattern(TypePattern::Slice(x) | TypePattern::SliceMut(x)) if !self.should_emit_marshaller_for_composite(x) => true,
+            CType::ReadPointer(p) => match &**p {
+                CType::Pattern(TypePattern::Slice(s)) => !self.should_emit_marshaller(&get_slice_type(s)),
+                CType::Pattern(TypePattern::SliceMut(s)) => !self.should_emit_marshaller(&get_slice_type(s)),
+                _ => false,
+            },
+            CType::ReadWritePointer(p) => match &**p {
+                CType::Pattern(TypePattern::Slice(s)) => !self.should_emit_marshaller(&get_slice_type(s)),
+                CType::Pattern(TypePattern::SliceMut(s)) => !self.should_emit_marshaller(&get_slice_type(s)),
+                _ => false,
+            },
+            CType::Pattern(p) => match p {
+                TypePattern::Slice(s) => !self.should_emit_marshaller(&get_slice_type(s)),
+                TypePattern::SliceMut(s) => !self.should_emit_marshaller(&get_slice_type(s)),
+                _ => false,
+            },
             _ => false,
         })
     }
