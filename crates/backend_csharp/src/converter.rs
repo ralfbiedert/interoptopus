@@ -222,6 +222,15 @@ pub fn field_name_to_csharp_name(field: &Field, rename_symbols: bool) -> String 
     }
 }
 
+pub fn get_slice_type(x: &CompositeType) -> CType {
+    let data_field = x.fields().iter().find(|x| x.name() == "data").expect("Slice must have data field");
+    if let CType::ReadPointer(y) = data_field.the_type() {
+        y.as_ref().clone()
+    } else {
+        panic!("Slice data field must be a pointer")
+    }
+}
+
 pub fn get_slice_type_argument(x: &CompositeType) -> String {
     let data_field = x.fields().iter().find(|x| x.name() == "data").expect("Slice must have data field");
     let t = if let CType::ReadPointer(y) = data_field.the_type() {
