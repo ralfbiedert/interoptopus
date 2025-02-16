@@ -281,10 +281,9 @@ impl Interop {
 
     fn has_overloadable(&self, signature: &FunctionSignature) -> bool {
         signature.params().iter().any(|x| match x.the_type() {
-            CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {
-                CType::Pattern(TypePattern::Slice(x) | TypePattern::SliceMut(x)) if !self.should_emit_marshaller_for_composite(x) => true,
-                _ => false,
-            },
+            CType::ReadPointer(x) | CType::ReadWritePointer(x) => {
+                matches!(&**x, CType::Pattern(TypePattern::Slice(x) | TypePattern::SliceMut(x)) if !self.should_emit_marshaller_for_composite(x))
+            }
             CType::Pattern(TypePattern::Slice(x) | TypePattern::SliceMut(x)) if !self.should_emit_marshaller_for_composite(x) => true,
             _ => false,
         })
