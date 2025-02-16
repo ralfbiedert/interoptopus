@@ -95,8 +95,8 @@ pub fn to_typespecifier_in_field(x: &CType, field: &Field, composite: &Composite
         CType::Pattern(x) => match x {
             TypePattern::CStrPointer => "string".to_string(),
             TypePattern::FFIErrorEnum(e) => enum_to_typename(e.the_enum()),
-            TypePattern::Slice(x) => format!("ReadOnlyMemory<{}>", get_slice_type_argument(x)),
-            TypePattern::SliceMut(x) => format!("Memory<{}>", get_slice_type_argument(x)),
+            TypePattern::Slice(x) => format!("Slice<{}>", get_slice_type_argument(x)),
+            TypePattern::SliceMut(x) => format!("SliceMut<{}>", get_slice_type_argument(x)),
             TypePattern::Option(e) => composite_to_typename(e),
             TypePattern::NamedCallback(e) => named_callback_to_typename(e),
             TypePattern::Bool => "Bool".to_string(),
