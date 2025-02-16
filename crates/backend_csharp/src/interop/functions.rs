@@ -268,7 +268,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     let mut params = Vec::new();
     for p in function.signature().params() {
         let name = p.name();
-        let native = pattern_to_native_in_signature(p);
+        let native = pattern_to_native_in_signature(i, p);
         let the_type = function_parameter_to_csharp_typename(p);
 
         let mut fallback = || {
@@ -283,12 +283,12 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
 
         match p.the_type() {
             CType::Pattern(TypePattern::Slice(x) | TypePattern::SliceMut(x)) => {
-                if !i.should_emit_marshaller(&get_slice_type(x)) {
+                if i.should_emit_marshaller(&get_slice_type(x)) {
+                    fallback();
+                } else {
                     to_pin_name.push(name);
                     to_pin_slice_type.push(the_type);
                     to_invoke.push(format!("{name}_slice"));
-                } else {
-                    fallback();
                 }
             }
             CType::Pattern(TypePattern::NamedCallback(callback)) => match callback.fnpointer().signature().rval() {
@@ -302,21 +302,21 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
             CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {
                 CType::Pattern(x) => match x {
                     TypePattern::Slice(x) => {
-                        if !i.should_emit_marshaller(&get_slice_type(x)) {
+                        if i.should_emit_marshaller(&get_slice_type(x)) {
+                            fallback();
+                        } else {
                             to_pin_name.push(name);
                             to_pin_slice_type.push(the_type.replace("ref ", ""));
                             to_invoke.push(format!("ref {name}_slice"));
-                        } else {
-                            fallback();
                         }
                     }
                     TypePattern::SliceMut(x) => {
-                        if !i.should_emit_marshaller(&get_slice_type(x)) {
+                        if i.should_emit_marshaller(&get_slice_type(x)) {
+                            fallback();
+                        } else {
                             to_pin_name.push(name);
                             to_pin_slice_type.push(the_type.replace("ref ", ""));
                             to_invoke.push(format!("ref {name}_slice"));
-                        } else {
-                            fallback();
                         }
                     }
                     _ => fallback(),

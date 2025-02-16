@@ -3,7 +3,7 @@ pub mod options;
 pub mod services;
 pub mod slices;
 
-use crate::converter::to_typespecifier_in_param;
+use crate::converter::{get_slice_type, to_typespecifier_in_param};
 use crate::interop::patterns::services::write_pattern_service;
 use crate::Interop;
 use interoptopus::lang::c::{CType, Parameter};
@@ -27,7 +27,7 @@ pub fn write_patterns(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
 }
 
 #[must_use]
-pub fn pattern_to_native_in_signature(param: &Parameter) -> String {
+pub fn pattern_to_native_in_signature(i: &Interop, param: &Parameter) -> String {
     let slice_type_name = |mutable: bool, element_type: &CType| -> String {
         if mutable {
             format!("System.Span<{}>", to_typespecifier_in_param(element_type))
@@ -37,11 +37,11 @@ pub fn pattern_to_native_in_signature(param: &Parameter) -> String {
     };
     match param.the_type() {
         CType::Pattern(p) => match p {
-            TypePattern::Slice(p) => {
+            TypePattern::Slice(p) if !i.should_emit_marshaller(&get_slice_type(p)) => {
                 let element_type = p.try_deref_pointer().expect("Must be pointer");
                 slice_type_name(false, &element_type)
             }
-            TypePattern::SliceMut(p) => {
+            TypePattern::SliceMut(p) if !i.should_emit_marshaller(&get_slice_type(p)) => {
                 let element_type = p.try_deref_pointer().expect("Must be pointer");
                 slice_type_name(true, &element_type)
             }
@@ -49,11 +49,11 @@ pub fn pattern_to_native_in_signature(param: &Parameter) -> String {
         },
         CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {
             CType::Pattern(x) => match x {
-                TypePattern::Slice(p) => {
+                TypePattern::Slice(p) if !i.should_emit_marshaller(&get_slice_type(p)) => {
                     let element_type = p.try_deref_pointer().expect("Must be pointer");
                     slice_type_name(false, &element_type)
                 }
-                TypePattern::SliceMut(p) => {
+                TypePattern::SliceMut(p) if !i.should_emit_marshaller(&get_slice_type(p)) => {
                     let element_type = p.try_deref_pointer().expect("Must be pointer");
                     slice_type_name(true, &element_type)
                 }
