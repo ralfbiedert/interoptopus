@@ -1,4 +1,4 @@
-use crate::converter::{function_name_to_csharp_name, has_overloadable, to_typespecifier_in_param, to_typespecifier_in_rval};
+use crate::converter::{function_name_to_csharp_name, to_typespecifier_in_param, to_typespecifier_in_rval};
 use crate::interop::functions::write_documentation;
 use crate::interop::patterns::pattern_to_native_in_signature;
 use crate::{FunctionNameFlavor, Interop};
@@ -310,7 +310,7 @@ pub fn write_service_method_overload(
     fn_pretty: &str,
     write_for: WriteFor,
 ) -> Result<(), Error> {
-    if !has_overloadable(function.signature()) {
+    if !i.has_overloadable(function.signature()) {
         return Ok(());
     }
 

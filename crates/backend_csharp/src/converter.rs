@@ -179,17 +179,6 @@ pub fn to_typespecifier_in_rval(x: &CType) -> String {
     }
 }
 
-pub fn has_overloadable(signature: &FunctionSignature) -> bool {
-    signature.params().iter().any(|x| match x.the_type() {
-        CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {
-            CType::Pattern(x) => matches!(x, TypePattern::Slice(_) | TypePattern::SliceMut(_)),
-            _ => false,
-        },
-        CType::Pattern(x) => matches!(x, TypePattern::Slice(_) | TypePattern::SliceMut(_)),
-        _ => false,
-    })
-}
-
 pub fn constant_value_to_value(value: &ConstantValue) -> String {
     match value {
         ConstantValue::Primitive(x) => match x {

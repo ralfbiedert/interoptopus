@@ -140,7 +140,7 @@ namespace My.Company.Common
     [NativeMarshalling(typeof(SliceMarshaller<>))]
     public readonly partial struct Slice<T> : IEnumerable<T> where T : struct
     {
-        internal readonly T[] Managed;
+        internal readonly T[]? Managed;
         internal readonly IntPtr Data;
         internal readonly ulong Len;
 
@@ -303,7 +303,7 @@ namespace My.Company.Common
     [NativeMarshalling(typeof(SliceMutMarshaller<>))]
     public readonly partial struct SliceMut<T> : IEnumerable<T> where T : struct
     {
-        internal readonly T[] Managed;
+        internal readonly T[]? Managed;
         internal readonly IntPtr Data;
         internal readonly ulong Len;
 
