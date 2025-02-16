@@ -107,7 +107,7 @@ pub fn write_function_wrapper_call_params(i: &Interop, w: &mut IndentWriter, par
                         },
                         _ => "",
                     },
-                    _ => ""
+                    _ => "",
                 };
                 indented!(w, r"{modifier}{name}{sep}")?;
             }
