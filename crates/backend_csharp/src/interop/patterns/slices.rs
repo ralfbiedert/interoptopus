@@ -1,249 +1,385 @@
-use crate::converter::{is_blittable, to_typespecifier_in_rval};
 use crate::Interop;
-use interoptopus::lang::c::CompositeType;
 use interoptopus::writer::IndentWriter;
 use interoptopus::{indented, Error};
 
-pub fn write_pattern_slice(i: &Interop, w: &mut IndentWriter, slice: &CompositeType) -> Result<(), Error> {
-    i.debug(w, "write_pattern_slice")?;
+pub fn write_pattern_read_only_span_marshaller(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
+    i.debug(w, "write_pattern_read_only_span_marshaller")?;
 
-    let context_type_name = slice.rust_name();
-    let data_type = slice
-        .fields()
-        .iter()
-        .find(|x| x.name().contains("data"))
-        .expect("Slice must contain field called 'data'.")
-        .the_type()
-        .try_deref_pointer()
-        .expect("data must be a pointer type");
+    write_pattern_generic_slice(i, w, true)?;
+    w.newline()?;
+    write_pattern_generic_slice_marshaller(i, w, true)
+}
 
-    let type_string = to_typespecifier_in_rval(data_type);
-    let is_blittable = is_blittable(data_type);
+pub fn write_pattern_span_marshaller(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
+    i.debug(w, "write_pattern_read_only_span_marshaller")?;
 
-    indented!(
-        w,
-        r"{} partial struct {} : IEnumerable<{}>",
-        i.visibility_types.to_access_modifier(),
-        context_type_name,
-        type_string
-    )?;
+    write_pattern_generic_slice(i, w, false)?;
+    w.newline()?;
+    write_pattern_generic_slice_marshaller(i, w, false)
+}
+
+fn write_pattern_generic_slice(i: &Interop, w: &mut IndentWriter, read_only: bool) -> Result<(), Error> {
+    i.debug(w, "write_pattern_generic_slice")?;
+
+    let struct_name = if read_only { "Slice" } else { "SliceMut" };
+
+    indented!(w, r"[NativeMarshalling(typeof({}Marshaller<>))]", struct_name)?;
+    indented!(w, r"public readonly partial struct {}<T> : IEnumerable<T> where T : struct", struct_name)?;
     indented!(w, r"{{")?;
-
-    // Ctor
-    indented!(w, [()], r"public {}(GCHandle handle, ulong count)", context_type_name)?;
+    indented!(w, [()], r"internal readonly T[] Managed;")?;
+    indented!(w, [()], r"internal readonly IntPtr Data;")?;
+    indented!(w, [()], r"internal readonly ulong Len;")?;
+    w.newline()?;
+    indented!(w, [()], r"public int Count => Managed?.Length ?? (int)Len;")?;
+    w.newline()?;
+    indented!(w, [()], r"public unsafe ReadOnlySpan<T> ReadOnlySpan")?;
     indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"this.data = handle.AddrOfPinnedObject();")?;
-    indented!(w, [()()], r"this.len = count;")?;
+    indented!(w, [()()], r"get")?;
+    indented!(w, [()()], r"{{")?;
+    indented!(w, [()()()], r"if (Managed is not null)")?;
+    indented!(w, [()()()], r"{{")?;
+    indented!(w, [()()()()], r"return new ReadOnlySpan<T>(Managed);")?;
+    indented!(w, [()()()], r"}}")?;
+    indented!(w, [()()()], r"return new ReadOnlySpan<T>(Data.ToPointer(), (int)Len);")?;
+    indented!(w, [()()], r"}}")?;
     indented!(w, [()], r"}}")?;
-
-    // Ctor
-    indented!(w, [()], r"public {}(IntPtr handle, ulong count)", context_type_name)?;
-    indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"this.data = handle;")?;
-    indented!(w, [()()], r"this.len = count;")?;
-    indented!(w, [()], r"}}")?;
-
-    write_pattern_slice_overload(w, context_type_name, &type_string)?;
-
-    // Getter
-    indented!(w, [()], r"public unsafe {} this[int i]", type_string)?;
+    w.newline()?;
+    if !read_only {
+        indented!(w, [()], r"public unsafe Span<T> Span")?;
+        indented!(w, [()], r"{{")?;
+        indented!(w, [()()], r"get")?;
+        indented!(w, [()()], r"{{")?;
+        indented!(w, [()()()], r"if (Managed is not null)")?;
+        indented!(w, [()()()], r"{{")?;
+        indented!(w, [()()()()], r"return new Span<T>(Managed);")?;
+        indented!(w, [()()()], r"}}")?;
+        indented!(w, [()()()], r"return new Span<T>(Data.ToPointer(), (int)Len);")?;
+        indented!(w, [()()], r"}}")?;
+        indented!(w, [()], r"}}")?;
+        w.newline()?;
+    }
+    indented!(w, [()], r"public unsafe T this[int i]")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"get")?;
     indented!(w, [()()], r"{{")?;
     indented!(w, [()()()], r"if (i >= Count) throw new IndexOutOfRangeException();")?;
-
-    if is_blittable {
-        indented!(w, [()()()], r"var d = ({}*) data.ToPointer();", type_string)?;
-        indented!(w, [()()()], r"return d[i];")?;
-    } else {
-        indented!(w, [()()()], r"var size = Marshal.SizeOf(typeof({}));", type_string)?;
-        indented!(w, [()()()], r"var ptr = new IntPtr(data.ToInt64() + i * size);")?;
-        indented!(w, [()()()], r"return Marshal.PtrToStructure<{}>(ptr);", type_string)?;
+    indented!(w, [()()()], r"if (Managed is not null)")?;
+    indented!(w, [()()()], r"{{")?;
+    indented!(w, [()()()()], r"return Managed[i];")?;
+    indented!(w, [()()()], r"}}")?;
+    indented!(w, [()()()], r"return Unsafe.Read<T>((void*)IntPtr.Add(Data, i * Unsafe.SizeOf<T>()));")?;
+    indented!(w, [()()], r"}}")?;
+    if !read_only {
+        indented!(w, [()()], r"set")?;
+        indented!(w, [()()], r"{{")?;
+        indented!(w, [()()()], r"if (i >= Count) throw new IndexOutOfRangeException();")?;
+        indented!(w, [()()()], r"if (Managed is not null)")?;
+        indented!(w, [()()()], r"{{")?;
+        indented!(w, [()()()()], r"Managed[i] = value;")?;
+        indented!(w, [()()()], r"}}")?;
+        indented!(w, [()()()], r"else")?;
+        indented!(w, [()()()], r"{{")?;
+        indented!(w, [()()()()], r"Unsafe.Write((void*)IntPtr.Add(Data, i * Unsafe.SizeOf<T>()), value);")?;
+        indented!(w, [()()()], r"}}")?;
+        indented!(w, [()()], r"}}")?;
     }
-
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()], r"public {}(GCHandle handle, ulong count)", struct_name)?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"this.Data = handle.AddrOfPinnedObject();")?;
+    indented!(w, [()()], r"this.Len = count;")?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()], r"public {}(IntPtr handle, ulong count)", struct_name)?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"this.Data = handle;")?;
+    indented!(w, [()()], r"this.Len = count;")?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()], r"public {}(T[] managed)", struct_name)?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"this.Managed = managed;")?;
+    indented!(w, [()()], r"this.Data = IntPtr.Zero;")?;
+    indented!(w, [()()], r"this.Len = 0;")?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()], r"public IEnumerator<T> GetEnumerator()")?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"for (var i = 0; i < Count; ++i)")?;
+    indented!(w, [()()], r"{{")?;
+    indented!(w, [()()()], r"yield return this[i];")?;
     indented!(w, [()()], r"}}")?;
     indented!(w, [()], r"}}")?;
-
-    // Copied
-    indented!(w, [()], r"public unsafe {}[] Copied", type_string)?;
+    w.newline()?;
+    indented!(w, [()], r"IEnumerator IEnumerable.GetEnumerator()")?;
     indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"get")?;
-    indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"var rval = new {}[len];", type_string)?;
+    indented!(w, [()()], r"return GetEnumerator();")?;
+    indented!(w, [()], r"}}")?;
+    indented!(w, r"}}")?;
 
-    if is_blittable {
-        indented!(w, [()()()], r"fixed (void* dst = rval)")?;
-        indented!(w, [()()()], r"{{")?;
+    Ok(())
+}
+
+#[allow(clippy::too_many_lines)]
+fn write_pattern_generic_slice_marshaller(i: &Interop, w: &mut IndentWriter, read_only: bool) -> Result<(), Error> {
+    i.debug(w, "write_pattern_generic_slice_marshaller")?;
+
+    if read_only {
+        indented!(w, r"[CustomMarshaller(typeof(Slice<>), MarshalMode.Default, typeof(SliceMarshaller<>.Marshaller))]")?;
+        indented!(w, r"internal static class SliceMarshaller<T> where T: struct")?;
+    } else {
         indented!(
             w,
-            [()()()()],
-            r"Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof({}));",
-            type_string
+            r"[CustomMarshaller(typeof(SliceMut<>), MarshalMode.Default, typeof(SliceMutMarshaller<>.Marshaller))]"
         )?;
-        indented!(w, [()()()()], r"for (var i = 0; i < (int) len; i++) {{")?;
-        indented!(w, [()()()()()], r"rval[i] = this[i];")?;
+        indented!(w, r"internal static class SliceMutMarshaller<T> where T: struct")?;
+    }
+    indented!(w, r"{{")?;
+    indented!(w, [()], r"[StructLayout(LayoutKind.Sequential)]")?;
+    indented!(w, [()], r"public unsafe struct Unmanaged")?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"public IntPtr Data;")?;
+    indented!(w, [()()], r"public ulong Len;")?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()], r"public ref struct Marshaller")?;
+    indented!(w, [()], r"{{")?;
+    if read_only {
+        indented!(w, [()()], r"private Slice<T> managed;")?;
+    } else {
+        indented!(w, [()()], r"private SliceMut<T> managed;")?;
+    }
+    indented!(w, [()()], r"private Unmanaged native;")?;
+    indented!(w, [()()], r"private Unmanaged sourceNative;")?;
+    indented!(w, [()()], r"private GCHandle? pinned;")?;
+    indented!(w, [()()], r"private T[] marshalled;")?;
+    w.newline()?;
+    if read_only {
+        indented!(w, [()()], r"public void FromManaged(Slice<T> managed)")?;
+    } else {
+        indented!(w, [()()], r"public void FromManaged(SliceMut<T> managed)")?;
+    }
+    indented!(w, [()()], r"{{")?;
+    indented!(w, [()()()], r"this.managed = managed;")?;
+    indented!(w, [()()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()()], r"public unsafe Unmanaged ToUnmanaged()")?;
+    indented!(w, [()()], r"{{")?;
+    indented!(w, [()()()], r"if(managed.Count == 0)")?;
+    indented!(w, [()()()], r"{{")?;
+    indented!(w, [()()()()], r"return default;")?;
+    indented!(w, [()()()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()()()], r"if (CustomMarshallerHelper<T>.HasCustomMarshaller)")?;
+    indented!(w, [()()()], r"{{")?;
+    indented!(w, [()()()()], r"var count = managed.Count;")?;
+    indented!(w, [()()()()], r"var size = CustomMarshallerHelper<T>.UnmanagedSize;")?;
+    indented!(w, [()()()()], r"native.Len = (ulong)count;")?;
+    indented!(w, [()()()()], r"native.Data = Marshal.AllocHGlobal(count * size);")?;
+    indented!(w, [()()()()], r"for (var i = 0; i < count; i++)")?;
+    indented!(w, [()()()()], r"{{")?;
+    indented!(
+        w,
+        [()()()()()],
+        r"CustomMarshallerHelper<T>.ToUnmanagedFunc!( managed[i], IntPtr.Add(native.Data, i * size));"
+    )?;
+    indented!(w, [()()()()], r"}}")?;
+    indented!(w, [()()()()], r"return native;")?;
+    indented!(w, [()()()], r"}}")?;
+    indented!(w, [()()()], r"else if(managed.Managed is not null)")?;
+    indented!(w, [()()()], r"{{")?;
+    indented!(w, [()()()()], r"pinned = GCHandle.Alloc(managed.Managed, GCHandleType.Pinned);")?;
+    indented!(w, [()()()()], r"return new Unmanaged")?;
+    indented!(w, [()()()()], r"{{")?;
+    indented!(w, [()()()()()], r"Data = pinned.Value.AddrOfPinnedObject(),")?;
+    indented!(w, [()()()()()], r"Len = (ulong)managed.Count")?;
+    indented!(w, [()()()()], r"}};")?;
+    indented!(w, [()()()], r"}}")?;
+    indented!(w, [()()()], r"else")?;
+    indented!(w, [()()()], r"{{")?;
+    indented!(w, [()()()()], r"return new Unmanaged")?;
+    indented!(w, [()()()()], r"{{")?;
+    indented!(w, [()()()()()], r"Data = (IntPtr)managed.Data,")?;
+    indented!(w, [()()()()()], r"Len = (ulong)managed.Len")?;
+    indented!(w, [()()()()], r"}};")?;
+    indented!(w, [()()()], r"}}")?;
+    indented!(w, [()()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()()], r"public void FromUnmanaged(Unmanaged unmanaged)")?;
+    indented!(w, [()()], r"{{")?;
+    indented!(w, [()()()], r"sourceNative = unmanaged;")?;
+    indented!(w, [()()], r"}}")?;
+    w.newline()?;
+    if read_only {
+        indented!(w, [()()], r"public unsafe Slice<T> ToManaged()")?;
+    } else {
+        indented!(w, [()()], r"public unsafe SliceMut<T> ToManaged()")?;
+    }
+    indented!(w, [()()], r"{{")?;
+    indented!(w, [()()()], r"if (CustomMarshallerHelper<T>.HasCustomMarshaller)")?;
+    indented!(w, [()()()], r"{{")?;
+    indented!(w, [()()()()], r"var count = (int)sourceNative.Len;")?;
+    indented!(w, [()()()()], r"var size = CustomMarshallerHelper<T>.UnmanagedSize;")?;
+    indented!(w, [()()()()], r"marshalled = new T[count];")?;
+    indented!(w, [()()()()], r"for (var i = 0; i < count; i++)")?;
+    indented!(w, [()()()()], r"{{")?;
+    indented!(
+        w,
+        [()()()()()],
+        r"marshalled[i] = CustomMarshallerHelper<T>.ToManagedFunc!(IntPtr.Add(sourceNative.Data, i * size));"
+    )?;
+    indented!(w, [()()()()], r"}}")?;
+    if read_only {
+        indented!(w, [()()()()], r"return new Slice<T>(marshalled);")?;
+    } else {
+        indented!(w, [()()()()], r"return new SliceMut<T>(marshalled);")?;
+    }
+    indented!(w, [()()()], r"}}")?;
+    indented!(w, [()()()], r"else")?;
+    indented!(w, [()()()], r"{{")?;
+    if read_only {
+        indented!(w, [()()()()], r"return new Slice<T>(sourceNative.Data, sourceNative.Len);")?;
+    } else {
+        indented!(w, [()()()()], r"return new SliceMut<T>(sourceNative.Data, sourceNative.Len);")?;
+    }
+    indented!(w, [()()()], r"}}")?;
+    indented!(w, [()()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()()], r"public void Free()")?;
+    indented!(w, [()()], r"{{")?;
+    indented!(w, [()()()], r"if (native.Data != IntPtr.Zero)")?;
+    indented!(w, [()()()], r"{{")?;
+    indented!(w, [()()()()], r"Marshal.FreeHGlobal(native.Data);")?;
+    indented!(w, [()()()], r"}}")?;
+    indented!(w, [()()()], r"pinned?.Free();")?;
+    indented!(w, [()()], r"}}")?;
+    if !read_only {
+        w.newline()?;
+        indented!(w, [()()], r"public void OnInvoked()")?;
+        indented!(w, [()()], r"{{")?;
+        indented!(w, [()()()], r"if (CustomMarshallerHelper<T>.HasCustomMarshaller)")?;
+        indented!(w, [()()()], r"{{")?;
+        indented!(w, [()()()()], r"if (marshalled is not null)")?;
+        indented!(w, [()()()()], r"{{")?;
+        indented!(w, [()()()()()], r"var count = marshalled.Length;")?;
+        indented!(w, [()()()()()], r"var size = CustomMarshallerHelper<T>.UnmanagedSize;")?;
+        indented!(w, [()()()()()], r"for (var i = 0; i < count; i++)")?;
+        indented!(w, [()()()()()], r"{{")?;
+        indented!(
+            w,
+            [()()()()()()],
+            r"CustomMarshallerHelper<T>.ToUnmanagedFunc!(marshalled[i], IntPtr.Add(sourceNative.Data, i * size));"
+        )?;
+        indented!(w, [()()()()()], r"}}")?;
+        indented!(w, [()()()()], r"}}")?;
+        indented!(w, [()()()()], r"else if (native.Data != IntPtr.Zero)")?;
+        indented!(w, [()()()()], r"{{")?;
+        indented!(w, [()()()()()], r"var count = managed.Count;")?;
+        indented!(w, [()()()()()], r"var size = CustomMarshallerHelper<T>.UnmanagedSize;")?;
+        indented!(w, [()()()()()], r"for (var i = 0; i < count; i++)")?;
+        indented!(w, [()()()()()], r"{{")?;
+        indented!(
+            w,
+            [()()()()()()],
+            r"managed[i] = (T)CustomMarshallerHelper<T>.ToManagedFunc!(IntPtr.Add(native.Data, i * size));"
+        )?;
+        indented!(w, [()()()()()], r"}}")?;
         indented!(w, [()()()()], r"}}")?;
         indented!(w, [()()()], r"}}")?;
-    } else {
-        indented!(w, [()()()], r"for (var i = 0; i < (int) len; i++) {{")?;
-        indented!(w, [()()()()], r"rval[i] = this[i];")?;
-        indented!(w, [()()()], r"}}")?;
+        indented!(w, [()()], r"}}")?;
     }
-    indented!(w, [()()()], r"return rval;")?;
-    indented!(w, [()()], r"}}")?;
     indented!(w, [()], r"}}")?;
-
-    // Count
-    indented!(w, [()], r"public int Count => (int) len;")?;
-
-    // GetEnumerator
-    indented!(w, [()], r"public IEnumerator<{}> GetEnumerator()", type_string)?;
-    indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"for (var i = 0; i < (int)len; ++i)")?;
-    indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"yield return this[i];")?;
-    indented!(w, [()()], r"}}")?;
-    indented!(w, [()], r"}}")?;
-
-    // The other GetEnumerator
-    indented!(w, [()], r"IEnumerator IEnumerable.GetEnumerator()")?;
-    indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"return this.GetEnumerator();")?;
-    indented!(w, [()], r"}}")?;
-
     indented!(w, r"}}")?;
-    w.newline()?;
 
     Ok(())
 }
 
-pub fn write_pattern_slice_overload(w: &mut IndentWriter, _context_type_name: &str, type_string: &str) -> Result<(), Error> {
-    indented!(w, [()], r"public unsafe ReadOnlySpan<{}> ReadOnlySpan", type_string)?;
-    indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"get")?;
-    indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"unsafe")?;
-    indented!(w, [()()()], r"{{")?;
-    indented!(w, [()()()()], r"return new ReadOnlySpan<{}>(this.data.ToPointer(), (int) this.len);", type_string)?;
-    indented!(w, [()()()], r"}}")?;
-    indented!(w, [()()], r"}}")?;
-    indented!(w, [()], r"}}")?;
-    Ok(())
-}
+pub fn write_pattern_generic_slice_helper(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
+    i.debug(w, "write_pattern_generic_slice_helper")?;
 
-pub fn write_pattern_slice_mut_overload(w: &mut IndentWriter, _context_type_name: &str, type_string: &str) -> Result<(), Error> {
-    indented!(w, [()], r"public unsafe Span<{}> Span", type_string)?;
-    indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"get")?;
-    indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"unsafe")?;
-    indented!(w, [()()()], r"{{")?;
-    indented!(w, [()()()()], r"return new Span<{}>(this.data.ToPointer(), (int) this.len);", type_string)?;
-    indented!(w, [()()()], r"}}")?;
-    indented!(w, [()()], r"}}")?;
-    indented!(w, [()], r"}}")?;
-    Ok(())
-}
-
-pub fn write_pattern_slice_mut(i: &Interop, w: &mut IndentWriter, slice: &CompositeType) -> Result<(), Error> {
-    i.debug(w, "write_pattern_slice_mut")?;
-    let context_type_name = slice.rust_name();
-    let data_type = slice
-        .fields()
-        .iter()
-        .find(|x| x.name().contains("data"))
-        .expect("Slice must contain field called 'data'.")
-        .the_type()
-        .try_deref_pointer()
-        .expect("data must be a pointer type");
-
-    let type_string = to_typespecifier_in_rval(data_type);
-
-    indented!(
-        w,
-        r"{} partial struct {} : IEnumerable<{}>",
-        i.visibility_types.to_access_modifier(),
-        context_type_name,
-        type_string
-    )?;
+    indented!(w, r"internal static class CustomMarshallerHelper<T> where T : struct")?;
     indented!(w, r"{{")?;
+    w.indent();
 
-    // Ctor
-    indented!(w, [()], r"public {}(GCHandle handle, ulong count)", context_type_name)?;
-    indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"this.data = handle.AddrOfPinnedObject();")?;
-    indented!(w, [()()], r"this.len = count;")?;
-    indented!(w, [()], r"}}")?;
+    indented!(w, r"public static readonly Action<T, IntPtr> ToUnmanagedFunc;")?;
+    indented!(w, r"public static readonly Func<IntPtr, T> ToManagedFunc;")?;
+    indented!(w, r"public static readonly bool HasCustomMarshaller;")?;
+    indented!(w, r"public static readonly int UnmanagedSize;")?;
+    indented!(w, r"public static readonly Type UnmanagedType;")?;
+    w.newline()?;
+    indented!(w, r"static CustomMarshallerHelper()")?;
+    indented!(w, r"{{")?;
+    w.indent();
 
-    // Ctor
-    indented!(w, [()], r"public {}(IntPtr handle, ulong count)", context_type_name)?;
-    indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"this.data = handle;")?;
-    indented!(w, [()()], r"this.len = count;")?;
-    indented!(w, [()], r"}}")?;
+    indented!(w, r"var nativeMarshalling = typeof(T).GetCustomAttribute<NativeMarshallingAttribute>();")?;
+    indented!(w, r"if (nativeMarshalling != null)")?;
+    indented!(w, r"{{")?;
+    w.indent();
 
-    write_pattern_slice_overload(w, context_type_name, &type_string)?;
-    write_pattern_slice_mut_overload(w, context_type_name, &type_string)?;
-
-    // Getter
-    indented!(w, [()], r"public unsafe {} this[int i]", type_string)?;
-    indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"get")?;
-    indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"if (i >= Count) throw new IndexOutOfRangeException();")?;
-    indented!(w, [()()()], r"var d = ({}*) data.ToPointer();", type_string)?;
-    indented!(w, [()()()], r"return d[i];")?;
-    indented!(w, [()()], r"}}")?;
-    indented!(w, [()()], r"set")?;
-    indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"if (i >= Count) throw new IndexOutOfRangeException();")?;
-    indented!(w, [()()()], r"var d = ({}*) data.ToPointer();", type_string)?;
-    indented!(w, [()()()], r"d[i] = value;")?;
-    indented!(w, [()()], r"}}")?;
-    indented!(w, [()], r"}}")?;
-
-    // Copied
-    indented!(w, [()], r"public unsafe {}[] Copied", type_string)?;
-    indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"get")?;
-    indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"var rval = new {}[len];", type_string)?;
-    indented!(w, [()()()], r"fixed (void* dst = rval)")?;
-    indented!(w, [()()()], r"{{")?;
+    indented!(w, r"var marshallerType = nativeMarshalling.NativeType;")?;
     indented!(
         w,
-        [()()()()],
-        r"Unsafe.CopyBlock(dst, data.ToPointer(), (uint) len * (uint) sizeof({}));",
-        type_string
+        r#"var convertToUnmanaged = marshallerType.GetMethod("ConvertToUnmanaged", BindingFlags.Public | BindingFlags.Static)!;"#
     )?;
-    indented!(w, [()()()()], r"for (var i = 0; i < (int) len; i++) {{")?;
-    indented!(w, [()()()()()], r"rval[i] = this[i];")?;
-    indented!(w, [()()()()], r"}}")?;
-    indented!(w, [()()()], r"}}")?;
-    indented!(w, [()()()], r"return rval;")?;
-    indented!(w, [()()], r"}}")?;
-    indented!(w, [()], r"}}")?;
-
-    // Count
-    indented!(w, [()], r"public int Count => (int) len;")?;
-
-    // GetEnumerator
-    indented!(w, [()], r"public IEnumerator<{}> GetEnumerator()", type_string)?;
-    indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"for (var i = 0; i < (int)len; ++i)")?;
-    indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"yield return this[i];")?;
-    indented!(w, [()()], r"}}")?;
-    indented!(w, [()], r"}}")?;
-
-    // The other GetEnumerator
-    indented!(w, [()], r"IEnumerator IEnumerable.GetEnumerator()")?;
-    indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"return this.GetEnumerator();")?;
-    indented!(w, [()], r"}}")?;
-
+    indented!(
+        w,
+        r#"var convertToManaged = marshallerType.GetMethod("ConvertToManaged", BindingFlags.Public | BindingFlags.Static)!;"#
+    )?;
+    indented!(w, r#"UnmanagedType = marshallerType.GetNestedType("Unmanaged")!;"#)?;
+    indented!(w, r"UnmanagedSize = Marshal.SizeOf(UnmanagedType);")?;
+    w.newline()?;
+    indented!(
+        w,
+        r"var unsafeRead = typeof(CustomMarshallerHelper<T>).GetMethod(nameof(ReadPointer), BindingFlags.NonPublic | BindingFlags.Static)!.MakeGenericMethod(UnmanagedType)!;"
+    )?;
+    indented!(w, r"var parameter = Expression.Parameter(typeof(IntPtr));")?;
+    indented!(w, r"var unsafeCall = Expression.Call(unsafeRead, parameter);")?;
+    indented!(w, r"var callExpression = Expression.Call(convertToManaged, unsafeCall);")?;
+    indented!(w, r"ToManagedFunc = Expression.Lambda<Func<IntPtr, T>>(callExpression, parameter).Compile();")?;
+    w.newline()?;
+    indented!(
+        w,
+        r" var unsafeWrite = typeof(CustomMarshallerHelper<T>).GetMethod(nameof(WritePointer), BindingFlags.NonPublic | BindingFlags.Static)!.MakeGenericMethod(UnmanagedType)!;"
+    )?;
+    indented!(w, r"var managedParameter = Expression.Parameter(typeof(T));")?;
+    indented!(w, r"var destParameter = Expression.Parameter(typeof(IntPtr));")?;
+    indented!(w, r"var toUnmanagedCall = Expression.Call(convertToUnmanaged, managedParameter);")?;
+    indented!(w, r"var unsafeWriteCall = Expression.Call(unsafeWrite, toUnmanagedCall, destParameter);")?;
+    indented!(
+        w,
+        r"ToUnmanagedFunc = Expression.Lambda<Action<T, IntPtr>>(unsafeWriteCall, managedParameter, destParameter).Compile();"
+    )?;
+    w.newline()?;
+    indented!(w, r"HasCustomMarshaller = true;")?;
+    w.unindent();
+    indented!(w, r"}}")?;
+    indented!(w, r"else")?;
+    indented!(w, r"{{")?;
+    w.indent();
+    indented!(w, r"HasCustomMarshaller = false;")?;
+    w.unindent();
+    indented!(w, r"}}")?;
+    w.unindent();
     indented!(w, r"}}")?;
     w.newline()?;
 
+    indented!(w, r"private static void WritePointer<TUnmanaged>(TUnmanaged unmanaged, IntPtr dest)")?;
+    indented!(w, r"{{")?;
+    w.indent();
+    indented!(w, r"unsafe {{ Unsafe.Write((void*)dest, unmanaged); }}")?;
+    w.unindent();
+    indented!(w, r"}}")?;
+    w.newline()?;
+
+    indented!(w, r"private static TUnmanaged ReadPointer<TUnmanaged>(IntPtr ptr)")?;
+    indented!(w, r"{{")?;
+    w.indent();
+    indented!(w, r" unsafe {{ return Unsafe.Read<TUnmanaged>((void*)ptr); }}")?;
+    w.unindent();
+    indented!(w, r"}}")?;
+
+    w.unindent();
+    indented!(w, r"}}")?;
     Ok(())
 }

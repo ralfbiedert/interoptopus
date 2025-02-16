@@ -1,12 +1,14 @@
-use crate::types::{CallbackFFISlice, Vec3f32};
+use crate::types::{CallbackCharArray, CallbackFFISlice, CharArray, Vec3f32};
 use interoptopus::patterns::slice::{FFISlice, FFISliceMut};
 use interoptopus::{callback, ffi_function};
+use crate::functions::callback;
 
 static HUGE_VEC_SLICE: [Vec3f32; 100_000] = [Vec3f32 { x: 0.0, y: 0.0, z: 0.0 }; 100_000];
 
 callback!(CallbackHugeVecSlice(slice: FFISlice<Vec3f32>) -> Vec3f32);
 callback!(CallbackSliceMut(slice: FFISliceMut<'_, u8>) -> ());
 callback!(CallbackU8(value: u8) -> u8);
+callback!(CallbackCharArray2(value: CharArray) -> ());
 
 #[ffi_function]
 pub fn pattern_ffi_slice_1(ffi_slice: FFISlice<u32>) -> u32 {
@@ -73,6 +75,11 @@ pub fn pattern_ffi_slice_6(slice: &FFISliceMut<u8>, callback: CallbackU8) {
 //
 //     sum
 // }
+
+#[ffi_function]
+pub fn pattern_ffi_slice_8(slice: &FFISliceMut<CharArray>, callback: CallbackCharArray2) {
+    callback.call(slice.as_slice().first().copied().unwrap());
+}
 
 // Some extra tests that were hard to do from core crate.
 #[cfg(test)]

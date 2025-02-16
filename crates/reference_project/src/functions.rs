@@ -2,8 +2,9 @@
 
 use crate::patterns::result::{Error, FFIError};
 use crate::types::{
-    ambiguous1, ambiguous2, common, Array, BoolField, Callbacku8u8, CharArray, EnumDocumented, EnumRenamedXYZ, FixedString, Generic, Generic2, Generic3, Generic4,
-    NestedArray, Packed1, Packed2, Phantom, StructDocumented, StructRenamedXYZ, Transparent, Tupled, Vec3f32, Visibility1, Visibility2, Weird1, Weird2,
+    ambiguous1, ambiguous2, common, Array, BoolField, CallbackCharArray, Callbacku8u8, CharArray, EnumDocumented, EnumRenamedXYZ, FixedString, Generic, Generic2,
+    Generic3, Generic4, NestedArray, Packed1, Packed2, Phantom, StructDocumented, StructRenamedXYZ, Transparent, Tupled, Vec3f32, Visibility1, Visibility2, Weird1,
+    Weird2,
 };
 use interoptopus::patterns::option::FFIOption;
 use interoptopus::patterns::result::panics_and_errors_to_ffi_enum;
@@ -164,6 +165,11 @@ pub fn complex_args_1(_a: Vec3f32, _b: Option<&Tupled>) -> FFIError {
 
 #[ffi_function]
 pub fn callback(callback: Callbacku8u8, value: u8) -> u8 {
+    callback(value)
+}
+
+#[ffi_function]
+pub fn callback_marshalled(callback: CallbackCharArray, value: CharArray) {
     callback(value)
 }
 

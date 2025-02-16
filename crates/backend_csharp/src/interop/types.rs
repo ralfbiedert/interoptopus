@@ -5,13 +5,13 @@ pub mod enums;
 pub mod fnptrs;
 
 use crate::interop::patterns::options::write_pattern_option;
-use crate::interop::patterns::slices::{write_pattern_slice, write_pattern_slice_mut};
+use crate::interop::patterns::slices::{write_pattern_generic_slice_helper, write_pattern_read_only_span_marshaller, write_pattern_span_marshaller};
 use crate::interop::types::bools::write_type_definition_ffibool;
 use crate::interop::types::callbacks::write_type_definition_named_callback;
 use crate::interop::types::composite::write_type_definition_composite;
 use crate::interop::types::enums::write_type_definition_enum;
 use crate::interop::types::fnptrs::write_type_definition_fn_pointer;
-use crate::Interop;
+use crate::{Interop, WriteTypes};
 use interoptopus::lang::c::CType;
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::{IndentWriter, WriteFor};
@@ -20,6 +20,25 @@ use interoptopus::Error;
 pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     for the_type in i.inventory.ctypes() {
         write_type_definition(i, w, the_type)?;
+    }
+
+    if i.write_types == WriteTypes::NamespaceAndInteroptopusGlobal {
+        let has_slices = i.inventory.ctypes().iter().any(|x| matches!(x, CType::Pattern(TypePattern::Slice(_))));
+        let has_slices_mut = i.inventory.ctypes().iter().any(|x| matches!(x, CType::Pattern(TypePattern::SliceMut(_))));
+        if has_slices || has_slices_mut {
+            write_pattern_generic_slice_helper(i, w)?;
+            w.newline()?;
+        }
+
+        if has_slices {
+            write_pattern_read_only_span_marshaller(i, w)?;
+            w.newline()?;
+        }
+
+        if has_slices_mut {
+            write_pattern_span_marshaller(i, w)?;
+            w.newline()?;
+        }
     }
 
     Ok(())
@@ -54,18 +73,8 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &CType
                 write_type_definition_enum(i, w, e.the_enum(), WriteFor::Code)?;
                 w.newline()?;
             }
-            TypePattern::Slice(x) => {
-                write_type_definition_composite(i, w, x)?;
-                w.newline()?;
-                write_pattern_slice(i, w, x)?;
-                w.newline()?;
-            }
-            TypePattern::SliceMut(x) => {
-                write_type_definition_composite(i, w, x)?;
-                w.newline()?;
-                write_pattern_slice_mut(i, w, x)?;
-                w.newline()?;
-            }
+            TypePattern::Slice(_) => {}
+            TypePattern::SliceMut(_) => {}
             TypePattern::Option(x) => {
                 write_type_definition_composite(i, w, x)?;
                 w.newline()?;

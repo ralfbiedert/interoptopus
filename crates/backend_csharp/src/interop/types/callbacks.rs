@@ -78,11 +78,24 @@ pub fn write_type_definition_named_callback_body(i: &Interop, w: &mut IndentWrit
     let rval = to_typespecifier_in_rval(the_type.fnpointer().signature().rval());
     let name = named_callback_to_typename(the_type);
     let visibility = i.visibility_types.to_access_modifier();
+    let needs_wrapper = i.has_custom_marshalled_types(the_type.fnpointer().signature());
 
     let mut params = Vec::new();
+    let mut native_params = Vec::new();
     for param in the_type.fnpointer().signature().params() {
         params.push(format!("{} {}", to_typespecifier_in_param(param.the_type()), param.name()));
+        native_params.push(format!("{} {}", i.to_native_callback_typespecifier(param.the_type()), param.name()));
     }
 
-    indented!(w, r"{} delegate {} {}({});", visibility, rval, name, params.join(", "))
+    indented!(w, r"{} delegate {} {}({});", visibility, rval, name, params.join(", "))?;
+    if needs_wrapper {
+        indented!(
+            w,
+            r"delegate {} {}Native({});",
+            i.to_native_callback_typespecifier(the_type.fnpointer().signature().rval()),
+            name,
+            native_params.join(", ")
+        )?;
+    }
+    Ok(())
 }
