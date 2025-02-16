@@ -1,5 +1,4 @@
-use crate::functions::callback;
-use crate::types::{CallbackCharArray, CallbackFFISlice, CharArray, Vec3f32};
+use crate::types::{CallbackFFISlice, CharArray, Vec3f32};
 use interoptopus::patterns::slice::{FFISlice, FFISliceMut};
 use interoptopus::{callback, ffi_function};
 
