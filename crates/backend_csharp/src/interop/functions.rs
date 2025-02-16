@@ -1,5 +1,5 @@
 use crate::converter::{
-    function_name_to_csharp_name, function_parameter_to_csharp_typename, function_rval_to_csharp_typename, has_ffi_error_rval, to_slice_marshaller,
+    function_name_to_csharp_name, function_parameter_to_csharp_typename, function_rval_to_csharp_typename, get_slice_type, has_ffi_error_rval, to_slice_marshaller,
     to_typespecifier_in_param, to_typespecifier_in_rval,
 };
 use crate::interop::patterns::pattern_to_native_in_signature;
@@ -282,10 +282,12 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         };
 
         match p.the_type() {
-            CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_)) => {
-                to_pin_name.push(name);
-                to_pin_slice_type.push(the_type);
-                to_invoke.push(format!("{name}_slice"));
+            CType::Pattern(TypePattern::Slice(x) | TypePattern::SliceMut(x)) => {
+                if !i.should_emit_marshaller(&get_slice_type(x)) {
+                    to_pin_name.push(name);
+                    to_pin_slice_type.push(the_type);
+                    to_invoke.push(format!("{name}_slice"));
+                }
             }
             CType::Pattern(TypePattern::NamedCallback(callback)) => match callback.fnpointer().signature().rval() {
                 CType::Pattern(TypePattern::FFIErrorEnum(_)) if i.work_around_exception_in_callback_no_reentry => {
@@ -297,15 +299,19 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
             },
             CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {
                 CType::Pattern(x) => match x {
-                    TypePattern::Slice(_) => {
-                        to_pin_name.push(name);
-                        to_pin_slice_type.push(the_type.replace("ref ", ""));
-                        to_invoke.push(format!("ref {name}_slice"));
+                    TypePattern::Slice(x) => {
+                        if !i.should_emit_marshaller(&get_slice_type(x)) {
+                            to_pin_name.push(name);
+                            to_pin_slice_type.push(the_type.replace("ref ", ""));
+                            to_invoke.push(format!("ref {name}_slice"));
+                        }
                     }
-                    TypePattern::SliceMut(_) => {
-                        to_pin_name.push(name);
-                        to_pin_slice_type.push(the_type.replace("ref ", ""));
-                        to_invoke.push(format!("ref {name}_slice"));
+                    TypePattern::SliceMut(x) => {
+                        if !i.should_emit_marshaller(&get_slice_type(x)) {
+                            to_pin_name.push(name);
+                            to_pin_slice_type.push(the_type.replace("ref ", ""));
+                            to_invoke.push(format!("ref {name}_slice"));
+                        }
                     }
                     _ => fallback(),
                 },
