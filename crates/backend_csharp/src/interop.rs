@@ -8,6 +8,7 @@ pub mod namespace;
 pub mod patterns;
 pub mod types;
 
+use crate::converter::{to_slice_marshaller, to_typespecifier_in_param};
 use crate::interop::builtins::write_builtins;
 use crate::interop::class::{write_class_context, write_native_lib_string};
 use crate::interop::constants::write_constants;
@@ -19,7 +20,7 @@ use crate::interop::patterns::abi_guard::write_abi_guard;
 use crate::interop::patterns::write_patterns;
 use crate::interop::types::write_type_definitions;
 use derive_builder::Builder;
-use interoptopus::lang::c::{CType, CompositeType, Constant, Function, Meta, PrimitiveType};
+use interoptopus::lang::c::{CType, CompositeType, Constant, Function, FunctionSignature, Meta, PrimitiveType};
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::{is_global_type, NamespaceMappings};
 use interoptopus::writer::IndentWriter;
@@ -196,7 +197,7 @@ impl Interop {
         composite
             .fields()
             .iter()
-            .any(|f| matches!(f.the_type(), CType::Composite(_) | CType::Primitive(PrimitiveType::Bool)) || self.should_emit_marshaller(f.the_type()))
+            .any(|f| matches!(f.the_type(), CType::Primitive(PrimitiveType::Bool)) || self.should_emit_marshaller(f.the_type()))
     }
 
     fn should_emit_marshaller(&self, ctype: &CType) -> bool {
@@ -231,6 +232,53 @@ impl Interop {
         rval
     }
 
+    fn is_custom_marshalled(&self, x: &CType) -> bool {
+        self.should_emit_marshaller(x)
+            || match x {
+                CType::FnPointer(y) => self.has_custom_marshalled_delegate(y.signature()),
+                CType::Pattern(y) => match y {
+                    TypePattern::NamedCallback(z) => self.has_custom_marshalled_delegate(z.fnpointer().signature()),
+                    TypePattern::Slice(_) => true,
+                    TypePattern::SliceMut(_) => true,
+                    _ => false,
+                },
+                _ => false,
+            }
+    }
+
+    fn has_custom_marshalled_types(&self, signature: &FunctionSignature) -> bool {
+        let mut types = signature.params().iter().map(|x| x.the_type().clone()).collect::<Vec<_>>();
+        types.push(signature.rval().clone());
+
+        types.iter().any(|x| self.is_custom_marshalled(x))
+    }
+
+    fn has_custom_marshalled_delegate(&self, signature: &FunctionSignature) -> bool {
+        let mut types = signature.params().iter().map(|x| x.the_type().clone()).collect::<Vec<_>>();
+        types.push(signature.rval().clone());
+
+        types.iter().any(|x| match x {
+            CType::FnPointer(y) => self.has_custom_marshalled_types(y.signature()),
+            CType::Pattern(TypePattern::NamedCallback(z)) => self.has_custom_marshalled_types(z.fnpointer().signature()),
+            _ => false,
+        })
+    }
+
+    fn to_native_callback_typespecifier(&self, t: &CType) -> String {
+        match t {
+            CType::Composite(x) => {
+                if self.should_emit_marshaller_for_composite(x) {
+                    format!("{}Marshaller.Unmanaged", to_typespecifier_in_param(t))
+                } else {
+                    to_typespecifier_in_param(t)
+                }
+            }
+            CType::Pattern(TypePattern::Slice(_)) => format!("{}.Unmanaged", to_slice_marshaller(t)),
+            CType::Pattern(TypePattern::SliceMut(_)) => format!("{}.Unmanaged", to_slice_marshaller(t)),
+            _ => to_typespecifier_in_param(t),
+        }
+    }
+
     /// Checks whether for the given type and the current file a type definition should be emitted.
     #[must_use]
     fn should_emit_by_type(&self, t: &CType) -> bool {
@@ -255,8 +303,8 @@ impl Interop {
                 TypePattern::CStrPointer => true,
                 TypePattern::APIVersion => true,
                 TypePattern::FFIErrorEnum(x) => self.should_emit_by_meta(x.the_enum().meta()),
-                TypePattern::Slice(x) => self.should_emit_by_meta(x.meta()),
-                TypePattern::SliceMut(x) => self.should_emit_by_meta(x.meta()),
+                TypePattern::Slice(_) => false,
+                TypePattern::SliceMut(_) => false,
                 TypePattern::Option(x) => self.should_emit_by_meta(x.meta()),
                 TypePattern::Bool => self.write_types == WriteTypes::NamespaceAndInteroptopusGlobal,
                 TypePattern::CChar => false,

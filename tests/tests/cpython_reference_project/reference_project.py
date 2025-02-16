@@ -34,6 +34,7 @@ def init_lib(path):
     c_lib.call_tupled.argtypes = [Tupled]
     c_lib.complex_args_1.argtypes = [Vec3f32, ctypes.POINTER(Tupled)]
     c_lib.callback.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8), ctypes.c_uint8]
+    c_lib.callback_marshalled.argtypes = [ctypes.CFUNCTYPE(None, CharArray), CharArray]
     c_lib.generic_1a.argtypes = [Genericu32, Phantomu8]
     c_lib.generic_1b.argtypes = [Genericu8, Phantomu8]
     c_lib.generic_1c.argtypes = [ctypes.POINTER(Genericu8), ctypes.POINTER(Genericu8)]
@@ -77,6 +78,7 @@ def init_lib(path):
     c_lib.pattern_ffi_slice_4.argtypes = [SliceU8, SliceMutU8]
     c_lib.pattern_ffi_slice_5.argtypes = [ctypes.POINTER(SliceU8), ctypes.POINTER(SliceMutU8)]
     c_lib.pattern_ffi_slice_6.argtypes = [ctypes.POINTER(SliceMutU8), ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8)]
+    c_lib.pattern_ffi_slice_8.argtypes = [ctypes.POINTER(SliceMutCharArray), ctypes.CFUNCTYPE(None, CharArray)]
     c_lib.pattern_ffi_slice_delegate.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint8, SliceU8)]
     c_lib.pattern_ffi_slice_delegate_huge.argtypes = [ctypes.CFUNCTYPE(Vec3f32, SliceVec3f32)]
     c_lib.pattern_ffi_option_1.argtypes = [OptionInner]
@@ -352,6 +354,12 @@ def callback(callback, value: int) -> int:
 
     return c_lib.callback(callback, value)
 
+def callback_marshalled(callback, value: CharArray):
+    if not hasattr(callback, "__ctypes_from_outparam__"):
+        callback = callbacks.fn_CharArray(callback)
+
+    return c_lib.callback_marshalled(callback, value)
+
 def generic_1a(x: Genericu32, y: Phantomu8) -> int:
     return c_lib.generic_1a(x, y)
 
@@ -522,6 +530,12 @@ def pattern_ffi_slice_6(slice: ctypes.POINTER(SliceMutU8), callback):
         callback = callbacks.fn_u8_rval_u8(callback)
 
     return c_lib.pattern_ffi_slice_6(slice, callback)
+
+def pattern_ffi_slice_8(slice: ctypes.POINTER(SliceMutCharArray), callback):
+    if not hasattr(callback, "__ctypes_from_outparam__"):
+        callback = callbacks.fn_CharArray(callback)
+
+    return c_lib.pattern_ffi_slice_8(slice, callback)
 
 def pattern_ffi_slice_delegate(callback) -> int:
     if not hasattr(callback, "__ctypes_from_outparam__"):
@@ -1958,11 +1972,74 @@ class SliceMutVec(ctypes.Structure):
         return self[len(self)-1]
 
 
+class SliceMutCharArray(ctypes.Structure):
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("data", ctypes.POINTER(CharArray)),
+        ("len", ctypes.c_uint64),
+    ]
+
+    def __len__(self):
+        return self.len
+
+    def __getitem__(self, i) -> CharArray:
+        if i < 0:
+            index = self.len+i
+        else:
+            index = i
+
+        if index >= self.len:
+            raise IndexError("Index out of range")
+
+        return self.data[index]
+
+    def __setitem__(self, i, v: CharArray):
+        if i < 0:
+            index = self.len+i
+        else:
+            index = i
+
+        if index >= self.len:
+            raise IndexError("Index out of range")
+
+        self.data[index] = v
+
+    def copied(self) -> SliceMutCharArray:
+        """Returns a shallow, owned copy of the underlying slice.
+
+        The returned object owns the immediate data, but not the targets of any contained
+        pointers. In other words, if your struct contains any pointers the returned object
+        may only be used as long as these pointers are valid. If the struct did not contain
+        any pointers the returned object is valid indefinitely."""
+        array = (CharArray * len(self))()
+        ctypes.memmove(array, self.data, len(self) * ctypes.sizeof(CharArray))
+        rval = SliceMutCharArray(data=ctypes.cast(array, ctypes.POINTER(CharArray)), len=len(self))
+        rval.owned = array  # Store array in returned slice to prevent memory deallocation
+        return rval
+
+    def __iter__(self) -> typing.Iterable[CharArray]:
+        return _Iter(self)
+
+    def iter(self) -> typing.Iterable[CharArray]:
+        """Convenience method returning a value iterator."""
+        return iter(self)
+
+    def first(self) -> CharArray:
+        """Returns the first element of this slice."""
+        return self[0]
+
+    def last(self) -> CharArray:
+        """Returns the last element of this slice."""
+        return self[len(self)-1]
+
+
 
 
 class callbacks:
     """Helpers to define callbacks."""
     fn_u8_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8)
+    fn_CharArray = ctypes.CFUNCTYPE(None, CharArray)
+    fn_CharArray = ctypes.CFUNCTYPE(None, CharArray)
     fn_SliceU8_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, SliceU8)
     fn_SliceVec3f32_rval_Vec3f32 = ctypes.CFUNCTYPE(Vec3f32, SliceVec3f32)
     fn_SliceMutU8 = ctypes.CFUNCTYPE(None, SliceMutU8)

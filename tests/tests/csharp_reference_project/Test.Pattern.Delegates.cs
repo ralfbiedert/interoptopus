@@ -9,7 +9,7 @@ public class TestPatternDelegates
     [Fact]
     public void pattern_ffi_slice_delegate()
     {
-        Interop.pattern_ffi_slice_delegate(delegate(SliceU8 x0)
+        Interop.pattern_ffi_slice_delegate(delegate(Slice<byte> x0)
         {
             Assert.Equal(x0.Count, 10);
             Assert.Equal(x0[0], 0);

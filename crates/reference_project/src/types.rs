@@ -100,6 +100,7 @@ pub struct NestedArray {
 }
 
 #[repr(transparent)]
+#[derive(Copy, Clone, Debug)]
 pub struct FixedString<const N: usize> {
     pub data: [u8; N],
 }
@@ -111,6 +112,7 @@ unsafe impl<const N: usize> CTypeInfo for FixedString<N> {
 }
 
 #[ffi_type]
+#[derive(Copy, Clone)]
 pub struct CharArray {
     pub str: FixedString<32>,
     pub str_2: FixedString<32>,
@@ -255,6 +257,8 @@ pub struct Packed2 {
 
 // Doesn't need annotations.
 pub type Callbacku8u8 = extern "C" fn(u8) -> u8;
+
+pub type CallbackCharArray = extern "C" fn(CharArray);
 
 // This does not work since we can't express the for<'x> bounds in our CTypeInfo implementation.
 // pub type CallbackFFISlice = extern "C" fn(FFISlice<u8>) -> u8;
