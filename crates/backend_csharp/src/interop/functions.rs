@@ -287,6 +287,8 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
                     to_pin_name.push(name);
                     to_pin_slice_type.push(the_type);
                     to_invoke.push(format!("{name}_slice"));
+                } else {
+                    fallback();
                 }
             }
             CType::Pattern(TypePattern::NamedCallback(callback)) => match callback.fnpointer().signature().rval() {
@@ -304,6 +306,8 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
                             to_pin_name.push(name);
                             to_pin_slice_type.push(the_type.replace("ref ", ""));
                             to_invoke.push(format!("ref {name}_slice"));
+                        } else {
+                            fallback();
                         }
                     }
                     TypePattern::SliceMut(x) => {
@@ -311,6 +315,8 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
                             to_pin_name.push(name);
                             to_pin_slice_type.push(the_type.replace("ref ", ""));
                             to_invoke.push(format!("ref {name}_slice"));
+                        } else {
+                            fallback();
                         }
                     }
                     _ => fallback(),
