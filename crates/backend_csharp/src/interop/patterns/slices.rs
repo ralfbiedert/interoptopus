@@ -26,7 +26,7 @@ fn write_pattern_generic_slice(i: &Interop, w: &mut IndentWriter, read_only: boo
     indented!(w, r"[NativeMarshalling(typeof({}Marshaller<>))]", struct_name)?;
     indented!(w, r"public readonly partial struct {}<T> : IEnumerable<T> where T : struct", struct_name)?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"internal readonly T[] Managed;")?;
+    indented!(w, [()], r"internal readonly T[]? Managed;")?;
     indented!(w, [()], r"internal readonly IntPtr Data;")?;
     indented!(w, [()], r"internal readonly ulong Len;")?;
     w.newline()?;

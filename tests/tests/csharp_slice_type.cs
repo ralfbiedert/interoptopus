@@ -92,7 +92,7 @@ namespace My.Company
     [NativeMarshalling(typeof(SliceMarshaller<>))]
     public readonly partial struct Slice<T> : IEnumerable<T> where T : struct
     {
-        internal readonly T[] Managed;
+        internal readonly T[]? Managed;
         internal readonly IntPtr Data;
         internal readonly ulong Len;
 

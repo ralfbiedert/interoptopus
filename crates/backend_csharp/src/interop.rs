@@ -279,6 +279,17 @@ impl Interop {
         }
     }
 
+    fn has_overloadable(&self, signature: &FunctionSignature) -> bool {
+        signature.params().iter().any(|x| match x.the_type() {
+            CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {
+                CType::Pattern(TypePattern::Slice(x) | TypePattern::SliceMut(x)) if !self.should_emit_marshaller_for_composite(x) => true,
+                _ => false,
+            },
+            CType::Pattern(TypePattern::Slice(x) | TypePattern::SliceMut(x)) if !self.should_emit_marshaller_for_composite(x) => true,
+            _ => false,
+        })
+    }
+
     /// Checks whether for the given type and the current file a type definition should be emitted.
     #[must_use]
     fn should_emit_by_type(&self, t: &CType) -> bool {
