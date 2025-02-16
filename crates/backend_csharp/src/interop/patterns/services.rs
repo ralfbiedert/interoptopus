@@ -213,7 +213,7 @@ pub fn write_pattern_service_method(
 }
 
 /// Writes common service overload code
-pub fn write_common_service_method_overload<FPatternMap: Fn(&Parameter) -> String>(
+pub fn write_common_service_method_overload<FPatternMap: Fn(&Interop, &Parameter) -> String>(
     i: &Interop,
     w: &mut IndentWriter,
     function: &Function,
@@ -241,7 +241,7 @@ pub fn write_common_service_method_overload<FPatternMap: Fn(&Parameter) -> Strin
         // If we call the checked function we want to resolve a `SliceU8` to a `byte[]`,
         // but if we call the unchecked version we want to keep that `Sliceu8` in our signature.
         // let native = i.to_typespecifier_in_param(p.the_type());
-        let native = f_pattern(p);
+        let native = f_pattern(i, p);
 
         // Forward `ref` and `out` accordingly.
         if native.contains("out ") {
