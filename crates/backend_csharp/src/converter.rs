@@ -95,8 +95,8 @@ pub fn to_typespecifier_in_field(x: &CType, field: &Field, composite: &Composite
         CType::Pattern(x) => match x {
             TypePattern::CStrPointer => "string".to_string(),
             TypePattern::FFIErrorEnum(e) => enum_to_typename(e.the_enum()),
-            TypePattern::Slice(e) => composite_to_typename(e),
-            TypePattern::SliceMut(e) => composite_to_typename(e),
+            TypePattern::Slice(x) => format!("ReadOnlyMemory<{}>", get_slice_type_argument(x)),
+            TypePattern::SliceMut(x) => format!("Memory<{}>", get_slice_type_argument(x)),
             TypePattern::Option(e) => composite_to_typename(e),
             TypePattern::NamedCallback(e) => named_callback_to_typename(e),
             TypePattern::Bool => "Bool".to_string(),
@@ -118,32 +118,32 @@ pub fn to_typespecifier_in_param(x: &CType) -> String {
         CType::Enum(x) => enum_to_typename(x),
         CType::Opaque(x) => opaque_to_typename(x),
         CType::Composite(x) => composite_to_typename(x),
-        CType::ReadPointer(z) => match **z {
+        CType::ReadPointer(z) => match &**z {
             CType::Opaque(_) => "IntPtr".to_string(),
             CType::Primitive(PrimitiveType::Void) => "IntPtr".to_string(),
             CType::ReadPointer(_) => "ref IntPtr".to_string(),
             CType::ReadWritePointer(_) => "ref IntPtr".to_string(),
             CType::Pattern(TypePattern::CChar) => "IntPtr".to_string(),
-            CType::Pattern(TypePattern::Slice(_)) => format!("ref {}", to_typespecifier_in_param(z)),
-            CType::Pattern(TypePattern::SliceMut(_)) => format!("ref {}", to_typespecifier_in_param(z)),
+            CType::Pattern(TypePattern::Slice(y)) => format!("ref Slice<{}>", get_slice_type_argument(y)),
+            CType::Pattern(TypePattern::SliceMut(y)) => format!("ref SliceMut<{}>", get_slice_type_argument(y)),
             _ => format!("ref {}", to_typespecifier_in_param(z)),
         },
-        CType::ReadWritePointer(z) => match **z {
+        CType::ReadWritePointer(z) => match &**z {
             CType::Opaque(_) => "IntPtr".to_string(),
             CType::Primitive(PrimitiveType::Void) => "IntPtr".to_string(),
             CType::ReadPointer(_) => "ref IntPtr".to_string(),
             CType::ReadWritePointer(_) => "ref IntPtr".to_string(),
             CType::Pattern(TypePattern::CChar) => "IntPtr".to_string(),
-            CType::Pattern(TypePattern::Slice(_)) => format!("ref {}", to_typespecifier_in_param(z)),
-            CType::Pattern(TypePattern::SliceMut(_)) => format!("ref {}", to_typespecifier_in_param(z)),
+            CType::Pattern(TypePattern::Slice(y)) => format!("ref Slice<{}>", get_slice_type_argument(y)),
+            CType::Pattern(TypePattern::SliceMut(y)) => format!("ref SliceMut<{}>", get_slice_type_argument(y)),
             _ => format!("out {}", to_typespecifier_in_param(z)),
         },
         CType::FnPointer(x) => fnpointer_to_typename(x),
         CType::Pattern(x) => match x {
             TypePattern::CStrPointer => "[MarshalAs(UnmanagedType.LPStr)] string".to_string(),
             TypePattern::FFIErrorEnum(e) => enum_to_typename(e.the_enum()),
-            TypePattern::Slice(x) => composite_to_typename(x),
-            TypePattern::SliceMut(x) => composite_to_typename(x),
+            TypePattern::Slice(x) => format!("Slice<{}>", get_slice_type_argument(x)),
+            TypePattern::SliceMut(x) => format!("SliceMut<{}>", get_slice_type_argument(x)),
             TypePattern::Option(x) => composite_to_typename(x),
             TypePattern::NamedCallback(x) => named_callback_to_typename(x),
             TypePattern::Bool => "Bool".to_string(),
@@ -167,8 +167,8 @@ pub fn to_typespecifier_in_rval(x: &CType) -> String {
         CType::Pattern(x) => match x {
             TypePattern::CStrPointer => "IntPtr".to_string(),
             TypePattern::FFIErrorEnum(e) => enum_to_typename(e.the_enum()),
-            TypePattern::Slice(x) => composite_to_typename(x),
-            TypePattern::SliceMut(x) => composite_to_typename(x),
+            TypePattern::Slice(x) => format!("Slice<{}>", get_slice_type_argument(x)),
+            TypePattern::SliceMut(x) => format!("SliceMut<{}>", get_slice_type_argument(x)),
             TypePattern::Option(x) => composite_to_typename(x),
             TypePattern::NamedCallback(x) => named_callback_to_typename(x),
             TypePattern::Bool => "Bool".to_string(),
@@ -230,5 +230,23 @@ pub fn field_name_to_csharp_name(field: &Field, rename_symbols: bool) -> String 
         field.name().to_lower_camel_case()
     } else {
         field.name().into()
+    }
+}
+
+pub fn get_slice_type_argument(x: &CompositeType) -> String {
+    let data_field = x.fields().iter().find(|x| x.name() == "data").expect("Slice must have data field");
+    let t = if let CType::ReadPointer(y) = data_field.the_type() {
+        to_typespecifier_in_param(y)
+    } else {
+        panic!("Slice data field must be a pointer")
+    };
+    t
+}
+
+pub fn to_slice_marshaller(t: &CType) -> String {
+    match t {
+        CType::Pattern(TypePattern::Slice(x)) => format!("SliceMarshaller<{}>", get_slice_type_argument(x)),
+        CType::Pattern(TypePattern::SliceMut(x)) => format!("SliceMutMarshaller<{}>", get_slice_type_argument(x)),
+        _ => panic!("Expected slice type"),
     }
 }

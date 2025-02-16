@@ -1,10 +1,10 @@
 use crate::converter::{
-    function_name_to_csharp_name, function_parameter_to_csharp_typename, function_rval_to_csharp_typename, has_ffi_error_rval, has_overloadable,
+    function_name_to_csharp_name, function_parameter_to_csharp_typename, function_rval_to_csharp_typename, has_ffi_error_rval, has_overloadable, to_slice_marshaller,
     to_typespecifier_in_param, to_typespecifier_in_rval,
 };
 use crate::interop::patterns::pattern_to_native_in_signature;
 use crate::{FunctionNameFlavor, Interop};
-use interoptopus::lang::c::{CType, Documentation, Function, PrimitiveType};
+use interoptopus::lang::c::{CType, Documentation, Function, FunctionSignature, Parameter, PrimitiveType};
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, Error};
@@ -27,7 +27,14 @@ pub fn write_function(i: &Interop, w: &mut IndentWriter, function: &Function, wr
         write_documentation(w, function.meta().documentation())?;
         write_function_annotation(i, w, function)?;
     }
-    write_function_declaration(i, w, function)?;
+
+    if i.has_custom_marshalled_delegate(function.signature()) {
+        write_function_declaration(i, w, function, true, false)?;
+        write_function_declaration(i, w, function, false, true)?;
+        write_function_native_wrapper_body(i, w, function)?;
+    } else {
+        write_function_declaration(i, w, function, false, false)?;
+    }
     write_function_overload(i, w, function, write_for)?;
 
     Ok(())
@@ -51,8 +58,7 @@ pub fn write_function_annotation(_i: &Interop, w: &mut IndentWriter, function: &
     Ok(())
 }
 
-pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
-    let rval = function_rval_to_csharp_typename(function);
+pub fn write_function_native_wrapper_body(i: &Interop, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
     let name = function_name_to_csharp_name(
         function,
         if i.rename_symbols {
@@ -62,15 +68,165 @@ pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &
         },
     );
 
+    let ret = if matches!(function.signature().rval(), CType::Primitive(PrimitiveType::Void)) {
+        ""
+    } else {
+        "return "
+    };
+
+    indented!(w, r"{{")?;
+    indented!(w, [()], r"{ret}{name}(")?;
+    w.indent();
+    w.indent();
+    write_function_wrapper_call_params(i, w, function.signature().params())?;
+    w.unindent();
+    w.unindent();
+    indented!(w, [()], r");")?;
+    indented!(w, r"}}")?;
+    Ok(())
+}
+
+pub fn write_function_wrapper_call_params(i: &Interop, w: &mut IndentWriter, params: &[Parameter]) -> Result<(), Error> {
+    for (index, p) in params.iter().enumerate() {
+        let name = p.name();
+        let sep = if index + 1 < params.len() { ", " } else { "" };
+        match p.the_type() {
+            CType::FnPointer(x) => {
+                write_function_wrapper_call_delegate_param_body(i, w, name, sep, x.signature())?;
+            }
+            CType::Pattern(TypePattern::NamedCallback(x)) => {
+                write_function_wrapper_call_delegate_param_body(i, w, name, sep, x.fnpointer().signature())?;
+            }
+            _ => {
+                let modifier = match p.the_type() {
+                    CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {
+                        CType::Pattern(x) => match x {
+                            TypePattern::Slice(_) => "ref ",
+                            TypePattern::SliceMut(_) => "ref ",
+                            _ => "",
+                        },
+                        _ => "",
+                    },
+                    _ => ""
+                };
+                indented!(w, r"{modifier}{name}{sep}")?;
+            }
+        }
+    }
+    Ok(())
+}
+
+pub fn write_function_wrapper_call_delegate_param_body(
+    i: &Interop,
+    w: &mut IndentWriter,
+    delegate_param_name: &str,
+    sep: &str,
+    delegate_signature: &FunctionSignature,
+) -> Result<(), Error> {
+    let mut lambda_params = Vec::new();
+    for p in delegate_signature.params() {
+        lambda_params.push(format!("{} {}_native", i.to_native_callback_typespecifier(p.the_type()), p.name()));
+    }
+
+    indented!(w, r"({}) => {{", lambda_params.join(", "))?;
+
+    // write custom marshalling for composite types
+    for p in delegate_signature.params() {
+        match p.the_type() {
+            CType::Composite(x) => {
+                if i.should_emit_marshaller_for_composite(x) {
+                    indented!(
+                        w,
+                        [()],
+                        r"var {0}_managed = {1}Marshaller.ConvertToManaged({0}_native);",
+                        p.name(),
+                        to_typespecifier_in_param(p.the_type())
+                    )?;
+                }
+            }
+            CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_)) => {
+                indented!(w, [()], r"var {}_marshaller = new {}.Marshaller();", p.name(), to_slice_marshaller(p.the_type()))?;
+                indented!(w, [()], r"{0}_marshaller.FromUnmanaged({0}_native);", p.name())?;
+                indented!(w, [()], r"var {0}_managed = {0}_marshaller.ToManaged();", p.name())?;
+            }
+            _ => {}
+        }
+    }
+
+    let returns = !matches!(delegate_signature.rval(), CType::Primitive(PrimitiveType::Void));
+
+    if returns {
+        indented!(w, [()], r"var result = {}(", delegate_param_name)?;
+    } else {
+        indented!(w, [()], r"{}(", delegate_param_name)?;
+    }
+
+    for (index, p) in delegate_signature.params().iter().enumerate() {
+        let sep = if index + 1 < delegate_signature.params().len() { ", " } else { "" };
+        match p.the_type() {
+            CType::Composite(x) => {
+                if i.should_emit_marshaller_for_composite(x) {
+                    indented!(w, [()()], r"{}_managed{}", p.name(), sep)?;
+                }
+            }
+            CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_)) => {
+                indented!(w, [()()], r"{}_managed{}", p.name(), sep)?;
+            }
+            _ => {
+                indented!(w, [()()], r"{}{}", p.name(), sep)?;
+            }
+        }
+    }
+    indented!(w, [()], r");")?;
+
+    for p in delegate_signature.params() {
+        if let CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_)) = p.the_type() {
+            if matches!(p.the_type(), CType::Pattern(TypePattern::SliceMut(_))) {
+                indented!(w, [()], r"{}_marshaller.OnInvoked();", p.name())?;
+            }
+            indented!(w, [()], r"{}_marshaller.Free();", p.name())?;
+        }
+    }
+
+    if returns {
+        indented!(w, [()], r"return result;")?;
+    }
+
+    indented!(w, r"}}{sep}")?;
+
+    Ok(())
+}
+
+pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &Function, native: bool, has_body: bool) -> Result<(), Error> {
+    let rval = function_rval_to_csharp_typename(function);
+    let name = function_name_to_csharp_name(
+        function,
+        if i.rename_symbols {
+            FunctionNameFlavor::CSharpMethodNameWithClass
+        } else {
+            FunctionNameFlavor::RawFFIName
+        },
+    );
+    let visibility = if native { "private " } else { "public " };
+
     let mut params = Vec::new();
     for p in function.signature().params() {
         let the_type = function_parameter_to_csharp_typename(p);
         let name = p.name();
 
-        params.push(format!("{the_type} {name}"));
+        if native && matches!(p.the_type(), CType::FnPointer(_) | CType::Pattern(TypePattern::NamedCallback(_))) {
+            let suffix = if matches!(p.the_type(), CType::FnPointer(_)) { "_native" } else { "Native" };
+            params.push(format!("{the_type}{suffix} {name}"));
+        } else {
+            params.push(format!("{the_type} {name}"));
+        }
     }
 
-    indented!(w, r"public static partial {} {}({});", rval, name, params.join(", "))
+    let line_ending = if has_body { "" } else { ";" };
+
+    let partial = if has_body { "" } else { "partial " };
+
+    indented!(w, r"{}static {}{} {}({}){}", visibility, partial, rval, name, params.join(", "), line_ending)
 }
 
 #[allow(clippy::too_many_lines)]

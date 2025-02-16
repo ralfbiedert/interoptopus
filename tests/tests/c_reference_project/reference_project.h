@@ -305,6 +305,8 @@ typedef struct NESTEDARRAY
     ARRAY field_struct;
     } NESTEDARRAY;
 
+typedef void (*fptr_fn_CharArray)(CHARARRAY x0);
+
 ///A pointer to an array of data someone else owns which may not be modified.
 typedef struct SLICEUSEASCIISTRINGPATTERN
     {
@@ -341,9 +343,20 @@ typedef struct SLICEMUTVEC
     uint64_t len;
     } SLICEMUTVEC;
 
+typedef void (*CALLBACKCHARARRAY2)(CHARARRAY VALUE);
+
 typedef uint8_t (*CALLBACKFFISLICE)(SLICEU8 SLICE);
 
 typedef void (*CALLBACKSLICEMUT)(SLICEMUTU8 SLICE);
+
+///A pointer to an array of data someone else owns which may be modified.
+typedef struct SLICEMUTCHARARRAY
+    {
+    ///Pointer to start of mutable data.
+    const CHARARRAY* data;
+    ///Number of elements.
+    uint64_t len;
+    } SLICEMUTCHARARRAY;
 
 typedef VEC3F32 (*CALLBACKHUGEVECSLICE)(SLICEVEC3F32 SLICE);
 
@@ -398,6 +411,8 @@ TUPLED call_tupled(TUPLED X);
 FFIERROR complex_args_1(VEC3F32 A, const TUPLED* B);
 
 uint8_t callback(fptr_fn_u8_rval_u8 CALLBACK, uint8_t VALUE);
+
+void callback_marshalled(fptr_fn_CharArray CALLBACK, CHARARRAY VALUE);
 
 uint32_t generic_1a(GENERICU32 X, PHANTOMU8 Y);
 
@@ -485,6 +500,8 @@ void pattern_ffi_slice_4(SLICEU8 SLICE, SLICEMUTU8 SLICE2);
 void pattern_ffi_slice_5(const SLICEU8* SLICE, SLICEMUTU8* SLICE2);
 
 void pattern_ffi_slice_6(const SLICEMUTU8* SLICE, CALLBACKU8 CALLBACK);
+
+void pattern_ffi_slice_8(const SLICEMUTCHARARRAY* SLICE, CALLBACKCHARARRAY2 CALLBACK);
 
 uint8_t pattern_ffi_slice_delegate(CALLBACKFFISLICE CALLBACK);
 

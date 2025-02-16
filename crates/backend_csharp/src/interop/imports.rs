@@ -8,6 +8,8 @@ pub fn write_imports(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     indented!(w, r"#pragma warning disable 0105")?;
     indented!(w, r"using System;")?;
     indented!(w, r"using System.Text;")?;
+    indented!(w, r"using System.Reflection;")?;
+    indented!(w, r"using System.Linq.Expressions;")?;
     indented!(w, r"using System.Collections;")?;
     indented!(w, r"using System.Collections.Generic;")?;
     indented!(w, r"using System.Runtime.InteropServices;")?;
