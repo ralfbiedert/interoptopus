@@ -298,16 +298,27 @@ fn write_pattern_generic_slice_marshaller(i: &Interop, w: &mut IndentWriter, rea
 pub fn write_pattern_generic_slice_helper(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     i.debug(w, "write_pattern_generic_slice_helper")?;
 
+    indented!(w, r"// This is a helper for the marshallers for Slice<T> and SliceMut<T> of Ts that require custom marshalling.")?;
+    indented!(w, r"// It is used to precompile the conversion logic for the custom marshaller.")?;
     indented!(w, r"internal static class CustomMarshallerHelper<T> where T : struct")?;
     indented!(w, r"{{")?;
     w.indent();
 
+    indented!(w, r"// Delegate to convert a managed T to its unmanaged representation at the given pointer.")?;
+    indented!(w, r"// Precompiling these conversions minimizes overhead during runtime marshalling.")?;
     indented!(w, r"public static readonly Action<T, IntPtr> ToUnmanagedFunc;")?;
+    indented!(w, r"// Delegate that converts unmanaged data at a specified pointer back to a managed instance of T.")?;
     indented!(w, r"public static readonly Func<IntPtr, T> ToManagedFunc;")?;
+    w.newline()?;
+    indented!(w, r"// Indicates whether type T is decorated with a NativeMarshallingAttribute.")?;
     indented!(w, r"public static readonly bool HasCustomMarshaller;")?;
+    indented!(w, r"// Size of the unmanaged type in bytes. This is used for memory allocation.")?;
     indented!(w, r"public static readonly int UnmanagedSize;")?;
+    indented!(w, r"// The unmanaged type that corresponds to T as defined by the custom marshaller.")?;
+    indented!(w, r"// This assumes that the custom marshaller has a nested type named 'Unmanaged'.")?;
     indented!(w, r"public static readonly Type UnmanagedType;")?;
     w.newline()?;
+    indented!(w, r"// This runs once per type T, ensuring that the conversion logic is set up only once.")?;
     indented!(w, r"static CustomMarshallerHelper()")?;
     indented!(w, r"{{")?;
     w.indent();
@@ -320,15 +331,26 @@ pub fn write_pattern_generic_slice_helper(i: &Interop, w: &mut IndentWriter) -> 
     indented!(w, r"var marshallerType = nativeMarshalling.NativeType;")?;
     indented!(
         w,
-        r#"var convertToUnmanaged = marshallerType.GetMethod("ConvertToUnmanaged", BindingFlags.Public | BindingFlags.Static)!;"#
+        r#"var convertToUnmanaged = marshallerType.GetMethod("ConvertToUnmanaged", BindingFlags.Public | BindingFlags.Static);"#
     )?;
     indented!(
         w,
-        r#"var convertToManaged = marshallerType.GetMethod("ConvertToManaged", BindingFlags.Public | BindingFlags.Static)!;"#
+        r#"var convertToManaged = marshallerType.GetMethod("ConvertToManaged", BindingFlags.Public | BindingFlags.Static);"#
     )?;
     indented!(w, r#"UnmanagedType = marshallerType.GetNestedType("Unmanaged")!;"#)?;
     indented!(w, r"UnmanagedSize = Marshal.SizeOf(UnmanagedType);")?;
     w.newline()?;
+    indented!(w, r"// If the stateless custom marshaller shape is not available we currently do not support marshalling T in a slice.")?;
+    indented!(w, r"if (convertToUnmanaged == null || convertToManaged == null)")?;
+    indented!(w, r"{{")?;
+    w.indent();
+    indented!(w, r"ToUnmanagedFunc = Expression.Lambda<Action<T, IntPtr>>(Expression.Throw(Expression.New(typeof(NotSupportedException))), Expression.Parameter(typeof(T)), Expression.Parameter(typeof(IntPtr))).Compile();")?;
+    indented!(w, r"ToManagedFunc = Expression.Lambda<Func<IntPtr, T>>(Expression.Throw(Expression.New(typeof(NotSupportedException)), typeof(T)), Expression.Parameter(typeof(IntPtr))).Compile();")?;
+    w.unindent();
+    indented!(w, r"}}")?;
+    indented!(w, r"else")?;
+    indented!(w, r"{{")?;
+    w.indent();
     indented!(
         w,
         r"var unsafeRead = typeof(CustomMarshallerHelper<T>).GetMethod(nameof(ReadPointer), BindingFlags.NonPublic | BindingFlags.Static)!.MakeGenericMethod(UnmanagedType)!;"
@@ -350,6 +372,8 @@ pub fn write_pattern_generic_slice_helper(i: &Interop, w: &mut IndentWriter) -> 
         w,
         r"ToUnmanagedFunc = Expression.Lambda<Action<T, IntPtr>>(unsafeWriteCall, managedParameter, destParameter).Compile();"
     )?;
+    w.unindent();
+    indented!(w, r"}}")?;
     w.newline()?;
     indented!(w, r"HasCustomMarshaller = true;")?;
     w.unindent();
@@ -357,6 +381,9 @@ pub fn write_pattern_generic_slice_helper(i: &Interop, w: &mut IndentWriter) -> 
     indented!(w, r"else")?;
     indented!(w, r"{{")?;
     w.indent();
+    indented!(w, r"UnmanagedType = typeof(T);")?;
+    indented!(w, r"ToUnmanagedFunc = Expression.Lambda<Action<T, IntPtr>>(Expression.Throw(Expression.New(typeof(InvalidOperationException))), Expression.Parameter(typeof(T)), Expression.Parameter(typeof(IntPtr))).Compile();")?;
+    indented!(w, r"ToManagedFunc = Expression.Lambda<Func<IntPtr, T>>(Expression.Throw(Expression.New(typeof(InvalidOperationException)), typeof(T)), Expression.Parameter(typeof(IntPtr))).Compile();")?;
     indented!(w, r"HasCustomMarshaller = false;")?;
     w.unindent();
     indented!(w, r"}}")?;
@@ -364,6 +391,7 @@ pub fn write_pattern_generic_slice_helper(i: &Interop, w: &mut IndentWriter) -> 
     indented!(w, r"}}")?;
     w.newline()?;
 
+    indented!(w, r"// This exists to simplify the creation of the expression tree.")?;
     indented!(w, r"private static void WritePointer<TUnmanaged>(TUnmanaged unmanaged, IntPtr dest)")?;
     indented!(w, r"{{")?;
     w.indent();
@@ -372,6 +400,7 @@ pub fn write_pattern_generic_slice_helper(i: &Interop, w: &mut IndentWriter) -> 
     indented!(w, r"}}")?;
     w.newline()?;
 
+    indented!(w, r"// This exists to simplify the creation of the expression tree.")?;
     indented!(w, r"private static TUnmanaged ReadPointer<TUnmanaged>(IntPtr ptr)")?;
     indented!(w, r"{{")?;
     w.indent();

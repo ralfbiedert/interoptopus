@@ -38,51 +38,76 @@ namespace My.Company
 
     }
 
+    // This is a helper for the marshallers for Slice<T> and SliceMut<T> of Ts that require custom marshalling.
+    // It is used to precompile the conversion logic for the custom marshaller.
     internal static class CustomMarshallerHelper<T> where T : struct
     {
+        // Delegate to convert a managed T to its unmanaged representation at the given pointer.
+        // Precompiling these conversions minimizes overhead during runtime marshalling.
         public static readonly Action<T, IntPtr> ToUnmanagedFunc;
+        // Delegate that converts unmanaged data at a specified pointer back to a managed instance of T.
         public static readonly Func<IntPtr, T> ToManagedFunc;
+
+        // Indicates whether type T is decorated with a NativeMarshallingAttribute.
         public static readonly bool HasCustomMarshaller;
+        // Size of the unmanaged type in bytes. This is used for memory allocation.
         public static readonly int UnmanagedSize;
+        // The unmanaged type that corresponds to T as defined by the custom marshaller.
+        // This assumes that the custom marshaller has a nested type named 'Unmanaged'.
         public static readonly Type UnmanagedType;
 
+        // This runs once per type T, ensuring that the conversion logic is set up only once.
         static CustomMarshallerHelper()
         {
             var nativeMarshalling = typeof(T).GetCustomAttribute<NativeMarshallingAttribute>();
             if (nativeMarshalling != null)
             {
                 var marshallerType = nativeMarshalling.NativeType;
-                var convertToUnmanaged = marshallerType.GetMethod("ConvertToUnmanaged", BindingFlags.Public | BindingFlags.Static)!;
-                var convertToManaged = marshallerType.GetMethod("ConvertToManaged", BindingFlags.Public | BindingFlags.Static)!;
+                var convertToUnmanaged = marshallerType.GetMethod("ConvertToUnmanaged", BindingFlags.Public | BindingFlags.Static);
+                var convertToManaged = marshallerType.GetMethod("ConvertToManaged", BindingFlags.Public | BindingFlags.Static);
                 UnmanagedType = marshallerType.GetNestedType("Unmanaged")!;
                 UnmanagedSize = Marshal.SizeOf(UnmanagedType);
 
-                var unsafeRead = typeof(CustomMarshallerHelper<T>).GetMethod(nameof(ReadPointer), BindingFlags.NonPublic | BindingFlags.Static)!.MakeGenericMethod(UnmanagedType)!;
-                var parameter = Expression.Parameter(typeof(IntPtr));
-                var unsafeCall = Expression.Call(unsafeRead, parameter);
-                var callExpression = Expression.Call(convertToManaged, unsafeCall);
-                ToManagedFunc = Expression.Lambda<Func<IntPtr, T>>(callExpression, parameter).Compile();
+                // If the stateless custom marshaller shape is not available we currently do not support marshalling T in a slice.
+                if (convertToUnmanaged == null || convertToManaged == null)
+                {
+                    ToUnmanagedFunc = Expression.Lambda<Action<T, IntPtr>>(Expression.Throw(Expression.New(typeof(NotSupportedException))), Expression.Parameter(typeof(T)), Expression.Parameter(typeof(IntPtr))).Compile();
+                    ToManagedFunc = Expression.Lambda<Func<IntPtr, T>>(Expression.Throw(Expression.New(typeof(NotSupportedException)), typeof(T)), Expression.Parameter(typeof(IntPtr))).Compile();
+                }
+                else
+                {
+                    var unsafeRead = typeof(CustomMarshallerHelper<T>).GetMethod(nameof(ReadPointer), BindingFlags.NonPublic | BindingFlags.Static)!.MakeGenericMethod(UnmanagedType)!;
+                    var parameter = Expression.Parameter(typeof(IntPtr));
+                    var unsafeCall = Expression.Call(unsafeRead, parameter);
+                    var callExpression = Expression.Call(convertToManaged, unsafeCall);
+                    ToManagedFunc = Expression.Lambda<Func<IntPtr, T>>(callExpression, parameter).Compile();
 
-                 var unsafeWrite = typeof(CustomMarshallerHelper<T>).GetMethod(nameof(WritePointer), BindingFlags.NonPublic | BindingFlags.Static)!.MakeGenericMethod(UnmanagedType)!;
-                var managedParameter = Expression.Parameter(typeof(T));
-                var destParameter = Expression.Parameter(typeof(IntPtr));
-                var toUnmanagedCall = Expression.Call(convertToUnmanaged, managedParameter);
-                var unsafeWriteCall = Expression.Call(unsafeWrite, toUnmanagedCall, destParameter);
-                ToUnmanagedFunc = Expression.Lambda<Action<T, IntPtr>>(unsafeWriteCall, managedParameter, destParameter).Compile();
+                     var unsafeWrite = typeof(CustomMarshallerHelper<T>).GetMethod(nameof(WritePointer), BindingFlags.NonPublic | BindingFlags.Static)!.MakeGenericMethod(UnmanagedType)!;
+                    var managedParameter = Expression.Parameter(typeof(T));
+                    var destParameter = Expression.Parameter(typeof(IntPtr));
+                    var toUnmanagedCall = Expression.Call(convertToUnmanaged, managedParameter);
+                    var unsafeWriteCall = Expression.Call(unsafeWrite, toUnmanagedCall, destParameter);
+                    ToUnmanagedFunc = Expression.Lambda<Action<T, IntPtr>>(unsafeWriteCall, managedParameter, destParameter).Compile();
+                }
 
                 HasCustomMarshaller = true;
             }
             else
             {
+                UnmanagedType = typeof(T);
+                ToUnmanagedFunc = Expression.Lambda<Action<T, IntPtr>>(Expression.Throw(Expression.New(typeof(InvalidOperationException))), Expression.Parameter(typeof(T)), Expression.Parameter(typeof(IntPtr))).Compile();
+                ToManagedFunc = Expression.Lambda<Func<IntPtr, T>>(Expression.Throw(Expression.New(typeof(InvalidOperationException)), typeof(T)), Expression.Parameter(typeof(IntPtr))).Compile();
                 HasCustomMarshaller = false;
             }
         }
 
+        // This exists to simplify the creation of the expression tree.
         private static void WritePointer<TUnmanaged>(TUnmanaged unmanaged, IntPtr dest)
         {
             unsafe { Unsafe.Write((void*)dest, unmanaged); }
         }
 
+        // This exists to simplify the creation of the expression tree.
         private static TUnmanaged ReadPointer<TUnmanaged>(IntPtr ptr)
         {
              unsafe { return Unsafe.Read<TUnmanaged>((void*)ptr); }
