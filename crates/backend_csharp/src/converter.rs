@@ -234,7 +234,11 @@ pub fn get_slice_type(x: &CompositeType) -> CType {
 pub fn get_slice_type_argument(x: &CompositeType) -> String {
     let data_field = x.fields().iter().find(|x| x.name() == "data").expect("Slice must have data field");
     let t = if let CType::ReadPointer(y) = data_field.the_type() {
-        to_typespecifier_in_param(y)
+        if matches!(&**y, CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_))) {
+            panic!("Slice data field must not be a slice")
+        } else {
+            to_typespecifier_in_param(y)
+        }
     } else {
         panic!("Slice data field must be a pointer")
     };
