@@ -295,10 +295,14 @@ fn write_pattern_generic_slice_marshaller(i: &Interop, w: &mut IndentWriter, rea
     Ok(())
 }
 
+#[allow(clippy::too_many_lines)]
 pub fn write_pattern_generic_slice_helper(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     i.debug(w, "write_pattern_generic_slice_helper")?;
 
-    indented!(w, r"// This is a helper for the marshallers for Slice<T> and SliceMut<T> of Ts that require custom marshalling.")?;
+    indented!(
+        w,
+        r"// This is a helper for the marshallers for Slice<T> and SliceMut<T> of Ts that require custom marshalling."
+    )?;
     indented!(w, r"// It is used to precompile the conversion logic for the custom marshaller.")?;
     indented!(w, r"internal static class CustomMarshallerHelper<T> where T : struct")?;
     indented!(w, r"{{")?;
@@ -340,12 +344,21 @@ pub fn write_pattern_generic_slice_helper(i: &Interop, w: &mut IndentWriter) -> 
     indented!(w, r#"UnmanagedType = marshallerType.GetNestedType("Unmanaged")!;"#)?;
     indented!(w, r"UnmanagedSize = Marshal.SizeOf(UnmanagedType);")?;
     w.newline()?;
-    indented!(w, r"// If the stateless custom marshaller shape is not available we currently do not support marshalling T in a slice.")?;
+    indented!(
+        w,
+        r"// If the stateless custom marshaller shape is not available we currently do not support marshalling T in a slice."
+    )?;
     indented!(w, r"if (convertToUnmanaged == null || convertToManaged == null)")?;
     indented!(w, r"{{")?;
     w.indent();
-    indented!(w, r"ToUnmanagedFunc = Expression.Lambda<Action<T, IntPtr>>(Expression.Throw(Expression.New(typeof(NotSupportedException))), Expression.Parameter(typeof(T)), Expression.Parameter(typeof(IntPtr))).Compile();")?;
-    indented!(w, r"ToManagedFunc = Expression.Lambda<Func<IntPtr, T>>(Expression.Throw(Expression.New(typeof(NotSupportedException)), typeof(T)), Expression.Parameter(typeof(IntPtr))).Compile();")?;
+    indented!(
+        w,
+        r"ToUnmanagedFunc = Expression.Lambda<Action<T, IntPtr>>(Expression.Throw(Expression.New(typeof(NotSupportedException))), Expression.Parameter(typeof(T)), Expression.Parameter(typeof(IntPtr))).Compile();"
+    )?;
+    indented!(
+        w,
+        r"ToManagedFunc = Expression.Lambda<Func<IntPtr, T>>(Expression.Throw(Expression.New(typeof(NotSupportedException)), typeof(T)), Expression.Parameter(typeof(IntPtr))).Compile();"
+    )?;
     w.unindent();
     indented!(w, r"}}")?;
     indented!(w, r"else")?;
@@ -382,8 +395,14 @@ pub fn write_pattern_generic_slice_helper(i: &Interop, w: &mut IndentWriter) -> 
     indented!(w, r"{{")?;
     w.indent();
     indented!(w, r"UnmanagedType = typeof(T);")?;
-    indented!(w, r"ToUnmanagedFunc = Expression.Lambda<Action<T, IntPtr>>(Expression.Throw(Expression.New(typeof(InvalidOperationException))), Expression.Parameter(typeof(T)), Expression.Parameter(typeof(IntPtr))).Compile();")?;
-    indented!(w, r"ToManagedFunc = Expression.Lambda<Func<IntPtr, T>>(Expression.Throw(Expression.New(typeof(InvalidOperationException)), typeof(T)), Expression.Parameter(typeof(IntPtr))).Compile();")?;
+    indented!(
+        w,
+        r"ToUnmanagedFunc = Expression.Lambda<Action<T, IntPtr>>(Expression.Throw(Expression.New(typeof(InvalidOperationException))), Expression.Parameter(typeof(T)), Expression.Parameter(typeof(IntPtr))).Compile();"
+    )?;
+    indented!(
+        w,
+        r"ToManagedFunc = Expression.Lambda<Func<IntPtr, T>>(Expression.Throw(Expression.New(typeof(InvalidOperationException)), typeof(T)), Expression.Parameter(typeof(IntPtr))).Compile();"
+    )?;
     indented!(w, r"HasCustomMarshaller = false;")?;
     w.unindent();
     indented!(w, r"}}")?;
