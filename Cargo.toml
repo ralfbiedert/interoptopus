@@ -1,15 +1,8 @@
 [workspace]
 members = [
-    "crates/core",
-    "crates/backend_c",
-    "crates/backend_cpython",
-    "crates/backend_csharp",
-    "crates/proc_macros",
-    "crates/reference_project",
+    "crates/*",
     "examples/hello_world",
-    "examples/real_project_layout/core_library",
-    "examples/real_project_layout/core_library_ffi",
-    "examples/real_project_layout/core_library_ffi_build",
+    "examples/real_project_layout/*",
     "tests"
 ]
 resolver = "2"
