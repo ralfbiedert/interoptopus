@@ -58,7 +58,7 @@ pub struct Attributes {
     debug: bool,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialOrd, PartialEq)]
 pub enum TypeRepresentation {
     C,
     Transparent,

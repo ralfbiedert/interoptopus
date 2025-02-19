@@ -4,6 +4,7 @@ use proc_macro2::{Span, TokenStream};
 use quote::{quote, ToTokens};
 use syn::spanned::Spanned;
 use syn::{GenericParam, ItemStruct, Type};
+use crate::types::TypeRepresentation::Opaque;
 
 // Various Struct examples
 //
@@ -144,8 +145,9 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
             Type::Ptr(x) => x.to_token_stream(),
             Type::Array(x) => x.to_token_stream(),
             Type::Reference(x) => x.to_token_stream(),
+            Type::Tuple(x) if type_repr == Opaque => x.to_token_stream(),
             _ => {
-                panic!("Unknown token: {field:?}");
+                panic!("Field '{name}' has an unsupported type '{:?}'", &field.ty);
             }
         };
 

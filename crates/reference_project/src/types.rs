@@ -21,6 +21,7 @@ pub struct Empty {}
 #[allow(dead_code)]
 pub struct Opaque {
     _internal: *const Vec3f32,
+    _unused: (),
 }
 
 #[ffi_type]
