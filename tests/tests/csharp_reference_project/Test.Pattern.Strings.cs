@@ -19,7 +19,7 @@ public class TestPatternStrings
         var rval = Interop.pattern_ascii_pointer_2();
         // Assert.Equal(string.IsNullOrEmpty(rval));
     }
-
+    
 
     [Fact]
     public void string_slices()
