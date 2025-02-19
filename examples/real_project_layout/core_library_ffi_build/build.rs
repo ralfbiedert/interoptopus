@@ -1,3 +1,4 @@
+use std::error::Error;
 use core_library_ffi::ffi_inventory;
 use interoptopus::Bindings;
 use interoptopus_backend_csharp::InteropBuilder;
@@ -9,14 +10,15 @@ use interoptopus_backend_csharp::InteropBuilder;
 // Instead, if you used to unit test trick in the other examples, you will have
 // to run both `cargo build` to produce the `.dll` and `cargo test`
 // to produce the bindings (since `cargo test` does not imply `cargo build`).
-fn main() {
+fn main() -> Result<(), Box<dyn Error>> {
     InteropBuilder::new()
         .inventory(ffi_inventory())
+        .dll_name("core_library")
         // You might also want to consider writing to `OUT_DIR` instead, since
         // writing to any other place from a `build.rs` is discouraged (we do
         // it here to simplify our example).
-        .build()
-        .unwrap()
-        .write_file("bindings/Interop.cs")
-        .unwrap();
+        .build()?
+        .write_file("bindings/Interop.cs")?;
+    
+    Ok(())
 }
