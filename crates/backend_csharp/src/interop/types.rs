@@ -7,7 +7,6 @@ pub mod fnptrs;
 use crate::interop::patterns::options::write_pattern_option;
 use crate::interop::patterns::slices::{write_pattern_generic_slice_helper, write_pattern_read_only_span_marshaller, write_pattern_span_marshaller};
 use crate::interop::types::bools::write_type_definition_ffibool;
-use crate::interop::types::callbacks::write_type_definition_named_callback;
 use crate::interop::types::composite::write_type_definition_composite;
 use crate::interop::types::enums::write_type_definition_enum;
 use crate::interop::types::fnptrs::write_type_definition_fn_pointer;
@@ -16,6 +15,7 @@ use interoptopus::lang::c::CType;
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::Error;
+use crate::interop::types::callbacks::write_type_definition_named_callback;
 
 pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     for the_type in i.inventory.ctypes() {

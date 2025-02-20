@@ -243,7 +243,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     let mut to_pin_slice_type = Vec::new();
     let mut to_invoke = Vec::new();
     let mut to_wrap_delegates = Vec::new();
-    let mut to_wrap_delegate_types = Vec::new();
+    // let mut to_wrap_delegate_types = Vec::new();
 
     let raw_name = function_name_to_csharp_name(
         function,
@@ -292,11 +292,11 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
                 }
             }
             CType::Pattern(TypePattern::NamedCallback(callback)) => match callback.fnpointer().signature().rval() {
-                CType::Pattern(TypePattern::FFIErrorEnum(_)) if i.work_around_exception_in_callback_no_reentry => {
-                    to_wrap_delegates.push(name);
-                    to_wrap_delegate_types.push(to_typespecifier_in_param(p.the_type()));
-                    to_invoke.push(format!("{name}_safe_delegate.Call"));
-                }
+                // CType::Pattern(TypePattern::FFIErrorEnum(_)) if i.work_around_exception_in_callback_no_reentry => {
+                //     to_wrap_delegates.push(name);
+                //     to_wrap_delegate_types.push(to_typespecifier_in_param(p.the_type()));
+                //     to_invoke.push(format!("{name}_safe_delegate.Call"));
+                // }
                 _ => fallback(),
             },
             CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {
@@ -344,9 +344,9 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     indented!(w, "{}", signature)?;
     indented!(w, r"{{")?;
 
-    for (name, ty) in zip(&to_wrap_delegates, &to_wrap_delegate_types) {
-        indented!(w, [()], r"var {}_safe_delegate = new {}ExceptionSafe({});", name, ty, name)?;
-    }
+    // for (name, ty) in zip(&to_wrap_delegates, &to_wrap_delegate_types) {
+    //     indented!(w, [()], r"var {}_safe_delegate = new {}ExceptionSafe({});", name, ty, name)?;
+    // }
 
     if !to_pin_name.is_empty() {
         for (pin_var, slice_struct) in to_pin_name.iter().zip(to_pin_slice_type.iter()) {

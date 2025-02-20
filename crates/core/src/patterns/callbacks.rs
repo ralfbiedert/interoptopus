@@ -245,7 +245,7 @@ macro_rules! callback {
         unsafe impl interoptopus::lang::rust::CTypeInfo for $name {
             fn type_info() -> interoptopus::lang::c::CType {
                 use interoptopus::lang::rust::CTypeInfo;
-                use interoptopus::lang::c::{Meta, Documentation};
+                use interoptopus::lang::c::{CType, Meta, Documentation, PrimitiveType};
 
                 let rval = < $rval as CTypeInfo >::type_info();
 
@@ -253,6 +253,7 @@ macro_rules! callback {
                 $(
                     interoptopus::lang::c::Parameter::new(stringify!($param).to_string(), < $ty as CTypeInfo >::type_info()),
                 )*
+                    interoptopus::lang::c::Parameter::new("callback_data".to_string(), CType::ReadPointer(Box::new(CType::Primitive(PrimitiveType::Void)))),                    
                 ];
 
                 let mut namespace = String::new();

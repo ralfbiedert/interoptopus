@@ -83,8 +83,39 @@ namespace My.Company.Common
     }
 
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate uint MyCallbackNamespaced(uint value);
+    delegate uint MyCallbackNamespacedNative(uint value);
+
+    // Internal helper that works around an issue where exceptions in callbacks don't reenter Rust.
+    public class MyCallbackNamespacedMarshaller {
+        private Exception failure = null;
+        private readonly MyCallbackNamespaced _callback;
+
+        public MyCallbackNamespacedMarshaller(MyCallbackNamespaced original)
+        {
+            _callback = original;
+        }
+
+        public uint Call(uint value)
+        {
+            try
+            {
+                return _callback(value);
+            }
+            catch (Exception e)
+            {
+                failure = e;
+            }
+        }
+
+        public void Rethrow()
+        {
+            if (this.failure != null)
+            {
+                throw this.failure;
+            }
+        }
+    }
 
     // This is a helper for the marshallers for Slice<T> and SliceMut<T> of Ts that require custom marshalling.
     // It is used to precompile the conversion logic for the custom marshaller.

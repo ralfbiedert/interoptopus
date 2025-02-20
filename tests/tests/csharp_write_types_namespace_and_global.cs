@@ -477,9 +477,7 @@ namespace My.Company
 
         public static unsafe void pattern_callback_7_checked(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o)
         {
-            var c1_safe_delegate = new SumDelegateReturnExceptionSafe(c1);
-            var rval = pattern_callback_7(c1_safe_delegate.Call, c2, x, i, out o);;
-            c1_safe_delegate.Rethrow();
+            var rval = pattern_callback_7(c1, c2, x, i, out o);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -639,9 +637,7 @@ namespace My.Company
 
         public static unsafe void service_callbacks_callback_ffi_return_checked(IntPtr context, SumDelegateReturn callback)
         {
-            var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
-            var rval = service_callbacks_callback_ffi_return(context, callback_safe_delegate.Call);;
-            callback_safe_delegate.Rethrow();
+            var rval = service_callbacks_callback_ffi_return(context, callback);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -653,12 +649,10 @@ namespace My.Company
 
         public static unsafe void service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, System.ReadOnlySpan<int> input)
         {
-            var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
             fixed (void* ptr_input = input)
             {
                 var input_slice = new Slice<int>(new IntPtr(ptr_input), (ulong) input.Length);
-                var rval = service_callbacks_callback_with_slice(context, callback_safe_delegate.Call, input_slice);;
-                callback_safe_delegate.Rethrow();
+                var rval = service_callbacks_callback_with_slice(context, callback, input_slice);;
                 if (rval != FFIError.Ok)
                 {
                     throw new InteropException<FFIError>(rval);
@@ -1632,46 +1626,321 @@ namespace My.Company
     }
 
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void CallbackCharArray2(CharArray value);
     delegate void CallbackCharArray2Native(CharArrayMarshaller.Unmanaged value);
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    // Internal helper that works around an issue where exceptions in callbacks don't reenter Rust.
+    public class CallbackCharArray2Marshaller {
+        private Exception failure = null;
+        private readonly CallbackCharArray2 _callback;
+
+        public CallbackCharArray2Marshaller(CallbackCharArray2 original)
+        {
+            _callback = original;
+        }
+
+        public void Call(CharArray value)
+        {
+            try
+            {
+                return _callback(value);
+            }
+            catch (Exception e)
+            {
+                failure = e;
+            }
+        }
+
+        public void Rethrow()
+        {
+            if (this.failure != null)
+            {
+                throw this.failure;
+            }
+        }
+    }
+
     public delegate byte CallbackFFISlice(Slice<byte> slice);
     delegate byte CallbackFFISliceNative(SliceMarshaller<byte>.Unmanaged slice);
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    // Internal helper that works around an issue where exceptions in callbacks don't reenter Rust.
+    public class CallbackFFISliceMarshaller {
+        private Exception failure = null;
+        private readonly CallbackFFISlice _callback;
+
+        public CallbackFFISliceMarshaller(CallbackFFISlice original)
+        {
+            _callback = original;
+        }
+
+        public byte Call(Slice<byte> slice)
+        {
+            try
+            {
+                return _callback(slice);
+            }
+            catch (Exception e)
+            {
+                failure = e;
+            }
+        }
+
+        public void Rethrow()
+        {
+            if (this.failure != null)
+            {
+                throw this.failure;
+            }
+        }
+    }
+
     public delegate Vec3f32 CallbackHugeVecSlice(Slice<Vec3f32> slice);
     delegate Vec3f32 CallbackHugeVecSliceNative(SliceMarshaller<Vec3f32>.Unmanaged slice);
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    // Internal helper that works around an issue where exceptions in callbacks don't reenter Rust.
+    public class CallbackHugeVecSliceMarshaller {
+        private Exception failure = null;
+        private readonly CallbackHugeVecSlice _callback;
+
+        public CallbackHugeVecSliceMarshaller(CallbackHugeVecSlice original)
+        {
+            _callback = original;
+        }
+
+        public Vec3f32 Call(Slice<Vec3f32> slice)
+        {
+            try
+            {
+                return _callback(slice);
+            }
+            catch (Exception e)
+            {
+                failure = e;
+            }
+        }
+
+        public void Rethrow()
+        {
+            if (this.failure != null)
+            {
+                throw this.failure;
+            }
+        }
+    }
+
     public delegate void CallbackSliceMut(SliceMut<byte> slice);
     delegate void CallbackSliceMutNative(SliceMutMarshaller<byte>.Unmanaged slice);
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    // Internal helper that works around an issue where exceptions in callbacks don't reenter Rust.
+    public class CallbackSliceMutMarshaller {
+        private Exception failure = null;
+        private readonly CallbackSliceMut _callback;
+
+        public CallbackSliceMutMarshaller(CallbackSliceMut original)
+        {
+            _callback = original;
+        }
+
+        public void Call(SliceMut<byte> slice)
+        {
+            try
+            {
+                return _callback(slice);
+            }
+            catch (Exception e)
+            {
+                failure = e;
+            }
+        }
+
+        public void Rethrow()
+        {
+            if (this.failure != null)
+            {
+                throw this.failure;
+            }
+        }
+    }
+
     public delegate byte CallbackU8(byte value);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint MyCallback(uint value);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void MyCallbackVoid(IntPtr ptr);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void SumDelegate1();
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate int SumDelegate2(int x, int y);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate FFIError SumDelegateReturn(int x, int y);
+    delegate byte CallbackU8Native(byte value);
 
     // Internal helper that works around an issue where exceptions in callbacks don't reenter Rust.
-    public class SumDelegateReturnExceptionSafe {
+    public class CallbackU8Marshaller {
+        private Exception failure = null;
+        private readonly CallbackU8 _callback;
+
+        public CallbackU8Marshaller(CallbackU8 original)
+        {
+            _callback = original;
+        }
+
+        public byte Call(byte value)
+        {
+            try
+            {
+                return _callback(value);
+            }
+            catch (Exception e)
+            {
+                failure = e;
+            }
+        }
+
+        public void Rethrow()
+        {
+            if (this.failure != null)
+            {
+                throw this.failure;
+            }
+        }
+    }
+
+    public delegate uint MyCallback(uint value);
+    delegate uint MyCallbackNative(uint value);
+
+    // Internal helper that works around an issue where exceptions in callbacks don't reenter Rust.
+    public class MyCallbackMarshaller {
+        private Exception failure = null;
+        private readonly MyCallback _callback;
+
+        public MyCallbackMarshaller(MyCallback original)
+        {
+            _callback = original;
+        }
+
+        public uint Call(uint value)
+        {
+            try
+            {
+                return _callback(value);
+            }
+            catch (Exception e)
+            {
+                failure = e;
+            }
+        }
+
+        public void Rethrow()
+        {
+            if (this.failure != null)
+            {
+                throw this.failure;
+            }
+        }
+    }
+
+    public delegate void MyCallbackVoid(IntPtr ptr);
+    delegate void MyCallbackVoidNative(IntPtr ptr);
+
+    // Internal helper that works around an issue where exceptions in callbacks don't reenter Rust.
+    public class MyCallbackVoidMarshaller {
+        private Exception failure = null;
+        private readonly MyCallbackVoid _callback;
+
+        public MyCallbackVoidMarshaller(MyCallbackVoid original)
+        {
+            _callback = original;
+        }
+
+        public void Call(IntPtr ptr)
+        {
+            try
+            {
+                return _callback(ptr);
+            }
+            catch (Exception e)
+            {
+                failure = e;
+            }
+        }
+
+        public void Rethrow()
+        {
+            if (this.failure != null)
+            {
+                throw this.failure;
+            }
+        }
+    }
+
+    public delegate void SumDelegate1();
+    delegate void SumDelegate1Native();
+
+    // Internal helper that works around an issue where exceptions in callbacks don't reenter Rust.
+    public class SumDelegate1Marshaller {
+        private Exception failure = null;
+        private readonly SumDelegate1 _callback;
+
+        public SumDelegate1Marshaller(SumDelegate1 original)
+        {
+            _callback = original;
+        }
+
+        public void Call()
+        {
+            try
+            {
+                return _callback();
+            }
+            catch (Exception e)
+            {
+                failure = e;
+            }
+        }
+
+        public void Rethrow()
+        {
+            if (this.failure != null)
+            {
+                throw this.failure;
+            }
+        }
+    }
+
+    public delegate int SumDelegate2(int x, int y);
+    delegate int SumDelegate2Native(int x, int y);
+
+    // Internal helper that works around an issue where exceptions in callbacks don't reenter Rust.
+    public class SumDelegate2Marshaller {
+        private Exception failure = null;
+        private readonly SumDelegate2 _callback;
+
+        public SumDelegate2Marshaller(SumDelegate2 original)
+        {
+            _callback = original;
+        }
+
+        public int Call(int x, int y)
+        {
+            try
+            {
+                return _callback(x, y);
+            }
+            catch (Exception e)
+            {
+                failure = e;
+            }
+        }
+
+        public void Rethrow()
+        {
+            if (this.failure != null)
+            {
+                throw this.failure;
+            }
+        }
+    }
+
+    public delegate FFIError SumDelegateReturn(int x, int y);
+    delegate FFIError SumDelegateReturnNative(int x, int y);
+
+    // Internal helper that works around an issue where exceptions in callbacks don't reenter Rust.
+    public class SumDelegateReturnMarshaller {
         private Exception failure = null;
         private readonly SumDelegateReturn _callback;
 
-        public SumDelegateReturnExceptionSafe(SumDelegateReturn original)
+        public SumDelegateReturnMarshaller(SumDelegateReturn original)
         {
             _callback = original;
         }
@@ -1685,7 +1954,6 @@ namespace My.Company
             catch (Exception e)
             {
                 failure = e;
-                return FFIError.Panic;
             }
         }
 
@@ -1698,8 +1966,39 @@ namespace My.Company
         }
     }
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void SumDelegateReturn2(int x, int y);
+    delegate void SumDelegateReturn2Native(int x, int y);
+
+    // Internal helper that works around an issue where exceptions in callbacks don't reenter Rust.
+    public class SumDelegateReturn2Marshaller {
+        private Exception failure = null;
+        private readonly SumDelegateReturn2 _callback;
+
+        public SumDelegateReturn2Marshaller(SumDelegateReturn2 original)
+        {
+            _callback = original;
+        }
+
+        public void Call(int x, int y)
+        {
+            try
+            {
+                return _callback(x, y);
+            }
+            catch (Exception e)
+            {
+                failure = e;
+            }
+        }
+
+        public void Rethrow()
+        {
+            if (this.failure != null)
+            {
+                throw this.failure;
+            }
+        }
+    }
 
     // This is a helper for the marshallers for Slice<T> and SliceMut<T> of Ts that require custom marshalling.
     // It is used to precompile the conversion logic for the custom marshaller.
@@ -2277,9 +2576,7 @@ namespace My.Company
 
         public void CallbackFfiReturn(SumDelegateReturn callback)
         {
-            var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
-            var rval = Interop.service_callbacks_callback_ffi_return(_context, callback_safe_delegate.Call);
-            callback_safe_delegate.Rethrow();
+            var rval = Interop.service_callbacks_callback_ffi_return(_context, callback);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -2288,9 +2585,7 @@ namespace My.Company
 
         public void CallbackWithSlice(SumDelegateReturn callback, Slice<int> input)
         {
-            var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
-            var rval = Interop.service_callbacks_callback_with_slice(_context, callback_safe_delegate.Call, input);
-            callback_safe_delegate.Rethrow();
+            var rval = Interop.service_callbacks_callback_with_slice(_context, callback, input);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);

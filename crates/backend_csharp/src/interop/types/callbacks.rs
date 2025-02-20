@@ -9,22 +9,14 @@ use interoptopus::{indented, Error};
 
 pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
     i.debug(w, "write_type_definition_named_callback")?;
-    write_type_definition_fn_pointer_annotation(w, the_type.fnpointer())?;
     write_type_definition_named_callback_body(i, w, the_type)?;
-    write_callback_overload(i, w, the_type)?;
+    write_callback_marshaller(i, w, the_type)?;
     Ok(())
 }
 
-pub fn write_callback_overload(i: &Interop, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
-    if !i.work_around_exception_in_callback_no_reentry {
-        return Ok(());
-    }
-
-    let CType::Pattern(TypePattern::FFIErrorEnum(ffi_error)) = the_type.fnpointer().signature().rval() else {
-        return Ok(());
-    };
-
-    let name = format!("{}ExceptionSafe", the_type.name());
+pub fn write_callback_marshaller(i: &Interop, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
+    i.debug(w, "write_callback_marshaller")?;
+    let name = format!("{}Marshaller", the_type.name());
     let rval = to_typespecifier_in_rval(the_type.fnpointer().signature().rval());
     let mut function_signature = Vec::new();
     let mut function_param_names = Vec::new();
@@ -58,7 +50,7 @@ pub fn write_callback_overload(i: &Interop, w: &mut IndentWriter, the_type: &Nam
     indented!(w, [()()], "catch (Exception e)")?;
     indented!(w, [()()], "{{")?;
     indented!(w, [()()()], "failure = e;")?;
-    indented!(w, [()()()], "return {}.{};", rval, ffi_error.panic_variant().name())?;
+    // indented!(w, [()()()], "return {}.{};", rval, ffi_error.panic_variant().name())?;
     indented!(w, [()()], "}}")?;
     indented!(w, [()], "}}")?;
     w.newline()?;
@@ -78,7 +70,6 @@ pub fn write_type_definition_named_callback_body(i: &Interop, w: &mut IndentWrit
     let rval = to_typespecifier_in_rval(the_type.fnpointer().signature().rval());
     let name = named_callback_to_typename(the_type);
     let visibility = i.visibility_types.to_access_modifier();
-    let needs_wrapper = i.has_custom_marshalled_types(the_type.fnpointer().signature());
 
     let mut params = Vec::new();
     let mut native_params = Vec::new();
@@ -86,16 +77,17 @@ pub fn write_type_definition_named_callback_body(i: &Interop, w: &mut IndentWrit
         params.push(format!("{} {}", to_typespecifier_in_param(param.the_type()), param.name()));
         native_params.push(format!("{} {}", i.to_native_callback_typespecifier(param.the_type()), param.name()));
     }
+    
+    // Last parameter is the *data pointer the native function has, but we want to hide and manage ourselves.
+    params.pop();
 
     indented!(w, r"{} delegate {} {}({});", visibility, rval, name, params.join(", "))?;
-    if needs_wrapper {
-        indented!(
-            w,
-            r"delegate {} {}Native({});",
-            i.to_native_callback_typespecifier(the_type.fnpointer().signature().rval()),
-            name,
-            native_params.join(", ")
-        )?;
-    }
+    indented!(
+        w,
+        r"delegate {} {}Native({});",
+        i.to_native_callback_typespecifier(the_type.fnpointer().signature().rval()),
+        name,
+        native_params.join(", ")
+    )?;
     Ok(())
 }

@@ -107,7 +107,6 @@ impl Default for Interop {
             write_types: WriteTypes::NamespaceAndInteroptopusGlobal,
             rename_symbols: false,
             debug: false,
-            work_around_exception_in_callback_no_reentry: true,
             unsupported: Unsupported::Panic,
             error_text: "Something went wrong: {error}".to_string(),
         }
@@ -144,6 +143,7 @@ pub struct Interop {
     ///
     /// If this is not set, interop generation with arrays in structs will fail. This is a somewhat
     /// open issue w.r.t Unity-sans-unsafe support and feedback would be greatly welcome!
+    // TODO
     unroll_struct_arrays: bool,
     /// Which types to write.
     #[builder(setter(into))]
@@ -152,10 +152,6 @@ pub struct Interop {
     pub(crate) rename_symbols: bool,
     /// Also generate markers for easier debugging
     debug: bool,
-    /// Whether we should attempt to work around issues where a callback back to C# might not
-    /// reenter Rust code when an exception happened. This requires callbacks to return
-    /// an `FFIError` type.
-    work_around_exception_in_callback_no_reentry: bool,
     /// How to handle unsupported constructs.
     #[builder(setter(into))]
     unsupported: Unsupported,
@@ -343,6 +339,7 @@ impl Interop {
         w.newline()?;
 
         write_namespace_context(self, w, |w| {
+            // TODO
             if self.class_constants.is_none() || self.class_constants == Some(self.clone().class) {
                 if self.has_emittable_functions(self.inventory.functions()) || self.has_emittable_constants(self.inventory.constants()) {
                     write_class_context(self, &self.class, w, |w| {

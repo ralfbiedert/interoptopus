@@ -9,18 +9,20 @@ use tests::validate_output;
 fn reference_benchmarks_prerequisites() -> Result<(), Error> {
     let generated_common = InteropBuilder::new()
         .inventory(ffi_inventory())
-        .namespace_id("common".to_string())
+        .namespace_id("common")
         .namespace_mappings(common_namespace_mappings())
-        .dll_name("interoptopus_reference_project".to_string())
+        .dll_name("interoptopus_reference_project")
         .write_types(WriteTypes::NamespaceAndInteroptopusGlobal)
+        .debug(true)
         .build()?
         .to_string()?;
 
     let generated_other = InteropBuilder::new()
         .inventory(ffi_inventory())
         .namespace_mappings(common_namespace_mappings())
-        .dll_name("interoptopus_reference_project".to_string())
+        .dll_name("interoptopus_reference_project")
         .write_types(WriteTypes::Namespace)
+        .debug(true)
         .build()?
         .to_string()?;
 

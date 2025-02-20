@@ -45,7 +45,10 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &CType
         CType::Pattern(p) => match p {
             TypePattern::CStrPointer => {}
             TypePattern::NamedCallback(e) => {
-                write_type_definition_named_callback(i, w, e)?;
+                write_type_definition_fn_pointer(i, w, e.fnpointer(), known_function_pointers)?;
+                write_type_definition(i, w, &p.fallback_type(), known_function_pointers)?;
+                // write_type_definition_named_callback(i, w, e)?;
+                // write_type_definition_composite(i, w, )?;
                 w.newline()?;
             }
             TypePattern::FFIErrorEnum(e) => {

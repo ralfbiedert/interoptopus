@@ -87,8 +87,8 @@ pub fn write_pattern_service_method(
     let mut names = Vec::new();
     let mut to_invoke = Vec::new();
     let mut types = Vec::new();
-    let mut to_wrap_delegates = Vec::new();
-    let mut to_wrap_delegate_types = Vec::new();
+    // let mut to_wrap_delegates = Vec::new();
+    // let mut to_wrap_delegate_types = Vec::new();
 
     // For every parameter except the first, figure out how we should forward
     // it to the invocation we perform.
@@ -101,11 +101,11 @@ pub fn write_pattern_service_method(
 
         match p.the_type() {
             CType::Pattern(TypePattern::NamedCallback(callback)) => match callback.fnpointer().signature().rval() {
-                CType::Pattern(TypePattern::FFIErrorEnum(_)) if i.work_around_exception_in_callback_no_reentry => {
-                    to_wrap_delegates.push(name);
-                    to_wrap_delegate_types.push(to_typespecifier_in_param(p.the_type()));
-                    to_invoke.push(format!("{name}_safe_delegate.Call"));
-                }
+                // CType::Pattern(TypePattern::FFIErrorEnum(_)) if i.work_around_exception_in_callback_no_reentry => {
+                //     to_wrap_delegates.push(name);
+                //     to_wrap_delegate_types.push(to_typespecifier_in_param(p.the_type()));
+                //     to_invoke.push(format!("{name}_safe_delegate.Call"));
+                // }
                 _ => {
                     // Forward `ref` and `out` accordingly.
                     if native.contains("out ") {
@@ -175,17 +175,17 @@ pub fn write_pattern_service_method(
         indented!(w, [()], r"var self = new {}();", class.the_type().rust_name())?;
     }
 
-    for (name, ty) in zip(&to_wrap_delegates, &to_wrap_delegate_types) {
-        indented!(w, [()], r"var {}_safe_delegate = new {}ExceptionSafe({});", name, ty, name)?;
-    }
+    // for (name, ty) in zip(&to_wrap_delegates, &to_wrap_delegate_types) {
+    //     indented!(w, [()], r"var {}_safe_delegate = new {}ExceptionSafe({});", name, ty, name)?;
+    // }
 
     // Determine return value behavior and write function call.
     match function.signature().rval() {
         CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
             indented!(w, [()], r"var rval = {};", fn_call)?;
-            for name in to_wrap_delegates {
-                indented!(w, [()], r"{}_safe_delegate.Rethrow();", name)?;
-            }
+            // for name in to_wrap_delegates {
+            //     indented!(w, [()], r"{}_safe_delegate.Rethrow();", name)?;
+            // }
             indented!(w, [()], r"if (rval != {}.{})", e.the_enum().rust_name(), e.success_variant().name())?;
             indented!(w, [()], r"{{")?;
             indented!(w, [()()], r"throw new InteropException<{}>(rval);", e.the_enum().rust_name())?;

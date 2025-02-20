@@ -76,7 +76,7 @@
 //! in certain backends.
 //!
 
-use crate::lang::c::{CType, CompositeType, PrimitiveType};
+use crate::lang::c::{CType, CompositeType, Field, PrimitiveType};
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::callbacks::NamedCallback;
 use crate::patterns::result::FFIErrorEnum;
@@ -143,7 +143,13 @@ impl TypePattern {
             Self::Slice(x) => CType::Composite(x.clone()),
             Self::SliceMut(x) => CType::Composite(x.clone()),
             Self::Option(x) => CType::Composite(x.clone()),
-            Self::NamedCallback(x) => CType::FnPointer(x.fnpointer().clone()),
+            Self::NamedCallback(x) => {
+                let composite = CompositeType::new(x.name().to_string(), vec![
+                    Field::new("fnptr".to_string(), CType::FnPointer(x.fnpointer().clone())),
+                    Field::new("data".to_string(), CType::ReadPointer(Box::new(CType::Primitive(PrimitiveType::Void)))),
+                ]);
+                CType::Composite(composite)
+            },
             Self::Bool => CType::Primitive(PrimitiveType::U8),
             Self::CChar => c_char::type_info(),
             Self::APIVersion => CType::Primitive(PrimitiveType::U64),
