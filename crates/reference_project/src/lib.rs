@@ -21,6 +21,7 @@ pub mod patterns {
     pub mod primitives;
     pub mod result;
     pub mod services {
+        pub mod asynk;
         pub mod basic;
         pub mod callbacks;
         pub mod ignored;

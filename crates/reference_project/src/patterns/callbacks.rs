@@ -1,6 +1,7 @@
 use crate::patterns::result::FFIError;
 use interoptopus::{callback, ffi_function, ffi_type};
 use std::ffi::c_void;
+use std::ptr::null;
 
 callback!(MyCallback(value: u32) -> u32);
 callback!(MyCallbackNamespaced(value: u32) -> u32, namespace = "common");
@@ -38,14 +39,16 @@ pub fn pattern_callback_4(callback: MyCallbackNamespaced, x: u32) -> u32 {
     callback.call(x)
 }
 
+
+
 #[ffi_function]
 pub fn pattern_callback_5() -> SumDelegate1 {
-    (exposed_sum1 as extern "C" fn()).into() // This is an ugly Rust limitation right now, compare #108
+    (exposed_sum1 as extern "C" fn(*const c_void)).into() // This is an ugly Rust limitation right now, compare #108
 }
 
 #[ffi_function]
 pub fn pattern_callback_6() -> SumDelegate2 {
-    SumDelegate2(Some(exposed_sum2)) // Similarly, compare #108
+    SumDelegate2(Some(exposed_sum2), null()) // Similarly, compare #108
 }
 
 #[ffi_function]
@@ -68,9 +71,9 @@ pub fn pattern_callback_7(c1: SumDelegateReturn, c2: SumDelegateReturn2, x: i32,
     FFIError::Ok
 }
 
-pub extern "C" fn exposed_sum1() {}
+pub extern "C" fn exposed_sum1(_: *const c_void) {}
 
-pub extern "C" fn exposed_sum2(x: i32, y: i32) -> i32 {
+pub extern "C" fn exposed_sum2(x: i32, y: i32, _: *const c_void) -> i32 {
     x + y
 }
 

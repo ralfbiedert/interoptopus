@@ -83,11 +83,12 @@ pub fn pattern_ffi_slice_8(slice: &FFISliceMut<CharArray>, callback: CallbackCha
 // Some extra tests that were hard to do from core crate.
 #[cfg(test)]
 mod test {
+    use std::ffi::c_void;
     use super::pattern_ffi_slice_3;
     use interoptopus::patterns::slice::FFISliceMut;
 
     #[allow(dead_code)]
-    extern "C" fn f(mut x: FFISliceMut<u8>) {
+    extern "C" fn f(mut x: FFISliceMut<u8>, _: *const c_void) {
         let slice = x.as_slice_mut();
         slice[1] = 100;
     }
@@ -96,7 +97,7 @@ mod test {
     fn test_pattern_ffi_slice_3() {
         let mut data = [0, 1, 2, 3, 4, 5];
 
-        let jfc: extern "C" fn(FFISliceMut<'_, u8>) -> () = f;
+        let jfc: extern "C" fn(FFISliceMut<'_, u8>, *const c_void) -> () = f;
 
         pattern_ffi_slice_3(FFISliceMut::from_slice(&mut data), jfc.into());
 

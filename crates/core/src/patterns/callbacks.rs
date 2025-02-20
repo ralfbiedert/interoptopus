@@ -103,13 +103,14 @@
 //! ```rust
 //! # use interoptopus::{ffi_function, callback};
 //! # callback!(SumFunction(x: i32, y: i32) -> i32);
-//! # extern "C" fn my_sum_function(x: i32, y: i32) -> i32 { x + y }
+//! # extern "C" fn my_sum_function(x: i32, y: i32, _: *const std::ffi::c_void) -> i32 { x + y }
 //! #
 //! #[ffi_function]
 //! pub fn return_sum_function() -> SumFunction {
-//!     SumFunction(Some(my_sum_function))
+//!     SumFunction(Some(my_sum_function), std::ptr::null())
 //! }
 //! ```
+
 use crate::lang::c::{FnPointerType, Meta};
 
 /// Internal helper naming a generated callback type wrapper.
@@ -191,7 +192,7 @@ impl NamedCallback {
 ///
 /// callback!(MyCallback() -> u8);
 ///
-/// extern "C" fn my_rust_callback() -> u8 {
+/// extern "C" fn my_rust_callback(_: *const std::ffi::c_void) -> u8 {
 ///     42
 /// }
 ///
@@ -205,37 +206,37 @@ macro_rules! callback {
     };
 
     ($name:ident($($param:ident: $ty:ty),*) -> $rval:ty $(, namespace = $ns:expr)?) => {
-        #[derive(Default, Clone, Copy)]
-        #[repr(transparent)]
-        pub struct $name(Option<extern "C" fn($($ty),*) -> $rval>);
+        #[derive(Clone, Copy)]
+        #[repr(C)]
+        pub struct $name(Option<extern "C" fn($($ty,)* *const std::ffi::c_void) -> $rval>, *const std::ffi::c_void);
 
         impl $name {
             /// Creates a new instance of the callback using `extern "C" fn`
-            pub fn new(func: extern "C" fn($($ty),*) -> $rval) -> Self {
-                Self(Some(func))
+            pub fn new(func: extern "C" fn($($ty,)* *const std::ffi::c_void) -> $rval) -> Self {
+                Self(Some(func), std::ptr::null())
             }
 
             /// Will call function if it exists, panic otherwise.
             pub fn call(&self, $($param: $ty),*) -> $rval {
-                self.0.expect("Assumed function would exist but it didn't.")($($param),*)
+                self.0.expect("Assumed function would exist but it didn't.")($($param,)* self.1)
             }
 
             /// Will call function only if it exists
-            pub fn call_if_some(&self, $($param: $ty),*) -> Option<$rval> {
+            pub fn call_if_some(&self, $($param: $ty,)*) -> Option<$rval> {
                 match self.0 {
-                    Some(c) => Some(c($($param),*)),
+                    Some(c) => Some(c($($param,)* self.1)),
                     None => None
                 }
             }
         }
 
-        impl From<for<> extern "C" fn($($ty),*) -> $rval> for $name {
-            fn from(x: extern "C" fn($($ty),*) -> $rval) -> Self {
-                Self(Some(x))
+        impl From<for<> extern "C" fn($($ty,)* *const std::ffi::c_void) -> $rval> for $name {
+            fn from(x: extern "C" fn($($ty,)* *const std::ffi::c_void) -> $rval) -> Self {
+                Self(Some(x), std::ptr::null())
             }
         }
 
-        impl From<$name> for Option<extern "C" fn($($ty),*) -> $rval> {
+        impl From<$name> for Option<extern "C" fn($($ty,)* *const std::ffi::c_void) -> $rval> {
             fn from(x: $name) -> Self {
                 x.0
             }
