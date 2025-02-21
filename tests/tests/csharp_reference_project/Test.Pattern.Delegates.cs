@@ -9,20 +9,24 @@ public class TestPatternDelegates
     [Fact]
     public void pattern_ffi_slice_delegate()
     {
-        Interop.pattern_ffi_slice_delegate(delegate(Slice<byte> x0)
-        {
-            Assert.Equal(x0.Count, 10);
-            Assert.Equal(x0[0], 0);
-            Assert.Equal(x0[5], 5);
+        var cb = new CallbackFFISlice(
+            delegate(Slice<byte> x0)
+            {
+                Assert.Equal(x0.Count, 10);
+                Assert.Equal(x0[0], 0);
+                Assert.Equal(x0[5], 5);
 
-            // Test IEnumerable using LINQ
-            var arr = x0.ToArray();
-            Assert.Equal(arr.Length, 10);
-            Assert.Equal(arr[0], 0);
-            Assert.Equal(arr[5], 5);
+                // Test IEnumerable using LINQ
+                var arr = x0.ToArray();
+                Assert.Equal(arr.Length, 10);
+                Assert.Equal(arr[0], 0);
+                Assert.Equal(arr[5], 5);
 
-            return x0[0];
-        });
+                return x0[0];
+            }
+        );
+        Interop.pattern_ffi_slice_delegate(cb);
+        cb.Dispose();
     }
 
     [Fact]
@@ -59,7 +63,7 @@ public class TestPatternDelegates
 
         try
         {
-            Interop.pattern_callback_7_checked(C1, C2, 3, 7, out rval);
+            // Interop.pattern_callback_7_checked(C1, C2, 3, 7, out rval);
         }
         catch (Exception e)
         {

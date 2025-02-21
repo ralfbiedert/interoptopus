@@ -36,44 +36,11 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "game_engine_destroy")]
         public static partial FFIError game_engine_destroy(ref IntPtr context);
 
-        /// Destroys the given instance.
-        ///
-        /// # Safety
-        ///
-        /// The passed parameter MUST have been created with the corresponding init function;
-        /// passing any other value results in undefined behavior.
-        public static unsafe void game_engine_destroy_checked(ref IntPtr context)
-        {
-            var rval = game_engine_destroy(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
-
         [LibraryImport(NativeLib, EntryPoint = "game_engine_new")]
         public static partial FFIError game_engine_new(ref IntPtr context);
 
-        public static unsafe void game_engine_new_checked(ref IntPtr context)
-        {
-            var rval = game_engine_new(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
-
         [LibraryImport(NativeLib, EntryPoint = "game_engine_place_object")]
         public static partial FFIError game_engine_place_object(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position);
-
-        public static unsafe void game_engine_place_object_checked(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position)
-        {
-            var rval = game_engine_place_object(context, name, position);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
 
         [LibraryImport(NativeLib, EntryPoint = "game_engine_num_objects")]
         public static partial uint game_engine_num_objects(IntPtr context);
@@ -97,81 +64,6 @@ namespace My.Company
         Fail = 400,
     }
 
-    [NativeMarshalling(typeof(CallbackStructMarshaller<>))]
-    public class CallbackStruct<T>: IDisposable where T: Delegate
-    {
-        internal T _callback;
-        internal IntPtr _callbackNative;
-
-        public CallbackStruct() {}
-
-        public CallbackStruct(T t)
-        {
-            Init(t);
-        }
-
-        protected void Init(T t)
-        {
-            _callback = t;
-            _callbackNative = Marshal.GetFunctionPointerForDelegate(t);
-        }
-
-        public void Dispose()
-        {
-            if (_callbackNative == IntPtr.Zero) return;
-            Marshal.FreeHGlobal(_callbackNative);
-            _callbackNative = IntPtr.Zero;
-        }
-    }
-
-    [CustomMarshaller(typeof(CallbackStruct<>), MarshalMode.Default, typeof(CallbackStructMarshaller<>.Marshaller))]
-    internal static class CallbackStructMarshaller<T> where T: Delegate
-    {
-        [StructLayout(LayoutKind.Sequential)]
-        public struct Unmanaged
-        {
-            internal IntPtr Callback;
-            internal IntPtr Data;
-        }
-
-        public ref struct Marshaller
-        {
-            private CallbackStruct<T> managed;
-            private Unmanaged native;
-            private Unmanaged sourceNative;
-            private GCHandle? pinned;
-            private T[] marshalled;
-
-            public void FromManaged(CallbackStruct<T> managed)
-            {
-                this.managed = managed;
-            }
-
-            public Unmanaged ToUnmanaged()
-            {
-                return new Unmanaged
-                {
-                    Callback = managed._callbackNative,
-                    Data = IntPtr.Zero
-                };
-            }
-
-            public void FromUnmanaged(Unmanaged unmanaged)
-            {
-                sourceNative = unmanaged;
-            }
-
-            public CallbackStruct<T> ToManaged()
-            {
-                return new CallbackStruct<T>
-                {
-                    _callbackNative = sourceNative.Callback,
-                };
-            }
-
-            public void Free() { }
-        }
-    }
 
     public partial class GameEngine : IDisposable
     {

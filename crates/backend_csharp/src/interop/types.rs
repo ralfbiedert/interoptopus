@@ -7,7 +7,7 @@ pub mod fnptrs;
 use crate::interop::patterns::options::write_pattern_option;
 use crate::interop::patterns::slices::{write_pattern_generic_slice_helper, write_pattern_read_only_span_marshaller, write_pattern_span_marshaller};
 use crate::interop::types::bools::write_type_definition_ffibool;
-use crate::interop::types::callbacks::{write_callback_helper, write_type_definition_named_callback};
+use crate::interop::types::callbacks::write_type_definition_named_callback;
 use crate::interop::types::composite::write_type_definition_composite;
 use crate::interop::types::enums::write_type_definition_enum;
 use crate::interop::types::fnptrs::write_type_definition_fn_pointer;
@@ -25,7 +25,7 @@ pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), E
     if i.write_types == WriteTypes::NamespaceAndInteroptopusGlobal {
         let has_slices = i.inventory.ctypes().iter().any(|x| matches!(x, CType::Pattern(TypePattern::Slice(_))));
         let has_slices_mut = i.inventory.ctypes().iter().any(|x| matches!(x, CType::Pattern(TypePattern::SliceMut(_))));
-        
+
         if has_slices || has_slices_mut {
             write_pattern_generic_slice_helper(i, w)?;
             w.newline()?;
@@ -40,8 +40,6 @@ pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), E
             write_pattern_span_marshaller(i, w)?;
             w.newline()?;
         }
-
-        write_callback_helper(i, w)?;
     }
 
     Ok(())

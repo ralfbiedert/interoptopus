@@ -201,7 +201,7 @@ pub fn write_function_wrapper_call_delegate_param_body(
 
 pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &Function, native: bool, has_body: bool) -> Result<(), Error> {
     i.debug(w, "write_function_declaration")?;
-    
+
     let rval = function_rval_to_csharp_typename(function);
     let name = function_name_to_csharp_name(
         function,
@@ -235,11 +235,13 @@ pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &
 
 #[allow(clippy::too_many_lines)]
 pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Function, write_for: WriteFor) -> Result<(), Error> {
+    i.debug(w, "write_function_overload")?;
+
     let has_overload = i.has_overloadable(function.signature());
     let has_error_enum = has_ffi_error_rval(function.signature());
 
     // If there is nothing to write, don't do it
-    if !has_overload && !has_error_enum {
+    if !has_overload {
         return Ok(());
     }
 
@@ -247,7 +249,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     let mut to_pin_slice_type = Vec::new();
     let mut to_invoke = Vec::new();
     let mut to_wrap_delegates = Vec::new();
-    let mut to_wrap_delegate_types = Vec::new();
+    // let mut to_wrap_delegate_types = Vec::new();
 
     let raw_name = function_name_to_csharp_name(
         function,
@@ -257,11 +259,6 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
             FunctionNameFlavor::RawFFIName
         },
     );
-    let this_name = if has_error_enum && !has_overload {
-        format!("{raw_name}_checked")
-    } else {
-        raw_name
-    };
 
     let rval = match function.signature().rval() {
         CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
@@ -295,14 +292,14 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
                     to_invoke.push(format!("{name}_slice"));
                 }
             }
-            CType::Pattern(TypePattern::NamedCallback(callback)) => match callback.fnpointer().signature().rval() {
-                CType::Pattern(TypePattern::FFIErrorEnum(_)) if i.work_around_exception_in_callback_no_reentry => {
-                    to_wrap_delegates.push(name);
-                    to_wrap_delegate_types.push(to_typespecifier_in_param(p.the_type()));
-                    to_invoke.push(format!("{name}_safe_delegate.Call"));
-                }
-                _ => fallback(),
-            },
+            // CType::Pattern(TypePattern::NamedCallback(callback)) => match callback.fnpointer().signature().rval() {
+            //     CType::Pattern(TypePattern::FFIErrorEnum(_)) if i.work_around_exception_in_callback_no_reentry => {
+            //         to_wrap_delegates.push(name);
+            //         to_wrap_delegate_types.push(to_typespecifier_in_param(p.the_type()));
+            //         to_invoke.push(format!("{name}_safe_delegate.Call"));
+            //     }
+            //     _ => fallback(),
+            // },
             CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {
                 CType::Pattern(x) => match x {
                     TypePattern::Slice(x) => {
@@ -333,7 +330,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         params.push(format!("{native} {name}"));
     }
 
-    let signature = format!(r"public static unsafe {} {}({})", rval, this_name, params.join(", "));
+    let signature = format!(r"public static unsafe {} {}({})", rval, raw_name, params.join(", "));
     if write_for == WriteFor::Docs {
         indented!(w, r"{};", signature)?;
         return Ok(());
@@ -348,9 +345,9 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     indented!(w, "{}", signature)?;
     indented!(w, r"{{")?;
 
-    for (name, ty) in zip(&to_wrap_delegates, &to_wrap_delegate_types) {
-        indented!(w, [()], r"var {}_safe_delegate = new {}ExceptionSafe({});", name, ty, name)?;
-    }
+    // for (name, ty) in zip(&to_wrap_delegates, &to_wrap_delegate_types) {
+    //     indented!(w, [()], r"var {}_safe_delegate = new {}ExceptionSafe({});", name, ty, name)?;
+    // }
 
     if !to_pin_name.is_empty() {
         for (pin_var, slice_struct) in to_pin_name.iter().zip(to_pin_slice_type.iter()) {

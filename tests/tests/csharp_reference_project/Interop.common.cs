@@ -98,22 +98,80 @@ namespace My.Company.Common
     public delegate uint MyCallbackNamespacedDelegate(uint value);
     public delegate uint MyCallbackNamespacedNative(uint value, IntPtr callback_data);
 
-    [NativeMarshalling(typeof(CallbackStructMarshaller<MyCallbackNamespacedNative>))]
-    public class MyCallbackNamespaced: CallbackStruct<MyCallbackNamespacedNative>
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct MyCallbackNamespaced : IDisposable
     {
-        internal readonly MyCallbackNamespacedDelegate _userCallback;
+        private MyCallbackNamespacedDelegate _callbackUser;
+        private IntPtr _callbackNative;
 
-        public MyCallbackNamespaced(MyCallbackNamespacedDelegate userCallback)
+        public MyCallbackNamespaced(MyCallbackNamespacedDelegate callbackUser)
         {
-            _userCallback = userCallback;
-            Init(Call);
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(Call);
         }
 
         public uint Call(uint value, IntPtr _)
         {
-            return _userCallback(value);
+            return _callbackUser(value);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(MyCallbackNamespaced), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private MyCallbackNamespaced managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(MyCallbackNamespaced managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public MyCallbackNamespaced ToManaged()
+            {
+                return new MyCallbackNamespaced
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
         }
     }
+
 
     // Debug - write_pattern_generic_slice_helper 
     // This is a helper for the marshallers for Slice<T> and SliceMut<T> of Ts that require custom marshalling.
@@ -573,94 +631,6 @@ namespace My.Company.Common
         }
     }
 
-    // Debug - write_callback_helper 
-    [NativeMarshalling(typeof(CallbackStructMarshaller<>))]
-    public class CallbackStruct<T>: IDisposable where T: Delegate
-    {
-        internal T _callback;
-        internal IntPtr _callbackNative;
-
-        public CallbackStruct() {}
-
-        public CallbackStruct(T t)
-        {
-            Init(t);
-        }
-
-        protected void Init(T t)
-        {
-            _callback = t;
-            _callbackNative = Marshal.GetFunctionPointerForDelegate(t);
-        }
-
-        public void Dispose()
-        {
-            if (_callbackNative == IntPtr.Zero) return;
-            Marshal.FreeHGlobal(_callbackNative);
-            _callbackNative = IntPtr.Zero;
-        }
-    }
-
-    [CustomMarshaller(typeof(CallbackStruct<CallbackCharArray2Native>), MarshalMode.Default, typeof(CallbackStructMarshaller<>.Marshaller))]
-    [CustomMarshaller(typeof(CallbackStruct<CallbackFFISliceNative>), MarshalMode.Default, typeof(CallbackStructMarshaller<>.Marshaller))]
-    [CustomMarshaller(typeof(CallbackStruct<CallbackHugeVecSliceNative>), MarshalMode.Default, typeof(CallbackStructMarshaller<>.Marshaller))]
-    [CustomMarshaller(typeof(CallbackStruct<CallbackSliceMutNative>), MarshalMode.Default, typeof(CallbackStructMarshaller<>.Marshaller))]
-    [CustomMarshaller(typeof(CallbackStruct<CallbackU8Native>), MarshalMode.Default, typeof(CallbackStructMarshaller<>.Marshaller))]
-    [CustomMarshaller(typeof(CallbackStruct<MyCallbackNative>), MarshalMode.Default, typeof(CallbackStructMarshaller<>.Marshaller))]
-    [CustomMarshaller(typeof(CallbackStruct<MyCallbackNamespacedNative>), MarshalMode.Default, typeof(CallbackStructMarshaller<>.Marshaller))]
-    [CustomMarshaller(typeof(CallbackStruct<MyCallbackVoidNative>), MarshalMode.Default, typeof(CallbackStructMarshaller<>.Marshaller))]
-    [CustomMarshaller(typeof(CallbackStruct<SumDelegate1Native>), MarshalMode.Default, typeof(CallbackStructMarshaller<>.Marshaller))]
-    [CustomMarshaller(typeof(CallbackStruct<SumDelegate2Native>), MarshalMode.Default, typeof(CallbackStructMarshaller<>.Marshaller))]
-    [CustomMarshaller(typeof(CallbackStruct<SumDelegateReturnNative>), MarshalMode.Default, typeof(CallbackStructMarshaller<>.Marshaller))]
-    [CustomMarshaller(typeof(CallbackStruct<SumDelegateReturn2Native>), MarshalMode.Default, typeof(CallbackStructMarshaller<>.Marshaller))]
-    [CustomMarshaller(typeof(CallbackStruct<>), MarshalMode.Default, typeof(CallbackStructMarshaller<>.Marshaller))]
-    internal static class CallbackStructMarshaller<T> where T: Delegate
-    {
-        [StructLayout(LayoutKind.Sequential)]
-        public struct Unmanaged
-        {
-            internal IntPtr Callback;
-            internal IntPtr Data;
-        }
-
-        public ref struct Marshaller
-        {
-            private CallbackStruct<T> managed;
-            private Unmanaged native;
-            private Unmanaged sourceNative;
-            private GCHandle? pinned;
-            private T[] marshalled;
-
-            public void FromManaged(CallbackStruct<T> managed)
-            {
-                this.managed = managed;
-            }
-
-            public Unmanaged ToUnmanaged()
-            {
-                return new Unmanaged
-                {
-                    Callback = managed._callbackNative,
-                    Data = IntPtr.Zero
-                };
-            }
-
-            public void FromUnmanaged(Unmanaged unmanaged)
-            {
-                sourceNative = unmanaged;
-            }
-
-            public CallbackStruct<T> ToManaged()
-            {
-                return new CallbackStruct<T>
-                {
-                    _callbackNative = sourceNative.Callback,
-                };
-            }
-
-            public void Free() { }
-        }
-    }
 
 
     public class InteropException<T> : Exception

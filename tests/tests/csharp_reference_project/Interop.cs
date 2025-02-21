@@ -48,77 +48,92 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "primitive_void")]
         // Debug - write_function_declaration 
         public static partial void primitive_void();
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "primitive_void2")]
         // Debug - write_function_declaration 
         public static partial void primitive_void2();
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "primitive_bool")]
         [return: MarshalAs(UnmanagedType.U1)]
         // Debug - write_function_declaration 
         public static partial bool primitive_bool([MarshalAs(UnmanagedType.U1)] bool x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "primitive_u8")]
         // Debug - write_function_declaration 
         public static partial byte primitive_u8(byte x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "primitive_u16")]
         // Debug - write_function_declaration 
         public static partial ushort primitive_u16(ushort x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "primitive_u32")]
         // Debug - write_function_declaration 
         public static partial uint primitive_u32(uint x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "primitive_u64")]
         // Debug - write_function_declaration 
         public static partial ulong primitive_u64(ulong x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "primitive_i8")]
         // Debug - write_function_declaration 
         public static partial sbyte primitive_i8(sbyte x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "primitive_i16")]
         // Debug - write_function_declaration 
         public static partial short primitive_i16(short x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "primitive_i32")]
         // Debug - write_function_declaration 
         public static partial int primitive_i32(int x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "primitive_i64")]
         // Debug - write_function_declaration 
         public static partial long primitive_i64(long x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "packed_to_packed1")]
         // Debug - write_function_declaration 
         public static partial Packed2 packed_to_packed1(Packed1 a);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "many_args_5")]
         // Debug - write_function_declaration 
         public static partial long many_args_5(long x0, long x1, long x2, long x3, long x4);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "many_args_10")]
         // Debug - write_function_declaration 
         public static partial long many_args_10(long x0, long x1, long x2, long x3, long x4, long x5, long x6, long x7, long x8, long x9);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "ptr")]
         // Debug - write_function_declaration 
         public static partial IntPtr ptr(ref long x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         /// # Safety
@@ -127,180 +142,204 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "ptr_mut")]
         // Debug - write_function_declaration 
         public static partial IntPtr ptr_mut(out long x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "ptr_ptr")]
         // Debug - write_function_declaration 
         public static partial IntPtr ptr_ptr(ref IntPtr x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "ref_simple")]
         // Debug - write_function_declaration 
         public static partial IntPtr ref_simple(ref long x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "ref_mut_simple")]
         // Debug - write_function_declaration 
         public static partial IntPtr ref_mut_simple(out long x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "ref_option")]
         [return: MarshalAs(UnmanagedType.U1)]
         // Debug - write_function_declaration 
         public static partial bool ref_option(ref long x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "ref_mut_option")]
         [return: MarshalAs(UnmanagedType.U1)]
         // Debug - write_function_declaration 
         public static partial bool ref_mut_option(out long x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "call_tupled")]
         // Debug - write_function_declaration 
         public static partial Tupled call_tupled(Tupled x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "complex_args_1")]
         // Debug - write_function_declaration 
         public static partial FFIError complex_args_1(Vec3f32 a, ref Tupled b);
-
-        public static unsafe void complex_args_1_checked(Vec3f32 a, ref Tupled b)
-        {
-            var rval = complex_args_1(a, ref b);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "callback")]
         // Debug - write_function_declaration 
         public static partial byte callback(InteropDelegate_fn_u8_rval_u8 callback, byte value);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "callback_marshalled")]
         // Debug - write_function_declaration 
         private static partial void callback_marshalled(InteropDelegate_fn_CharArray_native callback, CharArray value);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "generic_1a")]
         // Debug - write_function_declaration 
         public static partial uint generic_1a(Genericu32 x, Phantomu8 y);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "generic_1b")]
         // Debug - write_function_declaration 
         public static partial byte generic_1b(Genericu8 x, Phantomu8 y);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "generic_1c")]
         // Debug - write_function_declaration 
         public static partial byte generic_1c(ref Genericu8 x, ref Genericu8 y);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "generic_2")]
         // Debug - write_function_declaration 
         public static partial byte generic_2(IntPtr x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "generic_3")]
         // Debug - write_function_declaration 
         public static partial byte generic_3(IntPtr x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "generic_4")]
         // Debug - write_function_declaration 
         public static partial byte generic_4(IntPtr x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "array_1")]
         // Debug - write_function_declaration 
         public static partial byte array_1(Array x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "array_2")]
         // Debug - write_function_declaration 
         public static partial Array array_2();
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "array_3")]
         // Debug - write_function_declaration 
         public static partial void array_3(out Array arr);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "nested_array_1")]
         // Debug - write_function_declaration 
         public static partial NestedArray nested_array_1();
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "nested_array_2")]
         // Debug - write_function_declaration 
         public static partial void nested_array_2(out NestedArray result);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "nested_array_3")]
         // Debug - write_function_declaration 
         public static partial byte nested_array_3(NestedArray input);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "char_array_1")]
         // Debug - write_function_declaration 
         public static partial CharArray char_array_1();
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "char_array_2")]
         // Debug - write_function_declaration 
         public static partial CharArray char_array_2(CharArray arr);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "char_array_3")]
         // Debug - write_function_declaration 
         public static partial byte char_array_3(ref CharArray arr);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "bool_field")]
         [return: MarshalAs(UnmanagedType.U1)]
         // Debug - write_function_declaration 
         public static partial bool bool_field(BoolField x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         /// This function has documentation.
         [LibraryImport(NativeLib, EntryPoint = "documented")]
         // Debug - write_function_declaration 
         public static partial EnumDocumented documented(StructDocumented x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "ambiguous_1")]
         // Debug - write_function_declaration 
         public static partial Vec1 ambiguous_1(Vec1 x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "ambiguous_2")]
         // Debug - write_function_declaration 
         public static partial Vec2 ambiguous_2(Vec2 x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "ambiguous_3")]
         [return: MarshalAs(UnmanagedType.U1)]
         // Debug - write_function_declaration 
         public static partial bool ambiguous_3(Vec1 x, Vec2 y);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "namespaced_type")]
         // Debug - write_function_declaration 
         public static partial Vec namespaced_type(Vec x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_option")]
         // Debug - write_function_declaration 
         public static partial OptionVec namespaced_inner_option(OptionVec x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice")]
         // Debug - write_function_declaration 
         public static partial Slice<Vec> namespaced_inner_slice(Slice<Vec> x);
+        // Debug - write_function_overload 
 
         public static unsafe Slice<Vec> namespaced_inner_slice(ReadOnlySpan<Vec> x)
         {
@@ -315,6 +354,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice_mut")]
         // Debug - write_function_declaration 
         public static partial SliceMut<Vec> namespaced_inner_slice_mut(SliceMut<Vec> x);
+        // Debug - write_function_overload 
 
         public static unsafe SliceMut<Vec> namespaced_inner_slice_mut(Span<Vec> x)
         {
@@ -329,76 +369,80 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "panics")]
         // Debug - write_function_declaration 
         public static partial FFIError panics();
-
-        public static unsafe void panics_checked()
-        {
-            var rval = panics();;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "renamed")]
         // Debug - write_function_declaration 
         public static partial EnumRenamed renamed(StructRenamed x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "sleep")]
         // Debug - write_function_declaration 
         public static partial void sleep(ulong millis);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "weird_1")]
         [return: MarshalAs(UnmanagedType.U1)]
         // Debug - write_function_declaration 
         public static partial bool weird_1(Weird1u32 x, Weird2u8 y);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "visibility")]
         // Debug - write_function_declaration 
         public static partial void visibility(Visibility1 x, Visibility2 y);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "repr_transparent")]
         // Debug - write_function_declaration 
         public static partial Tupled repr_transparent(Tupled x, ref Tupled r);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_1")]
         // Debug - write_function_declaration 
         public static partial uint pattern_ascii_pointer_1([MarshalAs(UnmanagedType.LPStr)] string x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_2")]
         // Debug - write_function_declaration 
         public static partial IntPtr pattern_ascii_pointer_2();
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_3")]
         // Debug - write_function_declaration 
         public static partial IntPtr pattern_ascii_pointer_3([MarshalAs(UnmanagedType.LPStr)] string x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_4")]
         // Debug - write_function_declaration 
         public static partial IntPtr pattern_ascii_pointer_4([MarshalAs(UnmanagedType.LPStr)] string x, uint l);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_5")]
         // Debug - write_function_declaration 
         public static partial byte pattern_ascii_pointer_5([MarshalAs(UnmanagedType.LPStr)] string x, uint i);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_return_slice")]
         // Debug - write_function_declaration 
         public static partial Slice<UseAsciiStringPattern> pattern_ascii_pointer_return_slice();
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1")]
         // Debug - write_function_declaration 
         public static partial uint pattern_ffi_slice_1(Slice<uint> ffi_slice);
+        // Debug - write_function_overload 
 
         public static unsafe uint pattern_ffi_slice_1(ReadOnlySpan<uint> ffi_slice)
         {
@@ -413,6 +457,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1b")]
         // Debug - write_function_declaration 
         public static partial uint pattern_ffi_slice_1b(SliceMut<uint> ffi_slice);
+        // Debug - write_function_overload 
 
         public static unsafe uint pattern_ffi_slice_1b(Span<uint> ffi_slice)
         {
@@ -427,6 +472,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_2")]
         // Debug - write_function_declaration 
         public static partial Vec3f32 pattern_ffi_slice_2(Slice<Vec3f32> ffi_slice, int i);
+        // Debug - write_function_overload 
 
         public static unsafe Vec3f32 pattern_ffi_slice_2(ReadOnlySpan<Vec3f32> ffi_slice, int i)
         {
@@ -441,6 +487,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_3")]
         // Debug - write_function_declaration 
         private static partial void pattern_ffi_slice_3(SliceMut<byte> slice, CallbackSliceMut callback);
+        // Debug - write_function_overload 
 
         public static unsafe void pattern_ffi_slice_3(Span<byte> slice, CallbackSliceMut callback)
         {
@@ -455,6 +502,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_4")]
         // Debug - write_function_declaration 
         public static partial void pattern_ffi_slice_4(Slice<byte> slice, SliceMut<byte> slice2);
+        // Debug - write_function_overload 
 
         public static unsafe void pattern_ffi_slice_4(ReadOnlySpan<byte> slice, Span<byte> slice2)
         {
@@ -473,6 +521,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_5")]
         // Debug - write_function_declaration 
         public static partial void pattern_ffi_slice_5(ref Slice<byte> slice, ref SliceMut<byte> slice2);
+        // Debug - write_function_overload 
 
         public static unsafe void pattern_ffi_slice_5(ReadOnlySpan<byte> slice, Span<byte> slice2)
         {
@@ -491,6 +540,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_6")]
         // Debug - write_function_declaration 
         public static partial void pattern_ffi_slice_6(ref SliceMut<byte> slice, CallbackU8 callback);
+        // Debug - write_function_overload 
 
         public static unsafe void pattern_ffi_slice_6(Span<byte> slice, CallbackU8 callback)
         {
@@ -505,97 +555,103 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_8")]
         // Debug - write_function_declaration 
         private static partial void pattern_ffi_slice_8(ref SliceMut<CharArray> slice, CallbackCharArray2 callback);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_delegate")]
         // Debug - write_function_declaration 
-        private static partial byte pattern_ffi_slice_delegate(CallbackFFISlice callback);
+        public static partial byte pattern_ffi_slice_delegate(CallbackFFISlice callback);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_delegate_huge")]
         // Debug - write_function_declaration 
-        private static partial Vec3f32 pattern_ffi_slice_delegate_huge(CallbackHugeVecSlice callback);
+        public static partial Vec3f32 pattern_ffi_slice_delegate_huge(CallbackHugeVecSlice callback);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_1")]
         // Debug - write_function_declaration 
         public static partial OptionInner pattern_ffi_option_1(OptionInner ffi_slice);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_2")]
         // Debug - write_function_declaration 
         public static partial Inner pattern_ffi_option_2(OptionInner ffi_slice);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_bool")]
         // Debug - write_function_declaration 
         public static partial Bool pattern_ffi_bool(Bool ffi_bool);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_cchar")]
         // Debug - write_function_declaration 
         public static partial sbyte pattern_ffi_cchar(sbyte ffi_cchar);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_cchar_const_pointer")]
         // Debug - write_function_declaration 
         public static partial IntPtr pattern_ffi_cchar_const_pointer(IntPtr ffi_cchar);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_cchar_mut_pointer")]
         // Debug - write_function_declaration 
         public static partial IntPtr pattern_ffi_cchar_mut_pointer(IntPtr ffi_cchar);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_api_guard")]
         // Debug - write_function_declaration 
         public static partial ulong pattern_api_guard();
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_1")]
         // Debug - write_function_declaration 
         public static partial uint pattern_callback_1(MyCallback callback, uint x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_2")]
         // Debug - write_function_declaration 
         public static partial MyCallbackVoid pattern_callback_2(MyCallbackVoid callback);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_4")]
         // Debug - write_function_declaration 
         public static partial uint pattern_callback_4(MyCallbackNamespaced callback, uint x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_5")]
         // Debug - write_function_declaration 
         public static partial SumDelegate1 pattern_callback_5();
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_6")]
         // Debug - write_function_declaration 
         public static partial SumDelegate2 pattern_callback_6();
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_7")]
         // Debug - write_function_declaration 
         public static partial FFIError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o);
-
-        public static unsafe void pattern_callback_7_checked(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o)
-        {
-            var c1_safe_delegate = new SumDelegateReturnExceptionSafe(c1);
-            var rval = pattern_callback_7(c1_safe_delegate.Call, c2, x, i, out o);;
-            c1_safe_delegate.Rethrow();
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_surrogates_1")]
         // Debug - write_function_declaration 
         public static partial void pattern_surrogates_1(Local s, out Container c);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         /// Destroys the given instance.
@@ -607,35 +663,13 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "basic_service_destroy")]
         // Debug - write_function_declaration 
         public static partial FFIError basic_service_destroy(ref IntPtr context);
-
-        /// Destroys the given instance.
-        ///
-        /// # Safety
-        ///
-        /// The passed parameter MUST have been created with the corresponding init function;
-        /// passing any other value results in undefined behavior.
-        public static unsafe void basic_service_destroy_checked(ref IntPtr context)
-        {
-            var rval = basic_service_destroy(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "basic_service_new")]
         // Debug - write_function_declaration 
         public static partial FFIError basic_service_new(ref IntPtr context);
-
-        public static unsafe void basic_service_new_checked(ref IntPtr context)
-        {
-            var rval = basic_service_new(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         /// Destroys the given instance.
@@ -647,35 +681,13 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_destroy")]
         // Debug - write_function_declaration 
         public static partial FFIError service_on_panic_destroy(ref IntPtr context);
-
-        /// Destroys the given instance.
-        ///
-        /// # Safety
-        ///
-        /// The passed parameter MUST have been created with the corresponding init function;
-        /// passing any other value results in undefined behavior.
-        public static unsafe void service_on_panic_destroy_checked(ref IntPtr context)
-        {
-            var rval = service_on_panic_destroy(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_new")]
         // Debug - write_function_declaration 
         public static partial FFIError service_on_panic_new(ref IntPtr context);
-
-        public static unsafe void service_on_panic_new_checked(ref IntPtr context)
-        {
-            var rval = service_on_panic_new(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         /// Methods returning a Result<(), _> are the default and do not
@@ -683,23 +695,14 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_result")]
         // Debug - write_function_declaration 
         public static partial FFIError service_on_panic_return_result(IntPtr context, uint anon1);
-
-        /// Methods returning a Result<(), _> are the default and do not
-        /// need annotations.
-        public static unsafe void service_on_panic_return_result_checked(IntPtr context, uint anon1)
-        {
-            var rval = service_on_panic_return_result(context, anon1);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         /// Methods returning a value need an `on_panic` annotation.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_default_value")]
         // Debug - write_function_declaration 
         public static partial uint service_on_panic_return_default_value(IntPtr context, uint x);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         /// This function has no panic safeguards. It will be a bit faster to
@@ -707,6 +710,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_ub_on_panic")]
         // Debug - write_function_declaration 
         public static partial IntPtr service_on_panic_return_ub_on_panic(IntPtr context);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         /// Destroys the given instance.
@@ -718,79 +722,38 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_destroy")]
         // Debug - write_function_declaration 
         public static partial FFIError service_callbacks_destroy(ref IntPtr context);
-
-        /// Destroys the given instance.
-        ///
-        /// # Safety
-        ///
-        /// The passed parameter MUST have been created with the corresponding init function;
-        /// passing any other value results in undefined behavior.
-        public static unsafe void service_callbacks_destroy_checked(ref IntPtr context)
-        {
-            var rval = service_callbacks_destroy(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_new")]
         // Debug - write_function_declaration 
         public static partial FFIError service_callbacks_new(ref IntPtr context);
-
-        public static unsafe void service_callbacks_new_checked(ref IntPtr context)
-        {
-            var rval = service_callbacks_new(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_simple")]
         // Debug - write_function_declaration 
         public static partial FFIError service_callbacks_callback_simple(IntPtr context, MyCallback callback);
-
-        public static unsafe void service_callbacks_callback_simple_checked(IntPtr context, MyCallback callback)
-        {
-            var rval = service_callbacks_callback_simple(context, callback);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_ffi_return")]
         // Debug - write_function_declaration 
         public static partial FFIError service_callbacks_callback_ffi_return(IntPtr context, SumDelegateReturn callback);
-
-        public static unsafe void service_callbacks_callback_ffi_return_checked(IntPtr context, SumDelegateReturn callback)
-        {
-            var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
-            var rval = service_callbacks_callback_ffi_return(context, callback_safe_delegate.Call);;
-            callback_safe_delegate.Rethrow();
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_with_slice")]
         // Debug - write_function_declaration 
         public static partial FFIError service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, Slice<int> input);
+        // Debug - write_function_overload 
 
         public static unsafe void service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, ReadOnlySpan<int> input)
         {
-            var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
             fixed (void* ptr_input = input)
             {
                 var input_slice = new Slice<int>(new IntPtr(ptr_input), (ulong) input.Length);
-                var rval = service_callbacks_callback_with_slice(context, callback_safe_delegate.Call, input_slice);;
-                callback_safe_delegate.Rethrow();
+                var rval = service_callbacks_callback_with_slice(context, callback, input_slice);;
                 if (rval != FFIError.Ok)
                 {
                     throw new InteropException<FFIError>(rval);
@@ -802,15 +765,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_invoke_delegates")]
         // Debug - write_function_declaration 
         public static partial FFIError service_callbacks_invoke_delegates(IntPtr context);
-
-        public static unsafe void service_callbacks_invoke_delegates_checked(IntPtr context)
-        {
-            var rval = service_callbacks_invoke_delegates(context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         /// Destroys the given instance.
@@ -822,35 +777,13 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_destroy")]
         // Debug - write_function_declaration 
         public static partial FFIError service_ignoring_methods_destroy(ref IntPtr context);
-
-        /// Destroys the given instance.
-        ///
-        /// # Safety
-        ///
-        /// The passed parameter MUST have been created with the corresponding init function;
-        /// passing any other value results in undefined behavior.
-        public static unsafe void service_ignoring_methods_destroy_checked(ref IntPtr context)
-        {
-            var rval = service_ignoring_methods_destroy(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_new")]
         // Debug - write_function_declaration 
         public static partial FFIError service_ignoring_methods_new(ref IntPtr context);
-
-        public static unsafe void service_ignoring_methods_new_checked(ref IntPtr context)
-        {
-            var rval = service_ignoring_methods_new(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         /// Destroys the given instance.
@@ -862,77 +795,31 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_destroy")]
         // Debug - write_function_declaration 
         public static partial FFIError service_multiple_ctors_destroy(ref IntPtr context);
-
-        /// Destroys the given instance.
-        ///
-        /// # Safety
-        ///
-        /// The passed parameter MUST have been created with the corresponding init function;
-        /// passing any other value results in undefined behavior.
-        public static unsafe void service_multiple_ctors_destroy_checked(ref IntPtr context)
-        {
-            var rval = service_multiple_ctors_destroy(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with")]
         // Debug - write_function_declaration 
         public static partial FFIError service_multiple_ctors_new_with(ref IntPtr context, uint some_value);
-
-        public static unsafe void service_multiple_ctors_new_with_checked(ref IntPtr context, uint some_value)
-        {
-            var rval = service_multiple_ctors_new_with(ref context, some_value);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_without")]
         // Debug - write_function_declaration 
         public static partial FFIError service_multiple_ctors_new_without(ref IntPtr context);
-
-        public static unsafe void service_multiple_ctors_new_without_checked(ref IntPtr context)
-        {
-            var rval = service_multiple_ctors_new_without(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with_string")]
         // Debug - write_function_declaration 
         public static partial FFIError service_multiple_ctors_new_with_string(ref IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string anon0);
-
-        public static unsafe void service_multiple_ctors_new_with_string_checked(ref IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string anon0)
-        {
-            var rval = service_multiple_ctors_new_with_string(ref context, anon0);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_failing")]
         // Debug - write_function_declaration 
         public static partial FFIError service_multiple_ctors_new_failing(ref IntPtr context, byte some_value);
-
-        public static unsafe void service_multiple_ctors_new_failing_checked(ref IntPtr context, byte some_value)
-        {
-            var rval = service_multiple_ctors_new_failing(ref context, some_value);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         /// Destroys the given instance.
@@ -944,40 +831,19 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_destroy")]
         // Debug - write_function_declaration 
         public static partial FFIError service_using_lifetimes_destroy(ref IntPtr context);
-
-        /// Destroys the given instance.
-        ///
-        /// # Safety
-        ///
-        /// The passed parameter MUST have been created with the corresponding init function;
-        /// passing any other value results in undefined behavior.
-        public static unsafe void service_using_lifetimes_destroy_checked(ref IntPtr context)
-        {
-            var rval = service_using_lifetimes_destroy(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_new_with")]
         // Debug - write_function_declaration 
         public static partial FFIError service_using_lifetimes_new_with(ref IntPtr context, ref uint some_value);
-
-        public static unsafe void service_using_lifetimes_new_with_checked(ref IntPtr context, ref uint some_value)
-        {
-            var rval = service_using_lifetimes_new_with(ref context, ref some_value);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_lifetime_1")]
         // Debug - write_function_declaration 
         public static partial void service_using_lifetimes_lifetime_1(IntPtr context, Slice<Bool> slice);
+        // Debug - write_function_overload 
 
         public static unsafe void service_using_lifetimes_lifetime_1(IntPtr context, ReadOnlySpan<Bool> slice)
         {
@@ -992,6 +858,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_lifetime_2")]
         // Debug - write_function_declaration 
         public static partial void service_using_lifetimes_lifetime_2(IntPtr context, Slice<Bool> slice);
+        // Debug - write_function_overload 
 
         public static unsafe void service_using_lifetimes_lifetime_2(IntPtr context, ReadOnlySpan<Bool> slice)
         {
@@ -1006,6 +873,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_return_string_accept_slice")]
         // Debug - write_function_declaration 
         public static partial IntPtr service_using_lifetimes_return_string_accept_slice(IntPtr anon0, Slice<byte> anon1);
+        // Debug - write_function_overload 
 
         public static unsafe string service_using_lifetimes_return_string_accept_slice(IntPtr anon0, ReadOnlySpan<byte> anon1)
         {
@@ -1027,40 +895,19 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_destroy")]
         // Debug - write_function_declaration 
         public static partial FFIError service_various_slices_destroy(ref IntPtr context);
-
-        /// Destroys the given instance.
-        ///
-        /// # Safety
-        ///
-        /// The passed parameter MUST have been created with the corresponding init function;
-        /// passing any other value results in undefined behavior.
-        public static unsafe void service_various_slices_destroy_checked(ref IntPtr context)
-        {
-            var rval = service_various_slices_destroy(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_new")]
         // Debug - write_function_declaration 
         public static partial FFIError service_various_slices_new(ref IntPtr context);
-
-        public static unsafe void service_various_slices_new_checked(ref IntPtr context)
-        {
-            var rval = service_various_slices_new(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self")]
         // Debug - write_function_declaration 
         public static partial byte service_various_slices_mut_self(IntPtr context, Slice<byte> slice);
+        // Debug - write_function_overload 
 
         public static unsafe byte service_various_slices_mut_self(IntPtr context, ReadOnlySpan<byte> slice)
         {
@@ -1076,6 +923,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_void")]
         // Debug - write_function_declaration 
         public static partial void service_various_slices_mut_self_void(IntPtr context, Slice<Bool> slice);
+        // Debug - write_function_overload 
 
         /// Single line.
         public static unsafe void service_various_slices_mut_self_void(IntPtr context, ReadOnlySpan<Bool> slice)
@@ -1091,11 +939,13 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref")]
         // Debug - write_function_declaration 
         public static partial byte service_various_slices_mut_self_ref(IntPtr context, ref byte x, out byte y);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice")]
         // Debug - write_function_declaration 
         public static partial byte service_various_slices_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, Slice<byte> slice);
+        // Debug - write_function_overload 
 
         public static unsafe byte service_various_slices_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, ReadOnlySpan<byte> slice)
         {
@@ -1110,6 +960,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice_limited")]
         // Debug - write_function_declaration 
         public static partial byte service_various_slices_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, Slice<byte> slice, Slice<byte> slice2);
+        // Debug - write_function_overload 
 
         public static unsafe byte service_various_slices_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, ReadOnlySpan<byte> slice, ReadOnlySpan<byte> slice2)
         {
@@ -1128,6 +979,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ffi_error")]
         // Debug - write_function_declaration 
         public static partial FFIError service_various_slices_mut_self_ffi_error(IntPtr context, SliceMut<byte> slice);
+        // Debug - write_function_overload 
 
         public static unsafe void service_various_slices_mut_self_ffi_error(IntPtr context, Span<byte> slice)
         {
@@ -1146,6 +998,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_no_error")]
         // Debug - write_function_declaration 
         public static partial FFIError service_various_slices_mut_self_no_error(IntPtr context, SliceMut<byte> slice);
+        // Debug - write_function_overload 
 
         public static unsafe void service_various_slices_mut_self_no_error(IntPtr context, Span<byte> slice)
         {
@@ -1166,6 +1019,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_return_slice")]
         // Debug - write_function_declaration 
         public static partial Slice<uint> service_various_slices_return_slice(IntPtr context);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         /// Warning, you _must_ discard the returned slice object before calling into this service
@@ -1173,6 +1027,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_return_slice_mut")]
         // Debug - write_function_declaration 
         public static partial SliceMut<uint> service_various_slices_return_slice_mut(IntPtr context);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         /// Destroys the given instance.
@@ -1184,45 +1039,25 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_strings_destroy")]
         // Debug - write_function_declaration 
         public static partial FFIError service_strings_destroy(ref IntPtr context);
-
-        /// Destroys the given instance.
-        ///
-        /// # Safety
-        ///
-        /// The passed parameter MUST have been created with the corresponding init function;
-        /// passing any other value results in undefined behavior.
-        public static unsafe void service_strings_destroy_checked(ref IntPtr context)
-        {
-            var rval = service_strings_destroy(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_new")]
         // Debug - write_function_declaration 
         public static partial FFIError service_strings_new(ref IntPtr context);
-
-        public static unsafe void service_strings_new_checked(ref IntPtr context)
-        {
-            var rval = service_strings_new(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_pass_string")]
         // Debug - write_function_declaration 
         public static partial void service_strings_pass_string(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string anon1);
+        // Debug - write_function_overload 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_return_string")]
         // Debug - write_function_declaration 
         public static partial IntPtr service_strings_return_string(IntPtr context);
+        // Debug - write_function_overload 
 
     }
 
@@ -1862,274 +1697,880 @@ namespace My.Company
     public delegate void CallbackCharArray2Delegate(CharArray value);
     public delegate void CallbackCharArray2Native(CharArray value, IntPtr callback_data);
 
-    [NativeMarshalling(typeof(CallbackStructMarshaller<CallbackCharArray2Native>))]
-    public class CallbackCharArray2: CallbackStruct<CallbackCharArray2Native>
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct CallbackCharArray2 : IDisposable
     {
-        internal readonly CallbackCharArray2Delegate _userCallback;
+        private CallbackCharArray2Delegate _callbackUser;
+        private IntPtr _callbackNative;
 
-        public CallbackCharArray2(CallbackCharArray2Delegate userCallback)
+        public CallbackCharArray2(CallbackCharArray2Delegate callbackUser)
         {
-            _userCallback = userCallback;
-            Init(Call);
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(Call);
         }
 
         public void Call(CharArray value, IntPtr _)
         {
-            _userCallback(value);
+            _callbackUser(value);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(CallbackCharArray2), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private CallbackCharArray2 managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(CallbackCharArray2 managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public CallbackCharArray2 ToManaged()
+            {
+                return new CallbackCharArray2
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
         }
     }
+
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte CallbackFFISliceDelegate(Slice<byte> slice);
     public delegate byte CallbackFFISliceNative(Slice<byte> slice, IntPtr callback_data);
 
-    [NativeMarshalling(typeof(CallbackStructMarshaller<CallbackFFISliceNative>))]
-    public class CallbackFFISlice: CallbackStruct<CallbackFFISliceNative>
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct CallbackFFISlice : IDisposable
     {
-        internal readonly CallbackFFISliceDelegate _userCallback;
+        private CallbackFFISliceDelegate _callbackUser;
+        private IntPtr _callbackNative;
 
-        public CallbackFFISlice(CallbackFFISliceDelegate userCallback)
+        public CallbackFFISlice(CallbackFFISliceDelegate callbackUser)
         {
-            _userCallback = userCallback;
-            Init(Call);
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(Call);
         }
 
         public byte Call(Slice<byte> slice, IntPtr _)
         {
-            return _userCallback(slice);
+            return _callbackUser(slice);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(CallbackFFISlice), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private CallbackFFISlice managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(CallbackFFISlice managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public CallbackFFISlice ToManaged()
+            {
+                return new CallbackFFISlice
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
         }
     }
+
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate Vec3f32 CallbackHugeVecSliceDelegate(Slice<Vec3f32> slice);
     public delegate Vec3f32 CallbackHugeVecSliceNative(Slice<Vec3f32> slice, IntPtr callback_data);
 
-    [NativeMarshalling(typeof(CallbackStructMarshaller<CallbackHugeVecSliceNative>))]
-    public class CallbackHugeVecSlice: CallbackStruct<CallbackHugeVecSliceNative>
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct CallbackHugeVecSlice : IDisposable
     {
-        internal readonly CallbackHugeVecSliceDelegate _userCallback;
+        private CallbackHugeVecSliceDelegate _callbackUser;
+        private IntPtr _callbackNative;
 
-        public CallbackHugeVecSlice(CallbackHugeVecSliceDelegate userCallback)
+        public CallbackHugeVecSlice(CallbackHugeVecSliceDelegate callbackUser)
         {
-            _userCallback = userCallback;
-            Init(Call);
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(Call);
         }
 
         public Vec3f32 Call(Slice<Vec3f32> slice, IntPtr _)
         {
-            return _userCallback(slice);
+            return _callbackUser(slice);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(CallbackHugeVecSlice), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private CallbackHugeVecSlice managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(CallbackHugeVecSlice managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public CallbackHugeVecSlice ToManaged()
+            {
+                return new CallbackHugeVecSlice
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
         }
     }
+
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void CallbackSliceMutDelegate(SliceMut<byte> slice);
     public delegate void CallbackSliceMutNative(SliceMut<byte> slice, IntPtr callback_data);
 
-    [NativeMarshalling(typeof(CallbackStructMarshaller<CallbackSliceMutNative>))]
-    public class CallbackSliceMut: CallbackStruct<CallbackSliceMutNative>
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct CallbackSliceMut : IDisposable
     {
-        internal readonly CallbackSliceMutDelegate _userCallback;
+        private CallbackSliceMutDelegate _callbackUser;
+        private IntPtr _callbackNative;
 
-        public CallbackSliceMut(CallbackSliceMutDelegate userCallback)
+        public CallbackSliceMut(CallbackSliceMutDelegate callbackUser)
         {
-            _userCallback = userCallback;
-            Init(Call);
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(Call);
         }
 
         public void Call(SliceMut<byte> slice, IntPtr _)
         {
-            _userCallback(slice);
+            _callbackUser(slice);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(CallbackSliceMut), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private CallbackSliceMut managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(CallbackSliceMut managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public CallbackSliceMut ToManaged()
+            {
+                return new CallbackSliceMut
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
         }
     }
+
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte CallbackU8Delegate(byte value);
     public delegate byte CallbackU8Native(byte value, IntPtr callback_data);
 
-    [NativeMarshalling(typeof(CallbackStructMarshaller<CallbackU8Native>))]
-    public class CallbackU8: CallbackStruct<CallbackU8Native>
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct CallbackU8 : IDisposable
     {
-        internal readonly CallbackU8Delegate _userCallback;
+        private CallbackU8Delegate _callbackUser;
+        private IntPtr _callbackNative;
 
-        public CallbackU8(CallbackU8Delegate userCallback)
+        public CallbackU8(CallbackU8Delegate callbackUser)
         {
-            _userCallback = userCallback;
-            Init(Call);
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(Call);
         }
 
         public byte Call(byte value, IntPtr _)
         {
-            return _userCallback(value);
+            return _callbackUser(value);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(CallbackU8), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private CallbackU8 managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(CallbackU8 managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public CallbackU8 ToManaged()
+            {
+                return new CallbackU8
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
         }
     }
+
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate uint MyCallbackDelegate(uint value);
     public delegate uint MyCallbackNative(uint value, IntPtr callback_data);
 
-    [NativeMarshalling(typeof(CallbackStructMarshaller<MyCallbackNative>))]
-    public class MyCallback: CallbackStruct<MyCallbackNative>
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct MyCallback : IDisposable
     {
-        internal readonly MyCallbackDelegate _userCallback;
+        private MyCallbackDelegate _callbackUser;
+        private IntPtr _callbackNative;
 
-        public MyCallback(MyCallbackDelegate userCallback)
+        public MyCallback(MyCallbackDelegate callbackUser)
         {
-            _userCallback = userCallback;
-            Init(Call);
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(Call);
         }
 
         public uint Call(uint value, IntPtr _)
         {
-            return _userCallback(value);
+            return _callbackUser(value);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(MyCallback), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private MyCallback managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(MyCallback managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public MyCallback ToManaged()
+            {
+                return new MyCallback
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
         }
     }
+
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MyCallbackVoidDelegate(IntPtr ptr);
     public delegate void MyCallbackVoidNative(IntPtr ptr, IntPtr callback_data);
 
-    [NativeMarshalling(typeof(CallbackStructMarshaller<MyCallbackVoidNative>))]
-    public class MyCallbackVoid: CallbackStruct<MyCallbackVoidNative>
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct MyCallbackVoid : IDisposable
     {
-        internal readonly MyCallbackVoidDelegate _userCallback;
+        private MyCallbackVoidDelegate _callbackUser;
+        private IntPtr _callbackNative;
 
-        public MyCallbackVoid(MyCallbackVoidDelegate userCallback)
+        public MyCallbackVoid(MyCallbackVoidDelegate callbackUser)
         {
-            _userCallback = userCallback;
-            Init(Call);
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(Call);
         }
 
         public void Call(IntPtr ptr, IntPtr _)
         {
-            _userCallback(ptr);
+            _callbackUser(ptr);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(MyCallbackVoid), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private MyCallbackVoid managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(MyCallbackVoid managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public MyCallbackVoid ToManaged()
+            {
+                return new MyCallbackVoid
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
         }
     }
+
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void SumDelegate1Delegate();
     public delegate void SumDelegate1Native(IntPtr callback_data);
 
-    [NativeMarshalling(typeof(CallbackStructMarshaller<SumDelegate1Native>))]
-    public class SumDelegate1: CallbackStruct<SumDelegate1Native>
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct SumDelegate1 : IDisposable
     {
-        internal readonly SumDelegate1Delegate _userCallback;
+        private SumDelegate1Delegate _callbackUser;
+        private IntPtr _callbackNative;
 
-        public SumDelegate1(SumDelegate1Delegate userCallback)
+        public SumDelegate1(SumDelegate1Delegate callbackUser)
         {
-            _userCallback = userCallback;
-            Init(Call);
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(Call);
         }
 
-        public void Call(, IntPtr _)
+        public void Call(IntPtr _)
         {
-            _userCallback();
+            _callbackUser();
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(SumDelegate1), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private SumDelegate1 managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(SumDelegate1 managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public SumDelegate1 ToManaged()
+            {
+                return new SumDelegate1
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
         }
     }
+
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate int SumDelegate2Delegate(int x, int y);
     public delegate int SumDelegate2Native(int x, int y, IntPtr callback_data);
 
-    [NativeMarshalling(typeof(CallbackStructMarshaller<SumDelegate2Native>))]
-    public class SumDelegate2: CallbackStruct<SumDelegate2Native>
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct SumDelegate2 : IDisposable
     {
-        internal readonly SumDelegate2Delegate _userCallback;
+        private SumDelegate2Delegate _callbackUser;
+        private IntPtr _callbackNative;
 
-        public SumDelegate2(SumDelegate2Delegate userCallback)
+        public SumDelegate2(SumDelegate2Delegate callbackUser)
         {
-            _userCallback = userCallback;
-            Init(Call);
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(Call);
         }
 
         public int Call(int x, int y, IntPtr _)
         {
-            return _userCallback(x, y);
+            return _callbackUser(x, y);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(SumDelegate2), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private SumDelegate2 managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(SumDelegate2 managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public SumDelegate2 ToManaged()
+            {
+                return new SumDelegate2
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
         }
     }
+
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate FFIError SumDelegateReturnDelegate(int x, int y);
     public delegate FFIError SumDelegateReturnNative(int x, int y, IntPtr callback_data);
 
-    [NativeMarshalling(typeof(CallbackStructMarshaller<SumDelegateReturnNative>))]
-    public class SumDelegateReturn: CallbackStruct<SumDelegateReturnNative>
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct SumDelegateReturn : IDisposable
     {
-        internal readonly SumDelegateReturnDelegate _userCallback;
+        private SumDelegateReturnDelegate _callbackUser;
+        private IntPtr _callbackNative;
 
-        public SumDelegateReturn(SumDelegateReturnDelegate userCallback)
+        public SumDelegateReturn(SumDelegateReturnDelegate callbackUser)
         {
-            _userCallback = userCallback;
-            Init(Call);
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(Call);
         }
 
         public FFIError Call(int x, int y, IntPtr _)
         {
-            return _userCallback(x, y);
+            return _callbackUser(x, y);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(SumDelegateReturn), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private SumDelegateReturn managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(SumDelegateReturn managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public SumDelegateReturn ToManaged()
+            {
+                return new SumDelegateReturn
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
         }
     }
 
-    // Internal helper that works around an issue where exceptions in callbacks don't reenter Rust.
-    public class SumDelegateReturnExceptionSafe {
-        private Exception failure = null;
-        private readonly SumDelegateReturn _callback;
-
-        public SumDelegateReturnExceptionSafe(SumDelegateReturn original)
-        {
-            _callback = original;
-        }
-
-        public FFIError Call(int x, int y, IntPtr callback_data)
-        {
-            try
-            {
-                return _callback(x, y);
-            }
-            catch (Exception e)
-            {
-                failure = e;
-                return FFIError.Panic;
-            }
-        }
-
-        public void Rethrow()
-        {
-            if (this.failure != null)
-            {
-                throw this.failure;
-            }
-        }
-    }
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void SumDelegateReturn2Delegate(int x, int y);
     public delegate void SumDelegateReturn2Native(int x, int y, IntPtr callback_data);
 
-    [NativeMarshalling(typeof(CallbackStructMarshaller<SumDelegateReturn2Native>))]
-    public class SumDelegateReturn2: CallbackStruct<SumDelegateReturn2Native>
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct SumDelegateReturn2 : IDisposable
     {
-        internal readonly SumDelegateReturn2Delegate _userCallback;
+        private SumDelegateReturn2Delegate _callbackUser;
+        private IntPtr _callbackNative;
 
-        public SumDelegateReturn2(SumDelegateReturn2Delegate userCallback)
+        public SumDelegateReturn2(SumDelegateReturn2Delegate callbackUser)
         {
-            _userCallback = userCallback;
-            Init(Call);
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(Call);
         }
 
         public void Call(int x, int y, IntPtr _)
         {
-            _userCallback(x, y);
+            _callbackUser(x, y);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(SumDelegateReturn2), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private SumDelegateReturn2 managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(SumDelegateReturn2 managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public SumDelegateReturn2 ToManaged()
+            {
+                return new SumDelegateReturn2
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
         }
     }
+
 
 
     // Debug - write_pattern_service 
@@ -2270,9 +2711,7 @@ namespace My.Company
         // Debug - write_pattern_service_method 
         public void CallbackFfiReturn(SumDelegateReturn callback)
         {
-            var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
-            var rval = Interop.service_callbacks_callback_ffi_return(_context, callback_safe_delegate.Call);
-            callback_safe_delegate.Rethrow();
+            var rval = Interop.service_callbacks_callback_ffi_return(_context, callback);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -2282,9 +2721,7 @@ namespace My.Company
         // Debug - write_pattern_service_method 
         public void CallbackWithSlice(SumDelegateReturn callback, Slice<int> input)
         {
-            var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
-            var rval = Interop.service_callbacks_callback_with_slice(_context, callback_safe_delegate.Call, input);
-            callback_safe_delegate.Rethrow();
+            var rval = Interop.service_callbacks_callback_with_slice(_context, callback, input);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);

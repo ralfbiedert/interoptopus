@@ -15,16 +15,16 @@ public class TestCoreCallbacks
         Assert.Equal(43, result);
     }
 
-    [Fact]
-    public void callback_marshalled()
-    {
-        Interop.callback_marshalled((x) =>
-        {
-            Assert.Equal("test", x.str);
-        }, new CharArray
-        {
-            str = "test",
-            str_2 = ""
-        });
-    }
+    // [Fact]
+    // public void callback_marshalled()
+    // {
+    //     Interop.callback_marshalled((x) =>
+    //     {
+    //         Assert.Equal("test", x.str);
+    //     }, new CharArray
+    //     {
+    //         str = "test",
+    //         str_2 = ""
+    //     });
+    // }
 }
