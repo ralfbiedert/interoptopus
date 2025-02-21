@@ -11,7 +11,7 @@ pub fn write_pattern_read_only_span_marshaller(i: &Interop, w: &mut IndentWriter
 }
 
 pub fn write_pattern_span_marshaller(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
-    i.debug(w, "write_pattern_read_only_span_marshaller")?;
+    i.debug(w, "write_pattern_span_marshaller")?;
 
     write_pattern_generic_slice(i, w, false)?;
     w.newline()?;

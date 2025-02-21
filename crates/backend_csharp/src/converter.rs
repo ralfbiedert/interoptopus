@@ -145,7 +145,7 @@ pub fn to_typespecifier_in_param(x: &CType) -> String {
             TypePattern::Slice(x) => format!("Slice<{}>", get_slice_type_argument(x)),
             TypePattern::SliceMut(x) => format!("SliceMut<{}>", get_slice_type_argument(x)),
             TypePattern::Option(x) => composite_to_typename(x),
-            TypePattern::NamedCallback(x) => named_callback_to_typename(x),
+            TypePattern::NamedCallback(x) => format!("{}", named_callback_to_typename(x)),
             TypePattern::Bool => "Bool".to_string(),
             TypePattern::CChar => "sbyte".to_string(),
             TypePattern::APIVersion => to_typespecifier_in_param(&x.fallback_type()),

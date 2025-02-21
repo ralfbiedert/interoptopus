@@ -12,7 +12,7 @@ public class TestPatternServicesCallbacks
         var callbacks = ServiceCallbacks.New();
         var called = false;
 
-        callbacks.CallbackSimple((x) =>
+        callbacks.CallbackSimple((x, _) =>
         {
             called = true;
             Assert.Equal(x, 0u);

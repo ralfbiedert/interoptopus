@@ -30,9 +30,9 @@ pub fn write_patterns(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
 pub fn pattern_to_native_in_signature(i: &Interop, param: &Parameter) -> String {
     let slice_type_name = |mutable: bool, element_type: &CType| -> String {
         if mutable {
-            format!("System.Span<{}>", to_typespecifier_in_param(element_type))
+            format!("Span<{}>", to_typespecifier_in_param(element_type))
         } else {
-            format!("System.ReadOnlySpan<{}>", to_typespecifier_in_param(element_type))
+            format!("ReadOnlySpan<{}>", to_typespecifier_in_param(element_type))
         }
     };
     match param.the_type() {

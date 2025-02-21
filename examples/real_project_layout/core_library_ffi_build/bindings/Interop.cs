@@ -97,6 +97,81 @@ namespace My.Company
         Fail = 400,
     }
 
+    [NativeMarshalling(typeof(CallbackStructMarshaller<>))]
+    public class CallbackStruct<T>: IDisposable where T: Delegate
+    {
+        internal T _callback;
+        internal IntPtr _callbackNative;
+
+        public CallbackStruct() {}
+
+        public CallbackStruct(T t)
+        {
+            Init(t);
+        }
+
+        protected void Init(T t)
+        {
+            _callback = t;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(t);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+    }
+
+    [CustomMarshaller(typeof(CallbackStruct<>), MarshalMode.Default, typeof(CallbackStructMarshaller<>.Marshaller))]
+    internal static class CallbackStructMarshaller<T> where T: Delegate
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+        public ref struct Marshaller
+        {
+            private CallbackStruct<T> managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+            private T[] marshalled;
+
+            public void FromManaged(CallbackStruct<T> managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public CallbackStruct<T> ToManaged()
+            {
+                return new CallbackStruct<T>
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
+        }
+    }
 
     public partial class GameEngine : IDisposable
     {

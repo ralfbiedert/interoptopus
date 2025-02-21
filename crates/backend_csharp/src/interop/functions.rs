@@ -30,8 +30,8 @@ pub fn write_function(i: &Interop, w: &mut IndentWriter, function: &Function, wr
 
     if i.has_custom_marshalled_delegate(function.signature()) {
         write_function_declaration(i, w, function, true, false)?;
-        write_function_declaration(i, w, function, false, true)?;
-        write_function_native_wrapper_body(i, w, function)?;
+        // write_function_declaration(i, w, function, false, true)?;
+        // write_function_native_wrapper_body(i, w, function)?;
     } else {
         write_function_declaration(i, w, function, false, false)?;
     }
@@ -59,6 +59,8 @@ pub fn write_function_annotation(_i: &Interop, w: &mut IndentWriter, function: &
 }
 
 pub fn write_function_native_wrapper_body(i: &Interop, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
+    i.debug(w, "write_function_native_wrapper_body")?;
+
     let name = function_name_to_csharp_name(
         function,
         if i.rename_symbols {
@@ -198,6 +200,8 @@ pub fn write_function_wrapper_call_delegate_param_body(
 }
 
 pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &Function, native: bool, has_body: bool) -> Result<(), Error> {
+    i.debug(w, "write_function_declaration")?;
+    
     let rval = function_rval_to_csharp_typename(function);
     let name = function_name_to_csharp_name(
         function,
@@ -215,7 +219,7 @@ pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &
         let name = p.name();
 
         if native && matches!(p.the_type(), CType::FnPointer(_) | CType::Pattern(TypePattern::NamedCallback(_))) {
-            let suffix = if matches!(p.the_type(), CType::FnPointer(_)) { "_native" } else { "Native" };
+            let suffix = if matches!(p.the_type(), CType::FnPointer(_)) { "_native" } else { "" };
             params.push(format!("{the_type}{suffix} {name}"));
         } else {
             params.push(format!("{the_type} {name}"));
