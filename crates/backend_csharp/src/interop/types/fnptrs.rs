@@ -32,7 +32,8 @@ pub fn write_type_definition_fn_pointer_body(i: &Interop, w: &mut IndentWriter, 
     if needs_wrapper {
         indented!(
             w,
-            r"delegate {} {}_native({});",
+            r"{} delegate {} {}_native({});",
+            visibility,
             i.to_native_callback_typespecifier(the_type.signature().rval()),
             name,
             native_params.join(", ")

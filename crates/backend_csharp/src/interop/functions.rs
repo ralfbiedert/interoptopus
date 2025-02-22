@@ -8,6 +8,7 @@ use interoptopus::lang::c::{CType, Documentation, Function, FunctionSignature, P
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, Error};
+use std::fmt::format;
 use std::iter::zip;
 
 pub fn write_functions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
@@ -211,7 +212,9 @@ pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &
             FunctionNameFlavor::RawFFIName
         },
     );
-    let visibility = if native { "private " } else { "public " };
+
+    // let visibility = if native { "private " } else { "public " };
+    let visibility = "public ";
 
     let mut params = Vec::new();
     for p in function.signature().params() {
@@ -242,12 +245,15 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
 
     // If there is nothing to write, don't do it
     if !has_overload {
+        i.debug(w, &format!("no overload for {}", function.name()))?;
         return Ok(());
     }
 
     let mut to_pin_name = Vec::new();
     let mut to_pin_slice_type = Vec::new();
     let mut to_invoke = Vec::new();
+    let mut to_wrap_name = Vec::new();
+    let mut to_wrap_type = Vec::new();
     let mut to_wrap_delegates = Vec::new();
     // let mut to_wrap_delegate_types = Vec::new();
 
@@ -292,14 +298,18 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
                     to_invoke.push(format!("{name}_slice"));
                 }
             }
-            // CType::Pattern(TypePattern::NamedCallback(callback)) => match callback.fnpointer().signature().rval() {
-            //     CType::Pattern(TypePattern::FFIErrorEnum(_)) if i.work_around_exception_in_callback_no_reentry => {
-            //         to_wrap_delegates.push(name);
-            //         to_wrap_delegate_types.push(to_typespecifier_in_param(p.the_type()));
-            //         to_invoke.push(format!("{name}_safe_delegate.Call"));
-            //     }
-            //     _ => fallback(),
-            // },
+            CType::Pattern(TypePattern::NamedCallback(callback)) => {
+                // CType::Pattern(TypePattern::FFIErrorEnum(_)) if i.work_around_exception_in_callback_no_reentry => {
+                //     to_wrap_delegates.push(name);
+                //     to_wrap_delegate_types.push(to_typespecifier_in_param(p.the_type()));
+                //     to_invoke.push(format!("{name}_safe_delegate.Call"));
+                // }
+                // _ => fallback(),
+                to_wrap_name.push(name);
+                to_wrap_type.push(to_typespecifier_in_param(p.the_type()));
+                to_invoke.push(format!("{}_wrapped", name));
+                // fallback()
+            }
             CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {
                 CType::Pattern(x) => match x {
                     TypePattern::Slice(x) => {
@@ -374,6 +384,11 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
             FunctionNameFlavor::RawFFIName
         },
     );
+
+    for (n, t) in zip(to_wrap_name, to_wrap_type) {
+        indented!(w, [()], r"var {}_wrapped = new {}({});", n, t, n)?;
+    }
+
     let call = format!(r"{}({});", fn_name, to_invoke.join(", "));
 
     write_function_overloaded_invoke_with_error_handling(i, w, function, &call, to_wrap_delegates.as_slice())?;

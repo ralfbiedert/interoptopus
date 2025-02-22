@@ -9,9 +9,149 @@ use interoptopus::{indented, Error};
 
 pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
     i.debug(w, "write_type_definition_named_callback")?;
+
+    let rval = to_typespecifier_in_rval(the_type.fnpointer().signature().rval());
+    let name = named_callback_to_typename(the_type);
+    let visibility = i.visibility_types.to_access_modifier();
+    let needs_wrapper = i.has_custom_marshalled_types(the_type.fnpointer().signature());
+
+    let mut params = Vec::new();
+    let mut params_native = Vec::new();
+    let mut param_names = Vec::new();
+    let mut param_invokes = Vec::new();
+    for param in the_type.fnpointer().signature().params() {
+        match param.the_type() {
+            CType::Pattern(TypePattern::Slice(_)) => param_invokes.push(format!("{}.Managed()", param.name())),
+            CType::Pattern(TypePattern::SliceMut(_)) => param_invokes.push(format!("{}.Managed()", param.name())),
+            _ => param_invokes.push(param.name().to_string()),
+        }
+        param_names.push(param.name());
+        params.push(format!("{} {}", to_typespecifier_in_param(param.the_type()), param.name()));
+        params_native.push(format!("{} {}", i.to_native_callback_typespecifier(param.the_type()), param.name()));
+    }
+
+    params.pop();
+    param_names.pop();
+    param_invokes.pop();
+
     write_type_definition_fn_pointer_annotation(w, the_type.fnpointer())?;
-    write_type_definition_named_callback_body(i, w, the_type)?;
-    // write_callback_overload(i, w, the_type)?;
+    indented!(
+        w,
+        r"{} delegate {} {}Native({});",
+        visibility,
+        i.to_native_callback_typespecifier(the_type.fnpointer().signature().rval()),
+        name,
+        params_native.join(", ")
+    )?;
+    indented!(w, r"{} delegate {} {}Delegate({});", visibility, rval, name, params.join(", "))?;
+    w.newline()?;
+
+    // indented!(w, r"[NativeMarshalling(typeof(CallbackStructMarshaller<{}Native>))]", name)?;
+    // indented!(w, r"public class {}: CallbackStruct<{}Native>", name, name)?;
+    // indented!(w, r"{{")?;
+    // w.indent();
+    // indented!(w, r"internal readonly {}Delegate _userCallback;", name)?;
+    // w.newline()?;
+    // indented!(w, r"public {}({}Delegate userCallback)", name, name)?;
+    // indented!(w, r"{{")?;
+    // indented!(w, [()], r"_userCallback = userCallback;")?;
+    // indented!(w, [()], r"Init(Call);")?;
+    // indented!(w, r"}}")?;
+    // w.newline()?;
+    // indented!(w, r"public {} Call({}, IntPtr _)", rval, params.join(", "))?;
+    // indented!(w, r"{{")?;
+    // if the_type.fnpointer().signature().rval().is_void() {
+    //     indented!(w, [()], r"_userCallback({});", param_names.join(", "))?;
+    // } else {
+    //     indented!(w, [()], r"return _userCallback({});", param_names.join(", "))?;
+    // }
+    // indented!(w, r"}}")?;
+    // w.unindent();
+    // indented!(w, r"}}")?;
+    //
+    // Write the attribute and struct declaration without manual spaces.
+
+    indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
+    indented!(w, r"public struct {} : IDisposable", name)?;
+    indented!(w, r"{{")?;
+    indented!(w, [()], r"private {}Delegate _callbackUser;", name)?;
+    indented!(w, [()], r"private IntPtr _callbackNative;")?;
+    w.newline()?;
+    indented!(w, [()], r"public {}() {{ }}", name)?;
+    w.newline()?;
+    indented!(w, [()], r"public {}({}Delegate callbackUser)", name, name)?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"_callbackUser = callbackUser;")?;
+    indented!(w, [()()], r"_callbackNative = Marshal.GetFunctionPointerForDelegate(new {}Native(Call));", name)?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()], r"public {} Call({})", rval, params_native.join(", "))?;
+    indented!(w, [()], r"{{")?;
+    if the_type.fnpointer().signature().rval().is_void() {
+        indented!(w, [()()], r"_callbackUser({});", param_invokes.join(", "))?;
+    } else {
+        indented!(w, [()()], r"return _callbackUser({});", param_invokes.join(", "))?;
+    }
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()], r"public void Dispose()")?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"if (_callbackNative == IntPtr.Zero) return;")?;
+    indented!(w, [()()], r"Marshal.FreeHGlobal(_callbackNative);")?;
+    indented!(w, [()()], r"_callbackNative = IntPtr.Zero;")?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+    w.newline()?;
+    indented!(w, [()], r"[CustomMarshaller(typeof({}), MarshalMode.Default, typeof(Marshaller))]", name)?;
+    indented!(w, [()], r"private struct MarshallerMeta {{  }}")?;
+    w.newline()?;
+    indented!(w, [()], r"[StructLayout(LayoutKind.Sequential)]")?;
+    indented!(w, [()], r"public struct Unmanaged")?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"internal IntPtr Callback;")?;
+    indented!(w, [()()], r"internal IntPtr Data;")?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+    w.newline()?;
+    indented!(w, [()], r"public ref struct Marshaller")?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"private {} managed;", name)?;
+    indented!(w, [()()], r"private Unmanaged native;")?;
+    indented!(w, [()()], r"private Unmanaged sourceNative;")?;
+    indented!(w, [()()], r"private GCHandle? pinned;")?;
+    w.newline()?;
+    indented!(w, [()()], r"public void FromManaged({} managed)", name)?;
+    indented!(w, [()()], r"{{")?;
+    indented!(w, [()()()], r"this.managed = managed;")?;
+    indented!(w, [()()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()()], r"public Unmanaged ToUnmanaged()")?;
+    indented!(w, [()()], r"{{")?;
+    indented!(w, [()()()], r"return new Unmanaged")?;
+    indented!(w, [()()()], r"{{")?;
+    indented!(w, [()()()], r"    Callback = managed._callbackNative,")?;
+    indented!(w, [()()()], r"    Data = IntPtr.Zero")?;
+    indented!(w, [()()()], r"}};")?;
+    indented!(w, [()()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()()], r"public void FromUnmanaged(Unmanaged unmanaged)")?;
+    indented!(w, [()()], r"{{")?;
+    indented!(w, [()()()], r"sourceNative = unmanaged;")?;
+    indented!(w, [()()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()()], r"public {} ToManaged()", name)?;
+    indented!(w, [()()], r"{{")?;
+    indented!(w, [()()()], r"return new {}", name)?;
+    indented!(w, [()()()], r"{{")?;
+    indented!(w, [()()()], r"    _callbackNative = sourceNative.Callback,")?;
+    indented!(w, [()()()], r"}};")?;
+    indented!(w, [()()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()()], r"public void Free() {{ }}")?;
+    indented!(w, [()], r"}}")?; // Close ref struct Marshaller.
+    indented!(w, r"}}")?;
+    w.newline()?;
+
     Ok(())
 }
 
@@ -73,144 +213,6 @@ pub fn write_callback_overload(i: &Interop, w: &mut IndentWriter, the_type: &Nam
     indented!(w, [()()], "}}")?;
     indented!(w, [()], "}}")?;
     indented!(w, "}}")?;
-
-    Ok(())
-}
-
-pub fn write_type_definition_named_callback_body(i: &Interop, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
-    let rval = to_typespecifier_in_rval(the_type.fnpointer().signature().rval());
-    let name = named_callback_to_typename(the_type);
-    let visibility = i.visibility_types.to_access_modifier();
-    let needs_wrapper = i.has_custom_marshalled_types(the_type.fnpointer().signature());
-
-    let mut params = Vec::new();
-    let mut native_params = Vec::new();
-    let mut param_names = Vec::new();
-    for param in the_type.fnpointer().signature().params() {
-        param_names.push(param.name());
-        params.push(format!("{} {}", to_typespecifier_in_param(param.the_type()), param.name()));
-        native_params.push(format!("{} {}", i.to_native_callback_typespecifier(param.the_type()), param.name()));
-    }
-
-    params.pop();
-    param_names.pop();
-
-    indented!(w, r"{} delegate {} {}Delegate({});", visibility, rval, name, params.join(", "))?;
-    indented!(
-        w,
-        r"{} delegate {} {}Native({});",
-        visibility,
-        i.to_native_callback_typespecifier(the_type.fnpointer().signature().rval()),
-        name,
-        native_params.join(", ")
-    )?;
-    w.newline()?;
-
-    // indented!(w, r"[NativeMarshalling(typeof(CallbackStructMarshaller<{}Native>))]", name)?;
-    // indented!(w, r"public class {}: CallbackStruct<{}Native>", name, name)?;
-    // indented!(w, r"{{")?;
-    // w.indent();
-    // indented!(w, r"internal readonly {}Delegate _userCallback;", name)?;
-    // w.newline()?;
-    // indented!(w, r"public {}({}Delegate userCallback)", name, name)?;
-    // indented!(w, r"{{")?;
-    // indented!(w, [()], r"_userCallback = userCallback;")?;
-    // indented!(w, [()], r"Init(Call);")?;
-    // indented!(w, r"}}")?;
-    // w.newline()?;
-    // indented!(w, r"public {} Call({}, IntPtr _)", rval, params.join(", "))?;
-    // indented!(w, r"{{")?;
-    // if the_type.fnpointer().signature().rval().is_void() {
-    //     indented!(w, [()], r"_userCallback({});", param_names.join(", "))?;
-    // } else {
-    //     indented!(w, [()], r"return _userCallback({});", param_names.join(", "))?;
-    // }
-    // indented!(w, r"}}")?;
-    // w.unindent();
-    // indented!(w, r"}}")?;
-    //
-    // Write the attribute and struct declaration without manual spaces.
-
-    indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
-    indented!(w, r"public class {} : IDisposable", name)?;
-    indented!(w, r"{{")?;
-    indented!(w, [()], r"private {}Delegate _callbackUser;", name)?;
-    indented!(w, [()], r"private IntPtr _callbackNative;")?;
-    w.newline()?;
-    indented!(w, [()], r" private {}() {{ }}", name)?;
-    w.newline()?;
-    indented!(w, [()], r"public {}({}Delegate callbackUser)", name, name)?;
-    indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"_callbackUser = callbackUser;")?;
-    indented!(w, [()()], r"_callbackNative = Marshal.GetFunctionPointerForDelegate(Call);")?;
-    indented!(w, [()], r"}}")?;
-    w.newline()?;
-    indented!(w, [()], r"public {} Call({}, IntPtr _)", rval, params.join(", "))?;
-    indented!(w, [()], r"{{")?;
-    if the_type.fnpointer().signature().rval().is_void() {
-        indented!(w, [()()], r"_callbackUser({});", param_names.join(", "))?;
-    } else {
-        indented!(w, [()()], r"return _callbackUser({});", param_names.join(", "))?;
-    }
-    indented!(w, [()], r"}}")?;
-    w.newline()?;
-    indented!(w, [()], r"public void Dispose()")?;
-    indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"if (_callbackNative == IntPtr.Zero) return;")?;
-    indented!(w, [()()], r"Marshal.FreeHGlobal(_callbackNative);")?;
-    indented!(w, [()()], r"_callbackNative = IntPtr.Zero;")?;
-    indented!(w, [()], r"}}")?;
-    w.newline()?;
-    w.newline()?;
-    indented!(w, [()], r"[CustomMarshaller(typeof({}), MarshalMode.Default, typeof(Marshaller))]", name)?;
-    indented!(w, [()], r"private struct MarshallerMeta {{  }}")?;
-    w.newline()?;
-    indented!(w, [()], r"[StructLayout(LayoutKind.Sequential)]")?;
-    indented!(w, [()], r"public struct Unmanaged")?;
-    indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"internal IntPtr Callback;")?;
-    indented!(w, [()()], r"internal IntPtr Data;")?;
-    indented!(w, [()], r"}}")?;
-    w.newline()?;
-    w.newline()?;
-    indented!(w, [()], r"public ref struct Marshaller")?;
-    indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"private {} managed;", name)?;
-    indented!(w, [()()], r"private Unmanaged native;")?;
-    indented!(w, [()()], r"private Unmanaged sourceNative;")?;
-    indented!(w, [()()], r"private GCHandle? pinned;")?;
-    w.newline()?;
-    indented!(w, [()()], r"public void FromManaged({} managed)", name)?;
-    indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"this.managed = managed;")?;
-    indented!(w, [()()], r"}}")?;
-    w.newline()?;
-    indented!(w, [()()], r"public Unmanaged ToUnmanaged()")?;
-    indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"return new Unmanaged")?;
-    indented!(w, [()()()], r"{{")?;
-    indented!(w, [()()()], r"    Callback = managed._callbackNative,")?;
-    indented!(w, [()()()], r"    Data = IntPtr.Zero")?;
-    indented!(w, [()()()], r"}};")?;
-    indented!(w, [()()], r"}}")?;
-    w.newline()?;
-    indented!(w, [()()], r"public void FromUnmanaged(Unmanaged unmanaged)")?;
-    indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"sourceNative = unmanaged;")?;
-    indented!(w, [()()], r"}}")?;
-    w.newline()?;
-    indented!(w, [()()], r"public {} ToManaged()", name)?;
-    indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"return new {}", name)?;
-    indented!(w, [()()()], r"{{")?;
-    indented!(w, [()()()], r"    _callbackNative = sourceNative.Callback,")?;
-    indented!(w, [()()()], r"}};")?;
-    indented!(w, [()()], r"}}")?;
-    w.newline()?;
-    indented!(w, [()()], r"public void Free() {{ }}")?;
-    indented!(w, [()], r"}}")?; // Close ref struct Marshaller.
-    indented!(w, r"}}")?;
-    w.newline()?;
 
     Ok(())
 }

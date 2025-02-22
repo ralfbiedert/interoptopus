@@ -1,4 +1,5 @@
 using My.Company;
+using My.Company.Common;
 using Xunit;
 
 public class TestCoreCallbacks
@@ -13,6 +14,14 @@ public class TestCoreCallbacks
         }, 42);
 
         Assert.Equal(43, result);
+    }
+
+    [Fact]
+    public void pattern_callback_4()
+    {
+        var x = new MyCallbackNamespaced(value => value);
+        var y = Interop.pattern_callback_4(x, 5);
+        Assert.Equal(y, 5u);
     }
 
     // [Fact]

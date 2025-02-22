@@ -12,14 +12,13 @@ public class TestPatternServicesCallbacks
         var callbacks = ServiceCallbacks.New();
         var called = false;
 
-        var cb = new MyCallback(x =>
+        callbacks.CallbackSimple(x =>
         {
             called = true;
             Assert.Equal(x, 0u);
             return x;
         });
-        callbacks.CallbackSimple(cb);
-        cb.Dispose();
+        // cb.Dispose();
 
 
         Assert.True(called);
@@ -32,16 +31,17 @@ public class TestPatternServicesCallbacks
         var called = false;
         var slice = new[] { 1, 2, 3 };
 
-        var cb = new SumDelegateReturn((x, y) =>
+        callbacks.CallbackWithSlice((x, y) =>
         {
             Assert.Equal(x, 1);
             Assert.Equal(y, 2);
             called = true;
             return FFIError.Ok;
-        });
+        }, slice);
 
-        callbacks.CallbackWithSlice(cb, slice);
-        cb.Dispose();
+
+
+        // cb.Dispose();
 
         Assert.True(called);
     }

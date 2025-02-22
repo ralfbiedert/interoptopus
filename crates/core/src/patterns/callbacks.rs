@@ -218,6 +218,9 @@ macro_rules! callback {
 
             /// Will call function if it exists, panic otherwise.
             pub fn call(&self, $($param: $ty),*) -> $rval {
+                const {
+                    assert!(size_of::<Self>() == 16);
+                }
                 self.0.expect("Assumed function would exist but it didn't.")($($param,)* self.1)
             }
 
@@ -253,7 +256,7 @@ macro_rules! callback {
                 $(
                     interoptopus::lang::c::Parameter::new(stringify!($param).to_string(), < $ty as CTypeInfo >::type_info()),
                 )*
-                    interoptopus::lang::c::Parameter::new("callback_data".to_string(), CType::ReadPointer(Box::new(CType::Primitive(PrimitiveType::Void)))),                    
+                    interoptopus::lang::c::Parameter::new("callback_data".to_string(), CType::ReadPointer(Box::new(CType::Primitive(PrimitiveType::Void)))),
                 ];
 
                 let mut namespace = String::new();

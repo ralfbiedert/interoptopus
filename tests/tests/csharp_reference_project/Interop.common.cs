@@ -36,11 +36,11 @@ namespace My.Company.Common
     // Debug - write_type_definition_fn_pointer 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void InteropDelegate_fn_CharArray(CharArray x0);
-    delegate void InteropDelegate_fn_CharArray_native(CharArray x0);
+    public delegate void InteropDelegate_fn_CharArray_native(CharArray x0);
 
     // Debug - write_pattern_slice 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class SliceBool : IEnumerable<Bool>, IDisposable
+    public partial struct SliceBool : IEnumerable<Bool>, IDisposable
     {
         Bool[] _managed;
         IntPtr _data;
@@ -90,7 +90,7 @@ namespace My.Company.Common
         {
             _managed = managed;
             _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
-            _len = 0;
+            _len = (ulong) managed.Length;
             _wePinned = true;
         }
 
@@ -120,8 +120,13 @@ namespace My.Company.Common
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
         {
-        public IntPtr Data;
-        public ulong Len;
+            public IntPtr Data;
+            public ulong Len;
+
+            public SliceBool Managed()
+            {
+                return new SliceBool(Data, Len);
+            }
         }
 
         public ref struct Marshaller
@@ -142,7 +147,7 @@ namespace My.Company.Common
 
     // Debug - write_pattern_slice 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class SliceI32 : IEnumerable<int>, IDisposable
+    public partial struct SliceI32 : IEnumerable<int>, IDisposable
     {
         int[] _managed;
         IntPtr _data;
@@ -192,7 +197,7 @@ namespace My.Company.Common
         {
             _managed = managed;
             _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
-            _len = 0;
+            _len = (ulong) managed.Length;
             _wePinned = true;
         }
 
@@ -222,8 +227,13 @@ namespace My.Company.Common
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
         {
-        public IntPtr Data;
-        public ulong Len;
+            public IntPtr Data;
+            public ulong Len;
+
+            public SliceI32 Managed()
+            {
+                return new SliceI32(Data, Len);
+            }
         }
 
         public ref struct Marshaller
@@ -244,7 +254,7 @@ namespace My.Company.Common
 
     // Debug - write_pattern_slice 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class SliceU32 : IEnumerable<uint>, IDisposable
+    public partial struct SliceU32 : IEnumerable<uint>, IDisposable
     {
         uint[] _managed;
         IntPtr _data;
@@ -294,7 +304,7 @@ namespace My.Company.Common
         {
             _managed = managed;
             _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
-            _len = 0;
+            _len = (ulong) managed.Length;
             _wePinned = true;
         }
 
@@ -324,8 +334,13 @@ namespace My.Company.Common
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
         {
-        public IntPtr Data;
-        public ulong Len;
+            public IntPtr Data;
+            public ulong Len;
+
+            public SliceU32 Managed()
+            {
+                return new SliceU32(Data, Len);
+            }
         }
 
         public ref struct Marshaller
@@ -346,7 +361,7 @@ namespace My.Company.Common
 
     // Debug - write_pattern_slice 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class SliceU8 : IEnumerable<byte>, IDisposable
+    public partial struct SliceU8 : IEnumerable<byte>, IDisposable
     {
         byte[] _managed;
         IntPtr _data;
@@ -396,7 +411,7 @@ namespace My.Company.Common
         {
             _managed = managed;
             _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
-            _len = 0;
+            _len = (ulong) managed.Length;
             _wePinned = true;
         }
 
@@ -426,8 +441,13 @@ namespace My.Company.Common
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
         {
-        public IntPtr Data;
-        public ulong Len;
+            public IntPtr Data;
+            public ulong Len;
+
+            public SliceU8 Managed()
+            {
+                return new SliceU8(Data, Len);
+            }
         }
 
         public ref struct Marshaller
@@ -448,7 +468,7 @@ namespace My.Company.Common
 
     // Debug - write_pattern_slice 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class SliceVec : IEnumerable<Vec>, IDisposable
+    public partial struct SliceVec : IEnumerable<Vec>, IDisposable
     {
         Vec[] _managed;
         IntPtr _data;
@@ -498,7 +518,7 @@ namespace My.Company.Common
         {
             _managed = managed;
             _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
-            _len = 0;
+            _len = (ulong) managed.Length;
             _wePinned = true;
         }
 
@@ -528,8 +548,13 @@ namespace My.Company.Common
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
         {
-        public IntPtr Data;
-        public ulong Len;
+            public IntPtr Data;
+            public ulong Len;
+
+            public SliceVec Managed()
+            {
+                return new SliceVec(Data, Len);
+            }
         }
 
         public ref struct Marshaller
@@ -550,7 +575,7 @@ namespace My.Company.Common
 
     // Debug - write_pattern_slice_mut 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class SliceMutU32 : IEnumerable<uint>, IDisposable
+    public partial struct SliceMutU32 : IEnumerable<uint>, IDisposable
     {
         uint[] _managed;
         IntPtr _data;
@@ -582,6 +607,12 @@ namespace My.Company.Common
                 }
                 return Unsafe.Read<uint>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<uint>()));
             }
+            set
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                var d = (uint*) _data.ToPointer();
+                d[i] = value;
+            }
         }
 
         public SliceMutU32(GCHandle handle, ulong count)
@@ -600,7 +631,7 @@ namespace My.Company.Common
         {
             _managed = managed;
             _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
-            _len = 0;
+            _len = (ulong) managed.Length;
             _wePinned = true;
         }
 
@@ -630,8 +661,13 @@ namespace My.Company.Common
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
         {
-        public IntPtr Data;
-        public ulong Len;
+            public IntPtr Data;
+            public ulong Len;
+
+            public SliceMutU32 Managed()
+            {
+                return new SliceMutU32(Data, Len);
+            }
         }
 
         public ref struct Marshaller
@@ -652,7 +688,7 @@ namespace My.Company.Common
 
     // Debug - write_pattern_slice_mut 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class SliceMutU8 : IEnumerable<byte>, IDisposable
+    public partial struct SliceMutU8 : IEnumerable<byte>, IDisposable
     {
         byte[] _managed;
         IntPtr _data;
@@ -684,6 +720,12 @@ namespace My.Company.Common
                 }
                 return Unsafe.Read<byte>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<byte>()));
             }
+            set
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                var d = (byte*) _data.ToPointer();
+                d[i] = value;
+            }
         }
 
         public SliceMutU8(GCHandle handle, ulong count)
@@ -702,7 +744,7 @@ namespace My.Company.Common
         {
             _managed = managed;
             _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
-            _len = 0;
+            _len = (ulong) managed.Length;
             _wePinned = true;
         }
 
@@ -732,8 +774,13 @@ namespace My.Company.Common
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
         {
-        public IntPtr Data;
-        public ulong Len;
+            public IntPtr Data;
+            public ulong Len;
+
+            public SliceMutU8 Managed()
+            {
+                return new SliceMutU8(Data, Len);
+            }
         }
 
         public ref struct Marshaller
@@ -754,7 +801,7 @@ namespace My.Company.Common
 
     // Debug - write_pattern_slice_mut 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class SliceMutVec : IEnumerable<Vec>, IDisposable
+    public partial struct SliceMutVec : IEnumerable<Vec>, IDisposable
     {
         Vec[] _managed;
         IntPtr _data;
@@ -786,6 +833,12 @@ namespace My.Company.Common
                 }
                 return Unsafe.Read<Vec>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<Vec>()));
             }
+            set
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                var d = (Vec*) _data.ToPointer();
+                d[i] = value;
+            }
         }
 
         public SliceMutVec(GCHandle handle, ulong count)
@@ -804,7 +857,7 @@ namespace My.Company.Common
         {
             _managed = managed;
             _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
-            _len = 0;
+            _len = (ulong) managed.Length;
             _wePinned = true;
         }
 
@@ -834,8 +887,13 @@ namespace My.Company.Common
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
         {
-        public IntPtr Data;
-        public ulong Len;
+            public IntPtr Data;
+            public ulong Len;
+
+            public SliceMutVec Managed()
+            {
+                return new SliceMutVec(Data, Len);
+            }
         }
 
         public ref struct Marshaller
@@ -911,24 +969,24 @@ namespace My.Company.Common
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint MyCallbackNamespacedDelegate(uint value);
     public delegate uint MyCallbackNamespacedNative(uint value, IntPtr callback_data);
+    public delegate uint MyCallbackNamespacedDelegate(uint value);
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public class MyCallbackNamespaced : IDisposable
+    public struct MyCallbackNamespaced : IDisposable
     {
         private MyCallbackNamespacedDelegate _callbackUser;
         private IntPtr _callbackNative;
 
-         private MyCallbackNamespaced() { }
+        public MyCallbackNamespaced() { }
 
         public MyCallbackNamespaced(MyCallbackNamespacedDelegate callbackUser)
         {
             _callbackUser = callbackUser;
-            _callbackNative = Marshal.GetFunctionPointerForDelegate(Call);
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(new MyCallbackNamespacedNative(Call));
         }
 
-        public uint Call(uint value, IntPtr _)
+        public uint Call(uint value, IntPtr callback_data)
         {
             return _callbackUser(value);
         }

@@ -1,3 +1,4 @@
+use crate::functions::{callback, sleep};
 use crate::types::{CallbackFFISlice, CharArray, Vec3f32};
 use interoptopus::patterns::slice::{FFISlice, FFISliceMut};
 use interoptopus::{callback, ffi_function};
@@ -39,11 +40,15 @@ pub fn pattern_ffi_slice_delegate_huge(callback: CallbackHugeVecSlice) -> Vec3f3
 }
 
 #[ffi_function]
-pub fn pattern_ffi_slice_3(mut slice: FFISliceMut<u8>, callback: CallbackSliceMut) {
-    if let [x, ..] = slice.as_slice_mut() {
-        *x += 1;
-    }
-
+#[no_mangle]
+pub fn pattern_ffi_slice_3b(mut slice: FFISliceMut<u8>, callback: CallbackSliceMut) {
+    dbg!(slice.as_mut_ptr());
+    dbg!(slice.len());
+    dbg!(&callback.0);
+    dbg!(&callback.1);
+    // if let [x, ..] = slice.as_slice_mut() {
+    //     *x += 1;
+    // }
     callback.call(slice);
 }
 
@@ -83,9 +88,9 @@ pub fn pattern_ffi_slice_8(slice: &FFISliceMut<CharArray>, callback: CallbackCha
 // Some extra tests that were hard to do from core crate.
 #[cfg(test)]
 mod test {
-    use std::ffi::c_void;
     use super::pattern_ffi_slice_3;
     use interoptopus::patterns::slice::FFISliceMut;
+    use std::ffi::c_void;
 
     #[allow(dead_code)]
     extern "C" fn f(mut x: FFISliceMut<u8>, _: *const c_void) {

@@ -64,6 +64,10 @@ impl<T> Clone for FFISlice<'_, T> {
 
 impl<T> Default for FFISlice<'_, T> {
     fn default() -> Self {
+        const {
+            assert!(size_of::<Self>() == 16);
+        }
+
         Self {
             data: null(),
             len: 0,

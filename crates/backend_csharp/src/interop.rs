@@ -273,8 +273,8 @@ impl Interop {
             //         to_typespecifier_in_param(t)
             //     }
             // }
-            // CType::Pattern(TypePattern::Slice(_)) => format!("{}.Unmanaged", to_slice_marshaller(t)),
-            // CType::Pattern(TypePattern::SliceMut(_)) => format!("{}.Unmanaged", to_slice_marshaller(t)),
+            CType::Pattern(TypePattern::Slice(_)) => format!("{}.Unmanaged", to_typespecifier_in_param(t)),
+            CType::Pattern(TypePattern::SliceMut(_)) => format!("{}.Unmanaged", to_typespecifier_in_param(t)),
             _ => to_typespecifier_in_param(t),
         }
     }
@@ -294,6 +294,7 @@ impl Interop {
             CType::Pattern(p) => match p {
                 TypePattern::Slice(s) => !self.should_emit_marshaller(&get_slice_type(s)),
                 TypePattern::SliceMut(s) => !self.should_emit_marshaller(&get_slice_type(s)),
+                TypePattern::NamedCallback(x) => true,
                 _ => false,
             },
             _ => false,

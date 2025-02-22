@@ -9,24 +9,23 @@ public class TestPatternDelegates
     [Fact]
     public void pattern_ffi_slice_delegate()
     {
-        var cb = new CallbackFFISlice(
-            delegate(Slice<byte> x0)
-            {
-                Assert.Equal(x0.Count, 10);
-                Assert.Equal(x0[0], 0);
-                Assert.Equal(x0[5], 5);
 
-                // Test IEnumerable using LINQ
-                var arr = x0.ToArray();
-                Assert.Equal(arr.Length, 10);
-                Assert.Equal(arr[0], 0);
-                Assert.Equal(arr[5], 5);
+        Interop.pattern_ffi_slice_delegate(x =>
+        {
+            Assert.Equal(x.Count, 10);
+            Assert.Equal(x[0], 0);
+            Assert.Equal(x[5], 5);
 
-                return x0[0];
-            }
-        );
-        Interop.pattern_ffi_slice_delegate(cb);
-        cb.Dispose();
+            // Test IEnumerable using LINQ
+            var arr = x.ToArray();
+            Assert.Equal(arr.Length, 10);
+            Assert.Equal(arr[0], 0);
+            Assert.Equal(arr[5], 5);
+
+            return x[0];
+
+        });
+        // cb.Dispose();
     }
 
     [Fact]

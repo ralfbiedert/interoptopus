@@ -37,7 +37,7 @@ pub fn pattern_to_native_in_signature(i: &Interop, param: &Parameter) -> String 
         }
     };
     match param.the_type() {
-        CType::Pattern(p) => match p {
+        x @ CType::Pattern(p) => match p {
             TypePattern::Slice(p) if !i.should_emit_marshaller(&get_slice_type(p)) => {
                 let element_type = p.try_deref_pointer().expect("Must be pointer");
                 slice_type_name(false, &element_type)
@@ -46,6 +46,10 @@ pub fn pattern_to_native_in_signature(i: &Interop, param: &Parameter) -> String 
                 let element_type = p.try_deref_pointer().expect("Must be pointer");
                 slice_type_name(true, &element_type)
             }
+            TypePattern::NamedCallback(_) => {
+                format!("{}Delegate", to_typespecifier_in_param(x))
+            }
+
             _ => to_typespecifier_in_param(param.the_type()),
         },
         CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {

@@ -11,7 +11,7 @@ pub fn write_pattern_slice(i: &Interop, w: &mut IndentWriter, slice: &CompositeT
     let inner = get_slice_type_argument(slice);
 
     indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
-    indented!(w, r"public partial class {} : IEnumerable<{}>, IDisposable", name, inner)?;
+    indented!(w, r"public partial struct {} : IEnumerable<{}>, IDisposable", name, inner)?;
     indented!(w, r"{{")?;
     w.indent();
     indented!(w, r"{}[] _managed;", inner)?;
@@ -75,7 +75,7 @@ pub fn write_pattern_slice(i: &Interop, w: &mut IndentWriter, slice: &CompositeT
     w.indent();
     indented!(w, r"_managed = managed;")?;
     indented!(w, r"_data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();")?;
-    indented!(w, r"_len = 0;")?;
+    indented!(w, r"_len = (ulong) managed.Length;")?;
     indented!(w, r"_wePinned = true;")?;
     w.unindent();
     indented!(w, r"}}");
@@ -114,8 +114,13 @@ pub fn write_pattern_slice(i: &Interop, w: &mut IndentWriter, slice: &CompositeT
     indented!(w, r"[StructLayout(LayoutKind.Sequential)]")?;
     indented!(w, r"public struct Unmanaged")?;
     indented!(w, r"{{")?;
-    indented!(w, r"public IntPtr Data;")?;
-    indented!(w, r"public ulong Len;")?;
+    indented!(w, [()], r"public IntPtr Data;")?;
+    indented!(w, [()], r"public ulong Len;")?;
+    w.newline()?;
+    indented!(w, [()], r"public {} Managed()", name)?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"return new {}(Data, Len);", name)?;
+    indented!(w, [()], r"}}")?;
     indented!(w, r"}}")?;
     w.newline()?;
     indented!(w, r"public ref struct Marshaller")?;
@@ -146,7 +151,7 @@ pub fn write_pattern_slice_mut(i: &Interop, w: &mut IndentWriter, slice: &Compos
     let inner = get_slice_type_argument(slice);
 
     indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
-    indented!(w, r"public partial class {} : IEnumerable<{}>, IDisposable", name, inner)?;
+    indented!(w, r"public partial struct {} : IEnumerable<{}>, IDisposable", name, inner)?;
     indented!(w, r"{{")?;
     w.indent();
     indented!(w, r"{}[] _managed;", inner)?;
@@ -186,6 +191,14 @@ pub fn write_pattern_slice_mut(i: &Interop, w: &mut IndentWriter, slice: &Compos
     indented!(w, r"return Unsafe.Read<{}>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<{}>()));", inner, inner)?;
     w.unindent();
     indented!(w, r"}}");
+    indented!(w, r"set")?;
+    indented!(w, r"{{")?;
+    w.indent();
+    indented!(w, r"if (i >= Count) throw new IndexOutOfRangeException();")?;
+    indented!(w, r"var d = ({}*) _data.ToPointer();", inner)?;
+    indented!(w, r"d[i] = value;")?;
+    w.unindent();
+    indented!(w, r"}}")?;
     w.unindent();
     indented!(w, r"}}");
     w.newline()?;
@@ -210,7 +223,7 @@ pub fn write_pattern_slice_mut(i: &Interop, w: &mut IndentWriter, slice: &Compos
     w.indent();
     indented!(w, r"_managed = managed;")?;
     indented!(w, r"_data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();")?;
-    indented!(w, r"_len = 0;")?;
+    indented!(w, r"_len = (ulong) managed.Length;")?;
     indented!(w, r"_wePinned = true;")?;
     w.unindent();
     indented!(w, r"}}");
@@ -249,8 +262,13 @@ pub fn write_pattern_slice_mut(i: &Interop, w: &mut IndentWriter, slice: &Compos
     indented!(w, r"[StructLayout(LayoutKind.Sequential)]")?;
     indented!(w, r"public struct Unmanaged")?;
     indented!(w, r"{{")?;
-    indented!(w, r"public IntPtr Data;")?;
-    indented!(w, r"public ulong Len;")?;
+    indented!(w, [()], r"public IntPtr Data;")?;
+    indented!(w, [()], r"public ulong Len;")?;
+    w.newline()?;
+    indented!(w, [()], r"public {} Managed()", name)?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"return new {}(Data, Len);", name)?;
+    indented!(w, [()], r"}}")?;
     indented!(w, r"}}")?;
     w.newline()?;
     indented!(w, r"public ref struct Marshaller")?;
