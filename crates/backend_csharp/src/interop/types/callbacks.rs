@@ -132,10 +132,12 @@ pub fn write_type_definition_named_callback_body(i: &Interop, w: &mut IndentWrit
     // Write the attribute and struct declaration without manual spaces.
 
     indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
-    indented!(w, r"public struct {} : IDisposable", name)?;
+    indented!(w, r"public class {} : IDisposable", name)?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"private {}Delegate _callbackUser;", name)?;
     indented!(w, [()], r"private IntPtr _callbackNative;")?;
+    w.newline()?;
+    indented!(w, [()], r" private {}() {{ }}", name)?;
     w.newline()?;
     indented!(w, [()], r"public {}({}Delegate callbackUser)", name, name)?;
     indented!(w, [()], r"{{")?;

@@ -2,6 +2,7 @@ pub mod abi_guard;
 pub mod options;
 pub mod services;
 pub mod slices;
+mod slices_legacy;
 
 use crate::converter::{get_slice_type, to_typespecifier_in_param};
 use crate::interop::patterns::services::write_pattern_service;
