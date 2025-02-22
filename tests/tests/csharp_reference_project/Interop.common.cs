@@ -54,7 +54,9 @@ namespace My.Company.Common
             get
             {
                 if (_managed is not null)
-                { return new ReadOnlySpan<Bool>(_managed); }
+                {
+                    return new ReadOnlySpan<Bool>(_managed);
+                }
                 return new ReadOnlySpan<Bool>(_data.ToPointer(), (int)_len);
             }
         }
@@ -65,15 +67,25 @@ namespace My.Company.Common
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
                 if (_managed is not null)
-                { return _managed[i]; }
+                {
+                    return _managed[i];
+                }
                 return Unsafe.Read<Bool>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<Bool>()));
             }
         }
 
         public SliceBool(GCHandle handle, ulong count)
-        { _data = handle.AddrOfPinnedObject(); _len = count; }
+        {
+            _data = handle.AddrOfPinnedObject();
+            _len = count;
+        }
+
         public SliceBool(IntPtr handle, ulong count)
-        { _data = handle; _len = count; }
+        {
+            _data = handle;
+            _len = count;
+        }
+
         public SliceBool(Bool[] managed)
         {
             _managed = managed;
@@ -83,13 +95,22 @@ namespace My.Company.Common
         }
 
         public IEnumerator<Bool> GetEnumerator()
-        { for (var i = 0; i < Count; ++i) yield return this[i]; }
+        {
+            for (var i = 0; i < Count; ++i)
+            {
+                yield return this[i];
+            }
+        }
+
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void Dispose()
         {
             if (_wePinned && _data != IntPtr.Zero)
-            { Marshal.FreeHGlobal(_data); _data = IntPtr.Zero; }
+            {
+                Marshal.FreeHGlobal(_data);
+                _data = IntPtr.Zero;
+            }
             _managed = null;
         }
 
@@ -98,7 +119,10 @@ namespace My.Company.Common
 
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
-        { public IntPtr Data; public ulong Len; }
+        {
+        public IntPtr Data;
+        public ulong Len;
+        }
 
         public ref struct Marshaller
         {
@@ -132,7 +156,9 @@ namespace My.Company.Common
             get
             {
                 if (_managed is not null)
-                { return new ReadOnlySpan<int>(_managed); }
+                {
+                    return new ReadOnlySpan<int>(_managed);
+                }
                 return new ReadOnlySpan<int>(_data.ToPointer(), (int)_len);
             }
         }
@@ -143,15 +169,25 @@ namespace My.Company.Common
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
                 if (_managed is not null)
-                { return _managed[i]; }
+                {
+                    return _managed[i];
+                }
                 return Unsafe.Read<int>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<int>()));
             }
         }
 
         public SliceI32(GCHandle handle, ulong count)
-        { _data = handle.AddrOfPinnedObject(); _len = count; }
+        {
+            _data = handle.AddrOfPinnedObject();
+            _len = count;
+        }
+
         public SliceI32(IntPtr handle, ulong count)
-        { _data = handle; _len = count; }
+        {
+            _data = handle;
+            _len = count;
+        }
+
         public SliceI32(int[] managed)
         {
             _managed = managed;
@@ -161,13 +197,22 @@ namespace My.Company.Common
         }
 
         public IEnumerator<int> GetEnumerator()
-        { for (var i = 0; i < Count; ++i) yield return this[i]; }
+        {
+            for (var i = 0; i < Count; ++i)
+            {
+                yield return this[i];
+            }
+        }
+
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void Dispose()
         {
             if (_wePinned && _data != IntPtr.Zero)
-            { Marshal.FreeHGlobal(_data); _data = IntPtr.Zero; }
+            {
+                Marshal.FreeHGlobal(_data);
+                _data = IntPtr.Zero;
+            }
             _managed = null;
         }
 
@@ -176,7 +221,10 @@ namespace My.Company.Common
 
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
-        { public IntPtr Data; public ulong Len; }
+        {
+        public IntPtr Data;
+        public ulong Len;
+        }
 
         public ref struct Marshaller
         {
@@ -210,7 +258,9 @@ namespace My.Company.Common
             get
             {
                 if (_managed is not null)
-                { return new ReadOnlySpan<uint>(_managed); }
+                {
+                    return new ReadOnlySpan<uint>(_managed);
+                }
                 return new ReadOnlySpan<uint>(_data.ToPointer(), (int)_len);
             }
         }
@@ -221,15 +271,25 @@ namespace My.Company.Common
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
                 if (_managed is not null)
-                { return _managed[i]; }
+                {
+                    return _managed[i];
+                }
                 return Unsafe.Read<uint>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<uint>()));
             }
         }
 
         public SliceU32(GCHandle handle, ulong count)
-        { _data = handle.AddrOfPinnedObject(); _len = count; }
+        {
+            _data = handle.AddrOfPinnedObject();
+            _len = count;
+        }
+
         public SliceU32(IntPtr handle, ulong count)
-        { _data = handle; _len = count; }
+        {
+            _data = handle;
+            _len = count;
+        }
+
         public SliceU32(uint[] managed)
         {
             _managed = managed;
@@ -239,13 +299,22 @@ namespace My.Company.Common
         }
 
         public IEnumerator<uint> GetEnumerator()
-        { for (var i = 0; i < Count; ++i) yield return this[i]; }
+        {
+            for (var i = 0; i < Count; ++i)
+            {
+                yield return this[i];
+            }
+        }
+
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void Dispose()
         {
             if (_wePinned && _data != IntPtr.Zero)
-            { Marshal.FreeHGlobal(_data); _data = IntPtr.Zero; }
+            {
+                Marshal.FreeHGlobal(_data);
+                _data = IntPtr.Zero;
+            }
             _managed = null;
         }
 
@@ -254,7 +323,10 @@ namespace My.Company.Common
 
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
-        { public IntPtr Data; public ulong Len; }
+        {
+        public IntPtr Data;
+        public ulong Len;
+        }
 
         public ref struct Marshaller
         {
@@ -288,7 +360,9 @@ namespace My.Company.Common
             get
             {
                 if (_managed is not null)
-                { return new ReadOnlySpan<byte>(_managed); }
+                {
+                    return new ReadOnlySpan<byte>(_managed);
+                }
                 return new ReadOnlySpan<byte>(_data.ToPointer(), (int)_len);
             }
         }
@@ -299,15 +373,25 @@ namespace My.Company.Common
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
                 if (_managed is not null)
-                { return _managed[i]; }
+                {
+                    return _managed[i];
+                }
                 return Unsafe.Read<byte>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<byte>()));
             }
         }
 
         public SliceU8(GCHandle handle, ulong count)
-        { _data = handle.AddrOfPinnedObject(); _len = count; }
+        {
+            _data = handle.AddrOfPinnedObject();
+            _len = count;
+        }
+
         public SliceU8(IntPtr handle, ulong count)
-        { _data = handle; _len = count; }
+        {
+            _data = handle;
+            _len = count;
+        }
+
         public SliceU8(byte[] managed)
         {
             _managed = managed;
@@ -317,13 +401,22 @@ namespace My.Company.Common
         }
 
         public IEnumerator<byte> GetEnumerator()
-        { for (var i = 0; i < Count; ++i) yield return this[i]; }
+        {
+            for (var i = 0; i < Count; ++i)
+            {
+                yield return this[i];
+            }
+        }
+
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void Dispose()
         {
             if (_wePinned && _data != IntPtr.Zero)
-            { Marshal.FreeHGlobal(_data); _data = IntPtr.Zero; }
+            {
+                Marshal.FreeHGlobal(_data);
+                _data = IntPtr.Zero;
+            }
             _managed = null;
         }
 
@@ -332,7 +425,10 @@ namespace My.Company.Common
 
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
-        { public IntPtr Data; public ulong Len; }
+        {
+        public IntPtr Data;
+        public ulong Len;
+        }
 
         public ref struct Marshaller
         {
@@ -366,7 +462,9 @@ namespace My.Company.Common
             get
             {
                 if (_managed is not null)
-                { return new ReadOnlySpan<Vec>(_managed); }
+                {
+                    return new ReadOnlySpan<Vec>(_managed);
+                }
                 return new ReadOnlySpan<Vec>(_data.ToPointer(), (int)_len);
             }
         }
@@ -377,15 +475,25 @@ namespace My.Company.Common
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
                 if (_managed is not null)
-                { return _managed[i]; }
+                {
+                    return _managed[i];
+                }
                 return Unsafe.Read<Vec>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<Vec>()));
             }
         }
 
         public SliceVec(GCHandle handle, ulong count)
-        { _data = handle.AddrOfPinnedObject(); _len = count; }
+        {
+            _data = handle.AddrOfPinnedObject();
+            _len = count;
+        }
+
         public SliceVec(IntPtr handle, ulong count)
-        { _data = handle; _len = count; }
+        {
+            _data = handle;
+            _len = count;
+        }
+
         public SliceVec(Vec[] managed)
         {
             _managed = managed;
@@ -395,13 +503,22 @@ namespace My.Company.Common
         }
 
         public IEnumerator<Vec> GetEnumerator()
-        { for (var i = 0; i < Count; ++i) yield return this[i]; }
+        {
+            for (var i = 0; i < Count; ++i)
+            {
+                yield return this[i];
+            }
+        }
+
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void Dispose()
         {
             if (_wePinned && _data != IntPtr.Zero)
-            { Marshal.FreeHGlobal(_data); _data = IntPtr.Zero; }
+            {
+                Marshal.FreeHGlobal(_data);
+                _data = IntPtr.Zero;
+            }
             _managed = null;
         }
 
@@ -410,7 +527,10 @@ namespace My.Company.Common
 
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
-        { public IntPtr Data; public ulong Len; }
+        {
+        public IntPtr Data;
+        public ulong Len;
+        }
 
         public ref struct Marshaller
         {
@@ -444,7 +564,9 @@ namespace My.Company.Common
             get
             {
                 if (_managed is not null)
-                { return new ReadOnlySpan<uint>(_managed); }
+                {
+                    return new ReadOnlySpan<uint>(_managed);
+                }
                 return new ReadOnlySpan<uint>(_data.ToPointer(), (int)_len);
             }
         }
@@ -455,15 +577,25 @@ namespace My.Company.Common
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
                 if (_managed is not null)
-                { return _managed[i]; }
+                {
+                    return _managed[i];
+                }
                 return Unsafe.Read<uint>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<uint>()));
             }
         }
 
         public SliceMutU32(GCHandle handle, ulong count)
-        { _data = handle.AddrOfPinnedObject(); _len = count; }
+        {
+            _data = handle.AddrOfPinnedObject();
+            _len = count;
+        }
+
         public SliceMutU32(IntPtr handle, ulong count)
-        { _data = handle; _len = count; }
+        {
+            _data = handle;
+            _len = count;
+        }
+
         public SliceMutU32(uint[] managed)
         {
             _managed = managed;
@@ -473,13 +605,22 @@ namespace My.Company.Common
         }
 
         public IEnumerator<uint> GetEnumerator()
-        { for (var i = 0; i < Count; ++i) yield return this[i]; }
+        {
+            for (var i = 0; i < Count; ++i)
+            {
+                yield return this[i];
+            }
+        }
+
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void Dispose()
         {
             if (_wePinned && _data != IntPtr.Zero)
-            { Marshal.FreeHGlobal(_data); _data = IntPtr.Zero; }
+            {
+                Marshal.FreeHGlobal(_data);
+                _data = IntPtr.Zero;
+            }
             _managed = null;
         }
 
@@ -488,7 +629,10 @@ namespace My.Company.Common
 
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
-        { public IntPtr Data; public ulong Len; }
+        {
+        public IntPtr Data;
+        public ulong Len;
+        }
 
         public ref struct Marshaller
         {
@@ -522,7 +666,9 @@ namespace My.Company.Common
             get
             {
                 if (_managed is not null)
-                { return new ReadOnlySpan<byte>(_managed); }
+                {
+                    return new ReadOnlySpan<byte>(_managed);
+                }
                 return new ReadOnlySpan<byte>(_data.ToPointer(), (int)_len);
             }
         }
@@ -533,15 +679,25 @@ namespace My.Company.Common
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
                 if (_managed is not null)
-                { return _managed[i]; }
+                {
+                    return _managed[i];
+                }
                 return Unsafe.Read<byte>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<byte>()));
             }
         }
 
         public SliceMutU8(GCHandle handle, ulong count)
-        { _data = handle.AddrOfPinnedObject(); _len = count; }
+        {
+            _data = handle.AddrOfPinnedObject();
+            _len = count;
+        }
+
         public SliceMutU8(IntPtr handle, ulong count)
-        { _data = handle; _len = count; }
+        {
+            _data = handle;
+            _len = count;
+        }
+
         public SliceMutU8(byte[] managed)
         {
             _managed = managed;
@@ -551,13 +707,22 @@ namespace My.Company.Common
         }
 
         public IEnumerator<byte> GetEnumerator()
-        { for (var i = 0; i < Count; ++i) yield return this[i]; }
+        {
+            for (var i = 0; i < Count; ++i)
+            {
+                yield return this[i];
+            }
+        }
+
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void Dispose()
         {
             if (_wePinned && _data != IntPtr.Zero)
-            { Marshal.FreeHGlobal(_data); _data = IntPtr.Zero; }
+            {
+                Marshal.FreeHGlobal(_data);
+                _data = IntPtr.Zero;
+            }
             _managed = null;
         }
 
@@ -566,7 +731,10 @@ namespace My.Company.Common
 
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
-        { public IntPtr Data; public ulong Len; }
+        {
+        public IntPtr Data;
+        public ulong Len;
+        }
 
         public ref struct Marshaller
         {
@@ -600,7 +768,9 @@ namespace My.Company.Common
             get
             {
                 if (_managed is not null)
-                { return new ReadOnlySpan<Vec>(_managed); }
+                {
+                    return new ReadOnlySpan<Vec>(_managed);
+                }
                 return new ReadOnlySpan<Vec>(_data.ToPointer(), (int)_len);
             }
         }
@@ -611,15 +781,25 @@ namespace My.Company.Common
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
                 if (_managed is not null)
-                { return _managed[i]; }
+                {
+                    return _managed[i];
+                }
                 return Unsafe.Read<Vec>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<Vec>()));
             }
         }
 
         public SliceMutVec(GCHandle handle, ulong count)
-        { _data = handle.AddrOfPinnedObject(); _len = count; }
+        {
+            _data = handle.AddrOfPinnedObject();
+            _len = count;
+        }
+
         public SliceMutVec(IntPtr handle, ulong count)
-        { _data = handle; _len = count; }
+        {
+            _data = handle;
+            _len = count;
+        }
+
         public SliceMutVec(Vec[] managed)
         {
             _managed = managed;
@@ -629,13 +809,22 @@ namespace My.Company.Common
         }
 
         public IEnumerator<Vec> GetEnumerator()
-        { for (var i = 0; i < Count; ++i) yield return this[i]; }
+        {
+            for (var i = 0; i < Count; ++i)
+            {
+                yield return this[i];
+            }
+        }
+
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void Dispose()
         {
             if (_wePinned && _data != IntPtr.Zero)
-            { Marshal.FreeHGlobal(_data); _data = IntPtr.Zero; }
+            {
+                Marshal.FreeHGlobal(_data);
+                _data = IntPtr.Zero;
+            }
             _managed = null;
         }
 
@@ -644,7 +833,10 @@ namespace My.Company.Common
 
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
-        { public IntPtr Data; public ulong Len; }
+        {
+        public IntPtr Data;
+        public ulong Len;
+        }
 
         public ref struct Marshaller
         {
