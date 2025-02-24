@@ -132,7 +132,6 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(patterns::callbacks::pattern_callback_6))
             .register(function!(patterns::callbacks::pattern_callback_7))
             .register(function!(patterns::surrogates::pattern_surrogates_1))
-            .register(function!(patterns::services::asynk::__async_mock))
             
             // Constants
             .register(constant!(constants::U8))

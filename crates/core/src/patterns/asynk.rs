@@ -5,9 +5,13 @@ use crate::lang::rust::CTypeInfo;
 use crate::patterns;
 use crate::patterns::TypePattern;
 
+/// TODO: Document must be thread safe
 #[derive(Clone, Copy)]
 #[repr(C)]
 pub struct AsyncCallback<T>(Option<extern "C" fn(&T, *const c_void) -> ()>, *const c_void);
+
+unsafe impl<T> Send for AsyncCallback<T> {}
+unsafe impl<T> Sync for AsyncCallback<T> {}
 
 impl<T: CTypeInfo> AsyncCallback<T> {
     ///   Creates a new instance of the callback using  `extern "C" fn` 

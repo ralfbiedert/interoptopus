@@ -28,11 +28,15 @@
 //! }
 //! ```
 
-use crate::lang::c::{EnumType, Variant};
-use crate::util::log_error;
+use crate::lang::c::{CType, CompositeType, Documentation, EnumType, Field, Layout, Meta, PrimitiveType, Representation, Variant, Visibility};
+use crate::util::{capitalize_first_letter, log_error};
 use std::any::Any;
 use std::fmt::Debug;
 use std::panic::AssertUnwindSafe;
+use crate::lang::rust::CTypeInfo;
+use crate::patterns::option::FFIOption;
+use crate::patterns::primitives::FFIBool;
+use crate::patterns::TypePattern;
 
 /// A trait you should implement for enums that signal errors in FFI calls.
 ///
@@ -227,5 +231,48 @@ pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
             Some(s) => s,
             None => "Any { .. }",
         },
+    }
+}
+
+#[repr(C)]
+#[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Eq, Default, Deserialize, Serialize))]
+#[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Eq, Default))]
+pub struct FFIResult<T, E> {
+    t: T,
+    err: E,
+}
+
+impl<T, E> FFIResult<T, E> where T: CTypeInfo, E: CTypeInfo + FFIError {
+    pub const fn ok(t: T) -> Self {
+        Self { t, err: E::SUCCESS }
+    }
+}
+
+impl<T, E> FFIResult<T, E> where T: CTypeInfo + Default, E: CTypeInfo + FFIError {
+    pub fn error(err: E) -> Self {
+        Self { t: T::default(), err }
+    }
+}
+
+unsafe impl<T, E> CTypeInfo for FFIResult<T, E>
+where
+    T: CTypeInfo,
+    E: CTypeInfo + FFIError,
+{
+    fn type_info() -> CType {
+        let doc_t = Documentation::from_line("Element if err is `Ok`.");
+        let doc_err = Documentation::from_line("Error value.");
+
+        let fields = vec![
+            Field::with_documentation("t".to_string(), T::type_info(), Visibility::Private, doc_t),
+            Field::with_documentation("err".to_string(), E::type_info(), Visibility::Private, doc_err),
+        ];
+
+        let doc = Documentation::from_line("Result that contains value or an error.");
+        let repr = Representation::new(Layout::C, None);
+        let meta = Meta::with_namespace_documentation(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
+        let name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
+        let composite = CompositeType::with_meta_repr(format!("Result{name}"), fields, meta, repr);
+        CType::Pattern(TypePattern::Option(composite))
     }
 }

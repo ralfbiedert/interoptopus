@@ -1,12 +1,8 @@
+use std::thread::{sleep, spawn};
 use crate::patterns::result::{Error, FFIError};
 use interoptopus::{ffi_function, ffi_service, ffi_service_ctor, ffi_type};
 use interoptopus::patterns::asynk::AsyncCallback;
 
-
-#[ffi_function]
-pub fn __async_mock(x: u64, async_callback: AsyncCallback<u64>)  {
-    async_callback.call(&x);
-}
 
 
 #[ffi_type(opaque)]
@@ -22,6 +18,13 @@ impl ServiceAsync {
         Ok(Self {
             runtime: ()
         })
+    }
+
+    pub fn __async_mock(&self, x: u64, async_callback: AsyncCallback<u64>)  {
+        spawn(move || {
+            sleep(std::time::Duration::from_secs(1));
+            async_callback.call(&x);
+        });
     }
 
     // pub async fn do_work(&self) -> Result<u8, Error> {

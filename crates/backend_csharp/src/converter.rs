@@ -76,7 +76,8 @@ pub fn named_callback_to_typename(x: &NamedCallback) -> String {
 }
 
 pub fn async_callback_to_typename(x: &AsyncCallback) -> String {
-    format!("XXXXX_TODO____{}", x.fnpointer().name().unwrap().to_string())
+    // format!("AsyncHelper{}", x.fnpointer().name().unwrap().to_string())
+    "AsyncHelper".to_string()
 }
 
 
