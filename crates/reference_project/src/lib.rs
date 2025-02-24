@@ -132,6 +132,8 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(patterns::callbacks::pattern_callback_6))
             .register(function!(patterns::callbacks::pattern_callback_7))
             .register(function!(patterns::surrogates::pattern_surrogates_1))
+            .register(function!(patterns::services::asynk::__async_mock))
+            
             // Constants
             .register(constant!(constants::U8))
             .register(constant!(constants::F32_MIN_POSITIVE))
@@ -139,6 +141,7 @@ pub fn ffi_inventory() -> Inventory {
             // Extra Types
             .register(extra_type!(types::ExtraType<f32>))
             // Patterns
+            .register(pattern!(patterns::services::asynk::ServiceAsync))
             .register(pattern!(patterns::services::basic::BasicService))
             .register(pattern!(patterns::services::on_panic::ServiceOnPanic))
             .register(pattern!(patterns::services::callbacks::ServiceCallbacks))

@@ -78,7 +78,7 @@
 
 use crate::lang::c::{CType, CompositeType, PrimitiveType};
 use crate::lang::rust::CTypeInfo;
-use crate::patterns::callbacks::NamedCallback;
+use crate::patterns::callbacks::{AsyncCallback, NamedCallback};
 use crate::patterns::result::FFIErrorEnum;
 use crate::patterns::service::Service;
 use std::ffi::c_char;
@@ -94,6 +94,7 @@ pub mod service;
 pub mod slice;
 pub mod string;
 pub mod surrogates;
+pub mod asynk;
 
 /// A pattern on a library level, usually involving both methods and types.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -128,6 +129,7 @@ pub enum TypePattern {
     Bool,
     CChar,
     NamedCallback(NamedCallback),
+    AsyncCallback(AsyncCallback),    
 }
 
 impl TypePattern {
@@ -147,6 +149,7 @@ impl TypePattern {
             Self::Bool => CType::Primitive(PrimitiveType::U8),
             Self::CChar => c_char::type_info(),
             Self::APIVersion => CType::Primitive(PrimitiveType::U64),
+            Self::AsyncCallback(_) => panic!("TODO: We probably don't want to emit async callbacks as fallbacks?"),
         }
     }
 }

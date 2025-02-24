@@ -1,14 +1,10 @@
-use crate::converter::{
-    function_name_to_csharp_name, function_parameter_to_csharp_typename, function_rval_to_csharp_typename, get_slice_type, has_ffi_error_rval, to_slice_marshaller,
-    to_typespecifier_in_param, to_typespecifier_in_rval,
-};
+use crate::converter::{function_name_to_csharp_name, function_parameter_to_csharp_typename, function_rval_to_csharp_typename, get_slice_type, has_ffi_error_rval, to_slice_marshaller, to_typespecifier_in_param, to_typespecifier_in_rval};
 use crate::interop::patterns::pattern_to_native_in_signature;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::lang::c::{CType, Documentation, Function, FunctionSignature, Parameter, PrimitiveType};
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, Error};
-use std::fmt::format;
 use std::iter::zip;
 
 pub fn write_functions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {

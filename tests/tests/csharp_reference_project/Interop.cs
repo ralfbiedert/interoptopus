@@ -28,9 +28,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 2550245526635566063ul)
+            if (api_version != 14532655085685249476ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (2550245526635566063). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (14532655085685249476). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -770,6 +770,33 @@ namespace My.Company
         public static partial void pattern_surrogates_1(Local s, out Container c);
         // Debug - write_function_overload 
         // Debug - no overload for pattern_surrogates_1 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "__async_mock")]
+        // Debug - write_function_declaration 
+        public static partial void __async_mock(ulong x, XXXXX_TODO____AsyncCallbacku64 async_callback);
+        // Debug - write_function_overload 
+        // Debug - no overload for __async_mock 
+
+        // Debug - write_function 
+        /// Destroys the given instance.
+        ///
+        /// # Safety
+        ///
+        /// The passed parameter MUST have been created with the corresponding init function;
+        /// passing any other value results in undefined behavior.
+        [LibraryImport(NativeLib, EntryPoint = "service_async_destroy")]
+        // Debug - write_function_declaration 
+        public static partial FFIError service_async_destroy(ref IntPtr context);
+        // Debug - write_function_overload 
+        // Debug - no overload for service_async_destroy 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "service_async_new")]
+        // Debug - write_function_declaration 
+        public static partial FFIError service_async_new(ref IntPtr context);
+        // Debug - write_function_overload 
+        // Debug - no overload for service_async_new 
 
         // Debug - write_function 
         /// Destroys the given instance.
@@ -3087,6 +3114,39 @@ namespace My.Company
         }
     }
 
+
+
+    // Debug - write_pattern_service 
+    public partial class ServiceAsync : IDisposable
+    {
+        private IntPtr _context;
+
+        private ServiceAsync() {}
+
+        // Debug - write_pattern_service_method 
+        public static ServiceAsync New()
+        {
+            var self = new ServiceAsync();
+            var rval = Interop.service_async_new(ref self._context);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+            return self;
+        }
+
+        // Debug - write_pattern_service_method 
+        public void Dispose()
+        {
+            var rval = Interop.service_async_destroy(ref _context);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
+        public IntPtr Context => _context;
+    }
 
 
     // Debug - write_pattern_service 

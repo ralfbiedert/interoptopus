@@ -8,7 +8,7 @@ pub mod namespace;
 pub mod patterns;
 pub mod types;
 
-use crate::converter::{get_slice_type, to_slice_marshaller, to_typespecifier_in_param};
+use crate::converter::{get_slice_type,  to_typespecifier_in_param};
 use crate::interop::builtins::write_builtins;
 use crate::interop::class::{write_class_context, write_native_lib_string};
 use crate::interop::constants::write_constants;
@@ -294,7 +294,7 @@ impl Interop {
             CType::Pattern(p) => match p {
                 TypePattern::Slice(s) => !self.should_emit_marshaller(&get_slice_type(s)),
                 TypePattern::SliceMut(s) => !self.should_emit_marshaller(&get_slice_type(s)),
-                TypePattern::NamedCallback(x) => true,
+                TypePattern::NamedCallback(_) => true,
                 _ => false,
             },
             _ => false,
@@ -331,6 +331,7 @@ impl Interop {
                 TypePattern::Bool => self.write_types == WriteTypes::NamespaceAndInteroptopusGlobal,
                 TypePattern::CChar => false,
                 TypePattern::NamedCallback(x) => self.should_emit_by_meta(x.meta()),
+                TypePattern::AsyncCallback(x) => self.should_emit_by_meta(x.meta()),
                 _ => panic!("Pattern not explicitly handled"),
             },
         }

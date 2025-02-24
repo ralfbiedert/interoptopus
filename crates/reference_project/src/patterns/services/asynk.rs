@@ -1,16 +1,22 @@
 use crate::patterns::result::{Error, FFIError};
-use interoptopus::{ffi_service, ffi_service_ctor, ffi_type};
-use crate::patterns::slice::CallbackU8;
+use interoptopus::{ffi_function, ffi_service, ffi_service_ctor, ffi_type};
+use interoptopus::patterns::asynk::AsyncCallback;
+
+
+#[ffi_function]
+pub fn __async_mock(x: u64, async_callback: AsyncCallback<u64>)  {
+    async_callback.call(&x);
+}
 
 
 #[ffi_type(opaque)]
-pub struct AsyncService {
+pub struct ServiceAsync {
     runtime: (),
 }
 
 
 #[ffi_service(error = "FFIError")]
-impl AsyncService {
+impl ServiceAsync {
     #[ffi_service_ctor]
     pub fn new() -> Result<Self, Error> {
         Ok(Self {

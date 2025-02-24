@@ -9,12 +9,12 @@ public class TestPatternOptions
     public void pattern_ffi_option_nullable()
     {
         var t = new Inner();
-        OptionInner someOpt = OptionInner.FromNullable(t);
-        Inner? nullableOpt = someOpt.ToNullable();
+        var someOpt = OptionInner.FromNullable(t);
+        var nullableOpt = someOpt.ToNullable();
         Assert.True(nullableOpt.HasValue);
 
-        OptionInner someOpt2 = OptionInner.FromNullable(null);
-        Inner? nullableOpt2 = someOpt2.ToNullable();
+        var someOpt2 = OptionInner.FromNullable(null);
+        var nullableOpt2 = someOpt2.ToNullable();
         Assert.False(nullableOpt2.HasValue);
     }
 }

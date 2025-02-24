@@ -33,9 +33,9 @@ pub fn write_pattern_slice(i: &Interop, w: &mut IndentWriter, slice: &CompositeT
     indented!(w, r"}}")?;
     indented!(w, r"return new ReadOnlySpan<{}>(_data.ToPointer(), (int)_len);", inner)?;
     w.unindent();
-    indented!(w, r"}}");
+    indented!(w, r"}}")?;
     w.unindent();
-    indented!(w, r"}}");
+    indented!(w, r"}}")?;
     w.newline()?;
     indented!(w, r"public unsafe {} this[int i]", inner)?;
     indented!(w, r"{{")?;
@@ -50,9 +50,9 @@ pub fn write_pattern_slice(i: &Interop, w: &mut IndentWriter, slice: &CompositeT
     indented!(w, r"}}")?;
     indented!(w, r"return Unsafe.Read<{}>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<{}>()));", inner, inner)?;
     w.unindent();
-    indented!(w, r"}}");
+    indented!(w, r"}}")?;
     w.unindent();
-    indented!(w, r"}}");
+    indented!(w, r"}}")?;
     w.newline()?;
     indented!(w, r"public {}(GCHandle handle, ulong count)", name)?;
     indented!(w, r"{{")?;
@@ -78,7 +78,7 @@ pub fn write_pattern_slice(i: &Interop, w: &mut IndentWriter, slice: &CompositeT
     indented!(w, r"_len = (ulong) managed.Length;")?;
     indented!(w, r"_wePinned = true;")?;
     w.unindent();
-    indented!(w, r"}}");
+    indented!(w, r"}}")?;
     w.newline()?;
     indented!(w, r"public IEnumerator<{}> GetEnumerator()", inner)?;
     indented!(w, r"{{")?;
@@ -106,7 +106,7 @@ pub fn write_pattern_slice(i: &Interop, w: &mut IndentWriter, slice: &CompositeT
     indented!(w, r"}}")?;
     indented!(w, r"_managed = null;")?;
     w.unindent();
-    indented!(w, r"}}");
+    indented!(w, r"}}")?;
     w.newline()?;
     indented!(w, r"[CustomMarshaller(typeof({}), MarshalMode.Default, typeof(Marshaller))]", name)?;
     indented!(w, r"private struct MarshallerMeta {{ }}")?;
@@ -138,9 +138,9 @@ pub fn write_pattern_slice(i: &Interop, w: &mut IndentWriter, slice: &CompositeT
     indented!(w, r"public unsafe {} ToManaged() => new {}(sourceNative.Data, sourceNative.Len);", name, name)?;
     indented!(w, r"public void Free() {{ }}")?;
     w.unindent();
-    indented!(w, r"}}");
+    indented!(w, r"}}")?;
     w.unindent();
-    indented!(w, r"}}");
+    indented!(w, r"}}")?;
     Ok(())
 }
 
@@ -173,9 +173,9 @@ pub fn write_pattern_slice_mut(i: &Interop, w: &mut IndentWriter, slice: &Compos
     indented!(w, r"}}")?;
     indented!(w, r"return new ReadOnlySpan<{}>(_data.ToPointer(), (int)_len);", inner)?;
     w.unindent();
-    indented!(w, r"}}");
+    indented!(w, r"}}")?;
     w.unindent();
-    indented!(w, r"}}");
+    indented!(w, r"}}")?;
     w.newline()?;
     indented!(w, r"public unsafe {} this[int i]", inner)?;
     indented!(w, r"{{")?;
@@ -190,7 +190,7 @@ pub fn write_pattern_slice_mut(i: &Interop, w: &mut IndentWriter, slice: &Compos
     indented!(w, r"}}")?;
     indented!(w, r"return Unsafe.Read<{}>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<{}>()));", inner, inner)?;
     w.unindent();
-    indented!(w, r"}}");
+    indented!(w, r"}}")?;
     indented!(w, r"set")?;
     indented!(w, r"{{")?;
     w.indent();
@@ -200,7 +200,7 @@ pub fn write_pattern_slice_mut(i: &Interop, w: &mut IndentWriter, slice: &Compos
     w.unindent();
     indented!(w, r"}}")?;
     w.unindent();
-    indented!(w, r"}}");
+    indented!(w, r"}}")?;
     w.newline()?;
     indented!(w, r"public {}(GCHandle handle, ulong count)", name)?;
     indented!(w, r"{{")?;
@@ -226,7 +226,7 @@ pub fn write_pattern_slice_mut(i: &Interop, w: &mut IndentWriter, slice: &Compos
     indented!(w, r"_len = (ulong) managed.Length;")?;
     indented!(w, r"_wePinned = true;")?;
     w.unindent();
-    indented!(w, r"}}");
+    indented!(w, r"}}")?;
     w.newline()?;
     indented!(w, r"public IEnumerator<{}> GetEnumerator()", inner)?;
     indented!(w, r"{{")?;
@@ -254,7 +254,7 @@ pub fn write_pattern_slice_mut(i: &Interop, w: &mut IndentWriter, slice: &Compos
     indented!(w, r"}}")?;
     indented!(w, r"_managed = null;")?;
     w.unindent();
-    indented!(w, r"}}");
+    indented!(w, r"}}")?;
     w.newline()?;
     indented!(w, r"[CustomMarshaller(typeof({}), MarshalMode.Default, typeof(Marshaller))]", name)?;
     indented!(w, r"private struct MarshallerMeta {{ }}")?;
@@ -286,8 +286,8 @@ pub fn write_pattern_slice_mut(i: &Interop, w: &mut IndentWriter, slice: &Compos
     indented!(w, r"public unsafe {} ToManaged() => new {}(sourceNative.Data, sourceNative.Len);", name, name)?;
     indented!(w, r"public void Free() {{ }}")?;
     w.unindent();
-    indented!(w, r"}}");
+    indented!(w, r"}}")?;
     w.unindent();
-    indented!(w, r"}}");
+    indented!(w, r"}}")?;
     Ok(())
 }

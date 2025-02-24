@@ -161,6 +161,45 @@ impl NamedCallback {
     }
 }
 
+
+/// Helper naming a (hidden) async callback trampoline.
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub struct AsyncCallback {
+    fnpointer: FnPointerType,
+    meta: Meta,
+}
+
+impl AsyncCallback {
+    /// Creates a new async callback.
+    #[must_use]
+    pub fn new(callback: FnPointerType) -> Self {
+        Self::with_meta(callback, Meta::new())
+    }
+
+    /// Creates a new async callback with the given meta.
+    ///
+    /// # Panics
+    ///
+    /// The provided pointer must have a name.
+    #[must_use]
+    pub fn with_meta(callback: FnPointerType, meta: Meta) -> Self {
+        assert!(callback.name().is_some(), "The pointer provided to a named callback must have a name.");
+        Self { fnpointer: callback, meta }
+    }
+
+    /// Gets the type's meta.
+    #[must_use]
+    pub const fn meta(&self) -> &Meta {
+        &self.meta
+    }
+
+    /// Returns the function pointer type.
+    #[must_use]
+    pub const fn fnpointer(&self) -> &FnPointerType {
+        &self.fnpointer
+    }
+}
+
 /// Defines a callback type, akin to a `fn f(T) -> R` wrapped in an [Option](std::option).
 ///
 /// A named delegate will be emitted in languages supporting them, otherwise a regular
@@ -208,24 +247,21 @@ macro_rules! callback {
     ($name:ident($($param:ident: $ty:ty),*) -> $rval:ty $(, namespace = $ns:expr)?) => {
         #[derive(Clone, Copy)]
         #[repr(C)]
-        pub struct $name(Option<extern "C" fn($($ty,)* *const std::ffi::c_void) -> $rval>, *const std::ffi::c_void);
+        pub struct $name(::std::option::Option<extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval>, *const ::std::ffi::c_void);
 
         impl $name {
             /// Creates a new instance of the callback using `extern "C" fn`
-            pub fn new(func: extern "C" fn($($ty,)* *const std::ffi::c_void) -> $rval) -> Self {
-                Self(Some(func), std::ptr::null())
+            pub fn new(func: extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval) -> Self {
+                Self(Some(func), ::std::ptr::null())
             }
 
             /// Will call function if it exists, panic otherwise.
             pub fn call(&self, $($param: $ty),*) -> $rval {
-                const {
-                    assert!(size_of::<Self>() == 16);
-                }
                 self.0.expect("Assumed function would exist but it didn't.")($($param,)* self.1)
             }
 
             /// Will call function only if it exists
-            pub fn call_if_some(&self, $($param: $ty,)*) -> Option<$rval> {
+            pub fn call_if_some(&self, $($param: $ty,)*) -> ::std::option::Option<$rval> {
                 match self.0 {
                     Some(c) => Some(c($($param,)* self.1)),
                     None => None
@@ -233,43 +269,43 @@ macro_rules! callback {
             }
         }
 
-        impl From<for<> extern "C" fn($($ty,)* *const std::ffi::c_void) -> $rval> for $name {
-            fn from(x: extern "C" fn($($ty,)* *const std::ffi::c_void) -> $rval) -> Self {
-                Self(Some(x), std::ptr::null())
+        impl From<for<> extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval> for $name {
+            fn from(x: extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval) -> Self {
+                Self(Some(x), ::std::ptr::null())
             }
         }
 
-        impl From<$name> for Option<extern "C" fn($($ty,)* *const std::ffi::c_void) -> $rval> {
+        impl From<$name> for ::std::option::Option<extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval> {
             fn from(x: $name) -> Self {
                 x.0
             }
         }
 
-        unsafe impl interoptopus::lang::rust::CTypeInfo for $name {
-            fn type_info() -> interoptopus::lang::c::CType {
-                use interoptopus::lang::rust::CTypeInfo;
-                use interoptopus::lang::c::{CType, Meta, Documentation, PrimitiveType};
+        unsafe impl $crate::lang::rust::CTypeInfo for $name {
+            fn type_info() -> $crate::lang::c::CType {
+                use $crate::lang::rust::CTypeInfo;
+                use $crate::lang::c::{CType, Meta, Documentation, PrimitiveType, Parameter, FunctionSignature, FnPointerType};
 
                 let rval = < $rval as CTypeInfo >::type_info();
 
                 let params = vec![
                 $(
-                    interoptopus::lang::c::Parameter::new(stringify!($param).to_string(), < $ty as CTypeInfo >::type_info()),
+                    Parameter::new(stringify!($param).to_string(), < $ty as CTypeInfo >::type_info()),
                 )*
-                    interoptopus::lang::c::Parameter::new("callback_data".to_string(), CType::ReadPointer(Box::new(CType::Primitive(PrimitiveType::Void)))),
+                    Parameter::new("callback_data".to_string(), CType::ReadPointer(Box::new(CType::Primitive(PrimitiveType::Void)))),
                 ];
 
-                let mut namespace = String::new();
+                let mut namespace = ::std::string::String::new();
                 $(
-                    namespace = String::from($ns);
+                    namespace = ::std::string::String::from($ns);
                 )*
 
                 let meta = Meta::with_namespace_documentation(namespace, Documentation::new());
-                let sig = interoptopus::lang::c::FunctionSignature::new(params, rval);
-                let fn_pointer = interoptopus::lang::c::FnPointerType::new_named(sig, stringify!($name).to_string());
-                let named_callback = interoptopus::patterns::callbacks::NamedCallback::with_meta(fn_pointer, meta);
+                let sig = FunctionSignature::new(params, rval);
+                let fn_pointer = FnPointerType::new_named(sig, stringify!($name).to_string());
+                let named_callback = $crate::patterns::callbacks::NamedCallback::with_meta(fn_pointer, meta);
 
-                interoptopus::lang::c::CType::Pattern(interoptopus::patterns::TypePattern::NamedCallback(named_callback))
+                CType::Pattern($crate::patterns::TypePattern::NamedCallback(named_callback))
             }
         }
     };

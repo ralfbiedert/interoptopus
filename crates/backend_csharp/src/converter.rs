@@ -3,7 +3,7 @@ use heck::{ToLowerCamelCase, ToUpperCamelCase};
 use interoptopus::lang::c::{
     CType, CompositeType, ConstantValue, EnumType, Field, FnPointerType, Function, FunctionSignature, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
 };
-use interoptopus::patterns::callbacks::NamedCallback;
+use interoptopus::patterns::callbacks::{AsyncCallback, NamedCallback};
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::safe_name;
 
@@ -74,6 +74,11 @@ pub fn is_blittable(x: &CType) -> bool {
 pub fn named_callback_to_typename(x: &NamedCallback) -> String {
     x.name().to_string()
 }
+
+pub fn async_callback_to_typename(x: &AsyncCallback) -> String {
+    format!("XXXXX_TODO____{}", x.fnpointer().name().unwrap().to_string())
+}
+
 
 /// Converts an Rust `pub fn()` to a C# delegate name such as `InteropDelegate`.
 pub fn fnpointer_to_typename(x: &FnPointerType) -> String {
@@ -146,6 +151,7 @@ pub fn to_typespecifier_in_param(x: &CType) -> String {
             TypePattern::SliceMut(x) => composite_to_typename(x),
             TypePattern::Option(x) => composite_to_typename(x),
             TypePattern::NamedCallback(x) => format!("{}", named_callback_to_typename(x)),
+            TypePattern::AsyncCallback(x) => format!("{}", async_callback_to_typename(x)),
             TypePattern::Bool => "Bool".to_string(),
             TypePattern::CChar => "sbyte".to_string(),
             TypePattern::APIVersion => to_typespecifier_in_param(&x.fallback_type()),
