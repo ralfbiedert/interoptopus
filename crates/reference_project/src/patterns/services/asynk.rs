@@ -1,28 +1,23 @@
-use std::thread::{sleep, spawn};
 use crate::patterns::result::{Error, FFIError};
-use interoptopus::{ffi_function, ffi_service, ffi_service_ctor, ffi_type};
 use interoptopus::patterns::asynk::AsyncCallback;
-
-
+use interoptopus::{ffi_function, ffi_service, ffi_service_ctor, ffi_type};
+use std::thread::{sleep, spawn};
 
 #[ffi_type(opaque)]
 pub struct ServiceAsync {
     runtime: (),
 }
 
-
 #[ffi_service(error = "FFIError")]
 impl ServiceAsync {
     #[ffi_service_ctor]
     pub fn new() -> Result<Self, Error> {
-        Ok(Self {
-            runtime: ()
-        })
+        Ok(Self { runtime: () })
     }
 
-    pub fn __async_mock(&self, x: u64, async_callback: AsyncCallback<u64>)  {
+    pub fn return_after_ms(&self, x: u64, ms: u64, async_callback: AsyncCallback<u64>) {
         spawn(move || {
-            sleep(std::time::Duration::from_secs(1));
+            sleep(std::time::Duration::from_millis(ms));
             async_callback.call(&x);
         });
     }
@@ -37,14 +32,12 @@ impl ServiceAsync {
     //         callback.call(rval);
     //     })
     // }
-
 }
-
 
 // trait RuntimeXXX {
 //     fn spawn(&self, f: impl FnOnce() -> std::pin::Pin<Box<dyn std::future::Future<Output = ()>);
 // }
-// 
+//
 // impl RuntimeXXX for AsyncService {
-//     
+//
 // }

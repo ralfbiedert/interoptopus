@@ -163,7 +163,7 @@ impl Service {
         let destructor_first_parameter = self.destructor.first_param_type().expect("Must have type");
 
         match constructor_fist_parameter {
-            CType::ReadWritePointer(x) => match *x {
+            CType::ReadWritePointer(x) => match **x {
                 CType::ReadWritePointer(ref x) => match **x {
                     CType::Opaque(_) => {}
                     _ => panic!("First parameter must be opaque type"),
@@ -175,7 +175,7 @@ impl Service {
         }
 
         match destructor_first_parameter {
-            CType::ReadWritePointer(x) => match *x {
+            CType::ReadWritePointer(x) => match **x {
                 CType::ReadWritePointer(ref x) => match **x {
                     CType::Opaque(_) => {}
                     _ => panic!("First parameter must be opaque type"),

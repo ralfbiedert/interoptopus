@@ -1,4 +1,4 @@
-use crate::converter::{function_name_to_csharp_name, to_typespecifier_in_param, to_typespecifier_in_rval};
+use crate::converter::{async_callback_to_typename, function_name_to_csharp_name, to_typespecifier_in_param, to_typespecifier_in_rval};
 use crate::interop::functions::write_documentation;
 use crate::interop::patterns::pattern_to_native_in_signature;
 use crate::{FunctionNameFlavor, Interop};
@@ -76,7 +76,7 @@ pub fn write_pattern_service_method(
     w: &mut IndentWriter,
     class: &Service,
     function: &Function,
-    rval: &str,
+    mut rval: &str,
     fn_name: &str,
     write_contxt_by_ref: bool,
     is_ctor: bool,
@@ -84,6 +84,9 @@ pub fn write_pattern_service_method(
 ) -> Result<(), Error> {
     i.debug(w, "write_pattern_service_method")?;
 
+    let async_rval = function.async_rval();
+
+    let mut rval = rval.to_string();
     let mut names = Vec::new();
     let mut to_invoke = Vec::new();
     let mut types = Vec::new();
@@ -134,6 +137,14 @@ pub fn write_pattern_service_method(
         types.push(native);
     }
 
+    if let Some(x) = async_rval {
+        names.pop();
+        types.pop();
+        to_invoke.pop();
+        to_invoke.push("cb".to_string());
+        rval = format!("Task<{}>", to_typespecifier_in_param(x));
+    }
+
     let method_to_invoke = function_name_to_csharp_name(
         function,
         if i.rename_symbols {
@@ -175,6 +186,17 @@ pub fn write_pattern_service_method(
         indented!(w, [()], r"var self = new {}();", class.the_type().rust_name())?;
     }
 
+    if let Some(x) = async_rval {
+        indented!(w, [()], r"var cs = new TaskCompletionSource<{}>();", to_typespecifier_in_param(x))?;
+        indented!(w, [()], r"GCHandle pinned = default;")?;
+        indented!(w, [()], r"var cb = new AsyncHelper((x) => {{")?;
+        indented!(w, [()()], r"var rval = Marshal.PtrToStructure<{}>(x);", to_typespecifier_in_param(x))?;
+        indented!(w, [()()], r"cs.SetResult(rval);")?;
+        indented!(w, [()()], r"pinned.Free();")?;
+        indented!(w, [()], r"}});")?;
+        indented!(w, [()], r"pinned = GCHandle.Alloc(cb);")?;
+    }
+
     // for (name, ty) in zip(&to_wrap_delegates, &to_wrap_delegate_types) {
     //     indented!(w, [()], r"var {}_safe_delegate = new {}ExceptionSafe({});", name, ty, name)?;
     // }
@@ -207,7 +229,35 @@ pub fn write_pattern_service_method(
         indented!(w, [()], r"return self;")?;
     }
 
+    if let Some(x) = async_rval {
+        indented!(w, [()], r"return cs.Task;")?;
+    }
+
     indented!(w, r"}}")?;
+
+    Ok(())
+}
+
+pub fn write_service_method_overload(
+    i: &Interop,
+    w: &mut IndentWriter,
+    _class: &Service,
+    function: &Function,
+    fn_pretty: &str,
+    write_for: WriteFor,
+) -> Result<(), Error> {
+    i.debug(w, "write_service_method_overload")?;
+
+    if !i.has_overloadable(function.signature()) {
+        return Ok(());
+    }
+
+    if write_for == WriteFor::Code {
+        w.newline()?;
+        write_documentation(w, function.meta().documentation())?;
+    }
+
+    write_common_service_method_overload(i, w, function, fn_pretty, pattern_to_native_in_signature, write_for)?;
 
     Ok(())
 }
@@ -221,6 +271,8 @@ pub fn write_common_service_method_overload<FPatternMap: Fn(&Interop, &Parameter
     f_pattern: FPatternMap,
     write_for: WriteFor,
 ) -> Result<(), Error> {
+    i.debug(w, "write_common_service_method_overload")?;
+
     let mut names = Vec::new();
     let mut to_invoke = Vec::new();
     let mut types = Vec::new();
@@ -298,28 +350,6 @@ pub fn write_common_service_method_overload<FPatternMap: Fn(&Interop, &Parameter
     }
 
     indented!(w, r"}}")?;
-
-    Ok(())
-}
-
-pub fn write_service_method_overload(
-    i: &Interop,
-    w: &mut IndentWriter,
-    _class: &Service,
-    function: &Function,
-    fn_pretty: &str,
-    write_for: WriteFor,
-) -> Result<(), Error> {
-    if !i.has_overloadable(function.signature()) {
-        return Ok(());
-    }
-
-    if write_for == WriteFor::Code {
-        w.newline()?;
-        write_documentation(w, function.meta().documentation())?;
-    }
-
-    write_common_service_method_overload(i, w, function, fn_pretty, pattern_to_native_in_signature, write_for)?;
 
     Ok(())
 }

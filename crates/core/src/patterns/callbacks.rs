@@ -111,7 +111,8 @@
 //! }
 //! ```
 
-use crate::lang::c::{FnPointerType, Meta};
+use crate::lang::c::{CType, FnPointerType, Meta};
+use std::ops::Deref;
 
 /// Internal helper naming a generated callback type wrapper.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -161,7 +162,6 @@ impl NamedCallback {
     }
 }
 
-
 /// Helper naming a (hidden) async callback trampoline.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct AsyncCallback {
@@ -185,6 +185,19 @@ impl AsyncCallback {
     pub fn with_meta(callback: FnPointerType, meta: Meta) -> Self {
         assert!(callback.name().is_some(), "The pointer provided to a named callback must have a name.");
         Self { fnpointer: callback, meta }
+    }
+
+    /// Gets the type's meta.
+    #[must_use]
+    pub fn target(&self) -> &CType {
+        self.fnpointer
+            .signature()
+            .params()
+            .first()
+            .expect("Must have a first parameter")
+            .the_type()
+            .pointer_target()
+            .expect("Paramter must be a pointer")
     }
 
     /// Gets the type's meta.

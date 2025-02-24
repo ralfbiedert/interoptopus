@@ -8,7 +8,7 @@ public class TestPatternServicesAsync
     public async void service_async()
     {
         var s = ServiceAsync.New();
-        var r = await s.AsyncMock(123);
+        var r = await s.ReturnAfterMs(123, 500);
         Assert.Equal(r, 123u);
     }
 }
