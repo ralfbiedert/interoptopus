@@ -32,8 +32,8 @@ impl ServiceOnPanic {
     }
 
     /// This function has no panic safeguards. It will be a bit faster to
-    /// call, but if it panics your host app will be in an undefined state.
-    #[ffi_service_method(on_panic = "undefined_behavior")]
+    /// call, but if it panics your host app will abort.
+    #[ffi_service_method(on_panic = "abort")]
     pub fn return_ub_on_panic(&mut self) -> CStrPointer {
         CStrPointer::from_cstr(&self.c_string)
     }

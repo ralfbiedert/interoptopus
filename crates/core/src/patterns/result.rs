@@ -29,14 +29,14 @@
 //! ```
 
 use crate::lang::c::{CType, CompositeType, Documentation, EnumType, Field, Layout, Meta, PrimitiveType, Representation, Variant, Visibility};
-use crate::util::{capitalize_first_letter, log_error};
-use std::any::Any;
-use std::fmt::Debug;
-use std::panic::AssertUnwindSafe;
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::option::FFIOption;
 use crate::patterns::primitives::FFIBool;
 use crate::patterns::TypePattern;
+use crate::util::{capitalize_first_letter, log_error};
+use std::any::Any;
+use std::fmt::Debug;
+use std::panic::AssertUnwindSafe;
 
 /// A trait you should implement for enums that signal errors in FFI calls.
 ///
@@ -242,13 +242,21 @@ pub struct FFIResult<T, E> {
     err: E,
 }
 
-impl<T, E> FFIResult<T, E> where T: CTypeInfo, E: CTypeInfo + FFIError {
+impl<T, E> FFIResult<T, E>
+where
+    T: CTypeInfo,
+    E: CTypeInfo + FFIError,
+{
     pub const fn ok(t: T) -> Self {
         Self { t, err: E::SUCCESS }
     }
 }
 
-impl<T, E> FFIResult<T, E> where T: CTypeInfo + Default, E: CTypeInfo + FFIError {
+impl<T, E> FFIResult<T, E>
+where
+    T: CTypeInfo + Default,
+    E: CTypeInfo + FFIError,
+{
     pub fn error(err: E) -> Self {
         Self { t: T::default(), err }
     }
@@ -273,6 +281,6 @@ where
         let meta = Meta::with_namespace_documentation(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
         let name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
         let composite = CompositeType::with_meta_repr(format!("Result{name}"), fields, meta, repr);
-        CType::Pattern(TypePattern::Option(composite))
+        CType::Pattern(TypePattern::Result(composite))
     }
 }

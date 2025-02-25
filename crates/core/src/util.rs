@@ -187,6 +187,11 @@ pub(crate) fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CTyp
                     ctypes_from_type_recursive(field.the_type(), types);
                 }
             }
+            TypePattern::Result(x) => {
+                for field in x.fields() {
+                    ctypes_from_type_recursive(field.the_type(), types);
+                }
+            }
             TypePattern::Bool => {}
             TypePattern::CChar => {}
             TypePattern::APIVersion => {}
@@ -229,6 +234,9 @@ pub(crate) fn extract_namespaces_from_types(types: &[CType], into: &mut HashSet<
                     into.insert(x.meta().namespace().to_string());
                 }
                 TypePattern::Option(x) => {
+                    into.insert(x.meta().namespace().to_string());
+                }
+                TypePattern::Result(x) => {
                     into.insert(x.meta().namespace().to_string());
                 }
                 TypePattern::Bool => {}
@@ -333,6 +341,7 @@ pub fn is_global_type(t: &CType) -> bool {
             TypePattern::Slice(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),
             TypePattern::SliceMut(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),
             TypePattern::Option(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),
+            TypePattern::Result(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),
             TypePattern::Bool => true,
             TypePattern::CChar => true,
             TypePattern::NamedCallback(_) => false,

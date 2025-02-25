@@ -80,7 +80,6 @@ pub fn async_callback_to_typename(x: &AsyncCallback) -> String {
     "AsyncHelper".to_string()
 }
 
-
 /// Converts an Rust `pub fn()` to a C# delegate name such as `InteropDelegate`.
 pub fn fnpointer_to_typename(x: &FnPointerType) -> String {
     ["InteropDelegate".to_string(), safe_name(&x.internal_name())].join("_")
@@ -151,6 +150,7 @@ pub fn to_typespecifier_in_param(x: &CType) -> String {
             TypePattern::Slice(x) => composite_to_typename(x),
             TypePattern::SliceMut(x) => composite_to_typename(x),
             TypePattern::Option(x) => composite_to_typename(x),
+            TypePattern::Result(x) => composite_to_typename(x),
             TypePattern::NamedCallback(x) => format!("{}", named_callback_to_typename(x)),
             TypePattern::AsyncCallback(x) => format!("{}", async_callback_to_typename(x)),
             TypePattern::Bool => "Bool".to_string(),

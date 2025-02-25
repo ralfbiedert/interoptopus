@@ -1,12 +1,17 @@
 use crate::patterns::result::{Error, FFIError};
 use interoptopus::patterns::asynk::AsyncCallback;
-use interoptopus::{ffi_function, ffi_service, ffi_service_ctor, ffi_type};
+use interoptopus::patterns::result::FFIResult;
+use interoptopus::{ffi_service, ffi_service_ctor, ffi_type};
 use std::thread::{sleep, spawn};
 
 #[ffi_type(opaque)]
 pub struct ServiceAsync {
     runtime: (),
 }
+
+// impl Runtime for ServiceAsync {
+//     pub spawn() {}
+// }
 
 #[ffi_service(error = "FFIError")]
 impl ServiceAsync {
@@ -15,11 +20,18 @@ impl ServiceAsync {
         Ok(Self { runtime: () })
     }
 
-    pub fn return_after_ms(&self, x: u64, ms: u64, async_callback: AsyncCallback<u64>) {
+    // pub async fn return_after_ms2(&self, x: u64, ms: u64) -> Result<u64, FFIError> {
+    //     // sleep(std::time::Duration::from_millis(ms));
+    //     // async_callback.call(&x);
+    //     Ok(x)
+    // }
+
+    pub fn return_after_ms(&self, x: u64, ms: u64, async_callback: AsyncCallback<FFIResult<u64, FFIError>>) -> Result<(), FFIError> {
         spawn(move || {
             sleep(std::time::Duration::from_millis(ms));
-            async_callback.call(&x);
+            async_callback.call(&FFIResult::ok(x));
         });
+        Ok(())
     }
 
     // pub async fn do_work(&self) -> Result<u8, Error> {

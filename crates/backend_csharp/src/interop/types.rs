@@ -5,13 +5,14 @@ pub mod enums;
 pub mod fnptrs;
 
 use crate::interop::patterns::options::write_pattern_option;
+use crate::interop::patterns::results::write_pattern_result;
 use crate::interop::patterns::slices::{write_pattern_slice, write_pattern_slice_mut};
 use crate::interop::types::bools::write_type_definition_ffibool;
 use crate::interop::types::callbacks::write_type_definition_named_callback;
 use crate::interop::types::composite::write_type_definition_composite;
 use crate::interop::types::enums::write_type_definition_enum;
 use crate::interop::types::fnptrs::write_type_definition_fn_pointer;
-use crate::{Interop};
+use crate::Interop;
 use interoptopus::lang::c::CType;
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::{IndentWriter, WriteFor};
@@ -66,6 +67,12 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &CType
                 write_type_definition_composite(i, w, x)?;
                 w.newline()?;
                 write_pattern_option(i, w, x)?;
+                w.newline()?;
+            }
+            TypePattern::Result(x) => {
+                write_type_definition_composite(i, w, x)?;
+                w.newline()?;
+                write_pattern_result(i, w, x)?;
                 w.newline()?;
             }
             TypePattern::NamedCallback(x) => {

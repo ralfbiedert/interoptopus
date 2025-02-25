@@ -86,6 +86,7 @@ use std::ffi::c_char;
 #[doc(hidden)]
 pub mod api_entry;
 pub mod api_guard;
+pub mod asynk;
 pub mod callbacks;
 pub mod option;
 pub mod primitives;
@@ -94,7 +95,6 @@ pub mod service;
 pub mod slice;
 pub mod string;
 pub mod surrogates;
-pub mod asynk;
 
 /// A pattern on a library level, usually involving both methods and types.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -126,10 +126,11 @@ pub enum TypePattern {
     Slice(CompositeType),
     SliceMut(CompositeType),
     Option(CompositeType),
+    Result(CompositeType),
     Bool,
     CChar,
     NamedCallback(NamedCallback),
-    AsyncCallback(AsyncCallback),    
+    AsyncCallback(AsyncCallback),
 }
 
 impl TypePattern {
@@ -145,6 +146,7 @@ impl TypePattern {
             Self::Slice(x) => CType::Composite(x.clone()),
             Self::SliceMut(x) => CType::Composite(x.clone()),
             Self::Option(x) => CType::Composite(x.clone()),
+            Self::Result(x) => CType::Composite(x.clone()),
             Self::NamedCallback(x) => CType::FnPointer(x.fnpointer().clone()),
             Self::Bool => CType::Primitive(PrimitiveType::U8),
             Self::CChar => c_char::type_info(),

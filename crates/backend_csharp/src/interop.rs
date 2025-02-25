@@ -8,7 +8,7 @@ pub mod namespace;
 pub mod patterns;
 pub mod types;
 
-use crate::converter::{get_slice_type,  to_typespecifier_in_param};
+use crate::converter::{get_slice_type, to_typespecifier_in_param};
 use crate::interop::builtins::write_builtins;
 use crate::interop::class::{write_class_context, write_native_lib_string};
 use crate::interop::constants::write_constants;
@@ -328,6 +328,7 @@ impl Interop {
                 TypePattern::Slice(x) => self.should_emit_by_meta(x.meta()),
                 TypePattern::SliceMut(x) => self.should_emit_by_meta(x.meta()),
                 TypePattern::Option(x) => self.should_emit_by_meta(x.meta()),
+                TypePattern::Result(x) => self.should_emit_by_meta(x.meta()),
                 TypePattern::Bool => self.write_types == WriteTypes::NamespaceAndInteroptopusGlobal,
                 TypePattern::CChar => false,
                 TypePattern::NamedCallback(x) => self.should_emit_by_meta(x.meta()),

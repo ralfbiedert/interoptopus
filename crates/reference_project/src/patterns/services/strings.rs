@@ -17,7 +17,7 @@ impl ServiceStrings {
     pub fn pass_string(&mut self, _: CStrPointer) {}
 
     // If we actually return a value we have to declare what happens upon panic.
-    #[ffi_service_method(on_panic = "undefined_behavior")]
+    #[ffi_service_method(on_panic = "abort")]
     pub fn return_string(&mut self) -> CStrPointer {
         CStrPointer::empty()
     }

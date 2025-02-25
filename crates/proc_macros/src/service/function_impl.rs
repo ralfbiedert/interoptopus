@@ -27,7 +27,7 @@ pub struct AttributeCtor {}
 pub enum OnPanic {
     FfiError,
     ReturnDefault,
-    UndefinedBehavior,
+    Abort,
 }
 
 impl Default for OnPanic {
@@ -130,22 +130,22 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
     let method_type = method_type(function);
 
     match method_type {
-        MethodType::Constructor(_) => inputs.push(quote_spanned!(span_service_ty=> context: &mut *mut #service_type)),
+        MethodType::Constructor(_) => inputs.push(quote_spanned!(span_service_ty => context: &mut *mut #service_type)),
         MethodType::Method(method) if method.ignore => return None,
         _ => {}
     }
 
-    let service_purged_type = Box::new(purge_lifetimes_from_type(service_type));
+    let service_purged_lifetimes = Box::new(purge_lifetimes_from_type(service_type));
 
     let receiver_type = if matches!(method_type, MethodType::Constructor(..)) {
-        service_purged_type.clone()
+        service_purged_lifetimes.clone()
     } else {
         function
             .sig
             .inputs
             .first()
             .and_then(|fn_arg| match fn_arg {
-                FnArg::Receiver(..) => Some(service_purged_type.clone()),
+                FnArg::Receiver(..) => Some(service_purged_lifetimes.clone()),
                 FnArg::Typed(PatType { ty, .. }) => {
                     let ty = match &**ty {
                         Type::Reference(TypeReference { elem, .. }) => elem,
@@ -155,7 +155,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     Some(Box::new(purge_lifetimes_from_type(ty)))
                 }
             })
-            .unwrap_or(service_purged_type.clone())
+            .unwrap_or(service_purged_lifetimes.clone())
     };
 
     let type_eq_check = quote_spanned! {receiver_type.span() =>
@@ -173,7 +173,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 T: TypeEq<This = U>
                 {}
 
-            assert_type_eq_all::<#service_purged_type, #receiver_type>();
+            assert_type_eq_all::<#service_purged_lifetimes, #receiver_type>();
         };
     };
 
@@ -209,7 +209,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
     let generated_function = match &method_type {
         MethodType::Constructor(_) => {
             quote_spanned! { span_function =>
-                #[interoptopus::ffi_function]
+                #[::interoptopus::ffi_function]
                 #[no_mangle]
                 #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
                 #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals)]
@@ -250,7 +250,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
             OnPanic::ReturnDefault => {
                 quote_spanned! { span_function =>
                     #type_eq_check
-                    #[interoptopus::ffi_function]
+                    #[::interoptopus::ffi_function]
                     #[no_mangle]
                     #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
                     #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals)]
@@ -258,7 +258,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                         #[doc = #doc_lines]
                     )*
                     pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #rval {
-                        let result_result = ::std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                        let result_result = ::std::panic::catch_unwind(::std::panic::AssertUnwindSafe(|| {
                             // Make sure we only have a FnOnce closure and prevent lifetime errors.
                             #(
                                 let #arg_names = #arg_names;
@@ -276,7 +276,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     }
                 }
             }
-            OnPanic::UndefinedBehavior => {
+            OnPanic::Abort => {
                 quote_spanned! { span_function =>
                     #type_eq_check
                     #[interoptopus::ffi_function]
@@ -298,7 +298,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
 
                 quote_spanned! { span_function =>
                     #type_eq_check
-                    #[interoptopus::ffi_function]
+                    #[::interoptopus::ffi_function]
                     #[no_mangle]
                     #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
                     #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals)]

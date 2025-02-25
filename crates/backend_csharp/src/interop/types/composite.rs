@@ -16,7 +16,7 @@ pub fn write_type_definition_composite(i: &Interop, w: &mut IndentWriter, the_ty
 }
 
 pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
-    i.debug(w, "write_type_marshaller")?;
+    i.debug(w, "write_type_definition_composite_marshaller")?;
 
     if i.should_emit_marshaller_for_composite(the_type) {
         w.newline()?;

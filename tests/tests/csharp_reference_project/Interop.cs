@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 12785125258593405568ul)
+            if (api_version != 10279452154719646715ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (12785125258593405568). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10279452154719646715). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -795,7 +795,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_return_after_ms")]
         // Debug - write_function_declaration 
-        public static partial void service_async_return_after_ms(IntPtr context, ulong x, ulong ms, AsyncHelper async_callback);
+        public static partial FFIError service_async_return_after_ms(IntPtr context, ulong x, ulong ms, AsyncHelper async_callback);
         // Debug - write_function_overload 
         // Debug - no overload for service_async_return_after_ms 
 
@@ -858,7 +858,7 @@ namespace My.Company
 
         // Debug - write_function 
         /// This function has no panic safeguards. It will be a bit faster to
-        /// call, but if it panics your host app will be in an undefined state.
+        /// call, but if it panics your host app will abort.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_ub_on_panic")]
         // Debug - write_function_declaration 
         public static partial IntPtr service_on_panic_return_ub_on_panic(IntPtr context);
@@ -1281,7 +1281,7 @@ namespace My.Company
     {
         public byte[] data;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     [CustomMarshaller(typeof(Array), MarshalMode.Default, typeof(ArrayMarshaller))]
     internal static class ArrayMarshaller
@@ -1345,7 +1345,7 @@ namespace My.Company
     {
         public bool val;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     [CustomMarshaller(typeof(BoolField), MarshalMode.Default, typeof(BoolFieldMarshaller))]
     internal static class BoolFieldMarshaller
@@ -1394,7 +1394,7 @@ namespace My.Company
         public string str;
         public string str_2;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     [CustomMarshaller(typeof(CharArray), MarshalMode.Default, typeof(CharArrayMarshaller))]
     internal static class CharArrayMarshaller
@@ -1481,7 +1481,7 @@ namespace My.Company
     {
         public Local foreign;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1490,7 +1490,7 @@ namespace My.Company
     {
         public float x;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1499,7 +1499,7 @@ namespace My.Company
     {
         public IntPtr x;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1508,7 +1508,7 @@ namespace My.Company
     {
         public IntPtr x;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1517,7 +1517,7 @@ namespace My.Company
     {
         float x;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1526,7 +1526,7 @@ namespace My.Company
     {
         uint x;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1541,7 +1541,7 @@ namespace My.Company
         public ushort[] field_array_2;
         public Array field_struct;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     [CustomMarshaller(typeof(NestedArray), MarshalMode.Default, typeof(NestedArrayMarshaller))]
     internal static class NestedArrayMarshaller
@@ -1642,7 +1642,7 @@ namespace My.Company
         public byte x;
         public ushort y;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1652,7 +1652,7 @@ namespace My.Company
         public ushort y;
         public byte x;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1661,7 +1661,7 @@ namespace My.Company
     {
         public uint x;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
     /// Documented struct.
@@ -1672,7 +1672,7 @@ namespace My.Company
         /// Documented field.
         public float x;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1681,7 +1681,7 @@ namespace My.Company
     {
         public EnumRenamed e;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1690,7 +1690,7 @@ namespace My.Company
     {
         public byte x0;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1699,7 +1699,7 @@ namespace My.Company
     {
         public string ascii_string;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1709,7 +1709,7 @@ namespace My.Company
         public float x;
         public float y;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1719,7 +1719,7 @@ namespace My.Company
         public double x;
         public double z;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1730,7 +1730,7 @@ namespace My.Company
         public float y;
         public float z;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1740,7 +1740,7 @@ namespace My.Company
         public byte pblc;
         byte prvt;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1750,7 +1750,7 @@ namespace My.Company
         public byte pblc1;
         public byte pblc2;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1759,7 +1759,7 @@ namespace My.Company
     {
         uint x;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1770,7 +1770,7 @@ namespace My.Company
         internal byte[] a;
         internal IntPtr r;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     [CustomMarshaller(typeof(Weird2u8), MarshalMode.Default, typeof(Weird2u8Marshaller))]
     internal static class Weird2u8Marshaller
@@ -2190,7 +2190,7 @@ namespace My.Company
         ///Byte where `1` means element `t` is valid.
         byte is_some;
     }
-    // Debug - write_type_marshaller 
+    // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_pattern_option 
     public partial struct OptionInner
@@ -2211,6 +2211,34 @@ namespace My.Company
         {
             return this.is_some == 1 ? this.t : (Inner?)null;
         }
+    }
+
+
+    // Debug - write_type_definition_composite 
+    ///Result that contains value or an error.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct ResultU64
+    {
+        ///Element if err is `Ok`.
+        ulong t;
+        ///Error value.
+        FFIError err;
+    }
+    // Debug - write_type_definition_composite_marshaller 
+
+    // Debug - write_pattern_result 
+    public partial struct ResultU64
+    {
+        public ulong Ok()
+        {
+            if (err == 0)
+            {
+                return t;
+            }
+            throw new InteropException<FFIError>(err);
+        }
+
     }
 
 
@@ -3147,17 +3175,21 @@ namespace My.Company
         }
 
         // Debug - write_pattern_service_method 
-        public Task<ulong> ReturnAfterMs(ulong x, ulong ms)
+        public Task<ResultU64> ReturnAfterMs(ulong x, ulong ms)
         {
-            var cs = new TaskCompletionSource<ulong>();
+            var cs = new TaskCompletionSource<ResultU64>();
             GCHandle pinned = default;
             var cb = new AsyncHelper((x) => {
-                var rval = Marshal.PtrToStructure<ulong>(x);
+                var rval = Marshal.PtrToStructure<ResultU64>(x);
                 cs.SetResult(rval);
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
-            Interop.service_async_return_after_ms(_context, x, ms, cb);
+            var rval = Interop.service_async_return_after_ms(_context, x, ms, cb);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
             return cs.Task;
         }
         // Debug - write_service_method_overload 
@@ -3251,7 +3283,7 @@ namespace My.Company
         // Debug - write_service_method_overload 
 
         /// This function has no panic safeguards. It will be a bit faster to
-        /// call, but if it panics your host app will be in an undefined state.
+        /// call, but if it panics your host app will abort.
         // Debug - write_pattern_service_method 
         public string ReturnUbOnPanic()
         {
