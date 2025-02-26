@@ -21,6 +21,7 @@ pub mod patterns {
     pub mod primitives;
     pub mod result;
     pub mod services {
+        pub mod _tmp;
         pub mod asynk;
         pub mod basic;
         pub mod callbacks;
@@ -132,7 +133,6 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(patterns::callbacks::pattern_callback_6))
             .register(function!(patterns::callbacks::pattern_callback_7))
             .register(function!(patterns::surrogates::pattern_surrogates_1))
-            
             // Constants
             .register(constant!(constants::U8))
             .register(constant!(constants::F32_MIN_POSITIVE))

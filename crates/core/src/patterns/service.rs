@@ -112,20 +112,22 @@
 //!
 
 use crate::lang::c::{CType, Function, OpaqueType};
+use crate::lang::rust::CTypeInfo;
 use crate::patterns::TypePattern;
 use crate::util::longest_common_prefix;
 use std::fmt::Debug;
+use std::sync::Arc;
 
 /// Combines a receiver, constructor, destructor and multiple methods in one entity.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct Service {
+pub struct ServiceDefinition {
     the_type: OpaqueType,
     constructors: Vec<Function>,
     destructor: Function,
     methods: Vec<Function>,
 }
 
-impl Service {
+impl ServiceDefinition {
     /// Creates a new service definition.
     ///
     /// # Panics
@@ -243,5 +245,36 @@ fn extract_obvious_opaque_from_parameter(param: &CType) -> Option<OpaqueType> {
         CType::ReadWritePointer(x) => extract_obvious_opaque_from_parameter(x),
         CType::Pattern(_) => None,
         CType::Array(_) => None,
+    }
+}
+
+pub trait Service: CTypeInfo + Sized {
+    type Container: ServiceContainer<Self>;
+}
+
+/// TODO
+///
+/// # Safety
+/// TODO
+pub unsafe trait ServiceContainer<T> {
+    fn into_raw(self) -> *const T;
+    fn clone(*const T) -> Self;
+}
+
+unsafe impl<T: CTypeInfo> ServiceContainer<T> for Arc<T> {
+    fn into_raw(self) -> *const T {
+        Self::into_raw(self)
+    }
+
+    fn clone(x: *const T) -> Self {}
+}
+
+unsafe impl<T: CTypeInfo> ServiceContainer<T> for Box<T> {
+    fn into_raw(self) -> *const T {
+        Self::into_raw(self)
+    }
+
+    fn clone(_: *const T) -> Self {
+        panic!()
     }
 }

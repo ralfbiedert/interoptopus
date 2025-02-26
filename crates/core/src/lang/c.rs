@@ -249,8 +249,8 @@ impl CType {
     #[must_use]
     pub const fn pointer_target(&self) -> Option<&Self> {
         match self {
-            CType::ReadPointer(x) => Some(x),
-            CType::ReadWritePointer(x) => Some(x),
+            Self::ReadPointer(x) => Some(x),
+            Self::ReadWritePointer(x) => Some(x),
             _ => None,
         }
     }
@@ -710,7 +710,7 @@ impl Function {
         self.signature
             .params
             .last()
-            .map_or(None, |x| x.the_type().as_async_callback())
+            .and_then(|x| x.the_type().as_async_callback())
             .map(|async_callback: &AsyncCallback| async_callback.target())
     }
 }

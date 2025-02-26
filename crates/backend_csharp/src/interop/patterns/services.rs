@@ -1,16 +1,15 @@
-use crate::converter::{async_callback_to_typename, function_name_to_csharp_name, to_typespecifier_in_param, to_typespecifier_in_rval};
+use crate::converter::{function_name_to_csharp_name, to_typespecifier_in_param, to_typespecifier_in_rval};
 use crate::interop::functions::write_documentation;
 use crate::interop::patterns::pattern_to_native_in_signature;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::lang::c::{CType, Function, Parameter, PrimitiveType};
-use interoptopus::patterns::service::Service;
+use interoptopus::patterns::service::ServiceDefinition;
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::longest_common_prefix;
 use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, Error};
-use std::iter::zip;
 
-pub fn write_pattern_service(i: &Interop, w: &mut IndentWriter, class: &Service) -> Result<(), Error> {
+pub fn write_pattern_service(i: &Interop, w: &mut IndentWriter, class: &ServiceDefinition) -> Result<(), Error> {
     i.debug(w, "write_pattern_service")?;
     let mut all_functions = class.constructors().to_vec();
     all_functions.extend_from_slice(class.methods());
@@ -74,7 +73,7 @@ pub fn write_pattern_service(i: &Interop, w: &mut IndentWriter, class: &Service)
 pub fn write_pattern_service_method(
     i: &Interop,
     w: &mut IndentWriter,
-    class: &Service,
+    class: &ServiceDefinition,
     function: &Function,
     mut rval: &str,
     fn_name: &str,
@@ -241,7 +240,7 @@ pub fn write_pattern_service_method(
 pub fn write_service_method_overload(
     i: &Interop,
     w: &mut IndentWriter,
-    _class: &Service,
+    _class: &ServiceDefinition,
     function: &Function,
     fn_pretty: &str,
     write_for: WriteFor,

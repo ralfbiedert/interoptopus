@@ -20,6 +20,7 @@ proc-macro = true
 
 [dependencies]
 proc-macro2.workspace = true
+prettyplease.workspace = true
 syn = { workspace = true, features = ["full"] }
 quote.workspace = true
 darling.workspace = true

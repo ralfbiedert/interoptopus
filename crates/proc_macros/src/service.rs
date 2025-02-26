@@ -1,10 +1,10 @@
 use crate::macros::darling_parse;
 use crate::service::function_impl::{generate_service_dtor, generate_service_method};
-use crate::util::{get_type_name, pascal_to_snake_case};
+use crate::util::{get_type_name, pascal_to_snake_case, prettyprint_tokenstream};
 use darling::FromMeta;
 use function_impl::MethodType;
 use proc_macro2::TokenStream;
-use quote::quote;
+use quote::{quote, ToTokens};
 use syn::{ImplItem, ItemImpl, Visibility};
 
 pub mod function_impl;
@@ -117,7 +117,7 @@ pub fn ffi_service(attr: TokenStream, input: &TokenStream) -> TokenStream {
     };
 
     if attributes.debug {
-        println!("{}", &rval);
+        prettyprint_tokenstream(&rval);
     }
 
     rval

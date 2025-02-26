@@ -1,6 +1,8 @@
 use darling::ToTokens;
+use proc_macro::TokenStream;
+use syn::__private::TokenStream2;
 use syn::punctuated::Punctuated;
-use syn::{Attribute, Expr, GenericArgument, ItemImpl, Lit, Meta, PathArguments, Type, TypePath};
+use syn::{parse_macro_input, Attribute, Expr, File, GenericArgument, ItemImpl, Lit, Meta, PathArguments, Type, TypePath};
 
 /// From a let of attributes to an item, extracts the ones that are documentation, as strings.
 pub fn extract_doc_lines(attributes: &[Attribute]) -> Vec<String> {
@@ -109,4 +111,12 @@ pub fn pascal_to_snake_case(s: &str) -> String {
         }
     }
     result
+}
+
+pub fn prettyprint_tokenstream(tokens: &TokenStream2) -> TokenStream {
+    let rval1: proc_macro::TokenStream = tokens.clone().into();
+    let syntax_tree: File = parse_macro_input!(rval1 as File);
+    let string = prettyplease::unparse(&syntax_tree);
+    println!("{string}");
+    syntax_tree.into_token_stream().into()
 }

@@ -28,10 +28,8 @@
 //! }
 //! ```
 
-use crate::lang::c::{CType, CompositeType, Documentation, EnumType, Field, Layout, Meta, PrimitiveType, Representation, Variant, Visibility};
+use crate::lang::c::{CType, CompositeType, Documentation, EnumType, Field, Layout, Meta, Representation, Variant, Visibility};
 use crate::lang::rust::CTypeInfo;
-use crate::patterns::option::FFIOption;
-use crate::patterns::primitives::FFIBool;
 use crate::patterns::TypePattern;
 use crate::util::{capitalize_first_letter, log_error};
 use std::any::Any;
@@ -235,7 +233,7 @@ pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
 }
 
 #[repr(C)]
-#[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Eq, Default, Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Eq, Default, serde::Deserialize, serde::Serialize))]
 #[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Eq, Default))]
 pub struct FFIResult<T, E> {
     t: T,

@@ -3,6 +3,7 @@ use crate::lang::rust::CTypeInfo;
 use crate::patterns;
 use crate::patterns::TypePattern;
 use std::ffi::c_void;
+use std::future::Future;
 use std::ptr::null;
 
 /// TODO: Document must be thread safe
@@ -21,13 +22,16 @@ impl<T: CTypeInfo> AsyncCallback<T> {
 
     ///   Will call function if it exists, panic otherwise.
     pub fn call(&self, t: &T) {
-        self.0.expect("Assumed function would exist but it didn't.")(t, self.1)
+        self.0.expect("Assumed function would exist but it didn't.")(t, self.1);
     }
 
     ///   Will call function only if it exists
     pub fn call_if_some(&self, t: &T) -> Option<()> {
         match self.0 {
-            Some(c) => Some(c(t, self.1)),
+            Some(c) => {
+                c(t, self.1);
+                Some(())
+            }
             None => None,
         }
     }
@@ -61,4 +65,8 @@ unsafe impl<T: CTypeInfo> CTypeInfo for AsyncCallback<T> {
 
         CType::Pattern(TypePattern::AsyncCallback(named_callback))
     }
+}
+
+pub trait AsyncRuntime {
+    fn spawn<F: Future<Output = ()> + Send + 'static>(&self, f: F);
 }

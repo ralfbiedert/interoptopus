@@ -16,6 +16,7 @@ pub struct Descriptor {
 #[derive(Debug)]
 pub enum MethodType {
     Constructor(AttributeCtor),
+    Async,
     Method(AttributeMethod),
     Destructor,
 }
@@ -62,6 +63,12 @@ fn method_type(function: &ImplItemFn) -> MethodType {
         let ctor_attributes = attrs.iter().find_map(|attribute| AttributeCtor::from_meta(&attribute.meta).ok()).unwrap_or_default();
 
         return MethodType::Constructor(ctor_attributes);
+    }
+
+    // Methods that have an `async fn` are always async.
+    if function.sig.asyncness.is_some() {
+        // panic!("Async methods are not supported yet.");
+        return MethodType::Async;
     }
 
     // Methods explicitly marked a service methods
@@ -130,7 +137,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
     let method_type = method_type(function);
 
     match method_type {
-        MethodType::Constructor(_) => inputs.push(quote_spanned!(span_service_ty => context: &mut *mut #service_type)),
+        MethodType::Constructor(_) => inputs.push(quote_spanned!(span_service_ty => context: &mut *const #service_type)),
         MethodType::Method(method) if method.ignore => return None,
         _ => {}
     }
@@ -182,9 +189,9 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
         match arg {
             FnArg::Receiver(receiver) => {
                 if receiver.mutability.is_some() {
-                    inputs.push(quote_spanned!(span_arg=> context: &mut #service_type));
+                    inputs.push(quote_spanned!(span_arg=> context: *const #service_type));
                 } else {
-                    inputs.push(quote_spanned!(span_arg=> context: & #service_type));
+                    inputs.push(quote_spanned!(span_arg=> context: *mut #service_type));
                 }
 
                 arg_names.push(quote_spanned!(span_arg=> context));
@@ -217,6 +224,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     #[doc = #doc_lines]
                 )*
                 pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #error_ident {
+                    use ::interoptopus::patterns::service::ServiceContainer;
 
                     *context = ::std::ptr::null_mut();
 
@@ -226,10 +234,8 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
 
                     match result_result {
                         Ok(Ok(obj)) => {
-                            let boxed = ::std::boxed::Box::new(obj);
-                            let raw = ::std::boxed::Box::into_raw(boxed);
-                            *context = raw;
-
+                            let raw = obj.into_raw();
+                            *context = raw.cast();
                             <#error_ident as ::interoptopus::patterns::result::FFIError>::SUCCESS
                         }
 
@@ -313,6 +319,33 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 }
             }
         },
+        MethodType::Async => {
+            let first = arg_names.first().unwrap();
+            let block = quote_spanned! { span_body =>
+                use ::interoptopus::patterns::result::FFIError;
+                let f2 = <#without_lifetimes>::#orig_fn_ident( #(#arg_names),* );
+                let f1 = async move {
+                    f2.await;
+                };
+
+                <#without_lifetimes>::spawn(#first, f1);
+                #error_ident::SUCCESS
+            };
+
+            quote_spanned! { span_function =>
+                #type_eq_check
+                #[::interoptopus::ffi_function]
+                #[no_mangle]
+                #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
+                #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals)]
+                #(
+                    #[doc = #doc_lines]
+                )*
+                pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),*, async_callback: AsyncCallback<FFIResult<u64, FFIError>>) -> #error_ident {
+                    #block
+                }
+            }
+        }
         MethodType::Destructor => panic!("Must not happen."),
     };
 
@@ -338,11 +371,11 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
         ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
-        #[interoptopus::ffi_function]
+        #[::interoptopus::ffi_function]
         #[allow(unused_mut, unsafe_op_in_unsafe_fn, unused_unsafe)]
         #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals)]
         #[no_mangle]
-        pub unsafe extern "C" fn #ffi_fn_ident(context: &mut *mut #without_lifetimes) -> #error_ident {
+        pub unsafe extern "C" fn #ffi_fn_ident(context: &mut *mut <#without_lifetimes as ::interoptopus::patterns::service::Service>::Container) -> #error_ident {
             // Checks the _contained_ pointer is not null, which usually means service was not initialized.
             if context.is_null() {
                 return <#error_ident as ::interoptopus::patterns::result::FFIError>::NULL;

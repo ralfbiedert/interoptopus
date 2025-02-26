@@ -80,7 +80,7 @@ use crate::lang::c::{CType, CompositeType, PrimitiveType};
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::callbacks::{AsyncCallback, NamedCallback};
 use crate::patterns::result::FFIErrorEnum;
-use crate::patterns::service::Service;
+use crate::patterns::service::ServiceDefinition;
 use std::ffi::c_char;
 
 #[doc(hidden)]
@@ -100,7 +100,7 @@ pub mod surrogates;
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 #[non_exhaustive]
 pub enum LibraryPattern {
-    Service(Service),
+    Service(ServiceDefinition),
 }
 
 /// Used mostly internally and provides pattern info for auto generated structs.
@@ -109,8 +109,8 @@ pub trait LibraryPatternInfo {
     fn pattern_info() -> LibraryPattern;
 }
 
-impl From<Service> for LibraryPattern {
-    fn from(x: Service) -> Self {
+impl From<ServiceDefinition> for LibraryPattern {
+    fn from(x: ServiceDefinition) -> Self {
         Self::Service(x)
     }
 }

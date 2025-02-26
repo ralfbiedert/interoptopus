@@ -3,7 +3,7 @@ use crate::interop::functions::write_param_helpers;
 use crate::interop::utils::write_success_enum_aware_rval;
 use crate::Interop;
 use interoptopus::lang::c::{CType, CompositeType, Function};
-use interoptopus::patterns::service::Service;
+use interoptopus::patterns::service::ServiceDefinition;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::longest_common_prefix;
 use interoptopus::writer::{IndentWriter, WriteFor};
@@ -159,7 +159,7 @@ pub fn write_patterns(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     Ok(())
 }
 
-pub fn write_pattern_class(i: &Interop, w: &mut IndentWriter, class: &Service) -> Result<(), Error> {
+pub fn write_pattern_class(i: &Interop, w: &mut IndentWriter, class: &ServiceDefinition) -> Result<(), Error> {
     let context_type_name = class.the_type().rust_name();
 
     let mut all_functions = class.constructors().to_vec();
@@ -210,7 +210,7 @@ pub fn write_pattern_class(i: &Interop, w: &mut IndentWriter, class: &Service) -
     Ok(())
 }
 
-pub fn write_pattern_class_ctor(i: &Interop, w: &mut IndentWriter, class: &Service, ctor: &Function, write_for: WriteFor) -> Result<(), Error> {
+pub fn write_pattern_class_ctor(i: &Interop, w: &mut IndentWriter, class: &ServiceDefinition, ctor: &Function, write_for: WriteFor) -> Result<(), Error> {
     let context_type_name = class.the_type().rust_name();
     let mut all_functions = class.constructors().to_vec();
     all_functions.extend_from_slice(class.methods());
@@ -239,7 +239,7 @@ pub fn write_pattern_class_ctor(i: &Interop, w: &mut IndentWriter, class: &Servi
     Ok(())
 }
 
-pub fn write_pattern_class_method(i: &Interop, w: &mut IndentWriter, class: &Service, function: &Function, write_for: WriteFor) -> Result<(), Error> {
+pub fn write_pattern_class_method(i: &Interop, w: &mut IndentWriter, class: &ServiceDefinition, function: &Function, write_for: WriteFor) -> Result<(), Error> {
     let mut all_functions = class.constructors().to_vec();
     all_functions.extend_from_slice(class.methods());
     all_functions.push(class.destructor().clone());
