@@ -39,7 +39,9 @@ public class TestPatternServicesAsync
     {
         var s = ServiceAsync.New();
         var r = await s.ReturnAfterMs(123, 500);
+        var t = await s.Xxx(45);
         Assert.Equal(r.Ok(), 123u);
+        Assert.Equal(t.Ok(), 45);
         s.Dispose();
     }
 

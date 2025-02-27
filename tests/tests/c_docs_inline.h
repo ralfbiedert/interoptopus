@@ -14,7 +14,7 @@ extern "C" {
 
 
 
-/// Documented
+///  Documented
 void sample_function();
 
 

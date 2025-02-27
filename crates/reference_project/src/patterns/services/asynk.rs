@@ -18,6 +18,7 @@ impl AsyncRuntime for ServiceAsync {
         self.runtime.spawn(f);
     }
 }
+use interoptopus::patterns::result::IntoFFIResult;
 
 #[ffi_service(error = "FFIError")]
 impl ServiceAsync {
@@ -41,10 +42,13 @@ impl ServiceAsync {
         Ok(())
     }
 
-    pub async fn return_after_ms(s: Arc<ServiceAsync>, x: u64, ms: u64) -> Result<u64, FFIError> {
+    pub async fn return_after_ms(self: Arc<ServiceAsync>, x: u64, ms: u64) -> Result<u64, FFIError> {
         dbg!("I WORK!!!!!!");
-        // sleep(std::time::Duration::from_millis(ms));
-        // async_callback.call(&x);
+        tokio::time::sleep(std::time::Duration::from_millis(ms)).await;
+        Ok(x)
+    }
+
+    pub async fn xxx(self: Arc<ServiceAsync>, x: u8) -> Result<u8, FFIError> {
         Ok(x)
     }
 }

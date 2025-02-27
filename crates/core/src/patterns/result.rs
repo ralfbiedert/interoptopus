@@ -260,6 +260,19 @@ where
     }
 }
 
+impl<T, E> From<Result<T, E>> for FFIResult<T, E>
+where
+    T: CTypeInfo + Default,
+    E: CTypeInfo + FFIError,
+{
+    fn from(x: Result<T, E>) -> Self {
+        match x {
+            Ok(t) => Self::ok(t),
+            Err(err) => Self::error(err),
+        }
+    }
+}
+
 unsafe impl<T, E> CTypeInfo for FFIResult<T, E>
 where
     T: CTypeInfo,
@@ -283,15 +296,10 @@ where
     }
 }
 
-impl<T, E> From<Result<T, E>> for FFIResult<T, E>
-where
-    T: CTypeInfo + Default,
-    E: CTypeInfo + FFIError,
-{
-    fn from(x: Result<T, E>) -> Self {
-        match x {
-            Ok(t) => Self::ok(t),
-            Err(err) => Self::error(err),
-        }
-    }
+pub trait IntoFFIResult {
+    type FFIResult;
+}
+
+impl<T, E: FFIError> IntoFFIResult for Result<T, E> {
+    type FFIResult = FFIResult<T, E>;
 }

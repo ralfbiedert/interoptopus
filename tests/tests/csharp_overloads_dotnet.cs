@@ -3,6 +3,7 @@
 #pragma warning disable 0105
 using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Reflection;
 using System.Linq.Expressions;
 using System.Collections;
@@ -23,9 +24,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 2550245526635566063ul)
+            if (api_version != 3690414432940671665ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (2550245526635566063). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (3690414432940671665). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -286,12 +287,13 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_3b")]
         public static partial void pattern_ffi_slice_3b(SliceMutU8 slice, CallbackSliceMut callback);
 
-        public static unsafe void pattern_ffi_slice_3b(Span<byte> slice, CallbackSliceMut callback)
+        public static unsafe void pattern_ffi_slice_3b(Span<byte> slice, CallbackSliceMutDelegate callback)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                pattern_ffi_slice_3b(slice_slice, callback);;
+                var callback_wrapped = new CallbackSliceMut(callback);
+                pattern_ffi_slice_3b(slice_slice, callback_wrapped);;
             }
         }
 
@@ -330,23 +332,42 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_6")]
         public static partial void pattern_ffi_slice_6(ref SliceMutU8 slice, CallbackU8 callback);
 
-        public static unsafe void pattern_ffi_slice_6(Span<byte> slice, CallbackU8 callback)
+        public static unsafe void pattern_ffi_slice_6(Span<byte> slice, CallbackU8Delegate callback)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                pattern_ffi_slice_6(ref slice_slice, callback);;
+                var callback_wrapped = new CallbackU8(callback);
+                pattern_ffi_slice_6(ref slice_slice, callback_wrapped);;
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_8")]
         public static partial void pattern_ffi_slice_8(ref SliceMutCharArray slice, CallbackCharArray2 callback);
 
+        public static unsafe void pattern_ffi_slice_8(ref SliceMutCharArray slice, CallbackCharArray2Delegate callback)
+        {
+            var callback_wrapped = new CallbackCharArray2(callback);
+            pattern_ffi_slice_8(ref slice, callback_wrapped);;
+        }
+
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_delegate")]
         public static partial byte pattern_ffi_slice_delegate(CallbackFFISlice callback);
 
+        public static unsafe byte pattern_ffi_slice_delegate(CallbackFFISliceDelegate callback)
+        {
+            var callback_wrapped = new CallbackFFISlice(callback);
+            return pattern_ffi_slice_delegate(callback_wrapped);;
+        }
+
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_delegate_huge")]
         public static partial Vec3f32 pattern_ffi_slice_delegate_huge(CallbackHugeVecSlice callback);
+
+        public static unsafe Vec3f32 pattern_ffi_slice_delegate_huge(CallbackHugeVecSliceDelegate callback)
+        {
+            var callback_wrapped = new CallbackHugeVecSlice(callback);
+            return pattern_ffi_slice_delegate_huge(callback_wrapped);;
+        }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_1")]
         public static partial OptionInner pattern_ffi_option_1(OptionInner ffi_slice);
@@ -372,11 +393,29 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_1")]
         public static partial uint pattern_callback_1(MyCallback callback, uint x);
 
+        public static unsafe uint pattern_callback_1(MyCallbackDelegate callback, uint x)
+        {
+            var callback_wrapped = new MyCallback(callback);
+            return pattern_callback_1(callback_wrapped, x);;
+        }
+
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_2")]
         public static partial MyCallbackVoid pattern_callback_2(MyCallbackVoid callback);
 
+        public static unsafe MyCallbackVoid pattern_callback_2(MyCallbackVoidDelegate callback)
+        {
+            var callback_wrapped = new MyCallbackVoid(callback);
+            return pattern_callback_2(callback_wrapped);;
+        }
+
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_4")]
         public static partial uint pattern_callback_4(MyCallbackNamespaced callback, uint x);
+
+        public static unsafe uint pattern_callback_4(MyCallbackNamespacedDelegate callback, uint x)
+        {
+            var callback_wrapped = new MyCallbackNamespaced(callback);
+            return pattern_callback_4(callback_wrapped, x);;
+        }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_5")]
         public static partial SumDelegate1 pattern_callback_5();
@@ -387,8 +426,40 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_7")]
         public static partial FFIError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o);
 
+        public static unsafe void pattern_callback_7(SumDelegateReturnDelegate c1, SumDelegateReturn2Delegate c2, int x, int i, out int o)
+        {
+            var c1_wrapped = new SumDelegateReturn(c1);
+            var c2_wrapped = new SumDelegateReturn2(c2);
+            var rval = pattern_callback_7(c1_wrapped, c2_wrapped, x, i, out o);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
         [LibraryImport(NativeLib, EntryPoint = "pattern_surrogates_1")]
         public static partial void pattern_surrogates_1(Local s, out Container c);
+
+        /// Destroys the given instance.
+        ///
+        /// # Safety
+        ///
+        /// The passed parameter MUST have been created with the corresponding init function;
+        /// passing any other value results in undefined behavior.
+        [LibraryImport(NativeLib, EntryPoint = "service_async_destroy")]
+        public static partial FFIError service_async_destroy(ref IntPtr context);
+
+        [LibraryImport(NativeLib, EntryPoint = "service_async_new")]
+        public static partial FFIError service_async_new(ref IntPtr context);
+
+        [LibraryImport(NativeLib, EntryPoint = "service_async_return_after_ms_explicit")]
+        public static partial FFIError service_async_return_after_ms_explicit(IntPtr context, ulong x, ulong ms, AsyncHelper async_callback);
+
+        [LibraryImport(NativeLib, EntryPoint = "service_async_return_after_ms")]
+        public static partial FFIError service_async_return_after_ms(IntPtr context, ulong x, ulong ms, AsyncHelper async_callback);
+
+        [LibraryImport(NativeLib, EntryPoint = "service_async_xxx")]
+        public static partial FFIError service_async_xxx(IntPtr context, byte x, AsyncHelper async_callback);
 
         /// Destroys the given instance.
         ///
@@ -424,7 +495,7 @@ namespace My.Company
         public static partial uint service_on_panic_return_default_value(IntPtr context, uint x);
 
         /// This function has no panic safeguards. It will be a bit faster to
-        /// call, but if it panics your host app will be in an undefined state.
+        /// call, but if it panics your host app will abort.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_ub_on_panic")]
         public static partial IntPtr service_on_panic_return_ub_on_panic(IntPtr context);
 
@@ -443,18 +514,39 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_simple")]
         public static partial FFIError service_callbacks_callback_simple(IntPtr context, MyCallback callback);
 
+        public static unsafe void service_callbacks_callback_simple(IntPtr context, MyCallbackDelegate callback)
+        {
+            var callback_wrapped = new MyCallback(callback);
+            var rval = service_callbacks_callback_simple(context, callback_wrapped);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_ffi_return")]
         public static partial FFIError service_callbacks_callback_ffi_return(IntPtr context, SumDelegateReturn callback);
+
+        public static unsafe void service_callbacks_callback_ffi_return(IntPtr context, SumDelegateReturnDelegate callback)
+        {
+            var callback_wrapped = new SumDelegateReturn(callback);
+            var rval = service_callbacks_callback_ffi_return(context, callback_wrapped);;
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_with_slice")]
         public static partial FFIError service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, SliceI32 input);
 
-        public static unsafe void service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, ReadOnlySpan<int> input)
+        public static unsafe void service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
         {
             fixed (void* ptr_input = input)
             {
                 var input_slice = new SliceI32(new IntPtr(ptr_input), (ulong) input.Length);
-                var rval = service_callbacks_callback_with_slice(context, callback, input_slice);;
+                var callback_wrapped = new SumDelegateReturn(callback);
+                var rval = service_callbacks_callback_with_slice(context, callback_wrapped, input_slice);;
                 if (rval != FFIError.Ok)
                 {
                     throw new InteropException<FFIError>(rval);
@@ -2225,6 +2317,56 @@ namespace My.Company
     }
 
 
+    ///Result that contains value or an error.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct ResultU64
+    {
+        ///Element if err is `Ok`.
+        ulong t;
+        ///Error value.
+        FFIError err;
+    }
+
+    public partial struct ResultU64
+    {
+        public ulong Ok()
+        {
+            if (err == 0)
+            {
+                return t;
+            }
+            throw new InteropException<FFIError>(err);
+        }
+
+    }
+
+
+    ///Result that contains value or an error.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct ResultU8
+    {
+        ///Element if err is `Ok`.
+        byte t;
+        ///Error value.
+        FFIError err;
+    }
+
+    public partial struct ResultU8
+    {
+        public byte Ok()
+        {
+            if (err == 0)
+            {
+                return t;
+            }
+            throw new InteropException<FFIError>(err);
+        }
+
+    }
+
+
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public partial struct Bool
@@ -2244,10 +2386,9 @@ namespace My.Company
     }
 
 
-    public delegate void CallbackCharArray2Delegate(CharArray value);
-
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void CallbackCharArray2Native(CharArray value, IntPtr callback_data);
+    public delegate void CallbackCharArray2Delegate(CharArray value);
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public struct CallbackCharArray2 : IDisposable
@@ -2326,10 +2467,9 @@ namespace My.Company
     }
 
 
-    public delegate byte CallbackFFISliceDelegate(SliceU8 slice);
-
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte CallbackFFISliceNative(SliceU8.Unmanaged slice, IntPtr callback_data);
+    public delegate byte CallbackFFISliceDelegate(SliceU8 slice);
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public struct CallbackFFISlice : IDisposable
@@ -2408,10 +2548,9 @@ namespace My.Company
     }
 
 
-    public delegate Vec3f32 CallbackHugeVecSliceDelegate(SliceVec3f32 slice);
-
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate Vec3f32 CallbackHugeVecSliceNative(SliceVec3f32.Unmanaged slice, IntPtr callback_data);
+    public delegate Vec3f32 CallbackHugeVecSliceDelegate(SliceVec3f32 slice);
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public struct CallbackHugeVecSlice : IDisposable
@@ -2490,10 +2629,9 @@ namespace My.Company
     }
 
 
-    public delegate void CallbackSliceMutDelegate(SliceMutU8 slice);
-
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void CallbackSliceMutNative(SliceMutU8.Unmanaged slice, IntPtr callback_data);
+    public delegate void CallbackSliceMutDelegate(SliceMutU8 slice);
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public struct CallbackSliceMut : IDisposable
@@ -2572,10 +2710,9 @@ namespace My.Company
     }
 
 
-    public delegate byte CallbackU8Delegate(byte value);
-
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte CallbackU8Native(byte value, IntPtr callback_data);
+    public delegate byte CallbackU8Delegate(byte value);
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public struct CallbackU8 : IDisposable
@@ -2654,10 +2791,9 @@ namespace My.Company
     }
 
 
-    public delegate uint MyCallbackDelegate(uint value);
-
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate uint MyCallbackNative(uint value, IntPtr callback_data);
+    public delegate uint MyCallbackDelegate(uint value);
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public struct MyCallback : IDisposable
@@ -2736,10 +2872,9 @@ namespace My.Company
     }
 
 
-    public delegate void MyCallbackVoidDelegate(IntPtr ptr);
-
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MyCallbackVoidNative(IntPtr ptr, IntPtr callback_data);
+    public delegate void MyCallbackVoidDelegate(IntPtr ptr);
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public struct MyCallbackVoid : IDisposable
@@ -2818,10 +2953,9 @@ namespace My.Company
     }
 
 
-    public delegate void SumDelegate1Delegate();
-
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void SumDelegate1Native(IntPtr callback_data);
+    public delegate void SumDelegate1Delegate();
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public struct SumDelegate1 : IDisposable
@@ -2900,10 +3034,9 @@ namespace My.Company
     }
 
 
-    public delegate int SumDelegate2Delegate(int x, int y);
-
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate int SumDelegate2Native(int x, int y, IntPtr callback_data);
+    public delegate int SumDelegate2Delegate(int x, int y);
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public struct SumDelegate2 : IDisposable
@@ -2982,10 +3115,9 @@ namespace My.Company
     }
 
 
-    public delegate FFIError SumDelegateReturnDelegate(int x, int y);
-
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate FFIError SumDelegateReturnNative(int x, int y, IntPtr callback_data);
+    public delegate FFIError SumDelegateReturnDelegate(int x, int y);
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public struct SumDelegateReturn : IDisposable
@@ -3064,10 +3196,9 @@ namespace My.Company
     }
 
 
-    public delegate void SumDelegateReturn2Delegate(int x, int y);
-
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void SumDelegateReturn2Native(int x, int y, IntPtr callback_data);
+    public delegate void SumDelegateReturn2Delegate(int x, int y);
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public struct SumDelegateReturn2 : IDisposable
@@ -3147,6 +3278,90 @@ namespace My.Company
 
 
 
+    public partial class ServiceAsync : IDisposable
+    {
+        private IntPtr _context;
+
+        private ServiceAsync() {}
+
+        public static ServiceAsync New()
+        {
+            var self = new ServiceAsync();
+            var rval = Interop.service_async_new(ref self._context);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+            return self;
+        }
+
+        public void Dispose()
+        {
+            var rval = Interop.service_async_destroy(ref _context);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
+        public Task<ResultU64> ReturnAfterMsExplicit(ulong x, ulong ms)
+        {
+            var cs = new TaskCompletionSource<ResultU64>();
+            GCHandle pinned = default;
+            var cb = new AsyncHelper((x) => {
+                var rval = Marshal.PtrToStructure<ResultU64>(x);
+                cs.SetResult(rval);
+                pinned.Free();
+            });
+            pinned = GCHandle.Alloc(cb);
+            var rval = Interop.service_async_return_after_ms_explicit(_context, x, ms, cb);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+            return cs.Task;
+        }
+
+        public Task<ResultU64> ReturnAfterMs(ulong x, ulong ms)
+        {
+            var cs = new TaskCompletionSource<ResultU64>();
+            GCHandle pinned = default;
+            var cb = new AsyncHelper((x) => {
+                var rval = Marshal.PtrToStructure<ResultU64>(x);
+                cs.SetResult(rval);
+                pinned.Free();
+            });
+            pinned = GCHandle.Alloc(cb);
+            var rval = Interop.service_async_return_after_ms(_context, x, ms, cb);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+            return cs.Task;
+        }
+
+        public Task<ResultU8> Xxx(byte x)
+        {
+            var cs = new TaskCompletionSource<ResultU8>();
+            GCHandle pinned = default;
+            var cb = new AsyncHelper((x) => {
+                var rval = Marshal.PtrToStructure<ResultU8>(x);
+                cs.SetResult(rval);
+                pinned.Free();
+            });
+            pinned = GCHandle.Alloc(cb);
+            var rval = Interop.service_async_xxx(_context, x, cb);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+            return cs.Task;
+        }
+
+        public IntPtr Context => _context;
+    }
+
+
     public partial class BasicService : IDisposable
     {
         private IntPtr _context;
@@ -3222,7 +3437,7 @@ namespace My.Company
         }
 
         /// This function has no panic safeguards. It will be a bit faster to
-        /// call, but if it panics your host app will be in an undefined state.
+        /// call, but if it panics your host app will abort.
         public string ReturnUbOnPanic()
         {
             var s = Interop.service_on_panic_return_ub_on_panic(_context);
@@ -3269,6 +3484,11 @@ namespace My.Company
             }
         }
 
+        public void CallbackSimple(MyCallbackDelegate callback)
+        {
+            Interop.service_callbacks_callback_simple(_context, callback);
+        }
+
         public void CallbackFfiReturn(SumDelegateReturn callback)
         {
             var rval = Interop.service_callbacks_callback_ffi_return(_context, callback);
@@ -3276,6 +3496,11 @@ namespace My.Company
             {
                 throw new InteropException<FFIError>(rval);
             }
+        }
+
+        public void CallbackFfiReturn(SumDelegateReturnDelegate callback)
+        {
+            Interop.service_callbacks_callback_ffi_return(_context, callback);
         }
 
         public void CallbackWithSlice(SumDelegateReturn callback, SliceI32 input)
@@ -3287,7 +3512,7 @@ namespace My.Company
             }
         }
 
-        public void CallbackWithSlice(SumDelegateReturn callback, ReadOnlySpan<int> input)
+        public void CallbackWithSlice(SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
         {
             Interop.service_callbacks_callback_with_slice(_context, callback, input);
         }
@@ -3635,4 +3860,81 @@ namespace My.Company
         }
     }
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void AsyncHelperNative(IntPtr data, IntPtr callback_data);
+    public delegate void AsyncHelperDelegate(IntPtr data);
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct AsyncHelper : IDisposable
+    {
+        private AsyncHelperDelegate _callbackUser;
+        private IntPtr _callbackNative;
+
+        public AsyncHelper() { }
+
+        public AsyncHelper(AsyncHelperDelegate callbackUser)
+        {
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(new AsyncHelperNative(Call));
+        }
+
+        public void Call(IntPtr data, IntPtr callback_data)
+        {
+            _callbackUser(data);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+        [CustomMarshaller(typeof(AsyncHelper), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+        public ref struct Marshaller
+        {
+            private AsyncHelper managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(AsyncHelper managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public AsyncHelper ToManaged()
+            {
+                return new AsyncHelper
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
+        }
+    }
 }

@@ -3,6 +3,7 @@
 #pragma warning disable 0105
 using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Reflection;
 using System.Linq.Expressions;
 using System.Collections;
@@ -23,9 +24,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 3233524972288023213ul)
+            if (api_version != 3690414432940671665ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (3233524972288023213). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (3690414432940671665). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -111,32 +112,11 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "complex_args_1")]
         public static partial FFIError complex_args_1(Vec3f32 a, ref Tupled b);
 
-        public static unsafe void complex_args_1_checked(Vec3f32 a, ref Tupled b)
-        {
-            var rval = complex_args_1(a, ref b);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
-
         [LibraryImport(NativeLib, EntryPoint = "callback")]
         public static partial byte callback(InteropDelegate_fn_u8_rval_u8 callback, byte value);
 
         [LibraryImport(NativeLib, EntryPoint = "callback_marshalled")]
-        private static partial void callback_marshalled(InteropDelegate_fn_CharArray_native callback, CharArray value);
-        public static void callback_marshalled(InteropDelegate_fn_CharArray callback, CharArray value)
-        {
-            callback_marshalled(
-                (CharArrayMarshaller.Unmanaged x0_native) => {
-                    var x0_managed = CharArrayMarshaller.ConvertToManaged(x0_native);
-                    callback(
-                        x0_managed
-                    );
-                }, 
-                value
-            );
-        }
+        public static partial void callback_marshalled(InteropDelegate_fn_CharArray_native callback, CharArray value);
 
         [LibraryImport(NativeLib, EntryPoint = "generic_1a")]
         public static partial uint generic_1a(Genericu32 x, Phantomu8 y);
@@ -208,40 +188,31 @@ namespace My.Company
         public static partial OptionVec namespaced_inner_option(OptionVec x);
 
         [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice")]
-        public static partial Slice<Vec> namespaced_inner_slice(Slice<Vec> x);
+        public static partial SliceVec namespaced_inner_slice(SliceVec x);
 
-        public static unsafe Slice<Vec> namespaced_inner_slice(System.ReadOnlySpan<Vec> x)
+        public static unsafe SliceVec namespaced_inner_slice(ReadOnlySpan<Vec> x)
         {
             fixed (void* ptr_x = x)
             {
-                var x_slice = new Slice<Vec>(new IntPtr(ptr_x), (ulong) x.Length);
+                var x_slice = new SliceVec(new IntPtr(ptr_x), (ulong) x.Length);
                 return namespaced_inner_slice(x_slice);;
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice_mut")]
-        public static partial SliceMut<Vec> namespaced_inner_slice_mut(SliceMut<Vec> x);
+        public static partial SliceMutVec namespaced_inner_slice_mut(SliceMutVec x);
 
-        public static unsafe SliceMut<Vec> namespaced_inner_slice_mut(System.Span<Vec> x)
+        public static unsafe SliceMutVec namespaced_inner_slice_mut(Span<Vec> x)
         {
             fixed (void* ptr_x = x)
             {
-                var x_slice = new SliceMut<Vec>(new IntPtr(ptr_x), (ulong) x.Length);
+                var x_slice = new SliceMutVec(new IntPtr(ptr_x), (ulong) x.Length);
                 return namespaced_inner_slice_mut(x_slice);;
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "panics")]
         public static partial FFIError panics();
-
-        public static unsafe void panics_checked()
-        {
-            var rval = panics();;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
 
         [LibraryImport(NativeLib, EntryPoint = "renamed")]
         public static partial EnumRenamed renamed(StructRenamed x);
@@ -275,165 +246,127 @@ namespace My.Company
         public static partial byte pattern_ascii_pointer_5([MarshalAs(UnmanagedType.LPStr)] string x, uint i);
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_return_slice")]
-        public static partial Slice<UseAsciiStringPattern> pattern_ascii_pointer_return_slice();
+        public static partial SliceUseAsciiStringPattern pattern_ascii_pointer_return_slice();
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1")]
-        public static partial uint pattern_ffi_slice_1(Slice<uint> ffi_slice);
+        public static partial uint pattern_ffi_slice_1(SliceU32 ffi_slice);
 
-        public static unsafe uint pattern_ffi_slice_1(System.ReadOnlySpan<uint> ffi_slice)
+        public static unsafe uint pattern_ffi_slice_1(ReadOnlySpan<uint> ffi_slice)
         {
             fixed (void* ptr_ffi_slice = ffi_slice)
             {
-                var ffi_slice_slice = new Slice<uint>(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
+                var ffi_slice_slice = new SliceU32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
                 return pattern_ffi_slice_1(ffi_slice_slice);;
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1b")]
-        public static partial uint pattern_ffi_slice_1b(SliceMut<uint> ffi_slice);
+        public static partial uint pattern_ffi_slice_1b(SliceMutU32 ffi_slice);
 
-        public static unsafe uint pattern_ffi_slice_1b(System.Span<uint> ffi_slice)
+        public static unsafe uint pattern_ffi_slice_1b(Span<uint> ffi_slice)
         {
             fixed (void* ptr_ffi_slice = ffi_slice)
             {
-                var ffi_slice_slice = new SliceMut<uint>(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
+                var ffi_slice_slice = new SliceMutU32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
                 return pattern_ffi_slice_1b(ffi_slice_slice);;
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_2")]
-        public static partial Vec3f32 pattern_ffi_slice_2(Slice<Vec3f32> ffi_slice, int i);
+        public static partial Vec3f32 pattern_ffi_slice_2(SliceVec3f32 ffi_slice, int i);
 
-        public static unsafe Vec3f32 pattern_ffi_slice_2(System.ReadOnlySpan<Vec3f32> ffi_slice, int i)
+        public static unsafe Vec3f32 pattern_ffi_slice_2(ReadOnlySpan<Vec3f32> ffi_slice, int i)
         {
             fixed (void* ptr_ffi_slice = ffi_slice)
             {
-                var ffi_slice_slice = new Slice<Vec3f32>(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
+                var ffi_slice_slice = new SliceVec3f32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
                 return pattern_ffi_slice_2(ffi_slice_slice, i);;
             }
         }
 
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_3")]
-        private static partial void pattern_ffi_slice_3(SliceMut<byte> slice, CallbackSliceMutNative callback);
-        public static void pattern_ffi_slice_3(SliceMut<byte> slice, CallbackSliceMut callback)
-        {
-            pattern_ffi_slice_3(
-                slice, 
-                (SliceMutMarshaller<byte>.Unmanaged slice_native) => {
-                    var slice_marshaller = new SliceMutMarshaller<byte>.Marshaller();
-                    slice_marshaller.FromUnmanaged(slice_native);
-                    var slice_managed = slice_marshaller.ToManaged();
-                    callback(
-                        slice_managed
-                    );
-                    slice_marshaller.OnInvoked();
-                    slice_marshaller.Free();
-                }
-            );
-        }
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_3b")]
+        public static partial void pattern_ffi_slice_3b(SliceMutU8 slice, CallbackSliceMut callback);
 
-        public static unsafe void pattern_ffi_slice_3(System.Span<byte> slice, CallbackSliceMut callback)
+        public static unsafe void pattern_ffi_slice_3b(Span<byte> slice, CallbackSliceMutDelegate callback)
         {
             fixed (void* ptr_slice = slice)
             {
-                var slice_slice = new SliceMut<byte>(new IntPtr(ptr_slice), (ulong) slice.Length);
-                pattern_ffi_slice_3(slice_slice, callback);;
+                var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                var callback_wrapped = new CallbackSliceMut(callback);
+                pattern_ffi_slice_3b(slice_slice, callback_wrapped);;
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_4")]
-        public static partial void pattern_ffi_slice_4(Slice<byte> slice, SliceMut<byte> slice2);
+        public static partial void pattern_ffi_slice_4(SliceU8 slice, SliceMutU8 slice2);
 
-        public static unsafe void pattern_ffi_slice_4(System.ReadOnlySpan<byte> slice, System.Span<byte> slice2)
+        public static unsafe void pattern_ffi_slice_4(ReadOnlySpan<byte> slice, Span<byte> slice2)
         {
             fixed (void* ptr_slice = slice)
             {
-                var slice_slice = new Slice<byte>(new IntPtr(ptr_slice), (ulong) slice.Length);
+                var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                 fixed (void* ptr_slice2 = slice2)
                 {
-                    var slice2_slice = new SliceMut<byte>(new IntPtr(ptr_slice2), (ulong) slice2.Length);
+                    var slice2_slice = new SliceMutU8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
                     pattern_ffi_slice_4(slice_slice, slice2_slice);;
                 }
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_5")]
-        public static partial void pattern_ffi_slice_5(ref Slice<byte> slice, ref SliceMut<byte> slice2);
+        public static partial void pattern_ffi_slice_5(ref SliceU8 slice, ref SliceMutU8 slice2);
 
-        public static unsafe void pattern_ffi_slice_5(System.ReadOnlySpan<byte> slice, System.Span<byte> slice2)
+        public static unsafe void pattern_ffi_slice_5(ReadOnlySpan<byte> slice, Span<byte> slice2)
         {
             fixed (void* ptr_slice = slice)
             {
-                var slice_slice = new Slice<byte>(new IntPtr(ptr_slice), (ulong) slice.Length);
+                var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                 fixed (void* ptr_slice2 = slice2)
                 {
-                    var slice2_slice = new SliceMut<byte>(new IntPtr(ptr_slice2), (ulong) slice2.Length);
+                    var slice2_slice = new SliceMutU8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
                     pattern_ffi_slice_5(ref slice_slice, ref slice2_slice);;
                 }
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_6")]
-        public static partial void pattern_ffi_slice_6(ref SliceMut<byte> slice, CallbackU8 callback);
+        public static partial void pattern_ffi_slice_6(ref SliceMutU8 slice, CallbackU8 callback);
 
-        public static unsafe void pattern_ffi_slice_6(System.Span<byte> slice, CallbackU8 callback)
+        public static unsafe void pattern_ffi_slice_6(Span<byte> slice, CallbackU8Delegate callback)
         {
             fixed (void* ptr_slice = slice)
             {
-                var slice_slice = new SliceMut<byte>(new IntPtr(ptr_slice), (ulong) slice.Length);
-                pattern_ffi_slice_6(ref slice_slice, callback);;
+                var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
+                var callback_wrapped = new CallbackU8(callback);
+                pattern_ffi_slice_6(ref slice_slice, callback_wrapped);;
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_8")]
-        private static partial void pattern_ffi_slice_8(ref SliceMut<CharArray> slice, CallbackCharArray2Native callback);
-        public static void pattern_ffi_slice_8(ref SliceMut<CharArray> slice, CallbackCharArray2 callback)
+        public static partial void pattern_ffi_slice_8(ref SliceMutCharArray slice, CallbackCharArray2 callback);
+
+        public static unsafe void pattern_ffi_slice_8(ref SliceMutCharArray slice, CallbackCharArray2Delegate callback)
         {
-            pattern_ffi_slice_8(
-                ref slice, 
-                (CharArrayMarshaller.Unmanaged value_native) => {
-                    var value_managed = CharArrayMarshaller.ConvertToManaged(value_native);
-                    callback(
-                        value_managed
-                    );
-                }
-            );
+            var callback_wrapped = new CallbackCharArray2(callback);
+            pattern_ffi_slice_8(ref slice, callback_wrapped);;
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_delegate")]
-        private static partial byte pattern_ffi_slice_delegate(CallbackFFISliceNative callback);
-        public static byte pattern_ffi_slice_delegate(CallbackFFISlice callback)
+        public static partial byte pattern_ffi_slice_delegate(CallbackFFISlice callback);
+
+        public static unsafe byte pattern_ffi_slice_delegate(CallbackFFISliceDelegate callback)
         {
-            return pattern_ffi_slice_delegate(
-                (SliceMarshaller<byte>.Unmanaged slice_native) => {
-                    var slice_marshaller = new SliceMarshaller<byte>.Marshaller();
-                    slice_marshaller.FromUnmanaged(slice_native);
-                    var slice_managed = slice_marshaller.ToManaged();
-                    var result = callback(
-                        slice_managed
-                    );
-                    slice_marshaller.Free();
-                    return result;
-                }
-            );
+            var callback_wrapped = new CallbackFFISlice(callback);
+            return pattern_ffi_slice_delegate(callback_wrapped);;
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_delegate_huge")]
-        private static partial Vec3f32 pattern_ffi_slice_delegate_huge(CallbackHugeVecSliceNative callback);
-        public static Vec3f32 pattern_ffi_slice_delegate_huge(CallbackHugeVecSlice callback)
+        public static partial Vec3f32 pattern_ffi_slice_delegate_huge(CallbackHugeVecSlice callback);
+
+        public static unsafe Vec3f32 pattern_ffi_slice_delegate_huge(CallbackHugeVecSliceDelegate callback)
         {
-            return pattern_ffi_slice_delegate_huge(
-                (SliceMarshaller<Vec3f32>.Unmanaged slice_native) => {
-                    var slice_marshaller = new SliceMarshaller<Vec3f32>.Marshaller();
-                    slice_marshaller.FromUnmanaged(slice_native);
-                    var slice_managed = slice_marshaller.ToManaged();
-                    var result = callback(
-                        slice_managed
-                    );
-                    slice_marshaller.Free();
-                    return result;
-                }
-            );
+            var callback_wrapped = new CallbackHugeVecSlice(callback);
+            return pattern_ffi_slice_delegate_huge(callback_wrapped);;
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_1")]
@@ -460,11 +393,29 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_1")]
         public static partial uint pattern_callback_1(MyCallback callback, uint x);
 
+        public static unsafe uint pattern_callback_1(MyCallbackDelegate callback, uint x)
+        {
+            var callback_wrapped = new MyCallback(callback);
+            return pattern_callback_1(callback_wrapped, x);;
+        }
+
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_2")]
         public static partial MyCallbackVoid pattern_callback_2(MyCallbackVoid callback);
 
+        public static unsafe MyCallbackVoid pattern_callback_2(MyCallbackVoidDelegate callback)
+        {
+            var callback_wrapped = new MyCallbackVoid(callback);
+            return pattern_callback_2(callback_wrapped);;
+        }
+
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_4")]
         public static partial uint pattern_callback_4(MyCallbackNamespaced callback, uint x);
+
+        public static unsafe uint pattern_callback_4(MyCallbackNamespacedDelegate callback, uint x)
+        {
+            var callback_wrapped = new MyCallbackNamespaced(callback);
+            return pattern_callback_4(callback_wrapped, x);;
+        }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_5")]
         public static partial SumDelegate1 pattern_callback_5();
@@ -475,11 +426,11 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_7")]
         public static partial FFIError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o);
 
-        public static unsafe void pattern_callback_7_checked(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o)
+        public static unsafe void pattern_callback_7(SumDelegateReturnDelegate c1, SumDelegateReturn2Delegate c2, int x, int i, out int o)
         {
-            var c1_safe_delegate = new SumDelegateReturnExceptionSafe(c1);
-            var rval = pattern_callback_7(c1_safe_delegate.Call, c2, x, i, out o);;
-            c1_safe_delegate.Rethrow();
+            var c1_wrapped = new SumDelegateReturn(c1);
+            var c2_wrapped = new SumDelegateReturn2(c2);
+            var rval = pattern_callback_7(c1_wrapped, c2_wrapped, x, i, out o);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -495,8 +446,20 @@ namespace My.Company
         ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
-        [LibraryImport(NativeLib, EntryPoint = "basic_service_destroy")]
-        public static partial FFIError basic_service_destroy(ref IntPtr context);
+        [LibraryImport(NativeLib, EntryPoint = "service_async_destroy")]
+        public static partial FFIError service_async_destroy(ref IntPtr context);
+
+        [LibraryImport(NativeLib, EntryPoint = "service_async_new")]
+        public static partial FFIError service_async_new(ref IntPtr context);
+
+        [LibraryImport(NativeLib, EntryPoint = "service_async_return_after_ms_explicit")]
+        public static partial FFIError service_async_return_after_ms_explicit(IntPtr context, ulong x, ulong ms, AsyncHelper async_callback);
+
+        [LibraryImport(NativeLib, EntryPoint = "service_async_return_after_ms")]
+        public static partial FFIError service_async_return_after_ms(IntPtr context, ulong x, ulong ms, AsyncHelper async_callback);
+
+        [LibraryImport(NativeLib, EntryPoint = "service_async_xxx")]
+        public static partial FFIError service_async_xxx(IntPtr context, byte x, AsyncHelper async_callback);
 
         /// Destroys the given instance.
         ///
@@ -504,26 +467,11 @@ namespace My.Company
         ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
-        public static unsafe void basic_service_destroy_checked(ref IntPtr context)
-        {
-            var rval = basic_service_destroy(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
+        [LibraryImport(NativeLib, EntryPoint = "basic_service_destroy")]
+        public static partial FFIError basic_service_destroy(ref IntPtr context);
 
         [LibraryImport(NativeLib, EntryPoint = "basic_service_new")]
         public static partial FFIError basic_service_new(ref IntPtr context);
-
-        public static unsafe void basic_service_new_checked(ref IntPtr context)
-        {
-            var rval = basic_service_new(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
 
         /// Destroys the given instance.
         ///
@@ -534,55 +482,20 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_destroy")]
         public static partial FFIError service_on_panic_destroy(ref IntPtr context);
 
-        /// Destroys the given instance.
-        ///
-        /// # Safety
-        ///
-        /// The passed parameter MUST have been created with the corresponding init function;
-        /// passing any other value results in undefined behavior.
-        public static unsafe void service_on_panic_destroy_checked(ref IntPtr context)
-        {
-            var rval = service_on_panic_destroy(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
-
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_new")]
         public static partial FFIError service_on_panic_new(ref IntPtr context);
-
-        public static unsafe void service_on_panic_new_checked(ref IntPtr context)
-        {
-            var rval = service_on_panic_new(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
 
         /// Methods returning a Result<(), _> are the default and do not
         /// need annotations.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_result")]
         public static partial FFIError service_on_panic_return_result(IntPtr context, uint anon1);
 
-        /// Methods returning a Result<(), _> are the default and do not
-        /// need annotations.
-        public static unsafe void service_on_panic_return_result_checked(IntPtr context, uint anon1)
-        {
-            var rval = service_on_panic_return_result(context, anon1);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
-
         /// Methods returning a value need an `on_panic` annotation.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_default_value")]
         public static partial uint service_on_panic_return_default_value(IntPtr context, uint x);
 
         /// This function has no panic safeguards. It will be a bit faster to
-        /// call, but if it panics your host app will be in an undefined state.
+        /// call, but if it panics your host app will abort.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_ub_on_panic")]
         public static partial IntPtr service_on_panic_return_ub_on_panic(IntPtr context);
 
@@ -595,39 +508,16 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_destroy")]
         public static partial FFIError service_callbacks_destroy(ref IntPtr context);
 
-        /// Destroys the given instance.
-        ///
-        /// # Safety
-        ///
-        /// The passed parameter MUST have been created with the corresponding init function;
-        /// passing any other value results in undefined behavior.
-        public static unsafe void service_callbacks_destroy_checked(ref IntPtr context)
-        {
-            var rval = service_callbacks_destroy(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
-
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_new")]
         public static partial FFIError service_callbacks_new(ref IntPtr context);
-
-        public static unsafe void service_callbacks_new_checked(ref IntPtr context)
-        {
-            var rval = service_callbacks_new(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_simple")]
         public static partial FFIError service_callbacks_callback_simple(IntPtr context, MyCallback callback);
 
-        public static unsafe void service_callbacks_callback_simple_checked(IntPtr context, MyCallback callback)
+        public static unsafe void service_callbacks_callback_simple(IntPtr context, MyCallbackDelegate callback)
         {
-            var rval = service_callbacks_callback_simple(context, callback);;
+            var callback_wrapped = new MyCallback(callback);
+            var rval = service_callbacks_callback_simple(context, callback_wrapped);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -637,11 +527,10 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_ffi_return")]
         public static partial FFIError service_callbacks_callback_ffi_return(IntPtr context, SumDelegateReturn callback);
 
-        public static unsafe void service_callbacks_callback_ffi_return_checked(IntPtr context, SumDelegateReturn callback)
+        public static unsafe void service_callbacks_callback_ffi_return(IntPtr context, SumDelegateReturnDelegate callback)
         {
-            var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
-            var rval = service_callbacks_callback_ffi_return(context, callback_safe_delegate.Call);;
-            callback_safe_delegate.Rethrow();
+            var callback_wrapped = new SumDelegateReturn(callback);
+            var rval = service_callbacks_callback_ffi_return(context, callback_wrapped);;
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -649,16 +538,15 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_with_slice")]
-        public static partial FFIError service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, Slice<int> input);
+        public static partial FFIError service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, SliceI32 input);
 
-        public static unsafe void service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, System.ReadOnlySpan<int> input)
+        public static unsafe void service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
         {
-            var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
             fixed (void* ptr_input = input)
             {
-                var input_slice = new Slice<int>(new IntPtr(ptr_input), (ulong) input.Length);
-                var rval = service_callbacks_callback_with_slice(context, callback_safe_delegate.Call, input_slice);;
-                callback_safe_delegate.Rethrow();
+                var input_slice = new SliceI32(new IntPtr(ptr_input), (ulong) input.Length);
+                var callback_wrapped = new SumDelegateReturn(callback);
+                var rval = service_callbacks_callback_with_slice(context, callback_wrapped, input_slice);;
                 if (rval != FFIError.Ok)
                 {
                     throw new InteropException<FFIError>(rval);
@@ -669,15 +557,6 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_invoke_delegates")]
         public static partial FFIError service_callbacks_invoke_delegates(IntPtr context);
 
-        public static unsafe void service_callbacks_invoke_delegates_checked(IntPtr context)
-        {
-            var rval = service_callbacks_invoke_delegates(context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
-
         /// Destroys the given instance.
         ///
         /// # Safety
@@ -687,32 +566,8 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_destroy")]
         public static partial FFIError service_ignoring_methods_destroy(ref IntPtr context);
 
-        /// Destroys the given instance.
-        ///
-        /// # Safety
-        ///
-        /// The passed parameter MUST have been created with the corresponding init function;
-        /// passing any other value results in undefined behavior.
-        public static unsafe void service_ignoring_methods_destroy_checked(ref IntPtr context)
-        {
-            var rval = service_ignoring_methods_destroy(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
-
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_new")]
         public static partial FFIError service_ignoring_methods_new(ref IntPtr context);
-
-        public static unsafe void service_ignoring_methods_new_checked(ref IntPtr context)
-        {
-            var rval = service_ignoring_methods_new(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
 
         /// Destroys the given instance.
         ///
@@ -723,68 +578,17 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_destroy")]
         public static partial FFIError service_multiple_ctors_destroy(ref IntPtr context);
 
-        /// Destroys the given instance.
-        ///
-        /// # Safety
-        ///
-        /// The passed parameter MUST have been created with the corresponding init function;
-        /// passing any other value results in undefined behavior.
-        public static unsafe void service_multiple_ctors_destroy_checked(ref IntPtr context)
-        {
-            var rval = service_multiple_ctors_destroy(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
-
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with")]
         public static partial FFIError service_multiple_ctors_new_with(ref IntPtr context, uint some_value);
-
-        public static unsafe void service_multiple_ctors_new_with_checked(ref IntPtr context, uint some_value)
-        {
-            var rval = service_multiple_ctors_new_with(ref context, some_value);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_without")]
         public static partial FFIError service_multiple_ctors_new_without(ref IntPtr context);
 
-        public static unsafe void service_multiple_ctors_new_without_checked(ref IntPtr context)
-        {
-            var rval = service_multiple_ctors_new_without(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
-
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with_string")]
         public static partial FFIError service_multiple_ctors_new_with_string(ref IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string anon0);
 
-        public static unsafe void service_multiple_ctors_new_with_string_checked(ref IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string anon0)
-        {
-            var rval = service_multiple_ctors_new_with_string(ref context, anon0);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
-
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_failing")]
         public static partial FFIError service_multiple_ctors_new_failing(ref IntPtr context, byte some_value);
-
-        public static unsafe void service_multiple_ctors_new_failing_checked(ref IntPtr context, byte some_value)
-        {
-            var rval = service_multiple_ctors_new_failing(ref context, some_value);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
 
         /// Destroys the given instance.
         ///
@@ -795,65 +599,41 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_destroy")]
         public static partial FFIError service_using_lifetimes_destroy(ref IntPtr context);
 
-        /// Destroys the given instance.
-        ///
-        /// # Safety
-        ///
-        /// The passed parameter MUST have been created with the corresponding init function;
-        /// passing any other value results in undefined behavior.
-        public static unsafe void service_using_lifetimes_destroy_checked(ref IntPtr context)
-        {
-            var rval = service_using_lifetimes_destroy(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
-
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_new_with")]
         public static partial FFIError service_using_lifetimes_new_with(ref IntPtr context, ref uint some_value);
 
-        public static unsafe void service_using_lifetimes_new_with_checked(ref IntPtr context, ref uint some_value)
-        {
-            var rval = service_using_lifetimes_new_with(ref context, ref some_value);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
-
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_lifetime_1")]
-        public static partial void service_using_lifetimes_lifetime_1(IntPtr context, Slice<Bool> slice);
+        public static partial void service_using_lifetimes_lifetime_1(IntPtr context, SliceBool slice);
 
-        public static unsafe void service_using_lifetimes_lifetime_1(IntPtr context, System.ReadOnlySpan<Bool> slice)
+        public static unsafe void service_using_lifetimes_lifetime_1(IntPtr context, ReadOnlySpan<Bool> slice)
         {
             fixed (void* ptr_slice = slice)
             {
-                var slice_slice = new Slice<Bool>(new IntPtr(ptr_slice), (ulong) slice.Length);
+                var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
                 service_using_lifetimes_lifetime_1(context, slice_slice);;
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_lifetime_2")]
-        public static partial void service_using_lifetimes_lifetime_2(IntPtr context, Slice<Bool> slice);
+        public static partial void service_using_lifetimes_lifetime_2(IntPtr context, SliceBool slice);
 
-        public static unsafe void service_using_lifetimes_lifetime_2(IntPtr context, System.ReadOnlySpan<Bool> slice)
+        public static unsafe void service_using_lifetimes_lifetime_2(IntPtr context, ReadOnlySpan<Bool> slice)
         {
             fixed (void* ptr_slice = slice)
             {
-                var slice_slice = new Slice<Bool>(new IntPtr(ptr_slice), (ulong) slice.Length);
+                var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
                 service_using_lifetimes_lifetime_2(context, slice_slice);;
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_return_string_accept_slice")]
-        public static partial IntPtr service_using_lifetimes_return_string_accept_slice(IntPtr anon0, Slice<byte> anon1);
+        public static partial IntPtr service_using_lifetimes_return_string_accept_slice(IntPtr anon0, SliceU8 anon1);
 
-        public static unsafe string service_using_lifetimes_return_string_accept_slice(IntPtr anon0, System.ReadOnlySpan<byte> anon1)
+        public static unsafe string service_using_lifetimes_return_string_accept_slice(IntPtr anon0, ReadOnlySpan<byte> anon1)
         {
             fixed (void* ptr_anon1 = anon1)
             {
-                var anon1_slice = new Slice<byte>(new IntPtr(ptr_anon1), (ulong) anon1.Length);
+                var anon1_slice = new SliceU8(new IntPtr(ptr_anon1), (ulong) anon1.Length);
                 var s = service_using_lifetimes_return_string_accept_slice(anon0, anon1_slice);;
                 return Marshal.PtrToStringAnsi(s);
             }
@@ -868,55 +648,31 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_destroy")]
         public static partial FFIError service_various_slices_destroy(ref IntPtr context);
 
-        /// Destroys the given instance.
-        ///
-        /// # Safety
-        ///
-        /// The passed parameter MUST have been created with the corresponding init function;
-        /// passing any other value results in undefined behavior.
-        public static unsafe void service_various_slices_destroy_checked(ref IntPtr context)
-        {
-            var rval = service_various_slices_destroy(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
-
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_new")]
         public static partial FFIError service_various_slices_new(ref IntPtr context);
 
-        public static unsafe void service_various_slices_new_checked(ref IntPtr context)
-        {
-            var rval = service_various_slices_new(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
-
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self")]
-        public static partial byte service_various_slices_mut_self(IntPtr context, Slice<byte> slice);
+        public static partial byte service_various_slices_mut_self(IntPtr context, SliceU8 slice);
 
-        public static unsafe byte service_various_slices_mut_self(IntPtr context, System.ReadOnlySpan<byte> slice)
+        public static unsafe byte service_various_slices_mut_self(IntPtr context, ReadOnlySpan<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
-                var slice_slice = new Slice<byte>(new IntPtr(ptr_slice), (ulong) slice.Length);
+                var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                 return service_various_slices_mut_self(context, slice_slice);;
             }
         }
 
         /// Single line.
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_void")]
-        public static partial void service_various_slices_mut_self_void(IntPtr context, Slice<Bool> slice);
+        public static partial void service_various_slices_mut_self_void(IntPtr context, SliceBool slice);
 
         /// Single line.
-        public static unsafe void service_various_slices_mut_self_void(IntPtr context, System.ReadOnlySpan<Bool> slice)
+        public static unsafe void service_various_slices_mut_self_void(IntPtr context, ReadOnlySpan<Bool> slice)
         {
             fixed (void* ptr_slice = slice)
             {
-                var slice_slice = new Slice<Bool>(new IntPtr(ptr_slice), (ulong) slice.Length);
+                var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
                 service_various_slices_mut_self_void(context, slice_slice);;
             }
         }
@@ -925,41 +681,41 @@ namespace My.Company
         public static partial byte service_various_slices_mut_self_ref(IntPtr context, ref byte x, out byte y);
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice")]
-        public static partial byte service_various_slices_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, Slice<byte> slice);
+        public static partial byte service_various_slices_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, SliceU8 slice);
 
-        public static unsafe byte service_various_slices_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, System.ReadOnlySpan<byte> slice)
+        public static unsafe byte service_various_slices_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, ReadOnlySpan<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
-                var slice_slice = new Slice<byte>(new IntPtr(ptr_slice), (ulong) slice.Length);
+                var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                 return service_various_slices_mut_self_ref_slice(context, ref x, out y, slice_slice);;
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice_limited")]
-        public static partial byte service_various_slices_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, Slice<byte> slice, Slice<byte> slice2);
+        public static partial byte service_various_slices_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, SliceU8 slice, SliceU8 slice2);
 
-        public static unsafe byte service_various_slices_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, System.ReadOnlySpan<byte> slice, System.ReadOnlySpan<byte> slice2)
+        public static unsafe byte service_various_slices_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, ReadOnlySpan<byte> slice, ReadOnlySpan<byte> slice2)
         {
             fixed (void* ptr_slice = slice)
             {
-                var slice_slice = new Slice<byte>(new IntPtr(ptr_slice), (ulong) slice.Length);
+                var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                 fixed (void* ptr_slice2 = slice2)
                 {
-                    var slice2_slice = new Slice<byte>(new IntPtr(ptr_slice2), (ulong) slice2.Length);
+                    var slice2_slice = new SliceU8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
                     return service_various_slices_mut_self_ref_slice_limited(context, ref x, out y, slice_slice, slice2_slice);;
                 }
             }
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ffi_error")]
-        public static partial FFIError service_various_slices_mut_self_ffi_error(IntPtr context, SliceMut<byte> slice);
+        public static partial FFIError service_various_slices_mut_self_ffi_error(IntPtr context, SliceMutU8 slice);
 
-        public static unsafe void service_various_slices_mut_self_ffi_error(IntPtr context, System.Span<byte> slice)
+        public static unsafe void service_various_slices_mut_self_ffi_error(IntPtr context, Span<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
-                var slice_slice = new SliceMut<byte>(new IntPtr(ptr_slice), (ulong) slice.Length);
+                var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                 var rval = service_various_slices_mut_self_ffi_error(context, slice_slice);;
                 if (rval != FFIError.Ok)
                 {
@@ -969,13 +725,13 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_no_error")]
-        public static partial FFIError service_various_slices_mut_self_no_error(IntPtr context, SliceMut<byte> slice);
+        public static partial FFIError service_various_slices_mut_self_no_error(IntPtr context, SliceMutU8 slice);
 
-        public static unsafe void service_various_slices_mut_self_no_error(IntPtr context, System.Span<byte> slice)
+        public static unsafe void service_various_slices_mut_self_no_error(IntPtr context, Span<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
-                var slice_slice = new SliceMut<byte>(new IntPtr(ptr_slice), (ulong) slice.Length);
+                var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                 var rval = service_various_slices_mut_self_no_error(context, slice_slice);;
                 if (rval != FFIError.Ok)
                 {
@@ -987,12 +743,12 @@ namespace My.Company
         /// Warning, you _must_ discard the returned slice object before calling into this service
         /// again, as otherwise undefined behavior might happen.
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_return_slice")]
-        public static partial Slice<uint> service_various_slices_return_slice(IntPtr context);
+        public static partial SliceU32 service_various_slices_return_slice(IntPtr context);
 
         /// Warning, you _must_ discard the returned slice object before calling into this service
         /// again, as otherwise undefined behavior might happen.
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_return_slice_mut")]
-        public static partial SliceMut<uint> service_various_slices_return_slice_mut(IntPtr context);
+        public static partial SliceMutU32 service_various_slices_return_slice_mut(IntPtr context);
 
         /// Destroys the given instance.
         ///
@@ -1003,32 +759,8 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_strings_destroy")]
         public static partial FFIError service_strings_destroy(ref IntPtr context);
 
-        /// Destroys the given instance.
-        ///
-        /// # Safety
-        ///
-        /// The passed parameter MUST have been created with the corresponding init function;
-        /// passing any other value results in undefined behavior.
-        public static unsafe void service_strings_destroy_checked(ref IntPtr context)
-        {
-            var rval = service_strings_destroy(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
-
         [LibraryImport(NativeLib, EntryPoint = "service_strings_new")]
         public static partial FFIError service_strings_new(ref IntPtr context);
-
-        public static unsafe void service_strings_new_checked(ref IntPtr context)
-        {
-            var rval = service_strings_new(ref context);;
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-        }
 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_pass_string")]
         public static partial void service_strings_pass_string(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string anon1);
@@ -1578,7 +1310,7 @@ namespace My.Company
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void InteropDelegate_fn_CharArray(CharArray x0);
-    delegate void InteropDelegate_fn_CharArray_native(CharArrayMarshaller.Unmanaged x0);
+    public delegate void InteropDelegate_fn_CharArray_native(CharArray x0);
 
     public enum FFIError
     {
@@ -1587,6 +1319,1196 @@ namespace My.Company
         Panic = 200,
         Delegate = 300,
         Fail = 400,
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceBool : IEnumerable<Bool>, IDisposable
+    {
+        Bool[] _managed;
+        IntPtr _data;
+        ulong _len;
+        bool _wePinned;
+
+        public int Count => _managed?.Length ?? (int)_len;
+
+        public unsafe ReadOnlySpan<Bool> ReadOnlySpan
+        {
+            get
+            {
+                if (_managed is not null)
+                {
+                    return new ReadOnlySpan<Bool>(_managed);
+                }
+                return new ReadOnlySpan<Bool>(_data.ToPointer(), (int)_len);
+            }
+        }
+
+        public unsafe Bool this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                if (_managed is not null)
+                {
+                    return _managed[i];
+                }
+                return Unsafe.Read<Bool>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<Bool>()));
+            }
+        }
+
+        public SliceBool(GCHandle handle, ulong count)
+        {
+            _data = handle.AddrOfPinnedObject();
+            _len = count;
+        }
+
+        public SliceBool(IntPtr handle, ulong count)
+        {
+            _data = handle;
+            _len = count;
+        }
+
+        public SliceBool(Bool[] managed)
+        {
+            _managed = managed;
+            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _len = (ulong) managed.Length;
+            _wePinned = true;
+        }
+
+        public IEnumerator<Bool> GetEnumerator()
+        {
+            for (var i = 0; i < Count; ++i)
+            {
+                yield return this[i];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public void Dispose()
+        {
+            if (_wePinned && _data != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(_data);
+                _data = IntPtr.Zero;
+            }
+            _managed = null;
+        }
+
+        [CustomMarshaller(typeof(SliceBool), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            public IntPtr Data;
+            public ulong Len;
+
+            public SliceBool Managed()
+            {
+                return new SliceBool(Data, Len);
+            }
+        }
+
+        public ref struct Marshaller
+        {
+            private SliceBool managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+            private SliceBool marshalled;
+
+            public void FromManaged(SliceBool managed) { this.managed = managed; }
+            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
+            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
+            public unsafe SliceBool ToManaged() => new SliceBool(sourceNative.Data, sourceNative.Len);
+            public void Free() { }
+        }
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceI32 : IEnumerable<int>, IDisposable
+    {
+        int[] _managed;
+        IntPtr _data;
+        ulong _len;
+        bool _wePinned;
+
+        public int Count => _managed?.Length ?? (int)_len;
+
+        public unsafe ReadOnlySpan<int> ReadOnlySpan
+        {
+            get
+            {
+                if (_managed is not null)
+                {
+                    return new ReadOnlySpan<int>(_managed);
+                }
+                return new ReadOnlySpan<int>(_data.ToPointer(), (int)_len);
+            }
+        }
+
+        public unsafe int this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                if (_managed is not null)
+                {
+                    return _managed[i];
+                }
+                return Unsafe.Read<int>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<int>()));
+            }
+        }
+
+        public SliceI32(GCHandle handle, ulong count)
+        {
+            _data = handle.AddrOfPinnedObject();
+            _len = count;
+        }
+
+        public SliceI32(IntPtr handle, ulong count)
+        {
+            _data = handle;
+            _len = count;
+        }
+
+        public SliceI32(int[] managed)
+        {
+            _managed = managed;
+            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _len = (ulong) managed.Length;
+            _wePinned = true;
+        }
+
+        public IEnumerator<int> GetEnumerator()
+        {
+            for (var i = 0; i < Count; ++i)
+            {
+                yield return this[i];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public void Dispose()
+        {
+            if (_wePinned && _data != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(_data);
+                _data = IntPtr.Zero;
+            }
+            _managed = null;
+        }
+
+        [CustomMarshaller(typeof(SliceI32), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            public IntPtr Data;
+            public ulong Len;
+
+            public SliceI32 Managed()
+            {
+                return new SliceI32(Data, Len);
+            }
+        }
+
+        public ref struct Marshaller
+        {
+            private SliceI32 managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+            private SliceI32 marshalled;
+
+            public void FromManaged(SliceI32 managed) { this.managed = managed; }
+            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
+            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
+            public unsafe SliceI32 ToManaged() => new SliceI32(sourceNative.Data, sourceNative.Len);
+            public void Free() { }
+        }
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceU32 : IEnumerable<uint>, IDisposable
+    {
+        uint[] _managed;
+        IntPtr _data;
+        ulong _len;
+        bool _wePinned;
+
+        public int Count => _managed?.Length ?? (int)_len;
+
+        public unsafe ReadOnlySpan<uint> ReadOnlySpan
+        {
+            get
+            {
+                if (_managed is not null)
+                {
+                    return new ReadOnlySpan<uint>(_managed);
+                }
+                return new ReadOnlySpan<uint>(_data.ToPointer(), (int)_len);
+            }
+        }
+
+        public unsafe uint this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                if (_managed is not null)
+                {
+                    return _managed[i];
+                }
+                return Unsafe.Read<uint>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<uint>()));
+            }
+        }
+
+        public SliceU32(GCHandle handle, ulong count)
+        {
+            _data = handle.AddrOfPinnedObject();
+            _len = count;
+        }
+
+        public SliceU32(IntPtr handle, ulong count)
+        {
+            _data = handle;
+            _len = count;
+        }
+
+        public SliceU32(uint[] managed)
+        {
+            _managed = managed;
+            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _len = (ulong) managed.Length;
+            _wePinned = true;
+        }
+
+        public IEnumerator<uint> GetEnumerator()
+        {
+            for (var i = 0; i < Count; ++i)
+            {
+                yield return this[i];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public void Dispose()
+        {
+            if (_wePinned && _data != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(_data);
+                _data = IntPtr.Zero;
+            }
+            _managed = null;
+        }
+
+        [CustomMarshaller(typeof(SliceU32), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            public IntPtr Data;
+            public ulong Len;
+
+            public SliceU32 Managed()
+            {
+                return new SliceU32(Data, Len);
+            }
+        }
+
+        public ref struct Marshaller
+        {
+            private SliceU32 managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+            private SliceU32 marshalled;
+
+            public void FromManaged(SliceU32 managed) { this.managed = managed; }
+            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
+            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
+            public unsafe SliceU32 ToManaged() => new SliceU32(sourceNative.Data, sourceNative.Len);
+            public void Free() { }
+        }
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceU8 : IEnumerable<byte>, IDisposable
+    {
+        byte[] _managed;
+        IntPtr _data;
+        ulong _len;
+        bool _wePinned;
+
+        public int Count => _managed?.Length ?? (int)_len;
+
+        public unsafe ReadOnlySpan<byte> ReadOnlySpan
+        {
+            get
+            {
+                if (_managed is not null)
+                {
+                    return new ReadOnlySpan<byte>(_managed);
+                }
+                return new ReadOnlySpan<byte>(_data.ToPointer(), (int)_len);
+            }
+        }
+
+        public unsafe byte this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                if (_managed is not null)
+                {
+                    return _managed[i];
+                }
+                return Unsafe.Read<byte>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<byte>()));
+            }
+        }
+
+        public SliceU8(GCHandle handle, ulong count)
+        {
+            _data = handle.AddrOfPinnedObject();
+            _len = count;
+        }
+
+        public SliceU8(IntPtr handle, ulong count)
+        {
+            _data = handle;
+            _len = count;
+        }
+
+        public SliceU8(byte[] managed)
+        {
+            _managed = managed;
+            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _len = (ulong) managed.Length;
+            _wePinned = true;
+        }
+
+        public IEnumerator<byte> GetEnumerator()
+        {
+            for (var i = 0; i < Count; ++i)
+            {
+                yield return this[i];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public void Dispose()
+        {
+            if (_wePinned && _data != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(_data);
+                _data = IntPtr.Zero;
+            }
+            _managed = null;
+        }
+
+        [CustomMarshaller(typeof(SliceU8), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            public IntPtr Data;
+            public ulong Len;
+
+            public SliceU8 Managed()
+            {
+                return new SliceU8(Data, Len);
+            }
+        }
+
+        public ref struct Marshaller
+        {
+            private SliceU8 managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+            private SliceU8 marshalled;
+
+            public void FromManaged(SliceU8 managed) { this.managed = managed; }
+            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
+            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
+            public unsafe SliceU8 ToManaged() => new SliceU8(sourceNative.Data, sourceNative.Len);
+            public void Free() { }
+        }
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceUseAsciiStringPattern : IEnumerable<UseAsciiStringPattern>, IDisposable
+    {
+        UseAsciiStringPattern[] _managed;
+        IntPtr _data;
+        ulong _len;
+        bool _wePinned;
+
+        public int Count => _managed?.Length ?? (int)_len;
+
+        public unsafe ReadOnlySpan<UseAsciiStringPattern> ReadOnlySpan
+        {
+            get
+            {
+                if (_managed is not null)
+                {
+                    return new ReadOnlySpan<UseAsciiStringPattern>(_managed);
+                }
+                return new ReadOnlySpan<UseAsciiStringPattern>(_data.ToPointer(), (int)_len);
+            }
+        }
+
+        public unsafe UseAsciiStringPattern this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                if (_managed is not null)
+                {
+                    return _managed[i];
+                }
+                return Unsafe.Read<UseAsciiStringPattern>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<UseAsciiStringPattern>()));
+            }
+        }
+
+        public SliceUseAsciiStringPattern(GCHandle handle, ulong count)
+        {
+            _data = handle.AddrOfPinnedObject();
+            _len = count;
+        }
+
+        public SliceUseAsciiStringPattern(IntPtr handle, ulong count)
+        {
+            _data = handle;
+            _len = count;
+        }
+
+        public SliceUseAsciiStringPattern(UseAsciiStringPattern[] managed)
+        {
+            _managed = managed;
+            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _len = (ulong) managed.Length;
+            _wePinned = true;
+        }
+
+        public IEnumerator<UseAsciiStringPattern> GetEnumerator()
+        {
+            for (var i = 0; i < Count; ++i)
+            {
+                yield return this[i];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public void Dispose()
+        {
+            if (_wePinned && _data != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(_data);
+                _data = IntPtr.Zero;
+            }
+            _managed = null;
+        }
+
+        [CustomMarshaller(typeof(SliceUseAsciiStringPattern), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            public IntPtr Data;
+            public ulong Len;
+
+            public SliceUseAsciiStringPattern Managed()
+            {
+                return new SliceUseAsciiStringPattern(Data, Len);
+            }
+        }
+
+        public ref struct Marshaller
+        {
+            private SliceUseAsciiStringPattern managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+            private SliceUseAsciiStringPattern marshalled;
+
+            public void FromManaged(SliceUseAsciiStringPattern managed) { this.managed = managed; }
+            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
+            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
+            public unsafe SliceUseAsciiStringPattern ToManaged() => new SliceUseAsciiStringPattern(sourceNative.Data, sourceNative.Len);
+            public void Free() { }
+        }
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceVec : IEnumerable<Vec>, IDisposable
+    {
+        Vec[] _managed;
+        IntPtr _data;
+        ulong _len;
+        bool _wePinned;
+
+        public int Count => _managed?.Length ?? (int)_len;
+
+        public unsafe ReadOnlySpan<Vec> ReadOnlySpan
+        {
+            get
+            {
+                if (_managed is not null)
+                {
+                    return new ReadOnlySpan<Vec>(_managed);
+                }
+                return new ReadOnlySpan<Vec>(_data.ToPointer(), (int)_len);
+            }
+        }
+
+        public unsafe Vec this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                if (_managed is not null)
+                {
+                    return _managed[i];
+                }
+                return Unsafe.Read<Vec>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<Vec>()));
+            }
+        }
+
+        public SliceVec(GCHandle handle, ulong count)
+        {
+            _data = handle.AddrOfPinnedObject();
+            _len = count;
+        }
+
+        public SliceVec(IntPtr handle, ulong count)
+        {
+            _data = handle;
+            _len = count;
+        }
+
+        public SliceVec(Vec[] managed)
+        {
+            _managed = managed;
+            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _len = (ulong) managed.Length;
+            _wePinned = true;
+        }
+
+        public IEnumerator<Vec> GetEnumerator()
+        {
+            for (var i = 0; i < Count; ++i)
+            {
+                yield return this[i];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public void Dispose()
+        {
+            if (_wePinned && _data != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(_data);
+                _data = IntPtr.Zero;
+            }
+            _managed = null;
+        }
+
+        [CustomMarshaller(typeof(SliceVec), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            public IntPtr Data;
+            public ulong Len;
+
+            public SliceVec Managed()
+            {
+                return new SliceVec(Data, Len);
+            }
+        }
+
+        public ref struct Marshaller
+        {
+            private SliceVec managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+            private SliceVec marshalled;
+
+            public void FromManaged(SliceVec managed) { this.managed = managed; }
+            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
+            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
+            public unsafe SliceVec ToManaged() => new SliceVec(sourceNative.Data, sourceNative.Len);
+            public void Free() { }
+        }
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceVec3f32 : IEnumerable<Vec3f32>, IDisposable
+    {
+        Vec3f32[] _managed;
+        IntPtr _data;
+        ulong _len;
+        bool _wePinned;
+
+        public int Count => _managed?.Length ?? (int)_len;
+
+        public unsafe ReadOnlySpan<Vec3f32> ReadOnlySpan
+        {
+            get
+            {
+                if (_managed is not null)
+                {
+                    return new ReadOnlySpan<Vec3f32>(_managed);
+                }
+                return new ReadOnlySpan<Vec3f32>(_data.ToPointer(), (int)_len);
+            }
+        }
+
+        public unsafe Vec3f32 this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                if (_managed is not null)
+                {
+                    return _managed[i];
+                }
+                return Unsafe.Read<Vec3f32>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<Vec3f32>()));
+            }
+        }
+
+        public SliceVec3f32(GCHandle handle, ulong count)
+        {
+            _data = handle.AddrOfPinnedObject();
+            _len = count;
+        }
+
+        public SliceVec3f32(IntPtr handle, ulong count)
+        {
+            _data = handle;
+            _len = count;
+        }
+
+        public SliceVec3f32(Vec3f32[] managed)
+        {
+            _managed = managed;
+            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _len = (ulong) managed.Length;
+            _wePinned = true;
+        }
+
+        public IEnumerator<Vec3f32> GetEnumerator()
+        {
+            for (var i = 0; i < Count; ++i)
+            {
+                yield return this[i];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public void Dispose()
+        {
+            if (_wePinned && _data != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(_data);
+                _data = IntPtr.Zero;
+            }
+            _managed = null;
+        }
+
+        [CustomMarshaller(typeof(SliceVec3f32), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            public IntPtr Data;
+            public ulong Len;
+
+            public SliceVec3f32 Managed()
+            {
+                return new SliceVec3f32(Data, Len);
+            }
+        }
+
+        public ref struct Marshaller
+        {
+            private SliceVec3f32 managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+            private SliceVec3f32 marshalled;
+
+            public void FromManaged(SliceVec3f32 managed) { this.managed = managed; }
+            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
+            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
+            public unsafe SliceVec3f32 ToManaged() => new SliceVec3f32(sourceNative.Data, sourceNative.Len);
+            public void Free() { }
+        }
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceMutCharArray : IEnumerable<CharArray>, IDisposable
+    {
+        CharArray[] _managed;
+        IntPtr _data;
+        ulong _len;
+        bool _wePinned;
+
+        public int Count => _managed?.Length ?? (int)_len;
+
+        public unsafe ReadOnlySpan<CharArray> ReadOnlySpan
+        {
+            get
+            {
+                if (_managed is not null)
+                {
+                    return new ReadOnlySpan<CharArray>(_managed);
+                }
+                return new ReadOnlySpan<CharArray>(_data.ToPointer(), (int)_len);
+            }
+        }
+
+        public unsafe CharArray this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                if (_managed is not null)
+                {
+                    return _managed[i];
+                }
+                return Unsafe.Read<CharArray>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<CharArray>()));
+            }
+            set
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                var d = (CharArray*) _data.ToPointer();
+                d[i] = value;
+            }
+        }
+
+        public SliceMutCharArray(GCHandle handle, ulong count)
+        {
+            _data = handle.AddrOfPinnedObject();
+            _len = count;
+        }
+
+        public SliceMutCharArray(IntPtr handle, ulong count)
+        {
+            _data = handle;
+            _len = count;
+        }
+
+        public SliceMutCharArray(CharArray[] managed)
+        {
+            _managed = managed;
+            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _len = (ulong) managed.Length;
+            _wePinned = true;
+        }
+
+        public IEnumerator<CharArray> GetEnumerator()
+        {
+            for (var i = 0; i < Count; ++i)
+            {
+                yield return this[i];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public void Dispose()
+        {
+            if (_wePinned && _data != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(_data);
+                _data = IntPtr.Zero;
+            }
+            _managed = null;
+        }
+
+        [CustomMarshaller(typeof(SliceMutCharArray), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            public IntPtr Data;
+            public ulong Len;
+
+            public SliceMutCharArray Managed()
+            {
+                return new SliceMutCharArray(Data, Len);
+            }
+        }
+
+        public ref struct Marshaller
+        {
+            private SliceMutCharArray managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+            private SliceMutCharArray marshalled;
+
+            public void FromManaged(SliceMutCharArray managed) { this.managed = managed; }
+            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
+            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
+            public unsafe SliceMutCharArray ToManaged() => new SliceMutCharArray(sourceNative.Data, sourceNative.Len);
+            public void Free() { }
+        }
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceMutU32 : IEnumerable<uint>, IDisposable
+    {
+        uint[] _managed;
+        IntPtr _data;
+        ulong _len;
+        bool _wePinned;
+
+        public int Count => _managed?.Length ?? (int)_len;
+
+        public unsafe ReadOnlySpan<uint> ReadOnlySpan
+        {
+            get
+            {
+                if (_managed is not null)
+                {
+                    return new ReadOnlySpan<uint>(_managed);
+                }
+                return new ReadOnlySpan<uint>(_data.ToPointer(), (int)_len);
+            }
+        }
+
+        public unsafe uint this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                if (_managed is not null)
+                {
+                    return _managed[i];
+                }
+                return Unsafe.Read<uint>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<uint>()));
+            }
+            set
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                var d = (uint*) _data.ToPointer();
+                d[i] = value;
+            }
+        }
+
+        public SliceMutU32(GCHandle handle, ulong count)
+        {
+            _data = handle.AddrOfPinnedObject();
+            _len = count;
+        }
+
+        public SliceMutU32(IntPtr handle, ulong count)
+        {
+            _data = handle;
+            _len = count;
+        }
+
+        public SliceMutU32(uint[] managed)
+        {
+            _managed = managed;
+            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _len = (ulong) managed.Length;
+            _wePinned = true;
+        }
+
+        public IEnumerator<uint> GetEnumerator()
+        {
+            for (var i = 0; i < Count; ++i)
+            {
+                yield return this[i];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public void Dispose()
+        {
+            if (_wePinned && _data != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(_data);
+                _data = IntPtr.Zero;
+            }
+            _managed = null;
+        }
+
+        [CustomMarshaller(typeof(SliceMutU32), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            public IntPtr Data;
+            public ulong Len;
+
+            public SliceMutU32 Managed()
+            {
+                return new SliceMutU32(Data, Len);
+            }
+        }
+
+        public ref struct Marshaller
+        {
+            private SliceMutU32 managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+            private SliceMutU32 marshalled;
+
+            public void FromManaged(SliceMutU32 managed) { this.managed = managed; }
+            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
+            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
+            public unsafe SliceMutU32 ToManaged() => new SliceMutU32(sourceNative.Data, sourceNative.Len);
+            public void Free() { }
+        }
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceMutU8 : IEnumerable<byte>, IDisposable
+    {
+        byte[] _managed;
+        IntPtr _data;
+        ulong _len;
+        bool _wePinned;
+
+        public int Count => _managed?.Length ?? (int)_len;
+
+        public unsafe ReadOnlySpan<byte> ReadOnlySpan
+        {
+            get
+            {
+                if (_managed is not null)
+                {
+                    return new ReadOnlySpan<byte>(_managed);
+                }
+                return new ReadOnlySpan<byte>(_data.ToPointer(), (int)_len);
+            }
+        }
+
+        public unsafe byte this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                if (_managed is not null)
+                {
+                    return _managed[i];
+                }
+                return Unsafe.Read<byte>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<byte>()));
+            }
+            set
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                var d = (byte*) _data.ToPointer();
+                d[i] = value;
+            }
+        }
+
+        public SliceMutU8(GCHandle handle, ulong count)
+        {
+            _data = handle.AddrOfPinnedObject();
+            _len = count;
+        }
+
+        public SliceMutU8(IntPtr handle, ulong count)
+        {
+            _data = handle;
+            _len = count;
+        }
+
+        public SliceMutU8(byte[] managed)
+        {
+            _managed = managed;
+            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _len = (ulong) managed.Length;
+            _wePinned = true;
+        }
+
+        public IEnumerator<byte> GetEnumerator()
+        {
+            for (var i = 0; i < Count; ++i)
+            {
+                yield return this[i];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public void Dispose()
+        {
+            if (_wePinned && _data != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(_data);
+                _data = IntPtr.Zero;
+            }
+            _managed = null;
+        }
+
+        [CustomMarshaller(typeof(SliceMutU8), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            public IntPtr Data;
+            public ulong Len;
+
+            public SliceMutU8 Managed()
+            {
+                return new SliceMutU8(Data, Len);
+            }
+        }
+
+        public ref struct Marshaller
+        {
+            private SliceMutU8 managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+            private SliceMutU8 marshalled;
+
+            public void FromManaged(SliceMutU8 managed) { this.managed = managed; }
+            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
+            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
+            public unsafe SliceMutU8 ToManaged() => new SliceMutU8(sourceNative.Data, sourceNative.Len);
+            public void Free() { }
+        }
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceMutVec : IEnumerable<Vec>, IDisposable
+    {
+        Vec[] _managed;
+        IntPtr _data;
+        ulong _len;
+        bool _wePinned;
+
+        public int Count => _managed?.Length ?? (int)_len;
+
+        public unsafe ReadOnlySpan<Vec> ReadOnlySpan
+        {
+            get
+            {
+                if (_managed is not null)
+                {
+                    return new ReadOnlySpan<Vec>(_managed);
+                }
+                return new ReadOnlySpan<Vec>(_data.ToPointer(), (int)_len);
+            }
+        }
+
+        public unsafe Vec this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                if (_managed is not null)
+                {
+                    return _managed[i];
+                }
+                return Unsafe.Read<Vec>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<Vec>()));
+            }
+            set
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                var d = (Vec*) _data.ToPointer();
+                d[i] = value;
+            }
+        }
+
+        public SliceMutVec(GCHandle handle, ulong count)
+        {
+            _data = handle.AddrOfPinnedObject();
+            _len = count;
+        }
+
+        public SliceMutVec(IntPtr handle, ulong count)
+        {
+            _data = handle;
+            _len = count;
+        }
+
+        public SliceMutVec(Vec[] managed)
+        {
+            _managed = managed;
+            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _len = (ulong) managed.Length;
+            _wePinned = true;
+        }
+
+        public IEnumerator<Vec> GetEnumerator()
+        {
+            for (var i = 0; i < Count; ++i)
+            {
+                yield return this[i];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public void Dispose()
+        {
+            if (_wePinned && _data != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(_data);
+                _data = IntPtr.Zero;
+            }
+            _managed = null;
+        }
+
+        [CustomMarshaller(typeof(SliceMutVec), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            public IntPtr Data;
+            public ulong Len;
+
+            public SliceMutVec Managed()
+            {
+                return new SliceMutVec(Data, Len);
+            }
+        }
+
+        public ref struct Marshaller
+        {
+            private SliceMutVec managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+            private SliceMutVec marshalled;
+
+            public void FromManaged(SliceMutVec managed) { this.managed = managed; }
+            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
+            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
+            public unsafe SliceMutVec ToManaged() => new SliceMutVec(sourceNative.Data, sourceNative.Len);
+            public void Free() { }
+        }
     }
 
     ///Option type containing boolean flag and maybe valid data.
@@ -1653,6 +2575,56 @@ namespace My.Company
     }
 
 
+    ///Result that contains value or an error.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct ResultU64
+    {
+        ///Element if err is `Ok`.
+        ulong t;
+        ///Error value.
+        FFIError err;
+    }
+
+    public partial struct ResultU64
+    {
+        public ulong Ok()
+        {
+            if (err == 0)
+            {
+                return t;
+            }
+            throw new InteropException<FFIError>(err);
+        }
+
+    }
+
+
+    ///Result that contains value or an error.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct ResultU8
+    {
+        ///Element if err is `Ok`.
+        byte t;
+        ///Error value.
+        FFIError err;
+    }
+
+    public partial struct ResultU8
+    {
+        public byte Ok()
+        {
+            if (err == 0)
+            {
+                return t;
+            }
+            throw new InteropException<FFIError>(err);
+        }
+
+    }
+
+
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public partial struct Bool
@@ -1673,76 +2645,1060 @@ namespace My.Company
 
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void CallbackCharArray2(CharArray value);
-    delegate void CallbackCharArray2Native(CharArrayMarshaller.Unmanaged value);
+    public delegate void CallbackCharArray2Native(CharArray value, IntPtr callback_data);
+    public delegate void CallbackCharArray2Delegate(CharArray value);
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate byte CallbackFFISlice(Slice<byte> slice);
-    delegate byte CallbackFFISliceNative(SliceMarshaller<byte>.Unmanaged slice);
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct CallbackCharArray2 : IDisposable
+    {
+        private CallbackCharArray2Delegate _callbackUser;
+        private IntPtr _callbackNative;
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate Vec3f32 CallbackHugeVecSlice(Slice<Vec3f32> slice);
-    delegate Vec3f32 CallbackHugeVecSliceNative(SliceMarshaller<Vec3f32>.Unmanaged slice);
+        public CallbackCharArray2() { }
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void CallbackSliceMut(SliceMut<byte> slice);
-    delegate void CallbackSliceMutNative(SliceMutMarshaller<byte>.Unmanaged slice);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate byte CallbackU8(byte value);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint MyCallback(uint value);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint MyCallbackNamespaced(uint value);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void MyCallbackVoid(IntPtr ptr);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void SumDelegate1();
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate int SumDelegate2(int x, int y);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate FFIError SumDelegateReturn(int x, int y);
-
-    // Internal helper that works around an issue where exceptions in callbacks don't reenter Rust.
-    public class SumDelegateReturnExceptionSafe {
-        private Exception failure = null;
-        private readonly SumDelegateReturn _callback;
-
-        public SumDelegateReturnExceptionSafe(SumDelegateReturn original)
+        public CallbackCharArray2(CallbackCharArray2Delegate callbackUser)
         {
-            _callback = original;
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(new CallbackCharArray2Native(Call));
         }
 
-        public FFIError Call(int x, int y)
+        public void Call(CharArray value, IntPtr callback_data)
         {
-            try
-            {
-                return _callback(x, y);
-            }
-            catch (Exception e)
-            {
-                failure = e;
-                return FFIError.Panic;
-            }
+            _callbackUser(value);
         }
 
-        public void Rethrow()
+        public void Dispose()
         {
-            if (this.failure != null)
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(CallbackCharArray2), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private CallbackCharArray2 managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(CallbackCharArray2 managed)
             {
-                throw this.failure;
+                this.managed = managed;
             }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public CallbackCharArray2 ToManaged()
+            {
+                return new CallbackCharArray2
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
         }
     }
 
+
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void SumDelegateReturn2(int x, int y);
+    public delegate byte CallbackFFISliceNative(SliceU8.Unmanaged slice, IntPtr callback_data);
+    public delegate byte CallbackFFISliceDelegate(SliceU8 slice);
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct CallbackFFISlice : IDisposable
+    {
+        private CallbackFFISliceDelegate _callbackUser;
+        private IntPtr _callbackNative;
+
+        public CallbackFFISlice() { }
+
+        public CallbackFFISlice(CallbackFFISliceDelegate callbackUser)
+        {
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(new CallbackFFISliceNative(Call));
+        }
+
+        public byte Call(SliceU8.Unmanaged slice, IntPtr callback_data)
+        {
+            return _callbackUser(slice.Managed());
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(CallbackFFISlice), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private CallbackFFISlice managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(CallbackFFISlice managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public CallbackFFISlice ToManaged()
+            {
+                return new CallbackFFISlice
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
+        }
+    }
+
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate Vec3f32 CallbackHugeVecSliceNative(SliceVec3f32.Unmanaged slice, IntPtr callback_data);
+    public delegate Vec3f32 CallbackHugeVecSliceDelegate(SliceVec3f32 slice);
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct CallbackHugeVecSlice : IDisposable
+    {
+        private CallbackHugeVecSliceDelegate _callbackUser;
+        private IntPtr _callbackNative;
+
+        public CallbackHugeVecSlice() { }
+
+        public CallbackHugeVecSlice(CallbackHugeVecSliceDelegate callbackUser)
+        {
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(new CallbackHugeVecSliceNative(Call));
+        }
+
+        public Vec3f32 Call(SliceVec3f32.Unmanaged slice, IntPtr callback_data)
+        {
+            return _callbackUser(slice.Managed());
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(CallbackHugeVecSlice), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private CallbackHugeVecSlice managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(CallbackHugeVecSlice managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public CallbackHugeVecSlice ToManaged()
+            {
+                return new CallbackHugeVecSlice
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
+        }
+    }
+
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void CallbackSliceMutNative(SliceMutU8.Unmanaged slice, IntPtr callback_data);
+    public delegate void CallbackSliceMutDelegate(SliceMutU8 slice);
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct CallbackSliceMut : IDisposable
+    {
+        private CallbackSliceMutDelegate _callbackUser;
+        private IntPtr _callbackNative;
+
+        public CallbackSliceMut() { }
+
+        public CallbackSliceMut(CallbackSliceMutDelegate callbackUser)
+        {
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(new CallbackSliceMutNative(Call));
+        }
+
+        public void Call(SliceMutU8.Unmanaged slice, IntPtr callback_data)
+        {
+            _callbackUser(slice.Managed());
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(CallbackSliceMut), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private CallbackSliceMut managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(CallbackSliceMut managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public CallbackSliceMut ToManaged()
+            {
+                return new CallbackSliceMut
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
+        }
+    }
+
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate byte CallbackU8Native(byte value, IntPtr callback_data);
+    public delegate byte CallbackU8Delegate(byte value);
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct CallbackU8 : IDisposable
+    {
+        private CallbackU8Delegate _callbackUser;
+        private IntPtr _callbackNative;
+
+        public CallbackU8() { }
+
+        public CallbackU8(CallbackU8Delegate callbackUser)
+        {
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(new CallbackU8Native(Call));
+        }
+
+        public byte Call(byte value, IntPtr callback_data)
+        {
+            return _callbackUser(value);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(CallbackU8), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private CallbackU8 managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(CallbackU8 managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public CallbackU8 ToManaged()
+            {
+                return new CallbackU8
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
+        }
+    }
+
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate uint MyCallbackNative(uint value, IntPtr callback_data);
+    public delegate uint MyCallbackDelegate(uint value);
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct MyCallback : IDisposable
+    {
+        private MyCallbackDelegate _callbackUser;
+        private IntPtr _callbackNative;
+
+        public MyCallback() { }
+
+        public MyCallback(MyCallbackDelegate callbackUser)
+        {
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(new MyCallbackNative(Call));
+        }
+
+        public uint Call(uint value, IntPtr callback_data)
+        {
+            return _callbackUser(value);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(MyCallback), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private MyCallback managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(MyCallback managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public MyCallback ToManaged()
+            {
+                return new MyCallback
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
+        }
+    }
+
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate uint MyCallbackNamespacedNative(uint value, IntPtr callback_data);
+    public delegate uint MyCallbackNamespacedDelegate(uint value);
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct MyCallbackNamespaced : IDisposable
+    {
+        private MyCallbackNamespacedDelegate _callbackUser;
+        private IntPtr _callbackNative;
+
+        public MyCallbackNamespaced() { }
+
+        public MyCallbackNamespaced(MyCallbackNamespacedDelegate callbackUser)
+        {
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(new MyCallbackNamespacedNative(Call));
+        }
+
+        public uint Call(uint value, IntPtr callback_data)
+        {
+            return _callbackUser(value);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(MyCallbackNamespaced), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private MyCallbackNamespaced managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(MyCallbackNamespaced managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public MyCallbackNamespaced ToManaged()
+            {
+                return new MyCallbackNamespaced
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
+        }
+    }
+
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void MyCallbackVoidNative(IntPtr ptr, IntPtr callback_data);
+    public delegate void MyCallbackVoidDelegate(IntPtr ptr);
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct MyCallbackVoid : IDisposable
+    {
+        private MyCallbackVoidDelegate _callbackUser;
+        private IntPtr _callbackNative;
+
+        public MyCallbackVoid() { }
+
+        public MyCallbackVoid(MyCallbackVoidDelegate callbackUser)
+        {
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(new MyCallbackVoidNative(Call));
+        }
+
+        public void Call(IntPtr ptr, IntPtr callback_data)
+        {
+            _callbackUser(ptr);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(MyCallbackVoid), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private MyCallbackVoid managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(MyCallbackVoid managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public MyCallbackVoid ToManaged()
+            {
+                return new MyCallbackVoid
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
+        }
+    }
+
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void SumDelegate1Native(IntPtr callback_data);
+    public delegate void SumDelegate1Delegate();
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct SumDelegate1 : IDisposable
+    {
+        private SumDelegate1Delegate _callbackUser;
+        private IntPtr _callbackNative;
+
+        public SumDelegate1() { }
+
+        public SumDelegate1(SumDelegate1Delegate callbackUser)
+        {
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(new SumDelegate1Native(Call));
+        }
+
+        public void Call(IntPtr callback_data)
+        {
+            _callbackUser();
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(SumDelegate1), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private SumDelegate1 managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(SumDelegate1 managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public SumDelegate1 ToManaged()
+            {
+                return new SumDelegate1
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
+        }
+    }
+
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate int SumDelegate2Native(int x, int y, IntPtr callback_data);
+    public delegate int SumDelegate2Delegate(int x, int y);
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct SumDelegate2 : IDisposable
+    {
+        private SumDelegate2Delegate _callbackUser;
+        private IntPtr _callbackNative;
+
+        public SumDelegate2() { }
+
+        public SumDelegate2(SumDelegate2Delegate callbackUser)
+        {
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(new SumDelegate2Native(Call));
+        }
+
+        public int Call(int x, int y, IntPtr callback_data)
+        {
+            return _callbackUser(x, y);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(SumDelegate2), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private SumDelegate2 managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(SumDelegate2 managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public SumDelegate2 ToManaged()
+            {
+                return new SumDelegate2
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
+        }
+    }
+
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate FFIError SumDelegateReturnNative(int x, int y, IntPtr callback_data);
+    public delegate FFIError SumDelegateReturnDelegate(int x, int y);
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct SumDelegateReturn : IDisposable
+    {
+        private SumDelegateReturnDelegate _callbackUser;
+        private IntPtr _callbackNative;
+
+        public SumDelegateReturn() { }
+
+        public SumDelegateReturn(SumDelegateReturnDelegate callbackUser)
+        {
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(new SumDelegateReturnNative(Call));
+        }
+
+        public FFIError Call(int x, int y, IntPtr callback_data)
+        {
+            return _callbackUser(x, y);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(SumDelegateReturn), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private SumDelegateReturn managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(SumDelegateReturn managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public SumDelegateReturn ToManaged()
+            {
+                return new SumDelegateReturn
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
+        }
+    }
+
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void SumDelegateReturn2Native(int x, int y, IntPtr callback_data);
+    public delegate void SumDelegateReturn2Delegate(int x, int y);
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct SumDelegateReturn2 : IDisposable
+    {
+        private SumDelegateReturn2Delegate _callbackUser;
+        private IntPtr _callbackNative;
+
+        public SumDelegateReturn2() { }
+
+        public SumDelegateReturn2(SumDelegateReturn2Delegate callbackUser)
+        {
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(new SumDelegateReturn2Native(Call));
+        }
+
+        public void Call(int x, int y, IntPtr callback_data)
+        {
+            _callbackUser(x, y);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(SumDelegateReturn2), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private SumDelegateReturn2 managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(SumDelegateReturn2 managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public SumDelegateReturn2 ToManaged()
+            {
+                return new SumDelegateReturn2
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
+        }
+    }
+
+
+
+    public partial class ServiceAsync : IDisposable
+    {
+        private IntPtr _context;
+
+        private ServiceAsync() {}
+
+        public static ServiceAsync New()
+        {
+            var self = new ServiceAsync();
+            var rval = Interop.service_async_new(ref self._context);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+            return self;
+        }
+
+        public void Dispose()
+        {
+            var rval = Interop.service_async_destroy(ref _context);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+        }
+
+        public Task<ResultU64> ReturnAfterMsExplicit(ulong x, ulong ms)
+        {
+            var cs = new TaskCompletionSource<ResultU64>();
+            GCHandle pinned = default;
+            var cb = new AsyncHelper((x) => {
+                var rval = Marshal.PtrToStructure<ResultU64>(x);
+                cs.SetResult(rval);
+                pinned.Free();
+            });
+            pinned = GCHandle.Alloc(cb);
+            var rval = Interop.service_async_return_after_ms_explicit(_context, x, ms, cb);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+            return cs.Task;
+        }
+
+        public Task<ResultU64> ReturnAfterMs(ulong x, ulong ms)
+        {
+            var cs = new TaskCompletionSource<ResultU64>();
+            GCHandle pinned = default;
+            var cb = new AsyncHelper((x) => {
+                var rval = Marshal.PtrToStructure<ResultU64>(x);
+                cs.SetResult(rval);
+                pinned.Free();
+            });
+            pinned = GCHandle.Alloc(cb);
+            var rval = Interop.service_async_return_after_ms(_context, x, ms, cb);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+            return cs.Task;
+        }
+
+        public Task<ResultU8> Xxx(byte x)
+        {
+            var cs = new TaskCompletionSource<ResultU8>();
+            GCHandle pinned = default;
+            var cb = new AsyncHelper((x) => {
+                var rval = Marshal.PtrToStructure<ResultU8>(x);
+                cs.SetResult(rval);
+                pinned.Free();
+            });
+            pinned = GCHandle.Alloc(cb);
+            var rval = Interop.service_async_xxx(_context, x, cb);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+            return cs.Task;
+        }
+
+        public IntPtr Context => _context;
+    }
 
 
     public partial class BasicService : IDisposable
@@ -1820,7 +3776,7 @@ namespace My.Company
         }
 
         /// This function has no panic safeguards. It will be a bit faster to
-        /// call, but if it panics your host app will be in an undefined state.
+        /// call, but if it panics your host app will abort.
         public string ReturnUbOnPanic()
         {
             var s = Interop.service_on_panic_return_ub_on_panic(_context);
@@ -1867,29 +3823,35 @@ namespace My.Company
             }
         }
 
+        public void CallbackSimple(MyCallbackDelegate callback)
+        {
+            Interop.service_callbacks_callback_simple(_context, callback);
+        }
+
         public void CallbackFfiReturn(SumDelegateReturn callback)
         {
-            var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
-            var rval = Interop.service_callbacks_callback_ffi_return(_context, callback_safe_delegate.Call);
-            callback_safe_delegate.Rethrow();
+            var rval = Interop.service_callbacks_callback_ffi_return(_context, callback);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
             }
         }
 
-        public void CallbackWithSlice(SumDelegateReturn callback, Slice<int> input)
+        public void CallbackFfiReturn(SumDelegateReturnDelegate callback)
         {
-            var callback_safe_delegate = new SumDelegateReturnExceptionSafe(callback);
-            var rval = Interop.service_callbacks_callback_with_slice(_context, callback_safe_delegate.Call, input);
-            callback_safe_delegate.Rethrow();
+            Interop.service_callbacks_callback_ffi_return(_context, callback);
+        }
+
+        public void CallbackWithSlice(SumDelegateReturn callback, SliceI32 input)
+        {
+            var rval = Interop.service_callbacks_callback_with_slice(_context, callback, input);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
             }
         }
 
-        public void CallbackWithSlice(SumDelegateReturn callback, System.ReadOnlySpan<int> input)
+        public void CallbackWithSlice(SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
         {
             Interop.service_callbacks_callback_with_slice(_context, callback, input);
         }
@@ -2029,33 +3991,33 @@ namespace My.Company
             }
         }
 
-        public void Lifetime1(Slice<Bool> slice)
+        public void Lifetime1(SliceBool slice)
         {
             Interop.service_using_lifetimes_lifetime_1(_context, slice);
         }
 
-        public void Lifetime1(System.ReadOnlySpan<Bool> slice)
+        public void Lifetime1(ReadOnlySpan<Bool> slice)
         {
             Interop.service_using_lifetimes_lifetime_1(_context, slice);
         }
 
-        public void Lifetime2(Slice<Bool> slice)
+        public void Lifetime2(SliceBool slice)
         {
             Interop.service_using_lifetimes_lifetime_2(_context, slice);
         }
 
-        public void Lifetime2(System.ReadOnlySpan<Bool> slice)
+        public void Lifetime2(ReadOnlySpan<Bool> slice)
         {
             Interop.service_using_lifetimes_lifetime_2(_context, slice);
         }
 
-        public string ReturnStringAcceptSlice(Slice<byte> anon1)
+        public string ReturnStringAcceptSlice(SliceU8 anon1)
         {
             var s = Interop.service_using_lifetimes_return_string_accept_slice(_context, anon1);
             return Marshal.PtrToStringAnsi(s);
         }
 
-        public string ReturnStringAcceptSlice(System.ReadOnlySpan<byte> anon1)
+        public string ReturnStringAcceptSlice(ReadOnlySpan<byte> anon1)
         {
             return Interop.service_using_lifetimes_return_string_accept_slice(_context, anon1);
         }
@@ -2091,24 +4053,24 @@ namespace My.Company
             }
         }
 
-        public byte MutSelf(Slice<byte> slice)
+        public byte MutSelf(SliceU8 slice)
         {
             return Interop.service_various_slices_mut_self(_context, slice);
         }
 
-        public byte MutSelf(System.ReadOnlySpan<byte> slice)
+        public byte MutSelf(ReadOnlySpan<byte> slice)
         {
             return Interop.service_various_slices_mut_self(_context, slice);
         }
 
         /// Single line.
-        public void MutSelfVoid(Slice<Bool> slice)
+        public void MutSelfVoid(SliceBool slice)
         {
             Interop.service_various_slices_mut_self_void(_context, slice);
         }
 
         /// Single line.
-        public void MutSelfVoid(System.ReadOnlySpan<Bool> slice)
+        public void MutSelfVoid(ReadOnlySpan<Bool> slice)
         {
             Interop.service_various_slices_mut_self_void(_context, slice);
         }
@@ -2118,27 +4080,27 @@ namespace My.Company
             return Interop.service_various_slices_mut_self_ref(_context, ref x, out y);
         }
 
-        public byte MutSelfRefSlice(ref byte x, out byte y, Slice<byte> slice)
+        public byte MutSelfRefSlice(ref byte x, out byte y, SliceU8 slice)
         {
             return Interop.service_various_slices_mut_self_ref_slice(_context, ref x, out y, slice);
         }
 
-        public byte MutSelfRefSlice(ref byte x, out byte y, System.ReadOnlySpan<byte> slice)
+        public byte MutSelfRefSlice(ref byte x, out byte y, ReadOnlySpan<byte> slice)
         {
             return Interop.service_various_slices_mut_self_ref_slice(_context, ref x, out y, slice);
         }
 
-        public byte MutSelfRefSliceLimited(ref byte x, out byte y, Slice<byte> slice, Slice<byte> slice2)
+        public byte MutSelfRefSliceLimited(ref byte x, out byte y, SliceU8 slice, SliceU8 slice2)
         {
             return Interop.service_various_slices_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
         }
 
-        public byte MutSelfRefSliceLimited(ref byte x, out byte y, System.ReadOnlySpan<byte> slice, System.ReadOnlySpan<byte> slice2)
+        public byte MutSelfRefSliceLimited(ref byte x, out byte y, ReadOnlySpan<byte> slice, ReadOnlySpan<byte> slice2)
         {
             return Interop.service_various_slices_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
         }
 
-        public void MutSelfFfiError(SliceMut<byte> slice)
+        public void MutSelfFfiError(SliceMutU8 slice)
         {
             var rval = Interop.service_various_slices_mut_self_ffi_error(_context, slice);
             if (rval != FFIError.Ok)
@@ -2147,12 +4109,12 @@ namespace My.Company
             }
         }
 
-        public void MutSelfFfiError(System.Span<byte> slice)
+        public void MutSelfFfiError(Span<byte> slice)
         {
             Interop.service_various_slices_mut_self_ffi_error(_context, slice);
         }
 
-        public void MutSelfNoError(SliceMut<byte> slice)
+        public void MutSelfNoError(SliceMutU8 slice)
         {
             var rval = Interop.service_various_slices_mut_self_no_error(_context, slice);
             if (rval != FFIError.Ok)
@@ -2161,21 +4123,21 @@ namespace My.Company
             }
         }
 
-        public void MutSelfNoError(System.Span<byte> slice)
+        public void MutSelfNoError(Span<byte> slice)
         {
             Interop.service_various_slices_mut_self_no_error(_context, slice);
         }
 
         /// Warning, you _must_ discard the returned slice object before calling into this service
         /// again, as otherwise undefined behavior might happen.
-        public Slice<uint> ReturnSlice()
+        public SliceU32 ReturnSlice()
         {
             return Interop.service_various_slices_return_slice(_context);
         }
 
         /// Warning, you _must_ discard the returned slice object before calling into this service
         /// again, as otherwise undefined behavior might happen.
-        public SliceMut<uint> ReturnSliceMut()
+        public SliceMutU32 ReturnSliceMut()
         {
             return Interop.service_various_slices_return_slice_mut(_context);
         }
@@ -2237,4 +4199,81 @@ namespace My.Company
         }
     }
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void AsyncHelperNative(IntPtr data, IntPtr callback_data);
+    public delegate void AsyncHelperDelegate(IntPtr data);
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public struct AsyncHelper : IDisposable
+    {
+        private AsyncHelperDelegate _callbackUser;
+        private IntPtr _callbackNative;
+
+        public AsyncHelper() { }
+
+        public AsyncHelper(AsyncHelperDelegate callbackUser)
+        {
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(new AsyncHelperNative(Call));
+        }
+
+        public void Call(IntPtr data, IntPtr callback_data)
+        {
+            _callbackUser(data);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+        [CustomMarshaller(typeof(AsyncHelper), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+        public ref struct Marshaller
+        {
+            private AsyncHelper managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(AsyncHelper managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public AsyncHelper ToManaged()
+            {
+                return new AsyncHelper
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
+        }
+    }
 }

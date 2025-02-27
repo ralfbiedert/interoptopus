@@ -329,7 +329,6 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 // We must convert the element pointer into an Arc, then clone that Arc,
                 // but not drop the original one (which is the responsibility of the
                 // destructor)
-
                 let arc_restored = unsafe { ::std::sync::Arc::from_raw(context) };
                 let context = ::std::sync::Arc::clone(&arc_restored);
                 let _ = ::std::sync::Arc::into_raw(arc_restored);
@@ -345,7 +344,8 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
 
             quote_spanned! { span_function =>
                 #method_attributes
-                pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),*, async_callback: AsyncCallback<FFIResult<u64, FFIError>>) -> #error_ident {
+
+                pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),*, async_callback: ::interoptopus::patterns::asynk::AsyncCallback<<#rval as ::interoptopus::patterns::result::IntoFFIResult>::FFIResult>) -> #error_ident {
                     #block
                 }
             }

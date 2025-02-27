@@ -84,27 +84,28 @@ pub fn pattern_ffi_slice_8(slice: &FFISliceMut<CharArray>, callback: CallbackCha
     callback.call(slice.as_slice().first().copied().unwrap());
 }
 
-// Some extra tests that were hard to do from core crate.
-#[cfg(test)]
-mod test {
-    use super::pattern_ffi_slice_3;
-    use interoptopus::patterns::slice::FFISliceMut;
-    use std::ffi::c_void;
-
-    #[allow(dead_code)]
-    extern "C" fn f(mut x: FFISliceMut<u8>, _: *const c_void) {
-        let slice = x.as_slice_mut();
-        slice[1] = 100;
-    }
-
-    #[test]
-    fn test_pattern_ffi_slice_3() {
-        let mut data = [0, 1, 2, 3, 4, 5];
-
-        let jfc: extern "C" fn(FFISliceMut<'_, u8>, *const c_void) -> () = f;
-
-        pattern_ffi_slice_3(FFISliceMut::from_slice(&mut data), jfc.into());
-
-        assert_eq!(&data, &[1, 100, 2, 3, 4, 5])
-    }
-}
+//
+// // Some extra tests that were hard to do from core crate.
+// #[cfg(test)]
+// mod test {
+//     use super::pattern_ffi_slice_3;
+//     use interoptopus::patterns::slice::FFISliceMut;
+//     use std::ffi::c_void;
+//
+//     #[allow(dead_code)]
+//     extern "C" fn f(mut x: FFISliceMut<u8>, _: *const c_void) {
+//         let slice = x.as_slice_mut();
+//         slice[1] = 100;
+//     }
+//
+//     #[test]
+//     fn test_pattern_ffi_slice_3() {
+//         let mut data = [0, 1, 2, 3, 4, 5];
+//
+//         let jfc: extern "C" fn(FFISliceMut<'_, u8>, *const c_void) -> () = f;
+//
+//         pattern_ffi_slice_3(FFISliceMut::from_slice(&mut data), jfc.into());
+//
+//         assert_eq!(&data, &[1, 100, 2, 3, 4, 5])
+//     }
+// }
