@@ -1,6 +1,5 @@
 use interoptopus::ffi_type;
 use std::fmt::{Display, Formatter};
-
 // This file may look complex but the Interoptopus parts are actually really simple,
 // with some Rust best practices making up most of the code.
 

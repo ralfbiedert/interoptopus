@@ -282,3 +282,16 @@ where
         CType::Pattern(TypePattern::Result(composite))
     }
 }
+
+impl<T, E> From<Result<T, E>> for FFIResult<T, E>
+where
+    T: CTypeInfo + Default,
+    E: CTypeInfo + FFIError,
+{
+    fn from(x: Result<T, E>) -> Self {
+        match x {
+            Ok(t) => Self::ok(t),
+            Err(err) => Self::error(err),
+        }
+    }
+}

@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 5045127293355607160ul)
+            if (api_version != 4856011442108400541ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (5045127293355607160). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (4856011442108400541). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -791,6 +791,13 @@ namespace My.Company
         public static partial FFIError service_async_new(ref IntPtr context);
         // Debug - write_function_overload 
         // Debug - no overload for service_async_new 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "service_async_return_after_ms_explicit")]
+        // Debug - write_function_declaration 
+        public static partial FFIError service_async_return_after_ms_explicit(IntPtr context, ulong x, ulong ms, AsyncHelper async_callback);
+        // Debug - write_function_overload 
+        // Debug - no overload for service_async_return_after_ms_explicit 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_return_after_ms")]
@@ -3173,6 +3180,26 @@ namespace My.Company
                 throw new InteropException<FFIError>(rval);
             }
         }
+
+        // Debug - write_pattern_service_method 
+        public Task<ResultU64> ReturnAfterMsExplicit(ulong x, ulong ms)
+        {
+            var cs = new TaskCompletionSource<ResultU64>();
+            GCHandle pinned = default;
+            var cb = new AsyncHelper((x) => {
+                var rval = Marshal.PtrToStructure<ResultU64>(x);
+                cs.SetResult(rval);
+                pinned.Free();
+            });
+            pinned = GCHandle.Alloc(cb);
+            var rval = Interop.service_async_return_after_ms_explicit(_context, x, ms, cb);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+            return cs.Task;
+        }
+        // Debug - write_service_method_overload 
 
         // Debug - write_pattern_service_method 
         public Task<ResultU64> ReturnAfterMs(ulong x, ulong ms)

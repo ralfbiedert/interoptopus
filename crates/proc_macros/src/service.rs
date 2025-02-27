@@ -52,7 +52,7 @@ pub fn ffi_service(attr: TokenStream, input: &TokenStream) -> TokenStream {
     let ffi_dtor = generate_service_dtor(&attributes, &item);
     let ffi_method_ident = function_descriptors
         .iter()
-        .filter(|x| matches!(x.method_type, MethodType::MethodSync(_)))
+        .filter(|x| matches!(x.method_type, MethodType::MethodSync(_) | MethodType::MethodAsync(_)))
         .map(|x| x.ident.clone())
         .collect::<Vec<_>>();
     let ffi_ctors = function_descriptors
