@@ -75,8 +75,7 @@ pub fn named_callback_to_typename(x: &NamedCallback) -> String {
     x.name().to_string()
 }
 
-pub fn async_callback_to_typename(x: &AsyncCallback) -> String {
-    // format!("AsyncHelper{}", x.fnpointer().name().unwrap().to_string())
+pub fn async_callback_to_typename(_: &AsyncCallback) -> String {
     "AsyncHelper".to_string()
 }
 
@@ -252,7 +251,7 @@ pub fn get_slice_type_argument(x: &CompositeType) -> String {
     t
 }
 
-pub fn to_slice_marshaller(t: &CType) -> String {
+pub(crate) fn to_slice_marshaller(t: &CType) -> String {
     match t {
         CType::Pattern(TypePattern::Slice(x)) => format!("SliceMarshaller<{}>", get_slice_type_argument(x)),
         CType::Pattern(TypePattern::SliceMut(x)) => format!("SliceMutMarshaller<{}>", get_slice_type_argument(x)),

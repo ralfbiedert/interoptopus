@@ -112,7 +112,6 @@
 //! ```
 
 use crate::lang::c::{CType, FnPointerType, Meta};
-use std::ops::Deref;
 
 /// Internal helper naming a generated callback type wrapper.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]

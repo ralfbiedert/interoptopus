@@ -4,7 +4,7 @@ use crate::util::{get_type_name, pascal_to_snake_case, prettyprint_tokenstream};
 use darling::FromMeta;
 use function_impl::MethodType;
 use proc_macro2::TokenStream;
-use quote::{quote, ToTokens};
+use quote::quote;
 use syn::{ImplItem, ItemImpl, Visibility};
 
 pub mod function_impl;
@@ -52,7 +52,7 @@ pub fn ffi_service(attr: TokenStream, input: &TokenStream) -> TokenStream {
     let ffi_dtor = generate_service_dtor(&attributes, &item);
     let ffi_method_ident = function_descriptors
         .iter()
-        .filter(|x| matches!(x.method_type, MethodType::Method(_)))
+        .filter(|x| matches!(x.method_type, MethodType::MethodSync(_)))
         .map(|x| x.ident.clone())
         .collect::<Vec<_>>();
     let ffi_ctors = function_descriptors
@@ -105,7 +105,7 @@ pub fn ffi_service(attr: TokenStream, input: &TokenStream) -> TokenStream {
                     x::function_info()
                 };
 
-                let service = ::interoptopus::patterns::service::Service::new(
+                let service = ::interoptopus::patterns::service::ServiceDefinition::new(
                     ctors, dtor, methods,
                 );
 

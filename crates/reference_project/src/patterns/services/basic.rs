@@ -7,7 +7,7 @@ pub struct BasicService {}
 #[ffi_service(error = "FFIError")]
 impl BasicService {
     #[ffi_service_ctor]
-    pub fn new() -> Result<Box<Self>, Error> {
-        Ok(Box::new(Self {}))
+    pub fn new() -> Result<Self, Error> {
+        Ok(Self {})
     }
 }

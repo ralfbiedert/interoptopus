@@ -5,7 +5,7 @@ use proc_macro2::{Ident, TokenStream};
 use quote::quote_spanned;
 use std::ops::Deref;
 use syn::spanned::Spanned;
-use syn::{FnArg, GenericParam, ImplItemFn, ItemImpl, Pat, PatType, ReturnType, Type, TypeGroup, TypeReference};
+use syn::{FnArg, GenericParam, ImplItem, ImplItemFn, ItemImpl, Pat, ReturnType};
 
 pub struct Descriptor {
     pub ffi_function_tokens: TokenStream,
@@ -16,8 +16,8 @@ pub struct Descriptor {
 #[derive(Debug)]
 pub enum MethodType {
     Constructor(AttributeCtor),
-    Async,
-    Method(AttributeMethod),
+    MethodAsync(AttributeMethodAsync),
+    MethodSync(AttributeMethodSync),
     Destructor,
 }
 
@@ -37,21 +37,19 @@ impl Default for OnPanic {
     }
 }
 
-#[derive(Debug, FromMeta)]
-pub struct AttributeMethod {
+#[derive(Default, Debug, FromMeta)]
+pub struct AttributeMethodSync {
     #[darling(default)]
     ignore: bool,
     #[darling(default)]
     on_panic: OnPanic,
 }
 
-impl Default for AttributeMethod {
-    fn default() -> Self {
-        Self {
-            ignore: false,
-            on_panic: OnPanic::FfiError,
-        }
-    }
+#[derive(Default, Debug, FromMeta)]
+#[allow(dead_code)]
+pub struct AttributeMethodAsync {
+    #[darling(default)]
+    ignore: bool,
 }
 
 /// Inspects all attributes and determines the method type to generate.
@@ -67,8 +65,14 @@ fn method_type(function: &ImplItemFn) -> MethodType {
 
     // Methods that have an `async fn` are always async.
     if function.sig.asyncness.is_some() {
-        // panic!("Async methods are not supported yet.");
-        return MethodType::Async;
+        let function_attributes = attrs
+            .iter()
+            .filter(|x| format!("{x:?}").contains("ffi_service_method"))
+            .map(|attribute| AttributeMethodAsync::from_meta(&attribute.meta).unwrap())
+            .next()
+            .unwrap_or_default();
+
+        return MethodType::MethodAsync(function_attributes);
     }
 
     // Methods explicitly marked a service methods
@@ -76,22 +80,22 @@ fn method_type(function: &ImplItemFn) -> MethodType {
         let function_attributes = attrs
             .iter()
             .filter(|x| format!("{x:?}").contains("ffi_service_method"))
-            .map(|attribute| AttributeMethod::from_meta(&attribute.meta).unwrap())
+            .map(|attribute| AttributeMethodSync::from_meta(&attribute.meta).unwrap())
             .next()
             .unwrap_or_default();
 
-        return MethodType::Method(function_attributes);
+        return MethodType::MethodSync(function_attributes);
     }
 
     // If the method wasn't explicitly marked ...
     match function.sig.output {
         // If it has default output type, we can get away with "return default"
-        ReturnType::Default => MethodType::Method(AttributeMethod {
+        ReturnType::Default => MethodType::MethodSync(AttributeMethodSync {
             ignore: false,
             on_panic: OnPanic::ReturnDefault,
         }),
         // Otherwise, use FFI error conversion.
-        ReturnType::Type(_, _) => MethodType::Method(AttributeMethod {
+        ReturnType::Type(_, _) => MethodType::MethodSync(AttributeMethodSync {
             ignore: false,
             on_panic: OnPanic::FfiError,
         }),
@@ -111,6 +115,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
     let orig_fn_ident = &function.sig.ident;
     let service_type = &impl_block.self_ty;
     let service_prefix = attributes.prefered_service_name(impl_block);
+    let has_async = has_async_methods(impl_block);
     let mut generics = function.sig.generics.clone();
     let mut inputs = Vec::new();
     let mut arg_names = Vec::new();
@@ -129,75 +134,72 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
     let span_body = function.block.span();
     let span_service_ty = impl_block.self_ty.span();
 
+    // Determines what the first generated function parameter is, `&X` or `&mutX`
+    let ptr_type = if has_async {
+        quote_spanned!(span_service_ty => & #service_type)
+    } else {
+        quote_spanned!(span_service_ty => &mut #service_type)
+    };
+
+    // Determines what the return type is, `()` or `X`
     let rval = match &function.sig.output {
         ReturnType::Default => quote_spanned!(span_rval=> ()),
         ReturnType::Type(_, x) => quote_spanned!(span_rval=> #x),
     };
 
+    // Type of method we process (Constructor, Async, Method, Destructor)
     let method_type = method_type(function);
 
     match method_type {
-        MethodType::Constructor(_) => inputs.push(quote_spanned!(span_service_ty => context: &mut *const #service_type)),
-        MethodType::Method(method) if method.ignore => return None,
+        MethodType::Constructor(_) => inputs.push(quote_spanned!(span_service_ty => context: &mut #ptr_type)),
+        MethodType::MethodSync(method) if method.ignore => return None,
         _ => {}
     }
 
-    let service_purged_lifetimes = Box::new(purge_lifetimes_from_type(service_type));
-
-    let receiver_type = if matches!(method_type, MethodType::Constructor(..)) {
-        service_purged_lifetimes.clone()
-    } else {
-        function
-            .sig
-            .inputs
-            .first()
-            .and_then(|fn_arg| match fn_arg {
-                FnArg::Receiver(..) => Some(service_purged_lifetimes.clone()),
-                FnArg::Typed(PatType { ty, .. }) => {
-                    let ty = match &**ty {
-                        Type::Reference(TypeReference { elem, .. }) => elem,
-                        Type::Group(TypeGroup { elem, .. }) => elem,
-                        _ => ty,
-                    };
-                    Some(Box::new(purge_lifetimes_from_type(ty)))
-                }
-            })
-            .unwrap_or(service_purged_lifetimes.clone())
-    };
-
-    let type_eq_check = quote_spanned! {receiver_type.span() =>
-        const _: fn() = || {
-            trait TypeEq {
-                type This;
-            }
-
-            impl<T> TypeEq for T {
-                type This = Self;
-            }
-
-            fn assert_type_eq_all<T, U>()
-            where
-                T: TypeEq<This = U>
-                {}
-
-            assert_type_eq_all::<#service_purged_lifetimes, #receiver_type>();
-        };
-    };
+    // let service_purged_lifetimes = Box::new(purge_lifetimes_from_type(service_type));
+    // let receiver_type = if matches!(method_type, MethodType::Constructor(..)) {
+    //     service_purged_lifetimes.clone()
+    // } else {
+    //     function
+    //         .sig
+    //         .inputs
+    //         .first()
+    //         .and_then(|fn_arg| match fn_arg {
+    //             FnArg::Receiver(..) => Some(service_purged_lifetimes.clone()),
+    //             FnArg::Typed(PatType { ty, .. }) => {
+    //                 let ty = match &**ty {
+    //                     Type::Reference(TypeReference { elem, .. }) => elem,
+    //                     Type::Group(TypeGroup { elem, .. }) => elem,
+    //                     _ => ty,
+    //                 };
+    //                 Some(Box::new(purge_lifetimes_from_type(ty)))
+    //             }
+    //         })
+    //         .unwrap_or(service_purged_lifetimes.clone())
+    // };
 
     for (i, arg) in function.sig.inputs.iter().enumerate() {
         let span_arg = arg.span();
         match arg {
             FnArg::Receiver(receiver) => {
                 if receiver.mutability.is_some() {
-                    inputs.push(quote_spanned!(span_arg=> context: *const #service_type));
+                    inputs.push(quote_spanned!(span_arg=> context: &mut #service_type));
                 } else {
-                    inputs.push(quote_spanned!(span_arg=> context: *mut #service_type));
+                    inputs.push(quote_spanned!(span_arg=> context: & #service_type));
                 }
 
                 arg_names.push(quote_spanned!(span_arg=> context));
             }
             FnArg::Typed(pat) => match pat.pat.deref() {
                 Pat::Ident(x) => {
+                    // If this is the first parameter and we have `async`, the method must have
+                    // requested an `Arc<T>`. In that case we generate an FFI method asking for `&T`
+                    // and then convert it to `Arc<T>` internally.
+                    if i == 0 && has_async {
+                        arg_names.push(quote_spanned!(span_arg=> context));
+                        inputs.push(quote_spanned!(span_arg=> context: & #service_type));
+                        continue;
+                    }
                     let i = &x.ident;
                     arg_names.push(quote_spanned!(span_arg=> #i));
                     inputs.push(quote_spanned!(span_arg=> #arg));
@@ -213,29 +215,42 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
         }
     }
 
+    let method_attributes = quote_spanned! {span_service_ty =>
+        #[::interoptopus::ffi_function]
+        #[no_mangle]
+        #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
+        #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals)]
+        #(
+            #[doc = #doc_lines]
+        )*
+    };
+
     let generated_function = match &method_type {
         MethodType::Constructor(_) => {
+            let object_construction = if has_async {
+                quote_spanned! { span_service_ty =>
+                    let boxed = ::std::sync::Arc::new(obj);
+                    let raw = ::std::sync::Arc::into_raw(boxed);
+                    *context = unsafe { &*raw };
+                }
+            } else {
+                quote_spanned! { span_service_ty =>
+                    let boxed = ::std::boxed::Box::new(obj);
+                    let raw = ::std::boxed::Box::into_raw(boxed);
+                    *context = unsafe { &mut *raw };
+                }
+            };
+
             quote_spanned! { span_function =>
-                #[::interoptopus::ffi_function]
-                #[no_mangle]
-                #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
-                #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals)]
-                #(
-                    #[doc = #doc_lines]
-                )*
+                #method_attributes
                 pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #error_ident {
-                    use ::interoptopus::patterns::service::ServiceContainer;
-
-                    *context = ::std::ptr::null_mut();
-
                     let result_result = std::panic::catch_unwind(::std::panic::AssertUnwindSafe(|| {
                         <#service_type>::#orig_fn_ident( #(#arg_names),* )
                     }));
 
                     match result_result {
                         Ok(Ok(obj)) => {
-                            let raw = obj.into_raw();
-                            *context = raw.cast();
+                            #object_construction
                             <#error_ident as ::interoptopus::patterns::result::FFIError>::SUCCESS
                         }
 
@@ -252,101 +267,88 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 }
             }
         }
-        MethodType::Method(x) => match x.on_panic {
-            OnPanic::ReturnDefault => {
-                quote_spanned! { span_function =>
-                    #type_eq_check
-                    #[::interoptopus::ffi_function]
-                    #[no_mangle]
-                    #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
-                    #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals)]
-                    #(
-                        #[doc = #doc_lines]
-                    )*
-                    pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #rval {
-                        let result_result = ::std::panic::catch_unwind(::std::panic::AssertUnwindSafe(|| {
-                            // Make sure we only have a FnOnce closure and prevent lifetime errors.
-                            #(
-                                let #arg_names = #arg_names;
-                            )*
-                            <#without_lifetimes>::#orig_fn_ident( #(#arg_names),* )
-                        }));
+        MethodType::MethodSync(x) => {
+            match x.on_panic {
+                OnPanic::ReturnDefault => {
+                    quote_spanned! { span_function =>
+                        #method_attributes
+                        pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #rval {
+                            let result_result = ::std::panic::catch_unwind(::std::panic::AssertUnwindSafe(|| {
+                                // Make sure we only have a FnOnce closure and prevent lifetime errors.
+                                #(
+                                    let #arg_names = #arg_names;
+                                )*
+                                <#without_lifetimes>::#orig_fn_ident( #(#arg_names),* )
+                            }));
 
-                        match result_result {
-                            Ok(x) => x,
-                            Err(e) => {
-                                ::interoptopus::util::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::patterns::result::get_panic_message(e.as_ref())));
-                                <#rval>::default()
+                            match result_result {
+                                Ok(x) => x,
+                                Err(e) => {
+                                    ::interoptopus::util::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::patterns::result::get_panic_message(e.as_ref())));
+                                    <#rval>::default()
+                                }
                             }
                         }
                     }
                 }
-            }
-            OnPanic::Abort => {
-                quote_spanned! { span_function =>
-                    #type_eq_check
-                    #[interoptopus::ffi_function]
-                    #[no_mangle]
-                    #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
-                    #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals)]
-                    #(
-                        #[doc = #doc_lines]
-                    )*
-                    pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #rval {
-                        <#without_lifetimes>::#orig_fn_ident( #(#arg_names),* )
+                OnPanic::Abort => {
+                    quote_spanned! { span_function =>
+                        #method_attributes
+                        pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #rval {
+                            <#without_lifetimes>::#orig_fn_ident( #(#arg_names),* )
+                        }
                     }
                 }
-            }
-            OnPanic::FfiError => {
-                let block = quote_spanned! { span_body =>
-                    <#without_lifetimes>::#orig_fn_ident( #(#arg_names),* )
-                };
 
-                quote_spanned! { span_function =>
-                    #type_eq_check
-                    #[::interoptopus::ffi_function]
-                    #[no_mangle]
-                    #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
-                    #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals)]
-                    #(
-                        #[doc = #doc_lines]
-                    )*
-                    pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #error_ident {
-                        ::interoptopus::patterns::result::panics_and_errors_to_ffi_enum(move || {
-                            #block
-                        }, stringify!(#ffi_fn_ident))
+                OnPanic::FfiError => {
+                    let block = quote_spanned! { span_body =>
+                        <#without_lifetimes>::#orig_fn_ident( #(#arg_names),* )
+                    };
+
+                    quote_spanned! { span_function =>
+                        #method_attributes
+                        pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #error_ident {
+                            ::interoptopus::patterns::result::panics_and_errors_to_ffi_enum(move || {
+                                #block
+                            }, stringify!(#ffi_fn_ident))
+                        }
                     }
                 }
             }
-        },
-        MethodType::Async => {
+        }
+        MethodType::Destructor => panic!("Must not happen."),
+        MethodType::MethodAsync(_) => {
             let first = arg_names.first().unwrap();
             let block = quote_spanned! { span_body =>
                 use ::interoptopus::patterns::result::FFIError;
+
+                // We need &T down below to invoke spawn but override the name, so let's save
+                // it here
+                let this = context;
+
+                // We must convert the element pointer into an Arc, then clone that Arc,
+                // but not drop the original one (which is the responsibility of the
+                // destructor)
+                let arc_restored = unsafe { ::std::sync::Arc::from_raw(context) };
+                let context = ::std::sync::Arc::clone(&arc_restored);
+                let _ = ::std::sync::Arc::into_raw(arc_restored);
+
                 let f2 = <#without_lifetimes>::#orig_fn_ident( #(#arg_names),* );
                 let f1 = async move {
                     f2.await;
                 };
 
-                <#without_lifetimes>::spawn(#first, f1);
+                <#without_lifetimes>::spawn(this, f1);
                 #error_ident::SUCCESS
             };
 
             quote_spanned! { span_function =>
-                #type_eq_check
-                #[::interoptopus::ffi_function]
-                #[no_mangle]
-                #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
-                #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals)]
-                #(
-                    #[doc = #doc_lines]
-                )*
+                #method_attributes
                 pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),*, async_callback: AsyncCallback<FFIResult<u64, FFIError>>) -> #error_ident {
                     #block
                 }
             }
         }
-        MethodType::Destructor => panic!("Must not happen."),
     };
 
     Some(Descriptor {
@@ -361,10 +363,27 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
     let ffi_fn_ident = Ident::new(&format!("{service_prefix}destroy"), impl_block.span());
     let error_ident = Ident::new(&attributes.error, impl_block.span());
     let without_lifetimes = purge_lifetimes_from_type(&impl_block.self_ty);
+    let has_async = has_async_methods(impl_block);
 
     let span_service_ty = impl_block.self_ty.span();
 
-    let generated_function = quote_spanned! {span_service_ty=>
+    let ptr_type = if has_async {
+        quote_spanned!(span_service_ty => *const #without_lifetimes)
+    } else {
+        quote_spanned!(span_service_ty => *mut #without_lifetimes)
+    };
+
+    let object_deconstruction = if has_async {
+        quote_spanned! { span_service_ty =>
+            unsafe { drop(::std::sync::Arc::from_raw(*context)) };
+        }
+    } else {
+        quote_spanned! { span_service_ty =>
+            unsafe { drop(::std::boxed::Box::from_raw(*context)) };
+        }
+    };
+
+    let generated_function = quote_spanned! {span_service_ty =>
         /// Destroys the given instance.
         ///
         /// # Safety
@@ -375,14 +394,14 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
         #[allow(unused_mut, unsafe_op_in_unsafe_fn, unused_unsafe)]
         #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals)]
         #[no_mangle]
-        pub unsafe extern "C" fn #ffi_fn_ident(context: &mut *mut <#without_lifetimes as ::interoptopus::patterns::service::Service>::Container) -> #error_ident {
+        pub unsafe extern "C" fn #ffi_fn_ident(context: *mut #ptr_type) -> #error_ident {
             // Checks the _contained_ pointer is not null, which usually means service was not initialized.
             if context.is_null() {
                 return <#error_ident as ::interoptopus::patterns::result::FFIError>::NULL;
             }
 
             let result_result = ::std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                unsafe { drop(::std::boxed::Box::from_raw(*context)) };
+                #object_deconstruction
             }));
 
             *context = ::std::ptr::null_mut();
@@ -402,4 +421,9 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
         ident: ffi_fn_ident,
         method_type: MethodType::Destructor,
     }
+}
+
+/// Checks if the impl block as an `async fn`.
+fn has_async_methods(impl_block: &ItemImpl) -> bool {
+    impl_block.items.iter().any(|x| matches!(x, ImplItem::Fn(x) if x.sig.asyncness.is_some()))
 }

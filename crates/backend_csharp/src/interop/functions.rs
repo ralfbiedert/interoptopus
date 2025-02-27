@@ -1,4 +1,7 @@
-use crate::converter::{function_name_to_csharp_name, function_parameter_to_csharp_typename, function_rval_to_csharp_typename, get_slice_type, has_ffi_error_rval, to_slice_marshaller, to_typespecifier_in_param, to_typespecifier_in_rval};
+use crate::converter::{
+    function_name_to_csharp_name, function_parameter_to_csharp_typename, function_rval_to_csharp_typename, get_slice_type, has_ffi_error_rval, to_slice_marshaller,
+    to_typespecifier_in_param, to_typespecifier_in_rval,
+};
 use crate::interop::patterns::pattern_to_native_in_signature;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::lang::c::{CType, Documentation, Function, FunctionSignature, Parameter, PrimitiveType};
@@ -237,7 +240,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     i.debug(w, "write_function_overload")?;
 
     let has_overload = i.has_overloadable(function.signature());
-    let has_error_enum = has_ffi_error_rval(function.signature());
+    let _has_error_enum = has_ffi_error_rval(function.signature());
 
     // If there is nothing to write, don't do it
     if !has_overload {

@@ -100,6 +100,7 @@
 //! x.JustReturnValue();
 //! x.Dispose();
 //! ```
+
 //!
 //! In other languages and on the C FFI level the following methods would be emitted:
 //!
@@ -112,11 +113,9 @@
 //!
 
 use crate::lang::c::{CType, Function, OpaqueType};
-use crate::lang::rust::CTypeInfo;
 use crate::patterns::TypePattern;
 use crate::util::longest_common_prefix;
 use std::fmt::Debug;
-use std::sync::Arc;
 
 /// Combines a receiver, constructor, destructor and multiple methods in one entity.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -157,35 +156,39 @@ impl ServiceDefinition {
     /// # Panics
     /// Expect the first ctor parameter to be a type.
     pub fn assert_valid(&self) {
-        let constructor_fist_parameter = self
-            .constructors
-            .first()
-            .and_then(super::super::lang::c::Function::first_param_type)
-            .expect("Must have type");
+        let constructor_fist_parameter = self.constructors.first().and_then(Function::first_param_type).expect("Must have type");
         let destructor_first_parameter = self.destructor.first_param_type().expect("Must have type");
 
         match constructor_fist_parameter {
             CType::ReadWritePointer(x) => match **x {
                 CType::ReadWritePointer(ref x) => match **x {
                     CType::Opaque(_) => {}
-                    _ => panic!("First parameter must be opaque type"),
+                    _ => panic!("First parameter must be **opaque (but it was not opaque)."),
                 },
-                _ => panic!("First parameter must be opaque type"),
+                CType::ReadPointer(ref x) => match **x {
+                    CType::Opaque(_) => {}
+                    _ => panic!("First parameter must be **opaque (but it was not opaque)."),
+                },
+                ref x => panic!("First parameter must be **opaque, but it was *something. {x:?}"),
             },
             CType::Opaque(_) => {}
-            _ => panic!("First parameter must be RwPointer(RwPointer(Opaque)) type"),
+            _ => panic!("First parameter must be **opaque (but it was something else)."),
         }
 
         match destructor_first_parameter {
             CType::ReadWritePointer(x) => match **x {
                 CType::ReadWritePointer(ref x) => match **x {
                     CType::Opaque(_) => {}
-                    _ => panic!("First parameter must be opaque type"),
+                    _ => panic!("First parameter must be **opaque (but it was not opaque)."),
                 },
-                _ => panic!("First parameter must be opaque type"),
+                CType::ReadPointer(ref x) => match **x {
+                    CType::Opaque(_) => {}
+                    _ => panic!("First parameter must be **opaque (but it was not opaque)."),
+                },
+                ref x => panic!("First parameter must be **opaque, but it was *something. {x:?}"),
             },
             CType::Opaque(_) => {}
-            _ => panic!("First parameter must be RwPointer(RwPointer(Opaque)) type"),
+            _ => panic!("First parameter must be **opaque (but it was something else)."),
         }
 
         for constructor in &self.constructors {
@@ -245,36 +248,5 @@ fn extract_obvious_opaque_from_parameter(param: &CType) -> Option<OpaqueType> {
         CType::ReadWritePointer(x) => extract_obvious_opaque_from_parameter(x),
         CType::Pattern(_) => None,
         CType::Array(_) => None,
-    }
-}
-
-pub trait Service: CTypeInfo + Sized {
-    type Container: ServiceContainer<Self>;
-}
-
-/// TODO
-///
-/// # Safety
-/// TODO
-pub unsafe trait ServiceContainer<T> {
-    fn into_raw(self) -> *const T;
-    fn clone(*const T) -> Self;
-}
-
-unsafe impl<T: CTypeInfo> ServiceContainer<T> for Arc<T> {
-    fn into_raw(self) -> *const T {
-        Self::into_raw(self)
-    }
-
-    fn clone(x: *const T) -> Self {}
-}
-
-unsafe impl<T: CTypeInfo> ServiceContainer<T> for Box<T> {
-    fn into_raw(self) -> *const T {
-        Self::into_raw(self)
-    }
-
-    fn clone(_: *const T) -> Self {
-        panic!()
     }
 }
