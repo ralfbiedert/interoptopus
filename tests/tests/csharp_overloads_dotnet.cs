@@ -24,9 +24,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 3690414432940671665ul)
+            if (api_version != 6372935688695721067ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (3690414432940671665). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (6372935688695721067). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -452,14 +452,11 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_async_new")]
         public static partial FFIError service_async_new(ref IntPtr context);
 
-        [LibraryImport(NativeLib, EntryPoint = "service_async_return_after_ms_explicit")]
-        public static partial FFIError service_async_return_after_ms_explicit(IntPtr context, ulong x, ulong ms, AsyncHelper async_callback);
-
         [LibraryImport(NativeLib, EntryPoint = "service_async_return_after_ms")]
         public static partial FFIError service_async_return_after_ms(IntPtr context, ulong x, ulong ms, AsyncHelper async_callback);
 
-        [LibraryImport(NativeLib, EntryPoint = "service_async_xxx")]
-        public static partial FFIError service_async_xxx(IntPtr context, byte x, AsyncHelper async_callback);
+        [LibraryImport(NativeLib, EntryPoint = "service_async_bad")]
+        public static partial void service_async_bad(IntPtr context);
 
         /// Destroys the given instance.
         ///
@@ -2342,31 +2339,6 @@ namespace My.Company
     }
 
 
-    ///Result that contains value or an error.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct ResultU8
-    {
-        ///Element if err is `Ok`.
-        byte t;
-        ///Error value.
-        FFIError err;
-    }
-
-    public partial struct ResultU8
-    {
-        public byte Ok()
-        {
-            if (err == 0)
-            {
-                return t;
-            }
-            throw new InteropException<FFIError>(err);
-        }
-
-    }
-
-
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public partial struct Bool
@@ -3304,24 +3276,6 @@ namespace My.Company
             }
         }
 
-        public Task<ResultU64> ReturnAfterMsExplicit(ulong x, ulong ms)
-        {
-            var cs = new TaskCompletionSource<ResultU64>();
-            GCHandle pinned = default;
-            var cb = new AsyncHelper((x) => {
-                var rval = Marshal.PtrToStructure<ResultU64>(x);
-                cs.SetResult(rval);
-                pinned.Free();
-            });
-            pinned = GCHandle.Alloc(cb);
-            var rval = Interop.service_async_return_after_ms_explicit(_context, x, ms, cb);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-            return cs.Task;
-        }
-
         public Task<ResultU64> ReturnAfterMs(ulong x, ulong ms)
         {
             var cs = new TaskCompletionSource<ResultU64>();
@@ -3340,22 +3294,9 @@ namespace My.Company
             return cs.Task;
         }
 
-        public Task<ResultU8> Xxx(byte x)
+        public void Bad()
         {
-            var cs = new TaskCompletionSource<ResultU8>();
-            GCHandle pinned = default;
-            var cb = new AsyncHelper((x) => {
-                var rval = Marshal.PtrToStructure<ResultU8>(x);
-                cs.SetResult(rval);
-                pinned.Free();
-            });
-            pinned = GCHandle.Alloc(cb);
-            var rval = Interop.service_async_xxx(_context, x, cb);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-            return cs.Task;
+            Interop.service_async_bad(_context);
         }
 
         public IntPtr Context => _context;

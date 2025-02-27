@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 3690414432940671665ul)
+            if (api_version != 6372935688695721067ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (3690414432940671665). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (6372935688695721067). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -793,13 +793,6 @@ namespace My.Company
         // Debug - no overload for service_async_new 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "service_async_return_after_ms_explicit")]
-        // Debug - write_function_declaration 
-        public static partial FFIError service_async_return_after_ms_explicit(IntPtr context, ulong x, ulong ms, AsyncHelper async_callback);
-        // Debug - write_function_overload 
-        // Debug - no overload for service_async_return_after_ms_explicit 
-
-        // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_return_after_ms")]
         // Debug - write_function_declaration 
         public static partial FFIError service_async_return_after_ms(IntPtr context, ulong x, ulong ms, AsyncHelper async_callback);
@@ -807,11 +800,11 @@ namespace My.Company
         // Debug - no overload for service_async_return_after_ms 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "service_async_xxx")]
+        [LibraryImport(NativeLib, EntryPoint = "service_async_bad")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_async_xxx(IntPtr context, byte x, AsyncHelper async_callback);
+        public static partial void service_async_bad(IntPtr context);
         // Debug - write_function_overload 
-        // Debug - no overload for service_async_xxx 
+        // Debug - no overload for service_async_bad 
 
         // Debug - write_function 
         /// Destroys the given instance.
@@ -2256,34 +2249,6 @@ namespace My.Company
     }
 
 
-    // Debug - write_type_definition_composite 
-    ///Result that contains value or an error.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public partial struct ResultU8
-    {
-        ///Element if err is `Ok`.
-        byte t;
-        ///Error value.
-        FFIError err;
-    }
-    // Debug - write_type_definition_composite_marshaller 
-
-    // Debug - write_pattern_result 
-    public partial struct ResultU8
-    {
-        public byte Ok()
-        {
-            if (err == 0)
-            {
-                return t;
-            }
-            throw new InteropException<FFIError>(err);
-        }
-
-    }
-
-
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void CallbackCharArray2Native(CharArray value, IntPtr callback_data);
@@ -3217,26 +3182,6 @@ namespace My.Company
         }
 
         // Debug - write_pattern_service_method 
-        public Task<ResultU64> ReturnAfterMsExplicit(ulong x, ulong ms)
-        {
-            var cs = new TaskCompletionSource<ResultU64>();
-            GCHandle pinned = default;
-            var cb = new AsyncHelper((x) => {
-                var rval = Marshal.PtrToStructure<ResultU64>(x);
-                cs.SetResult(rval);
-                pinned.Free();
-            });
-            pinned = GCHandle.Alloc(cb);
-            var rval = Interop.service_async_return_after_ms_explicit(_context, x, ms, cb);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-            return cs.Task;
-        }
-        // Debug - write_service_method_overload 
-
-        // Debug - write_pattern_service_method 
         public Task<ResultU64> ReturnAfterMs(ulong x, ulong ms)
         {
             var cs = new TaskCompletionSource<ResultU64>();
@@ -3257,22 +3202,9 @@ namespace My.Company
         // Debug - write_service_method_overload 
 
         // Debug - write_pattern_service_method 
-        public Task<ResultU8> Xxx(byte x)
+        public void Bad()
         {
-            var cs = new TaskCompletionSource<ResultU8>();
-            GCHandle pinned = default;
-            var cb = new AsyncHelper((x) => {
-                var rval = Marshal.PtrToStructure<ResultU8>(x);
-                cs.SetResult(rval);
-                pinned.Free();
-            });
-            pinned = GCHandle.Alloc(cb);
-            var rval = Interop.service_async_xxx(_context, x, cb);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-            return cs.Task;
+            Interop.service_async_bad(_context);
         }
         // Debug - write_service_method_overload 
 

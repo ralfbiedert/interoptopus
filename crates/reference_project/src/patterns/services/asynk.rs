@@ -5,7 +5,6 @@ use interoptopus::patterns::result::FFIResult;
 use interoptopus::{ffi_service, ffi_service_ctor, ffi_type};
 use std::future::Future;
 use std::sync::Arc;
-use std::thread::{sleep, spawn};
 use tokio::runtime::Runtime;
 
 #[ffi_type(opaque)]
@@ -18,7 +17,6 @@ impl AsyncRuntime for ServiceAsync {
         self.runtime.spawn(f);
     }
 }
-use interoptopus::patterns::result::IntoFFIResult;
 
 #[ffi_service(error = "FFIError")]
 impl ServiceAsync {
@@ -28,27 +26,16 @@ impl ServiceAsync {
             .worker_threads(1)
             .enable_all()
             .build()
-            .map_err(|_| Error::Bad)
-            .unwrap();
+            .map_err(|_| Error::Bad)?;
 
         Ok(Self { runtime })
     }
 
-    pub fn return_after_ms_explicit(&self, x: u64, ms: u64, async_callback: AsyncCallback<FFIResult<u64, FFIError>>) -> Result<(), FFIError> {
-        spawn(move || {
-            sleep(std::time::Duration::from_millis(ms));
-            async_callback.call(&FFIResult::ok(x));
-        });
-        Ok(())
-    }
-
     pub async fn return_after_ms(self: Arc<ServiceAsync>, x: u64, ms: u64) -> Result<u64, FFIError> {
-        dbg!("I WORK!!!!!!");
         tokio::time::sleep(std::time::Duration::from_millis(ms)).await;
         Ok(x)
     }
 
-    pub async fn xxx(self: Arc<ServiceAsync>, x: u8) -> Result<u8, FFIError> {
-        Ok(x)
-    }
+    // TODO: This must not compile.
+    pub fn bad(&mut self) {}
 }
