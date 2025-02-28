@@ -20,7 +20,7 @@ use crate::interop::patterns::abi_guard::write_abi_guard;
 use crate::interop::patterns::write_patterns;
 use crate::interop::types::write_type_definitions;
 use derive_builder::Builder;
-use interoptopus::lang::c::{CType, CompositeType, Constant, Function, FunctionSignature, Meta, PrimitiveType};
+use interoptopus::lang::c::{CType, CompositeType, Constant, Function, FunctionSignature, Meta};
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::{is_global_type, NamespaceMappings};
 use interoptopus::writer::IndentWriter;
@@ -103,7 +103,6 @@ impl Default for Interop {
             namespace_mappings: NamespaceMappings::new("My.Company"),
             namespace_id: String::new(),
             visibility_types: Visibility::AsDeclared,
-            unroll_struct_arrays: false,
             write_types: WriteTypes::NamespaceAndInteroptopusGlobal,
             rename_symbols: false,
             debug: false,
@@ -140,11 +139,6 @@ pub struct Interop {
     /// Sets the visibility access modifiers for generated types.
     #[builder(setter(into))]
     pub(crate) visibility_types: Visibility,
-    /// Whether, say, a `x: [u8; 3]` should become 3 `x0: u8, ...` instead.
-    ///
-    /// If this is not set, interop generation with arrays in structs will fail. This is a somewhat
-    /// open issue w.r.t Unity-sans-unsafe support and feedback would be greatly welcome!
-    unroll_struct_arrays: bool,
     /// Which types to write.
     #[builder(setter(into))]
     write_types: WriteTypes,
@@ -194,15 +188,16 @@ impl Interop {
     }
 
     fn should_emit_marshaller_for_composite(&self, composite: &CompositeType) -> bool {
-        composite
-            .fields()
-            .iter()
-            .any(|f| matches!(f.the_type(), CType::Primitive(PrimitiveType::Bool)) || self.should_emit_marshaller(f.the_type()))
+        // composite
+        //     .fields()
+        //     .iter()
+        //     .any(|f| matches!(f.the_type(), CType::Primitive(PrimitiveType::Bool)) || self.should_emit_marshaller(f.the_type()))
+        true
     }
 
     fn should_emit_marshaller(&self, ctype: &CType) -> bool {
         match ctype {
-            CType::Array(_) => !self.unroll_struct_arrays,
+            CType::Array(_) => true,
             CType::Composite(x) => self.should_emit_marshaller_for_composite(x),
             _ => false,
         }

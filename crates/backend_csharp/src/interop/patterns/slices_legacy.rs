@@ -129,10 +129,7 @@ fn write_pattern_generic_slice_marshaller(i: &Interop, w: &mut IndentWriter, rea
         indented!(w, r"[CustomMarshaller(typeof(Slice<>), MarshalMode.Default, typeof(SliceMarshaller<>.Marshaller))]")?;
         indented!(w, r"internal static class SliceMarshaller<T> where T: struct")?;
     } else {
-        indented!(
-            w,
-            r"[CustomMarshaller(typeof(SliceMut<>), MarshalMode.Default, typeof(SliceMutMarshaller<>.Marshaller))]"
-        )?;
+        indented!(w, r"[CustomMarshaller(typeof(SliceMut<>), MarshalMode.Default, typeof(SliceMutMarshaller<>.Marshaller))]")?;
         indented!(w, r"internal static class SliceMutMarshaller<T> where T: struct")?;
     }
     indented!(w, r"{{")?;
@@ -179,11 +176,7 @@ fn write_pattern_generic_slice_marshaller(i: &Interop, w: &mut IndentWriter, rea
     indented!(w, [()()()()], r"native.Data = Marshal.AllocHGlobal(count * size);")?;
     indented!(w, [()()()()], r"for (var i = 0; i < count; i++)")?;
     indented!(w, [()()()()], r"{{")?;
-    indented!(
-        w,
-        [()()()()()],
-        r"CustomMarshallerHelper<T>.ToUnmanagedFunc!( managed[i], IntPtr.Add(native.Data, i * size));"
-    )?;
+    indented!(w, [()()()()()], r"CustomMarshallerHelper<T>.ToUnmanagedFunc!( managed[i], IntPtr.Add(native.Data, i * size));")?;
     indented!(w, [()()()()], r"}}")?;
     indented!(w, [()()()()], r"return native;")?;
     indented!(w, [()()()], r"}}")?;
@@ -224,11 +217,7 @@ fn write_pattern_generic_slice_marshaller(i: &Interop, w: &mut IndentWriter, rea
     indented!(w, [()()()()], r"marshalled = new T[count];")?;
     indented!(w, [()()()()], r"for (var i = 0; i < count; i++)")?;
     indented!(w, [()()()()], r"{{")?;
-    indented!(
-        w,
-        [()()()()()],
-        r"marshalled[i] = CustomMarshallerHelper<T>.ToManagedFunc!(IntPtr.Add(sourceNative.Data, i * size));"
-    )?;
+    indented!(w, [()()()()()], r"marshalled[i] = CustomMarshallerHelper<T>.ToManagedFunc!(IntPtr.Add(sourceNative.Data, i * size));")?;
     indented!(w, [()()()()], r"}}")?;
     if read_only {
         indented!(w, [()()()()], r"return new Slice<T>(marshalled);")?;
@@ -266,11 +255,7 @@ fn write_pattern_generic_slice_marshaller(i: &Interop, w: &mut IndentWriter, rea
         indented!(w, [()()()()()], r"var size = CustomMarshallerHelper<T>.UnmanagedSize;")?;
         indented!(w, [()()()()()], r"for (var i = 0; i < count; i++)")?;
         indented!(w, [()()()()()], r"{{")?;
-        indented!(
-            w,
-            [()()()()()()],
-            r"CustomMarshallerHelper<T>.ToUnmanagedFunc!(marshalled[i], IntPtr.Add(sourceNative.Data, i * size));"
-        )?;
+        indented!(w, [()()()()()()], r"CustomMarshallerHelper<T>.ToUnmanagedFunc!(marshalled[i], IntPtr.Add(sourceNative.Data, i * size));")?;
         indented!(w, [()()()()()], r"}}")?;
         indented!(w, [()()()()], r"}}")?;
         indented!(w, [()()()()], r"else if (native.Data != IntPtr.Zero)")?;
@@ -279,11 +264,7 @@ fn write_pattern_generic_slice_marshaller(i: &Interop, w: &mut IndentWriter, rea
         indented!(w, [()()()()()], r"var size = CustomMarshallerHelper<T>.UnmanagedSize;")?;
         indented!(w, [()()()()()], r"for (var i = 0; i < count; i++)")?;
         indented!(w, [()()()()()], r"{{")?;
-        indented!(
-            w,
-            [()()()()()()],
-            r"managed[i] = (T)CustomMarshallerHelper<T>.ToManagedFunc!(IntPtr.Add(native.Data, i * size));"
-        )?;
+        indented!(w, [()()()()()()], r"managed[i] = (T)CustomMarshallerHelper<T>.ToManagedFunc!(IntPtr.Add(native.Data, i * size));")?;
         indented!(w, [()()()()()], r"}}")?;
         indented!(w, [()()()()], r"}}")?;
         indented!(w, [()()()], r"}}")?;
@@ -299,10 +280,7 @@ fn write_pattern_generic_slice_marshaller(i: &Interop, w: &mut IndentWriter, rea
 pub fn write_pattern_generic_slice_helper(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     i.debug(w, "write_pattern_generic_slice_helper")?;
 
-    indented!(
-        w,
-        r"// This is a helper for the marshallers for Slice<T> and SliceMut<T> of Ts that require custom marshalling."
-    )?;
+    indented!(w, r"// This is a helper for the marshallers for Slice<T> and SliceMut<T> of Ts that require custom marshalling.")?;
     indented!(w, r"// It is used to precompile the conversion logic for the custom marshaller.")?;
     indented!(w, r"internal static class CustomMarshallerHelper<T> where T : struct")?;
     indented!(w, r"{{")?;
@@ -333,21 +311,12 @@ pub fn write_pattern_generic_slice_helper(i: &Interop, w: &mut IndentWriter) -> 
     w.indent();
 
     indented!(w, r"var marshallerType = nativeMarshalling.NativeType;")?;
-    indented!(
-        w,
-        r#"var convertToUnmanaged = marshallerType.GetMethod("ConvertToUnmanaged", BindingFlags.Public | BindingFlags.Static);"#
-    )?;
-    indented!(
-        w,
-        r#"var convertToManaged = marshallerType.GetMethod("ConvertToManaged", BindingFlags.Public | BindingFlags.Static);"#
-    )?;
+    indented!(w, r#"var convertToUnmanaged = marshallerType.GetMethod("ConvertToUnmanaged", BindingFlags.Public | BindingFlags.Static);"#)?;
+    indented!(w, r#"var convertToManaged = marshallerType.GetMethod("ConvertToManaged", BindingFlags.Public | BindingFlags.Static);"#)?;
     indented!(w, r#"UnmanagedType = marshallerType.GetNestedType("Unmanaged")!;"#)?;
     indented!(w, r"UnmanagedSize = Marshal.SizeOf(UnmanagedType);")?;
     w.newline()?;
-    indented!(
-        w,
-        r"// If the stateless custom marshaller shape is not available we currently do not support marshalling T in a slice."
-    )?;
+    indented!(w, r"// If the stateless custom marshaller shape is not available we currently do not support marshalling T in a slice.")?;
     indented!(w, r"if (convertToUnmanaged == null || convertToManaged == null)")?;
     indented!(w, r"{{")?;
     w.indent();
@@ -381,10 +350,7 @@ pub fn write_pattern_generic_slice_helper(i: &Interop, w: &mut IndentWriter) -> 
     indented!(w, r"var destParameter = Expression.Parameter(typeof(IntPtr));")?;
     indented!(w, r"var toUnmanagedCall = Expression.Call(convertToUnmanaged, managedParameter);")?;
     indented!(w, r"var unsafeWriteCall = Expression.Call(unsafeWrite, toUnmanagedCall, destParameter);")?;
-    indented!(
-        w,
-        r"ToUnmanagedFunc = Expression.Lambda<Action<T, IntPtr>>(unsafeWriteCall, managedParameter, destParameter).Compile();"
-    )?;
+    indented!(w, r"ToUnmanagedFunc = Expression.Lambda<Action<T, IntPtr>>(unsafeWriteCall, managedParameter, destParameter).Compile();")?;
     w.unindent();
     indented!(w, r"}}")?;
     w.newline()?;

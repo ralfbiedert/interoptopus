@@ -322,10 +322,7 @@ pub struct ArrayType {
 impl ArrayType {
     #[must_use]
     pub fn new(array_type: CType, len: usize) -> Self {
-        Self {
-            array_type: Box::new(array_type),
-            len,
-        }
+        Self { array_type: Box::new(array_type), len }
     }
 
     #[must_use]
@@ -452,12 +449,7 @@ impl CompositeType {
     /// Creates a new composite with the given name and type-level documentation.
     #[must_use]
     pub fn with_meta(name: String, fields: Vec<Field>, meta: Meta) -> Self {
-        Self {
-            name,
-            fields,
-            meta,
-            repr: Representation::default(),
-        }
+        Self { name, fields, meta, repr: Representation::default() }
     }
 
     /// Creates a new composite with the given name and type-level documentation.
@@ -527,10 +519,7 @@ pub struct Representation {
 
 impl Default for Representation {
     fn default() -> Self {
-        Self {
-            layout: Layout::C,
-            alignment: None,
-        }
+        Self { layout: Layout::C, alignment: None }
     }
 }
 
@@ -568,12 +557,7 @@ impl Field {
 
     #[must_use]
     pub const fn with_documentation(name: String, the_type: CType, visibility: Visibility, documentation: Documentation) -> Self {
-        Self {
-            name,
-            visibility,
-            the_type,
-            documentation,
-        }
+        Self { name, visibility, the_type, documentation }
     }
 
     #[must_use]
@@ -773,18 +757,12 @@ pub struct FnPointerType {
 impl FnPointerType {
     #[must_use]
     pub fn new(signature: FunctionSignature) -> Self {
-        Self {
-            signature: Box::new(signature),
-            name: None,
-        }
+        Self { signature: Box::new(signature), name: None }
     }
 
     #[must_use]
     pub fn new_named(signature: FunctionSignature, name: String) -> Self {
-        Self {
-            signature: Box::new(signature),
-            name: Some(name),
-        }
+        Self { signature: Box::new(signature), name: Some(name) }
     }
 
     #[must_use]
@@ -829,9 +807,7 @@ impl Documentation {
         if joined_line.is_empty() {
             Self::new()
         } else {
-            Self {
-                lines: joined_line.split('\n').map(std::string::ToString::to_string).collect(),
-            }
+            Self { lines: joined_line.split('\n').map(std::string::ToString::to_string).collect() }
         }
     }
 

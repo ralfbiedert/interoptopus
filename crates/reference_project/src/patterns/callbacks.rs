@@ -39,8 +39,6 @@ pub fn pattern_callback_4(callback: MyCallbackNamespaced, x: u32) -> u32 {
     callback.call(x)
 }
 
-
-
 #[ffi_function]
 pub fn pattern_callback_5() -> SumDelegate1 {
     (exposed_sum1 as extern "C" fn(*const c_void)).into() // This is an ugly Rust limitation right now, compare #108

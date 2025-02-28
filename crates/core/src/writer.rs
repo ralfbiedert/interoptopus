@@ -32,19 +32,11 @@ impl<'a> IndentWriter<'a> {
     }
 
     pub fn new(writer: &'a mut dyn Write) -> Self {
-        Self {
-            one_indent: FOUR_SPACES.to_string(),
-            current_level: 0,
-            writer,
-        }
+        Self { one_indent: FOUR_SPACES.to_string(), current_level: 0, writer }
     }
 
     pub fn with_indent(writer: &'a mut dyn Write, one_indent: &str) -> Self {
-        Self {
-            one_indent: one_indent.to_string(),
-            current_level: 0,
-            writer,
-        }
+        Self { one_indent: one_indent.to_string(), current_level: 0, writer }
     }
 
     pub fn indented(&mut self, f: impl FnOnce(&mut dyn Write) -> std::io::Result<()>) -> Result<(), Error> {

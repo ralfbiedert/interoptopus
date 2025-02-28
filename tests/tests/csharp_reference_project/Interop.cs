@@ -388,30 +388,14 @@ namespace My.Company
         // Debug - write_function_declaration 
         public static partial SliceVec namespaced_inner_slice(SliceVec x);
         // Debug - write_function_overload 
-
-        public static unsafe SliceVec namespaced_inner_slice(ReadOnlySpan<Vec> x)
-        {
-            fixed (void* ptr_x = x)
-            {
-                var x_slice = new SliceVec(new IntPtr(ptr_x), (ulong) x.Length);
-                return namespaced_inner_slice(x_slice);;
-            }
-        }
+        // Debug - no overload for namespaced_inner_slice 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice_mut")]
         // Debug - write_function_declaration 
         public static partial SliceMutVec namespaced_inner_slice_mut(SliceMutVec x);
         // Debug - write_function_overload 
-
-        public static unsafe SliceMutVec namespaced_inner_slice_mut(Span<Vec> x)
-        {
-            fixed (void* ptr_x = x)
-            {
-                var x_slice = new SliceMutVec(new IntPtr(ptr_x), (ulong) x.Length);
-                return namespaced_inner_slice_mut(x_slice);;
-            }
-        }
+        // Debug - no overload for namespaced_inner_slice_mut 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "panics")]
@@ -533,15 +517,7 @@ namespace My.Company
         // Debug - write_function_declaration 
         public static partial Vec3f32 pattern_ffi_slice_2(SliceVec3f32 ffi_slice, int i);
         // Debug - write_function_overload 
-
-        public static unsafe Vec3f32 pattern_ffi_slice_2(ReadOnlySpan<Vec3f32> ffi_slice, int i)
-        {
-            fixed (void* ptr_ffi_slice = ffi_slice)
-            {
-                var ffi_slice_slice = new SliceVec3f32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
-                return pattern_ffi_slice_2(ffi_slice_slice, i);;
-            }
-        }
+        // Debug - no overload for pattern_ffi_slice_2 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_3b")]
@@ -1312,6 +1288,13 @@ namespace My.Company
 
         public ref struct Marshaller
         {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(Array managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe Array ToManaged() => new Array();
+            public void Free() { }
+
             public static Unmanaged ConvertToUnmanaged(Array managed)
             {
                 var result = new Unmanaged
@@ -1358,8 +1341,6 @@ namespace My.Company
                 return result;
             }
 
-            public void Free() { }
-
         }
     }
 
@@ -1387,6 +1368,13 @@ namespace My.Company
 
         public ref struct Marshaller
         {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(BoolField managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe BoolField ToManaged() => new BoolField();
+            public void Free() { }
+
             public static Unmanaged ConvertToUnmanaged(BoolField managed)
             {
                 var result = new Unmanaged
@@ -1416,8 +1404,6 @@ namespace My.Company
 
                 return result;
             }
-
-            public void Free() { }
 
         }
     }
@@ -1449,6 +1435,13 @@ namespace My.Company
 
         public ref struct Marshaller
         {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(CharArray managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe CharArray ToManaged() => new CharArray();
+            public void Free() { }
+
             public static Unmanaged ConvertToUnmanaged(CharArray managed)
             {
                 var result = new Unmanaged
@@ -1519,8 +1512,6 @@ namespace My.Company
                 return result;
             }
 
-            public void Free() { }
-
         }
     }
 
@@ -1533,6 +1524,60 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Container
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public Local.Unmanaged foreign;
+        }
+
+        [CustomMarshaller(typeof(Container), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(Container managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe Container ToManaged() => new Container();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(Container managed)
+            {
+                var result = new Unmanaged
+                {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    foreign = Local.Marshaller.ConvertToUnmanaged(managed.foreign),
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static Container ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new Container()
+                {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    foreign = Local.Marshaller.ConvertToManaged(unmanaged.foreign),
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1550,6 +1595,44 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct DelegateTable
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public MyCallback.Unmanaged my_callback;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public MyCallbackNamespaced.Unmanaged my_callback_namespaced;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public MyCallbackVoid.Unmanaged my_callback_void;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public MyCallbackContextual.Unmanaged my_callback_contextual;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public SumDelegate1.Unmanaged sum_delegate_1;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public SumDelegate2.Unmanaged sum_delegate_2;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public SumDelegateReturn.Unmanaged sum_delegate_return;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public SumDelegateReturn2.Unmanaged sum_delegate_return_2;
+        }
+
+        [CustomMarshaller(typeof(DelegateTable), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(DelegateTable managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe DelegateTable ToManaged() => new DelegateTable();
+            public void Free() { }
+
+        }
+    }
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1560,6 +1643,60 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct ExtraTypef32
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public float x;
+        }
+
+        [CustomMarshaller(typeof(ExtraTypef32), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(ExtraTypef32 managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe ExtraTypef32 ToManaged() => new ExtraTypef32();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(ExtraTypef32 managed)
+            {
+                var result = new Unmanaged
+                {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    x = managed.x,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static ExtraTypef32 ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new ExtraTypef32()
+                {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    x = unmanaged.x,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1570,6 +1707,60 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Genericu32
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public IntPtr x;
+        }
+
+        [CustomMarshaller(typeof(Genericu32), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(Genericu32 managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe Genericu32 ToManaged() => new Genericu32();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(Genericu32 managed)
+            {
+                var result = new Unmanaged
+                {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    x = managed.x,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static Genericu32 ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new Genericu32()
+                {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    x = unmanaged.x,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1580,26 +1771,188 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Genericu8
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public IntPtr x;
+        }
+
+        [CustomMarshaller(typeof(Genericu8), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(Genericu8 managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe Genericu8 ToManaged() => new Genericu8();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(Genericu8 managed)
+            {
+                var result = new Unmanaged
+                {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    x = managed.x,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static Genericu8 ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new Genericu8()
+                {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    x = unmanaged.x,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
 
     // Debug - write_type_definition_composite 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public partial struct Inner
     {
-        float x;
+        internal float x;
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Inner
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public float x;
+        }
+
+        [CustomMarshaller(typeof(Inner), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(Inner managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe Inner ToManaged() => new Inner();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(Inner managed)
+            {
+                var result = new Unmanaged
+                {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    x = managed.x,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static Inner ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new Inner()
+                {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    x = unmanaged.x,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
 
     // Debug - write_type_definition_composite 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public partial struct Local
     {
-        uint x;
+        internal uint x;
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Local
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public uint x;
+        }
+
+        [CustomMarshaller(typeof(Local), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(Local managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe Local ToManaged() => new Local();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(Local managed)
+            {
+                var result = new Unmanaged
+                {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    x = managed.x,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static Local ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new Local()
+                {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    x = unmanaged.x,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1625,7 +1978,7 @@ namespace My.Company
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public EnumRenamed field_enum;
             // Debug - write_type_definition_composite_unmanaged_body_field 
-            public Vec3f32 field_vec;
+            public Vec3f32.Unmanaged field_vec;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public sbyte field_bool;
             // Debug - write_type_definition_composite_unmanaged_body_field 
@@ -1635,7 +1988,7 @@ namespace My.Company
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public fixed ushort field_array_2[5];
             // Debug - write_type_definition_composite_unmanaged_body_field 
-            public ArrayMarshaller.Unmanaged field_struct;
+            public Array.Unmanaged field_struct;
         }
 
         [CustomMarshaller(typeof(NestedArray), MarshalMode.Default, typeof(Marshaller))]
@@ -1643,6 +1996,13 @@ namespace My.Company
 
         public ref struct Marshaller
         {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(NestedArray managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe NestedArray ToManaged() => new NestedArray();
+            public void Free() { }
+
             public static Unmanaged ConvertToUnmanaged(NestedArray managed)
             {
                 var result = new Unmanaged
@@ -1650,13 +2010,13 @@ namespace My.Company
                     // Debug - write_type_definition_composite_to_unmanaged_inline_field 
                     field_enum = managed.field_enum,
                     // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    field_vec = managed.field_vec,
+                    field_vec = Vec3f32.Marshaller.ConvertToUnmanaged(managed.field_vec),
                     // Debug - write_type_definition_composite_to_unmanaged_inline_field 
                     field_bool = Convert.ToSByte(managed.field_bool),
                     // Debug - write_type_definition_composite_to_unmanaged_inline_field 
                     field_int = managed.field_int,
                     // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    field_struct = ArrayMarshaller.ConvertToUnmanaged(managed.field_struct),
+                    field_struct = Array.Marshaller.ConvertToUnmanaged(managed.field_struct),
                 };
 
                 unsafe
@@ -1704,13 +2064,13 @@ namespace My.Company
                     // Debug - write_type_definition_composite_to_managed_inline_field 
                     field_enum = unmanaged.field_enum,
                     // Debug - write_type_definition_composite_to_managed_inline_field 
-                    field_vec = unmanaged.field_vec,
+                    field_vec = Vec3f32.Marshaller.ConvertToManaged(unmanaged.field_vec),
                     // Debug - write_type_definition_composite_to_managed_inline_field 
                     field_bool = Convert.ToBoolean(unmanaged.field_bool),
                     // Debug - write_type_definition_composite_to_managed_inline_field 
                     field_int = unmanaged.field_int,
                     // Debug - write_type_definition_composite_to_managed_inline_field 
-                    field_struct = ArrayMarshaller.ConvertToManaged(unmanaged.field_struct),
+                    field_struct = Array.Marshaller.ConvertToManaged(unmanaged.field_struct),
                 };
 
                 unsafe
@@ -1731,8 +2091,6 @@ namespace My.Company
                 return result;
             }
 
-            public void Free() { }
-
         }
     }
 
@@ -1746,6 +2104,66 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Packed1
+    {
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public byte x;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public ushort y;
+        }
+
+        [CustomMarshaller(typeof(Packed1), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(Packed1 managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe Packed1 ToManaged() => new Packed1();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(Packed1 managed)
+            {
+                var result = new Unmanaged
+                {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    x = managed.x,
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    y = managed.y,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static Packed1 ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new Packed1()
+                {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    x = unmanaged.x,
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    y = unmanaged.y,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1757,6 +2175,66 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Packed2
+    {
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public ushort y;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public byte x;
+        }
+
+        [CustomMarshaller(typeof(Packed2), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(Packed2 managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe Packed2 ToManaged() => new Packed2();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(Packed2 managed)
+            {
+                var result = new Unmanaged
+                {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    y = managed.y,
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    x = managed.x,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static Packed2 ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new Packed2()
+                {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    y = unmanaged.y,
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    x = unmanaged.x,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1767,6 +2245,60 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Phantomu8
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public uint x;
+        }
+
+        [CustomMarshaller(typeof(Phantomu8), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(Phantomu8 managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe Phantomu8 ToManaged() => new Phantomu8();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(Phantomu8 managed)
+            {
+                var result = new Unmanaged
+                {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    x = managed.x,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static Phantomu8 ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new Phantomu8()
+                {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    x = unmanaged.x,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
 
     // Debug - write_type_definition_composite 
     /// Documented struct.
@@ -1779,6 +2311,60 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct StructDocumented
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public float x;
+        }
+
+        [CustomMarshaller(typeof(StructDocumented), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(StructDocumented managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe StructDocumented ToManaged() => new StructDocumented();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(StructDocumented managed)
+            {
+                var result = new Unmanaged
+                {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    x = managed.x,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static StructDocumented ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new StructDocumented()
+                {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    x = unmanaged.x,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1789,6 +2375,60 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct StructRenamed
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public EnumRenamed e;
+        }
+
+        [CustomMarshaller(typeof(StructRenamed), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(StructRenamed managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe StructRenamed ToManaged() => new StructRenamed();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(StructRenamed managed)
+            {
+                var result = new Unmanaged
+                {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    e = managed.e,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static StructRenamed ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new StructRenamed()
+                {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    e = unmanaged.e,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1799,6 +2439,60 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Tupled
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public byte x0;
+        }
+
+        [CustomMarshaller(typeof(Tupled), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(Tupled managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe Tupled ToManaged() => new Tupled();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(Tupled managed)
+            {
+                var result = new Unmanaged
+                {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    x0 = managed.x0,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static Tupled ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new Tupled()
+                {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    x0 = unmanaged.x0,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1809,6 +2503,60 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct UseAsciiStringPattern
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public IntPtr ascii_string;
+        }
+
+        [CustomMarshaller(typeof(UseAsciiStringPattern), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(UseAsciiStringPattern managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe UseAsciiStringPattern ToManaged() => new UseAsciiStringPattern();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(UseAsciiStringPattern managed)
+            {
+                var result = new Unmanaged
+                {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    ascii_string = managed.ascii_string,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static UseAsciiStringPattern ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new UseAsciiStringPattern()
+                {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    ascii_string = unmanaged.ascii_string,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1820,6 +2568,66 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Vec1
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public float x;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public float y;
+        }
+
+        [CustomMarshaller(typeof(Vec1), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(Vec1 managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe Vec1 ToManaged() => new Vec1();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(Vec1 managed)
+            {
+                var result = new Unmanaged
+                {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    x = managed.x,
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    y = managed.y,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static Vec1 ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new Vec1()
+                {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    x = unmanaged.x,
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    y = unmanaged.y,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1831,6 +2639,66 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Vec2
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public double x;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public double z;
+        }
+
+        [CustomMarshaller(typeof(Vec2), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(Vec2 managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe Vec2 ToManaged() => new Vec2();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(Vec2 managed)
+            {
+                var result = new Unmanaged
+                {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    x = managed.x,
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    z = managed.z,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static Vec2 ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new Vec2()
+                {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    x = unmanaged.x,
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    z = unmanaged.z,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1843,6 +2711,72 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Vec3f32
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public float x;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public float y;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public float z;
+        }
+
+        [CustomMarshaller(typeof(Vec3f32), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(Vec3f32 managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe Vec3f32 ToManaged() => new Vec3f32();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(Vec3f32 managed)
+            {
+                var result = new Unmanaged
+                {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    x = managed.x,
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    y = managed.y,
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    z = managed.z,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static Vec3f32 ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new Vec3f32()
+                {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    x = unmanaged.x,
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    y = unmanaged.y,
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    z = unmanaged.z,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1850,10 +2784,70 @@ namespace My.Company
     public partial struct Visibility1
     {
         public byte pblc;
-        byte prvt;
+        internal byte prvt;
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Visibility1
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public byte pblc;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public byte prvt;
+        }
+
+        [CustomMarshaller(typeof(Visibility1), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(Visibility1 managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe Visibility1 ToManaged() => new Visibility1();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(Visibility1 managed)
+            {
+                var result = new Unmanaged
+                {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    pblc = managed.pblc,
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    prvt = managed.prvt,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static Visibility1 ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new Visibility1()
+                {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    pblc = unmanaged.pblc,
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    prvt = unmanaged.prvt,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1865,16 +2859,130 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Visibility2
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public byte pblc1;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public byte pblc2;
+        }
+
+        [CustomMarshaller(typeof(Visibility2), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(Visibility2 managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe Visibility2 ToManaged() => new Visibility2();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(Visibility2 managed)
+            {
+                var result = new Unmanaged
+                {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    pblc1 = managed.pblc1,
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    pblc2 = managed.pblc2,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static Visibility2 ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new Visibility2()
+                {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    pblc1 = unmanaged.pblc1,
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    pblc2 = unmanaged.pblc2,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
 
     // Debug - write_type_definition_composite 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public partial struct Weird1u32
     {
-        uint x;
+        internal uint x;
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Weird1u32
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public uint x;
+        }
+
+        [CustomMarshaller(typeof(Weird1u32), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(Weird1u32 managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe Weird1u32 ToManaged() => new Weird1u32();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(Weird1u32 managed)
+            {
+                var result = new Unmanaged
+                {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    x = managed.x,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static Weird1u32 ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new Weird1u32()
+                {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    x = unmanaged.x,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1906,6 +3014,13 @@ namespace My.Company
 
         public ref struct Marshaller
         {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(Weird2u8 managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe Weird2u8 ToManaged() => new Weird2u8();
+            public void Free() { }
+
             public static Unmanaged ConvertToUnmanaged(Weird2u8 managed)
             {
                 var result = new Unmanaged
@@ -1959,8 +3074,6 @@ namespace My.Company
 
                 return result;
             }
-
-            public void Free() { }
 
         }
     }
@@ -2324,12 +3437,72 @@ namespace My.Company
     public partial struct OptionInner
     {
         ///Element that is maybe valid.
-        Inner t;
+        internal Inner t;
         ///Byte where `1` means element `t` is valid.
-        byte is_some;
+        internal byte is_some;
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct OptionInner
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public Inner.Unmanaged t;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public byte is_some;
+        }
+
+        [CustomMarshaller(typeof(OptionInner), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(OptionInner managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe OptionInner ToManaged() => new OptionInner();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(OptionInner managed)
+            {
+                var result = new Unmanaged
+                {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    t = Inner.Marshaller.ConvertToUnmanaged(managed.t),
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    is_some = managed.is_some,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static OptionInner ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new OptionInner()
+                {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    t = Inner.Marshaller.ConvertToManaged(unmanaged.t),
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    is_some = unmanaged.is_some,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
 
     // Debug - write_pattern_option 
     public partial struct OptionInner
@@ -2360,12 +3533,72 @@ namespace My.Company
     public partial struct ResultU64
     {
         ///Element if err is `Ok`.
-        ulong t;
+        internal ulong t;
         ///Error value.
-        FFIError err;
+        internal FFIError err;
     }
 
     // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct ResultU64
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public ulong t;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public FFIError err;
+        }
+
+        [CustomMarshaller(typeof(ResultU64), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(ResultU64 managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe ResultU64 ToManaged() => new ResultU64();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(ResultU64 managed)
+            {
+                var result = new Unmanaged
+                {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    t = managed.t,
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
+                    err = managed.err,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static ResultU64 ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new ResultU64()
+                {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    t = unmanaged.t,
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
+                    err = unmanaged.err,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
 
     // Debug - write_pattern_result 
     public partial struct ResultU64

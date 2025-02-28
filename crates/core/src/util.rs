@@ -294,9 +294,7 @@ impl IdPrettifier {
     /// Creates a new prettifier from a `my_name` identifier.
     #[must_use]
     pub fn from_rust_lower(id: &str) -> Self {
-        Self {
-            tokens: id.split('_').map(std::string::ToString::to_string).collect(),
-        }
+        Self { tokens: id.split('_').map(std::string::ToString::to_string).collect() }
     }
 
     #[must_use]

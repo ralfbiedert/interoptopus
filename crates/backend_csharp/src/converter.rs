@@ -251,7 +251,7 @@ pub fn get_slice_type_argument(x: &CompositeType) -> String {
     t
 }
 
-pub(crate) fn to_slice_marshaller(t: &CType) -> String {
+pub fn to_slice_marshaller(t: &CType) -> String {
     match t {
         CType::Pattern(TypePattern::Slice(x)) => format!("SliceMarshaller<{}>", get_slice_type_argument(x)),
         CType::Pattern(TypePattern::SliceMut(x)) => format!("SliceMutMarshaller<{}>", get_slice_type_argument(x)),

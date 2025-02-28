@@ -68,14 +68,7 @@ pub fn write_param_helpers(_i: &Interop, w: &mut IndentWriter, function: &Functi
                         false,
                     );
 
-                    indented!(
-                        w,
-                        [()],
-                        r#"if hasattr({}, "_length_") and getattr({}, "_type_", "") == {}:"#,
-                        arg.name(),
-                        arg.name(),
-                        inner
-                    )?;
+                    indented!(w, [()], r#"if hasattr({}, "_length_") and getattr({}, "_type_", "") == {}:"#, arg.name(), arg.name(), inner)?;
 
                     indented!(
                         w,

@@ -41,19 +41,10 @@ pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &
     for p in function.signature().params() {
         match p.the_type() {
             CType::Array(a) => {
-                params.push(format!(
-                    "{} {}[{}]",
-                    to_type_specifier(i, a.array_type()),
-                    p.name().to_naming_style(&i.function_parameter_naming),
-                    a.len(),
-                ));
+                params.push(format!("{} {}[{}]", to_type_specifier(i, a.array_type()), p.name().to_naming_style(&i.function_parameter_naming), a.len(),));
             }
             _ => {
-                params.push(format!(
-                    "{} {}",
-                    to_type_specifier(i, p.the_type()),
-                    p.name().to_naming_style(&i.function_parameter_naming)
-                ));
+                params.push(format!("{} {}", to_type_specifier(i, p.the_type()), p.name().to_naming_style(&i.function_parameter_naming)));
             }
         }
     }

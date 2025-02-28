@@ -14,9 +14,7 @@ pub struct ServiceOnPanic {
 impl ServiceOnPanic {
     #[ffi_service_ctor]
     pub fn new() -> Result<Self, Error> {
-        Ok(Self {
-            c_string: CString::new("Hello new_with").unwrap(),
-        })
+        Ok(Self { c_string: CString::new("Hello new_with").unwrap() })
     }
 
     /// Methods returning a Result<(), _> are the default and do not

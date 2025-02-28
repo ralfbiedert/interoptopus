@@ -1,7 +1,7 @@
-use std::error::Error;
 use core_library_ffi::ffi_inventory;
 use interoptopus::Bindings;
 use interoptopus_backend_csharp::InteropBuilder;
+use std::error::Error;
 
 // By adding the interop generation logic into a `build.rs` that depends on
 // our `core_library_ffi` we ensure that upon `cargo build` both the `.dll`
@@ -19,6 +19,6 @@ fn main() -> Result<(), Box<dyn Error>> {
         // it here to simplify our example).
         .build()?
         .write_file("bindings/Interop.cs")?;
-    
+
     Ok(())
 }

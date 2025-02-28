@@ -106,11 +106,7 @@ fn write_type_definition_named_callback_body(i: &Interop, w: &mut IndentWriter, 
 
     let mut params = Vec::new();
     for param in the_type.fnpointer().signature().params() {
-        params.push(format!(
-            "{} {}",
-            to_type_specifier(i, param.the_type()),
-            param.name().to_naming_style(&i.function_parameter_naming)
-        ));
+        params.push(format!("{} {}", to_type_specifier(i, param.the_type()), param.name().to_naming_style(&i.function_parameter_naming)));
     }
 
     indented!(w, "{}", format!("typedef {} (*{})({});", rval, name, params.join(", ")))?;

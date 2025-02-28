@@ -50,6 +50,13 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
     indented!(w, [()], r"public ref struct Marshaller")?;
     indented!(w, [()], r"{{")?;
     w.indent();
+    indented!(w, [()], r"// TODO, we have to fix this marshalling type")?;
+    indented!(w, [()], r"public void FromManaged({} managed) {{ }}", name)?;
+    indented!(w, [()], r"public Unmanaged ToUnmanaged() => new Unmanaged {{  }};")?;
+    indented!(w, [()], r"public void FromUnmanaged(Unmanaged unmanaged) {{ }}")?;
+    indented!(w, [()], r"public unsafe {} ToManaged() => new {}();", name, name)?;
+    indented!(w, [()], r"public void Free() {{ }}")?;
+    w.newline()?;
     indented!(w, [()], r"public static Unmanaged ConvertToUnmanaged({} managed)", name)?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"var result = new Unmanaged")?;
@@ -122,8 +129,6 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
     indented!(w, [()()], r"return result;")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
-    indented!(w, [()], r"public void Free() {{ }}")?;
-    w.newline()?;
     indented!(w, r"}}")?;
     w.unindent();
     indented!(w, r"}}")?;
@@ -141,11 +146,8 @@ pub fn write_type_definition_composite_to_managed_marshal_field(
     i.debug(w, "write_type_definition_composite_to_managed_marshal_field")?;
     let field_name = field_name_to_csharp_name(field, i.rename_symbols);
     let type_name = to_typespecifier_in_field(a.array_type(), field, the_type);
-    if i.unroll_struct_arrays {
-        for i in 0..a.len() {
-            indented!(w, r"result.{0}{1} = unmanaged.{0}[{1}];", field_name, i)?;
-        }
-    } else if matches!(a.array_type(), CType::Pattern(TypePattern::CChar)) {
+
+    if matches!(a.array_type(), CType::Pattern(TypePattern::CChar)) {
         indented!(w, r"var source_{0} = new ReadOnlySpan<byte>(unmanaged.{0}, {1});", field_name, a.len())?;
         indented!(w, r"var terminatorIndex_{0} = source_{0}.IndexOf<byte>(0);", field_name)?;
         indented!(
@@ -171,7 +173,7 @@ pub fn write_type_definition_composite_to_managed_inline_field(i: &Interop, w: &
             indented!(w, r"{0} = Convert.ToBoolean(unmanaged.{0}),", field_name)?;
         }
         CType::Composite(composite) if i.should_emit_marshaller_for_composite(composite) => {
-            indented!(w, r"{0} = {1}Marshaller.ConvertToManaged(unmanaged.{0}),", field_name, composite.rust_name())?;
+            indented!(w, r"{0} = {1}.Marshaller.ConvertToManaged(unmanaged.{0}),", field_name, composite.rust_name())?;
         }
         _ => {
             indented!(w, r"{0} = unmanaged.{0},", field_name)?;
@@ -190,70 +192,46 @@ pub fn write_type_definition_composite_to_unmanaged_marshal_field(
     i.debug(w, "write_type_definition_composite_to_unmanaged_marshal_field")?;
     let field_name = field_name_to_csharp_name(field, i.rename_symbols);
     let type_name = to_typespecifier_in_field(a.array_type(), field, the_type);
-    if i.unroll_struct_arrays {
-        for i in 0..a.len() {
-            indented!(w, r"result.{0}[{1}] = managed.{0}{1};", field_name, i)?;
-        }
+    indented!(w, r"if(managed.{} != null)", field_name)?;
+    indented!(w, r"{{")?;
+    if matches!(a.array_type(), CType::Pattern(TypePattern::CChar)) {
+        indented!(w, [()], r"fixed(char* s = managed.{0})", field_name)?;
+        indented!(w, [()], r"{{")?;
+        indented!(w, [()()], r"if(Encoding.UTF8.GetByteCount(managed.{0}, 0, managed.{0}.Length) + 1 > {1})", field_name, a.len())?;
+        indented!(w, [()()], r"{{")?;
+        indented!(
+            w,
+            [()()()],
+            r#"throw new InvalidOperationException($"The managed string field '{{nameof({0}.{1})}}' cannot be encoded to fit the fixed size array of {2}.");"#,
+            the_type.rust_name(),
+            field_name,
+            a.len()
+        )?;
+        indented!(w, [()()], r"}}")?;
+        indented!(w, [()()], r"var written = Encoding.UTF8.GetBytes(s, managed.{0}.Length, result.{0}, {1});", field_name, a.len() - 1)?;
+        indented!(w, [()()], r"result.{}[written] = 0;", field_name)?;
+        indented!(w, [()], r"}}")?;
     } else {
-        indented!(w, r"if(managed.{} != null)", field_name)?;
-        indented!(w, r"{{")?;
-        if matches!(a.array_type(), CType::Pattern(TypePattern::CChar)) {
-            indented!(w, [()], r"fixed(char* s = managed.{0})", field_name)?;
-            indented!(w, [()], r"{{")?;
-            indented!(
-                w,
-                [()()],
-                r"if(Encoding.UTF8.GetByteCount(managed.{0}, 0, managed.{0}.Length) + 1 > {1})",
-                field_name,
-                a.len()
-            )?;
-            indented!(w, [()()], r"{{")?;
-            indented!(
-                w,
-                [()()()],
-                r#"throw new InvalidOperationException($"The managed string field '{{nameof({0}.{1})}}' cannot be encoded to fit the fixed size array of {2}.");"#,
-                the_type.rust_name(),
-                field_name,
-                a.len()
-            )?;
-            indented!(w, [()()], r"}}")?;
-            indented!(
-                w,
-                [()()],
-                r"var written = Encoding.UTF8.GetBytes(s, managed.{0}.Length, result.{0}, {1});",
-                field_name,
-                a.len() - 1
-            )?;
-            indented!(w, [()()], r"result.{}[written] = 0;", field_name)?;
-            indented!(w, [()], r"}}")?;
-        } else {
-            indented!(w, [()], r"if(managed.{}.Length != {})", field_name, a.len())?;
-            indented!(w, [()], r"{{")?;
-            indented!(
-                w,
-                [()()],
-                r#"throw new InvalidOperationException($"The managed array field '{{nameof({0}.{1})}}' has {{managed.{1}.Length}} elements, exceeding the fixed size array of {2}.");"#,
-                the_type.rust_name(),
-                field_name,
-                a.len()
-            )?;
-            indented!(w, [()], r"}}")?;
-            indented!(
-                w,
-                [()],
-                r"var source_{1} = new ReadOnlySpan<{0}>(managed.{1}, 0, managed.{1}.Length);",
-                type_name,
-                field_name
-            )?;
-            indented!(w, [()], r"var dest = new Span<{0}>(result.{1}, {2});", type_name, field_name, a.len())?;
-            indented!(w, [()], r"source_{}.CopyTo(dest);", field_name)?;
-        }
-        indented!(w, r"}}")?;
-        indented!(w, r"else")?;
-        indented!(w, r"{{")?;
-        indented!(w, [()], r#"throw new InvalidOperationException($"The managed field cannot be null.");"#)?;
-        indented!(w, r"}}")?;
+        indented!(w, [()], r"if(managed.{}.Length != {})", field_name, a.len())?;
+        indented!(w, [()], r"{{")?;
+        indented!(
+            w,
+            [()()],
+            r#"throw new InvalidOperationException($"The managed array field '{{nameof({0}.{1})}}' has {{managed.{1}.Length}} elements, exceeding the fixed size array of {2}.");"#,
+            the_type.rust_name(),
+            field_name,
+            a.len()
+        )?;
+        indented!(w, [()], r"}}")?;
+        indented!(w, [()], r"var source_{1} = new ReadOnlySpan<{0}>(managed.{1}, 0, managed.{1}.Length);", type_name, field_name)?;
+        indented!(w, [()], r"var dest = new Span<{0}>(result.{1}, {2});", type_name, field_name, a.len())?;
+        indented!(w, [()], r"source_{}.CopyTo(dest);", field_name)?;
     }
+    indented!(w, r"}}")?;
+    indented!(w, r"else")?;
+    indented!(w, r"{{")?;
+    indented!(w, [()], r#"throw new InvalidOperationException($"The managed field cannot be null.");"#)?;
+    indented!(w, r"}}")?;
     Ok(())
 }
 
@@ -266,7 +244,7 @@ pub fn write_type_definition_composite_to_unmanaged_inline_field(i: &Interop, w:
             indented!(w, r"{0} = Convert.ToSByte(managed.{0}),", field_name)?;
         }
         CType::Composite(composite) if i.should_emit_marshaller_for_composite(composite) => {
-            indented!(w, r"{0} = {1}Marshaller.ConvertToUnmanaged(managed.{0}),", field_name, composite.rust_name())?;
+            indented!(w, r"{0} = {1}.Marshaller.ConvertToUnmanaged(managed.{0}),", field_name, composite.rust_name())?;
         }
         _ => {
             indented!(w, r"{0} = managed.{0},", field_name)?;
@@ -294,10 +272,16 @@ pub fn write_type_definition_composite_unmanaged_body_field(i: &Interop, w: &mut
         }
         CType::Composite(composite) => {
             if i.should_emit_marshaller_for_composite(composite) {
-                indented!(w, r"public {}Marshaller.Unmanaged {};", composite.rust_name(), field_name)?;
+                indented!(w, r"public {}.Unmanaged {};", composite.rust_name(), field_name)?;
             } else {
                 indented!(w, r"public {} {};", composite.rust_name(), field_name)?;
             }
+        }
+        CType::Pattern(TypePattern::NamedCallback(x)) => {
+            indented!(w, r"public {}.Unmanaged {};", x.name(), field_name)?;
+        }
+        CType::Pattern(TypePattern::CStrPointer) => {
+            indented!(w, r"public IntPtr {};", field_name)?;
         }
         _ => {
             let type_name = to_typespecifier_in_field(field.the_type(), field, the_type);
@@ -361,22 +345,15 @@ pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWri
     };
 
     if let CType::Array(a) = field.the_type() {
-        if i.unroll_struct_arrays {
-            let type_name = to_typespecifier_in_field(a.array_type(), field, the_type);
-            for i in 0..a.len() {
-                indented!(w, r"{}{} {}{};", visibility, type_name, field_name, i)?;
-            }
+        assert!(is_blittable(a.array_type()), "Array type is not blittable: {:?}", a.array_type());
+
+        let type_name = if matches!(a.array_type(), CType::Pattern(TypePattern::CChar)) {
+            "string".to_string()
         } else {
-            assert!(is_blittable(a.array_type()), "Array type is not blittable: {:?}", a.array_type());
+            format!("{}[]", to_typespecifier_in_field(a.array_type(), field, the_type))
+        };
 
-            let type_name = if matches!(a.array_type(), CType::Pattern(TypePattern::CChar)) {
-                "string".to_string()
-            } else {
-                format!("{}[]", to_typespecifier_in_field(a.array_type(), field, the_type))
-            };
-
-            indented!(w, r"{}{} {};", visibility, type_name, field_name)?;
-        }
+        indented!(w, r"{}{} {};", visibility, type_name, field_name)?;
 
         Ok(())
     } else {

@@ -89,10 +89,7 @@ impl<T, L: CTypeInfo + CorrectSurrogate<T>> Surrogate<T, L> {
             std::ptr::read(std::ptr::from_ref::<L>(&*this).cast::<T>())
         };
 
-        Self {
-            inner: t,
-            _marker: PhantomData::default(),
-        }
+        Self { inner: t, _marker: PhantomData::default() }
     }
 
     /// Views the type as a `T`.

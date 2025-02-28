@@ -50,11 +50,7 @@ pub fn write_utils(_i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     w.newline()?;
 
     indented!(w, r"class CallbackVars(object):")?;
-    indented!(
-        w,
-        [()],
-        r#""""Helper to be used `lambda x: setattr(cv, "x", x)` when getting values from callbacks.""""#
-    )?;
+    indented!(w, [()], r#""""Helper to be used `lambda x: setattr(cv, "x", x)` when getting values from callbacks.""""#)?;
     indented!(w, [()], r"def __str__(self):")?;
     indented!(w, [()()], r#"rval = """#)?;
     indented!(w, [()()], r#"for var in  filter(lambda x: "__" not in x, dir(self)):"#)?;

@@ -125,6 +125,7 @@ pub fn write_function_wrapper_call_delegate_param_body(
     sep: &str,
     delegate_signature: &FunctionSignature,
 ) -> Result<(), Error> {
+    i.debug(w, "write_function_wrapper_call_delegate_param_body")?;
     let mut lambda_params = Vec::new();
     for p in delegate_signature.params() {
         lambda_params.push(format!("{} {}_native", i.to_native_callback_typespecifier(p.the_type()), p.name()));
@@ -137,13 +138,7 @@ pub fn write_function_wrapper_call_delegate_param_body(
         match p.the_type() {
             CType::Composite(x) => {
                 if i.should_emit_marshaller_for_composite(x) {
-                    indented!(
-                        w,
-                        [()],
-                        r"var {0}_managed = {1}Marshaller.ConvertToManaged({0}_native);",
-                        p.name(),
-                        to_typespecifier_in_param(p.the_type())
-                    )?;
+                    indented!(w, [()], r"var {0}_managed = {1}Marshaller.ConvertToManaged({0}_native);", p.name(), to_typespecifier_in_param(p.the_type()))?;
                 }
             }
             CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_)) => {
@@ -306,7 +301,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
                 // _ => fallback(),
                 to_wrap_name.push(name);
                 to_wrap_type.push(to_typespecifier_in_param(p.the_type()));
-                to_invoke.push(format!("{}_wrapped", name));
+                to_invoke.push(format!("{name}_wrapped"));
                 // fallback()
             }
             CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {
@@ -362,15 +357,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         for (pin_var, slice_struct) in to_pin_name.iter().zip(to_pin_slice_type.iter()) {
             indented!(w, [()], r"fixed (void* ptr_{} = {})", pin_var, pin_var)?;
             indented!(w, [()], r"{{")?;
-            indented!(
-                w,
-                [()()],
-                r"var {}_slice = new {}(new IntPtr(ptr_{}), (ulong) {}.Length);",
-                pin_var,
-                slice_struct,
-                pin_var,
-                pin_var
-            )?;
+            indented!(w, [()()], r"var {}_slice = new {}(new IntPtr(ptr_{}), (ulong) {}.Length);", pin_var, slice_struct, pin_var, pin_var)?;
             w.indent();
         }
     }

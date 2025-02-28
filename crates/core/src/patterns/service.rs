@@ -139,12 +139,7 @@ impl ServiceDefinition {
             .expect("Must have type");
         let the_type = extract_obvious_opaque_from_parameter(first_type).expect("First parameter must point to opaque.");
 
-        Self {
-            the_type,
-            constructors,
-            destructor,
-            methods,
-        }
+        Self { the_type, constructors, destructor, methods }
     }
 
     /// Checks if the signature of this service is compatible with the `Service` pattern, panic with

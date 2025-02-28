@@ -10,7 +10,7 @@ public class TestPatternDelegateTable
     void CreatePatternDelegateTable(ServiceCallbacks service)
     {
     
-        var table = new DelegateTableX
+        var table = new DelegateTable
         {
             my_callback = new MyCallback(value => 1),
             // sum_delegate_1 = () => { },

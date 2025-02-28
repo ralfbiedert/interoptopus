@@ -120,10 +120,7 @@ impl<T> FFIOption<T> {
 impl<T: Default> FFIOption<T> {
     #[must_use]
     pub fn none() -> Self {
-        Self {
-            is_some: FFIBool::FALSE,
-            t: T::default(),
-        }
+        Self { is_some: FFIBool::FALSE, t: T::default() }
     }
 }
 

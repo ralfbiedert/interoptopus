@@ -56,6 +56,61 @@ namespace My.Company
         public float y;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Vec2
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public float x;
+            public float y;
+        }
+
+        [CustomMarshaller(typeof(Vec2), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(Vec2 managed) { }
+            public Unmanaged ToUnmanaged() => new Unmanaged {  };
+            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public unsafe Vec2 ToManaged() => new Vec2();
+            public void Free() { }
+
+            public static Unmanaged ConvertToUnmanaged(Vec2 managed)
+            {
+                var result = new Unmanaged
+                {
+                    x = managed.x,
+                    y = managed.y,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+            public static Vec2 ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new Vec2()
+                {
+                    x = unmanaged.x,
+                    y = unmanaged.y,
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
+            }
+
+        }
+    }
+
     public enum FFIError
     {
         Ok = 0,

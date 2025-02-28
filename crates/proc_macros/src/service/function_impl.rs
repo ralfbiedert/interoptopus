@@ -90,15 +90,9 @@ fn method_type(function: &ImplItemFn) -> MethodType {
     // If the method wasn't explicitly marked ...
     match function.sig.output {
         // If it has default output type, we can get away with "return default"
-        ReturnType::Default => MethodType::MethodSync(AttributeMethodSync {
-            ignore: false,
-            on_panic: OnPanic::ReturnDefault,
-        }),
+        ReturnType::Default => MethodType::MethodSync(AttributeMethodSync { ignore: false, on_panic: OnPanic::ReturnDefault }),
         // Otherwise, use FFI error conversion.
-        ReturnType::Type(_, _) => MethodType::MethodSync(AttributeMethodSync {
-            ignore: false,
-            on_panic: OnPanic::FfiError,
-        }),
+        ReturnType::Type(_, _) => MethodType::MethodSync(AttributeMethodSync { ignore: false, on_panic: OnPanic::FfiError }),
     }
 }
 
@@ -352,11 +346,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
         }
     };
 
-    Some(Descriptor {
-        ffi_function_tokens: generated_function,
-        ident: ffi_fn_ident,
-        method_type,
-    })
+    Some(Descriptor { ffi_function_tokens: generated_function, ident: ffi_fn_ident, method_type })
 }
 
 pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> Descriptor {
@@ -417,11 +407,7 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
         }
     };
 
-    Descriptor {
-        ffi_function_tokens: generated_function,
-        ident: ffi_fn_ident,
-        method_type: MethodType::Destructor,
-    }
+    Descriptor { ffi_function_tokens: generated_function, ident: ffi_fn_ident, method_type: MethodType::Destructor }
 }
 
 /// Checks if the impl block as an `async fn`.

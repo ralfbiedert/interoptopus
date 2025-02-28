@@ -72,13 +72,7 @@ pub fn write_slice(_i: &Interop, w: &mut IndentWriter, c: &CompositeType, mutabl
     )?;
     indented!(w, [()()], r"array = ({} * len(self))()", data_type_python)?;
     indented!(w, [()()], r"ctypes.memmove(array, self.data, len(self) * ctypes.sizeof({}))", data_type_python)?;
-    indented!(
-        w,
-        [()()],
-        r"rval = {}(data=ctypes.cast(array, ctypes.POINTER({})), len=len(self))",
-        c.rust_name(),
-        data_type_python
-    )?;
+    indented!(w, [()()], r"rval = {}(data=ctypes.cast(array, ctypes.POINTER({})), len=len(self))", c.rust_name(), data_type_python)?;
     indented!(w, [()()], r"rval.owned = array  # Store array in returned slice to prevent memory deallocation")?;
     indented!(w, [()()], r"return rval")?;
     w.newline()?;
@@ -176,12 +170,7 @@ pub fn write_pattern_class(i: &Interop, w: &mut IndentWriter, class: &ServiceDef
     indented!(w, [()], r"__api_lock = object()")?;
     w.newline()?;
     indented!(w, [()], r"def __init__(self, api_lock, ctx):")?;
-    indented!(
-        w,
-        [()()],
-        r#"assert(api_lock == {}.__api_lock), "You must create this with a static constructor." "#,
-        context_type_name
-    )?;
+    indented!(w, [()()], r#"assert(api_lock == {}.__api_lock), "You must create this with a static constructor." "#, context_type_name)?;
     indented!(w, [()()], r"self._ctx = ctx")?;
     w.newline()?;
     indented!(w, [()], r"@property")?;

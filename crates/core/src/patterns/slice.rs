@@ -68,22 +68,14 @@ impl<T> Default for FFISlice<'_, T> {
             assert!(size_of::<Self>() == 16);
         }
 
-        Self {
-            data: null(),
-            len: 0,
-            _phantom: PhantomData,
-        }
+        Self { data: null(), len: 0, _phantom: PhantomData }
     }
 }
 
 impl<'a, T> FFISlice<'a, T> {
     /// Create new Self from a normal slice.
     pub const fn from_slice(slice: &'a [T]) -> Self {
-        FFISlice {
-            data: slice.as_ptr(),
-            len: slice.len() as u64,
-            _phantom: PhantomData,
-        }
+        FFISlice { data: slice.as_ptr(), len: slice.len() as u64, _phantom: PhantomData }
     }
 
     /// Returns a safe Rust slice.
@@ -161,22 +153,14 @@ pub struct FFISliceMut<'a, T> {
 
 impl<T> Default for FFISliceMut<'_, T> {
     fn default() -> Self {
-        Self {
-            data: null_mut(),
-            len: 0,
-            _phantom: PhantomData,
-        }
+        Self { data: null_mut(), len: 0, _phantom: PhantomData }
     }
 }
 
 impl<'a, T> FFISliceMut<'a, T> {
     /// Create new Self from a normal slice.
     pub fn from_slice(slice: &'a mut [T]) -> Self {
-        FFISliceMut {
-            data: slice.as_mut_ptr(),
-            len: slice.len() as u64,
-            _phantom: PhantomData::default(),
-        }
+        FFISliceMut { data: slice.as_mut_ptr(), len: slice.len() as u64, _phantom: PhantomData::default() }
     }
 
     /// Returns a safe, mutable Rust slice.

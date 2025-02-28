@@ -61,12 +61,7 @@ impl InventoryBuilder {
     /// Start creating a new library.
     #[must_use]
     pub const fn new() -> Self {
-        Self {
-            functions: Vec::new(),
-            ctypes: Vec::new(),
-            constants: Vec::new(),
-            patterns: Vec::new(),
-        }
+        Self { functions: Vec::new(), ctypes: Vec::new(), constants: Vec::new(), patterns: Vec::new() }
     }
 
     /// Registers a symbol.
@@ -109,11 +104,7 @@ impl InventoryBuilder {
             let has_opaque_param = x.signature().params().iter().any(|x| x.the_type().as_opaque_type().is_some());
             let has_opaque_rval = x.signature().rval().as_opaque_type().is_some();
 
-            assert!(
-                !(has_opaque_param || has_opaque_rval),
-                "Function {} has an opaque parameter or return value. This can cause UB.",
-                x.name()
-            );
+            assert!(!(has_opaque_param || has_opaque_rval), "Function {} has an opaque parameter or return value. This can cause UB.", x.name());
         }
 
         self
@@ -171,13 +162,7 @@ impl Inventory {
         ctypes.sort();
         // constants.sort(); TODO: do sort constants (issue with Ord and float values ...)
 
-        Self {
-            functions,
-            ctypes,
-            constants,
-            patterns,
-            namespaces,
-        }
+        Self { functions, ctypes, constants, patterns, namespaces }
     }
 
     /// Return all functions registered.
@@ -240,13 +225,7 @@ impl Inventory {
         let patterns: Vec<LibraryPattern> = self.patterns.iter().filter(|x| predicate(InventoryItem::Pattern(x))).cloned().collect();
         let namespaces: Vec<String> = self.namespaces.iter().filter(|x| predicate(InventoryItem::Namespace(x))).cloned().collect();
 
-        Self {
-            functions,
-            ctypes,
-            constants,
-            patterns,
-            namespaces,
-        }
+        Self { functions, ctypes, constants, patterns, namespaces }
     }
 }
 

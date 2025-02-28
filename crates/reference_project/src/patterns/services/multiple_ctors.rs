@@ -13,9 +13,7 @@ pub struct ServiceMultipleCtors {
 impl ServiceMultipleCtors {
     #[ffi_service_ctor]
     pub fn new_with(some_value: u32) -> Result<Self, Error> {
-        Ok(Self {
-            data: vec![some_value; some_value as usize],
-        })
+        Ok(Self { data: vec![some_value; some_value as usize] })
     }
 
     #[ffi_service_ctor]

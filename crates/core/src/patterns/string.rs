@@ -57,20 +57,14 @@ pub struct CStrPointer<'a> {
 
 impl Default for CStrPointer<'_> {
     fn default() -> Self {
-        Self {
-            ptr: null(),
-            _phantom: PhantomData::default(),
-        }
+        Self { ptr: null(), _phantom: PhantomData::default() }
     }
 }
 
 impl<'a> CStrPointer<'a> {
     #[must_use]
     pub fn empty() -> Self {
-        Self {
-            ptr: EMPTY.as_ptr().cast(),
-            _phantom: PhantomData::default(),
-        }
+        Self { ptr: EMPTY.as_ptr().cast(), _phantom: PhantomData::default() }
     }
 
     /// Create a `CStrPointer` from a `&[u8]` slice reference.
@@ -94,19 +88,13 @@ impl<'a> CStrPointer<'a> {
         //     return Err(Error::Ascii);
         // }
 
-        Ok(Self {
-            ptr: cstr_with_nul.as_ptr().cast(),
-            _phantom: PhantomData::default(),
-        })
+        Ok(Self { ptr: cstr_with_nul.as_ptr().cast(), _phantom: PhantomData::default() })
     }
 
     /// Create a pointer from a `CStr`.
     #[must_use]
     pub fn from_cstr(cstr: &'a CStr) -> Self {
-        Self {
-            ptr: cstr.as_ptr(),
-            _phantom: PhantomData::default(),
-        }
+        Self { ptr: cstr.as_ptr(), _phantom: PhantomData::default() }
     }
 
     /// Create a [`CStr`] for the pointer.

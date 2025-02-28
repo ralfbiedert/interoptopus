@@ -210,9 +210,7 @@ pub fn array_1(x: Array) -> u8 {
 
 #[ffi_function]
 pub fn array_2() -> Array {
-    Array {
-        data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
-    }
+    Array { data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] }
 }
 
 #[ffi_function]
@@ -229,9 +227,7 @@ pub fn nested_array_1() -> NestedArray {
         field_int: 42,
         field_array: [1, 2, 3, 4, 5],
         field_array_2: [6, 7, 8, 9, 10],
-        field_struct: Array {
-            data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
-        },
+        field_struct: Array { data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] },
     }
 }
 
@@ -242,9 +238,7 @@ pub fn nested_array_2(result: &mut NestedArray) {
     result.field_bool = true;
     result.field_int = 42;
     result.field_array = [1, 2, 3, 4, 5];
-    result.field_struct = Array {
-        data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
-    };
+    result.field_struct = Array { data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] };
 }
 
 #[ffi_function]
@@ -254,10 +248,7 @@ pub fn nested_array_3(input: NestedArray) -> u8 {
 
 #[ffi_function]
 pub fn char_array_1() -> CharArray {
-    let mut result = CharArray {
-        str: FixedString { data: [0; 32] },
-        str_2: FixedString { data: [0; 32] },
-    };
+    let mut result = CharArray { str: FixedString { data: [0; 32] }, str_2: FixedString { data: [0; 32] } };
 
     result.str.data[..14].copy_from_slice(b"Hello, World!\0");
 
