@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 6372935688695721067ul)
+            if (api_version != 10198333809987967799ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (6372935688695721067). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10198333809987967799). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -945,6 +945,13 @@ namespace My.Company
         }
 
         // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_set_delegate_table")]
+        // Debug - write_function_declaration 
+        public static partial void service_callbacks_set_delegate_table(IntPtr context, ref DelegateTable table);
+        // Debug - write_function_overload 
+        // Debug - no overload for service_callbacks_set_delegate_table 
+
+        // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_invoke_delegates")]
         // Debug - write_function_declaration 
         public static partial FFIError service_callbacks_invoke_delegates(IntPtr context);
@@ -1283,15 +1290,15 @@ namespace My.Company
 
     // Debug - write_type_definition_composite 
     [Serializable]
-    [NativeMarshalling(typeof(ArrayMarshaller))]
+    [StructLayout(LayoutKind.Sequential)]
     public partial struct Array
     {
         public byte[] data;
     }
     // Debug - write_type_definition_composite_marshaller 
 
-    [CustomMarshaller(typeof(Array), MarshalMode.Default, typeof(ArrayMarshaller))]
-    internal static class ArrayMarshaller
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Array
     {
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
@@ -1299,63 +1306,71 @@ namespace My.Company
             public fixed byte data[16];
         }
 
-        public static Unmanaged ConvertToUnmanaged(Array managed)
-        {
-            var result = new Unmanaged
-            {
-            };
+        [CustomMarshaller(typeof(Array), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
-            unsafe
+        public ref struct Marshaller
+        {
+            public static Unmanaged ConvertToUnmanaged(Array managed)
             {
-                if(managed.data != null)
+                var result = new Unmanaged
                 {
-                    if(managed.data.Length != 16)
+                };
+
+                unsafe
+                {
+                    if(managed.data != null)
                     {
-                        throw new InvalidOperationException($"The managed array field '{nameof(Array.data)}' has {managed.data.Length} elements, exceeding the fixed size array of 16.");
+                        if(managed.data.Length != 16)
+                        {
+                            throw new InvalidOperationException($"The managed array field '{nameof(Array.data)}' has {managed.data.Length} elements, exceeding the fixed size array of 16.");
+                        }
+                        var source_data = new ReadOnlySpan<byte>(managed.data, 0, managed.data.Length);
+                        var dest = new Span<byte>(result.data, 16);
+                        source_data.CopyTo(dest);
                     }
-                    var source_data = new ReadOnlySpan<byte>(managed.data, 0, managed.data.Length);
-                    var dest = new Span<byte>(result.data, 16);
-                    source_data.CopyTo(dest);
+                    else
+                    {
+                        throw new InvalidOperationException($"The managed field cannot be null.");
+                    }
                 }
-                else
+
+                return result;
+            }
+
+            public static Array ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new Array()
                 {
-                    throw new InvalidOperationException($"The managed field cannot be null.");
+                };
+
+                unsafe
+                {
+                    var source_data = new Span<byte>(unmanaged.data, 16);
+                    var arr_data = new byte[16];
+                    source_data.CopyTo(arr_data.AsSpan());
+                    result.data = arr_data;
                 }
+
+                return result;
             }
 
-            return result;
-        }
+            public void Free() { }
 
-        public static Array ConvertToManaged(Unmanaged unmanaged)
-        {
-            var result = new Array()
-            {
-            };
-
-            unsafe
-            {
-                var source_data = new Span<byte>(unmanaged.data, 16);
-                var arr_data = new byte[16];
-                source_data.CopyTo(arr_data.AsSpan());
-                result.data = arr_data;
-            }
-
-            return result;
         }
     }
 
-
     // Debug - write_type_definition_composite 
     [Serializable]
-    [NativeMarshalling(typeof(BoolFieldMarshaller))]
+    [StructLayout(LayoutKind.Sequential)]
     public partial struct BoolField
     {
         public bool val;
     }
     // Debug - write_type_definition_composite_marshaller 
 
-    [CustomMarshaller(typeof(BoolField), MarshalMode.Default, typeof(BoolFieldMarshaller))]
-    internal static class BoolFieldMarshaller
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct BoolField
     {
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
@@ -1363,39 +1378,47 @@ namespace My.Company
             public sbyte val;
         }
 
-        public static Unmanaged ConvertToUnmanaged(BoolField managed)
-        {
-            var result = new Unmanaged
-            {
-                val = Convert.ToSByte(managed.val),
-            };
+        [CustomMarshaller(typeof(BoolField), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
-            unsafe
+        public ref struct Marshaller
+        {
+            public static Unmanaged ConvertToUnmanaged(BoolField managed)
             {
+                var result = new Unmanaged
+                {
+                    val = Convert.ToSByte(managed.val),
+                };
+
+                unsafe
+                {
+                }
+
+                return result;
             }
 
-            return result;
-        }
-
-        public static BoolField ConvertToManaged(Unmanaged unmanaged)
-        {
-            var result = new BoolField()
+            public static BoolField ConvertToManaged(Unmanaged unmanaged)
             {
-                val = Convert.ToBoolean(unmanaged.val),
-            };
+                var result = new BoolField()
+                {
+                    val = Convert.ToBoolean(unmanaged.val),
+                };
 
-            unsafe
-            {
+                unsafe
+                {
+                }
+
+                return result;
             }
 
-            return result;
+            public void Free() { }
+
         }
     }
 
-
     // Debug - write_type_definition_composite 
     [Serializable]
-    [NativeMarshalling(typeof(CharArrayMarshaller))]
+    [StructLayout(LayoutKind.Sequential)]
     public partial struct CharArray
     {
         public string str;
@@ -1403,8 +1426,8 @@ namespace My.Company
     }
     // Debug - write_type_definition_composite_marshaller 
 
-    [CustomMarshaller(typeof(CharArray), MarshalMode.Default, typeof(CharArrayMarshaller))]
-    internal static class CharArrayMarshaller
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct CharArray
     {
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
@@ -1413,73 +1436,81 @@ namespace My.Company
             public fixed byte str_2[32];
         }
 
-        public static Unmanaged ConvertToUnmanaged(CharArray managed)
-        {
-            var result = new Unmanaged
-            {
-            };
+        [CustomMarshaller(typeof(CharArray), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
-            unsafe
+        public ref struct Marshaller
+        {
+            public static Unmanaged ConvertToUnmanaged(CharArray managed)
             {
-                if(managed.str != null)
+                var result = new Unmanaged
                 {
-                    fixed(char* s = managed.str)
+                };
+
+                unsafe
+                {
+                    if(managed.str != null)
                     {
-                        if(Encoding.UTF8.GetByteCount(managed.str, 0, managed.str.Length) + 1 > 32)
+                        fixed(char* s = managed.str)
                         {
-                            throw new InvalidOperationException($"The managed string field '{nameof(CharArray.str)}' cannot be encoded to fit the fixed size array of 32.");
+                            if(Encoding.UTF8.GetByteCount(managed.str, 0, managed.str.Length) + 1 > 32)
+                            {
+                                throw new InvalidOperationException($"The managed string field '{nameof(CharArray.str)}' cannot be encoded to fit the fixed size array of 32.");
+                            }
+                            var written = Encoding.UTF8.GetBytes(s, managed.str.Length, result.str, 31);
+                            result.str[written] = 0;
                         }
-                        var written = Encoding.UTF8.GetBytes(s, managed.str.Length, result.str, 31);
-                        result.str[written] = 0;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"The managed field cannot be null.");
+                    }
+
+                    if(managed.str_2 != null)
+                    {
+                        fixed(char* s = managed.str_2)
+                        {
+                            if(Encoding.UTF8.GetByteCount(managed.str_2, 0, managed.str_2.Length) + 1 > 32)
+                            {
+                                throw new InvalidOperationException($"The managed string field '{nameof(CharArray.str_2)}' cannot be encoded to fit the fixed size array of 32.");
+                            }
+                            var written = Encoding.UTF8.GetBytes(s, managed.str_2.Length, result.str_2, 31);
+                            result.str_2[written] = 0;
+                        }
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"The managed field cannot be null.");
                     }
                 }
-                else
-                {
-                    throw new InvalidOperationException($"The managed field cannot be null.");
-                }
 
-                if(managed.str_2 != null)
-                {
-                    fixed(char* s = managed.str_2)
-                    {
-                        if(Encoding.UTF8.GetByteCount(managed.str_2, 0, managed.str_2.Length) + 1 > 32)
-                        {
-                            throw new InvalidOperationException($"The managed string field '{nameof(CharArray.str_2)}' cannot be encoded to fit the fixed size array of 32.");
-                        }
-                        var written = Encoding.UTF8.GetBytes(s, managed.str_2.Length, result.str_2, 31);
-                        result.str_2[written] = 0;
-                    }
-                }
-                else
-                {
-                    throw new InvalidOperationException($"The managed field cannot be null.");
-                }
+                return result;
             }
 
-            return result;
-        }
-
-        public static CharArray ConvertToManaged(Unmanaged unmanaged)
-        {
-            var result = new CharArray()
+            public static CharArray ConvertToManaged(Unmanaged unmanaged)
             {
-            };
+                var result = new CharArray()
+                {
+                };
 
-            unsafe
-            {
-                var source_str = new ReadOnlySpan<byte>(unmanaged.str, 32);
-                var terminatorIndex_str = source_str.IndexOf<byte>(0);
-                result.str = Encoding.UTF8.GetString(source_str.Slice(0, terminatorIndex_str == -1 ? Math.Min(source_str.Length, 32) : terminatorIndex_str));
+                unsafe
+                {
+                    var source_str = new ReadOnlySpan<byte>(unmanaged.str, 32);
+                    var terminatorIndex_str = source_str.IndexOf<byte>(0);
+                    result.str = Encoding.UTF8.GetString(source_str.Slice(0, terminatorIndex_str == -1 ? Math.Min(source_str.Length, 32) : terminatorIndex_str));
 
-                var source_str_2 = new ReadOnlySpan<byte>(unmanaged.str_2, 32);
-                var terminatorIndex_str_2 = source_str_2.IndexOf<byte>(0);
-                result.str_2 = Encoding.UTF8.GetString(source_str_2.Slice(0, terminatorIndex_str_2 == -1 ? Math.Min(source_str_2.Length, 32) : terminatorIndex_str_2));
+                    var source_str_2 = new ReadOnlySpan<byte>(unmanaged.str_2, 32);
+                    var terminatorIndex_str_2 = source_str_2.IndexOf<byte>(0);
+                    result.str_2 = Encoding.UTF8.GetString(source_str_2.Slice(0, terminatorIndex_str_2 == -1 ? Math.Min(source_str_2.Length, 32) : terminatorIndex_str_2));
+                }
+
+                return result;
             }
 
-            return result;
+            public void Free() { }
+
         }
     }
-
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1487,6 +1518,22 @@ namespace My.Company
     public partial struct Container
     {
         public Local foreign;
+    }
+    // Debug - write_type_definition_composite_marshaller 
+
+    // Debug - write_type_definition_composite 
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct DelegateTable
+    {
+        public MyCallback my_callback;
+        public MyCallbackNamespaced my_callback_namespaced;
+        public MyCallbackVoid my_callback_void;
+        public MyCallbackContextual my_callback_contextual;
+        public SumDelegate1 sum_delegate_1;
+        public SumDelegate2 sum_delegate_2;
+        public SumDelegateReturn sum_delegate_return;
+        public SumDelegateReturn2 sum_delegate_return_2;
     }
     // Debug - write_type_definition_composite_marshaller 
 
@@ -1537,7 +1584,7 @@ namespace My.Company
 
     // Debug - write_type_definition_composite 
     [Serializable]
-    [NativeMarshalling(typeof(NestedArrayMarshaller))]
+    [StructLayout(LayoutKind.Sequential)]
     public partial struct NestedArray
     {
         public EnumRenamed field_enum;
@@ -1550,8 +1597,8 @@ namespace My.Company
     }
     // Debug - write_type_definition_composite_marshaller 
 
-    [CustomMarshaller(typeof(NestedArray), MarshalMode.Default, typeof(NestedArrayMarshaller))]
-    internal static class NestedArrayMarshaller
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct NestedArray
     {
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
@@ -1565,81 +1612,89 @@ namespace My.Company
             public ArrayMarshaller.Unmanaged field_struct;
         }
 
-        public static Unmanaged ConvertToUnmanaged(NestedArray managed)
+        [CustomMarshaller(typeof(NestedArray), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
         {
-            var result = new Unmanaged
+            public static Unmanaged ConvertToUnmanaged(NestedArray managed)
             {
-                field_enum = managed.field_enum,
-                field_vec = managed.field_vec,
-                field_bool = Convert.ToSByte(managed.field_bool),
-                field_int = managed.field_int,
-                field_struct = ArrayMarshaller.ConvertToUnmanaged(managed.field_struct),
-            };
+                var result = new Unmanaged
+                {
+                    field_enum = managed.field_enum,
+                    field_vec = managed.field_vec,
+                    field_bool = Convert.ToSByte(managed.field_bool),
+                    field_int = managed.field_int,
+                    field_struct = ArrayMarshaller.ConvertToUnmanaged(managed.field_struct),
+                };
 
-            unsafe
-            {
-                if(managed.field_array != null)
+                unsafe
                 {
-                    if(managed.field_array.Length != 5)
+                    if(managed.field_array != null)
                     {
-                        throw new InvalidOperationException($"The managed array field '{nameof(NestedArray.field_array)}' has {managed.field_array.Length} elements, exceeding the fixed size array of 5.");
+                        if(managed.field_array.Length != 5)
+                        {
+                            throw new InvalidOperationException($"The managed array field '{nameof(NestedArray.field_array)}' has {managed.field_array.Length} elements, exceeding the fixed size array of 5.");
+                        }
+                        var source_field_array = new ReadOnlySpan<ushort>(managed.field_array, 0, managed.field_array.Length);
+                        var dest = new Span<ushort>(result.field_array, 5);
+                        source_field_array.CopyTo(dest);
                     }
-                    var source_field_array = new ReadOnlySpan<ushort>(managed.field_array, 0, managed.field_array.Length);
-                    var dest = new Span<ushort>(result.field_array, 5);
-                    source_field_array.CopyTo(dest);
-                }
-                else
-                {
-                    throw new InvalidOperationException($"The managed field cannot be null.");
+                    else
+                    {
+                        throw new InvalidOperationException($"The managed field cannot be null.");
+                    }
+
+                    if(managed.field_array_2 != null)
+                    {
+                        if(managed.field_array_2.Length != 5)
+                        {
+                            throw new InvalidOperationException($"The managed array field '{nameof(NestedArray.field_array_2)}' has {managed.field_array_2.Length} elements, exceeding the fixed size array of 5.");
+                        }
+                        var source_field_array_2 = new ReadOnlySpan<ushort>(managed.field_array_2, 0, managed.field_array_2.Length);
+                        var dest = new Span<ushort>(result.field_array_2, 5);
+                        source_field_array_2.CopyTo(dest);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"The managed field cannot be null.");
+                    }
                 }
 
-                if(managed.field_array_2 != null)
-                {
-                    if(managed.field_array_2.Length != 5)
-                    {
-                        throw new InvalidOperationException($"The managed array field '{nameof(NestedArray.field_array_2)}' has {managed.field_array_2.Length} elements, exceeding the fixed size array of 5.");
-                    }
-                    var source_field_array_2 = new ReadOnlySpan<ushort>(managed.field_array_2, 0, managed.field_array_2.Length);
-                    var dest = new Span<ushort>(result.field_array_2, 5);
-                    source_field_array_2.CopyTo(dest);
-                }
-                else
-                {
-                    throw new InvalidOperationException($"The managed field cannot be null.");
-                }
+                return result;
             }
 
-            return result;
-        }
-
-        public static NestedArray ConvertToManaged(Unmanaged unmanaged)
-        {
-            var result = new NestedArray()
+            public static NestedArray ConvertToManaged(Unmanaged unmanaged)
             {
-                field_enum = unmanaged.field_enum,
-                field_vec = unmanaged.field_vec,
-                field_bool = Convert.ToBoolean(unmanaged.field_bool),
-                field_int = unmanaged.field_int,
-                field_struct = ArrayMarshaller.ConvertToManaged(unmanaged.field_struct),
-            };
+                var result = new NestedArray()
+                {
+                    field_enum = unmanaged.field_enum,
+                    field_vec = unmanaged.field_vec,
+                    field_bool = Convert.ToBoolean(unmanaged.field_bool),
+                    field_int = unmanaged.field_int,
+                    field_struct = ArrayMarshaller.ConvertToManaged(unmanaged.field_struct),
+                };
 
-            unsafe
-            {
-                var source_field_array = new Span<ushort>(unmanaged.field_array, 5);
-                var arr_field_array = new ushort[5];
-                source_field_array.CopyTo(arr_field_array.AsSpan());
-                result.field_array = arr_field_array;
+                unsafe
+                {
+                    var source_field_array = new Span<ushort>(unmanaged.field_array, 5);
+                    var arr_field_array = new ushort[5];
+                    source_field_array.CopyTo(arr_field_array.AsSpan());
+                    result.field_array = arr_field_array;
 
-                var source_field_array_2 = new Span<ushort>(unmanaged.field_array_2, 5);
-                var arr_field_array_2 = new ushort[5];
-                source_field_array_2.CopyTo(arr_field_array_2.AsSpan());
-                result.field_array_2 = arr_field_array_2;
+                    var source_field_array_2 = new Span<ushort>(unmanaged.field_array_2, 5);
+                    var arr_field_array_2 = new ushort[5];
+                    source_field_array_2.CopyTo(arr_field_array_2.AsSpan());
+                    result.field_array_2 = arr_field_array_2;
+                }
+
+                return result;
             }
 
-            return result;
+            public void Free() { }
+
         }
     }
-
 
     // Debug - write_type_definition_composite 
     [Serializable]
@@ -1770,7 +1825,7 @@ namespace My.Company
 
     // Debug - write_type_definition_composite 
     [Serializable]
-    [NativeMarshalling(typeof(Weird2u8Marshaller))]
+    [StructLayout(LayoutKind.Sequential)]
     public partial struct Weird2u8
     {
         internal byte t;
@@ -1779,8 +1834,8 @@ namespace My.Company
     }
     // Debug - write_type_definition_composite_marshaller 
 
-    [CustomMarshaller(typeof(Weird2u8), MarshalMode.Default, typeof(Weird2u8Marshaller))]
-    internal static class Weird2u8Marshaller
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Weird2u8
     {
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
@@ -1790,55 +1845,63 @@ namespace My.Company
             public IntPtr r;
         }
 
-        public static Unmanaged ConvertToUnmanaged(Weird2u8 managed)
-        {
-            var result = new Unmanaged
-            {
-                t = managed.t,
-                r = managed.r,
-            };
+        [CustomMarshaller(typeof(Weird2u8), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
-            unsafe
+        public ref struct Marshaller
+        {
+            public static Unmanaged ConvertToUnmanaged(Weird2u8 managed)
             {
-                if(managed.a != null)
+                var result = new Unmanaged
                 {
-                    if(managed.a.Length != 5)
+                    t = managed.t,
+                    r = managed.r,
+                };
+
+                unsafe
+                {
+                    if(managed.a != null)
                     {
-                        throw new InvalidOperationException($"The managed array field '{nameof(Weird2u8.a)}' has {managed.a.Length} elements, exceeding the fixed size array of 5.");
+                        if(managed.a.Length != 5)
+                        {
+                            throw new InvalidOperationException($"The managed array field '{nameof(Weird2u8.a)}' has {managed.a.Length} elements, exceeding the fixed size array of 5.");
+                        }
+                        var source_a = new ReadOnlySpan<byte>(managed.a, 0, managed.a.Length);
+                        var dest = new Span<byte>(result.a, 5);
+                        source_a.CopyTo(dest);
                     }
-                    var source_a = new ReadOnlySpan<byte>(managed.a, 0, managed.a.Length);
-                    var dest = new Span<byte>(result.a, 5);
-                    source_a.CopyTo(dest);
+                    else
+                    {
+                        throw new InvalidOperationException($"The managed field cannot be null.");
+                    }
                 }
-                else
+
+                return result;
+            }
+
+            public static Weird2u8 ConvertToManaged(Unmanaged unmanaged)
+            {
+                var result = new Weird2u8()
                 {
-                    throw new InvalidOperationException($"The managed field cannot be null.");
+                    t = unmanaged.t,
+                    r = unmanaged.r,
+                };
+
+                unsafe
+                {
+                    var source_a = new Span<byte>(unmanaged.a, 5);
+                    var arr_a = new byte[5];
+                    source_a.CopyTo(arr_a.AsSpan());
+                    result.a = arr_a;
                 }
+
+                return result;
             }
 
-            return result;
-        }
+            public void Free() { }
 
-        public static Weird2u8 ConvertToManaged(Unmanaged unmanaged)
-        {
-            var result = new Weird2u8()
-            {
-                t = unmanaged.t,
-                r = unmanaged.r,
-            };
-
-            unsafe
-            {
-                var source_a = new Span<byte>(unmanaged.a, 5);
-                var arr_a = new byte[5];
-                source_a.CopyTo(arr_a.AsSpan());
-                result.a = arr_a;
-            }
-
-            return result;
         }
     }
-
 
     // Debug - write_type_definition_fn_pointer 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -1860,14 +1923,17 @@ namespace My.Company
     }
 
     // Debug - write_pattern_slice 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct SliceUseAsciiStringPattern : IEnumerable<UseAsciiStringPattern>, IDisposable
+    public partial struct SliceUseAsciiStringPattern
     {
         UseAsciiStringPattern[] _managed;
         IntPtr _data;
         ulong _len;
         bool _wePinned;
+    }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceUseAsciiStringPattern : IEnumerable<UseAsciiStringPattern>, IDisposable
+    {
         public int Count => _managed?.Length ?? (int)_len;
 
         public unsafe ReadOnlySpan<UseAsciiStringPattern> ReadOnlySpan
@@ -1967,14 +2033,17 @@ namespace My.Company
     }
 
     // Debug - write_pattern_slice 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct SliceVec3f32 : IEnumerable<Vec3f32>, IDisposable
+    public partial struct SliceVec3f32
     {
         Vec3f32[] _managed;
         IntPtr _data;
         ulong _len;
         bool _wePinned;
+    }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceVec3f32 : IEnumerable<Vec3f32>, IDisposable
+    {
         public int Count => _managed?.Length ?? (int)_len;
 
         public unsafe ReadOnlySpan<Vec3f32> ReadOnlySpan
@@ -2254,11 +2323,15 @@ namespace My.Company
     public delegate void CallbackCharArray2Native(CharArray value, IntPtr callback_data);
     public delegate void CallbackCharArray2Delegate(CharArray value);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct CallbackCharArray2 : IDisposable
+    public partial struct CallbackCharArray2 : IDisposable
     {
         private CallbackCharArray2Delegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct CallbackCharArray2 : IDisposable
+    {
 
         public CallbackCharArray2() { }
 
@@ -2336,11 +2409,15 @@ namespace My.Company
     public delegate byte CallbackFFISliceNative(SliceU8.Unmanaged slice, IntPtr callback_data);
     public delegate byte CallbackFFISliceDelegate(SliceU8 slice);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct CallbackFFISlice : IDisposable
+    public partial struct CallbackFFISlice : IDisposable
     {
         private CallbackFFISliceDelegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct CallbackFFISlice : IDisposable
+    {
 
         public CallbackFFISlice() { }
 
@@ -2418,11 +2495,15 @@ namespace My.Company
     public delegate Vec3f32 CallbackHugeVecSliceNative(SliceVec3f32.Unmanaged slice, IntPtr callback_data);
     public delegate Vec3f32 CallbackHugeVecSliceDelegate(SliceVec3f32 slice);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct CallbackHugeVecSlice : IDisposable
+    public partial struct CallbackHugeVecSlice : IDisposable
     {
         private CallbackHugeVecSliceDelegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct CallbackHugeVecSlice : IDisposable
+    {
 
         public CallbackHugeVecSlice() { }
 
@@ -2500,11 +2581,15 @@ namespace My.Company
     public delegate void CallbackSliceMutNative(SliceMutU8.Unmanaged slice, IntPtr callback_data);
     public delegate void CallbackSliceMutDelegate(SliceMutU8 slice);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct CallbackSliceMut : IDisposable
+    public partial struct CallbackSliceMut : IDisposable
     {
         private CallbackSliceMutDelegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct CallbackSliceMut : IDisposable
+    {
 
         public CallbackSliceMut() { }
 
@@ -2582,11 +2667,15 @@ namespace My.Company
     public delegate byte CallbackU8Native(byte value, IntPtr callback_data);
     public delegate byte CallbackU8Delegate(byte value);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct CallbackU8 : IDisposable
+    public partial struct CallbackU8 : IDisposable
     {
         private CallbackU8Delegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct CallbackU8 : IDisposable
+    {
 
         public CallbackU8() { }
 
@@ -2664,11 +2753,15 @@ namespace My.Company
     public delegate uint MyCallbackNative(uint value, IntPtr callback_data);
     public delegate uint MyCallbackDelegate(uint value);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct MyCallback : IDisposable
+    public partial struct MyCallback : IDisposable
     {
         private MyCallbackDelegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct MyCallback : IDisposable
+    {
 
         public MyCallback() { }
 
@@ -2743,14 +2836,104 @@ namespace My.Company
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void MyCallbackContextualNative(IntPtr context, uint value, IntPtr callback_data);
+    public delegate void MyCallbackContextualDelegate(IntPtr context, uint value);
+
+    public partial struct MyCallbackContextual : IDisposable
+    {
+        private MyCallbackContextualDelegate _callbackUser;
+        private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct MyCallbackContextual : IDisposable
+    {
+
+        public MyCallbackContextual() { }
+
+        public MyCallbackContextual(MyCallbackContextualDelegate callbackUser)
+        {
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(new MyCallbackContextualNative(Call));
+        }
+
+        public void Call(IntPtr context, uint value, IntPtr callback_data)
+        {
+            _callbackUser(context, value);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(MyCallbackContextual), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private MyCallbackContextual managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(MyCallbackContextual managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public MyCallbackContextual ToManaged()
+            {
+                return new MyCallbackContextual
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
+        }
+    }
+
+
+    // Debug - write_type_definition_named_callback 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MyCallbackVoidNative(IntPtr ptr, IntPtr callback_data);
     public delegate void MyCallbackVoidDelegate(IntPtr ptr);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct MyCallbackVoid : IDisposable
+    public partial struct MyCallbackVoid : IDisposable
     {
         private MyCallbackVoidDelegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct MyCallbackVoid : IDisposable
+    {
 
         public MyCallbackVoid() { }
 
@@ -2828,11 +3011,15 @@ namespace My.Company
     public delegate void SumDelegate1Native(IntPtr callback_data);
     public delegate void SumDelegate1Delegate();
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct SumDelegate1 : IDisposable
+    public partial struct SumDelegate1 : IDisposable
     {
         private SumDelegate1Delegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SumDelegate1 : IDisposable
+    {
 
         public SumDelegate1() { }
 
@@ -2910,11 +3097,15 @@ namespace My.Company
     public delegate int SumDelegate2Native(int x, int y, IntPtr callback_data);
     public delegate int SumDelegate2Delegate(int x, int y);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct SumDelegate2 : IDisposable
+    public partial struct SumDelegate2 : IDisposable
     {
         private SumDelegate2Delegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SumDelegate2 : IDisposable
+    {
 
         public SumDelegate2() { }
 
@@ -2992,11 +3183,15 @@ namespace My.Company
     public delegate FFIError SumDelegateReturnNative(int x, int y, IntPtr callback_data);
     public delegate FFIError SumDelegateReturnDelegate(int x, int y);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct SumDelegateReturn : IDisposable
+    public partial struct SumDelegateReturn : IDisposable
     {
         private SumDelegateReturnDelegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SumDelegateReturn : IDisposable
+    {
 
         public SumDelegateReturn() { }
 
@@ -3074,11 +3269,15 @@ namespace My.Company
     public delegate void SumDelegateReturn2Native(int x, int y, IntPtr callback_data);
     public delegate void SumDelegateReturn2Delegate(int x, int y);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct SumDelegateReturn2 : IDisposable
+    public partial struct SumDelegateReturn2 : IDisposable
     {
         private SumDelegateReturn2Delegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SumDelegateReturn2 : IDisposable
+    {
 
         public SumDelegateReturn2() { }
 
@@ -3390,6 +3589,13 @@ namespace My.Company
         {
             Interop.service_callbacks_callback_with_slice(_context, callback, input);
         }
+
+        // Debug - write_pattern_service_method 
+        public void SetDelegateTable(ref DelegateTable table)
+        {
+            Interop.service_callbacks_set_delegate_table(_context, ref table);
+        }
+        // Debug - write_service_method_overload 
 
         // Debug - write_pattern_service_method 
         public void InvokeDelegates()

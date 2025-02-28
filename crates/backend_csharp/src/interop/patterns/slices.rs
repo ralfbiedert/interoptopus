@@ -10,15 +10,18 @@ pub fn write_pattern_slice(i: &Interop, w: &mut IndentWriter, slice: &CompositeT
     let name = slice.rust_name();
     let inner = get_slice_type_argument(slice);
 
+    indented!(w, r"public partial struct {}", name)?;
+    indented!(w, r"{{")?;
+    indented!(w, [()], r"{}[] _managed;", inner)?;
+    indented!(w, [()], r"IntPtr _data;")?;
+    indented!(w, [()], r"ulong _len;")?;
+    indented!(w, [()], r"bool _wePinned;")?;
+    indented!(w, r"}}")?;
+    w.newline()?;
     indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
     indented!(w, r"public partial struct {} : IEnumerable<{}>, IDisposable", name, inner)?;
     indented!(w, r"{{")?;
     w.indent();
-    indented!(w, r"{}[] _managed;", inner)?;
-    indented!(w, r"IntPtr _data;")?;
-    indented!(w, r"ulong _len;")?;
-    indented!(w, r"bool _wePinned;")?;
-    w.newline()?;
     indented!(w, r"public int Count => _managed?.Length ?? (int)_len;")?;
     w.newline()?;
     indented!(w, r"public unsafe ReadOnlySpan<{}> ReadOnlySpan", inner)?;

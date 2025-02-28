@@ -954,11 +954,15 @@ namespace My.Company.Common
     public delegate uint MyCallbackNamespacedNative(uint value, IntPtr callback_data);
     public delegate uint MyCallbackNamespacedDelegate(uint value);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct MyCallbackNamespaced : IDisposable
+    public partial struct MyCallbackNamespaced : IDisposable
     {
         private MyCallbackNamespacedDelegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct MyCallbackNamespaced : IDisposable
+    {
 
         public MyCallbackNamespaced() { }
 

@@ -1,4 +1,5 @@
 pub mod abi_guard;
+pub mod callbacks;
 pub mod options;
 pub mod results;
 pub mod services;

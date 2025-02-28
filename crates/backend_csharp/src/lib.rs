@@ -111,7 +111,7 @@
 //! }
 //! ```
 
-#![allow(clippy::test_attr_in_doctest)]
+#![allow(clippy::test_attr_in_doctest, clippy::too_many_lines)]
 
 mod converter;
 mod docs;

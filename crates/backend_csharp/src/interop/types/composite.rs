@@ -20,13 +20,8 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
 
     if i.should_emit_marshaller_for_composite(the_type) {
         w.newline()?;
-        indented!(
-            w,
-            r"[CustomMarshaller(typeof({}), MarshalMode.Default, typeof({}Marshaller))]",
-            the_type.rust_name(),
-            the_type.rust_name()
-        )?;
-        indented!(w, r"internal static class {}Marshaller", the_type.rust_name())?;
+        indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
+        indented!(w, r"public partial struct {}", the_type.rust_name())?;
         indented!(w, r"{{")?;
         w.indent();
         write_type_definition_composite_layout_annotation(w, the_type)?;
@@ -38,8 +33,14 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
         }
         w.unindent();
         indented!(w, r"}}")?;
-        w.unindent();
         w.newline()?;
+
+        indented!(w, r"[CustomMarshaller(typeof({}), MarshalMode.Default, typeof(Marshaller))]", the_type.rust_name())?;
+        indented!(w, r"private struct MarshallerMeta {{ }}")?;
+        w.newline()?;
+
+        indented!(w, r"public ref struct Marshaller")?;
+        indented!(w, r"{{")?;
         w.indent();
         indented!(w, r"public static Unmanaged ConvertToUnmanaged({} managed)", the_type.rust_name())?;
         indented!(w, r"{{")?;
@@ -100,9 +101,13 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
         indented!(w, r"return result;")?;
         w.unindent();
         indented!(w, r"}}")?;
+        w.newline()?;
+        indented!(w, r"public void Free() {{ }}")?;
+        w.newline()?;
         w.unindent();
         indented!(w, r"}}")?;
-        w.newline()?;
+        w.unindent();
+        indented!(w, r"}}")?;
     }
 
     Ok(())
@@ -291,11 +296,7 @@ pub fn write_type_definition_composite_annotation(i: &Interop, w: &mut IndentWri
         }
     }
 
-    if i.should_emit_marshaller_for_composite(the_type) {
-        indented!(w, r"[NativeMarshalling(typeof({}Marshaller))]", the_type.rust_name())?;
-    } else {
-        write_type_definition_composite_layout_annotation(w, the_type)?;
-    }
+    write_type_definition_composite_layout_annotation(w, the_type)?;
 
     Ok(())
 }

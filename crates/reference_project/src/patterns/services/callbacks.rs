@@ -48,9 +48,9 @@ impl ServiceCallbacks {
     }
 
     // UNSUPPORTED FOR NOW - Unclear how to handle in C# with LibraryImport
-    // pub fn set_delegate_table(&mut self, table: &DelegateTable) {
-    //     self.delegate_table = Some(*table);
-    // }
+    pub fn set_delegate_table(&mut self, table: &DelegateTable) {
+        self.delegate_table = Some(*table);
+    }
 
     pub fn invoke_delegates(&self) -> Result<(), Error> {
         let Some(table) = &self.delegate_table else {

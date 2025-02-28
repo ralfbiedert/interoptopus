@@ -24,9 +24,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 6372935688695721067ul)
+            if (api_version != 10198333809987967799ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (6372935688695721067). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10198333809987967799). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -551,6 +551,9 @@ namespace My.Company
             }
         }
 
+        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_set_delegate_table")]
+        public static partial void service_callbacks_set_delegate_table(IntPtr context, ref DelegateTable table);
+
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_invoke_delegates")]
         public static partial FFIError service_callbacks_invoke_delegates(IntPtr context);
 
@@ -982,6 +985,20 @@ namespace My.Company
     public partial struct Container
     {
         public Local foreign;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct DelegateTable
+    {
+        public MyCallback my_callback;
+        public MyCallbackNamespaced my_callback_namespaced;
+        public MyCallbackVoid my_callback_void;
+        public MyCallbackContextual my_callback_contextual;
+        public SumDelegate1 sum_delegate_1;
+        public SumDelegate2 sum_delegate_2;
+        public SumDelegateReturn sum_delegate_return;
+        public SumDelegateReturn2 sum_delegate_return_2;
     }
 
     [Serializable]
@@ -1695,11 +1712,15 @@ namespace My.Company
     public delegate void CallbackCharArray2Native(CharArray value, IntPtr callback_data);
     public delegate void CallbackCharArray2Delegate(CharArray value);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct CallbackCharArray2 : IDisposable
+    public partial struct CallbackCharArray2 : IDisposable
     {
         private CallbackCharArray2Delegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct CallbackCharArray2 : IDisposable
+    {
 
         public CallbackCharArray2() { }
 
@@ -1776,11 +1797,15 @@ namespace My.Company
     public delegate byte CallbackFFISliceNative(SliceU8.Unmanaged slice, IntPtr callback_data);
     public delegate byte CallbackFFISliceDelegate(SliceU8 slice);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct CallbackFFISlice : IDisposable
+    public partial struct CallbackFFISlice : IDisposable
     {
         private CallbackFFISliceDelegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct CallbackFFISlice : IDisposable
+    {
 
         public CallbackFFISlice() { }
 
@@ -1857,11 +1882,15 @@ namespace My.Company
     public delegate Vec3f32 CallbackHugeVecSliceNative(SliceVec3f32.Unmanaged slice, IntPtr callback_data);
     public delegate Vec3f32 CallbackHugeVecSliceDelegate(SliceVec3f32 slice);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct CallbackHugeVecSlice : IDisposable
+    public partial struct CallbackHugeVecSlice : IDisposable
     {
         private CallbackHugeVecSliceDelegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct CallbackHugeVecSlice : IDisposable
+    {
 
         public CallbackHugeVecSlice() { }
 
@@ -1938,11 +1967,15 @@ namespace My.Company
     public delegate void CallbackSliceMutNative(SliceMutU8.Unmanaged slice, IntPtr callback_data);
     public delegate void CallbackSliceMutDelegate(SliceMutU8 slice);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct CallbackSliceMut : IDisposable
+    public partial struct CallbackSliceMut : IDisposable
     {
         private CallbackSliceMutDelegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct CallbackSliceMut : IDisposable
+    {
 
         public CallbackSliceMut() { }
 
@@ -2019,11 +2052,15 @@ namespace My.Company
     public delegate byte CallbackU8Native(byte value, IntPtr callback_data);
     public delegate byte CallbackU8Delegate(byte value);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct CallbackU8 : IDisposable
+    public partial struct CallbackU8 : IDisposable
     {
         private CallbackU8Delegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct CallbackU8 : IDisposable
+    {
 
         public CallbackU8() { }
 
@@ -2100,11 +2137,15 @@ namespace My.Company
     public delegate uint MyCallbackNative(uint value, IntPtr callback_data);
     public delegate uint MyCallbackDelegate(uint value);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct MyCallback : IDisposable
+    public partial struct MyCallback : IDisposable
     {
         private MyCallbackDelegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct MyCallback : IDisposable
+    {
 
         public MyCallback() { }
 
@@ -2178,14 +2219,103 @@ namespace My.Company
 
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void MyCallbackContextualNative(IntPtr context, uint value, IntPtr callback_data);
+    public delegate void MyCallbackContextualDelegate(IntPtr context, uint value);
+
+    public partial struct MyCallbackContextual : IDisposable
+    {
+        private MyCallbackContextualDelegate _callbackUser;
+        private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct MyCallbackContextual : IDisposable
+    {
+
+        public MyCallbackContextual() { }
+
+        public MyCallbackContextual(MyCallbackContextualDelegate callbackUser)
+        {
+            _callbackUser = callbackUser;
+            _callbackNative = Marshal.GetFunctionPointerForDelegate(new MyCallbackContextualNative(Call));
+        }
+
+        public void Call(IntPtr context, uint value, IntPtr callback_data)
+        {
+            _callbackUser(context, value);
+        }
+
+        public void Dispose()
+        {
+            if (_callbackNative == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_callbackNative);
+            _callbackNative = IntPtr.Zero;
+        }
+
+
+        [CustomMarshaller(typeof(MyCallbackContextual), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+
+        public ref struct Marshaller
+        {
+            private MyCallbackContextual managed;
+            private Unmanaged native;
+            private Unmanaged sourceNative;
+            private GCHandle? pinned;
+
+            public void FromManaged(MyCallbackContextual managed)
+            {
+                this.managed = managed;
+            }
+
+            public Unmanaged ToUnmanaged()
+            {
+                return new Unmanaged
+                {
+                    Callback = managed._callbackNative,
+                    Data = IntPtr.Zero
+                };
+            }
+
+            public void FromUnmanaged(Unmanaged unmanaged)
+            {
+                sourceNative = unmanaged;
+            }
+
+            public MyCallbackContextual ToManaged()
+            {
+                return new MyCallbackContextual
+                {
+                    _callbackNative = sourceNative.Callback,
+                };
+            }
+
+            public void Free() { }
+        }
+    }
+
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MyCallbackVoidNative(IntPtr ptr, IntPtr callback_data);
     public delegate void MyCallbackVoidDelegate(IntPtr ptr);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct MyCallbackVoid : IDisposable
+    public partial struct MyCallbackVoid : IDisposable
     {
         private MyCallbackVoidDelegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct MyCallbackVoid : IDisposable
+    {
 
         public MyCallbackVoid() { }
 
@@ -2262,11 +2392,15 @@ namespace My.Company
     public delegate void SumDelegate1Native(IntPtr callback_data);
     public delegate void SumDelegate1Delegate();
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct SumDelegate1 : IDisposable
+    public partial struct SumDelegate1 : IDisposable
     {
         private SumDelegate1Delegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SumDelegate1 : IDisposable
+    {
 
         public SumDelegate1() { }
 
@@ -2343,11 +2477,15 @@ namespace My.Company
     public delegate int SumDelegate2Native(int x, int y, IntPtr callback_data);
     public delegate int SumDelegate2Delegate(int x, int y);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct SumDelegate2 : IDisposable
+    public partial struct SumDelegate2 : IDisposable
     {
         private SumDelegate2Delegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SumDelegate2 : IDisposable
+    {
 
         public SumDelegate2() { }
 
@@ -2424,11 +2562,15 @@ namespace My.Company
     public delegate FFIError SumDelegateReturnNative(int x, int y, IntPtr callback_data);
     public delegate FFIError SumDelegateReturnDelegate(int x, int y);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct SumDelegateReturn : IDisposable
+    public partial struct SumDelegateReturn : IDisposable
     {
         private SumDelegateReturnDelegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SumDelegateReturn : IDisposable
+    {
 
         public SumDelegateReturn() { }
 
@@ -2505,11 +2647,15 @@ namespace My.Company
     public delegate void SumDelegateReturn2Native(int x, int y, IntPtr callback_data);
     public delegate void SumDelegateReturn2Delegate(int x, int y);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct SumDelegateReturn2 : IDisposable
+    public partial struct SumDelegateReturn2 : IDisposable
     {
         private SumDelegateReturn2Delegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SumDelegateReturn2 : IDisposable
+    {
 
         public SumDelegateReturn2() { }
 
@@ -2789,6 +2935,11 @@ namespace My.Company
         public void CallbackWithSlice(SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
         {
             Interop.service_callbacks_callback_with_slice(_context, callback, input);
+        }
+
+        public void SetDelegateTable(ref DelegateTable table)
+        {
+            Interop.service_callbacks_set_delegate_table(_context, ref table);
         }
 
         public void InvokeDelegates()

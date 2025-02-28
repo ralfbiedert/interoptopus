@@ -40,14 +40,17 @@ namespace My.Company.Common
     public delegate void InteropDelegate_fn_CharArray_native(CharArray x0);
 
     // Debug - write_pattern_slice 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct SliceBool : IEnumerable<Bool>, IDisposable
+    public partial struct SliceBool
     {
         Bool[] _managed;
         IntPtr _data;
         ulong _len;
         bool _wePinned;
+    }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceBool : IEnumerable<Bool>, IDisposable
+    {
         public int Count => _managed?.Length ?? (int)_len;
 
         public unsafe ReadOnlySpan<Bool> ReadOnlySpan
@@ -147,14 +150,17 @@ namespace My.Company.Common
     }
 
     // Debug - write_pattern_slice 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct SliceI32 : IEnumerable<int>, IDisposable
+    public partial struct SliceI32
     {
         int[] _managed;
         IntPtr _data;
         ulong _len;
         bool _wePinned;
+    }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceI32 : IEnumerable<int>, IDisposable
+    {
         public int Count => _managed?.Length ?? (int)_len;
 
         public unsafe ReadOnlySpan<int> ReadOnlySpan
@@ -254,14 +260,17 @@ namespace My.Company.Common
     }
 
     // Debug - write_pattern_slice 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct SliceU32 : IEnumerable<uint>, IDisposable
+    public partial struct SliceU32
     {
         uint[] _managed;
         IntPtr _data;
         ulong _len;
         bool _wePinned;
+    }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceU32 : IEnumerable<uint>, IDisposable
+    {
         public int Count => _managed?.Length ?? (int)_len;
 
         public unsafe ReadOnlySpan<uint> ReadOnlySpan
@@ -361,14 +370,17 @@ namespace My.Company.Common
     }
 
     // Debug - write_pattern_slice 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct SliceU8 : IEnumerable<byte>, IDisposable
+    public partial struct SliceU8
     {
         byte[] _managed;
         IntPtr _data;
         ulong _len;
         bool _wePinned;
+    }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceU8 : IEnumerable<byte>, IDisposable
+    {
         public int Count => _managed?.Length ?? (int)_len;
 
         public unsafe ReadOnlySpan<byte> ReadOnlySpan
@@ -468,14 +480,17 @@ namespace My.Company.Common
     }
 
     // Debug - write_pattern_slice 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct SliceVec : IEnumerable<Vec>, IDisposable
+    public partial struct SliceVec
     {
         Vec[] _managed;
         IntPtr _data;
         ulong _len;
         bool _wePinned;
+    }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceVec : IEnumerable<Vec>, IDisposable
+    {
         public int Count => _managed?.Length ?? (int)_len;
 
         public unsafe ReadOnlySpan<Vec> ReadOnlySpan
@@ -973,11 +988,15 @@ namespace My.Company.Common
     public delegate uint MyCallbackNamespacedNative(uint value, IntPtr callback_data);
     public delegate uint MyCallbackNamespacedDelegate(uint value);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct MyCallbackNamespaced : IDisposable
+    public partial struct MyCallbackNamespaced : IDisposable
     {
         private MyCallbackNamespacedDelegate _callbackUser;
         private IntPtr _callbackNative;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct MyCallbackNamespaced : IDisposable
+    {
 
         public MyCallbackNamespaced() { }
 

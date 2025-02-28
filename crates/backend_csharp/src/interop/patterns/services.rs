@@ -102,24 +102,16 @@ pub fn write_pattern_service_method(
         let native = to_typespecifier_in_param(p.the_type());
 
         match p.the_type() {
-            CType::Pattern(TypePattern::NamedCallback(callback)) => match callback.fnpointer().signature().rval() {
-                // CType::Pattern(TypePattern::FFIErrorEnum(_)) if i.work_around_exception_in_callback_no_reentry => {
-                //     to_wrap_delegates.push(name);
-                //     to_wrap_delegate_types.push(to_typespecifier_in_param(p.the_type()));
-                //     to_invoke.push(format!("{name}_safe_delegate.Call"));
-                // }
-                _ => {
-                    // Forward `ref` and `out` accordingly.
-                    if native.contains("out ") {
-                        to_invoke.push(format!("out {name}"));
-                    } else if native.contains("ref ") {
-                        to_invoke.push(format!("ref {name}"));
-                    } else {
-                        to_invoke.push(name.to_string());
-                    }
+            CType::Pattern(TypePattern::NamedCallback(callback)) => {
+                let _ = callback.fnpointer().signature().rval();
+                if native.contains("out ") {
+                    to_invoke.push(format!("out {name}"));
+                } else if native.contains("ref ") {
+                    to_invoke.push(format!("ref {name}"));
+                } else {
+                    to_invoke.push(name.to_string());
                 }
-            },
-
+            }
             _ => {
                 // Forward `ref` and `out` accordingly.
                 if native.contains("out ") {
