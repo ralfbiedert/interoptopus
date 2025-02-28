@@ -12,11 +12,10 @@ pub fn write_pattern_result(i: &Interop, w: &mut IndentWriter, slice: &Composite
         .inventory
         .ctypes()
         .iter()
-        .filter_map(|x| match x {
+        .find_map(|x| match x {
             CType::Pattern(TypePattern::FFIErrorEnum(e)) => Some(e),
             _ => None,
         })
-        .next()
         .expect("When using result type there must be an FFIError in the inventory with an `ok` variant.");
 
     let context_type_name = slice.rust_name();

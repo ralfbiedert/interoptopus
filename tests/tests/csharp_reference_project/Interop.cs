@@ -49,6 +49,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "primitive_void")]
         // Debug - write_function_declaration 
         public static partial void primitive_void();
+
         // Debug - write_function_overload 
         // Debug - no overload for primitive_void 
 
@@ -56,6 +57,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "primitive_void2")]
         // Debug - write_function_declaration 
         public static partial void primitive_void2();
+
         // Debug - write_function_overload 
         // Debug - no overload for primitive_void2 
 
@@ -64,6 +66,7 @@ namespace My.Company
         [return: MarshalAs(UnmanagedType.U1)]
         // Debug - write_function_declaration 
         public static partial bool primitive_bool([MarshalAs(UnmanagedType.U1)] bool x);
+
         // Debug - write_function_overload 
         // Debug - no overload for primitive_bool 
 
@@ -71,6 +74,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "primitive_u8")]
         // Debug - write_function_declaration 
         public static partial byte primitive_u8(byte x);
+
         // Debug - write_function_overload 
         // Debug - no overload for primitive_u8 
 
@@ -78,6 +82,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "primitive_u16")]
         // Debug - write_function_declaration 
         public static partial ushort primitive_u16(ushort x);
+
         // Debug - write_function_overload 
         // Debug - no overload for primitive_u16 
 
@@ -85,6 +90,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "primitive_u32")]
         // Debug - write_function_declaration 
         public static partial uint primitive_u32(uint x);
+
         // Debug - write_function_overload 
         // Debug - no overload for primitive_u32 
 
@@ -92,6 +98,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "primitive_u64")]
         // Debug - write_function_declaration 
         public static partial ulong primitive_u64(ulong x);
+
         // Debug - write_function_overload 
         // Debug - no overload for primitive_u64 
 
@@ -99,6 +106,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "primitive_i8")]
         // Debug - write_function_declaration 
         public static partial sbyte primitive_i8(sbyte x);
+
         // Debug - write_function_overload 
         // Debug - no overload for primitive_i8 
 
@@ -106,6 +114,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "primitive_i16")]
         // Debug - write_function_declaration 
         public static partial short primitive_i16(short x);
+
         // Debug - write_function_overload 
         // Debug - no overload for primitive_i16 
 
@@ -113,6 +122,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "primitive_i32")]
         // Debug - write_function_declaration 
         public static partial int primitive_i32(int x);
+
         // Debug - write_function_overload 
         // Debug - no overload for primitive_i32 
 
@@ -120,6 +130,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "primitive_i64")]
         // Debug - write_function_declaration 
         public static partial long primitive_i64(long x);
+
         // Debug - write_function_overload 
         // Debug - no overload for primitive_i64 
 
@@ -127,6 +138,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "packed_to_packed1")]
         // Debug - write_function_declaration 
         public static partial Packed2 packed_to_packed1(Packed1 a);
+
         // Debug - write_function_overload 
         // Debug - no overload for packed_to_packed1 
 
@@ -134,6 +146,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "many_args_5")]
         // Debug - write_function_declaration 
         public static partial long many_args_5(long x0, long x1, long x2, long x3, long x4);
+
         // Debug - write_function_overload 
         // Debug - no overload for many_args_5 
 
@@ -141,6 +154,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "many_args_10")]
         // Debug - write_function_declaration 
         public static partial long many_args_10(long x0, long x1, long x2, long x3, long x4, long x5, long x6, long x7, long x8, long x9);
+
         // Debug - write_function_overload 
         // Debug - no overload for many_args_10 
 
@@ -148,6 +162,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "ptr")]
         // Debug - write_function_declaration 
         public static partial IntPtr ptr(ref long x);
+
         // Debug - write_function_overload 
         // Debug - no overload for ptr 
 
@@ -158,6 +173,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "ptr_mut")]
         // Debug - write_function_declaration 
         public static partial IntPtr ptr_mut(out long x);
+
         // Debug - write_function_overload 
         // Debug - no overload for ptr_mut 
 
@@ -165,6 +181,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "ptr_ptr")]
         // Debug - write_function_declaration 
         public static partial IntPtr ptr_ptr(ref IntPtr x);
+
         // Debug - write_function_overload 
         // Debug - no overload for ptr_ptr 
 
@@ -172,6 +189,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "ref_simple")]
         // Debug - write_function_declaration 
         public static partial IntPtr ref_simple(ref long x);
+
         // Debug - write_function_overload 
         // Debug - no overload for ref_simple 
 
@@ -179,6 +197,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "ref_mut_simple")]
         // Debug - write_function_declaration 
         public static partial IntPtr ref_mut_simple(out long x);
+
         // Debug - write_function_overload 
         // Debug - no overload for ref_mut_simple 
 
@@ -187,6 +206,7 @@ namespace My.Company
         [return: MarshalAs(UnmanagedType.U1)]
         // Debug - write_function_declaration 
         public static partial bool ref_option(ref long x);
+
         // Debug - write_function_overload 
         // Debug - no overload for ref_option 
 
@@ -195,6 +215,7 @@ namespace My.Company
         [return: MarshalAs(UnmanagedType.U1)]
         // Debug - write_function_declaration 
         public static partial bool ref_mut_option(out long x);
+
         // Debug - write_function_overload 
         // Debug - no overload for ref_mut_option 
 
@@ -202,6 +223,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "call_tupled")]
         // Debug - write_function_declaration 
         public static partial Tupled call_tupled(Tupled x);
+
         // Debug - write_function_overload 
         // Debug - no overload for call_tupled 
 
@@ -209,6 +231,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "complex_args_1")]
         // Debug - write_function_declaration 
         public static partial FFIError complex_args_1(Vec3f32 a, ref Tupled b);
+
         // Debug - write_function_overload 
         // Debug - no overload for complex_args_1 
 
@@ -216,6 +239,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "callback")]
         // Debug - write_function_declaration 
         public static partial byte callback(InteropDelegate_fn_u8_rval_u8 callback, byte value);
+
         // Debug - write_function_overload 
         // Debug - no overload for callback 
 
@@ -223,6 +247,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "callback_marshalled")]
         // Debug - write_function_declaration 
         public static partial void callback_marshalled(InteropDelegate_fn_CharArray_native callback, CharArray value);
+
         // Debug - write_function_overload 
         // Debug - no overload for callback_marshalled 
 
@@ -230,6 +255,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "generic_1a")]
         // Debug - write_function_declaration 
         public static partial uint generic_1a(Genericu32 x, Phantomu8 y);
+
         // Debug - write_function_overload 
         // Debug - no overload for generic_1a 
 
@@ -237,6 +263,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "generic_1b")]
         // Debug - write_function_declaration 
         public static partial byte generic_1b(Genericu8 x, Phantomu8 y);
+
         // Debug - write_function_overload 
         // Debug - no overload for generic_1b 
 
@@ -244,6 +271,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "generic_1c")]
         // Debug - write_function_declaration 
         public static partial byte generic_1c(ref Genericu8 x, ref Genericu8 y);
+
         // Debug - write_function_overload 
         // Debug - no overload for generic_1c 
 
@@ -251,6 +279,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "generic_2")]
         // Debug - write_function_declaration 
         public static partial byte generic_2(IntPtr x);
+
         // Debug - write_function_overload 
         // Debug - no overload for generic_2 
 
@@ -258,6 +287,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "generic_3")]
         // Debug - write_function_declaration 
         public static partial byte generic_3(IntPtr x);
+
         // Debug - write_function_overload 
         // Debug - no overload for generic_3 
 
@@ -265,6 +295,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "generic_4")]
         // Debug - write_function_declaration 
         public static partial byte generic_4(IntPtr x);
+
         // Debug - write_function_overload 
         // Debug - no overload for generic_4 
 
@@ -272,6 +303,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "array_1")]
         // Debug - write_function_declaration 
         public static partial byte array_1(Array x);
+
         // Debug - write_function_overload 
         // Debug - no overload for array_1 
 
@@ -279,6 +311,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "array_2")]
         // Debug - write_function_declaration 
         public static partial Array array_2();
+
         // Debug - write_function_overload 
         // Debug - no overload for array_2 
 
@@ -286,6 +319,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "array_3")]
         // Debug - write_function_declaration 
         public static partial void array_3(out Array arr);
+
         // Debug - write_function_overload 
         // Debug - no overload for array_3 
 
@@ -293,6 +327,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "nested_array_1")]
         // Debug - write_function_declaration 
         public static partial NestedArray nested_array_1();
+
         // Debug - write_function_overload 
         // Debug - no overload for nested_array_1 
 
@@ -300,6 +335,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "nested_array_2")]
         // Debug - write_function_declaration 
         public static partial void nested_array_2(out NestedArray result);
+
         // Debug - write_function_overload 
         // Debug - no overload for nested_array_2 
 
@@ -307,6 +343,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "nested_array_3")]
         // Debug - write_function_declaration 
         public static partial byte nested_array_3(NestedArray input);
+
         // Debug - write_function_overload 
         // Debug - no overload for nested_array_3 
 
@@ -314,6 +351,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "char_array_1")]
         // Debug - write_function_declaration 
         public static partial CharArray char_array_1();
+
         // Debug - write_function_overload 
         // Debug - no overload for char_array_1 
 
@@ -321,6 +359,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "char_array_2")]
         // Debug - write_function_declaration 
         public static partial CharArray char_array_2(CharArray arr);
+
         // Debug - write_function_overload 
         // Debug - no overload for char_array_2 
 
@@ -328,6 +367,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "char_array_3")]
         // Debug - write_function_declaration 
         public static partial byte char_array_3(ref CharArray arr);
+
         // Debug - write_function_overload 
         // Debug - no overload for char_array_3 
 
@@ -336,6 +376,7 @@ namespace My.Company
         [return: MarshalAs(UnmanagedType.U1)]
         // Debug - write_function_declaration 
         public static partial bool bool_field(BoolField x);
+
         // Debug - write_function_overload 
         // Debug - no overload for bool_field 
 
@@ -344,6 +385,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "documented")]
         // Debug - write_function_declaration 
         public static partial EnumDocumented documented(StructDocumented x);
+
         // Debug - write_function_overload 
         // Debug - no overload for documented 
 
@@ -351,6 +393,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "ambiguous_1")]
         // Debug - write_function_declaration 
         public static partial Vec1 ambiguous_1(Vec1 x);
+
         // Debug - write_function_overload 
         // Debug - no overload for ambiguous_1 
 
@@ -358,6 +401,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "ambiguous_2")]
         // Debug - write_function_declaration 
         public static partial Vec2 ambiguous_2(Vec2 x);
+
         // Debug - write_function_overload 
         // Debug - no overload for ambiguous_2 
 
@@ -366,6 +410,7 @@ namespace My.Company
         [return: MarshalAs(UnmanagedType.U1)]
         // Debug - write_function_declaration 
         public static partial bool ambiguous_3(Vec1 x, Vec2 y);
+
         // Debug - write_function_overload 
         // Debug - no overload for ambiguous_3 
 
@@ -373,6 +418,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "namespaced_type")]
         // Debug - write_function_declaration 
         public static partial Vec namespaced_type(Vec x);
+
         // Debug - write_function_overload 
         // Debug - no overload for namespaced_type 
 
@@ -380,6 +426,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_option")]
         // Debug - write_function_declaration 
         public static partial OptionVec namespaced_inner_option(OptionVec x);
+
         // Debug - write_function_overload 
         // Debug - no overload for namespaced_inner_option 
 
@@ -387,20 +434,37 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice")]
         // Debug - write_function_declaration 
         public static partial SliceVec namespaced_inner_slice(SliceVec x);
+
         // Debug - write_function_overload 
-        // Debug - no overload for namespaced_inner_slice 
+        public static unsafe SliceVec namespaced_inner_slice(ReadOnlySpan<Vec> x)
+        {
+            fixed (void* ptr_x = x)
+            {
+                var x_slice = new SliceVec(new IntPtr(ptr_x), (ulong) x.Length);
+                return namespaced_inner_slice(x_slice);
+            }
+        }
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice_mut")]
         // Debug - write_function_declaration 
         public static partial SliceMutVec namespaced_inner_slice_mut(SliceMutVec x);
+
         // Debug - write_function_overload 
-        // Debug - no overload for namespaced_inner_slice_mut 
+        public static unsafe SliceMutVec namespaced_inner_slice_mut(Span<Vec> x)
+        {
+            fixed (void* ptr_x = x)
+            {
+                var x_slice = new SliceMutVec(new IntPtr(ptr_x), (ulong) x.Length);
+                return namespaced_inner_slice_mut(x_slice);
+            }
+        }
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "panics")]
         // Debug - write_function_declaration 
         public static partial FFIError panics();
+
         // Debug - write_function_overload 
         // Debug - no overload for panics 
 
@@ -408,6 +472,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "renamed")]
         // Debug - write_function_declaration 
         public static partial EnumRenamed renamed(StructRenamed x);
+
         // Debug - write_function_overload 
         // Debug - no overload for renamed 
 
@@ -415,6 +480,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "sleep")]
         // Debug - write_function_declaration 
         public static partial void sleep(ulong millis);
+
         // Debug - write_function_overload 
         // Debug - no overload for sleep 
 
@@ -423,6 +489,7 @@ namespace My.Company
         [return: MarshalAs(UnmanagedType.U1)]
         // Debug - write_function_declaration 
         public static partial bool weird_1(Weird1u32 x, Weird2u8 y);
+
         // Debug - write_function_overload 
         // Debug - no overload for weird_1 
 
@@ -430,6 +497,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "visibility")]
         // Debug - write_function_declaration 
         public static partial void visibility(Visibility1 x, Visibility2 y);
+
         // Debug - write_function_overload 
         // Debug - no overload for visibility 
 
@@ -437,6 +505,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "repr_transparent")]
         // Debug - write_function_declaration 
         public static partial Tupled repr_transparent(Tupled x, ref Tupled r);
+
         // Debug - write_function_overload 
         // Debug - no overload for repr_transparent 
 
@@ -444,6 +513,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_1")]
         // Debug - write_function_declaration 
         public static partial uint pattern_ascii_pointer_1([MarshalAs(UnmanagedType.LPStr)] string x);
+
         // Debug - write_function_overload 
         // Debug - no overload for pattern_ascii_pointer_1 
 
@@ -451,6 +521,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_2")]
         // Debug - write_function_declaration 
         public static partial IntPtr pattern_ascii_pointer_2();
+
         // Debug - write_function_overload 
         // Debug - no overload for pattern_ascii_pointer_2 
 
@@ -458,6 +529,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_3")]
         // Debug - write_function_declaration 
         public static partial IntPtr pattern_ascii_pointer_3([MarshalAs(UnmanagedType.LPStr)] string x);
+
         // Debug - write_function_overload 
         // Debug - no overload for pattern_ascii_pointer_3 
 
@@ -465,6 +537,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_4")]
         // Debug - write_function_declaration 
         public static partial IntPtr pattern_ascii_pointer_4([MarshalAs(UnmanagedType.LPStr)] string x, uint l);
+
         // Debug - write_function_overload 
         // Debug - no overload for pattern_ascii_pointer_4 
 
@@ -472,6 +545,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_5")]
         // Debug - write_function_declaration 
         public static partial byte pattern_ascii_pointer_5([MarshalAs(UnmanagedType.LPStr)] string x, uint i);
+
         // Debug - write_function_overload 
         // Debug - no overload for pattern_ascii_pointer_5 
 
@@ -479,6 +553,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_return_slice")]
         // Debug - write_function_declaration 
         public static partial SliceUseAsciiStringPattern pattern_ascii_pointer_return_slice();
+
         // Debug - write_function_overload 
         // Debug - no overload for pattern_ascii_pointer_return_slice 
 
@@ -486,14 +561,14 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1")]
         // Debug - write_function_declaration 
         public static partial uint pattern_ffi_slice_1(SliceU32 ffi_slice);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe uint pattern_ffi_slice_1(ReadOnlySpan<uint> ffi_slice)
         {
             fixed (void* ptr_ffi_slice = ffi_slice)
             {
                 var ffi_slice_slice = new SliceU32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
-                return pattern_ffi_slice_1(ffi_slice_slice);;
+                return pattern_ffi_slice_1(ffi_slice_slice);
             }
         }
 
@@ -501,14 +576,14 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1b")]
         // Debug - write_function_declaration 
         public static partial uint pattern_ffi_slice_1b(SliceMutU32 ffi_slice);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe uint pattern_ffi_slice_1b(Span<uint> ffi_slice)
         {
             fixed (void* ptr_ffi_slice = ffi_slice)
             {
                 var ffi_slice_slice = new SliceMutU32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
-                return pattern_ffi_slice_1b(ffi_slice_slice);;
+                return pattern_ffi_slice_1b(ffi_slice_slice);
             }
         }
 
@@ -516,22 +591,30 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_2")]
         // Debug - write_function_declaration 
         public static partial Vec3f32 pattern_ffi_slice_2(SliceVec3f32 ffi_slice, int i);
+
         // Debug - write_function_overload 
-        // Debug - no overload for pattern_ffi_slice_2 
+        public static unsafe Vec3f32 pattern_ffi_slice_2(ReadOnlySpan<Vec3f32> ffi_slice, int i)
+        {
+            fixed (void* ptr_ffi_slice = ffi_slice)
+            {
+                var ffi_slice_slice = new SliceVec3f32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
+                return pattern_ffi_slice_2(ffi_slice_slice, i);
+            }
+        }
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_3b")]
         // Debug - write_function_declaration 
         public static partial void pattern_ffi_slice_3b(SliceMutU8 slice, CallbackSliceMut callback);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe void pattern_ffi_slice_3b(Span<byte> slice, CallbackSliceMutDelegate callback)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                 var callback_wrapped = new CallbackSliceMut(callback);
-                pattern_ffi_slice_3b(slice_slice, callback_wrapped);;
+                pattern_ffi_slice_3b(slice_slice, callback_wrapped);
             }
         }
 
@@ -539,8 +622,8 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_4")]
         // Debug - write_function_declaration 
         public static partial void pattern_ffi_slice_4(SliceU8 slice, SliceMutU8 slice2);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe void pattern_ffi_slice_4(ReadOnlySpan<byte> slice, Span<byte> slice2)
         {
             fixed (void* ptr_slice = slice)
@@ -549,7 +632,7 @@ namespace My.Company
                 fixed (void* ptr_slice2 = slice2)
                 {
                     var slice2_slice = new SliceMutU8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
-                    pattern_ffi_slice_4(slice_slice, slice2_slice);;
+                    pattern_ffi_slice_4(slice_slice, slice2_slice);
                 }
             }
         }
@@ -558,8 +641,8 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_5")]
         // Debug - write_function_declaration 
         public static partial void pattern_ffi_slice_5(ref SliceU8 slice, ref SliceMutU8 slice2);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe void pattern_ffi_slice_5(ReadOnlySpan<byte> slice, Span<byte> slice2)
         {
             fixed (void* ptr_slice = slice)
@@ -568,7 +651,7 @@ namespace My.Company
                 fixed (void* ptr_slice2 = slice2)
                 {
                     var slice2_slice = new SliceMutU8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
-                    pattern_ffi_slice_5(ref slice_slice, ref slice2_slice);;
+                    pattern_ffi_slice_5(ref slice_slice, ref slice2_slice);
                 }
             }
         }
@@ -577,15 +660,15 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_6")]
         // Debug - write_function_declaration 
         public static partial void pattern_ffi_slice_6(ref SliceMutU8 slice, CallbackU8 callback);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe void pattern_ffi_slice_6(Span<byte> slice, CallbackU8Delegate callback)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                 var callback_wrapped = new CallbackU8(callback);
-                pattern_ffi_slice_6(ref slice_slice, callback_wrapped);;
+                pattern_ffi_slice_6(ref slice_slice, callback_wrapped);
             }
         }
 
@@ -593,42 +676,47 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_8")]
         // Debug - write_function_declaration 
         public static partial void pattern_ffi_slice_8(ref SliceMutCharArray slice, CallbackCharArray2 callback);
-        // Debug - write_function_overload 
 
-        public static unsafe void pattern_ffi_slice_8(ref SliceMutCharArray slice, CallbackCharArray2Delegate callback)
+        // Debug - write_function_overload 
+        public static unsafe void pattern_ffi_slice_8(Span<CharArray> slice, CallbackCharArray2Delegate callback)
         {
-            var callback_wrapped = new CallbackCharArray2(callback);
-            pattern_ffi_slice_8(ref slice, callback_wrapped);;
+            fixed (void* ptr_slice = slice)
+            {
+                var slice_slice = new SliceMutCharArray(new IntPtr(ptr_slice), (ulong) slice.Length);
+                var callback_wrapped = new CallbackCharArray2(callback);
+                pattern_ffi_slice_8(ref slice_slice, callback_wrapped);
+            }
         }
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_delegate")]
         // Debug - write_function_declaration 
         public static partial byte pattern_ffi_slice_delegate(CallbackFFISlice callback);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe byte pattern_ffi_slice_delegate(CallbackFFISliceDelegate callback)
         {
             var callback_wrapped = new CallbackFFISlice(callback);
-            return pattern_ffi_slice_delegate(callback_wrapped);;
+            return pattern_ffi_slice_delegate(callback_wrapped);
         }
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_delegate_huge")]
         // Debug - write_function_declaration 
         public static partial Vec3f32 pattern_ffi_slice_delegate_huge(CallbackHugeVecSlice callback);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe Vec3f32 pattern_ffi_slice_delegate_huge(CallbackHugeVecSliceDelegate callback)
         {
             var callback_wrapped = new CallbackHugeVecSlice(callback);
-            return pattern_ffi_slice_delegate_huge(callback_wrapped);;
+            return pattern_ffi_slice_delegate_huge(callback_wrapped);
         }
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_1")]
         // Debug - write_function_declaration 
         public static partial OptionInner pattern_ffi_option_1(OptionInner ffi_slice);
+
         // Debug - write_function_overload 
         // Debug - no overload for pattern_ffi_option_1 
 
@@ -636,6 +724,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_2")]
         // Debug - write_function_declaration 
         public static partial Inner pattern_ffi_option_2(OptionInner ffi_slice);
+
         // Debug - write_function_overload 
         // Debug - no overload for pattern_ffi_option_2 
 
@@ -643,6 +732,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_bool")]
         // Debug - write_function_declaration 
         public static partial Bool pattern_ffi_bool(Bool ffi_bool);
+
         // Debug - write_function_overload 
         // Debug - no overload for pattern_ffi_bool 
 
@@ -650,6 +740,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_cchar")]
         // Debug - write_function_declaration 
         public static partial sbyte pattern_ffi_cchar(sbyte ffi_cchar);
+
         // Debug - write_function_overload 
         // Debug - no overload for pattern_ffi_cchar 
 
@@ -657,6 +748,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_cchar_const_pointer")]
         // Debug - write_function_declaration 
         public static partial IntPtr pattern_ffi_cchar_const_pointer(IntPtr ffi_cchar);
+
         // Debug - write_function_overload 
         // Debug - no overload for pattern_ffi_cchar_const_pointer 
 
@@ -664,6 +756,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_cchar_mut_pointer")]
         // Debug - write_function_declaration 
         public static partial IntPtr pattern_ffi_cchar_mut_pointer(IntPtr ffi_cchar);
+
         // Debug - write_function_overload 
         // Debug - no overload for pattern_ffi_cchar_mut_pointer 
 
@@ -671,6 +764,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_api_guard")]
         // Debug - write_function_declaration 
         public static partial ulong pattern_api_guard();
+
         // Debug - write_function_overload 
         // Debug - no overload for pattern_api_guard 
 
@@ -678,42 +772,43 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_1")]
         // Debug - write_function_declaration 
         public static partial uint pattern_callback_1(MyCallback callback, uint x);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe uint pattern_callback_1(MyCallbackDelegate callback, uint x)
         {
             var callback_wrapped = new MyCallback(callback);
-            return pattern_callback_1(callback_wrapped, x);;
+            return pattern_callback_1(callback_wrapped, x);
         }
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_2")]
         // Debug - write_function_declaration 
         public static partial MyCallbackVoid pattern_callback_2(MyCallbackVoid callback);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe MyCallbackVoid pattern_callback_2(MyCallbackVoidDelegate callback)
         {
             var callback_wrapped = new MyCallbackVoid(callback);
-            return pattern_callback_2(callback_wrapped);;
+            return pattern_callback_2(callback_wrapped);
         }
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_4")]
         // Debug - write_function_declaration 
         public static partial uint pattern_callback_4(MyCallbackNamespaced callback, uint x);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe uint pattern_callback_4(MyCallbackNamespacedDelegate callback, uint x)
         {
             var callback_wrapped = new MyCallbackNamespaced(callback);
-            return pattern_callback_4(callback_wrapped, x);;
+            return pattern_callback_4(callback_wrapped, x);
         }
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_5")]
         // Debug - write_function_declaration 
         public static partial SumDelegate1 pattern_callback_5();
+
         // Debug - write_function_overload 
         // Debug - no overload for pattern_callback_5 
 
@@ -721,6 +816,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_6")]
         // Debug - write_function_declaration 
         public static partial SumDelegate2 pattern_callback_6();
+
         // Debug - write_function_overload 
         // Debug - no overload for pattern_callback_6 
 
@@ -728,13 +824,13 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_7")]
         // Debug - write_function_declaration 
         public static partial FFIError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe void pattern_callback_7(SumDelegateReturnDelegate c1, SumDelegateReturn2Delegate c2, int x, int i, out int o)
         {
             var c1_wrapped = new SumDelegateReturn(c1);
             var c2_wrapped = new SumDelegateReturn2(c2);
-            var rval = pattern_callback_7(c1_wrapped, c2_wrapped, x, i, out o);;
+            var rval = pattern_callback_7(c1_wrapped, c2_wrapped, x, i, out o);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -745,6 +841,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_surrogates_1")]
         // Debug - write_function_declaration 
         public static partial void pattern_surrogates_1(Local s, out Container c);
+
         // Debug - write_function_overload 
         // Debug - no overload for pattern_surrogates_1 
 
@@ -758,6 +855,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_async_destroy")]
         // Debug - write_function_declaration 
         public static partial FFIError service_async_destroy(ref IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_async_destroy 
 
@@ -765,6 +863,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_async_new")]
         // Debug - write_function_declaration 
         public static partial FFIError service_async_new(ref IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_async_new 
 
@@ -772,6 +871,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_async_return_after_ms")]
         // Debug - write_function_declaration 
         public static partial FFIError service_async_return_after_ms(IntPtr context, ulong x, ulong ms, AsyncHelper async_callback);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_async_return_after_ms 
 
@@ -779,6 +879,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_async_bad")]
         // Debug - write_function_declaration 
         public static partial void service_async_bad(IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_async_bad 
 
@@ -792,6 +893,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "basic_service_destroy")]
         // Debug - write_function_declaration 
         public static partial FFIError basic_service_destroy(ref IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for basic_service_destroy 
 
@@ -799,6 +901,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "basic_service_new")]
         // Debug - write_function_declaration 
         public static partial FFIError basic_service_new(ref IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for basic_service_new 
 
@@ -812,6 +915,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_destroy")]
         // Debug - write_function_declaration 
         public static partial FFIError service_on_panic_destroy(ref IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_destroy 
 
@@ -819,6 +923,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_new")]
         // Debug - write_function_declaration 
         public static partial FFIError service_on_panic_new(ref IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_new 
 
@@ -828,6 +933,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_result")]
         // Debug - write_function_declaration 
         public static partial FFIError service_on_panic_return_result(IntPtr context, uint anon1);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_return_result 
 
@@ -836,6 +942,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_default_value")]
         // Debug - write_function_declaration 
         public static partial uint service_on_panic_return_default_value(IntPtr context, uint x);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_return_default_value 
 
@@ -845,6 +952,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_ub_on_panic")]
         // Debug - write_function_declaration 
         public static partial IntPtr service_on_panic_return_ub_on_panic(IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_return_ub_on_panic 
 
@@ -858,6 +966,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_destroy")]
         // Debug - write_function_declaration 
         public static partial FFIError service_callbacks_destroy(ref IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_destroy 
 
@@ -865,6 +974,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_new")]
         // Debug - write_function_declaration 
         public static partial FFIError service_callbacks_new(ref IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_new 
 
@@ -872,12 +982,12 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_simple")]
         // Debug - write_function_declaration 
         public static partial FFIError service_callbacks_callback_simple(IntPtr context, MyCallback callback);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe void service_callbacks_callback_simple(IntPtr context, MyCallbackDelegate callback)
         {
             var callback_wrapped = new MyCallback(callback);
-            var rval = service_callbacks_callback_simple(context, callback_wrapped);;
+            var rval = service_callbacks_callback_simple(context, callback_wrapped);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -888,12 +998,12 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_ffi_return")]
         // Debug - write_function_declaration 
         public static partial FFIError service_callbacks_callback_ffi_return(IntPtr context, SumDelegateReturn callback);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe void service_callbacks_callback_ffi_return(IntPtr context, SumDelegateReturnDelegate callback)
         {
             var callback_wrapped = new SumDelegateReturn(callback);
-            var rval = service_callbacks_callback_ffi_return(context, callback_wrapped);;
+            var rval = service_callbacks_callback_ffi_return(context, callback_wrapped);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -904,15 +1014,15 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_with_slice")]
         // Debug - write_function_declaration 
         public static partial FFIError service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, SliceI32 input);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe void service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
         {
             fixed (void* ptr_input = input)
             {
                 var input_slice = new SliceI32(new IntPtr(ptr_input), (ulong) input.Length);
                 var callback_wrapped = new SumDelegateReturn(callback);
-                var rval = service_callbacks_callback_with_slice(context, callback_wrapped, input_slice);;
+                var rval = service_callbacks_callback_with_slice(context, callback_wrapped, input_slice);
                 if (rval != FFIError.Ok)
                 {
                     throw new InteropException<FFIError>(rval);
@@ -924,6 +1034,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_set_delegate_table")]
         // Debug - write_function_declaration 
         public static partial void service_callbacks_set_delegate_table(IntPtr context, ref DelegateTable table);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_set_delegate_table 
 
@@ -931,6 +1042,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_invoke_delegates")]
         // Debug - write_function_declaration 
         public static partial FFIError service_callbacks_invoke_delegates(IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_invoke_delegates 
 
@@ -944,6 +1056,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_destroy")]
         // Debug - write_function_declaration 
         public static partial FFIError service_ignoring_methods_destroy(ref IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_ignoring_methods_destroy 
 
@@ -951,6 +1064,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_new")]
         // Debug - write_function_declaration 
         public static partial FFIError service_ignoring_methods_new(ref IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_ignoring_methods_new 
 
@@ -964,6 +1078,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_destroy")]
         // Debug - write_function_declaration 
         public static partial FFIError service_multiple_ctors_destroy(ref IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_destroy 
 
@@ -971,6 +1086,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with")]
         // Debug - write_function_declaration 
         public static partial FFIError service_multiple_ctors_new_with(ref IntPtr context, uint some_value);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_with 
 
@@ -978,6 +1094,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_without")]
         // Debug - write_function_declaration 
         public static partial FFIError service_multiple_ctors_new_without(ref IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_without 
 
@@ -985,6 +1102,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with_string")]
         // Debug - write_function_declaration 
         public static partial FFIError service_multiple_ctors_new_with_string(ref IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string anon0);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_with_string 
 
@@ -992,6 +1110,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_failing")]
         // Debug - write_function_declaration 
         public static partial FFIError service_multiple_ctors_new_failing(ref IntPtr context, byte some_value);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_failing 
 
@@ -1005,6 +1124,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_destroy")]
         // Debug - write_function_declaration 
         public static partial FFIError service_using_lifetimes_destroy(ref IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_using_lifetimes_destroy 
 
@@ -1012,6 +1132,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_new_with")]
         // Debug - write_function_declaration 
         public static partial FFIError service_using_lifetimes_new_with(ref IntPtr context, ref uint some_value);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_using_lifetimes_new_with 
 
@@ -1019,14 +1140,14 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_lifetime_1")]
         // Debug - write_function_declaration 
         public static partial void service_using_lifetimes_lifetime_1(IntPtr context, SliceBool slice);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe void service_using_lifetimes_lifetime_1(IntPtr context, ReadOnlySpan<Bool> slice)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
-                service_using_lifetimes_lifetime_1(context, slice_slice);;
+                service_using_lifetimes_lifetime_1(context, slice_slice);
             }
         }
 
@@ -1034,14 +1155,14 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_lifetime_2")]
         // Debug - write_function_declaration 
         public static partial void service_using_lifetimes_lifetime_2(IntPtr context, SliceBool slice);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe void service_using_lifetimes_lifetime_2(IntPtr context, ReadOnlySpan<Bool> slice)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
-                service_using_lifetimes_lifetime_2(context, slice_slice);;
+                service_using_lifetimes_lifetime_2(context, slice_slice);
             }
         }
 
@@ -1049,14 +1170,14 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_return_string_accept_slice")]
         // Debug - write_function_declaration 
         public static partial IntPtr service_using_lifetimes_return_string_accept_slice(IntPtr anon0, SliceU8 anon1);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe string service_using_lifetimes_return_string_accept_slice(IntPtr anon0, ReadOnlySpan<byte> anon1)
         {
             fixed (void* ptr_anon1 = anon1)
             {
                 var anon1_slice = new SliceU8(new IntPtr(ptr_anon1), (ulong) anon1.Length);
-                var s = service_using_lifetimes_return_string_accept_slice(anon0, anon1_slice);;
+                var s = service_using_lifetimes_return_string_accept_slice(anon0, anon1_slice);
                 return Marshal.PtrToStringAnsi(s);
             }
         }
@@ -1071,6 +1192,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_destroy")]
         // Debug - write_function_declaration 
         public static partial FFIError service_various_slices_destroy(ref IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_various_slices_destroy 
 
@@ -1078,6 +1200,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_new")]
         // Debug - write_function_declaration 
         public static partial FFIError service_various_slices_new(ref IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_various_slices_new 
 
@@ -1085,14 +1208,14 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self")]
         // Debug - write_function_declaration 
         public static partial byte service_various_slices_mut_self(IntPtr context, SliceU8 slice);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe byte service_various_slices_mut_self(IntPtr context, ReadOnlySpan<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                return service_various_slices_mut_self(context, slice_slice);;
+                return service_various_slices_mut_self(context, slice_slice);
             }
         }
 
@@ -1101,15 +1224,15 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_void")]
         // Debug - write_function_declaration 
         public static partial void service_various_slices_mut_self_void(IntPtr context, SliceBool slice);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         /// Single line.
         public static unsafe void service_various_slices_mut_self_void(IntPtr context, ReadOnlySpan<Bool> slice)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
-                service_various_slices_mut_self_void(context, slice_slice);;
+                service_various_slices_mut_self_void(context, slice_slice);
             }
         }
 
@@ -1117,6 +1240,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref")]
         // Debug - write_function_declaration 
         public static partial byte service_various_slices_mut_self_ref(IntPtr context, ref byte x, out byte y);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_various_slices_mut_self_ref 
 
@@ -1124,14 +1248,14 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice")]
         // Debug - write_function_declaration 
         public static partial byte service_various_slices_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, SliceU8 slice);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe byte service_various_slices_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, ReadOnlySpan<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                return service_various_slices_mut_self_ref_slice(context, ref x, out y, slice_slice);;
+                return service_various_slices_mut_self_ref_slice(context, ref x, out y, slice_slice);
             }
         }
 
@@ -1139,8 +1263,8 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice_limited")]
         // Debug - write_function_declaration 
         public static partial byte service_various_slices_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, SliceU8 slice, SliceU8 slice2);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe byte service_various_slices_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, ReadOnlySpan<byte> slice, ReadOnlySpan<byte> slice2)
         {
             fixed (void* ptr_slice = slice)
@@ -1149,7 +1273,7 @@ namespace My.Company
                 fixed (void* ptr_slice2 = slice2)
                 {
                     var slice2_slice = new SliceU8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
-                    return service_various_slices_mut_self_ref_slice_limited(context, ref x, out y, slice_slice, slice2_slice);;
+                    return service_various_slices_mut_self_ref_slice_limited(context, ref x, out y, slice_slice, slice2_slice);
                 }
             }
         }
@@ -1158,14 +1282,14 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ffi_error")]
         // Debug - write_function_declaration 
         public static partial FFIError service_various_slices_mut_self_ffi_error(IntPtr context, SliceMutU8 slice);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe void service_various_slices_mut_self_ffi_error(IntPtr context, Span<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                var rval = service_various_slices_mut_self_ffi_error(context, slice_slice);;
+                var rval = service_various_slices_mut_self_ffi_error(context, slice_slice);
                 if (rval != FFIError.Ok)
                 {
                     throw new InteropException<FFIError>(rval);
@@ -1177,14 +1301,14 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_no_error")]
         // Debug - write_function_declaration 
         public static partial FFIError service_various_slices_mut_self_no_error(IntPtr context, SliceMutU8 slice);
-        // Debug - write_function_overload 
 
+        // Debug - write_function_overload 
         public static unsafe void service_various_slices_mut_self_no_error(IntPtr context, Span<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                var rval = service_various_slices_mut_self_no_error(context, slice_slice);;
+                var rval = service_various_slices_mut_self_no_error(context, slice_slice);
                 if (rval != FFIError.Ok)
                 {
                     throw new InteropException<FFIError>(rval);
@@ -1198,6 +1322,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_return_slice")]
         // Debug - write_function_declaration 
         public static partial SliceU32 service_various_slices_return_slice(IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_various_slices_return_slice 
 
@@ -1207,6 +1332,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_return_slice_mut")]
         // Debug - write_function_declaration 
         public static partial SliceMutU32 service_various_slices_return_slice_mut(IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_various_slices_return_slice_mut 
 
@@ -1220,6 +1346,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_strings_destroy")]
         // Debug - write_function_declaration 
         public static partial FFIError service_strings_destroy(ref IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_strings_destroy 
 
@@ -1227,6 +1354,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_strings_new")]
         // Debug - write_function_declaration 
         public static partial FFIError service_strings_new(ref IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_strings_new 
 
@@ -1234,6 +1362,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_strings_pass_string")]
         // Debug - write_function_declaration 
         public static partial void service_strings_pass_string(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string anon1);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_strings_pass_string 
 
@@ -1241,6 +1370,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "service_strings_return_string")]
         // Debug - write_function_declaration 
         public static partial IntPtr service_strings_return_string(IntPtr context);
+
         // Debug - write_function_overload 
         // Debug - no overload for service_strings_return_string 
 
@@ -1294,53 +1424,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe Array ToManaged() => new Array();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(Array managed)
-            {
-                var result = new Unmanaged
-                {
-                };
-
-                unsafe
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_marshal_field 
-                    if(managed.data != null)
-                    {
-                        if(managed.data.Length != 16)
-                        {
-                            throw new InvalidOperationException($"The managed array field '{nameof(Array.data)}' has {managed.data.Length} elements, exceeding the fixed size array of 16.");
-                        }
-                        var source_data = new ReadOnlySpan<byte>(managed.data, 0, managed.data.Length);
-                        var dest = new Span<byte>(result.data, 16);
-                        source_data.CopyTo(dest);
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException($"The managed field cannot be null.");
-                    }
-                }
-
-                return result;
-            }
-
-            public static Array ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new Array()
-                {
-                };
-
-                unsafe
-                {
-                    // Debug - write_type_definition_composite_to_managed_marshal_field 
-                    var source_data = new Span<byte>(unmanaged.data, 16);
-                    var arr_data = new byte[16];
-                    source_data.CopyTo(arr_data.AsSpan());
-                    result.data = arr_data;
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -1374,37 +1457,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe BoolField ToManaged() => new BoolField();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(BoolField managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    val = Convert.ToSByte(managed.val),
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static BoolField ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new BoolField()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    val = Convert.ToBoolean(unmanaged.val),
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -1441,77 +1493,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe CharArray ToManaged() => new CharArray();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(CharArray managed)
-            {
-                var result = new Unmanaged
-                {
-                };
-
-                unsafe
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_marshal_field 
-                    if(managed.str != null)
-                    {
-                        fixed(char* s = managed.str)
-                        {
-                            if(Encoding.UTF8.GetByteCount(managed.str, 0, managed.str.Length) + 1 > 32)
-                            {
-                                throw new InvalidOperationException($"The managed string field '{nameof(CharArray.str)}' cannot be encoded to fit the fixed size array of 32.");
-                            }
-                            var written = Encoding.UTF8.GetBytes(s, managed.str.Length, result.str, 31);
-                            result.str[written] = 0;
-                        }
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException($"The managed field cannot be null.");
-                    }
-
-                    // Debug - write_type_definition_composite_to_unmanaged_marshal_field 
-                    if(managed.str_2 != null)
-                    {
-                        fixed(char* s = managed.str_2)
-                        {
-                            if(Encoding.UTF8.GetByteCount(managed.str_2, 0, managed.str_2.Length) + 1 > 32)
-                            {
-                                throw new InvalidOperationException($"The managed string field '{nameof(CharArray.str_2)}' cannot be encoded to fit the fixed size array of 32.");
-                            }
-                            var written = Encoding.UTF8.GetBytes(s, managed.str_2.Length, result.str_2, 31);
-                            result.str_2[written] = 0;
-                        }
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException($"The managed field cannot be null.");
-                    }
-                }
-
-                return result;
-            }
-
-            public static CharArray ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new CharArray()
-                {
-                };
-
-                unsafe
-                {
-                    // Debug - write_type_definition_composite_to_managed_marshal_field 
-                    var source_str = new ReadOnlySpan<byte>(unmanaged.str, 32);
-                    var terminatorIndex_str = source_str.IndexOf<byte>(0);
-                    result.str = Encoding.UTF8.GetString(source_str.Slice(0, terminatorIndex_str == -1 ? Math.Min(source_str.Length, 32) : terminatorIndex_str));
-
-                    // Debug - write_type_definition_composite_to_managed_marshal_field 
-                    var source_str_2 = new ReadOnlySpan<byte>(unmanaged.str_2, 32);
-                    var terminatorIndex_str_2 = source_str_2.IndexOf<byte>(0);
-                    result.str_2 = Encoding.UTF8.GetString(source_str_2.Slice(0, terminatorIndex_str_2 == -1 ? Math.Min(source_str_2.Length, 32) : terminatorIndex_str_2));
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -1545,37 +1526,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe Container ToManaged() => new Container();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(Container managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    foreign = Local.Marshaller.ConvertToUnmanaged(managed.foreign),
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static Container ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new Container()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    foreign = Local.Marshaller.ConvertToManaged(unmanaged.foreign),
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -1630,7 +1580,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe DelegateTable ToManaged() => new DelegateTable();
             public void Free() { }
-
         }
     }
 
@@ -1664,37 +1613,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe ExtraTypef32 ToManaged() => new ExtraTypef32();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(ExtraTypef32 managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    x = managed.x,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static ExtraTypef32 ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new ExtraTypef32()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    x = unmanaged.x,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -1728,37 +1646,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe Genericu32 ToManaged() => new Genericu32();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(Genericu32 managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    x = managed.x,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static Genericu32 ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new Genericu32()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    x = unmanaged.x,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -1792,37 +1679,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe Genericu8 ToManaged() => new Genericu8();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(Genericu8 managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    x = managed.x,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static Genericu8 ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new Genericu8()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    x = unmanaged.x,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -1856,37 +1712,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe Inner ToManaged() => new Inner();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(Inner managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    x = managed.x,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static Inner ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new Inner()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    x = unmanaged.x,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -1920,37 +1745,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe Local ToManaged() => new Local();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(Local managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    x = managed.x,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static Local ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new Local()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    x = unmanaged.x,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -2002,95 +1796,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe NestedArray ToManaged() => new NestedArray();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(NestedArray managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    field_enum = managed.field_enum,
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    field_vec = Vec3f32.Marshaller.ConvertToUnmanaged(managed.field_vec),
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    field_bool = Convert.ToSByte(managed.field_bool),
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    field_int = managed.field_int,
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    field_struct = Array.Marshaller.ConvertToUnmanaged(managed.field_struct),
-                };
-
-                unsafe
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_marshal_field 
-                    if(managed.field_array != null)
-                    {
-                        if(managed.field_array.Length != 5)
-                        {
-                            throw new InvalidOperationException($"The managed array field '{nameof(NestedArray.field_array)}' has {managed.field_array.Length} elements, exceeding the fixed size array of 5.");
-                        }
-                        var source_field_array = new ReadOnlySpan<ushort>(managed.field_array, 0, managed.field_array.Length);
-                        var dest = new Span<ushort>(result.field_array, 5);
-                        source_field_array.CopyTo(dest);
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException($"The managed field cannot be null.");
-                    }
-
-                    // Debug - write_type_definition_composite_to_unmanaged_marshal_field 
-                    if(managed.field_array_2 != null)
-                    {
-                        if(managed.field_array_2.Length != 5)
-                        {
-                            throw new InvalidOperationException($"The managed array field '{nameof(NestedArray.field_array_2)}' has {managed.field_array_2.Length} elements, exceeding the fixed size array of 5.");
-                        }
-                        var source_field_array_2 = new ReadOnlySpan<ushort>(managed.field_array_2, 0, managed.field_array_2.Length);
-                        var dest = new Span<ushort>(result.field_array_2, 5);
-                        source_field_array_2.CopyTo(dest);
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException($"The managed field cannot be null.");
-                    }
-                }
-
-                return result;
-            }
-
-            public static NestedArray ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new NestedArray()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    field_enum = unmanaged.field_enum,
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    field_vec = Vec3f32.Marshaller.ConvertToManaged(unmanaged.field_vec),
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    field_bool = Convert.ToBoolean(unmanaged.field_bool),
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    field_int = unmanaged.field_int,
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    field_struct = Array.Marshaller.ConvertToManaged(unmanaged.field_struct),
-                };
-
-                unsafe
-                {
-                    // Debug - write_type_definition_composite_to_managed_marshal_field 
-                    var source_field_array = new Span<ushort>(unmanaged.field_array, 5);
-                    var arr_field_array = new ushort[5];
-                    source_field_array.CopyTo(arr_field_array.AsSpan());
-                    result.field_array = arr_field_array;
-
-                    // Debug - write_type_definition_composite_to_managed_marshal_field 
-                    var source_field_array_2 = new Span<ushort>(unmanaged.field_array_2, 5);
-                    var arr_field_array_2 = new ushort[5];
-                    source_field_array_2.CopyTo(arr_field_array_2.AsSpan());
-                    result.field_array_2 = arr_field_array_2;
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -2127,41 +1832,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe Packed1 ToManaged() => new Packed1();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(Packed1 managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    x = managed.x,
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    y = managed.y,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static Packed1 ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new Packed1()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    x = unmanaged.x,
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    y = unmanaged.y,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -2198,41 +1868,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe Packed2 ToManaged() => new Packed2();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(Packed2 managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    y = managed.y,
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    x = managed.x,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static Packed2 ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new Packed2()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    y = unmanaged.y,
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    x = unmanaged.x,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -2266,37 +1901,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe Phantomu8 ToManaged() => new Phantomu8();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(Phantomu8 managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    x = managed.x,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static Phantomu8 ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new Phantomu8()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    x = unmanaged.x,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -2332,37 +1936,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe StructDocumented ToManaged() => new StructDocumented();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(StructDocumented managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    x = managed.x,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static StructDocumented ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new StructDocumented()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    x = unmanaged.x,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -2396,37 +1969,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe StructRenamed ToManaged() => new StructRenamed();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(StructRenamed managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    e = managed.e,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static StructRenamed ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new StructRenamed()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    e = unmanaged.e,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -2460,37 +2002,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe Tupled ToManaged() => new Tupled();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(Tupled managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    x0 = managed.x0,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static Tupled ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new Tupled()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    x0 = unmanaged.x0,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -2524,37 +2035,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe UseAsciiStringPattern ToManaged() => new UseAsciiStringPattern();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(UseAsciiStringPattern managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    ascii_string = managed.ascii_string,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static UseAsciiStringPattern ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new UseAsciiStringPattern()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    ascii_string = unmanaged.ascii_string,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -2591,41 +2071,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe Vec1 ToManaged() => new Vec1();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(Vec1 managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    x = managed.x,
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    y = managed.y,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static Vec1 ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new Vec1()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    x = unmanaged.x,
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    y = unmanaged.y,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -2662,41 +2107,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe Vec2 ToManaged() => new Vec2();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(Vec2 managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    x = managed.x,
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    z = managed.z,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static Vec2 ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new Vec2()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    x = unmanaged.x,
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    z = unmanaged.z,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -2736,45 +2146,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe Vec3f32 ToManaged() => new Vec3f32();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(Vec3f32 managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    x = managed.x,
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    y = managed.y,
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    z = managed.z,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static Vec3f32 ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new Vec3f32()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    x = unmanaged.x,
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    y = unmanaged.y,
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    z = unmanaged.z,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -2811,41 +2182,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe Visibility1 ToManaged() => new Visibility1();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(Visibility1 managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    pblc = managed.pblc,
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    prvt = managed.prvt,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static Visibility1 ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new Visibility1()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    pblc = unmanaged.pblc,
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    prvt = unmanaged.prvt,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -2882,41 +2218,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe Visibility2 ToManaged() => new Visibility2();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(Visibility2 managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    pblc1 = managed.pblc1,
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    pblc2 = managed.pblc2,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static Visibility2 ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new Visibility2()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    pblc1 = unmanaged.pblc1,
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    pblc2 = unmanaged.pblc2,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -2950,37 +2251,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe Weird1u32 ToManaged() => new Weird1u32();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(Weird1u32 managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    x = managed.x,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static Weird1u32 ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new Weird1u32()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    x = unmanaged.x,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -3020,61 +2290,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe Weird2u8 ToManaged() => new Weird2u8();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(Weird2u8 managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    t = managed.t,
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    r = managed.r,
-                };
-
-                unsafe
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_marshal_field 
-                    if(managed.a != null)
-                    {
-                        if(managed.a.Length != 5)
-                        {
-                            throw new InvalidOperationException($"The managed array field '{nameof(Weird2u8.a)}' has {managed.a.Length} elements, exceeding the fixed size array of 5.");
-                        }
-                        var source_a = new ReadOnlySpan<byte>(managed.a, 0, managed.a.Length);
-                        var dest = new Span<byte>(result.a, 5);
-                        source_a.CopyTo(dest);
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException($"The managed field cannot be null.");
-                    }
-                }
-
-                return result;
-            }
-
-            public static Weird2u8 ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new Weird2u8()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    t = unmanaged.t,
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    r = unmanaged.r,
-                };
-
-                unsafe
-                {
-                    // Debug - write_type_definition_composite_to_managed_marshal_field 
-                    var source_a = new Span<byte>(unmanaged.a, 5);
-                    var arr_a = new byte[5];
-                    source_a.CopyTo(arr_a.AsSpan());
-                    result.a = arr_a;
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -3466,41 +2681,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe OptionInner ToManaged() => new OptionInner();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(OptionInner managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    t = Inner.Marshaller.ConvertToUnmanaged(managed.t),
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    is_some = managed.is_some,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static OptionInner ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new OptionInner()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    t = Inner.Marshaller.ConvertToManaged(unmanaged.t),
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    is_some = unmanaged.is_some,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -3562,41 +2742,6 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe ResultU64 ToManaged() => new ResultU64();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(ResultU64 managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    t = managed.t,
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    err = managed.err,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static ResultU64 ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new ResultU64()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    t = unmanaged.t,
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    err = unmanaged.err,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 

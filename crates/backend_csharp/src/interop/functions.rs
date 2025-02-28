@@ -1,8 +1,7 @@
 use crate::converter::{
-    function_name_to_csharp_name, function_parameter_to_csharp_typename, function_rval_to_csharp_typename, get_slice_type, has_ffi_error_rval, to_slice_marshaller,
-    to_typespecifier_in_param, to_typespecifier_in_rval,
+    function_name_to_csharp_name, function_parameter_to_csharp_typename, function_rval_to_csharp_typename, has_ffi_error_rval, pattern_to_native_in_signature,
+    to_slice_marshaller, to_typespecifier_in_param, to_typespecifier_in_rval,
 };
-use crate::interop::patterns::pattern_to_native_in_signature;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::lang::c::{CType, Documentation, Function, FunctionSignature, Parameter, PrimitiveType};
 use interoptopus::patterns::TypePattern;
@@ -35,6 +34,8 @@ pub fn write_function(i: &Interop, w: &mut IndentWriter, function: &Function, wr
     } else {
         write_function_declaration(i, w, function, false, false)?;
     }
+
+    w.newline()?;
     write_function_overload(i, w, function, write_for)?;
 
     Ok(())
@@ -284,13 +285,9 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
 
         match p.the_type() {
             CType::Pattern(TypePattern::Slice(x) | TypePattern::SliceMut(x)) => {
-                if i.should_emit_marshaller(&get_slice_type(x)) {
-                    fallback();
-                } else {
-                    to_pin_name.push(name);
-                    to_pin_slice_type.push(the_type);
-                    to_invoke.push(format!("{name}_slice"));
-                }
+                to_pin_name.push(name);
+                to_pin_slice_type.push(the_type);
+                to_invoke.push(format!("{name}_slice"));
             }
             CType::Pattern(TypePattern::NamedCallback(callback)) => {
                 // CType::Pattern(TypePattern::FFIErrorEnum(_)) if i.work_around_exception_in_callback_no_reentry => {
@@ -302,27 +299,18 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
                 to_wrap_name.push(name);
                 to_wrap_type.push(to_typespecifier_in_param(p.the_type()));
                 to_invoke.push(format!("{name}_wrapped"));
-                // fallback()
             }
             CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {
                 CType::Pattern(x) => match x {
                     TypePattern::Slice(x) => {
-                        if i.should_emit_marshaller(&get_slice_type(x)) {
-                            fallback();
-                        } else {
-                            to_pin_name.push(name);
-                            to_pin_slice_type.push(the_type.replace("ref ", ""));
-                            to_invoke.push(format!("ref {name}_slice"));
-                        }
+                        to_pin_name.push(name);
+                        to_pin_slice_type.push(the_type.replace("ref ", ""));
+                        to_invoke.push(format!("ref {name}_slice"));
                     }
                     TypePattern::SliceMut(x) => {
-                        if i.should_emit_marshaller(&get_slice_type(x)) {
-                            fallback();
-                        } else {
-                            to_pin_name.push(name);
-                            to_pin_slice_type.push(the_type.replace("ref ", ""));
-                            to_invoke.push(format!("ref {name}_slice"));
-                        }
+                        to_pin_name.push(name);
+                        to_pin_slice_type.push(the_type.replace("ref ", ""));
+                        to_invoke.push(format!("ref {name}_slice"));
                     }
                     _ => fallback(),
                 },
@@ -339,8 +327,6 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         indented!(w, r"{};", signature)?;
         return Ok(());
     }
-
-    w.newline()?;
 
     if write_for == WriteFor::Code {
         write_documentation(w, function.meta().documentation())?;
@@ -375,7 +361,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         indented!(w, [()], r"var {}_wrapped = new {}({});", n, t, n)?;
     }
 
-    let call = format!(r"{}({});", fn_name, to_invoke.join(", "));
+    let call = format!(r"{}({})", fn_name, to_invoke.join(", "));
 
     write_function_overloaded_invoke_with_error_handling(i, w, function, &call, to_wrap_delegates.as_slice())?;
 

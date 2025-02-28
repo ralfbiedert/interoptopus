@@ -134,7 +134,7 @@ fn write_pattern_generic_slice_marshaller(i: &Interop, w: &mut IndentWriter, rea
     }
     indented!(w, r"{{")?;
     indented!(w, [()], r"[StructLayout(LayoutKind.Sequential)]")?;
-    indented!(w, [()], r"public unsafe struct Unmanaged")?;
+    indented!(w, [()], r"public struct Unmanaged")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"public IntPtr Data;")?;
     indented!(w, [()()], r"public ulong Len;")?;

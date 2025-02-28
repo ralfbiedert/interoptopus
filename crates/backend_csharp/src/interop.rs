@@ -8,7 +8,7 @@ pub mod namespace;
 pub mod patterns;
 pub mod types;
 
-use crate::converter::{get_slice_type, to_typespecifier_in_param};
+use crate::converter::to_typespecifier_in_param;
 use crate::interop::builtins::write_builtins;
 use crate::interop::class::{write_class_context, write_native_lib_string};
 use crate::interop::constants::write_constants;
@@ -195,7 +195,8 @@ impl Interop {
         true
     }
 
-    fn should_emit_marshaller(&self, ctype: &CType) -> bool {
+    #[must_use]
+    pub fn should_emit_marshaller(&self, ctype: &CType) -> bool {
         match ctype {
             CType::Array(_) => true,
             CType::Composite(x) => self.should_emit_marshaller_for_composite(x),
@@ -276,22 +277,9 @@ impl Interop {
 
     fn has_overloadable(&self, signature: &FunctionSignature) -> bool {
         signature.params().iter().any(|x| match x.the_type() {
-            CType::ReadPointer(p) => match &**p {
-                CType::Pattern(TypePattern::Slice(s)) => !self.should_emit_marshaller(&get_slice_type(s)),
-                CType::Pattern(TypePattern::SliceMut(s)) => !self.should_emit_marshaller(&get_slice_type(s)),
-                _ => false,
-            },
-            CType::ReadWritePointer(p) => match &**p {
-                CType::Pattern(TypePattern::Slice(s)) => !self.should_emit_marshaller(&get_slice_type(s)),
-                CType::Pattern(TypePattern::SliceMut(s)) => !self.should_emit_marshaller(&get_slice_type(s)),
-                _ => false,
-            },
-            CType::Pattern(p) => match p {
-                TypePattern::Slice(s) => !self.should_emit_marshaller(&get_slice_type(s)),
-                TypePattern::SliceMut(s) => !self.should_emit_marshaller(&get_slice_type(s)),
-                TypePattern::NamedCallback(_) => true,
-                _ => false,
-            },
+            CType::ReadPointer(p) => matches!(&**p, CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_))),
+            CType::ReadWritePointer(p) => matches!(&**p, CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_))),
+            CType::Pattern(p) => matches!(p, TypePattern::Slice(_) | TypePattern::SliceMut(_) | TypePattern::NamedCallback(_)),
             _ => false,
         })
     }

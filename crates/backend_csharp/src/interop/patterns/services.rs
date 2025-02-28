@@ -1,8 +1,7 @@
-use crate::converter::{function_name_to_csharp_name, to_typespecifier_in_param, to_typespecifier_in_rval};
+use crate::converter::{function_name_to_csharp_name, pattern_to_native_in_signature, to_typespecifier_in_param, to_typespecifier_in_rval};
 use crate::interop::functions::write_documentation;
-use crate::interop::patterns::pattern_to_native_in_signature;
 use crate::{FunctionNameFlavor, Interop};
-use interoptopus::lang::c::{CType, Function, Parameter, PrimitiveType};
+use interoptopus::lang::c::{CType, Function, PrimitiveType};
 use interoptopus::patterns::service::ServiceDefinition;
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::longest_common_prefix;
@@ -248,20 +247,13 @@ pub fn write_service_method_overload(
         write_documentation(w, function.meta().documentation())?;
     }
 
-    write_common_service_method_overload(i, w, function, fn_pretty, pattern_to_native_in_signature, write_for)?;
+    write_common_service_method_overload(i, w, function, fn_pretty, write_for)?;
 
     Ok(())
 }
 
 /// Writes common service overload code
-pub fn write_common_service_method_overload<FPatternMap: Fn(&Interop, &Parameter) -> String>(
-    i: &Interop,
-    w: &mut IndentWriter,
-    function: &Function,
-    fn_pretty: &str,
-    f_pattern: FPatternMap,
-    write_for: WriteFor,
-) -> Result<(), Error> {
+pub fn write_common_service_method_overload(i: &Interop, w: &mut IndentWriter, function: &Function, fn_pretty: &str, write_for: WriteFor) -> Result<(), Error> {
     i.debug(w, "write_common_service_method_overload")?;
 
     let mut names = Vec::new();
@@ -284,7 +276,7 @@ pub fn write_common_service_method_overload<FPatternMap: Fn(&Interop, &Parameter
         // If we call the checked function we want to resolve a `SliceU8` to a `byte[]`,
         // but if we call the unchecked version we want to keep that `Sliceu8` in our signature.
         // let native = i.to_typespecifier_in_param(p.the_type());
-        let native = f_pattern(i, p);
+        let native = pattern_to_native_in_signature(i, p);
 
         // Forward `ref` and `out` accordingly.
         if native.contains("out ") {

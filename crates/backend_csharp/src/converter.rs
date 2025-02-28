@@ -1,4 +1,5 @@
 use crate::interop::FunctionNameFlavor;
+use crate::Interop;
 use heck::{ToLowerCamelCase, ToUpperCamelCase};
 use interoptopus::lang::c::{
     CType, CompositeType, ConstantValue, EnumType, Field, FnPointerType, Function, FunctionSignature, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
@@ -150,8 +151,8 @@ pub fn to_typespecifier_in_param(x: &CType) -> String {
             TypePattern::SliceMut(x) => composite_to_typename(x),
             TypePattern::Option(x) => composite_to_typename(x),
             TypePattern::Result(x) => composite_to_typename(x),
-            TypePattern::NamedCallback(x) => format!("{}", named_callback_to_typename(x)),
-            TypePattern::AsyncCallback(x) => format!("{}", async_callback_to_typename(x)),
+            TypePattern::NamedCallback(x) => named_callback_to_typename(x),
+            TypePattern::AsyncCallback(x) => async_callback_to_typename(x),
             TypePattern::Bool => "Bool".to_string(),
             TypePattern::CChar => "sbyte".to_string(),
             TypePattern::APIVersion => to_typespecifier_in_param(&x.fallback_type()),
@@ -256,5 +257,49 @@ pub fn to_slice_marshaller(t: &CType) -> String {
         CType::Pattern(TypePattern::Slice(x)) => format!("SliceMarshaller<{}>", get_slice_type_argument(x)),
         CType::Pattern(TypePattern::SliceMut(x)) => format!("SliceMutMarshaller<{}>", get_slice_type_argument(x)),
         _ => panic!("Expected slice type"),
+    }
+}
+
+#[must_use]
+pub fn pattern_to_native_in_signature(i: &Interop, param: &Parameter) -> String {
+    let slice_type_name = |mutable: bool, element_type: &CType| -> String {
+        if mutable {
+            format!("Span<{}>", to_typespecifier_in_param(element_type))
+        } else {
+            format!("ReadOnlySpan<{}>", to_typespecifier_in_param(element_type))
+        }
+    };
+    match param.the_type() {
+        x @ CType::Pattern(p) => match p {
+            TypePattern::Slice(p) => {
+                let element_type = p.try_deref_pointer().expect("Must be pointer");
+                slice_type_name(false, &element_type)
+            }
+            TypePattern::SliceMut(p) => {
+                let element_type = p.try_deref_pointer().expect("Must be pointer");
+                slice_type_name(true, &element_type)
+            }
+            TypePattern::NamedCallback(_) => {
+                format!("{}Delegate", to_typespecifier_in_param(x))
+            }
+
+            _ => to_typespecifier_in_param(param.the_type()),
+        },
+        CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {
+            CType::Pattern(x) => match x {
+                TypePattern::Slice(p) => {
+                    let element_type = p.try_deref_pointer().expect("Must be pointer");
+                    slice_type_name(false, &element_type)
+                }
+                TypePattern::SliceMut(p) => {
+                    let element_type = p.try_deref_pointer().expect("Must be pointer");
+                    slice_type_name(true, &element_type)
+                }
+                _ => to_typespecifier_in_param(param.the_type()),
+            },
+            _ => to_typespecifier_in_param(param.the_type()),
+        },
+
+        x => to_typespecifier_in_param(x),
     }
 }

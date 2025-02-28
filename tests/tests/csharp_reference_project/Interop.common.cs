@@ -53,41 +53,6 @@ namespace My.Company.Common
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe Vec ToManaged() => new Vec();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(Vec managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    x = managed.x,
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    z = managed.z,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static Vec ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new Vec()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    x = unmanaged.x,
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    z = unmanaged.z,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
@@ -1025,41 +990,6 @@ namespace My.Company.Common
             public void FromUnmanaged(Unmanaged unmanaged) { }
             public unsafe OptionVec ToManaged() => new OptionVec();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(OptionVec managed)
-            {
-                var result = new Unmanaged
-                {
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    t = Vec.Marshaller.ConvertToUnmanaged(managed.t),
-                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
-                    is_some = managed.is_some,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static OptionVec ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new OptionVec()
-                {
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    t = Vec.Marshaller.ConvertToManaged(unmanaged.t),
-                    // Debug - write_type_definition_composite_to_managed_inline_field 
-                    is_some = unmanaged.is_some,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 
