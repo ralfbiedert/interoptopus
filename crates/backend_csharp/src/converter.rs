@@ -90,7 +90,8 @@ pub fn fnpointer_to_typename(x: &FnPointerType) -> String {
 pub fn to_typespecifier_in_field(x: &CType, field: &Field, composite: &CompositeType) -> String {
     match &x {
         CType::Primitive(x) => primitive_to_typename(*x),
-        CType::Array(_) => panic!("Needs special handling in the writer."),
+        // CType::Array(_) => panic!("Needs special handling in the writer."),
+        CType::Array(_) => "TODO".to_string(),
         CType::Enum(x) => enum_to_typename(x),
         CType::Opaque(x) => opaque_to_typename(x),
         CType::Composite(x) => composite_to_typename(x),

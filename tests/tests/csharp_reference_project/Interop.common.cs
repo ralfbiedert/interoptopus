@@ -47,10 +47,31 @@ namespace My.Company.Common
 
         public ref struct Marshaller
         {
+            private Vec _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(Vec managed) { _managed = managed; }
+
             // TODO, we have to fix this marshalling type
-            public void FromManaged(Vec managed) { }
-            public Unmanaged ToUnmanaged() => new Unmanaged {  };
-            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public void FromManaged(Vec managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public Unmanaged ToUnmanaged()
+            {;
+                // Debug - write_type_definition_composite_marshaller_field_wrapper 
+                var x = _managed.x;
+                // Debug - write_type_definition_composite_marshaller_field_wrapper 
+                var z = _managed.z;
+
+                return new Unmanaged()
+                {
+                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                    x = x,
+                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                    z = z,
+                };
+            }
+
             public unsafe Vec ToManaged() => new Vec();
             public void Free() { }
         }
@@ -984,10 +1005,31 @@ namespace My.Company.Common
 
         public ref struct Marshaller
         {
+            private OptionVec _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(OptionVec managed) { _managed = managed; }
+
             // TODO, we have to fix this marshalling type
-            public void FromManaged(OptionVec managed) { }
-            public Unmanaged ToUnmanaged() => new Unmanaged {  };
-            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public void FromManaged(OptionVec managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public Unmanaged ToUnmanaged()
+            {;
+                // Debug - write_type_definition_composite_marshaller_field_wrapper 
+                var t = new Vec.Marshaller(_managed.t);
+                // Debug - write_type_definition_composite_marshaller_field_wrapper 
+                var is_some = _managed.is_some;
+
+                return new Unmanaged()
+                {
+                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                    t = t.ToUnmanaged(),
+                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                    is_some = is_some,
+                };
+            }
+
             public unsafe OptionVec ToManaged() => new OptionVec();
             public void Free() { }
         }
@@ -1084,35 +1126,28 @@ namespace My.Company.Common
 
         public ref struct Marshaller
         {
-            private MyCallbackNamespaced managed;
-            private Unmanaged native;
-            private Unmanaged sourceNative;
-            private GCHandle? pinned;
+            private MyCallbackNamespaced _managed;
+            private Unmanaged _unmanaged;
 
-            public void FromManaged(MyCallbackNamespaced managed)
-            {
-                this.managed = managed;
-            }
+            public Marshaller(MyCallbackNamespaced managed) { _managed = managed; }
+
+            public void FromManaged(MyCallbackNamespaced managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public Unmanaged ToUnmanaged()
             {
                 return new Unmanaged
                 {
-                    Callback = managed._callbackNative,
+                    Callback = _managed._callbackNative,
                     Data = IntPtr.Zero
                 };
-            }
-
-            public void FromUnmanaged(Unmanaged unmanaged)
-            {
-                sourceNative = unmanaged;
             }
 
             public MyCallbackNamespaced ToManaged()
             {
                 return new MyCallbackNamespaced
                 {
-                    _callbackNative = sourceNative.Callback,
+                    _callbackNative = _unmanaged.Callback,
                 };
             }
 

@@ -50,10 +50,39 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
     indented!(w, [()], r"public ref struct Marshaller")?;
     indented!(w, [()], r"{{")?;
     w.indent();
+    indented!(w, [()], r"private {} _managed; // Used when converting managed -> unmanaged", name)?;
+    indented!(w, [()], r"private Unmanaged _unmanaged; // Used when converting unmanaged -> managed")?;
+    w.newline()?;
+    indented!(w, [()], r"public Marshaller({} managed) {{ _managed = managed; }}", name)?;
+    w.newline()?;
     indented!(w, [()], r"// TODO, we have to fix this marshalling type")?;
-    indented!(w, [()], r"public void FromManaged({} managed) {{ }}", name)?;
-    indented!(w, [()], r"public Unmanaged ToUnmanaged() => new Unmanaged {{  }};")?;
-    indented!(w, [()], r"public void FromUnmanaged(Unmanaged unmanaged) {{ }}")?;
+    indented!(w, [()], r"public void FromManaged({} managed) {{ _managed = managed; }}", name)?;
+    indented!(w, [()], r"public void FromUnmanaged(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
+    w.newline()?;
+    indented!(w, [()], r"public Unmanaged ToUnmanaged()")?;
+    indented!(w, [()], r"{{;")?;
+    for field in the_type.fields() {
+        w.indent();
+        w.indent();
+        write_type_definition_composite_marshaller_field_wrapper(i, w, field, the_type)?;
+        w.unindent();
+        w.unindent();
+    }
+    w.newline()?;
+    indented!(w, [()()], r"return new Unmanaged()")?;
+    indented!(w, [()()], r"{{")?;
+    for field in the_type.fields() {
+        w.indent();
+        w.indent();
+        w.indent();
+        write_type_definition_composite_marshaller_unmanaged_invoke(i, w, field, the_type)?;
+        w.unindent();
+        w.unindent();
+        w.unindent();
+    }
+    indented!(w, [()()], r"}};")?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
     indented!(w, [()], r"public unsafe {} ToManaged() => new {}();", name, name)?;
     indented!(w, [()], r"public void Free() {{ }}")?;
     indented!(w, r"}}")?;
@@ -287,4 +316,34 @@ pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWri
         let type_name = to_typespecifier_in_field(field.the_type(), field, the_type);
         indented!(w, r"{}{} {};", visibility, type_name, field_name)
     }
+}
+
+pub fn write_type_definition_composite_marshaller_field_wrapper(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &CompositeType) -> Result<(), Error> {
+    i.debug(w, "write_type_definition_composite_marshaller_field_wrapper")?;
+
+    let name = field.name();
+    let ctor = match field.the_type() {
+        CType::Primitive(_) => format!("_managed.{name}"),
+        CType::Enum(_) => format!("_managed.{name}"),
+        x => format!("new {}.Marshaller(_managed.{})", to_typespecifier_in_field(x, field, the_type), name),
+    };
+
+    indented!(w, r"var {} = {};", name, ctor)?;
+
+    Ok(())
+}
+
+pub fn write_type_definition_composite_marshaller_unmanaged_invoke(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &CompositeType) -> Result<(), Error> {
+    i.debug(w, "write_type_definition_composite_marshaller_unmanaged_invoke")?;
+
+    let name = field.name();
+    let ctor = match field.the_type() {
+        CType::Primitive(PrimitiveType::Bool) => indented!(w, "{name} = (sbyte) ({name} ? 1 : 0),"),
+        CType::Primitive(_) => indented!(w, "{name} = {name},"),
+        CType::Enum(_) => indented!(w, "{name} = {name},"),
+        CType::Pattern(TypePattern::Bool) => indented!(w, "{name} = (sbyte) ({name} ? 1 : 0),"),
+        x => indented!(w, "{name} = {name}.ToUnmanaged(),"),
+    };
+
+    Ok(())
 }
