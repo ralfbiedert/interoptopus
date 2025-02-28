@@ -28,6 +28,7 @@ namespace My.Company.Common
         public double x;
         public double z;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_fn_pointer 
@@ -939,6 +940,7 @@ namespace My.Company.Common
         ///Byte where `1` means element `t` is valid.
         byte is_some;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_pattern_option 

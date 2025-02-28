@@ -17,98 +17,116 @@ pub fn write_type_definition_composite(i: &Interop, w: &mut IndentWriter, the_ty
 
 pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
     i.debug(w, "write_type_definition_composite_marshaller")?;
+    let name = the_type.rust_name();
 
-    if i.should_emit_marshaller_for_composite(the_type) {
-        w.newline()?;
-        indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
-        indented!(w, r"public partial struct {}", the_type.rust_name())?;
-        indented!(w, r"{{")?;
-        w.indent();
-        write_type_definition_composite_layout_annotation(w, the_type)?;
-        indented!(w, r"public unsafe struct Unmanaged")?;
-        indented!(w, r"{{")?;
-        w.indent();
-        for field in the_type.fields() {
-            write_type_definition_composite_unmanaged_body_field(i, w, field, the_type)?;
-        }
-        w.unindent();
-        indented!(w, r"}}")?;
-        w.newline()?;
-
-        indented!(w, r"[CustomMarshaller(typeof({}), MarshalMode.Default, typeof(Marshaller))]", the_type.rust_name())?;
-        indented!(w, r"private struct MarshallerMeta {{ }}")?;
-        w.newline()?;
-
-        indented!(w, r"public ref struct Marshaller")?;
-        indented!(w, r"{{")?;
-        w.indent();
-        indented!(w, r"public static Unmanaged ConvertToUnmanaged({} managed)", the_type.rust_name())?;
-        indented!(w, r"{{")?;
-        w.indent();
-        indented!(w, r"var result = new Unmanaged")?;
-        indented!(w, r"{{")?;
-        w.indent();
-        for field in the_type.fields().iter().filter(|t| !matches!(t.the_type(), CType::Array(_))) {
-            write_type_definition_composite_to_unmanaged_inline_field(i, w, field)?;
-        }
-        w.unindent();
-        indented!(w, r"}};")?;
-        w.newline()?;
-        indented!(w, r"unsafe")?;
-        indented!(w, r"{{")?;
-        w.indent();
-        for (x, field) in the_type.fields().iter().filter(|t| matches!(t.the_type(), CType::Array(_))).enumerate() {
-            if x > 0 {
-                w.newline()?;
-            }
-            if let CType::Array(a) = field.the_type() {
-                write_type_definition_composite_to_unmanaged_marshal_field(i, w, the_type, field, a)?;
-            }
-        }
-        w.unindent();
-        indented!(w, r"}}")?;
-        w.newline()?;
-        indented!(w, r"return result;")?;
-        w.unindent();
-        indented!(w, r"}}")?;
-        w.newline()?;
-        indented!(w, r"public static {0} ConvertToManaged(Unmanaged unmanaged)", the_type.rust_name())?;
-        indented!(w, r"{{")?;
-        w.indent();
-        indented!(w, r"var result = new {0}()", the_type.rust_name())?;
-        indented!(w, r"{{")?;
-        w.indent();
-        for field in the_type.fields().iter().filter(|t| !matches!(t.the_type(), CType::Array(_))) {
-            write_type_definition_composite_to_managed_inline_field(i, w, field)?;
-        }
-        w.unindent();
-        indented!(w, r"}};")?;
-        w.newline()?;
-        indented!(w, r"unsafe")?;
-        indented!(w, r"{{")?;
-        w.indent();
-        for (x, field) in the_type.fields().iter().filter(|t| matches!(t.the_type(), CType::Array(_))).enumerate() {
-            if x > 0 {
-                w.newline()?;
-            }
-            if let CType::Array(a) = field.the_type() {
-                write_type_definition_composite_to_managed_marshal_field(i, w, the_type, field, a)?;
-            }
-        }
-        w.unindent();
-        indented!(w, r"}}")?;
-        w.newline()?;
-        indented!(w, r"return result;")?;
-        w.unindent();
-        indented!(w, r"}}")?;
-        w.newline()?;
-        indented!(w, r"public void Free() {{ }}")?;
-        w.newline()?;
-        w.unindent();
-        indented!(w, r"}}")?;
-        w.unindent();
-        indented!(w, r"}}")?;
+    if !i.should_emit_marshaller_for_composite(the_type) {
+        return Ok(());
     }
+
+    indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
+    indented!(w, r"public partial struct {}", name)?;
+    indented!(w, r"{{")?;
+
+    w.indent();
+    write_type_definition_composite_layout_annotation(w, the_type)?;
+    w.unindent();
+
+    indented!(w, [()], r"public unsafe struct Unmanaged")?;
+    indented!(w, [()], r"{{")?;
+    for field in the_type.fields() {
+        w.indent();
+        w.indent();
+        write_type_definition_composite_unmanaged_body_field(i, w, field, the_type)?;
+        w.unindent();
+        w.unindent();
+    }
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+
+    indented!(w, [()], r"[CustomMarshaller(typeof({}), MarshalMode.Default, typeof(Marshaller))]", name)?;
+    indented!(w, [()], r"private struct MarshallerMeta {{ }}")?;
+    w.newline()?;
+
+    indented!(w, [()], r"public ref struct Marshaller")?;
+    indented!(w, [()], r"{{")?;
+    w.indent();
+    indented!(w, [()], r"public static Unmanaged ConvertToUnmanaged({} managed)", name)?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"var result = new Unmanaged")?;
+    indented!(w, [()()], r"{{")?;
+    for field in the_type.fields().iter().filter(|t| !matches!(t.the_type(), CType::Array(_))) {
+        w.indent();
+        w.indent();
+        w.indent();
+        write_type_definition_composite_to_unmanaged_inline_field(i, w, field)?;
+        w.unindent();
+        w.unindent();
+        w.unindent();
+    }
+    indented!(w, [()()], r"}};")?;
+    w.newline()?;
+    indented!(w, [()()], r"unsafe")?;
+    indented!(w, [()()], r"{{")?;
+    for (x, field) in the_type.fields().iter().filter(|t| matches!(t.the_type(), CType::Array(_))).enumerate() {
+        if x > 0 {
+            w.newline()?;
+        }
+        if let CType::Array(a) = field.the_type() {
+            w.indent();
+            w.indent();
+            w.indent();
+            write_type_definition_composite_to_unmanaged_marshal_field(i, w, the_type, field, a)?;
+            w.unindent();
+            w.unindent();
+            w.unindent();
+        }
+    }
+    indented!(w, [()()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()()], r"return result;")?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()], r"public static {0} ConvertToManaged(Unmanaged unmanaged)", the_type.rust_name())?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"var result = new {0}()", the_type.rust_name())?;
+    indented!(w, [()()], r"{{")?;
+    for field in the_type.fields().iter().filter(|t| !matches!(t.the_type(), CType::Array(_))) {
+        w.indent();
+        w.indent();
+        w.indent();
+        write_type_definition_composite_to_managed_inline_field(i, w, field)?;
+        w.unindent();
+        w.unindent();
+        w.unindent();
+    }
+    indented!(w, [()()], r"}};")?;
+    w.newline()?;
+    indented!(w, [()()], r"unsafe")?;
+    indented!(w, [()()], r"{{")?;
+    for (x, field) in the_type.fields().iter().filter(|t| matches!(t.the_type(), CType::Array(_))).enumerate() {
+        if x > 0 {
+            w.newline()?;
+        }
+        if let CType::Array(a) = field.the_type() {
+            w.indent();
+            w.indent();
+            w.indent();
+            write_type_definition_composite_to_managed_marshal_field(i, w, the_type, field, a)?;
+            w.unindent();
+            w.unindent();
+            w.unindent();
+        }
+    }
+    indented!(w, [()()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()()], r"return result;")?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()], r"public void Free() {{ }}")?;
+    w.newline()?;
+    indented!(w, r"}}")?;
+    w.unindent();
+    indented!(w, r"}}")?;
 
     Ok(())
 }
@@ -120,6 +138,7 @@ pub fn write_type_definition_composite_to_managed_marshal_field(
     field: &Field,
     a: &ArrayType,
 ) -> Result<(), Error> {
+    i.debug(w, "write_type_definition_composite_to_managed_marshal_field")?;
     let field_name = field_name_to_csharp_name(field, i.rename_symbols);
     let type_name = to_typespecifier_in_field(a.array_type(), field, the_type);
     if i.unroll_struct_arrays {
@@ -145,6 +164,7 @@ pub fn write_type_definition_composite_to_managed_marshal_field(
 }
 
 pub fn write_type_definition_composite_to_managed_inline_field(i: &Interop, w: &mut IndentWriter, field: &Field) -> Result<(), Error> {
+    i.debug(w, "write_type_definition_composite_to_managed_inline_field")?;
     let field_name = field_name_to_csharp_name(field, i.rename_symbols);
     match field.the_type() {
         CType::Primitive(PrimitiveType::Bool) => {
@@ -167,6 +187,7 @@ pub fn write_type_definition_composite_to_unmanaged_marshal_field(
     field: &Field,
     a: &ArrayType,
 ) -> Result<(), Error> {
+    i.debug(w, "write_type_definition_composite_to_unmanaged_marshal_field")?;
     let field_name = field_name_to_csharp_name(field, i.rename_symbols);
     let type_name = to_typespecifier_in_field(a.array_type(), field, the_type);
     if i.unroll_struct_arrays {
@@ -176,62 +197,59 @@ pub fn write_type_definition_composite_to_unmanaged_marshal_field(
     } else {
         indented!(w, r"if(managed.{} != null)", field_name)?;
         indented!(w, r"{{")?;
-        w.indent();
         if matches!(a.array_type(), CType::Pattern(TypePattern::CChar)) {
-            indented!(w, "fixed(char* s = managed.{})", field_name)?;
-            indented!(w, "{{")?;
-            w.indent();
+            indented!(w, [()], r"fixed(char* s = managed.{0})", field_name)?;
+            indented!(w, [()], r"{{")?;
             indented!(
                 w,
+                [()()],
                 r"if(Encoding.UTF8.GetByteCount(managed.{0}, 0, managed.{0}.Length) + 1 > {1})",
                 field_name,
                 a.len()
             )?;
-            indented!(w, r"{{")?;
-            w.indent();
+            indented!(w, [()()], r"{{")?;
             indented!(
                 w,
+                [()()()],
                 r#"throw new InvalidOperationException($"The managed string field '{{nameof({0}.{1})}}' cannot be encoded to fit the fixed size array of {2}.");"#,
                 the_type.rust_name(),
                 field_name,
                 a.len()
             )?;
-            w.unindent();
-            indented!(w, r"}}")?;
+            indented!(w, [()()], r"}}")?;
             indented!(
                 w,
+                [()()],
                 r"var written = Encoding.UTF8.GetBytes(s, managed.{0}.Length, result.{0}, {1});",
                 field_name,
                 a.len() - 1
             )?;
-            indented!(w, r"result.{}[written] = 0;", field_name)?;
-            w.unindent();
-            indented!(w, r"}}")?;
+            indented!(w, [()()], r"result.{}[written] = 0;", field_name)?;
+            indented!(w, [()], r"}}")?;
         } else {
-            indented!(w, r"if(managed.{}.Length != {})", field_name, a.len())?;
-            indented!(w, r"{{")?;
-            w.indent();
+            indented!(w, [()], r"if(managed.{}.Length != {})", field_name, a.len())?;
+            indented!(w, [()], r"{{")?;
             indented!(
                 w,
+                [()()],
                 r#"throw new InvalidOperationException($"The managed array field '{{nameof({0}.{1})}}' has {{managed.{1}.Length}} elements, exceeding the fixed size array of {2}.");"#,
                 the_type.rust_name(),
                 field_name,
                 a.len()
             )?;
-            w.unindent();
-            indented!(w, r"}}")?;
+            indented!(w, [()], r"}}")?;
             indented!(
                 w,
+                [()],
                 r"var source_{1} = new ReadOnlySpan<{0}>(managed.{1}, 0, managed.{1}.Length);",
                 type_name,
                 field_name
             )?;
-            indented!(w, r"var dest = new Span<{0}>(result.{1}, {2});", type_name, field_name, a.len())?;
-            indented!(w, r"source_{}.CopyTo(dest);", field_name)?;
+            indented!(w, [()], r"var dest = new Span<{0}>(result.{1}, {2});", type_name, field_name, a.len())?;
+            indented!(w, [()], r"source_{}.CopyTo(dest);", field_name)?;
         }
-        w.unindent();
         indented!(w, r"}}")?;
-        indented!(w, "else")?;
+        indented!(w, r"else")?;
         indented!(w, r"{{")?;
         indented!(w, [()], r#"throw new InvalidOperationException($"The managed field cannot be null.");"#)?;
         indented!(w, r"}}")?;
@@ -240,6 +258,8 @@ pub fn write_type_definition_composite_to_unmanaged_marshal_field(
 }
 
 pub fn write_type_definition_composite_to_unmanaged_inline_field(i: &Interop, w: &mut IndentWriter, field: &Field) -> Result<(), Error> {
+    i.debug(w, "write_type_definition_composite_to_unmanaged_inline_field")?;
+
     let field_name = field_name_to_csharp_name(field, i.rename_symbols);
     match field.the_type() {
         CType::Primitive(PrimitiveType::Bool) => {
@@ -256,6 +276,8 @@ pub fn write_type_definition_composite_to_unmanaged_inline_field(i: &Interop, w:
 }
 
 pub fn write_type_definition_composite_unmanaged_body_field(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &CompositeType) -> Result<(), Error> {
+    i.debug(w, "write_type_definition_composite_unmanaged_body_field")?;
+
     let field_name = field_name_to_csharp_name(field, i.rename_symbols);
     match field.the_type() {
         CType::Array(a) => {
@@ -324,7 +346,10 @@ pub fn write_type_definition_composite_body(i: &Interop, w: &mut IndentWriter, t
     }
 
     w.unindent();
-    indented!(w, r"}}")
+    indented!(w, r"}}")?;
+    w.newline()?;
+
+    Ok(())
 }
 
 pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &CompositeType) -> Result<(), Error> {

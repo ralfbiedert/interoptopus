@@ -1295,14 +1295,15 @@ namespace My.Company
     {
         public byte[] data;
     }
-    // Debug - write_type_definition_composite_marshaller 
 
+    // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Array
     {
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
             public fixed byte data[16];
         }
 
@@ -1319,6 +1320,7 @@ namespace My.Company
 
                 unsafe
                 {
+                    // Debug - write_type_definition_composite_to_unmanaged_marshal_field 
                     if(managed.data != null)
                     {
                         if(managed.data.Length != 16)
@@ -1346,6 +1348,7 @@ namespace My.Company
 
                 unsafe
                 {
+                    // Debug - write_type_definition_composite_to_managed_marshal_field 
                     var source_data = new Span<byte>(unmanaged.data, 16);
                     var arr_data = new byte[16];
                     source_data.CopyTo(arr_data.AsSpan());
@@ -1367,14 +1370,15 @@ namespace My.Company
     {
         public bool val;
     }
-    // Debug - write_type_definition_composite_marshaller 
 
+    // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct BoolField
     {
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
             public sbyte val;
         }
 
@@ -1387,6 +1391,7 @@ namespace My.Company
             {
                 var result = new Unmanaged
                 {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
                     val = Convert.ToSByte(managed.val),
                 };
 
@@ -1401,6 +1406,7 @@ namespace My.Company
             {
                 var result = new BoolField()
                 {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
                     val = Convert.ToBoolean(unmanaged.val),
                 };
 
@@ -1424,15 +1430,17 @@ namespace My.Company
         public string str;
         public string str_2;
     }
-    // Debug - write_type_definition_composite_marshaller 
 
+    // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct CharArray
     {
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
             public fixed byte str[32];
+            // Debug - write_type_definition_composite_unmanaged_body_field 
             public fixed byte str_2[32];
         }
 
@@ -1449,6 +1457,7 @@ namespace My.Company
 
                 unsafe
                 {
+                    // Debug - write_type_definition_composite_to_unmanaged_marshal_field 
                     if(managed.str != null)
                     {
                         fixed(char* s = managed.str)
@@ -1466,6 +1475,7 @@ namespace My.Company
                         throw new InvalidOperationException($"The managed field cannot be null.");
                     }
 
+                    // Debug - write_type_definition_composite_to_unmanaged_marshal_field 
                     if(managed.str_2 != null)
                     {
                         fixed(char* s = managed.str_2)
@@ -1495,10 +1505,12 @@ namespace My.Company
 
                 unsafe
                 {
+                    // Debug - write_type_definition_composite_to_managed_marshal_field 
                     var source_str = new ReadOnlySpan<byte>(unmanaged.str, 32);
                     var terminatorIndex_str = source_str.IndexOf<byte>(0);
                     result.str = Encoding.UTF8.GetString(source_str.Slice(0, terminatorIndex_str == -1 ? Math.Min(source_str.Length, 32) : terminatorIndex_str));
 
+                    // Debug - write_type_definition_composite_to_managed_marshal_field 
                     var source_str_2 = new ReadOnlySpan<byte>(unmanaged.str_2, 32);
                     var terminatorIndex_str_2 = source_str_2.IndexOf<byte>(0);
                     result.str_2 = Encoding.UTF8.GetString(source_str_2.Slice(0, terminatorIndex_str_2 == -1 ? Math.Min(source_str_2.Length, 32) : terminatorIndex_str_2));
@@ -1519,6 +1531,7 @@ namespace My.Company
     {
         public Local foreign;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
@@ -1535,6 +1548,7 @@ namespace My.Company
         public SumDelegateReturn sum_delegate_return;
         public SumDelegateReturn2 sum_delegate_return_2;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
@@ -1544,6 +1558,7 @@ namespace My.Company
     {
         public float x;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
@@ -1553,6 +1568,7 @@ namespace My.Company
     {
         public IntPtr x;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
@@ -1562,6 +1578,7 @@ namespace My.Company
     {
         public IntPtr x;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
@@ -1571,6 +1588,7 @@ namespace My.Company
     {
         float x;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
@@ -1580,6 +1598,7 @@ namespace My.Company
     {
         uint x;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
@@ -1595,20 +1614,27 @@ namespace My.Company
         public ushort[] field_array_2;
         public Array field_struct;
     }
-    // Debug - write_type_definition_composite_marshaller 
 
+    // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct NestedArray
     {
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
             public EnumRenamed field_enum;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
             public Vec3f32 field_vec;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
             public sbyte field_bool;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
             public int field_int;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
             public fixed ushort field_array[5];
+            // Debug - write_type_definition_composite_unmanaged_body_field 
             public fixed ushort field_array_2[5];
+            // Debug - write_type_definition_composite_unmanaged_body_field 
             public ArrayMarshaller.Unmanaged field_struct;
         }
 
@@ -1621,15 +1647,21 @@ namespace My.Company
             {
                 var result = new Unmanaged
                 {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
                     field_enum = managed.field_enum,
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
                     field_vec = managed.field_vec,
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
                     field_bool = Convert.ToSByte(managed.field_bool),
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
                     field_int = managed.field_int,
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
                     field_struct = ArrayMarshaller.ConvertToUnmanaged(managed.field_struct),
                 };
 
                 unsafe
                 {
+                    // Debug - write_type_definition_composite_to_unmanaged_marshal_field 
                     if(managed.field_array != null)
                     {
                         if(managed.field_array.Length != 5)
@@ -1645,6 +1677,7 @@ namespace My.Company
                         throw new InvalidOperationException($"The managed field cannot be null.");
                     }
 
+                    // Debug - write_type_definition_composite_to_unmanaged_marshal_field 
                     if(managed.field_array_2 != null)
                     {
                         if(managed.field_array_2.Length != 5)
@@ -1668,20 +1701,27 @@ namespace My.Company
             {
                 var result = new NestedArray()
                 {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
                     field_enum = unmanaged.field_enum,
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
                     field_vec = unmanaged.field_vec,
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
                     field_bool = Convert.ToBoolean(unmanaged.field_bool),
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
                     field_int = unmanaged.field_int,
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
                     field_struct = ArrayMarshaller.ConvertToManaged(unmanaged.field_struct),
                 };
 
                 unsafe
                 {
+                    // Debug - write_type_definition_composite_to_managed_marshal_field 
                     var source_field_array = new Span<ushort>(unmanaged.field_array, 5);
                     var arr_field_array = new ushort[5];
                     source_field_array.CopyTo(arr_field_array.AsSpan());
                     result.field_array = arr_field_array;
 
+                    // Debug - write_type_definition_composite_to_managed_marshal_field 
                     var source_field_array_2 = new Span<ushort>(unmanaged.field_array_2, 5);
                     var arr_field_array_2 = new ushort[5];
                     source_field_array_2.CopyTo(arr_field_array_2.AsSpan());
@@ -1704,6 +1744,7 @@ namespace My.Company
         public byte x;
         public ushort y;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
@@ -1714,6 +1755,7 @@ namespace My.Company
         public ushort y;
         public byte x;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
@@ -1723,6 +1765,7 @@ namespace My.Company
     {
         public uint x;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
@@ -1734,6 +1777,7 @@ namespace My.Company
         /// Documented field.
         public float x;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
@@ -1743,6 +1787,7 @@ namespace My.Company
     {
         public EnumRenamed e;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
@@ -1752,6 +1797,7 @@ namespace My.Company
     {
         public byte x0;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
@@ -1761,6 +1807,7 @@ namespace My.Company
     {
         public string ascii_string;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
@@ -1771,6 +1818,7 @@ namespace My.Company
         public float x;
         public float y;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
@@ -1781,6 +1829,7 @@ namespace My.Company
         public double x;
         public double z;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
@@ -1792,6 +1841,7 @@ namespace My.Company
         public float y;
         public float z;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
@@ -1802,6 +1852,7 @@ namespace My.Company
         public byte pblc;
         byte prvt;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
@@ -1812,6 +1863,7 @@ namespace My.Company
         public byte pblc1;
         public byte pblc2;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
@@ -1821,6 +1873,7 @@ namespace My.Company
     {
         uint x;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_type_definition_composite 
@@ -1832,16 +1885,19 @@ namespace My.Company
         internal byte[] a;
         internal IntPtr r;
     }
-    // Debug - write_type_definition_composite_marshaller 
 
+    // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Weird2u8
     {
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
             public byte t;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
             public fixed byte a[5];
+            // Debug - write_type_definition_composite_unmanaged_body_field 
             public IntPtr r;
         }
 
@@ -1854,12 +1910,15 @@ namespace My.Company
             {
                 var result = new Unmanaged
                 {
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
                     t = managed.t,
+                    // Debug - write_type_definition_composite_to_unmanaged_inline_field 
                     r = managed.r,
                 };
 
                 unsafe
                 {
+                    // Debug - write_type_definition_composite_to_unmanaged_marshal_field 
                     if(managed.a != null)
                     {
                         if(managed.a.Length != 5)
@@ -1883,12 +1942,15 @@ namespace My.Company
             {
                 var result = new Weird2u8()
                 {
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
                     t = unmanaged.t,
+                    // Debug - write_type_definition_composite_to_managed_inline_field 
                     r = unmanaged.r,
                 };
 
                 unsafe
                 {
+                    // Debug - write_type_definition_composite_to_managed_marshal_field 
                     var source_a = new Span<byte>(unmanaged.a, 5);
                     var arr_a = new byte[5];
                     source_a.CopyTo(arr_a.AsSpan());
@@ -2266,6 +2328,7 @@ namespace My.Company
         ///Byte where `1` means element `t` is valid.
         byte is_some;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_pattern_option 
@@ -2301,6 +2364,7 @@ namespace My.Company
         ///Error value.
         FFIError err;
     }
+
     // Debug - write_type_definition_composite_marshaller 
 
     // Debug - write_pattern_result 
