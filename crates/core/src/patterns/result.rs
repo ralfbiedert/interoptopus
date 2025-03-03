@@ -34,6 +34,7 @@ use crate::patterns::TypePattern;
 use crate::util::{capitalize_first_letter, log_error};
 use std::any::Any;
 use std::fmt::Debug;
+use std::mem::MaybeUninit;
 use std::panic::AssertUnwindSafe;
 
 /// A trait you should implement for enums that signal errors in FFI calls.
@@ -229,10 +230,9 @@ pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
 }
 
 #[repr(C)]
-#[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Eq, Default, serde::Deserialize, serde::Serialize))]
-#[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Eq, Default))]
+#[derive(Debug)]
 pub struct FFIResult<T, E> {
-    t: T,
+    t: MaybeUninit<T>,
     err: E,
 }
 
@@ -242,23 +242,23 @@ where
     E: CTypeInfo + FFIError,
 {
     pub const fn ok(t: T) -> Self {
-        Self { t, err: E::SUCCESS }
+        Self { t: MaybeUninit::new(t), err: E::SUCCESS }
     }
 }
 
 impl<T, E> FFIResult<T, E>
 where
-    T: CTypeInfo + Default,
+    T: CTypeInfo,
     E: CTypeInfo + FFIError,
 {
     pub fn error(err: E) -> Self {
-        Self { t: T::default(), err }
+        Self { t: MaybeUninit::uninit(), err }
     }
 }
 
 impl<T, E> From<Result<T, E>> for FFIResult<T, E>
 where
-    T: CTypeInfo + Default,
+    T: CTypeInfo,
     E: CTypeInfo + FFIError,
 {
     fn from(x: Result<T, E>) -> Self {

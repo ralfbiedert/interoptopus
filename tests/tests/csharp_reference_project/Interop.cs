@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 14558971871602263811ul)
+            if (api_version != 11742672840196803799ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (14558971871602263811). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (11742672840196803799). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -884,6 +884,14 @@ namespace My.Company
 
         // Debug - write_function_overload 
         // Debug - no overload for service_async_return_after_ms 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "service_async_process_struct")]
+        // Debug - write_function_declaration 
+        public static partial FFIError service_async_process_struct(IntPtr context, NestedArray x, AsyncHelper async_callback);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for service_async_process_struct 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_bad")]
@@ -3570,6 +3578,89 @@ namespace My.Company
     ///Result that contains value or an error.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
+    public partial struct ResultNestedArray
+    {
+        ///Element if err is `Ok`.
+        internal NestedArray t;
+        ///Error value.
+        internal FFIError err;
+    }
+
+    // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct ResultNestedArray
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public NestedArray.Unmanaged t;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public FFIError err;
+        }
+
+        [CustomMarshaller(typeof(ResultNestedArray), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private ResultNestedArray _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(ResultNestedArray managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(ResultNestedArray managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _t = new NestedArray.Marshaller(_managed.t);
+                _unmanaged.t = _t.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.err = _managed.err;
+
+                return _unmanaged;
+            }
+
+            public unsafe ResultNestedArray ToManaged()
+            {
+                _managed = new ResultNestedArray();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _t = new NestedArray.Marshaller(_unmanaged.t);
+                _managed.t = _t.ToManaged();
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.err = _unmanaged.err;
+
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    // Debug - write_pattern_result 
+    public partial struct ResultNestedArray
+    {
+        public NestedArray Ok()
+        {
+            if (err == 0)
+            {
+                return t;
+            }
+            throw new InteropException<FFIError>(err);
+        }
+
+    }
+
+
+    // Debug - write_type_definition_composite 
+    ///Result that contains value or an error.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
     public partial struct ResultU64
     {
         ///Element if err is `Ok`.
@@ -4757,6 +4848,26 @@ namespace My.Company
             });
             pinned = GCHandle.Alloc(cb);
             var rval = Interop.service_async_return_after_ms(_context, x, ms, cb);
+            if (rval != FFIError.Ok)
+            {
+                throw new InteropException<FFIError>(rval);
+            }
+            return cs.Task;
+        }
+        // Debug - write_service_method_overload 
+
+        // Debug - write_pattern_service_method 
+        public Task<ResultNestedArray> ProcessStruct(NestedArray x)
+        {
+            var cs = new TaskCompletionSource<ResultNestedArray>();
+            GCHandle pinned = default;
+            var cb = new AsyncHelper((x) => {
+                var rval = Marshal.PtrToStructure<ResultNestedArray>(x);
+                cs.SetResult(rval);
+                pinned.Free();
+            });
+            pinned = GCHandle.Alloc(cb);
+            var rval = Interop.service_async_process_struct(_context, x, cb);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);

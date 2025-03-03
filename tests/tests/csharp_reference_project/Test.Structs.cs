@@ -6,8 +6,11 @@ public class TestStructs
     [Fact]
     public void Test_bool_field()
     {
-        Assert.True(Interop.bool_field(new BoolField{
+        var rval = Interop.bool_field(new BoolField
+        {
             val = true
-        }));
+        });
+        
+        Assert.True(rval);
     }
 }

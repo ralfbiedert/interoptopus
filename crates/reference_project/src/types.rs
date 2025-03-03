@@ -1,6 +1,5 @@
 //! All supported type patterns.
 
-use interoptopus::lang::c::CType;
 use interoptopus::lang::rust::CTypeInfo;
 use interoptopus::patterns::slice::FFISlice;
 use interoptopus::patterns::string::CStrPointer;

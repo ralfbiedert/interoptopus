@@ -177,18 +177,23 @@ namespace My.Company
     public delegate void AsyncHelperNative(IntPtr data, IntPtr callback_data);
     public delegate void AsyncHelperDelegate(IntPtr data);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct AsyncHelper : IDisposable
+    public partial struct AsyncHelper
     {
         private AsyncHelperDelegate _managed;
-        private IntPtr _native;
+        private AsyncHelperNative _native;
+        private IntPtr _ptr;
+    }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct AsyncHelper : IDisposable
+    {
         public AsyncHelper() { }
 
         public AsyncHelper(AsyncHelperDelegate managed)
         {
             _managed = managed;
-            _native = Marshal.GetFunctionPointerForDelegate(new AsyncHelperNative(Call));
+            _native = Call;
+            _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
         void Call(IntPtr data, IntPtr _)
@@ -198,9 +203,9 @@ namespace My.Company
 
         public void Dispose()
         {
-            if (_native == IntPtr.Zero) return;
-            Marshal.FreeHGlobal(_native);
-            _native = IntPtr.Zero;
+            if (_ptr == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_ptr);
+            _ptr = IntPtr.Zero;
         }
 
         [CustomMarshaller(typeof(AsyncHelper), MarshalMode.Default, typeof(Marshaller))]
@@ -224,7 +229,7 @@ namespace My.Company
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
-                _unmanaged.Callback = _managed._native;
+                _unmanaged.Callback = _managed._ptr;
                 _unmanaged.Data = IntPtr.Zero;
                 return _unmanaged;
             }
@@ -232,7 +237,7 @@ namespace My.Company
             public AsyncHelper ToManaged()
             {
                 _managed = new AsyncHelper();
-                _managed._native = _unmanaged.Callback;
+                _managed._ptr = _unmanaged.Callback;
                 return _managed;
             }
 

@@ -1,7 +1,7 @@
 use crate::patterns::result::Error;
 use crate::patterns::result::FFIError;
-use interoptopus::patterns::asynk::{AsyncCallback, AsyncRuntime};
-use interoptopus::patterns::result::FFIResult;
+use crate::types::NestedArray;
+use interoptopus::patterns::asynk::AsyncRuntime;
 use interoptopus::{ffi_service, ffi_service_ctor, ffi_type};
 use std::future::Future;
 use std::sync::Arc;
@@ -33,6 +33,11 @@ impl ServiceAsync {
 
     pub async fn return_after_ms(self: Arc<ServiceAsync>, x: u64, ms: u64) -> Result<u64, FFIError> {
         tokio::time::sleep(std::time::Duration::from_millis(ms)).await;
+        Ok(x)
+    }
+
+    pub async fn process_struct(self: Arc<ServiceAsync>, mut x: NestedArray) -> Result<NestedArray, FFIError> {
+        x.field_int += 1;
         Ok(x)
     }
 
