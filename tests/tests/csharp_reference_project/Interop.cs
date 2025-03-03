@@ -3652,7 +3652,7 @@ namespace My.Company
     public delegate void CallbackCharArray2Native(CharArray value, IntPtr callback_data); // 'True' native callback signature
     public delegate void CallbackCharArray2Delegate(CharArray value); // Our C# signature
 
-    public partial struct CallbackCharArray2
+    public partial class CallbackCharArray2
     {
         private CallbackCharArray2Delegate _managed; // C# callback
         private CallbackCharArray2Native _native; // Native callback 
@@ -3661,7 +3661,7 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct CallbackCharArray2 : IDisposable
+    public partial class CallbackCharArray2 : IDisposable
     {
 
         public CallbackCharArray2() { }
@@ -3719,7 +3719,7 @@ namespace My.Company
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
-                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Callback = _managed?._ptr ?? IntPtr.Zero;
                 _unmanaged.Data = IntPtr.Zero;
                 return _unmanaged;
             }
@@ -3741,7 +3741,7 @@ namespace My.Company
     public delegate byte CallbackFFISliceNative(SliceU8.Unmanaged slice, IntPtr callback_data); // 'True' native callback signature
     public delegate byte CallbackFFISliceDelegate(SliceU8 slice); // Our C# signature
 
-    public partial struct CallbackFFISlice
+    public partial class CallbackFFISlice
     {
         private CallbackFFISliceDelegate _managed; // C# callback
         private CallbackFFISliceNative _native; // Native callback 
@@ -3750,7 +3750,7 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct CallbackFFISlice : IDisposable
+    public partial class CallbackFFISlice : IDisposable
     {
 
         public CallbackFFISlice() { }
@@ -3808,7 +3808,7 @@ namespace My.Company
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
-                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Callback = _managed?._ptr ?? IntPtr.Zero;
                 _unmanaged.Data = IntPtr.Zero;
                 return _unmanaged;
             }
@@ -3830,7 +3830,7 @@ namespace My.Company
     public delegate Vec3f32 CallbackHugeVecSliceNative(SliceVec3f32.Unmanaged slice, IntPtr callback_data); // 'True' native callback signature
     public delegate Vec3f32 CallbackHugeVecSliceDelegate(SliceVec3f32 slice); // Our C# signature
 
-    public partial struct CallbackHugeVecSlice
+    public partial class CallbackHugeVecSlice
     {
         private CallbackHugeVecSliceDelegate _managed; // C# callback
         private CallbackHugeVecSliceNative _native; // Native callback 
@@ -3839,7 +3839,7 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct CallbackHugeVecSlice : IDisposable
+    public partial class CallbackHugeVecSlice : IDisposable
     {
 
         public CallbackHugeVecSlice() { }
@@ -3897,7 +3897,7 @@ namespace My.Company
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
-                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Callback = _managed?._ptr ?? IntPtr.Zero;
                 _unmanaged.Data = IntPtr.Zero;
                 return _unmanaged;
             }
@@ -3919,7 +3919,7 @@ namespace My.Company
     public delegate void CallbackSliceMutNative(SliceMutU8.Unmanaged slice, IntPtr callback_data); // 'True' native callback signature
     public delegate void CallbackSliceMutDelegate(SliceMutU8 slice); // Our C# signature
 
-    public partial struct CallbackSliceMut
+    public partial class CallbackSliceMut
     {
         private CallbackSliceMutDelegate _managed; // C# callback
         private CallbackSliceMutNative _native; // Native callback 
@@ -3928,7 +3928,7 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct CallbackSliceMut : IDisposable
+    public partial class CallbackSliceMut : IDisposable
     {
 
         public CallbackSliceMut() { }
@@ -3986,7 +3986,7 @@ namespace My.Company
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
-                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Callback = _managed?._ptr ?? IntPtr.Zero;
                 _unmanaged.Data = IntPtr.Zero;
                 return _unmanaged;
             }
@@ -4008,7 +4008,7 @@ namespace My.Company
     public delegate byte CallbackU8Native(byte value, IntPtr callback_data); // 'True' native callback signature
     public delegate byte CallbackU8Delegate(byte value); // Our C# signature
 
-    public partial struct CallbackU8
+    public partial class CallbackU8
     {
         private CallbackU8Delegate _managed; // C# callback
         private CallbackU8Native _native; // Native callback 
@@ -4017,7 +4017,7 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct CallbackU8 : IDisposable
+    public partial class CallbackU8 : IDisposable
     {
 
         public CallbackU8() { }
@@ -4075,7 +4075,7 @@ namespace My.Company
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
-                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Callback = _managed?._ptr ?? IntPtr.Zero;
                 _unmanaged.Data = IntPtr.Zero;
                 return _unmanaged;
             }
@@ -4097,7 +4097,7 @@ namespace My.Company
     public delegate uint MyCallbackNative(uint value, IntPtr callback_data); // 'True' native callback signature
     public delegate uint MyCallbackDelegate(uint value); // Our C# signature
 
-    public partial struct MyCallback
+    public partial class MyCallback
     {
         private MyCallbackDelegate _managed; // C# callback
         private MyCallbackNative _native; // Native callback 
@@ -4106,7 +4106,7 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct MyCallback : IDisposable
+    public partial class MyCallback : IDisposable
     {
 
         public MyCallback() { }
@@ -4164,7 +4164,7 @@ namespace My.Company
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
-                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Callback = _managed?._ptr ?? IntPtr.Zero;
                 _unmanaged.Data = IntPtr.Zero;
                 return _unmanaged;
             }
@@ -4186,7 +4186,7 @@ namespace My.Company
     public delegate void MyCallbackContextualNative(IntPtr context, uint value, IntPtr callback_data); // 'True' native callback signature
     public delegate void MyCallbackContextualDelegate(IntPtr context, uint value); // Our C# signature
 
-    public partial struct MyCallbackContextual
+    public partial class MyCallbackContextual
     {
         private MyCallbackContextualDelegate _managed; // C# callback
         private MyCallbackContextualNative _native; // Native callback 
@@ -4195,7 +4195,7 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct MyCallbackContextual : IDisposable
+    public partial class MyCallbackContextual : IDisposable
     {
 
         public MyCallbackContextual() { }
@@ -4253,7 +4253,7 @@ namespace My.Company
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
-                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Callback = _managed?._ptr ?? IntPtr.Zero;
                 _unmanaged.Data = IntPtr.Zero;
                 return _unmanaged;
             }
@@ -4275,7 +4275,7 @@ namespace My.Company
     public delegate void MyCallbackVoidNative(IntPtr ptr, IntPtr callback_data); // 'True' native callback signature
     public delegate void MyCallbackVoidDelegate(IntPtr ptr); // Our C# signature
 
-    public partial struct MyCallbackVoid
+    public partial class MyCallbackVoid
     {
         private MyCallbackVoidDelegate _managed; // C# callback
         private MyCallbackVoidNative _native; // Native callback 
@@ -4284,7 +4284,7 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct MyCallbackVoid : IDisposable
+    public partial class MyCallbackVoid : IDisposable
     {
 
         public MyCallbackVoid() { }
@@ -4342,7 +4342,7 @@ namespace My.Company
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
-                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Callback = _managed?._ptr ?? IntPtr.Zero;
                 _unmanaged.Data = IntPtr.Zero;
                 return _unmanaged;
             }
@@ -4364,7 +4364,7 @@ namespace My.Company
     public delegate void SumDelegate1Native(IntPtr callback_data); // 'True' native callback signature
     public delegate void SumDelegate1Delegate(); // Our C# signature
 
-    public partial struct SumDelegate1
+    public partial class SumDelegate1
     {
         private SumDelegate1Delegate _managed; // C# callback
         private SumDelegate1Native _native; // Native callback 
@@ -4373,7 +4373,7 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct SumDelegate1 : IDisposable
+    public partial class SumDelegate1 : IDisposable
     {
 
         public SumDelegate1() { }
@@ -4431,7 +4431,7 @@ namespace My.Company
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
-                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Callback = _managed?._ptr ?? IntPtr.Zero;
                 _unmanaged.Data = IntPtr.Zero;
                 return _unmanaged;
             }
@@ -4453,7 +4453,7 @@ namespace My.Company
     public delegate int SumDelegate2Native(int x, int y, IntPtr callback_data); // 'True' native callback signature
     public delegate int SumDelegate2Delegate(int x, int y); // Our C# signature
 
-    public partial struct SumDelegate2
+    public partial class SumDelegate2
     {
         private SumDelegate2Delegate _managed; // C# callback
         private SumDelegate2Native _native; // Native callback 
@@ -4462,7 +4462,7 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct SumDelegate2 : IDisposable
+    public partial class SumDelegate2 : IDisposable
     {
 
         public SumDelegate2() { }
@@ -4520,7 +4520,7 @@ namespace My.Company
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
-                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Callback = _managed?._ptr ?? IntPtr.Zero;
                 _unmanaged.Data = IntPtr.Zero;
                 return _unmanaged;
             }
@@ -4542,7 +4542,7 @@ namespace My.Company
     public delegate FFIError SumDelegateReturnNative(int x, int y, IntPtr callback_data); // 'True' native callback signature
     public delegate FFIError SumDelegateReturnDelegate(int x, int y); // Our C# signature
 
-    public partial struct SumDelegateReturn
+    public partial class SumDelegateReturn
     {
         private SumDelegateReturnDelegate _managed; // C# callback
         private SumDelegateReturnNative _native; // Native callback 
@@ -4551,7 +4551,7 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct SumDelegateReturn : IDisposable
+    public partial class SumDelegateReturn : IDisposable
     {
 
         public SumDelegateReturn() { }
@@ -4609,7 +4609,7 @@ namespace My.Company
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
-                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Callback = _managed?._ptr ?? IntPtr.Zero;
                 _unmanaged.Data = IntPtr.Zero;
                 return _unmanaged;
             }
@@ -4631,7 +4631,7 @@ namespace My.Company
     public delegate void SumDelegateReturn2Native(int x, int y, IntPtr callback_data); // 'True' native callback signature
     public delegate void SumDelegateReturn2Delegate(int x, int y); // Our C# signature
 
-    public partial struct SumDelegateReturn2
+    public partial class SumDelegateReturn2
     {
         private SumDelegateReturn2Delegate _managed; // C# callback
         private SumDelegateReturn2Native _native; // Native callback 
@@ -4640,7 +4640,7 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct SumDelegateReturn2 : IDisposable
+    public partial class SumDelegateReturn2 : IDisposable
     {
 
         public SumDelegateReturn2() { }
@@ -4698,7 +4698,7 @@ namespace My.Company
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
-                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Callback = _managed?._ptr ?? IntPtr.Zero;
                 _unmanaged.Data = IntPtr.Zero;
                 return _unmanaged;
             }

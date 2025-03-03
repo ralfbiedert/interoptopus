@@ -71,7 +71,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     //
     // Write the attribute and struct declaration without manual spaces.
 
-    indented!(w, r"public partial struct {}", name)?;
+    indented!(w, r"public partial class {}", name)?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"private {}Delegate _managed; // C# callback", name)?;
     indented!(w, [()], r"private {}Native _native; // Native callback ", name)?;
@@ -80,7 +80,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, r"}}")?;
     w.newline()?;
     indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
-    indented!(w, r"public partial struct {} : IDisposable", name)?;
+    indented!(w, r"public partial class {} : IDisposable", name)?;
     indented!(w, r"{{")?;
     w.newline()?;
     indented!(w, [()], r"public {}() {{ }}", name)?;
@@ -148,7 +148,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()()], r"public Unmanaged ToUnmanaged()")?;
     indented!(w, [()()], r"{{")?;
     indented!(w, [()()()], r"_unmanaged = new Unmanaged();")?;
-    indented!(w, [()()()], r"_unmanaged.Callback = _managed._ptr;")?;
+    indented!(w, [()()()], r"_unmanaged.Callback = _managed?._ptr ?? IntPtr.Zero;")?;
     indented!(w, [()()()], r"_unmanaged.Data = IntPtr.Zero;")?;
     indented!(w, [()()()], r"return _unmanaged;")?;
     indented!(w, [()()], r"}}")?;

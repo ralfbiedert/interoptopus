@@ -1096,7 +1096,7 @@ namespace My.Company.Common
     public delegate uint MyCallbackNamespacedNative(uint value, IntPtr callback_data); // 'True' native callback signature
     public delegate uint MyCallbackNamespacedDelegate(uint value); // Our C# signature
 
-    public partial struct MyCallbackNamespaced
+    public partial class MyCallbackNamespaced
     {
         private MyCallbackNamespacedDelegate _managed; // C# callback
         private MyCallbackNamespacedNative _native; // Native callback 
@@ -1105,7 +1105,7 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct MyCallbackNamespaced : IDisposable
+    public partial class MyCallbackNamespaced : IDisposable
     {
 
         public MyCallbackNamespaced() { }
@@ -1163,7 +1163,7 @@ namespace My.Company.Common
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
-                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Callback = _managed?._ptr ?? IntPtr.Zero;
                 _unmanaged.Data = IntPtr.Zero;
                 return _unmanaged;
             }
