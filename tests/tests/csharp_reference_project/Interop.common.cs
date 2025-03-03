@@ -56,20 +56,16 @@ namespace My.Company.Common
             public void FromManaged(Vec managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var x = _managed.x;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var z = _managed.z;
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    x = x,
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    z = z,
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.x = _managed.x;
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.z = _managed.z;
+
+                return _unmanaged;
             }
 
             public unsafe Vec ToManaged() => new Vec();
@@ -1014,20 +1010,17 @@ namespace My.Company.Common
             public void FromManaged(OptionVec managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var t = new Vec.Marshaller(_managed.t);
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var is_some = _managed.is_some;
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    t = t.ToUnmanaged(),
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    is_some = is_some,
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _t = new Vec.Marshaller(_managed.t);
+                _unmanaged.t = _t.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.is_some = _managed.is_some;
+
+                return _unmanaged;
             }
 
             public unsafe OptionVec ToManaged() => new OptionVec();

@@ -28,6 +28,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "start_server")]
         public static partial void start_server([MarshalAs(UnmanagedType.LPStr)] string server_name);
 
+
         /// Destroys the given instance.
         ///
         /// # Safety
@@ -37,14 +38,18 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "game_engine_destroy")]
         public static partial FFIError game_engine_destroy(ref IntPtr context);
 
+
         [LibraryImport(NativeLib, EntryPoint = "game_engine_new")]
         public static partial FFIError game_engine_new(ref IntPtr context);
+
 
         [LibraryImport(NativeLib, EntryPoint = "game_engine_place_object")]
         public static partial FFIError game_engine_place_object(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position);
 
+
         [LibraryImport(NativeLib, EntryPoint = "game_engine_num_objects")]
         public static partial uint game_engine_num_objects(IntPtr context);
+
 
     }
 
@@ -71,43 +76,27 @@ namespace My.Company
 
         public ref struct Marshaller
         {
+            private Vec2 _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(Vec2 managed) { _managed = managed; }
+
             // TODO, we have to fix this marshalling type
-            public void FromManaged(Vec2 managed) { }
-            public Unmanaged ToUnmanaged() => new Unmanaged {  };
-            public void FromUnmanaged(Unmanaged unmanaged) { }
+            public void FromManaged(Vec2 managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+
+                _unmanaged.x = _managed.x;
+                _unmanaged.y = _managed.y;
+
+                return _unmanaged;
+            }
+
             public unsafe Vec2 ToManaged() => new Vec2();
             public void Free() { }
-
-            public static Unmanaged ConvertToUnmanaged(Vec2 managed)
-            {
-                var result = new Unmanaged
-                {
-                    x = managed.x,
-                    y = managed.y,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
-            public static Vec2 ConvertToManaged(Unmanaged unmanaged)
-            {
-                var result = new Vec2()
-                {
-                    x = unmanaged.x,
-                    y = unmanaged.y,
-                };
-
-                unsafe
-                {
-                }
-
-                return result;
-            }
-
         }
     }
 

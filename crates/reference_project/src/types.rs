@@ -1,10 +1,9 @@
 //! All supported type patterns.
 
-use interoptopus::lang::c::{ArrayType, CType};
+use interoptopus::lang::c::CType;
 use interoptopus::lang::rust::CTypeInfo;
 use interoptopus::patterns::slice::FFISlice;
 use interoptopus::patterns::string::CStrPointer;
-use interoptopus::patterns::TypePattern;
 use interoptopus::{callback, ffi_type};
 use std::fmt::Debug;
 use std::marker::PhantomData;
@@ -100,17 +99,18 @@ pub struct NestedArray {
     pub field_struct: Array,
 }
 
-#[repr(transparent)]
+// #[repr(transparent)]
+#[ffi_type]
 #[derive(Copy, Clone, Debug)]
 pub struct FixedString<const N: usize> {
     pub data: [u8; N],
 }
 
-unsafe impl<const N: usize> CTypeInfo for FixedString<N> {
-    fn type_info() -> CType {
-        CType::Array(ArrayType::new(CType::Pattern(TypePattern::CChar), N))
-    }
-}
+// unsafe impl<const N: usize> CTypeInfo for FixedString<N> {
+//     fn type_info() -> CType {
+//         CType::Array(ArrayType::new(CType::Pattern(TypePattern::CChar), N))
+//     }
+// }
 
 #[ffi_type]
 #[derive(Copy, Clone)]

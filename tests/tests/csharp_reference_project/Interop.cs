@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 10198333809987967799ul)
+            if (api_version != 13279506127017047779ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10198333809987967799). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (13279506127017047779). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -1427,16 +1427,19 @@ namespace My.Company
             public void FromManaged(Array managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var data = new TODO.Marshaller(_managed.data);
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                fixed(byte* _fixed = _unmanaged.data)
                 {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    data = data.ToUnmanaged(),
-                };
+                    var src = new ReadOnlySpan<byte>(_managed.data, 0, Math.Min(16, _managed.data.Length));
+                    var dst = new Span<byte>(_fixed, 16);
+                    src.CopyTo(dst);
+                }
+
+                return _unmanaged;
             }
 
             public unsafe Array ToManaged() => new Array();
@@ -1477,16 +1480,14 @@ namespace My.Company
             public void FromManaged(BoolField managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var val = _managed.val;
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    val = (sbyte) (val ? 1 : 0),
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.val = (sbyte) (_managed.val ? 1 : 0);
+
+                return _unmanaged;
             }
 
             public unsafe BoolField ToManaged() => new BoolField();
@@ -1499,8 +1500,8 @@ namespace My.Company
     [StructLayout(LayoutKind.Sequential)]
     public partial struct CharArray
     {
-        public string str;
-        public string str_2;
+        public FixedString str;
+        public FixedString str_2;
     }
 
     // Debug - write_type_definition_composite_marshaller 
@@ -1511,9 +1512,9 @@ namespace My.Company
         public unsafe struct Unmanaged
         {
             // Debug - write_type_definition_composite_unmanaged_body_field 
-            public fixed byte str[32];
+            public FixedString.Unmanaged str;
             // Debug - write_type_definition_composite_unmanaged_body_field 
-            public fixed byte str_2[32];
+            public FixedString.Unmanaged str_2;
         }
 
         [CustomMarshaller(typeof(CharArray), MarshalMode.Default, typeof(Marshaller))]
@@ -1530,20 +1531,18 @@ namespace My.Company
             public void FromManaged(CharArray managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var str = new TODO.Marshaller(_managed.str);
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var str_2 = new TODO.Marshaller(_managed.str_2);
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    str = str.ToUnmanaged(),
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    str_2 = str_2.ToUnmanaged(),
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _str = new FixedString.Marshaller(_managed.str);
+                _unmanaged.str = _str.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _str_2 = new FixedString.Marshaller(_managed.str_2);
+                _unmanaged.str_2 = _str_2.ToUnmanaged();
+
+                return _unmanaged;
             }
 
             public unsafe CharArray ToManaged() => new CharArray();
@@ -1584,16 +1583,15 @@ namespace My.Company
             public void FromManaged(Container managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var foreign = new Local.Marshaller(_managed.foreign);
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    foreign = foreign.ToUnmanaged(),
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _foreign = new Local.Marshaller(_managed.foreign);
+                _unmanaged.foreign = _foreign.ToUnmanaged();
+
+                return _unmanaged;
             }
 
             public unsafe Container ToManaged() => new Container();
@@ -1655,44 +1653,36 @@ namespace My.Company
             public void FromManaged(DelegateTable managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var my_callback = new MyCallback.Marshaller(_managed.my_callback);
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var my_callback_namespaced = new MyCallbackNamespaced.Marshaller(_managed.my_callback_namespaced);
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var my_callback_void = new MyCallbackVoid.Marshaller(_managed.my_callback_void);
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var my_callback_contextual = new MyCallbackContextual.Marshaller(_managed.my_callback_contextual);
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var sum_delegate_1 = new SumDelegate1.Marshaller(_managed.sum_delegate_1);
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var sum_delegate_2 = new SumDelegate2.Marshaller(_managed.sum_delegate_2);
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var sum_delegate_return = new SumDelegateReturn.Marshaller(_managed.sum_delegate_return);
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var sum_delegate_return_2 = new SumDelegateReturn2.Marshaller(_managed.sum_delegate_return_2);
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    my_callback = my_callback.ToUnmanaged(),
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    my_callback_namespaced = my_callback_namespaced.ToUnmanaged(),
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    my_callback_void = my_callback_void.ToUnmanaged(),
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    my_callback_contextual = my_callback_contextual.ToUnmanaged(),
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    sum_delegate_1 = sum_delegate_1.ToUnmanaged(),
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    sum_delegate_2 = sum_delegate_2.ToUnmanaged(),
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    sum_delegate_return = sum_delegate_return.ToUnmanaged(),
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    sum_delegate_return_2 = sum_delegate_return_2.ToUnmanaged(),
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _my_callback = new MyCallback.Marshaller(_managed.my_callback);
+                _unmanaged.my_callback = _my_callback.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _my_callback_namespaced = new MyCallbackNamespaced.Marshaller(_managed.my_callback_namespaced);
+                _unmanaged.my_callback_namespaced = _my_callback_namespaced.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _my_callback_void = new MyCallbackVoid.Marshaller(_managed.my_callback_void);
+                _unmanaged.my_callback_void = _my_callback_void.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _my_callback_contextual = new MyCallbackContextual.Marshaller(_managed.my_callback_contextual);
+                _unmanaged.my_callback_contextual = _my_callback_contextual.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _sum_delegate_1 = new SumDelegate1.Marshaller(_managed.sum_delegate_1);
+                _unmanaged.sum_delegate_1 = _sum_delegate_1.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _sum_delegate_2 = new SumDelegate2.Marshaller(_managed.sum_delegate_2);
+                _unmanaged.sum_delegate_2 = _sum_delegate_2.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _sum_delegate_return = new SumDelegateReturn.Marshaller(_managed.sum_delegate_return);
+                _unmanaged.sum_delegate_return = _sum_delegate_return.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _sum_delegate_return_2 = new SumDelegateReturn2.Marshaller(_managed.sum_delegate_return_2);
+                _unmanaged.sum_delegate_return_2 = _sum_delegate_return_2.ToUnmanaged();
+
+                return _unmanaged;
             }
 
             public unsafe DelegateTable ToManaged() => new DelegateTable();
@@ -1733,19 +1723,70 @@ namespace My.Company
             public void FromManaged(ExtraTypef32 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var x = _managed.x;
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    x = x,
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.x = _managed.x;
+
+                return _unmanaged;
             }
 
             public unsafe ExtraTypef32 ToManaged() => new ExtraTypef32();
+            public void Free() { }
+        }
+    }
+
+    // Debug - write_type_definition_composite 
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct FixedString
+    {
+        public byte[] data;
+    }
+
+    // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct FixedString
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public fixed byte data[32];
+        }
+
+        [CustomMarshaller(typeof(FixedString), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private FixedString _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(FixedString managed) { _managed = managed; }
+
+            // TODO, we have to fix this marshalling type
+            public void FromManaged(FixedString managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                fixed(byte* _fixed = _unmanaged.data)
+                {
+                    var src = new ReadOnlySpan<byte>(_managed.data, 0, Math.Min(32, _managed.data.Length));
+                    var dst = new Span<byte>(_fixed, 32);
+                    src.CopyTo(dst);
+                }
+
+                return _unmanaged;
+            }
+
+            public unsafe FixedString ToManaged() => new FixedString();
             public void Free() { }
         }
     }
@@ -1783,16 +1824,14 @@ namespace My.Company
             public void FromManaged(Genericu32 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var x = new IntPtr.Marshaller(_managed.x);
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    x = x.ToUnmanaged(),
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.x = _managed.x;
+
+                return _unmanaged;
             }
 
             public unsafe Genericu32 ToManaged() => new Genericu32();
@@ -1833,16 +1872,14 @@ namespace My.Company
             public void FromManaged(Genericu8 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var x = new IntPtr.Marshaller(_managed.x);
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    x = x.ToUnmanaged(),
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.x = _managed.x;
+
+                return _unmanaged;
             }
 
             public unsafe Genericu8 ToManaged() => new Genericu8();
@@ -1883,16 +1920,14 @@ namespace My.Company
             public void FromManaged(Inner managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var x = _managed.x;
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    x = x,
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.x = _managed.x;
+
+                return _unmanaged;
             }
 
             public unsafe Inner ToManaged() => new Inner();
@@ -1933,16 +1968,14 @@ namespace My.Company
             public void FromManaged(Local managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var x = _managed.x;
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    x = x,
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.x = _managed.x;
+
+                return _unmanaged;
             }
 
             public unsafe Local ToManaged() => new Local();
@@ -2001,40 +2034,38 @@ namespace My.Company
             public void FromManaged(NestedArray managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var field_enum = _managed.field_enum;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var field_vec = new Vec3f32.Marshaller(_managed.field_vec);
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var field_bool = _managed.field_bool;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var field_int = _managed.field_int;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var field_array = new TODO.Marshaller(_managed.field_array);
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var field_array_2 = new TODO.Marshaller(_managed.field_array_2);
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var field_struct = new Array.Marshaller(_managed.field_struct);
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.field_enum = _managed.field_enum;
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _field_vec = new Vec3f32.Marshaller(_managed.field_vec);
+                _unmanaged.field_vec = _field_vec.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.field_bool = (sbyte) (_managed.field_bool ? 1 : 0);
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.field_int = _managed.field_int;
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                fixed(ushort* _fixed = _unmanaged.field_array)
                 {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    field_enum = field_enum,
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    field_vec = field_vec.ToUnmanaged(),
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    field_bool = (sbyte) (field_bool ? 1 : 0),
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    field_int = field_int,
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    field_array = field_array.ToUnmanaged(),
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    field_array_2 = field_array_2.ToUnmanaged(),
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    field_struct = field_struct.ToUnmanaged(),
-                };
+                    var src = new ReadOnlySpan<ushort>(_managed.field_array, 0, Math.Min(5, _managed.field_array.Length));
+                    var dst = new Span<ushort>(_fixed, 5);
+                    src.CopyTo(dst);
+                }
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                fixed(ushort* _fixed = _unmanaged.field_array_2)
+                {
+                    var src = new ReadOnlySpan<ushort>(_managed.field_array_2, 0, Math.Min(5, _managed.field_array_2.Length));
+                    var dst = new Span<ushort>(_fixed, 5);
+                    src.CopyTo(dst);
+                }
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _field_struct = new Array.Marshaller(_managed.field_struct);
+                _unmanaged.field_struct = _field_struct.ToUnmanaged();
+
+                return _unmanaged;
             }
 
             public unsafe NestedArray ToManaged() => new NestedArray();
@@ -2078,20 +2109,16 @@ namespace My.Company
             public void FromManaged(Packed1 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var x = _managed.x;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var y = _managed.y;
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    x = x,
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    y = y,
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.x = _managed.x;
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.y = _managed.y;
+
+                return _unmanaged;
             }
 
             public unsafe Packed1 ToManaged() => new Packed1();
@@ -2135,20 +2162,16 @@ namespace My.Company
             public void FromManaged(Packed2 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var y = _managed.y;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var x = _managed.x;
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    y = y,
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    x = x,
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.y = _managed.y;
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.x = _managed.x;
+
+                return _unmanaged;
             }
 
             public unsafe Packed2 ToManaged() => new Packed2();
@@ -2189,16 +2212,14 @@ namespace My.Company
             public void FromManaged(Phantomu8 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var x = _managed.x;
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    x = x,
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.x = _managed.x;
+
+                return _unmanaged;
             }
 
             public unsafe Phantomu8 ToManaged() => new Phantomu8();
@@ -2241,16 +2262,14 @@ namespace My.Company
             public void FromManaged(StructDocumented managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var x = _managed.x;
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    x = x,
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.x = _managed.x;
+
+                return _unmanaged;
             }
 
             public unsafe StructDocumented ToManaged() => new StructDocumented();
@@ -2291,16 +2310,14 @@ namespace My.Company
             public void FromManaged(StructRenamed managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var e = _managed.e;
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    e = e,
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.e = _managed.e;
+
+                return _unmanaged;
             }
 
             public unsafe StructRenamed ToManaged() => new StructRenamed();
@@ -2341,16 +2358,14 @@ namespace My.Company
             public void FromManaged(Tupled managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var x0 = _managed.x0;
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    x0 = x0,
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.x0 = _managed.x0;
+
+                return _unmanaged;
             }
 
             public unsafe Tupled ToManaged() => new Tupled();
@@ -2391,16 +2406,15 @@ namespace My.Company
             public void FromManaged(UseAsciiStringPattern managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var ascii_string = new string.Marshaller(_managed.ascii_string);
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    ascii_string = ascii_string.ToUnmanaged(),
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _ascii_string = Marshal.StringToHGlobalAnsi(_managed.ascii_string);
+                _unmanaged.ascii_string = _ascii_string;
+
+                return _unmanaged;
             }
 
             public unsafe UseAsciiStringPattern ToManaged() => new UseAsciiStringPattern();
@@ -2444,20 +2458,16 @@ namespace My.Company
             public void FromManaged(Vec1 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var x = _managed.x;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var y = _managed.y;
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    x = x,
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    y = y,
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.x = _managed.x;
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.y = _managed.y;
+
+                return _unmanaged;
             }
 
             public unsafe Vec1 ToManaged() => new Vec1();
@@ -2501,20 +2511,16 @@ namespace My.Company
             public void FromManaged(Vec2 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var x = _managed.x;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var z = _managed.z;
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    x = x,
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    z = z,
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.x = _managed.x;
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.z = _managed.z;
+
+                return _unmanaged;
             }
 
             public unsafe Vec2 ToManaged() => new Vec2();
@@ -2561,24 +2567,18 @@ namespace My.Company
             public void FromManaged(Vec3f32 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var x = _managed.x;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var y = _managed.y;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var z = _managed.z;
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    x = x,
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    y = y,
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    z = z,
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.x = _managed.x;
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.y = _managed.y;
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.z = _managed.z;
+
+                return _unmanaged;
             }
 
             public unsafe Vec3f32 ToManaged() => new Vec3f32();
@@ -2622,20 +2622,16 @@ namespace My.Company
             public void FromManaged(Visibility1 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var pblc = _managed.pblc;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var prvt = _managed.prvt;
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    pblc = pblc,
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    prvt = prvt,
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.pblc = _managed.pblc;
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.prvt = _managed.prvt;
+
+                return _unmanaged;
             }
 
             public unsafe Visibility1 ToManaged() => new Visibility1();
@@ -2679,20 +2675,16 @@ namespace My.Company
             public void FromManaged(Visibility2 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var pblc1 = _managed.pblc1;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var pblc2 = _managed.pblc2;
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    pblc1 = pblc1,
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    pblc2 = pblc2,
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.pblc1 = _managed.pblc1;
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.pblc2 = _managed.pblc2;
+
+                return _unmanaged;
             }
 
             public unsafe Visibility2 ToManaged() => new Visibility2();
@@ -2733,16 +2725,14 @@ namespace My.Company
             public void FromManaged(Weird1u32 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var x = _managed.x;
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    x = x,
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.x = _managed.x;
+
+                return _unmanaged;
             }
 
             public unsafe Weird1u32 ToManaged() => new Weird1u32();
@@ -2789,24 +2779,23 @@ namespace My.Company
             public void FromManaged(Weird2u8 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var t = _managed.t;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var a = new TODO.Marshaller(_managed.a);
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var r = new IntPtr.Marshaller(_managed.r);
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.t = _managed.t;
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                fixed(byte* _fixed = _unmanaged.a)
                 {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    t = t,
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    a = a.ToUnmanaged(),
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    r = r.ToUnmanaged(),
-                };
+                    var src = new ReadOnlySpan<byte>(_managed.a, 0, Math.Min(5, _managed.a.Length));
+                    var dst = new Span<byte>(_fixed, 5);
+                    src.CopyTo(dst);
+                }
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.r = _managed.r;
+
+                return _unmanaged;
             }
 
             public unsafe Weird2u8 ToManaged() => new Weird2u8();
@@ -3205,20 +3194,17 @@ namespace My.Company
             public void FromManaged(OptionInner managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var t = new Inner.Marshaller(_managed.t);
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var is_some = _managed.is_some;
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    t = t.ToUnmanaged(),
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    is_some = is_some,
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _t = new Inner.Marshaller(_managed.t);
+                _unmanaged.t = _t.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.is_some = _managed.is_some;
+
+                return _unmanaged;
             }
 
             public unsafe OptionInner ToManaged() => new OptionInner();
@@ -3287,20 +3273,16 @@ namespace My.Company
             public void FromManaged(ResultU64 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public Unmanaged ToUnmanaged()
+            public unsafe Unmanaged ToUnmanaged()
             {;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var t = _managed.t;
-                // Debug - write_type_definition_composite_marshaller_field_wrapper 
-                var err = new FFIError.Marshaller(_managed.err);
+                _unmanaged = new Unmanaged();
 
-                return new Unmanaged()
-                {
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    t = t,
-                    // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                    err = err.ToUnmanaged(),
-                };
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.t = _managed.t;
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.err = _managed.err;
+
+                return _unmanaged;
             }
 
             public unsafe ResultU64 ToManaged() => new ResultU64();
