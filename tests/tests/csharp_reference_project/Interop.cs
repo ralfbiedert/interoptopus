@@ -1422,8 +1422,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(Array managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(Array managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -1434,7 +1434,9 @@ namespace My.Company
                 // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
                 fixed(byte* _fixed = _unmanaged.data)
                 {
-                    var src = new ReadOnlySpan<byte>(_managed.data, 0, Math.Min(16, _managed.data.Length));
+                    if (_managed.data == null) { throw new InvalidOperationException("Array 'data' must not be null"); }
+                    if (_managed.data.Length != 16) { throw new InvalidOperationException("Array size mismatch for 'data'"); }
+                    var src = new ReadOnlySpan<byte>(_managed.data, 0, 16);
                     var dst = new Span<byte>(_fixed, 16);
                     src.CopyTo(dst);
                 }
@@ -1442,7 +1444,21 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe Array ToManaged() => new Array();
+            public unsafe Array ToManaged()
+            {
+                _managed = new Array();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                fixed(byte* _fixed = _unmanaged.data)
+                {
+                    _managed.data = new byte[16];
+                    var src = new ReadOnlySpan<byte>(_fixed, 16);
+                    var dst = new Span<byte>(_managed.data, 0, 16);
+                    src.CopyTo(dst);
+                }
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -1475,8 +1491,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(BoolField managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(BoolField managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -1490,7 +1506,15 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe BoolField ToManaged() => new BoolField();
+            public unsafe BoolField ToManaged()
+            {
+                _managed = new BoolField();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.val = _unmanaged.val == 1 ? true : false;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -1526,8 +1550,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(CharArray managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(CharArray managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -1545,7 +1569,19 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe CharArray ToManaged() => new CharArray();
+            public unsafe CharArray ToManaged()
+            {
+                _managed = new CharArray();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _str = new FixedString.Marshaller(_unmanaged.str);
+                _managed.str = _str.ToManaged();
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _str_2 = new FixedString.Marshaller(_unmanaged.str_2);
+                _managed.str_2 = _str_2.ToManaged();
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -1578,8 +1614,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(Container managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(Container managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -1594,7 +1630,16 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe Container ToManaged() => new Container();
+            public unsafe Container ToManaged()
+            {
+                _managed = new Container();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _foreign = new Local.Marshaller(_unmanaged.foreign);
+                _managed.foreign = _foreign.ToManaged();
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -1648,8 +1693,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(DelegateTable managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(DelegateTable managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -1685,7 +1730,37 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe DelegateTable ToManaged() => new DelegateTable();
+            public unsafe DelegateTable ToManaged()
+            {
+                _managed = new DelegateTable();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _my_callback = new MyCallback.Marshaller(_unmanaged.my_callback);
+                _managed.my_callback = _my_callback.ToManaged();
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _my_callback_namespaced = new MyCallbackNamespaced.Marshaller(_unmanaged.my_callback_namespaced);
+                _managed.my_callback_namespaced = _my_callback_namespaced.ToManaged();
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _my_callback_void = new MyCallbackVoid.Marshaller(_unmanaged.my_callback_void);
+                _managed.my_callback_void = _my_callback_void.ToManaged();
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _my_callback_contextual = new MyCallbackContextual.Marshaller(_unmanaged.my_callback_contextual);
+                _managed.my_callback_contextual = _my_callback_contextual.ToManaged();
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _sum_delegate_1 = new SumDelegate1.Marshaller(_unmanaged.sum_delegate_1);
+                _managed.sum_delegate_1 = _sum_delegate_1.ToManaged();
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _sum_delegate_2 = new SumDelegate2.Marshaller(_unmanaged.sum_delegate_2);
+                _managed.sum_delegate_2 = _sum_delegate_2.ToManaged();
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _sum_delegate_return = new SumDelegateReturn.Marshaller(_unmanaged.sum_delegate_return);
+                _managed.sum_delegate_return = _sum_delegate_return.ToManaged();
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _sum_delegate_return_2 = new SumDelegateReturn2.Marshaller(_unmanaged.sum_delegate_return_2);
+                _managed.sum_delegate_return_2 = _sum_delegate_return_2.ToManaged();
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -1718,8 +1793,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(ExtraTypef32 managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(ExtraTypef32 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -1733,7 +1808,15 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ExtraTypef32 ToManaged() => new ExtraTypef32();
+            public unsafe ExtraTypef32 ToManaged()
+            {
+                _managed = new ExtraTypef32();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.x = _unmanaged.x;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -1766,8 +1849,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(FixedString managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(FixedString managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -1778,7 +1861,9 @@ namespace My.Company
                 // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
                 fixed(byte* _fixed = _unmanaged.data)
                 {
-                    var src = new ReadOnlySpan<byte>(_managed.data, 0, Math.Min(32, _managed.data.Length));
+                    if (_managed.data == null) { throw new InvalidOperationException("Array 'data' must not be null"); }
+                    if (_managed.data.Length != 32) { throw new InvalidOperationException("Array size mismatch for 'data'"); }
+                    var src = new ReadOnlySpan<byte>(_managed.data, 0, 32);
                     var dst = new Span<byte>(_fixed, 32);
                     src.CopyTo(dst);
                 }
@@ -1786,7 +1871,21 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe FixedString ToManaged() => new FixedString();
+            public unsafe FixedString ToManaged()
+            {
+                _managed = new FixedString();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                fixed(byte* _fixed = _unmanaged.data)
+                {
+                    _managed.data = new byte[32];
+                    var src = new ReadOnlySpan<byte>(_fixed, 32);
+                    var dst = new Span<byte>(_managed.data, 0, 32);
+                    src.CopyTo(dst);
+                }
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -1819,8 +1918,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(Genericu32 managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(Genericu32 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -1834,7 +1933,15 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe Genericu32 ToManaged() => new Genericu32();
+            public unsafe Genericu32 ToManaged()
+            {
+                _managed = new Genericu32();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.x = _unmanaged.x;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -1867,8 +1974,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(Genericu8 managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(Genericu8 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -1882,7 +1989,15 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe Genericu8 ToManaged() => new Genericu8();
+            public unsafe Genericu8 ToManaged()
+            {
+                _managed = new Genericu8();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.x = _unmanaged.x;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -1915,8 +2030,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(Inner managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(Inner managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -1930,7 +2045,15 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe Inner ToManaged() => new Inner();
+            public unsafe Inner ToManaged()
+            {
+                _managed = new Inner();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.x = _unmanaged.x;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -1963,8 +2086,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(Local managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(Local managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -1978,7 +2101,15 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe Local ToManaged() => new Local();
+            public unsafe Local ToManaged()
+            {
+                _managed = new Local();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.x = _unmanaged.x;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -2029,8 +2160,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(NestedArray managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(NestedArray managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -2050,14 +2181,18 @@ namespace My.Company
                 // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
                 fixed(ushort* _fixed = _unmanaged.field_array)
                 {
-                    var src = new ReadOnlySpan<ushort>(_managed.field_array, 0, Math.Min(5, _managed.field_array.Length));
+                    if (_managed.field_array == null) { throw new InvalidOperationException("Array 'field_array' must not be null"); }
+                    if (_managed.field_array.Length != 5) { throw new InvalidOperationException("Array size mismatch for 'field_array'"); }
+                    var src = new ReadOnlySpan<ushort>(_managed.field_array, 0, 5);
                     var dst = new Span<ushort>(_fixed, 5);
                     src.CopyTo(dst);
                 }
                 // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
                 fixed(ushort* _fixed = _unmanaged.field_array_2)
                 {
-                    var src = new ReadOnlySpan<ushort>(_managed.field_array_2, 0, Math.Min(5, _managed.field_array_2.Length));
+                    if (_managed.field_array_2 == null) { throw new InvalidOperationException("Array 'field_array_2' must not be null"); }
+                    if (_managed.field_array_2.Length != 5) { throw new InvalidOperationException("Array size mismatch for 'field_array_2'"); }
+                    var src = new ReadOnlySpan<ushort>(_managed.field_array_2, 0, 5);
                     var dst = new Span<ushort>(_fixed, 5);
                     src.CopyTo(dst);
                 }
@@ -2068,7 +2203,41 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe NestedArray ToManaged() => new NestedArray();
+            public unsafe NestedArray ToManaged()
+            {
+                _managed = new NestedArray();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.field_enum = _unmanaged.field_enum;
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _field_vec = new Vec3f32.Marshaller(_unmanaged.field_vec);
+                _managed.field_vec = _field_vec.ToManaged();
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.field_bool = _unmanaged.field_bool == 1 ? true : false;
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.field_int = _unmanaged.field_int;
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                fixed(ushort* _fixed = _unmanaged.field_array)
+                {
+                    _managed.field_array = new ushort[5];
+                    var src = new ReadOnlySpan<ushort>(_fixed, 5);
+                    var dst = new Span<ushort>(_managed.field_array, 0, 5);
+                    src.CopyTo(dst);
+                }
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                fixed(ushort* _fixed = _unmanaged.field_array_2)
+                {
+                    _managed.field_array_2 = new ushort[5];
+                    var src = new ReadOnlySpan<ushort>(_fixed, 5);
+                    var dst = new Span<ushort>(_managed.field_array_2, 0, 5);
+                    src.CopyTo(dst);
+                }
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _field_struct = new Array.Marshaller(_unmanaged.field_struct);
+                _managed.field_struct = _field_struct.ToManaged();
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -2104,8 +2273,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(Packed1 managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(Packed1 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -2121,7 +2290,17 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe Packed1 ToManaged() => new Packed1();
+            public unsafe Packed1 ToManaged()
+            {
+                _managed = new Packed1();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.x = _unmanaged.x;
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.y = _unmanaged.y;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -2157,8 +2336,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(Packed2 managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(Packed2 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -2174,7 +2353,17 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe Packed2 ToManaged() => new Packed2();
+            public unsafe Packed2 ToManaged()
+            {
+                _managed = new Packed2();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.y = _unmanaged.y;
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.x = _unmanaged.x;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -2207,8 +2396,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(Phantomu8 managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(Phantomu8 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -2222,7 +2411,15 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe Phantomu8 ToManaged() => new Phantomu8();
+            public unsafe Phantomu8 ToManaged()
+            {
+                _managed = new Phantomu8();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.x = _unmanaged.x;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -2257,8 +2454,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(StructDocumented managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(StructDocumented managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -2272,7 +2469,15 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe StructDocumented ToManaged() => new StructDocumented();
+            public unsafe StructDocumented ToManaged()
+            {
+                _managed = new StructDocumented();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.x = _unmanaged.x;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -2305,8 +2510,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(StructRenamed managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(StructRenamed managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -2320,7 +2525,15 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe StructRenamed ToManaged() => new StructRenamed();
+            public unsafe StructRenamed ToManaged()
+            {
+                _managed = new StructRenamed();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.e = _unmanaged.e;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -2353,8 +2566,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(Tupled managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(Tupled managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -2368,7 +2581,15 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe Tupled ToManaged() => new Tupled();
+            public unsafe Tupled ToManaged()
+            {
+                _managed = new Tupled();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.x0 = _unmanaged.x0;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -2401,8 +2622,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(UseAsciiStringPattern managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(UseAsciiStringPattern managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -2411,13 +2632,20 @@ namespace My.Company
                 _unmanaged = new Unmanaged();
 
                 // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                var _ascii_string = Marshal.StringToHGlobalAnsi(_managed.ascii_string);
-                _unmanaged.ascii_string = _ascii_string;
+                _unmanaged.ascii_string = Marshal.StringToHGlobalAnsi(_managed.ascii_string);
 
                 return _unmanaged;
             }
 
-            public unsafe UseAsciiStringPattern ToManaged() => new UseAsciiStringPattern();
+            public unsafe UseAsciiStringPattern ToManaged()
+            {
+                _managed = new UseAsciiStringPattern();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.ascii_string = Marshal.PtrToStringAnsi(_unmanaged.ascii_string);
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -2453,8 +2681,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(Vec1 managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(Vec1 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -2470,7 +2698,17 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe Vec1 ToManaged() => new Vec1();
+            public unsafe Vec1 ToManaged()
+            {
+                _managed = new Vec1();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.x = _unmanaged.x;
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.y = _unmanaged.y;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -2506,8 +2744,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(Vec2 managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(Vec2 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -2523,7 +2761,17 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe Vec2 ToManaged() => new Vec2();
+            public unsafe Vec2 ToManaged()
+            {
+                _managed = new Vec2();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.x = _unmanaged.x;
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.z = _unmanaged.z;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -2562,8 +2810,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(Vec3f32 managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(Vec3f32 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -2581,7 +2829,19 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe Vec3f32 ToManaged() => new Vec3f32();
+            public unsafe Vec3f32 ToManaged()
+            {
+                _managed = new Vec3f32();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.x = _unmanaged.x;
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.y = _unmanaged.y;
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.z = _unmanaged.z;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -2617,8 +2877,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(Visibility1 managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(Visibility1 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -2634,7 +2894,17 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe Visibility1 ToManaged() => new Visibility1();
+            public unsafe Visibility1 ToManaged()
+            {
+                _managed = new Visibility1();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.pblc = _unmanaged.pblc;
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.prvt = _unmanaged.prvt;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -2670,8 +2940,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(Visibility2 managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(Visibility2 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -2687,7 +2957,17 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe Visibility2 ToManaged() => new Visibility2();
+            public unsafe Visibility2 ToManaged()
+            {
+                _managed = new Visibility2();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.pblc1 = _unmanaged.pblc1;
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.pblc2 = _unmanaged.pblc2;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -2720,8 +3000,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(Weird1u32 managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(Weird1u32 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -2735,7 +3015,15 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe Weird1u32 ToManaged() => new Weird1u32();
+            public unsafe Weird1u32 ToManaged()
+            {
+                _managed = new Weird1u32();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.x = _unmanaged.x;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -2774,8 +3062,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(Weird2u8 managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(Weird2u8 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -2788,7 +3076,9 @@ namespace My.Company
                 // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
                 fixed(byte* _fixed = _unmanaged.a)
                 {
-                    var src = new ReadOnlySpan<byte>(_managed.a, 0, Math.Min(5, _managed.a.Length));
+                    if (_managed.a == null) { throw new InvalidOperationException("Array 'a' must not be null"); }
+                    if (_managed.a.Length != 5) { throw new InvalidOperationException("Array size mismatch for 'a'"); }
+                    var src = new ReadOnlySpan<byte>(_managed.a, 0, 5);
                     var dst = new Span<byte>(_fixed, 5);
                     src.CopyTo(dst);
                 }
@@ -2798,7 +3088,25 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe Weird2u8 ToManaged() => new Weird2u8();
+            public unsafe Weird2u8 ToManaged()
+            {
+                _managed = new Weird2u8();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.t = _unmanaged.t;
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                fixed(byte* _fixed = _unmanaged.a)
+                {
+                    _managed.a = new byte[5];
+                    var src = new ReadOnlySpan<byte>(_fixed, 5);
+                    var dst = new Span<byte>(_managed.a, 0, 5);
+                    src.CopyTo(dst);
+                }
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.r = _unmanaged.r;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -3189,8 +3497,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(OptionInner managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(OptionInner managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -3207,7 +3515,18 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe OptionInner ToManaged() => new OptionInner();
+            public unsafe OptionInner ToManaged()
+            {
+                _managed = new OptionInner();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _t = new Inner.Marshaller(_unmanaged.t);
+                _managed.t = _t.ToManaged();
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.is_some = _unmanaged.is_some;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -3268,8 +3587,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(ResultU64 managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(ResultU64 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -3285,7 +3604,17 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultU64 ToManaged() => new ResultU64();
+            public unsafe ResultU64 ToManaged()
+            {
+                _managed = new ResultU64();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.t = _unmanaged.t;
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.err = _unmanaged.err;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -3358,6 +3687,7 @@ namespace My.Company
             private Unmanaged _unmanaged;
 
             public Marshaller(CallbackCharArray2 managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public void FromManaged(CallbackCharArray2 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
@@ -3437,6 +3767,7 @@ namespace My.Company
             private Unmanaged _unmanaged;
 
             public Marshaller(CallbackFFISlice managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public void FromManaged(CallbackFFISlice managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
@@ -3516,6 +3847,7 @@ namespace My.Company
             private Unmanaged _unmanaged;
 
             public Marshaller(CallbackHugeVecSlice managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public void FromManaged(CallbackHugeVecSlice managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
@@ -3595,6 +3927,7 @@ namespace My.Company
             private Unmanaged _unmanaged;
 
             public Marshaller(CallbackSliceMut managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public void FromManaged(CallbackSliceMut managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
@@ -3674,6 +4007,7 @@ namespace My.Company
             private Unmanaged _unmanaged;
 
             public Marshaller(CallbackU8 managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public void FromManaged(CallbackU8 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
@@ -3753,6 +4087,7 @@ namespace My.Company
             private Unmanaged _unmanaged;
 
             public Marshaller(MyCallback managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public void FromManaged(MyCallback managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
@@ -3832,6 +4167,7 @@ namespace My.Company
             private Unmanaged _unmanaged;
 
             public Marshaller(MyCallbackContextual managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public void FromManaged(MyCallbackContextual managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
@@ -3911,6 +4247,7 @@ namespace My.Company
             private Unmanaged _unmanaged;
 
             public Marshaller(MyCallbackVoid managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public void FromManaged(MyCallbackVoid managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
@@ -3990,6 +4327,7 @@ namespace My.Company
             private Unmanaged _unmanaged;
 
             public Marshaller(SumDelegate1 managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public void FromManaged(SumDelegate1 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
@@ -4069,6 +4407,7 @@ namespace My.Company
             private Unmanaged _unmanaged;
 
             public Marshaller(SumDelegate2 managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public void FromManaged(SumDelegate2 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
@@ -4148,6 +4487,7 @@ namespace My.Company
             private Unmanaged _unmanaged;
 
             public Marshaller(SumDelegateReturn managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public void FromManaged(SumDelegateReturn managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
@@ -4227,6 +4567,7 @@ namespace My.Company
             private Unmanaged _unmanaged;
 
             public Marshaller(SumDelegateReturn2 managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public void FromManaged(SumDelegateReturn2 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }

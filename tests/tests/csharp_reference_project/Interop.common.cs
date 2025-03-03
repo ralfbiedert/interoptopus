@@ -51,8 +51,8 @@ namespace My.Company.Common
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(Vec managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(Vec managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -68,7 +68,17 @@ namespace My.Company.Common
                 return _unmanaged;
             }
 
-            public unsafe Vec ToManaged() => new Vec();
+            public unsafe Vec ToManaged()
+            {
+                _managed = new Vec();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.x = _unmanaged.x;
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.z = _unmanaged.z;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -1005,8 +1015,8 @@ namespace My.Company.Common
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(OptionVec managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(OptionVec managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -1023,7 +1033,18 @@ namespace My.Company.Common
                 return _unmanaged;
             }
 
-            public unsafe OptionVec ToManaged() => new OptionVec();
+            public unsafe OptionVec ToManaged()
+            {
+                _managed = new OptionVec();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _t = new Vec.Marshaller(_unmanaged.t);
+                _managed.t = _t.ToManaged();
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.is_some = _unmanaged.is_some;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -1123,6 +1144,7 @@ namespace My.Company.Common
             private Unmanaged _unmanaged;
 
             public Marshaller(MyCallbackNamespaced managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public void FromManaged(MyCallbackNamespaced managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }

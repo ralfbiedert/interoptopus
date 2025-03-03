@@ -54,8 +54,8 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
     indented!(w, [()], r"private Unmanaged _unmanaged; // Used when converting unmanaged -> managed")?;
     w.newline()?;
     indented!(w, [()], r"public Marshaller({} managed) {{ _managed = managed; }}", name)?;
+    indented!(w, [()], r"public Marshaller(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
     w.newline()?;
-    indented!(w, [()], r"// TODO, we have to fix this marshalling type")?;
     indented!(w, [()], r"public void FromManaged({} managed) {{ _managed = managed; }}", name)?;
     indented!(w, [()], r"public void FromUnmanaged(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
     w.newline()?;
@@ -66,7 +66,7 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
     for field in the_type.fields() {
         w.indent();
         w.indent();
-        write_type_definition_composite_marshaller_field_conversion(i, w, field, the_type)?;
+        write_type_definition_composite_marshaller_field_to_unmanaged(i, w, field, the_type)?;
         w.unindent();
         w.unindent();
     }
@@ -74,7 +74,20 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
     indented!(w, [()()], r"return _unmanaged;")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
-    indented!(w, [()], r"public unsafe {} ToManaged() => new {}();", name, name)?;
+    indented!(w, [()], r"public unsafe {} ToManaged()", name)?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"_managed = new {}();", name)?;
+    w.newline()?;
+    for field in the_type.fields() {
+        w.indent();
+        w.indent();
+        write_type_definition_composite_marshaller_field_from_unmanaged(i, w, field, the_type)?;
+        w.unindent();
+        w.unindent();
+    }
+    w.newline()?;
+    indented!(w, [()()], r"return _managed;")?;
+    indented!(w, [()], r"}}")?;
     indented!(w, [()], r"public void Free() {{ }}")?;
     indented!(w, r"}}")?;
     w.unindent();
@@ -309,7 +322,7 @@ pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWri
     }
 }
 
-pub fn write_type_definition_composite_marshaller_field_conversion(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &CompositeType) -> Result<(), Error> {
+pub fn write_type_definition_composite_marshaller_field_to_unmanaged(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &CompositeType) -> Result<(), Error> {
     i.debug(w, "write_type_definition_composite_marshaller_unmanaged_invoke")?;
 
     let name = field.name();
@@ -323,7 +336,9 @@ pub fn write_type_definition_composite_marshaller_field_conversion(i: &Interop, 
             let array_type = to_typespecifier_in_field(x.array_type(), field, the_type);
             indented!(w, "fixed({}* _fixed = _unmanaged.{})", array_type, name)?;
             indented!(w, "{{")?;
-            indented!(w, [()], "var src = new ReadOnlySpan<{}>(_managed.{}, 0, Math.Min({}, _managed.{}.Length));", array_type, name, x.len(), name)?;
+            indented!(w, [()], r#"if (_managed.{} == null) {{ throw new InvalidOperationException("Array '{}' must not be null"); }}"#, name, name)?;
+            indented!(w, [()], r#"if (_managed.{}.Length != {}) {{ throw new InvalidOperationException("Array size mismatch for '{}'"); }}"#, name, x.len(), name)?;
+            indented!(w, [()], "var src = new ReadOnlySpan<{}>(_managed.{}, 0, {});", array_type, name, x.len())?;
             indented!(w, [()], "var dst = new Span<{}>(_fixed, {});", array_type, x.len())?;
             indented!(w, [()], "src.CopyTo(dst);")?;
             indented!(w, "}}")?;
@@ -331,12 +346,45 @@ pub fn write_type_definition_composite_marshaller_field_conversion(i: &Interop, 
         CType::Pattern(TypePattern::Bool) => indented!(w, "_unmanaged.{name} = (sbyte) (_managed.{name} ? 1 : 0);")?,
         CType::Pattern(TypePattern::FFIErrorEnum(_)) => indented!(w, "_unmanaged.{name} = _managed.{name};")?,
         CType::Pattern(TypePattern::CStrPointer) => {
-            indented!(w, "var _{name} = Marshal.StringToHGlobalAnsi(_managed.{name});")?;
-            indented!(w, "_unmanaged.{name} = _{name};")?;
+            indented!(w, "_unmanaged.{name} = Marshal.StringToHGlobalAnsi(_managed.{name});")?;
         }
         x => {
             indented!(w, "var _{name} = new {}.Marshaller(_managed.{});", to_typespecifier_in_field(x, field, the_type), name)?;
             indented!(w, "_unmanaged.{name} = _{name}.ToUnmanaged();")?;
+        }
+    };
+
+    Ok(())
+}
+
+pub fn write_type_definition_composite_marshaller_field_from_unmanaged(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &CompositeType) -> Result<(), Error> {
+    i.debug(w, "write_type_definition_composite_marshaller_field_from_unmanaged")?;
+
+    let name = field.name();
+    match field.the_type() {
+        CType::Primitive(PrimitiveType::Bool) => indented!(w, "_managed.{name} = _unmanaged.{name} == 1 ? true : false;")?,
+        CType::Primitive(_) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
+        CType::Enum(_) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
+        CType::ReadPointer(_) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
+        CType::ReadWritePointer(_) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
+        CType::Array(x) => {
+            let array_type = to_typespecifier_in_field(x.array_type(), field, the_type);
+            indented!(w, "fixed({}* _fixed = _unmanaged.{})", array_type, name)?;
+            indented!(w, "{{")?;
+            indented!(w, [()], "_managed.{} = new {}[{}];", name, array_type, x.len())?;
+            indented!(w, [()], "var src = new ReadOnlySpan<{}>(_fixed, {});", array_type, x.len())?;
+            indented!(w, [()], "var dst = new Span<{}>(_managed.{}, 0, {});", array_type, name, x.len())?;
+            indented!(w, [()], "src.CopyTo(dst);")?;
+            indented!(w, "}}")?;
+        }
+        CType::Primitive(PrimitiveType::Bool) => indented!(w, "_managed.{name} = _unmanaged.{name} == 1 ? true : false;")?,
+        CType::Pattern(TypePattern::FFIErrorEnum(_)) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
+        CType::Pattern(TypePattern::CStrPointer) => {
+            indented!(w, "_managed.{name} = Marshal.PtrToStringAnsi(_unmanaged.{name});")?;
+        }
+        x => {
+            indented!(w, "var _{name} = new {}.Marshaller(_unmanaged.{});", to_typespecifier_in_field(x, field, the_type), name)?;
+            indented!(w, "_managed.{name} = _{name}.ToManaged();")?;
         }
     };
 

@@ -123,6 +123,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()()], r"private Unmanaged _unmanaged;")?;
     w.newline()?;
     indented!(w, [()()], r"public Marshaller({} managed) {{ _managed = managed; }}", name)?;
+    indented!(w, [()()], r"public Marshaller(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
     w.newline()?;
     indented!(w, [()()], r"public void FromManaged({} managed) {{ _managed = managed; }}", name)?;
     indented!(w, [()()], r"public void FromUnmanaged(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
