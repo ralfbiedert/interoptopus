@@ -25,15 +25,18 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"public delegate void AsyncHelperDelegate(IntPtr data);")?;
         w.newline()?;
 
+        indented!(w, r"public partial struct AsyncHelper")?;
+        indented!(w, r"{{")?;
+        indented!(w, [()], r"private AsyncHelperDelegate _managed;")?;
+        indented!(w, [()], r"private AsyncHelperNative _native;")?;
+        indented!(w, [()], r"private IntPtr _ptr;")?;
+        indented!(w, r"}}")?;
+        w.newline()?;
+
         // Emit main struct
         indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
-        indented!(w, r"public struct AsyncHelper : IDisposable")?;
+        indented!(w, r"public partial struct AsyncHelper : IDisposable")?;
         indented!(w, r"{{")?;
-
-        // Fields
-        indented!(w, [()], r"private AsyncHelperDelegate _managed;")?;
-        indented!(w, [()], r"private IntPtr _native;")?;
-        w.newline()?;
 
         // Constructors
         indented!(w, [()], r"public AsyncHelper() {{ }}")?;
@@ -41,7 +44,8 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, [()], r"public AsyncHelper(AsyncHelperDelegate managed)")?;
         indented!(w, [()], r"{{")?;
         indented!(w, [()()], r"_managed = managed;")?;
-        indented!(w, [()()], r"_native = Marshal.GetFunctionPointerForDelegate(new AsyncHelperNative(Call));")?;
+        indented!(w, [()()], r"_native = Call;")?;
+        indented!(w, [()()], r"_ptr = Marshal.GetFunctionPointerForDelegate(_native);")?;
         indented!(w, [()], r"}}")?;
         w.newline()?;
 
@@ -54,9 +58,9 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
 
         indented!(w, [()], r"public void Dispose()")?;
         indented!(w, [()], r"{{")?;
-        indented!(w, [()()], r"if (_native == IntPtr.Zero) return;")?;
-        indented!(w, [()()], r"Marshal.FreeHGlobal(_native);")?;
-        indented!(w, [()()], r"_native = IntPtr.Zero;")?;
+        indented!(w, [()()], r"if (_ptr == IntPtr.Zero) return;")?;
+        indented!(w, [()()], r"Marshal.FreeHGlobal(_ptr);")?;
+        indented!(w, [()()], r"_ptr = IntPtr.Zero;")?;
         indented!(w, [()], r"}}")?;
         w.newline()?;
 
@@ -88,7 +92,7 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, [()()], r"public Unmanaged ToUnmanaged()")?;
         indented!(w, [()()], r"{{")?;
         indented!(w, [()()()], r"_unmanaged = new Unmanaged();")?;
-        indented!(w, [()()()], r"_unmanaged.Callback = _managed._native;")?;
+        indented!(w, [()()()], r"_unmanaged.Callback = _managed._ptr;")?;
         indented!(w, [()()()], r"_unmanaged.Data = IntPtr.Zero;")?;
         indented!(w, [()()()], r"return _unmanaged;")?;
         indented!(w, [()()], r"}}")?;
@@ -97,7 +101,7 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, [()()], r"public AsyncHelper ToManaged()")?;
         indented!(w, [()()], r"{{")?;
         indented!(w, [()()()], r"_managed = new AsyncHelper();")?;
-        indented!(w, [()()()], r"_managed._native = _unmanaged.Callback;")?;
+        indented!(w, [()()()], r"_managed._ptr = _unmanaged.Callback;")?;
         indented!(w, [()()()], r"return _managed;")?;
         indented!(w, [()()], r"}}")?;
         w.newline()?;
