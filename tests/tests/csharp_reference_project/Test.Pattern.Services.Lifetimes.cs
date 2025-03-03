@@ -19,7 +19,8 @@ public class TestPatternServicesLifetimes
         service.Lifetime2(bools);
 
         var str = service.ReturnStringAcceptSlice(bytes);
-
+        service.Dispose();
+        
         Assert.True(string.IsNullOrEmpty(str));
     }
 

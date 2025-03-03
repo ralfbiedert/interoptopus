@@ -16,5 +16,6 @@ public class TestPatternServicesOnPanic
 
         Assert.Equal(service.ReturnDefaultValue(123u), 123u);
         Assert.Equal(service.ReturnUbOnPanic(), "Hello new_with");
+        service.Dispose();
     }
 }

@@ -8,7 +8,8 @@ public class TestPatternServicesBasic
     [Fact]
     public void service_basic()
     {
-        var _ = BasicService.New();
+        var service = BasicService.New();
+        service.Dispose();
     }
 
 }

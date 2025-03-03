@@ -23,5 +23,6 @@ public class TestPatternServicesSlices
         var lt = ServiceUsingLifetimes.NewWith(ref value);
         var s3 = lt.ReturnStringAcceptSlice(System.Array.Empty<byte>());
         var s4 = lt.ReturnStringAcceptSlice(System.Array.Empty<byte>());
+        service_slices.Dispose();
     }
 }

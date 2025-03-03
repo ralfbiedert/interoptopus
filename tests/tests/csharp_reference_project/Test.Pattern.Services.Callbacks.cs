@@ -18,8 +18,6 @@ public class TestPatternServicesCallbacks
             Assert.Equal(x, 0u);
             return x;
         });
-        // cb.Dispose();
-
 
         Assert.True(called);
     }
@@ -38,10 +36,6 @@ public class TestPatternServicesCallbacks
             called = true;
             return FFIError.Ok;
         }, slice);
-
-
-
-        // cb.Dispose();
 
         Assert.True(called);
     }

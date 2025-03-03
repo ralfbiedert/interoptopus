@@ -12,6 +12,8 @@ public class TestPatternServicesAsync
     {
         var s = ServiceAsync.New();
         var r = await s.ReturnAfterMs(123, 500);
+        s.Dispose();
+        
         Assert.Equal(r.Ok(), 123u);
     }
     
@@ -32,6 +34,7 @@ public class TestPatternServicesAsync
         }).ToList();
         
         await Task.WhenAll(tasks);
+        s.Dispose();
     }
    
 }

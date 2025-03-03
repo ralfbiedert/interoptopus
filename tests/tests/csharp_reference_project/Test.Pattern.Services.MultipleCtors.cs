@@ -10,9 +10,9 @@ public class TestPatternServicesMultipleCtors
     [Fact]
     public void service_ctors()
     {
-        ServiceMultipleCtors.NewWith(123);
-        ServiceMultipleCtors.NewWithout();
-        ServiceMultipleCtors.NewWithString("hello world");
+        using (ServiceMultipleCtors.NewWith(123)) { }
+        using (ServiceMultipleCtors.NewWithout()) { };
+        using (ServiceMultipleCtors.NewWithString("hello world")) { };
 
         try
         {

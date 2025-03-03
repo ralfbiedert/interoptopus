@@ -29,6 +29,5 @@ public class TestCoreAlignment
     //         Assert.Equal(x.is_valid, false);
     //     }
     // }
-
-
+    
 }
