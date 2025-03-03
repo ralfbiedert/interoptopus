@@ -80,8 +80,8 @@ namespace My.Company
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
             public Marshaller(Vec2 managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            // TODO, we have to fix this marshalling type
             public void FromManaged(Vec2 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
@@ -95,7 +95,15 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe Vec2 ToManaged() => new Vec2();
+            public unsafe Vec2 ToManaged()
+            {
+                _managed = new Vec2();
+
+                _managed.x = _unmanaged.x;
+                _managed.y = _unmanaged.y;
+
+                return _managed;
+            }
             public void Free() { }
         }
     }
@@ -172,27 +180,27 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public struct AsyncHelper : IDisposable
     {
-        private AsyncHelperDelegate _callbackUser;
-        private IntPtr _callbackNative;
+        private AsyncHelperDelegate _managed;
+        private IntPtr _native;
 
         public AsyncHelper() { }
 
-        public AsyncHelper(AsyncHelperDelegate callbackUser)
+        public AsyncHelper(AsyncHelperDelegate managed)
         {
-            _callbackUser = callbackUser;
-            _callbackNative = Marshal.GetFunctionPointerForDelegate(new AsyncHelperNative(Call));
+            _managed = managed;
+            _native = Marshal.GetFunctionPointerForDelegate(new AsyncHelperNative(Call));
         }
 
-        public void Call(IntPtr data, IntPtr callback_data)
+        void Call(IntPtr data, IntPtr _)
         {
-            _callbackUser(data);
+            _managed(data);
         }
 
         public void Dispose()
         {
-            if (_callbackNative == IntPtr.Zero) return;
-            Marshal.FreeHGlobal(_callbackNative);
-            _callbackNative = IntPtr.Zero;
+            if (_native == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_native);
+            _native = IntPtr.Zero;
         }
 
         [CustomMarshaller(typeof(AsyncHelper), MarshalMode.Default, typeof(Marshaller))]
@@ -207,36 +215,25 @@ namespace My.Company
 
         public ref struct Marshaller
         {
-            private AsyncHelper managed;
-            private Unmanaged native;
-            private Unmanaged sourceNative;
-            private GCHandle? pinned;
+            private AsyncHelper _managed;
+            private Unmanaged _unmanaged;
 
-            public void FromManaged(AsyncHelper managed)
-            {
-                this.managed = managed;
-            }
+            public void FromManaged(AsyncHelper managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public Unmanaged ToUnmanaged()
             {
-                return new Unmanaged
-                {
-                    Callback = managed._callbackNative,
-                    Data = IntPtr.Zero
-                };
-            }
-
-            public void FromUnmanaged(Unmanaged unmanaged)
-            {
-                sourceNative = unmanaged;
+                _unmanaged = new Unmanaged();
+                _unmanaged.Callback = _managed._native;
+                _unmanaged.Data = IntPtr.Zero;
+                return _unmanaged;
             }
 
             public AsyncHelper ToManaged()
             {
-                return new AsyncHelper
-                {
-                    _callbackNative = sourceNative.Callback,
-                };
+                _managed = new AsyncHelper();
+                _managed._native = _unmanaged.Callback;
+                return _managed;
             }
 
             public void Free() { }

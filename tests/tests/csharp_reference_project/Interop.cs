@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 13279506127017047779ul)
+            if (api_version != 14558971871602263811ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (13279506127017047779). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (14558971871602263811). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -1033,7 +1033,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_set_delegate_table")]
         // Debug - write_function_declaration 
-        public static partial void service_callbacks_set_delegate_table(IntPtr context, ref DelegateTable table);
+        public static partial void service_callbacks_set_delegate_table(IntPtr context, DelegateTable table);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_set_delegate_table 
@@ -3639,10 +3639,11 @@ namespace My.Company
     public delegate void CallbackCharArray2Native(CharArray value, IntPtr callback_data);
     public delegate void CallbackCharArray2Delegate(CharArray value);
 
-    public partial struct CallbackCharArray2 : IDisposable
+    public partial struct CallbackCharArray2
     {
-        private CallbackCharArray2Delegate _callbackUser;
-        private IntPtr _callbackNative;
+        private CallbackCharArray2Delegate _managed;
+        private CallbackCharArray2Native _native;
+        private IntPtr _ptr;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -3651,24 +3652,22 @@ namespace My.Company
 
         public CallbackCharArray2() { }
 
-        public CallbackCharArray2(CallbackCharArray2Delegate callbackUser)
+        public CallbackCharArray2(CallbackCharArray2Delegate managed)
         {
-            _callbackUser = callbackUser;
-            _callbackNative = Marshal.GetFunctionPointerForDelegate(new CallbackCharArray2Native(Call));
+            _managed = managed;
+            _native = Call;
+            _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
         public void Call(CharArray value, IntPtr callback_data)
         {
-            _callbackUser(value);
+            // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
+            _managed(value);
         }
 
         public void Dispose()
         {
-            if (_callbackNative == IntPtr.Zero) return;
-            Marshal.FreeHGlobal(_callbackNative);
-            _callbackNative = IntPtr.Zero;
         }
-
 
         [CustomMarshaller(typeof(CallbackCharArray2), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -3679,7 +3678,6 @@ namespace My.Company
             internal IntPtr Callback;
             internal IntPtr Data;
         }
-
 
         public ref struct Marshaller
         {
@@ -3694,19 +3692,17 @@ namespace My.Company
 
             public Unmanaged ToUnmanaged()
             {
-                return new Unmanaged
-                {
-                    Callback = _managed._callbackNative,
-                    Data = IntPtr.Zero
-                };
+                _unmanaged = new Unmanaged();
+                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Data = IntPtr.Zero;
+                return _unmanaged;
             }
 
             public CallbackCharArray2 ToManaged()
             {
-                return new CallbackCharArray2
-                {
-                    _callbackNative = _unmanaged.Callback,
-                };
+                _managed = new CallbackCharArray2();
+                _managed._ptr = _unmanaged.Callback;
+                return _managed;
             }
 
             public void Free() { }
@@ -3719,10 +3715,11 @@ namespace My.Company
     public delegate byte CallbackFFISliceNative(SliceU8.Unmanaged slice, IntPtr callback_data);
     public delegate byte CallbackFFISliceDelegate(SliceU8 slice);
 
-    public partial struct CallbackFFISlice : IDisposable
+    public partial struct CallbackFFISlice
     {
-        private CallbackFFISliceDelegate _callbackUser;
-        private IntPtr _callbackNative;
+        private CallbackFFISliceDelegate _managed;
+        private CallbackFFISliceNative _native;
+        private IntPtr _ptr;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -3731,24 +3728,22 @@ namespace My.Company
 
         public CallbackFFISlice() { }
 
-        public CallbackFFISlice(CallbackFFISliceDelegate callbackUser)
+        public CallbackFFISlice(CallbackFFISliceDelegate managed)
         {
-            _callbackUser = callbackUser;
-            _callbackNative = Marshal.GetFunctionPointerForDelegate(new CallbackFFISliceNative(Call));
+            _managed = managed;
+            _native = Call;
+            _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
         public byte Call(SliceU8.Unmanaged slice, IntPtr callback_data)
         {
-            return _callbackUser(slice.Managed());
+            // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
+            return _managed(slice.Managed());
         }
 
         public void Dispose()
         {
-            if (_callbackNative == IntPtr.Zero) return;
-            Marshal.FreeHGlobal(_callbackNative);
-            _callbackNative = IntPtr.Zero;
         }
-
 
         [CustomMarshaller(typeof(CallbackFFISlice), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -3759,7 +3754,6 @@ namespace My.Company
             internal IntPtr Callback;
             internal IntPtr Data;
         }
-
 
         public ref struct Marshaller
         {
@@ -3774,19 +3768,17 @@ namespace My.Company
 
             public Unmanaged ToUnmanaged()
             {
-                return new Unmanaged
-                {
-                    Callback = _managed._callbackNative,
-                    Data = IntPtr.Zero
-                };
+                _unmanaged = new Unmanaged();
+                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Data = IntPtr.Zero;
+                return _unmanaged;
             }
 
             public CallbackFFISlice ToManaged()
             {
-                return new CallbackFFISlice
-                {
-                    _callbackNative = _unmanaged.Callback,
-                };
+                _managed = new CallbackFFISlice();
+                _managed._ptr = _unmanaged.Callback;
+                return _managed;
             }
 
             public void Free() { }
@@ -3799,10 +3791,11 @@ namespace My.Company
     public delegate Vec3f32 CallbackHugeVecSliceNative(SliceVec3f32.Unmanaged slice, IntPtr callback_data);
     public delegate Vec3f32 CallbackHugeVecSliceDelegate(SliceVec3f32 slice);
 
-    public partial struct CallbackHugeVecSlice : IDisposable
+    public partial struct CallbackHugeVecSlice
     {
-        private CallbackHugeVecSliceDelegate _callbackUser;
-        private IntPtr _callbackNative;
+        private CallbackHugeVecSliceDelegate _managed;
+        private CallbackHugeVecSliceNative _native;
+        private IntPtr _ptr;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -3811,24 +3804,22 @@ namespace My.Company
 
         public CallbackHugeVecSlice() { }
 
-        public CallbackHugeVecSlice(CallbackHugeVecSliceDelegate callbackUser)
+        public CallbackHugeVecSlice(CallbackHugeVecSliceDelegate managed)
         {
-            _callbackUser = callbackUser;
-            _callbackNative = Marshal.GetFunctionPointerForDelegate(new CallbackHugeVecSliceNative(Call));
+            _managed = managed;
+            _native = Call;
+            _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
         public Vec3f32 Call(SliceVec3f32.Unmanaged slice, IntPtr callback_data)
         {
-            return _callbackUser(slice.Managed());
+            // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
+            return _managed(slice.Managed());
         }
 
         public void Dispose()
         {
-            if (_callbackNative == IntPtr.Zero) return;
-            Marshal.FreeHGlobal(_callbackNative);
-            _callbackNative = IntPtr.Zero;
         }
-
 
         [CustomMarshaller(typeof(CallbackHugeVecSlice), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -3839,7 +3830,6 @@ namespace My.Company
             internal IntPtr Callback;
             internal IntPtr Data;
         }
-
 
         public ref struct Marshaller
         {
@@ -3854,19 +3844,17 @@ namespace My.Company
 
             public Unmanaged ToUnmanaged()
             {
-                return new Unmanaged
-                {
-                    Callback = _managed._callbackNative,
-                    Data = IntPtr.Zero
-                };
+                _unmanaged = new Unmanaged();
+                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Data = IntPtr.Zero;
+                return _unmanaged;
             }
 
             public CallbackHugeVecSlice ToManaged()
             {
-                return new CallbackHugeVecSlice
-                {
-                    _callbackNative = _unmanaged.Callback,
-                };
+                _managed = new CallbackHugeVecSlice();
+                _managed._ptr = _unmanaged.Callback;
+                return _managed;
             }
 
             public void Free() { }
@@ -3879,10 +3867,11 @@ namespace My.Company
     public delegate void CallbackSliceMutNative(SliceMutU8.Unmanaged slice, IntPtr callback_data);
     public delegate void CallbackSliceMutDelegate(SliceMutU8 slice);
 
-    public partial struct CallbackSliceMut : IDisposable
+    public partial struct CallbackSliceMut
     {
-        private CallbackSliceMutDelegate _callbackUser;
-        private IntPtr _callbackNative;
+        private CallbackSliceMutDelegate _managed;
+        private CallbackSliceMutNative _native;
+        private IntPtr _ptr;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -3891,24 +3880,22 @@ namespace My.Company
 
         public CallbackSliceMut() { }
 
-        public CallbackSliceMut(CallbackSliceMutDelegate callbackUser)
+        public CallbackSliceMut(CallbackSliceMutDelegate managed)
         {
-            _callbackUser = callbackUser;
-            _callbackNative = Marshal.GetFunctionPointerForDelegate(new CallbackSliceMutNative(Call));
+            _managed = managed;
+            _native = Call;
+            _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
         public void Call(SliceMutU8.Unmanaged slice, IntPtr callback_data)
         {
-            _callbackUser(slice.Managed());
+            // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
+            _managed(slice.Managed());
         }
 
         public void Dispose()
         {
-            if (_callbackNative == IntPtr.Zero) return;
-            Marshal.FreeHGlobal(_callbackNative);
-            _callbackNative = IntPtr.Zero;
         }
-
 
         [CustomMarshaller(typeof(CallbackSliceMut), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -3919,7 +3906,6 @@ namespace My.Company
             internal IntPtr Callback;
             internal IntPtr Data;
         }
-
 
         public ref struct Marshaller
         {
@@ -3934,19 +3920,17 @@ namespace My.Company
 
             public Unmanaged ToUnmanaged()
             {
-                return new Unmanaged
-                {
-                    Callback = _managed._callbackNative,
-                    Data = IntPtr.Zero
-                };
+                _unmanaged = new Unmanaged();
+                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Data = IntPtr.Zero;
+                return _unmanaged;
             }
 
             public CallbackSliceMut ToManaged()
             {
-                return new CallbackSliceMut
-                {
-                    _callbackNative = _unmanaged.Callback,
-                };
+                _managed = new CallbackSliceMut();
+                _managed._ptr = _unmanaged.Callback;
+                return _managed;
             }
 
             public void Free() { }
@@ -3959,10 +3943,11 @@ namespace My.Company
     public delegate byte CallbackU8Native(byte value, IntPtr callback_data);
     public delegate byte CallbackU8Delegate(byte value);
 
-    public partial struct CallbackU8 : IDisposable
+    public partial struct CallbackU8
     {
-        private CallbackU8Delegate _callbackUser;
-        private IntPtr _callbackNative;
+        private CallbackU8Delegate _managed;
+        private CallbackU8Native _native;
+        private IntPtr _ptr;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -3971,24 +3956,22 @@ namespace My.Company
 
         public CallbackU8() { }
 
-        public CallbackU8(CallbackU8Delegate callbackUser)
+        public CallbackU8(CallbackU8Delegate managed)
         {
-            _callbackUser = callbackUser;
-            _callbackNative = Marshal.GetFunctionPointerForDelegate(new CallbackU8Native(Call));
+            _managed = managed;
+            _native = Call;
+            _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
         public byte Call(byte value, IntPtr callback_data)
         {
-            return _callbackUser(value);
+            // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
+            return _managed(value);
         }
 
         public void Dispose()
         {
-            if (_callbackNative == IntPtr.Zero) return;
-            Marshal.FreeHGlobal(_callbackNative);
-            _callbackNative = IntPtr.Zero;
         }
-
 
         [CustomMarshaller(typeof(CallbackU8), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -3999,7 +3982,6 @@ namespace My.Company
             internal IntPtr Callback;
             internal IntPtr Data;
         }
-
 
         public ref struct Marshaller
         {
@@ -4014,19 +3996,17 @@ namespace My.Company
 
             public Unmanaged ToUnmanaged()
             {
-                return new Unmanaged
-                {
-                    Callback = _managed._callbackNative,
-                    Data = IntPtr.Zero
-                };
+                _unmanaged = new Unmanaged();
+                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Data = IntPtr.Zero;
+                return _unmanaged;
             }
 
             public CallbackU8 ToManaged()
             {
-                return new CallbackU8
-                {
-                    _callbackNative = _unmanaged.Callback,
-                };
+                _managed = new CallbackU8();
+                _managed._ptr = _unmanaged.Callback;
+                return _managed;
             }
 
             public void Free() { }
@@ -4039,10 +4019,11 @@ namespace My.Company
     public delegate uint MyCallbackNative(uint value, IntPtr callback_data);
     public delegate uint MyCallbackDelegate(uint value);
 
-    public partial struct MyCallback : IDisposable
+    public partial struct MyCallback
     {
-        private MyCallbackDelegate _callbackUser;
-        private IntPtr _callbackNative;
+        private MyCallbackDelegate _managed;
+        private MyCallbackNative _native;
+        private IntPtr _ptr;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -4051,24 +4032,22 @@ namespace My.Company
 
         public MyCallback() { }
 
-        public MyCallback(MyCallbackDelegate callbackUser)
+        public MyCallback(MyCallbackDelegate managed)
         {
-            _callbackUser = callbackUser;
-            _callbackNative = Marshal.GetFunctionPointerForDelegate(new MyCallbackNative(Call));
+            _managed = managed;
+            _native = Call;
+            _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
         public uint Call(uint value, IntPtr callback_data)
         {
-            return _callbackUser(value);
+            // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
+            return _managed(value);
         }
 
         public void Dispose()
         {
-            if (_callbackNative == IntPtr.Zero) return;
-            Marshal.FreeHGlobal(_callbackNative);
-            _callbackNative = IntPtr.Zero;
         }
-
 
         [CustomMarshaller(typeof(MyCallback), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -4079,7 +4058,6 @@ namespace My.Company
             internal IntPtr Callback;
             internal IntPtr Data;
         }
-
 
         public ref struct Marshaller
         {
@@ -4094,19 +4072,17 @@ namespace My.Company
 
             public Unmanaged ToUnmanaged()
             {
-                return new Unmanaged
-                {
-                    Callback = _managed._callbackNative,
-                    Data = IntPtr.Zero
-                };
+                _unmanaged = new Unmanaged();
+                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Data = IntPtr.Zero;
+                return _unmanaged;
             }
 
             public MyCallback ToManaged()
             {
-                return new MyCallback
-                {
-                    _callbackNative = _unmanaged.Callback,
-                };
+                _managed = new MyCallback();
+                _managed._ptr = _unmanaged.Callback;
+                return _managed;
             }
 
             public void Free() { }
@@ -4119,10 +4095,11 @@ namespace My.Company
     public delegate void MyCallbackContextualNative(IntPtr context, uint value, IntPtr callback_data);
     public delegate void MyCallbackContextualDelegate(IntPtr context, uint value);
 
-    public partial struct MyCallbackContextual : IDisposable
+    public partial struct MyCallbackContextual
     {
-        private MyCallbackContextualDelegate _callbackUser;
-        private IntPtr _callbackNative;
+        private MyCallbackContextualDelegate _managed;
+        private MyCallbackContextualNative _native;
+        private IntPtr _ptr;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -4131,24 +4108,22 @@ namespace My.Company
 
         public MyCallbackContextual() { }
 
-        public MyCallbackContextual(MyCallbackContextualDelegate callbackUser)
+        public MyCallbackContextual(MyCallbackContextualDelegate managed)
         {
-            _callbackUser = callbackUser;
-            _callbackNative = Marshal.GetFunctionPointerForDelegate(new MyCallbackContextualNative(Call));
+            _managed = managed;
+            _native = Call;
+            _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
         public void Call(IntPtr context, uint value, IntPtr callback_data)
         {
-            _callbackUser(context, value);
+            // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
+            _managed(context, value);
         }
 
         public void Dispose()
         {
-            if (_callbackNative == IntPtr.Zero) return;
-            Marshal.FreeHGlobal(_callbackNative);
-            _callbackNative = IntPtr.Zero;
         }
-
 
         [CustomMarshaller(typeof(MyCallbackContextual), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -4159,7 +4134,6 @@ namespace My.Company
             internal IntPtr Callback;
             internal IntPtr Data;
         }
-
 
         public ref struct Marshaller
         {
@@ -4174,19 +4148,17 @@ namespace My.Company
 
             public Unmanaged ToUnmanaged()
             {
-                return new Unmanaged
-                {
-                    Callback = _managed._callbackNative,
-                    Data = IntPtr.Zero
-                };
+                _unmanaged = new Unmanaged();
+                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Data = IntPtr.Zero;
+                return _unmanaged;
             }
 
             public MyCallbackContextual ToManaged()
             {
-                return new MyCallbackContextual
-                {
-                    _callbackNative = _unmanaged.Callback,
-                };
+                _managed = new MyCallbackContextual();
+                _managed._ptr = _unmanaged.Callback;
+                return _managed;
             }
 
             public void Free() { }
@@ -4199,10 +4171,11 @@ namespace My.Company
     public delegate void MyCallbackVoidNative(IntPtr ptr, IntPtr callback_data);
     public delegate void MyCallbackVoidDelegate(IntPtr ptr);
 
-    public partial struct MyCallbackVoid : IDisposable
+    public partial struct MyCallbackVoid
     {
-        private MyCallbackVoidDelegate _callbackUser;
-        private IntPtr _callbackNative;
+        private MyCallbackVoidDelegate _managed;
+        private MyCallbackVoidNative _native;
+        private IntPtr _ptr;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -4211,24 +4184,22 @@ namespace My.Company
 
         public MyCallbackVoid() { }
 
-        public MyCallbackVoid(MyCallbackVoidDelegate callbackUser)
+        public MyCallbackVoid(MyCallbackVoidDelegate managed)
         {
-            _callbackUser = callbackUser;
-            _callbackNative = Marshal.GetFunctionPointerForDelegate(new MyCallbackVoidNative(Call));
+            _managed = managed;
+            _native = Call;
+            _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
         public void Call(IntPtr ptr, IntPtr callback_data)
         {
-            _callbackUser(ptr);
+            // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
+            _managed(ptr);
         }
 
         public void Dispose()
         {
-            if (_callbackNative == IntPtr.Zero) return;
-            Marshal.FreeHGlobal(_callbackNative);
-            _callbackNative = IntPtr.Zero;
         }
-
 
         [CustomMarshaller(typeof(MyCallbackVoid), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -4239,7 +4210,6 @@ namespace My.Company
             internal IntPtr Callback;
             internal IntPtr Data;
         }
-
 
         public ref struct Marshaller
         {
@@ -4254,19 +4224,17 @@ namespace My.Company
 
             public Unmanaged ToUnmanaged()
             {
-                return new Unmanaged
-                {
-                    Callback = _managed._callbackNative,
-                    Data = IntPtr.Zero
-                };
+                _unmanaged = new Unmanaged();
+                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Data = IntPtr.Zero;
+                return _unmanaged;
             }
 
             public MyCallbackVoid ToManaged()
             {
-                return new MyCallbackVoid
-                {
-                    _callbackNative = _unmanaged.Callback,
-                };
+                _managed = new MyCallbackVoid();
+                _managed._ptr = _unmanaged.Callback;
+                return _managed;
             }
 
             public void Free() { }
@@ -4279,10 +4247,11 @@ namespace My.Company
     public delegate void SumDelegate1Native(IntPtr callback_data);
     public delegate void SumDelegate1Delegate();
 
-    public partial struct SumDelegate1 : IDisposable
+    public partial struct SumDelegate1
     {
-        private SumDelegate1Delegate _callbackUser;
-        private IntPtr _callbackNative;
+        private SumDelegate1Delegate _managed;
+        private SumDelegate1Native _native;
+        private IntPtr _ptr;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -4291,24 +4260,22 @@ namespace My.Company
 
         public SumDelegate1() { }
 
-        public SumDelegate1(SumDelegate1Delegate callbackUser)
+        public SumDelegate1(SumDelegate1Delegate managed)
         {
-            _callbackUser = callbackUser;
-            _callbackNative = Marshal.GetFunctionPointerForDelegate(new SumDelegate1Native(Call));
+            _managed = managed;
+            _native = Call;
+            _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
         public void Call(IntPtr callback_data)
         {
-            _callbackUser();
+            // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
+            _managed();
         }
 
         public void Dispose()
         {
-            if (_callbackNative == IntPtr.Zero) return;
-            Marshal.FreeHGlobal(_callbackNative);
-            _callbackNative = IntPtr.Zero;
         }
-
 
         [CustomMarshaller(typeof(SumDelegate1), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -4319,7 +4286,6 @@ namespace My.Company
             internal IntPtr Callback;
             internal IntPtr Data;
         }
-
 
         public ref struct Marshaller
         {
@@ -4334,19 +4300,17 @@ namespace My.Company
 
             public Unmanaged ToUnmanaged()
             {
-                return new Unmanaged
-                {
-                    Callback = _managed._callbackNative,
-                    Data = IntPtr.Zero
-                };
+                _unmanaged = new Unmanaged();
+                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Data = IntPtr.Zero;
+                return _unmanaged;
             }
 
             public SumDelegate1 ToManaged()
             {
-                return new SumDelegate1
-                {
-                    _callbackNative = _unmanaged.Callback,
-                };
+                _managed = new SumDelegate1();
+                _managed._ptr = _unmanaged.Callback;
+                return _managed;
             }
 
             public void Free() { }
@@ -4359,10 +4323,11 @@ namespace My.Company
     public delegate int SumDelegate2Native(int x, int y, IntPtr callback_data);
     public delegate int SumDelegate2Delegate(int x, int y);
 
-    public partial struct SumDelegate2 : IDisposable
+    public partial struct SumDelegate2
     {
-        private SumDelegate2Delegate _callbackUser;
-        private IntPtr _callbackNative;
+        private SumDelegate2Delegate _managed;
+        private SumDelegate2Native _native;
+        private IntPtr _ptr;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -4371,24 +4336,22 @@ namespace My.Company
 
         public SumDelegate2() { }
 
-        public SumDelegate2(SumDelegate2Delegate callbackUser)
+        public SumDelegate2(SumDelegate2Delegate managed)
         {
-            _callbackUser = callbackUser;
-            _callbackNative = Marshal.GetFunctionPointerForDelegate(new SumDelegate2Native(Call));
+            _managed = managed;
+            _native = Call;
+            _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
         public int Call(int x, int y, IntPtr callback_data)
         {
-            return _callbackUser(x, y);
+            // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
+            return _managed(x, y);
         }
 
         public void Dispose()
         {
-            if (_callbackNative == IntPtr.Zero) return;
-            Marshal.FreeHGlobal(_callbackNative);
-            _callbackNative = IntPtr.Zero;
         }
-
 
         [CustomMarshaller(typeof(SumDelegate2), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -4399,7 +4362,6 @@ namespace My.Company
             internal IntPtr Callback;
             internal IntPtr Data;
         }
-
 
         public ref struct Marshaller
         {
@@ -4414,19 +4376,17 @@ namespace My.Company
 
             public Unmanaged ToUnmanaged()
             {
-                return new Unmanaged
-                {
-                    Callback = _managed._callbackNative,
-                    Data = IntPtr.Zero
-                };
+                _unmanaged = new Unmanaged();
+                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Data = IntPtr.Zero;
+                return _unmanaged;
             }
 
             public SumDelegate2 ToManaged()
             {
-                return new SumDelegate2
-                {
-                    _callbackNative = _unmanaged.Callback,
-                };
+                _managed = new SumDelegate2();
+                _managed._ptr = _unmanaged.Callback;
+                return _managed;
             }
 
             public void Free() { }
@@ -4439,10 +4399,11 @@ namespace My.Company
     public delegate FFIError SumDelegateReturnNative(int x, int y, IntPtr callback_data);
     public delegate FFIError SumDelegateReturnDelegate(int x, int y);
 
-    public partial struct SumDelegateReturn : IDisposable
+    public partial struct SumDelegateReturn
     {
-        private SumDelegateReturnDelegate _callbackUser;
-        private IntPtr _callbackNative;
+        private SumDelegateReturnDelegate _managed;
+        private SumDelegateReturnNative _native;
+        private IntPtr _ptr;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -4451,24 +4412,22 @@ namespace My.Company
 
         public SumDelegateReturn() { }
 
-        public SumDelegateReturn(SumDelegateReturnDelegate callbackUser)
+        public SumDelegateReturn(SumDelegateReturnDelegate managed)
         {
-            _callbackUser = callbackUser;
-            _callbackNative = Marshal.GetFunctionPointerForDelegate(new SumDelegateReturnNative(Call));
+            _managed = managed;
+            _native = Call;
+            _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
         public FFIError Call(int x, int y, IntPtr callback_data)
         {
-            return _callbackUser(x, y);
+            // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
+            return _managed(x, y);
         }
 
         public void Dispose()
         {
-            if (_callbackNative == IntPtr.Zero) return;
-            Marshal.FreeHGlobal(_callbackNative);
-            _callbackNative = IntPtr.Zero;
         }
-
 
         [CustomMarshaller(typeof(SumDelegateReturn), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -4479,7 +4438,6 @@ namespace My.Company
             internal IntPtr Callback;
             internal IntPtr Data;
         }
-
 
         public ref struct Marshaller
         {
@@ -4494,19 +4452,17 @@ namespace My.Company
 
             public Unmanaged ToUnmanaged()
             {
-                return new Unmanaged
-                {
-                    Callback = _managed._callbackNative,
-                    Data = IntPtr.Zero
-                };
+                _unmanaged = new Unmanaged();
+                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Data = IntPtr.Zero;
+                return _unmanaged;
             }
 
             public SumDelegateReturn ToManaged()
             {
-                return new SumDelegateReturn
-                {
-                    _callbackNative = _unmanaged.Callback,
-                };
+                _managed = new SumDelegateReturn();
+                _managed._ptr = _unmanaged.Callback;
+                return _managed;
             }
 
             public void Free() { }
@@ -4519,10 +4475,11 @@ namespace My.Company
     public delegate void SumDelegateReturn2Native(int x, int y, IntPtr callback_data);
     public delegate void SumDelegateReturn2Delegate(int x, int y);
 
-    public partial struct SumDelegateReturn2 : IDisposable
+    public partial struct SumDelegateReturn2
     {
-        private SumDelegateReturn2Delegate _callbackUser;
-        private IntPtr _callbackNative;
+        private SumDelegateReturn2Delegate _managed;
+        private SumDelegateReturn2Native _native;
+        private IntPtr _ptr;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -4531,24 +4488,22 @@ namespace My.Company
 
         public SumDelegateReturn2() { }
 
-        public SumDelegateReturn2(SumDelegateReturn2Delegate callbackUser)
+        public SumDelegateReturn2(SumDelegateReturn2Delegate managed)
         {
-            _callbackUser = callbackUser;
-            _callbackNative = Marshal.GetFunctionPointerForDelegate(new SumDelegateReturn2Native(Call));
+            _managed = managed;
+            _native = Call;
+            _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
         public void Call(int x, int y, IntPtr callback_data)
         {
-            _callbackUser(x, y);
+            // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
+            _managed(x, y);
         }
 
         public void Dispose()
         {
-            if (_callbackNative == IntPtr.Zero) return;
-            Marshal.FreeHGlobal(_callbackNative);
-            _callbackNative = IntPtr.Zero;
         }
-
 
         [CustomMarshaller(typeof(SumDelegateReturn2), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -4559,7 +4514,6 @@ namespace My.Company
             internal IntPtr Callback;
             internal IntPtr Data;
         }
-
 
         public ref struct Marshaller
         {
@@ -4574,19 +4528,17 @@ namespace My.Company
 
             public Unmanaged ToUnmanaged()
             {
-                return new Unmanaged
-                {
-                    Callback = _managed._callbackNative,
-                    Data = IntPtr.Zero
-                };
+                _unmanaged = new Unmanaged();
+                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Data = IntPtr.Zero;
+                return _unmanaged;
             }
 
             public SumDelegateReturn2 ToManaged()
             {
-                return new SumDelegateReturn2
-                {
-                    _callbackNative = _unmanaged.Callback,
-                };
+                _managed = new SumDelegateReturn2();
+                _managed._ptr = _unmanaged.Callback;
+                return _managed;
             }
 
             public void Free() { }
@@ -4835,9 +4787,9 @@ namespace My.Company
         }
 
         // Debug - write_pattern_service_method 
-        public void SetDelegateTable(ref DelegateTable table)
+        public void SetDelegateTable(DelegateTable table)
         {
-            Interop.service_callbacks_set_delegate_table(_context, ref table);
+            Interop.service_callbacks_set_delegate_table(_context, table);
         }
         // Debug - write_service_method_overload 
 

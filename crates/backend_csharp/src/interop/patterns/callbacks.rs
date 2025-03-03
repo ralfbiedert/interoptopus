@@ -71,10 +71,11 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     //
     // Write the attribute and struct declaration without manual spaces.
 
-    indented!(w, r"public partial struct {} : IDisposable", name)?;
+    indented!(w, r"public partial struct {}", name)?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"private {}Delegate _callbackUser;", name)?;
-    indented!(w, [()], r"private IntPtr _callbackNative;")?;
+    indented!(w, [()], r"private {}Delegate _managed;", name)?;
+    indented!(w, [()], r"private {}Native _native;", name)?;
+    indented!(w, [()], r"private IntPtr _ptr;")?;
     indented!(w, r"}}")?;
     w.newline()?;
     indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
@@ -83,28 +84,29 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     w.newline()?;
     indented!(w, [()], r"public {}() {{ }}", name)?;
     w.newline()?;
-    indented!(w, [()], r"public {}({}Delegate callbackUser)", name, name)?;
+    indented!(w, [()], r"public {}({}Delegate managed)", name, name)?;
     indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"_callbackUser = callbackUser;")?;
-    indented!(w, [()()], r"_callbackNative = Marshal.GetFunctionPointerForDelegate(new {}Native(Call));", name)?;
+    indented!(w, [()()], r"_managed = managed;")?;
+    indented!(w, [()()], r"_native = Call;")?;
+    indented!(w, [()()], r"_ptr = Marshal.GetFunctionPointerForDelegate(_native);")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
     indented!(w, [()], r"public {} Call({})", rval, params_native.join(", "))?;
     indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"// We ignore the last parameter, a generic callback pointer, as it's not needed in C#.")?;
     if the_type.fnpointer().signature().rval().is_void() {
-        indented!(w, [()()], r"_callbackUser({});", param_invokes.join(", "))?;
+        indented!(w, [()()], r"_managed({});", param_invokes.join(", "))?;
     } else {
-        indented!(w, [()()], r"return _callbackUser({});", param_invokes.join(", "))?;
+        indented!(w, [()()], r"return _managed({});", param_invokes.join(", "))?;
     }
     indented!(w, [()], r"}}")?;
     w.newline()?;
     indented!(w, [()], r"public void Dispose()")?;
     indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"if (_callbackNative == IntPtr.Zero) return;")?;
-    indented!(w, [()()], r"Marshal.FreeHGlobal(_callbackNative);")?;
-    indented!(w, [()()], r"_callbackNative = IntPtr.Zero;")?;
+    // indented!(w, [()()], r"if (_callbackNative == IntPtr.Zero) return;")?;
+    // indented!(w, [()()], r"Marshal.FreeHGlobal(_callbackNative);")?;
+    // indented!(w, [()()], r"_callbackNative = IntPtr.Zero;")?;
     indented!(w, [()], r"}}")?;
-    w.newline()?;
     w.newline()?;
     indented!(w, [()], r"[CustomMarshaller(typeof({}), MarshalMode.Default, typeof(Marshaller))]", name)?;
     indented!(w, [()], r"private struct MarshallerMeta {{  }}")?;
@@ -115,7 +117,6 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()()], r"internal IntPtr Callback;")?;
     indented!(w, [()()], r"internal IntPtr Data;")?;
     indented!(w, [()], r"}}")?;
-    w.newline()?;
     w.newline()?;
     indented!(w, [()], r"public ref struct Marshaller")?;
     indented!(w, [()], r"{{")?;
@@ -130,19 +131,17 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     w.newline()?;
     indented!(w, [()()], r"public Unmanaged ToUnmanaged()")?;
     indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"return new Unmanaged")?;
-    indented!(w, [()()()], r"{{")?;
-    indented!(w, [()()()()], r"Callback = _managed._callbackNative,")?;
-    indented!(w, [()()()()], r"Data = IntPtr.Zero")?;
-    indented!(w, [()()()], r"}};")?;
+    indented!(w, [()()()], r"_unmanaged = new Unmanaged();")?;
+    indented!(w, [()()()], r"_unmanaged.Callback = _managed._ptr;")?;
+    indented!(w, [()()()], r"_unmanaged.Data = IntPtr.Zero;")?;
+    indented!(w, [()()()], r"return _unmanaged;")?;
     indented!(w, [()()], r"}}")?;
     w.newline()?;
     indented!(w, [()()], r"public {} ToManaged()", name)?;
     indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"return new {}", name)?;
-    indented!(w, [()()()], r"{{")?;
-    indented!(w, [()()()()], r"_callbackNative = _unmanaged.Callback,")?;
-    indented!(w, [()()()], r"}};")?;
+    indented!(w, [()()()], r"_managed = new {}();", name)?;
+    indented!(w, [()()()], r"_managed._ptr = _unmanaged.Callback;")?;
+    indented!(w, [()()()], r"return _managed;")?;
     indented!(w, [()()], r"}}")?;
     w.newline()?;
     indented!(w, [()()], r"public void Free() {{ }}")?;

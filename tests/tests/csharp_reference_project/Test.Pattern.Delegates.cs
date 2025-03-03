@@ -62,7 +62,7 @@ public class TestPatternDelegates
 
         try
         {
-            // Interop.pattern_callback_7_checked(C1, C2, 3, 7, out rval);
+            Interop.pattern_callback_7(C1, C2, 3, 7, out rval);
         }
         catch (Exception e)
         {
