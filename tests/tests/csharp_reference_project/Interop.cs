@@ -615,6 +615,7 @@ namespace My.Company
                 var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                 var callback_wrapped = new CallbackSliceMut(callback);
                 pattern_ffi_slice_3b(slice_slice, callback_wrapped);
+                callback_wrapped.Dispose();
             }
         }
 
@@ -669,6 +670,7 @@ namespace My.Company
                 var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                 var callback_wrapped = new CallbackU8(callback);
                 pattern_ffi_slice_6(ref slice_slice, callback_wrapped);
+                callback_wrapped.Dispose();
             }
         }
 
@@ -685,6 +687,7 @@ namespace My.Company
                 var slice_slice = new SliceMutCharArray(new IntPtr(ptr_slice), (ulong) slice.Length);
                 var callback_wrapped = new CallbackCharArray2(callback);
                 pattern_ffi_slice_8(ref slice_slice, callback_wrapped);
+                callback_wrapped.Dispose();
             }
         }
 
@@ -698,6 +701,7 @@ namespace My.Company
         {
             var callback_wrapped = new CallbackFFISlice(callback);
             return pattern_ffi_slice_delegate(callback_wrapped);
+            callback_wrapped.Dispose();
         }
 
         // Debug - write_function 
@@ -710,6 +714,7 @@ namespace My.Company
         {
             var callback_wrapped = new CallbackHugeVecSlice(callback);
             return pattern_ffi_slice_delegate_huge(callback_wrapped);
+            callback_wrapped.Dispose();
         }
 
         // Debug - write_function 
@@ -778,6 +783,7 @@ namespace My.Company
         {
             var callback_wrapped = new MyCallback(callback);
             return pattern_callback_1(callback_wrapped, x);
+            callback_wrapped.Dispose();
         }
 
         // Debug - write_function 
@@ -790,6 +796,7 @@ namespace My.Company
         {
             var callback_wrapped = new MyCallbackVoid(callback);
             return pattern_callback_2(callback_wrapped);
+            callback_wrapped.Dispose();
         }
 
         // Debug - write_function 
@@ -802,6 +809,7 @@ namespace My.Company
         {
             var callback_wrapped = new MyCallbackNamespaced(callback);
             return pattern_callback_4(callback_wrapped, x);
+            callback_wrapped.Dispose();
         }
 
         // Debug - write_function 
@@ -835,6 +843,8 @@ namespace My.Company
             {
                 throw new InteropException<FFIError>(rval);
             }
+            c1_wrapped.Dispose();
+            c2_wrapped.Dispose();
         }
 
         // Debug - write_function 
@@ -992,6 +1002,7 @@ namespace My.Company
             {
                 throw new InteropException<FFIError>(rval);
             }
+            callback_wrapped.Dispose();
         }
 
         // Debug - write_function 
@@ -1008,6 +1019,7 @@ namespace My.Company
             {
                 throw new InteropException<FFIError>(rval);
             }
+            callback_wrapped.Dispose();
         }
 
         // Debug - write_function 
@@ -1027,6 +1039,7 @@ namespace My.Company
                 {
                     throw new InteropException<FFIError>(rval);
                 }
+                callback_wrapped.Dispose();
             }
         }
 
@@ -3636,14 +3649,15 @@ namespace My.Company
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void CallbackCharArray2Native(CharArray value, IntPtr callback_data);
-    public delegate void CallbackCharArray2Delegate(CharArray value);
+    public delegate void CallbackCharArray2Native(CharArray value, IntPtr callback_data); // 'True' native callback signature
+    public delegate void CallbackCharArray2Delegate(CharArray value); // Our C# signature
 
     public partial struct CallbackCharArray2
     {
-        private CallbackCharArray2Delegate _managed;
-        private CallbackCharArray2Native _native;
-        private IntPtr _ptr;
+        private CallbackCharArray2Delegate _managed; // C# callback
+        private CallbackCharArray2Native _native; // Native callback 
+        private IntPtr _ptr; // Raw function pointer of native callback
+        private Exception _exception; // Set if the callback encountered an Exception
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -3662,11 +3676,23 @@ namespace My.Company
         public void Call(CharArray value, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
-            _managed(value);
+            try
+            {
+                _managed(value);
+            }
+            catch (Exception e)
+            {
+                _exception = e;
+                return;
+            }
         }
 
         public void Dispose()
         {
+            // This means when the callback was invoked from Rust C# had an exception which
+            // we caught (otherwise C# might not re-enter Rust, and we leak memory). Now is
+            // the time to rethrow it.
+            if (_exception != null) throw _exception;
         }
 
         [CustomMarshaller(typeof(CallbackCharArray2), MarshalMode.Default, typeof(Marshaller))]
@@ -3712,14 +3738,15 @@ namespace My.Company
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate byte CallbackFFISliceNative(SliceU8.Unmanaged slice, IntPtr callback_data);
-    public delegate byte CallbackFFISliceDelegate(SliceU8 slice);
+    public delegate byte CallbackFFISliceNative(SliceU8.Unmanaged slice, IntPtr callback_data); // 'True' native callback signature
+    public delegate byte CallbackFFISliceDelegate(SliceU8 slice); // Our C# signature
 
     public partial struct CallbackFFISlice
     {
-        private CallbackFFISliceDelegate _managed;
-        private CallbackFFISliceNative _native;
-        private IntPtr _ptr;
+        private CallbackFFISliceDelegate _managed; // C# callback
+        private CallbackFFISliceNative _native; // Native callback 
+        private IntPtr _ptr; // Raw function pointer of native callback
+        private Exception _exception; // Set if the callback encountered an Exception
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -3738,11 +3765,23 @@ namespace My.Company
         public byte Call(SliceU8.Unmanaged slice, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
-            return _managed(slice.Managed());
+            try
+            {
+                return _managed(slice.Managed());
+            }
+            catch (Exception e)
+            {
+                _exception = e;
+                return default;
+            }
         }
 
         public void Dispose()
         {
+            // This means when the callback was invoked from Rust C# had an exception which
+            // we caught (otherwise C# might not re-enter Rust, and we leak memory). Now is
+            // the time to rethrow it.
+            if (_exception != null) throw _exception;
         }
 
         [CustomMarshaller(typeof(CallbackFFISlice), MarshalMode.Default, typeof(Marshaller))]
@@ -3788,14 +3827,15 @@ namespace My.Company
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate Vec3f32 CallbackHugeVecSliceNative(SliceVec3f32.Unmanaged slice, IntPtr callback_data);
-    public delegate Vec3f32 CallbackHugeVecSliceDelegate(SliceVec3f32 slice);
+    public delegate Vec3f32 CallbackHugeVecSliceNative(SliceVec3f32.Unmanaged slice, IntPtr callback_data); // 'True' native callback signature
+    public delegate Vec3f32 CallbackHugeVecSliceDelegate(SliceVec3f32 slice); // Our C# signature
 
     public partial struct CallbackHugeVecSlice
     {
-        private CallbackHugeVecSliceDelegate _managed;
-        private CallbackHugeVecSliceNative _native;
-        private IntPtr _ptr;
+        private CallbackHugeVecSliceDelegate _managed; // C# callback
+        private CallbackHugeVecSliceNative _native; // Native callback 
+        private IntPtr _ptr; // Raw function pointer of native callback
+        private Exception _exception; // Set if the callback encountered an Exception
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -3814,11 +3854,23 @@ namespace My.Company
         public Vec3f32 Call(SliceVec3f32.Unmanaged slice, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
-            return _managed(slice.Managed());
+            try
+            {
+                return _managed(slice.Managed());
+            }
+            catch (Exception e)
+            {
+                _exception = e;
+                return default;
+            }
         }
 
         public void Dispose()
         {
+            // This means when the callback was invoked from Rust C# had an exception which
+            // we caught (otherwise C# might not re-enter Rust, and we leak memory). Now is
+            // the time to rethrow it.
+            if (_exception != null) throw _exception;
         }
 
         [CustomMarshaller(typeof(CallbackHugeVecSlice), MarshalMode.Default, typeof(Marshaller))]
@@ -3864,14 +3916,15 @@ namespace My.Company
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void CallbackSliceMutNative(SliceMutU8.Unmanaged slice, IntPtr callback_data);
-    public delegate void CallbackSliceMutDelegate(SliceMutU8 slice);
+    public delegate void CallbackSliceMutNative(SliceMutU8.Unmanaged slice, IntPtr callback_data); // 'True' native callback signature
+    public delegate void CallbackSliceMutDelegate(SliceMutU8 slice); // Our C# signature
 
     public partial struct CallbackSliceMut
     {
-        private CallbackSliceMutDelegate _managed;
-        private CallbackSliceMutNative _native;
-        private IntPtr _ptr;
+        private CallbackSliceMutDelegate _managed; // C# callback
+        private CallbackSliceMutNative _native; // Native callback 
+        private IntPtr _ptr; // Raw function pointer of native callback
+        private Exception _exception; // Set if the callback encountered an Exception
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -3890,11 +3943,23 @@ namespace My.Company
         public void Call(SliceMutU8.Unmanaged slice, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
-            _managed(slice.Managed());
+            try
+            {
+                _managed(slice.Managed());
+            }
+            catch (Exception e)
+            {
+                _exception = e;
+                return;
+            }
         }
 
         public void Dispose()
         {
+            // This means when the callback was invoked from Rust C# had an exception which
+            // we caught (otherwise C# might not re-enter Rust, and we leak memory). Now is
+            // the time to rethrow it.
+            if (_exception != null) throw _exception;
         }
 
         [CustomMarshaller(typeof(CallbackSliceMut), MarshalMode.Default, typeof(Marshaller))]
@@ -3940,14 +4005,15 @@ namespace My.Company
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate byte CallbackU8Native(byte value, IntPtr callback_data);
-    public delegate byte CallbackU8Delegate(byte value);
+    public delegate byte CallbackU8Native(byte value, IntPtr callback_data); // 'True' native callback signature
+    public delegate byte CallbackU8Delegate(byte value); // Our C# signature
 
     public partial struct CallbackU8
     {
-        private CallbackU8Delegate _managed;
-        private CallbackU8Native _native;
-        private IntPtr _ptr;
+        private CallbackU8Delegate _managed; // C# callback
+        private CallbackU8Native _native; // Native callback 
+        private IntPtr _ptr; // Raw function pointer of native callback
+        private Exception _exception; // Set if the callback encountered an Exception
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -3966,11 +4032,23 @@ namespace My.Company
         public byte Call(byte value, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
-            return _managed(value);
+            try
+            {
+                return _managed(value);
+            }
+            catch (Exception e)
+            {
+                _exception = e;
+                return default;
+            }
         }
 
         public void Dispose()
         {
+            // This means when the callback was invoked from Rust C# had an exception which
+            // we caught (otherwise C# might not re-enter Rust, and we leak memory). Now is
+            // the time to rethrow it.
+            if (_exception != null) throw _exception;
         }
 
         [CustomMarshaller(typeof(CallbackU8), MarshalMode.Default, typeof(Marshaller))]
@@ -4016,14 +4094,15 @@ namespace My.Company
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint MyCallbackNative(uint value, IntPtr callback_data);
-    public delegate uint MyCallbackDelegate(uint value);
+    public delegate uint MyCallbackNative(uint value, IntPtr callback_data); // 'True' native callback signature
+    public delegate uint MyCallbackDelegate(uint value); // Our C# signature
 
     public partial struct MyCallback
     {
-        private MyCallbackDelegate _managed;
-        private MyCallbackNative _native;
-        private IntPtr _ptr;
+        private MyCallbackDelegate _managed; // C# callback
+        private MyCallbackNative _native; // Native callback 
+        private IntPtr _ptr; // Raw function pointer of native callback
+        private Exception _exception; // Set if the callback encountered an Exception
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -4042,11 +4121,23 @@ namespace My.Company
         public uint Call(uint value, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
-            return _managed(value);
+            try
+            {
+                return _managed(value);
+            }
+            catch (Exception e)
+            {
+                _exception = e;
+                return default;
+            }
         }
 
         public void Dispose()
         {
+            // This means when the callback was invoked from Rust C# had an exception which
+            // we caught (otherwise C# might not re-enter Rust, and we leak memory). Now is
+            // the time to rethrow it.
+            if (_exception != null) throw _exception;
         }
 
         [CustomMarshaller(typeof(MyCallback), MarshalMode.Default, typeof(Marshaller))]
@@ -4092,14 +4183,15 @@ namespace My.Company
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void MyCallbackContextualNative(IntPtr context, uint value, IntPtr callback_data);
-    public delegate void MyCallbackContextualDelegate(IntPtr context, uint value);
+    public delegate void MyCallbackContextualNative(IntPtr context, uint value, IntPtr callback_data); // 'True' native callback signature
+    public delegate void MyCallbackContextualDelegate(IntPtr context, uint value); // Our C# signature
 
     public partial struct MyCallbackContextual
     {
-        private MyCallbackContextualDelegate _managed;
-        private MyCallbackContextualNative _native;
-        private IntPtr _ptr;
+        private MyCallbackContextualDelegate _managed; // C# callback
+        private MyCallbackContextualNative _native; // Native callback 
+        private IntPtr _ptr; // Raw function pointer of native callback
+        private Exception _exception; // Set if the callback encountered an Exception
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -4118,11 +4210,23 @@ namespace My.Company
         public void Call(IntPtr context, uint value, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
-            _managed(context, value);
+            try
+            {
+                _managed(context, value);
+            }
+            catch (Exception e)
+            {
+                _exception = e;
+                return;
+            }
         }
 
         public void Dispose()
         {
+            // This means when the callback was invoked from Rust C# had an exception which
+            // we caught (otherwise C# might not re-enter Rust, and we leak memory). Now is
+            // the time to rethrow it.
+            if (_exception != null) throw _exception;
         }
 
         [CustomMarshaller(typeof(MyCallbackContextual), MarshalMode.Default, typeof(Marshaller))]
@@ -4168,14 +4272,15 @@ namespace My.Company
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void MyCallbackVoidNative(IntPtr ptr, IntPtr callback_data);
-    public delegate void MyCallbackVoidDelegate(IntPtr ptr);
+    public delegate void MyCallbackVoidNative(IntPtr ptr, IntPtr callback_data); // 'True' native callback signature
+    public delegate void MyCallbackVoidDelegate(IntPtr ptr); // Our C# signature
 
     public partial struct MyCallbackVoid
     {
-        private MyCallbackVoidDelegate _managed;
-        private MyCallbackVoidNative _native;
-        private IntPtr _ptr;
+        private MyCallbackVoidDelegate _managed; // C# callback
+        private MyCallbackVoidNative _native; // Native callback 
+        private IntPtr _ptr; // Raw function pointer of native callback
+        private Exception _exception; // Set if the callback encountered an Exception
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -4194,11 +4299,23 @@ namespace My.Company
         public void Call(IntPtr ptr, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
-            _managed(ptr);
+            try
+            {
+                _managed(ptr);
+            }
+            catch (Exception e)
+            {
+                _exception = e;
+                return;
+            }
         }
 
         public void Dispose()
         {
+            // This means when the callback was invoked from Rust C# had an exception which
+            // we caught (otherwise C# might not re-enter Rust, and we leak memory). Now is
+            // the time to rethrow it.
+            if (_exception != null) throw _exception;
         }
 
         [CustomMarshaller(typeof(MyCallbackVoid), MarshalMode.Default, typeof(Marshaller))]
@@ -4244,14 +4361,15 @@ namespace My.Company
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void SumDelegate1Native(IntPtr callback_data);
-    public delegate void SumDelegate1Delegate();
+    public delegate void SumDelegate1Native(IntPtr callback_data); // 'True' native callback signature
+    public delegate void SumDelegate1Delegate(); // Our C# signature
 
     public partial struct SumDelegate1
     {
-        private SumDelegate1Delegate _managed;
-        private SumDelegate1Native _native;
-        private IntPtr _ptr;
+        private SumDelegate1Delegate _managed; // C# callback
+        private SumDelegate1Native _native; // Native callback 
+        private IntPtr _ptr; // Raw function pointer of native callback
+        private Exception _exception; // Set if the callback encountered an Exception
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -4270,11 +4388,23 @@ namespace My.Company
         public void Call(IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
-            _managed();
+            try
+            {
+                _managed();
+            }
+            catch (Exception e)
+            {
+                _exception = e;
+                return;
+            }
         }
 
         public void Dispose()
         {
+            // This means when the callback was invoked from Rust C# had an exception which
+            // we caught (otherwise C# might not re-enter Rust, and we leak memory). Now is
+            // the time to rethrow it.
+            if (_exception != null) throw _exception;
         }
 
         [CustomMarshaller(typeof(SumDelegate1), MarshalMode.Default, typeof(Marshaller))]
@@ -4320,14 +4450,15 @@ namespace My.Company
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate int SumDelegate2Native(int x, int y, IntPtr callback_data);
-    public delegate int SumDelegate2Delegate(int x, int y);
+    public delegate int SumDelegate2Native(int x, int y, IntPtr callback_data); // 'True' native callback signature
+    public delegate int SumDelegate2Delegate(int x, int y); // Our C# signature
 
     public partial struct SumDelegate2
     {
-        private SumDelegate2Delegate _managed;
-        private SumDelegate2Native _native;
-        private IntPtr _ptr;
+        private SumDelegate2Delegate _managed; // C# callback
+        private SumDelegate2Native _native; // Native callback 
+        private IntPtr _ptr; // Raw function pointer of native callback
+        private Exception _exception; // Set if the callback encountered an Exception
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -4346,11 +4477,23 @@ namespace My.Company
         public int Call(int x, int y, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
-            return _managed(x, y);
+            try
+            {
+                return _managed(x, y);
+            }
+            catch (Exception e)
+            {
+                _exception = e;
+                return default;
+            }
         }
 
         public void Dispose()
         {
+            // This means when the callback was invoked from Rust C# had an exception which
+            // we caught (otherwise C# might not re-enter Rust, and we leak memory). Now is
+            // the time to rethrow it.
+            if (_exception != null) throw _exception;
         }
 
         [CustomMarshaller(typeof(SumDelegate2), MarshalMode.Default, typeof(Marshaller))]
@@ -4396,14 +4539,15 @@ namespace My.Company
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate FFIError SumDelegateReturnNative(int x, int y, IntPtr callback_data);
-    public delegate FFIError SumDelegateReturnDelegate(int x, int y);
+    public delegate FFIError SumDelegateReturnNative(int x, int y, IntPtr callback_data); // 'True' native callback signature
+    public delegate FFIError SumDelegateReturnDelegate(int x, int y); // Our C# signature
 
     public partial struct SumDelegateReturn
     {
-        private SumDelegateReturnDelegate _managed;
-        private SumDelegateReturnNative _native;
-        private IntPtr _ptr;
+        private SumDelegateReturnDelegate _managed; // C# callback
+        private SumDelegateReturnNative _native; // Native callback 
+        private IntPtr _ptr; // Raw function pointer of native callback
+        private Exception _exception; // Set if the callback encountered an Exception
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -4422,11 +4566,23 @@ namespace My.Company
         public FFIError Call(int x, int y, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
-            return _managed(x, y);
+            try
+            {
+                return _managed(x, y);
+            }
+            catch (Exception e)
+            {
+                _exception = e;
+                return FFIError.Panic;
+            }
         }
 
         public void Dispose()
         {
+            // This means when the callback was invoked from Rust C# had an exception which
+            // we caught (otherwise C# might not re-enter Rust, and we leak memory). Now is
+            // the time to rethrow it.
+            if (_exception != null) throw _exception;
         }
 
         [CustomMarshaller(typeof(SumDelegateReturn), MarshalMode.Default, typeof(Marshaller))]
@@ -4472,14 +4628,15 @@ namespace My.Company
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void SumDelegateReturn2Native(int x, int y, IntPtr callback_data);
-    public delegate void SumDelegateReturn2Delegate(int x, int y);
+    public delegate void SumDelegateReturn2Native(int x, int y, IntPtr callback_data); // 'True' native callback signature
+    public delegate void SumDelegateReturn2Delegate(int x, int y); // Our C# signature
 
     public partial struct SumDelegateReturn2
     {
-        private SumDelegateReturn2Delegate _managed;
-        private SumDelegateReturn2Native _native;
-        private IntPtr _ptr;
+        private SumDelegateReturn2Delegate _managed; // C# callback
+        private SumDelegateReturn2Native _native; // Native callback 
+        private IntPtr _ptr; // Raw function pointer of native callback
+        private Exception _exception; // Set if the callback encountered an Exception
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -4498,11 +4655,23 @@ namespace My.Company
         public void Call(int x, int y, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
-            _managed(x, y);
+            try
+            {
+                _managed(x, y);
+            }
+            catch (Exception e)
+            {
+                _exception = e;
+                return;
+            }
         }
 
         public void Dispose()
         {
+            // This means when the callback was invoked from Rust C# had an exception which
+            // we caught (otherwise C# might not re-enter Rust, and we leak memory). Now is
+            // the time to rethrow it.
+            if (_exception != null) throw _exception;
         }
 
         [CustomMarshaller(typeof(SumDelegateReturn2), MarshalMode.Default, typeof(Marshaller))]

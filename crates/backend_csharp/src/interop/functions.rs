@@ -290,12 +290,6 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
                 to_invoke.push(format!("{name}_slice"));
             }
             CType::Pattern(TypePattern::NamedCallback(callback)) => {
-                // CType::Pattern(TypePattern::FFIErrorEnum(_)) if i.work_around_exception_in_callback_no_reentry => {
-                //     to_wrap_delegates.push(name);
-                //     to_wrap_delegate_types.push(to_typespecifier_in_param(p.the_type()));
-                //     to_invoke.push(format!("{name}_safe_delegate.Call"));
-                // }
-                // _ => fallback(),
                 to_wrap_name.push(name);
                 to_wrap_type.push(to_typespecifier_in_param(p.the_type()));
                 to_invoke.push(format!("{name}_wrapped"));
@@ -335,10 +329,6 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     indented!(w, "{}", signature)?;
     indented!(w, r"{{")?;
 
-    // for (name, ty) in zip(&to_wrap_delegates, &to_wrap_delegate_types) {
-    //     indented!(w, [()], r"var {}_safe_delegate = new {}ExceptionSafe({});", name, ty, name)?;
-    // }
-
     if !to_pin_name.is_empty() {
         for (pin_var, slice_struct) in to_pin_name.iter().zip(to_pin_slice_type.iter()) {
             indented!(w, [()], r"fixed (void* ptr_{} = {})", pin_var, pin_var)?;
@@ -357,13 +347,17 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         },
     );
 
-    for (n, t) in zip(to_wrap_name, to_wrap_type) {
+    for (n, t) in zip(&to_wrap_name, &to_wrap_type) {
         indented!(w, [()], r"var {}_wrapped = new {}({});", n, t, n)?;
     }
 
     let call = format!(r"{}({})", fn_name, to_invoke.join(", "));
 
     write_function_overloaded_invoke_with_error_handling(i, w, function, &call, to_wrap_delegates.as_slice())?;
+
+    for n in to_wrap_name {
+        indented!(w, [()], r"{}_wrapped.Dispose();", n)?;
+    }
 
     if !to_pin_name.is_empty() {
         for _ in &to_pin_name {

@@ -1,7 +1,7 @@
 use crate::converter::{function_parameter_to_csharp_typename, named_callback_to_typename, to_typespecifier_in_param, to_typespecifier_in_rval};
 use crate::interop::types::fnptrs::write_type_definition_fn_pointer_annotation;
 use crate::Interop;
-use interoptopus::lang::c::CType;
+use interoptopus::lang::c::{CType, PrimitiveType};
 use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::IndentWriter;
@@ -37,13 +37,13 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     write_type_definition_fn_pointer_annotation(w, the_type.fnpointer())?;
     indented!(
         w,
-        r"{} delegate {} {}Native({});",
+        r"{} delegate {} {}Native({}); // 'True' native callback signature",
         visibility,
         i.to_native_callback_typespecifier(the_type.fnpointer().signature().rval()),
         name,
         params_native.join(", ")
     )?;
-    indented!(w, r"{} delegate {} {}Delegate({});", visibility, rval, name, params.join(", "))?;
+    indented!(w, r"{} delegate {} {}Delegate({}); // Our C# signature", visibility, rval, name, params.join(", "))?;
     w.newline()?;
 
     // indented!(w, r"[NativeMarshalling(typeof(CallbackStructMarshaller<{}Native>))]", name)?;
@@ -73,9 +73,10 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
 
     indented!(w, r"public partial struct {}", name)?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"private {}Delegate _managed;", name)?;
-    indented!(w, [()], r"private {}Native _native;", name)?;
-    indented!(w, [()], r"private IntPtr _ptr;")?;
+    indented!(w, [()], r"private {}Delegate _managed; // C# callback", name)?;
+    indented!(w, [()], r"private {}Native _native; // Native callback ", name)?;
+    indented!(w, [()], r"private IntPtr _ptr; // Raw function pointer of native callback")?;
+    indented!(w, [()], r"private Exception _exception; // Set if the callback encountered an Exception")?;
     indented!(w, r"}}")?;
     w.newline()?;
     indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
@@ -94,18 +95,33 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()], r"public {} Call({})", rval, params_native.join(", "))?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"// We ignore the last parameter, a generic callback pointer, as it's not needed in C#.")?;
+    indented!(w, [()()], r"try")?;
+    indented!(w, [()()], r"{{")?;
     if the_type.fnpointer().signature().rval().is_void() {
-        indented!(w, [()()], r"_managed({});", param_invokes.join(", "))?;
+        indented!(w, [()()()], r"_managed({});", param_invokes.join(", "))?;
     } else {
-        indented!(w, [()()], r"return _managed({});", param_invokes.join(", "))?;
+        indented!(w, [()()()], r"return _managed({});", param_invokes.join(", "))?;
     }
+    indented!(w, [()()], r"}}")?;
+    indented!(w, [()()], r"catch (Exception e)")?;
+    indented!(w, [()()], r"{{")?;
+    indented!(w, [()()()], r"_exception = e;")?;
+    match the_type.fnpointer().signature().rval() {
+        CType::Primitive(PrimitiveType::Void) => indented!(w, [()()()], r"return;")?,
+        CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
+            indented!(w, [()()()], r"return {}.{};", rval, e.panic_variant().name())?;
+        }
+        _ => indented!(w, [()()()], r"return default;")?,
+    }
+    indented!(w, [()()], r"}}")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
     indented!(w, [()], r"public void Dispose()")?;
     indented!(w, [()], r"{{")?;
-    // indented!(w, [()()], r"if (_callbackNative == IntPtr.Zero) return;")?;
-    // indented!(w, [()()], r"Marshal.FreeHGlobal(_callbackNative);")?;
-    // indented!(w, [()()], r"_callbackNative = IntPtr.Zero;")?;
+    indented!(w, [()()], r"// This means when the callback was invoked from Rust C# had an exception which")?;
+    indented!(w, [()()], r"// we caught (otherwise C# might not re-enter Rust, and we leak memory). Now is")?;
+    indented!(w, [()()], r"// the time to rethrow it.")?;
+    indented!(w, [()()], r"if (_exception != null) throw _exception;")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
     indented!(w, [()], r"[CustomMarshaller(typeof({}), MarshalMode.Default, typeof(Marshaller))]", name)?;
