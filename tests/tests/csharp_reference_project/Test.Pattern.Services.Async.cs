@@ -30,7 +30,6 @@ public class TestPatternServicesAsync
             var ms = Random.Shared.Next(100, 1000);
             
             var r = await s.ReturnAfterMs((ulong) x, (ulong) ms);
-            
             Assert.Equal((int) r.Ok(), x);
         }).ToList();
         

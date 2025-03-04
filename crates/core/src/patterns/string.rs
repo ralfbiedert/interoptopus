@@ -55,6 +55,11 @@ pub struct CStrPointer<'a> {
     _phantom: PhantomData<&'a ()>,
 }
 
+// Safety: `CStrPointer` is a transparent wrapper around a pointer. From Rust
+//         we only allow safe construction, from interop it's up to the FFI caller.
+unsafe impl Send for CStrPointer<'_> {}
+unsafe impl Sync for CStrPointer<'_> {}
+
 impl Default for CStrPointer<'_> {
     fn default() -> Self {
         Self { ptr: null(), _phantom: PhantomData::default() }

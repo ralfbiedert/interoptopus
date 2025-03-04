@@ -261,6 +261,12 @@ macro_rules! callback {
         #[repr(C)]
         pub struct $name(::std::option::Option<extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval>, *const ::std::ffi::c_void);
 
+        // Safety: This is a transparent wrapper around a function pointer
+        //         and user-managed callback state. From out perspective
+        //         this is thread safe, as long as the caller's code is.
+        unsafe impl ::std::marker::Send for $name {}
+        unsafe impl ::std::marker::Sync for $name {}
+
         impl $name {
             /// Creates a new instance of the callback using `extern "C" fn`
             pub fn new(func: extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval) -> Self {

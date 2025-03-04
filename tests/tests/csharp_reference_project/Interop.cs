@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 11742672840196803799ul)
+            if (api_version != 7122984414827529015ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (11742672840196803799). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (7122984414827529015). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -864,7 +864,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_async_destroy")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_async_destroy(ref IntPtr context);
+        public static partial FFIError service_async_destroy(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_async_destroy 
@@ -872,7 +872,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_new")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_async_new(ref IntPtr context);
+        public static partial FFIError service_async_new(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_async_new 
@@ -880,7 +880,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_return_after_ms")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_async_return_after_ms(IntPtr context, ulong x, ulong ms, AsyncHelper async_callback);
+        public static partial FFIError service_async_return_after_ms(IntPtr _context, ulong x, ulong ms, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_async_return_after_ms 
@@ -888,7 +888,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_process_struct")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_async_process_struct(IntPtr context, NestedArray x, AsyncHelper async_callback);
+        public static partial FFIError service_async_process_struct(IntPtr _context, NestedArray x, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_async_process_struct 
@@ -896,7 +896,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_bad")]
         // Debug - write_function_declaration 
-        public static partial void service_async_bad(IntPtr context);
+        public static partial void service_async_bad(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_async_bad 
@@ -910,7 +910,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "basic_service_destroy")]
         // Debug - write_function_declaration 
-        public static partial FFIError basic_service_destroy(ref IntPtr context);
+        public static partial FFIError basic_service_destroy(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for basic_service_destroy 
@@ -918,7 +918,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "basic_service_new")]
         // Debug - write_function_declaration 
-        public static partial FFIError basic_service_new(ref IntPtr context);
+        public static partial FFIError basic_service_new(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for basic_service_new 
@@ -932,7 +932,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_destroy")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_on_panic_destroy(ref IntPtr context);
+        public static partial FFIError service_on_panic_destroy(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_destroy 
@@ -940,7 +940,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_new")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_on_panic_new(ref IntPtr context);
+        public static partial FFIError service_on_panic_new(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_new 
@@ -950,7 +950,7 @@ namespace My.Company
         /// need annotations.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_result")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_on_panic_return_result(IntPtr context, uint anon1);
+        public static partial FFIError service_on_panic_return_result(IntPtr _context, uint anon1);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_return_result 
@@ -959,7 +959,7 @@ namespace My.Company
         /// Methods returning a value need an `on_panic` annotation.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_default_value")]
         // Debug - write_function_declaration 
-        public static partial uint service_on_panic_return_default_value(IntPtr context, uint x);
+        public static partial uint service_on_panic_return_default_value(IntPtr _context, uint x);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_return_default_value 
@@ -969,7 +969,7 @@ namespace My.Company
         /// call, but if it panics your host app will abort.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_ub_on_panic")]
         // Debug - write_function_declaration 
-        public static partial IntPtr service_on_panic_return_ub_on_panic(IntPtr context);
+        public static partial IntPtr service_on_panic_return_ub_on_panic(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_return_ub_on_panic 
@@ -983,7 +983,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_destroy")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_callbacks_destroy(ref IntPtr context);
+        public static partial FFIError service_callbacks_destroy(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_destroy 
@@ -991,7 +991,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_new")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_callbacks_new(ref IntPtr context);
+        public static partial FFIError service_callbacks_new(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_new 
@@ -999,13 +999,13 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_simple")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_callbacks_callback_simple(IntPtr context, MyCallback callback);
+        public static partial FFIError service_callbacks_callback_simple(IntPtr _context, MyCallback callback);
 
         // Debug - write_function_overload 
-        public static unsafe void service_callbacks_callback_simple(IntPtr context, MyCallbackDelegate callback)
+        public static unsafe void service_callbacks_callback_simple(IntPtr _context, MyCallbackDelegate callback)
         {
             var callback_wrapped = new MyCallback(callback);
-            var rval = service_callbacks_callback_simple(context, callback_wrapped);
+            var rval = service_callbacks_callback_simple(_context, callback_wrapped);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -1016,13 +1016,13 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_ffi_return")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_callbacks_callback_ffi_return(IntPtr context, SumDelegateReturn callback);
+        public static partial FFIError service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturn callback);
 
         // Debug - write_function_overload 
-        public static unsafe void service_callbacks_callback_ffi_return(IntPtr context, SumDelegateReturnDelegate callback)
+        public static unsafe void service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturnDelegate callback)
         {
             var callback_wrapped = new SumDelegateReturn(callback);
-            var rval = service_callbacks_callback_ffi_return(context, callback_wrapped);
+            var rval = service_callbacks_callback_ffi_return(_context, callback_wrapped);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -1033,16 +1033,16 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_with_slice")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturn callback, SliceI32 input);
+        public static partial FFIError service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturn callback, SliceI32 input);
 
         // Debug - write_function_overload 
-        public static unsafe void service_callbacks_callback_with_slice(IntPtr context, SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
+        public static unsafe void service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
         {
             fixed (void* ptr_input = input)
             {
                 var input_slice = new SliceI32(new IntPtr(ptr_input), (ulong) input.Length);
                 var callback_wrapped = new SumDelegateReturn(callback);
-                var rval = service_callbacks_callback_with_slice(context, callback_wrapped, input_slice);
+                var rval = service_callbacks_callback_with_slice(_context, callback_wrapped, input_slice);
                 if (rval != FFIError.Ok)
                 {
                     throw new InteropException<FFIError>(rval);
@@ -1054,7 +1054,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_set_delegate_table")]
         // Debug - write_function_declaration 
-        public static partial void service_callbacks_set_delegate_table(IntPtr context, DelegateTable table);
+        public static partial void service_callbacks_set_delegate_table(IntPtr _context, DelegateTable table);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_set_delegate_table 
@@ -1062,7 +1062,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_invoke_delegates")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_callbacks_invoke_delegates(IntPtr context);
+        public static partial FFIError service_callbacks_invoke_delegates(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_invoke_delegates 
@@ -1076,7 +1076,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_destroy")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_ignoring_methods_destroy(ref IntPtr context);
+        public static partial FFIError service_ignoring_methods_destroy(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_ignoring_methods_destroy 
@@ -1084,7 +1084,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_new")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_ignoring_methods_new(ref IntPtr context);
+        public static partial FFIError service_ignoring_methods_new(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_ignoring_methods_new 
@@ -1098,7 +1098,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_destroy")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_multiple_ctors_destroy(ref IntPtr context);
+        public static partial FFIError service_multiple_ctors_destroy(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_destroy 
@@ -1106,7 +1106,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_multiple_ctors_new_with(ref IntPtr context, uint some_value);
+        public static partial FFIError service_multiple_ctors_new_with(ref IntPtr _context, uint some_value);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_with 
@@ -1114,7 +1114,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_without")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_multiple_ctors_new_without(ref IntPtr context);
+        public static partial FFIError service_multiple_ctors_new_without(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_without 
@@ -1122,7 +1122,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with_string")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_multiple_ctors_new_with_string(ref IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string anon0);
+        public static partial FFIError service_multiple_ctors_new_with_string(ref IntPtr _context, [MarshalAs(UnmanagedType.LPStr)] string anon0);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_with_string 
@@ -1130,7 +1130,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_failing")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_multiple_ctors_new_failing(ref IntPtr context, byte some_value);
+        public static partial FFIError service_multiple_ctors_new_failing(ref IntPtr _context, byte some_value);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_failing 
@@ -1144,7 +1144,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_destroy")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_using_lifetimes_destroy(ref IntPtr context);
+        public static partial FFIError service_using_lifetimes_destroy(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_using_lifetimes_destroy 
@@ -1152,7 +1152,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_new_with")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_using_lifetimes_new_with(ref IntPtr context, ref uint some_value);
+        public static partial FFIError service_using_lifetimes_new_with(ref IntPtr _context, ref uint some_value);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_using_lifetimes_new_with 
@@ -1160,30 +1160,30 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_lifetime_1")]
         // Debug - write_function_declaration 
-        public static partial void service_using_lifetimes_lifetime_1(IntPtr context, SliceBool slice);
+        public static partial void service_using_lifetimes_lifetime_1(IntPtr _context, SliceBool slice);
 
         // Debug - write_function_overload 
-        public static unsafe void service_using_lifetimes_lifetime_1(IntPtr context, ReadOnlySpan<Bool> slice)
+        public static unsafe void service_using_lifetimes_lifetime_1(IntPtr _context, ReadOnlySpan<Bool> slice)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
-                service_using_lifetimes_lifetime_1(context, slice_slice);
+                service_using_lifetimes_lifetime_1(_context, slice_slice);
             }
         }
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_lifetime_2")]
         // Debug - write_function_declaration 
-        public static partial void service_using_lifetimes_lifetime_2(IntPtr context, SliceBool slice);
+        public static partial void service_using_lifetimes_lifetime_2(IntPtr _context, SliceBool slice);
 
         // Debug - write_function_overload 
-        public static unsafe void service_using_lifetimes_lifetime_2(IntPtr context, ReadOnlySpan<Bool> slice)
+        public static unsafe void service_using_lifetimes_lifetime_2(IntPtr _context, ReadOnlySpan<Bool> slice)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
-                service_using_lifetimes_lifetime_2(context, slice_slice);
+                service_using_lifetimes_lifetime_2(_context, slice_slice);
             }
         }
 
@@ -1212,7 +1212,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_destroy")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_various_slices_destroy(ref IntPtr context);
+        public static partial FFIError service_various_slices_destroy(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_various_slices_destroy 
@@ -1220,7 +1220,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_new")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_various_slices_new(ref IntPtr context);
+        public static partial FFIError service_various_slices_new(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_various_slices_new 
@@ -1228,15 +1228,15 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self")]
         // Debug - write_function_declaration 
-        public static partial byte service_various_slices_mut_self(IntPtr context, SliceU8 slice);
+        public static partial byte service_various_slices_mut_self(IntPtr _context, SliceU8 slice);
 
         // Debug - write_function_overload 
-        public static unsafe byte service_various_slices_mut_self(IntPtr context, ReadOnlySpan<byte> slice)
+        public static unsafe byte service_various_slices_mut_self(IntPtr _context, ReadOnlySpan<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                return service_various_slices_mut_self(context, slice_slice);
+                return service_various_slices_mut_self(_context, slice_slice);
             }
         }
 
@@ -1244,23 +1244,23 @@ namespace My.Company
         /// Single line.
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_void")]
         // Debug - write_function_declaration 
-        public static partial void service_various_slices_mut_self_void(IntPtr context, SliceBool slice);
+        public static partial void service_various_slices_mut_self_void(IntPtr _context, SliceBool slice);
 
         // Debug - write_function_overload 
         /// Single line.
-        public static unsafe void service_various_slices_mut_self_void(IntPtr context, ReadOnlySpan<Bool> slice)
+        public static unsafe void service_various_slices_mut_self_void(IntPtr _context, ReadOnlySpan<Bool> slice)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
-                service_various_slices_mut_self_void(context, slice_slice);
+                service_various_slices_mut_self_void(_context, slice_slice);
             }
         }
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref")]
         // Debug - write_function_declaration 
-        public static partial byte service_various_slices_mut_self_ref(IntPtr context, ref byte x, out byte y);
+        public static partial byte service_various_slices_mut_self_ref(IntPtr _context, ref byte x, out byte y);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_various_slices_mut_self_ref 
@@ -1268,25 +1268,25 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice")]
         // Debug - write_function_declaration 
-        public static partial byte service_various_slices_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, SliceU8 slice);
+        public static partial byte service_various_slices_mut_self_ref_slice(IntPtr _context, ref byte x, out byte y, SliceU8 slice);
 
         // Debug - write_function_overload 
-        public static unsafe byte service_various_slices_mut_self_ref_slice(IntPtr context, ref byte x, out byte y, ReadOnlySpan<byte> slice)
+        public static unsafe byte service_various_slices_mut_self_ref_slice(IntPtr _context, ref byte x, out byte y, ReadOnlySpan<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                return service_various_slices_mut_self_ref_slice(context, ref x, out y, slice_slice);
+                return service_various_slices_mut_self_ref_slice(_context, ref x, out y, slice_slice);
             }
         }
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice_limited")]
         // Debug - write_function_declaration 
-        public static partial byte service_various_slices_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, SliceU8 slice, SliceU8 slice2);
+        public static partial byte service_various_slices_mut_self_ref_slice_limited(IntPtr _context, ref byte x, out byte y, SliceU8 slice, SliceU8 slice2);
 
         // Debug - write_function_overload 
-        public static unsafe byte service_various_slices_mut_self_ref_slice_limited(IntPtr context, ref byte x, out byte y, ReadOnlySpan<byte> slice, ReadOnlySpan<byte> slice2)
+        public static unsafe byte service_various_slices_mut_self_ref_slice_limited(IntPtr _context, ref byte x, out byte y, ReadOnlySpan<byte> slice, ReadOnlySpan<byte> slice2)
         {
             fixed (void* ptr_slice = slice)
             {
@@ -1294,7 +1294,7 @@ namespace My.Company
                 fixed (void* ptr_slice2 = slice2)
                 {
                     var slice2_slice = new SliceU8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
-                    return service_various_slices_mut_self_ref_slice_limited(context, ref x, out y, slice_slice, slice2_slice);
+                    return service_various_slices_mut_self_ref_slice_limited(_context, ref x, out y, slice_slice, slice2_slice);
                 }
             }
         }
@@ -1302,15 +1302,15 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ffi_error")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_various_slices_mut_self_ffi_error(IntPtr context, SliceMutU8 slice);
+        public static partial FFIError service_various_slices_mut_self_ffi_error(IntPtr _context, SliceMutU8 slice);
 
         // Debug - write_function_overload 
-        public static unsafe void service_various_slices_mut_self_ffi_error(IntPtr context, Span<byte> slice)
+        public static unsafe void service_various_slices_mut_self_ffi_error(IntPtr _context, Span<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                var rval = service_various_slices_mut_self_ffi_error(context, slice_slice);
+                var rval = service_various_slices_mut_self_ffi_error(_context, slice_slice);
                 if (rval != FFIError.Ok)
                 {
                     throw new InteropException<FFIError>(rval);
@@ -1321,15 +1321,15 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_no_error")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_various_slices_mut_self_no_error(IntPtr context, SliceMutU8 slice);
+        public static partial FFIError service_various_slices_mut_self_no_error(IntPtr _context, SliceMutU8 slice);
 
         // Debug - write_function_overload 
-        public static unsafe void service_various_slices_mut_self_no_error(IntPtr context, Span<byte> slice)
+        public static unsafe void service_various_slices_mut_self_no_error(IntPtr _context, Span<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                var rval = service_various_slices_mut_self_no_error(context, slice_slice);
+                var rval = service_various_slices_mut_self_no_error(_context, slice_slice);
                 if (rval != FFIError.Ok)
                 {
                     throw new InteropException<FFIError>(rval);
@@ -1342,7 +1342,7 @@ namespace My.Company
         /// again, as otherwise undefined behavior might happen.
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_return_slice")]
         // Debug - write_function_declaration 
-        public static partial SliceU32 service_various_slices_return_slice(IntPtr context);
+        public static partial SliceU32 service_various_slices_return_slice(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_various_slices_return_slice 
@@ -1352,7 +1352,7 @@ namespace My.Company
         /// again, as otherwise undefined behavior might happen.
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_return_slice_mut")]
         // Debug - write_function_declaration 
-        public static partial SliceMutU32 service_various_slices_return_slice_mut(IntPtr context);
+        public static partial SliceMutU32 service_various_slices_return_slice_mut(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_various_slices_return_slice_mut 
@@ -1366,7 +1366,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_strings_destroy")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_strings_destroy(ref IntPtr context);
+        public static partial FFIError service_strings_destroy(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_strings_destroy 
@@ -1374,7 +1374,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_new")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_strings_new(ref IntPtr context);
+        public static partial FFIError service_strings_new(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_strings_new 
@@ -1382,7 +1382,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_pass_string")]
         // Debug - write_function_declaration 
-        public static partial void service_strings_pass_string(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string anon1);
+        public static partial void service_strings_pass_string(IntPtr _context, [MarshalAs(UnmanagedType.LPStr)] string anon1);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_strings_pass_string 
@@ -1390,7 +1390,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_return_string")]
         // Debug - write_function_declaration 
-        public static partial IntPtr service_strings_return_string(IntPtr context);
+        public static partial IntPtr service_strings_return_string(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_strings_return_string 

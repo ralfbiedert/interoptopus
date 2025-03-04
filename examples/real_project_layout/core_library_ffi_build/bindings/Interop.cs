@@ -36,19 +36,19 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "game_engine_destroy")]
-        public static partial FFIError game_engine_destroy(ref IntPtr context);
+        public static partial FFIError game_engine_destroy(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "game_engine_new")]
-        public static partial FFIError game_engine_new(ref IntPtr context);
+        public static partial FFIError game_engine_new(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "game_engine_place_object")]
-        public static partial FFIError game_engine_place_object(IntPtr context, [MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position);
+        public static partial FFIError game_engine_place_object(IntPtr _context, [MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position);
 
 
         [LibraryImport(NativeLib, EntryPoint = "game_engine_num_objects")]
-        public static partial uint game_engine_num_objects(IntPtr context);
+        public static partial uint game_engine_num_objects(IntPtr _context);
 
 
     }

@@ -4,7 +4,9 @@ use crate::patterns;
 use crate::patterns::TypePattern;
 use std::ffi::c_void;
 use std::future::Future;
+use std::ops::Deref;
 use std::ptr::null;
+use std::sync::Arc;
 
 /// TODO: Document must be thread safe
 #[derive(Clone, Copy)]
@@ -67,6 +69,68 @@ unsafe impl<T: CTypeInfo> CTypeInfo for AsyncCallback<T> {
     }
 }
 
+pub struct AsyncSelf<S> {
+    s: Arc<S>, // Self
+}
+
+impl<S> AsyncSelf<S> {
+    pub fn new(s: Arc<S>) -> Self {
+        Self { s }
+    }
+}
+
+impl<S> Deref for AsyncSelf<S> {
+    type Target = Arc<S>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.s
+    }
+}
+
+pub struct AsyncThreadLocal<S, T> {
+    s: Arc<S>, // Self
+    t: T,      // Thread locals from runtime
+}
+
+impl<S, T> AsyncThreadLocal<S, T> {
+    pub fn new(s: Arc<S>, t: T) -> Self {
+        Self { s, t }
+    }
+
+    pub fn slf(&self) -> &Arc<S> {
+        &self.s
+    }
+}
+
+impl<S, T> Deref for AsyncThreadLocal<S, T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.t
+    }
+}
+
 pub trait AsyncRuntime {
-    fn spawn<F: Future<Output = ()> + Send + 'static>(&self, f: F);
+    type ThreadLocal; // Thread local;
+
+    fn spawn<Fn, F>(&self, f: Fn)
+    where
+        Fn: FnOnce(Self::ThreadLocal) -> F,
+        F: Future<Output = ()> + Send + 'static;
+}
+
+pub trait AsyncProxy<S, T> {
+    fn new(s: Arc<S>, t: T) -> Self;
+}
+
+impl<S, T> AsyncProxy<S, T> for AsyncThreadLocal<S, T> {
+    fn new(s: Arc<S>, t: T) -> Self {
+        Self::new(s, t)
+    }
+}
+
+impl<S, T> AsyncProxy<S, T> for AsyncSelf<S> {
+    fn new(s: Arc<S>, _: T) -> Self {
+        Self::new(s)
+    }
 }

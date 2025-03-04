@@ -262,7 +262,7 @@ pub fn to_slice_marshaller(t: &CType) -> String {
 }
 
 #[must_use]
-pub fn pattern_to_native_in_signature(i: &Interop, param: &Parameter) -> String {
+pub fn pattern_to_native_in_signature(_: &Interop, param: &Parameter) -> String {
     let slice_type_name = |mutable: bool, element_type: &CType| -> String {
         if mutable {
             format!("Span<{}>", to_typespecifier_in_param(element_type))

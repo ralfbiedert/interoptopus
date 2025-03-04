@@ -1,10 +1,9 @@
 use crate::patterns::result::Error;
 use crate::patterns::result::FFIError;
 use crate::types::NestedArray;
-use interoptopus::patterns::asynk::AsyncRuntime;
+use interoptopus::patterns::asynk::{AsyncRuntime, AsyncSelf};
 use interoptopus::{ffi_service, ffi_service_ctor, ffi_type};
 use std::future::Future;
-use std::sync::Arc;
 use tokio::runtime::Runtime;
 
 #[ffi_type(opaque)]
@@ -12,13 +11,7 @@ pub struct ServiceAsync {
     runtime: Runtime,
 }
 
-impl AsyncRuntime for ServiceAsync {
-    fn spawn<F: Future<Output = ()> + Send + 'static>(&self, f: F) {
-        self.runtime.spawn(f);
-    }
-}
-
-#[ffi_service(error = "FFIError")]
+#[ffi_service(error = "FFIError", debug)]
 impl ServiceAsync {
     #[ffi_service_ctor]
     pub fn new() -> Result<Self, Error> {
@@ -31,12 +24,12 @@ impl ServiceAsync {
         Ok(Self { runtime })
     }
 
-    pub async fn return_after_ms(self: Arc<ServiceAsync>, x: u64, ms: u64) -> Result<u64, FFIError> {
+    pub async fn return_after_ms(this: This, x: u64, ms: u64) -> Result<u64, FFIError> {
         tokio::time::sleep(std::time::Duration::from_millis(ms)).await;
         Ok(x)
     }
 
-    pub async fn process_struct(self: Arc<ServiceAsync>, mut x: NestedArray) -> Result<NestedArray, FFIError> {
+    pub async fn process_struct(this: This, mut x: NestedArray) -> Result<NestedArray, FFIError> {
         x.field_int += 1;
         Ok(x)
     }
@@ -44,3 +37,17 @@ impl ServiceAsync {
     // TODO: This must not compile.
     pub fn bad(&mut self) {}
 }
+
+impl AsyncRuntime for ServiceAsync {
+    type ThreadLocal = ();
+
+    fn spawn<Fn, F>(&self, f: Fn)
+    where
+        Fn: FnOnce(Self::ThreadLocal) -> F,
+        F: Future<Output = ()> + Send + 'static,
+    {
+        self.runtime.spawn(f(()));
+    }
+}
+
+type This = AsyncSelf<ServiceAsync>;
