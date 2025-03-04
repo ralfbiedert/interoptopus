@@ -110,15 +110,6 @@ impl<S, T> Deref for AsyncThreadLocal<S, T> {
     }
 }
 
-pub trait AsyncRuntime {
-    type ThreadLocal; // Thread local;
-
-    fn spawn<Fn, F>(&self, f: Fn)
-    where
-        Fn: FnOnce(Self::ThreadLocal) -> F,
-        F: Future<Output = ()> + Send + 'static;
-}
-
 pub trait AsyncProxy<S, T> {
     fn new(s: Arc<S>, t: T) -> Self;
 }
@@ -133,4 +124,20 @@ impl<S, T> AsyncProxy<S, T> for AsyncSelf<S> {
     fn new(s: Arc<S>, _: T) -> Self {
         Self::new(s)
     }
+}
+
+pub trait AsyncRuntime {
+    fn spawn<Fn, F>(&self, f: Fn)
+    where
+        Fn: FnOnce(()) -> F,
+        F: Future<Output = ()> + Send + 'static;
+}
+
+pub trait AsyncRuntimeThreadLocal {
+    type ThreadLocal; // Thread local;
+
+    fn spawn<Fn, F>(&self, f: Fn)
+    where
+        Fn: FnOnce(Self::ThreadLocal) -> F,
+        F: Future<Output = ()> + 'static;
 }

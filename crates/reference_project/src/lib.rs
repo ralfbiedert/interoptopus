@@ -7,7 +7,7 @@
 //! Note, many items here are deliberately not documented as testing how and if documentation
 //! is generated is part of the test.
 
-use interoptopus::{constant, extra_type, function, pattern, Inventory, InventoryBuilder};
+use interoptopus::{constant, extra_type, ffi_function, function, pattern, Inventory, InventoryBuilder};
 
 pub mod constants;
 pub mod functions;
@@ -37,7 +37,23 @@ pub mod patterns {
 }
 pub mod types;
 
+fn f(x: bool) {}
+
 pub fn ffi_inventory() -> Inventory {
+    f(true);
+    f({
+        #[ffi_function]
+        #[no_mangle]
+        fn f() {}
+        true
+    });
+    f({
+        #[ffi_function]
+        #[no_mangle]
+        fn f() {}
+        true
+    });
+
     {
         InventoryBuilder::new()
             // Functions
