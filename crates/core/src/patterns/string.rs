@@ -183,7 +183,8 @@ impl Utf8String {
     }
 
     #[must_use]
-    pub fn to_string(self) -> String {
+    #[allow(clippy::cast_possible_truncation)]
+    pub fn into_string(self) -> String {
         let rval = unsafe { String::from_raw_parts(self.ptr, self.len as usize, self.capacity as usize) };
         forget(self);
         rval

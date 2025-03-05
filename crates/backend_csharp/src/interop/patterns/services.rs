@@ -113,7 +113,7 @@ pub fn write_pattern_service_method(
             }
             CType::Pattern(TypePattern::Utf8String(_)) => {
                 native = "string".to_string();
-                to_invoke.push(format!("{name}"));
+                to_invoke.push(name.to_string());
             }
             _ => {
                 // Forward `ref` and `out` accordingly.

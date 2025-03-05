@@ -55,7 +55,7 @@ pub fn pattern_string_1(x: Utf8String) -> Utf8String {
 
 #[ffi_function]
 pub fn pattern_string_2(x: Utf8String) -> u32 {
-    x.to_string().len() as u32
+    x.into_string().len() as u32
 }
 
 #[ffi_function]

@@ -16,7 +16,6 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
 
     let mut params = Vec::new();
     let mut params_native = Vec::new();
-    let mut param_names = Vec::new();
     let mut param_invokes = Vec::new();
     for param in the_type.fnpointer().signature().params() {
         match param.the_type() {
@@ -24,13 +23,11 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
             CType::Pattern(TypePattern::SliceMut(_)) => param_invokes.push(format!("{}.Managed()", param.name())),
             _ => param_invokes.push(param.name().to_string()),
         }
-        param_names.push(param.name());
         params.push(format!("{} {}", to_typespecifier_in_param(param.the_type()), param.name()));
         params_native.push(format!("{} {}", i.to_native_callback_typespecifier(param.the_type()), param.name()));
     }
 
     params.pop();
-    param_names.pop();
     param_invokes.pop();
 
     write_type_definition_fn_pointer_annotation(w, the_type.fnpointer())?;
@@ -44,31 +41,6 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     )?;
     indented!(w, r"{} delegate {} {}Delegate({}); // Our C# signature", visibility, rval, name, params.join(", "))?;
     w.newline()?;
-
-    // indented!(w, r"[NativeMarshalling(typeof(CallbackStructMarshaller<{}Native>))]", name)?;
-    // indented!(w, r"public class {}: CallbackStruct<{}Native>", name, name)?;
-    // indented!(w, r"{{")?;
-    // w.indent();
-    // indented!(w, r"internal readonly {}Delegate _userCallback;", name)?;
-    // w.newline()?;
-    // indented!(w, r"public {}({}Delegate userCallback)", name, name)?;
-    // indented!(w, r"{{")?;
-    // indented!(w, [()], r"_userCallback = userCallback;")?;
-    // indented!(w, [()], r"Init(Call);")?;
-    // indented!(w, r"}}")?;
-    // w.newline()?;
-    // indented!(w, r"public {} Call({}, IntPtr _)", rval, params.join(", "))?;
-    // indented!(w, r"{{")?;
-    // if the_type.fnpointer().signature().rval().is_void() {
-    //     indented!(w, [()], r"_userCallback({});", param_names.join(", "))?;
-    // } else {
-    //     indented!(w, [()], r"return _userCallback({});", param_names.join(", "))?;
-    // }
-    // indented!(w, r"}}")?;
-    // w.unindent();
-    // indented!(w, r"}}")?;
-    //
-    // Write the attribute and struct declaration without manual spaces.
 
     indented!(w, r"public partial class {}", name)?;
     indented!(w, r"{{")?;

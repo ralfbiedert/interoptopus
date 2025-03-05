@@ -188,6 +188,7 @@ impl Interop {
     }
 
     #[must_use]
+    #[allow(clippy::match_like_matches_macro)]
     pub fn should_emit_marshaller(&self, ctype: &CType) -> bool {
         match ctype {
             CType::Array(_) => true,
@@ -267,6 +268,7 @@ impl Interop {
         }
     }
 
+    #[allow(clippy::match_like_matches_macro)]
     fn has_overloadable(&self, signature: &FunctionSignature) -> bool {
         signature.params().iter().any(|x| match x.the_type() {
             CType::ReadPointer(p) => matches!(&**p, CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_))),
