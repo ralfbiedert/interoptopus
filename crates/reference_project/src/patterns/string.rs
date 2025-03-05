@@ -1,4 +1,4 @@
-use crate::types::UseAsciiStringPattern;
+use crate::types::{UseCStrPtr, UseUtf8String};
 use interoptopus::ffi_function;
 use interoptopus::patterns::slice::FFISlice;
 use interoptopus::patterns::string::{CStrPointer, Utf8String};
@@ -44,7 +44,7 @@ pub fn pattern_ascii_pointer_5(x: CStrPointer, i: u32) -> u8 {
 // }
 
 #[ffi_function]
-pub fn pattern_ascii_pointer_return_slice() -> FFISlice<'static, UseAsciiStringPattern<'static>> {
+pub fn pattern_ascii_pointer_return_slice() -> FFISlice<'static, UseCStrPtr<'static>> {
     FFISlice::empty()
 }
 
@@ -61,4 +61,9 @@ pub fn pattern_string_2(x: Utf8String) -> u32 {
 #[ffi_function]
 pub fn pattern_string_3() -> Utf8String {
     Utf8String::from_string("pattern_string_3".to_string())
+}
+
+#[ffi_function]
+pub fn pattern_string_4(x: UseUtf8String) -> UseUtf8String {
+    x
 }

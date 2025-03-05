@@ -100,6 +100,7 @@ pub fn to_typespecifier_in_field(x: &CType, field: &Field, composite: &Composite
         CType::FnPointer(x) => fnpointer_to_typename(x),
         CType::Pattern(x) => match x {
             TypePattern::CStrPointer => "string".to_string(),
+            TypePattern::Utf8String(_) => "string".to_string(),
             TypePattern::FFIErrorEnum(e) => enum_to_typename(e.the_enum()),
             TypePattern::Slice(x) => format!("Slice<{}>", get_slice_type_argument(x)),
             TypePattern::SliceMut(x) => format!("SliceMut<{}>", get_slice_type_argument(x)),
@@ -285,6 +286,7 @@ pub fn pattern_to_native_in_signature(_: &Interop, param: &Parameter) -> String 
             TypePattern::NamedCallback(_) => {
                 format!("{}Delegate", to_typespecifier_in_param(x))
             }
+            TypePattern::Utf8String(_) => "string".to_string(),
 
             _ => to_typespecifier_in_param(param.the_type()),
         },

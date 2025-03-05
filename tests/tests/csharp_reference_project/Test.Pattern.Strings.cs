@@ -39,13 +39,21 @@ public class TestPatternStrings
     }
 
     [Fact]
-    public void string_utf8_in_out()
+    public void string_utf8_in_out_wrapped()
     {
         var s = Interop.pattern_string_3();
         Assert.Equal(s.String, "pattern_string_3");
 
         var l = Interop.pattern_string_2(s);
         Assert.Equal(l, 16u);
+    }
+
+    [Fact]
+    public void string_utf8_in_out_by_struct()
+    {
+        var w = new UseUtf8String { s = "hello world" };
+        var s = Interop.pattern_string_4(w);
+        Assert.Equal(s.s, "hello world");
     }
 
 }

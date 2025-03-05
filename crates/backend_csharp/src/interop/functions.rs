@@ -294,6 +294,11 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
                 to_wrap_type.push(to_typespecifier_in_param(p.the_type()));
                 to_invoke.push(format!("{name}_wrapped"));
             }
+            CType::Pattern(TypePattern::Utf8String(_)) => {
+                to_wrap_name.push(name);
+                to_wrap_type.push(to_typespecifier_in_param(p.the_type()));
+                to_invoke.push(format!("{name}_wrapped"));
+            }
             CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {
                 CType::Pattern(x) => match x {
                     TypePattern::Slice(x) => {
@@ -353,11 +358,18 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
 
     let call = format!(r"{}({})", fn_name, to_invoke.join(", "));
 
+    indented!(w, [()], r"try")?;
+    indented!(w, [()], r"{{")?;
+    w.indent();
     write_function_overloaded_invoke_with_error_handling(i, w, function, &call, to_wrap_delegates.as_slice())?;
-
+    w.unindent();
+    indented!(w, [()], r"}}")?;
+    indented!(w, [()], r"finally")?;
+    indented!(w, [()], r"{{")?;
     for n in to_wrap_name {
-        indented!(w, [()], r"{}_wrapped.Dispose();", n)?;
+        indented!(w, [()()], r"{}_wrapped.Dispose();", n)?;
     }
+    indented!(w, [()], r"}}")?;
 
     if !to_pin_name.is_empty() {
         for _ in &to_pin_name {
@@ -392,6 +404,9 @@ pub fn write_function_overloaded_invoke_with_error_handling(
             indented!(w, [()], r"var s = {};", fn_call)?;
             indented!(w, [()], r"return Marshal.PtrToStringAnsi(s);")?;
         }
+        // CType::Pattern(TypePattern::Utf8String(_)) => {
+        //     indented!(w, [()], r"var s = {};", fn_call)?;
+        // }
         CType::Primitive(PrimitiveType::Void) => {
             indented!(w, [()], r"{};", fn_call)?;
         }

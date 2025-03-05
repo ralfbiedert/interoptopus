@@ -1269,14 +1269,14 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct Utf8String
+    public partial struct Utf8String: IDisposable
     {
-            public Utf8String(string s) { _s = s; }
+        public Utf8String(string s) { _s = s; }
 
-            public string String { get { return _s; } }
+        public string String => _s;
 
-        /// UTF-8 string marshalling helper.
-        ///
+        public void Dispose() { }
+
         /// A highly dangerous 'use once type' that has ownership semantics!
         /// Once passed over an FFI boundary 'the other side' is meant to own
         /// (and free) it. Rust handles that fine, but if in C# you put this

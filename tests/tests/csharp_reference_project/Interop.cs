@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 10109741615850800818ul)
+            if (api_version != 791495051959197899ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10109741615850800818). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (791495051959197899). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -59,7 +59,18 @@ namespace My.Company
         public static partial long interoptopus_string_destroy(Utf8String utf8);
 
         // Debug - write_function_overload 
-        // Debug - no overload for interoptopus_string_destroy 
+        public static unsafe long interoptopus_string_destroy(string utf8)
+        {
+            var utf8_wrapped = new Utf8String(utf8);
+            try
+            {
+                return interoptopus_string_destroy(utf8_wrapped);
+            }
+            finally
+            {
+                utf8_wrapped.Dispose();
+            }
+        }
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "primitive_void")]
@@ -457,7 +468,13 @@ namespace My.Company
             fixed (void* ptr_x = x)
             {
                 var x_slice = new SliceVec(new IntPtr(ptr_x), (ulong) x.Length);
-                return namespaced_inner_slice(x_slice);
+                try
+                {
+                    return namespaced_inner_slice(x_slice);
+                }
+                finally
+                {
+                }
             }
         }
 
@@ -472,7 +489,13 @@ namespace My.Company
             fixed (void* ptr_x = x)
             {
                 var x_slice = new SliceMutVec(new IntPtr(ptr_x), (ulong) x.Length);
-                return namespaced_inner_slice_mut(x_slice);
+                try
+                {
+                    return namespaced_inner_slice_mut(x_slice);
+                }
+                finally
+                {
+                }
             }
         }
 
@@ -568,7 +591,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_return_slice")]
         // Debug - write_function_declaration 
-        public static partial SliceUseAsciiStringPattern pattern_ascii_pointer_return_slice();
+        public static partial SliceUseCStrPtr pattern_ascii_pointer_return_slice();
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_ascii_pointer_return_slice 
@@ -579,7 +602,18 @@ namespace My.Company
         public static partial Utf8String pattern_string_1(Utf8String x);
 
         // Debug - write_function_overload 
-        // Debug - no overload for pattern_string_1 
+        public static unsafe Utf8String pattern_string_1(string x)
+        {
+            var x_wrapped = new Utf8String(x);
+            try
+            {
+                return pattern_string_1(x_wrapped);
+            }
+            finally
+            {
+                x_wrapped.Dispose();
+            }
+        }
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_2")]
@@ -587,7 +621,18 @@ namespace My.Company
         public static partial uint pattern_string_2(Utf8String x);
 
         // Debug - write_function_overload 
-        // Debug - no overload for pattern_string_2 
+        public static unsafe uint pattern_string_2(string x)
+        {
+            var x_wrapped = new Utf8String(x);
+            try
+            {
+                return pattern_string_2(x_wrapped);
+            }
+            finally
+            {
+                x_wrapped.Dispose();
+            }
+        }
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_3")]
@@ -596,6 +641,14 @@ namespace My.Company
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_string_3 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_4")]
+        // Debug - write_function_declaration 
+        public static partial UseUtf8String pattern_string_4(UseUtf8String x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for pattern_string_4 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1")]
@@ -608,7 +661,13 @@ namespace My.Company
             fixed (void* ptr_ffi_slice = ffi_slice)
             {
                 var ffi_slice_slice = new SliceU32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
-                return pattern_ffi_slice_1(ffi_slice_slice);
+                try
+                {
+                    return pattern_ffi_slice_1(ffi_slice_slice);
+                }
+                finally
+                {
+                }
             }
         }
 
@@ -623,7 +682,13 @@ namespace My.Company
             fixed (void* ptr_ffi_slice = ffi_slice)
             {
                 var ffi_slice_slice = new SliceMutU32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
-                return pattern_ffi_slice_1b(ffi_slice_slice);
+                try
+                {
+                    return pattern_ffi_slice_1b(ffi_slice_slice);
+                }
+                finally
+                {
+                }
             }
         }
 
@@ -638,7 +703,13 @@ namespace My.Company
             fixed (void* ptr_ffi_slice = ffi_slice)
             {
                 var ffi_slice_slice = new SliceVec3f32(new IntPtr(ptr_ffi_slice), (ulong) ffi_slice.Length);
-                return pattern_ffi_slice_2(ffi_slice_slice, i);
+                try
+                {
+                    return pattern_ffi_slice_2(ffi_slice_slice, i);
+                }
+                finally
+                {
+                }
             }
         }
 
@@ -654,8 +725,14 @@ namespace My.Company
             {
                 var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                 var callback_wrapped = new CallbackSliceMut(callback);
-                pattern_ffi_slice_3b(slice_slice, callback_wrapped);
-                callback_wrapped.Dispose();
+                try
+                {
+                    pattern_ffi_slice_3b(slice_slice, callback_wrapped);
+                }
+                finally
+                {
+                    callback_wrapped.Dispose();
+                }
             }
         }
 
@@ -673,7 +750,13 @@ namespace My.Company
                 fixed (void* ptr_slice2 = slice2)
                 {
                     var slice2_slice = new SliceMutU8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
-                    pattern_ffi_slice_4(slice_slice, slice2_slice);
+                    try
+                    {
+                        pattern_ffi_slice_4(slice_slice, slice2_slice);
+                    }
+                    finally
+                    {
+                    }
                 }
             }
         }
@@ -692,7 +775,13 @@ namespace My.Company
                 fixed (void* ptr_slice2 = slice2)
                 {
                     var slice2_slice = new SliceMutU8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
-                    pattern_ffi_slice_5(ref slice_slice, ref slice2_slice);
+                    try
+                    {
+                        pattern_ffi_slice_5(ref slice_slice, ref slice2_slice);
+                    }
+                    finally
+                    {
+                    }
                 }
             }
         }
@@ -709,8 +798,14 @@ namespace My.Company
             {
                 var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                 var callback_wrapped = new CallbackU8(callback);
-                pattern_ffi_slice_6(ref slice_slice, callback_wrapped);
-                callback_wrapped.Dispose();
+                try
+                {
+                    pattern_ffi_slice_6(ref slice_slice, callback_wrapped);
+                }
+                finally
+                {
+                    callback_wrapped.Dispose();
+                }
             }
         }
 
@@ -726,8 +821,14 @@ namespace My.Company
             {
                 var slice_slice = new SliceMutCharArray(new IntPtr(ptr_slice), (ulong) slice.Length);
                 var callback_wrapped = new CallbackCharArray2(callback);
-                pattern_ffi_slice_8(ref slice_slice, callback_wrapped);
-                callback_wrapped.Dispose();
+                try
+                {
+                    pattern_ffi_slice_8(ref slice_slice, callback_wrapped);
+                }
+                finally
+                {
+                    callback_wrapped.Dispose();
+                }
             }
         }
 
@@ -740,8 +841,14 @@ namespace My.Company
         public static unsafe byte pattern_ffi_slice_delegate(CallbackFFISliceDelegate callback)
         {
             var callback_wrapped = new CallbackFFISlice(callback);
-            return pattern_ffi_slice_delegate(callback_wrapped);
-            callback_wrapped.Dispose();
+            try
+            {
+                return pattern_ffi_slice_delegate(callback_wrapped);
+            }
+            finally
+            {
+                callback_wrapped.Dispose();
+            }
         }
 
         // Debug - write_function 
@@ -753,8 +860,14 @@ namespace My.Company
         public static unsafe Vec3f32 pattern_ffi_slice_delegate_huge(CallbackHugeVecSliceDelegate callback)
         {
             var callback_wrapped = new CallbackHugeVecSlice(callback);
-            return pattern_ffi_slice_delegate_huge(callback_wrapped);
-            callback_wrapped.Dispose();
+            try
+            {
+                return pattern_ffi_slice_delegate_huge(callback_wrapped);
+            }
+            finally
+            {
+                callback_wrapped.Dispose();
+            }
         }
 
         // Debug - write_function 
@@ -822,8 +935,14 @@ namespace My.Company
         public static unsafe uint pattern_callback_1(MyCallbackDelegate callback, uint x)
         {
             var callback_wrapped = new MyCallback(callback);
-            return pattern_callback_1(callback_wrapped, x);
-            callback_wrapped.Dispose();
+            try
+            {
+                return pattern_callback_1(callback_wrapped, x);
+            }
+            finally
+            {
+                callback_wrapped.Dispose();
+            }
         }
 
         // Debug - write_function 
@@ -835,8 +954,14 @@ namespace My.Company
         public static unsafe MyCallbackVoid pattern_callback_2(MyCallbackVoidDelegate callback)
         {
             var callback_wrapped = new MyCallbackVoid(callback);
-            return pattern_callback_2(callback_wrapped);
-            callback_wrapped.Dispose();
+            try
+            {
+                return pattern_callback_2(callback_wrapped);
+            }
+            finally
+            {
+                callback_wrapped.Dispose();
+            }
         }
 
         // Debug - write_function 
@@ -848,8 +973,14 @@ namespace My.Company
         public static unsafe uint pattern_callback_4(MyCallbackNamespacedDelegate callback, uint x)
         {
             var callback_wrapped = new MyCallbackNamespaced(callback);
-            return pattern_callback_4(callback_wrapped, x);
-            callback_wrapped.Dispose();
+            try
+            {
+                return pattern_callback_4(callback_wrapped, x);
+            }
+            finally
+            {
+                callback_wrapped.Dispose();
+            }
         }
 
         // Debug - write_function 
@@ -878,13 +1009,19 @@ namespace My.Company
         {
             var c1_wrapped = new SumDelegateReturn(c1);
             var c2_wrapped = new SumDelegateReturn2(c2);
-            var rval = pattern_callback_7(c1_wrapped, c2_wrapped, x, i, out o);
-            if (rval != FFIError.Ok)
+            try
             {
-                throw new InteropException<FFIError>(rval);
+                var rval = pattern_callback_7(c1_wrapped, c2_wrapped, x, i, out o);
+                if (rval != FFIError.Ok)
+                {
+                    throw new InteropException<FFIError>(rval);
+                }
             }
-            c1_wrapped.Dispose();
-            c2_wrapped.Dispose();
+            finally
+            {
+                c1_wrapped.Dispose();
+                c2_wrapped.Dispose();
+            }
         }
 
         // Debug - write_function 
@@ -1045,12 +1182,18 @@ namespace My.Company
         public static unsafe void service_callbacks_callback_simple(IntPtr _context, MyCallbackDelegate callback)
         {
             var callback_wrapped = new MyCallback(callback);
-            var rval = service_callbacks_callback_simple(_context, callback_wrapped);
-            if (rval != FFIError.Ok)
+            try
             {
-                throw new InteropException<FFIError>(rval);
+                var rval = service_callbacks_callback_simple(_context, callback_wrapped);
+                if (rval != FFIError.Ok)
+                {
+                    throw new InteropException<FFIError>(rval);
+                }
             }
-            callback_wrapped.Dispose();
+            finally
+            {
+                callback_wrapped.Dispose();
+            }
         }
 
         // Debug - write_function 
@@ -1062,12 +1205,18 @@ namespace My.Company
         public static unsafe void service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturnDelegate callback)
         {
             var callback_wrapped = new SumDelegateReturn(callback);
-            var rval = service_callbacks_callback_ffi_return(_context, callback_wrapped);
-            if (rval != FFIError.Ok)
+            try
             {
-                throw new InteropException<FFIError>(rval);
+                var rval = service_callbacks_callback_ffi_return(_context, callback_wrapped);
+                if (rval != FFIError.Ok)
+                {
+                    throw new InteropException<FFIError>(rval);
+                }
             }
-            callback_wrapped.Dispose();
+            finally
+            {
+                callback_wrapped.Dispose();
+            }
         }
 
         // Debug - write_function 
@@ -1082,12 +1231,18 @@ namespace My.Company
             {
                 var input_slice = new SliceI32(new IntPtr(ptr_input), (ulong) input.Length);
                 var callback_wrapped = new SumDelegateReturn(callback);
-                var rval = service_callbacks_callback_with_slice(_context, callback_wrapped, input_slice);
-                if (rval != FFIError.Ok)
+                try
                 {
-                    throw new InteropException<FFIError>(rval);
+                    var rval = service_callbacks_callback_with_slice(_context, callback_wrapped, input_slice);
+                    if (rval != FFIError.Ok)
+                    {
+                        throw new InteropException<FFIError>(rval);
+                    }
                 }
-                callback_wrapped.Dispose();
+                finally
+                {
+                    callback_wrapped.Dispose();
+                }
             }
         }
 
@@ -1208,7 +1363,13 @@ namespace My.Company
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
-                service_using_lifetimes_lifetime_1(_context, slice_slice);
+                try
+                {
+                    service_using_lifetimes_lifetime_1(_context, slice_slice);
+                }
+                finally
+                {
+                }
             }
         }
 
@@ -1223,7 +1384,13 @@ namespace My.Company
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
-                service_using_lifetimes_lifetime_2(_context, slice_slice);
+                try
+                {
+                    service_using_lifetimes_lifetime_2(_context, slice_slice);
+                }
+                finally
+                {
+                }
             }
         }
 
@@ -1238,8 +1405,14 @@ namespace My.Company
             fixed (void* ptr_anon1 = anon1)
             {
                 var anon1_slice = new SliceU8(new IntPtr(ptr_anon1), (ulong) anon1.Length);
-                var s = service_using_lifetimes_return_string_accept_slice(anon0, anon1_slice);
-                return Marshal.PtrToStringAnsi(s);
+                try
+                {
+                    var s = service_using_lifetimes_return_string_accept_slice(anon0, anon1_slice);
+                    return Marshal.PtrToStringAnsi(s);
+                }
+                finally
+                {
+                }
             }
         }
 
@@ -1276,7 +1449,13 @@ namespace My.Company
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                return service_various_slices_mut_self(_context, slice_slice);
+                try
+                {
+                    return service_various_slices_mut_self(_context, slice_slice);
+                }
+                finally
+                {
+                }
             }
         }
 
@@ -1293,7 +1472,13 @@ namespace My.Company
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceBool(new IntPtr(ptr_slice), (ulong) slice.Length);
-                service_various_slices_mut_self_void(_context, slice_slice);
+                try
+                {
+                    service_various_slices_mut_self_void(_context, slice_slice);
+                }
+                finally
+                {
+                }
             }
         }
 
@@ -1316,7 +1501,13 @@ namespace My.Company
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                return service_various_slices_mut_self_ref_slice(_context, ref x, out y, slice_slice);
+                try
+                {
+                    return service_various_slices_mut_self_ref_slice(_context, ref x, out y, slice_slice);
+                }
+                finally
+                {
+                }
             }
         }
 
@@ -1334,7 +1525,13 @@ namespace My.Company
                 fixed (void* ptr_slice2 = slice2)
                 {
                     var slice2_slice = new SliceU8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
-                    return service_various_slices_mut_self_ref_slice_limited(_context, ref x, out y, slice_slice, slice2_slice);
+                    try
+                    {
+                        return service_various_slices_mut_self_ref_slice_limited(_context, ref x, out y, slice_slice, slice2_slice);
+                    }
+                    finally
+                    {
+                    }
                 }
             }
         }
@@ -1350,10 +1547,16 @@ namespace My.Company
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                var rval = service_various_slices_mut_self_ffi_error(_context, slice_slice);
-                if (rval != FFIError.Ok)
+                try
                 {
-                    throw new InteropException<FFIError>(rval);
+                    var rval = service_various_slices_mut_self_ffi_error(_context, slice_slice);
+                    if (rval != FFIError.Ok)
+                    {
+                        throw new InteropException<FFIError>(rval);
+                    }
+                }
+                finally
+                {
                 }
             }
         }
@@ -1369,10 +1572,16 @@ namespace My.Company
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
-                var rval = service_various_slices_mut_self_no_error(_context, slice_slice);
-                if (rval != FFIError.Ok)
+                try
                 {
-                    throw new InteropException<FFIError>(rval);
+                    var rval = service_various_slices_mut_self_no_error(_context, slice_slice);
+                    if (rval != FFIError.Ok)
+                    {
+                        throw new InteropException<FFIError>(rval);
+                    }
+                }
+                finally
+                {
                 }
             }
         }
@@ -2658,14 +2867,14 @@ namespace My.Company
     // Debug - write_type_definition_composite 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct UseAsciiStringPattern
+    public partial struct UseCStrPtr
     {
         public string ascii_string;
     }
 
     // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct UseAsciiStringPattern
+    public partial struct UseCStrPtr
     {
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
@@ -2674,18 +2883,18 @@ namespace My.Company
             public IntPtr ascii_string;
         }
 
-        [CustomMarshaller(typeof(UseAsciiStringPattern), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(UseCStrPtr), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private UseAsciiStringPattern _managed; // Used when converting managed -> unmanaged
+            private UseCStrPtr _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(UseAsciiStringPattern managed) { _managed = managed; }
+            public Marshaller(UseCStrPtr managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(UseAsciiStringPattern managed) { _managed = managed; }
+            public void FromManaged(UseCStrPtr managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -2698,12 +2907,70 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe UseAsciiStringPattern ToManaged()
+            public unsafe UseCStrPtr ToManaged()
             {
-                _managed = new UseAsciiStringPattern();
+                _managed = new UseCStrPtr();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 _managed.ascii_string = Marshal.PtrToStringAnsi(_unmanaged.ascii_string);
+
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    // Debug - write_type_definition_composite 
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct UseUtf8String
+    {
+        public string s;
+    }
+
+    // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct UseUtf8String
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public Utf8String.Unmanaged s;
+        }
+
+        [CustomMarshaller(typeof(UseUtf8String), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private UseUtf8String _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(UseUtf8String managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(UseUtf8String managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _s = new Utf8String.Marshaller(new Utf8String(_managed.s));
+                _unmanaged.s = _s.ToUnmanaged();
+
+                return _unmanaged;
+            }
+
+            public unsafe UseUtf8String ToManaged()
+            {
+                _managed = new UseUtf8String();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _s = new Utf8String.Marshaller(_unmanaged.s);
+                _managed.s = _s.ToManaged().String;
 
                 return _managed;
             }
@@ -3192,32 +3459,32 @@ namespace My.Company
     }
 
     // Debug - write_pattern_slice 
-    public partial struct SliceUseAsciiStringPattern
+    public partial struct SliceUseCStrPtr
     {
-        UseAsciiStringPattern[] _managed;
+        UseCStrPtr[] _managed;
         IntPtr _data;
         ulong _len;
         bool _wePinned;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct SliceUseAsciiStringPattern : IEnumerable<UseAsciiStringPattern>, IDisposable
+    public partial struct SliceUseCStrPtr : IEnumerable<UseCStrPtr>, IDisposable
     {
         public int Count => _managed?.Length ?? (int)_len;
 
-        public unsafe ReadOnlySpan<UseAsciiStringPattern> ReadOnlySpan
+        public unsafe ReadOnlySpan<UseCStrPtr> ReadOnlySpan
         {
             get
             {
                 if (_managed is not null)
                 {
-                    return new ReadOnlySpan<UseAsciiStringPattern>(_managed);
+                    return new ReadOnlySpan<UseCStrPtr>(_managed);
                 }
-                return new ReadOnlySpan<UseAsciiStringPattern>(_data.ToPointer(), (int)_len);
+                return new ReadOnlySpan<UseCStrPtr>(_data.ToPointer(), (int)_len);
             }
         }
 
-        public unsafe UseAsciiStringPattern this[int i]
+        public unsafe UseCStrPtr this[int i]
         {
             get
             {
@@ -3226,23 +3493,23 @@ namespace My.Company
                 {
                     return _managed[i];
                 }
-                return Unsafe.Read<UseAsciiStringPattern>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<UseAsciiStringPattern>()));
+                return Unsafe.Read<UseCStrPtr>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<UseCStrPtr>()));
             }
         }
 
-        public SliceUseAsciiStringPattern(GCHandle handle, ulong count)
+        public SliceUseCStrPtr(GCHandle handle, ulong count)
         {
             _data = handle.AddrOfPinnedObject();
             _len = count;
         }
 
-        public SliceUseAsciiStringPattern(IntPtr handle, ulong count)
+        public SliceUseCStrPtr(IntPtr handle, ulong count)
         {
             _data = handle;
             _len = count;
         }
 
-        public SliceUseAsciiStringPattern(UseAsciiStringPattern[] managed)
+        public SliceUseCStrPtr(UseCStrPtr[] managed)
         {
             _managed = managed;
             _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
@@ -3250,7 +3517,7 @@ namespace My.Company
             _wePinned = true;
         }
 
-        public IEnumerator<UseAsciiStringPattern> GetEnumerator()
+        public IEnumerator<UseCStrPtr> GetEnumerator()
         {
             for (var i = 0; i < Count; ++i)
             {
@@ -3270,7 +3537,7 @@ namespace My.Company
             _managed = null;
         }
 
-        [CustomMarshaller(typeof(SliceUseAsciiStringPattern), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(SliceUseCStrPtr), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -3279,24 +3546,24 @@ namespace My.Company
             public IntPtr Data;
             public ulong Len;
 
-            public SliceUseAsciiStringPattern Managed()
+            public SliceUseCStrPtr Managed()
             {
-                return new SliceUseAsciiStringPattern(Data, Len);
+                return new SliceUseCStrPtr(Data, Len);
             }
         }
 
         public ref struct Marshaller
         {
-            private SliceUseAsciiStringPattern managed;
+            private SliceUseCStrPtr managed;
             private Unmanaged native;
             private Unmanaged sourceNative;
             private GCHandle? pinned;
-            private SliceUseAsciiStringPattern marshalled;
+            private SliceUseCStrPtr marshalled;
 
-            public void FromManaged(SliceUseAsciiStringPattern managed) { this.managed = managed; }
+            public void FromManaged(SliceUseCStrPtr managed) { this.managed = managed; }
             public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
             public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
-            public unsafe SliceUseAsciiStringPattern ToManaged() => new SliceUseAsciiStringPattern(sourceNative.Data, sourceNative.Len);
+            public unsafe SliceUseCStrPtr ToManaged() => new SliceUseCStrPtr(sourceNative.Data, sourceNative.Len);
             public void Free() { }
         }
     }

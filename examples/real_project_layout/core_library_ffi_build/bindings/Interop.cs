@@ -246,12 +246,16 @@ namespace My.Company
     }
     public partial struct Utf8String
     {
-        public string s;
+        string _s;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Utf8String
     {
+            public Utf8String(string s) { _s = s; }
+
+            public string String { get { return _s; } }
+
         /// UTF-8 string marshalling helper.
         ///
         /// A highly dangerous 'use once type' that has ownership semantics!
@@ -292,7 +296,7 @@ namespace My.Company
 
             public unsafe Unmanaged ToUnmanaged()
             {
-                var utf8Bytes = Encoding.UTF8.GetBytes(_managed.s);
+                var utf8Bytes = Encoding.UTF8.GetBytes(_managed._s);
                 var len = utf8Bytes.Length;
 
                 fixed (byte* p = utf8Bytes)
@@ -309,7 +313,7 @@ namespace My.Company
                 var span = new ReadOnlySpan<byte>((byte*)_unmanaged.ptr, (int)_unmanaged.len);
 
                 _managed = new Utf8String();
-                _managed.s = Encoding.UTF8.GetString(span);
+                _managed._s = Encoding.UTF8.GetString(span);
 
                 InteropHelper.interoptopus_string_destroy(_unmanaged);
 

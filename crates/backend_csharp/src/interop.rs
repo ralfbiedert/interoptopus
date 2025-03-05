@@ -279,7 +279,13 @@ impl Interop {
         signature.params().iter().any(|x| match x.the_type() {
             CType::ReadPointer(p) => matches!(&**p, CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_))),
             CType::ReadWritePointer(p) => matches!(&**p, CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_))),
-            CType::Pattern(p) => matches!(p, TypePattern::Slice(_) | TypePattern::SliceMut(_) | TypePattern::NamedCallback(_)),
+            CType::Pattern(p) => match p {
+                TypePattern::Slice(_) => true,
+                TypePattern::SliceMut(_) => true,
+                TypePattern::NamedCallback(_) => true,
+                TypePattern::Utf8String(_) => true,
+                _ => false,
+            },
             _ => false,
         })
     }

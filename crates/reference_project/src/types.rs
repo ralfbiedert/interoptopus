@@ -2,7 +2,7 @@
 
 use interoptopus::lang::rust::CTypeInfo;
 use interoptopus::patterns::slice::FFISlice;
-use interoptopus::patterns::string::CStrPointer;
+use interoptopus::patterns::string::{CStrPointer, Utf8String};
 use interoptopus::{callback, ffi_type};
 use std::fmt::Debug;
 use std::marker::PhantomData;
@@ -167,8 +167,13 @@ pub struct ExtraType<T> {
 }
 
 #[ffi_type]
-pub struct UseAsciiStringPattern<'a> {
+pub struct UseCStrPtr<'a> {
     pub ascii_string: CStrPointer<'a>,
+}
+
+#[ffi_type]
+pub struct UseUtf8String {
+    pub s: Utf8String,
 }
 
 /// This can also be used for the `class` pattern.

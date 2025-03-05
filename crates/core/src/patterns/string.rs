@@ -169,6 +169,9 @@ pub struct Utf8String {
     capacity: u64,
 }
 
+unsafe impl Send for Utf8String {}
+unsafe impl Sync for Utf8String {}
+
 impl Utf8String {
     #[must_use]
     pub fn from_string(mut s: String) -> Self {
