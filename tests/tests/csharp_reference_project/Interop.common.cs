@@ -1263,4 +1263,84 @@ namespace My.Company.Common
             public void Free() { }
         }
     }
+    public partial struct Utf8String
+    {
+        string _s;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Utf8String
+    {
+            public Utf8String(string s) { _s = s; }
+
+            public string String { get { return _s; } }
+
+        /// UTF-8 string marshalling helper.
+        ///
+        /// A highly dangerous 'use once type' that has ownership semantics!
+        /// Once passed over an FFI boundary 'the other side' is meant to own
+        /// (and free) it. Rust handles that fine, but if in C# you put this
+        /// in a struct and then call Rust multiple times with that struct
+        /// you'll free the same pointer multiple times, and get UB!
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public IntPtr ptr;
+            public ulong len;
+            public ulong capacity;
+        }
+
+        public partial class InteropHelper
+        {
+            [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_create")]
+            public static partial long interoptopus_string_create(IntPtr utf8, ulong len, out Unmanaged rval);
+
+            [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_destroy")]
+            public static partial long interoptopus_string_destroy(Unmanaged utf8);
+        }
+
+        [CustomMarshaller(typeof(Utf8String), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private Utf8String _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(Utf8String managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(Utf8String managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {
+                var utf8Bytes = Encoding.UTF8.GetBytes(_managed._s);
+                var len = utf8Bytes.Length;
+
+                fixed (byte* p = utf8Bytes)
+                {
+                    InteropHelper.interoptopus_string_create((IntPtr)p, (ulong)len, out var rval);
+                    _unmanaged = rval;
+                }
+
+                return _unmanaged;
+            }
+
+            public unsafe Utf8String ToManaged()
+            {
+                var span = new ReadOnlySpan<byte>((byte*)_unmanaged.ptr, (int)_unmanaged.len);
+
+                _managed = new Utf8String();
+                _managed._s = Encoding.UTF8.GetString(span);
+
+                InteropHelper.interoptopus_string_destroy(_unmanaged);
+
+                return _managed;
+            }
+
+            public void Free() { }
+        }
+    }
+
 }

@@ -29,4 +29,23 @@ public class TestPatternStrings
         // var total_length  = Interop.pattern_ffi_slice_7(strings.ToArray());
         // Assert.Equal(total_length, 6u);
     }
+    
+    [Fact]
+    public void string_utf8_passthrough()
+    {
+        var i = new Utf8String("hello world");
+        var o = Interop.pattern_string_1(i);
+        Assert.Equal(o.String, "hello world");
+    }
+
+    [Fact]
+    public void string_utf8_in_out()
+    {
+        var s = Interop.pattern_string_3();
+        Assert.Equal(s.String, "pattern_string_3");
+
+        var l = Interop.pattern_string_2(s);
+        Assert.Equal(l, 16u);
+    }
+
 }

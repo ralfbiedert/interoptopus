@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 8019061383878594888ul)
+            if (api_version != 10109741615850800818ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (8019061383878594888). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10109741615850800818). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -44,6 +44,22 @@ namespace My.Company
         // Debug - write_constant 
         public const int COMPUTED_I32 = (int) -2147483647;
 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_create")]
+        // Debug - write_function_declaration 
+        public static partial long interoptopus_string_create(IntPtr utf8, ulong len, out Utf8String rval);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for interoptopus_string_create 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_destroy")]
+        // Debug - write_function_declaration 
+        public static partial long interoptopus_string_destroy(Utf8String utf8);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for interoptopus_string_destroy 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "primitive_void")]
@@ -556,6 +572,30 @@ namespace My.Company
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_ascii_pointer_return_slice 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_1")]
+        // Debug - write_function_declaration 
+        public static partial Utf8String pattern_string_1(Utf8String x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for pattern_string_1 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_2")]
+        // Debug - write_function_declaration 
+        public static partial uint pattern_string_2(Utf8String x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for pattern_string_2 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_3")]
+        // Debug - write_function_declaration 
+        public static partial Utf8String pattern_string_3();
+
+        // Debug - write_function_overload 
+        // Debug - no overload for pattern_string_3 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1")]

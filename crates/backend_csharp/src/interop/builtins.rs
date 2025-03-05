@@ -33,6 +33,8 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"}}")?;
         w.newline()?;
 
+        // --------------------------------
+
         // Emit main struct
         indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
         indented!(w, r"public partial struct AsyncHelper : IDisposable")?;
@@ -110,6 +112,97 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
 
         indented!(w, [()], r"}}")?;
         indented!(w, r"}}")?;
+
+        // --------------------------------
+
+        indented!(w, r"public partial struct Utf8String")?;
+        indented!(w, r"{{")?;
+        indented!(w, [()], r"string _s;")?;
+        indented!(w, r"}}")?;
+        w.newline()?;
+        indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
+        indented!(w, r"public partial struct Utf8String")?;
+        indented!(w, r"{{")?;
+        indented!(w, [()()], r"public Utf8String(string s) {{ _s = s; }}")?;
+        w.newline()?;
+        indented!(w, [()()], r"public string String {{ get {{ return _s; }} }}")?;
+        w.newline()?;
+        indented!(w, [()], r"/// UTF-8 string marshalling helper.")?;
+        indented!(w, [()], r"///")?;
+        indented!(w, [()], r"/// A highly dangerous 'use once type' that has ownership semantics!")?;
+        indented!(w, [()], r"/// Once passed over an FFI boundary 'the other side' is meant to own")?;
+        indented!(w, [()], r"/// (and free) it. Rust handles that fine, but if in C# you put this")?;
+        indented!(w, [()], r"/// in a struct and then call Rust multiple times with that struct")?;
+        indented!(w, [()], r"/// you'll free the same pointer multiple times, and get UB!")?;
+        indented!(w, [()], r"[StructLayout(LayoutKind.Sequential)]")?;
+        indented!(w, [()], r"public unsafe struct Unmanaged")?;
+        indented!(w, [()], r"{{")?;
+        indented!(w, [()()], r"public IntPtr ptr;")?;
+        indented!(w, [()()], r"public ulong len;")?;
+        indented!(w, [()()], r"public ulong capacity;")?;
+        indented!(w, [()], r"}}")?;
+        w.newline()?;
+
+        indented!(w, [()], r"public partial class InteropHelper")?;
+        indented!(w, [()], r"{{")?;
+        indented!(w, [()()], r#"[LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_create")]"#)?;
+        indented!(w, [()()], r"public static partial long interoptopus_string_create(IntPtr utf8, ulong len, out Unmanaged rval);")?;
+        w.newline()?;
+        indented!(w, [()()], r#"[LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_destroy")]"#)?;
+        indented!(w, [()()], r"public static partial long interoptopus_string_destroy(Unmanaged utf8);")?;
+        indented!(w, [()], r"}}")?;
+        w.newline()?;
+
+        indented!(w, [()], r"[CustomMarshaller(typeof(Utf8String), MarshalMode.Default, typeof(Marshaller))]")?;
+        indented!(w, [()], r"private struct MarshallerMeta {{ }}")?;
+        w.newline()?;
+
+        indented!(w, [()], r"public ref struct Marshaller")?;
+        indented!(w, [()], r"{{")?;
+        indented!(w, [()()], r"private Utf8String _managed; // Used when converting managed -> unmanaged")?;
+        indented!(w, [()()], r"private Unmanaged _unmanaged; // Used when converting unmanaged -> managed")?;
+        w.newline()?;
+
+        indented!(w, [()()], r"public Marshaller(Utf8String managed) {{ _managed = managed; }}")?;
+        indented!(w, [()()], r"public Marshaller(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
+        w.newline()?;
+
+        indented!(w, [()()], r"public void FromManaged(Utf8String managed) {{ _managed = managed; }}")?;
+        indented!(w, [()()], r"public void FromUnmanaged(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
+        w.newline()?;
+
+        indented!(w, [()()], r"public unsafe Unmanaged ToUnmanaged()")?;
+        indented!(w, [()()], r"{{")?;
+        indented!(w, [()()()], r"var utf8Bytes = Encoding.UTF8.GetBytes(_managed._s);")?;
+        indented!(w, [()()()], r"var len = utf8Bytes.Length;")?;
+        w.newline()?;
+        indented!(w, [()()()], r"fixed (byte* p = utf8Bytes)")?;
+        indented!(w, [()()()], r"{{")?;
+        indented!(w, [()()()()], r"InteropHelper.interoptopus_string_create((IntPtr)p, (ulong)len, out var rval);")?;
+        indented!(w, [()()()()], r"_unmanaged = rval;")?;
+        indented!(w, [()()()], r"}}")?;
+        w.newline()?;
+        indented!(w, [()()()], r"return _unmanaged;")?;
+        indented!(w, [()()], r"}}")?;
+        w.newline()?;
+
+        indented!(w, [()()], r"public unsafe Utf8String ToManaged()")?;
+        indented!(w, [()()], r"{{")?;
+        indented!(w, [()()()], r"var span = new ReadOnlySpan<byte>((byte*)_unmanaged.ptr, (int)_unmanaged.len);")?;
+        w.newline()?;
+        indented!(w, [()()()], r"_managed = new Utf8String();")?;
+        indented!(w, [()()()], r"_managed._s = Encoding.UTF8.GetString(span);")?;
+        w.newline()?;
+        indented!(w, [()()()], r"InteropHelper.interoptopus_string_destroy(_unmanaged);")?;
+        w.newline()?;
+        indented!(w, [()()()], r"return _managed;")?;
+        indented!(w, [()()], r"}}")?;
+        w.newline()?;
+
+        indented!(w, [()()], r"public void Free() {{ }}")?;
+        indented!(w, [()], r"}}")?;
+        indented!(w, r"}}")?;
+        w.newline()?;
     }
 
     Ok(())

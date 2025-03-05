@@ -195,6 +195,7 @@ pub(crate) fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CTyp
             TypePattern::Bool => {}
             TypePattern::CChar => {}
             TypePattern::APIVersion => {}
+            TypePattern::Utf8String(_) => {}
         },
     }
 }
@@ -242,6 +243,7 @@ pub(crate) fn extract_namespaces_from_types(types: &[CType], into: &mut HashSet<
                 TypePattern::Bool => {}
                 TypePattern::CChar => {}
                 TypePattern::NamedCallback(_) => {}
+                TypePattern::Utf8String(_) => {}
             },
         }
     }
@@ -344,6 +346,7 @@ pub fn is_global_type(t: &CType) -> bool {
             TypePattern::CChar => true,
             TypePattern::NamedCallback(_) => false,
             TypePattern::AsyncCallback(_) => false,
+            TypePattern::Utf8String(_) => true,
         },
     }
 }

@@ -148,6 +148,7 @@ pub fn to_typespecifier_in_param(x: &CType) -> String {
         CType::Pattern(x) => match x {
             TypePattern::CStrPointer => "[MarshalAs(UnmanagedType.LPStr)] string".to_string(),
             TypePattern::FFIErrorEnum(e) => enum_to_typename(e.the_enum()),
+            TypePattern::Utf8String(x) => composite_to_typename(x),
             TypePattern::Slice(x) => composite_to_typename(x),
             TypePattern::SliceMut(x) => composite_to_typename(x),
             TypePattern::Option(x) => composite_to_typename(x),
@@ -174,6 +175,7 @@ pub fn to_typespecifier_in_rval(x: &CType) -> String {
         CType::FnPointer(x) => fnpointer_to_typename(x),
         CType::Pattern(x) => match x {
             TypePattern::CStrPointer => "IntPtr".to_string(),
+            TypePattern::Utf8String(x) => composite_to_typename(x),
             TypePattern::FFIErrorEnum(e) => enum_to_typename(e.the_enum()),
             TypePattern::Slice(x) => composite_to_typename(x),
             TypePattern::SliceMut(x) => composite_to_typename(x),

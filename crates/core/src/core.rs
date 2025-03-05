@@ -81,6 +81,9 @@ impl InventoryBuilder {
                         self.functions.extend(x.constructors().iter().cloned());
                         self.functions.extend(x.methods().iter().cloned());
                     }
+                    LibraryPattern::Builtins(x) => {
+                        self.functions.extend(x.functions().iter().cloned());
+                    }
                 }
                 self.patterns.push(x);
             }
@@ -243,6 +246,7 @@ pub fn non_service_functions(inventory: &Inventory) -> Vec<&Function> {
                 service_methods.extend_from_slice(service.constructors());
                 service_methods.push(service.destructor().clone());
             }
+            LibraryPattern::Builtins(_) => {}
         }
     }
 

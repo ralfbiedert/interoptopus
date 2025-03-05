@@ -1,6 +1,7 @@
 //! Helpers to introspect Rust code when generating bindings, mostly derived by the `#[ffi_...]` macros.
 
 use crate::lang::c::{ArrayType, CType, Constant, ConstantValue, FnPointerType, Function, FunctionSignature, Parameter, PrimitiveType, PrimitiveValue, Variant};
+use std::mem::MaybeUninit;
 use std::ptr::NonNull;
 
 /// Implemented for a constant-helper produced by [`ffi_constant`](crate::ffi_constant), gives meta info for a constant.
@@ -386,5 +387,14 @@ where
 {
     fn type_info() -> CType {
         CType::Array(ArrayType::new(T::type_info(), N))
+    }
+}
+
+unsafe impl<T> CTypeInfo for MaybeUninit<T>
+where
+    T: CTypeInfo,
+{
+    fn type_info() -> CType {
+        T::type_info()
     }
 }

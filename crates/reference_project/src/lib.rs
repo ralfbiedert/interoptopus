@@ -7,7 +7,7 @@
 //! Note, many items here are deliberately not documented as testing how and if documentation
 //! is generated is part of the test.
 
-use interoptopus::{constant, extra_type, function, pattern, Inventory, InventoryBuilder};
+use interoptopus::{builtins, constant, extra_type, function, pattern, Inventory, InventoryBuilder};
 
 pub mod constants;
 pub mod functions;
@@ -58,6 +58,7 @@ pub fn ffi_inventory() -> Inventory {
     {
         InventoryBuilder::new()
             // Functions
+            .register(builtins!())
             .register(function!(functions::primitive_void))
             .register(function!(functions::primitive_void2))
             .register(function!(functions::primitive_bool))
@@ -124,6 +125,9 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(patterns::string::pattern_ascii_pointer_5))
             // .register(function!(patterns::ascii_pointer::pattern_ascii_pointer_len))
             .register(function!(patterns::string::pattern_ascii_pointer_return_slice))
+            .register(function!(patterns::string::pattern_string_1))
+            .register(function!(patterns::string::pattern_string_2))
+            .register(function!(patterns::string::pattern_string_3))
             .register(function!(patterns::slice::pattern_ffi_slice_1))
             .register(function!(patterns::slice::pattern_ffi_slice_1b))
             .register(function!(patterns::slice::pattern_ffi_slice_2))

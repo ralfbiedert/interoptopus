@@ -26,12 +26,13 @@
 //! void call_with_string(uint8_t* s);
 //! ```
 //!
-use crate::lang::c::CType;
+use crate::lang::c::{CType, CompositeType, Documentation, Field, Layout, Meta, PrimitiveType, Representation};
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::TypePattern;
 use crate::Error;
 use std::ffi::CStr;
 use std::marker::PhantomData;
+use std::mem::forget;
 use std::option::Option::None;
 use std::os::raw::c_char;
 use std::ptr::null;
@@ -157,5 +158,65 @@ mod test {
         let ptr_some = CStrPointer::from_slice_with_nul(&s[..]);
 
         assert!(ptr_some.is_err());
+    }
+}
+
+#[derive(Debug)]
+#[repr(C)]
+pub struct Utf8String {
+    ptr: *mut u8,
+    len: u64,
+    capacity: u64,
+}
+
+impl Utf8String {
+    #[must_use]
+    pub fn from_string(mut s: String) -> Self {
+        let ptr = s.as_mut_ptr();
+        let capacity = s.capacity() as u64;
+        let len = s.len() as u64;
+        forget(s);
+        Self { ptr, len, capacity }
+    }
+
+    #[must_use]
+    pub fn to_string(self) -> String {
+        let rval = unsafe { String::from_raw_parts(self.ptr, self.len as usize, self.capacity as usize) };
+        forget(self);
+        rval
+    }
+}
+
+impl Drop for Utf8String {
+    #[allow(clippy::cast_possible_truncation)]
+    fn drop(&mut self) {
+        unsafe {
+            let _ = String::from_raw_parts(self.ptr, self.len as usize, self.capacity as usize);
+        }
+    }
+}
+
+unsafe impl CTypeInfo for Utf8String {
+    #[rustfmt::skip]
+    fn type_info() -> CType {
+        let fields = vec![
+            Field::new("ptr".to_string(), CType::ReadWritePointer(Box::new(CType::Primitive(PrimitiveType::U8)))),
+            Field::new("len".to_string(), CType::Primitive(PrimitiveType::U64)),
+            Field::new("capacity".to_string(), CType::Primitive(PrimitiveType::U64)),
+        ];
+
+        let doc = Documentation::from_lines(vec![
+            " UTF-8 string marshalling helper.".to_string(),
+            String::new(),
+            " A highly dangerous 'use once type' that has ownership semantics!".to_string(),
+            " Once passed over an FFI boundary 'the other side' is meant to own".to_string(),
+            " (and free) it. Rust handles that fine, but if in C# you put this".to_string(),
+            " in a struct and then call Rust multiple times with that struct ".to_string(),
+            " you'll free the same pointer multiple times, and get UB!".to_string(),
+        ]);
+        let repr = Representation::new(Layout::C, None);
+        let meta = Meta::with_documentation(doc);
+        let composite = CompositeType::with_meta_repr("Utf8String".to_string(), fields, meta, repr);
+        CType::Pattern(TypePattern::Utf8String(composite))
     }
 }

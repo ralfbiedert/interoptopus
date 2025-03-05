@@ -78,6 +78,7 @@
 
 use crate::lang::c::{CType, CompositeType, PrimitiveType};
 use crate::lang::rust::CTypeInfo;
+use crate::patterns::builtins::Builtins;
 use crate::patterns::callbacks::{AsyncCallback, NamedCallback};
 use crate::patterns::result::FFIErrorEnum;
 use crate::patterns::service::ServiceDefinition;
@@ -87,6 +88,7 @@ use std::ffi::c_char;
 pub mod api_entry;
 pub mod api_guard;
 pub mod asynk;
+pub mod builtins;
 pub mod callbacks;
 pub mod option;
 pub mod primitives;
@@ -101,6 +103,7 @@ pub mod surrogates;
 #[non_exhaustive]
 pub enum LibraryPattern {
     Service(ServiceDefinition),
+    Builtins(Builtins),
 }
 
 /// Used mostly internally and provides pattern info for auto generated structs.
@@ -121,6 +124,7 @@ impl From<ServiceDefinition> for LibraryPattern {
 #[non_exhaustive]
 pub enum TypePattern {
     CStrPointer,
+    Utf8String(CompositeType),
     APIVersion,
     FFIErrorEnum(FFIErrorEnum),
     Slice(CompositeType),
@@ -152,6 +156,7 @@ impl TypePattern {
             Self::CChar => c_char::type_info(),
             Self::APIVersion => CType::Primitive(PrimitiveType::U64),
             Self::AsyncCallback(_) => panic!("TODO: We probably don't want to emit async callbacks as fallbacks?"),
+            Self::Utf8String(x) => CType::Composite(x.clone()),
         }
     }
 }

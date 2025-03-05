@@ -4,7 +4,7 @@ using Xunit;
 public class TestStructs
 {
     [Fact]
-    public void Test_bool_field()
+    public void bool_field()
     {
         var rval = Interop.bool_field(new BoolField
         {
