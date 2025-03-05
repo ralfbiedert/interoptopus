@@ -284,6 +284,7 @@ impl Interop {
                 TypePattern::SliceMut(_) => true,
                 TypePattern::NamedCallback(_) => true,
                 TypePattern::Utf8String(_) => true,
+                TypePattern::AsyncCallback(_) => true,
                 _ => false,
             },
             _ => false,

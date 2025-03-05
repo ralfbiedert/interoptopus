@@ -317,6 +317,10 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     let __context = <#first as ::interoptopus::patterns::asynk::AsyncProxy<_, _>>::new(__context, __tlcontext);
                     let __rval = <#without_lifetimes>::#orig_fn_ident( #(#arg_names),* ).await.into();
                     __async_callback.call(&__rval);
+                    // We actually want move semantics for rval for types like `Utf8Strings` that
+                    // should be owned by the FFI side now. We therefore forget it here since
+                    // the caller must have moved it out by now.
+                    ::std::mem::forget(__rval);
                 };
 
                 <#without_lifetimes>::spawn(__this, __async_fn);

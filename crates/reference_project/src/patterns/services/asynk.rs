@@ -2,6 +2,7 @@ use crate::patterns::result::Error;
 use crate::patterns::result::FFIError;
 use crate::types::NestedArray;
 use interoptopus::patterns::asynk::{AsyncRuntime, AsyncRuntimeThreadLocal, AsyncThreadLocal};
+use interoptopus::patterns::string::Utf8String;
 use interoptopus::{ffi_service, ffi_service_ctor, ffi_type};
 use std::future::Future;
 use tokio::runtime::Runtime;
@@ -32,6 +33,10 @@ impl ServiceAsync {
     pub async fn process_struct(this: This, mut x: NestedArray) -> Result<NestedArray, FFIError> {
         x.field_int += 1;
         Ok(x)
+    }
+
+    pub async fn handle_string(this: This, s: Utf8String) -> Result<Utf8String, FFIError> {
+        Ok(s)
     }
 
     // TODO: This must not compile.

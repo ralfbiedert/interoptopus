@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 791495051959197899ul)
+            if (api_version != 7627744572083768741ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (791495051959197899). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (7627744572083768741). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -1060,7 +1060,30 @@ namespace My.Company
         public static partial FFIError service_async_return_after_ms(IntPtr _context, ulong x, ulong ms, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
-        // Debug - no overload for service_async_return_after_ms 
+        public static unsafe Task<ResultU64> service_async_return_after_ms(IntPtr _context, ulong x, ulong ms)
+        {
+            var cs = new TaskCompletionSource<ResultU64>();
+            GCHandle pinned = default;
+            var cb = new AsyncHelper((x) => {
+                var unmanaged = Marshal.PtrToStructure<ResultU64.Unmanaged>(x);
+                var marshaller = new ResultU64.Marshaller(unmanaged);
+                cs.SetResult(marshaller.ToManaged());
+                pinned.Free();
+            });
+            pinned = GCHandle.Alloc(cb);
+            try
+            {
+                var rval = service_async_return_after_ms(_context, x, ms, cb);
+                if (rval != FFIError.Ok)
+                {
+                    throw new InteropException<FFIError>(rval);
+                }
+            }
+            finally
+            {
+            }
+            return cs.Task;
+        }
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_process_struct")]
@@ -1068,7 +1091,63 @@ namespace My.Company
         public static partial FFIError service_async_process_struct(IntPtr _context, NestedArray x, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
-        // Debug - no overload for service_async_process_struct 
+        public static unsafe Task<ResultNestedArray> service_async_process_struct(IntPtr _context, NestedArray x)
+        {
+            var cs = new TaskCompletionSource<ResultNestedArray>();
+            GCHandle pinned = default;
+            var cb = new AsyncHelper((x) => {
+                var unmanaged = Marshal.PtrToStructure<ResultNestedArray.Unmanaged>(x);
+                var marshaller = new ResultNestedArray.Marshaller(unmanaged);
+                cs.SetResult(marshaller.ToManaged());
+                pinned.Free();
+            });
+            pinned = GCHandle.Alloc(cb);
+            try
+            {
+                var rval = service_async_process_struct(_context, x, cb);
+                if (rval != FFIError.Ok)
+                {
+                    throw new InteropException<FFIError>(rval);
+                }
+            }
+            finally
+            {
+            }
+            return cs.Task;
+        }
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "service_async_handle_string")]
+        // Debug - write_function_declaration 
+        public static partial FFIError service_async_handle_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
+
+        // Debug - write_function_overload 
+        public static unsafe Task<ResultUtf8String> service_async_handle_string(IntPtr _context, string s)
+        {
+            var cs = new TaskCompletionSource<ResultUtf8String>();
+            GCHandle pinned = default;
+            var cb = new AsyncHelper((x) => {
+                var unmanaged = Marshal.PtrToStructure<ResultUtf8String.Unmanaged>(x);
+                var marshaller = new ResultUtf8String.Marshaller(unmanaged);
+                cs.SetResult(marshaller.ToManaged());
+                pinned.Free();
+            });
+            pinned = GCHandle.Alloc(cb);
+            var s_wrapped = new Utf8String(s);
+            try
+            {
+                var rval = service_async_handle_string(_context, s_wrapped, cb);
+                if (rval != FFIError.Ok)
+                {
+                    throw new InteropException<FFIError>(rval);
+                }
+            }
+            finally
+            {
+                s_wrapped.Dispose();
+            }
+            return cs.Task;
+        }
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_bad")]
@@ -4045,6 +4124,89 @@ namespace My.Company
     }
 
 
+    // Debug - write_type_definition_composite 
+    ///Result that contains value or an error.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct ResultUtf8String
+    {
+        ///Element if err is `Ok`.
+        internal string t;
+        ///Error value.
+        internal FFIError err;
+    }
+
+    // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct ResultUtf8String
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public Utf8String.Unmanaged t;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public FFIError err;
+        }
+
+        [CustomMarshaller(typeof(ResultUtf8String), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private ResultUtf8String _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(ResultUtf8String managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(ResultUtf8String managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _t = new Utf8String.Marshaller(new Utf8String(_managed.t));
+                _unmanaged.t = _t.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.err = _managed.err;
+
+                return _unmanaged;
+            }
+
+            public unsafe ResultUtf8String ToManaged()
+            {
+                _managed = new ResultUtf8String();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _t = new Utf8String.Marshaller(_unmanaged.t);
+                _managed.t = _t.ToManaged().String;
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.err = _unmanaged.err;
+
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    // Debug - write_pattern_result 
+    public partial struct ResultUtf8String
+    {
+        public string Ok()
+        {
+            if (err == 0)
+            {
+                return t;
+            }
+            throw new InteropException<FFIError>(err);
+        }
+
+    }
+
+
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void CallbackCharArray2Native(CharArray value, IntPtr callback_data); // 'True' native callback signature
@@ -5146,40 +5308,21 @@ namespace My.Company
         // Debug - write_pattern_service_method 
         public Task<ResultU64> ReturnAfterMs(ulong x, ulong ms)
         {
-            var cs = new TaskCompletionSource<ResultU64>();
-            GCHandle pinned = default;
-            var cb = new AsyncHelper((x) => {
-                var rval = Marshal.PtrToStructure<ResultU64>(x);
-                cs.SetResult(rval);
-                pinned.Free();
-            });
-            pinned = GCHandle.Alloc(cb);
-            var rval = Interop.service_async_return_after_ms(_context, x, ms, cb);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-            return cs.Task;
+            return Interop.service_async_return_after_ms(_context, x, ms);
         }
         // Debug - write_service_method_overload 
 
         // Debug - write_pattern_service_method 
         public Task<ResultNestedArray> ProcessStruct(NestedArray x)
         {
-            var cs = new TaskCompletionSource<ResultNestedArray>();
-            GCHandle pinned = default;
-            var cb = new AsyncHelper((x) => {
-                var rval = Marshal.PtrToStructure<ResultNestedArray>(x);
-                cs.SetResult(rval);
-                pinned.Free();
-            });
-            pinned = GCHandle.Alloc(cb);
-            var rval = Interop.service_async_process_struct(_context, x, cb);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
-            return cs.Task;
+            return Interop.service_async_process_struct(_context, x);
+        }
+        // Debug - write_service_method_overload 
+
+        // Debug - write_pattern_service_method 
+        public Task<ResultUtf8String> HandleString(string s)
+        {
+            return Interop.service_async_handle_string(_context, s);
         }
         // Debug - write_service_method_overload 
 

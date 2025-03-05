@@ -26,7 +26,10 @@ pub fn write_pattern_result(i: &Interop, w: &mut IndentWriter, slice: &Composite
         .expect("Option must contain field called 't'.")
         .the_type();
 
-    let type_string = to_typespecifier_in_rval(data_type);
+    let type_string = match data_type {
+        CType::Pattern(TypePattern::Utf8String(_)) => "string".to_string(),
+        _ => to_typespecifier_in_rval(data_type),
+    };
 
     indented!(w, r"{} partial struct {}", i.visibility_types.to_access_modifier(), context_type_name)?;
     indented!(w, r"{{")?;

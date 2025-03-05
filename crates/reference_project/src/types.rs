@@ -75,7 +75,7 @@ where
 }
 
 #[ffi_type]
-#[derive(Copy, Clone, Default)]
+#[derive(Debug, Copy, Clone, Default)]
 pub struct Vec3f32 {
     pub x: f32,
     pub y: f32,
@@ -83,11 +83,13 @@ pub struct Vec3f32 {
 }
 
 #[ffi_type]
+#[derive(Debug, Copy, Clone)]
 pub struct Array {
     pub data: [u8; 16],
 }
 
 #[ffi_type]
+#[derive(Debug)]
 pub struct NestedArray {
     pub field_enum: EnumRenamedXYZ,
     pub field_vec: Vec3f32,
@@ -150,6 +152,7 @@ pub enum EnumDocumented {
 }
 
 #[ffi_type(name = "EnumRenamed")]
+#[derive(Debug)]
 pub enum EnumRenamedXYZ {
     X,
 }

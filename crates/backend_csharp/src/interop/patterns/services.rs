@@ -98,7 +98,7 @@ pub fn write_pattern_service_method(
 
         // If we call the checked function we want to resolve a `SliceU8` to a `byte[]`,
         // but if we call the unchecked version we want to keep that `Sliceu8` in our signature.
-        let native = to_typespecifier_in_param(p.the_type());
+        let mut native = to_typespecifier_in_param(p.the_type());
 
         match p.the_type() {
             CType::Pattern(TypePattern::NamedCallback(callback)) => {
@@ -110,6 +110,10 @@ pub fn write_pattern_service_method(
                 } else {
                     to_invoke.push(name.to_string());
                 }
+            }
+            CType::Pattern(TypePattern::Utf8String(_)) => {
+                native = "string".to_string();
+                to_invoke.push(format!("{name}"));
             }
             _ => {
                 // Forward `ref` and `out` accordingly.
@@ -131,7 +135,6 @@ pub fn write_pattern_service_method(
         names.pop();
         types.pop();
         to_invoke.pop();
-        to_invoke.push("cb".to_string());
         rval = format!("Task<{}>", to_typespecifier_in_param(x));
     }
 
@@ -176,24 +179,9 @@ pub fn write_pattern_service_method(
         indented!(w, [()], r"var self = new {}();", class.the_type().rust_name())?;
     }
 
-    if let Some(x) = async_rval {
-        indented!(w, [()], r"var cs = new TaskCompletionSource<{}>();", to_typespecifier_in_param(x))?;
-        indented!(w, [()], r"GCHandle pinned = default;")?;
-        indented!(w, [()], r"var cb = new AsyncHelper((x) => {{")?;
-        indented!(w, [()()], r"var rval = Marshal.PtrToStructure<{}>(x);", to_typespecifier_in_param(x))?;
-        indented!(w, [()()], r"cs.SetResult(rval);")?;
-        indented!(w, [()()], r"pinned.Free();")?;
-        indented!(w, [()], r"}});")?;
-        indented!(w, [()], r"pinned = GCHandle.Alloc(cb);")?;
-    }
-
-    // for (name, ty) in zip(&to_wrap_delegates, &to_wrap_delegate_types) {
-    //     indented!(w, [()], r"var {}_safe_delegate = new {}ExceptionSafe({});", name, ty, name)?;
-    // }
-
     // Determine return value behavior and write function call.
     match function.signature().rval() {
-        CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
+        CType::Pattern(TypePattern::FFIErrorEnum(e)) if async_rval.is_none() => {
             indented!(w, [()], r"var rval = {};", fn_call)?;
             // for name in to_wrap_delegates {
             //     indented!(w, [()], r"{}_safe_delegate.Rethrow();", name)?;
@@ -202,6 +190,9 @@ pub fn write_pattern_service_method(
             indented!(w, [()], r"{{")?;
             indented!(w, [()()], r"throw new InteropException<{}>(rval);", e.the_enum().rust_name())?;
             indented!(w, [()], r"}}")?;
+        }
+        CType::Pattern(TypePattern::FFIErrorEnum(e)) if async_rval.is_some() => {
+            indented!(w, [()], r"return {};", fn_call)?;
         }
         CType::Pattern(TypePattern::CStrPointer) => {
             indented!(w, [()], r"var s = {};", fn_call)?;
@@ -219,10 +210,6 @@ pub fn write_pattern_service_method(
         indented!(w, [()], r"return self;")?;
     }
 
-    if let Some(x) = async_rval {
-        indented!(w, [()], r"return cs.Task;")?;
-    }
-
     indented!(w, r"}}")?;
 
     Ok(())
@@ -238,7 +225,7 @@ pub fn write_service_method_overload(
 ) -> Result<(), Error> {
     i.debug(w, "write_service_method_overload")?;
 
-    if !i.has_overloadable(function.signature()) {
+    if !i.has_overloadable(function.signature()) || function.async_rval().is_some() {
         return Ok(());
     }
 

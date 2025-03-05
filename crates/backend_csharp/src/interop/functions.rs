@@ -244,6 +244,8 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         return Ok(());
     }
 
+    let async_rval = function.async_rval();
+
     let mut to_pin_name = Vec::new();
     let mut to_pin_slice_type = Vec::new();
     let mut to_invoke = Vec::new();
@@ -261,7 +263,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         },
     );
 
-    let rval = match function.signature().rval() {
+    let mut rval = match function.signature().rval() {
         CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
         CType::Pattern(TypePattern::CStrPointer) => "string".to_string(),
         _ => to_typespecifier_in_rval(function.signature().rval()),
@@ -321,6 +323,13 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         params.push(format!("{native} {name}"));
     }
 
+    if let Some(x) = async_rval {
+        params.pop();
+        to_invoke.pop();
+        to_invoke.push("cb".to_string());
+        rval = format!("Task<{}>", to_typespecifier_in_param(x));
+    }
+
     let signature = format!(r"public static unsafe {} {}({})", rval, raw_name, params.join(", "));
     if write_for == WriteFor::Docs {
         indented!(w, r"{};", signature)?;
@@ -333,6 +342,18 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
 
     indented!(w, "{}", signature)?;
     indented!(w, r"{{")?;
+
+    if let Some(x) = async_rval {
+        indented!(w, [()], r"var cs = new TaskCompletionSource<{}>();", to_typespecifier_in_param(x))?;
+        indented!(w, [()], r"GCHandle pinned = default;")?;
+        indented!(w, [()], r"var cb = new AsyncHelper((x) => {{")?;
+        indented!(w, [()()], r"var unmanaged = Marshal.PtrToStructure<{}.Unmanaged>(x);", to_typespecifier_in_param(x))?;
+        indented!(w, [()()], r"var marshaller = new {}.Marshaller(unmanaged);", to_typespecifier_in_param(x))?;
+        indented!(w, [()()], r"cs.SetResult(marshaller.ToManaged());")?;
+        indented!(w, [()()], r"pinned.Free();")?;
+        indented!(w, [()], r"}});")?;
+        indented!(w, [()], r"pinned = GCHandle.Alloc(cb);")?;
+    }
 
     if !to_pin_name.is_empty() {
         for (pin_var, slice_struct) in to_pin_name.iter().zip(to_pin_slice_type.iter()) {
@@ -376,6 +397,10 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
             w.unindent();
             indented!(w, [()], r"}}")?;
         }
+    }
+
+    if let Some(x) = async_rval {
+        indented!(w, [()], r"return cs.Task;")?;
     }
 
     indented!(w, r"}}")

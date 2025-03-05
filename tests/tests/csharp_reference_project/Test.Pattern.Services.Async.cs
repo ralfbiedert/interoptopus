@@ -12,10 +12,14 @@ public class TestPatternServicesAsync
     public async void service_async_explicit_basic()
     {
         var s = ServiceAsync.New();
-        var r = await s.ReturnAfterMs(123, 500);
+        var r1 = await s.ReturnAfterMs(123, 500);
+        var r2 = await s.HandleString("abc");
+        
         s.Dispose();
         
-        Assert.Equal(r.Ok(), 123u);
+        var ss = r2.Ok();
+        Assert.Equal(r1.Ok(), 123u);
+        Assert.Equal(r2.Ok(), "abc");
     }
     
     
