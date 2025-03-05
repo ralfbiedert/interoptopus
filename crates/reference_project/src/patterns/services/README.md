@@ -4,10 +4,10 @@ shows various ways to author them.
 | File                                     | Description                                           |
 |------------------------------------------|-------------------------------------------------------|
 | [`basic.rs`](basic.rs)                   | A very simple service, start here. 🍼                 |
-| [`callbacks.rs`](callbacks.rs)           | Passing callbacks to and invoking them from services. |
+| [`callback.rs`](callback.rs)             | Passing callbacks to and invoking them from services. |
 | [`ignored.rs`](ignored.rs)               | Ignoring methods.                                     |
-| [`lifetimes.rs`](lifetimes.rs)           | Services utilizing lifetimes. Slightly dangerous ⚠️   |
+| [`lifetime.rs`](lifetime.rs)             | Services utilizing lifetimes. Slightly dangerous ⚠️   |
 | [`multiple_ctors.rs`](multiple_ctors.rs) | Providing multiple constructors.                      |
 | [`on_panic.rs`](on_panic.rs)             | Specifying panic behavior.                            |
-| [`slices.rs`](slices.rs)                 | Sending and receiving slices.                         |
-| [`strings.rs`](strings.rs)               | Sending and receiving strings.                        |
+| [`slice.rs`](slice.rs)                   | Sending and receiving slices.                         |
+| [`string.rs`](string.rs)                 | Sending and receiving strings.                        |

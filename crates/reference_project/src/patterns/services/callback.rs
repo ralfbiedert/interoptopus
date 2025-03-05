@@ -1,4 +1,4 @@
-use crate::patterns::callbacks::{
+use crate::patterns::callback::{
     MyCallback, MyCallbackContextual, MyCallbackNamespaced, MyCallbackVoid, SumDelegate1, SumDelegate2, SumDelegateReturn, SumDelegateReturn2,
 };
 use crate::patterns::result::{Error, FFIError};

@@ -149,7 +149,7 @@ impl ServiceDefinition {
     /// message is beneficial.
     ///
     /// # Panics
-    /// Expect the first ctor parameter to be a type.
+    /// Panics if service constraints are violated.
     pub fn assert_valid(&self) {
         let constructor_fist_parameter = self.constructors.first().and_then(Function::first_param_type).expect("Must have type");
         let destructor_first_parameter = self.destructor.first_param_type().expect("Must have type");

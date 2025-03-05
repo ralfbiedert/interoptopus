@@ -138,6 +138,6 @@ pub trait AsyncRuntimeThreadLocal {
 
     fn spawn<Fn, F>(&self, f: Fn)
     where
-        Fn: FnOnce(Self::ThreadLocal) -> F,
+        Fn: FnOnce(Self::ThreadLocal) -> F + Send + 'static,
         F: Future<Output = ()> + 'static;
 }

@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 7122984414827529015ul)
+            if (api_version != 8019061383878594888ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (7122984414827529015). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (8019061383878594888). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -908,20 +908,20 @@ namespace My.Company
         ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
-        [LibraryImport(NativeLib, EntryPoint = "basic_service_destroy")]
+        [LibraryImport(NativeLib, EntryPoint = "service_basic_destroy")]
         // Debug - write_function_declaration 
-        public static partial FFIError basic_service_destroy(ref IntPtr _context);
+        public static partial FFIError service_basic_destroy(ref IntPtr _context);
 
         // Debug - write_function_overload 
-        // Debug - no overload for basic_service_destroy 
+        // Debug - no overload for service_basic_destroy 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "basic_service_new")]
+        [LibraryImport(NativeLib, EntryPoint = "service_basic_new")]
         // Debug - write_function_declaration 
-        public static partial FFIError basic_service_new(ref IntPtr _context);
+        public static partial FFIError service_basic_new(ref IntPtr _context);
 
         // Debug - write_function_overload 
-        // Debug - no overload for basic_service_new 
+        // Debug - no overload for service_basic_new 
 
         // Debug - write_function 
         /// Destroys the given instance.
@@ -4888,17 +4888,17 @@ namespace My.Company
 
 
     // Debug - write_pattern_service 
-    public partial class BasicService : IDisposable
+    public partial class ServiceBasic : IDisposable
     {
         private IntPtr _context;
 
-        private BasicService() {}
+        private ServiceBasic() {}
 
         // Debug - write_pattern_service_method 
-        public static BasicService New()
+        public static ServiceBasic New()
         {
-            var self = new BasicService();
-            var rval = Interop.basic_service_new(ref self._context);
+            var self = new ServiceBasic();
+            var rval = Interop.service_basic_new(ref self._context);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);
@@ -4909,7 +4909,7 @@ namespace My.Company
         // Debug - write_pattern_service_method 
         public void Dispose()
         {
-            var rval = Interop.basic_service_destroy(ref _context);
+            var rval = Interop.service_basic_destroy(ref _context);
             if (rval != FFIError.Ok)
             {
                 throw new InteropException<FFIError>(rval);

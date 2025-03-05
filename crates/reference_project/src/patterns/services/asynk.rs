@@ -1,7 +1,7 @@
 use crate::patterns::result::Error;
 use crate::patterns::result::FFIError;
 use crate::types::NestedArray;
-use interoptopus::patterns::asynk::{AsyncRuntime, AsyncRuntimeThreadLocal, AsyncSelf, AsyncThreadLocal};
+use interoptopus::patterns::asynk::{AsyncRuntime, AsyncRuntimeThreadLocal, AsyncThreadLocal};
 use interoptopus::{ffi_service, ffi_service_ctor, ffi_type};
 use std::future::Future;
 use tokio::runtime::Runtime;
@@ -38,39 +38,15 @@ impl ServiceAsync {
     pub fn bad(&mut self) {}
 }
 
-// impl AsyncRuntime for ServiceAsync {
-//     type ThreadLocal = ();
-//
-//     fn spawn<Fn, F>(&self, f: Fn)
-//     where
-//         Fn: FnOnce(Self::ThreadLocal) -> F,
-//         F: Future<Output = ()> + Send + 'static,
-//     {
-//         self.runtime.spawn(f(()));
-//     }
-// }
-
 type ThreadLocal = ();
 type This = AsyncThreadLocal<ServiceAsync, ThreadLocal>;
 
-impl AsyncRuntimeThreadLocal for ServiceAsync {
-    type ThreadLocal = ThreadLocal;
-
+impl AsyncRuntime for ServiceAsync {
     fn spawn<Fn, F>(&self, f: Fn)
     where
-        Fn: FnOnce(Self::ThreadLocal) -> F,
-        F: Future<Output = ()> + 'static,
+        Fn: FnOnce(()) -> F,
+        F: Future<Output = ()> + Send + 'static,
     {
-        // self.runtime.spawn(f(()));
+        self.runtime.spawn(f(()));
     }
 }
-
-// impl AsyncRuntime for ServiceAsync {
-//     fn spawn<Fn, F>(&self, f: Fn)
-//     where
-//         Fn: FnOnce(()) -> F,
-//         F: Future<Output = ()> + 'static,
-//     {
-//         // self.runtime.spawn(f(()));
-//     }
-// }

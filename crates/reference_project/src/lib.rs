@@ -7,7 +7,7 @@
 //! Note, many items here are deliberately not documented as testing how and if documentation
 //! is generated is part of the test.
 
-use interoptopus::{constant, extra_type, ffi_function, function, pattern, Inventory, InventoryBuilder};
+use interoptopus::{constant, extra_type, function, pattern, Inventory, InventoryBuilder};
 
 pub mod constants;
 pub mod functions;
@@ -15,44 +15,45 @@ pub mod functions;
 pub mod patterns {
     // pub mod api_entry;
     pub mod api_guard;
-    pub mod ascii_pointer;
-    pub mod callbacks;
+    pub mod callback;
     pub mod option;
-    pub mod primitives;
+    pub mod primitive;
     pub mod result;
+    pub mod string;
     pub mod services {
         pub mod _tmp;
         pub mod asynk;
         pub mod basic;
-        pub mod callbacks;
+        pub mod callback;
+        pub mod converter;
         pub mod ignored;
-        pub mod lifetimes;
+        pub mod lifetime;
         pub mod multiple_ctors;
         pub mod on_panic;
-        pub mod slices;
-        pub mod strings;
+        pub mod slice;
+        pub mod string;
     }
     pub mod slice;
-    pub mod surrogates;
+    pub mod surrogate;
 }
 pub mod types;
 
 fn f(x: bool) {}
 
 pub fn ffi_inventory() -> Inventory {
-    f(true);
-    f({
-        #[ffi_function]
-        #[no_mangle]
-        fn f() {}
-        true
-    });
-    f({
-        #[ffi_function]
-        #[no_mangle]
-        fn f() {}
-        true
-    });
+    // f(true);
+    // f({
+    //     #[ffi_function]
+    //     #[no_mangle]
+    //     fn f() {}
+    //     true
+    // });
+    // f({
+    //     #[ffi_function]
+    //     #[no_mangle]
+    //     fn f() {}
+    //     true
+    // });
 
     {
         InventoryBuilder::new()
@@ -116,13 +117,13 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(functions::weird_1))
             .register(function!(functions::visibility))
             .register(function!(functions::repr_transparent))
-            .register(function!(patterns::ascii_pointer::pattern_ascii_pointer_1))
-            .register(function!(patterns::ascii_pointer::pattern_ascii_pointer_2))
-            .register(function!(patterns::ascii_pointer::pattern_ascii_pointer_3))
-            .register(function!(patterns::ascii_pointer::pattern_ascii_pointer_4))
-            .register(function!(patterns::ascii_pointer::pattern_ascii_pointer_5))
+            .register(function!(patterns::string::pattern_ascii_pointer_1))
+            .register(function!(patterns::string::pattern_ascii_pointer_2))
+            .register(function!(patterns::string::pattern_ascii_pointer_3))
+            .register(function!(patterns::string::pattern_ascii_pointer_4))
+            .register(function!(patterns::string::pattern_ascii_pointer_5))
             // .register(function!(patterns::ascii_pointer::pattern_ascii_pointer_len))
-            .register(function!(patterns::ascii_pointer::pattern_ascii_pointer_return_slice))
+            .register(function!(patterns::string::pattern_ascii_pointer_return_slice))
             .register(function!(patterns::slice::pattern_ffi_slice_1))
             .register(function!(patterns::slice::pattern_ffi_slice_1b))
             .register(function!(patterns::slice::pattern_ffi_slice_2))
@@ -136,19 +137,19 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(patterns::slice::pattern_ffi_slice_delegate_huge))
             .register(function!(patterns::option::pattern_ffi_option_1))
             .register(function!(patterns::option::pattern_ffi_option_2))
-            .register(function!(patterns::primitives::pattern_ffi_bool))
-            .register(function!(patterns::primitives::pattern_ffi_cchar))
-            .register(function!(patterns::primitives::pattern_ffi_cchar_const_pointer))
-            .register(function!(patterns::primitives::pattern_ffi_cchar_mut_pointer))
+            .register(function!(patterns::primitive::pattern_ffi_bool))
+            .register(function!(patterns::primitive::pattern_ffi_cchar))
+            .register(function!(patterns::primitive::pattern_ffi_cchar_const_pointer))
+            .register(function!(patterns::primitive::pattern_ffi_cchar_mut_pointer))
             .register(function!(patterns::api_guard::pattern_api_guard))
-            .register(function!(patterns::callbacks::pattern_callback_1))
-            .register(function!(patterns::callbacks::pattern_callback_2))
+            .register(function!(patterns::callback::pattern_callback_1))
+            .register(function!(patterns::callback::pattern_callback_2))
             // .register(function!(patterns::callbacks::pattern_callback_3))
-            .register(function!(patterns::callbacks::pattern_callback_4))
-            .register(function!(patterns::callbacks::pattern_callback_5))
-            .register(function!(patterns::callbacks::pattern_callback_6))
-            .register(function!(patterns::callbacks::pattern_callback_7))
-            .register(function!(patterns::surrogates::pattern_surrogates_1))
+            .register(function!(patterns::callback::pattern_callback_4))
+            .register(function!(patterns::callback::pattern_callback_5))
+            .register(function!(patterns::callback::pattern_callback_6))
+            .register(function!(patterns::callback::pattern_callback_7))
+            .register(function!(patterns::surrogate::pattern_surrogates_1))
             // Constants
             .register(constant!(constants::U8))
             .register(constant!(constants::F32_MIN_POSITIVE))
@@ -157,14 +158,14 @@ pub fn ffi_inventory() -> Inventory {
             .register(extra_type!(types::ExtraType<f32>))
             // Patterns
             .register(pattern!(patterns::services::asynk::ServiceAsync))
-            .register(pattern!(patterns::services::basic::BasicService))
+            .register(pattern!(patterns::services::basic::ServiceBasic))
             .register(pattern!(patterns::services::on_panic::ServiceOnPanic))
-            .register(pattern!(patterns::services::callbacks::ServiceCallbacks))
+            .register(pattern!(patterns::services::callback::ServiceCallbacks))
             .register(pattern!(patterns::services::ignored::ServiceIgnoringMethods))
             .register(pattern!(patterns::services::multiple_ctors::ServiceMultipleCtors))
-            .register(pattern!(patterns::services::lifetimes::ServiceUsingLifetimes))
-            .register(pattern!(patterns::services::slices::ServiceVariousSlices))
-            .register(pattern!(patterns::services::strings::ServiceStrings))
+            .register(pattern!(patterns::services::lifetime::ServiceUsingLifetimes))
+            .register(pattern!(patterns::services::slice::ServiceVariousSlices))
+            .register(pattern!(patterns::services::string::ServiceStrings))
             .validate()
             .build()
     }
