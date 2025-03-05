@@ -38,23 +38,7 @@ pub mod patterns {
 }
 pub mod types;
 
-fn f(x: bool) {}
-
 pub fn ffi_inventory() -> Inventory {
-    // f(true);
-    // f({
-    //     #[ffi_function]
-    //     #[no_mangle]
-    //     fn f() {}
-    //     true
-    // });
-    // f({
-    //     #[ffi_function]
-    //     #[no_mangle]
-    //     fn f() {}
-    //     true
-    // });
-
     {
         InventoryBuilder::new()
             // Functions

@@ -8,7 +8,7 @@ callback!(Foo(slice: FFISlice<u8>) -> u8);
 
 /// Has documentation
 #[ffi_function]
-fn f(y: Foo) {}
+fn f(_: Foo) {}
 
 #[test]
 fn can_produce_markdown() -> Result<(), Error> {

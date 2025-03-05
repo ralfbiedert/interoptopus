@@ -74,7 +74,7 @@ pub fn write_pattern_service_method(
     w: &mut IndentWriter,
     class: &ServiceDefinition,
     function: &Function,
-    mut rval: &str,
+    rval: &str,
     fn_name: &str,
     write_contxt_by_ref: bool,
     is_ctor: bool,
@@ -191,7 +191,7 @@ pub fn write_pattern_service_method(
             indented!(w, [()()], r"throw new InteropException<{}>(rval);", e.the_enum().rust_name())?;
             indented!(w, [()], r"}}")?;
         }
-        CType::Pattern(TypePattern::FFIErrorEnum(e)) if async_rval.is_some() => {
+        CType::Pattern(TypePattern::FFIErrorEnum(_)) if async_rval.is_some() => {
             indented!(w, [()], r"return {};", fn_call)?;
         }
         CType::Pattern(TypePattern::CStrPointer) => {

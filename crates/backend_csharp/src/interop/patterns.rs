@@ -20,7 +20,7 @@ pub fn write_patterns(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
                     write_pattern_service(i, w, cls)?;
                 }
             }
-            LibraryPattern::Builtins(x) => {}
+            LibraryPattern::Builtins(_) => {}
             _ => panic!("Pattern not explicitly handled"),
         }
     }

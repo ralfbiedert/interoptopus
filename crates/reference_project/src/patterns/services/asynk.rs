@@ -1,7 +1,7 @@
 use crate::patterns::result::Error;
 use crate::patterns::result::FFIError;
 use crate::types::NestedArray;
-use interoptopus::patterns::asynk::{AsyncRuntime, AsyncRuntimeThreadLocal, AsyncThreadLocal};
+use interoptopus::patterns::asynk::{AsyncRuntime, AsyncThreadLocal};
 use interoptopus::patterns::string::Utf8String;
 use interoptopus::{ffi_service, ffi_service_ctor, ffi_type};
 use std::future::Future;
@@ -25,17 +25,17 @@ impl ServiceAsync {
         Ok(Self { runtime })
     }
 
-    pub async fn return_after_ms(this: This, x: u64, ms: u64) -> Result<u64, FFIError> {
+    pub async fn return_after_ms(_this: This, x: u64, ms: u64) -> Result<u64, FFIError> {
         tokio::time::sleep(std::time::Duration::from_millis(ms)).await;
         Ok(x)
     }
 
-    pub async fn process_struct(this: This, mut x: NestedArray) -> Result<NestedArray, FFIError> {
+    pub async fn process_struct(_this: This, mut x: NestedArray) -> Result<NestedArray, FFIError> {
         x.field_int += 1;
         Ok(x)
     }
 
-    pub async fn handle_string(this: This, s: Utf8String) -> Result<Utf8String, FFIError> {
+    pub async fn handle_string(_this: This, s: Utf8String) -> Result<Utf8String, FFIError> {
         Ok(s)
     }
 

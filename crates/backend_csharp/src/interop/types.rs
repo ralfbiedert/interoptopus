@@ -84,7 +84,7 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &CType
                 w.newline()?;
             }
 
-            TypePattern::Utf8String(x) => {}
+            TypePattern::Utf8String(_) => {}
             TypePattern::CChar => {}
             TypePattern::APIVersion => {}
             TypePattern::AsyncCallback(_) => {}

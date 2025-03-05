@@ -13,7 +13,6 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     let rval = to_typespecifier_in_rval(the_type.fnpointer().signature().rval());
     let name = named_callback_to_typename(the_type);
     let visibility = i.visibility_types.to_access_modifier();
-    let needs_wrapper = i.has_custom_marshalled_types(the_type.fnpointer().signature());
 
     let mut params = Vec::new();
     let mut params_native = Vec::new();

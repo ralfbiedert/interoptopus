@@ -137,10 +137,8 @@ pub fn write_function_wrapper_call_delegate_param_body(
     // write custom marshalling for composite types
     for p in delegate_signature.params() {
         match p.the_type() {
-            CType::Composite(x) => {
-                if i.should_emit_marshaller_for_composite(x) {
-                    indented!(w, [()], r"var {0}_managed = {1}Marshaller.ConvertToManaged({0}_native);", p.name(), to_typespecifier_in_param(p.the_type()))?;
-                }
+            CType::Composite(_) => {
+                indented!(w, [()], r"var {0}_managed = {1}Marshaller.ConvertToManaged({0}_native);", p.name(), to_typespecifier_in_param(p.the_type()))?;
             }
             CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_)) => {
                 indented!(w, [()], r"var {}_marshaller = new {}.Marshaller();", p.name(), to_slice_marshaller(p.the_type()))?;
@@ -162,10 +160,8 @@ pub fn write_function_wrapper_call_delegate_param_body(
     for (index, p) in delegate_signature.params().iter().enumerate() {
         let sep = if index + 1 < delegate_signature.params().len() { ", " } else { "" };
         match p.the_type() {
-            CType::Composite(x) => {
-                if i.should_emit_marshaller_for_composite(x) {
-                    indented!(w, [()()], r"{}_managed{}", p.name(), sep)?;
-                }
+            CType::Composite(_) => {
+                indented!(w, [()()], r"{}_managed{}", p.name(), sep)?;
             }
             CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_)) => {
                 indented!(w, [()()], r"{}_managed{}", p.name(), sep)?;
@@ -251,7 +247,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     let mut to_invoke = Vec::new();
     let mut to_wrap_name = Vec::new();
     let mut to_wrap_type = Vec::new();
-    let mut to_wrap_delegates = Vec::new();
+    let to_wrap_delegates = Vec::new();
     // let mut to_wrap_delegate_types = Vec::new();
 
     let raw_name = function_name_to_csharp_name(
@@ -286,12 +282,12 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         };
 
         match p.the_type() {
-            CType::Pattern(TypePattern::Slice(x) | TypePattern::SliceMut(x)) => {
+            CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_)) => {
                 to_pin_name.push(name);
                 to_pin_slice_type.push(the_type);
                 to_invoke.push(format!("{name}_slice"));
             }
-            CType::Pattern(TypePattern::NamedCallback(callback)) => {
+            CType::Pattern(TypePattern::NamedCallback(_)) => {
                 to_wrap_name.push(name);
                 to_wrap_type.push(to_typespecifier_in_param(p.the_type()));
                 to_invoke.push(format!("{name}_wrapped"));
@@ -303,12 +299,12 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
             }
             CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {
                 CType::Pattern(x) => match x {
-                    TypePattern::Slice(x) => {
+                    TypePattern::Slice(_) => {
                         to_pin_name.push(name);
                         to_pin_slice_type.push(the_type.replace("ref ", ""));
                         to_invoke.push(format!("ref {name}_slice"));
                     }
-                    TypePattern::SliceMut(x) => {
+                    TypePattern::SliceMut(_) => {
                         to_pin_name.push(name);
                         to_pin_slice_type.push(the_type.replace("ref ", ""));
                         to_invoke.push(format!("ref {name}_slice"));
@@ -399,7 +395,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         }
     }
 
-    if let Some(x) = async_rval {
+    if async_rval.is_some() {
         indented!(w, [()], r"return cs.Task;")?;
     }
 

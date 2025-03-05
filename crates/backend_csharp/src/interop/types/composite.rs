@@ -19,10 +19,6 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
     i.debug(w, "write_type_definition_composite_marshaller")?;
     let name = the_type.rust_name();
 
-    if !i.should_emit_marshaller_for_composite(the_type) {
-        return Ok(());
-    }
-
     indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
     indented!(w, r"public partial struct {}", name)?;
     indented!(w, r"{{")?;
@@ -132,7 +128,7 @@ pub fn write_type_definition_composite_to_managed_inline_field(i: &Interop, w: &
         CType::Primitive(PrimitiveType::Bool) => {
             indented!(w, r"{0} = Convert.ToBoolean(unmanaged.{0}),", field_name)?;
         }
-        CType::Composite(composite) if i.should_emit_marshaller_for_composite(composite) => {
+        CType::Composite(composite) => {
             indented!(w, r"{0} = {1}.Marshaller.ConvertToManaged(unmanaged.{0}),", field_name, composite.rust_name())?;
         }
         _ => {
@@ -195,24 +191,6 @@ pub fn write_type_definition_composite_to_unmanaged_marshal_field(
     Ok(())
 }
 
-pub fn write_type_definition_composite_to_unmanaged_inline_field(i: &Interop, w: &mut IndentWriter, field: &Field) -> Result<(), Error> {
-    i.debug(w, "write_type_definition_composite_to_unmanaged_inline_field")?;
-
-    let field_name = field_name_to_csharp_name(field, i.rename_symbols);
-    match field.the_type() {
-        CType::Primitive(PrimitiveType::Bool) => {
-            indented!(w, r"{0} = Convert.ToSByte(managed.{0}),", field_name)?;
-        }
-        CType::Composite(composite) if i.should_emit_marshaller_for_composite(composite) => {
-            indented!(w, r"{0} = {1}.Marshaller.ConvertToUnmanaged(managed.{0}),", field_name, composite.rust_name())?;
-        }
-        _ => {
-            indented!(w, r"{0} = managed.{0},", field_name)?;
-        }
-    }
-    Ok(())
-}
-
 pub fn write_type_definition_composite_unmanaged_body_field(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &CompositeType) -> Result<(), Error> {
     i.debug(w, "write_type_definition_composite_unmanaged_body_field")?;
 
@@ -231,11 +209,7 @@ pub fn write_type_definition_composite_unmanaged_body_field(i: &Interop, w: &mut
             indented!(w, r"public sbyte {};", field_name)?;
         }
         CType::Composite(composite) => {
-            if i.should_emit_marshaller_for_composite(composite) {
-                indented!(w, r"public {}.Unmanaged {};", composite.rust_name(), field_name)?;
-            } else {
-                indented!(w, r"public {} {};", composite.rust_name(), field_name)?;
-            }
+            indented!(w, r"public {}.Unmanaged {};", composite.rust_name(), field_name)?;
         }
         CType::Pattern(TypePattern::NamedCallback(x)) => {
             indented!(w, r"public {}.Unmanaged {};", x.name(), field_name)?;
@@ -304,8 +278,8 @@ pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWri
     let field_name = field_name_to_csharp_name(field, i.rename_symbols);
     let visibility = match field.visibility() {
         c::Visibility::Public => "public ",
-        c::Visibility::Private if i.should_emit_marshaller_for_composite(the_type) => "internal ",
-        c::Visibility::Private => "",
+        c::Visibility::Private => "internal ",
+        // c::Visibility::Private => "",
     };
 
     if let CType::Array(a) = field.the_type() {
@@ -385,7 +359,6 @@ pub fn write_type_definition_composite_marshaller_field_from_unmanaged(i: &Inter
             indented!(w, [()], "src.CopyTo(dst);")?;
             indented!(w, "}}")?;
         }
-        CType::Primitive(PrimitiveType::Bool) => indented!(w, "_managed.{name} = _unmanaged.{name} == 1 ? true : false;")?,
         CType::Pattern(TypePattern::FFIErrorEnum(_)) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
         CType::Pattern(TypePattern::CStrPointer) => {
             indented!(w, "_managed.{name} = Marshal.PtrToStringAnsi(_unmanaged.{name});")?;

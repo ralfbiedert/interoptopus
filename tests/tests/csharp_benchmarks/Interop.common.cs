@@ -26,6 +26,53 @@ namespace My.Company.Common
         public double z;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Vec
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public double x;
+            public double z;
+        }
+
+        [CustomMarshaller(typeof(Vec), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private Vec _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(Vec managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(Vec managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+
+                _unmanaged.x = _managed.x;
+                _unmanaged.z = _managed.z;
+
+                return _unmanaged;
+            }
+
+            public unsafe Vec ToManaged()
+            {
+                _managed = new Vec();
+
+                _managed.x = _unmanaged.x;
+                _managed.z = _unmanaged.z;
+
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate byte InteropDelegate_fn_u8_rval_u8(byte x0);
 
@@ -33,14 +80,17 @@ namespace My.Company.Common
     public delegate void InteropDelegate_fn_CharArray(CharArray x0);
     public delegate void InteropDelegate_fn_CharArray_native(CharArray x0);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct SliceBool : IEnumerable<Bool>, IDisposable
+    public partial struct SliceBool
     {
         Bool[] _managed;
         IntPtr _data;
         ulong _len;
         bool _wePinned;
+    }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceBool : IEnumerable<Bool>, IDisposable
+    {
         public int Count => _managed?.Length ?? (int)_len;
 
         public unsafe ReadOnlySpan<Bool> ReadOnlySpan
@@ -139,14 +189,17 @@ namespace My.Company.Common
         }
     }
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct SliceI32 : IEnumerable<int>, IDisposable
+    public partial struct SliceI32
     {
         int[] _managed;
         IntPtr _data;
         ulong _len;
         bool _wePinned;
+    }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceI32 : IEnumerable<int>, IDisposable
+    {
         public int Count => _managed?.Length ?? (int)_len;
 
         public unsafe ReadOnlySpan<int> ReadOnlySpan
@@ -245,14 +298,17 @@ namespace My.Company.Common
         }
     }
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct SliceU32 : IEnumerable<uint>, IDisposable
+    public partial struct SliceU32
     {
         uint[] _managed;
         IntPtr _data;
         ulong _len;
         bool _wePinned;
+    }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceU32 : IEnumerable<uint>, IDisposable
+    {
         public int Count => _managed?.Length ?? (int)_len;
 
         public unsafe ReadOnlySpan<uint> ReadOnlySpan
@@ -351,14 +407,17 @@ namespace My.Company.Common
         }
     }
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct SliceU8 : IEnumerable<byte>, IDisposable
+    public partial struct SliceU8
     {
         byte[] _managed;
         IntPtr _data;
         ulong _len;
         bool _wePinned;
+    }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceU8 : IEnumerable<byte>, IDisposable
+    {
         public int Count => _managed?.Length ?? (int)_len;
 
         public unsafe ReadOnlySpan<byte> ReadOnlySpan
@@ -457,14 +516,17 @@ namespace My.Company.Common
         }
     }
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct SliceVec : IEnumerable<Vec>, IDisposable
+    public partial struct SliceVec
     {
         Vec[] _managed;
         IntPtr _data;
         ulong _len;
         bool _wePinned;
+    }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceVec : IEnumerable<Vec>, IDisposable
+    {
         public int Count => _managed?.Length ?? (int)_len;
 
         public unsafe ReadOnlySpan<Vec> ReadOnlySpan
@@ -905,9 +967,58 @@ namespace My.Company.Common
     public partial struct OptionVec
     {
         ///Element that is maybe valid.
-        Vec t;
+        internal Vec t;
         ///Byte where `1` means element `t` is valid.
-        byte is_some;
+        internal byte is_some;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct OptionVec
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public Vec.Unmanaged t;
+            public byte is_some;
+        }
+
+        [CustomMarshaller(typeof(OptionVec), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private OptionVec _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(OptionVec managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(OptionVec managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+
+                var _t = new Vec.Marshaller(_managed.t);
+                _unmanaged.t = _t.ToUnmanaged();
+                _unmanaged.is_some = _managed.is_some;
+
+                return _unmanaged;
+            }
+
+            public unsafe OptionVec ToManaged()
+            {
+                _managed = new OptionVec();
+
+                var _t = new Vec.Marshaller(_unmanaged.t);
+                _managed.t = _t.ToManaged();
+                _managed.is_some = _unmanaged.is_some;
+
+                return _managed;
+            }
+            public void Free() { }
+        }
     }
 
     public partial struct OptionVec
@@ -951,39 +1062,51 @@ namespace My.Company.Common
 
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint MyCallbackNamespacedNative(uint value, IntPtr callback_data);
-    public delegate uint MyCallbackNamespacedDelegate(uint value);
+    public delegate uint MyCallbackNamespacedNative(uint value, IntPtr callback_data); // 'True' native callback signature
+    public delegate uint MyCallbackNamespacedDelegate(uint value); // Our C# signature
 
-    public partial struct MyCallbackNamespaced : IDisposable
+    public partial class MyCallbackNamespaced
     {
-        private MyCallbackNamespacedDelegate _callbackUser;
-        private IntPtr _callbackNative;
+        private MyCallbackNamespacedDelegate _managed; // C# callback
+        private MyCallbackNamespacedNative _native; // Native callback 
+        private IntPtr _ptr; // Raw function pointer of native callback
+        private Exception _exception; // Set if the callback encountered an Exception
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct MyCallbackNamespaced : IDisposable
+    public partial class MyCallbackNamespaced : IDisposable
     {
 
         public MyCallbackNamespaced() { }
 
-        public MyCallbackNamespaced(MyCallbackNamespacedDelegate callbackUser)
+        public MyCallbackNamespaced(MyCallbackNamespacedDelegate managed)
         {
-            _callbackUser = callbackUser;
-            _callbackNative = Marshal.GetFunctionPointerForDelegate(new MyCallbackNamespacedNative(Call));
+            _managed = managed;
+            _native = Call;
+            _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
         public uint Call(uint value, IntPtr callback_data)
         {
-            return _callbackUser(value);
+            // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
+            try
+            {
+                return _managed(value);
+            }
+            catch (Exception e)
+            {
+                _exception = e;
+                return default;
+            }
         }
 
         public void Dispose()
         {
-            if (_callbackNative == IntPtr.Zero) return;
-            Marshal.FreeHGlobal(_callbackNative);
-            _callbackNative = IntPtr.Zero;
+            // This means when the callback was invoked from Rust C# had an exception which
+            // we caught (otherwise C# might not re-enter Rust, and we leak memory). Now is
+            // the time to rethrow it.
+            if (_exception != null) throw _exception;
         }
-
 
         [CustomMarshaller(typeof(MyCallbackNamespaced), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -995,39 +1118,30 @@ namespace My.Company.Common
             internal IntPtr Data;
         }
 
-
         public ref struct Marshaller
         {
-            private MyCallbackNamespaced managed;
-            private Unmanaged native;
-            private Unmanaged sourceNative;
-            private GCHandle? pinned;
+            private MyCallbackNamespaced _managed;
+            private Unmanaged _unmanaged;
 
-            public void FromManaged(MyCallbackNamespaced managed)
-            {
-                this.managed = managed;
-            }
+            public Marshaller(MyCallbackNamespaced managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(MyCallbackNamespaced managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public Unmanaged ToUnmanaged()
             {
-                return new Unmanaged
-                {
-                    Callback = managed._callbackNative,
-                    Data = IntPtr.Zero
-                };
-            }
-
-            public void FromUnmanaged(Unmanaged unmanaged)
-            {
-                sourceNative = unmanaged;
+                _unmanaged = new Unmanaged();
+                _unmanaged.Callback = _managed?._ptr ?? IntPtr.Zero;
+                _unmanaged.Data = IntPtr.Zero;
+                return _unmanaged;
             }
 
             public MyCallbackNamespaced ToManaged()
             {
-                return new MyCallbackNamespaced
-                {
-                    _callbackNative = sourceNative.Callback,
-                };
+                _managed = new MyCallbackNamespaced();
+                _managed._ptr = _unmanaged.Callback;
+                return _managed;
             }
 
             public void Free() { }
@@ -1051,30 +1165,35 @@ namespace My.Company.Common
     public delegate void AsyncHelperNative(IntPtr data, IntPtr callback_data);
     public delegate void AsyncHelperDelegate(IntPtr data);
 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public struct AsyncHelper : IDisposable
+    public partial struct AsyncHelper
     {
-        private AsyncHelperDelegate _callbackUser;
-        private IntPtr _callbackNative;
+        private AsyncHelperDelegate _managed;
+        private AsyncHelperNative _native;
+        private IntPtr _ptr;
+    }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct AsyncHelper : IDisposable
+    {
         public AsyncHelper() { }
 
-        public AsyncHelper(AsyncHelperDelegate callbackUser)
+        public AsyncHelper(AsyncHelperDelegate managed)
         {
-            _callbackUser = callbackUser;
-            _callbackNative = Marshal.GetFunctionPointerForDelegate(new AsyncHelperNative(Call));
+            _managed = managed;
+            _native = Call;
+            _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
-        public void Call(IntPtr data, IntPtr callback_data)
+        void Call(IntPtr data, IntPtr _)
         {
-            _callbackUser(data);
+            _managed(data);
         }
 
         public void Dispose()
         {
-            if (_callbackNative == IntPtr.Zero) return;
-            Marshal.FreeHGlobal(_callbackNative);
-            _callbackNative = IntPtr.Zero;
+            if (_ptr == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_ptr);
+            _ptr = IntPtr.Zero;
         }
 
         [CustomMarshaller(typeof(AsyncHelper), MarshalMode.Default, typeof(Marshaller))]
@@ -1089,39 +1208,108 @@ namespace My.Company.Common
 
         public ref struct Marshaller
         {
-            private AsyncHelper managed;
-            private Unmanaged native;
-            private Unmanaged sourceNative;
-            private GCHandle? pinned;
+            private AsyncHelper _managed;
+            private Unmanaged _unmanaged;
 
-            public void FromManaged(AsyncHelper managed)
-            {
-                this.managed = managed;
-            }
+            public void FromManaged(AsyncHelper managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public Unmanaged ToUnmanaged()
             {
-                return new Unmanaged
-                {
-                    Callback = managed._callbackNative,
-                    Data = IntPtr.Zero
-                };
-            }
-
-            public void FromUnmanaged(Unmanaged unmanaged)
-            {
-                sourceNative = unmanaged;
+                _unmanaged = new Unmanaged();
+                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Data = IntPtr.Zero;
+                return _unmanaged;
             }
 
             public AsyncHelper ToManaged()
             {
-                return new AsyncHelper
-                {
-                    _callbackNative = sourceNative.Callback,
-                };
+                _managed = new AsyncHelper();
+                _managed._ptr = _unmanaged.Callback;
+                return _managed;
             }
 
             public void Free() { }
         }
     }
+    public partial struct Utf8String
+    {
+        string _s;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Utf8String: IDisposable
+    {
+        public Utf8String(string s) { _s = s; }
+
+        public string String => _s;
+
+        public void Dispose() { }
+
+        /// A highly dangerous 'use once type' that has ownership semantics!
+        /// Once passed over an FFI boundary 'the other side' is meant to own
+        /// (and free) it. Rust handles that fine, but if in C# you put this
+        /// in a struct and then call Rust multiple times with that struct
+        /// you'll free the same pointer multiple times, and get UB!
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public IntPtr ptr;
+            public ulong len;
+            public ulong capacity;
+        }
+
+        public partial class InteropHelper
+        {
+            [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_create")]
+            public static partial long interoptopus_string_create(IntPtr utf8, ulong len, out Unmanaged rval);
+
+            [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_destroy")]
+            public static partial long interoptopus_string_destroy(Unmanaged utf8);
+        }
+
+        [CustomMarshaller(typeof(Utf8String), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private Utf8String _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(Utf8String managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(Utf8String managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {
+                var utf8Bytes = Encoding.UTF8.GetBytes(_managed._s);
+                var len = utf8Bytes.Length;
+
+                fixed (byte* p = utf8Bytes)
+                {
+                    InteropHelper.interoptopus_string_create((IntPtr)p, (ulong)len, out var rval);
+                    _unmanaged = rval;
+                }
+
+                return _unmanaged;
+            }
+
+            public unsafe Utf8String ToManaged()
+            {
+                var span = new ReadOnlySpan<byte>((byte*)_unmanaged.ptr, (int)_unmanaged.len);
+
+                _managed = new Utf8String();
+                _managed._s = Encoding.UTF8.GetString(span);
+
+                InteropHelper.interoptopus_string_destroy(_unmanaged);
+
+                return _managed;
+            }
+
+            public void Free() { }
+        }
+    }
+
 }
