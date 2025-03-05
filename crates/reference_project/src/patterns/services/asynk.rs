@@ -12,7 +12,7 @@ pub struct ServiceAsync {
     runtime: Runtime,
 }
 
-#[ffi_service(error = "FFIError", debug)]
+#[ffi_service(error = "FFIError")]
 impl ServiceAsync {
     #[ffi_service_ctor]
     pub fn new() -> Result<Self, Error> {

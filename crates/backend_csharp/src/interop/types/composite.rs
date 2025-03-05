@@ -2,7 +2,7 @@ use crate::converter::{field_name_to_csharp_name, is_blittable, to_typespecifier
 use crate::interop::functions::write_documentation;
 use crate::{Interop, Unsupported};
 use interoptopus::lang::c;
-use interoptopus::lang::c::{ArrayType, CType, CompositeType, Field, Layout, PrimitiveType};
+use interoptopus::lang::c::{CType, CompositeType, Field, Layout, PrimitiveType};
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, Error};
@@ -89,105 +89,6 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
     w.unindent();
     indented!(w, r"}}")?;
 
-    Ok(())
-}
-
-pub fn write_type_definition_composite_to_managed_marshal_field(
-    i: &Interop,
-    w: &mut IndentWriter,
-    the_type: &CompositeType,
-    field: &Field,
-    a: &ArrayType,
-) -> Result<(), Error> {
-    i.debug(w, "write_type_definition_composite_to_managed_marshal_field")?;
-    let field_name = field_name_to_csharp_name(field, i.rename_symbols);
-    let type_name = to_typespecifier_in_field(a.array_type(), field, the_type);
-
-    if matches!(a.array_type(), CType::Pattern(TypePattern::CChar)) {
-        indented!(w, r"var source_{0} = new ReadOnlySpan<byte>(unmanaged.{0}, {1});", field_name, a.len())?;
-        indented!(w, r"var terminatorIndex_{0} = source_{0}.IndexOf<byte>(0);", field_name)?;
-        indented!(
-            w,
-            r"result.{0} = Encoding.UTF8.GetString(source_{0}.Slice(0, terminatorIndex_{0} == -1 ? Math.Min(source_{0}.Length, {1}) : terminatorIndex_{0}));",
-            field_name,
-            a.len()
-        )?;
-    } else {
-        indented!(w, r"var source_{1} = new Span<{0}>(unmanaged.{1}, {2});", type_name, field_name, a.len())?;
-        indented!(w, r"var arr_{} = new {}[{}];", field_name, type_name, a.len())?;
-        indented!(w, r"source_{0}.CopyTo(arr_{0}.AsSpan());", field_name)?;
-        indented!(w, r"result.{0} = arr_{0};", field_name)?;
-    }
-    Ok(())
-}
-
-pub fn write_type_definition_composite_to_managed_inline_field(i: &Interop, w: &mut IndentWriter, field: &Field) -> Result<(), Error> {
-    i.debug(w, "write_type_definition_composite_to_managed_inline_field")?;
-    let field_name = field_name_to_csharp_name(field, i.rename_symbols);
-    match field.the_type() {
-        CType::Primitive(PrimitiveType::Bool) => {
-            indented!(w, r"{0} = Convert.ToBoolean(unmanaged.{0}),", field_name)?;
-        }
-        CType::Composite(composite) => {
-            indented!(w, r"{0} = {1}.Marshaller.ConvertToManaged(unmanaged.{0}),", field_name, composite.rust_name())?;
-        }
-        _ => {
-            indented!(w, r"{0} = unmanaged.{0},", field_name)?;
-        }
-    }
-    Ok(())
-}
-
-pub fn write_type_definition_composite_to_unmanaged_marshal_field(
-    i: &Interop,
-    w: &mut IndentWriter,
-    the_type: &CompositeType,
-    field: &Field,
-    a: &ArrayType,
-) -> Result<(), Error> {
-    i.debug(w, "write_type_definition_composite_to_unmanaged_marshal_field")?;
-    let field_name = field_name_to_csharp_name(field, i.rename_symbols);
-    let type_name = to_typespecifier_in_field(a.array_type(), field, the_type);
-    indented!(w, r"if(managed.{} != null)", field_name)?;
-    indented!(w, r"{{")?;
-    if matches!(a.array_type(), CType::Pattern(TypePattern::CChar)) {
-        indented!(w, [()], r"fixed(char* s = managed.{0})", field_name)?;
-        indented!(w, [()], r"{{")?;
-        indented!(w, [()()], r"if(Encoding.UTF8.GetByteCount(managed.{0}, 0, managed.{0}.Length) + 1 > {1})", field_name, a.len())?;
-        indented!(w, [()()], r"{{")?;
-        indented!(
-            w,
-            [()()()],
-            r#"throw new InvalidOperationException($"The managed string field '{{nameof({0}.{1})}}' cannot be encoded to fit the fixed size array of {2}.");"#,
-            the_type.rust_name(),
-            field_name,
-            a.len()
-        )?;
-        indented!(w, [()()], r"}}")?;
-        indented!(w, [()()], r"var written = Encoding.UTF8.GetBytes(s, managed.{0}.Length, result.{0}, {1});", field_name, a.len() - 1)?;
-        indented!(w, [()()], r"result.{}[written] = 0;", field_name)?;
-        indented!(w, [()], r"}}")?;
-    } else {
-        indented!(w, [()], r"if(managed.{}.Length != {})", field_name, a.len())?;
-        indented!(w, [()], r"{{")?;
-        indented!(
-            w,
-            [()()],
-            r#"throw new InvalidOperationException($"The managed array field '{{nameof({0}.{1})}}' has {{managed.{1}.Length}} elements, exceeding the fixed size array of {2}.");"#,
-            the_type.rust_name(),
-            field_name,
-            a.len()
-        )?;
-        indented!(w, [()], r"}}")?;
-        indented!(w, [()], r"var source_{1} = new ReadOnlySpan<{0}>(managed.{1}, 0, managed.{1}.Length);", type_name, field_name)?;
-        indented!(w, [()], r"var dest = new Span<{0}>(result.{1}, {2});", type_name, field_name, a.len())?;
-        indented!(w, [()], r"source_{}.CopyTo(dest);", field_name)?;
-    }
-    indented!(w, r"}}")?;
-    indented!(w, r"else")?;
-    indented!(w, r"{{")?;
-    indented!(w, [()], r#"throw new InvalidOperationException($"The managed field cannot be null.");"#)?;
-    indented!(w, r"}}")?;
     Ok(())
 }
 
