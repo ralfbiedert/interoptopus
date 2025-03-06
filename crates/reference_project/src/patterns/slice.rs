@@ -39,15 +39,10 @@ pub fn pattern_ffi_slice_delegate_huge(callback: CallbackHugeVecSlice) -> Vec3f3
 }
 
 #[ffi_function]
-#[no_mangle]
-pub fn pattern_ffi_slice_3b(mut slice: FFISliceMut<u8>, callback: CallbackSliceMut) {
-    dbg!(slice.as_mut_ptr());
-    dbg!(slice.len());
-    dbg!(&callback.0);
-    dbg!(&callback.1);
-    // if let [x, ..] = slice.as_slice_mut() {
-    //     *x += 1;
-    // }
+pub fn pattern_ffi_slice_3(mut slice: FFISliceMut<u8>, callback: CallbackSliceMut) {
+    if let [x, ..] = slice.as_slice_mut() {
+        *x += 1;
+    }
     callback.call(slice);
 }
 

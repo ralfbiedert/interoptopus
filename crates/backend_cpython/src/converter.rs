@@ -99,6 +99,7 @@ pub fn to_ctypes_name(the_type: &CType, with_type_annotations: bool) -> String {
         CType::Pattern(pattern) => match pattern {
             TypePattern::CStrPointer => to_ctypes_name(&pattern.fallback_type(), with_type_annotations),
             TypePattern::APIVersion => "ctypes.c_uint64".to_string(),
+            TypePattern::Utf8String(c) => c.rust_name().to_string(),
             TypePattern::FFIErrorEnum(_) => "ctypes.c_int".to_string(),
             TypePattern::Slice(c) => c.rust_name().to_string(),
             TypePattern::SliceMut(c) => c.rust_name().to_string(),
@@ -106,6 +107,8 @@ pub fn to_ctypes_name(the_type: &CType, with_type_annotations: bool) -> String {
             TypePattern::Bool => "ctypes.c_uint8".to_string(),
             TypePattern::CChar => "ctypes.c_char".to_string(),
             TypePattern::NamedCallback(x) => fnpointer_to_typename(x.fnpointer()),
+            TypePattern::Result(c) => c.rust_name().to_string(),
+            TypePattern::AsyncCallback(x) => fnpointer_to_typename(x.fnpointer()),
             _ => panic!("Pattern not explicitly handled"),
         },
     }

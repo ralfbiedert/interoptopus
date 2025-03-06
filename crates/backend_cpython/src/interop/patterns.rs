@@ -146,6 +146,7 @@ pub fn write_patterns(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     for pattern in i.inventory.patterns() {
         match pattern {
             LibraryPattern::Service(x) => write_pattern_class(i, w, x)?,
+            LibraryPattern::Builtins(_) => { /* TODO */ }
             _ => panic!("Pattern not explicitly handled"),
         }
     }
