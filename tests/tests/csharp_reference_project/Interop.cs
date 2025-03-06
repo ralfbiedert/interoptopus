@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 8615964985678512413ul)
+            if (api_version != 7273415914452811554ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (8615964985678512413). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (7273415914452811554). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -257,7 +257,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "complex_args_1")]
         // Debug - write_function_declaration 
-        public static partial FFIError complex_args_1(Vec3f32 a, ref Tupled b);
+        public static partial ResultFFIError complex_args_1(Vec3f32 a, ref Tupled b);
 
         // Debug - write_function_overload 
         // Debug - no overload for complex_args_1 
@@ -502,7 +502,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "panics")]
         // Debug - write_function_declaration 
-        public static partial FFIError panics();
+        public static partial ResultFFIError panics();
 
         // Debug - write_function_overload 
         // Debug - no overload for panics 
@@ -919,6 +919,30 @@ namespace My.Company
         // Debug - no overload for pattern_ffi_cchar_mut_pointer 
 
         // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "pattern_result_1")]
+        // Debug - write_function_declaration 
+        public static partial ResultU32FFIError pattern_result_1(ResultU32FFIError x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for pattern_result_1 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "pattern_result_2")]
+        // Debug - write_function_declaration 
+        public static partial ResultFFIError pattern_result_2();
+
+        // Debug - write_function_overload 
+        // Debug - no overload for pattern_result_2 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "pattern_result_3")]
+        // Debug - write_function_declaration 
+        public static partial ResultFFIError pattern_result_3(ResultFFIError x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for pattern_result_3 
+
+        // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_api_guard")]
         // Debug - write_function_declaration 
         public static partial ulong pattern_api_guard();
@@ -1002,7 +1026,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_7")]
         // Debug - write_function_declaration 
-        public static partial FFIError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o);
+        public static partial ResultFFIError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o);
 
         // Debug - write_function_overload 
         public static unsafe void pattern_callback_7(SumDelegateReturnDelegate c1, SumDelegateReturn2Delegate c2, int x, int i, out int o)
@@ -1011,11 +1035,7 @@ namespace My.Company
             var c2_wrapped = new SumDelegateReturn2(c2);
             try
             {
-                var rval = pattern_callback_7(c1_wrapped, c2_wrapped, x, i, out o);
-                if (rval != FFIError.Ok)
-                {
-                    throw new InteropException<FFIError>(rval);
-                }
+                pattern_callback_7(c1_wrapped, c2_wrapped, x, i, out o).Ok();
             }
             finally
             {
@@ -1041,7 +1061,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_async_destroy")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_async_destroy(ref IntPtr _context);
+        public static partial ResultFFIError service_async_destroy(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_async_destroy 
@@ -1049,7 +1069,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_new")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_async_new(ref IntPtr _context);
+        public static partial ResultFFIError service_async_new(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_async_new 
@@ -1057,27 +1077,23 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_return_after_ms")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_async_return_after_ms(IntPtr _context, ulong x, ulong ms, AsyncHelper _async_callback);
+        public static partial ResultFFIError service_async_return_after_ms(IntPtr _context, ulong x, ulong ms, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
-        public static unsafe Task<ResultU64> service_async_return_after_ms(IntPtr _context, ulong x, ulong ms)
+        public static unsafe Task<ResultU64FFIError> service_async_return_after_ms(IntPtr _context, ulong x, ulong ms)
         {
-            var cs = new TaskCompletionSource<ResultU64>();
+            var cs = new TaskCompletionSource<ResultU64FFIError>();
             GCHandle pinned = default;
             var cb = new AsyncHelper((x) => {
-                var unmanaged = Marshal.PtrToStructure<ResultU64.Unmanaged>(x);
-                var marshaller = new ResultU64.Marshaller(unmanaged);
+                var unmanaged = Marshal.PtrToStructure<ResultU64FFIError.Unmanaged>(x);
+                var marshaller = new ResultU64FFIError.Marshaller(unmanaged);
                 cs.SetResult(marshaller.ToManaged());
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
             try
             {
-                var rval = service_async_return_after_ms(_context, x, ms, cb);
-                if (rval != FFIError.Ok)
-                {
-                    throw new InteropException<FFIError>(rval);
-                }
+                service_async_return_after_ms(_context, x, ms, cb).Ok();
             }
             finally
             {
@@ -1088,27 +1104,23 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_process_struct")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_async_process_struct(IntPtr _context, NestedArray x, AsyncHelper _async_callback);
+        public static partial ResultFFIError service_async_process_struct(IntPtr _context, NestedArray x, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
-        public static unsafe Task<ResultNestedArray> service_async_process_struct(IntPtr _context, NestedArray x)
+        public static unsafe Task<ResultNestedArrayFFIError> service_async_process_struct(IntPtr _context, NestedArray x)
         {
-            var cs = new TaskCompletionSource<ResultNestedArray>();
+            var cs = new TaskCompletionSource<ResultNestedArrayFFIError>();
             GCHandle pinned = default;
             var cb = new AsyncHelper((x) => {
-                var unmanaged = Marshal.PtrToStructure<ResultNestedArray.Unmanaged>(x);
-                var marshaller = new ResultNestedArray.Marshaller(unmanaged);
+                var unmanaged = Marshal.PtrToStructure<ResultNestedArrayFFIError.Unmanaged>(x);
+                var marshaller = new ResultNestedArrayFFIError.Marshaller(unmanaged);
                 cs.SetResult(marshaller.ToManaged());
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
             try
             {
-                var rval = service_async_process_struct(_context, x, cb);
-                if (rval != FFIError.Ok)
-                {
-                    throw new InteropException<FFIError>(rval);
-                }
+                service_async_process_struct(_context, x, cb).Ok();
             }
             finally
             {
@@ -1119,16 +1131,16 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_handle_string")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_async_handle_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
+        public static partial ResultFFIError service_async_handle_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
-        public static unsafe Task<ResultUtf8String> service_async_handle_string(IntPtr _context, string s)
+        public static unsafe Task<ResultUtf8StringFFIError> service_async_handle_string(IntPtr _context, string s)
         {
-            var cs = new TaskCompletionSource<ResultUtf8String>();
+            var cs = new TaskCompletionSource<ResultUtf8StringFFIError>();
             GCHandle pinned = default;
             var cb = new AsyncHelper((x) => {
-                var unmanaged = Marshal.PtrToStructure<ResultUtf8String.Unmanaged>(x);
-                var marshaller = new ResultUtf8String.Marshaller(unmanaged);
+                var unmanaged = Marshal.PtrToStructure<ResultUtf8StringFFIError.Unmanaged>(x);
+                var marshaller = new ResultUtf8StringFFIError.Marshaller(unmanaged);
                 cs.SetResult(marshaller.ToManaged());
                 pinned.Free();
             });
@@ -1136,11 +1148,7 @@ namespace My.Company
             var s_wrapped = new Utf8String(s);
             try
             {
-                var rval = service_async_handle_string(_context, s_wrapped, cb);
-                if (rval != FFIError.Ok)
-                {
-                    throw new InteropException<FFIError>(rval);
-                }
+                service_async_handle_string(_context, s_wrapped, cb).Ok();
             }
             finally
             {
@@ -1166,7 +1174,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_basic_destroy")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_basic_destroy(ref IntPtr _context);
+        public static partial ResultFFIError service_basic_destroy(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_basic_destroy 
@@ -1174,7 +1182,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_basic_new")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_basic_new(ref IntPtr _context);
+        public static partial ResultFFIError service_basic_new(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_basic_new 
@@ -1188,7 +1196,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_destroy")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_on_panic_destroy(ref IntPtr _context);
+        public static partial ResultFFIError service_on_panic_destroy(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_destroy 
@@ -1196,7 +1204,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_new")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_on_panic_new(ref IntPtr _context);
+        public static partial ResultFFIError service_on_panic_new(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_new 
@@ -1206,7 +1214,7 @@ namespace My.Company
         /// need annotations.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_result")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_on_panic_return_result(IntPtr _context, uint anon1);
+        public static partial ResultFFIError service_on_panic_return_result(IntPtr _context, uint anon1);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_return_result 
@@ -1239,7 +1247,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_destroy")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_callbacks_destroy(ref IntPtr _context);
+        public static partial ResultFFIError service_callbacks_destroy(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_destroy 
@@ -1247,7 +1255,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_new")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_callbacks_new(ref IntPtr _context);
+        public static partial ResultFFIError service_callbacks_new(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_new 
@@ -1255,7 +1263,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_simple")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_callbacks_callback_simple(IntPtr _context, MyCallback callback);
+        public static partial ResultFFIError service_callbacks_callback_simple(IntPtr _context, MyCallback callback);
 
         // Debug - write_function_overload 
         public static unsafe void service_callbacks_callback_simple(IntPtr _context, MyCallbackDelegate callback)
@@ -1263,11 +1271,7 @@ namespace My.Company
             var callback_wrapped = new MyCallback(callback);
             try
             {
-                var rval = service_callbacks_callback_simple(_context, callback_wrapped);
-                if (rval != FFIError.Ok)
-                {
-                    throw new InteropException<FFIError>(rval);
-                }
+                service_callbacks_callback_simple(_context, callback_wrapped).Ok();
             }
             finally
             {
@@ -1278,7 +1282,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_ffi_return")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturn callback);
+        public static partial ResultFFIError service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturn callback);
 
         // Debug - write_function_overload 
         public static unsafe void service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturnDelegate callback)
@@ -1286,11 +1290,7 @@ namespace My.Company
             var callback_wrapped = new SumDelegateReturn(callback);
             try
             {
-                var rval = service_callbacks_callback_ffi_return(_context, callback_wrapped);
-                if (rval != FFIError.Ok)
-                {
-                    throw new InteropException<FFIError>(rval);
-                }
+                service_callbacks_callback_ffi_return(_context, callback_wrapped).Ok();
             }
             finally
             {
@@ -1301,7 +1301,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_with_slice")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturn callback, SliceI32 input);
+        public static partial ResultFFIError service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturn callback, SliceI32 input);
 
         // Debug - write_function_overload 
         public static unsafe void service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
@@ -1312,11 +1312,7 @@ namespace My.Company
                 var callback_wrapped = new SumDelegateReturn(callback);
                 try
                 {
-                    var rval = service_callbacks_callback_with_slice(_context, callback_wrapped, input_slice);
-                    if (rval != FFIError.Ok)
-                    {
-                        throw new InteropException<FFIError>(rval);
-                    }
+                    service_callbacks_callback_with_slice(_context, callback_wrapped, input_slice).Ok();
                 }
                 finally
                 {
@@ -1336,7 +1332,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_invoke_delegates")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_callbacks_invoke_delegates(IntPtr _context);
+        public static partial ResultFFIError service_callbacks_invoke_delegates(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_invoke_delegates 
@@ -1350,7 +1346,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_destroy")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_ignoring_methods_destroy(ref IntPtr _context);
+        public static partial ResultFFIError service_ignoring_methods_destroy(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_ignoring_methods_destroy 
@@ -1358,7 +1354,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_new")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_ignoring_methods_new(ref IntPtr _context);
+        public static partial ResultFFIError service_ignoring_methods_new(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_ignoring_methods_new 
@@ -1372,7 +1368,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_destroy")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_multiple_ctors_destroy(ref IntPtr _context);
+        public static partial ResultFFIError service_multiple_ctors_destroy(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_destroy 
@@ -1380,7 +1376,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_multiple_ctors_new_with(ref IntPtr _context, uint some_value);
+        public static partial ResultFFIError service_multiple_ctors_new_with(ref IntPtr _context, uint some_value);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_with 
@@ -1388,7 +1384,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_without")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_multiple_ctors_new_without(ref IntPtr _context);
+        public static partial ResultFFIError service_multiple_ctors_new_without(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_without 
@@ -1396,7 +1392,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with_string")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_multiple_ctors_new_with_string(ref IntPtr _context, [MarshalAs(UnmanagedType.LPStr)] string anon0);
+        public static partial ResultFFIError service_multiple_ctors_new_with_string(ref IntPtr _context, [MarshalAs(UnmanagedType.LPStr)] string anon0);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_with_string 
@@ -1404,7 +1400,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_failing")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_multiple_ctors_new_failing(ref IntPtr _context, byte some_value);
+        public static partial ResultFFIError service_multiple_ctors_new_failing(ref IntPtr _context, byte some_value);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_failing 
@@ -1418,7 +1414,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_destroy")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_using_lifetimes_destroy(ref IntPtr _context);
+        public static partial ResultFFIError service_using_lifetimes_destroy(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_using_lifetimes_destroy 
@@ -1426,7 +1422,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_new_with")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_using_lifetimes_new_with(ref IntPtr _context, ref uint some_value);
+        public static partial ResultFFIError service_using_lifetimes_new_with(ref IntPtr _context, ref uint some_value);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_using_lifetimes_new_with 
@@ -1504,7 +1500,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_destroy")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_various_slices_destroy(ref IntPtr _context);
+        public static partial ResultFFIError service_various_slices_destroy(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_various_slices_destroy 
@@ -1512,7 +1508,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_new")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_various_slices_new(ref IntPtr _context);
+        public static partial ResultFFIError service_various_slices_new(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_various_slices_new 
@@ -1618,7 +1614,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ffi_error")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_various_slices_mut_self_ffi_error(IntPtr _context, SliceMutU8 slice);
+        public static partial ResultFFIError service_various_slices_mut_self_ffi_error(IntPtr _context, SliceMutU8 slice);
 
         // Debug - write_function_overload 
         public static unsafe void service_various_slices_mut_self_ffi_error(IntPtr _context, Span<byte> slice)
@@ -1628,11 +1624,7 @@ namespace My.Company
                 var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                 try
                 {
-                    var rval = service_various_slices_mut_self_ffi_error(_context, slice_slice);
-                    if (rval != FFIError.Ok)
-                    {
-                        throw new InteropException<FFIError>(rval);
-                    }
+                    service_various_slices_mut_self_ffi_error(_context, slice_slice).Ok();
                 }
                 finally
                 {
@@ -1643,7 +1635,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_no_error")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_various_slices_mut_self_no_error(IntPtr _context, SliceMutU8 slice);
+        public static partial ResultFFIError service_various_slices_mut_self_no_error(IntPtr _context, SliceMutU8 slice);
 
         // Debug - write_function_overload 
         public static unsafe void service_various_slices_mut_self_no_error(IntPtr _context, Span<byte> slice)
@@ -1653,11 +1645,7 @@ namespace My.Company
                 var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                 try
                 {
-                    var rval = service_various_slices_mut_self_no_error(_context, slice_slice);
-                    if (rval != FFIError.Ok)
-                    {
-                        throw new InteropException<FFIError>(rval);
-                    }
+                    service_various_slices_mut_self_no_error(_context, slice_slice).Ok();
                 }
                 finally
                 {
@@ -1694,7 +1682,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_strings_destroy")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_strings_destroy(ref IntPtr _context);
+        public static partial ResultFFIError service_strings_destroy(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_strings_destroy 
@@ -1702,7 +1690,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_new")]
         // Debug - write_function_declaration 
-        public static partial FFIError service_strings_new(ref IntPtr _context);
+        public static partial ResultFFIError service_strings_new(ref IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_strings_new 
@@ -3537,6 +3525,67 @@ namespace My.Company
         Fail = 400,
     }
 
+    // Debug - write_pattern_result_void 
+    public partial struct ResultFFIError
+    {
+        internal FFIError _err;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct ResultFFIError
+    {
+        public ResultFFIError(FFIError e) { _err = e; }
+
+        public void Ok()
+        {
+            if (_err == FFIError.Ok)
+            {
+                return;
+            }
+            throw new InteropException<FFIError>(_err);
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public FFIError _err;
+        }
+
+        [CustomMarshaller(typeof(ResultFFIError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+
+        public ref struct Marshaller
+        {
+            private ResultFFIError _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(ResultFFIError managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(ResultFFIError managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {
+                _unmanaged = new Unmanaged();
+                _unmanaged._err = _managed._err;
+                return _unmanaged;
+            }
+
+            public unsafe ResultFFIError ToManaged()
+            {
+                _managed = new ResultFFIError();
+                _managed._err = _unmanaged._err;
+                return _managed;
+            }
+
+            public void Free() { }
+        }
+
+    }
+
+
     // Debug - write_pattern_slice 
     public partial struct SliceUseCStrPtr
     {
@@ -3964,7 +4013,7 @@ namespace My.Company
     ///Result that contains value or an error.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct ResultNestedArray
+    public partial struct ResultNestedArrayFFIError
     {
         ///Element if err is `Ok`.
         internal NestedArray t;
@@ -3974,7 +4023,7 @@ namespace My.Company
 
     // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultNestedArray
+    public partial struct ResultNestedArrayFFIError
     {
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
@@ -3985,18 +4034,18 @@ namespace My.Company
             public FFIError err;
         }
 
-        [CustomMarshaller(typeof(ResultNestedArray), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultNestedArrayFFIError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private ResultNestedArray _managed; // Used when converting managed -> unmanaged
+            private ResultNestedArrayFFIError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultNestedArray managed) { _managed = managed; }
+            public Marshaller(ResultNestedArrayFFIError managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultNestedArray managed) { _managed = managed; }
+            public void FromManaged(ResultNestedArrayFFIError managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -4012,9 +4061,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultNestedArray ToManaged()
+            public unsafe ResultNestedArrayFFIError ToManaged()
             {
-                _managed = new ResultNestedArray();
+                _managed = new ResultNestedArrayFFIError();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 var _t = new NestedArray.Marshaller(_unmanaged.t);
@@ -4029,11 +4078,11 @@ namespace My.Company
     }
 
     // Debug - write_pattern_result 
-    public partial struct ResultNestedArray
+    public partial struct ResultNestedArrayFFIError
     {
         public NestedArray Ok()
         {
-            if (err == 0)
+            if (err == FFIError.Ok)
             {
                 return t;
             }
@@ -4047,39 +4096,39 @@ namespace My.Company
     ///Result that contains value or an error.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct ResultU64
+    public partial struct ResultU32FFIError
     {
         ///Element if err is `Ok`.
-        internal ulong t;
+        internal uint t;
         ///Error value.
         internal FFIError err;
     }
 
     // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultU64
+    public partial struct ResultU32FFIError
     {
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
             // Debug - write_type_definition_composite_unmanaged_body_field 
-            public ulong t;
+            public uint t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public FFIError err;
         }
 
-        [CustomMarshaller(typeof(ResultU64), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultU32FFIError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private ResultU64 _managed; // Used when converting managed -> unmanaged
+            private ResultU32FFIError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultU64 managed) { _managed = managed; }
+            public Marshaller(ResultU32FFIError managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultU64 managed) { _managed = managed; }
+            public void FromManaged(ResultU32FFIError managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -4094,9 +4143,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultU64 ToManaged()
+            public unsafe ResultU32FFIError ToManaged()
             {
-                _managed = new ResultU64();
+                _managed = new ResultU32FFIError();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 _managed.t = _unmanaged.t;
@@ -4110,11 +4159,11 @@ namespace My.Company
     }
 
     // Debug - write_pattern_result 
-    public partial struct ResultU64
+    public partial struct ResultU32FFIError
     {
-        public ulong Ok()
+        public uint Ok()
         {
-            if (err == 0)
+            if (err == FFIError.Ok)
             {
                 return t;
             }
@@ -4128,7 +4177,88 @@ namespace My.Company
     ///Result that contains value or an error.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct ResultUtf8String
+    public partial struct ResultU64FFIError
+    {
+        ///Element if err is `Ok`.
+        internal ulong t;
+        ///Error value.
+        internal FFIError err;
+    }
+
+    // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct ResultU64FFIError
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public ulong t;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public FFIError err;
+        }
+
+        [CustomMarshaller(typeof(ResultU64FFIError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private ResultU64FFIError _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(ResultU64FFIError managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(ResultU64FFIError managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.t = _managed.t;
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.err = _managed.err;
+
+                return _unmanaged;
+            }
+
+            public unsafe ResultU64FFIError ToManaged()
+            {
+                _managed = new ResultU64FFIError();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.t = _unmanaged.t;
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.err = _unmanaged.err;
+
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    // Debug - write_pattern_result 
+    public partial struct ResultU64FFIError
+    {
+        public ulong Ok()
+        {
+            if (err == FFIError.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<FFIError>(err);
+        }
+
+    }
+
+
+    // Debug - write_type_definition_composite 
+    ///Result that contains value or an error.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct ResultUtf8StringFFIError
     {
         ///Element if err is `Ok`.
         internal string t;
@@ -4138,7 +4268,7 @@ namespace My.Company
 
     // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultUtf8String
+    public partial struct ResultUtf8StringFFIError
     {
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
@@ -4149,18 +4279,18 @@ namespace My.Company
             public FFIError err;
         }
 
-        [CustomMarshaller(typeof(ResultUtf8String), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultUtf8StringFFIError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private ResultUtf8String _managed; // Used when converting managed -> unmanaged
+            private ResultUtf8StringFFIError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultUtf8String managed) { _managed = managed; }
+            public Marshaller(ResultUtf8StringFFIError managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultUtf8String managed) { _managed = managed; }
+            public void FromManaged(ResultUtf8StringFFIError managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -4176,9 +4306,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultUtf8String ToManaged()
+            public unsafe ResultUtf8StringFFIError ToManaged()
             {
-                _managed = new ResultUtf8String();
+                _managed = new ResultUtf8StringFFIError();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 var _t = new Utf8String.Marshaller(_unmanaged.t);
@@ -4193,11 +4323,11 @@ namespace My.Company
     }
 
     // Debug - write_pattern_result 
-    public partial struct ResultUtf8String
+    public partial struct ResultUtf8StringFFIError
     {
         public string Ok()
         {
-            if (err == 0)
+            if (err == FFIError.Ok)
             {
                 return t;
             }
@@ -5099,8 +5229,8 @@ namespace My.Company
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate FFIError SumDelegateReturnNative(int x, int y, IntPtr callback_data); // 'True' native callback signature
-    public delegate FFIError SumDelegateReturnDelegate(int x, int y); // Our C# signature
+    public delegate ResultFFIError SumDelegateReturnNative(int x, int y, IntPtr callback_data); // 'True' native callback signature
+    public delegate ResultFFIError SumDelegateReturnDelegate(int x, int y); // Our C# signature
 
     public partial class SumDelegateReturn
     {
@@ -5123,7 +5253,7 @@ namespace My.Company
             _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
-        public FFIError Call(int x, int y, IntPtr callback_data)
+        public ResultFFIError Call(int x, int y, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
@@ -5133,7 +5263,7 @@ namespace My.Company
             catch (Exception e)
             {
                 _exception = e;
-                return FFIError.Panic;
+                return new ResultFFIError(FFIError.Panic);
             }
         }
 
@@ -5287,40 +5417,32 @@ namespace My.Company
         public static ServiceAsync New()
         {
             var self = new ServiceAsync();
-            var rval = Interop.service_async_new(ref self._context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_async_new(ref self._context).Ok();
             return self;
         }
 
         // Debug - write_pattern_service_method 
         public void Dispose()
         {
-            var rval = Interop.service_async_destroy(ref _context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_async_destroy(ref _context).Ok();
         }
 
         // Debug - write_pattern_service_method 
-        public Task<ResultU64> ReturnAfterMs(ulong x, ulong ms)
+        public Task<ResultU64FFIError> ReturnAfterMs(ulong x, ulong ms)
         {
             return Interop.service_async_return_after_ms(_context, x, ms);
         }
         // Debug - write_service_method_overload 
 
         // Debug - write_pattern_service_method 
-        public Task<ResultNestedArray> ProcessStruct(NestedArray x)
+        public Task<ResultNestedArrayFFIError> ProcessStruct(NestedArray x)
         {
             return Interop.service_async_process_struct(_context, x);
         }
         // Debug - write_service_method_overload 
 
         // Debug - write_pattern_service_method 
-        public Task<ResultUtf8String> HandleString(string s)
+        public Task<ResultUtf8StringFFIError> HandleString(string s)
         {
             return Interop.service_async_handle_string(_context, s);
         }
@@ -5348,22 +5470,14 @@ namespace My.Company
         public static ServiceBasic New()
         {
             var self = new ServiceBasic();
-            var rval = Interop.service_basic_new(ref self._context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_basic_new(ref self._context).Ok();
             return self;
         }
 
         // Debug - write_pattern_service_method 
         public void Dispose()
         {
-            var rval = Interop.service_basic_destroy(ref _context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_basic_destroy(ref _context).Ok();
         }
 
         public IntPtr Context => _context;
@@ -5382,22 +5496,14 @@ namespace My.Company
         public static ServiceOnPanic New()
         {
             var self = new ServiceOnPanic();
-            var rval = Interop.service_on_panic_new(ref self._context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_on_panic_new(ref self._context).Ok();
             return self;
         }
 
         // Debug - write_pattern_service_method 
         public void Dispose()
         {
-            var rval = Interop.service_on_panic_destroy(ref _context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_on_panic_destroy(ref _context).Ok();
         }
 
         /// Methods returning a Result<(), _> are the default and do not
@@ -5405,11 +5511,7 @@ namespace My.Company
         // Debug - write_pattern_service_method 
         public void ReturnResult(uint anon1)
         {
-            var rval = Interop.service_on_panic_return_result(_context, anon1);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_on_panic_return_result(_context, anon1).Ok();
         }
         // Debug - write_service_method_overload 
 
@@ -5447,32 +5549,20 @@ namespace My.Company
         public static ServiceCallbacks New()
         {
             var self = new ServiceCallbacks();
-            var rval = Interop.service_callbacks_new(ref self._context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_callbacks_new(ref self._context).Ok();
             return self;
         }
 
         // Debug - write_pattern_service_method 
         public void Dispose()
         {
-            var rval = Interop.service_callbacks_destroy(ref _context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_callbacks_destroy(ref _context).Ok();
         }
 
         // Debug - write_pattern_service_method 
         public void CallbackSimple(MyCallback callback)
         {
-            var rval = Interop.service_callbacks_callback_simple(_context, callback);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_callbacks_callback_simple(_context, callback).Ok();
         }
         // Debug - write_service_method_overload 
 
@@ -5485,11 +5575,7 @@ namespace My.Company
         // Debug - write_pattern_service_method 
         public void CallbackFfiReturn(SumDelegateReturn callback)
         {
-            var rval = Interop.service_callbacks_callback_ffi_return(_context, callback);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_callbacks_callback_ffi_return(_context, callback).Ok();
         }
         // Debug - write_service_method_overload 
 
@@ -5502,11 +5588,7 @@ namespace My.Company
         // Debug - write_pattern_service_method 
         public void CallbackWithSlice(SumDelegateReturn callback, SliceI32 input)
         {
-            var rval = Interop.service_callbacks_callback_with_slice(_context, callback, input);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_callbacks_callback_with_slice(_context, callback, input).Ok();
         }
         // Debug - write_service_method_overload 
 
@@ -5526,11 +5608,7 @@ namespace My.Company
         // Debug - write_pattern_service_method 
         public void InvokeDelegates()
         {
-            var rval = Interop.service_callbacks_invoke_delegates(_context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_callbacks_invoke_delegates(_context).Ok();
         }
         // Debug - write_service_method_overload 
 
@@ -5549,22 +5627,14 @@ namespace My.Company
         public static ServiceIgnoringMethods New()
         {
             var self = new ServiceIgnoringMethods();
-            var rval = Interop.service_ignoring_methods_new(ref self._context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_ignoring_methods_new(ref self._context).Ok();
             return self;
         }
 
         // Debug - write_pattern_service_method 
         public void Dispose()
         {
-            var rval = Interop.service_ignoring_methods_destroy(ref _context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_ignoring_methods_destroy(ref _context).Ok();
         }
 
         public IntPtr Context => _context;
@@ -5583,11 +5653,7 @@ namespace My.Company
         public static ServiceMultipleCtors NewWith(uint some_value)
         {
             var self = new ServiceMultipleCtors();
-            var rval = Interop.service_multiple_ctors_new_with(ref self._context, some_value);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_multiple_ctors_new_with(ref self._context, some_value).Ok();
             return self;
         }
 
@@ -5595,11 +5661,7 @@ namespace My.Company
         public static ServiceMultipleCtors NewWithout()
         {
             var self = new ServiceMultipleCtors();
-            var rval = Interop.service_multiple_ctors_new_without(ref self._context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_multiple_ctors_new_without(ref self._context).Ok();
             return self;
         }
 
@@ -5607,11 +5669,7 @@ namespace My.Company
         public static ServiceMultipleCtors NewWithString([MarshalAs(UnmanagedType.LPStr)] string anon0)
         {
             var self = new ServiceMultipleCtors();
-            var rval = Interop.service_multiple_ctors_new_with_string(ref self._context, anon0);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_multiple_ctors_new_with_string(ref self._context, anon0).Ok();
             return self;
         }
 
@@ -5619,22 +5677,14 @@ namespace My.Company
         public static ServiceMultipleCtors NewFailing(byte some_value)
         {
             var self = new ServiceMultipleCtors();
-            var rval = Interop.service_multiple_ctors_new_failing(ref self._context, some_value);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_multiple_ctors_new_failing(ref self._context, some_value).Ok();
             return self;
         }
 
         // Debug - write_pattern_service_method 
         public void Dispose()
         {
-            var rval = Interop.service_multiple_ctors_destroy(ref _context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_multiple_ctors_destroy(ref _context).Ok();
         }
 
         public IntPtr Context => _context;
@@ -5654,22 +5704,14 @@ namespace My.Company
         public static ServiceUsingLifetimes NewWith(ref uint some_value)
         {
             var self = new ServiceUsingLifetimes();
-            var rval = Interop.service_using_lifetimes_new_with(ref self._context, ref some_value);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_using_lifetimes_new_with(ref self._context, ref some_value).Ok();
             return self;
         }
 
         // Debug - write_pattern_service_method 
         public void Dispose()
         {
-            var rval = Interop.service_using_lifetimes_destroy(ref _context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_using_lifetimes_destroy(ref _context).Ok();
         }
 
         // Debug - write_pattern_service_method 
@@ -5728,22 +5770,14 @@ namespace My.Company
         public static ServiceVariousSlices New()
         {
             var self = new ServiceVariousSlices();
-            var rval = Interop.service_various_slices_new(ref self._context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_various_slices_new(ref self._context).Ok();
             return self;
         }
 
         // Debug - write_pattern_service_method 
         public void Dispose()
         {
-            var rval = Interop.service_various_slices_destroy(ref _context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_various_slices_destroy(ref _context).Ok();
         }
 
         // Debug - write_pattern_service_method 
@@ -5810,11 +5844,7 @@ namespace My.Company
         // Debug - write_pattern_service_method 
         public void MutSelfFfiError(SliceMutU8 slice)
         {
-            var rval = Interop.service_various_slices_mut_self_ffi_error(_context, slice);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_various_slices_mut_self_ffi_error(_context, slice).Ok();
         }
         // Debug - write_service_method_overload 
 
@@ -5827,11 +5857,7 @@ namespace My.Company
         // Debug - write_pattern_service_method 
         public void MutSelfNoError(SliceMutU8 slice)
         {
-            var rval = Interop.service_various_slices_mut_self_no_error(_context, slice);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_various_slices_mut_self_no_error(_context, slice).Ok();
         }
         // Debug - write_service_method_overload 
 
@@ -5875,22 +5901,14 @@ namespace My.Company
         public static ServiceStrings New()
         {
             var self = new ServiceStrings();
-            var rval = Interop.service_strings_new(ref self._context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_strings_new(ref self._context).Ok();
             return self;
         }
 
         // Debug - write_pattern_service_method 
         public void Dispose()
         {
-            var rval = Interop.service_strings_destroy(ref _context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_strings_destroy(ref _context).Ok();
         }
 
         // Debug - write_pattern_service_method 

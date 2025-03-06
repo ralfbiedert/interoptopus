@@ -36,15 +36,15 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "game_engine_destroy")]
-        public static partial FFIError game_engine_destroy(ref IntPtr _context);
+        public static partial ResultFFIError game_engine_destroy(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "game_engine_new")]
-        public static partial FFIError game_engine_new(ref IntPtr _context);
+        public static partial ResultFFIError game_engine_new(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "game_engine_place_object")]
-        public static partial FFIError game_engine_place_object(IntPtr _context, [MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position);
+        public static partial ResultFFIError game_engine_place_object(IntPtr _context, [MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position);
 
 
         [LibraryImport(NativeLib, EntryPoint = "game_engine_num_objects")]
@@ -117,6 +117,66 @@ namespace My.Company
         Fail = 400,
     }
 
+    public partial struct ResultFFIError
+    {
+        internal FFIError _err;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct ResultFFIError
+    {
+        public ResultFFIError(FFIError e) { _err = e; }
+
+        public void Ok()
+        {
+            if (_err == FFIError.Ok)
+            {
+                return;
+            }
+            throw new InteropException<FFIError>(_err);
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public FFIError _err;
+        }
+
+        [CustomMarshaller(typeof(ResultFFIError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+
+        public ref struct Marshaller
+        {
+            private ResultFFIError _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(ResultFFIError managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(ResultFFIError managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {
+                _unmanaged = new Unmanaged();
+                _unmanaged._err = _managed._err;
+                return _unmanaged;
+            }
+
+            public unsafe ResultFFIError ToManaged()
+            {
+                _managed = new ResultFFIError();
+                _managed._err = _unmanaged._err;
+                return _managed;
+            }
+
+            public void Free() { }
+        }
+
+    }
+
+
 
     public partial class GameEngine : IDisposable
     {
@@ -127,30 +187,18 @@ namespace My.Company
         public static GameEngine New()
         {
             var self = new GameEngine();
-            var rval = Interop.game_engine_new(ref self._context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.game_engine_new(ref self._context).Ok();
             return self;
         }
 
         public void Dispose()
         {
-            var rval = Interop.game_engine_destroy(ref _context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.game_engine_destroy(ref _context).Ok();
         }
 
         public void PlaceObject([MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position)
         {
-            var rval = Interop.game_engine_place_object(_context, name, position);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.game_engine_place_object(_context, name, position).Ok();
         }
 
         public uint NumObjects()

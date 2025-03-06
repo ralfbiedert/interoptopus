@@ -107,7 +107,7 @@ pub fn to_ctypes_name(the_type: &CType, with_type_annotations: bool) -> String {
             TypePattern::Bool => "ctypes.c_uint8".to_string(),
             TypePattern::CChar => "ctypes.c_char".to_string(),
             TypePattern::NamedCallback(x) => fnpointer_to_typename(x.fnpointer()),
-            TypePattern::Result(c) => c.rust_name().to_string(),
+            TypePattern::Result(c) => c.composite().rust_name().to_string(),
             TypePattern::AsyncCallback(x) => fnpointer_to_typename(x.fnpointer()),
             _ => panic!("Pattern not explicitly handled"),
         },

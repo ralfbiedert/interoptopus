@@ -171,7 +171,7 @@ def init_lib(path):
     c_lib.ref_option.restype = ctypes.c_bool
     c_lib.ref_mut_option.restype = ctypes.c_bool
     c_lib.call_tupled.restype = Tupled
-    c_lib.complex_args_1.restype = ctypes.c_int
+    c_lib.complex_args_1.restype = Result()
     c_lib.callback.restype = ctypes.c_uint8
     c_lib.generic_1a.restype = ctypes.c_uint32
     c_lib.generic_1b.restype = ctypes.c_uint8
@@ -269,7 +269,6 @@ def init_lib(path):
     c_lib.service_strings_new.restype = ctypes.c_int
     c_lib.service_strings_return_string.restype = ctypes.POINTER(ctypes.c_char)
 
-    c_lib.complex_args_1.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.panics.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.pattern_callback_7.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_async_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
@@ -1250,6 +1249,42 @@ class Weird1u32(ctypes.Structure):
     @x.setter
     def x(self, value: int):
         return ctypes.Structure.__set__(self, "x", value)
+
+
+class Result()(ctypes.Structure):
+    """Result that contains value or an error."""
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("t", ),
+        ("err", ctypes.c_int),
+    ]
+
+    def __init__(self, t = None, err = None):
+        if t is not None:
+            self.t = t
+        if err is not None:
+            self.err = err
+
+    @property
+    def t(self):
+        """Element if err is `Ok`."""
+        return ctypes.Structure.__get__(self, "t")
+
+    @t.setter
+    def t(self, value):
+        """Element if err is `Ok`."""
+        return ctypes.Structure.__set__(self, "t", value)
+
+    @property
+    def err(self):
+        """Error value."""
+        return ctypes.Structure.__get__(self, "err")
+
+    @err.setter
+    def err(self, value):
+        """Error value."""
+        return ctypes.Structure.__set__(self, "err", value)
 
 
 class ResultU64(ctypes.Structure):

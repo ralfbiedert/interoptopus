@@ -19,7 +19,7 @@ pub fn write_types(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
                 TypePattern::FFIErrorEnum(e) => write_enum(i, w, e.the_enum(), WriteFor::Code)?,
                 TypePattern::Slice(c) => write_slice(i, w, c, false)?,
                 TypePattern::SliceMut(c) => write_slice(i, w, c, true)?,
-                TypePattern::Result(c) => write_struct(i, w, c, WriteFor::Code)?,
+                TypePattern::Result(c) => write_struct(i, w, c.composite(), WriteFor::Code)?,
                 TypePattern::Utf8String(c) => write_struct(i, w, c, WriteFor::Code)?,
                 TypePattern::Option(c) => {
                     write_option(i, w, c)?;

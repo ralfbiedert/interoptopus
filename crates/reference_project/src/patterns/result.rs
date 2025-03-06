@@ -1,4 +1,5 @@
-use interoptopus::ffi_type;
+use interoptopus::patterns::result::FFIResult;
+use interoptopus::{ffi_function, ffi_type};
 use std::fmt::{Display, Formatter};
 // This file may look complex but the Interoptopus parts are actually really simple,
 // with some Rust best practices making up most of the code.
@@ -56,3 +57,18 @@ impl Display for Error {
 
 // Tell Rust your error type is an actual Rust Error.
 impl std::error::Error for Error {}
+
+#[ffi_function]
+pub fn pattern_result_1(x: FFIResult<u32, FFIError>) -> FFIResult<u32, FFIError> {
+    x
+}
+
+#[ffi_function]
+pub fn pattern_result_2() -> FFIResult<(), FFIError> {
+    FFIResult::ok(())
+}
+
+#[ffi_function]
+pub fn pattern_result_3(x: FFIResult<(), FFIError>) -> FFIResult<(), FFIError> {
+    x
+}

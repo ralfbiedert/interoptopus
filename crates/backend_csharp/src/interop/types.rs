@@ -5,7 +5,7 @@ pub mod fnptrs;
 
 use crate::interop::patterns::callbacks::write_type_definition_named_callback;
 use crate::interop::patterns::options::write_pattern_option;
-use crate::interop::patterns::results::write_pattern_result;
+use crate::interop::patterns::results::{write_pattern_result, write_pattern_result_void};
 use crate::interop::patterns::slices::{write_pattern_slice, write_pattern_slice_mut};
 use crate::interop::types::bools::write_type_definition_ffibool;
 use crate::interop::types::composite::write_type_definition_composite;
@@ -53,6 +53,8 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &CType
             TypePattern::FFIErrorEnum(e) => {
                 write_type_definition_enum(i, w, e.the_enum(), WriteFor::Code)?;
                 w.newline()?;
+                write_pattern_result_void(i, w, e)?;
+                w.newline()?;
             }
             TypePattern::Slice(x) => {
                 write_pattern_slice(i, w, x)?;
@@ -69,7 +71,7 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &CType
                 w.newline()?;
             }
             TypePattern::Result(x) => {
-                write_type_definition_composite(i, w, x)?;
+                write_type_definition_composite(i, w, x.composite())?;
                 w.newline()?;
                 write_pattern_result(i, w, x)?;
                 w.newline()?;

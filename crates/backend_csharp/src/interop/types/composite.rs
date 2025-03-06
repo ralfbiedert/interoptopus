@@ -121,6 +121,9 @@ pub fn write_type_definition_composite_unmanaged_body_field(i: &Interop, w: &mut
         CType::Pattern(TypePattern::Utf8String(_)) => {
             indented!(w, r"public Utf8String.Unmanaged {};", field_name)?;
         }
+        CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
+            indented!(w, r"public {} {};", e.the_enum().rust_name(), field_name)?;
+        }
 
         _ => {
             let type_name = to_typespecifier_in_field(field.the_type(), field, the_type);
@@ -183,22 +186,28 @@ pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWri
         // c::Visibility::Private => "",
     };
 
-    if let CType::Array(a) = field.the_type() {
-        assert!(is_blittable(a.array_type()), "Array type is not blittable: {:?}", a.array_type());
+    match field.the_type() {
+        CType::Array(a) => {
+            assert!(is_blittable(a.array_type()), "Array type is not blittable: {:?}", a.array_type());
 
-        let type_name = if matches!(a.array_type(), CType::Pattern(TypePattern::CChar)) {
-            "string".to_string()
-        } else {
-            format!("{}[]", to_typespecifier_in_field(a.array_type(), field, the_type))
-        };
+            let type_name = if matches!(a.array_type(), CType::Pattern(TypePattern::CChar)) {
+                "string".to_string()
+            } else {
+                format!("{}[]", to_typespecifier_in_field(a.array_type(), field, the_type))
+            };
 
-        indented!(w, r"{}{} {};", visibility, type_name, field_name)?;
-
-        Ok(())
-    } else {
-        let type_name = to_typespecifier_in_field(field.the_type(), field, the_type);
-        indented!(w, r"{}{} {};", visibility, type_name, field_name)
+            indented!(w, r"{}{} {};", visibility, type_name, field_name)?;
+        }
+        CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
+            let enum_name = e.the_enum().rust_name();
+            indented!(w, r"{}{} {};", visibility, enum_name, field_name)?;
+        }
+        _ => {
+            let type_name = to_typespecifier_in_field(field.the_type(), field, the_type);
+            indented!(w, r"{}{} {};", visibility, type_name, field_name)?;
+        }
     }
+    Ok(())
 }
 
 pub fn write_type_definition_composite_marshaller_field_to_unmanaged(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &CompositeType) -> Result<(), Error> {

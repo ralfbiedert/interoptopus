@@ -7,7 +7,7 @@ use crate::types::{
     Weird2,
 };
 use interoptopus::patterns::option::FFIOption;
-use interoptopus::patterns::result::panics_and_errors_to_ffi_enum;
+use interoptopus::patterns::result::{panics_and_errors_to_ffi_enum, FFIResult};
 use interoptopus::patterns::slice::FFISlice;
 use interoptopus::patterns::slice::FFISliceMut;
 use interoptopus::{ffi_function, here};
@@ -159,8 +159,8 @@ pub fn repr_transparent(x: Transparent, _r: &Transparent) -> Transparent {
 }
 
 #[ffi_function]
-pub fn complex_args_1(_a: Vec3f32, _b: Option<&Tupled>) -> FFIError {
-    FFIError::Ok
+pub fn complex_args_1(_a: Vec3f32, _b: Option<&Tupled>) -> FFIResult<(), FFIError> {
+    FFIResult::ok(())
 }
 
 #[ffi_function]

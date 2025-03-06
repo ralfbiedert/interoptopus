@@ -80,7 +80,7 @@ use crate::lang::c::{CType, CompositeType, PrimitiveType};
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::builtins::Builtins;
 use crate::patterns::callbacks::{AsyncCallback, NamedCallback};
-use crate::patterns::result::FFIErrorEnum;
+use crate::patterns::result::{FFIErrorEnum, FFIResultType};
 use crate::patterns::service::ServiceDefinition;
 use std::ffi::c_char;
 
@@ -130,7 +130,7 @@ pub enum TypePattern {
     Slice(CompositeType),
     SliceMut(CompositeType),
     Option(CompositeType),
-    Result(CompositeType),
+    Result(FFIResultType),
     Bool,
     CChar,
     NamedCallback(NamedCallback),
@@ -150,7 +150,7 @@ impl TypePattern {
             Self::Slice(x) => CType::Composite(x.clone()),
             Self::SliceMut(x) => CType::Composite(x.clone()),
             Self::Option(x) => CType::Composite(x.clone()),
-            Self::Result(x) => CType::Composite(x.clone()),
+            Self::Result(x) => CType::Composite(x.composite().clone()),
             Self::NamedCallback(x) => CType::FnPointer(x.fnpointer().clone()),
             Self::Bool => CType::Primitive(PrimitiveType::U8),
             Self::CChar => c_char::type_info(),

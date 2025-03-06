@@ -182,14 +182,7 @@ pub fn write_pattern_service_method(
     // Determine return value behavior and write function call.
     match function.signature().rval() {
         CType::Pattern(TypePattern::FFIErrorEnum(e)) if async_rval.is_none() => {
-            indented!(w, [()], r"var rval = {};", fn_call)?;
-            // for name in to_wrap_delegates {
-            //     indented!(w, [()], r"{}_safe_delegate.Rethrow();", name)?;
-            // }
-            indented!(w, [()], r"if (rval != {}.{})", e.the_enum().rust_name(), e.success_variant().name())?;
-            indented!(w, [()], r"{{")?;
-            indented!(w, [()()], r"throw new InteropException<{}>(rval);", e.the_enum().rust_name())?;
-            indented!(w, [()], r"}}")?;
+            indented!(w, [()], r"{}.Ok();", fn_call)?;
         }
         CType::Pattern(TypePattern::FFIErrorEnum(_)) if async_rval.is_some() => {
             indented!(w, [()], r"return {};", fn_call)?;

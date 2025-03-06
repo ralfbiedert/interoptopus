@@ -39,7 +39,7 @@ public class TestPatternDelegates
         var called_exception = false;
 
 
-        FFIError C1(int x, int y)
+        ResultFFIError C1(int x, int y)
         {
             // This should see `6` here, and it does, because the function has set that value.
             Assert.Equal(rval, 6);
@@ -65,7 +65,7 @@ public class TestPatternDelegates
             throw new Exception("Unchecked callback which we didn't handle. Comment this out and see the test fail.");
         };
 
-        var cc1 = new SumDelegateReturn(C1); 
+        var cc1 = new SumDelegateReturn(C1);
         var cc2 = new SumDelegateReturn2(C2); 
 
         try

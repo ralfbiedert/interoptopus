@@ -115,8 +115,6 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     let mut to_invoke = Vec::new();
     let mut to_wrap_name = Vec::new();
     let mut to_wrap_type = Vec::new();
-    let to_wrap_delegates = Vec::new();
-    // let mut to_wrap_delegate_types = Vec::new();
 
     let raw_name = function_name_to_csharp_name(
         function,
@@ -246,7 +244,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     indented!(w, [()], r"try")?;
     indented!(w, [()], r"{{")?;
     w.indent();
-    write_function_overloaded_invoke_with_error_handling(i, w, function, &call, to_wrap_delegates.as_slice())?;
+    write_function_overloaded_invoke_with_error_handling(i, w, function, &call)?;
     w.unindent();
     indented!(w, [()], r"}}")?;
     indented!(w, [()], r"finally")?;
@@ -271,31 +269,15 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
 }
 
 /// Writes common error handling based on a call's return type.
-pub fn write_function_overloaded_invoke_with_error_handling(
-    _i: &Interop,
-    w: &mut IndentWriter,
-    function: &Function,
-    fn_call: &str,
-    rethrow_delegates: &[&str],
-) -> Result<(), Error> {
+pub fn write_function_overloaded_invoke_with_error_handling(_i: &Interop, w: &mut IndentWriter, function: &Function, fn_call: &str) -> Result<(), Error> {
     match function.signature().rval() {
         CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
-            indented!(w, [()], r"var rval = {};", fn_call)?;
-            for name in rethrow_delegates {
-                indented!(w, [()], r"{}_safe_delegate.Rethrow();", name)?;
-            }
-            indented!(w, [()], r"if (rval != {}.{})", e.the_enum().rust_name(), e.success_variant().name())?;
-            indented!(w, [()], r"{{")?;
-            indented!(w, [()()], r"throw new InteropException<{}>(rval);", e.the_enum().rust_name())?;
-            indented!(w, [()], r"}}")?;
+            indented!(w, [()], r"{}.Ok();", fn_call)?;
         }
         CType::Pattern(TypePattern::CStrPointer) => {
             indented!(w, [()], r"var s = {};", fn_call)?;
             indented!(w, [()], r"return Marshal.PtrToStringAnsi(s);")?;
         }
-        // CType::Pattern(TypePattern::Utf8String(_)) => {
-        //     indented!(w, [()], r"var s = {};", fn_call)?;
-        // }
         CType::Primitive(PrimitiveType::Void) => {
             indented!(w, [()], r"{};", fn_call)?;
         }

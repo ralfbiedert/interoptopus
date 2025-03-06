@@ -101,7 +101,7 @@ pub fn to_typespecifier_in_field(x: &CType, field: &Field, composite: &Composite
         CType::Pattern(x) => match x {
             TypePattern::CStrPointer => "string".to_string(),
             TypePattern::Utf8String(_) => "string".to_string(),
-            TypePattern::FFIErrorEnum(e) => enum_to_typename(e.the_enum()),
+            TypePattern::FFIErrorEnum(e) => format!("Result{}", e.the_enum().rust_name()),
             TypePattern::Slice(x) => format!("Slice<{}>", get_slice_type_argument(x)),
             TypePattern::SliceMut(x) => format!("SliceMut<{}>", get_slice_type_argument(x)),
             TypePattern::Option(e) => composite_to_typename(e),
@@ -148,12 +148,12 @@ pub fn to_typespecifier_in_param(x: &CType) -> String {
         CType::FnPointer(x) => fnpointer_to_typename(x),
         CType::Pattern(x) => match x {
             TypePattern::CStrPointer => "[MarshalAs(UnmanagedType.LPStr)] string".to_string(),
-            TypePattern::FFIErrorEnum(e) => enum_to_typename(e.the_enum()),
+            TypePattern::FFIErrorEnum(e) => format!("Result{}", e.the_enum().rust_name()),
             TypePattern::Utf8String(x) => composite_to_typename(x),
             TypePattern::Slice(x) => composite_to_typename(x),
             TypePattern::SliceMut(x) => composite_to_typename(x),
             TypePattern::Option(x) => composite_to_typename(x),
-            TypePattern::Result(x) => composite_to_typename(x),
+            TypePattern::Result(x) => composite_to_typename(x.composite()),
             TypePattern::NamedCallback(x) => named_callback_to_typename(x),
             TypePattern::AsyncCallback(x) => async_callback_to_typename(x),
             TypePattern::Bool => "Bool".to_string(),
@@ -177,7 +177,8 @@ pub fn to_typespecifier_in_rval(x: &CType) -> String {
         CType::Pattern(x) => match x {
             TypePattern::CStrPointer => "IntPtr".to_string(),
             TypePattern::Utf8String(x) => composite_to_typename(x),
-            TypePattern::FFIErrorEnum(e) => enum_to_typename(e.the_enum()),
+            TypePattern::FFIErrorEnum(e) => format!("Result{}", e.the_enum().rust_name()),
+            TypePattern::Result(x) => composite_to_typename(x.composite()),
             TypePattern::Slice(x) => composite_to_typename(x),
             TypePattern::SliceMut(x) => composite_to_typename(x),
             TypePattern::Option(x) => composite_to_typename(x),

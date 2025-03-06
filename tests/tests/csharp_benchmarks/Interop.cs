@@ -24,9 +24,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 8615964985678512413ul)
+            if (api_version != 7273415914452811554ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (8615964985678512413). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (7273415914452811554). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -152,7 +152,7 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "complex_args_1")]
-        public static partial FFIError complex_args_1(Vec3f32 a, ref Tupled b);
+        public static partial ResultVoid complex_args_1(Vec3f32 a, ref Tupled b);
 
 
         [LibraryImport(NativeLib, EntryPoint = "callback")]
@@ -291,7 +291,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "panics")]
-        public static partial FFIError panics();
+        public static partial ResultVoid panics();
 
 
         [LibraryImport(NativeLib, EntryPoint = "renamed")]
@@ -593,6 +593,18 @@ namespace My.Company
         public static partial IntPtr pattern_ffi_cchar_mut_pointer(IntPtr ffi_cchar);
 
 
+        [LibraryImport(NativeLib, EntryPoint = "pattern_result_1")]
+        public static partial ResultU32FFIError pattern_result_1(ResultU32FFIError x);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_result_2")]
+        public static partial ResultVoid pattern_result_2();
+
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_result_3")]
+        public static partial ResultVoid pattern_result_3(FFIError x);
+
+
         [LibraryImport(NativeLib, EntryPoint = "pattern_api_guard")]
         public static partial ulong pattern_api_guard();
 
@@ -654,7 +666,7 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_7")]
-        public static partial FFIError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o);
+        public static partial ResultVoid pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o);
 
         public static unsafe void pattern_callback_7(SumDelegateReturnDelegate c1, SumDelegateReturn2Delegate c2, int x, int i, out int o)
         {
@@ -686,23 +698,23 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_async_destroy")]
-        public static partial FFIError service_async_destroy(ref IntPtr _context);
+        public static partial ResultVoid service_async_destroy(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_new")]
-        public static partial FFIError service_async_new(ref IntPtr _context);
+        public static partial ResultVoid service_async_new(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_return_after_ms")]
-        public static partial FFIError service_async_return_after_ms(IntPtr _context, ulong x, ulong ms, AsyncHelper _async_callback);
+        public static partial ResultVoid service_async_return_after_ms(IntPtr _context, ulong x, ulong ms, AsyncHelper _async_callback);
 
-        public static unsafe Task<ResultU64> service_async_return_after_ms(IntPtr _context, ulong x, ulong ms)
+        public static unsafe Task<ResultU64FFIError> service_async_return_after_ms(IntPtr _context, ulong x, ulong ms)
         {
-            var cs = new TaskCompletionSource<ResultU64>();
+            var cs = new TaskCompletionSource<ResultU64FFIError>();
             GCHandle pinned = default;
             var cb = new AsyncHelper((x) => {
-                var unmanaged = Marshal.PtrToStructure<ResultU64.Unmanaged>(x);
-                var marshaller = new ResultU64.Marshaller(unmanaged);
+                var unmanaged = Marshal.PtrToStructure<ResultU64FFIError.Unmanaged>(x);
+                var marshaller = new ResultU64FFIError.Marshaller(unmanaged);
                 cs.SetResult(marshaller.ToManaged());
                 pinned.Free();
             });
@@ -722,15 +734,15 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_process_struct")]
-        public static partial FFIError service_async_process_struct(IntPtr _context, NestedArray x, AsyncHelper _async_callback);
+        public static partial ResultVoid service_async_process_struct(IntPtr _context, NestedArray x, AsyncHelper _async_callback);
 
-        public static unsafe Task<ResultNestedArray> service_async_process_struct(IntPtr _context, NestedArray x)
+        public static unsafe Task<ResultNestedArrayFFIError> service_async_process_struct(IntPtr _context, NestedArray x)
         {
-            var cs = new TaskCompletionSource<ResultNestedArray>();
+            var cs = new TaskCompletionSource<ResultNestedArrayFFIError>();
             GCHandle pinned = default;
             var cb = new AsyncHelper((x) => {
-                var unmanaged = Marshal.PtrToStructure<ResultNestedArray.Unmanaged>(x);
-                var marshaller = new ResultNestedArray.Marshaller(unmanaged);
+                var unmanaged = Marshal.PtrToStructure<ResultNestedArrayFFIError.Unmanaged>(x);
+                var marshaller = new ResultNestedArrayFFIError.Marshaller(unmanaged);
                 cs.SetResult(marshaller.ToManaged());
                 pinned.Free();
             });
@@ -750,15 +762,15 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_handle_string")]
-        public static partial FFIError service_async_handle_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
+        public static partial ResultVoid service_async_handle_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
 
-        public static unsafe Task<ResultUtf8String> service_async_handle_string(IntPtr _context, string s)
+        public static unsafe Task<ResultUtf8StringFFIError> service_async_handle_string(IntPtr _context, string s)
         {
-            var cs = new TaskCompletionSource<ResultUtf8String>();
+            var cs = new TaskCompletionSource<ResultUtf8StringFFIError>();
             GCHandle pinned = default;
             var cb = new AsyncHelper((x) => {
-                var unmanaged = Marshal.PtrToStructure<ResultUtf8String.Unmanaged>(x);
-                var marshaller = new ResultUtf8String.Marshaller(unmanaged);
+                var unmanaged = Marshal.PtrToStructure<ResultUtf8StringFFIError.Unmanaged>(x);
+                var marshaller = new ResultUtf8StringFFIError.Marshaller(unmanaged);
                 cs.SetResult(marshaller.ToManaged());
                 pinned.Free();
             });
@@ -790,11 +802,11 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_basic_destroy")]
-        public static partial FFIError service_basic_destroy(ref IntPtr _context);
+        public static partial ResultVoid service_basic_destroy(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_basic_new")]
-        public static partial FFIError service_basic_new(ref IntPtr _context);
+        public static partial ResultVoid service_basic_new(ref IntPtr _context);
 
 
         /// Destroys the given instance.
@@ -804,17 +816,17 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_destroy")]
-        public static partial FFIError service_on_panic_destroy(ref IntPtr _context);
+        public static partial ResultVoid service_on_panic_destroy(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_new")]
-        public static partial FFIError service_on_panic_new(ref IntPtr _context);
+        public static partial ResultVoid service_on_panic_new(ref IntPtr _context);
 
 
         /// Methods returning a Result<(), _> are the default and do not
         /// need annotations.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_result")]
-        public static partial FFIError service_on_panic_return_result(IntPtr _context, uint anon1);
+        public static partial ResultVoid service_on_panic_return_result(IntPtr _context, uint anon1);
 
 
         /// Methods returning a value need an `on_panic` annotation.
@@ -835,15 +847,15 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_destroy")]
-        public static partial FFIError service_callbacks_destroy(ref IntPtr _context);
+        public static partial ResultVoid service_callbacks_destroy(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_new")]
-        public static partial FFIError service_callbacks_new(ref IntPtr _context);
+        public static partial ResultVoid service_callbacks_new(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_simple")]
-        public static partial FFIError service_callbacks_callback_simple(IntPtr _context, MyCallback callback);
+        public static partial ResultVoid service_callbacks_callback_simple(IntPtr _context, MyCallback callback);
 
         public static unsafe void service_callbacks_callback_simple(IntPtr _context, MyCallbackDelegate callback)
         {
@@ -863,7 +875,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_ffi_return")]
-        public static partial FFIError service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturn callback);
+        public static partial ResultVoid service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturn callback);
 
         public static unsafe void service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturnDelegate callback)
         {
@@ -883,7 +895,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_with_slice")]
-        public static partial FFIError service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturn callback, SliceI32 input);
+        public static partial ResultVoid service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturn callback, SliceI32 input);
 
         public static unsafe void service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
         {
@@ -911,7 +923,7 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_invoke_delegates")]
-        public static partial FFIError service_callbacks_invoke_delegates(IntPtr _context);
+        public static partial ResultVoid service_callbacks_invoke_delegates(IntPtr _context);
 
 
         /// Destroys the given instance.
@@ -921,11 +933,11 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_destroy")]
-        public static partial FFIError service_ignoring_methods_destroy(ref IntPtr _context);
+        public static partial ResultVoid service_ignoring_methods_destroy(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_new")]
-        public static partial FFIError service_ignoring_methods_new(ref IntPtr _context);
+        public static partial ResultVoid service_ignoring_methods_new(ref IntPtr _context);
 
 
         /// Destroys the given instance.
@@ -935,23 +947,23 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_destroy")]
-        public static partial FFIError service_multiple_ctors_destroy(ref IntPtr _context);
+        public static partial ResultVoid service_multiple_ctors_destroy(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with")]
-        public static partial FFIError service_multiple_ctors_new_with(ref IntPtr _context, uint some_value);
+        public static partial ResultVoid service_multiple_ctors_new_with(ref IntPtr _context, uint some_value);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_without")]
-        public static partial FFIError service_multiple_ctors_new_without(ref IntPtr _context);
+        public static partial ResultVoid service_multiple_ctors_new_without(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with_string")]
-        public static partial FFIError service_multiple_ctors_new_with_string(ref IntPtr _context, [MarshalAs(UnmanagedType.LPStr)] string anon0);
+        public static partial ResultVoid service_multiple_ctors_new_with_string(ref IntPtr _context, [MarshalAs(UnmanagedType.LPStr)] string anon0);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_failing")]
-        public static partial FFIError service_multiple_ctors_new_failing(ref IntPtr _context, byte some_value);
+        public static partial ResultVoid service_multiple_ctors_new_failing(ref IntPtr _context, byte some_value);
 
 
         /// Destroys the given instance.
@@ -961,11 +973,11 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_destroy")]
-        public static partial FFIError service_using_lifetimes_destroy(ref IntPtr _context);
+        public static partial ResultVoid service_using_lifetimes_destroy(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_new_with")]
-        public static partial FFIError service_using_lifetimes_new_with(ref IntPtr _context, ref uint some_value);
+        public static partial ResultVoid service_using_lifetimes_new_with(ref IntPtr _context, ref uint some_value);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_lifetime_1")]
@@ -1030,11 +1042,11 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_destroy")]
-        public static partial FFIError service_various_slices_destroy(ref IntPtr _context);
+        public static partial ResultVoid service_various_slices_destroy(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_new")]
-        public static partial FFIError service_various_slices_new(ref IntPtr _context);
+        public static partial ResultVoid service_various_slices_new(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self")]
@@ -1120,7 +1132,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ffi_error")]
-        public static partial FFIError service_various_slices_mut_self_ffi_error(IntPtr _context, SliceMutU8 slice);
+        public static partial ResultVoid service_various_slices_mut_self_ffi_error(IntPtr _context, SliceMutU8 slice);
 
         public static unsafe void service_various_slices_mut_self_ffi_error(IntPtr _context, Span<byte> slice)
         {
@@ -1142,7 +1154,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_no_error")]
-        public static partial FFIError service_various_slices_mut_self_no_error(IntPtr _context, SliceMutU8 slice);
+        public static partial ResultVoid service_various_slices_mut_self_no_error(IntPtr _context, SliceMutU8 slice);
 
         public static unsafe void service_various_slices_mut_self_no_error(IntPtr _context, Span<byte> slice)
         {
@@ -1182,11 +1194,11 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_strings_destroy")]
-        public static partial FFIError service_strings_destroy(ref IntPtr _context);
+        public static partial ResultVoid service_strings_destroy(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_new")]
-        public static partial FFIError service_strings_new(ref IntPtr _context);
+        public static partial ResultVoid service_strings_new(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_pass_string")]
@@ -3213,7 +3225,7 @@ namespace My.Company
     ///Result that contains value or an error.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct ResultNestedArray
+    public partial struct ResultNestedArrayFFIError
     {
         ///Element if err is `Ok`.
         internal NestedArray t;
@@ -3222,7 +3234,7 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultNestedArray
+    public partial struct ResultNestedArrayFFIError
     {
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
@@ -3231,18 +3243,18 @@ namespace My.Company
             public FFIError err;
         }
 
-        [CustomMarshaller(typeof(ResultNestedArray), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultNestedArrayFFIError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private ResultNestedArray _managed; // Used when converting managed -> unmanaged
+            private ResultNestedArrayFFIError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultNestedArray managed) { _managed = managed; }
+            public Marshaller(ResultNestedArrayFFIError managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultNestedArray managed) { _managed = managed; }
+            public void FromManaged(ResultNestedArrayFFIError managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -3256,9 +3268,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultNestedArray ToManaged()
+            public unsafe ResultNestedArrayFFIError ToManaged()
             {
-                _managed = new ResultNestedArray();
+                _managed = new ResultNestedArrayFFIError();
 
                 var _t = new NestedArray.Marshaller(_unmanaged.t);
                 _managed.t = _t.ToManaged();
@@ -3270,7 +3282,7 @@ namespace My.Company
         }
     }
 
-    public partial struct ResultNestedArray
+    public partial struct ResultNestedArrayFFIError
     {
         public NestedArray Ok()
         {
@@ -3287,36 +3299,36 @@ namespace My.Company
     ///Result that contains value or an error.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct ResultU64
+    public partial struct ResultU32FFIError
     {
         ///Element if err is `Ok`.
-        internal ulong t;
+        internal uint t;
         ///Error value.
         internal FFIError err;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultU64
+    public partial struct ResultU32FFIError
     {
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            public ulong t;
+            public uint t;
             public FFIError err;
         }
 
-        [CustomMarshaller(typeof(ResultU64), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultU32FFIError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private ResultU64 _managed; // Used when converting managed -> unmanaged
+            private ResultU32FFIError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultU64 managed) { _managed = managed; }
+            public Marshaller(ResultU32FFIError managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultU64 managed) { _managed = managed; }
+            public void FromManaged(ResultU32FFIError managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -3329,9 +3341,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultU64 ToManaged()
+            public unsafe ResultU32FFIError ToManaged()
             {
-                _managed = new ResultU64();
+                _managed = new ResultU32FFIError();
 
                 _managed.t = _unmanaged.t;
                 _managed.err = _unmanaged.err;
@@ -3342,7 +3354,79 @@ namespace My.Company
         }
     }
 
-    public partial struct ResultU64
+    public partial struct ResultU32FFIError
+    {
+        public uint Ok()
+        {
+            if (err == 0)
+            {
+                return t;
+            }
+            throw new InteropException<FFIError>(err);
+        }
+
+    }
+
+
+    ///Result that contains value or an error.
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct ResultU64FFIError
+    {
+        ///Element if err is `Ok`.
+        internal ulong t;
+        ///Error value.
+        internal FFIError err;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct ResultU64FFIError
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public ulong t;
+            public FFIError err;
+        }
+
+        [CustomMarshaller(typeof(ResultU64FFIError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private ResultU64FFIError _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(ResultU64FFIError managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(ResultU64FFIError managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+
+                _unmanaged.t = _managed.t;
+                _unmanaged.err = _managed.err;
+
+                return _unmanaged;
+            }
+
+            public unsafe ResultU64FFIError ToManaged()
+            {
+                _managed = new ResultU64FFIError();
+
+                _managed.t = _unmanaged.t;
+                _managed.err = _unmanaged.err;
+
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    public partial struct ResultU64FFIError
     {
         public ulong Ok()
         {
@@ -3359,7 +3443,7 @@ namespace My.Company
     ///Result that contains value or an error.
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct ResultUtf8String
+    public partial struct ResultUtf8StringFFIError
     {
         ///Element if err is `Ok`.
         internal string t;
@@ -3368,7 +3452,7 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultUtf8String
+    public partial struct ResultUtf8StringFFIError
     {
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
@@ -3377,18 +3461,18 @@ namespace My.Company
             public FFIError err;
         }
 
-        [CustomMarshaller(typeof(ResultUtf8String), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultUtf8StringFFIError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private ResultUtf8String _managed; // Used when converting managed -> unmanaged
+            private ResultUtf8StringFFIError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultUtf8String managed) { _managed = managed; }
+            public Marshaller(ResultUtf8StringFFIError managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultUtf8String managed) { _managed = managed; }
+            public void FromManaged(ResultUtf8StringFFIError managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -3402,9 +3486,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultUtf8String ToManaged()
+            public unsafe ResultUtf8StringFFIError ToManaged()
             {
-                _managed = new ResultUtf8String();
+                _managed = new ResultUtf8StringFFIError();
 
                 var _t = new Utf8String.Marshaller(_unmanaged.t);
                 _managed.t = _t.ToManaged().String;
@@ -3416,7 +3500,7 @@ namespace My.Company
         }
     }
 
-    public partial struct ResultUtf8String
+    public partial struct ResultUtf8StringFFIError
     {
         public string Ok()
         {
@@ -4312,7 +4396,7 @@ namespace My.Company
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate FFIError SumDelegateReturnNative(int x, int y, IntPtr callback_data); // 'True' native callback signature
-    public delegate FFIError SumDelegateReturnDelegate(int x, int y); // Our C# signature
+    public delegate ResultVoid SumDelegateReturnDelegate(int x, int y); // Our C# signature
 
     public partial class SumDelegateReturn
     {
@@ -4335,7 +4419,7 @@ namespace My.Company
             _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
-        public FFIError Call(int x, int y, IntPtr callback_data)
+        public ResultVoid Call(int x, int y, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
@@ -4345,7 +4429,7 @@ namespace My.Company
             catch (Exception e)
             {
                 _exception = e;
-                return FFIError.Panic;
+                return ResultVoid.Panic;
             }
         }
 
@@ -4513,17 +4597,17 @@ namespace My.Company
             }
         }
 
-        public Task<ResultU64> ReturnAfterMs(ulong x, ulong ms)
+        public Task<ResultU64FFIError> ReturnAfterMs(ulong x, ulong ms)
         {
             return Interop.service_async_return_after_ms(_context, x, ms);
         }
 
-        public Task<ResultNestedArray> ProcessStruct(NestedArray x)
+        public Task<ResultNestedArrayFFIError> ProcessStruct(NestedArray x)
         {
             return Interop.service_async_process_struct(_context, x);
         }
 
-        public Task<ResultUtf8String> HandleString(string s)
+        public Task<ResultUtf8StringFFIError> HandleString(string s)
         {
             return Interop.service_async_handle_string(_context, s);
         }

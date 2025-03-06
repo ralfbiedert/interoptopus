@@ -203,6 +203,8 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, [()], r"}}")?;
         indented!(w, r"}}")?;
         w.newline()?;
+
+        // --------------------------------
     }
 
     Ok(())

@@ -195,6 +195,15 @@ typedef struct WEIRD1U32
 typedef uint8_t (*fptr_fn_u8_rval_u8)(uint8_t x0);
 
 /// Result that contains value or an error.
+typedef struct RESULT()
+    {
+    /// Element if err is `Ok`.
+    void t;
+    /// Error value.
+    FFIERROR err;
+    } RESULT();
+
+/// Result that contains value or an error.
 typedef struct RESULTU64
     {
     /// Element if err is `Ok`.
@@ -485,7 +494,7 @@ typedef bool (*ref_mut_option)(int64_t*);
 
 typedef TUPLED (*call_tupled)(TUPLED);
 
-typedef FFIERROR (*complex_args_1)(VEC3F32, const TUPLED*);
+typedef RESULT() (*complex_args_1)(VEC3F32, const TUPLED*);
 
 typedef uint8_t (*callback)(fptr_fn_u8_rval_u8, uint8_t);
 

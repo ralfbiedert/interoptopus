@@ -28,7 +28,7 @@
 //! }
 //! ```
 
-use crate::lang::c::{CType, CompositeType, Documentation, EnumType, Field, Layout, Meta, Representation, Variant, Visibility};
+use crate::lang::c::{CType, CompositeType, Documentation, EnumType, Field, Layout, Meta, PrimitiveType, Representation, Variant, Visibility};
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::TypePattern;
 use crate::util::{capitalize_first_letter, log_error};
@@ -122,6 +122,41 @@ impl FFIErrorEnum {
     #[must_use]
     pub const fn panic_variant(&self) -> &Variant {
         &self.panic_variant
+    }
+}
+
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub struct FFIResultType {
+    composite_type: CompositeType,
+}
+
+impl FFIResultType {
+    #[must_use]
+    pub const fn new(composite_type: CompositeType) -> Self {
+        Self { composite_type }
+    }
+
+    #[must_use]
+    pub fn t(&self) -> &CType {
+        self.composite_type.fields()[0].the_type()
+    }
+
+    #[must_use]
+    pub fn e(&self) -> &FFIErrorEnum {
+        match self.composite_type.fields()[1].the_type() {
+            CType::Pattern(TypePattern::FFIErrorEnum(x)) => x,
+            _ => panic!("Expected FFIErrorEnum."),
+        }
+    }
+
+    #[must_use]
+    pub const fn composite(&self) -> &CompositeType {
+        &self.composite_type
+    }
+
+    #[must_use]
+    pub fn meta(&self) -> &Meta {
+        self.composite_type.meta()
     }
 }
 
@@ -275,20 +310,28 @@ where
     E: CTypeInfo + FFIError,
 {
     fn type_info() -> CType {
-        let doc_t = Documentation::from_line("Element if err is `Ok`.");
-        let doc_err = Documentation::from_line("Error value.");
+        let t_is_void = matches!(T::type_info(), CType::Primitive(PrimitiveType::Void));
 
-        let fields = vec![
-            Field::with_documentation("t".to_string(), T::type_info(), Visibility::Private, doc_t),
-            Field::with_documentation("err".to_string(), E::type_info(), Visibility::Private, doc_err),
-        ];
+        if t_is_void {
+            E::type_info()
+        } else {
+            let doc_t = Documentation::from_line("Element if err is `Ok`.");
+            let doc_err = Documentation::from_line("Error value.");
 
-        let doc = Documentation::from_line("Result that contains value or an error.");
-        let repr = Representation::new(Layout::C, None);
-        let meta = Meta::with_namespace_documentation(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
-        let name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
-        let composite = CompositeType::with_meta_repr(format!("Result{name}"), fields, meta, repr);
-        CType::Pattern(TypePattern::Result(composite))
+            let fields = vec![
+                Field::with_documentation("t".to_string(), T::type_info(), Visibility::Private, doc_t),
+                Field::with_documentation("err".to_string(), E::type_info(), Visibility::Private, doc_err),
+            ];
+
+            let doc = Documentation::from_line("Result that contains value or an error.");
+            let repr = Representation::new(Layout::C, None);
+            let meta = Meta::with_namespace_documentation(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
+            let t_name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
+            let e_name = capitalize_first_letter(E::type_info().name_within_lib().as_str());
+            let composite = CompositeType::with_meta_repr(format!("Result{t_name}{e_name}"), fields, meta, repr);
+            let result = FFIResultType::new(composite);
+            CType::Pattern(TypePattern::Result(result))
+        }
     }
 }
 

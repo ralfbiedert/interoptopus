@@ -188,7 +188,7 @@ pub(crate) fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CTyp
                 }
             }
             TypePattern::Result(x) => {
-                for field in x.fields() {
+                for field in x.composite().fields() {
                     ctypes_from_type_recursive(field.the_type(), types);
                 }
             }
@@ -341,7 +341,7 @@ pub fn is_global_type(t: &CType) -> bool {
             TypePattern::Slice(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),
             TypePattern::SliceMut(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),
             TypePattern::Option(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),
-            TypePattern::Result(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),
+            TypePattern::Result(x) => x.composite().fields().iter().all(|x| is_global_type(x.the_type())),
             TypePattern::Bool => true,
             TypePattern::CChar => true,
             TypePattern::NamedCallback(_) => false,

@@ -19,7 +19,7 @@ public class TestCoreSlices
             slice[1] = 100;
         });
 
-        Interop.pattern_ffi_slice_3b(smu, cc2);
+        Interop.pattern_ffi_slice_3(smu, cc2);
         Assert.Equal(data[0], 1);
         Assert.Equal(data[1], 100);
     }

@@ -80,7 +80,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     match the_type.fnpointer().signature().rval() {
         CType::Primitive(PrimitiveType::Void) => indented!(w, [()()()], r"return;")?,
         CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
-            indented!(w, [()()()], r"return {}.{};", rval, e.panic_variant().name())?;
+            indented!(w, [()()()], r"return new {}({}.{});", rval, e.the_enum().rust_name(), e.panic_variant().name())?;
         }
         _ => indented!(w, [()()()], r"return default;")?,
     }
