@@ -8,13 +8,15 @@ public class TestPatternResult
     [Fact]
     public void simple_result_passthrough_works()
     {
-        Interop.pattern_result_1(new ResultU32FFIError()).Ok();
+        var x = new ResultU32FFIError();
+        Interop.pattern_result_1(x).Ok();
     }
 
     [Fact]
     public void result_void_works()
     {
-        Assert.Equal(new ResultFFIError(FFIError.Ok), Interop.pattern_result_3(new ResultFFIError(FFIError.Ok)));
-        Assert.Equal(new ResultFFIError(FFIError.Fail), Interop.pattern_result_3(new ResultFFIError(FFIError.Fail)));
+        Interop.pattern_result_3(ResultFFIError.OK).Ok();
+        Assert.Equal(ResultFFIError.OK, Interop.pattern_result_3(ResultFFIError.OK));
+        Assert.Equal(ResultFFIError.FAIL, Interop.pattern_result_3(ResultFFIError.FAIL));
     }
 }

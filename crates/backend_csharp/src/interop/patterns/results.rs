@@ -63,6 +63,12 @@ pub fn write_pattern_result_void(i: &Interop, w: &mut IndentWriter, result: &FFI
     indented!(w, r"{{")?;
     indented!(w, [()], r"public {name}({enum_name} e) {{ _err = e; }}",)?;
     w.newline()?;
+    for x in result.the_enum().variants() {
+        let vname = x.name();
+        let vname_upper = vname.to_uppercase();
+        indented!(w, [()], r"public static {name} {vname_upper} => new {name}({enum_name}.{vname});",)?;
+    }
+    w.newline()?;
     indented!(w, [()], r"public void Ok()")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"if (_err == {enum_name}.{})", result.success_variant().name())?;

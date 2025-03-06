@@ -195,31 +195,31 @@ typedef struct WEIRD1U32
 typedef uint8_t (*fptr_fn_u8_rval_u8)(uint8_t x0);
 
 /// Result that contains value or an error.
-typedef struct RESULT()
+typedef struct RESULTU32FFIERROR
     {
     /// Element if err is `Ok`.
-    void t;
+    uint32_t t;
     /// Error value.
     FFIERROR err;
-    } RESULT();
+    } RESULTU32FFIERROR;
 
 /// Result that contains value or an error.
-typedef struct RESULTU64
+typedef struct RESULTU64FFIERROR
     {
     /// Element if err is `Ok`.
     uint64_t t;
     /// Error value.
     FFIERROR err;
-    } RESULTU64;
+    } RESULTU64FFIERROR;
 
 /// Result that contains value or an error.
-typedef struct RESULTUTF8STRING
+typedef struct RESULTUTF8STRINGFFIERROR
     {
     /// Element if err is `Ok`.
     UTF8STRING t;
     /// Error value.
     FFIERROR err;
-    } RESULTUTF8STRING;
+    } RESULTUTF8STRINGFFIERROR;
 
 typedef struct ARRAY
     {
@@ -412,20 +412,20 @@ typedef uint8_t (*CALLBACKFFISLICE)(SLICEU8 SLICE, const void* CALLBACK_DATA);
 
 typedef void (*CALLBACKSLICEMUT)(SLICEMUTU8 SLICE, const void* CALLBACK_DATA);
 
-typedef void (*fptr_fn_ConstPtrResultU64_ConstPtr)(const RESULTU64* x0, const void* x1);
+typedef void (*fptr_fn_ConstPtrResultU64FFIError_ConstPtr)(const RESULTU64FFIERROR* x0, const void* x1);
 
-typedef void (*fptr_fn_ConstPtrResultUtf8String_ConstPtr)(const RESULTUTF8STRING* x0, const void* x1);
+typedef void (*fptr_fn_ConstPtrResultUtf8StringFFIError_ConstPtr)(const RESULTUTF8STRINGFFIERROR* x0, const void* x1);
 
 typedef void (*fptr_fn_CharArray)(CHARARRAY x0);
 
 /// Result that contains value or an error.
-typedef struct RESULTNESTEDARRAY
+typedef struct RESULTNESTEDARRAYFFIERROR
     {
     /// Element if err is `Ok`.
     NESTEDARRAY t;
     /// Error value.
     FFIERROR err;
-    } RESULTNESTEDARRAY;
+    } RESULTNESTEDARRAYFFIERROR;
 
 typedef void (*CALLBACKCHARARRAY2)(CHARARRAY VALUE, const void* CALLBACK_DATA);
 
@@ -440,7 +440,7 @@ typedef struct SLICEMUTCHARARRAY
     uint64_t len;
     } SLICEMUTCHARARRAY;
 
-typedef void (*fptr_fn_ConstPtrResultNestedArray_ConstPtr)(const RESULTNESTEDARRAY* x0, const void* x1);
+typedef void (*fptr_fn_ConstPtrResultNestedArrayFFIError_ConstPtr)(const RESULTNESTEDARRAYFFIERROR* x0, const void* x1);
 
 
 typedef int64_t (*interoptopus_string_create)(const void*, uint64_t, UTF8STRING*);
@@ -494,7 +494,7 @@ typedef bool (*ref_mut_option)(int64_t*);
 
 typedef TUPLED (*call_tupled)(TUPLED);
 
-typedef RESULT() (*complex_args_1)(VEC3F32, const TUPLED*);
+typedef FFIERROR (*complex_args_1)(VEC3F32, const TUPLED*);
 
 typedef uint8_t (*callback)(fptr_fn_u8_rval_u8, uint8_t);
 
@@ -613,6 +613,12 @@ typedef const char* (*pattern_ffi_cchar_const_pointer)(const char*);
 
 typedef char* (*pattern_ffi_cchar_mut_pointer)(char*);
 
+typedef RESULTU32FFIERROR (*pattern_result_1)(RESULTU32FFIERROR);
+
+typedef FFIERROR (*pattern_result_2)();
+
+typedef FFIERROR (*pattern_result_3)(FFIERROR);
+
 typedef uint64_t (*pattern_api_guard)();
 
 typedef uint32_t (*pattern_callback_1)(MYCALLBACK, uint32_t);
@@ -639,11 +645,11 @@ typedef FFIERROR (*service_async_destroy)(const SERVICEASYNC**);
 
 typedef FFIERROR (*service_async_new)(const SERVICEASYNC**);
 
-typedef FFIERROR (*service_async_return_after_ms)(const SERVICEASYNC*, uint64_t, uint64_t, fptr_fn_ConstPtrResultU64_ConstPtr);
+typedef FFIERROR (*service_async_return_after_ms)(const SERVICEASYNC*, uint64_t, uint64_t, fptr_fn_ConstPtrResultU64FFIError_ConstPtr);
 
-typedef FFIERROR (*service_async_process_struct)(const SERVICEASYNC*, NESTEDARRAY, fptr_fn_ConstPtrResultNestedArray_ConstPtr);
+typedef FFIERROR (*service_async_process_struct)(const SERVICEASYNC*, NESTEDARRAY, fptr_fn_ConstPtrResultNestedArrayFFIError_ConstPtr);
 
-typedef FFIERROR (*service_async_handle_string)(const SERVICEASYNC*, UTF8STRING, fptr_fn_ConstPtrResultUtf8String_ConstPtr);
+typedef FFIERROR (*service_async_handle_string)(const SERVICEASYNC*, UTF8STRING, fptr_fn_ConstPtrResultUtf8StringFFIError_ConstPtr);
 
 typedef void (*service_async_bad)(SERVICEASYNC*);
 

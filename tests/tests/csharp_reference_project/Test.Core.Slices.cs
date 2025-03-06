@@ -8,7 +8,7 @@ public class TestCoreSlices
 {
 
     [Fact]
-    public unsafe void pattern_ffi_slice_3()
+    public void pattern_ffi_slice_3()
     {
         var data = new byte[100_000];
         var smu = new SliceMutU8(data);
@@ -28,9 +28,9 @@ public class TestCoreSlices
     public void pattern_ffi_slice_2()
     {
         var data = new Vec3f32[] {
-            new Vec3f32 { x = 1.0f, y = 2.0f, z = 3.0f },
-            new Vec3f32 { x = 4.0f, y = 5.0f, z = 6.0f },
-            new Vec3f32 { x = 7.0f, y = 8.0f, z = 9.0f },
+            new() { x = 1.0f, y = 2.0f, z = 3.0f },
+            new() { x = 4.0f, y = 5.0f, z = 6.0f },
+            new() { x = 7.0f, y = 8.0f, z = 9.0f },
         };
 
         var result = Interop.pattern_ffi_slice_2(data, 1);
@@ -43,9 +43,7 @@ public class TestCoreSlices
     [Fact]
     public void pattern_ffi_slice_delegate_huge()
     {
-        var cb = new CallbackHugeVecSlice(x => x[0]);
-        var result = Interop.pattern_ffi_slice_delegate_huge(cb);
-        // cb.Dispose();
+        var result = Interop.pattern_ffi_slice_delegate_huge(x => x[0]);
 
         Assert.Equal(0, result.x);
     }
@@ -54,14 +52,11 @@ public class TestCoreSlices
     public void pattern_ffi_slice_6()
     {
         var data = new byte[] {1, 2, 3};
-        var slice = new SliceMutU8(data);
-        var cb = new CallbackU8(x =>
+        Interop.pattern_ffi_slice_6(data, x =>
         {
             Assert.Equal(1, x);
             return 0;
         });
-        Interop.pattern_ffi_slice_6(ref slice, cb);
-        // cb.Dispose();
     }
 
     // [Fact]

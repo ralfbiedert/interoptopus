@@ -152,7 +152,7 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "complex_args_1")]
-        public static partial ResultVoid complex_args_1(Vec3f32 a, ref Tupled b);
+        public static partial ResultFFIError complex_args_1(Vec3f32 a, ref Tupled b);
 
 
         [LibraryImport(NativeLib, EntryPoint = "callback")]
@@ -291,7 +291,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "panics")]
-        public static partial ResultVoid panics();
+        public static partial ResultFFIError panics();
 
 
         [LibraryImport(NativeLib, EntryPoint = "renamed")]
@@ -598,11 +598,11 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_result_2")]
-        public static partial ResultVoid pattern_result_2();
+        public static partial ResultFFIError pattern_result_2();
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_result_3")]
-        public static partial ResultVoid pattern_result_3(FFIError x);
+        public static partial ResultFFIError pattern_result_3(ResultFFIError x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_api_guard")]
@@ -666,7 +666,7 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_7")]
-        public static partial ResultVoid pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o);
+        public static partial ResultFFIError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o);
 
         public static unsafe void pattern_callback_7(SumDelegateReturnDelegate c1, SumDelegateReturn2Delegate c2, int x, int i, out int o)
         {
@@ -674,11 +674,7 @@ namespace My.Company
             var c2_wrapped = new SumDelegateReturn2(c2);
             try
             {
-                var rval = pattern_callback_7(c1_wrapped, c2_wrapped, x, i, out o);
-                if (rval != FFIError.Ok)
-                {
-                    throw new InteropException<FFIError>(rval);
-                }
+                pattern_callback_7(c1_wrapped, c2_wrapped, x, i, out o).Ok();
             }
             finally
             {
@@ -698,15 +694,15 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_async_destroy")]
-        public static partial ResultVoid service_async_destroy(ref IntPtr _context);
+        public static partial ResultFFIError service_async_destroy(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_new")]
-        public static partial ResultVoid service_async_new(ref IntPtr _context);
+        public static partial ResultFFIError service_async_new(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_return_after_ms")]
-        public static partial ResultVoid service_async_return_after_ms(IntPtr _context, ulong x, ulong ms, AsyncHelper _async_callback);
+        public static partial ResultFFIError service_async_return_after_ms(IntPtr _context, ulong x, ulong ms, AsyncHelper _async_callback);
 
         public static unsafe Task<ResultU64FFIError> service_async_return_after_ms(IntPtr _context, ulong x, ulong ms)
         {
@@ -721,11 +717,7 @@ namespace My.Company
             pinned = GCHandle.Alloc(cb);
             try
             {
-                var rval = service_async_return_after_ms(_context, x, ms, cb);
-                if (rval != FFIError.Ok)
-                {
-                    throw new InteropException<FFIError>(rval);
-                }
+                service_async_return_after_ms(_context, x, ms, cb).Ok();
             }
             finally
             {
@@ -734,7 +726,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_process_struct")]
-        public static partial ResultVoid service_async_process_struct(IntPtr _context, NestedArray x, AsyncHelper _async_callback);
+        public static partial ResultFFIError service_async_process_struct(IntPtr _context, NestedArray x, AsyncHelper _async_callback);
 
         public static unsafe Task<ResultNestedArrayFFIError> service_async_process_struct(IntPtr _context, NestedArray x)
         {
@@ -749,11 +741,7 @@ namespace My.Company
             pinned = GCHandle.Alloc(cb);
             try
             {
-                var rval = service_async_process_struct(_context, x, cb);
-                if (rval != FFIError.Ok)
-                {
-                    throw new InteropException<FFIError>(rval);
-                }
+                service_async_process_struct(_context, x, cb).Ok();
             }
             finally
             {
@@ -762,7 +750,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_handle_string")]
-        public static partial ResultVoid service_async_handle_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
+        public static partial ResultFFIError service_async_handle_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
 
         public static unsafe Task<ResultUtf8StringFFIError> service_async_handle_string(IntPtr _context, string s)
         {
@@ -778,11 +766,7 @@ namespace My.Company
             var s_wrapped = new Utf8String(s);
             try
             {
-                var rval = service_async_handle_string(_context, s_wrapped, cb);
-                if (rval != FFIError.Ok)
-                {
-                    throw new InteropException<FFIError>(rval);
-                }
+                service_async_handle_string(_context, s_wrapped, cb).Ok();
             }
             finally
             {
@@ -802,11 +786,11 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_basic_destroy")]
-        public static partial ResultVoid service_basic_destroy(ref IntPtr _context);
+        public static partial ResultFFIError service_basic_destroy(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_basic_new")]
-        public static partial ResultVoid service_basic_new(ref IntPtr _context);
+        public static partial ResultFFIError service_basic_new(ref IntPtr _context);
 
 
         /// Destroys the given instance.
@@ -816,17 +800,17 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_destroy")]
-        public static partial ResultVoid service_on_panic_destroy(ref IntPtr _context);
+        public static partial ResultFFIError service_on_panic_destroy(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_new")]
-        public static partial ResultVoid service_on_panic_new(ref IntPtr _context);
+        public static partial ResultFFIError service_on_panic_new(ref IntPtr _context);
 
 
         /// Methods returning a Result<(), _> are the default and do not
         /// need annotations.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_result")]
-        public static partial ResultVoid service_on_panic_return_result(IntPtr _context, uint anon1);
+        public static partial ResultFFIError service_on_panic_return_result(IntPtr _context, uint anon1);
 
 
         /// Methods returning a value need an `on_panic` annotation.
@@ -847,26 +831,22 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_destroy")]
-        public static partial ResultVoid service_callbacks_destroy(ref IntPtr _context);
+        public static partial ResultFFIError service_callbacks_destroy(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_new")]
-        public static partial ResultVoid service_callbacks_new(ref IntPtr _context);
+        public static partial ResultFFIError service_callbacks_new(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_simple")]
-        public static partial ResultVoid service_callbacks_callback_simple(IntPtr _context, MyCallback callback);
+        public static partial ResultFFIError service_callbacks_callback_simple(IntPtr _context, MyCallback callback);
 
         public static unsafe void service_callbacks_callback_simple(IntPtr _context, MyCallbackDelegate callback)
         {
             var callback_wrapped = new MyCallback(callback);
             try
             {
-                var rval = service_callbacks_callback_simple(_context, callback_wrapped);
-                if (rval != FFIError.Ok)
-                {
-                    throw new InteropException<FFIError>(rval);
-                }
+                service_callbacks_callback_simple(_context, callback_wrapped).Ok();
             }
             finally
             {
@@ -875,18 +855,14 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_ffi_return")]
-        public static partial ResultVoid service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturn callback);
+        public static partial ResultFFIError service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturn callback);
 
         public static unsafe void service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturnDelegate callback)
         {
             var callback_wrapped = new SumDelegateReturn(callback);
             try
             {
-                var rval = service_callbacks_callback_ffi_return(_context, callback_wrapped);
-                if (rval != FFIError.Ok)
-                {
-                    throw new InteropException<FFIError>(rval);
-                }
+                service_callbacks_callback_ffi_return(_context, callback_wrapped).Ok();
             }
             finally
             {
@@ -895,7 +871,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_with_slice")]
-        public static partial ResultVoid service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturn callback, SliceI32 input);
+        public static partial ResultFFIError service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturn callback, SliceI32 input);
 
         public static unsafe void service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
         {
@@ -905,11 +881,7 @@ namespace My.Company
                 var callback_wrapped = new SumDelegateReturn(callback);
                 try
                 {
-                    var rval = service_callbacks_callback_with_slice(_context, callback_wrapped, input_slice);
-                    if (rval != FFIError.Ok)
-                    {
-                        throw new InteropException<FFIError>(rval);
-                    }
+                    service_callbacks_callback_with_slice(_context, callback_wrapped, input_slice).Ok();
                 }
                 finally
                 {
@@ -923,7 +895,7 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_invoke_delegates")]
-        public static partial ResultVoid service_callbacks_invoke_delegates(IntPtr _context);
+        public static partial ResultFFIError service_callbacks_invoke_delegates(IntPtr _context);
 
 
         /// Destroys the given instance.
@@ -933,11 +905,11 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_destroy")]
-        public static partial ResultVoid service_ignoring_methods_destroy(ref IntPtr _context);
+        public static partial ResultFFIError service_ignoring_methods_destroy(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_new")]
-        public static partial ResultVoid service_ignoring_methods_new(ref IntPtr _context);
+        public static partial ResultFFIError service_ignoring_methods_new(ref IntPtr _context);
 
 
         /// Destroys the given instance.
@@ -947,23 +919,23 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_destroy")]
-        public static partial ResultVoid service_multiple_ctors_destroy(ref IntPtr _context);
+        public static partial ResultFFIError service_multiple_ctors_destroy(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with")]
-        public static partial ResultVoid service_multiple_ctors_new_with(ref IntPtr _context, uint some_value);
+        public static partial ResultFFIError service_multiple_ctors_new_with(ref IntPtr _context, uint some_value);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_without")]
-        public static partial ResultVoid service_multiple_ctors_new_without(ref IntPtr _context);
+        public static partial ResultFFIError service_multiple_ctors_new_without(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with_string")]
-        public static partial ResultVoid service_multiple_ctors_new_with_string(ref IntPtr _context, [MarshalAs(UnmanagedType.LPStr)] string anon0);
+        public static partial ResultFFIError service_multiple_ctors_new_with_string(ref IntPtr _context, [MarshalAs(UnmanagedType.LPStr)] string anon0);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_failing")]
-        public static partial ResultVoid service_multiple_ctors_new_failing(ref IntPtr _context, byte some_value);
+        public static partial ResultFFIError service_multiple_ctors_new_failing(ref IntPtr _context, byte some_value);
 
 
         /// Destroys the given instance.
@@ -973,11 +945,11 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_destroy")]
-        public static partial ResultVoid service_using_lifetimes_destroy(ref IntPtr _context);
+        public static partial ResultFFIError service_using_lifetimes_destroy(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_new_with")]
-        public static partial ResultVoid service_using_lifetimes_new_with(ref IntPtr _context, ref uint some_value);
+        public static partial ResultFFIError service_using_lifetimes_new_with(ref IntPtr _context, ref uint some_value);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_using_lifetimes_lifetime_1")]
@@ -1042,11 +1014,11 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_destroy")]
-        public static partial ResultVoid service_various_slices_destroy(ref IntPtr _context);
+        public static partial ResultFFIError service_various_slices_destroy(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_new")]
-        public static partial ResultVoid service_various_slices_new(ref IntPtr _context);
+        public static partial ResultFFIError service_various_slices_new(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self")]
@@ -1132,7 +1104,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ffi_error")]
-        public static partial ResultVoid service_various_slices_mut_self_ffi_error(IntPtr _context, SliceMutU8 slice);
+        public static partial ResultFFIError service_various_slices_mut_self_ffi_error(IntPtr _context, SliceMutU8 slice);
 
         public static unsafe void service_various_slices_mut_self_ffi_error(IntPtr _context, Span<byte> slice)
         {
@@ -1141,11 +1113,7 @@ namespace My.Company
                 var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                 try
                 {
-                    var rval = service_various_slices_mut_self_ffi_error(_context, slice_slice);
-                    if (rval != FFIError.Ok)
-                    {
-                        throw new InteropException<FFIError>(rval);
-                    }
+                    service_various_slices_mut_self_ffi_error(_context, slice_slice).Ok();
                 }
                 finally
                 {
@@ -1154,7 +1122,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_no_error")]
-        public static partial ResultVoid service_various_slices_mut_self_no_error(IntPtr _context, SliceMutU8 slice);
+        public static partial ResultFFIError service_various_slices_mut_self_no_error(IntPtr _context, SliceMutU8 slice);
 
         public static unsafe void service_various_slices_mut_self_no_error(IntPtr _context, Span<byte> slice)
         {
@@ -1163,11 +1131,7 @@ namespace My.Company
                 var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                 try
                 {
-                    var rval = service_various_slices_mut_self_no_error(_context, slice_slice);
-                    if (rval != FFIError.Ok)
-                    {
-                        throw new InteropException<FFIError>(rval);
-                    }
+                    service_various_slices_mut_self_no_error(_context, slice_slice).Ok();
                 }
                 finally
                 {
@@ -1194,11 +1158,11 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_strings_destroy")]
-        public static partial ResultVoid service_strings_destroy(ref IntPtr _context);
+        public static partial ResultFFIError service_strings_destroy(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_new")]
-        public static partial ResultVoid service_strings_new(ref IntPtr _context);
+        public static partial ResultFFIError service_strings_new(ref IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_pass_string")]
@@ -2811,6 +2775,66 @@ namespace My.Company
         Fail = 400,
     }
 
+    public partial struct ResultFFIError
+    {
+        internal FFIError _err;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct ResultFFIError
+    {
+        public ResultFFIError(FFIError e) { _err = e; }
+
+        public void Ok()
+        {
+            if (_err == FFIError.Ok)
+            {
+                return;
+            }
+            throw new InteropException<FFIError>(_err);
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public FFIError _err;
+        }
+
+        [CustomMarshaller(typeof(ResultFFIError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+
+        public ref struct Marshaller
+        {
+            private ResultFFIError _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(ResultFFIError managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(ResultFFIError managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {
+                _unmanaged = new Unmanaged();
+                _unmanaged._err = _managed._err;
+                return _unmanaged;
+            }
+
+            public unsafe ResultFFIError ToManaged()
+            {
+                _managed = new ResultFFIError();
+                _managed._err = _unmanaged._err;
+                return _managed;
+            }
+
+            public void Free() { }
+        }
+
+    }
+
+
     public partial struct SliceUseCStrPtr
     {
         UseCStrPtr[] _managed;
@@ -3286,7 +3310,7 @@ namespace My.Company
     {
         public NestedArray Ok()
         {
-            if (err == 0)
+            if (err == FFIError.Ok)
             {
                 return t;
             }
@@ -3358,7 +3382,7 @@ namespace My.Company
     {
         public uint Ok()
         {
-            if (err == 0)
+            if (err == FFIError.Ok)
             {
                 return t;
             }
@@ -3430,7 +3454,7 @@ namespace My.Company
     {
         public ulong Ok()
         {
-            if (err == 0)
+            if (err == FFIError.Ok)
             {
                 return t;
             }
@@ -3504,7 +3528,7 @@ namespace My.Company
     {
         public string Ok()
         {
-            if (err == 0)
+            if (err == FFIError.Ok)
             {
                 return t;
             }
@@ -4395,8 +4419,8 @@ namespace My.Company
 
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate FFIError SumDelegateReturnNative(int x, int y, IntPtr callback_data); // 'True' native callback signature
-    public delegate ResultVoid SumDelegateReturnDelegate(int x, int y); // Our C# signature
+    public delegate ResultFFIError SumDelegateReturnNative(int x, int y, IntPtr callback_data); // 'True' native callback signature
+    public delegate ResultFFIError SumDelegateReturnDelegate(int x, int y); // Our C# signature
 
     public partial class SumDelegateReturn
     {
@@ -4419,7 +4443,7 @@ namespace My.Company
             _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
-        public ResultVoid Call(int x, int y, IntPtr callback_data)
+        public ResultFFIError Call(int x, int y, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
@@ -4429,7 +4453,7 @@ namespace My.Company
             catch (Exception e)
             {
                 _exception = e;
-                return ResultVoid.Panic;
+                return new ResultFFIError(FFIError.Panic);
             }
         }
 
@@ -4580,21 +4604,13 @@ namespace My.Company
         public static ServiceAsync New()
         {
             var self = new ServiceAsync();
-            var rval = Interop.service_async_new(ref self._context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_async_new(ref self._context).Ok();
             return self;
         }
 
         public void Dispose()
         {
-            var rval = Interop.service_async_destroy(ref _context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_async_destroy(ref _context).Ok();
         }
 
         public Task<ResultU64FFIError> ReturnAfterMs(ulong x, ulong ms)
@@ -4630,21 +4646,13 @@ namespace My.Company
         public static ServiceBasic New()
         {
             var self = new ServiceBasic();
-            var rval = Interop.service_basic_new(ref self._context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_basic_new(ref self._context).Ok();
             return self;
         }
 
         public void Dispose()
         {
-            var rval = Interop.service_basic_destroy(ref _context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_basic_destroy(ref _context).Ok();
         }
 
         public IntPtr Context => _context;
@@ -4661,32 +4669,20 @@ namespace My.Company
         public static ServiceOnPanic New()
         {
             var self = new ServiceOnPanic();
-            var rval = Interop.service_on_panic_new(ref self._context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_on_panic_new(ref self._context).Ok();
             return self;
         }
 
         public void Dispose()
         {
-            var rval = Interop.service_on_panic_destroy(ref _context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_on_panic_destroy(ref _context).Ok();
         }
 
         /// Methods returning a Result<(), _> are the default and do not
         /// need annotations.
         public void ReturnResult(uint anon1)
         {
-            var rval = Interop.service_on_panic_return_result(_context, anon1);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_on_panic_return_result(_context, anon1).Ok();
         }
 
         /// Methods returning a value need an `on_panic` annotation.
@@ -4717,30 +4713,18 @@ namespace My.Company
         public static ServiceCallbacks New()
         {
             var self = new ServiceCallbacks();
-            var rval = Interop.service_callbacks_new(ref self._context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_callbacks_new(ref self._context).Ok();
             return self;
         }
 
         public void Dispose()
         {
-            var rval = Interop.service_callbacks_destroy(ref _context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_callbacks_destroy(ref _context).Ok();
         }
 
         public void CallbackSimple(MyCallback callback)
         {
-            var rval = Interop.service_callbacks_callback_simple(_context, callback);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_callbacks_callback_simple(_context, callback).Ok();
         }
 
         public void CallbackSimple(MyCallbackDelegate callback)
@@ -4750,11 +4734,7 @@ namespace My.Company
 
         public void CallbackFfiReturn(SumDelegateReturn callback)
         {
-            var rval = Interop.service_callbacks_callback_ffi_return(_context, callback);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_callbacks_callback_ffi_return(_context, callback).Ok();
         }
 
         public void CallbackFfiReturn(SumDelegateReturnDelegate callback)
@@ -4764,11 +4744,7 @@ namespace My.Company
 
         public void CallbackWithSlice(SumDelegateReturn callback, SliceI32 input)
         {
-            var rval = Interop.service_callbacks_callback_with_slice(_context, callback, input);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_callbacks_callback_with_slice(_context, callback, input).Ok();
         }
 
         public void CallbackWithSlice(SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
@@ -4783,11 +4759,7 @@ namespace My.Company
 
         public void InvokeDelegates()
         {
-            var rval = Interop.service_callbacks_invoke_delegates(_context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_callbacks_invoke_delegates(_context).Ok();
         }
 
         public IntPtr Context => _context;
@@ -4803,21 +4775,13 @@ namespace My.Company
         public static ServiceIgnoringMethods New()
         {
             var self = new ServiceIgnoringMethods();
-            var rval = Interop.service_ignoring_methods_new(ref self._context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_ignoring_methods_new(ref self._context).Ok();
             return self;
         }
 
         public void Dispose()
         {
-            var rval = Interop.service_ignoring_methods_destroy(ref _context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_ignoring_methods_destroy(ref _context).Ok();
         }
 
         public IntPtr Context => _context;
@@ -4834,54 +4798,34 @@ namespace My.Company
         public static ServiceMultipleCtors NewWith(uint some_value)
         {
             var self = new ServiceMultipleCtors();
-            var rval = Interop.service_multiple_ctors_new_with(ref self._context, some_value);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_multiple_ctors_new_with(ref self._context, some_value).Ok();
             return self;
         }
 
         public static ServiceMultipleCtors NewWithout()
         {
             var self = new ServiceMultipleCtors();
-            var rval = Interop.service_multiple_ctors_new_without(ref self._context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_multiple_ctors_new_without(ref self._context).Ok();
             return self;
         }
 
         public static ServiceMultipleCtors NewWithString([MarshalAs(UnmanagedType.LPStr)] string anon0)
         {
             var self = new ServiceMultipleCtors();
-            var rval = Interop.service_multiple_ctors_new_with_string(ref self._context, anon0);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_multiple_ctors_new_with_string(ref self._context, anon0).Ok();
             return self;
         }
 
         public static ServiceMultipleCtors NewFailing(byte some_value)
         {
             var self = new ServiceMultipleCtors();
-            var rval = Interop.service_multiple_ctors_new_failing(ref self._context, some_value);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_multiple_ctors_new_failing(ref self._context, some_value).Ok();
             return self;
         }
 
         public void Dispose()
         {
-            var rval = Interop.service_multiple_ctors_destroy(ref _context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_multiple_ctors_destroy(ref _context).Ok();
         }
 
         public IntPtr Context => _context;
@@ -4899,21 +4843,13 @@ namespace My.Company
         public static ServiceUsingLifetimes NewWith(ref uint some_value)
         {
             var self = new ServiceUsingLifetimes();
-            var rval = Interop.service_using_lifetimes_new_with(ref self._context, ref some_value);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_using_lifetimes_new_with(ref self._context, ref some_value).Ok();
             return self;
         }
 
         public void Dispose()
         {
-            var rval = Interop.service_using_lifetimes_destroy(ref _context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_using_lifetimes_destroy(ref _context).Ok();
         }
 
         public void Lifetime1(SliceBool slice)
@@ -4961,21 +4897,13 @@ namespace My.Company
         public static ServiceVariousSlices New()
         {
             var self = new ServiceVariousSlices();
-            var rval = Interop.service_various_slices_new(ref self._context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_various_slices_new(ref self._context).Ok();
             return self;
         }
 
         public void Dispose()
         {
-            var rval = Interop.service_various_slices_destroy(ref _context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_various_slices_destroy(ref _context).Ok();
         }
 
         public byte MutSelf(SliceU8 slice)
@@ -5027,11 +4955,7 @@ namespace My.Company
 
         public void MutSelfFfiError(SliceMutU8 slice)
         {
-            var rval = Interop.service_various_slices_mut_self_ffi_error(_context, slice);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_various_slices_mut_self_ffi_error(_context, slice).Ok();
         }
 
         public void MutSelfFfiError(Span<byte> slice)
@@ -5041,11 +4965,7 @@ namespace My.Company
 
         public void MutSelfNoError(SliceMutU8 slice)
         {
-            var rval = Interop.service_various_slices_mut_self_no_error(_context, slice);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_various_slices_mut_self_no_error(_context, slice).Ok();
         }
 
         public void MutSelfNoError(Span<byte> slice)
@@ -5081,21 +5001,13 @@ namespace My.Company
         public static ServiceStrings New()
         {
             var self = new ServiceStrings();
-            var rval = Interop.service_strings_new(ref self._context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_strings_new(ref self._context).Ok();
             return self;
         }
 
         public void Dispose()
         {
-            var rval = Interop.service_strings_destroy(ref _context);
-            if (rval != FFIError.Ok)
-            {
-                throw new InteropException<FFIError>(rval);
-            }
+            Interop.service_strings_destroy(ref _context).Ok();
         }
 
         public void PassString([MarshalAs(UnmanagedType.LPStr)] string anon1)
