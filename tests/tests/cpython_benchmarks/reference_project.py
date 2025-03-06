@@ -10,6 +10,8 @@ def init_lib(path):
     global c_lib
     c_lib = ctypes.cdll.LoadLibrary(path)
 
+    c_lib.interoptopus_string_create.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(Utf8String)]
+    c_lib.interoptopus_string_destroy.argtypes = [Utf8String]
     c_lib.primitive_void.argtypes = []
     c_lib.primitive_void2.argtypes = []
     c_lib.primitive_bool.argtypes = [ctypes.c_bool]
@@ -71,16 +73,20 @@ def init_lib(path):
     c_lib.pattern_ascii_pointer_4.argtypes = [ctypes.POINTER(ctypes.c_char), ctypes.c_uint32]
     c_lib.pattern_ascii_pointer_5.argtypes = [ctypes.POINTER(ctypes.c_char), ctypes.c_uint32]
     c_lib.pattern_ascii_pointer_return_slice.argtypes = []
+    c_lib.pattern_string_1.argtypes = [Utf8String]
+    c_lib.pattern_string_2.argtypes = [Utf8String]
+    c_lib.pattern_string_3.argtypes = []
+    c_lib.pattern_string_4.argtypes = [UseUtf8String]
     c_lib.pattern_ffi_slice_1.argtypes = [SliceU32]
     c_lib.pattern_ffi_slice_1b.argtypes = [SliceMutU32]
     c_lib.pattern_ffi_slice_2.argtypes = [SliceVec3f32, ctypes.c_int32]
-    c_lib.pattern_ffi_slice_3.argtypes = [SliceMutU8, ctypes.CFUNCTYPE(None, SliceMutU8)]
+    c_lib.pattern_ffi_slice_3.argtypes = [SliceMutU8, ctypes.CFUNCTYPE(None, SliceMutU8, ctypes.c_void_p)]
     c_lib.pattern_ffi_slice_4.argtypes = [SliceU8, SliceMutU8]
     c_lib.pattern_ffi_slice_5.argtypes = [ctypes.POINTER(SliceU8), ctypes.POINTER(SliceMutU8)]
-    c_lib.pattern_ffi_slice_6.argtypes = [ctypes.POINTER(SliceMutU8), ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8)]
-    c_lib.pattern_ffi_slice_8.argtypes = [ctypes.POINTER(SliceMutCharArray), ctypes.CFUNCTYPE(None, CharArray)]
-    c_lib.pattern_ffi_slice_delegate.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint8, SliceU8)]
-    c_lib.pattern_ffi_slice_delegate_huge.argtypes = [ctypes.CFUNCTYPE(Vec3f32, SliceVec3f32)]
+    c_lib.pattern_ffi_slice_6.argtypes = [ctypes.POINTER(SliceMutU8), ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8, ctypes.c_void_p)]
+    c_lib.pattern_ffi_slice_8.argtypes = [ctypes.POINTER(SliceMutCharArray), ctypes.CFUNCTYPE(None, CharArray, ctypes.c_void_p)]
+    c_lib.pattern_ffi_slice_delegate.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint8, SliceU8, ctypes.c_void_p)]
+    c_lib.pattern_ffi_slice_delegate_huge.argtypes = [ctypes.CFUNCTYPE(Vec3f32, SliceVec3f32, ctypes.c_void_p)]
     c_lib.pattern_ffi_option_1.argtypes = [OptionInner]
     c_lib.pattern_ffi_option_2.argtypes = [OptionInner]
     c_lib.pattern_ffi_bool.argtypes = [ctypes.c_uint8]
@@ -88,15 +94,21 @@ def init_lib(path):
     c_lib.pattern_ffi_cchar_const_pointer.argtypes = [ctypes.POINTER(ctypes.c_char)]
     c_lib.pattern_ffi_cchar_mut_pointer.argtypes = [ctypes.POINTER(ctypes.c_char)]
     c_lib.pattern_api_guard.argtypes = []
-    c_lib.pattern_callback_1.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32), ctypes.c_uint32]
-    c_lib.pattern_callback_2.argtypes = [ctypes.CFUNCTYPE(None, ctypes.c_void_p)]
-    c_lib.pattern_callback_4.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32), ctypes.c_uint32]
+    c_lib.pattern_callback_1.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p), ctypes.c_uint32]
+    c_lib.pattern_callback_2.argtypes = [ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p)]
+    c_lib.pattern_callback_4.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p), ctypes.c_uint32]
     c_lib.pattern_callback_5.argtypes = []
     c_lib.pattern_callback_6.argtypes = []
-    c_lib.pattern_callback_7.argtypes = [ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32), ctypes.CFUNCTYPE(None, ctypes.c_int32, ctypes.c_int32), ctypes.c_int32, ctypes.c_int32, ctypes.POINTER(ctypes.c_int32)]
+    c_lib.pattern_callback_7.argtypes = [ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p), ctypes.CFUNCTYPE(None, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p), ctypes.c_int32, ctypes.c_int32, ctypes.POINTER(ctypes.c_int32)]
     c_lib.pattern_surrogates_1.argtypes = [Local, ctypes.POINTER(Container)]
-    c_lib.basic_service_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
-    c_lib.basic_service_new.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
+    c_lib.service_async_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
+    c_lib.service_async_new.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
+    c_lib.service_async_return_after_ms.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint64, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultU64), ctypes.c_void_p)]
+    c_lib.service_async_process_struct.argtypes = [ctypes.c_void_p, NestedArray, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultNestedArray), ctypes.c_void_p)]
+    c_lib.service_async_handle_string.argtypes = [ctypes.c_void_p, Utf8String, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultUtf8String), ctypes.c_void_p)]
+    c_lib.service_async_bad.argtypes = [ctypes.c_void_p]
+    c_lib.service_basic_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
+    c_lib.service_basic_new.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.service_on_panic_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.service_on_panic_new.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.service_on_panic_return_result.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
@@ -104,9 +116,10 @@ def init_lib(path):
     c_lib.service_on_panic_return_ub_on_panic.argtypes = [ctypes.c_void_p]
     c_lib.service_callbacks_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.service_callbacks_new.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
-    c_lib.service_callbacks_callback_simple.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)]
-    c_lib.service_callbacks_callback_ffi_return.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32)]
-    c_lib.service_callbacks_callback_with_slice.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32), SliceI32]
+    c_lib.service_callbacks_callback_simple.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p)]
+    c_lib.service_callbacks_callback_ffi_return.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)]
+    c_lib.service_callbacks_callback_with_slice.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p), SliceI32]
+    c_lib.service_callbacks_set_delegate_table.argtypes = [ctypes.c_void_p, DelegateTable]
     c_lib.service_callbacks_invoke_delegates.argtypes = [ctypes.c_void_p]
     c_lib.service_ignoring_methods_destroy.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     c_lib.service_ignoring_methods_new.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
@@ -136,6 +149,8 @@ def init_lib(path):
     c_lib.service_strings_pass_string.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_char)]
     c_lib.service_strings_return_string.argtypes = [ctypes.c_void_p]
 
+    c_lib.interoptopus_string_create.restype = ctypes.c_int64
+    c_lib.interoptopus_string_destroy.restype = ctypes.c_int64
     c_lib.primitive_bool.restype = ctypes.c_bool
     c_lib.primitive_u8.restype = ctypes.c_uint8
     c_lib.primitive_u16.restype = ctypes.c_uint16
@@ -189,7 +204,11 @@ def init_lib(path):
     c_lib.pattern_ascii_pointer_3.restype = ctypes.POINTER(ctypes.c_char)
     c_lib.pattern_ascii_pointer_4.restype = ctypes.POINTER(ctypes.c_char)
     c_lib.pattern_ascii_pointer_5.restype = ctypes.c_uint8
-    c_lib.pattern_ascii_pointer_return_slice.restype = SliceUseAsciiStringPattern
+    c_lib.pattern_ascii_pointer_return_slice.restype = SliceUseCStrPtr
+    c_lib.pattern_string_1.restype = Utf8String
+    c_lib.pattern_string_2.restype = ctypes.c_uint32
+    c_lib.pattern_string_3.restype = Utf8String
+    c_lib.pattern_string_4.restype = UseUtf8String
     c_lib.pattern_ffi_slice_1.restype = ctypes.c_uint32
     c_lib.pattern_ffi_slice_1b.restype = ctypes.c_uint32
     c_lib.pattern_ffi_slice_2.restype = Vec3f32
@@ -203,13 +222,18 @@ def init_lib(path):
     c_lib.pattern_ffi_cchar_mut_pointer.restype = ctypes.POINTER(ctypes.c_char)
     c_lib.pattern_api_guard.restype = ctypes.c_uint64
     c_lib.pattern_callback_1.restype = ctypes.c_uint32
-    c_lib.pattern_callback_2.restype = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
+    c_lib.pattern_callback_2.restype = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p)
     c_lib.pattern_callback_4.restype = ctypes.c_uint32
-    c_lib.pattern_callback_5.restype = ctypes.CFUNCTYPE(None, )
-    c_lib.pattern_callback_6.restype = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_int32, ctypes.c_int32)
+    c_lib.pattern_callback_5.restype = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
+    c_lib.pattern_callback_6.restype = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)
     c_lib.pattern_callback_7.restype = ctypes.c_int
-    c_lib.basic_service_destroy.restype = ctypes.c_int
-    c_lib.basic_service_new.restype = ctypes.c_int
+    c_lib.service_async_destroy.restype = ctypes.c_int
+    c_lib.service_async_new.restype = ctypes.c_int
+    c_lib.service_async_return_after_ms.restype = ctypes.c_int
+    c_lib.service_async_process_struct.restype = ctypes.c_int
+    c_lib.service_async_handle_string.restype = ctypes.c_int
+    c_lib.service_basic_destroy.restype = ctypes.c_int
+    c_lib.service_basic_new.restype = ctypes.c_int
     c_lib.service_on_panic_destroy.restype = ctypes.c_int
     c_lib.service_on_panic_new.restype = ctypes.c_int
     c_lib.service_on_panic_return_result.restype = ctypes.c_int
@@ -248,8 +272,13 @@ def init_lib(path):
     c_lib.complex_args_1.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.panics.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.pattern_callback_7.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.basic_service_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.basic_service_new.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.service_async_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.service_async_new.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.service_async_return_after_ms.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.service_async_process_struct.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.service_async_handle_string.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.service_basic_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
+    c_lib.service_basic_new.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_on_panic_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_on_panic_new.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_on_panic_return_result.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
@@ -275,6 +304,12 @@ def init_lib(path):
     c_lib.service_strings_destroy.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.service_strings_new.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
 
+
+def interoptopus_string_create(utf8: ctypes.c_void_p, len: int, rval: ctypes.POINTER(Utf8String)) -> int:
+    return c_lib.interoptopus_string_create(utf8, len, rval)
+
+def interoptopus_string_destroy(utf8) -> int:
+    return c_lib.interoptopus_string_destroy(utf8)
 
 def primitive_void():
     return c_lib.primitive_void()
@@ -483,8 +518,20 @@ def pattern_ascii_pointer_5(x: bytes, i: int) -> int:
         x = ctypes.cast(x, ctypes.POINTER(ctypes.c_char))
     return c_lib.pattern_ascii_pointer_5(x, i)
 
-def pattern_ascii_pointer_return_slice() -> SliceUseAsciiStringPattern:
+def pattern_ascii_pointer_return_slice() -> SliceUseCStrPtr:
     return c_lib.pattern_ascii_pointer_return_slice()
+
+def pattern_string_1(x):
+    return c_lib.pattern_string_1(x)
+
+def pattern_string_2(x) -> int:
+    return c_lib.pattern_string_2(x)
+
+def pattern_string_3():
+    return c_lib.pattern_string_3()
+
+def pattern_string_4(x: UseUtf8String) -> UseUtf8String:
+    return c_lib.pattern_string_4(x)
 
 def pattern_ffi_slice_1(ffi_slice: SliceU32 | ctypes.Array[ctypes.c_uint32]) -> int:
     if hasattr(ffi_slice, "_length_") and getattr(ffi_slice, "_type_", "") == ctypes.c_uint32:
@@ -509,7 +556,7 @@ def pattern_ffi_slice_3(slice: SliceMutU8 | ctypes.Array[ctypes.c_uint8], callba
         slice = SliceMutU8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
     if not hasattr(callback, "__ctypes_from_outparam__"):
-        callback = callbacks.fn_SliceMutU8(callback)
+        callback = callbacks.fn_SliceMutU8_ConstPtr(callback)
 
     return c_lib.pattern_ffi_slice_3(slice, callback)
 
@@ -527,25 +574,25 @@ def pattern_ffi_slice_5(slice: ctypes.POINTER(SliceU8), slice2: ctypes.POINTER(S
 
 def pattern_ffi_slice_6(slice: ctypes.POINTER(SliceMutU8), callback):
     if not hasattr(callback, "__ctypes_from_outparam__"):
-        callback = callbacks.fn_u8_rval_u8(callback)
+        callback = callbacks.fn_u8_ConstPtr_rval_u8(callback)
 
     return c_lib.pattern_ffi_slice_6(slice, callback)
 
 def pattern_ffi_slice_8(slice: ctypes.POINTER(SliceMutCharArray), callback):
     if not hasattr(callback, "__ctypes_from_outparam__"):
-        callback = callbacks.fn_CharArray(callback)
+        callback = callbacks.fn_CharArray_ConstPtr(callback)
 
     return c_lib.pattern_ffi_slice_8(slice, callback)
 
 def pattern_ffi_slice_delegate(callback) -> int:
     if not hasattr(callback, "__ctypes_from_outparam__"):
-        callback = callbacks.fn_SliceU8_rval_u8(callback)
+        callback = callbacks.fn_SliceU8_ConstPtr_rval_u8(callback)
 
     return c_lib.pattern_ffi_slice_delegate(callback)
 
 def pattern_ffi_slice_delegate_huge(callback) -> Vec3f32:
     if not hasattr(callback, "__ctypes_from_outparam__"):
-        callback = callbacks.fn_SliceVec3f32_rval_Vec3f32(callback)
+        callback = callbacks.fn_SliceVec3f32_ConstPtr_rval_Vec3f32(callback)
 
     return c_lib.pattern_ffi_slice_delegate_huge(callback)
 
@@ -572,19 +619,19 @@ def pattern_api_guard():
 
 def pattern_callback_1(callback, x: int) -> int:
     if not hasattr(callback, "__ctypes_from_outparam__"):
-        callback = callbacks.fn_u32_rval_u32(callback)
+        callback = callbacks.fn_u32_ConstPtr_rval_u32(callback)
 
     return c_lib.pattern_callback_1(callback, x)
 
 def pattern_callback_2(callback):
     if not hasattr(callback, "__ctypes_from_outparam__"):
-        callback = callbacks.fn_ConstPtr(callback)
+        callback = callbacks.fn_ConstPtr_ConstPtr(callback)
 
     return c_lib.pattern_callback_2(callback)
 
 def pattern_callback_4(callback, x: int) -> int:
     if not hasattr(callback, "__ctypes_from_outparam__"):
-        callback = callbacks.fn_u32_rval_u32(callback)
+        callback = callbacks.fn_u32_ConstPtr_rval_u32(callback)
 
     return c_lib.pattern_callback_4(callback, x)
 
@@ -596,10 +643,10 @@ def pattern_callback_6():
 
 def pattern_callback_7(c1, c2, x: int, i: int, o: ctypes.POINTER(ctypes.c_int32)):
     if not hasattr(c1, "__ctypes_from_outparam__"):
-        c1 = callbacks.fn_i32_i32_rval_FFIError(c1)
+        c1 = callbacks.fn_i32_i32_ConstPtr_rval_FFIError(c1)
 
     if not hasattr(c2, "__ctypes_from_outparam__"):
-        c2 = callbacks.fn_i32_i32(c2)
+        c2 = callbacks.fn_i32_i32_ConstPtr(c2)
 
     return c_lib.pattern_callback_7(c1, c2, x, i, o)
 
@@ -662,6 +709,55 @@ class EnumDocumented:
 
 class EnumRenamed:
     X = 0
+
+
+class Utf8String(ctypes.Structure):
+    """ UTF-8 string marshalling helper.
+
+ A highly dangerous 'use once type' that has ownership semantics!
+ Once passed over an FFI boundary 'the other side' is meant to own
+ (and free) it. Rust handles that fine, but if in C# you put this
+ in a struct and then call Rust multiple times with that struct 
+ you'll free the same pointer multiple times, and get UB!"""
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("ptr", ctypes.POINTER(ctypes.c_uint8)),
+        ("len", ctypes.c_uint64),
+        ("capacity", ctypes.c_uint64),
+    ]
+
+    def __init__(self, ptr: ctypes.POINTER(ctypes.c_uint8) = None, len: int = None, capacity: int = None):
+        if ptr is not None:
+            self.ptr = ptr
+        if len is not None:
+            self.len = len
+        if capacity is not None:
+            self.capacity = capacity
+
+    @property
+    def ptr(self) -> ctypes.POINTER(ctypes.c_uint8):
+        return ctypes.Structure.__get__(self, "ptr")
+
+    @ptr.setter
+    def ptr(self, value: ctypes.POINTER(ctypes.c_uint8)):
+        return ctypes.Structure.__set__(self, "ptr", value)
+
+    @property
+    def len(self) -> int:
+        return ctypes.Structure.__get__(self, "len")
+
+    @len.setter
+    def len(self, value: int):
+        return ctypes.Structure.__set__(self, "len", value)
+
+    @property
+    def capacity(self) -> int:
+        return ctypes.Structure.__get__(self, "capacity")
+
+    @capacity.setter
+    def capacity(self, value: int):
+        return ctypes.Structure.__set__(self, "capacity", value)
 
 
 class FFIError:
@@ -899,7 +995,7 @@ class Tupled(ctypes.Structure):
         return ctypes.Structure.__set__(self, "x0", value)
 
 
-class UseAsciiStringPattern(ctypes.Structure):
+class UseCStrPtr(ctypes.Structure):
 
     # These fields represent the underlying C data layout
     _fields_ = [
@@ -917,6 +1013,26 @@ class UseAsciiStringPattern(ctypes.Structure):
     @ascii_string.setter
     def ascii_string(self, value: bytes):
         return ctypes.Structure.__set__(self, "ascii_string", value)
+
+
+class UseUtf8String(ctypes.Structure):
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("s", Utf8String),
+    ]
+
+    def __init__(self, s = None):
+        if s is not None:
+            self.s = s
+
+    @property
+    def s(self):
+        return ctypes.Structure.__get__(self, "s")
+
+    @s.setter
+    def s(self, value):
+        return ctypes.Structure.__set__(self, "s", value)
 
 
 class Vec(ctypes.Structure):
@@ -1136,6 +1252,78 @@ class Weird1u32(ctypes.Structure):
         return ctypes.Structure.__set__(self, "x", value)
 
 
+class ResultU64(ctypes.Structure):
+    """Result that contains value or an error."""
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("t", ctypes.c_uint64),
+        ("err", ctypes.c_int),
+    ]
+
+    def __init__(self, t: int = None, err = None):
+        if t is not None:
+            self.t = t
+        if err is not None:
+            self.err = err
+
+    @property
+    def t(self) -> int:
+        """Element if err is `Ok`."""
+        return ctypes.Structure.__get__(self, "t")
+
+    @t.setter
+    def t(self, value: int):
+        """Element if err is `Ok`."""
+        return ctypes.Structure.__set__(self, "t", value)
+
+    @property
+    def err(self):
+        """Error value."""
+        return ctypes.Structure.__get__(self, "err")
+
+    @err.setter
+    def err(self, value):
+        """Error value."""
+        return ctypes.Structure.__set__(self, "err", value)
+
+
+class ResultUtf8String(ctypes.Structure):
+    """Result that contains value or an error."""
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("t", Utf8String),
+        ("err", ctypes.c_int),
+    ]
+
+    def __init__(self, t = None, err = None):
+        if t is not None:
+            self.t = t
+        if err is not None:
+            self.err = err
+
+    @property
+    def t(self):
+        """Element if err is `Ok`."""
+        return ctypes.Structure.__get__(self, "t")
+
+    @t.setter
+    def t(self, value):
+        """Element if err is `Ok`."""
+        return ctypes.Structure.__set__(self, "t", value)
+
+    @property
+    def err(self):
+        """Error value."""
+        return ctypes.Structure.__get__(self, "err")
+
+    @err.setter
+    def err(self, value):
+        """Error value."""
+        return ctypes.Structure.__set__(self, "err", value)
+
+
 class Array(ctypes.Structure):
 
     # These fields represent the underlying C data layout
@@ -1156,37 +1344,6 @@ class Array(ctypes.Structure):
         return ctypes.Structure.__set__(self, "data", value)
 
 
-class CharArray(ctypes.Structure):
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("str", ctypes.c_char * 32),
-        ("str_2", ctypes.c_char * 32),
-    ]
-
-    def __init__(self, str = None, str_2 = None):
-        if str is not None:
-            self.str = str
-        if str_2 is not None:
-            self.str_2 = str_2
-
-    @property
-    def str(self):
-        return ctypes.Structure.__get__(self, "str")
-
-    @str.setter
-    def str(self, value):
-        return ctypes.Structure.__set__(self, "str", value)
-
-    @property
-    def str_2(self):
-        return ctypes.Structure.__get__(self, "str_2")
-
-    @str_2.setter
-    def str_2(self, value):
-        return ctypes.Structure.__set__(self, "str_2", value)
-
-
 class Container(ctypes.Structure):
 
     # These fields represent the underlying C data layout
@@ -1205,6 +1362,26 @@ class Container(ctypes.Structure):
     @foreign.setter
     def foreign(self, value: Local):
         return ctypes.Structure.__set__(self, "foreign", value)
+
+
+class FixedString(ctypes.Structure):
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("data", ctypes.c_uint8 * 32),
+    ]
+
+    def __init__(self, data = None):
+        if data is not None:
+            self.data = data
+
+    @property
+    def data(self):
+        return ctypes.Structure.__get__(self, "data")
+
+    @data.setter
+    def data(self, value):
+        return ctypes.Structure.__set__(self, "data", value)
 
 
 class Genericu32(ctypes.Structure):
@@ -1675,6 +1852,134 @@ class OptionVec(ctypes.Structure):
         return self._is_some != 0
 
 
+class CharArray(ctypes.Structure):
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("str", FixedString),
+        ("str_2", FixedString),
+    ]
+
+    def __init__(self, str: FixedString = None, str_2: FixedString = None):
+        if str is not None:
+            self.str = str
+        if str_2 is not None:
+            self.str_2 = str_2
+
+    @property
+    def str(self) -> FixedString:
+        return ctypes.Structure.__get__(self, "str")
+
+    @str.setter
+    def str(self, value: FixedString):
+        return ctypes.Structure.__set__(self, "str", value)
+
+    @property
+    def str_2(self) -> FixedString:
+        return ctypes.Structure.__get__(self, "str_2")
+
+    @str_2.setter
+    def str_2(self, value: FixedString):
+        return ctypes.Structure.__set__(self, "str_2", value)
+
+
+class DelegateTable(ctypes.Structure):
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("my_callback", ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p)),
+        ("my_callback_namespaced", ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p)),
+        ("my_callback_void", ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p)),
+        ("my_callback_contextual", ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_uint32, ctypes.c_void_p)),
+        ("sum_delegate_1", ctypes.CFUNCTYPE(None, ctypes.c_void_p)),
+        ("sum_delegate_2", ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)),
+        ("sum_delegate_return", ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)),
+        ("sum_delegate_return_2", ctypes.CFUNCTYPE(None, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)),
+    ]
+
+    def __init__(self, my_callback = None, my_callback_namespaced = None, my_callback_void = None, my_callback_contextual = None, sum_delegate_1 = None, sum_delegate_2 = None, sum_delegate_return = None, sum_delegate_return_2 = None):
+        if my_callback is not None:
+            self.my_callback = my_callback
+        if my_callback_namespaced is not None:
+            self.my_callback_namespaced = my_callback_namespaced
+        if my_callback_void is not None:
+            self.my_callback_void = my_callback_void
+        if my_callback_contextual is not None:
+            self.my_callback_contextual = my_callback_contextual
+        if sum_delegate_1 is not None:
+            self.sum_delegate_1 = sum_delegate_1
+        if sum_delegate_2 is not None:
+            self.sum_delegate_2 = sum_delegate_2
+        if sum_delegate_return is not None:
+            self.sum_delegate_return = sum_delegate_return
+        if sum_delegate_return_2 is not None:
+            self.sum_delegate_return_2 = sum_delegate_return_2
+
+    @property
+    def my_callback(self):
+        return ctypes.Structure.__get__(self, "my_callback")
+
+    @my_callback.setter
+    def my_callback(self, value):
+        return ctypes.Structure.__set__(self, "my_callback", value)
+
+    @property
+    def my_callback_namespaced(self):
+        return ctypes.Structure.__get__(self, "my_callback_namespaced")
+
+    @my_callback_namespaced.setter
+    def my_callback_namespaced(self, value):
+        return ctypes.Structure.__set__(self, "my_callback_namespaced", value)
+
+    @property
+    def my_callback_void(self):
+        return ctypes.Structure.__get__(self, "my_callback_void")
+
+    @my_callback_void.setter
+    def my_callback_void(self, value):
+        return ctypes.Structure.__set__(self, "my_callback_void", value)
+
+    @property
+    def my_callback_contextual(self):
+        return ctypes.Structure.__get__(self, "my_callback_contextual")
+
+    @my_callback_contextual.setter
+    def my_callback_contextual(self, value):
+        return ctypes.Structure.__set__(self, "my_callback_contextual", value)
+
+    @property
+    def sum_delegate_1(self):
+        return ctypes.Structure.__get__(self, "sum_delegate_1")
+
+    @sum_delegate_1.setter
+    def sum_delegate_1(self, value):
+        return ctypes.Structure.__set__(self, "sum_delegate_1", value)
+
+    @property
+    def sum_delegate_2(self):
+        return ctypes.Structure.__get__(self, "sum_delegate_2")
+
+    @sum_delegate_2.setter
+    def sum_delegate_2(self, value):
+        return ctypes.Structure.__set__(self, "sum_delegate_2", value)
+
+    @property
+    def sum_delegate_return(self):
+        return ctypes.Structure.__get__(self, "sum_delegate_return")
+
+    @sum_delegate_return.setter
+    def sum_delegate_return(self, value):
+        return ctypes.Structure.__set__(self, "sum_delegate_return", value)
+
+    @property
+    def sum_delegate_return_2(self):
+        return ctypes.Structure.__get__(self, "sum_delegate_return_2")
+
+    @sum_delegate_return_2.setter
+    def sum_delegate_return_2(self, value):
+        return ctypes.Structure.__set__(self, "sum_delegate_return_2", value)
+
+
 class NestedArray(ctypes.Structure):
 
     # These fields represent the underlying C data layout
@@ -1761,17 +2066,17 @@ class NestedArray(ctypes.Structure):
         return ctypes.Structure.__set__(self, "field_struct", value)
 
 
-class SliceUseAsciiStringPattern(ctypes.Structure):
+class SliceUseCStrPtr(ctypes.Structure):
     # These fields represent the underlying C data layout
     _fields_ = [
-        ("data", ctypes.POINTER(UseAsciiStringPattern)),
+        ("data", ctypes.POINTER(UseCStrPtr)),
         ("len", ctypes.c_uint64),
     ]
 
     def __len__(self):
         return self.len
 
-    def __getitem__(self, i) -> UseAsciiStringPattern:
+    def __getitem__(self, i) -> UseCStrPtr:
         if i < 0:
             index = self.len+i
         else:
@@ -1782,31 +2087,31 @@ class SliceUseAsciiStringPattern(ctypes.Structure):
 
         return self.data[index]
 
-    def copied(self) -> SliceUseAsciiStringPattern:
+    def copied(self) -> SliceUseCStrPtr:
         """Returns a shallow, owned copy of the underlying slice.
 
         The returned object owns the immediate data, but not the targets of any contained
         pointers. In other words, if your struct contains any pointers the returned object
         may only be used as long as these pointers are valid. If the struct did not contain
         any pointers the returned object is valid indefinitely."""
-        array = (UseAsciiStringPattern * len(self))()
-        ctypes.memmove(array, self.data, len(self) * ctypes.sizeof(UseAsciiStringPattern))
-        rval = SliceUseAsciiStringPattern(data=ctypes.cast(array, ctypes.POINTER(UseAsciiStringPattern)), len=len(self))
+        array = (UseCStrPtr * len(self))()
+        ctypes.memmove(array, self.data, len(self) * ctypes.sizeof(UseCStrPtr))
+        rval = SliceUseCStrPtr(data=ctypes.cast(array, ctypes.POINTER(UseCStrPtr)), len=len(self))
         rval.owned = array  # Store array in returned slice to prevent memory deallocation
         return rval
 
-    def __iter__(self) -> typing.Iterable[UseAsciiStringPattern]:
+    def __iter__(self) -> typing.Iterable[UseCStrPtr]:
         return _Iter(self)
 
-    def iter(self) -> typing.Iterable[UseAsciiStringPattern]:
+    def iter(self) -> typing.Iterable[UseCStrPtr]:
         """Convenience method returning a value iterator."""
         return iter(self)
 
-    def first(self) -> UseAsciiStringPattern:
+    def first(self) -> UseCStrPtr:
         """Returns the first element of this slice."""
         return self[0]
 
-    def last(self) -> UseAsciiStringPattern:
+    def last(self) -> UseCStrPtr:
         """Returns the last element of this slice."""
         return self[len(self)-1]
 
@@ -1972,6 +2277,42 @@ class SliceMutVec(ctypes.Structure):
         return self[len(self)-1]
 
 
+class ResultNestedArray(ctypes.Structure):
+    """Result that contains value or an error."""
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("t", NestedArray),
+        ("err", ctypes.c_int),
+    ]
+
+    def __init__(self, t: NestedArray = None, err = None):
+        if t is not None:
+            self.t = t
+        if err is not None:
+            self.err = err
+
+    @property
+    def t(self) -> NestedArray:
+        """Element if err is `Ok`."""
+        return ctypes.Structure.__get__(self, "t")
+
+    @t.setter
+    def t(self, value: NestedArray):
+        """Element if err is `Ok`."""
+        return ctypes.Structure.__set__(self, "t", value)
+
+    @property
+    def err(self):
+        """Error value."""
+        return ctypes.Structure.__get__(self, "err")
+
+    @err.setter
+    def err(self, value):
+        """Error value."""
+        return ctypes.Structure.__set__(self, "err", value)
+
+
 class SliceMutCharArray(ctypes.Structure):
     # These fields represent the underlying C data layout
     _fields_ = [
@@ -2039,25 +2380,26 @@ class callbacks:
     """Helpers to define callbacks."""
     fn_u8_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8)
     fn_CharArray = ctypes.CFUNCTYPE(None, CharArray)
-    fn_CharArray = ctypes.CFUNCTYPE(None, CharArray)
-    fn_SliceU8_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, SliceU8)
-    fn_SliceVec3f32_rval_Vec3f32 = ctypes.CFUNCTYPE(Vec3f32, SliceVec3f32)
-    fn_SliceMutU8 = ctypes.CFUNCTYPE(None, SliceMutU8)
-    fn_u8_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8)
-    fn_u32_rval_u32 = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)
-    fn_u32_rval_u32 = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32)
+    fn_CharArray_ConstPtr = ctypes.CFUNCTYPE(None, CharArray, ctypes.c_void_p)
+    fn_SliceU8_ConstPtr_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, SliceU8, ctypes.c_void_p)
+    fn_SliceVec3f32_ConstPtr_rval_Vec3f32 = ctypes.CFUNCTYPE(Vec3f32, SliceVec3f32, ctypes.c_void_p)
+    fn_SliceMutU8_ConstPtr = ctypes.CFUNCTYPE(None, SliceMutU8, ctypes.c_void_p)
+    fn_u8_ConstPtr_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8, ctypes.c_void_p)
+    fn_u32_ConstPtr_rval_u32 = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p)
+    fn_ConstPtr_u32_ConstPtr = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_uint32, ctypes.c_void_p)
+    fn_u32_ConstPtr_rval_u32 = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p)
+    fn_ConstPtr_ConstPtr = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p)
     fn_ConstPtr = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
-    fn = ctypes.CFUNCTYPE(None, )
-    fn_i32_i32_rval_i32 = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_int32, ctypes.c_int32)
-    fn_i32_i32_rval_FFIError = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32)
-    fn_i32_i32 = ctypes.CFUNCTYPE(None, ctypes.c_int32, ctypes.c_int32)
+    fn_i32_i32_ConstPtr_rval_i32 = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)
+    fn_i32_i32_ConstPtr_rval_FFIError = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)
+    fn_i32_i32_ConstPtr = ctypes.CFUNCTYPE(None, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)
 
 
-class BasicService:
+class ServiceAsync:
     __api_lock = object()
 
     def __init__(self, api_lock, ctx):
-        assert(api_lock == BasicService.__api_lock), "You must create this with a static constructor." 
+        assert(api_lock == ServiceAsync.__api_lock), "You must create this with a static constructor." 
         self._ctx = ctx
 
     @property
@@ -2065,15 +2407,54 @@ class BasicService:
         return self._ctx
 
     @staticmethod
-    def new() -> BasicService:
+    def new() -> ServiceAsync:
         """"""
         ctx = ctypes.c_void_p()
-        c_lib.basic_service_new(ctx, )
-        self = BasicService(BasicService.__api_lock, ctx)
+        c_lib.service_async_new(ctx, )
+        self = ServiceAsync(ServiceAsync.__api_lock, ctx)
         return self
 
     def __del__(self):
-        c_lib.basic_service_destroy(self._ctx, )
+        c_lib.service_async_destroy(self._ctx, )
+    def return_after_ms(self, x: int, ms: int, _async_callback):
+        """"""
+        return c_lib.service_async_return_after_ms(self._ctx, x, ms, _async_callback)
+
+    def process_struct(self, x: NestedArray, _async_callback):
+        """"""
+        return c_lib.service_async_process_struct(self._ctx, x, _async_callback)
+
+    def handle_string(self, s, _async_callback):
+        """"""
+        return c_lib.service_async_handle_string(self._ctx, s, _async_callback)
+
+    def bad(self, ):
+        """"""
+        return c_lib.service_async_bad(self._ctx, )
+
+
+
+class ServiceBasic:
+    __api_lock = object()
+
+    def __init__(self, api_lock, ctx):
+        assert(api_lock == ServiceBasic.__api_lock), "You must create this with a static constructor." 
+        self._ctx = ctx
+
+    @property
+    def _as_parameter_(self):
+        return self._ctx
+
+    @staticmethod
+    def new() -> ServiceBasic:
+        """"""
+        ctx = ctypes.c_void_p()
+        c_lib.service_basic_new(ctx, )
+        self = ServiceBasic(ServiceBasic.__api_lock, ctx)
+        return self
+
+    def __del__(self):
+        c_lib.service_basic_destroy(self._ctx, )
 
 
 class ServiceOnPanic:
@@ -2109,7 +2490,7 @@ class ServiceOnPanic:
 
     def return_ub_on_panic(self, ) -> bytes:
         """ This function has no panic safeguards. It will be a bit faster to
- call, but if it panics your host app will be in an undefined state."""
+ call, but if it panics your host app will abort."""
         rval = c_lib.service_on_panic_return_ub_on_panic(self._ctx, )
         return ctypes.string_at(rval)
 
@@ -2140,26 +2521,30 @@ class ServiceCallbacks:
     def callback_simple(self, callback):
         """"""
         if not hasattr(callback, "__ctypes_from_outparam__"):
-            callback = callbacks.fn_u32_rval_u32(callback)
+            callback = callbacks.fn_u32_ConstPtr_rval_u32(callback)
 
         return c_lib.service_callbacks_callback_simple(self._ctx, callback)
 
     def callback_ffi_return(self, callback):
         """"""
         if not hasattr(callback, "__ctypes_from_outparam__"):
-            callback = callbacks.fn_i32_i32_rval_FFIError(callback)
+            callback = callbacks.fn_i32_i32_ConstPtr_rval_FFIError(callback)
 
         return c_lib.service_callbacks_callback_ffi_return(self._ctx, callback)
 
     def callback_with_slice(self, callback, input: SliceI32 | ctypes.Array[ctypes.c_int32]):
         """"""
         if not hasattr(callback, "__ctypes_from_outparam__"):
-            callback = callbacks.fn_i32_i32_rval_FFIError(callback)
+            callback = callbacks.fn_i32_i32_ConstPtr_rval_FFIError(callback)
 
         if hasattr(input, "_length_") and getattr(input, "_type_", "") == ctypes.c_int32:
             input = SliceI32(data=ctypes.cast(input, ctypes.POINTER(ctypes.c_int32)), len=len(input))
 
         return c_lib.service_callbacks_callback_with_slice(self._ctx, callback, input)
+
+    def set_delegate_table(self, table: DelegateTable):
+        """"""
+        return c_lib.service_callbacks_set_delegate_table(self._ctx, table)
 
     def invoke_delegates(self, ):
         """"""

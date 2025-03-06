@@ -155,7 +155,7 @@ impl TypePattern {
             Self::Bool => CType::Primitive(PrimitiveType::U8),
             Self::CChar => c_char::type_info(),
             Self::APIVersion => CType::Primitive(PrimitiveType::U64),
-            Self::AsyncCallback(_) => panic!("TODO: We probably don't want to emit async callbacks as fallbacks?"),
+            Self::AsyncCallback(x) => CType::FnPointer(x.fnpointer().clone()),
             Self::Utf8String(x) => CType::Composite(x.clone()),
         }
     }

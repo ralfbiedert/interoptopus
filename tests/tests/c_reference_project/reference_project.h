@@ -16,14 +16,14 @@ const uint8_t U8 = 255;
 const float F32_MIN_POSITIVE = 0.000000000000000000000000000000000000011754944;
 const int32_t COMPUTED_I32 = -2147483647;
 
-/// Documented enum.
+///  Documented enum.
 typedef enum ENUMDOCUMENTED
     {
-    /// Variant A.
+    ///  Variant A.
     ENUMDOCUMENTED_A = 0,
-    /// Variant B.
+    ///  Variant B.
     ENUMDOCUMENTED_B = 1,
-    /// Variant B.
+    ///  Variant B.
     ENUMDOCUMENTED_C = 2,
     } ENUMDOCUMENTED;
 
@@ -32,34 +32,50 @@ typedef enum ENUMRENAMED
     ENUMRENAMED_X = 0,
     } ENUMRENAMED;
 
-typedef struct BASICSERVICE BASICSERVICE;
-
 typedef struct GENERIC2U8 GENERIC2U8;
 
 typedef struct GENERIC3 GENERIC3;
 
 typedef struct GENERIC4 GENERIC4;
 
-/// Some struct we want to expose as a class.
+typedef struct SERVICEASYNC SERVICEASYNC;
+
+typedef struct SERVICEBASIC SERVICEBASIC;
+
+///  Some struct we want to expose as a class.
 typedef struct SERVICECALLBACKS SERVICECALLBACKS;
 
 typedef struct SERVICEIGNORINGMETHODS SERVICEIGNORINGMETHODS;
 
-/// Some struct we want to expose as a class.
+///  Some struct we want to expose as a class.
 typedef struct SERVICEMULTIPLECTORS SERVICEMULTIPLECTORS;
 
-/// Some struct we want to expose as a class.
+///  Some struct we want to expose as a class.
 typedef struct SERVICEONPANIC SERVICEONPANIC;
 
-/// Some struct we want to expose as a class.
+///  Some struct we want to expose as a class.
 typedef struct SERVICESTRINGS SERVICESTRINGS;
 
-/// Services can use lifetimes. However, they are more dangerous to use
-/// via FFI, since you will not get any help tracking lifetimes there.
+///  Services can use lifetimes. However, they are more dangerous to use
+///  via FFI, since you will not get any help tracking lifetimes there.
 typedef struct SERVICEUSINGLIFETIMES SERVICEUSINGLIFETIMES;
 
-/// Some struct we want to expose as a class.
+///  Some struct we want to expose as a class.
 typedef struct SERVICEVARIOUSSLICES SERVICEVARIOUSSLICES;
+
+///  UTF-8 string marshalling helper.
+/// 
+///  A highly dangerous 'use once type' that has ownership semantics!
+///  Once passed over an FFI boundary 'the other side' is meant to own
+///  (and free) it. Rust handles that fine, but if in C# you put this
+///  in a struct and then call Rust multiple times with that struct 
+///  you'll free the same pointer multiple times, and get UB!
+typedef struct UTF8STRING
+    {
+    uint8_t* ptr;
+    uint64_t len;
+    uint64_t capacity;
+    } UTF8STRING;
 
 typedef enum FFIERROR
     {
@@ -107,10 +123,10 @@ typedef struct PHANTOMU8
     uint32_t x;
     } PHANTOMU8;
 
-/// Documented struct.
+///  Documented struct.
 typedef struct STRUCTDOCUMENTED
     {
-    /// Documented field.
+    ///  Documented field.
     float x;
     } STRUCTDOCUMENTED;
 
@@ -124,10 +140,15 @@ typedef struct TUPLED
     uint8_t x0;
     } TUPLED;
 
-typedef struct USEASCIISTRINGPATTERN
+typedef struct USECSTRPTR
     {
     const char* ascii_string;
-    } USEASCIISTRINGPATTERN;
+    } USECSTRPTR;
+
+typedef struct USEUTF8STRING
+    {
+    UTF8STRING s;
+    } USEUTF8STRING;
 
 typedef struct VEC
     {
@@ -173,35 +194,38 @@ typedef struct WEIRD1U32
 
 typedef uint8_t (*fptr_fn_u8_rval_u8)(uint8_t x0);
 
-typedef uint8_t (*CALLBACKU8)(uint8_t VALUE);
+/// Result that contains value or an error.
+typedef struct RESULTU64
+    {
+    /// Element if err is `Ok`.
+    uint64_t t;
+    /// Error value.
+    FFIERROR err;
+    } RESULTU64;
 
-typedef uint32_t (*MYCALLBACK)(uint32_t VALUE);
-
-typedef uint32_t (*MYCALLBACKNAMESPACED)(uint32_t VALUE);
-
-typedef void (*SUMDELEGATE1)();
-
-typedef int32_t (*SUMDELEGATE2)(int32_t X, int32_t Y);
-
-typedef FFIERROR (*SUMDELEGATERETURN)(int32_t X, int32_t Y);
-
-typedef void (*SUMDELEGATERETURN2)(int32_t X, int32_t Y);
+/// Result that contains value or an error.
+typedef struct RESULTUTF8STRING
+    {
+    /// Element if err is `Ok`.
+    UTF8STRING t;
+    /// Error value.
+    FFIERROR err;
+    } RESULTUTF8STRING;
 
 typedef struct ARRAY
     {
     uint8_t data[16];
     } ARRAY;
 
-typedef struct CHARARRAY
-    {
-    char str[32];
-    char str_2[32];
-    } CHARARRAY;
-
 typedef struct CONTAINER
     {
     LOCAL foreign;
     } CONTAINER;
+
+typedef struct FIXEDSTRING
+    {
+    uint8_t data[32];
+    } FIXEDSTRING;
 
 typedef struct GENERICU32
     {
@@ -220,79 +244,113 @@ typedef struct WEIRD2U8
     const uint8_t* r;
     } WEIRD2U8;
 
-///A pointer to an array of data someone else owns which may not be modified.
+/// A pointer to an array of data someone else owns which may not be modified.
 typedef struct SLICEBOOL
     {
-    ///Pointer to start of immutable data.
+    /// Pointer to start of immutable data.
     const uint8_t* data;
-    ///Number of elements.
+    /// Number of elements.
     uint64_t len;
     } SLICEBOOL;
 
-///A pointer to an array of data someone else owns which may not be modified.
+/// A pointer to an array of data someone else owns which may not be modified.
 typedef struct SLICEI32
     {
-    ///Pointer to start of immutable data.
+    /// Pointer to start of immutable data.
     const int32_t* data;
-    ///Number of elements.
+    /// Number of elements.
     uint64_t len;
     } SLICEI32;
 
-///A pointer to an array of data someone else owns which may not be modified.
+/// A pointer to an array of data someone else owns which may not be modified.
 typedef struct SLICEU32
     {
-    ///Pointer to start of immutable data.
+    /// Pointer to start of immutable data.
     const uint32_t* data;
-    ///Number of elements.
+    /// Number of elements.
     uint64_t len;
     } SLICEU32;
 
-///A pointer to an array of data someone else owns which may not be modified.
+/// A pointer to an array of data someone else owns which may not be modified.
 typedef struct SLICEU8
     {
-    ///Pointer to start of immutable data.
+    /// Pointer to start of immutable data.
     const uint8_t* data;
-    ///Number of elements.
+    /// Number of elements.
     uint64_t len;
     } SLICEU8;
 
-///A pointer to an array of data someone else owns which may be modified.
+/// A pointer to an array of data someone else owns which may be modified.
 typedef struct SLICEMUTU32
     {
-    ///Pointer to start of mutable data.
+    /// Pointer to start of mutable data.
     const uint32_t* data;
-    ///Number of elements.
+    /// Number of elements.
     uint64_t len;
     } SLICEMUTU32;
 
-///A pointer to an array of data someone else owns which may be modified.
+/// A pointer to an array of data someone else owns which may be modified.
 typedef struct SLICEMUTU8
     {
-    ///Pointer to start of mutable data.
+    /// Pointer to start of mutable data.
     const uint8_t* data;
-    ///Number of elements.
+    /// Number of elements.
     uint64_t len;
     } SLICEMUTU8;
 
-///Option type containing boolean flag and maybe valid data.
+/// Option type containing boolean flag and maybe valid data.
 typedef struct OPTIONINNER
     {
-    ///Element that is maybe valid.
+    /// Element that is maybe valid.
     INNER t;
-    ///Byte where `1` means element `t` is valid.
+    /// Byte where `1` means element `t` is valid.
     uint8_t is_some;
     } OPTIONINNER;
 
-///Option type containing boolean flag and maybe valid data.
+/// Option type containing boolean flag and maybe valid data.
 typedef struct OPTIONVEC
     {
-    ///Element that is maybe valid.
+    /// Element that is maybe valid.
     VEC t;
-    ///Byte where `1` means element `t` is valid.
+    /// Byte where `1` means element `t` is valid.
     uint8_t is_some;
     } OPTIONVEC;
 
-typedef void (*MYCALLBACKVOID)(const void* PTR);
+typedef uint8_t (*CALLBACKU8)(uint8_t VALUE, const void* CALLBACK_DATA);
+
+typedef uint32_t (*MYCALLBACK)(uint32_t VALUE, const void* CALLBACK_DATA);
+
+typedef void (*MYCALLBACKCONTEXTUAL)(const void* CONTEXT, uint32_t VALUE, const void* CALLBACK_DATA);
+
+typedef uint32_t (*MYCALLBACKNAMESPACED)(uint32_t VALUE, const void* CALLBACK_DATA);
+
+typedef void (*MYCALLBACKVOID)(const void* PTR, const void* CALLBACK_DATA);
+
+typedef void (*SUMDELEGATE1)(const void* CALLBACK_DATA);
+
+typedef int32_t (*SUMDELEGATE2)(int32_t X, int32_t Y, const void* CALLBACK_DATA);
+
+typedef FFIERROR (*SUMDELEGATERETURN)(int32_t X, int32_t Y, const void* CALLBACK_DATA);
+
+typedef void (*SUMDELEGATERETURN2)(int32_t X, int32_t Y, const void* CALLBACK_DATA);
+
+typedef struct CHARARRAY
+    {
+    FIXEDSTRING str;
+    FIXEDSTRING str_2;
+    } CHARARRAY;
+
+typedef struct DELEGATETABLE
+    {
+    MYCALLBACK my_callback;
+    MYCALLBACKNAMESPACED my_callback_namespaced;
+    MYCALLBACKVOID my_callback_void;
+    MYCALLBACKCONTEXTUAL my_callback_contextual;
+    SUMDELEGATE1 sum_delegate_1;
+    SUMDELEGATE2 sum_delegate_2;
+    SUMDELEGATERETURN sum_delegate_return;
+    SUMDELEGATERETURN2 sum_delegate_return_2;
+    } DELEGATETABLE;
 
 typedef struct NESTEDARRAY
     {
@@ -305,61 +363,80 @@ typedef struct NESTEDARRAY
     ARRAY field_struct;
     } NESTEDARRAY;
 
-typedef void (*fptr_fn_CharArray)(CHARARRAY x0);
-
-///A pointer to an array of data someone else owns which may not be modified.
-typedef struct SLICEUSEASCIISTRINGPATTERN
+/// A pointer to an array of data someone else owns which may not be modified.
+typedef struct SLICEUSECSTRPTR
     {
-    ///Pointer to start of immutable data.
-    const USEASCIISTRINGPATTERN* data;
-    ///Number of elements.
+    /// Pointer to start of immutable data.
+    const USECSTRPTR* data;
+    /// Number of elements.
     uint64_t len;
-    } SLICEUSEASCIISTRINGPATTERN;
+    } SLICEUSECSTRPTR;
 
-///A pointer to an array of data someone else owns which may not be modified.
+/// A pointer to an array of data someone else owns which may not be modified.
 typedef struct SLICEVEC
     {
-    ///Pointer to start of immutable data.
+    /// Pointer to start of immutable data.
     const VEC* data;
-    ///Number of elements.
+    /// Number of elements.
     uint64_t len;
     } SLICEVEC;
 
-///A pointer to an array of data someone else owns which may not be modified.
+/// A pointer to an array of data someone else owns which may not be modified.
 typedef struct SLICEVEC3F32
     {
-    ///Pointer to start of immutable data.
+    /// Pointer to start of immutable data.
     const VEC3F32* data;
-    ///Number of elements.
+    /// Number of elements.
     uint64_t len;
     } SLICEVEC3F32;
 
-///A pointer to an array of data someone else owns which may be modified.
+/// A pointer to an array of data someone else owns which may be modified.
 typedef struct SLICEMUTVEC
     {
-    ///Pointer to start of mutable data.
+    /// Pointer to start of mutable data.
     const VEC* data;
-    ///Number of elements.
+    /// Number of elements.
     uint64_t len;
     } SLICEMUTVEC;
 
-typedef void (*CALLBACKCHARARRAY2)(CHARARRAY VALUE);
+typedef uint8_t (*CALLBACKFFISLICE)(SLICEU8 SLICE, const void* CALLBACK_DATA);
 
-typedef uint8_t (*CALLBACKFFISLICE)(SLICEU8 SLICE);
+typedef void (*CALLBACKSLICEMUT)(SLICEMUTU8 SLICE, const void* CALLBACK_DATA);
 
-typedef void (*CALLBACKSLICEMUT)(SLICEMUTU8 SLICE);
+typedef void (*fptr_fn_ConstPtrResultU64_ConstPtr)(const RESULTU64* x0, const void* x1);
 
-///A pointer to an array of data someone else owns which may be modified.
+typedef void (*fptr_fn_ConstPtrResultUtf8String_ConstPtr)(const RESULTUTF8STRING* x0, const void* x1);
+
+typedef void (*fptr_fn_CharArray)(CHARARRAY x0);
+
+/// Result that contains value or an error.
+typedef struct RESULTNESTEDARRAY
+    {
+    /// Element if err is `Ok`.
+    NESTEDARRAY t;
+    /// Error value.
+    FFIERROR err;
+    } RESULTNESTEDARRAY;
+
+typedef void (*CALLBACKCHARARRAY2)(CHARARRAY VALUE, const void* CALLBACK_DATA);
+
+typedef VEC3F32 (*CALLBACKHUGEVECSLICE)(SLICEVEC3F32 SLICE, const void* CALLBACK_DATA);
+
+/// A pointer to an array of data someone else owns which may be modified.
 typedef struct SLICEMUTCHARARRAY
     {
-    ///Pointer to start of mutable data.
+    /// Pointer to start of mutable data.
     const CHARARRAY* data;
-    ///Number of elements.
+    /// Number of elements.
     uint64_t len;
     } SLICEMUTCHARARRAY;
 
-typedef VEC3F32 (*CALLBACKHUGEVECSLICE)(SLICEVEC3F32 SLICE);
+typedef void (*fptr_fn_ConstPtrResultNestedArray_ConstPtr)(const RESULTNESTEDARRAY* x0, const void* x1);
 
+
+int64_t interoptopus_string_create(const void* UTF8, uint64_t LEN, UTF8STRING* RVAL);
+
+int64_t interoptopus_string_destroy(UTF8STRING UTF8);
 
 void primitive_void();
 
@@ -391,9 +468,9 @@ int64_t many_args_10(int64_t X0, int64_t X1, int64_t X2, int64_t X3, int64_t X4,
 
 const int64_t* ptr(const int64_t* X);
 
-/// # Safety
-///
-/// Parameter x must point to valid data.
+///  # Safety
+/// 
+///  Parameter x must point to valid data.
 int64_t* ptr_mut(int64_t* X);
 
 const const int64_t** ptr_ptr(const const int64_t** X);
@@ -446,7 +523,7 @@ uint8_t char_array_3(const CHARARRAY* ARR);
 
 bool bool_field(BOOLFIELD X);
 
-/// This function has documentation.
+///  This function has documentation.
 ENUMDOCUMENTED documented(STRUCTDOCUMENTED X);
 
 VEC1 ambiguous_1(VEC1 X);
@@ -485,7 +562,15 @@ const char* pattern_ascii_pointer_4(const char* X, uint32_t L);
 
 uint8_t pattern_ascii_pointer_5(const char* X, uint32_t I);
 
-SLICEUSEASCIISTRINGPATTERN pattern_ascii_pointer_return_slice();
+SLICEUSECSTRPTR pattern_ascii_pointer_return_slice();
+
+UTF8STRING pattern_string_1(UTF8STRING X);
+
+uint32_t pattern_string_2(UTF8STRING X);
+
+UTF8STRING pattern_string_3();
+
+USEUTF8STRING pattern_string_4(USEUTF8STRING X);
 
 uint32_t pattern_ffi_slice_1(SLICEU32 FFI_SLICE);
 
@@ -535,143 +620,163 @@ FFIERROR pattern_callback_7(SUMDELEGATERETURN C1, SUMDELEGATERETURN2 C2, int32_t
 
 void pattern_surrogates_1(LOCAL S, CONTAINER* C);
 
-/// Destroys the given instance.
-///
-/// # Safety
-///
-/// The passed parameter MUST have been created with the corresponding init function;
-/// passing any other value results in undefined behavior.
-FFIERROR basic_service_destroy(BASICSERVICE** CONTEXT);
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+FFIERROR service_async_destroy(const SERVICEASYNC** _CONTEXT);
 
-FFIERROR basic_service_new(BASICSERVICE** CONTEXT);
+FFIERROR service_async_new(const SERVICEASYNC** _CONTEXT);
 
-/// Destroys the given instance.
-///
-/// # Safety
-///
-/// The passed parameter MUST have been created with the corresponding init function;
-/// passing any other value results in undefined behavior.
-FFIERROR service_on_panic_destroy(SERVICEONPANIC** CONTEXT);
+FFIERROR service_async_return_after_ms(const SERVICEASYNC* _CONTEXT, uint64_t X, uint64_t MS, fptr_fn_ConstPtrResultU64_ConstPtr _ASYNC_CALLBACK);
 
-FFIERROR service_on_panic_new(SERVICEONPANIC** CONTEXT);
+FFIERROR service_async_process_struct(const SERVICEASYNC* _CONTEXT, NESTEDARRAY X, fptr_fn_ConstPtrResultNestedArray_ConstPtr _ASYNC_CALLBACK);
 
-/// Methods returning a Result<(), _> are the default and do not
-/// need annotations.
-FFIERROR service_on_panic_return_result(const SERVICEONPANIC* CONTEXT, uint32_t ANON1);
+FFIERROR service_async_handle_string(const SERVICEASYNC* _CONTEXT, UTF8STRING S, fptr_fn_ConstPtrResultUtf8String_ConstPtr _ASYNC_CALLBACK);
 
-/// Methods returning a value need an `on_panic` annotation.
-uint32_t service_on_panic_return_default_value(const SERVICEONPANIC* CONTEXT, uint32_t X);
+void service_async_bad(SERVICEASYNC* _CONTEXT);
 
-/// This function has no panic safeguards. It will be a bit faster to
-/// call, but if it panics your host app will be in an undefined state.
-const char* service_on_panic_return_ub_on_panic(SERVICEONPANIC* CONTEXT);
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+FFIERROR service_basic_destroy(SERVICEBASIC** _CONTEXT);
 
-/// Destroys the given instance.
-///
-/// # Safety
-///
-/// The passed parameter MUST have been created with the corresponding init function;
-/// passing any other value results in undefined behavior.
-FFIERROR service_callbacks_destroy(SERVICECALLBACKS** CONTEXT);
+FFIERROR service_basic_new(SERVICEBASIC** _CONTEXT);
 
-FFIERROR service_callbacks_new(SERVICECALLBACKS** CONTEXT);
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+FFIERROR service_on_panic_destroy(SERVICEONPANIC** _CONTEXT);
 
-FFIERROR service_callbacks_callback_simple(SERVICECALLBACKS* CONTEXT, MYCALLBACK CALLBACK);
+FFIERROR service_on_panic_new(SERVICEONPANIC** _CONTEXT);
 
-FFIERROR service_callbacks_callback_ffi_return(SERVICECALLBACKS* CONTEXT, SUMDELEGATERETURN CALLBACK);
+///  Methods returning a Result<(), _> are the default and do not
+///  need annotations.
+FFIERROR service_on_panic_return_result(const SERVICEONPANIC* _CONTEXT, uint32_t ANON1);
 
-FFIERROR service_callbacks_callback_with_slice(SERVICECALLBACKS* CONTEXT, SUMDELEGATERETURN CALLBACK, SLICEI32 INPUT);
+///  Methods returning a value need an `on_panic` annotation.
+uint32_t service_on_panic_return_default_value(const SERVICEONPANIC* _CONTEXT, uint32_t X);
 
-FFIERROR service_callbacks_invoke_delegates(const SERVICECALLBACKS* CONTEXT);
+///  This function has no panic safeguards. It will be a bit faster to
+///  call, but if it panics your host app will abort.
+const char* service_on_panic_return_ub_on_panic(SERVICEONPANIC* _CONTEXT);
 
-/// Destroys the given instance.
-///
-/// # Safety
-///
-/// The passed parameter MUST have been created with the corresponding init function;
-/// passing any other value results in undefined behavior.
-FFIERROR service_ignoring_methods_destroy(SERVICEIGNORINGMETHODS** CONTEXT);
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+FFIERROR service_callbacks_destroy(SERVICECALLBACKS** _CONTEXT);
 
-FFIERROR service_ignoring_methods_new(SERVICEIGNORINGMETHODS** CONTEXT);
+FFIERROR service_callbacks_new(SERVICECALLBACKS** _CONTEXT);
 
-/// Destroys the given instance.
-///
-/// # Safety
-///
-/// The passed parameter MUST have been created with the corresponding init function;
-/// passing any other value results in undefined behavior.
-FFIERROR service_multiple_ctors_destroy(SERVICEMULTIPLECTORS** CONTEXT);
+FFIERROR service_callbacks_callback_simple(SERVICECALLBACKS* _CONTEXT, MYCALLBACK CALLBACK);
 
-FFIERROR service_multiple_ctors_new_with(SERVICEMULTIPLECTORS** CONTEXT, uint32_t SOME_VALUE);
+FFIERROR service_callbacks_callback_ffi_return(SERVICECALLBACKS* _CONTEXT, SUMDELEGATERETURN CALLBACK);
 
-FFIERROR service_multiple_ctors_new_without(SERVICEMULTIPLECTORS** CONTEXT);
+FFIERROR service_callbacks_callback_with_slice(SERVICECALLBACKS* _CONTEXT, SUMDELEGATERETURN CALLBACK, SLICEI32 INPUT);
 
-FFIERROR service_multiple_ctors_new_with_string(SERVICEMULTIPLECTORS** CONTEXT, const char* ANON0);
+void service_callbacks_set_delegate_table(SERVICECALLBACKS* _CONTEXT, DELEGATETABLE TABLE);
 
-FFIERROR service_multiple_ctors_new_failing(SERVICEMULTIPLECTORS** CONTEXT, uint8_t SOME_VALUE);
+FFIERROR service_callbacks_invoke_delegates(const SERVICECALLBACKS* _CONTEXT);
 
-/// Destroys the given instance.
-///
-/// # Safety
-///
-/// The passed parameter MUST have been created with the corresponding init function;
-/// passing any other value results in undefined behavior.
-FFIERROR service_using_lifetimes_destroy(SERVICEUSINGLIFETIMES** CONTEXT);
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+FFIERROR service_ignoring_methods_destroy(SERVICEIGNORINGMETHODS** _CONTEXT);
 
-FFIERROR service_using_lifetimes_new_with(SERVICEUSINGLIFETIMES** CONTEXT, const uint32_t* SOME_VALUE);
+FFIERROR service_ignoring_methods_new(SERVICEIGNORINGMETHODS** _CONTEXT);
 
-void service_using_lifetimes_lifetime_1(SERVICEUSINGLIFETIMES* CONTEXT, SLICEBOOL SLICE);
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+FFIERROR service_multiple_ctors_destroy(SERVICEMULTIPLECTORS** _CONTEXT);
 
-void service_using_lifetimes_lifetime_2(SERVICEUSINGLIFETIMES* CONTEXT, SLICEBOOL SLICE);
+FFIERROR service_multiple_ctors_new_with(SERVICEMULTIPLECTORS** _CONTEXT, uint32_t SOME_VALUE);
+
+FFIERROR service_multiple_ctors_new_without(SERVICEMULTIPLECTORS** _CONTEXT);
+
+FFIERROR service_multiple_ctors_new_with_string(SERVICEMULTIPLECTORS** _CONTEXT, const char* ANON0);
+
+FFIERROR service_multiple_ctors_new_failing(SERVICEMULTIPLECTORS** _CONTEXT, uint8_t SOME_VALUE);
+
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+FFIERROR service_using_lifetimes_destroy(SERVICEUSINGLIFETIMES** _CONTEXT);
+
+FFIERROR service_using_lifetimes_new_with(SERVICEUSINGLIFETIMES** _CONTEXT, const uint32_t* SOME_VALUE);
+
+void service_using_lifetimes_lifetime_1(SERVICEUSINGLIFETIMES* _CONTEXT, SLICEBOOL SLICE);
+
+void service_using_lifetimes_lifetime_2(SERVICEUSINGLIFETIMES* _CONTEXT, SLICEBOOL SLICE);
 
 const char* service_using_lifetimes_return_string_accept_slice(SERVICEUSINGLIFETIMES* ANON0, SLICEU8 ANON1);
 
-/// Destroys the given instance.
-///
-/// # Safety
-///
-/// The passed parameter MUST have been created with the corresponding init function;
-/// passing any other value results in undefined behavior.
-FFIERROR service_various_slices_destroy(SERVICEVARIOUSSLICES** CONTEXT);
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+FFIERROR service_various_slices_destroy(SERVICEVARIOUSSLICES** _CONTEXT);
 
-FFIERROR service_various_slices_new(SERVICEVARIOUSSLICES** CONTEXT);
+FFIERROR service_various_slices_new(SERVICEVARIOUSSLICES** _CONTEXT);
 
-uint8_t service_various_slices_mut_self(SERVICEVARIOUSSLICES* CONTEXT, SLICEU8 SLICE);
+uint8_t service_various_slices_mut_self(SERVICEVARIOUSSLICES* _CONTEXT, SLICEU8 SLICE);
 
-/// Single line.
-void service_various_slices_mut_self_void(SERVICEVARIOUSSLICES* CONTEXT, SLICEBOOL SLICE);
+///  Single line.
+void service_various_slices_mut_self_void(SERVICEVARIOUSSLICES* _CONTEXT, SLICEBOOL SLICE);
 
-uint8_t service_various_slices_mut_self_ref(SERVICEVARIOUSSLICES* CONTEXT, const uint8_t* X, uint8_t* Y);
+uint8_t service_various_slices_mut_self_ref(SERVICEVARIOUSSLICES* _CONTEXT, const uint8_t* X, uint8_t* Y);
 
-uint8_t service_various_slices_mut_self_ref_slice(SERVICEVARIOUSSLICES* CONTEXT, const uint8_t* X, uint8_t* Y, SLICEU8 SLICE);
+uint8_t service_various_slices_mut_self_ref_slice(SERVICEVARIOUSSLICES* _CONTEXT, const uint8_t* X, uint8_t* Y, SLICEU8 SLICE);
 
-uint8_t service_various_slices_mut_self_ref_slice_limited(SERVICEVARIOUSSLICES* CONTEXT, const uint8_t* X, uint8_t* Y, SLICEU8 SLICE, SLICEU8 SLICE2);
+uint8_t service_various_slices_mut_self_ref_slice_limited(SERVICEVARIOUSSLICES* _CONTEXT, const uint8_t* X, uint8_t* Y, SLICEU8 SLICE, SLICEU8 SLICE2);
 
-FFIERROR service_various_slices_mut_self_ffi_error(SERVICEVARIOUSSLICES* CONTEXT, SLICEMUTU8 SLICE);
+FFIERROR service_various_slices_mut_self_ffi_error(SERVICEVARIOUSSLICES* _CONTEXT, SLICEMUTU8 SLICE);
 
-FFIERROR service_various_slices_mut_self_no_error(SERVICEVARIOUSSLICES* CONTEXT, SLICEMUTU8 SLICE);
+FFIERROR service_various_slices_mut_self_no_error(SERVICEVARIOUSSLICES* _CONTEXT, SLICEMUTU8 SLICE);
 
-/// Warning, you _must_ discard the returned slice object before calling into this service
-/// again, as otherwise undefined behavior might happen.
-SLICEU32 service_various_slices_return_slice(SERVICEVARIOUSSLICES* CONTEXT);
+///  Warning, you _must_ discard the returned slice object before calling into this service
+///  again, as otherwise undefined behavior might happen.
+SLICEU32 service_various_slices_return_slice(SERVICEVARIOUSSLICES* _CONTEXT);
 
-/// Warning, you _must_ discard the returned slice object before calling into this service
-/// again, as otherwise undefined behavior might happen.
-SLICEMUTU32 service_various_slices_return_slice_mut(SERVICEVARIOUSSLICES* CONTEXT);
+///  Warning, you _must_ discard the returned slice object before calling into this service
+///  again, as otherwise undefined behavior might happen.
+SLICEMUTU32 service_various_slices_return_slice_mut(SERVICEVARIOUSSLICES* _CONTEXT);
 
-/// Destroys the given instance.
-///
-/// # Safety
-///
-/// The passed parameter MUST have been created with the corresponding init function;
-/// passing any other value results in undefined behavior.
-FFIERROR service_strings_destroy(SERVICESTRINGS** CONTEXT);
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+FFIERROR service_strings_destroy(SERVICESTRINGS** _CONTEXT);
 
-FFIERROR service_strings_new(SERVICESTRINGS** CONTEXT);
+FFIERROR service_strings_new(SERVICESTRINGS** _CONTEXT);
 
-void service_strings_pass_string(SERVICESTRINGS* CONTEXT, const char* ANON1);
+void service_strings_pass_string(SERVICESTRINGS* _CONTEXT, const char* ANON1);
 
-const char* service_strings_return_string(SERVICESTRINGS* CONTEXT);
+const char* service_strings_return_string(SERVICESTRINGS* _CONTEXT);
 
 
 #ifdef __cplusplus

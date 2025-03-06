@@ -64,6 +64,18 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &CType
                 write_type_definition_composite(i, w, x)?;
                 w.newline()?;
             }
+            TypePattern::Utf8String(x) => {
+                write_type_definition_composite(i, w, x)?;
+                w.newline()?;
+            }
+            TypePattern::Result(x) => {
+                write_type_definition_composite(i, w, x)?;
+                w.newline()?;
+            }
+            TypePattern::AsyncCallback(x) => {
+                write_type_definition_fn_pointer(i, w, x.fnpointer(), known_function_pointers)?;
+                w.newline()?;
+            }
             TypePattern::Bool => {}
             TypePattern::CChar => {}
             TypePattern::APIVersion => {}

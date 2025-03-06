@@ -24,9 +24,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 7627744572083768741ul)
+            if (api_version != 8615964985678512413ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (7627744572083768741). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (8615964985678512413). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -433,10 +433,10 @@ namespace My.Company
             }
         }
 
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_3b")]
-        public static partial void pattern_ffi_slice_3b(SliceMutU8 slice, CallbackSliceMut callback);
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_3")]
+        public static partial void pattern_ffi_slice_3(SliceMutU8 slice, CallbackSliceMut callback);
 
-        public static unsafe void pattern_ffi_slice_3b(Span<byte> slice, CallbackSliceMutDelegate callback)
+        public static unsafe void pattern_ffi_slice_3(Span<byte> slice, CallbackSliceMutDelegate callback)
         {
             fixed (void* ptr_slice = slice)
             {
@@ -444,7 +444,7 @@ namespace My.Company
                 var callback_wrapped = new CallbackSliceMut(callback);
                 try
                 {
-                    pattern_ffi_slice_3b(slice_slice, callback_wrapped);
+                    pattern_ffi_slice_3(slice_slice, callback_wrapped);
                 }
                 finally
                 {
