@@ -1,6 +1,6 @@
 use crate::converter::{field_name_to_csharp_name, function_name_to_csharp_name, to_typespecifier_in_rval};
 use crate::interop::functions::write_function;
-use crate::interop::patterns::services::{write_pattern_service_method, write_service_method_overload};
+use crate::interop::patterns::services::{write_pattern_service_method, write_service_method_overload, MethodType};
 use crate::interop::types::composite::write_type_definition_composite_body;
 use crate::interop::types::enums::write_type_definition_enum;
 use crate::interop::FunctionNameFlavor;
@@ -264,7 +264,7 @@ impl<'a> Markdown<'a> {
                 w.newline()?;
                 indented!(w, r"#### Definition ")?;
                 indented!(w, r"```csharp")?;
-                write_pattern_service_method(self.interop, w, pattern, x, class_name, &fname, true, true, WriteFor::Docs)?;
+                write_pattern_service_method(self.interop, w, pattern, x, class_name, &fname, MethodType::Ctor, WriteFor::Docs)?;
                 indented!(w, r"```")?;
                 w.newline()?;
                 indented!(w, r"---")?;
@@ -296,7 +296,7 @@ impl<'a> Markdown<'a> {
                 indented!(w, r"```csharp")?;
                 indented!(w, r"{} class {} {{", self.interop.visibility_types.to_access_modifier(), class_name)?;
                 w.indent();
-                write_pattern_service_method(self.interop, w, pattern, x, &rval, &fname, false, false, WriteFor::Docs)?;
+                write_pattern_service_method(self.interop, w, pattern, x, &rval, &fname, MethodType::Regular, WriteFor::Docs)?;
                 write_service_method_overload(self.interop, w, pattern, x, &fname, WriteFor::Docs)?;
                 w.unindent();
                 indented!(w, r"}}")?;

@@ -10,6 +10,7 @@
 //! by a backend**.
 
 use crate::patterns::callbacks::AsyncCallback;
+use crate::patterns::result::FFIResultType;
 use crate::patterns::TypePattern;
 use crate::util::{capitalize_first_letter, ctypes_from_type_recursive, IdPrettifier};
 use std::collections::HashSet;
@@ -236,6 +237,15 @@ impl CType {
         }
     }
 
+    /// Convenience method attempting to convert the contained type as a composite.
+    #[must_use]
+    pub const fn as_result(&self) -> Option<&FFIResultType> {
+        match self {
+            Self::Pattern(TypePattern::Result(x)) => Some(x),
+            _ => None,
+        }
+    }
+
     /// Convenience method attempting to convert the contained type as an Async callback.
     #[must_use]
     pub const fn as_async_callback(&self) -> Option<&AsyncCallback> {
@@ -245,7 +255,7 @@ impl CType {
         }
     }
 
-    /// Convenience method attempting to convert the contained type as an Async callback.
+    /// Convenience method attempting to get the pointer target of a contained type.
     #[must_use]
     pub const fn pointer_target(&self) -> Option<&Self> {
         match self {

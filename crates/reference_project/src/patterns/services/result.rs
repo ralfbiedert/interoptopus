@@ -12,7 +12,7 @@ impl ServiceResult {
         FFIResult::ok(Self {})
     }
 
-    pub fn test() -> FFIResult<(), FFIError> {
+    pub fn test(&self) -> FFIResult<(), FFIError> {
         FFIResult::err(FFIError::Fail)
     }
 }

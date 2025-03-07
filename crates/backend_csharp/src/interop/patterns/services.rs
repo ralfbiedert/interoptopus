@@ -8,6 +8,12 @@ use interoptopus::util::longest_common_prefix;
 use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, Error};
 
+pub enum MethodType {
+    Ctor,
+    Dtor,
+    Regular,
+}
+
 pub fn write_pattern_service(i: &Interop, w: &mut IndentWriter, class: &ServiceDefinition) -> Result<(), Error> {
     i.debug(w, "write_pattern_service")?;
     let mut all_functions = class.constructors().to_vec();
@@ -32,12 +38,12 @@ pub fn write_pattern_service(i: &Interop, w: &mut IndentWriter, class: &ServiceD
         let rval = format!("static {context_type_name}");
 
         write_documentation(w, ctor.meta().documentation())?;
-        write_pattern_service_method(i, w, class, ctor, &rval, &fn_name, true, true, WriteFor::Code)?;
+        write_pattern_service_method(i, w, class, ctor, &rval, &fn_name, MethodType::Ctor, WriteFor::Code)?;
         w.newline()?;
     }
 
     // Dtor
-    write_pattern_service_method(i, w, class, class.destructor(), "void", "Dispose", true, false, WriteFor::Code)?;
+    write_pattern_service_method(i, w, class, class.destructor(), "void", "Dispose", MethodType::Dtor, WriteFor::Code)?;
     w.newline()?;
 
     for function in class.methods() {
@@ -52,7 +58,7 @@ pub fn write_pattern_service(i: &Interop, w: &mut IndentWriter, class: &ServiceD
             _ => to_typespecifier_in_rval(function.signature().rval()),
         };
         write_documentation(w, function.meta().documentation())?;
-        write_pattern_service_method(i, w, class, function, &rval, &fn_name, false, false, WriteFor::Code)?;
+        write_pattern_service_method(i, w, class, function, &rval, &fn_name, MethodType::Regular, WriteFor::Code)?;
         write_service_method_overload(i, w, class, function, &fn_name, WriteFor::Code)?;
 
         w.newline()?;
@@ -76,8 +82,7 @@ pub fn write_pattern_service_method(
     function: &Function,
     rval: &str,
     fn_name: &str,
-    write_contxt_by_ref: bool,
-    is_ctor: bool,
+    method_type: MethodType,
     write_for: WriteFor,
 ) -> Result<(), Error> {
     i.debug(w, "write_pattern_service_method")?;
@@ -93,7 +98,13 @@ pub fn write_pattern_service_method(
 
     // For every parameter except the first, figure out how we should forward
     // it to the invocation we perform.
-    for p in function.signature().params().iter().skip(1) {
+    let skip = match method_type {
+        MethodType::Ctor => 0,
+        MethodType::Dtor => 1,
+        MethodType::Regular => 1,
+    };
+
+    for p in function.signature().params().iter().skip(skip) {
         let name = p.name();
 
         // If we call the checked function we want to resolve a `SliceU8` to a `byte[]`,
@@ -146,24 +157,28 @@ pub fn write_pattern_service_method(
             FunctionNameFlavor::RawFFIName
         },
     );
-    let extra_args = if to_invoke.is_empty() {
-        String::new()
-    } else {
-        format!(", {}", to_invoke.join(", "))
-    };
 
     // Assemble actual function call.
-    let context = if write_contxt_by_ref {
-        if is_ctor {
-            "ref self._context"
-        } else {
-            "ref _context"
+    let invoke_args = match method_type {
+        MethodType::Ctor => {
+            if to_invoke.is_empty() {
+                String::new()
+            } else {
+                format!("{}", to_invoke.join(", "))
+            }
         }
-    } else {
-        "_context"
+        MethodType::Dtor => "_context".to_string(),
+        MethodType::Regular => {
+            if to_invoke.is_empty() {
+                "_context".to_string()
+            } else {
+                format!("_context, {}", to_invoke.join(", "))
+            }
+        }
     };
+
     let arg_tokens = names.iter().zip(types.iter()).map(|(n, t)| format!("{t} {n}")).collect::<Vec<_>>();
-    let fn_call = format!(r"{}.{}({}{})", i.class, method_to_invoke, context, extra_args);
+    let fn_call = format!(r"{}.{}({})", i.class, method_to_invoke, invoke_args);
 
     // Write signature.
     let signature = format!(r"public {} {}({})", rval, fn_name, arg_tokens.join(", "));
@@ -175,31 +190,37 @@ pub fn write_pattern_service_method(
     indented!(w, "{}", signature)?;
     indented!(w, r"{{")?;
 
-    if is_ctor {
+    if matches!(method_type, MethodType::Ctor) {
         indented!(w, [()], r"var self = new {}();", class.the_type().rust_name())?;
     }
 
     // Determine return value behavior and write function call.
     match function.signature().rval() {
         CType::Pattern(TypePattern::FFIErrorEnum(e)) if async_rval.is_none() => {
-            indented!(w, [()], r"{}.Ok();", fn_call)?;
+            indented!(w, [()], r"{fn_call}.Ok();")?;
         }
         CType::Pattern(TypePattern::FFIErrorEnum(_)) if async_rval.is_some() => {
-            indented!(w, [()], r"return {};", fn_call)?;
+            indented!(w, [()], r"return {fn_call};")?;
         }
         CType::Pattern(TypePattern::CStrPointer) => {
-            indented!(w, [()], r"var s = {};", fn_call)?;
+            indented!(w, [()], r"var s = {fn_call};")?;
             indented!(w, [()], r"return Marshal.PtrToStringAnsi(s);")?;
         }
         CType::Primitive(PrimitiveType::Void) => {
-            indented!(w, [()], r"{};", fn_call)?;
+            indented!(w, [()], r"{fn_call};",)?;
+        }
+        _ if matches!(method_type, MethodType::Ctor) => {
+            indented!(w, [()], r"self._context = {fn_call}.Ok();")?;
+        }
+        _ if matches!(method_type, MethodType::Dtor) => {
+            indented!(w, [()], r"{fn_call}.Ok();")?;
         }
         _ => {
-            indented!(w, [()], r"return {};", fn_call)?;
+            indented!(w, [()], r"return {fn_call};")?;
         }
     }
 
-    if is_ctor {
+    if matches!(method_type, MethodType::Ctor) {
         indented!(w, [()], r"return self;")?;
     }
 

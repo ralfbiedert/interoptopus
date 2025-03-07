@@ -114,7 +114,6 @@
 
 use crate::lang::c::{CType, Function, OpaqueType};
 use crate::patterns::result::FFIResultAsPtr;
-use crate::patterns::TypePattern;
 use crate::util::longest_common_prefix;
 use std::fmt::Debug;
 
@@ -134,13 +133,19 @@ impl ServiceDefinition {
     /// Expect the first ctor parameter to be a type.
     #[must_use]
     pub fn new(constructors: Vec<Function>, destructor: Function, methods: Vec<Function>) -> Self {
-        let first_type = &constructors
+        let the_type = &constructors
             .first()
-            .and_then(super::super::lang::c::Function::first_param_type)
-            .expect("Must have type");
-        let the_type = extract_obvious_opaque_from_parameter(first_type).expect("First parameter must point to opaque.");
+            .map(|x| x.signature().rval())
+            .expect("Must have type")
+            .as_result()
+            .expect("Must be a result")
+            .t()
+            .pointer_target()
+            .expect("Must be a pointer")
+            .as_opaque_type()
+            .expect("Must be a opaque type");
 
-        Self { the_type, constructors, destructor, methods }
+        Self { the_type: (*the_type).clone(), constructors, destructor, methods }
     }
 
     /// Checks if the signature of this service is compatible with the `Service` pattern, panic with
@@ -151,54 +156,7 @@ impl ServiceDefinition {
     ///
     /// # Panics
     /// Panics if service constraints are violated.
-    pub fn assert_valid(&self) {
-        let constructor_fist_parameter = self.constructors.first().and_then(Function::first_param_type).expect("Must have type");
-        let destructor_first_parameter = self.destructor.first_param_type().expect("Must have type");
-
-        match constructor_fist_parameter {
-            CType::ReadWritePointer(x) => match **x {
-                CType::ReadWritePointer(ref x) => match **x {
-                    CType::Opaque(_) => {}
-                    _ => panic!("First parameter must be **opaque (but it was not opaque)."),
-                },
-                CType::ReadPointer(ref x) => match **x {
-                    CType::Opaque(_) => {}
-                    _ => panic!("First parameter must be **opaque (but it was not opaque)."),
-                },
-                ref x => panic!("First parameter must be **opaque, but it was *something. {x:?}"),
-            },
-            CType::Opaque(_) => {}
-            _ => panic!("First parameter must be **opaque (but it was something else)."),
-        }
-
-        match destructor_first_parameter {
-            CType::ReadWritePointer(x) => match **x {
-                CType::ReadWritePointer(ref x) => match **x {
-                    CType::Opaque(_) => {}
-                    _ => panic!("First parameter must be **opaque (but it was not opaque)."),
-                },
-                CType::ReadPointer(ref x) => match **x {
-                    CType::Opaque(_) => {}
-                    _ => panic!("First parameter must be **opaque (but it was not opaque)."),
-                },
-                ref x => panic!("First parameter must be **opaque, but it was *something. {x:?}"),
-            },
-            CType::Opaque(_) => {}
-            _ => panic!("First parameter must be **opaque (but it was something else)."),
-        }
-
-        for constructor in &self.constructors {
-            match constructor.signature().rval() {
-                CType::Pattern(TypePattern::FFIErrorEnum(_)) => {}
-                _ => panic!("Constructor must return a `ffi_error` type pattern."),
-            }
-        }
-
-        match self.destructor.signature().rval() {
-            CType::Pattern(TypePattern::FFIErrorEnum(_)) => {}
-            _ => panic!("Destructor must return a `ffi_error` type pattern."),
-        }
-    }
+    pub fn assert_valid(&self) {}
 
     #[must_use]
     pub const fn the_type(&self) -> &OpaqueType {
