@@ -12,14 +12,13 @@ public class TestPatternServicesAsync
     public async void service_async_explicit_basic()
     {
         var s = ServiceAsync.New();
-        var r1 = await s.ReturnAfterMs(123, 500);
-        var r2 = await s.HandleString("abc");
+        var r1 = (await s.ReturnAfterMs(123, 500)).Ok();
+        var r2 = (await s.HandleString("abc")).Ok();
         
         s.Dispose();
         
-        var ss = r2.Ok();
-        Assert.Equal(r1.Ok(), 123u);
-        Assert.Equal(r2.Ok(), "abc");
+        Assert.Equal(r1, 123u);
+        Assert.Equal(r2, "abc");
     }
     
     
@@ -33,8 +32,8 @@ public class TestPatternServicesAsync
             var x = Random.Shared.Next(100, 1000);
             var ms = Random.Shared.Next(100, 1000);
             
-            var r = await s.ReturnAfterMs((ulong) x, (ulong) ms);
-            Assert.Equal((int) r.Ok(), x);
+            var r = (await s.ReturnAfterMs((ulong)x, (ulong)ms)).Ok();
+            Assert.Equal((int) r, x);
         }).ToList();
         
         await Task.WhenAll(tasks);
@@ -56,10 +55,10 @@ public class TestPatternServicesAsync
             },
             field_int = 123,
         };
-        var r = await s.ProcessStruct(a);
+        var r = (await s.ProcessStruct(a)).Ok();
         s.Dispose();
         
-        Assert.Equal(r.Ok().field_int, 124);
+        Assert.Equal(r.field_int, 124);
     }
 
 }

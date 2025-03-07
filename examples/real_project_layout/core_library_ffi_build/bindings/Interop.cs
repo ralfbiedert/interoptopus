@@ -53,8 +53,6 @@ namespace My.Company
 
     }
 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct Vec2
     {
         public float x;
@@ -126,6 +124,12 @@ namespace My.Company
     public partial struct ResultFFIError
     {
         public ResultFFIError(FFIError e) { _err = e; }
+
+        public static ResultFFIError OK => new ResultFFIError(FFIError.Ok);
+        public static ResultFFIError NULL => new ResultFFIError(FFIError.Null);
+        public static ResultFFIError PANIC => new ResultFFIError(FFIError.Panic);
+        public static ResultFFIError DELEGATE => new ResultFFIError(FFIError.Delegate);
+        public static ResultFFIError FAIL => new ResultFFIError(FFIError.Fail);
 
         public void Ok()
         {

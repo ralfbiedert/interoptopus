@@ -27,9 +27,9 @@ pub mod patterns {
         pub mod callback;
         pub mod converter;
         pub mod ignored;
-        pub mod lifetime;
         pub mod multiple_ctors;
         pub mod on_panic;
+        pub mod result;
         pub mod slice;
         pub mod string;
     }
@@ -151,11 +151,11 @@ pub fn ffi_inventory() -> Inventory {
             // Patterns
             .register(pattern!(patterns::services::asynk::ServiceAsync))
             .register(pattern!(patterns::services::basic::ServiceBasic))
+            .register(pattern!(patterns::services::result::ServiceResult))
             .register(pattern!(patterns::services::on_panic::ServiceOnPanic))
             .register(pattern!(patterns::services::callback::ServiceCallbacks))
             .register(pattern!(patterns::services::ignored::ServiceIgnoringMethods))
             .register(pattern!(patterns::services::multiple_ctors::ServiceMultipleCtors))
-            .register(pattern!(patterns::services::lifetime::ServiceUsingLifetimes))
             .register(pattern!(patterns::services::slice::ServiceVariousSlices))
             .register(pattern!(patterns::services::string::ServiceStrings))
             .validate()

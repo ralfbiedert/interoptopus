@@ -21,8 +21,6 @@ namespace My.Company.Common
 {
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct Vec
     {
         public double x;
@@ -983,14 +981,12 @@ namespace My.Company.Common
 
     // Debug - write_type_definition_composite 
     ///Option type containing boolean flag and maybe valid data.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct OptionVec
     {
         ///Element that is maybe valid.
-        internal Vec t;
+        Vec t;
         ///Byte where `1` means element `t` is valid.
-        internal byte is_some;
+        byte is_some;
     }
 
     // Debug - write_type_definition_composite_marshaller 

@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 7273415914452811554ul)
+            if (api_version != 1064556727969646338ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (7273415914452811554). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (1064556727969646338). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -1029,13 +1029,13 @@ namespace My.Company
         public static partial ResultFFIError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o);
 
         // Debug - write_function_overload 
-        public static unsafe void pattern_callback_7(SumDelegateReturnDelegate c1, SumDelegateReturn2Delegate c2, int x, int i, out int o)
+        public static unsafe ResultFFIError pattern_callback_7(SumDelegateReturnDelegate c1, SumDelegateReturn2Delegate c2, int x, int i, out int o)
         {
             var c1_wrapped = new SumDelegateReturn(c1);
             var c2_wrapped = new SumDelegateReturn2(c2);
             try
             {
-                pattern_callback_7(c1_wrapped, c2_wrapped, x, i, out o).Ok();
+                return pattern_callback_7(c1_wrapped, c2_wrapped, x, i, out o);
             }
             finally
             {
@@ -1094,6 +1094,7 @@ namespace My.Company
             try
             {
                 service_async_return_after_ms(_context, x, ms, cb).Ok();
+                return cs.Task;
             }
             finally
             {
@@ -1121,6 +1122,7 @@ namespace My.Company
             try
             {
                 service_async_process_struct(_context, x, cb).Ok();
+                return cs.Task;
             }
             finally
             {
@@ -1149,6 +1151,7 @@ namespace My.Company
             try
             {
                 service_async_handle_string(_context, s_wrapped, cb).Ok();
+                return cs.Task;
             }
             finally
             {
@@ -1164,6 +1167,14 @@ namespace My.Company
 
         // Debug - write_function_overload 
         // Debug - no overload for service_async_bad 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "ffff")]
+        // Debug - write_function_declaration 
+        public static partial ResultMutPtrServiceBasicFFIError ffff();
+
+        // Debug - write_function_overload 
+        // Debug - no overload for ffff 
 
         // Debug - write_function 
         /// Destroys the given instance.
@@ -1266,12 +1277,12 @@ namespace My.Company
         public static partial ResultFFIError service_callbacks_callback_simple(IntPtr _context, MyCallback callback);
 
         // Debug - write_function_overload 
-        public static unsafe void service_callbacks_callback_simple(IntPtr _context, MyCallbackDelegate callback)
+        public static unsafe ResultFFIError service_callbacks_callback_simple(IntPtr _context, MyCallbackDelegate callback)
         {
             var callback_wrapped = new MyCallback(callback);
             try
             {
-                service_callbacks_callback_simple(_context, callback_wrapped).Ok();
+                return service_callbacks_callback_simple(_context, callback_wrapped);
             }
             finally
             {
@@ -1285,12 +1296,12 @@ namespace My.Company
         public static partial ResultFFIError service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturn callback);
 
         // Debug - write_function_overload 
-        public static unsafe void service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturnDelegate callback)
+        public static unsafe ResultFFIError service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturnDelegate callback)
         {
             var callback_wrapped = new SumDelegateReturn(callback);
             try
             {
-                service_callbacks_callback_ffi_return(_context, callback_wrapped).Ok();
+                return service_callbacks_callback_ffi_return(_context, callback_wrapped);
             }
             finally
             {
@@ -1304,7 +1315,7 @@ namespace My.Company
         public static partial ResultFFIError service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturn callback, SliceI32 input);
 
         // Debug - write_function_overload 
-        public static unsafe void service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
+        public static unsafe ResultFFIError service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
         {
             fixed (void* ptr_input = input)
             {
@@ -1312,7 +1323,7 @@ namespace My.Company
                 var callback_wrapped = new SumDelegateReturn(callback);
                 try
                 {
-                    service_callbacks_callback_with_slice(_context, callback_wrapped, input_slice).Ok();
+                    return service_callbacks_callback_with_slice(_context, callback_wrapped, input_slice);
                 }
                 finally
                 {
@@ -1617,14 +1628,14 @@ namespace My.Company
         public static partial ResultFFIError service_various_slices_mut_self_ffi_error(IntPtr _context, SliceMutU8 slice);
 
         // Debug - write_function_overload 
-        public static unsafe void service_various_slices_mut_self_ffi_error(IntPtr _context, Span<byte> slice)
+        public static unsafe ResultFFIError service_various_slices_mut_self_ffi_error(IntPtr _context, Span<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                 try
                 {
-                    service_various_slices_mut_self_ffi_error(_context, slice_slice).Ok();
+                    return service_various_slices_mut_self_ffi_error(_context, slice_slice);
                 }
                 finally
                 {
@@ -1638,14 +1649,14 @@ namespace My.Company
         public static partial ResultFFIError service_various_slices_mut_self_no_error(IntPtr _context, SliceMutU8 slice);
 
         // Debug - write_function_overload 
-        public static unsafe void service_various_slices_mut_self_no_error(IntPtr _context, Span<byte> slice)
+        public static unsafe ResultFFIError service_various_slices_mut_self_no_error(IntPtr _context, Span<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceMutU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                 try
                 {
-                    service_various_slices_mut_self_no_error(_context, slice_slice).Ok();
+                    return service_various_slices_mut_self_no_error(_context, slice_slice);
                 }
                 finally
                 {
@@ -1732,8 +1743,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct Array
     {
         public byte[] data;
@@ -1801,8 +1810,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct BoolField
     {
         public bool val;
@@ -1857,8 +1864,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct CharArray
     {
         public FixedString str;
@@ -1924,8 +1929,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct Container
     {
         public Local foreign;
@@ -1982,8 +1985,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct DelegateTable
     {
         public MyCallback my_callback;
@@ -2103,8 +2104,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct ExtraTypef32
     {
         public float x;
@@ -2159,8 +2158,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct FixedString
     {
         public byte[] data;
@@ -2228,8 +2225,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct Genericu32
     {
         public IntPtr x;
@@ -2284,8 +2279,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct Genericu8
     {
         public IntPtr x;
@@ -2340,11 +2333,9 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct Inner
     {
-        internal float x;
+        float x;
     }
 
     // Debug - write_type_definition_composite_marshaller 
@@ -2396,11 +2387,9 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct Local
     {
-        internal uint x;
+        uint x;
     }
 
     // Debug - write_type_definition_composite_marshaller 
@@ -2452,8 +2441,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct NestedArray
     {
         public EnumRenamed field_enum;
@@ -2580,8 +2567,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public partial struct Packed1
     {
         public byte x;
@@ -2643,8 +2628,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public partial struct Packed2
     {
         public ushort y;
@@ -2706,8 +2689,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct Phantomu8
     {
         public uint x;
@@ -2763,8 +2744,6 @@ namespace My.Company
 
     // Debug - write_type_definition_composite 
     /// Documented struct.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct StructDocumented
     {
         /// Documented field.
@@ -2820,8 +2799,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct StructRenamed
     {
         public EnumRenamed e;
@@ -2876,8 +2853,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct Tupled
     {
         public byte x0;
@@ -2932,8 +2907,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct UseCStrPtr
     {
         public string ascii_string;
@@ -2988,8 +2961,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct UseUtf8String
     {
         public string s;
@@ -3046,8 +3017,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct Vec1
     {
         public float x;
@@ -3109,8 +3078,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct Vec2
     {
         public double x;
@@ -3172,8 +3139,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct Vec3f32
     {
         public float x;
@@ -3242,12 +3207,10 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct Visibility1
     {
         public byte pblc;
-        internal byte prvt;
+        byte prvt;
     }
 
     // Debug - write_type_definition_composite_marshaller 
@@ -3305,8 +3268,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct Visibility2
     {
         public byte pblc1;
@@ -3368,11 +3329,9 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct Weird1u32
     {
-        internal uint x;
+        uint x;
     }
 
     // Debug - write_type_definition_composite_marshaller 
@@ -3424,13 +3383,11 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct Weird2u8
     {
-        internal byte t;
-        internal byte[] a;
-        internal IntPtr r;
+        byte t;
+        byte[] a;
+        IntPtr r;
     }
 
     // Debug - write_type_definition_composite_marshaller 
@@ -3927,14 +3884,12 @@ namespace My.Company
 
     // Debug - write_type_definition_composite 
     ///Option type containing boolean flag and maybe valid data.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct OptionInner
     {
         ///Element that is maybe valid.
-        internal Inner t;
+        Inner t;
         ///Byte where `1` means element `t` is valid.
-        internal byte is_some;
+        byte is_some;
     }
 
     // Debug - write_type_definition_composite_marshaller 
@@ -4017,14 +3972,91 @@ namespace My.Company
 
     // Debug - write_type_definition_composite 
     ///Result that contains value or an error.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
+    public partial struct ResultMutPtrServiceBasicFFIError
+    {
+        ///Element if err is `Ok`.
+        IntPtr t;
+        ///Error value.
+        FFIError err;
+    }
+
+    // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct ResultMutPtrServiceBasicFFIError
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public IntPtr t;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public FFIError err;
+        }
+
+        [CustomMarshaller(typeof(ResultMutPtrServiceBasicFFIError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private ResultMutPtrServiceBasicFFIError _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(ResultMutPtrServiceBasicFFIError managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(ResultMutPtrServiceBasicFFIError managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.t = _managed.t;
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.err = _managed.err;
+
+                return _unmanaged;
+            }
+
+            public unsafe ResultMutPtrServiceBasicFFIError ToManaged()
+            {
+                _managed = new ResultMutPtrServiceBasicFFIError();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.t = _unmanaged.t;
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.err = _unmanaged.err;
+
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    // Debug - write_pattern_result 
+    public partial struct ResultMutPtrServiceBasicFFIError
+    {
+        public IntPtr Ok()
+        {
+            if (err == FFIError.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<FFIError>(err);
+        }
+
+    }
+
+
+    // Debug - write_type_definition_composite 
+    ///Result that contains value or an error.
     public partial struct ResultNestedArrayFFIError
     {
         ///Element if err is `Ok`.
-        internal NestedArray t;
+        NestedArray t;
         ///Error value.
-        internal FFIError err;
+        FFIError err;
     }
 
     // Debug - write_type_definition_composite_marshaller 
@@ -4100,14 +4132,12 @@ namespace My.Company
 
     // Debug - write_type_definition_composite 
     ///Result that contains value or an error.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct ResultU32FFIError
     {
         ///Element if err is `Ok`.
-        internal uint t;
+        uint t;
         ///Error value.
-        internal FFIError err;
+        FFIError err;
     }
 
     // Debug - write_type_definition_composite_marshaller 
@@ -4181,14 +4211,12 @@ namespace My.Company
 
     // Debug - write_type_definition_composite 
     ///Result that contains value or an error.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct ResultU64FFIError
     {
         ///Element if err is `Ok`.
-        internal ulong t;
+        ulong t;
         ///Error value.
-        internal FFIError err;
+        FFIError err;
     }
 
     // Debug - write_type_definition_composite_marshaller 
@@ -4262,14 +4290,12 @@ namespace My.Company
 
     // Debug - write_type_definition_composite 
     ///Result that contains value or an error.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct ResultUtf8StringFFIError
     {
         ///Element if err is `Ok`.
-        internal string t;
+        string t;
         ///Error value.
-        internal FFIError err;
+        FFIError err;
     }
 
     // Debug - write_type_definition_composite_marshaller 
@@ -5573,9 +5599,9 @@ namespace My.Company
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public void CallbackSimple(MyCallbackDelegate callback)
+        public ResultFFIError CallbackSimple(MyCallbackDelegate callback)
         {
-            Interop.service_callbacks_callback_simple(_context, callback);
+            return Interop.service_callbacks_callback_simple(_context, callback);
         }
 
         // Debug - write_pattern_service_method 
@@ -5586,9 +5612,9 @@ namespace My.Company
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public void CallbackFfiReturn(SumDelegateReturnDelegate callback)
+        public ResultFFIError CallbackFfiReturn(SumDelegateReturnDelegate callback)
         {
-            Interop.service_callbacks_callback_ffi_return(_context, callback);
+            return Interop.service_callbacks_callback_ffi_return(_context, callback);
         }
 
         // Debug - write_pattern_service_method 
@@ -5599,9 +5625,9 @@ namespace My.Company
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public void CallbackWithSlice(SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
+        public ResultFFIError CallbackWithSlice(SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
         {
-            Interop.service_callbacks_callback_with_slice(_context, callback, input);
+            return Interop.service_callbacks_callback_with_slice(_context, callback, input);
         }
 
         // Debug - write_pattern_service_method 
@@ -5855,9 +5881,9 @@ namespace My.Company
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public void MutSelfFfiError(Span<byte> slice)
+        public ResultFFIError MutSelfFfiError(Span<byte> slice)
         {
-            Interop.service_various_slices_mut_self_ffi_error(_context, slice);
+            return Interop.service_various_slices_mut_self_ffi_error(_context, slice);
         }
 
         // Debug - write_pattern_service_method 
@@ -5868,9 +5894,9 @@ namespace My.Company
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public void MutSelfNoError(Span<byte> slice)
+        public ResultFFIError MutSelfNoError(Span<byte> slice)
         {
-            Interop.service_various_slices_mut_self_no_error(_context, slice);
+            return Interop.service_various_slices_mut_self_no_error(_context, slice);
         }
 
         /// Warning, you _must_ discard the returned slice object before calling into this service

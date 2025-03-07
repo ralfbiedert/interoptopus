@@ -126,7 +126,6 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     );
 
     let mut rval = match function.signature().rval() {
-        CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
         CType::Pattern(TypePattern::CStrPointer) => "string".to_string(),
         _ => to_typespecifier_in_rval(function.signature().rval()),
     };
@@ -226,6 +225,13 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         }
     }
 
+    for (n, t) in zip(&to_wrap_name, &to_wrap_type) {
+        indented!(w, [()], r"var {}_wrapped = new {}({});", n, t, n)?;
+    }
+
+    indented!(w, [()], r"try")?;
+    indented!(w, [()], r"{{")?;
+
     let fn_name = function_name_to_csharp_name(
         function,
         if i.rename_symbols {
@@ -235,17 +241,24 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         },
     );
 
-    for (n, t) in zip(&to_wrap_name, &to_wrap_type) {
-        indented!(w, [()], r"var {}_wrapped = new {}({});", n, t, n)?;
-    }
-
     let call = format!(r"{}({})", fn_name, to_invoke.join(", "));
 
-    indented!(w, [()], r"try")?;
-    indented!(w, [()], r"{{")?;
-    w.indent();
-    write_function_overloaded_invoke_with_error_handling(i, w, function, &call)?;
-    w.unindent();
+    match function.signature().rval() {
+        CType::Pattern(TypePattern::CStrPointer) => {
+            indented!(w, [()()], r"var s = {};", call)?;
+            indented!(w, [()()], r"return Marshal.PtrToStringAnsi(s);")?;
+        }
+        CType::Primitive(PrimitiveType::Void) => {
+            indented!(w, [()()], r"{};", call)?;
+        }
+        _ if async_rval.is_some() => {
+            indented!(w, [()()], r"{call}.Ok();")?;
+            indented!(w, [()()], r"return cs.Task;")?;
+        }
+        _ => {
+            indented!(w, [()()], r"return {call};")?;
+        }
+    }
     indented!(w, [()], r"}}")?;
     indented!(w, [()], r"finally")?;
     indented!(w, [()], r"{{")?;
@@ -266,25 +279,4 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     }
 
     indented!(w, r"}}")
-}
-
-/// Writes common error handling based on a call's return type.
-pub fn write_function_overloaded_invoke_with_error_handling(_i: &Interop, w: &mut IndentWriter, function: &Function, fn_call: &str) -> Result<(), Error> {
-    match function.signature().rval() {
-        CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
-            indented!(w, [()], r"{}.Ok();", fn_call)?;
-        }
-        CType::Pattern(TypePattern::CStrPointer) => {
-            indented!(w, [()], r"var s = {};", fn_call)?;
-            indented!(w, [()], r"return Marshal.PtrToStringAnsi(s);")?;
-        }
-        CType::Primitive(PrimitiveType::Void) => {
-            indented!(w, [()], r"{};", fn_call)?;
-        }
-        _ => {
-            indented!(w, [()], r"return {};", fn_call)?;
-        }
-    }
-
-    Ok(())
 }

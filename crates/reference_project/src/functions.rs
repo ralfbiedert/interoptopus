@@ -1,16 +1,16 @@
 //! Functions using all supported type patterns.
 
-use crate::patterns::result::{Error, FFIError};
+use crate::patterns::result::FFIError;
 use crate::types::{
     ambiguous1, ambiguous2, common, Array, BoolField, CallbackCharArray, Callbacku8u8, CharArray, EnumDocumented, EnumRenamedXYZ, FixedString, Generic, Generic2,
     Generic3, Generic4, NestedArray, Packed1, Packed2, Phantom, StructDocumented, StructRenamedXYZ, Transparent, Tupled, Vec3f32, Visibility1, Visibility2, Weird1,
     Weird2,
 };
+use interoptopus::ffi_function;
 use interoptopus::patterns::option::FFIOption;
-use interoptopus::patterns::result::{panics_and_errors_to_ffi_enum, FFIResult};
+use interoptopus::patterns::result::FFIResult;
 use interoptopus::patterns::slice::FFISlice;
 use interoptopus::patterns::slice::FFISliceMut;
-use interoptopus::{ffi_function, here};
 use std::time::Duration;
 
 #[ffi_function]
@@ -327,13 +327,7 @@ pub fn namespaced_inner_slice_mut(x: FFISliceMut<common::Vec>) -> FFISliceMut<co
 #[ffi_function]
 #[allow(unreachable_code)]
 pub fn panics() -> FFIError {
-    panics_and_errors_to_ffi_enum(
-        || {
-            panic!("Oh no");
-            Ok::<(), Error>(())
-        },
-        here!(),
-    )
+    panic!("Oh no");
 }
 
 #[ffi_function]

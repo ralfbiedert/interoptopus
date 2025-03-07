@@ -1,5 +1,6 @@
-use crate::patterns::result::{Error, FFIError};
+use crate::patterns::result::FFIError;
 use interoptopus::patterns::primitives::FFIBool;
+use interoptopus::patterns::result::FFIResult;
 use interoptopus::patterns::slice::{FFISlice, FFISliceMut};
 use interoptopus::{ffi_service, ffi_service_ctor, ffi_service_method, ffi_type};
 
@@ -10,11 +11,11 @@ pub struct ServiceVariousSlices {
 }
 
 // Regular implementation of methods.
-#[ffi_service(error = "FFIError")]
+#[ffi_service]
 impl ServiceVariousSlices {
     #[ffi_service_ctor]
-    pub fn new() -> Result<Self, Error> {
-        Ok(Self { data: vec![123; 64] })
+    pub fn new() -> FFIResult<Self, FFIError> {
+        FFIResult::ok(Self { data: vec![123; 64] })
     }
 
     #[ffi_service_method(on_panic = "return_default")]
@@ -44,13 +45,13 @@ impl ServiceVariousSlices {
 
     // This annotation isn't really needed, `ffi_error` is standard error handling.
     #[ffi_service_method(on_panic = "ffi_error")]
-    pub fn mut_self_ffi_error(&mut self, _slice: FFISliceMut<u8>) -> Result<(), Error> {
-        Ok(())
+    pub fn mut_self_ffi_error(&mut self, _slice: FFISliceMut<u8>) -> FFIResult<(), FFIError> {
+        FFIResult::ok(())
     }
 
-    pub fn mut_self_no_error(&mut self, mut slice: FFISliceMut<u8>) -> Result<(), Error> {
+    pub fn mut_self_no_error(&mut self, mut slice: FFISliceMut<u8>) -> FFIResult<(), FFIError> {
         slice.as_slice_mut();
-        Ok(())
+        FFIResult::ok(())
     }
 
     /// Warning, you _must_ discard the returned slice object before calling into this service

@@ -31,11 +31,10 @@
 use crate::lang::c::{CType, CompositeType, Documentation, EnumType, Field, Layout, Meta, PrimitiveType, Representation, Variant, Visibility};
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::TypePattern;
-use crate::util::{capitalize_first_letter, log_error};
+use crate::util::capitalize_first_letter;
 use std::any::Any;
 use std::fmt::Debug;
 use std::mem::MaybeUninit;
-use std::panic::AssertUnwindSafe;
 
 /// A trait you should implement for enums that signal errors in FFI calls.
 ///
@@ -79,7 +78,7 @@ use std::panic::AssertUnwindSafe;
 /// }
 ///
 /// ```
-pub trait FFIError: Sized {
+pub trait FFIError: PartialEq + Sized {
     /// The variant to return when everything went OK, usually the variant with value `0`.
     const SUCCESS: Self;
     /// Signals a null pointer was passed where an actual element was needed.
@@ -160,99 +159,6 @@ impl FFIResultType {
     }
 }
 
-/// Helper to transform [`Result`] types to [`FFIError::SUCCESS`] enums inside `extern "C"` functions.
-///
-/// This function executes the given closure `f`. If `f` returns `Ok(())` the `SUCCESS`
-/// variant is returned. On a panic or `Err` the respective error variant is returned instead.
-///
-/// # Feature Flags
-///
-/// If the `log` crate option is enabled this will invoke `log::error` on errors and panics.
-///
-/// # Example
-///
-/// ```
-/// use interoptopus::patterns::result::panics_and_errors_to_ffi_enum;
-/// use interoptopus::{ffi_type, ffi_function, here};
-/// # use std::fmt::{Display, Formatter};
-/// #
-/// # #[derive(Debug)]
-/// # pub enum Error {
-/// #     Bad,
-/// # }
-/// #
-/// # impl Display for Error {
-/// #    fn fmt(&self, _: &mut Formatter<'_>) -> std::fmt::Result {
-/// #        Ok(())
-/// #    }
-/// # }
-/// #
-/// # impl std::error::Error for Error {}
-///
-/// // The FFI error the library users will see.
-/// #[ffi_type(error)]
-/// pub enum MyFFIError {
-///     Ok = 0,
-///     Null = 100,
-///     Panic = 200,
-///     Fail = 300,
-/// }
-///
-/// // How to convert a normal error to an FFI Error.
-/// impl From<Error> for MyFFIError {
-///     fn from(x: Error) -> Self {
-///         match x {
-///             Error::Bad => Self::Fail,
-///         }
-///     }
-/// }
-///
-/// // Map special error conditions to your error type.
-/// impl interoptopus::patterns::result::FFIError for MyFFIError {
-///     const SUCCESS: Self = Self::Ok;
-///     const NULL: Self = Self::Null;
-///     const PANIC: Self = Self::Panic;
-/// }
-///
-/// // Now call a function that may panic or throw an error.
-/// #[ffi_function]
-/// #[allow(unreachable_code)]
-/// pub fn panics() -> MyFFIError {
-///     panics_and_errors_to_ffi_enum(
-///         || {
-///             panic!("Oh no");
-///             Ok::<(), Error>(())
-///         },
-///         here!(),
-///     )
-/// }
-/// ```
-///
-/// # Safety
-///
-/// Once [`FFIError::PANIC`] has been observed the enum's recipient should stop calling this API
-/// (and probably gracefully shutdown or restart), as any subsequent call risks causing a
-/// process abort.
-#[allow(unused_variables)]
-pub fn panics_and_errors_to_ffi_enum<E: Debug, FE: FFIError + From<E>>(f: impl FnOnce() -> Result<(), E>, error_context: &str) -> FE {
-    let result: Result<(), E> = match std::panic::catch_unwind(AssertUnwindSafe(f)) {
-        Ok(x) => x,
-        Err(e) => {
-            log_error(|| format!("Panic in ({}): {}", error_context, get_panic_message(e.as_ref())));
-            return FE::PANIC;
-        }
-    };
-
-    if let Err(e) = &result {
-        log_error(|| format!("Error in ({error_context}): {e:?}"));
-    }
-
-    match result {
-        Ok(()) => FE::SUCCESS,
-        Err(e) => FE::from(e),
-    }
-}
-
 /// Extracts a string message from a panic unwind.
 pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
     match pan.downcast_ref::<&'static str>() {
@@ -264,11 +170,27 @@ pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
     }
 }
 
+pub trait FFIResultAsPtr {
+    type AsPtr;
+}
+
+pub trait FFIResultAsUnitT {
+    type AsUnitT;
+}
+
 #[repr(C)]
 #[derive(Debug)]
 pub struct FFIResult<T, E> {
     t: MaybeUninit<T>,
     err: E,
+}
+
+impl<T, E> FFIResultAsPtr for FFIResult<T, E> {
+    type AsPtr = FFIResult<*const T, E>;
+}
+
+impl<T, E> FFIResultAsUnitT for FFIResult<T, E> {
+    type AsUnitT = FFIResult<(), E>;
 }
 
 impl<T, E> FFIResult<T, E>
@@ -278,6 +200,34 @@ where
 {
     pub const fn ok(t: T) -> Self {
         Self { t: MaybeUninit::new(t), err: E::SUCCESS }
+    }
+
+    pub const fn err(err: E) -> Self {
+        Self { t: MaybeUninit::uninit(), err }
+    }
+
+    pub const fn panic() -> Self {
+        Self { t: MaybeUninit::uninit(), err: E::PANIC }
+    }
+
+    pub const fn null() -> Self {
+        Self { t: MaybeUninit::uninit(), err: E::NULL }
+    }
+
+    pub fn is_ok(&self) -> bool {
+        self.err == E::SUCCESS
+    }
+
+    pub fn unwrap(self) -> T {
+        if self.is_ok() {
+            unsafe { self.t.assume_init() }
+        } else {
+            panic!("Called `unwrap` on an `FFIResult` that is not `Ok`.")
+        }
+    }
+
+    pub fn unwrap_err(&self) -> &E {
+        &self.err
     }
 }
 

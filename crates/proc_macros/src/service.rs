@@ -4,8 +4,8 @@ use crate::util::{get_type_name, pascal_to_snake_case, prettyprint_tokenstream};
 use darling::FromMeta;
 use function_impl::MethodType;
 use proc_macro2::TokenStream;
-use quote::quote;
-use syn::{ImplItem, ItemImpl, Visibility};
+use quote::{quote, ToTokens};
+use syn::{ImplItem, ItemImpl, ReturnType, Visibility};
 
 pub mod function_impl;
 
@@ -37,17 +37,26 @@ pub fn ffi_service(attr: TokenStream, input: &TokenStream) -> TokenStream {
     let item = syn::parse2::<ItemImpl>(input.clone()).expect("Must be item.");
     let service_type = &item.self_ty;
     let mut function_descriptors = Vec::new();
+    let mut rval = None;
 
     for impl_item in &item.items {
         if let ImplItem::Fn(method) = impl_item {
             if let Visibility::Public(_) = &method.vis {
                 if let Some(descriptor) = generate_service_method(&attributes, &item, method) {
+                    if matches!(descriptor.method_type, MethodType::Constructor(_)) {
+                        let rval_type = match &method.sig.output {
+                            ReturnType::Type(_, b) => b.to_token_stream(),
+                            _ => panic!("Must have return value"),
+                        };
+                        rval = Some(rval_type);
+                    }
                     function_descriptors.push(descriptor);
                 }
             }
         }
     }
 
+    let rval = rval.unwrap();
     let ffi_functions = function_descriptors.iter().map(|x| x.ffi_function_tokens.clone()).collect::<Vec<_>>();
     let ffi_dtor = generate_service_dtor(&attributes, &item);
     let ffi_method_ident = function_descriptors
@@ -75,6 +84,10 @@ pub fn ffi_service(attr: TokenStream, input: &TokenStream) -> TokenStream {
         )*
 
         #ffi_dtor_quote
+
+        impl <#lt> ::interoptopus::patterns::service::ServiceInfo for #service_type {
+            type CtorResult = #rval;
+        }
 
         impl <#lt> ::interoptopus::patterns::LibraryPatternInfo for #service_type {
             fn pattern_info() -> ::interoptopus::patterns::LibraryPattern {

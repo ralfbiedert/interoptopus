@@ -16,7 +16,7 @@ public class TestPatternServicesMultipleCtors
 
         try
         {
-            ServiceMultipleCtors.NewFailing(123);
+            var serviceMultipleCtors = ServiceMultipleCtors.NewFailing(123);
             Assert.True(false);
         }
         catch (InteropException<FFIError>) { }

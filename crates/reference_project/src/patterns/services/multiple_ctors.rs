@@ -1,4 +1,5 @@
-use crate::patterns::result::{Error, FFIError};
+use crate::patterns::result::FFIError;
+use interoptopus::patterns::result::FFIResult;
 use interoptopus::patterns::string::CStrPointer;
 use interoptopus::{ffi_service, ffi_service_ctor, ffi_type};
 
@@ -9,25 +10,25 @@ pub struct ServiceMultipleCtors {
 }
 
 // Regular implementation of methods.
-#[ffi_service(error = "FFIError")]
+#[ffi_service]
 impl ServiceMultipleCtors {
     #[ffi_service_ctor]
-    pub fn new_with(some_value: u32) -> Result<Self, Error> {
-        Ok(Self { data: vec![some_value; some_value as usize] })
+    pub fn new_with(some_value: u32) -> FFIResult<Self, FFIError> {
+        FFIResult::ok(Self { data: vec![some_value; some_value as usize] })
     }
 
     #[ffi_service_ctor]
-    pub fn new_without() -> Result<Self, Error> {
-        Ok(Self { data: vec![1, 2, 3] })
+    pub fn new_without() -> FFIResult<Self, FFIError> {
+        FFIResult::ok(Self { data: vec![1, 2, 3] })
     }
 
     #[ffi_service_ctor]
-    pub fn new_with_string(_: CStrPointer) -> Result<Self, Error> {
-        Ok(Self { data: vec![1, 2, 3] })
+    pub fn new_with_string(_: CStrPointer) -> FFIResult<Self, FFIError> {
+        FFIResult::ok(Self { data: vec![1, 2, 3] })
     }
 
     #[ffi_service_ctor]
-    pub fn new_failing(_some_value: u8) -> Result<Self, Error> {
-        Err(Error::Bad)
+    pub fn new_failing(_some_value: u8) -> FFIResult<Self, FFIError> {
+        FFIResult::err(FFIError::Fail)
     }
 }

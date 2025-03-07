@@ -243,7 +243,7 @@ pub fn write_common_service_method_overload(i: &Interop, w: &mut IndentWriter, f
     // Write checked method. These are "normal" methods that accept
     // common C# types.
     let rval = match function.signature().rval() {
-        CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
+        // CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
         CType::Pattern(TypePattern::CStrPointer) => "string".to_string(),
         _ => to_typespecifier_in_rval(function.signature().rval()),
     };
@@ -301,9 +301,9 @@ pub fn write_common_service_method_overload(i: &Interop, w: &mut IndentWriter, f
     indented!(w, r"{{")?;
 
     match function.signature().rval() {
-        CType::Pattern(TypePattern::FFIErrorEnum(_)) => {
-            indented!(w, [()], r"{};", fn_call)?;
-        }
+        // CType::Pattern(TypePattern::FFIErrorEnum(_)) => {
+        //     indented!(w, [()], r"{};", fn_call)?;
+        // }
         CType::Primitive(PrimitiveType::Void) => {
             indented!(w, [()], r"{};", fn_call)?;
         }

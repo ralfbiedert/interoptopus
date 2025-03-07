@@ -113,6 +113,7 @@
 //!
 
 use crate::lang::c::{CType, Function, OpaqueType};
+use crate::patterns::result::FFIResultAsPtr;
 use crate::patterns::TypePattern;
 use crate::util::longest_common_prefix;
 use std::fmt::Debug;
@@ -244,4 +245,10 @@ fn extract_obvious_opaque_from_parameter(param: &CType) -> Option<OpaqueType> {
         CType::Pattern(_) => None,
         CType::Array(_) => None,
     }
+}
+
+// pub trait ServiceResult {}
+
+pub trait ServiceInfo {
+    type CtorResult: FFIResultAsPtr;
 }

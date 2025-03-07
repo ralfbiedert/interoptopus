@@ -1,4 +1,5 @@
-use crate::patterns::result::{Error, FFIError};
+use crate::patterns::result::FFIError;
+use interoptopus::patterns::result::FFIResult;
 use interoptopus::patterns::string::CStrPointer;
 use interoptopus::{ffi_service, ffi_service_ctor, ffi_service_method, ffi_type};
 use std::ffi::CString;
@@ -10,17 +11,17 @@ pub struct ServiceOnPanic {
 }
 
 // Regular implementation of methods.
-#[ffi_service(error = "FFIError")]
+#[ffi_service]
 impl ServiceOnPanic {
     #[ffi_service_ctor]
-    pub fn new() -> Result<Self, Error> {
-        Ok(Self { c_string: CString::new("Hello new_with").unwrap() })
+    pub fn new() -> FFIResult<Self, FFIError> {
+        FFIResult::ok(Self { c_string: CString::new("Hello new_with").unwrap() })
     }
 
     /// Methods returning a Result<(), _> are the default and do not
     /// need annotations.
-    pub fn return_result(&self, _: u32) -> Result<(), Error> {
-        Ok(())
+    pub fn return_result(&self, _: u32) -> FFIResult<(), FFIError> {
+        FFIResult::ok(())
     }
 
     /// Methods returning a value need an `on_panic` annotation.

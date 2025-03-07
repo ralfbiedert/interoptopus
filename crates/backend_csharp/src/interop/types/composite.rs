@@ -10,7 +10,6 @@ use interoptopus::{indented, Error};
 pub fn write_type_definition_composite(i: &Interop, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
     i.debug(w, "write_type_definition_composite")?;
     write_documentation(w, the_type.meta().documentation())?;
-    write_type_definition_composite_annotation(i, w, the_type)?;
     write_type_definition_composite_body(i, w, the_type, WriteFor::Code)?;
     write_type_definition_composite_marshaller(i, w, the_type)
 }
@@ -134,8 +133,6 @@ pub fn write_type_definition_composite_unmanaged_body_field(i: &Interop, w: &mut
 }
 
 pub fn write_type_definition_composite_annotation(i: &Interop, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
-    indented!(w, r"[Serializable]")?;
-
     if the_type.repr().alignment().is_some() {
         let comment = r"// THIS STRUCT IS BROKEN - C# does not support alignment of entire Rust types that do #[repr(align(...))]";
         match i.unsupported {
@@ -182,7 +179,7 @@ pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWri
     let field_name = field_name_to_csharp_name(field, i.rename_symbols);
     let visibility = match field.visibility() {
         c::Visibility::Public => "public ",
-        c::Visibility::Private => "internal ",
+        c::Visibility::Private => "",
         // c::Visibility::Private => "",
     };
 

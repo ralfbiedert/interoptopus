@@ -121,7 +121,6 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
     }
 
     let ffi_fn_ident = Ident::new(&format!("{service_prefix}{orig_fn_ident}"), function.span());
-    let error_ident = Ident::new(&attributes.error, function.span());
     let without_lifetimes = purge_lifetimes_from_type(&impl_block.self_ty);
     let doc_lines = extract_doc_lines(&function.attrs);
 
@@ -147,7 +146,6 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
     let method_type = method_type(function);
 
     match method_type {
-        MethodType::Constructor(_) => inputs.push(quote_spanned!(span_service_ty => __context: &mut #ptr_type)),
         MethodType::MethodSync(method) if method.ignore => return None,
         _ => {}
     }
@@ -209,39 +207,38 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
         MethodType::Constructor(_) => {
             let object_construction = if has_async {
                 quote_spanned! { span_service_ty =>
-                    let __boxed = ::std::sync::Arc::new(__obj);
+                    let __boxed = ::std::sync::Arc::new(__res.unwrap());
                     let __raw = ::std::sync::Arc::into_raw(__boxed);
-                    *__context = unsafe { &*__raw };
                 }
             } else {
                 quote_spanned! { span_service_ty =>
-                    let __boxed = ::std::boxed::Box::new(__obj);
+                    let __boxed = ::std::boxed::Box::new(__res.unwrap());
                     let __raw = ::std::boxed::Box::into_raw(__boxed);
-                    *__context = unsafe { &mut *__raw };
                 }
             };
 
+            let ctor_result = quote_spanned! {span_rval => <<#service_type as ::interoptopus::patterns::service::ServiceInfo>::CtorResult as ::interoptopus::patterns::result::FFIResultAsPtr>::AsPtr };
+
             quote_spanned! { span_function =>
                 #method_attributes
-                pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #error_ident {
+                pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #ctor_result {
                     let __result_result = std::panic::catch_unwind(::std::panic::AssertUnwindSafe(|| {
                         <#service_type>::#orig_fn_ident( #(#arg_names),* )
                     }));
 
                     match __result_result {
-                        Ok(Ok(__obj)) => {
+                        Ok(__res) if __res.is_ok() => {
                             #object_construction
-                            <#error_ident as ::interoptopus::patterns::result::FFIError>::SUCCESS
+                            #ctor_result::ok(__raw)
                         }
-
-                        Ok(Err(__e)) => {
-                            ::interoptopus::util::log_error(|| format!("Error in ({}): {:?}", stringify!(#ffi_fn_ident), __e));
-                            __e.into()
+                        Ok(__res) => {
+                            let __e = __res.unwrap_err();
+                            ::interoptopus::util::log_error(|| format!("Error in ({}): {:?}", stringify!(service_basic_new), __e));
+                            #ctor_result::err(*__e)
                         }
-
                         Err(__e) => {
                             ::interoptopus::util::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::patterns::result::get_panic_message(__e.as_ref())));
-                            <#error_ident as ::interoptopus::patterns::result::FFIError>::PANIC
+                            #ctor_result::panic()
                         }
                     }
                 }
@@ -287,10 +284,8 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
 
                     quote_spanned! { span_function =>
                         #method_attributes
-                        pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #error_ident {
-                            ::interoptopus::patterns::result::panics_and_errors_to_ffi_enum(move || {
-                                #block
-                            }, stringify!(#ffi_fn_ident))
+                        pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),* ) -> #rval {
+                            #block
                         }
                     }
                 }
@@ -300,8 +295,6 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
         MethodType::MethodAsync(_) => {
             let first = arg_types.first().unwrap();
             let block = quote_spanned! { span_body =>
-                use ::interoptopus::patterns::result::FFIError;
-
                 // We need &T down below to invoke spawn but override the name, so let's save
                 // it here
                 let __this = __context;
@@ -324,13 +317,13 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 };
 
                 <#without_lifetimes>::spawn(__this, __async_fn);
-                #error_ident::SUCCESS
+                <#rval as ::interoptopus::patterns::result::FFIResultAsUnitT>::AsUnitT::ok(())
             };
 
             quote_spanned! { span_function =>
                 #method_attributes
 
-                pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),*, __async_callback: ::interoptopus::patterns::asynk::AsyncCallback<<#rval as ::interoptopus::patterns::result::IntoFFIResult>::FFIResult>) -> #error_ident {
+                pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),*, __async_callback: ::interoptopus::patterns::asynk::AsyncCallback<#rval>) -> <#rval as ::interoptopus::patterns::result::FFIResultAsUnitT>::AsUnitT {
                     #block
                 }
             }
@@ -343,7 +336,6 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
 pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> Descriptor {
     let service_prefix = attributes.prefered_service_name(impl_block);
     let ffi_fn_ident = Ident::new(&format!("{service_prefix}destroy"), impl_block.span());
-    let error_ident = Ident::new(&attributes.error, impl_block.span());
     let without_lifetimes = purge_lifetimes_from_type(&impl_block.self_ty);
     let has_async = has_async_methods(impl_block);
 
@@ -355,13 +347,15 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
         quote_spanned!(span_service_ty => *mut #without_lifetimes)
     };
 
+    let ctor_result = quote_spanned! {span_service_ty => <<#without_lifetimes as ::interoptopus::patterns::service::ServiceInfo>::CtorResult as ::interoptopus::patterns::result::FFIResultAsPtr>::AsPtr };
+
     let object_deconstruction = if has_async {
         quote_spanned! { span_service_ty =>
-            unsafe { drop(::std::sync::Arc::from_raw(*__context)) };
+            unsafe { drop(::std::sync::Arc::from_raw(__context)) };
         }
     } else {
         quote_spanned! { span_service_ty =>
-            unsafe { drop(::std::boxed::Box::from_raw(*__context)) };
+            unsafe { drop(::std::boxed::Box::from_raw(__context)) };
         }
     };
 
@@ -376,23 +370,21 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
         #[allow(unused_mut, unsafe_op_in_unsafe_fn, unused_unsafe)]
         #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals)]
         #[no_mangle]
-        pub unsafe extern "C" fn #ffi_fn_ident(__context: *mut #ptr_type) -> #error_ident {
+        pub unsafe extern "C" fn #ffi_fn_ident(__context: #ptr_type) -> #ctor_result {
             // Checks the _contained_ pointer is not null, which usually means service was not initialized.
             if __context.is_null() {
-                return <#error_ident as ::interoptopus::patterns::result::FFIError>::NULL;
+                return #ctor_result::null();
             }
 
             let __result_result = ::std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                 #object_deconstruction
             }));
 
-            *__context = ::std::ptr::null_mut();
-
             match __result_result {
-                Ok(_) => <#error_ident as ::interoptopus::patterns::result::FFIError>::SUCCESS,
+                Ok(_) => #ctor_result::ok(::std::ptr::null()),
                 Err(__e) => {
                     ::interoptopus::util::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::patterns::result::get_panic_message(__e.as_ref())));
-                    <#error_ident as ::interoptopus::patterns::result::FFIError>::PANIC
+                    #ctor_result::panic()
                 }
             }
         }
