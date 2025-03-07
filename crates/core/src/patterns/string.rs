@@ -194,6 +194,9 @@ impl Utf8String {
 impl Drop for Utf8String {
     #[allow(clippy::cast_possible_truncation)]
     fn drop(&mut self) {
+        if self.ptr.is_null() {
+            return;
+        }
         unsafe {
             let _ = String::from_raw_parts(self.ptr, self.len as usize, self.capacity as usize);
         }

@@ -11,15 +11,13 @@ public class TestCoreSlices
     public void pattern_ffi_slice_3()
     {
         var data = new byte[100_000];
-        var smu = new SliceMutU8(data);
 
-        var cc2 = new CallbackSliceMut((slice) =>
+        Interop.pattern_ffi_slice_3(data, (slice) =>
         {
             slice[0] = 1;
             slice[1] = 100;
         });
 
-        Interop.pattern_ffi_slice_3(smu, cc2);
         Assert.Equal(data[0], 1);
         Assert.Equal(data[1], 100);
     }

@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 17548471341849339894ul)
+            if (api_version != 16904145262249274528ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (17548471341849339894). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (16904145262249274528). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -649,6 +649,30 @@ namespace My.Company
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_string_4 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_5")]
+        // Debug - write_function_declaration 
+        public static partial ResultUseUtf8StringFFIError pattern_string_5(UseUtf8String x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for pattern_string_5 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_6a")]
+        // Debug - write_function_declaration 
+        public static partial ResultFFIError pattern_string_6a(ref UseUtf8String x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for pattern_string_6a 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_6b")]
+        // Debug - write_function_declaration 
+        public static partial ResultFFIError pattern_string_6b(out UseUtf8String y);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for pattern_string_6b 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1")]
@@ -2899,7 +2923,8 @@ namespace My.Company
     // Debug - write_type_definition_composite 
     public partial struct UseUtf8String
     {
-        public string s;
+        public string s1;
+        public string s2;
     }
 
     // Debug - write_type_definition_composite_marshaller 
@@ -2910,7 +2935,9 @@ namespace My.Company
         public unsafe struct Unmanaged
         {
             // Debug - write_type_definition_composite_unmanaged_body_field 
-            public Utf8String.Unmanaged s;
+            public Utf8String.Unmanaged s1;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public Utf8String.Unmanaged s2;
         }
 
         [CustomMarshaller(typeof(UseUtf8String), MarshalMode.Default, typeof(Marshaller))]
@@ -2932,8 +2959,11 @@ namespace My.Company
                 _unmanaged = new Unmanaged();
 
                 // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                var _s = new Utf8String.Marshaller(new Utf8String(_managed.s));
-                _unmanaged.s = _s.ToUnmanaged();
+                var _s1 = new Utf8String.Marshaller(new Utf8String(_managed.s1));
+                _unmanaged.s1 = _s1.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _s2 = new Utf8String.Marshaller(new Utf8String(_managed.s2));
+                _unmanaged.s2 = _s2.ToUnmanaged();
 
                 return _unmanaged;
             }
@@ -2943,8 +2973,11 @@ namespace My.Company
                 _managed = new UseUtf8String();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                var _s = new Utf8String.Marshaller(_unmanaged.s);
-                _managed.s = _s.ToManaged().String;
+                var _s1 = new Utf8String.Marshaller(_unmanaged.s1);
+                _managed.s1 = _s1.ToManaged().String;
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _s2 = new Utf8String.Marshaller(_unmanaged.s2);
+                _managed.s2 = _s2.ToManaged().String;
 
                 return _managed;
             }
@@ -4845,6 +4878,87 @@ namespace My.Company
     public partial struct ResultU64FFIError
     {
         public ulong Ok()
+        {
+            if (err == FFIError.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<FFIError>(err);
+        }
+
+    }
+
+
+    // Debug - write_type_definition_composite 
+    ///Result that contains value or an error.
+    public partial struct ResultUseUtf8StringFFIError
+    {
+        ///Element if err is `Ok`.
+        UseUtf8String t;
+        ///Error value.
+        FFIError err;
+    }
+
+    // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct ResultUseUtf8StringFFIError
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public UseUtf8String.Unmanaged t;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public FFIError err;
+        }
+
+        [CustomMarshaller(typeof(ResultUseUtf8StringFFIError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private ResultUseUtf8StringFFIError _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(ResultUseUtf8StringFFIError managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(ResultUseUtf8StringFFIError managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _t = new UseUtf8String.Marshaller(_managed.t);
+                _unmanaged.t = _t.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.err = _managed.err;
+
+                return _unmanaged;
+            }
+
+            public unsafe ResultUseUtf8StringFFIError ToManaged()
+            {
+                _managed = new ResultUseUtf8StringFFIError();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _t = new UseUtf8String.Marshaller(_unmanaged.t);
+                _managed.t = _t.ToManaged();
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.err = _unmanaged.err;
+
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    // Debug - write_pattern_result 
+    public partial struct ResultUseUtf8StringFFIError
+    {
+        public UseUtf8String Ok()
         {
             if (err == FFIError.Ok)
             {

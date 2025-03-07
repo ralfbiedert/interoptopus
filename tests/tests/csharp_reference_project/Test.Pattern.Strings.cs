@@ -51,9 +51,44 @@ public class TestPatternStrings
     [Fact]
     public void string_utf8_in_out_by_struct()
     {
-        var w = new UseUtf8String { s = "hello world" };
+        var w = new UseUtf8String { s1 = "hello", s2 = "world" };
         var s = Interop.pattern_string_4(w);
-        Assert.Equal(s.s, "hello world");
+        Assert.Equal(s.s1, "hello");
+        Assert.Equal(s.s2, "world");
+    }
+
+    [Fact]
+    public void string_out_via_xxx()
+    {
+        var w = new UseUtf8String { s1 = "hello", s2 = "world" };
+        Interop.pattern_string_6a(ref w);
+
+        // var y = new UseUtf8String();
+        var r2 = Interop.pattern_string_6b(out var y);
+        Assert.Equal(y.s1, "s1");
+        Assert.Equal(y.s2, "s2");
+    }
+
+    [Fact]
+    public void string_by_ref_dont_leak()
+    {
+        // TODO - Can we somehow measure memory use?
+        var w = new UseUtf8String { s1 = "hello", s2 = "world" };
+        for (var i = 0; i < 1024 * 1024; i++)
+        {
+            Interop.pattern_string_6a(ref w);
+        }
+    }
+
+    [Fact]
+    public void string_by_out_dont_leak()
+    {
+        // TODO - Can we somehow measure memory use?
+        var w = new UseUtf8String { s1 = "hello", s2 = "world" };
+        for (var i = 0; i < 1024 * 1024; i++)
+        {
+            var r2 = Interop.pattern_string_6b(out var y);
+        }
     }
 
 }

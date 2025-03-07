@@ -1,5 +1,7 @@
+use crate::patterns::result::FFIError;
 use crate::types::{UseCStrPtr, UseUtf8String};
 use interoptopus::ffi_function;
+use interoptopus::patterns::result::FFIResult;
 use interoptopus::patterns::slice::FFISlice;
 use interoptopus::patterns::string::{CStrPointer, Utf8String};
 
@@ -66,4 +68,20 @@ pub fn pattern_string_3() -> Utf8String {
 #[ffi_function]
 pub fn pattern_string_4(x: UseUtf8String) -> UseUtf8String {
     x
+}
+
+#[ffi_function]
+pub fn pattern_string_5(x: UseUtf8String) -> FFIResult<UseUtf8String, FFIError> {
+    FFIResult::ok(x)
+}
+
+#[ffi_function]
+pub fn pattern_string_6a(x: &UseUtf8String) -> FFIResult<(), FFIError> {
+    FFIResult::ok(())
+}
+
+#[ffi_function]
+pub fn pattern_string_6b(y: &mut UseUtf8String) -> FFIResult<(), FFIError> {
+    *y = UseUtf8String { s1: Utf8String::from_string("s1".to_string()), s2: Utf8String::from_string("s2".to_string()) };
+    FFIResult::ok(())
 }

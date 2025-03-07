@@ -176,7 +176,8 @@ pub struct UseCStrPtr<'a> {
 
 #[ffi_type]
 pub struct UseUtf8String {
-    pub s: Utf8String,
+    pub s1: Utf8String,
+    pub s2: Utf8String,
 }
 
 /// This can also be used for the `class` pattern.
