@@ -59,11 +59,12 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()], r"public {}({}Delegate managed)", name, name)?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"_managed = managed;")?;
-    indented!(w, [()()], r"_native = Call;")?;
+    indented!(w, [()()], r"_native = CallTrampoline;")?;
     indented!(w, [()()], r"_ptr = Marshal.GetFunctionPointerForDelegate(_native);")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
-    indented!(w, [()], r"public {} Call({})", rval, params_native.join(", "))?;
+    indented!(w, [()], r"// Helper to invoke managed code from the native invocation.")?;
+    indented!(w, [()], r"private {} CallTrampoline({})", rval, params_native.join(", "))?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"// We ignore the last parameter, a generic callback pointer, as it's not needed in C#.")?;
     indented!(w, [()()], r"try")?;
@@ -85,6 +86,25 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
         _ => indented!(w, [()()()], r"return default;")?,
     }
     indented!(w, [()()], r"}}")?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()], r"// Invokes the callback.")?;
+    indented!(w, [()], r"public {} Call({})", rval, params.join(", "))?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"var __target = Marshal.GetDelegateForFunctionPointer<{name}Native>(_ptr);")?;
+    indented!(w, [()()], r"// TODO")?;
+    if the_type.fnpointer().signature().rval().is_void() {
+        indented!(w, [()()], r"// __target({});", param_invokes.join(", "))?;
+    } else {
+        indented!(w, [()()], r"// return __target({});", param_invokes.join(", "))?;
+    }
+    match the_type.fnpointer().signature().rval() {
+        CType::Primitive(PrimitiveType::Void) => indented!(w, [()()], r"return;")?,
+        CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
+            indented!(w, [()()], r"return new {}({}.{});", rval, e.the_enum().rust_name(), e.panic_variant().name())?;
+        }
+        _ => indented!(w, [()()], r"return default;")?,
+    }
     indented!(w, [()], r"}}")?;
     w.newline()?;
     indented!(w, [()], r"public void Dispose()")?;

@@ -49,6 +49,7 @@ pub fn pattern_ffi_slice_3(mut slice: FFISliceMut<u8>, callback: CallbackSliceMu
 #[ffi_function]
 pub fn pattern_ffi_slice_4(_slice: FFISlice<u8>, _slice2: FFISliceMut<u8>) {}
 
+/// It is (probably?) UB to call this function with the same FFI slice data at the same time.
 #[ffi_function]
 pub fn pattern_ffi_slice_5(slice: &FFISlice<u8>, slice2: &mut FFISliceMut<u8>) {
     let _ = slice.as_slice().len();

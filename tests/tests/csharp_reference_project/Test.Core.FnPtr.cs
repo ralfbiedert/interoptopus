@@ -2,12 +2,12 @@ using My.Company;
 using My.Company.Common;
 using Xunit;
 
-public class TestCoreFnPtr
+public class TestFnPtr
 {
     [Fact]
-    public void callback()
+    public void fnptr_1()
     {
-        var result = Interop.fnptr_1((x) =>
+        var result = Interop.fnptr_1(x =>
         {
             Assert.Equal(42, x);
             return 43;
@@ -19,7 +19,7 @@ public class TestCoreFnPtr
     // [Fact]
     // public void callback_marshalled()
     // {
-    //     Interop.callback_marshalled((x) =>
+    //     Interop.fnptr_2((x) =>
     //     {
     //         Assert.Equal("test", x.str);
     //     }, new CharArray

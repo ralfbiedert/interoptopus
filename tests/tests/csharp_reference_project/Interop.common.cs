@@ -1219,11 +1219,12 @@ namespace My.Company.Common
         public MyCallbackNamespaced(MyCallbackNamespacedDelegate managed)
         {
             _managed = managed;
-            _native = Call;
+            _native = CallTrampoline;
             _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
-        public uint Call(uint value, IntPtr callback_data)
+        // Helper to invoke managed code from the native invocation.
+        private uint CallTrampoline(uint value, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
@@ -1235,6 +1236,15 @@ namespace My.Company.Common
                 _exception = e;
                 return default;
             }
+        }
+
+        // Invokes the callback.
+        public uint Call(uint value)
+        {
+            var __target = Marshal.GetDelegateForFunctionPointer<MyCallbackNamespacedNative>(_ptr);
+            // TODO
+            // return __target(value);
+            return default;
         }
 
         public void Dispose()

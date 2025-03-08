@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 16286479253332814942ul)
+            if (api_version != 12825769361323931047ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (16286479253332814942). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (12825769361323931047). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -815,11 +815,13 @@ namespace My.Company
         }
 
         // Debug - write_function 
+        /// It is (probably?) UB to call this function with the same FFI slice data at the same time.
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_5")]
         // Debug - write_function_declaration 
         public static partial void pattern_ffi_slice_5(ref SliceU8 slice, ref SliceMutU8 slice2);
 
         // Debug - write_function_overload 
+        /// It is (probably?) UB to call this function with the same FFI slice data at the same time.
         public static unsafe void pattern_ffi_slice_5(ReadOnlySpan<byte> slice, Span<byte> slice2)
         {
             fixed (void* ptr_slice = slice)
@@ -1040,6 +1042,14 @@ namespace My.Company
                 callback_wrapped.Dispose();
             }
         }
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_3")]
+        // Debug - write_function_declaration 
+        public static partial void pattern_callback_3(DelegateCallbackMyCallbackContextual callback, uint x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for pattern_callback_3 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_4")]
@@ -2085,6 +2095,69 @@ namespace My.Company
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 var _foreign = new Local.Marshaller(_unmanaged.foreign);
                 _managed.foreign = _foreign.ToManaged();
+
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    // Debug - write_type_definition_composite 
+    public partial struct DelegateCallbackMyCallbackContextual
+    {
+        public MyCallbackContextual callback;
+        public IntPtr context;
+    }
+
+    // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct DelegateCallbackMyCallbackContextual
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public MyCallbackContextual.Unmanaged callback;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public IntPtr context;
+        }
+
+        [CustomMarshaller(typeof(DelegateCallbackMyCallbackContextual), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private DelegateCallbackMyCallbackContextual _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(DelegateCallbackMyCallbackContextual managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(DelegateCallbackMyCallbackContextual managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _callback = new MyCallbackContextual.Marshaller(_managed.callback);
+                _unmanaged.callback = _callback.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.context = _managed.context;
+
+                return _unmanaged;
+            }
+
+            public unsafe DelegateCallbackMyCallbackContextual ToManaged()
+            {
+                _managed = new DelegateCallbackMyCallbackContextual();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _callback = new MyCallbackContextual.Marshaller(_unmanaged.callback);
+                _managed.callback = _callback.ToManaged();
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.context = _unmanaged.context;
 
                 return _managed;
             }
@@ -5102,11 +5175,12 @@ namespace My.Company
         public CallbackCharArray2(CallbackCharArray2Delegate managed)
         {
             _managed = managed;
-            _native = Call;
+            _native = CallTrampoline;
             _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
-        public void Call(CharArray value, IntPtr callback_data)
+        // Helper to invoke managed code from the native invocation.
+        private void CallTrampoline(CharArray value, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
@@ -5118,6 +5192,15 @@ namespace My.Company
                 _exception = e;
                 return;
             }
+        }
+
+        // Invokes the callback.
+        public void Call(CharArray value)
+        {
+            var __target = Marshal.GetDelegateForFunctionPointer<CallbackCharArray2Native>(_ptr);
+            // TODO
+            // __target(value);
+            return;
         }
 
         public void Dispose()
@@ -5191,11 +5274,12 @@ namespace My.Company
         public CallbackFFISlice(CallbackFFISliceDelegate managed)
         {
             _managed = managed;
-            _native = Call;
+            _native = CallTrampoline;
             _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
-        public byte Call(SliceU8.Unmanaged slice, IntPtr callback_data)
+        // Helper to invoke managed code from the native invocation.
+        private byte CallTrampoline(SliceU8.Unmanaged slice, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
@@ -5207,6 +5291,15 @@ namespace My.Company
                 _exception = e;
                 return default;
             }
+        }
+
+        // Invokes the callback.
+        public byte Call(SliceU8 slice)
+        {
+            var __target = Marshal.GetDelegateForFunctionPointer<CallbackFFISliceNative>(_ptr);
+            // TODO
+            // return __target(slice.Managed());
+            return default;
         }
 
         public void Dispose()
@@ -5280,11 +5373,12 @@ namespace My.Company
         public CallbackHugeVecSlice(CallbackHugeVecSliceDelegate managed)
         {
             _managed = managed;
-            _native = Call;
+            _native = CallTrampoline;
             _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
-        public Vec3f32 Call(SliceVec3f32.Unmanaged slice, IntPtr callback_data)
+        // Helper to invoke managed code from the native invocation.
+        private Vec3f32 CallTrampoline(SliceVec3f32.Unmanaged slice, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
@@ -5296,6 +5390,15 @@ namespace My.Company
                 _exception = e;
                 return default;
             }
+        }
+
+        // Invokes the callback.
+        public Vec3f32 Call(SliceVec3f32 slice)
+        {
+            var __target = Marshal.GetDelegateForFunctionPointer<CallbackHugeVecSliceNative>(_ptr);
+            // TODO
+            // return __target(slice.Managed());
+            return default;
         }
 
         public void Dispose()
@@ -5369,11 +5472,12 @@ namespace My.Company
         public CallbackSliceMut(CallbackSliceMutDelegate managed)
         {
             _managed = managed;
-            _native = Call;
+            _native = CallTrampoline;
             _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
-        public void Call(SliceMutU8.Unmanaged slice, IntPtr callback_data)
+        // Helper to invoke managed code from the native invocation.
+        private void CallTrampoline(SliceMutU8.Unmanaged slice, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
@@ -5385,6 +5489,15 @@ namespace My.Company
                 _exception = e;
                 return;
             }
+        }
+
+        // Invokes the callback.
+        public void Call(SliceMutU8 slice)
+        {
+            var __target = Marshal.GetDelegateForFunctionPointer<CallbackSliceMutNative>(_ptr);
+            // TODO
+            // __target(slice.Managed());
+            return;
         }
 
         public void Dispose()
@@ -5458,11 +5571,12 @@ namespace My.Company
         public CallbackU8(CallbackU8Delegate managed)
         {
             _managed = managed;
-            _native = Call;
+            _native = CallTrampoline;
             _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
-        public byte Call(byte value, IntPtr callback_data)
+        // Helper to invoke managed code from the native invocation.
+        private byte CallTrampoline(byte value, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
@@ -5474,6 +5588,15 @@ namespace My.Company
                 _exception = e;
                 return default;
             }
+        }
+
+        // Invokes the callback.
+        public byte Call(byte value)
+        {
+            var __target = Marshal.GetDelegateForFunctionPointer<CallbackU8Native>(_ptr);
+            // TODO
+            // return __target(value);
+            return default;
         }
 
         public void Dispose()
@@ -5547,11 +5670,12 @@ namespace My.Company
         public MyCallback(MyCallbackDelegate managed)
         {
             _managed = managed;
-            _native = Call;
+            _native = CallTrampoline;
             _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
-        public uint Call(uint value, IntPtr callback_data)
+        // Helper to invoke managed code from the native invocation.
+        private uint CallTrampoline(uint value, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
@@ -5563,6 +5687,15 @@ namespace My.Company
                 _exception = e;
                 return default;
             }
+        }
+
+        // Invokes the callback.
+        public uint Call(uint value)
+        {
+            var __target = Marshal.GetDelegateForFunctionPointer<MyCallbackNative>(_ptr);
+            // TODO
+            // return __target(value);
+            return default;
         }
 
         public void Dispose()
@@ -5636,11 +5769,12 @@ namespace My.Company
         public MyCallbackContextual(MyCallbackContextualDelegate managed)
         {
             _managed = managed;
-            _native = Call;
+            _native = CallTrampoline;
             _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
-        public void Call(IntPtr context, uint value, IntPtr callback_data)
+        // Helper to invoke managed code from the native invocation.
+        private void CallTrampoline(IntPtr context, uint value, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
@@ -5652,6 +5786,15 @@ namespace My.Company
                 _exception = e;
                 return;
             }
+        }
+
+        // Invokes the callback.
+        public void Call(IntPtr context, uint value)
+        {
+            var __target = Marshal.GetDelegateForFunctionPointer<MyCallbackContextualNative>(_ptr);
+            // TODO
+            // __target(context, value);
+            return;
         }
 
         public void Dispose()
@@ -5725,11 +5868,12 @@ namespace My.Company
         public MyCallbackVoid(MyCallbackVoidDelegate managed)
         {
             _managed = managed;
-            _native = Call;
+            _native = CallTrampoline;
             _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
-        public void Call(IntPtr ptr, IntPtr callback_data)
+        // Helper to invoke managed code from the native invocation.
+        private void CallTrampoline(IntPtr ptr, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
@@ -5741,6 +5885,15 @@ namespace My.Company
                 _exception = e;
                 return;
             }
+        }
+
+        // Invokes the callback.
+        public void Call(IntPtr ptr)
+        {
+            var __target = Marshal.GetDelegateForFunctionPointer<MyCallbackVoidNative>(_ptr);
+            // TODO
+            // __target(ptr);
+            return;
         }
 
         public void Dispose()
@@ -5814,11 +5967,12 @@ namespace My.Company
         public SumDelegate1(SumDelegate1Delegate managed)
         {
             _managed = managed;
-            _native = Call;
+            _native = CallTrampoline;
             _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
-        public void Call(IntPtr callback_data)
+        // Helper to invoke managed code from the native invocation.
+        private void CallTrampoline(IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
@@ -5830,6 +5984,15 @@ namespace My.Company
                 _exception = e;
                 return;
             }
+        }
+
+        // Invokes the callback.
+        public void Call()
+        {
+            var __target = Marshal.GetDelegateForFunctionPointer<SumDelegate1Native>(_ptr);
+            // TODO
+            // __target();
+            return;
         }
 
         public void Dispose()
@@ -5903,11 +6066,12 @@ namespace My.Company
         public SumDelegate2(SumDelegate2Delegate managed)
         {
             _managed = managed;
-            _native = Call;
+            _native = CallTrampoline;
             _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
-        public int Call(int x, int y, IntPtr callback_data)
+        // Helper to invoke managed code from the native invocation.
+        private int CallTrampoline(int x, int y, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
@@ -5919,6 +6083,15 @@ namespace My.Company
                 _exception = e;
                 return default;
             }
+        }
+
+        // Invokes the callback.
+        public int Call(int x, int y)
+        {
+            var __target = Marshal.GetDelegateForFunctionPointer<SumDelegate2Native>(_ptr);
+            // TODO
+            // return __target(x, y);
+            return default;
         }
 
         public void Dispose()
@@ -5992,11 +6165,12 @@ namespace My.Company
         public SumDelegateReturn(SumDelegateReturnDelegate managed)
         {
             _managed = managed;
-            _native = Call;
+            _native = CallTrampoline;
             _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
-        public ResultFFIError Call(int x, int y, IntPtr callback_data)
+        // Helper to invoke managed code from the native invocation.
+        private ResultFFIError CallTrampoline(int x, int y, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
@@ -6008,6 +6182,15 @@ namespace My.Company
                 _exception = e;
                 return new ResultFFIError(FFIError.Panic);
             }
+        }
+
+        // Invokes the callback.
+        public ResultFFIError Call(int x, int y)
+        {
+            var __target = Marshal.GetDelegateForFunctionPointer<SumDelegateReturnNative>(_ptr);
+            // TODO
+            // return __target(x, y);
+            return new ResultFFIError(FFIError.Panic);
         }
 
         public void Dispose()
@@ -6081,11 +6264,12 @@ namespace My.Company
         public SumDelegateReturn2(SumDelegateReturn2Delegate managed)
         {
             _managed = managed;
-            _native = Call;
+            _native = CallTrampoline;
             _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
-        public void Call(int x, int y, IntPtr callback_data)
+        // Helper to invoke managed code from the native invocation.
+        private void CallTrampoline(int x, int y, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
@@ -6097,6 +6281,15 @@ namespace My.Company
                 _exception = e;
                 return;
             }
+        }
+
+        // Invokes the callback.
+        public void Call(int x, int y)
+        {
+            var __target = Marshal.GetDelegateForFunctionPointer<SumDelegateReturn2Native>(_ptr);
+            // TODO
+            // __target(x, y);
+            return;
         }
 
         public void Dispose()

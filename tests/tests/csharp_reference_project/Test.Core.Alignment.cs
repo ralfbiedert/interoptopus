@@ -1,7 +1,7 @@
 using My.Company;
 using Xunit;
 
-public class TestCoreAlignment
+public class TestAlignment
 {
     [Fact]
     public void alignment_1()

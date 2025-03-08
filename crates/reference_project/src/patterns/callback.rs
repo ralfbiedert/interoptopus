@@ -28,7 +28,6 @@ pub fn pattern_callback_2(callback: MyCallbackVoid) -> MyCallbackVoid {
     callback
 }
 
-// UNSUPPORTED FOR NOW - Gives errors in C# when using LibraryImport
 // #[ffi_function]
 // pub fn pattern_callback_3(callback: DelegateCallback<MyCallbackContextual>, x: u32) {
 //     callback.callback.call(callback.context, x);
@@ -69,7 +68,10 @@ pub fn pattern_callback_7(c1: SumDelegateReturn, c2: SumDelegateReturn2, x: i32,
     FFIError::Ok
 }
 
-pub extern "C" fn exposed_sum1(_: *const c_void) {}
+pub extern "C" fn exposed_sum1(x: *const c_void) {
+    println!("0x{x:?}");
+    eprintln!("0x{x:?}");
+}
 
 pub extern "C" fn exposed_sum2(x: i32, y: i32, _: *const c_void) -> i32 {
     x + y

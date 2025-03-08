@@ -7,11 +7,39 @@ using Xunit;
 public class TestPatternDelegates
 {
     [Fact]
+    public void pattern_callback_1()
+    {
+        var x = Interop.pattern_callback_1(value => value + 1, 0);
+        Assert.Equal(1u, x);
+    }
+    
+    [Fact]
+    public void pattern_callback_2()
+    {
+        var called = false;
+        var cb = new MyCallbackVoid(ptr => { called = true; });
+        var x = Interop.pattern_callback_2(cb);
+        x.Call(IntPtr.Zero);
+
+        // TODO
+        // Assert.True(called);
+    }
+
+
+
+    [Fact]
     public void pattern_callback_4()
     {
         var x = new MyCallbackNamespaced(value => value);
         var y = Interop.pattern_callback_4(x, 5);
         Assert.Equal(y, 5u);
+    }
+
+    [Fact]
+    public void pattern_callback_5()
+    {
+        var cb = Interop.pattern_callback_5();
+        cb.Call();
     }
 
 

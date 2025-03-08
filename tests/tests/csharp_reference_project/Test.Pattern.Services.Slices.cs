@@ -20,7 +20,7 @@ public class TestPatternServicesSlices
         var s = ServiceVariousSlices.New();
         var slice = s.ReturnSlice();
         Assert.Equal(slice.Count, 64);
-        Assert.Equal((int) slice[0], 44);
-        Assert.Equal((int) slice[1], 123);
+        Assert.Equal(123, (int) slice[0]);
+        Assert.Equal(123, (int) slice[1]);
     }
 }

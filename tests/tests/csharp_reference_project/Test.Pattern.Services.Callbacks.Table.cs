@@ -5,7 +5,7 @@ using My.Company;
 using My.Company.Common;
 using Xunit;
 
-public class TestPatternDelegateTable
+public class TestPatternServicesCallbacksTable
 {
     private CallbackTable _table;
 

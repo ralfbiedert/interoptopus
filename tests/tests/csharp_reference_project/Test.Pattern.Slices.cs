@@ -1,26 +1,16 @@
-using System;
-using System.Runtime.InteropServices;
 using My.Company;
-using My.Company.Common;
 using Xunit;
 
-public class TestCoreSlices
+public class TestPatternSlices
 {
-
     [Fact]
-    public void pattern_ffi_slice_3()
+    public void pattern_ffi_slice_1()
     {
-        var data = new byte[100_000];
-
-        Interop.pattern_ffi_slice_3(data, (slice) =>
-        {
-            slice[0] = 1;
-            slice[1] = 100;
-        });
-
-        Assert.Equal(data[0], 1);
-        Assert.Equal(data[1], 100);
+        var data = new uint[100_000];
+        var result = Interop.pattern_ffi_slice_1(data);
+        Assert.Equal(100_000u, result);
     }
+
 
     [Fact]
     public void pattern_ffi_slice_2()
@@ -39,11 +29,26 @@ public class TestCoreSlices
     }
 
     [Fact]
-    public void pattern_ffi_slice_delegate_huge()
+    public void pattern_ffi_slice_3()
     {
-        var result = Interop.pattern_ffi_slice_delegate_huge(x => x[0]);
+        var data = new byte[100_000];
 
-        Assert.Equal(0, result.x);
+        Interop.pattern_ffi_slice_3(data, (slice) =>
+        {
+            slice[0] = 1;
+            slice[1] = 100;
+        });
+
+        Assert.Equal(data[0], 1);
+        Assert.Equal(data[1], 100);
+    }
+
+    [Fact]
+    public void pattern_ffi_slice_5()
+    {
+        var data1 = new byte[100_000];
+        var data2 = new byte[100_000];
+        Interop.pattern_ffi_slice_5(data1, data2);
     }
 
     [Fact]
@@ -67,4 +72,13 @@ public class TestCoreSlices
     //         Assert.Equal("test2", ca.str_2);
     //     });
     // }
+
+    [Fact]
+    public void pattern_ffi_slice_delegate_huge()
+    {
+        var result = Interop.pattern_ffi_slice_delegate_huge(x => x[0]);
+        Assert.Equal(0, result.x);
+    }
+
+
 }
