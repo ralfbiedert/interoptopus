@@ -9,21 +9,26 @@ using Array = My.Company.Array;
 public class TestPatternServicesAsync
 {
     [Fact]
-    public async void service_async_explicit_basic()
+    public async void ReturnAfterMs()
     {
         var s = ServiceAsync.New();
-        var r1 = (await s.ReturnAfterMs(123, 500)).Ok();
-        var r2 = (await s.HandleString("abc")).Ok();
-        
+        var r = (await s.ReturnAfterMs(123, 500)).Ok();
         s.Dispose();
-        
-        Assert.Equal(r1, 123u);
-        Assert.Equal(r2, "abc");
+        Assert.Equal(r, 123u);
     }
-    
+
+    [Fact]
+    public async void HandleString()
+    {
+        var s = ServiceAsync.New();
+        var r = (await s.HandleString("abc")).Ok();
+        s.Dispose();
+        Assert.Equal(r, "abc");
+    }
+
     
     [Fact]
-    public async void service_async_explicit_parallel()
+    public async void SupportsMultipleParallelCalls()
     {
         var s = ServiceAsync.New();
         
@@ -42,7 +47,7 @@ public class TestPatternServicesAsync
  
     
     [Fact]
-    public async void service_async_complex_struct()
+    public async void ProcessStruct()
     {
         var s = ServiceAsync.New();
         var a = new NestedArray

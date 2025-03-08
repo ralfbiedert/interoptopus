@@ -8,12 +8,16 @@ public class TestPatternServicesMultipleCtors
 {
 
     [Fact]
-    public void service_ctors()
+    public void MultipleCtors()
     {
         using (ServiceMultipleCtors.NewWith(123)) { }
         using (ServiceMultipleCtors.NewWithout()) { };
         using (ServiceMultipleCtors.NewWithString("hello world")) { };
+    }
 
+    [Fact]
+    public void NewFailing()
+    {
         try
         {
             var serviceMultipleCtors = ServiceMultipleCtors.NewFailing(123);
@@ -21,6 +25,5 @@ public class TestPatternServicesMultipleCtors
         }
         catch (InteropException<FFIError>) { }
     }
-
 
 }

@@ -7,7 +7,7 @@ public class TestPatternServicesCallbacks
 {
 
     [Fact]
-    public void service_callbacks()
+    public void CallbackSimple()
     {
         var callbacks = ServiceCallbacks.New();
         var called = false;
@@ -23,7 +23,7 @@ public class TestPatternServicesCallbacks
     }
 
     [Fact]
-    public void service_callbacks_with_slice()
+    public void CallbackWithSlice()
     {
         var callbacks = ServiceCallbacks.New();
         var called = false;

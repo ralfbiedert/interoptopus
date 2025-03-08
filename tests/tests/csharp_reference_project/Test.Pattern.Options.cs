@@ -6,7 +6,7 @@ using Xunit;
 public class TestPatternOptions
 {
     [Fact]
-    public void pattern_ffi_option_nullable()
+    public void FromToNullable()
     {
         var t = new Inner();
         var someOpt = OptionInner.FromNullable(t);

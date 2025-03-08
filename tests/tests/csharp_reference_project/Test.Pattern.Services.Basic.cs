@@ -6,7 +6,7 @@ using Xunit;
 public class TestPatternServicesBasic
 {
     [Fact]
-    public void service_basic()
+    public void NewDispose()
     {
         var service = ServiceBasic.New();
         service.Dispose();

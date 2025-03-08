@@ -77,7 +77,7 @@ public class TestPatternStrings
     [Fact]
     public void pattern_string_7()
     {
-        // TODO 
+        // TODO
         var a = new Utf8String("hello");
         var b = new Utf8String("world");
         var r1 = Interop.pattern_string_7([a, b], 0).Ok();
@@ -108,7 +108,4 @@ public class TestPatternStrings
             var r2 = Interop.pattern_string_6b(out var y);
         }
     }
-
-
-
 }

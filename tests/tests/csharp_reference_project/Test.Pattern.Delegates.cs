@@ -29,7 +29,7 @@ public class TestPatternDelegates
     }
 
     [Fact]
-    public void pattern_ffi_callback_exception()
+    public void pattern_callback_7_exception_handling()
     {
         // This value will be changed to `6` before the callbacks are invoked, and
         // changed to `8` after callbacks return.

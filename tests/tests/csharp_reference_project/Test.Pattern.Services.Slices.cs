@@ -6,15 +6,19 @@ using Xunit;
 public class TestPatternServicesSlices
 {
     [Fact]
-    public void service_slices()
+    public void ReturnSliceMut()
     {
-        var service_slices = ServiceVariousSlices.New();
-        var b = new byte[] { 1, 2, 3 } ;
+        var s = ServiceVariousSlices.New();
+        var slice = s.ReturnSliceMut();
+        s.Dispose();
+        slice[0] = 44;
+    }
 
-        var sliceMut = service_slices.ReturnSliceMut();
-        sliceMut[0] = 44;
-
-        var slice = service_slices.ReturnSlice();
+    [Fact]
+    public void ReturnSlice()
+    {
+        var s = ServiceVariousSlices.New();
+        var slice = s.ReturnSlice();
         Assert.Equal(slice.Count, 64);
         Assert.Equal((int) slice[0], 44);
         Assert.Equal((int) slice[1], 123);

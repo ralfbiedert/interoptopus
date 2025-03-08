@@ -22,7 +22,7 @@ public class TestPatternDelegateTable
     }
 
     [Fact]
-    public void pattern_ffi_slice_delegate()
+    public void InvokeDelegates()
     {
         var service = ServiceCallbacks.New();
     
