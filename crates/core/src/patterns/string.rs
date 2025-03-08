@@ -182,12 +182,26 @@ impl Utf8String {
         Self { ptr, len, capacity }
     }
 
+    pub fn as_str(&self) -> &str {
+        if self.ptr.is_null() {
+            return "";
+        }
+
+        unsafe { std::str::from_utf8_unchecked(std::slice::from_raw_parts(self.ptr, self.len as usize)) }
+    }
+
     #[must_use]
     #[allow(clippy::cast_possible_truncation)]
     pub fn into_string(self) -> String {
         let rval = unsafe { String::from_raw_parts(self.ptr, self.len as usize, self.capacity as usize) };
         forget(self);
         rval
+    }
+}
+
+impl Clone for Utf8String {
+    fn clone(&self) -> Self {
+        Utf8String::from_string(self.as_str().to_string())
     }
 }
 

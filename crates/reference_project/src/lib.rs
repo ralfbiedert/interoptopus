@@ -116,6 +116,7 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(patterns::string::pattern_string_5))
             .register(function!(patterns::string::pattern_string_6a))
             .register(function!(patterns::string::pattern_string_6b))
+            .register(function!(patterns::string::pattern_string_7))
             .register(function!(patterns::slice::pattern_ffi_slice_1))
             .register(function!(patterns::slice::pattern_ffi_slice_1b))
             .register(function!(patterns::slice::pattern_ffi_slice_2))

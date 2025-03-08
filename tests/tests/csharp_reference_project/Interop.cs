@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 16904145262249274528ul)
+            if (api_version != 1188374551704804212ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (16904145262249274528). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (1188374551704804212). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -673,6 +673,27 @@ namespace My.Company
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_string_6b 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_7")]
+        // Debug - write_function_declaration 
+        public static partial ResultUtf8StringFFIError pattern_string_7(SliceUtf8String x, ulong i);
+
+        // Debug - write_function_overload 
+        public static unsafe ResultUtf8StringFFIError pattern_string_7(ReadOnlySpan<Utf8String> x, ulong i)
+        {
+            fixed (void* ptr_x = x)
+            {
+                var x_slice = new SliceUtf8String(new IntPtr(ptr_x), (ulong) x.Length);
+                try
+                {
+                    return pattern_string_7(x_slice, i);
+                }
+                finally
+                {
+                }
+            }
+        }
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1")]

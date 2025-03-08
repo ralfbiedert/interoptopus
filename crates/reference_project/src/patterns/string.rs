@@ -85,3 +85,8 @@ pub fn pattern_string_6b(y: &mut UseUtf8String) -> FFIResult<(), FFIError> {
     *y = UseUtf8String { s1: Utf8String::from_string("s1".to_string()), s2: Utf8String::from_string("s2".to_string()) };
     FFIResult::ok(())
 }
+
+#[ffi_function]
+pub fn pattern_string_7(x: FFISlice<Utf8String>, i: u64) -> FFIResult<Utf8String, FFIError> {
+    FFIResult::ok(x.as_slice()[i as usize].clone())
+}

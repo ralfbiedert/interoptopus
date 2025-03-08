@@ -31,7 +31,7 @@ public class TestPatternStrings
     }
     
     [Fact]
-    public void string_utf8_passthrough()
+    public void pattern_string_1()
     {
         var i = new Utf8String("hello world");
         var o = Interop.pattern_string_1(i);
@@ -39,17 +39,22 @@ public class TestPatternStrings
     }
 
     [Fact]
-    public void string_utf8_in_out_wrapped()
+    public void pattern_string_2()
     {
-        var s = Interop.pattern_string_3();
-        Assert.Equal(s.String, "pattern_string_3");
-
-        var l = Interop.pattern_string_2(s);
+        var l = Interop.pattern_string_2("hello world");
         Assert.Equal(l, 16u);
     }
 
     [Fact]
-    public void string_utf8_in_out_by_struct()
+    public void pattern_string_3()
+    {
+        var s = Interop.pattern_string_3();
+        Assert.Equal(s.String, "pattern_string_3");
+    }
+
+
+    [Fact]
+    public void pattern_string_4()
     {
         var w = new UseUtf8String { s1 = "hello", s2 = "world" };
         var s = Interop.pattern_string_4(w);
@@ -58,7 +63,7 @@ public class TestPatternStrings
     }
 
     [Fact]
-    public void string_out_via_xxx()
+    public void pattern_string_6()
     {
         var w = new UseUtf8String { s1 = "hello", s2 = "world" };
         Interop.pattern_string_6a(ref w);
@@ -68,6 +73,19 @@ public class TestPatternStrings
         Assert.Equal(y.s1, "s1");
         Assert.Equal(y.s2, "s2");
     }
+
+    [Fact]
+    public void pattern_string_7()
+    {
+        // TODO 
+        var a = new Utf8String("hello");
+        var b = new Utf8String("world");
+        var r1 = Interop.pattern_string_7([a, b], 0).Ok();
+        var r2 = Interop.pattern_string_7([a, b], 1).Ok();
+        Assert.Equal(r1, "hello");
+        Assert.Equal(r2, "world");
+    }
+
 
     [Fact]
     public void string_by_ref_dont_leak()
@@ -90,5 +108,7 @@ public class TestPatternStrings
             var r2 = Interop.pattern_string_6b(out var y);
         }
     }
+
+
 
 }
