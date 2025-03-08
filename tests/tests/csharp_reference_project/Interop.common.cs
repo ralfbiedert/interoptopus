@@ -31,6 +31,12 @@ namespace My.Company.Common
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Vec
     {
+        public Vec(Vec other)
+        {
+            x = other.x;
+            z = other.z;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -90,30 +96,22 @@ namespace My.Company.Common
     public delegate void InteropDelegate_fn_CharArray(CharArray x0);
     public delegate void InteropDelegate_fn_CharArray_native(CharArray x0);
 
-    // Debug - write_pattern_slice 
+    // Debug - write_pattern_fast_slice 
     public partial struct SliceBool
     {
-        Bool[] _managed;
+        GCHandle _handle;
         IntPtr _data;
         ulong _len;
-        bool _wePinned;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct SliceBool : IEnumerable<Bool>, IDisposable
     {
-        public int Count => _managed?.Length ?? (int)_len;
+        public int Count => (int) _len;
 
         public unsafe ReadOnlySpan<Bool> ReadOnlySpan
         {
-            get
-            {
-                if (_managed is not null)
-                {
-                    return new ReadOnlySpan<Bool>(_managed);
-                }
-                return new ReadOnlySpan<Bool>(_data.ToPointer(), (int)_len);
-            }
+            get => new(_data.ToPointer(), (int)_len);
         }
 
         public unsafe Bool this[int i]
@@ -121,52 +119,34 @@ namespace My.Company.Common
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                if (_managed is not null)
-                {
-                    return _managed[i];
-                }
                 return Unsafe.Read<Bool>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<Bool>()));
             }
+
         }
 
-        public SliceBool(GCHandle handle, ulong count)
+        public SliceBool(IntPtr data, ulong len)
         {
-            _data = handle.AddrOfPinnedObject();
-            _len = count;
-        }
-
-        public SliceBool(IntPtr handle, ulong count)
-        {
-            _data = handle;
-            _len = count;
+            _data = data;
+            _len = len;
         }
 
         public SliceBool(Bool[] managed)
         {
-            _managed = managed;
-            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            _data = _handle.AddrOfPinnedObject();
             _len = (ulong) managed.Length;
-            _wePinned = true;
         }
 
         public IEnumerator<Bool> GetEnumerator()
         {
-            for (var i = 0; i < Count; ++i)
-            {
-                yield return this[i];
-            }
+            for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void Dispose()
         {
-            if (_wePinned && _data != IntPtr.Zero)
-            {
-                Marshal.FreeHGlobal(_data);
-                _data = IntPtr.Zero;
-            }
-            _managed = null;
+            if (_handle is { IsAllocated: true }) { _handle.Free(); }
         }
 
         [CustomMarshaller(typeof(SliceBool), MarshalMode.Default, typeof(Marshaller))]
@@ -186,44 +166,48 @@ namespace My.Company.Common
 
         public ref struct Marshaller
         {
-            private SliceBool managed;
-            private Unmanaged native;
-            private Unmanaged sourceNative;
-            private GCHandle? pinned;
-            private SliceBool marshalled;
+            private SliceBool _managed;
+            private Unmanaged _unmanaged;
 
-            public void FromManaged(SliceBool managed) { this.managed = managed; }
-            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
-            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
-            public unsafe SliceBool ToManaged() => new SliceBool(sourceNative.Data, sourceNative.Len);
+            public void FromManaged(SliceBool managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public Unmanaged ToUnmanaged()
+            {
+                _unmanaged = new Unmanaged();
+                _unmanaged.Data = _managed._data;
+                _unmanaged.Len = _managed._len;
+                return _unmanaged;
+            }
+
+            public unsafe SliceBool ToManaged()
+            {
+                _managed = new SliceBool();
+                _managed._data = _unmanaged.Data;
+                _managed._len = _unmanaged.Len;
+                return _managed;
+            }
+
             public void Free() { }
         }
     }
 
-    // Debug - write_pattern_slice 
+    // Debug - write_pattern_fast_slice 
     public partial struct SliceI32
     {
-        int[] _managed;
+        GCHandle _handle;
         IntPtr _data;
         ulong _len;
-        bool _wePinned;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct SliceI32 : IEnumerable<int>, IDisposable
     {
-        public int Count => _managed?.Length ?? (int)_len;
+        public int Count => (int) _len;
 
         public unsafe ReadOnlySpan<int> ReadOnlySpan
         {
-            get
-            {
-                if (_managed is not null)
-                {
-                    return new ReadOnlySpan<int>(_managed);
-                }
-                return new ReadOnlySpan<int>(_data.ToPointer(), (int)_len);
-            }
+            get => new(_data.ToPointer(), (int)_len);
         }
 
         public unsafe int this[int i]
@@ -231,52 +215,34 @@ namespace My.Company.Common
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                if (_managed is not null)
-                {
-                    return _managed[i];
-                }
                 return Unsafe.Read<int>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<int>()));
             }
+
         }
 
-        public SliceI32(GCHandle handle, ulong count)
+        public SliceI32(IntPtr data, ulong len)
         {
-            _data = handle.AddrOfPinnedObject();
-            _len = count;
-        }
-
-        public SliceI32(IntPtr handle, ulong count)
-        {
-            _data = handle;
-            _len = count;
+            _data = data;
+            _len = len;
         }
 
         public SliceI32(int[] managed)
         {
-            _managed = managed;
-            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            _data = _handle.AddrOfPinnedObject();
             _len = (ulong) managed.Length;
-            _wePinned = true;
         }
 
         public IEnumerator<int> GetEnumerator()
         {
-            for (var i = 0; i < Count; ++i)
-            {
-                yield return this[i];
-            }
+            for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void Dispose()
         {
-            if (_wePinned && _data != IntPtr.Zero)
-            {
-                Marshal.FreeHGlobal(_data);
-                _data = IntPtr.Zero;
-            }
-            _managed = null;
+            if (_handle is { IsAllocated: true }) { _handle.Free(); }
         }
 
         [CustomMarshaller(typeof(SliceI32), MarshalMode.Default, typeof(Marshaller))]
@@ -296,44 +262,48 @@ namespace My.Company.Common
 
         public ref struct Marshaller
         {
-            private SliceI32 managed;
-            private Unmanaged native;
-            private Unmanaged sourceNative;
-            private GCHandle? pinned;
-            private SliceI32 marshalled;
+            private SliceI32 _managed;
+            private Unmanaged _unmanaged;
 
-            public void FromManaged(SliceI32 managed) { this.managed = managed; }
-            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
-            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
-            public unsafe SliceI32 ToManaged() => new SliceI32(sourceNative.Data, sourceNative.Len);
+            public void FromManaged(SliceI32 managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public Unmanaged ToUnmanaged()
+            {
+                _unmanaged = new Unmanaged();
+                _unmanaged.Data = _managed._data;
+                _unmanaged.Len = _managed._len;
+                return _unmanaged;
+            }
+
+            public unsafe SliceI32 ToManaged()
+            {
+                _managed = new SliceI32();
+                _managed._data = _unmanaged.Data;
+                _managed._len = _unmanaged.Len;
+                return _managed;
+            }
+
             public void Free() { }
         }
     }
 
-    // Debug - write_pattern_slice 
+    // Debug - write_pattern_fast_slice 
     public partial struct SliceU32
     {
-        uint[] _managed;
+        GCHandle _handle;
         IntPtr _data;
         ulong _len;
-        bool _wePinned;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct SliceU32 : IEnumerable<uint>, IDisposable
     {
-        public int Count => _managed?.Length ?? (int)_len;
+        public int Count => (int) _len;
 
         public unsafe ReadOnlySpan<uint> ReadOnlySpan
         {
-            get
-            {
-                if (_managed is not null)
-                {
-                    return new ReadOnlySpan<uint>(_managed);
-                }
-                return new ReadOnlySpan<uint>(_data.ToPointer(), (int)_len);
-            }
+            get => new(_data.ToPointer(), (int)_len);
         }
 
         public unsafe uint this[int i]
@@ -341,52 +311,34 @@ namespace My.Company.Common
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                if (_managed is not null)
-                {
-                    return _managed[i];
-                }
                 return Unsafe.Read<uint>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<uint>()));
             }
+
         }
 
-        public SliceU32(GCHandle handle, ulong count)
+        public SliceU32(IntPtr data, ulong len)
         {
-            _data = handle.AddrOfPinnedObject();
-            _len = count;
-        }
-
-        public SliceU32(IntPtr handle, ulong count)
-        {
-            _data = handle;
-            _len = count;
+            _data = data;
+            _len = len;
         }
 
         public SliceU32(uint[] managed)
         {
-            _managed = managed;
-            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            _data = _handle.AddrOfPinnedObject();
             _len = (ulong) managed.Length;
-            _wePinned = true;
         }
 
         public IEnumerator<uint> GetEnumerator()
         {
-            for (var i = 0; i < Count; ++i)
-            {
-                yield return this[i];
-            }
+            for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void Dispose()
         {
-            if (_wePinned && _data != IntPtr.Zero)
-            {
-                Marshal.FreeHGlobal(_data);
-                _data = IntPtr.Zero;
-            }
-            _managed = null;
+            if (_handle is { IsAllocated: true }) { _handle.Free(); }
         }
 
         [CustomMarshaller(typeof(SliceU32), MarshalMode.Default, typeof(Marshaller))]
@@ -406,44 +358,48 @@ namespace My.Company.Common
 
         public ref struct Marshaller
         {
-            private SliceU32 managed;
-            private Unmanaged native;
-            private Unmanaged sourceNative;
-            private GCHandle? pinned;
-            private SliceU32 marshalled;
+            private SliceU32 _managed;
+            private Unmanaged _unmanaged;
 
-            public void FromManaged(SliceU32 managed) { this.managed = managed; }
-            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
-            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
-            public unsafe SliceU32 ToManaged() => new SliceU32(sourceNative.Data, sourceNative.Len);
+            public void FromManaged(SliceU32 managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public Unmanaged ToUnmanaged()
+            {
+                _unmanaged = new Unmanaged();
+                _unmanaged.Data = _managed._data;
+                _unmanaged.Len = _managed._len;
+                return _unmanaged;
+            }
+
+            public unsafe SliceU32 ToManaged()
+            {
+                _managed = new SliceU32();
+                _managed._data = _unmanaged.Data;
+                _managed._len = _unmanaged.Len;
+                return _managed;
+            }
+
             public void Free() { }
         }
     }
 
-    // Debug - write_pattern_slice 
+    // Debug - write_pattern_fast_slice 
     public partial struct SliceU8
     {
-        byte[] _managed;
+        GCHandle _handle;
         IntPtr _data;
         ulong _len;
-        bool _wePinned;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct SliceU8 : IEnumerable<byte>, IDisposable
     {
-        public int Count => _managed?.Length ?? (int)_len;
+        public int Count => (int) _len;
 
         public unsafe ReadOnlySpan<byte> ReadOnlySpan
         {
-            get
-            {
-                if (_managed is not null)
-                {
-                    return new ReadOnlySpan<byte>(_managed);
-                }
-                return new ReadOnlySpan<byte>(_data.ToPointer(), (int)_len);
-            }
+            get => new(_data.ToPointer(), (int)_len);
         }
 
         public unsafe byte this[int i]
@@ -451,52 +407,34 @@ namespace My.Company.Common
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                if (_managed is not null)
-                {
-                    return _managed[i];
-                }
                 return Unsafe.Read<byte>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<byte>()));
             }
+
         }
 
-        public SliceU8(GCHandle handle, ulong count)
+        public SliceU8(IntPtr data, ulong len)
         {
-            _data = handle.AddrOfPinnedObject();
-            _len = count;
-        }
-
-        public SliceU8(IntPtr handle, ulong count)
-        {
-            _data = handle;
-            _len = count;
+            _data = data;
+            _len = len;
         }
 
         public SliceU8(byte[] managed)
         {
-            _managed = managed;
-            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            _data = _handle.AddrOfPinnedObject();
             _len = (ulong) managed.Length;
-            _wePinned = true;
         }
 
         public IEnumerator<byte> GetEnumerator()
         {
-            for (var i = 0; i < Count; ++i)
-            {
-                yield return this[i];
-            }
+            for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void Dispose()
         {
-            if (_wePinned && _data != IntPtr.Zero)
-            {
-                Marshal.FreeHGlobal(_data);
-                _data = IntPtr.Zero;
-            }
-            _managed = null;
+            if (_handle is { IsAllocated: true }) { _handle.Free(); }
         }
 
         [CustomMarshaller(typeof(SliceU8), MarshalMode.Default, typeof(Marshaller))]
@@ -516,98 +454,66 @@ namespace My.Company.Common
 
         public ref struct Marshaller
         {
-            private SliceU8 managed;
-            private Unmanaged native;
-            private Unmanaged sourceNative;
-            private GCHandle? pinned;
-            private SliceU8 marshalled;
+            private SliceU8 _managed;
+            private Unmanaged _unmanaged;
 
-            public void FromManaged(SliceU8 managed) { this.managed = managed; }
-            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
-            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
-            public unsafe SliceU8 ToManaged() => new SliceU8(sourceNative.Data, sourceNative.Len);
+            public void FromManaged(SliceU8 managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public Unmanaged ToUnmanaged()
+            {
+                _unmanaged = new Unmanaged();
+                _unmanaged.Data = _managed._data;
+                _unmanaged.Len = _managed._len;
+                return _unmanaged;
+            }
+
+            public unsafe SliceU8 ToManaged()
+            {
+                _managed = new SliceU8();
+                _managed._data = _unmanaged.Data;
+                _managed._len = _unmanaged.Len;
+                return _managed;
+            }
+
             public void Free() { }
         }
     }
 
-    // Debug - write_pattern_slice 
+    // Debug - write_pattern_marshalling_slice 
     public partial struct SliceUtf8String
     {
-        Utf8String[] _managed;
-        IntPtr _data;
-        ulong _len;
-        bool _wePinned;
+        string[] _managed;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct SliceUtf8String : IEnumerable<Utf8String>, IDisposable
+    public partial struct SliceUtf8String : IEnumerable<string>, IDisposable
     {
-        public int Count => _managed?.Length ?? (int)_len;
+        public int Count => _managed?.Length ?? (int) 0;
 
-        public unsafe ReadOnlySpan<Utf8String> ReadOnlySpan
-        {
-            get
-            {
-                if (_managed is not null)
-                {
-                    return new ReadOnlySpan<Utf8String>(_managed);
-                }
-                return new ReadOnlySpan<Utf8String>(_data.ToPointer(), (int)_len);
-            }
-        }
-
-        public unsafe Utf8String this[int i]
+        public unsafe string this[int i]
         {
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                if (_managed is not null)
-                {
-                    return _managed[i];
-                }
-                return Unsafe.Read<Utf8String>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<Utf8String>()));
+                if (_managed is not null) { return _managed[i]; }
+                return default;
             }
         }
 
-        public SliceUtf8String(GCHandle handle, ulong count)
-        {
-            _data = handle.AddrOfPinnedObject();
-            _len = count;
-        }
-
-        public SliceUtf8String(IntPtr handle, ulong count)
-        {
-            _data = handle;
-            _len = count;
-        }
-
-        public SliceUtf8String(Utf8String[] managed)
+        public SliceUtf8String(string[] managed)
         {
             _managed = managed;
-            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
-            _len = (ulong) managed.Length;
-            _wePinned = true;
         }
 
-        public IEnumerator<Utf8String> GetEnumerator()
+        public IEnumerator<string> GetEnumerator()
         {
-            for (var i = 0; i < Count; ++i)
-            {
-                yield return this[i];
-            }
+            for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public void Dispose()
-        {
-            if (_wePinned && _data != IntPtr.Zero)
-            {
-                Marshal.FreeHGlobal(_data);
-                _data = IntPtr.Zero;
-            }
-            _managed = null;
-        }
+        public void Dispose() { }
 
         [CustomMarshaller(typeof(SliceUtf8String), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
@@ -617,53 +523,59 @@ namespace My.Company.Common
         {
             public IntPtr Data;
             public ulong Len;
-
-            public SliceUtf8String Managed()
-            {
-                return new SliceUtf8String(Data, Len);
-            }
         }
 
         public ref struct Marshaller
         {
-            private SliceUtf8String managed;
-            private Unmanaged native;
-            private Unmanaged sourceNative;
-            private GCHandle? pinned;
-            private SliceUtf8String marshalled;
+            private SliceUtf8String _managed;
+            private Unmanaged _unmanaged;
 
-            public void FromManaged(SliceUtf8String managed) { this.managed = managed; }
-            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
-            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
-            public unsafe SliceUtf8String ToManaged() => new SliceUtf8String(sourceNative.Data, sourceNative.Len);
-            public void Free() { }
+            public void FromManaged(SliceUtf8String managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {
+                var size = sizeof(Utf8String.Unmanaged);
+                _unmanaged = new Unmanaged();
+                _unmanaged.Data = Marshal.AllocHGlobal(size * _managed.Count);
+                _unmanaged.Len = (ulong) _managed.Count;
+                for (var i = 0; i < _managed.Count; ++i)
+                {
+                    var _marshaller = new Utf8String.Marshaller();
+                    _marshaller.FromManaged(new Utf8String(_managed._managed[i]));
+                    var unmanaged = _marshaller.ToUnmanaged();
+                    var dst = IntPtr.Add(_unmanaged.Data, i * size);
+                    Marshal.StructureToPtr(unmanaged, dst, false);
+                }
+                return _unmanaged;
+            }
+
+            public unsafe SliceUtf8String ToManaged()
+            {
+                _managed = new SliceUtf8String();
+                return _managed;
+            }
+
+            public void Free() { Marshal.FreeHGlobal(_unmanaged.Data); }
         }
     }
 
-    // Debug - write_pattern_slice 
+    // Debug - write_pattern_fast_slice 
     public partial struct SliceVec
     {
-        Vec[] _managed;
+        GCHandle _handle;
         IntPtr _data;
         ulong _len;
-        bool _wePinned;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct SliceVec : IEnumerable<Vec>, IDisposable
     {
-        public int Count => _managed?.Length ?? (int)_len;
+        public int Count => (int) _len;
 
         public unsafe ReadOnlySpan<Vec> ReadOnlySpan
         {
-            get
-            {
-                if (_managed is not null)
-                {
-                    return new ReadOnlySpan<Vec>(_managed);
-                }
-                return new ReadOnlySpan<Vec>(_data.ToPointer(), (int)_len);
-            }
+            get => new(_data.ToPointer(), (int)_len);
         }
 
         public unsafe Vec this[int i]
@@ -671,52 +583,34 @@ namespace My.Company.Common
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                if (_managed is not null)
-                {
-                    return _managed[i];
-                }
                 return Unsafe.Read<Vec>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<Vec>()));
             }
+
         }
 
-        public SliceVec(GCHandle handle, ulong count)
+        public SliceVec(IntPtr data, ulong len)
         {
-            _data = handle.AddrOfPinnedObject();
-            _len = count;
-        }
-
-        public SliceVec(IntPtr handle, ulong count)
-        {
-            _data = handle;
-            _len = count;
+            _data = data;
+            _len = len;
         }
 
         public SliceVec(Vec[] managed)
         {
-            _managed = managed;
-            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            _data = _handle.AddrOfPinnedObject();
             _len = (ulong) managed.Length;
-            _wePinned = true;
         }
 
         public IEnumerator<Vec> GetEnumerator()
         {
-            for (var i = 0; i < Count; ++i)
-            {
-                yield return this[i];
-            }
+            for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void Dispose()
         {
-            if (_wePinned && _data != IntPtr.Zero)
-            {
-                Marshal.FreeHGlobal(_data);
-                _data = IntPtr.Zero;
-            }
-            _managed = null;
+            if (_handle is { IsAllocated: true }) { _handle.Free(); }
         }
 
         [CustomMarshaller(typeof(SliceVec), MarshalMode.Default, typeof(Marshaller))]
@@ -736,41 +630,48 @@ namespace My.Company.Common
 
         public ref struct Marshaller
         {
-            private SliceVec managed;
-            private Unmanaged native;
-            private Unmanaged sourceNative;
-            private GCHandle? pinned;
-            private SliceVec marshalled;
+            private SliceVec _managed;
+            private Unmanaged _unmanaged;
 
-            public void FromManaged(SliceVec managed) { this.managed = managed; }
-            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
-            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
-            public unsafe SliceVec ToManaged() => new SliceVec(sourceNative.Data, sourceNative.Len);
+            public void FromManaged(SliceVec managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public Unmanaged ToUnmanaged()
+            {
+                _unmanaged = new Unmanaged();
+                _unmanaged.Data = _managed._data;
+                _unmanaged.Len = _managed._len;
+                return _unmanaged;
+            }
+
+            public unsafe SliceVec ToManaged()
+            {
+                _managed = new SliceVec();
+                _managed._data = _unmanaged.Data;
+                _managed._len = _unmanaged.Len;
+                return _managed;
+            }
+
             public void Free() { }
         }
     }
 
-    // Debug - write_pattern_slice_mut 
+    // Debug - write_pattern_fast_slice 
+    public partial struct SliceMutU32
+    {
+        GCHandle _handle;
+        IntPtr _data;
+        ulong _len;
+    }
+
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct SliceMutU32 : IEnumerable<uint>, IDisposable
     {
-        uint[] _managed;
-        IntPtr _data;
-        ulong _len;
-        bool _wePinned;
-
-        public int Count => _managed?.Length ?? (int)_len;
+        public int Count => (int) _len;
 
         public unsafe ReadOnlySpan<uint> ReadOnlySpan
         {
-            get
-            {
-                if (_managed is not null)
-                {
-                    return new ReadOnlySpan<uint>(_managed);
-                }
-                return new ReadOnlySpan<uint>(_data.ToPointer(), (int)_len);
-            }
+            get => new(_data.ToPointer(), (int)_len);
         }
 
         public unsafe uint this[int i]
@@ -778,58 +679,39 @@ namespace My.Company.Common
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                if (_managed is not null)
-                {
-                    return _managed[i];
-                }
                 return Unsafe.Read<uint>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<uint>()));
             }
+
             set
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var d = (uint*) _data.ToPointer();
-                d[i] = value;
+                Unsafe.Write<uint>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<uint>()), value);
             }
         }
 
-        public SliceMutU32(GCHandle handle, ulong count)
+        public SliceMutU32(IntPtr data, ulong len)
         {
-            _data = handle.AddrOfPinnedObject();
-            _len = count;
-        }
-
-        public SliceMutU32(IntPtr handle, ulong count)
-        {
-            _data = handle;
-            _len = count;
+            _data = data;
+            _len = len;
         }
 
         public SliceMutU32(uint[] managed)
         {
-            _managed = managed;
-            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            _data = _handle.AddrOfPinnedObject();
             _len = (ulong) managed.Length;
-            _wePinned = true;
         }
 
         public IEnumerator<uint> GetEnumerator()
         {
-            for (var i = 0; i < Count; ++i)
-            {
-                yield return this[i];
-            }
+            for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void Dispose()
         {
-            if (_wePinned && _data != IntPtr.Zero)
-            {
-                Marshal.FreeHGlobal(_data);
-                _data = IntPtr.Zero;
-            }
-            _managed = null;
+            if (_handle is { IsAllocated: true }) { _handle.Free(); }
         }
 
         [CustomMarshaller(typeof(SliceMutU32), MarshalMode.Default, typeof(Marshaller))]
@@ -849,41 +731,48 @@ namespace My.Company.Common
 
         public ref struct Marshaller
         {
-            private SliceMutU32 managed;
-            private Unmanaged native;
-            private Unmanaged sourceNative;
-            private GCHandle? pinned;
-            private SliceMutU32 marshalled;
+            private SliceMutU32 _managed;
+            private Unmanaged _unmanaged;
 
-            public void FromManaged(SliceMutU32 managed) { this.managed = managed; }
-            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
-            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
-            public unsafe SliceMutU32 ToManaged() => new SliceMutU32(sourceNative.Data, sourceNative.Len);
+            public void FromManaged(SliceMutU32 managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public Unmanaged ToUnmanaged()
+            {
+                _unmanaged = new Unmanaged();
+                _unmanaged.Data = _managed._data;
+                _unmanaged.Len = _managed._len;
+                return _unmanaged;
+            }
+
+            public unsafe SliceMutU32 ToManaged()
+            {
+                _managed = new SliceMutU32();
+                _managed._data = _unmanaged.Data;
+                _managed._len = _unmanaged.Len;
+                return _managed;
+            }
+
             public void Free() { }
         }
     }
 
-    // Debug - write_pattern_slice_mut 
+    // Debug - write_pattern_fast_slice 
+    public partial struct SliceMutU8
+    {
+        GCHandle _handle;
+        IntPtr _data;
+        ulong _len;
+    }
+
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct SliceMutU8 : IEnumerable<byte>, IDisposable
     {
-        byte[] _managed;
-        IntPtr _data;
-        ulong _len;
-        bool _wePinned;
-
-        public int Count => _managed?.Length ?? (int)_len;
+        public int Count => (int) _len;
 
         public unsafe ReadOnlySpan<byte> ReadOnlySpan
         {
-            get
-            {
-                if (_managed is not null)
-                {
-                    return new ReadOnlySpan<byte>(_managed);
-                }
-                return new ReadOnlySpan<byte>(_data.ToPointer(), (int)_len);
-            }
+            get => new(_data.ToPointer(), (int)_len);
         }
 
         public unsafe byte this[int i]
@@ -891,58 +780,39 @@ namespace My.Company.Common
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                if (_managed is not null)
-                {
-                    return _managed[i];
-                }
                 return Unsafe.Read<byte>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<byte>()));
             }
+
             set
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var d = (byte*) _data.ToPointer();
-                d[i] = value;
+                Unsafe.Write<byte>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<byte>()), value);
             }
         }
 
-        public SliceMutU8(GCHandle handle, ulong count)
+        public SliceMutU8(IntPtr data, ulong len)
         {
-            _data = handle.AddrOfPinnedObject();
-            _len = count;
-        }
-
-        public SliceMutU8(IntPtr handle, ulong count)
-        {
-            _data = handle;
-            _len = count;
+            _data = data;
+            _len = len;
         }
 
         public SliceMutU8(byte[] managed)
         {
-            _managed = managed;
-            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            _data = _handle.AddrOfPinnedObject();
             _len = (ulong) managed.Length;
-            _wePinned = true;
         }
 
         public IEnumerator<byte> GetEnumerator()
         {
-            for (var i = 0; i < Count; ++i)
-            {
-                yield return this[i];
-            }
+            for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void Dispose()
         {
-            if (_wePinned && _data != IntPtr.Zero)
-            {
-                Marshal.FreeHGlobal(_data);
-                _data = IntPtr.Zero;
-            }
-            _managed = null;
+            if (_handle is { IsAllocated: true }) { _handle.Free(); }
         }
 
         [CustomMarshaller(typeof(SliceMutU8), MarshalMode.Default, typeof(Marshaller))]
@@ -962,41 +832,48 @@ namespace My.Company.Common
 
         public ref struct Marshaller
         {
-            private SliceMutU8 managed;
-            private Unmanaged native;
-            private Unmanaged sourceNative;
-            private GCHandle? pinned;
-            private SliceMutU8 marshalled;
+            private SliceMutU8 _managed;
+            private Unmanaged _unmanaged;
 
-            public void FromManaged(SliceMutU8 managed) { this.managed = managed; }
-            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
-            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
-            public unsafe SliceMutU8 ToManaged() => new SliceMutU8(sourceNative.Data, sourceNative.Len);
+            public void FromManaged(SliceMutU8 managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public Unmanaged ToUnmanaged()
+            {
+                _unmanaged = new Unmanaged();
+                _unmanaged.Data = _managed._data;
+                _unmanaged.Len = _managed._len;
+                return _unmanaged;
+            }
+
+            public unsafe SliceMutU8 ToManaged()
+            {
+                _managed = new SliceMutU8();
+                _managed._data = _unmanaged.Data;
+                _managed._len = _unmanaged.Len;
+                return _managed;
+            }
+
             public void Free() { }
         }
     }
 
-    // Debug - write_pattern_slice_mut 
+    // Debug - write_pattern_fast_slice 
+    public partial struct SliceMutVec
+    {
+        GCHandle _handle;
+        IntPtr _data;
+        ulong _len;
+    }
+
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct SliceMutVec : IEnumerable<Vec>, IDisposable
     {
-        Vec[] _managed;
-        IntPtr _data;
-        ulong _len;
-        bool _wePinned;
-
-        public int Count => _managed?.Length ?? (int)_len;
+        public int Count => (int) _len;
 
         public unsafe ReadOnlySpan<Vec> ReadOnlySpan
         {
-            get
-            {
-                if (_managed is not null)
-                {
-                    return new ReadOnlySpan<Vec>(_managed);
-                }
-                return new ReadOnlySpan<Vec>(_data.ToPointer(), (int)_len);
-            }
+            get => new(_data.ToPointer(), (int)_len);
         }
 
         public unsafe Vec this[int i]
@@ -1004,58 +881,39 @@ namespace My.Company.Common
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                if (_managed is not null)
-                {
-                    return _managed[i];
-                }
                 return Unsafe.Read<Vec>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<Vec>()));
             }
+
             set
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var d = (Vec*) _data.ToPointer();
-                d[i] = value;
+                Unsafe.Write<Vec>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<Vec>()), value);
             }
         }
 
-        public SliceMutVec(GCHandle handle, ulong count)
+        public SliceMutVec(IntPtr data, ulong len)
         {
-            _data = handle.AddrOfPinnedObject();
-            _len = count;
-        }
-
-        public SliceMutVec(IntPtr handle, ulong count)
-        {
-            _data = handle;
-            _len = count;
+            _data = data;
+            _len = len;
         }
 
         public SliceMutVec(Vec[] managed)
         {
-            _managed = managed;
-            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            _data = _handle.AddrOfPinnedObject();
             _len = (ulong) managed.Length;
-            _wePinned = true;
         }
 
         public IEnumerator<Vec> GetEnumerator()
         {
-            for (var i = 0; i < Count; ++i)
-            {
-                yield return this[i];
-            }
+            for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void Dispose()
         {
-            if (_wePinned && _data != IntPtr.Zero)
-            {
-                Marshal.FreeHGlobal(_data);
-                _data = IntPtr.Zero;
-            }
-            _managed = null;
+            if (_handle is { IsAllocated: true }) { _handle.Free(); }
         }
 
         [CustomMarshaller(typeof(SliceMutVec), MarshalMode.Default, typeof(Marshaller))]
@@ -1075,16 +933,28 @@ namespace My.Company.Common
 
         public ref struct Marshaller
         {
-            private SliceMutVec managed;
-            private Unmanaged native;
-            private Unmanaged sourceNative;
-            private GCHandle? pinned;
-            private SliceMutVec marshalled;
+            private SliceMutVec _managed;
+            private Unmanaged _unmanaged;
 
-            public void FromManaged(SliceMutVec managed) { this.managed = managed; }
-            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
-            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
-            public unsafe SliceMutVec ToManaged() => new SliceMutVec(sourceNative.Data, sourceNative.Len);
+            public void FromManaged(SliceMutVec managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public Unmanaged ToUnmanaged()
+            {
+                _unmanaged = new Unmanaged();
+                _unmanaged.Data = _managed._data;
+                _unmanaged.Len = _managed._len;
+                return _unmanaged;
+            }
+
+            public unsafe SliceMutVec ToManaged()
+            {
+                _managed = new SliceMutVec();
+                _managed._data = _unmanaged.Data;
+                _managed._len = _unmanaged.Len;
+                return _managed;
+            }
+
             public void Free() { }
         }
     }
@@ -1103,6 +973,12 @@ namespace My.Company.Common
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct OptionVec
     {
+        public OptionVec(OptionVec other)
+        {
+            t = other.t;
+            is_some = other.is_some;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {

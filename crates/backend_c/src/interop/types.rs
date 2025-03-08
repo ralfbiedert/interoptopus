@@ -53,11 +53,11 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &CType
                 w.newline()?;
             }
             TypePattern::Slice(x) => {
-                write_type_definition_composite(i, w, x)?;
+                write_type_definition_composite(i, w, x.composite_type())?;
                 w.newline()?;
             }
             TypePattern::SliceMut(x) => {
-                write_type_definition_composite(i, w, x)?;
+                write_type_definition_composite(i, w, x.composite_type())?;
                 w.newline()?;
             }
             TypePattern::Option(x) => {

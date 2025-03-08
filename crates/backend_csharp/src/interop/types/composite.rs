@@ -22,6 +22,14 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
     indented!(w, r"public partial struct {}", name)?;
     indented!(w, r"{{")?;
 
+    indented!(w, [()], r"public {name}({name} other)")?;
+    indented!(w, [()], r"{{")?;
+    for field in the_type.fields() {
+        indented!(w, [()()], r"{} = other.{};", field.name(), field.name())?;
+    }
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+
     w.indent();
     write_type_definition_composite_layout_annotation(w, the_type)?;
     w.unindent();

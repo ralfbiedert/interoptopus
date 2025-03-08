@@ -21,15 +21,6 @@ public class TestPatternStrings
     
 
     [Fact]
-    public void string_slices()
-    {
-        // TODO - This won't work as C# would need more special marshalling of the individual strings.
-        // List<string> strings = ["a", "bb", "ccc"];
-        // var total_length  = Interop.pattern_ffi_slice_7(strings.ToArray());
-        // Assert.Equal(total_length, 6u);
-    }
-    
-    [Fact]
     public void pattern_string_1()
     {
         var i = new Utf8String("hello world");
@@ -64,11 +55,10 @@ public class TestPatternStrings
     [Fact]
     public void pattern_string_6()
     {
-        var w = new UseUtf8String { s1 = "hello", s2 = "world" };
-        Interop.pattern_string_6a(ref w);
+        var r1 = new UseUtf8String { s1 = "hello", s2 = "world" };
+        Interop.pattern_string_6a(ref r1);
 
-        // var y = new UseUtf8String();
-        var r2 = Interop.pattern_string_6b(out var y);
+        Interop.pattern_string_6b(out var y).Ok();
         Assert.Equal(y.s1, "s1");
         Assert.Equal(y.s2, "s2");
     }
@@ -76,15 +66,27 @@ public class TestPatternStrings
     [Fact]
     public void pattern_string_7()
     {
-        // TODO
-        var a = new Utf8String("hello");
-        var b = new Utf8String("world");
-        var r1 = Interop.pattern_string_7([a, b], 0).Ok();
-        var r2 = Interop.pattern_string_7([a, b], 1).Ok();
+        var r1 = Interop.pattern_string_7(["hello", "world"], 0).Ok();
+        var r2 = Interop.pattern_string_7(["hello", "world"], 1).Ok();
         Assert.Equal(r1, "hello");
         Assert.Equal(r2, "world");
     }
 
+    [Fact]
+    public void pattern_string_8()
+    {
+        var x = new UseUtf8String[]
+        {
+            new() { s1 = "hello1", s2 = "world1" },
+            new() { s1 = "hello2", s2 = "world2" },
+        };
+
+        var r1 = Interop.pattern_string_8(x, 0);
+        var r2 = Interop.pattern_string_8(x, 1);
+        
+        Assert.Equal(r1.Ok().s1, "hello1");
+        Assert.Equal(r2.Ok().s2, "world2");
+    }
 
     [Fact]
     public void string_by_ref_dont_leak()

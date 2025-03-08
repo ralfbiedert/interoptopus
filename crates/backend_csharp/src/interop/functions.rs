@@ -1,6 +1,6 @@
 use crate::converter::{
-    function_name_to_csharp_name, function_parameter_to_csharp_typename, function_rval_to_csharp_typename, has_ffi_error_rval, pattern_to_native_in_signature,
-    to_typespecifier_in_param, to_typespecifier_in_rval,
+    function_name_to_csharp_name, function_parameter_to_csharp_typename, function_rval_to_csharp_typename, has_ffi_error_rval, is_owned_slice,
+    pattern_to_native_in_signature, to_typespecifier_in_param, to_typespecifier_in_rval,
 };
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::lang::c::{CType, Documentation, Function, PrimitiveType};
@@ -147,10 +147,16 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         };
 
         match p.the_type() {
-            CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_)) => {
-                to_pin_name.push(name);
-                to_pin_slice_type.push(the_type);
-                to_invoke.push(format!("{name}_slice"));
+            CType::Pattern(TypePattern::Slice(x) | TypePattern::SliceMut(x)) => {
+                if is_owned_slice(x) {
+                    to_wrap_name.push(name);
+                    to_wrap_type.push(to_typespecifier_in_param(p.the_type()));
+                    to_invoke.push(format!("{name}_wrapped"));
+                } else {
+                    to_pin_name.push(name);
+                    to_pin_slice_type.push(the_type);
+                    to_invoke.push(format!("{name}_slice"));
+                }
             }
             CType::Pattern(TypePattern::NamedCallback(_)) => {
                 to_wrap_name.push(name);

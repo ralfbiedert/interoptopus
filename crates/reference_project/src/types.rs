@@ -175,6 +175,7 @@ pub struct UseCStrPtr<'a> {
 }
 
 #[ffi_type]
+#[derive(Clone)]
 pub struct UseUtf8String {
     pub s1: Utf8String,
     pub s2: Utf8String,

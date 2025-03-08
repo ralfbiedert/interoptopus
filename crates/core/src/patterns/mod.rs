@@ -82,6 +82,7 @@ use crate::patterns::builtins::Builtins;
 use crate::patterns::callbacks::{AsyncCallback, NamedCallback};
 use crate::patterns::result::{FFIErrorEnum, FFIResultType};
 use crate::patterns::service::ServiceDefinition;
+use crate::patterns::slice::SliceType;
 use std::ffi::c_char;
 
 #[doc(hidden)]
@@ -127,8 +128,8 @@ pub enum TypePattern {
     Utf8String(CompositeType),
     APIVersion,
     FFIErrorEnum(FFIErrorEnum),
-    Slice(CompositeType),
-    SliceMut(CompositeType),
+    Slice(SliceType),
+    SliceMut(SliceType),
     Option(CompositeType),
     Result(FFIResultType),
     Bool,
@@ -147,8 +148,8 @@ impl TypePattern {
         match self {
             Self::CStrPointer => CType::ReadPointer(Box::new(CType::Pattern(Self::CChar))),
             Self::FFIErrorEnum(e) => CType::Enum(e.the_enum().clone()),
-            Self::Slice(x) => CType::Composite(x.clone()),
-            Self::SliceMut(x) => CType::Composite(x.clone()),
+            Self::Slice(x) => CType::Composite(x.composite_type().clone()),
+            Self::SliceMut(x) => CType::Composite(x.composite_type().clone()),
             Self::Option(x) => CType::Composite(x.clone()),
             Self::Result(x) => CType::Composite(x.composite().clone()),
             Self::NamedCallback(x) => CType::FnPointer(x.fnpointer().clone()),

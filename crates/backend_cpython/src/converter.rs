@@ -41,16 +41,7 @@ pub fn to_type_hint(the_type: &CType, is_parameter: bool) -> String {
             TypePattern::Option(c) => c.rust_name().to_string(),
             TypePattern::Slice(c) | TypePattern::SliceMut(c) => {
                 let mut res = c.rust_name().to_string();
-                let inner = to_ctypes_name(
-                    c.fields()
-                        .iter()
-                        .find(|i| i.name().eq_ignore_ascii_case("data"))
-                        .expect("slice must have a data field")
-                        .the_type()
-                        .try_deref_pointer()
-                        .expect("data must be a pointer type"),
-                    false,
-                );
+                let inner = to_ctypes_name(c.target_type(), false);
                 if is_parameter {
                     res = format!("{res} | ctypes.Array[{inner}]");
                 }

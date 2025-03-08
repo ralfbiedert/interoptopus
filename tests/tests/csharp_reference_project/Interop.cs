@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 12825769361323931047ul)
+            if (api_version != 10019157065517906080ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (12825769361323931047). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10019157065517906080). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -688,18 +688,35 @@ namespace My.Company
         public static partial ResultUtf8StringFFIError pattern_string_7(SliceUtf8String x, ulong i);
 
         // Debug - write_function_overload 
-        public static unsafe ResultUtf8StringFFIError pattern_string_7(ReadOnlySpan<Utf8String> x, ulong i)
+        public static unsafe ResultUtf8StringFFIError pattern_string_7(string[] x, ulong i)
         {
-            fixed (void* ptr_x = x)
+            var x_wrapped = new SliceUtf8String(x);
+            try
             {
-                var x_slice = new SliceUtf8String(new IntPtr(ptr_x), (ulong) x.Length);
-                try
-                {
-                    return pattern_string_7(x_slice, i);
-                }
-                finally
-                {
-                }
+                return pattern_string_7(x_wrapped, i);
+            }
+            finally
+            {
+                x_wrapped.Dispose();
+            }
+        }
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_8")]
+        // Debug - write_function_declaration 
+        public static partial ResultUseUtf8StringFFIError pattern_string_8(SliceUseUtf8String x, ulong i);
+
+        // Debug - write_function_overload 
+        public static unsafe ResultUseUtf8StringFFIError pattern_string_8(UseUtf8String[] x, ulong i)
+        {
+            var x_wrapped = new SliceUseUtf8String(x);
+            try
+            {
+                return pattern_string_8(x_wrapped, i);
+            }
+            finally
+            {
+                x_wrapped.Dispose();
             }
         }
 
@@ -1042,14 +1059,6 @@ namespace My.Company
                 callback_wrapped.Dispose();
             }
         }
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_3")]
-        // Debug - write_function_declaration 
-        public static partial void pattern_callback_3(DelegateCallbackMyCallbackContextual callback, uint x);
-
-        // Debug - write_function_overload 
-        // Debug - no overload for pattern_callback_3 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_4")]
@@ -1751,6 +1760,11 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Array
     {
+        public Array(Array other)
+        {
+            data = other.data;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -1818,6 +1832,11 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct BoolField
     {
+        public BoolField(BoolField other)
+        {
+            val = other.val;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -1879,6 +1898,18 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct CallbackTable
     {
+        public CallbackTable(CallbackTable other)
+        {
+            my_callback = other.my_callback;
+            my_callback_namespaced = other.my_callback_namespaced;
+            my_callback_void = other.my_callback_void;
+            my_callback_contextual = other.my_callback_contextual;
+            sum_delegate_1 = other.sum_delegate_1;
+            sum_delegate_2 = other.sum_delegate_2;
+            sum_delegate_return = other.sum_delegate_return;
+            sum_delegate_return_2 = other.sum_delegate_return_2;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -1992,6 +2023,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct CharArray
     {
+        public CharArray(CharArray other)
+        {
+            str = other.str;
+            str_2 = other.str_2;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -2056,6 +2093,11 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Container
     {
+        public Container(Container other)
+        {
+            foreign = other.foreign;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -2103,69 +2145,6 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    public partial struct DelegateCallbackMyCallbackContextual
-    {
-        public MyCallbackContextual callback;
-        public IntPtr context;
-    }
-
-    // Debug - write_type_definition_composite_marshaller 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct DelegateCallbackMyCallbackContextual
-    {
-        [StructLayout(LayoutKind.Sequential)]
-        public unsafe struct Unmanaged
-        {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
-            public MyCallbackContextual.Unmanaged callback;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
-            public IntPtr context;
-        }
-
-        [CustomMarshaller(typeof(DelegateCallbackMyCallbackContextual), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
-        public ref struct Marshaller
-        {
-            private DelegateCallbackMyCallbackContextual _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
-
-            public Marshaller(DelegateCallbackMyCallbackContextual managed) { _managed = managed; }
-            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-
-            public void FromManaged(DelegateCallbackMyCallbackContextual managed) { _managed = managed; }
-            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
-
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                var _callback = new MyCallbackContextual.Marshaller(_managed.callback);
-                _unmanaged.callback = _callback.ToUnmanaged();
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.context = _managed.context;
-
-                return _unmanaged;
-            }
-
-            public unsafe DelegateCallbackMyCallbackContextual ToManaged()
-            {
-                _managed = new DelegateCallbackMyCallbackContextual();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                var _callback = new MyCallbackContextual.Marshaller(_unmanaged.callback);
-                _managed.callback = _callback.ToManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.context = _unmanaged.context;
-
-                return _managed;
-            }
-            public void Free() { }
-        }
-    }
-
-    // Debug - write_type_definition_composite 
     public partial struct ExtraTypef32
     {
         public float x;
@@ -2175,6 +2154,11 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ExtraTypef32
     {
+        public ExtraTypef32(ExtraTypef32 other)
+        {
+            x = other.x;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -2229,6 +2213,11 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct FixedString
     {
+        public FixedString(FixedString other)
+        {
+            data = other.data;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -2296,6 +2285,11 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Genericu32
     {
+        public Genericu32(Genericu32 other)
+        {
+            x = other.x;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -2350,6 +2344,11 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Genericu8
     {
+        public Genericu8(Genericu8 other)
+        {
+            x = other.x;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -2404,6 +2403,11 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Inner
     {
+        public Inner(Inner other)
+        {
+            x = other.x;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -2458,6 +2462,11 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Local
     {
+        public Local(Local other)
+        {
+            x = other.x;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -2518,6 +2527,17 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct NestedArray
     {
+        public NestedArray(NestedArray other)
+        {
+            field_enum = other.field_enum;
+            field_vec = other.field_vec;
+            field_bool = other.field_bool;
+            field_int = other.field_int;
+            field_array = other.field_array;
+            field_array_2 = other.field_array_2;
+            field_struct = other.field_struct;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -2639,6 +2659,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Packed1
     {
+        public Packed1(Packed1 other)
+        {
+            x = other.x;
+            y = other.y;
+        }
+
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public unsafe struct Unmanaged
         {
@@ -2700,6 +2726,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Packed2
     {
+        public Packed2(Packed2 other)
+        {
+            y = other.y;
+            x = other.x;
+        }
+
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public unsafe struct Unmanaged
         {
@@ -2760,6 +2792,11 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Phantomu8
     {
+        public Phantomu8(Phantomu8 other)
+        {
+            x = other.x;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -2816,6 +2853,11 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct StructDocumented
     {
+        public StructDocumented(StructDocumented other)
+        {
+            x = other.x;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -2870,6 +2912,11 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct StructRenamed
     {
+        public StructRenamed(StructRenamed other)
+        {
+            e = other.e;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -2924,6 +2971,11 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Tupled
     {
+        public Tupled(Tupled other)
+        {
+            x0 = other.x0;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -2978,6 +3030,11 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct UseCStrPtr
     {
+        public UseCStrPtr(UseCStrPtr other)
+        {
+            ascii_string = other.ascii_string;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -3033,6 +3090,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct UseUtf8String
     {
+        public UseUtf8String(UseUtf8String other)
+        {
+            s1 = other.s1;
+            s2 = other.s2;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -3098,6 +3161,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Vec1
     {
+        public Vec1(Vec1 other)
+        {
+            x = other.x;
+            y = other.y;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -3159,6 +3228,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Vec2
     {
+        public Vec2(Vec2 other)
+        {
+            x = other.x;
+            z = other.z;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -3221,6 +3296,13 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Vec3f32
     {
+        public Vec3f32(Vec3f32 other)
+        {
+            x = other.x;
+            y = other.y;
+            z = other.z;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -3288,6 +3370,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Visibility1
     {
+        public Visibility1(Visibility1 other)
+        {
+            pblc = other.pblc;
+            prvt = other.prvt;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -3349,6 +3437,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Visibility2
     {
+        public Visibility2(Visibility2 other)
+        {
+            pblc1 = other.pblc1;
+            pblc2 = other.pblc2;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -3409,6 +3503,11 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Weird1u32
     {
+        public Weird1u32(Weird1u32 other)
+        {
+            x = other.x;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -3465,6 +3564,13 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Weird2u8
     {
+        public Weird2u8(Weird2u8 other)
+        {
+            t = other.t;
+            a = other.a;
+            r = other.r;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -3620,30 +3726,22 @@ namespace My.Company
     }
 
 
-    // Debug - write_pattern_slice 
+    // Debug - write_pattern_fast_slice 
     public partial struct SliceUseCStrPtr
     {
-        UseCStrPtr[] _managed;
+        GCHandle _handle;
         IntPtr _data;
         ulong _len;
-        bool _wePinned;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct SliceUseCStrPtr : IEnumerable<UseCStrPtr>, IDisposable
     {
-        public int Count => _managed?.Length ?? (int)_len;
+        public int Count => (int) _len;
 
         public unsafe ReadOnlySpan<UseCStrPtr> ReadOnlySpan
         {
-            get
-            {
-                if (_managed is not null)
-                {
-                    return new ReadOnlySpan<UseCStrPtr>(_managed);
-                }
-                return new ReadOnlySpan<UseCStrPtr>(_data.ToPointer(), (int)_len);
-            }
+            get => new(_data.ToPointer(), (int)_len);
         }
 
         public unsafe UseCStrPtr this[int i]
@@ -3651,52 +3749,34 @@ namespace My.Company
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                if (_managed is not null)
-                {
-                    return _managed[i];
-                }
                 return Unsafe.Read<UseCStrPtr>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<UseCStrPtr>()));
             }
+
         }
 
-        public SliceUseCStrPtr(GCHandle handle, ulong count)
+        public SliceUseCStrPtr(IntPtr data, ulong len)
         {
-            _data = handle.AddrOfPinnedObject();
-            _len = count;
-        }
-
-        public SliceUseCStrPtr(IntPtr handle, ulong count)
-        {
-            _data = handle;
-            _len = count;
+            _data = data;
+            _len = len;
         }
 
         public SliceUseCStrPtr(UseCStrPtr[] managed)
         {
-            _managed = managed;
-            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            _data = _handle.AddrOfPinnedObject();
             _len = (ulong) managed.Length;
-            _wePinned = true;
         }
 
         public IEnumerator<UseCStrPtr> GetEnumerator()
         {
-            for (var i = 0; i < Count; ++i)
-            {
-                yield return this[i];
-            }
+            for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void Dispose()
         {
-            if (_wePinned && _data != IntPtr.Zero)
-            {
-                Marshal.FreeHGlobal(_data);
-                _data = IntPtr.Zero;
-            }
-            _managed = null;
+            if (_handle is { IsAllocated: true }) { _handle.Free(); }
         }
 
         [CustomMarshaller(typeof(SliceUseCStrPtr), MarshalMode.Default, typeof(Marshaller))]
@@ -3716,44 +3796,128 @@ namespace My.Company
 
         public ref struct Marshaller
         {
-            private SliceUseCStrPtr managed;
-            private Unmanaged native;
-            private Unmanaged sourceNative;
-            private GCHandle? pinned;
-            private SliceUseCStrPtr marshalled;
+            private SliceUseCStrPtr _managed;
+            private Unmanaged _unmanaged;
 
-            public void FromManaged(SliceUseCStrPtr managed) { this.managed = managed; }
-            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
-            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
-            public unsafe SliceUseCStrPtr ToManaged() => new SliceUseCStrPtr(sourceNative.Data, sourceNative.Len);
+            public void FromManaged(SliceUseCStrPtr managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public Unmanaged ToUnmanaged()
+            {
+                _unmanaged = new Unmanaged();
+                _unmanaged.Data = _managed._data;
+                _unmanaged.Len = _managed._len;
+                return _unmanaged;
+            }
+
+            public unsafe SliceUseCStrPtr ToManaged()
+            {
+                _managed = new SliceUseCStrPtr();
+                _managed._data = _unmanaged.Data;
+                _managed._len = _unmanaged.Len;
+                return _managed;
+            }
+
             public void Free() { }
         }
     }
 
-    // Debug - write_pattern_slice 
+    // Debug - write_pattern_marshalling_slice 
+    public partial struct SliceUseUtf8String
+    {
+        UseUtf8String[] _managed;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct SliceUseUtf8String : IEnumerable<UseUtf8String>, IDisposable
+    {
+        public int Count => _managed?.Length ?? (int) 0;
+
+        public unsafe UseUtf8String this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                if (_managed is not null) { return _managed[i]; }
+                return default;
+            }
+        }
+
+        public SliceUseUtf8String(UseUtf8String[] managed)
+        {
+            _managed = managed;
+        }
+
+        public IEnumerator<UseUtf8String> GetEnumerator()
+        {
+            for (var i = 0; i < Count; ++i) { yield return this[i]; }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public void Dispose() { }
+
+        [CustomMarshaller(typeof(SliceUseUtf8String), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            public IntPtr Data;
+            public ulong Len;
+        }
+
+        public ref struct Marshaller
+        {
+            private SliceUseUtf8String _managed;
+            private Unmanaged _unmanaged;
+
+            public void FromManaged(SliceUseUtf8String managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {
+                var size = sizeof(UseUtf8String.Unmanaged);
+                _unmanaged = new Unmanaged();
+                _unmanaged.Data = Marshal.AllocHGlobal(size * _managed.Count);
+                _unmanaged.Len = (ulong) _managed.Count;
+                for (var i = 0; i < _managed.Count; ++i)
+                {
+                    var _marshaller = new UseUtf8String.Marshaller();
+                    _marshaller.FromManaged(new UseUtf8String(_managed._managed[i]));
+                    var unmanaged = _marshaller.ToUnmanaged();
+                    var dst = IntPtr.Add(_unmanaged.Data, i * size);
+                    Marshal.StructureToPtr(unmanaged, dst, false);
+                }
+                return _unmanaged;
+            }
+
+            public unsafe SliceUseUtf8String ToManaged()
+            {
+                _managed = new SliceUseUtf8String();
+                return _managed;
+            }
+
+            public void Free() { Marshal.FreeHGlobal(_unmanaged.Data); }
+        }
+    }
+
+    // Debug - write_pattern_fast_slice 
     public partial struct SliceVec3f32
     {
-        Vec3f32[] _managed;
+        GCHandle _handle;
         IntPtr _data;
         ulong _len;
-        bool _wePinned;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct SliceVec3f32 : IEnumerable<Vec3f32>, IDisposable
     {
-        public int Count => _managed?.Length ?? (int)_len;
+        public int Count => (int) _len;
 
         public unsafe ReadOnlySpan<Vec3f32> ReadOnlySpan
         {
-            get
-            {
-                if (_managed is not null)
-                {
-                    return new ReadOnlySpan<Vec3f32>(_managed);
-                }
-                return new ReadOnlySpan<Vec3f32>(_data.ToPointer(), (int)_len);
-            }
+            get => new(_data.ToPointer(), (int)_len);
         }
 
         public unsafe Vec3f32 this[int i]
@@ -3761,52 +3925,34 @@ namespace My.Company
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                if (_managed is not null)
-                {
-                    return _managed[i];
-                }
                 return Unsafe.Read<Vec3f32>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<Vec3f32>()));
             }
+
         }
 
-        public SliceVec3f32(GCHandle handle, ulong count)
+        public SliceVec3f32(IntPtr data, ulong len)
         {
-            _data = handle.AddrOfPinnedObject();
-            _len = count;
-        }
-
-        public SliceVec3f32(IntPtr handle, ulong count)
-        {
-            _data = handle;
-            _len = count;
+            _data = data;
+            _len = len;
         }
 
         public SliceVec3f32(Vec3f32[] managed)
         {
-            _managed = managed;
-            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            _data = _handle.AddrOfPinnedObject();
             _len = (ulong) managed.Length;
-            _wePinned = true;
         }
 
         public IEnumerator<Vec3f32> GetEnumerator()
         {
-            for (var i = 0; i < Count; ++i)
-            {
-                yield return this[i];
-            }
+            for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void Dispose()
         {
-            if (_wePinned && _data != IntPtr.Zero)
-            {
-                Marshal.FreeHGlobal(_data);
-                _data = IntPtr.Zero;
-            }
-            _managed = null;
+            if (_handle is { IsAllocated: true }) { _handle.Free(); }
         }
 
         [CustomMarshaller(typeof(SliceVec3f32), MarshalMode.Default, typeof(Marshaller))]
@@ -3826,41 +3972,48 @@ namespace My.Company
 
         public ref struct Marshaller
         {
-            private SliceVec3f32 managed;
-            private Unmanaged native;
-            private Unmanaged sourceNative;
-            private GCHandle? pinned;
-            private SliceVec3f32 marshalled;
+            private SliceVec3f32 _managed;
+            private Unmanaged _unmanaged;
 
-            public void FromManaged(SliceVec3f32 managed) { this.managed = managed; }
-            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
-            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
-            public unsafe SliceVec3f32 ToManaged() => new SliceVec3f32(sourceNative.Data, sourceNative.Len);
+            public void FromManaged(SliceVec3f32 managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public Unmanaged ToUnmanaged()
+            {
+                _unmanaged = new Unmanaged();
+                _unmanaged.Data = _managed._data;
+                _unmanaged.Len = _managed._len;
+                return _unmanaged;
+            }
+
+            public unsafe SliceVec3f32 ToManaged()
+            {
+                _managed = new SliceVec3f32();
+                _managed._data = _unmanaged.Data;
+                _managed._len = _unmanaged.Len;
+                return _managed;
+            }
+
             public void Free() { }
         }
     }
 
-    // Debug - write_pattern_slice_mut 
+    // Debug - write_pattern_fast_slice 
+    public partial struct SliceMutCharArray
+    {
+        GCHandle _handle;
+        IntPtr _data;
+        ulong _len;
+    }
+
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct SliceMutCharArray : IEnumerable<CharArray>, IDisposable
     {
-        CharArray[] _managed;
-        IntPtr _data;
-        ulong _len;
-        bool _wePinned;
-
-        public int Count => _managed?.Length ?? (int)_len;
+        public int Count => (int) _len;
 
         public unsafe ReadOnlySpan<CharArray> ReadOnlySpan
         {
-            get
-            {
-                if (_managed is not null)
-                {
-                    return new ReadOnlySpan<CharArray>(_managed);
-                }
-                return new ReadOnlySpan<CharArray>(_data.ToPointer(), (int)_len);
-            }
+            get => new(_data.ToPointer(), (int)_len);
         }
 
         public unsafe CharArray this[int i]
@@ -3868,58 +4021,39 @@ namespace My.Company
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                if (_managed is not null)
-                {
-                    return _managed[i];
-                }
                 return Unsafe.Read<CharArray>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<CharArray>()));
             }
+
             set
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                var d = (CharArray*) _data.ToPointer();
-                d[i] = value;
+                Unsafe.Write<CharArray>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<CharArray>()), value);
             }
         }
 
-        public SliceMutCharArray(GCHandle handle, ulong count)
+        public SliceMutCharArray(IntPtr data, ulong len)
         {
-            _data = handle.AddrOfPinnedObject();
-            _len = count;
-        }
-
-        public SliceMutCharArray(IntPtr handle, ulong count)
-        {
-            _data = handle;
-            _len = count;
+            _data = data;
+            _len = len;
         }
 
         public SliceMutCharArray(CharArray[] managed)
         {
-            _managed = managed;
-            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            _data = _handle.AddrOfPinnedObject();
             _len = (ulong) managed.Length;
-            _wePinned = true;
         }
 
         public IEnumerator<CharArray> GetEnumerator()
         {
-            for (var i = 0; i < Count; ++i)
-            {
-                yield return this[i];
-            }
+            for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void Dispose()
         {
-            if (_wePinned && _data != IntPtr.Zero)
-            {
-                Marshal.FreeHGlobal(_data);
-                _data = IntPtr.Zero;
-            }
-            _managed = null;
+            if (_handle is { IsAllocated: true }) { _handle.Free(); }
         }
 
         [CustomMarshaller(typeof(SliceMutCharArray), MarshalMode.Default, typeof(Marshaller))]
@@ -3939,16 +4073,28 @@ namespace My.Company
 
         public ref struct Marshaller
         {
-            private SliceMutCharArray managed;
-            private Unmanaged native;
-            private Unmanaged sourceNative;
-            private GCHandle? pinned;
-            private SliceMutCharArray marshalled;
+            private SliceMutCharArray _managed;
+            private Unmanaged _unmanaged;
 
-            public void FromManaged(SliceMutCharArray managed) { this.managed = managed; }
-            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
-            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
-            public unsafe SliceMutCharArray ToManaged() => new SliceMutCharArray(sourceNative.Data, sourceNative.Len);
+            public void FromManaged(SliceMutCharArray managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public Unmanaged ToUnmanaged()
+            {
+                _unmanaged = new Unmanaged();
+                _unmanaged.Data = _managed._data;
+                _unmanaged.Len = _managed._len;
+                return _unmanaged;
+            }
+
+            public unsafe SliceMutCharArray ToManaged()
+            {
+                _managed = new SliceMutCharArray();
+                _managed._data = _unmanaged.Data;
+                _managed._len = _unmanaged.Len;
+                return _managed;
+            }
+
             public void Free() { }
         }
     }
@@ -3967,6 +4113,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct OptionInner
     {
+        public OptionInner(OptionInner other)
+        {
+            t = other.t;
+            is_some = other.is_some;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -4055,6 +4207,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceAsyncFFIError
     {
+        public ResultConstPtrServiceAsyncFFIError(ResultConstPtrServiceAsyncFFIError other)
+        {
+            t = other.t;
+            err = other.err;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -4134,6 +4292,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceBasicFFIError
     {
+        public ResultConstPtrServiceBasicFFIError(ResultConstPtrServiceBasicFFIError other)
+        {
+            t = other.t;
+            err = other.err;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -4213,6 +4377,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceCallbacksFFIError
     {
+        public ResultConstPtrServiceCallbacksFFIError(ResultConstPtrServiceCallbacksFFIError other)
+        {
+            t = other.t;
+            err = other.err;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -4292,6 +4462,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceIgnoringMethodsFFIError
     {
+        public ResultConstPtrServiceIgnoringMethodsFFIError(ResultConstPtrServiceIgnoringMethodsFFIError other)
+        {
+            t = other.t;
+            err = other.err;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -4371,6 +4547,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceMultipleCtorsFFIError
     {
+        public ResultConstPtrServiceMultipleCtorsFFIError(ResultConstPtrServiceMultipleCtorsFFIError other)
+        {
+            t = other.t;
+            err = other.err;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -4450,6 +4632,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceOnPanicFFIError
     {
+        public ResultConstPtrServiceOnPanicFFIError(ResultConstPtrServiceOnPanicFFIError other)
+        {
+            t = other.t;
+            err = other.err;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -4529,6 +4717,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceResultFFIError
     {
+        public ResultConstPtrServiceResultFFIError(ResultConstPtrServiceResultFFIError other)
+        {
+            t = other.t;
+            err = other.err;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -4608,6 +4802,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceStringsFFIError
     {
+        public ResultConstPtrServiceStringsFFIError(ResultConstPtrServiceStringsFFIError other)
+        {
+            t = other.t;
+            err = other.err;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -4687,6 +4887,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceVariousSlicesFFIError
     {
+        public ResultConstPtrServiceVariousSlicesFFIError(ResultConstPtrServiceVariousSlicesFFIError other)
+        {
+            t = other.t;
+            err = other.err;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -4766,6 +4972,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultNestedArrayFFIError
     {
+        public ResultNestedArrayFFIError(ResultNestedArrayFFIError other)
+        {
+            t = other.t;
+            err = other.err;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -4847,6 +5059,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultU32FFIError
     {
+        public ResultU32FFIError(ResultU32FFIError other)
+        {
+            t = other.t;
+            err = other.err;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -4926,6 +5144,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultU64FFIError
     {
+        public ResultU64FFIError(ResultU64FFIError other)
+        {
+            t = other.t;
+            err = other.err;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -5005,6 +5229,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultUseUtf8StringFFIError
     {
+        public ResultUseUtf8StringFFIError(ResultUseUtf8StringFFIError other)
+        {
+            t = other.t;
+            err = other.err;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -5086,6 +5316,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultUtf8StringFFIError
     {
+        public ResultUtf8StringFFIError(ResultUtf8StringFFIError other)
+        {
+            t = other.t;
+            err = other.err;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {

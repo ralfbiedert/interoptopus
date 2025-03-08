@@ -4,21 +4,14 @@ use crate::interop::utils::write_success_enum_aware_rval;
 use crate::Interop;
 use interoptopus::lang::c::{CType, CompositeType, Function};
 use interoptopus::patterns::service::ServiceDefinition;
+use interoptopus::patterns::slice::SliceType;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::longest_common_prefix;
 use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, Error};
 
-pub fn write_slice(_i: &Interop, w: &mut IndentWriter, c: &CompositeType, mutable: bool) -> Result<(), Error> {
-    let data_type = c
-        .fields()
-        .iter()
-        .find(|x| x.name().contains("data"))
-        .expect("Slice must contain field called 'data'.")
-        .the_type()
-        .try_deref_pointer()
-        .expect("data must be a pointer type");
-
+pub fn write_slice(_i: &Interop, w: &mut IndentWriter, c: &SliceType, mutable: bool) -> Result<(), Error> {
+    let data_type = c.target_type();
     let data_type_python = to_ctypes_name(data_type, true);
     let hint_in = to_type_hint_in(data_type, false);
     let hint_out = to_type_hint_out(data_type);

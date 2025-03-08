@@ -38,7 +38,7 @@
 //! ```
 //!
 
-use crate::lang::c::{CType, CompositeType, Documentation, Field, Layout, Meta, PrimitiveType, Representation, Visibility};
+use crate::lang::c::{CType, CompositeType, Documentation, Field, FnPointerType, Layout, Meta, PrimitiveType, Representation, Visibility};
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::TypePattern;
 use crate::util::capitalize_first_letter;
@@ -139,7 +139,8 @@ where
         let meta = Meta::with_namespace_documentation(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
         let name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
         let composite = CompositeType::with_meta_repr(format!("Slice{name}"), fields, meta, repr);
-        CType::Pattern(TypePattern::Slice(composite))
+        let slice = SliceType::new(composite, T::type_info());
+        CType::Pattern(TypePattern::Slice(slice))
     }
 }
 
@@ -243,7 +244,36 @@ where
         let meta = Meta::with_namespace_documentation(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
         let name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
         let composite = CompositeType::with_meta_repr(format!("SliceMut{name}"), fields, meta, repr);
-        CType::Pattern(TypePattern::SliceMut(composite))
+        let slice = SliceType::new(composite, T::type_info());
+        CType::Pattern(TypePattern::SliceMut(slice))
+    }
+}
+
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub struct SliceType {
+    composite_type: CompositeType,
+    target_type: Box<CType>,
+}
+
+impl SliceType {
+    pub fn new(composite_type: CompositeType, target_type: CType) -> Self {
+        Self { composite_type, target_type: Box::new(target_type) }
+    }
+
+    pub fn rust_name(&self) -> &str {
+        self.composite_type.rust_name()
+    }
+
+    pub fn meta(&self) -> &Meta {
+        &self.composite_type.meta()
+    }
+
+    pub fn composite_type(&self) -> &CompositeType {
+        &self.composite_type
+    }
+
+    pub fn target_type(&self) -> &CType {
+        &self.target_type
     }
 }
 

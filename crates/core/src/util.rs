@@ -132,7 +132,7 @@ pub(crate) fn ctypes_from_functions_types(functions: &[Function], extra_types: &
 }
 
 /// Recursive helper for [`ctypes_from_functions_types`].
-pub(crate) fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CType>) {
+pub fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CType>) {
     types.insert(start.clone());
 
     match start {
@@ -172,16 +172,8 @@ pub(crate) fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CTyp
                     ctypes_from_type_recursive(param.the_type(), types);
                 }
             }
-            TypePattern::Slice(x) => {
-                for field in x.fields() {
-                    ctypes_from_type_recursive(field.the_type(), types);
-                }
-            }
-            TypePattern::SliceMut(x) => {
-                for field in x.fields() {
-                    ctypes_from_type_recursive(field.the_type(), types);
-                }
-            }
+            TypePattern::Slice(x) => ctypes_from_type_recursive(&x.target_type(), types),
+            TypePattern::SliceMut(x) => ctypes_from_type_recursive(&x.target_type(), types),
             TypePattern::Option(x) => {
                 for field in x.fields() {
                     ctypes_from_type_recursive(field.the_type(), types);
@@ -338,8 +330,8 @@ pub fn is_global_type(t: &CType) -> bool {
             TypePattern::CStrPointer => true,
             TypePattern::APIVersion => false,
             TypePattern::FFIErrorEnum(_) => false,
-            TypePattern::Slice(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),
-            TypePattern::SliceMut(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),
+            TypePattern::Slice(x) => is_global_type(x.target_type()),
+            TypePattern::SliceMut(x) => is_global_type(x.target_type()),
             TypePattern::Option(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),
             TypePattern::Result(x) => x.composite().fields().iter().all(|x| is_global_type(x.the_type())),
             TypePattern::Bool => true,

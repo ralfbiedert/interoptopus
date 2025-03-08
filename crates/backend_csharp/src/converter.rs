@@ -1,3 +1,4 @@
+use crate::interop::patterns::slices::SliceKind;
 use crate::interop::FunctionNameFlavor;
 use crate::Interop;
 use heck::{ToLowerCamelCase, ToUpperCamelCase};
@@ -5,8 +6,10 @@ use interoptopus::lang::c::{
     CType, CompositeType, ConstantValue, EnumType, Field, FnPointerType, Function, FunctionSignature, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
 };
 use interoptopus::patterns::callbacks::{AsyncCallback, NamedCallback};
+use interoptopus::patterns::slice::SliceType;
 use interoptopus::patterns::TypePattern;
-use interoptopus::util::safe_name;
+use interoptopus::util::{ctypes_from_type_recursive, safe_name};
+use std::collections::HashSet;
 
 /// Converts a primitive (Rust) type to a native C# type name, e.g., `f32` to `float`.
 pub fn primitive_to_typename(x: PrimitiveType) -> String {
@@ -131,8 +134,8 @@ pub fn to_typespecifier_in_param(x: &CType) -> String {
             CType::ReadPointer(_) => "ref IntPtr".to_string(),
             CType::ReadWritePointer(_) => "ref IntPtr".to_string(),
             CType::Pattern(TypePattern::CChar) => "IntPtr".to_string(),
-            CType::Pattern(TypePattern::Slice(y)) => format!("ref {}", composite_to_typename(y)),
-            CType::Pattern(TypePattern::SliceMut(y)) => format!("ref {}", composite_to_typename(y)),
+            CType::Pattern(TypePattern::Slice(y)) => format!("ref {}", composite_to_typename(y.composite_type())),
+            CType::Pattern(TypePattern::SliceMut(y)) => format!("ref {}", composite_to_typename(y.composite_type())),
             _ => format!("ref {}", to_typespecifier_in_param(z)),
         },
         CType::ReadWritePointer(z) => match &**z {
@@ -141,8 +144,8 @@ pub fn to_typespecifier_in_param(x: &CType) -> String {
             CType::ReadPointer(_) => "ref IntPtr".to_string(),
             CType::ReadWritePointer(_) => "ref IntPtr".to_string(),
             CType::Pattern(TypePattern::CChar) => "IntPtr".to_string(),
-            CType::Pattern(TypePattern::Slice(y)) => format!("ref {}>", composite_to_typename(y)),
-            CType::Pattern(TypePattern::SliceMut(y)) => format!("ref {}", composite_to_typename(y)),
+            CType::Pattern(TypePattern::Slice(y)) => format!("ref {}>", composite_to_typename(y.composite_type())),
+            CType::Pattern(TypePattern::SliceMut(y)) => format!("ref {}", composite_to_typename(y.composite_type())),
             _ => format!("out {}", to_typespecifier_in_param(z)),
         },
         CType::FnPointer(x) => fnpointer_to_typename(x),
@@ -150,8 +153,8 @@ pub fn to_typespecifier_in_param(x: &CType) -> String {
             TypePattern::CStrPointer => "[MarshalAs(UnmanagedType.LPStr)] string".to_string(),
             TypePattern::FFIErrorEnum(e) => format!("Result{}", e.the_enum().rust_name()),
             TypePattern::Utf8String(x) => composite_to_typename(x),
-            TypePattern::Slice(x) => composite_to_typename(x),
-            TypePattern::SliceMut(x) => composite_to_typename(x),
+            TypePattern::Slice(x) => composite_to_typename(x.composite_type()),
+            TypePattern::SliceMut(x) => composite_to_typename(x.composite_type()),
             TypePattern::Option(x) => composite_to_typename(x),
             TypePattern::Result(x) => composite_to_typename(x.composite()),
             TypePattern::NamedCallback(x) => named_callback_to_typename(x),
@@ -179,8 +182,8 @@ pub fn to_typespecifier_in_rval(x: &CType) -> String {
             TypePattern::Utf8String(x) => composite_to_typename(x),
             TypePattern::FFIErrorEnum(e) => format!("Result{}", e.the_enum().rust_name()),
             TypePattern::Result(x) => composite_to_typename(x.composite()),
-            TypePattern::Slice(x) => composite_to_typename(x),
-            TypePattern::SliceMut(x) => composite_to_typename(x),
+            TypePattern::Slice(x) => composite_to_typename(x.composite_type()),
+            TypePattern::SliceMut(x) => composite_to_typename(x.composite_type()),
             TypePattern::Option(x) => composite_to_typename(x),
             TypePattern::NamedCallback(x) => named_callback_to_typename(x),
             TypePattern::Bool => "Bool".to_string(),
@@ -234,39 +237,35 @@ pub fn field_name_to_csharp_name(field: &Field, rename_symbols: bool) -> String 
     }
 }
 
-pub fn get_slice_type_argument(x: &CompositeType) -> String {
-    let data_field = x.fields().iter().find(|x| x.name() == "data").expect("Slice must have data field");
-    let t = if let CType::ReadPointer(y) = data_field.the_type() {
-        if matches!(&**y, CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_))) {
-            panic!("Slice data field must not be a slice")
-        } else {
-            to_typespecifier_in_param(y)
-        }
-    } else {
-        panic!("Slice data field must be a pointer")
-    };
-    t
+pub fn get_slice_type_argument(x: &SliceType) -> String {
+    to_typespecifier_in_param(x.target_type())
+}
+
+pub fn is_owned_slice(slice: &SliceType) -> bool {
+    let mut rval = HashSet::new();
+    ctypes_from_type_recursive(slice.target_type(), &mut rval);
+
+    rval.iter().any(|x| matches!(x, CType::Pattern(TypePattern::Utf8String(_))))
 }
 
 #[must_use]
 pub fn pattern_to_native_in_signature(_: &Interop, param: &Parameter) -> String {
-    let slice_type_name = |mutable: bool, element_type: &CType| -> String {
-        if mutable {
-            format!("Span<{}>", to_typespecifier_in_param(element_type))
+    let slice_type_name = |mutable: bool, slice: &SliceType| -> String {
+        if is_owned_slice(slice) {
+            match slice.target_type() {
+                CType::Pattern(TypePattern::Utf8String(_)) => "string[]".to_string(),
+                _ => format!("{}[]", crate::converter::to_typespecifier_in_param(slice.target_type())),
+            }
+        } else if mutable {
+            format!("Span<{}>", to_typespecifier_in_param(slice.target_type()))
         } else {
-            format!("ReadOnlySpan<{}>", to_typespecifier_in_param(element_type))
+            format!("ReadOnlySpan<{}>", to_typespecifier_in_param(slice.target_type()))
         }
     };
     match param.the_type() {
         x @ CType::Pattern(p) => match p {
-            TypePattern::Slice(p) => {
-                let element_type = p.try_deref_pointer().expect("Must be pointer");
-                slice_type_name(false, &element_type)
-            }
-            TypePattern::SliceMut(p) => {
-                let element_type = p.try_deref_pointer().expect("Must be pointer");
-                slice_type_name(true, &element_type)
-            }
+            TypePattern::Slice(p) => slice_type_name(false, p),
+            TypePattern::SliceMut(p) => slice_type_name(true, p),
             TypePattern::NamedCallback(_) => {
                 format!("{}Delegate", to_typespecifier_in_param(x))
             }
@@ -276,14 +275,8 @@ pub fn pattern_to_native_in_signature(_: &Interop, param: &Parameter) -> String 
         },
         CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {
             CType::Pattern(x) => match x {
-                TypePattern::Slice(p) => {
-                    let element_type = p.try_deref_pointer().expect("Must be pointer");
-                    slice_type_name(false, &element_type)
-                }
-                TypePattern::SliceMut(p) => {
-                    let element_type = p.try_deref_pointer().expect("Must be pointer");
-                    slice_type_name(true, &element_type)
-                }
+                TypePattern::Slice(p) => slice_type_name(false, p),
+                TypePattern::SliceMut(p) => slice_type_name(true, p),
                 _ => to_typespecifier_in_param(param.the_type()),
             },
             _ => to_typespecifier_in_param(param.the_type()),

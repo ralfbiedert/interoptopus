@@ -57,17 +57,7 @@ pub fn write_param_helpers(_i: &Interop, w: &mut IndentWriter, function: &Functi
                     indented!(w, [()()], r"{} = ctypes.cast({}, ctypes.POINTER(ctypes.c_char))", arg.name(), arg.name())?;
                 }
                 TypePattern::Slice(t) | TypePattern::SliceMut(t) => {
-                    let inner = to_ctypes_name(
-                        t.fields()
-                            .iter()
-                            .find(|i| i.name().eq_ignore_ascii_case("data"))
-                            .expect("slice must have a data field")
-                            .the_type()
-                            .try_deref_pointer()
-                            .expect("data must be a pointer type"),
-                        false,
-                    );
-
+                    let inner = to_ctypes_name(t.target_type(), false);
                     indented!(w, [()], r#"if hasattr({}, "_length_") and getattr({}, "_type_", "") == {}:"#, arg.name(), arg.name(), inner)?;
 
                     indented!(

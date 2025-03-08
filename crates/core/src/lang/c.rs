@@ -500,6 +500,10 @@ impl CompositeType {
     pub const fn repr(&self) -> &Representation {
         &self.repr
     }
+
+    pub fn into_ctype(&self) -> CType {
+        CType::Composite(self.clone())
+    }
 }
 
 /// Doesn't exist in C, but other languages can benefit from accidentally using 'private' fields.
