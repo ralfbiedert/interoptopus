@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 10019157065517906080ul)
+            if (api_version != 11383153978358929544ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10019157065517906080). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (11383153978358929544). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -1223,6 +1223,36 @@ namespace My.Company
             try
             {
                 service_async_handle_string(_context, s_wrapped, cb).Ok();
+                return cs.Task;
+            }
+            finally
+            {
+                s_wrapped.Dispose();
+            }
+            return cs.Task;
+        }
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "service_async_handle_nested_string")]
+        // Debug - write_function_declaration 
+        public static partial ResultFFIError service_async_handle_nested_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
+
+        // Debug - write_function_overload 
+        public static unsafe Task<ResultUseUtf8StringFFIError> service_async_handle_nested_string(IntPtr _context, string s)
+        {
+            var cs = new TaskCompletionSource<ResultUseUtf8StringFFIError>();
+            GCHandle pinned = default;
+            var cb = new AsyncHelper((x) => {
+                var unmanaged = Marshal.PtrToStructure<ResultUseUtf8StringFFIError.Unmanaged>(x);
+                var marshaller = new ResultUseUtf8StringFFIError.Marshaller(unmanaged);
+                cs.SetResult(marshaller.ToManaged());
+                pinned.Free();
+            });
+            pinned = GCHandle.Alloc(cb);
+            var s_wrapped = new Utf8String(s);
+            try
+            {
+                service_async_handle_nested_string(_context, s_wrapped, cb).Ok();
                 return cs.Task;
             }
             finally
@@ -6617,6 +6647,13 @@ namespace My.Company
         public Task<ResultUtf8StringFFIError> HandleString(string s)
         {
             return Interop.service_async_handle_string(_context, s);
+        }
+        // Debug - write_service_method_overload 
+
+        // Debug - write_pattern_service_method 
+        public Task<ResultUseUtf8StringFFIError> HandleNestedString(string s)
+        {
+            return Interop.service_async_handle_nested_string(_context, s);
         }
         // Debug - write_service_method_overload 
 

@@ -81,11 +81,11 @@ public class TestPatternStrings
             new() { s1 = "hello2", s2 = "world2" },
         };
 
-        var r1 = Interop.pattern_string_8(x, 0);
-        var r2 = Interop.pattern_string_8(x, 1);
-        
-        Assert.Equal(r1.Ok().s1, "hello1");
-        Assert.Equal(r2.Ok().s2, "world2");
+        var r1 = Interop.pattern_string_8(x, 0).Ok();
+        var r2 = Interop.pattern_string_8(x, 1).Ok();
+
+        Assert.Equal(r1.s1, "hello1");
+        Assert.Equal(r2.s2, "world2");
     }
 
     [Fact]

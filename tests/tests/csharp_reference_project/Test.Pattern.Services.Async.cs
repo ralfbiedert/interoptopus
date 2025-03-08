@@ -17,6 +17,7 @@ public class TestPatternServicesAsync
         Assert.Equal(r, 123u);
     }
 
+
     [Fact]
     public async void HandleString()
     {
@@ -26,7 +27,18 @@ public class TestPatternServicesAsync
         Assert.Equal(r, "abc");
     }
 
-    
+
+    [Fact]
+    public async void HandleNestedString()
+    {
+        var s = ServiceAsync.New();
+        var r = (await s.HandleNestedString("abc")).Ok();
+        s.Dispose();
+        Assert.Equal(r.s1, "abc");
+        Assert.Equal(r.s2, "abc");
+    }
+
+
     [Fact]
     public async void SupportsMultipleParallelCalls()
     {
