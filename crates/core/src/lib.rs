@@ -177,7 +177,7 @@ pub use backend::Bindings;
 pub use error::Error;
 #[cfg(feature = "derive")]
 #[cfg_attr(docsrs, doc(cfg(feature = "derive")))] // does this work?
-pub use interoptopus_proc::{ffi_constant, ffi_function, ffi_service, ffi_service_ctor, ffi_service_method, ffi_type};
+pub use interoptopus_proc::{ffi_constant, ffi_function, ffi_service, ffi_service_method, ffi_type};
 
 mod backend;
 mod core;

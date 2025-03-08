@@ -5,7 +5,7 @@ use interoptopus::lang::rust::CTypeInfo;
 use interoptopus::patterns::asynk::{AsyncRuntime, AsyncThreadLocal};
 use interoptopus::patterns::result::FFIResult;
 use interoptopus::patterns::string::Utf8String;
-use interoptopus::{ffi_service, ffi_service_ctor, ffi_type};
+use interoptopus::{ffi_service, ffi_type};
 use std::future::Future;
 use tokio::runtime::Runtime;
 
@@ -30,7 +30,6 @@ async fn f_async<T: CTypeInfo, E: CTypeInfo + interoptopus::patterns::result::FF
 
 #[ffi_service]
 impl ServiceAsync {
-    #[ffi_service_ctor]
     pub fn new() -> FFIResult<Self, FFIError> {
         // This is a workaround for the fact that tokio::runtime::Builder::new_multi_thread()
         // cannot be used in a const context.

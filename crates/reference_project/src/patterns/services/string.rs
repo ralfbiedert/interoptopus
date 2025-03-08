@@ -1,7 +1,7 @@
 use crate::patterns::result::FFIError;
 use interoptopus::patterns::result::FFIResult;
 use interoptopus::patterns::string::CStrPointer;
-use interoptopus::{ffi_service, ffi_service_ctor, ffi_service_method, ffi_type};
+use interoptopus::{ffi_service, ffi_service_method, ffi_type};
 
 /// Some struct we want to expose as a class.
 #[ffi_type(opaque)]
@@ -10,7 +10,6 @@ pub struct ServiceStrings {}
 // Regular implementation of methods.
 #[ffi_service]
 impl ServiceStrings {
-    #[ffi_service_ctor]
     pub fn new() -> FFIResult<Self, FFIError> {
         FFIResult::ok(Self {})
     }

@@ -16,14 +16,11 @@ pub struct Descriptor {
 #[derive(Debug)]
 #[allow(dead_code)]
 pub enum MethodType {
-    Constructor(AttributeCtor),
+    Constructor,
     MethodAsync(AttributeMethodAsync),
     MethodSync(AttributeMethodSync),
     Destructor,
 }
-
-#[derive(Debug, Default, FromMeta)]
-pub struct AttributeCtor {}
 
 #[derive(Debug, FromMeta)]
 pub enum OnPanic {
@@ -57,11 +54,16 @@ pub struct AttributeMethodAsync {
 fn method_type(function: &ImplItemFn) -> MethodType {
     let attrs = function.attrs.as_slice();
 
-    // Methods explicitly marked a constructors
-    if function.attrs.iter().any(|x| format!("{x:?}").contains("ffi_service_ctor")) {
-        let ctor_attributes = attrs.iter().find_map(|attribute| AttributeCtor::from_meta(&attribute.meta).ok()).unwrap_or_default();
+    // To be a ctor the function must
+    // - not take &self
+    // - and not be `async`
+    let is_ctor = function.sig.inputs.iter().next().map_or(true, |x| match x {
+        FnArg::Typed(_) if function.sig.asyncness.is_none() => true,
+        _ => false,
+    });
 
-        return MethodType::Constructor(ctor_attributes);
+    if is_ctor {
+        return MethodType::Constructor;
     }
 
     // Methods that have an `async fn` are always async.
@@ -172,7 +174,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     // If this is the first parameter and we have `async`, the method must have
                     // requested an `Arc<T>`. In that case we generate an FFI method asking for `&T`
                     // and then convert it to `Arc<T>` internally.
-                    if i == 0 && has_async && !matches!(method_type, MethodType::Constructor(..)) {
+                    if i == 0 && has_async && !matches!(method_type, MethodType::Constructor) {
                         arg_names.push(quote_spanned!(span_arg=> __context));
                         inputs.push(quote_spanned!(span_arg=> __context: & #service_type));
                         continue;
@@ -204,7 +206,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
     };
 
     let generated_function = match &method_type {
-        MethodType::Constructor(_) => {
+        MethodType::Constructor => {
             let object_construction = if has_async {
                 quote_spanned! { span_service_ty =>
                     let __boxed = ::std::sync::Arc::new(__res.unwrap());

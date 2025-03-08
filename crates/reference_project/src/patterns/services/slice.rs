@@ -2,7 +2,7 @@ use crate::patterns::result::FFIError;
 use interoptopus::patterns::primitives::FFIBool;
 use interoptopus::patterns::result::FFIResult;
 use interoptopus::patterns::slice::{FFISlice, FFISliceMut};
-use interoptopus::{ffi_service, ffi_service_ctor, ffi_service_method, ffi_type};
+use interoptopus::{ffi_service, ffi_service_method, ffi_type};
 
 /// Some struct we want to expose as a class.
 #[ffi_type(opaque)]
@@ -13,7 +13,6 @@ pub struct ServiceVariousSlices {
 // Regular implementation of methods.
 #[ffi_service]
 impl ServiceVariousSlices {
-    #[ffi_service_ctor]
     pub fn new() -> FFIResult<Self, FFIError> {
         FFIResult::ok(Self { data: vec![123; 64] })
     }

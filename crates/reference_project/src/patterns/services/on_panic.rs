@@ -1,7 +1,7 @@
 use crate::patterns::result::FFIError;
 use interoptopus::patterns::result::FFIResult;
 use interoptopus::patterns::string::CStrPointer;
-use interoptopus::{ffi_service, ffi_service_ctor, ffi_service_method, ffi_type};
+use interoptopus::{ffi_service, ffi_service_method, ffi_type};
 use std::ffi::CString;
 
 /// Some struct we want to expose as a class.
@@ -13,7 +13,6 @@ pub struct ServiceOnPanic {
 // Regular implementation of methods.
 #[ffi_service]
 impl ServiceOnPanic {
-    #[ffi_service_ctor]
     pub fn new() -> FFIResult<Self, FFIError> {
         FFIResult::ok(Self { c_string: CString::new("Hello new_with").unwrap() })
     }

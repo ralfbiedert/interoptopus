@@ -43,7 +43,7 @@ pub fn ffi_service(attr: TokenStream, input: &TokenStream) -> TokenStream {
         if let ImplItem::Fn(method) = impl_item {
             if let Visibility::Public(_) = &method.vis {
                 if let Some(descriptor) = generate_service_method(&attributes, &item, method) {
-                    if matches!(descriptor.method_type, MethodType::Constructor(_)) {
+                    if matches!(descriptor.method_type, MethodType::Constructor) {
                         let rval_type = match &method.sig.output {
                             ReturnType::Type(_, b) => b.to_token_stream(),
                             _ => panic!("Must have return value"),
@@ -56,7 +56,7 @@ pub fn ffi_service(attr: TokenStream, input: &TokenStream) -> TokenStream {
         }
     }
 
-    let rval = rval.unwrap();
+    let rval = rval.expect("Must have had ctor rval");
     let ffi_functions = function_descriptors.iter().map(|x| x.ffi_function_tokens.clone()).collect::<Vec<_>>();
     let ffi_dtor = generate_service_dtor(&attributes, &item);
     let ffi_method_ident = function_descriptors
@@ -66,7 +66,7 @@ pub fn ffi_service(attr: TokenStream, input: &TokenStream) -> TokenStream {
         .collect::<Vec<_>>();
     let ffi_ctors = function_descriptors
         .iter()
-        .filter(|x| matches!(x.method_type, MethodType::Constructor(_)))
+        .filter(|x| matches!(x.method_type, MethodType::Constructor))
         .map(|x| x.ident.clone())
         .collect::<Vec<_>>();
 
