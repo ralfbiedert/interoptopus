@@ -8,7 +8,7 @@ use interoptopus::{ffi_service, ffi_service_ctor, ffi_type};
 
 #[ffi_type]
 #[derive(Copy, Clone)]
-pub struct DelegateTable {
+pub struct CallbackTable {
     pub my_callback: MyCallback,
     pub my_callback_namespaced: MyCallbackNamespaced,
     pub my_callback_void: MyCallbackVoid,
@@ -22,7 +22,7 @@ pub struct DelegateTable {
 /// Some struct we want to expose as a class.
 #[ffi_type(opaque)]
 pub struct ServiceCallbacks {
-    delegate_table: Option<DelegateTable>,
+    delegate_table: Option<CallbackTable>,
 }
 
 // Regular implementation of methods.
@@ -48,7 +48,7 @@ impl ServiceCallbacks {
         FFIResult::ok(())
     }
 
-    pub fn set_delegate_table(&mut self, table: DelegateTable) {
+    pub fn set_delegate_table(&mut self, table: CallbackTable) {
         self.delegate_table = Some(table);
     }
 

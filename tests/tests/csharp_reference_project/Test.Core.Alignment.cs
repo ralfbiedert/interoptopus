@@ -3,6 +3,15 @@ using Xunit;
 
 public class TestCoreAlignment
 {
+    [Fact]
+    public void alignment_1()
+    {
+        var p1 = new Packed1 { x = 12, y = 34 };
+        var p2 = Interop.alignment_1(p1);
+        Assert.Equal(p1.x, p2.x);
+        Assert.Equal(p1.y, p2.y);
+    }
+
     // [Fact]
     // public void boolean_alignment()
     // {

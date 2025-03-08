@@ -7,11 +7,11 @@ using Xunit;
 
 public class TestPatternDelegateTable
 {
-    private DelegateTable _table;
+    private CallbackTable _table;
 
     void CreatePatternDelegateTable(ServiceCallbacks service)
     {
-        _table = new DelegateTable
+        _table = new CallbackTable
         {
             my_callback = new MyCallback(value => 1),
             sum_delegate_1 = new SumDelegate1(() => { }),

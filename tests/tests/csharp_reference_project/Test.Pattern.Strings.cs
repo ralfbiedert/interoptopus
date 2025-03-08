@@ -42,7 +42,7 @@ public class TestPatternStrings
     public void pattern_string_2()
     {
         var l = Interop.pattern_string_2("hello world");
-        Assert.Equal(l, 16u);
+        Assert.Equal(l, 11u);
     }
 
     [Fact]

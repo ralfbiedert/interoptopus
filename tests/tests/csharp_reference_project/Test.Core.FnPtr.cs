@@ -2,26 +2,18 @@ using My.Company;
 using My.Company.Common;
 using Xunit;
 
-public class TestCoreCallbacks
+public class TestCoreFnPtr
 {
     [Fact]
     public void callback()
     {
-        var result = Interop.callback((x) =>
+        var result = Interop.fnptr_1((x) =>
         {
             Assert.Equal(42, x);
             return 43;
         }, 42);
 
         Assert.Equal(43, result);
-    }
-
-    [Fact]
-    public void pattern_callback_4()
-    {
-        var x = new MyCallbackNamespaced(value => value);
-        var y = Interop.pattern_callback_4(x, 5);
-        Assert.Equal(y, 5u);
     }
 
     // [Fact]

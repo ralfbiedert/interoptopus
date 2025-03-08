@@ -7,6 +7,15 @@ using Xunit;
 public class TestPatternDelegates
 {
     [Fact]
+    public void pattern_callback_4()
+    {
+        var x = new MyCallbackNamespaced(value => value);
+        var y = Interop.pattern_callback_4(x, 5);
+        Assert.Equal(y, 5u);
+    }
+
+
+    [Fact]
     public void pattern_ffi_slice_delegate()
     {
 

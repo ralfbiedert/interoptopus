@@ -4,9 +4,9 @@ using Xunit;
 public class TestStructs
 {
     [Fact]
-    public void bool_field()
+    public void struct3()
     {
-        var rval = Interop.bool_field(new BoolField
+        var rval = Interop.struct3(new BoolField
         {
             val = true
         });

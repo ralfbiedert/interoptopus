@@ -43,8 +43,8 @@ public class TestArrayNested
     {
         var result = Interop.nested_array_3(new NestedArray
         {
-            field_array = new ushort[] { 1, 2, 3, 4, 5 },
-            field_array_2 = new ushort[] { 1, 2, 3, 4, 5 },
+            field_array = [1, 2, 3, 4, 5],
+            field_array_2 = [1, 2, 3, 4, 5],
             field_struct = new Array
             {
                 data = Enumerable.Range(1, 16).Select(i => (byte)i).ToArray()
@@ -60,7 +60,7 @@ public class TestArrayNested
         {
             Interop.nested_array_3(new NestedArray
             {
-                field_array = new ushort[] { 1, 2, 3 },
+                field_array = [1, 2, 3],
                 field_struct = new Array
                 {
                     data = Enumerable.Range(1, 16).Select(i => (byte)i).ToArray()

@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 1188374551704804212ul)
+            if (api_version != 16286479253332814942ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (1188374551704804212). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (16286479253332814942). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -73,210 +73,116 @@ namespace My.Company
         }
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "primitive_void")]
+        [LibraryImport(NativeLib, EntryPoint = "alignment_1")]
         // Debug - write_function_declaration 
-        public static partial void primitive_void();
+        public static partial Packed2 alignment_1(Packed1 a);
 
         // Debug - write_function_overload 
-        // Debug - no overload for primitive_void 
+        // Debug - no overload for alignment_1 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "primitive_void2")]
+        [LibraryImport(NativeLib, EntryPoint = "array_1")]
         // Debug - write_function_declaration 
-        public static partial void primitive_void2();
+        public static partial byte array_1(Array x);
 
         // Debug - write_function_overload 
-        // Debug - no overload for primitive_void2 
+        // Debug - no overload for array_1 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "primitive_bool")]
-        [return: MarshalAs(UnmanagedType.U1)]
+        [LibraryImport(NativeLib, EntryPoint = "array_2")]
         // Debug - write_function_declaration 
-        public static partial bool primitive_bool([MarshalAs(UnmanagedType.U1)] bool x);
+        public static partial Array array_2();
 
         // Debug - write_function_overload 
-        // Debug - no overload for primitive_bool 
+        // Debug - no overload for array_2 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "primitive_u8")]
+        [LibraryImport(NativeLib, EntryPoint = "array_3")]
         // Debug - write_function_declaration 
-        public static partial byte primitive_u8(byte x);
+        public static partial void array_3(out Array arr);
 
         // Debug - write_function_overload 
-        // Debug - no overload for primitive_u8 
+        // Debug - no overload for array_3 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "primitive_u16")]
+        [LibraryImport(NativeLib, EntryPoint = "char_array_1")]
         // Debug - write_function_declaration 
-        public static partial ushort primitive_u16(ushort x);
+        public static partial CharArray char_array_1();
 
         // Debug - write_function_overload 
-        // Debug - no overload for primitive_u16 
+        // Debug - no overload for char_array_1 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "primitive_u32")]
+        [LibraryImport(NativeLib, EntryPoint = "char_array_2")]
         // Debug - write_function_declaration 
-        public static partial uint primitive_u32(uint x);
+        public static partial CharArray char_array_2(CharArray arr);
 
         // Debug - write_function_overload 
-        // Debug - no overload for primitive_u32 
+        // Debug - no overload for char_array_2 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "primitive_u64")]
+        [LibraryImport(NativeLib, EntryPoint = "char_array_3")]
         // Debug - write_function_declaration 
-        public static partial ulong primitive_u64(ulong x);
+        public static partial byte char_array_3(ref CharArray arr);
 
         // Debug - write_function_overload 
-        // Debug - no overload for primitive_u64 
+        // Debug - no overload for char_array_3 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "primitive_i8")]
+        [LibraryImport(NativeLib, EntryPoint = "nested_array_1")]
         // Debug - write_function_declaration 
-        public static partial sbyte primitive_i8(sbyte x);
+        public static partial NestedArray nested_array_1();
 
         // Debug - write_function_overload 
-        // Debug - no overload for primitive_i8 
+        // Debug - no overload for nested_array_1 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "primitive_i16")]
+        [LibraryImport(NativeLib, EntryPoint = "nested_array_2")]
         // Debug - write_function_declaration 
-        public static partial short primitive_i16(short x);
+        public static partial void nested_array_2(out NestedArray result);
 
         // Debug - write_function_overload 
-        // Debug - no overload for primitive_i16 
+        // Debug - no overload for nested_array_2 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "primitive_i32")]
+        [LibraryImport(NativeLib, EntryPoint = "nested_array_3")]
         // Debug - write_function_declaration 
-        public static partial int primitive_i32(int x);
+        public static partial byte nested_array_3(NestedArray input);
 
         // Debug - write_function_overload 
-        // Debug - no overload for primitive_i32 
+        // Debug - no overload for nested_array_3 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "primitive_i64")]
+        [LibraryImport(NativeLib, EntryPoint = "behavior_sleep")]
         // Debug - write_function_declaration 
-        public static partial long primitive_i64(long x);
+        public static partial void behavior_sleep(ulong millis);
 
         // Debug - write_function_overload 
-        // Debug - no overload for primitive_i64 
+        // Debug - no overload for behavior_sleep 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "packed_to_packed1")]
+        [LibraryImport(NativeLib, EntryPoint = "behavior_panics")]
         // Debug - write_function_declaration 
-        public static partial Packed2 packed_to_packed1(Packed1 a);
+        public static partial ResultFFIError behavior_panics();
 
         // Debug - write_function_overload 
-        // Debug - no overload for packed_to_packed1 
+        // Debug - no overload for behavior_panics 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "many_args_5")]
+        [LibraryImport(NativeLib, EntryPoint = "fnptr_1")]
         // Debug - write_function_declaration 
-        public static partial long many_args_5(long x0, long x1, long x2, long x3, long x4);
+        public static partial byte fnptr_1(InteropDelegate_fn_u8_rval_u8 callback, byte value);
 
         // Debug - write_function_overload 
-        // Debug - no overload for many_args_5 
+        // Debug - no overload for fnptr_1 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "many_args_10")]
+        [LibraryImport(NativeLib, EntryPoint = "fnptr_2")]
         // Debug - write_function_declaration 
-        public static partial long many_args_10(long x0, long x1, long x2, long x3, long x4, long x5, long x6, long x7, long x8, long x9);
+        public static partial void fnptr_2(InteropDelegate_fn_CharArray_native callback, CharArray value);
 
         // Debug - write_function_overload 
-        // Debug - no overload for many_args_10 
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "ptr")]
-        // Debug - write_function_declaration 
-        public static partial IntPtr ptr(ref long x);
-
-        // Debug - write_function_overload 
-        // Debug - no overload for ptr 
-
-        // Debug - write_function 
-        /// # Safety
-        ///
-        /// Parameter x must point to valid data.
-        [LibraryImport(NativeLib, EntryPoint = "ptr_mut")]
-        // Debug - write_function_declaration 
-        public static partial IntPtr ptr_mut(out long x);
-
-        // Debug - write_function_overload 
-        // Debug - no overload for ptr_mut 
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "ptr_ptr")]
-        // Debug - write_function_declaration 
-        public static partial IntPtr ptr_ptr(ref IntPtr x);
-
-        // Debug - write_function_overload 
-        // Debug - no overload for ptr_ptr 
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "ref_simple")]
-        // Debug - write_function_declaration 
-        public static partial IntPtr ref_simple(ref long x);
-
-        // Debug - write_function_overload 
-        // Debug - no overload for ref_simple 
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "ref_mut_simple")]
-        // Debug - write_function_declaration 
-        public static partial IntPtr ref_mut_simple(out long x);
-
-        // Debug - write_function_overload 
-        // Debug - no overload for ref_mut_simple 
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "ref_option")]
-        [return: MarshalAs(UnmanagedType.U1)]
-        // Debug - write_function_declaration 
-        public static partial bool ref_option(ref long x);
-
-        // Debug - write_function_overload 
-        // Debug - no overload for ref_option 
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "ref_mut_option")]
-        [return: MarshalAs(UnmanagedType.U1)]
-        // Debug - write_function_declaration 
-        public static partial bool ref_mut_option(out long x);
-
-        // Debug - write_function_overload 
-        // Debug - no overload for ref_mut_option 
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "call_tupled")]
-        // Debug - write_function_declaration 
-        public static partial Tupled call_tupled(Tupled x);
-
-        // Debug - write_function_overload 
-        // Debug - no overload for call_tupled 
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "complex_args_1")]
-        // Debug - write_function_declaration 
-        public static partial ResultFFIError complex_args_1(Vec3f32 a, ref Tupled b);
-
-        // Debug - write_function_overload 
-        // Debug - no overload for complex_args_1 
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "callback")]
-        // Debug - write_function_declaration 
-        public static partial byte callback(InteropDelegate_fn_u8_rval_u8 callback, byte value);
-
-        // Debug - write_function_overload 
-        // Debug - no overload for callback 
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "callback_marshalled")]
-        // Debug - write_function_declaration 
-        public static partial void callback_marshalled(InteropDelegate_fn_CharArray_native callback, CharArray value);
-
-        // Debug - write_function_overload 
-        // Debug - no overload for callback_marshalled 
+        // Debug - no overload for fnptr_2 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "generic_1a")]
@@ -327,127 +233,63 @@ namespace My.Company
         // Debug - no overload for generic_4 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "array_1")]
-        // Debug - write_function_declaration 
-        public static partial byte array_1(Array x);
-
-        // Debug - write_function_overload 
-        // Debug - no overload for array_1 
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "array_2")]
-        // Debug - write_function_declaration 
-        public static partial Array array_2();
-
-        // Debug - write_function_overload 
-        // Debug - no overload for array_2 
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "array_3")]
-        // Debug - write_function_declaration 
-        public static partial void array_3(out Array arr);
-
-        // Debug - write_function_overload 
-        // Debug - no overload for array_3 
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "nested_array_1")]
-        // Debug - write_function_declaration 
-        public static partial NestedArray nested_array_1();
-
-        // Debug - write_function_overload 
-        // Debug - no overload for nested_array_1 
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "nested_array_2")]
-        // Debug - write_function_declaration 
-        public static partial void nested_array_2(out NestedArray result);
-
-        // Debug - write_function_overload 
-        // Debug - no overload for nested_array_2 
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "nested_array_3")]
-        // Debug - write_function_declaration 
-        public static partial byte nested_array_3(NestedArray input);
-
-        // Debug - write_function_overload 
-        // Debug - no overload for nested_array_3 
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "char_array_1")]
-        // Debug - write_function_declaration 
-        public static partial CharArray char_array_1();
-
-        // Debug - write_function_overload 
-        // Debug - no overload for char_array_1 
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "char_array_2")]
-        // Debug - write_function_declaration 
-        public static partial CharArray char_array_2(CharArray arr);
-
-        // Debug - write_function_overload 
-        // Debug - no overload for char_array_2 
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "char_array_3")]
-        // Debug - write_function_declaration 
-        public static partial byte char_array_3(ref CharArray arr);
-
-        // Debug - write_function_overload 
-        // Debug - no overload for char_array_3 
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "bool_field")]
+        [LibraryImport(NativeLib, EntryPoint = "generic_5")]
         [return: MarshalAs(UnmanagedType.U1)]
         // Debug - write_function_declaration 
-        public static partial bool bool_field(BoolField x);
+        public static partial bool generic_5(Weird1u32 x, Weird2u8 y);
 
         // Debug - write_function_overload 
-        // Debug - no overload for bool_field 
+        // Debug - no overload for generic_5 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "meta_ambiguous_1")]
+        // Debug - write_function_declaration 
+        public static partial Vec1 meta_ambiguous_1(Vec1 x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for meta_ambiguous_1 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "meta_ambiguous_2")]
+        // Debug - write_function_declaration 
+        public static partial Vec2 meta_ambiguous_2(Vec2 x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for meta_ambiguous_2 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "meta_ambiguous_3")]
+        [return: MarshalAs(UnmanagedType.U1)]
+        // Debug - write_function_declaration 
+        public static partial bool meta_ambiguous_3(Vec1 x, Vec2 y);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for meta_ambiguous_3 
 
         // Debug - write_function 
         /// This function has documentation.
-        [LibraryImport(NativeLib, EntryPoint = "documented")]
+        [LibraryImport(NativeLib, EntryPoint = "meta_documented")]
         // Debug - write_function_declaration 
-        public static partial EnumDocumented documented(StructDocumented x);
+        public static partial EnumDocumented meta_documented(StructDocumented x);
 
         // Debug - write_function_overload 
-        // Debug - no overload for documented 
+        // Debug - no overload for meta_documented 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "ambiguous_1")]
+        [LibraryImport(NativeLib, EntryPoint = "meta_visibility1")]
         // Debug - write_function_declaration 
-        public static partial Vec1 ambiguous_1(Vec1 x);
+        public static partial void meta_visibility1(Visibility1 x, Visibility2 y);
 
         // Debug - write_function_overload 
-        // Debug - no overload for ambiguous_1 
+        // Debug - no overload for meta_visibility1 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "ambiguous_2")]
+        [LibraryImport(NativeLib, EntryPoint = "meta_renamed")]
         // Debug - write_function_declaration 
-        public static partial Vec2 ambiguous_2(Vec2 x);
+        public static partial EnumRenamed meta_renamed(StructRenamed x);
 
         // Debug - write_function_overload 
-        // Debug - no overload for ambiguous_2 
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "ambiguous_3")]
-        [return: MarshalAs(UnmanagedType.U1)]
-        // Debug - write_function_declaration 
-        public static partial bool ambiguous_3(Vec1 x, Vec2 y);
-
-        // Debug - write_function_overload 
-        // Debug - no overload for ambiguous_3 
-
-        // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "namespaced_type")]
-        // Debug - write_function_declaration 
-        public static partial Vec namespaced_type(Vec x);
-
-        // Debug - write_function_overload 
-        // Debug - no overload for namespaced_type 
+        // Debug - no overload for meta_renamed 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_option")]
@@ -500,53 +342,219 @@ namespace My.Company
         }
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "panics")]
+        [LibraryImport(NativeLib, EntryPoint = "namespaced_type")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError panics();
+        public static partial Vec namespaced_type(Vec x);
 
         // Debug - write_function_overload 
-        // Debug - no overload for panics 
+        // Debug - no overload for namespaced_type 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "renamed")]
+        [LibraryImport(NativeLib, EntryPoint = "primitive_args_5")]
         // Debug - write_function_declaration 
-        public static partial EnumRenamed renamed(StructRenamed x);
+        public static partial long primitive_args_5(long x0, long x1, long x2, long x3, long x4);
 
         // Debug - write_function_overload 
-        // Debug - no overload for renamed 
+        // Debug - no overload for primitive_args_5 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "sleep")]
+        [LibraryImport(NativeLib, EntryPoint = "primitive_args_10")]
         // Debug - write_function_declaration 
-        public static partial void sleep(ulong millis);
+        public static partial long primitive_args_10(long x0, long x1, long x2, long x3, long x4, long x5, long x6, long x7, long x8, long x9);
 
         // Debug - write_function_overload 
-        // Debug - no overload for sleep 
+        // Debug - no overload for primitive_args_10 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "weird_1")]
+        [LibraryImport(NativeLib, EntryPoint = "primitive_bool")]
         [return: MarshalAs(UnmanagedType.U1)]
         // Debug - write_function_declaration 
-        public static partial bool weird_1(Weird1u32 x, Weird2u8 y);
+        public static partial bool primitive_bool([MarshalAs(UnmanagedType.U1)] bool x);
 
         // Debug - write_function_overload 
-        // Debug - no overload for weird_1 
+        // Debug - no overload for primitive_bool 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "visibility")]
+        [LibraryImport(NativeLib, EntryPoint = "primitive_f32")]
         // Debug - write_function_declaration 
-        public static partial void visibility(Visibility1 x, Visibility2 y);
+        public static partial float primitive_f32(float x);
 
         // Debug - write_function_overload 
-        // Debug - no overload for visibility 
+        // Debug - no overload for primitive_f32 
 
         // Debug - write_function 
-        [LibraryImport(NativeLib, EntryPoint = "repr_transparent")]
+        [LibraryImport(NativeLib, EntryPoint = "primitive_f64")]
         // Debug - write_function_declaration 
-        public static partial Tupled repr_transparent(Tupled x, ref Tupled r);
+        public static partial double primitive_f64(double x);
 
         // Debug - write_function_overload 
-        // Debug - no overload for repr_transparent 
+        // Debug - no overload for primitive_f64 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "primitive_i16")]
+        // Debug - write_function_declaration 
+        public static partial short primitive_i16(short x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for primitive_i16 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "primitive_i32")]
+        // Debug - write_function_declaration 
+        public static partial int primitive_i32(int x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for primitive_i32 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "primitive_i64")]
+        // Debug - write_function_declaration 
+        public static partial long primitive_i64(long x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for primitive_i64 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "primitive_i8")]
+        // Debug - write_function_declaration 
+        public static partial sbyte primitive_i8(sbyte x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for primitive_i8 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "primitive_u16")]
+        // Debug - write_function_declaration 
+        public static partial ushort primitive_u16(ushort x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for primitive_u16 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "primitive_u32")]
+        // Debug - write_function_declaration 
+        public static partial uint primitive_u32(uint x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for primitive_u32 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "primitive_u64")]
+        // Debug - write_function_declaration 
+        public static partial ulong primitive_u64(ulong x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for primitive_u64 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "primitive_u8")]
+        // Debug - write_function_declaration 
+        public static partial byte primitive_u8(byte x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for primitive_u8 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "primitive_void")]
+        // Debug - write_function_declaration 
+        public static partial void primitive_void();
+
+        // Debug - write_function_overload 
+        // Debug - no overload for primitive_void 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "primitive_void2")]
+        // Debug - write_function_declaration 
+        public static partial void primitive_void2();
+
+        // Debug - write_function_overload 
+        // Debug - no overload for primitive_void2 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "ptr1")]
+        // Debug - write_function_declaration 
+        public static partial IntPtr ptr1(ref long x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for ptr1 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "ptr2")]
+        // Debug - write_function_declaration 
+        public static partial IntPtr ptr2(ref IntPtr x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for ptr2 
+
+        // Debug - write_function 
+        /// # Safety
+        ///
+        /// Parameter x must point to valid data.
+        [LibraryImport(NativeLib, EntryPoint = "ptr3")]
+        // Debug - write_function_declaration 
+        public static partial IntPtr ptr3(out long x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for ptr3 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "ref1")]
+        // Debug - write_function_declaration 
+        public static partial IntPtr ref1(ref long x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for ref1 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "ref2")]
+        // Debug - write_function_declaration 
+        public static partial IntPtr ref2(out long x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for ref2 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "ref3")]
+        [return: MarshalAs(UnmanagedType.U1)]
+        // Debug - write_function_declaration 
+        public static partial bool ref3(ref long x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for ref3 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "ref4")]
+        [return: MarshalAs(UnmanagedType.U1)]
+        // Debug - write_function_declaration 
+        public static partial bool ref4(out long x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for ref4 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "struct1")]
+        // Debug - write_function_declaration 
+        public static partial Tupled struct1(Tupled x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for struct1 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "struct2")]
+        // Debug - write_function_declaration 
+        public static partial ResultFFIError struct2(Vec3f32 a, ref Tupled b);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for struct2 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "struct3")]
+        [return: MarshalAs(UnmanagedType.U1)]
+        // Debug - write_function_declaration 
+        public static partial bool struct3(BoolField x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for struct3 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_1")]
@@ -1402,7 +1410,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_set_delegate_table")]
         // Debug - write_function_declaration 
-        public static partial void service_callbacks_set_delegate_table(IntPtr _context, DelegateTable table);
+        public static partial void service_callbacks_set_delegate_table(IntPtr _context, CallbackTable table);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_set_delegate_table 
@@ -1845,6 +1853,125 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
+    public partial struct CallbackTable
+    {
+        public MyCallback my_callback;
+        public MyCallbackNamespaced my_callback_namespaced;
+        public MyCallbackVoid my_callback_void;
+        public MyCallbackContextual my_callback_contextual;
+        public SumDelegate1 sum_delegate_1;
+        public SumDelegate2 sum_delegate_2;
+        public SumDelegateReturn sum_delegate_return;
+        public SumDelegateReturn2 sum_delegate_return_2;
+    }
+
+    // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct CallbackTable
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public MyCallback.Unmanaged my_callback;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public MyCallbackNamespaced.Unmanaged my_callback_namespaced;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public MyCallbackVoid.Unmanaged my_callback_void;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public MyCallbackContextual.Unmanaged my_callback_contextual;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public SumDelegate1.Unmanaged sum_delegate_1;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public SumDelegate2.Unmanaged sum_delegate_2;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public SumDelegateReturn.Unmanaged sum_delegate_return;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public SumDelegateReturn2.Unmanaged sum_delegate_return_2;
+        }
+
+        [CustomMarshaller(typeof(CallbackTable), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private CallbackTable _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(CallbackTable managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(CallbackTable managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _my_callback = new MyCallback.Marshaller(_managed.my_callback);
+                _unmanaged.my_callback = _my_callback.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _my_callback_namespaced = new MyCallbackNamespaced.Marshaller(_managed.my_callback_namespaced);
+                _unmanaged.my_callback_namespaced = _my_callback_namespaced.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _my_callback_void = new MyCallbackVoid.Marshaller(_managed.my_callback_void);
+                _unmanaged.my_callback_void = _my_callback_void.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _my_callback_contextual = new MyCallbackContextual.Marshaller(_managed.my_callback_contextual);
+                _unmanaged.my_callback_contextual = _my_callback_contextual.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _sum_delegate_1 = new SumDelegate1.Marshaller(_managed.sum_delegate_1);
+                _unmanaged.sum_delegate_1 = _sum_delegate_1.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _sum_delegate_2 = new SumDelegate2.Marshaller(_managed.sum_delegate_2);
+                _unmanaged.sum_delegate_2 = _sum_delegate_2.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _sum_delegate_return = new SumDelegateReturn.Marshaller(_managed.sum_delegate_return);
+                _unmanaged.sum_delegate_return = _sum_delegate_return.ToUnmanaged();
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                var _sum_delegate_return_2 = new SumDelegateReturn2.Marshaller(_managed.sum_delegate_return_2);
+                _unmanaged.sum_delegate_return_2 = _sum_delegate_return_2.ToUnmanaged();
+
+                return _unmanaged;
+            }
+
+            public unsafe CallbackTable ToManaged()
+            {
+                _managed = new CallbackTable();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _my_callback = new MyCallback.Marshaller(_unmanaged.my_callback);
+                _managed.my_callback = _my_callback.ToManaged();
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _my_callback_namespaced = new MyCallbackNamespaced.Marshaller(_unmanaged.my_callback_namespaced);
+                _managed.my_callback_namespaced = _my_callback_namespaced.ToManaged();
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _my_callback_void = new MyCallbackVoid.Marshaller(_unmanaged.my_callback_void);
+                _managed.my_callback_void = _my_callback_void.ToManaged();
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _my_callback_contextual = new MyCallbackContextual.Marshaller(_unmanaged.my_callback_contextual);
+                _managed.my_callback_contextual = _my_callback_contextual.ToManaged();
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _sum_delegate_1 = new SumDelegate1.Marshaller(_unmanaged.sum_delegate_1);
+                _managed.sum_delegate_1 = _sum_delegate_1.ToManaged();
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _sum_delegate_2 = new SumDelegate2.Marshaller(_unmanaged.sum_delegate_2);
+                _managed.sum_delegate_2 = _sum_delegate_2.ToManaged();
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _sum_delegate_return = new SumDelegateReturn.Marshaller(_unmanaged.sum_delegate_return);
+                _managed.sum_delegate_return = _sum_delegate_return.ToManaged();
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                var _sum_delegate_return_2 = new SumDelegateReturn2.Marshaller(_unmanaged.sum_delegate_return_2);
+                _managed.sum_delegate_return_2 = _sum_delegate_return_2.ToManaged();
+
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    // Debug - write_type_definition_composite 
     public partial struct CharArray
     {
         public FixedString str;
@@ -1958,125 +2085,6 @@ namespace My.Company
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 var _foreign = new Local.Marshaller(_unmanaged.foreign);
                 _managed.foreign = _foreign.ToManaged();
-
-                return _managed;
-            }
-            public void Free() { }
-        }
-    }
-
-    // Debug - write_type_definition_composite 
-    public partial struct DelegateTable
-    {
-        public MyCallback my_callback;
-        public MyCallbackNamespaced my_callback_namespaced;
-        public MyCallbackVoid my_callback_void;
-        public MyCallbackContextual my_callback_contextual;
-        public SumDelegate1 sum_delegate_1;
-        public SumDelegate2 sum_delegate_2;
-        public SumDelegateReturn sum_delegate_return;
-        public SumDelegateReturn2 sum_delegate_return_2;
-    }
-
-    // Debug - write_type_definition_composite_marshaller 
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct DelegateTable
-    {
-        [StructLayout(LayoutKind.Sequential)]
-        public unsafe struct Unmanaged
-        {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
-            public MyCallback.Unmanaged my_callback;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
-            public MyCallbackNamespaced.Unmanaged my_callback_namespaced;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
-            public MyCallbackVoid.Unmanaged my_callback_void;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
-            public MyCallbackContextual.Unmanaged my_callback_contextual;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
-            public SumDelegate1.Unmanaged sum_delegate_1;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
-            public SumDelegate2.Unmanaged sum_delegate_2;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
-            public SumDelegateReturn.Unmanaged sum_delegate_return;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
-            public SumDelegateReturn2.Unmanaged sum_delegate_return_2;
-        }
-
-        [CustomMarshaller(typeof(DelegateTable), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
-        public ref struct Marshaller
-        {
-            private DelegateTable _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
-
-            public Marshaller(DelegateTable managed) { _managed = managed; }
-            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-
-            public void FromManaged(DelegateTable managed) { _managed = managed; }
-            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
-
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                var _my_callback = new MyCallback.Marshaller(_managed.my_callback);
-                _unmanaged.my_callback = _my_callback.ToUnmanaged();
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                var _my_callback_namespaced = new MyCallbackNamespaced.Marshaller(_managed.my_callback_namespaced);
-                _unmanaged.my_callback_namespaced = _my_callback_namespaced.ToUnmanaged();
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                var _my_callback_void = new MyCallbackVoid.Marshaller(_managed.my_callback_void);
-                _unmanaged.my_callback_void = _my_callback_void.ToUnmanaged();
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                var _my_callback_contextual = new MyCallbackContextual.Marshaller(_managed.my_callback_contextual);
-                _unmanaged.my_callback_contextual = _my_callback_contextual.ToUnmanaged();
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                var _sum_delegate_1 = new SumDelegate1.Marshaller(_managed.sum_delegate_1);
-                _unmanaged.sum_delegate_1 = _sum_delegate_1.ToUnmanaged();
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                var _sum_delegate_2 = new SumDelegate2.Marshaller(_managed.sum_delegate_2);
-                _unmanaged.sum_delegate_2 = _sum_delegate_2.ToUnmanaged();
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                var _sum_delegate_return = new SumDelegateReturn.Marshaller(_managed.sum_delegate_return);
-                _unmanaged.sum_delegate_return = _sum_delegate_return.ToUnmanaged();
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                var _sum_delegate_return_2 = new SumDelegateReturn2.Marshaller(_managed.sum_delegate_return_2);
-                _unmanaged.sum_delegate_return_2 = _sum_delegate_return_2.ToUnmanaged();
-
-                return _unmanaged;
-            }
-
-            public unsafe DelegateTable ToManaged()
-            {
-                _managed = new DelegateTable();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                var _my_callback = new MyCallback.Marshaller(_unmanaged.my_callback);
-                _managed.my_callback = _my_callback.ToManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                var _my_callback_namespaced = new MyCallbackNamespaced.Marshaller(_unmanaged.my_callback_namespaced);
-                _managed.my_callback_namespaced = _my_callback_namespaced.ToManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                var _my_callback_void = new MyCallbackVoid.Marshaller(_unmanaged.my_callback_void);
-                _managed.my_callback_void = _my_callback_void.ToManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                var _my_callback_contextual = new MyCallbackContextual.Marshaller(_unmanaged.my_callback_contextual);
-                _managed.my_callback_contextual = _my_callback_contextual.ToManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                var _sum_delegate_1 = new SumDelegate1.Marshaller(_unmanaged.sum_delegate_1);
-                _managed.sum_delegate_1 = _sum_delegate_1.ToManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                var _sum_delegate_2 = new SumDelegate2.Marshaller(_unmanaged.sum_delegate_2);
-                _managed.sum_delegate_2 = _sum_delegate_2.ToManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                var _sum_delegate_return = new SumDelegateReturn.Marshaller(_unmanaged.sum_delegate_return);
-                _managed.sum_delegate_return = _sum_delegate_return.ToManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                var _sum_delegate_return_2 = new SumDelegateReturn2.Marshaller(_unmanaged.sum_delegate_return_2);
-                _managed.sum_delegate_return_2 = _sum_delegate_return_2.ToManaged();
 
                 return _managed;
             }
@@ -6366,7 +6374,7 @@ namespace My.Company
         }
 
         // Debug - write_pattern_service_method 
-        public void SetDelegateTable(DelegateTable table)
+        public void SetDelegateTable(CallbackTable table)
         {
             Interop.service_callbacks_set_delegate_table(_context, table);
         }
