@@ -13,7 +13,7 @@ fn reference_benchmarks_prerequisites() -> Result<(), Error> {
         .namespace_mappings(common_namespace_mappings())
         .dll_name("interoptopus_reference_project")
         .write_types(WriteTypes::NamespaceAndInteroptopusGlobal)
-        .debug(true)
+        .debug(false)
         .build()?
         .to_string()?;
 
@@ -22,7 +22,7 @@ fn reference_benchmarks_prerequisites() -> Result<(), Error> {
         .namespace_mappings(common_namespace_mappings())
         .dll_name("interoptopus_reference_project")
         .write_types(WriteTypes::Namespace)
-        .debug(true)
+        .debug(false)
         .build()?
         .to_string()?;
 
