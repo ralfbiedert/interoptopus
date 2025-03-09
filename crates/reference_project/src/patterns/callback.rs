@@ -1,5 +1,6 @@
 use crate::patterns::result::Error;
-use interoptopus::{callback, ffi_function, ffi_type};
+use crate::types::UseString;
+use interoptopus::{callback, ffi, ffi_function, ffi_type};
 use std::ffi::c_void;
 use std::ptr::null;
 
@@ -11,6 +12,8 @@ callback!(SumDelegate1());
 callback!(SumDelegate2(x: i32, y: i32) -> i32);
 callback!(SumDelegateReturn(x: i32, y: i32) -> Error);
 callback!(SumDelegateReturn2(x: i32, y: i32));
+callback!(StringCallback(s: ffi::String));
+callback!(NestedStringCallback(s: UseString));
 
 #[ffi_type]
 pub struct DelegateCallback<C> {
@@ -66,6 +69,12 @@ pub fn pattern_callback_7(c1: SumDelegateReturn, c2: SumDelegateReturn2, x: i32,
     *o = i + 1;
 
     Error::Ok
+}
+
+#[ffi_function]
+pub fn pattern_callback_8(cb: StringCallback, cb2: NestedStringCallback, s: ffi::String) {
+    cb.call(s.clone());
+    cb2.call(UseString { s1: s.clone(), s2: s.clone() });
 }
 
 pub extern "C" fn exposed_sum1(x: *const c_void) {

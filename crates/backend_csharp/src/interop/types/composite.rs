@@ -29,6 +29,13 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
     }
     indented!(w, [()], r"}}")?;
     w.newline()?;
+    indented!(w, [()], r"public Unmanaged ToUnmanaged()")?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"var marshaller = new Marshaller(this);")?;
+    indented!(w, [()()], r"try {{ return marshaller.ToUnmanaged(); }}")?;
+    indented!(w, [()()], r"finally {{ marshaller.Free(); }}")?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
 
     w.indent();
     write_type_definition_composite_layout_annotation(w, the_type)?;
@@ -43,6 +50,13 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
         w.unindent();
         w.unindent();
     }
+    w.newline()?;
+    indented!(w, [()()], r"public {name} ToManaged()")?;
+    indented!(w, [()()], r"{{")?;
+    indented!(w, [()()()], r"var marshaller = new Marshaller(this);")?;
+    indented!(w, [()()()], r"try {{ return marshaller.ToManaged(); }}")?;
+    indented!(w, [()()()], r"finally {{ marshaller.Free(); }}")?;
+    indented!(w, [()()], r"}}")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
 

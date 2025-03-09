@@ -255,15 +255,10 @@ impl Interop {
 
     fn to_native_callback_typespecifier(&self, t: &CType) -> String {
         match t {
-            // CType::Composite(x) => {
-            //     if self.should_emit_marshaller_for_composite(x) {
-            //         format!("{}Marshaller.Unmanaged", to_typespecifier_in_param(t))
-            //     } else {
-            //         to_typespecifier_in_param(t)
-            //     }
-            // }
             CType::Pattern(TypePattern::Slice(_)) => format!("{}.Unmanaged", to_typespecifier_in_param(t)),
             CType::Pattern(TypePattern::SliceMut(_)) => format!("{}.Unmanaged", to_typespecifier_in_param(t)),
+            CType::Pattern(TypePattern::Utf8String(_)) => format!("{}.Unmanaged", to_typespecifier_in_param(t)),
+            CType::Composite(_) => format!("{}.Unmanaged", to_typespecifier_in_param(t)),
             _ => to_typespecifier_in_param(t),
         }
     }

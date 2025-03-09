@@ -35,6 +35,13 @@ namespace My.Company.Common
             z = other.z;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -42,6 +49,13 @@ namespace My.Company.Common
             public double x;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public double z;
+
+            public Vec ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(Vec), MarshalMode.Default, typeof(Marshaller))]
@@ -92,7 +106,7 @@ namespace My.Company.Common
     // Debug - write_type_definition_fn_pointer 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void InteropDelegate_fn_CharArray(CharArray x0);
-    public delegate void InteropDelegate_fn_CharArray_native(CharArray x0);
+    public delegate void InteropDelegate_fn_CharArray_native(CharArray.Unmanaged x0);
 
     // Debug - write_pattern_fast_slice 
     public partial struct SliceBool
@@ -156,7 +170,7 @@ namespace My.Company.Common
             public IntPtr Data;
             public ulong Len;
 
-            public SliceBool Managed()
+            public SliceBool ToManaged()
             {
                 return new SliceBool(Data, Len);
             }
@@ -252,7 +266,7 @@ namespace My.Company.Common
             public IntPtr Data;
             public ulong Len;
 
-            public SliceI32 Managed()
+            public SliceI32 ToManaged()
             {
                 return new SliceI32(Data, Len);
             }
@@ -348,7 +362,7 @@ namespace My.Company.Common
             public IntPtr Data;
             public ulong Len;
 
-            public SliceU32 Managed()
+            public SliceU32 ToManaged()
             {
                 return new SliceU32(Data, Len);
             }
@@ -444,7 +458,7 @@ namespace My.Company.Common
             public IntPtr Data;
             public ulong Len;
 
-            public SliceU8 Managed()
+            public SliceU8 ToManaged()
             {
                 return new SliceU8(Data, Len);
             }
@@ -620,7 +634,7 @@ namespace My.Company.Common
             public IntPtr Data;
             public ulong Len;
 
-            public SliceVec Managed()
+            public SliceVec ToManaged()
             {
                 return new SliceVec(Data, Len);
             }
@@ -721,7 +735,7 @@ namespace My.Company.Common
             public IntPtr Data;
             public ulong Len;
 
-            public SliceMutU32 Managed()
+            public SliceMutU32 ToManaged()
             {
                 return new SliceMutU32(Data, Len);
             }
@@ -822,7 +836,7 @@ namespace My.Company.Common
             public IntPtr Data;
             public ulong Len;
 
-            public SliceMutU8 Managed()
+            public SliceMutU8 ToManaged()
             {
                 return new SliceMutU8(Data, Len);
             }
@@ -923,7 +937,7 @@ namespace My.Company.Common
             public IntPtr Data;
             public ulong Len;
 
-            public SliceMutVec Managed()
+            public SliceMutVec ToManaged()
             {
                 return new SliceMutVec(Data, Len);
             }
@@ -977,6 +991,13 @@ namespace My.Company.Common
             is_some = other.is_some;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -984,6 +1005,13 @@ namespace My.Company.Common
             public Vec.Unmanaged t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public byte is_some;
+
+            public OptionVec ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(OptionVec), MarshalMode.Default, typeof(Marshaller))]
@@ -1267,6 +1295,13 @@ namespace My.Company.Common
 
         public void Dispose() { }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         /// A highly dangerous 'use once type' that has ownership semantics!
         /// Once passed over an FFI boundary 'the other side' is meant to own
         /// (and free) it. Rust handles that fine, but if in C# you put this
@@ -1278,6 +1313,14 @@ namespace My.Company.Common
             public IntPtr ptr;
             public ulong len;
             public ulong capacity;
+
+            public string ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged().String; }
+                finally { marshaller.Free(); }
+            }
+
         }
 
         public partial class InteropHelper

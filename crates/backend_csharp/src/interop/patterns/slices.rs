@@ -107,7 +107,7 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
     indented!(w, [()], r"public IntPtr Data;")?;
     indented!(w, [()], r"public ulong Len;")?;
     w.newline()?;
-    indented!(w, [()], r"public {} Managed()", name)?;
+    indented!(w, [()], r"public {} ToManaged()", name)?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"return new {}(Data, Len);", name)?;
     indented!(w, [()], r"}}")?;

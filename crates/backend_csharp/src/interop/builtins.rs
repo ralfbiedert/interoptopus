@@ -129,6 +129,14 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         w.newline()?;
         indented!(w, [()], r"public void Dispose() {{ }}")?;
         w.newline()?;
+        indented!(w, [()], r"public Unmanaged ToUnmanaged()")?;
+        indented!(w, [()], r"{{")?;
+        indented!(w, [()()], r"var marshaller = new Marshaller(this);")?;
+        indented!(w, [()()], r"try {{ return marshaller.ToUnmanaged(); }}")?;
+        indented!(w, [()()], r"finally {{ marshaller.Free(); }}")?;
+        indented!(w, [()], r"}}")?;
+        w.newline()?;
+
         indented!(w, [()], r"/// A highly dangerous 'use once type' that has ownership semantics!")?;
         indented!(w, [()], r"/// Once passed over an FFI boundary 'the other side' is meant to own")?;
         indented!(w, [()], r"/// (and free) it. Rust handles that fine, but if in C# you put this")?;
@@ -140,6 +148,14 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, [()()], r"public IntPtr ptr;")?;
         indented!(w, [()()], r"public ulong len;")?;
         indented!(w, [()()], r"public ulong capacity;")?;
+        w.newline()?;
+        indented!(w, [()()], r"public string ToManaged()")?;
+        indented!(w, [()()], r"{{")?;
+        indented!(w, [()()()], r"var marshaller = new Marshaller(this);")?;
+        indented!(w, [()()()], r"try {{ return marshaller.ToManaged().String; }}")?;
+        indented!(w, [()()()], r"finally {{ marshaller.Free(); }}")?;
+        indented!(w, [()()], r"}}")?;
+        w.newline()?;
         indented!(w, [()], r"}}")?;
         w.newline()?;
 

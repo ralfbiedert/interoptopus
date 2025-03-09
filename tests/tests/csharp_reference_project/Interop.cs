@@ -27,9 +27,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 11265075442944792215ul)
+            if (api_version != 18400386674043818275ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (11265075442944792215). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (18400386674043818275). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -651,7 +651,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_4")]
         // Debug - write_function_declaration 
-        public static partial UseUtf8String pattern_string_4(UseUtf8String x);
+        public static partial UseString pattern_string_4(UseString x);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_string_4 
@@ -659,7 +659,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_5")]
         // Debug - write_function_declaration 
-        public static partial ResultUseUtf8StringError pattern_string_5(UseUtf8String x);
+        public static partial ResultUseStringError pattern_string_5(UseString x);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_string_5 
@@ -667,7 +667,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_6a")]
         // Debug - write_function_declaration 
-        public static partial ResultError pattern_string_6a(ref UseUtf8String ignored);
+        public static partial ResultError pattern_string_6a(ref UseString ignored);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_string_6a 
@@ -675,7 +675,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_6b")]
         // Debug - write_function_declaration 
-        public static partial ResultError pattern_string_6b(out UseUtf8String y);
+        public static partial ResultError pattern_string_6b(out UseString y);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_string_6b 
@@ -702,12 +702,12 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_8")]
         // Debug - write_function_declaration 
-        public static partial ResultUseUtf8StringError pattern_string_8(SliceUseUtf8String x, ulong i);
+        public static partial ResultUseStringError pattern_string_8(SliceUseString x, ulong i);
 
         // Debug - write_function_overload 
-        public static unsafe ResultUseUtf8StringError pattern_string_8(UseUtf8String[] x, ulong i)
+        public static unsafe ResultUseStringError pattern_string_8(UseString[] x, ulong i)
         {
-            var x_wrapped = new SliceUseUtf8String(x);
+            var x_wrapped = new SliceUseString(x);
             try
             {
                 return pattern_string_8(x_wrapped, i);
@@ -1115,6 +1115,29 @@ namespace My.Company
         }
 
         // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_8")]
+        // Debug - write_function_declaration 
+        public static partial void pattern_callback_8(StringCallback cb, NestedStringCallback cb2, Utf8String s);
+
+        // Debug - write_function_overload 
+        public static unsafe void pattern_callback_8(StringCallbackDelegate cb, NestedStringCallbackDelegate cb2, string s)
+        {
+            var cb_wrapped = new StringCallback(cb);
+            var cb2_wrapped = new NestedStringCallback(cb2);
+            var s_wrapped = new Utf8String(s);
+            try
+            {
+                pattern_callback_8(cb_wrapped, cb2_wrapped, s_wrapped);
+            }
+            finally
+            {
+                cb_wrapped.Dispose();
+                cb2_wrapped.Dispose();
+                s_wrapped.Dispose();
+            }
+        }
+
+        // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_surrogates_1")]
         // Debug - write_function_declaration 
         public static partial void pattern_surrogates_1(Local s, out Container c);
@@ -1242,13 +1265,13 @@ namespace My.Company
         public static partial ResultError service_async_handle_nested_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
-        public static unsafe Task<UseUtf8String> service_async_handle_nested_string(IntPtr _context, string s)
+        public static unsafe Task<UseString> service_async_handle_nested_string(IntPtr _context, string s)
         {
-            var cs = new TaskCompletionSource<UseUtf8String>();
+            var cs = new TaskCompletionSource<UseString>();
             GCHandle pinned = default;
             var cb = new AsyncHelper((x) => {
-                var unmanaged = Marshal.PtrToStructure<ResultUseUtf8StringError.Unmanaged>(x);
-                var marshaller = new ResultUseUtf8StringError.Marshaller(unmanaged);
+                var unmanaged = Marshal.PtrToStructure<ResultUseStringError.Unmanaged>(x);
+                var marshaller = new ResultUseStringError.Marshaller(unmanaged);
                 var managed = marshaller.ToManaged();
                 if (managed.IsOk()) { cs.SetResult(managed.Ok()); }
                 else { cs.SetException(new InteropException<Error>(managed.Err())); }
@@ -1883,11 +1906,25 @@ namespace My.Company
             data = other.data;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public fixed byte data[16];
+
+            public Array ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(Array), MarshalMode.Default, typeof(Marshaller))]
@@ -1955,11 +1992,25 @@ namespace My.Company
             val = other.val;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public sbyte val;
+
+            public BoolField ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(BoolField), MarshalMode.Default, typeof(Marshaller))]
@@ -2028,6 +2079,13 @@ namespace My.Company
             sum_delegate_return_2 = other.sum_delegate_return_2;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -2047,6 +2105,13 @@ namespace My.Company
             public SumDelegateReturn.Unmanaged sum_delegate_return;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public SumDelegateReturn2.Unmanaged sum_delegate_return_2;
+
+            public CallbackTable ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(CallbackTable), MarshalMode.Default, typeof(Marshaller))]
@@ -2147,6 +2212,13 @@ namespace My.Company
             str_2 = other.str_2;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -2154,6 +2226,13 @@ namespace My.Company
             public FixedString.Unmanaged str;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public FixedString.Unmanaged str_2;
+
+            public CharArray ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(CharArray), MarshalMode.Default, typeof(Marshaller))]
@@ -2216,11 +2295,25 @@ namespace My.Company
             foreign = other.foreign;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public Local.Unmanaged foreign;
+
+            public Container ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(Container), MarshalMode.Default, typeof(Marshaller))]
@@ -2277,11 +2370,25 @@ namespace My.Company
             x = other.x;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public float x;
+
+            public ExtraTypef32 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(ExtraTypef32), MarshalMode.Default, typeof(Marshaller))]
@@ -2336,11 +2443,25 @@ namespace My.Company
             data = other.data;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public fixed byte data[32];
+
+            public FixedString ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(FixedString), MarshalMode.Default, typeof(Marshaller))]
@@ -2408,11 +2529,25 @@ namespace My.Company
             x = other.x;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public IntPtr x;
+
+            public Genericu32 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(Genericu32), MarshalMode.Default, typeof(Marshaller))]
@@ -2467,11 +2602,25 @@ namespace My.Company
             x = other.x;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public IntPtr x;
+
+            public Genericu8 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(Genericu8), MarshalMode.Default, typeof(Marshaller))]
@@ -2526,11 +2675,25 @@ namespace My.Company
             x = other.x;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public float x;
+
+            public Inner ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(Inner), MarshalMode.Default, typeof(Marshaller))]
@@ -2585,11 +2748,25 @@ namespace My.Company
             x = other.x;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public uint x;
+
+            public Local ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(Local), MarshalMode.Default, typeof(Marshaller))]
@@ -2656,6 +2833,13 @@ namespace My.Company
             field_struct = other.field_struct;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -2673,6 +2857,13 @@ namespace My.Company
             public fixed ushort field_array_2[5];
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public Array.Unmanaged field_struct;
+
+            public NestedArray ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(NestedArray), MarshalMode.Default, typeof(Marshaller))]
@@ -2783,6 +2974,13 @@ namespace My.Company
             y = other.y;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public unsafe struct Unmanaged
         {
@@ -2790,6 +2988,13 @@ namespace My.Company
             public byte x;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public ushort y;
+
+            public Packed1 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(Packed1), MarshalMode.Default, typeof(Marshaller))]
@@ -2850,6 +3055,13 @@ namespace My.Company
             x = other.x;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public unsafe struct Unmanaged
         {
@@ -2857,6 +3069,13 @@ namespace My.Company
             public ushort y;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public byte x;
+
+            public Packed2 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(Packed2), MarshalMode.Default, typeof(Marshaller))]
@@ -2915,11 +3134,25 @@ namespace My.Company
             x = other.x;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public uint x;
+
+            public Phantomu8 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(Phantomu8), MarshalMode.Default, typeof(Marshaller))]
@@ -2976,11 +3209,25 @@ namespace My.Company
             x = other.x;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public float x;
+
+            public StructDocumented ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(StructDocumented), MarshalMode.Default, typeof(Marshaller))]
@@ -3035,11 +3282,25 @@ namespace My.Company
             e = other.e;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public EnumRenamed e;
+
+            public StructRenamed ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(StructRenamed), MarshalMode.Default, typeof(Marshaller))]
@@ -3094,11 +3355,25 @@ namespace My.Company
             x0 = other.x0;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public byte x0;
+
+            public Tupled ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(Tupled), MarshalMode.Default, typeof(Marshaller))]
@@ -3153,11 +3428,25 @@ namespace My.Company
             ascii_string = other.ascii_string;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public IntPtr ascii_string;
+
+            public UseCStrPtr ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(UseCStrPtr), MarshalMode.Default, typeof(Marshaller))]
@@ -3198,7 +3487,7 @@ namespace My.Company
     }
 
     // Debug - write_type_definition_composite 
-    public partial struct UseUtf8String
+    public partial struct UseString
     {
         public string s1;
         public string s2;
@@ -3206,12 +3495,19 @@ namespace My.Company
 
     // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct UseUtf8String
+    public partial struct UseString
     {
-        public UseUtf8String(UseUtf8String other)
+        public UseString(UseString other)
         {
             s1 = other.s1;
             s2 = other.s2;
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -3221,20 +3517,27 @@ namespace My.Company
             public Utf8String.Unmanaged s1;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public Utf8String.Unmanaged s2;
+
+            public UseString ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
-        [CustomMarshaller(typeof(UseUtf8String), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(UseString), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private UseUtf8String _managed; // Used when converting managed -> unmanaged
+            private UseString _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(UseUtf8String managed) { _managed = managed; }
+            public Marshaller(UseString managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(UseUtf8String managed) { _managed = managed; }
+            public void FromManaged(UseString managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -3251,9 +3554,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe UseUtf8String ToManaged()
+            public unsafe UseString ToManaged()
             {
-                _managed = new UseUtf8String();
+                _managed = new UseString();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 var _s1 = new Utf8String.Marshaller(_unmanaged.s1);
@@ -3285,6 +3588,13 @@ namespace My.Company
             y = other.y;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -3292,6 +3602,13 @@ namespace My.Company
             public float x;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public float y;
+
+            public Vec1 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(Vec1), MarshalMode.Default, typeof(Marshaller))]
@@ -3352,6 +3669,13 @@ namespace My.Company
             z = other.z;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -3359,6 +3683,13 @@ namespace My.Company
             public double x;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public double z;
+
+            public Vec2 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(Vec2), MarshalMode.Default, typeof(Marshaller))]
@@ -3421,6 +3752,13 @@ namespace My.Company
             z = other.z;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -3430,6 +3768,13 @@ namespace My.Company
             public float y;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public float z;
+
+            public Vec3f32 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(Vec3f32), MarshalMode.Default, typeof(Marshaller))]
@@ -3494,6 +3839,13 @@ namespace My.Company
             prvt = other.prvt;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -3501,6 +3853,13 @@ namespace My.Company
             public byte pblc;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public byte prvt;
+
+            public Visibility1 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(Visibility1), MarshalMode.Default, typeof(Marshaller))]
@@ -3561,6 +3920,13 @@ namespace My.Company
             pblc2 = other.pblc2;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -3568,6 +3934,13 @@ namespace My.Company
             public byte pblc1;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public byte pblc2;
+
+            public Visibility2 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(Visibility2), MarshalMode.Default, typeof(Marshaller))]
@@ -3626,11 +3999,25 @@ namespace My.Company
             x = other.x;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public uint x;
+
+            public Weird1u32 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(Weird1u32), MarshalMode.Default, typeof(Marshaller))]
@@ -3689,6 +4076,13 @@ namespace My.Company
             r = other.r;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -3698,6 +4092,13 @@ namespace My.Company
             public fixed byte a[5];
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public IntPtr r;
+
+            public Weird2u8 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(Weird2u8), MarshalMode.Default, typeof(Marshaller))]
@@ -3765,7 +4166,7 @@ namespace My.Company
     // Debug - write_type_definition_fn_pointer 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void InteropDelegate_fn_CharArray(CharArray x0);
-    public delegate void InteropDelegate_fn_CharArray_native(CharArray x0);
+    public delegate void InteropDelegate_fn_CharArray_native(CharArray.Unmanaged x0);
 
     // Debug - write_type_definition_enum 
     public enum Error
@@ -3909,7 +4310,7 @@ namespace My.Company
             public IntPtr Data;
             public ulong Len;
 
-            public SliceUseCStrPtr Managed()
+            public SliceUseCStrPtr ToManaged()
             {
                 return new SliceUseCStrPtr(Data, Len);
             }
@@ -3944,17 +4345,17 @@ namespace My.Company
     }
 
     // Debug - write_pattern_marshalling_slice 
-    public partial struct SliceUseUtf8String
+    public partial struct SliceUseString
     {
-        UseUtf8String[] _managed;
+        UseString[] _managed;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct SliceUseUtf8String : IEnumerable<UseUtf8String>, IDisposable
+    public partial struct SliceUseString : IEnumerable<UseString>, IDisposable
     {
         public int Count => _managed?.Length ?? (int) 0;
 
-        public unsafe UseUtf8String this[int i]
+        public unsafe UseString this[int i]
         {
             get
             {
@@ -3964,12 +4365,12 @@ namespace My.Company
             }
         }
 
-        public SliceUseUtf8String(UseUtf8String[] managed)
+        public SliceUseString(UseString[] managed)
         {
             _managed = managed;
         }
 
-        public IEnumerator<UseUtf8String> GetEnumerator()
+        public IEnumerator<UseString> GetEnumerator()
         {
             for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
@@ -3978,7 +4379,7 @@ namespace My.Company
 
         public void Dispose() { }
 
-        [CustomMarshaller(typeof(SliceUseUtf8String), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(SliceUseString), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -3990,22 +4391,22 @@ namespace My.Company
 
         public ref struct Marshaller
         {
-            private SliceUseUtf8String _managed;
+            private SliceUseString _managed;
             private Unmanaged _unmanaged;
 
-            public void FromManaged(SliceUseUtf8String managed) { _managed = managed; }
+            public void FromManaged(SliceUseString managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
             {
-                var size = sizeof(UseUtf8String.Unmanaged);
+                var size = sizeof(UseString.Unmanaged);
                 _unmanaged = new Unmanaged();
                 _unmanaged.Data = Marshal.AllocHGlobal(size * _managed.Count);
                 _unmanaged.Len = (ulong) _managed.Count;
                 for (var i = 0; i < _managed.Count; ++i)
                 {
-                    var _marshaller = new UseUtf8String.Marshaller();
-                    _marshaller.FromManaged(new UseUtf8String(_managed._managed[i]));
+                    var _marshaller = new UseString.Marshaller();
+                    _marshaller.FromManaged(new UseString(_managed._managed[i]));
                     var unmanaged = _marshaller.ToUnmanaged();
                     var dst = IntPtr.Add(_unmanaged.Data, i * size);
                     Marshal.StructureToPtr(unmanaged, dst, false);
@@ -4013,9 +4414,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe SliceUseUtf8String ToManaged()
+            public unsafe SliceUseString ToManaged()
             {
-                _managed = new SliceUseUtf8String();
+                _managed = new SliceUseString();
                 return _managed;
             }
 
@@ -4085,7 +4486,7 @@ namespace My.Company
             public IntPtr Data;
             public ulong Len;
 
-            public SliceVec3f32 Managed()
+            public SliceVec3f32 ToManaged()
             {
                 return new SliceVec3f32(Data, Len);
             }
@@ -4186,7 +4587,7 @@ namespace My.Company
             public IntPtr Data;
             public ulong Len;
 
-            public SliceMutCharArray Managed()
+            public SliceMutCharArray ToManaged()
             {
                 return new SliceMutCharArray(Data, Len);
             }
@@ -4240,6 +4641,13 @@ namespace My.Company
             is_some = other.is_some;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -4247,6 +4655,13 @@ namespace My.Company
             public Inner.Unmanaged t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public byte is_some;
+
+            public OptionInner ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(OptionInner), MarshalMode.Default, typeof(Marshaller))]
@@ -4334,6 +4749,13 @@ namespace My.Company
             err = other.err;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -4341,6 +4763,13 @@ namespace My.Company
             public IntPtr t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public Error err;
+
+            public ResultConstPtrServiceAsyncError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceAsyncError), MarshalMode.Default, typeof(Marshaller))]
@@ -4422,6 +4851,13 @@ namespace My.Company
             err = other.err;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -4429,6 +4865,13 @@ namespace My.Company
             public IntPtr t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public Error err;
+
+            public ResultConstPtrServiceBasicError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceBasicError), MarshalMode.Default, typeof(Marshaller))]
@@ -4510,6 +4953,13 @@ namespace My.Company
             err = other.err;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -4517,6 +4967,13 @@ namespace My.Company
             public IntPtr t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public Error err;
+
+            public ResultConstPtrServiceCallbacksError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceCallbacksError), MarshalMode.Default, typeof(Marshaller))]
@@ -4598,6 +5055,13 @@ namespace My.Company
             err = other.err;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -4605,6 +5069,13 @@ namespace My.Company
             public IntPtr t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public Error err;
+
+            public ResultConstPtrServiceDependentError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceDependentError), MarshalMode.Default, typeof(Marshaller))]
@@ -4686,6 +5157,13 @@ namespace My.Company
             err = other.err;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -4693,6 +5171,13 @@ namespace My.Company
             public IntPtr t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public Error err;
+
+            public ResultConstPtrServiceIgnoringMethodsError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceIgnoringMethodsError), MarshalMode.Default, typeof(Marshaller))]
@@ -4774,6 +5259,13 @@ namespace My.Company
             err = other.err;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -4781,6 +5273,13 @@ namespace My.Company
             public IntPtr t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public Error err;
+
+            public ResultConstPtrServiceMainError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceMainError), MarshalMode.Default, typeof(Marshaller))]
@@ -4862,6 +5361,13 @@ namespace My.Company
             err = other.err;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -4869,6 +5375,13 @@ namespace My.Company
             public IntPtr t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public Error err;
+
+            public ResultConstPtrServiceMultipleCtorsError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceMultipleCtorsError), MarshalMode.Default, typeof(Marshaller))]
@@ -4950,6 +5463,13 @@ namespace My.Company
             err = other.err;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -4957,6 +5477,13 @@ namespace My.Company
             public IntPtr t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public Error err;
+
+            public ResultConstPtrServiceOnPanicError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceOnPanicError), MarshalMode.Default, typeof(Marshaller))]
@@ -5038,6 +5565,13 @@ namespace My.Company
             err = other.err;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -5045,6 +5579,13 @@ namespace My.Company
             public IntPtr t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public Error err;
+
+            public ResultConstPtrServiceResultError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceResultError), MarshalMode.Default, typeof(Marshaller))]
@@ -5126,6 +5667,13 @@ namespace My.Company
             err = other.err;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -5133,6 +5681,13 @@ namespace My.Company
             public IntPtr t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public Error err;
+
+            public ResultConstPtrServiceStringsError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceStringsError), MarshalMode.Default, typeof(Marshaller))]
@@ -5214,6 +5769,13 @@ namespace My.Company
             err = other.err;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -5221,6 +5783,13 @@ namespace My.Company
             public IntPtr t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public Error err;
+
+            public ResultConstPtrServiceVariousSlicesError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceVariousSlicesError), MarshalMode.Default, typeof(Marshaller))]
@@ -5302,6 +5871,13 @@ namespace My.Company
             err = other.err;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -5309,6 +5885,13 @@ namespace My.Company
             public NestedArray.Unmanaged t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public Error err;
+
+            public ResultNestedArrayError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(ResultNestedArrayError), MarshalMode.Default, typeof(Marshaller))]
@@ -5392,6 +5975,13 @@ namespace My.Company
             err = other.err;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -5399,6 +5989,13 @@ namespace My.Company
             public uint t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public Error err;
+
+            public ResultU32Error ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(ResultU32Error), MarshalMode.Default, typeof(Marshaller))]
@@ -5480,6 +6077,13 @@ namespace My.Company
             err = other.err;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -5487,6 +6091,13 @@ namespace My.Company
             public ulong t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public Error err;
+
+            public ResultU64Error ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(ResultU64Error), MarshalMode.Default, typeof(Marshaller))]
@@ -5550,45 +6161,59 @@ namespace My.Company
 
     // Debug - write_type_definition_composite 
     ///Result that contains value or an error.
-    public partial struct ResultUseUtf8StringError
+    public partial struct ResultUseStringError
     {
         ///Element if err is `Ok`.
-        UseUtf8String t;
+        UseString t;
         ///Error value.
         Error err;
     }
 
     // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultUseUtf8StringError
+    public partial struct ResultUseStringError
     {
-        public ResultUseUtf8StringError(ResultUseUtf8StringError other)
+        public ResultUseStringError(ResultUseStringError other)
         {
             t = other.t;
             err = other.err;
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
             // Debug - write_type_definition_composite_unmanaged_body_field 
-            public UseUtf8String.Unmanaged t;
+            public UseString.Unmanaged t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public Error err;
+
+            public ResultUseStringError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
-        [CustomMarshaller(typeof(ResultUseUtf8StringError), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultUseStringError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private ResultUseUtf8StringError _managed; // Used when converting managed -> unmanaged
+            private ResultUseStringError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultUseUtf8StringError managed) { _managed = managed; }
+            public Marshaller(ResultUseStringError managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultUseUtf8StringError managed) { _managed = managed; }
+            public void FromManaged(ResultUseStringError managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -5596,7 +6221,7 @@ namespace My.Company
                 _unmanaged = new Unmanaged();
 
                 // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                var _t = new UseUtf8String.Marshaller(_managed.t);
+                var _t = new UseString.Marshaller(_managed.t);
                 _unmanaged.t = _t.ToUnmanaged();
                 // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
                 _unmanaged.err = _managed.err;
@@ -5604,12 +6229,12 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultUseUtf8StringError ToManaged()
+            public unsafe ResultUseStringError ToManaged()
             {
-                _managed = new ResultUseUtf8StringError();
+                _managed = new ResultUseStringError();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                var _t = new UseUtf8String.Marshaller(_unmanaged.t);
+                var _t = new UseString.Marshaller(_unmanaged.t);
                 _managed.t = _t.ToManaged();
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 _managed.err = _unmanaged.err;
@@ -5621,9 +6246,9 @@ namespace My.Company
     }
 
     // Debug - write_pattern_result 
-    public partial struct ResultUseUtf8StringError
+    public partial struct ResultUseStringError
     {
-        public UseUtf8String Ok()
+        public UseString Ok()
         {
             if (err == Error.Ok)
             {
@@ -5658,6 +6283,13 @@ namespace My.Company
             err = other.err;
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
@@ -5665,6 +6297,13 @@ namespace My.Company
             public Utf8String.Unmanaged t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public Error err;
+
+            public ResultUtf8StringError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(ResultUtf8StringError), MarshalMode.Default, typeof(Marshaller))]
@@ -5730,7 +6369,7 @@ namespace My.Company
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void CallbackCharArray2Native(CharArray value, IntPtr callback_data); // 'True' native callback signature
+    public delegate void CallbackCharArray2Native(CharArray.Unmanaged value, IntPtr callback_data); // 'True' native callback signature
     public delegate void CallbackCharArray2Delegate(CharArray value); // Our C# signature
 
     public partial class CallbackCharArray2
@@ -5755,12 +6394,12 @@ namespace My.Company
         }
 
         // Helper to invoke managed code from the native invocation.
-        private void CallTrampoline(CharArray value, IntPtr callback_data)
+        private void CallTrampoline(CharArray.Unmanaged value, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
             {
-                _managed(value);
+                _managed(value.ToManaged());
             }
             catch (Exception e)
             {
@@ -5774,7 +6413,7 @@ namespace My.Company
         {
             var __target = Marshal.GetDelegateForFunctionPointer<CallbackCharArray2Native>(_ptr);
             // TODO
-            // __target(value);
+            // __target(value.ToManaged());
             return;
         }
 
@@ -5859,7 +6498,7 @@ namespace My.Company
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
             {
-                return _managed(slice.Managed());
+                return _managed(slice.ToManaged());
             }
             catch (Exception e)
             {
@@ -5873,7 +6512,7 @@ namespace My.Company
         {
             var __target = Marshal.GetDelegateForFunctionPointer<CallbackFFISliceNative>(_ptr);
             // TODO
-            // return __target(slice.Managed());
+            // return __target(slice.ToManaged());
             return default;
         }
 
@@ -5928,7 +6567,7 @@ namespace My.Company
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate Vec3f32 CallbackHugeVecSliceNative(SliceVec3f32.Unmanaged slice, IntPtr callback_data); // 'True' native callback signature
+    public delegate Vec3f32.Unmanaged CallbackHugeVecSliceNative(SliceVec3f32.Unmanaged slice, IntPtr callback_data); // 'True' native callback signature
     public delegate Vec3f32 CallbackHugeVecSliceDelegate(SliceVec3f32 slice); // Our C# signature
 
     public partial class CallbackHugeVecSlice
@@ -5953,12 +6592,12 @@ namespace My.Company
         }
 
         // Helper to invoke managed code from the native invocation.
-        private Vec3f32 CallTrampoline(SliceVec3f32.Unmanaged slice, IntPtr callback_data)
+        private Vec3f32.Unmanaged CallTrampoline(SliceVec3f32.Unmanaged slice, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
             {
-                return _managed(slice.Managed());
+                return _managed(slice.ToManaged()).ToUnmanaged();
             }
             catch (Exception e)
             {
@@ -5972,7 +6611,7 @@ namespace My.Company
         {
             var __target = Marshal.GetDelegateForFunctionPointer<CallbackHugeVecSliceNative>(_ptr);
             // TODO
-            // return __target(slice.Managed());
+            // return __target(slice.ToManaged());
             return default;
         }
 
@@ -6057,7 +6696,7 @@ namespace My.Company
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
             {
-                _managed(slice.Managed());
+                _managed(slice.ToManaged());
             }
             catch (Exception e)
             {
@@ -6071,7 +6710,7 @@ namespace My.Company
         {
             var __target = Marshal.GetDelegateForFunctionPointer<CallbackSliceMutNative>(_ptr);
             // TODO
-            // __target(slice.Managed());
+            // __target(slice.ToManaged());
             return;
         }
 
@@ -6522,6 +7161,204 @@ namespace My.Company
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void NestedStringCallbackNative(UseString.Unmanaged s, IntPtr callback_data); // 'True' native callback signature
+    public delegate void NestedStringCallbackDelegate(UseString s); // Our C# signature
+
+    public partial class NestedStringCallback
+    {
+        private NestedStringCallbackDelegate _managed; // C# callback
+        private NestedStringCallbackNative _native; // Native callback 
+        private IntPtr _ptr; // Raw function pointer of native callback
+        private Exception _exception; // Set if the callback encountered an Exception
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial class NestedStringCallback : IDisposable
+    {
+
+        public NestedStringCallback() { }
+
+        public NestedStringCallback(NestedStringCallbackDelegate managed)
+        {
+            _managed = managed;
+            _native = CallTrampoline;
+            _ptr = Marshal.GetFunctionPointerForDelegate(_native);
+        }
+
+        // Helper to invoke managed code from the native invocation.
+        private void CallTrampoline(UseString.Unmanaged s, IntPtr callback_data)
+        {
+            // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
+            try
+            {
+                _managed(s.ToManaged());
+            }
+            catch (Exception e)
+            {
+                _exception = e;
+                return;
+            }
+        }
+
+        // Invokes the callback.
+        public void Call(UseString s)
+        {
+            var __target = Marshal.GetDelegateForFunctionPointer<NestedStringCallbackNative>(_ptr);
+            // TODO
+            // __target(s.ToManaged());
+            return;
+        }
+
+        public void Dispose()
+        {
+            // This means when the callback was invoked from Rust C# had an exception which
+            // we caught (otherwise C# might not re-enter Rust, and we leak memory). Now is
+            // the time to rethrow it.
+            if (_exception != null) throw _exception;
+        }
+
+        [CustomMarshaller(typeof(NestedStringCallback), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+        public ref struct Marshaller
+        {
+            private NestedStringCallback _managed;
+            private Unmanaged _unmanaged;
+
+            public Marshaller(NestedStringCallback managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(NestedStringCallback managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public Unmanaged ToUnmanaged()
+            {
+                _unmanaged = new Unmanaged();
+                _unmanaged.Callback = _managed?._ptr ?? IntPtr.Zero;
+                _unmanaged.Data = IntPtr.Zero;
+                return _unmanaged;
+            }
+
+            public NestedStringCallback ToManaged()
+            {
+                _managed = new NestedStringCallback();
+                _managed._ptr = _unmanaged.Callback;
+                return _managed;
+            }
+
+            public void Free() { }
+        }
+    }
+
+
+    // Debug - write_type_definition_named_callback 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void StringCallbackNative(Utf8String.Unmanaged s, IntPtr callback_data); // 'True' native callback signature
+    public delegate void StringCallbackDelegate(string s); // Our C# signature
+
+    public partial class StringCallback
+    {
+        private StringCallbackDelegate _managed; // C# callback
+        private StringCallbackNative _native; // Native callback 
+        private IntPtr _ptr; // Raw function pointer of native callback
+        private Exception _exception; // Set if the callback encountered an Exception
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial class StringCallback : IDisposable
+    {
+
+        public StringCallback() { }
+
+        public StringCallback(StringCallbackDelegate managed)
+        {
+            _managed = managed;
+            _native = CallTrampoline;
+            _ptr = Marshal.GetFunctionPointerForDelegate(_native);
+        }
+
+        // Helper to invoke managed code from the native invocation.
+        private void CallTrampoline(Utf8String.Unmanaged s, IntPtr callback_data)
+        {
+            // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
+            try
+            {
+                _managed(s.ToManaged());
+            }
+            catch (Exception e)
+            {
+                _exception = e;
+                return;
+            }
+        }
+
+        // Invokes the callback.
+        public void Call(string s)
+        {
+            var __target = Marshal.GetDelegateForFunctionPointer<StringCallbackNative>(_ptr);
+            // TODO
+            // __target(s.ToManaged());
+            return;
+        }
+
+        public void Dispose()
+        {
+            // This means when the callback was invoked from Rust C# had an exception which
+            // we caught (otherwise C# might not re-enter Rust, and we leak memory). Now is
+            // the time to rethrow it.
+            if (_exception != null) throw _exception;
+        }
+
+        [CustomMarshaller(typeof(StringCallback), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta {  }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+        public ref struct Marshaller
+        {
+            private StringCallback _managed;
+            private Unmanaged _unmanaged;
+
+            public Marshaller(StringCallback managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(StringCallback managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public Unmanaged ToUnmanaged()
+            {
+                _unmanaged = new Unmanaged();
+                _unmanaged.Callback = _managed?._ptr ?? IntPtr.Zero;
+                _unmanaged.Data = IntPtr.Zero;
+                return _unmanaged;
+            }
+
+            public StringCallback ToManaged()
+            {
+                _managed = new StringCallback();
+                _managed._ptr = _unmanaged.Callback;
+                return _managed;
+            }
+
+            public void Free() { }
+        }
+    }
+
+
+    // Debug - write_type_definition_named_callback 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void SumDelegate1Native(IntPtr callback_data); // 'True' native callback signature
     public delegate void SumDelegate1Delegate(); // Our C# signature
 
@@ -6960,7 +7797,7 @@ namespace My.Company
         // Debug - write_service_method_overload 
 
         // Debug - write_pattern_service_method 
-        public Task<UseUtf8String> HandleNestedString(string s)
+        public Task<UseString> HandleNestedString(string s)
         {
             return Interop.service_async_handle_nested_string(_context, s);
         }

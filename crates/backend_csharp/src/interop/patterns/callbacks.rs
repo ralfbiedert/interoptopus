@@ -10,36 +10,44 @@ use interoptopus::{indented, Error};
 pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
     i.debug(w, "write_type_definition_named_callback")?;
 
-    let rval = to_typespecifier_in_sync_fn_rval(the_type.fnpointer().signature().rval());
+    let rval_safe = to_typespecifier_in_sync_fn_rval(the_type.fnpointer().signature().rval());
+    let rval_unsafe = match the_type.fnpointer().signature().rval() {
+        CType::Composite(_) => format!("{rval_safe}.Unmanaged"),
+        _ => rval_safe.clone(),
+    };
+
     let name = named_callback_to_typename(the_type);
     let visibility = i.visibility_types.to_access_modifier();
 
     let mut params = Vec::new();
     let mut params_native = Vec::new();
-    let mut param_invokes = Vec::new();
+    let mut params_invoke = Vec::new();
     for param in the_type.fnpointer().signature().params() {
-        match param.the_type() {
-            CType::Pattern(TypePattern::Slice(_)) => param_invokes.push(format!("{}.Managed()", param.name())),
-            CType::Pattern(TypePattern::SliceMut(_)) => param_invokes.push(format!("{}.Managed()", param.name())),
-            _ => param_invokes.push(param.name().to_string()),
-        }
         params.push(format!("{} {}", to_typespecifier_in_param(param.the_type()), param.name()));
         params_native.push(format!("{} {}", i.to_native_callback_typespecifier(param.the_type()), param.name()));
+
+        match param.the_type() {
+            CType::Pattern(TypePattern::Slice(_)) => params_invoke.push(format!("{}.ToManaged()", param.name())),
+            CType::Pattern(TypePattern::SliceMut(_)) => params_invoke.push(format!("{}.ToManaged()", param.name())),
+            CType::Pattern(TypePattern::Utf8String(_)) => {
+                params.pop();
+                params.push(format!("string {}", param.name()));
+                params_invoke.push(format!("{}.ToManaged()", param.name()));
+            }
+            CType::Composite(_) => params_invoke.push(format!("{}.ToManaged()", param.name())),
+            _ => params_invoke.push(param.name().to_string()),
+        }
     }
 
     params.pop();
-    param_invokes.pop();
+    params_invoke.pop();
 
     write_type_definition_fn_pointer_annotation(w, the_type.fnpointer())?;
-    indented!(
-        w,
-        r"{} delegate {} {}Native({}); // 'True' native callback signature",
-        visibility,
-        i.to_native_callback_typespecifier(the_type.fnpointer().signature().rval()),
-        name,
-        params_native.join(", ")
-    )?;
-    indented!(w, r"{} delegate {} {}Delegate({}); // Our C# signature", visibility, rval, name, params.join(", "))?;
+    let params_unsafe_str = params_native.join(", ");
+    let params_str = params.join(", ");
+    let params_invoke = params_invoke.join(", ");
+    indented!(w, r"{visibility} delegate {rval_unsafe} {name}Native({params_unsafe_str}); // 'True' native callback signature",)?;
+    indented!(w, r"{visibility} delegate {rval_safe} {name}Delegate({params_str}); // Our C# signature")?;
     w.newline()?;
 
     indented!(w, r"public partial class {}", name)?;
@@ -64,15 +72,16 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()], r"}}")?;
     w.newline()?;
     indented!(w, [()], r"// Helper to invoke managed code from the native invocation.")?;
-    indented!(w, [()], r"private {} CallTrampoline({})", rval, params_native.join(", "))?;
+    indented!(w, [()], r"private {rval_unsafe} CallTrampoline({params_unsafe_str})")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"// We ignore the last parameter, a generic callback pointer, as it's not needed in C#.")?;
     indented!(w, [()()], r"try")?;
     indented!(w, [()()], r"{{")?;
-    if the_type.fnpointer().signature().rval().is_void() {
-        indented!(w, [()()()], r"_managed({});", param_invokes.join(", "))?;
-    } else {
-        indented!(w, [()()()], r"return _managed({});", param_invokes.join(", "))?;
+    match the_type.fnpointer().signature().rval() {
+        CType::Primitive(PrimitiveType::Void) => indented!(w, [()()()], r"_managed({params_invoke});")?,
+        CType::Primitive(_) => indented!(w, [()()()], r"return _managed({params_invoke});")?,
+        CType::Pattern(TypePattern::FFIErrorEnum(_)) => indented!(w, [()()()], r"return _managed({params_invoke});")?,
+        _ => indented!(w, [()()()], r"return _managed({params_invoke}).ToUnmanaged();")?,
     }
     indented!(w, [()()], r"}}")?;
     indented!(w, [()()], r"catch (Exception e)")?;
@@ -81,7 +90,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     match the_type.fnpointer().signature().rval() {
         CType::Primitive(PrimitiveType::Void) => indented!(w, [()()()], r"return;")?,
         CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
-            indented!(w, [()()()], r"return new {}({}.{});", rval, e.the_enum().rust_name(), e.panic_variant().name())?;
+            indented!(w, [()()()], r"return new {rval_unsafe}({}.{});", e.the_enum().rust_name(), e.panic_variant().name())?;
         }
         _ => indented!(w, [()()()], r"return default;")?,
     }
@@ -89,19 +98,19 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()], r"}}")?;
     w.newline()?;
     indented!(w, [()], r"// Invokes the callback.")?;
-    indented!(w, [()], r"public {} Call({})", rval, params.join(", "))?;
+    indented!(w, [()], r"public {rval_safe} Call({params_str})")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"var __target = Marshal.GetDelegateForFunctionPointer<{name}Native>(_ptr);")?;
     indented!(w, [()()], r"// TODO")?;
     if the_type.fnpointer().signature().rval().is_void() {
-        indented!(w, [()()], r"// __target({});", param_invokes.join(", "))?;
+        indented!(w, [()()], r"// __target({params_invoke});")?;
     } else {
-        indented!(w, [()()], r"// return __target({});", param_invokes.join(", "))?;
+        indented!(w, [()()], r"// return __target({params_invoke});")?;
     }
     match the_type.fnpointer().signature().rval() {
         CType::Primitive(PrimitiveType::Void) => indented!(w, [()()], r"return;")?,
         CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
-            indented!(w, [()()], r"return new {}({}.{});", rval, e.the_enum().rust_name(), e.panic_variant().name())?;
+            indented!(w, [()()], r"return new {rval_safe}({}.{});", e.the_enum().rust_name(), e.panic_variant().name())?;
         }
         _ => indented!(w, [()()], r"return default;")?,
     }
@@ -115,7 +124,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()()], r"if (_exception != null) throw _exception;")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
-    indented!(w, [()], r"[CustomMarshaller(typeof({}), MarshalMode.Default, typeof(Marshaller))]", name)?;
+    indented!(w, [()], r"[CustomMarshaller(typeof({name}), MarshalMode.Default, typeof(Marshaller))]")?;
     indented!(w, [()], r"private struct MarshallerMeta {{  }}")?;
     w.newline()?;
     indented!(w, [()], r"[StructLayout(LayoutKind.Sequential)]")?;
@@ -127,13 +136,13 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     w.newline()?;
     indented!(w, [()], r"public ref struct Marshaller")?;
     indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"private {} _managed;", name)?;
+    indented!(w, [()()], r"private {name} _managed;")?;
     indented!(w, [()()], r"private Unmanaged _unmanaged;")?;
     w.newline()?;
-    indented!(w, [()()], r"public Marshaller({} managed) {{ _managed = managed; }}", name)?;
+    indented!(w, [()()], r"public Marshaller({name} managed) {{ _managed = managed; }}")?;
     indented!(w, [()()], r"public Marshaller(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
     w.newline()?;
-    indented!(w, [()()], r"public void FromManaged({} managed) {{ _managed = managed; }}", name)?;
+    indented!(w, [()()], r"public void FromManaged({name} managed) {{ _managed = managed; }}")?;
     indented!(w, [()()], r"public void FromUnmanaged(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
     w.newline()?;
     indented!(w, [()()], r"public Unmanaged ToUnmanaged()")?;
@@ -144,9 +153,9 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()()()], r"return _unmanaged;")?;
     indented!(w, [()()], r"}}")?;
     w.newline()?;
-    indented!(w, [()()], r"public {} ToManaged()", name)?;
+    indented!(w, [()()], r"public {name} ToManaged()")?;
     indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"_managed = new {}();", name)?;
+    indented!(w, [()()()], r"_managed = new {name}();")?;
     indented!(w, [()()()], r"_managed._ptr = _unmanaged.Callback;")?;
     indented!(w, [()()()], r"return _managed;")?;
     indented!(w, [()()], r"}}")?;

@@ -46,7 +46,7 @@ public class TestPatternStrings
     [Fact]
     public void pattern_string_4()
     {
-        var w = new UseUtf8String { s1 = "hello", s2 = "world" };
+        var w = new UseString { s1 = "hello", s2 = "world" };
         var s = Interop.pattern_string_4(w);
         Assert.Equal(s.s1, "hello");
         Assert.Equal(s.s2, "world");
@@ -55,7 +55,7 @@ public class TestPatternStrings
     [Fact]
     public void pattern_string_6()
     {
-        var r1 = new UseUtf8String { s1 = "hello", s2 = "world" };
+        var r1 = new UseString { s1 = "hello", s2 = "world" };
         Interop.pattern_string_6a(ref r1);
 
         Interop.pattern_string_6b(out var y).Ok();
@@ -75,7 +75,7 @@ public class TestPatternStrings
     [Fact]
     public void pattern_string_8()
     {
-        var x = new UseUtf8String[]
+        var x = new UseString[]
         {
             new() { s1 = "hello1", s2 = "world1" },
             new() { s1 = "hello2", s2 = "world2" },
@@ -92,7 +92,7 @@ public class TestPatternStrings
     public void string_by_ref_dont_leak()
     {
         // TODO - Can we somehow measure memory use?
-        var w = new UseUtf8String { s1 = "hello", s2 = "world" };
+        var w = new UseString { s1 = "hello", s2 = "world" };
         for (var i = 0; i < 1024 * 1024; i++)
         {
             Interop.pattern_string_6a(ref w);
@@ -103,7 +103,7 @@ public class TestPatternStrings
     public void string_by_out_dont_leak()
     {
         // TODO - Can we somehow measure memory use?
-        var w = new UseUtf8String { s1 = "hello", s2 = "world" };
+        var w = new UseString { s1 = "hello", s2 = "world" };
         for (var i = 0; i < 1024 * 1024; i++)
         {
             var r2 = Interop.pattern_string_6b(out var y);

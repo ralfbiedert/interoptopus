@@ -1,6 +1,6 @@
 use crate::patterns::result::Error;
 use crate::patterns::result::ErrorXX;
-use crate::types::{NestedArray, UseUtf8String};
+use crate::types::{NestedArray, UseString};
 use interoptopus::ffi;
 use interoptopus::patterns::asynk::{AsyncRuntime, AsyncThreadLocal};
 use interoptopus::patterns::result::{result_to_ffi, result_to_ffi_async};
@@ -47,8 +47,8 @@ impl ServiceAsync {
         ffi::Ok(s)
     }
 
-    pub async fn handle_nested_string(_this: This, s: ffi::String) -> ffi::Result<UseUtf8String, Error> {
-        ffi::Result::ok(UseUtf8String { s1: s.clone(), s2: s.clone() })
+    pub async fn handle_nested_string(_this: This, s: ffi::String) -> ffi::Result<UseString, Error> {
+        ffi::Result::ok(UseString { s1: s.clone(), s2: s.clone() })
     }
 
     pub async fn fail(_this: This) -> ffi::Result<(), Error> {

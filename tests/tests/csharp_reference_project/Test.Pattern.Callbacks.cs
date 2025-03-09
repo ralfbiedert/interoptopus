@@ -125,4 +125,25 @@ public class TestPatternDelegates
         Assert.True(called_exception);
     }
 
+    [Fact]
+    public void pattern_callback_8()
+    {
+        var r1 = string.Empty;
+        var r2a = string.Empty;
+        var r2b = string.Empty;
+
+        Interop.pattern_callback_8((s) =>
+        {
+            r1 = s;
+        }, s =>
+        {
+            r2a = s.s1;
+            r2b = s.s2;
+        }, "hello world");
+
+        Assert.Equal("hello world", r1);
+        Assert.Equal("hello world", r2a);
+        Assert.Equal("hello world", r2b);
+    }
+
 }
