@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using My.Company;
+using My.Company.Common;
 using Xunit;
 using Array = My.Company.Array;
 
@@ -12,7 +13,7 @@ public class TestPatternServicesAsync
     public async void ReturnAfterMs()
     {
         var s = ServiceAsync.New();
-        var r = (await s.ReturnAfterMs(123, 500)).Ok();
+        var r = await s.ReturnAfterMs(123, 500);
         s.Dispose();
         Assert.Equal(r, 123u);
     }
@@ -22,7 +23,7 @@ public class TestPatternServicesAsync
     public async void HandleString()
     {
         var s = ServiceAsync.New();
-        var r = (await s.HandleString("abc")).Ok();
+        var r = await s.HandleString("abc");
         s.Dispose();
         Assert.Equal(r, "abc");
     }
@@ -49,7 +50,7 @@ public class TestPatternServicesAsync
             var x = Random.Shared.Next(100, 1000);
             var ms = Random.Shared.Next(100, 1000);
             
-            var r = (await s.ReturnAfterMs((ulong)x, (ulong)ms)).Ok();
+            var r = await s.ReturnAfterMs((ulong)x, (ulong)ms);
             Assert.Equal((int) r, x);
         }).ToList();
         
@@ -64,18 +65,35 @@ public class TestPatternServicesAsync
         var s = ServiceAsync.New();
         var a = new NestedArray
         {
-            field_array = new ushort [5],
-            field_array_2 = new ushort [5],
+            field_array = new ushort[5],
+            field_array_2 = new ushort[5],
             field_struct = new Array
             {
                 data = new byte[16],
             },
             field_int = 123,
         };
-        var r = (await s.ProcessStruct(a)).Ok();
+        var r = await s.ProcessStruct(a);
         s.Dispose();
         
         Assert.Equal(r.field_int, 124);
+    }
+
+    [Fact]
+    public async void Fail()
+    {
+        var exceptionThrown = false;
+        var s = ServiceAsync.New();
+
+        try { await s.Fail(); }
+        catch (Exception e)
+        {
+            exceptionThrown = true;
+            Assert.IsType<InteropException<FFIError>>(e);
+        }
+        s.Dispose();
+
+        Assert.True(exceptionThrown);
     }
 
 }

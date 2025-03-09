@@ -116,6 +116,7 @@ use crate::lang::c::{Function, OpaqueType};
 use crate::patterns::result::FFIResultAsPtr;
 use crate::util::longest_common_prefix;
 use std::fmt::Debug;
+use std::slice::from_ref;
 
 /// Combines a receiver, constructor, destructor and multiple methods in one entity.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -183,6 +184,7 @@ impl ServiceDefinition {
     pub fn common_prefix(&self) -> String {
         let mut all_methods = self.methods().to_vec();
         all_methods.extend_from_slice(self.constructors());
+        all_methods.extend_from_slice(from_ref(&self.destructor));
         longest_common_prefix(all_methods.as_slice())
     }
 }

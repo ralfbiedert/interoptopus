@@ -5,12 +5,10 @@ use interoptopus::lang::c::{
     AsyncRval, CType, CompositeType, ConstantValue, EnumType, Field, FnPointerType, Function, FunctionSignature, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
 };
 use interoptopus::patterns::callbacks::{AsyncCallback, NamedCallback};
-use interoptopus::patterns::result::FFIResultType;
 use interoptopus::patterns::slice::SliceType;
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::{ctypes_from_type_recursive, safe_name};
 use std::collections::HashSet;
-use std::fmt::format;
 
 /// Converts a primitive (Rust) type to a native C# type name, e.g., `f32` to `float`.
 pub fn primitive_to_typename(x: PrimitiveType) -> String {
@@ -168,7 +166,7 @@ pub fn to_typespecifier_in_param(x: &CType) -> String {
     }
 }
 
-pub fn to_typespecifier_in_rval(x: &CType) -> String {
+pub fn to_typespecifier_in_sync_fn_rval(x: &CType) -> String {
     match &x {
         CType::Primitive(x) => primitive_to_typename(*x),
         CType::Array(_) => todo!(),
@@ -189,21 +187,22 @@ pub fn to_typespecifier_in_rval(x: &CType) -> String {
             TypePattern::NamedCallback(x) => named_callback_to_typename(x),
             TypePattern::Bool => "Bool".to_string(),
             TypePattern::CChar => "sbyte".to_string(),
-            TypePattern::APIVersion => to_typespecifier_in_rval(&x.fallback_type()),
+            TypePattern::APIVersion => to_typespecifier_in_sync_fn_rval(&x.fallback_type()),
             _ => panic!("Pattern not explicitly handled"),
         },
     }
 }
 
-pub fn to_typespecifier_in_async_rval(x: &AsyncRval) -> String {
+pub fn to_typespecifier_in_async_fn_rval(x: &AsyncRval) -> String {
     match x {
         AsyncRval::Async(CType::Pattern(TypePattern::Utf8String(_))) => "Task<string>".to_string(),
+        AsyncRval::Async(CType::Pattern(TypePattern::FFIErrorEnum(_))) => "Task".to_string(),
         AsyncRval::Async(CType::Pattern(TypePattern::Result(x))) => match x.t() {
             CType::Pattern(TypePattern::Utf8String(_)) => "Task<string>".to_string(),
-            x => format!("Task<{}>", to_typespecifier_in_rval(x)),
+            x => format!("Task<{}>", to_typespecifier_in_sync_fn_rval(x)),
         },
-        AsyncRval::Async(x) => format!("Task<{}>", to_typespecifier_in_rval(x)),
-        AsyncRval::Sync(x) => to_typespecifier_in_rval(x),
+        AsyncRval::Async(x) => format!("Task<{}>", to_typespecifier_in_sync_fn_rval(x)),
+        AsyncRval::Sync(x) => to_typespecifier_in_sync_fn_rval(x),
     }
 }
 
@@ -230,7 +229,7 @@ pub fn function_parameter_to_csharp_typename(x: &Parameter) -> String {
 }
 
 pub fn function_rval_to_csharp_typename(function: &Function) -> String {
-    to_typespecifier_in_rval(function.signature().rval())
+    to_typespecifier_in_sync_fn_rval(function.signature().rval())
 }
 
 /// Gets the function name in a specific flavor

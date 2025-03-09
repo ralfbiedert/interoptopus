@@ -1,14 +1,13 @@
-use crate::converter::{function_name_to_csharp_name, pattern_to_native_in_signature, to_typespecifier_in_param, to_typespecifier_in_rval};
+use crate::converter::{
+    function_name_to_csharp_name, pattern_to_native_in_signature, to_typespecifier_in_async_fn_rval, to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval,
+};
 use crate::interop::docs::write_documentation;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::lang::c::{AsyncRval, CType, Function, PrimitiveType};
 use interoptopus::patterns::service::ServiceDefinition;
 use interoptopus::patterns::TypePattern;
-use interoptopus::util::longest_common_prefix;
 use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, Error};
-use std::iter;
-use std::iter::zip;
 
 pub enum MethodType {
     Ctor,
@@ -23,7 +22,6 @@ pub fn write_pattern_service(i: &Interop, w: &mut IndentWriter, class: &ServiceD
     all_functions.push(class.destructor().clone());
 
     let context_type_name = class.the_type().rust_name();
-    let common_prefix = longest_common_prefix(&all_functions);
 
     write_documentation(w, class.the_type().meta().documentation())?;
     indented!(w, r"{} partial class {} : IDisposable", i.visibility_types.to_access_modifier(), context_type_name)?;
@@ -35,34 +33,19 @@ pub fn write_pattern_service(i: &Interop, w: &mut IndentWriter, class: &ServiceD
     w.newline()?;
 
     for ctor in class.constructors() {
-        // Ctor
-        let fn_name = function_name_to_csharp_name(ctor, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix));
-        let rval = format!("static {context_type_name}");
-
         write_documentation(w, ctor.meta().documentation())?;
-        write_pattern_service_method(i, w, class, ctor, &rval, &fn_name, MethodType::Ctor, WriteFor::Code)?;
+        write_pattern_service_method(i, w, class, ctor, MethodType::Ctor, WriteFor::Code)?;
         w.newline()?;
     }
 
     // Dtor
-    write_pattern_service_method(i, w, class, class.destructor(), "void", "Dispose", MethodType::Dtor, WriteFor::Code)?;
+    write_pattern_service_method(i, w, class, class.destructor(), MethodType::Dtor, WriteFor::Code)?;
     w.newline()?;
 
     for function in class.methods() {
-        // Main function
-        let fn_name = function_name_to_csharp_name(function, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix));
-
-        // Write checked method. These are "normal" methods that accept
-        // common C# types.
-        let rval = match function.signature().rval() {
-            CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
-            CType::Pattern(TypePattern::CStrPointer) => "string".to_string(),
-            _ => to_typespecifier_in_rval(function.signature().rval()),
-        };
         write_documentation(w, function.meta().documentation())?;
-        write_pattern_service_method(i, w, class, function, &rval, &fn_name, MethodType::Regular, WriteFor::Code)?;
-        write_service_method_overload(i, w, class, function, &fn_name, WriteFor::Code)?;
-
+        write_pattern_service_method(i, w, class, function, MethodType::Regular, WriteFor::Code)?;
+        write_service_method_overload(i, w, class, function, WriteFor::Code)?;
         w.newline()?;
     }
 
@@ -82,13 +65,12 @@ pub fn write_pattern_service_method(
     w: &mut IndentWriter,
     class: &ServiceDefinition,
     function: &Function,
-    rval: &str,
-    fn_name: &str,
     method_type: MethodType,
     write_for: WriteFor,
 ) -> Result<(), Error> {
     i.debug(w, "write_pattern_service_method")?;
 
+    let common_prefix = class.common_prefix();
     let mut names = Vec::new();
     let mut to_invoke = Vec::new();
     let mut types = Vec::new();
@@ -140,19 +122,40 @@ pub fn write_pattern_service_method(
         types.push(native);
     }
 
+    let fn_name = match method_type {
+        MethodType::Ctor => function_name_to_csharp_name(function, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix)),
+        MethodType::Regular => function_name_to_csharp_name(function, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix)),
+        MethodType::Dtor => "Dispose".to_string(),
+    };
+
+    let mut static_prefix = "";
+
     let rval = match async_rval {
-        AsyncRval::Sync(_) => rval.to_string(),
-        AsyncRval::Async(CType::Pattern(TypePattern::Result(ref x))) => {
+        // let fn_name = function_name_to_csharp_name(ctor, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix));
+        // let rval = format!("static {context_type_name}");
+        AsyncRval::Sync(_) => match method_type {
+            MethodType::Ctor => {
+                static_prefix = "static ";
+                class.the_type().rust_name().to_string()
+            }
+            MethodType::Regular => match function.signature().rval() {
+                CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
+                CType::Pattern(TypePattern::CStrPointer) => "string".to_string(),
+                x => to_typespecifier_in_sync_fn_rval(x),
+            },
+            MethodType::Dtor => "void".to_string(),
+        },
+        AsyncRval::Async(CType::Pattern(TypePattern::Result(_))) => {
             names.pop();
             types.pop();
             to_invoke.pop();
-            format!("Task<{}>", to_typespecifier_in_param(x.t()))
+            to_typespecifier_in_async_fn_rval(&async_rval)
         }
-        AsyncRval::Async(ref x) => {
+        AsyncRval::Async(_) => {
             names.pop();
             types.pop();
             to_invoke.pop();
-            format!("Task<{}>", to_typespecifier_in_param(&x))
+            to_typespecifier_in_async_fn_rval(&async_rval)
         }
     };
 
@@ -188,7 +191,7 @@ pub fn write_pattern_service_method(
     let fn_call = format!(r"{}.{}({})", i.class, method_to_invoke, invoke_args);
 
     // Write signature.
-    let signature = format!(r"public {} {}({})", rval, fn_name, arg_tokens.join(", "));
+    let signature = format!(r"public {static_prefix}{rval} {fn_name}({})", arg_tokens.join(", "));
     if write_for == WriteFor::Docs {
         indented!(w, r"{};", signature)?;
         return Ok(());
@@ -236,14 +239,7 @@ pub fn write_pattern_service_method(
     Ok(())
 }
 
-pub fn write_service_method_overload(
-    i: &Interop,
-    w: &mut IndentWriter,
-    _class: &ServiceDefinition,
-    function: &Function,
-    fn_pretty: &str,
-    write_for: WriteFor,
-) -> Result<(), Error> {
+pub fn write_service_method_overload(i: &Interop, w: &mut IndentWriter, class: &ServiceDefinition, function: &Function, write_for: WriteFor) -> Result<(), Error> {
     i.debug(w, "write_service_method_overload")?;
 
     if !i.has_overloadable(function.signature()) || function.async_rval().is_async() {
@@ -255,25 +251,27 @@ pub fn write_service_method_overload(
         write_documentation(w, function.meta().documentation())?;
     }
 
-    write_common_service_method_overload(i, w, function, fn_pretty, write_for)?;
+    write_common_service_method_overload(i, w, class, function, write_for)?;
 
     Ok(())
 }
 
 /// Writes common service overload code
-pub fn write_common_service_method_overload(i: &Interop, w: &mut IndentWriter, function: &Function, fn_pretty: &str, write_for: WriteFor) -> Result<(), Error> {
+pub fn write_common_service_method_overload(i: &Interop, w: &mut IndentWriter, class: &ServiceDefinition, function: &Function, write_for: WriteFor) -> Result<(), Error> {
     i.debug(w, "write_common_service_method_overload")?;
 
     let mut names = Vec::new();
     let mut to_invoke = Vec::new();
     let mut types = Vec::new();
 
+    let fn_name = function_name_to_csharp_name(function, FunctionNameFlavor::CSharpMethodNameWithoutClass(&class.common_prefix()));
+
     // Write checked method. These are "normal" methods that accept
     // common C# types.
     let rval = match function.signature().rval() {
         // CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
         CType::Pattern(TypePattern::CStrPointer) => "string".to_string(),
-        _ => to_typespecifier_in_rval(function.signature().rval()),
+        _ => to_typespecifier_in_sync_fn_rval(function.signature().rval()),
     };
 
     // For every parameter except the first, figure out how we should forward
@@ -318,7 +316,7 @@ pub fn write_common_service_method_overload(i: &Interop, w: &mut IndentWriter, f
     let arg_tokens = names.iter().zip(types.iter()).map(|(n, t)| format!("{t} {n}")).collect::<Vec<_>>();
     let fn_call = format!(r"{}.{}({}{})", i.class, method_to_invoke, context, extra_args);
 
-    let signature = format!(r"public {} {}({})", rval, fn_pretty, arg_tokens.join(", "));
+    let signature = format!(r"public {} {}({})", rval, fn_name, arg_tokens.join(", "));
     if write_for == WriteFor::Docs {
         indented!(w, "{};", signature)?;
         return Ok(());

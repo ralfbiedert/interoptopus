@@ -1,4 +1,4 @@
-use crate::converter::{fnpointer_to_typename, to_typespecifier_in_param, to_typespecifier_in_rval};
+use crate::converter::{fnpointer_to_typename, to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval};
 use crate::Interop;
 use interoptopus::lang::c::FnPointerType;
 use interoptopus::writer::IndentWriter;
@@ -16,7 +16,7 @@ pub fn write_type_definition_fn_pointer_annotation(w: &mut IndentWriter, _the_ty
 }
 
 pub fn write_type_definition_fn_pointer_body(i: &Interop, w: &mut IndentWriter, the_type: &FnPointerType) -> Result<(), Error> {
-    let rval = to_typespecifier_in_rval(the_type.signature().rval());
+    let rval = to_typespecifier_in_sync_fn_rval(the_type.signature().rval());
     let name = fnpointer_to_typename(the_type);
     let visibility = i.visibility_types.to_access_modifier();
     let needs_wrapper = i.has_custom_marshalled_types(the_type.signature());

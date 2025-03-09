@@ -1,7 +1,6 @@
 use crate::patterns::result::Error;
 use crate::patterns::result::FFIError;
 use crate::types::{NestedArray, UseUtf8String};
-use interoptopus::lang::rust::CTypeInfo;
 use interoptopus::patterns::asynk::{AsyncRuntime, AsyncThreadLocal};
 use interoptopus::patterns::result::{result_to_ffi, result_to_ffi_async, FFIResult};
 use interoptopus::patterns::string::Utf8String;
@@ -50,6 +49,10 @@ impl ServiceAsync {
 
     pub async fn handle_nested_string(_this: This, s: Utf8String) -> FFIResult<UseUtf8String, FFIError> {
         FFIResult::ok(UseUtf8String { s1: s.clone(), s2: s.clone() })
+    }
+
+    pub async fn fail(_this: This) -> FFIResult<(), FFIError> {
+        FFIResult::error(FFIError::Fail)
     }
 
     // pub async fn non_result_rval(_this: This, s: Utf8String) -> u8 {

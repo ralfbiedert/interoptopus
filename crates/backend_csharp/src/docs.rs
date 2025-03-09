@@ -1,4 +1,4 @@
-use crate::converter::{field_name_to_csharp_name, function_name_to_csharp_name, to_typespecifier_in_rval};
+use crate::converter::{field_name_to_csharp_name, function_name_to_csharp_name};
 use crate::interop::functions::write_function;
 use crate::interop::patterns::services::{write_pattern_service_method, write_service_method_overload, MethodType};
 use crate::interop::types::composite::write_type_definition_composite_body;
@@ -264,7 +264,7 @@ impl<'a> Markdown<'a> {
                 w.newline()?;
                 indented!(w, r"#### Definition ")?;
                 indented!(w, r"```csharp")?;
-                write_pattern_service_method(self.interop, w, pattern, x, class_name, &fname, MethodType::Ctor, WriteFor::Docs)?;
+                write_pattern_service_method(self.interop, w, pattern, x, MethodType::Ctor, WriteFor::Docs)?;
                 indented!(w, r"```")?;
                 w.newline()?;
                 indented!(w, r"---")?;
@@ -274,12 +274,6 @@ impl<'a> Markdown<'a> {
             for x in pattern.methods() {
                 let fname = function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
                 let target = fname.to_string();
-
-                let rval = match x.signature().rval() {
-                    CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
-                    CType::Pattern(TypePattern::CStrPointer) => "string".to_string(),
-                    _ => to_typespecifier_in_rval(x.signature().rval()),
-                };
 
                 indented!(w, r#"### <a name="{}">**{}**</a>"#, target, target)?;
 
@@ -296,8 +290,8 @@ impl<'a> Markdown<'a> {
                 indented!(w, r"```csharp")?;
                 indented!(w, r"{} class {} {{", self.interop.visibility_types.to_access_modifier(), class_name)?;
                 w.indent();
-                write_pattern_service_method(self.interop, w, pattern, x, &rval, &fname, MethodType::Regular, WriteFor::Docs)?;
-                write_service_method_overload(self.interop, w, pattern, x, &fname, WriteFor::Docs)?;
+                write_pattern_service_method(self.interop, w, pattern, x, MethodType::Regular, WriteFor::Docs)?;
+                write_service_method_overload(self.interop, w, pattern, x, WriteFor::Docs)?;
                 w.unindent();
                 indented!(w, r"}}")?;
                 indented!(w, r"```")?;

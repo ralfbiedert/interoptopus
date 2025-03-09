@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 14474581097001798023ul)
+            if (api_version != 10179430876365156536ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (14474581097001798023). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10179430876365156536). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -1266,6 +1266,36 @@ namespace My.Company
             finally
             {
                 s_wrapped.Dispose();
+            }
+            return cs.Task;
+        }
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "service_async_fail")]
+        // Debug - write_function_declaration 
+        public static partial ResultFFIError service_async_fail(IntPtr _context, AsyncHelper _async_callback);
+
+        // Debug - write_function_overload 
+        public static unsafe Task service_async_fail(IntPtr _context)
+        {
+            var cs = new TaskCompletionSource();
+            GCHandle pinned = default;
+            var cb = new AsyncHelper((x) => {
+                var unmanaged = Marshal.PtrToStructure<ResultFFIError.Unmanaged>(x);
+                var marshaller = new ResultFFIError.Marshaller(unmanaged);
+                var managed = marshaller.ToManaged();
+                if (managed.IsOk()) { cs.SetResult(); }
+                else { cs.SetException(new InteropException<FFIError>(managed.Err())); }
+                pinned.Free();
+            });
+            pinned = GCHandle.Alloc(cb);
+            try
+            {
+                service_async_fail(_context, cb).Ok();
+                return cs.Task;
+            }
+            finally
+            {
             }
             return cs.Task;
         }
@@ -3722,6 +3752,9 @@ namespace My.Company
             }
             throw new InteropException<FFIError>(_err);
         }
+
+        public bool IsOk() { return _err == FFIError.Ok; }
+        public FFIError Err() { return _err; }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
@@ -6694,7 +6727,7 @@ namespace My.Company
         // Debug - write_service_method_overload 
 
         // Debug - write_pattern_service_method 
-        public Task<Utf8String> HandleString(string s)
+        public Task<string> HandleString(string s)
         {
             return Interop.service_async_handle_string(_context, s);
         }
@@ -6704,6 +6737,13 @@ namespace My.Company
         public Task<UseUtf8String> HandleNestedString(string s)
         {
             return Interop.service_async_handle_nested_string(_context, s);
+        }
+        // Debug - write_service_method_overload 
+
+        // Debug - write_pattern_service_method 
+        public Task Fail()
+        {
+            return Interop.service_async_fail(_context);
         }
         // Debug - write_service_method_overload 
 

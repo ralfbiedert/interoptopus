@@ -1,4 +1,4 @@
-use crate::converter::{constant_value_to_value, to_typespecifier_in_rval};
+use crate::converter::{constant_value_to_value, to_typespecifier_in_sync_fn_rval};
 use crate::interop::docs::write_documentation;
 use crate::Interop;
 use interoptopus::lang::c::Constant;
@@ -18,7 +18,7 @@ pub fn write_constants(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
 
 pub fn write_constant(i: &Interop, w: &mut IndentWriter, constant: &Constant) -> Result<(), Error> {
     i.debug(w, "write_constant")?;
-    let rval = to_typespecifier_in_rval(&constant.the_type());
+    let rval = to_typespecifier_in_sync_fn_rval(&constant.the_type());
     let name = constant.name();
     let value = constant_value_to_value(constant.value());
 

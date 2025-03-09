@@ -1,4 +1,4 @@
-use crate::converter::to_typespecifier_in_rval;
+use crate::converter::to_typespecifier_in_sync_fn_rval;
 use crate::Interop;
 use interoptopus::lang::c::CType;
 use interoptopus::patterns::result::{FFIErrorEnum, FFIResultType};
@@ -17,7 +17,7 @@ pub fn write_pattern_result(i: &Interop, w: &mut IndentWriter, result: &FFIResul
 
     let type_string = match t {
         CType::Pattern(TypePattern::Utf8String(_)) => "string".to_string(),
-        _ => to_typespecifier_in_rval(t),
+        _ => to_typespecifier_in_sync_fn_rval(t),
     };
 
     indented!(w, r"{} partial struct {}", i.visibility_types.to_access_modifier(), context_type_name)?;
@@ -41,8 +41,8 @@ pub fn write_pattern_result(i: &Interop, w: &mut IndentWriter, result: &FFIResul
 
 pub fn write_pattern_result_void(i: &Interop, w: &mut IndentWriter, error: &FFIErrorEnum) -> Result<(), Error> {
     i.debug(w, "write_pattern_result_void")?;
-    let e_name = error.the_enum().rust_name();
-    let name = format!("Result{e_name}");
+    let enum_name = error.the_enum().rust_name();
+    let name = format!("Result{enum_name}");
     let success_variant = error.success_variant().name();
 
     indented!(w, r"public partial struct {name}")?;
@@ -53,22 +53,25 @@ pub fn write_pattern_result_void(i: &Interop, w: &mut IndentWriter, error: &FFIE
     indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
     indented!(w, r"public partial struct {name}")?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"public {name}({e_name} e) {{ _err = e; }}",)?;
+    indented!(w, [()], r"public {name}({enum_name} e) {{ _err = e; }}",)?;
     w.newline()?;
     for x in error.the_enum().variants() {
         let vname = x.name();
         let vname_upper = vname.to_uppercase();
-        indented!(w, [()], r"public static {name} {vname_upper} => new {name}({e_name}.{vname});",)?;
+        indented!(w, [()], r"public static {name} {vname_upper} => new {name}({enum_name}.{vname});",)?;
     }
     w.newline()?;
     indented!(w, [()], r"public void Ok()")?;
     indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"if (_err == {e_name}.{success_variant})")?;
+    indented!(w, [()()], r"if (_err == {enum_name}.{success_variant})")?;
     indented!(w, [()()], r"{{")?;
     indented!(w, [()()()], r"return;")?;
     indented!(w, [()()], r"}}")?;
-    indented!(w, [()()], r"throw new InteropException<{e_name}>(_err);")?;
+    indented!(w, [()()], r"throw new InteropException<{enum_name}>(_err);")?;
     indented!(w, [()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()], r"public bool IsOk() {{ return _err == {enum_name}.{success_variant}; }}")?;
+    indented!(w, [()], r"public {enum_name} Err() {{ return _err; }}")?;
     w.newline()?;
     indented!(w, [()], r"[StructLayout(LayoutKind.Sequential)]")?;
     indented!(w, [()], r"public unsafe struct Unmanaged")?;

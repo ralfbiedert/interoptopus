@@ -1,10 +1,10 @@
 use crate::converter::{
     function_name_to_csharp_name, function_parameter_to_csharp_typename, function_rval_to_csharp_typename, has_ffi_error_rval, is_owned_slice,
-    pattern_to_native_in_signature, to_typespecifier_in_async_rval, to_typespecifier_in_param, to_typespecifier_in_rval,
+    pattern_to_native_in_signature, to_typespecifier_in_async_fn_rval, to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval,
 };
 use crate::interop::docs::write_documentation;
 use crate::{FunctionNameFlavor, Interop};
-use interoptopus::lang::c::{AsyncRval, CType, Documentation, Function, PrimitiveType};
+use interoptopus::lang::c::{AsyncRval, CType, Function, PrimitiveType};
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, Error};
@@ -110,7 +110,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         },
     );
 
-    let rval = to_typespecifier_in_async_rval(&function.async_rval());
+    let rval = to_typespecifier_in_async_fn_rval(&function.async_rval());
 
     let mut params = Vec::new();
     for p in function.signature().params() {
@@ -194,22 +194,31 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     if let AsyncRval::Async(ref x) = async_rval {
         let task_type = match x {
             CType::Pattern(TypePattern::Result(x)) if matches!(x.t(), CType::Pattern(TypePattern::Utf8String(_))) => "string".to_string(),
-            CType::Pattern(TypePattern::Result(x)) => to_typespecifier_in_rval(x.t()),
-            x => to_typespecifier_in_rval(&x),
+            CType::Pattern(TypePattern::Result(x)) => to_typespecifier_in_sync_fn_rval(x.t()),
+            x => to_typespecifier_in_sync_fn_rval(&x),
         };
 
-        indented!(w, [()], r"var cs = new TaskCompletionSource<{}>();", task_type)?;
+        let task_completion_source = match x {
+            CType::Pattern(TypePattern::FFIErrorEnum(_)) => format!("TaskCompletionSource"),
+            _ => format!("TaskCompletionSource<{task_type}>"),
+        };
+
+        indented!(w, [()], r"var cs = new {task_completion_source}();")?;
         indented!(w, [()], r"GCHandle pinned = default;")?;
         indented!(w, [()], r"var cb = new AsyncHelper((x) => {{")?;
         indented!(w, [()()], r"var unmanaged = Marshal.PtrToStructure<{}.Unmanaged>(x);", to_typespecifier_in_param(x))?;
         indented!(w, [()()], r"var marshaller = new {}.Marshaller(unmanaged);", to_typespecifier_in_param(x))?;
         indented!(w, [()()], r"var managed = marshaller.ToManaged();")?;
         match x {
+            CType::Pattern(TypePattern::FFIErrorEnum(x)) => {
+                indented!(w, [()()], r"if (managed.IsOk()) {{ cs.SetResult(); }}")?;
+                indented!(w, [()()], r"else {{ cs.SetException(new InteropException<{}>(managed.Err())); }}", x.the_enum().rust_name())?;
+            }
             CType::Pattern(TypePattern::Result(x)) => {
                 indented!(w, [()()], r"if (managed.IsOk()) {{ cs.SetResult(managed.Ok()); }}")?;
                 indented!(w, [()()], r"else {{ cs.SetException(new InteropException<{}>(managed.Err())); }}", x.e().the_enum().rust_name())?;
             }
-            x => indented!(w, [()()], r"cs.SetResult(managed);")?,
+            _ => indented!(w, [()()], r"cs.SetResult(managed);")?,
         };
         indented!(w, [()()], r"pinned.Free();")?;
         indented!(w, [()], r"}});")?;
