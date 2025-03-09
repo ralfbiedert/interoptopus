@@ -1,12 +1,12 @@
 [package]
 name = "core_library_ffi_build"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 publish = false
 
 [lib]
 name = "core_library"
-crate-type = [ "cdylib", "rlib" ]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 core_library_ffi = { path = "../core_library_ffi" }

@@ -22,7 +22,6 @@
 //! }
 //!
 //! #[ffi_function]
-//! #[no_mangle]
 //! pub fn my_function(input: Vec2) -> Vec2 {
 //!     input
 //! }

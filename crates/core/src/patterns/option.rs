@@ -6,11 +6,10 @@
 //!
 //! ```
 //! use interoptopus::ffi_function;
-//! use interoptopus::patterns::option::Option;
+//! use interoptopus::ffi;
 //!
 //! #[ffi_function]
-//! #[no_mangle]
-//! pub extern "C" fn set_value(x: Option<u8>) {
+//! pub fn set_value(x: ffi::Option<u8>) {
 //!     let _ = x.into_option();
 //! }
 //! ```
@@ -30,8 +29,8 @@
 use crate::lang::c::{CType, CompositeType, Documentation, Field, Layout, Meta, PrimitiveType, Representation, Visibility};
 use crate::lang::rust::CTypeInfo;
 
-use crate::patterns::primitives::Bool;
 use crate::patterns::TypePattern;
+use crate::patterns::primitives::Bool;
 use crate::util::capitalize_first_letter;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};

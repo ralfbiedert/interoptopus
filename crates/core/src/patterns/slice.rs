@@ -9,11 +9,10 @@
 //!
 //! ```
 //! use interoptopus::{ffi_function};
-//! use interoptopus::patterns::slice::Slice;
+//! use interoptopus::ffi;
 //!
 //! #[ffi_function]
-//! #[no_mangle]
-//! pub extern "C" fn call_with_slice(ffi_slice: Slice<u32>) {
+//! pub fn call_with_slice(ffi_slice: ffi::Slice<u32>) {
 //!     // ...
 //! }
 //! ```

@@ -9,7 +9,6 @@
 //! use interoptopus::ffi;
 //!
 //! #[ffi_function]
-//! #[no_mangle]
 //! pub extern "C" fn call_with_string(s: ffi::CStrPointer) {
 //!     //
 //! }
@@ -26,10 +25,10 @@
 //! void call_with_string(uint8_t* s);
 //! ```
 //!
+use crate::Error;
 use crate::lang::c::CType;
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::TypePattern;
-use crate::Error;
 use std::ffi::CStr;
 use std::marker::PhantomData;
 use std::option::Option::None;

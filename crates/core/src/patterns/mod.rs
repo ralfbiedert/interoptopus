@@ -16,8 +16,7 @@
 //! # use interoptopus::ffi_function;
 //!
 //! #[ffi_function]
-//! #[no_mangle]
-//! pub extern "C" fn print_ptr(x: *const u8) {
+//! pub fn print_ptr(x: *const u8) {
 //!    // Write unsafe code to convert `x`
 //! }
 //!
@@ -26,13 +25,11 @@
 //! you would instead accept an [`CStrPointer`](crate::patterns::string::CStrPointer):
 //!
 //! ```
-//! # use interoptopus::ffi_function;
-//! # use interoptopus::ffi::CStrPointer;
+//! # use interoptopus::{ffi_function, ffi};
 //! # use std::ffi::CStr;
 //!
 //! #[ffi_function]
-//! #[no_mangle]
-//! pub extern "C" fn print_ascii(x: CStrPointer) {
+//! pub fn print_ascii(x: ffi::CStrPointer) {
 //!    // Call `x.as_str()` and handle Result
 //! }
 //!

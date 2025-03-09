@@ -1,5 +1,5 @@
 use proc_macro2::TokenStream;
-use quote::{quote, quote_spanned, ToTokens};
+use quote::{ToTokens, quote, quote_spanned};
 use syn::spanned::Spanned;
 use syn::{FnArg, GenericParam, ItemFn, Pat, ReturnType, Signature, Type};
 
@@ -138,7 +138,7 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
     }
 
     if !item_fn.attrs.iter().any(|attr| attr.path().is_ident("no_mangle")) {
-        item_fn.attrs.push(syn::parse_quote!(#[no_mangle]));
+        item_fn.attrs.push(syn::parse_quote!(#[unsafe(no_mangle)]));
     }
 
     let rval = quote! {
