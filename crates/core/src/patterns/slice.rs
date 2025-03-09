@@ -256,22 +256,27 @@ pub struct SliceType {
 }
 
 impl SliceType {
+    #[must_use]
     pub fn new(composite_type: CompositeType, target_type: CType) -> Self {
         Self { composite_type, target_type: Box::new(target_type) }
     }
 
+    #[must_use]
     pub fn rust_name(&self) -> &str {
         self.composite_type.rust_name()
     }
 
+    #[must_use]
     pub fn meta(&self) -> &Meta {
-        &self.composite_type.meta()
+        self.composite_type.meta()
     }
 
+    #[must_use]
     pub fn composite_type(&self) -> &CompositeType {
         &self.composite_type
     }
 
+    #[must_use]
     pub fn target_type(&self) -> &CType {
         &self.target_type
     }

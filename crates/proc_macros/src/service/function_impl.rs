@@ -51,13 +51,15 @@ pub struct AttributeMethodAsync {
 }
 
 /// Inspects all attributes and determines the method type to generate.
+#[allow(clippy::match_like_matches_macro)]
+#[allow(clippy::match_wildcard_for_single_variants)]
 fn method_type(function: &ImplItemFn) -> MethodType {
     let attrs = function.attrs.as_slice();
 
     // To be a ctor the function must
     // - not take &self
     // - and not be `async`
-    let is_ctor = function.sig.inputs.iter().next().map_or(true, |x| match x {
+    let is_ctor = function.sig.inputs.iter().next().is_none_or(|x| match x {
         FnArg::Typed(_) if function.sig.asyncness.is_none() => true,
         _ => false,
     });
@@ -106,6 +108,7 @@ fn method_type(function: &ImplItemFn) -> MethodType {
     clippy::explicit_deref_methods,
     clippy::redundant_clone,
     clippy::bind_instead_of_map,
+    clippy::forget_non_drop,
     clippy::or_fun_call
 )]
 pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, function: &ImplItemFn) -> Option<Descriptor> {
@@ -192,7 +195,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
         #[::interoptopus::ffi_function]
         #[no_mangle]
         #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
-        #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals)]
+        #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals, clippy::forget_non_drop, clippy::useless_conversion)]
         #(
             #[doc = #doc_lines]
         )*

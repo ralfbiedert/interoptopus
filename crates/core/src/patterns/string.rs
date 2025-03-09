@@ -24,6 +24,8 @@ impl String {
         Self { ptr, len, capacity }
     }
 
+    #[must_use]
+    #[allow(clippy::cast_possible_truncation)]
     pub fn as_str(&self) -> &str {
         if self.ptr.is_null() {
             return "";
@@ -43,7 +45,7 @@ impl String {
 
 impl From<std::string::String> for String {
     fn from(value: std::string::String) -> Self {
-        String::from_string(value)
+        Self::from_string(value)
     }
 }
 
@@ -55,7 +57,7 @@ impl From<String> for std::string::String {
 
 impl Clone for String {
     fn clone(&self) -> Self {
-        String::from_string(self.as_str().to_string())
+        Self::from_string(self.as_str().to_string())
     }
 }
 

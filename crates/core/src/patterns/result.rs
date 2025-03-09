@@ -225,14 +225,17 @@ where
         Self { t: MaybeUninit::uninit(), err }
     }
 
+    #[must_use]
     pub const fn panic() -> Self {
         Self { t: MaybeUninit::uninit(), err: E::PANIC }
     }
 
+    #[must_use]
     pub const fn null() -> Self {
         Self { t: MaybeUninit::uninit(), err: E::NULL }
     }
 
+    #[must_use]
     pub fn is_ok(&self) -> bool {
         self.err == E::SUCCESS
     }
@@ -309,7 +312,7 @@ pub trait IntoFFIResult {
 }
 
 impl<T, E: FFIError> IntoFFIResult for Result<T, E> {
-    type FFIResult = Result<T, E>;
+    type FFIResult = Self;
 }
 
 ///
@@ -322,7 +325,9 @@ pub fn result_to_ffi<T: CTypeInfo, E: CTypeInfo + crate::patterns::result::FFIEr
 }
 
 /// At some point we want to get rid of these once `Try` ([try_trait_v2](https://github.com/rust-lang/rust/issues/84277)) stabilizes.
-pub async fn result_to_ffi_async<T: CTypeInfo, E: CTypeInfo + crate::patterns::result::FFIError>(f: impl AsyncFnOnce() -> std::result::Result<T, E>) -> Result<T, E> {
+pub async fn result_to_ffi_async<T: CTypeInfo, E: CTypeInfo + crate::patterns::result::FFIError>(
+    f: impl std::ops::AsyncFnOnce() -> std::result::Result<T, E>,
+) -> Result<T, E> {
     match f().await {
         std::result::Result::Ok(x) => Result::ok(x),
         std::result::Result::Err(e) => Result::error(e),

@@ -29,6 +29,7 @@ impl Attributes {
     }
 }
 
+#[allow(clippy::match_wildcard_for_single_variants)]
 pub fn ffi_service(attr: TokenStream, input: &TokenStream) -> TokenStream {
     let attributes = darling_parse!(Attributes, attr);
     let item = syn::parse2::<ItemImpl>(input.clone()).expect("Must be item.");

@@ -501,6 +501,7 @@ impl CompositeType {
         &self.repr
     }
 
+    #[must_use]
     pub fn into_ctype(&self) -> CType {
         CType::Composite(self.clone())
     }
@@ -667,18 +668,12 @@ pub enum AsyncRval {
 impl AsyncRval {
     #[must_use]
     pub fn is_async(&self) -> bool {
-        match self {
-            Self::Async(_) => true,
-            _ => false,
-        }
+        matches!(self, Self::Async(_))
     }
 
     #[must_use]
     pub fn is_sync(&self) -> bool {
-        match self {
-            Self::Sync(_) => true,
-            _ => false,
-        }
+        matches!(self, Self::Sync(_))
     }
 }
 

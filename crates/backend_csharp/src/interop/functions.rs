@@ -80,7 +80,7 @@ pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &
     indented!(w, r"{}static {}{} {}({}){}", visibility, partial, rval, name, params.join(", "), line_ending)
 }
 
-#[allow(clippy::too_many_lines)]
+#[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
 pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Function, write_for: WriteFor) -> Result<(), Error> {
     i.debug(w, "write_function_overload")?;
 
@@ -195,11 +195,11 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         let task_type = match x {
             CType::Pattern(TypePattern::Result(x)) if matches!(x.t(), CType::Pattern(TypePattern::Utf8String(_))) => "string".to_string(),
             CType::Pattern(TypePattern::Result(x)) => to_typespecifier_in_sync_fn_rval(x.t()),
-            x => to_typespecifier_in_sync_fn_rval(&x),
+            x => to_typespecifier_in_sync_fn_rval(x),
         };
 
         let task_completion_source = match x {
-            CType::Pattern(TypePattern::FFIErrorEnum(_)) => format!("TaskCompletionSource"),
+            CType::Pattern(TypePattern::FFIErrorEnum(_)) => "TaskCompletionSource".to_string(),
             _ => format!("TaskCompletionSource<{task_type}>"),
         };
 

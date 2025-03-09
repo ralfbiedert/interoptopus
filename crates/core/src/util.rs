@@ -132,6 +132,7 @@ pub(crate) fn ctypes_from_functions_types(functions: &[Function], extra_types: &
 }
 
 /// Recursive helper for [`ctypes_from_functions_types`].
+#[allow(clippy::implicit_hasher)]
 pub fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CType>) {
     types.insert(start.clone());
 
@@ -172,8 +173,8 @@ pub fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CType>) {
                     ctypes_from_type_recursive(param.the_type(), types);
                 }
             }
-            TypePattern::Slice(x) => ctypes_from_type_recursive(&x.target_type(), types),
-            TypePattern::SliceMut(x) => ctypes_from_type_recursive(&x.target_type(), types),
+            TypePattern::Slice(x) => ctypes_from_type_recursive(x.target_type(), types),
+            TypePattern::SliceMut(x) => ctypes_from_type_recursive(x.target_type(), types),
             TypePattern::Option(x) => {
                 for field in x.fields() {
                     ctypes_from_type_recursive(field.the_type(), types);
@@ -241,6 +242,7 @@ pub(crate) fn extract_namespaces_from_types(types: &[CType], into: &mut HashSet<
     }
 }
 
+#[must_use]
 pub fn holds_opaque_without_ref(typ: &CType) -> bool {
     match typ {
         CType::Primitive(_) => false,

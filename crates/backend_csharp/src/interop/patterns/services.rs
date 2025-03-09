@@ -9,6 +9,7 @@ use interoptopus::patterns::TypePattern;
 use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, Error};
 
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum MethodType {
     Ctor,
     Dtor,
@@ -17,9 +18,6 @@ pub enum MethodType {
 
 pub fn write_pattern_service(i: &Interop, w: &mut IndentWriter, class: &ServiceDefinition) -> Result<(), Error> {
     i.debug(w, "write_pattern_service")?;
-    let mut all_functions = class.constructors().to_vec();
-    all_functions.extend_from_slice(class.methods());
-    all_functions.push(class.destructor().clone());
 
     let context_type_name = class.the_type().rust_name();
 
@@ -59,7 +57,7 @@ pub fn write_pattern_service(i: &Interop, w: &mut IndentWriter, class: &ServiceD
     Ok(())
 }
 
-#[allow(clippy::too_many_arguments, clippy::too_many_lines)]
+#[allow(clippy::too_many_arguments, clippy::too_many_lines, clippy::cognitive_complexity)]
 pub fn write_pattern_service_method(
     i: &Interop,
     w: &mut IndentWriter,
@@ -174,7 +172,7 @@ pub fn write_pattern_service_method(
             if to_invoke.is_empty() {
                 String::new()
             } else {
-                format!("{}", to_invoke.join(", "))
+                to_invoke.join(", ")
             }
         }
         MethodType::Dtor => "_context".to_string(),
