@@ -45,7 +45,11 @@ typedef struct SERVICEBASIC SERVICEBASIC;
 ///  Some struct we want to expose as a class.
 typedef struct SERVICECALLBACKS SERVICECALLBACKS;
 
+typedef struct SERVICEDEPENDENT SERVICEDEPENDENT;
+
 typedef struct SERVICEIGNORINGMETHODS SERVICEIGNORINGMETHODS;
+
+typedef struct SERVICEMAIN SERVICEMAIN;
 
 ///  Some struct we want to expose as a class.
 typedef struct SERVICEMULTIPLECTORS SERVICEMULTIPLECTORS;
@@ -53,18 +57,15 @@ typedef struct SERVICEMULTIPLECTORS SERVICEMULTIPLECTORS;
 ///  Some struct we want to expose as a class.
 typedef struct SERVICEONPANIC SERVICEONPANIC;
 
+typedef struct SERVICERESULT SERVICERESULT;
+
 ///  Some struct we want to expose as a class.
 typedef struct SERVICESTRINGS SERVICESTRINGS;
-
-///  Services can use lifetimes. However, they are more dangerous to use
-///  via FFI, since you will not get any help tracking lifetimes there.
-typedef struct SERVICEUSINGLIFETIMES SERVICEUSINGLIFETIMES;
 
 ///  Some struct we want to expose as a class.
 typedef struct SERVICEVARIOUSSLICES SERVICEVARIOUSSLICES;
 
 ///  UTF-8 string marshalling helper.
-/// 
 ///  A highly dangerous 'use once type' that has ownership semantics!
 ///  Once passed over an FFI boundary 'the other side' is meant to own
 ///  (and free) it. Rust handles that fine, but if in C# you put this
@@ -77,14 +78,14 @@ typedef struct UTF8STRING
     uint64_t capacity;
     } UTF8STRING;
 
-typedef enum FFIERROR
+typedef enum ERROR
     {
-    FFIERROR_OK = 0,
-    FFIERROR_NULL = 100,
-    FFIERROR_PANIC = 200,
-    FFIERROR_DELEGATE = 300,
-    FFIERROR_FAIL = 400,
-    } FFIERROR;
+    ERROR_OK = 0,
+    ERROR_NULL = 100,
+    ERROR_PANIC = 200,
+    ERROR_DELEGATE = 300,
+    ERROR_FAIL = 400,
+    } ERROR;
 
 typedef struct BOOLFIELD
     {
@@ -145,10 +146,11 @@ typedef struct USECSTRPTR
     const char* ascii_string;
     } USECSTRPTR;
 
-typedef struct USEUTF8STRING
+typedef struct USESTRING
     {
-    UTF8STRING s;
-    } USEUTF8STRING;
+    UTF8STRING s1;
+    UTF8STRING s2;
+    } USESTRING;
 
 typedef struct VEC
     {
@@ -194,65 +196,6 @@ typedef struct WEIRD1U32
 
 typedef uint8_t (*fptr_fn_u8_rval_u8)(uint8_t x0);
 
-/// Result that contains value or an error.
-typedef struct RESULTU32FFIERROR
-    {
-    /// Element if err is `Ok`.
-    uint32_t t;
-    /// Error value.
-    FFIERROR err;
-    } RESULTU32FFIERROR;
-
-/// Result that contains value or an error.
-typedef struct RESULTU64FFIERROR
-    {
-    /// Element if err is `Ok`.
-    uint64_t t;
-    /// Error value.
-    FFIERROR err;
-    } RESULTU64FFIERROR;
-
-/// Result that contains value or an error.
-typedef struct RESULTUTF8STRINGFFIERROR
-    {
-    /// Element if err is `Ok`.
-    UTF8STRING t;
-    /// Error value.
-    FFIERROR err;
-    } RESULTUTF8STRINGFFIERROR;
-
-typedef struct ARRAY
-    {
-    uint8_t data[16];
-    } ARRAY;
-
-typedef struct CONTAINER
-    {
-    LOCAL foreign;
-    } CONTAINER;
-
-typedef struct FIXEDSTRING
-    {
-    uint8_t data[32];
-    } FIXEDSTRING;
-
-typedef struct GENERICU32
-    {
-    const uint32_t* x;
-    } GENERICU32;
-
-typedef struct GENERICU8
-    {
-    const uint8_t* x;
-    } GENERICU8;
-
-typedef struct WEIRD2U8
-    {
-    uint8_t t;
-    uint8_t a[5];
-    const uint8_t* r;
-    } WEIRD2U8;
-
 /// A pointer to an array of data someone else owns which may not be modified.
 typedef struct SLICEBOOL
     {
@@ -289,6 +232,15 @@ typedef struct SLICEU8
     uint64_t len;
     } SLICEU8;
 
+/// A pointer to an array of data someone else owns which may not be modified.
+typedef struct SLICEUTF8STRING
+    {
+    /// Pointer to start of immutable data.
+    const UTF8STRING* data;
+    /// Number of elements.
+    uint64_t len;
+    } SLICEUTF8STRING;
+
 /// A pointer to an array of data someone else owns which may be modified.
 typedef struct SLICEMUTU32
     {
@@ -307,70 +259,64 @@ typedef struct SLICEMUTU8
     uint64_t len;
     } SLICEMUTU8;
 
-/// Option type containing boolean flag and maybe valid data.
-typedef struct OPTIONINNER
+/// Result that contains value or an error.
+typedef struct RESULTU32ERROR
     {
-    /// Element that is maybe valid.
-    INNER t;
-    /// Byte where `1` means element `t` is valid.
-    uint8_t is_some;
-    } OPTIONINNER;
+    /// Element if err is `Ok`.
+    uint32_t t;
+    /// Error value.
+    ERROR err;
+    } RESULTU32ERROR;
 
-/// Option type containing boolean flag and maybe valid data.
-typedef struct OPTIONVEC
+/// Result that contains value or an error.
+typedef struct RESULTU64ERROR
     {
-    /// Element that is maybe valid.
-    VEC t;
-    /// Byte where `1` means element `t` is valid.
-    uint8_t is_some;
-    } OPTIONVEC;
+    /// Element if err is `Ok`.
+    uint64_t t;
+    /// Error value.
+    ERROR err;
+    } RESULTU64ERROR;
 
-typedef uint8_t (*CALLBACKU8)(uint8_t VALUE, const void* CALLBACK_DATA);
-
-typedef uint32_t (*MYCALLBACK)(uint32_t VALUE, const void* CALLBACK_DATA);
-
-typedef void (*MYCALLBACKCONTEXTUAL)(const void* CONTEXT, uint32_t VALUE, const void* CALLBACK_DATA);
-
-typedef uint32_t (*MYCALLBACKNAMESPACED)(uint32_t VALUE, const void* CALLBACK_DATA);
-
-typedef void (*MYCALLBACKVOID)(const void* PTR, const void* CALLBACK_DATA);
-
-typedef void (*SUMDELEGATE1)(const void* CALLBACK_DATA);
-
-typedef int32_t (*SUMDELEGATE2)(int32_t X, int32_t Y, const void* CALLBACK_DATA);
-
-typedef FFIERROR (*SUMDELEGATERETURN)(int32_t X, int32_t Y, const void* CALLBACK_DATA);
-
-typedef void (*SUMDELEGATERETURN2)(int32_t X, int32_t Y, const void* CALLBACK_DATA);
-
-typedef struct CHARARRAY
+/// Result that contains value or an error.
+typedef struct RESULTUTF8STRINGERROR
     {
-    FIXEDSTRING str;
-    FIXEDSTRING str_2;
-    } CHARARRAY;
+    /// Element if err is `Ok`.
+    UTF8STRING t;
+    /// Error value.
+    ERROR err;
+    } RESULTUTF8STRINGERROR;
 
-typedef struct DELEGATETABLE
+typedef struct ARRAY
     {
-    MYCALLBACK my_callback;
-    MYCALLBACKNAMESPACED my_callback_namespaced;
-    MYCALLBACKVOID my_callback_void;
-    MYCALLBACKCONTEXTUAL my_callback_contextual;
-    SUMDELEGATE1 sum_delegate_1;
-    SUMDELEGATE2 sum_delegate_2;
-    SUMDELEGATERETURN sum_delegate_return;
-    SUMDELEGATERETURN2 sum_delegate_return_2;
-    } DELEGATETABLE;
+    uint8_t data[16];
+    } ARRAY;
 
-typedef struct NESTEDARRAY
+typedef struct CONTAINER
     {
-    ENUMRENAMED field_enum;
-    VEC3F32 field_vec;
-    bool field_bool;
-    int32_t field_int;
-    uint16_t field_array[5];
-    uint16_t field_array_2[5];
-    ARRAY field_struct;
-    } NESTEDARRAY;
+    LOCAL foreign;
+    } CONTAINER;
+
+typedef struct FIXEDSTRING
+    {
+    uint8_t data[32];
+    } FIXEDSTRING;
+
+typedef struct GENERICU32
+    {
+    const uint32_t* x;
+    } GENERICU32;
+
+typedef struct GENERICU8
+    {
+    const uint8_t* x;
+    } GENERICU8;
+
+typedef struct WEIRD2U8
+    {
+    uint8_t t;
+    uint8_t a[5];
+    const uint8_t* r;
+    } WEIRD2U8;
 
 /// A pointer to an array of data someone else owns which may not be modified.
 typedef struct SLICEUSECSTRPTR
@@ -380,6 +326,15 @@ typedef struct SLICEUSECSTRPTR
     /// Number of elements.
     uint64_t len;
     } SLICEUSECSTRPTR;
+
+/// A pointer to an array of data someone else owns which may not be modified.
+typedef struct SLICEUSESTRING
+    {
+    /// Pointer to start of immutable data.
+    const USESTRING* data;
+    /// Number of elements.
+    uint64_t len;
+    } SLICEUSESTRING;
 
 /// A pointer to an array of data someone else owns which may not be modified.
 typedef struct SLICEVEC
@@ -408,28 +363,196 @@ typedef struct SLICEMUTVEC
     uint64_t len;
     } SLICEMUTVEC;
 
+/// Option type containing boolean flag and maybe valid data.
+typedef struct OPTIONINNER
+    {
+    /// Element that is maybe valid.
+    INNER t;
+    /// Byte where `1` means element `t` is valid.
+    uint8_t is_some;
+    } OPTIONINNER;
+
+/// Option type containing boolean flag and maybe valid data.
+typedef struct OPTIONVEC
+    {
+    /// Element that is maybe valid.
+    VEC t;
+    /// Byte where `1` means element `t` is valid.
+    uint8_t is_some;
+    } OPTIONVEC;
+
+/// Result that contains value or an error.
+typedef struct RESULTCONSTPTRSERVICEASYNCERROR
+    {
+    /// Element if err is `Ok`.
+    const SERVICEASYNC* t;
+    /// Error value.
+    ERROR err;
+    } RESULTCONSTPTRSERVICEASYNCERROR;
+
+/// Result that contains value or an error.
+typedef struct RESULTCONSTPTRSERVICEBASICERROR
+    {
+    /// Element if err is `Ok`.
+    const SERVICEBASIC* t;
+    /// Error value.
+    ERROR err;
+    } RESULTCONSTPTRSERVICEBASICERROR;
+
+/// Result that contains value or an error.
+typedef struct RESULTCONSTPTRSERVICECALLBACKSERROR
+    {
+    /// Element if err is `Ok`.
+    const SERVICECALLBACKS* t;
+    /// Error value.
+    ERROR err;
+    } RESULTCONSTPTRSERVICECALLBACKSERROR;
+
+/// Result that contains value or an error.
+typedef struct RESULTCONSTPTRSERVICEDEPENDENTERROR
+    {
+    /// Element if err is `Ok`.
+    const SERVICEDEPENDENT* t;
+    /// Error value.
+    ERROR err;
+    } RESULTCONSTPTRSERVICEDEPENDENTERROR;
+
+/// Result that contains value or an error.
+typedef struct RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR
+    {
+    /// Element if err is `Ok`.
+    const SERVICEIGNORINGMETHODS* t;
+    /// Error value.
+    ERROR err;
+    } RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR;
+
+/// Result that contains value or an error.
+typedef struct RESULTCONSTPTRSERVICEMAINERROR
+    {
+    /// Element if err is `Ok`.
+    const SERVICEMAIN* t;
+    /// Error value.
+    ERROR err;
+    } RESULTCONSTPTRSERVICEMAINERROR;
+
+/// Result that contains value or an error.
+typedef struct RESULTCONSTPTRSERVICEMULTIPLECTORSERROR
+    {
+    /// Element if err is `Ok`.
+    const SERVICEMULTIPLECTORS* t;
+    /// Error value.
+    ERROR err;
+    } RESULTCONSTPTRSERVICEMULTIPLECTORSERROR;
+
+/// Result that contains value or an error.
+typedef struct RESULTCONSTPTRSERVICEONPANICERROR
+    {
+    /// Element if err is `Ok`.
+    const SERVICEONPANIC* t;
+    /// Error value.
+    ERROR err;
+    } RESULTCONSTPTRSERVICEONPANICERROR;
+
+/// Result that contains value or an error.
+typedef struct RESULTCONSTPTRSERVICERESULTERROR
+    {
+    /// Element if err is `Ok`.
+    const SERVICERESULT* t;
+    /// Error value.
+    ERROR err;
+    } RESULTCONSTPTRSERVICERESULTERROR;
+
+/// Result that contains value or an error.
+typedef struct RESULTCONSTPTRSERVICESTRINGSERROR
+    {
+    /// Element if err is `Ok`.
+    const SERVICESTRINGS* t;
+    /// Error value.
+    ERROR err;
+    } RESULTCONSTPTRSERVICESTRINGSERROR;
+
+/// Result that contains value or an error.
+typedef struct RESULTCONSTPTRSERVICEVARIOUSSLICESERROR
+    {
+    /// Element if err is `Ok`.
+    const SERVICEVARIOUSSLICES* t;
+    /// Error value.
+    ERROR err;
+    } RESULTCONSTPTRSERVICEVARIOUSSLICESERROR;
+
+/// Result that contains value or an error.
+typedef struct RESULTUSESTRINGERROR
+    {
+    /// Element if err is `Ok`.
+    USESTRING t;
+    /// Error value.
+    ERROR err;
+    } RESULTUSESTRINGERROR;
+
 typedef uint8_t (*CALLBACKFFISLICE)(SLICEU8 SLICE, const void* CALLBACK_DATA);
 
 typedef void (*CALLBACKSLICEMUT)(SLICEMUTU8 SLICE, const void* CALLBACK_DATA);
 
-typedef void (*fptr_fn_ConstPtrResultU64FFIError_ConstPtr)(const RESULTU64FFIERROR* x0, const void* x1);
+typedef uint8_t (*CALLBACKU8)(uint8_t VALUE, const void* CALLBACK_DATA);
 
-typedef void (*fptr_fn_ConstPtrResultUtf8StringFFIError_ConstPtr)(const RESULTUTF8STRINGFFIERROR* x0, const void* x1);
+typedef uint32_t (*MYCALLBACK)(uint32_t VALUE, const void* CALLBACK_DATA);
 
-typedef void (*fptr_fn_CharArray)(CHARARRAY x0);
+typedef void (*MYCALLBACKCONTEXTUAL)(const void* CONTEXT, uint32_t VALUE, const void* CALLBACK_DATA);
 
-/// Result that contains value or an error.
-typedef struct RESULTNESTEDARRAYFFIERROR
+typedef uint32_t (*MYCALLBACKNAMESPACED)(uint32_t VALUE, const void* CALLBACK_DATA);
+
+typedef void (*MYCALLBACKVOID)(const void* PTR, const void* CALLBACK_DATA);
+
+typedef void (*NESTEDSTRINGCALLBACK)(USESTRING S, const void* CALLBACK_DATA);
+
+typedef void (*STRINGCALLBACK)(UTF8STRING S, const void* CALLBACK_DATA);
+
+typedef void (*SUMDELEGATE1)(const void* CALLBACK_DATA);
+
+typedef int32_t (*SUMDELEGATE2)(int32_t X, int32_t Y, const void* CALLBACK_DATA);
+
+typedef ERROR (*SUMDELEGATERETURN)(int32_t X, int32_t Y, const void* CALLBACK_DATA);
+
+typedef void (*SUMDELEGATERETURN2)(int32_t X, int32_t Y, const void* CALLBACK_DATA);
+
+typedef void (*fptr_fn_ConstPtrError_ConstPtr)(const ERROR* x0, const void* x1);
+
+typedef struct CALLBACKTABLE
     {
-    /// Element if err is `Ok`.
-    NESTEDARRAY t;
-    /// Error value.
-    FFIERROR err;
-    } RESULTNESTEDARRAYFFIERROR;
+    MYCALLBACK my_callback;
+    MYCALLBACKNAMESPACED my_callback_namespaced;
+    MYCALLBACKVOID my_callback_void;
+    MYCALLBACKCONTEXTUAL my_callback_contextual;
+    SUMDELEGATE1 sum_delegate_1;
+    SUMDELEGATE2 sum_delegate_2;
+    SUMDELEGATERETURN sum_delegate_return;
+    SUMDELEGATERETURN2 sum_delegate_return_2;
+    } CALLBACKTABLE;
 
-typedef void (*CALLBACKCHARARRAY2)(CHARARRAY VALUE, const void* CALLBACK_DATA);
+typedef struct CHARARRAY
+    {
+    FIXEDSTRING str;
+    FIXEDSTRING str_2;
+    } CHARARRAY;
+
+typedef struct NESTEDARRAY
+    {
+    ENUMRENAMED field_enum;
+    VEC3F32 field_vec;
+    bool field_bool;
+    int32_t field_int;
+    uint16_t field_array[5];
+    uint16_t field_array_2[5];
+    ARRAY field_struct;
+    } NESTEDARRAY;
 
 typedef VEC3F32 (*CALLBACKHUGEVECSLICE)(SLICEVEC3F32 SLICE, const void* CALLBACK_DATA);
+
+typedef void (*fptr_fn_ConstPtrResultU64Error_ConstPtr)(const RESULTU64ERROR* x0, const void* x1);
+
+typedef void (*fptr_fn_ConstPtrResultUtf8StringError_ConstPtr)(const RESULTUTF8STRINGERROR* x0, const void* x1);
+
+typedef void (*fptr_fn_CharArray)(CHARARRAY x0);
 
 /// A pointer to an array of data someone else owns which may be modified.
 typedef struct SLICEMUTCHARARRAY
@@ -440,65 +563,53 @@ typedef struct SLICEMUTCHARARRAY
     uint64_t len;
     } SLICEMUTCHARARRAY;
 
-typedef void (*fptr_fn_ConstPtrResultNestedArrayFFIError_ConstPtr)(const RESULTNESTEDARRAYFFIERROR* x0, const void* x1);
+/// Result that contains value or an error.
+typedef struct RESULTNESTEDARRAYERROR
+    {
+    /// Element if err is `Ok`.
+    NESTEDARRAY t;
+    /// Error value.
+    ERROR err;
+    } RESULTNESTEDARRAYERROR;
+
+typedef void (*CALLBACKCHARARRAY2)(CHARARRAY VALUE, const void* CALLBACK_DATA);
+
+typedef void (*fptr_fn_ConstPtrResultUseStringError_ConstPtr)(const RESULTUSESTRINGERROR* x0, const void* x1);
+
+typedef void (*fptr_fn_ConstPtrResultNestedArrayError_ConstPtr)(const RESULTNESTEDARRAYERROR* x0, const void* x1);
 
 
 typedef int64_t (*interoptopus_string_create)(const void*, uint64_t, UTF8STRING*);
 
 typedef int64_t (*interoptopus_string_destroy)(UTF8STRING);
 
-typedef void (*primitive_void)();
+typedef PACKED2 (*alignment_1)(PACKED1);
 
-typedef void (*primitive_void2)();
+typedef uint8_t (*array_1)(ARRAY);
 
-typedef bool (*primitive_bool)(bool);
+typedef ARRAY (*array_2)();
 
-typedef uint8_t (*primitive_u8)(uint8_t);
+typedef void (*array_3)(ARRAY*);
 
-typedef uint16_t (*primitive_u16)(uint16_t);
+typedef CHARARRAY (*char_array_1)();
 
-typedef uint32_t (*primitive_u32)(uint32_t);
+typedef CHARARRAY (*char_array_2)(CHARARRAY);
 
-typedef uint64_t (*primitive_u64)(uint64_t);
+typedef uint8_t (*char_array_3)(const CHARARRAY*);
 
-typedef int8_t (*primitive_i8)(int8_t);
+typedef NESTEDARRAY (*nested_array_1)();
 
-typedef int16_t (*primitive_i16)(int16_t);
+typedef void (*nested_array_2)(NESTEDARRAY*);
 
-typedef int32_t (*primitive_i32)(int32_t);
+typedef uint8_t (*nested_array_3)(NESTEDARRAY);
 
-typedef int64_t (*primitive_i64)(int64_t);
+typedef void (*behavior_sleep)(uint64_t);
 
-typedef PACKED2 (*packed_to_packed1)(PACKED1);
+typedef ERROR (*behavior_panics)();
 
-typedef int64_t (*many_args_5)(int64_t, int64_t, int64_t, int64_t, int64_t);
+typedef uint8_t (*fnptr_1)(fptr_fn_u8_rval_u8, uint8_t);
 
-typedef int64_t (*many_args_10)(int64_t, int64_t, int64_t, int64_t, int64_t, int64_t, int64_t, int64_t, int64_t, int64_t);
-
-typedef const int64_t* (*ptr)(const int64_t*);
-
-///  # Safety
-/// 
-///  Parameter x must point to valid data.
-typedef int64_t* (*ptr_mut)(int64_t*);
-
-typedef const const int64_t** (*ptr_ptr)(const const int64_t**);
-
-typedef const int64_t* (*ref_simple)(const int64_t*);
-
-typedef int64_t* (*ref_mut_simple)(int64_t*);
-
-typedef bool (*ref_option)(const int64_t*);
-
-typedef bool (*ref_mut_option)(int64_t*);
-
-typedef TUPLED (*call_tupled)(TUPLED);
-
-typedef FFIERROR (*complex_args_1)(VEC3F32, const TUPLED*);
-
-typedef uint8_t (*callback)(fptr_fn_u8_rval_u8, uint8_t);
-
-typedef void (*callback_marshalled)(fptr_fn_CharArray, CHARARRAY);
+typedef void (*fnptr_2)(fptr_fn_CharArray, CHARARRAY);
 
 typedef uint32_t (*generic_1a)(GENERICU32, PHANTOMU8);
 
@@ -512,36 +623,20 @@ typedef uint8_t (*generic_3)(const GENERIC3*);
 
 typedef uint8_t (*generic_4)(const GENERIC4*);
 
-typedef uint8_t (*array_1)(ARRAY);
+typedef bool (*generic_5)(WEIRD1U32, WEIRD2U8);
 
-typedef ARRAY (*array_2)();
+typedef VEC1 (*meta_ambiguous_1)(VEC1);
 
-typedef void (*array_3)(ARRAY*);
+typedef VEC2 (*meta_ambiguous_2)(VEC2);
 
-typedef NESTEDARRAY (*nested_array_1)();
-
-typedef void (*nested_array_2)(NESTEDARRAY*);
-
-typedef uint8_t (*nested_array_3)(NESTEDARRAY);
-
-typedef CHARARRAY (*char_array_1)();
-
-typedef CHARARRAY (*char_array_2)(CHARARRAY);
-
-typedef uint8_t (*char_array_3)(const CHARARRAY*);
-
-typedef bool (*bool_field)(BOOLFIELD);
+typedef bool (*meta_ambiguous_3)(VEC1, VEC2);
 
 ///  This function has documentation.
-typedef ENUMDOCUMENTED (*documented)(STRUCTDOCUMENTED);
+typedef ENUMDOCUMENTED (*meta_documented)(STRUCTDOCUMENTED);
 
-typedef VEC1 (*ambiguous_1)(VEC1);
+typedef void (*meta_visibility1)(VISIBILITY1, VISIBILITY2);
 
-typedef VEC2 (*ambiguous_2)(VEC2);
-
-typedef bool (*ambiguous_3)(VEC1, VEC2);
-
-typedef VEC (*namespaced_type)(VEC);
+typedef ENUMRENAMED (*meta_renamed)(STRUCTRENAMED);
 
 typedef OPTIONVEC (*namespaced_inner_option)(OPTIONVEC);
 
@@ -549,17 +644,60 @@ typedef SLICEVEC (*namespaced_inner_slice)(SLICEVEC);
 
 typedef SLICEMUTVEC (*namespaced_inner_slice_mut)(SLICEMUTVEC);
 
-typedef FFIERROR (*panics)();
+typedef VEC (*namespaced_type)(VEC);
 
-typedef ENUMRENAMED (*renamed)(STRUCTRENAMED);
+typedef int64_t (*primitive_args_5)(int64_t, int64_t, int64_t, int64_t, int64_t);
 
-typedef void (*sleep)(uint64_t);
+typedef int64_t (*primitive_args_10)(int64_t, int64_t, int64_t, int64_t, int64_t, int64_t, int64_t, int64_t, int64_t, int64_t);
 
-typedef bool (*weird_1)(WEIRD1U32, WEIRD2U8);
+typedef bool (*primitive_bool)(bool);
 
-typedef void (*visibility)(VISIBILITY1, VISIBILITY2);
+typedef float (*primitive_f32)(float);
 
-typedef TUPLED (*repr_transparent)(TUPLED, const TUPLED*);
+typedef double (*primitive_f64)(double);
+
+typedef int16_t (*primitive_i16)(int16_t);
+
+typedef int32_t (*primitive_i32)(int32_t);
+
+typedef int64_t (*primitive_i64)(int64_t);
+
+typedef int8_t (*primitive_i8)(int8_t);
+
+typedef uint16_t (*primitive_u16)(uint16_t);
+
+typedef uint32_t (*primitive_u32)(uint32_t);
+
+typedef uint64_t (*primitive_u64)(uint64_t);
+
+typedef uint8_t (*primitive_u8)(uint8_t);
+
+typedef void (*primitive_void)();
+
+typedef void (*primitive_void2)();
+
+typedef const int64_t* (*ptr1)(const int64_t*);
+
+typedef const const int64_t** (*ptr2)(const const int64_t**);
+
+///  # Safety
+/// 
+///  Parameter x must point to valid data.
+typedef int64_t* (*ptr3)(int64_t*);
+
+typedef const int64_t* (*ref1)(const int64_t*);
+
+typedef int64_t* (*ref2)(int64_t*);
+
+typedef bool (*ref3)(const int64_t*);
+
+typedef bool (*ref4)(int64_t*);
+
+typedef TUPLED (*struct1)(TUPLED);
+
+typedef ERROR (*struct2)(VEC3F32, const TUPLED*);
+
+typedef bool (*struct3)(BOOLFIELD);
 
 typedef uint32_t (*pattern_ascii_pointer_1)(const char*);
 
@@ -579,7 +717,17 @@ typedef uint32_t (*pattern_string_2)(UTF8STRING);
 
 typedef UTF8STRING (*pattern_string_3)();
 
-typedef USEUTF8STRING (*pattern_string_4)(USEUTF8STRING);
+typedef USESTRING (*pattern_string_4)(USESTRING);
+
+typedef RESULTUSESTRINGERROR (*pattern_string_5)(USESTRING);
+
+typedef ERROR (*pattern_string_6a)(const USESTRING*);
+
+typedef ERROR (*pattern_string_6b)(USESTRING*);
+
+typedef RESULTUTF8STRINGERROR (*pattern_string_7)(SLICEUTF8STRING, uint64_t);
+
+typedef RESULTUSESTRINGERROR (*pattern_string_8)(SLICEUSESTRING, uint64_t);
 
 typedef uint32_t (*pattern_ffi_slice_1)(SLICEU32);
 
@@ -591,6 +739,7 @@ typedef void (*pattern_ffi_slice_3)(SLICEMUTU8, CALLBACKSLICEMUT);
 
 typedef void (*pattern_ffi_slice_4)(SLICEU8, SLICEMUTU8);
 
+///  It is (probably?) UB to call this function with the same FFI slice data at the same time.
 typedef void (*pattern_ffi_slice_5)(const SLICEU8*, SLICEMUTU8*);
 
 typedef void (*pattern_ffi_slice_6)(const SLICEMUTU8*, CALLBACKU8);
@@ -613,11 +762,11 @@ typedef const char* (*pattern_ffi_cchar_const_pointer)(const char*);
 
 typedef char* (*pattern_ffi_cchar_mut_pointer)(char*);
 
-typedef RESULTU32FFIERROR (*pattern_result_1)(RESULTU32FFIERROR);
+typedef RESULTU32ERROR (*pattern_result_1)(RESULTU32ERROR);
 
-typedef FFIERROR (*pattern_result_2)();
+typedef ERROR (*pattern_result_2)();
 
-typedef FFIERROR (*pattern_result_3)(FFIERROR);
+typedef ERROR (*pattern_result_3)(ERROR);
 
 typedef uint64_t (*pattern_api_guard)();
 
@@ -631,7 +780,9 @@ typedef SUMDELEGATE1 (*pattern_callback_5)();
 
 typedef SUMDELEGATE2 (*pattern_callback_6)();
 
-typedef FFIERROR (*pattern_callback_7)(SUMDELEGATERETURN, SUMDELEGATERETURN2, int32_t, int32_t, int32_t*);
+typedef ERROR (*pattern_callback_7)(SUMDELEGATERETURN, SUMDELEGATERETURN2, int32_t, int32_t, int32_t*);
+
+typedef void (*pattern_callback_8)(STRINGCALLBACK, NESTEDSTRINGCALLBACK, UTF8STRING);
 
 typedef void (*pattern_surrogates_1)(LOCAL, CONTAINER*);
 
@@ -641,15 +792,19 @@ typedef void (*pattern_surrogates_1)(LOCAL, CONTAINER*);
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef FFIERROR (*service_async_destroy)(const SERVICEASYNC**);
+typedef RESULTCONSTPTRSERVICEASYNCERROR (*service_async_destroy)(const SERVICEASYNC*);
 
-typedef FFIERROR (*service_async_new)(const SERVICEASYNC**);
+typedef RESULTCONSTPTRSERVICEASYNCERROR (*service_async_new)();
 
-typedef FFIERROR (*service_async_return_after_ms)(const SERVICEASYNC*, uint64_t, uint64_t, fptr_fn_ConstPtrResultU64FFIError_ConstPtr);
+typedef ERROR (*service_async_return_after_ms)(const SERVICEASYNC*, uint64_t, uint64_t, fptr_fn_ConstPtrResultU64Error_ConstPtr);
 
-typedef FFIERROR (*service_async_process_struct)(const SERVICEASYNC*, NESTEDARRAY, fptr_fn_ConstPtrResultNestedArrayFFIError_ConstPtr);
+typedef ERROR (*service_async_process_struct)(const SERVICEASYNC*, NESTEDARRAY, fptr_fn_ConstPtrResultNestedArrayError_ConstPtr);
 
-typedef FFIERROR (*service_async_handle_string)(const SERVICEASYNC*, UTF8STRING, fptr_fn_ConstPtrResultUtf8StringFFIError_ConstPtr);
+typedef ERROR (*service_async_handle_string)(const SERVICEASYNC*, UTF8STRING, fptr_fn_ConstPtrResultUtf8StringError_ConstPtr);
+
+typedef ERROR (*service_async_handle_nested_string)(const SERVICEASYNC*, UTF8STRING, fptr_fn_ConstPtrResultUseStringError_ConstPtr);
+
+typedef ERROR (*service_async_fail)(const SERVICEASYNC*, fptr_fn_ConstPtrError_ConstPtr);
 
 typedef void (*service_async_bad)(SERVICEASYNC*);
 
@@ -659,9 +814,9 @@ typedef void (*service_async_bad)(SERVICEASYNC*);
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef FFIERROR (*service_basic_destroy)(SERVICEBASIC**);
+typedef RESULTCONSTPTRSERVICEBASICERROR (*service_basic_destroy)(SERVICEBASIC*);
 
-typedef FFIERROR (*service_basic_new)(SERVICEBASIC**);
+typedef RESULTCONSTPTRSERVICEBASICERROR (*service_basic_new)();
 
 ///  Destroys the given instance.
 /// 
@@ -669,13 +824,47 @@ typedef FFIERROR (*service_basic_new)(SERVICEBASIC**);
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef FFIERROR (*service_on_panic_destroy)(SERVICEONPANIC**);
+typedef RESULTCONSTPTRSERVICEMAINERROR (*service_main_destroy)(SERVICEMAIN*);
 
-typedef FFIERROR (*service_on_panic_new)(SERVICEONPANIC**);
+typedef RESULTCONSTPTRSERVICEMAINERROR (*service_main_new)(uint32_t);
+
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+typedef RESULTCONSTPTRSERVICEDEPENDENTERROR (*service_dependent_destroy)(SERVICEDEPENDENT*);
+
+typedef RESULTCONSTPTRSERVICEDEPENDENTERROR (*service_dependent_from_main)(const SERVICEMAIN*);
+
+typedef uint32_t (*service_dependent_get)(const SERVICEDEPENDENT*);
+
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+typedef RESULTCONSTPTRSERVICERESULTERROR (*service_result_destroy)(SERVICERESULT*);
+
+typedef RESULTCONSTPTRSERVICERESULTERROR (*service_result_new)();
+
+typedef ERROR (*service_result_test)(const SERVICERESULT*);
+
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+typedef RESULTCONSTPTRSERVICEONPANICERROR (*service_on_panic_destroy)(SERVICEONPANIC*);
+
+typedef RESULTCONSTPTRSERVICEONPANICERROR (*service_on_panic_new)();
 
 ///  Methods returning a Result<(), _> are the default and do not
 ///  need annotations.
-typedef FFIERROR (*service_on_panic_return_result)(const SERVICEONPANIC*, uint32_t);
+typedef ERROR (*service_on_panic_return_result)(const SERVICEONPANIC*, uint32_t);
 
 ///  Methods returning a value need an `on_panic` annotation.
 typedef uint32_t (*service_on_panic_return_default_value)(const SERVICEONPANIC*, uint32_t);
@@ -690,29 +879,19 @@ typedef const char* (*service_on_panic_return_ub_on_panic)(SERVICEONPANIC*);
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef FFIERROR (*service_callbacks_destroy)(SERVICECALLBACKS**);
+typedef RESULTCONSTPTRSERVICECALLBACKSERROR (*service_callbacks_destroy)(SERVICECALLBACKS*);
 
-typedef FFIERROR (*service_callbacks_new)(SERVICECALLBACKS**);
+typedef RESULTCONSTPTRSERVICECALLBACKSERROR (*service_callbacks_new)();
 
-typedef FFIERROR (*service_callbacks_callback_simple)(SERVICECALLBACKS*, MYCALLBACK);
+typedef ERROR (*service_callbacks_callback_simple)(SERVICECALLBACKS*, MYCALLBACK);
 
-typedef FFIERROR (*service_callbacks_callback_ffi_return)(SERVICECALLBACKS*, SUMDELEGATERETURN);
+typedef ERROR (*service_callbacks_callback_ffi_return)(SERVICECALLBACKS*, SUMDELEGATERETURN);
 
-typedef FFIERROR (*service_callbacks_callback_with_slice)(SERVICECALLBACKS*, SUMDELEGATERETURN, SLICEI32);
+typedef ERROR (*service_callbacks_callback_with_slice)(SERVICECALLBACKS*, SUMDELEGATERETURN, SLICEI32);
 
-typedef void (*service_callbacks_set_delegate_table)(SERVICECALLBACKS*, DELEGATETABLE);
+typedef void (*service_callbacks_set_delegate_table)(SERVICECALLBACKS*, CALLBACKTABLE);
 
-typedef FFIERROR (*service_callbacks_invoke_delegates)(const SERVICECALLBACKS*);
-
-///  Destroys the given instance.
-/// 
-///  # Safety
-/// 
-///  The passed parameter MUST have been created with the corresponding init function;
-///  passing any other value results in undefined behavior.
-typedef FFIERROR (*service_ignoring_methods_destroy)(SERVICEIGNORINGMETHODS**);
-
-typedef FFIERROR (*service_ignoring_methods_new)(SERVICEIGNORINGMETHODS**);
+typedef ERROR (*service_callbacks_invoke_delegates)(const SERVICECALLBACKS*);
 
 ///  Destroys the given instance.
 /// 
@@ -720,15 +899,9 @@ typedef FFIERROR (*service_ignoring_methods_new)(SERVICEIGNORINGMETHODS**);
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef FFIERROR (*service_multiple_ctors_destroy)(SERVICEMULTIPLECTORS**);
+typedef RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR (*service_ignoring_methods_destroy)(SERVICEIGNORINGMETHODS*);
 
-typedef FFIERROR (*service_multiple_ctors_new_with)(SERVICEMULTIPLECTORS**, uint32_t);
-
-typedef FFIERROR (*service_multiple_ctors_new_without)(SERVICEMULTIPLECTORS**);
-
-typedef FFIERROR (*service_multiple_ctors_new_with_string)(SERVICEMULTIPLECTORS**, const char*);
-
-typedef FFIERROR (*service_multiple_ctors_new_failing)(SERVICEMULTIPLECTORS**, uint8_t);
+typedef RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR (*service_ignoring_methods_new)();
 
 ///  Destroys the given instance.
 /// 
@@ -736,15 +909,15 @@ typedef FFIERROR (*service_multiple_ctors_new_failing)(SERVICEMULTIPLECTORS**, u
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef FFIERROR (*service_using_lifetimes_destroy)(SERVICEUSINGLIFETIMES**);
+typedef RESULTCONSTPTRSERVICEMULTIPLECTORSERROR (*service_multiple_ctors_destroy)(SERVICEMULTIPLECTORS*);
 
-typedef FFIERROR (*service_using_lifetimes_new_with)(SERVICEUSINGLIFETIMES**, const uint32_t*);
+typedef RESULTCONSTPTRSERVICEMULTIPLECTORSERROR (*service_multiple_ctors_new_with)(uint32_t);
 
-typedef void (*service_using_lifetimes_lifetime_1)(SERVICEUSINGLIFETIMES*, SLICEBOOL);
+typedef RESULTCONSTPTRSERVICEMULTIPLECTORSERROR (*service_multiple_ctors_new_without)();
 
-typedef void (*service_using_lifetimes_lifetime_2)(SERVICEUSINGLIFETIMES*, SLICEBOOL);
+typedef RESULTCONSTPTRSERVICEMULTIPLECTORSERROR (*service_multiple_ctors_new_with_string)(const char*);
 
-typedef const char* (*service_using_lifetimes_return_string_accept_slice)(SERVICEUSINGLIFETIMES*, SLICEU8);
+typedef RESULTCONSTPTRSERVICEMULTIPLECTORSERROR (*service_multiple_ctors_new_failing)(uint8_t);
 
 ///  Destroys the given instance.
 /// 
@@ -752,9 +925,9 @@ typedef const char* (*service_using_lifetimes_return_string_accept_slice)(SERVIC
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef FFIERROR (*service_various_slices_destroy)(SERVICEVARIOUSSLICES**);
+typedef RESULTCONSTPTRSERVICEVARIOUSSLICESERROR (*service_various_slices_destroy)(SERVICEVARIOUSSLICES*);
 
-typedef FFIERROR (*service_various_slices_new)(SERVICEVARIOUSSLICES**);
+typedef RESULTCONSTPTRSERVICEVARIOUSSLICESERROR (*service_various_slices_new)();
 
 typedef uint8_t (*service_various_slices_mut_self)(SERVICEVARIOUSSLICES*, SLICEU8);
 
@@ -767,9 +940,9 @@ typedef uint8_t (*service_various_slices_mut_self_ref_slice)(SERVICEVARIOUSSLICE
 
 typedef uint8_t (*service_various_slices_mut_self_ref_slice_limited)(SERVICEVARIOUSSLICES*, const uint8_t*, uint8_t*, SLICEU8, SLICEU8);
 
-typedef FFIERROR (*service_various_slices_mut_self_ffi_error)(SERVICEVARIOUSSLICES*, SLICEMUTU8);
+typedef ERROR (*service_various_slices_mut_self_ffi_error)(SERVICEVARIOUSSLICES*, SLICEMUTU8);
 
-typedef FFIERROR (*service_various_slices_mut_self_no_error)(SERVICEVARIOUSSLICES*, SLICEMUTU8);
+typedef ERROR (*service_various_slices_mut_self_no_error)(SERVICEVARIOUSSLICES*, SLICEMUTU8);
 
 ///  Warning, you _must_ discard the returned slice object before calling into this service
 ///  again, as otherwise undefined behavior might happen.
@@ -785,9 +958,9 @@ typedef SLICEMUTU32 (*service_various_slices_return_slice_mut)(SERVICEVARIOUSSLI
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef FFIERROR (*service_strings_destroy)(SERVICESTRINGS**);
+typedef RESULTCONSTPTRSERVICESTRINGSERROR (*service_strings_destroy)(SERVICESTRINGS*);
 
-typedef FFIERROR (*service_strings_new)(SERVICESTRINGS**);
+typedef RESULTCONSTPTRSERVICESTRINGSERROR (*service_strings_new)();
 
 typedef void (*service_strings_pass_string)(SERVICESTRINGS*, const char*);
 

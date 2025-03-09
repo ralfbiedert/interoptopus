@@ -1,7 +1,7 @@
-use crate::error::{Error, FFIError};
-use interoptopus::patterns::result::{FFIResultType, Result};
-use interoptopus::patterns::string::CStrPointer;
-use interoptopus::{ffi_service, ffi_service_method, ffi_type};
+use crate::error::Error;
+use interoptopus::ffi::CStrPointer;
+use interoptopus::patterns::result::{result_to_ffi, Result};
+use interoptopus::{ffi, ffi_service, ffi_service_method, ffi_type};
 
 // As a rule of thumb, in your FFI crate you shouldn't expose "native Rust" types, as often
 // their signatures and fields diverge. Instead, re-define each Rust type and method you want
@@ -23,11 +23,13 @@ impl GameEngine {
         Result::ok(Self { engine })
     }
 
-    pub fn place_object(&mut self, name: CStrPointer, position: Vec2) -> Result<(), Error> {
-        let name = name.as_str()?;
-        let position = position.into_native();
-        self.engine.place_object(name, position);
-        Result::ok(())
+    pub fn place_object(&mut self, name: ffi::CStrPointer, position: Vec2) -> ffi::Result<(), Error> {
+        result_to_ffi(|| {
+            let name = name.as_str()?;
+            let position = position.into_native();
+            self.engine.place_object(name, position);
+            Ok(())
+        })
     }
 
     #[ffi_service_method(on_panic = "return_default")]

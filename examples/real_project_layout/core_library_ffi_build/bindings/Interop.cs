@@ -4,8 +4,6 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
-using System.Reflection;
-using System.Linq.Expressions;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -36,15 +34,15 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "game_engine_destroy")]
-        public static partial ResultFFIError game_engine_destroy(ref IntPtr _context);
+        public static partial ResultConstPtrGameEngineError game_engine_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "game_engine_new")]
-        public static partial ResultFFIError game_engine_new(ref IntPtr _context);
+        public static partial ResultConstPtrGameEngineError game_engine_new();
 
 
         [LibraryImport(NativeLib, EntryPoint = "game_engine_place_object")]
-        public static partial ResultFFIError game_engine_place_object(IntPtr _context, [MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position);
+        public static partial ResultError game_engine_place_object(IntPtr _context, [MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position);
 
 
         [LibraryImport(NativeLib, EntryPoint = "game_engine_num_objects")]
@@ -62,11 +60,31 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Vec2
     {
+        public Vec2(Vec2 other)
+        {
+            x = other.x;
+            y = other.y;
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
             public float x;
             public float y;
+
+            public Vec2 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(Vec2), MarshalMode.Default, typeof(Marshaller))]
@@ -106,7 +124,7 @@ namespace My.Company
         }
     }
 
-    public enum FFIError
+    public enum Error
     {
         Ok = 0,
         Null = 100,
@@ -115,50 +133,53 @@ namespace My.Company
         Fail = 400,
     }
 
-    public partial struct ResultFFIError
+    public partial struct ResultError
     {
-        internal FFIError _err;
+        internal Error _err;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultFFIError
+    public partial struct ResultError
     {
-        public ResultFFIError(FFIError e) { _err = e; }
+        public ResultError(Error e) { _err = e; }
 
-        public static ResultFFIError OK => new ResultFFIError(FFIError.Ok);
-        public static ResultFFIError NULL => new ResultFFIError(FFIError.Null);
-        public static ResultFFIError PANIC => new ResultFFIError(FFIError.Panic);
-        public static ResultFFIError DELEGATE => new ResultFFIError(FFIError.Delegate);
-        public static ResultFFIError FAIL => new ResultFFIError(FFIError.Fail);
+        public static ResultError OK => new ResultError(Error.Ok);
+        public static ResultError NULL => new ResultError(Error.Null);
+        public static ResultError PANIC => new ResultError(Error.Panic);
+        public static ResultError DELEGATE => new ResultError(Error.Delegate);
+        public static ResultError FAIL => new ResultError(Error.Fail);
 
         public void Ok()
         {
-            if (_err == FFIError.Ok)
+            if (_err == Error.Ok)
             {
                 return;
             }
-            throw new InteropException<FFIError>(_err);
+            throw new InteropException<Error>(_err);
         }
+
+        public bool IsOk() { return _err == Error.Ok; }
+        public Error Err() { return _err; }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            public FFIError _err;
+            public Error _err;
         }
 
-        [CustomMarshaller(typeof(ResultFFIError), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
 
         public ref struct Marshaller
         {
-            private ResultFFIError _managed; // Used when converting managed -> unmanaged
+            private ResultError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultFFIError managed) { _managed = managed; }
+            public Marshaller(ResultError managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultFFIError managed) { _managed = managed; }
+            public void FromManaged(ResultError managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -168,15 +189,108 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultFFIError ToManaged()
+            public unsafe ResultError ToManaged()
             {
-                _managed = new ResultFFIError();
+                _managed = new ResultError();
                 _managed._err = _unmanaged._err;
                 return _managed;
             }
 
             public void Free() { }
         }
+
+    }
+
+
+    ///Result that contains value or an error.
+    public partial struct ResultConstPtrGameEngineError
+    {
+        ///Element if err is `Ok`.
+        IntPtr t;
+        ///Error value.
+        Error err;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct ResultConstPtrGameEngineError
+    {
+        public ResultConstPtrGameEngineError(ResultConstPtrGameEngineError other)
+        {
+            t = other.t;
+            err = other.err;
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public IntPtr t;
+            public Error err;
+
+            public ResultConstPtrGameEngineError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrGameEngineError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private ResultConstPtrGameEngineError _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(ResultConstPtrGameEngineError managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(ResultConstPtrGameEngineError managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+
+                _unmanaged.t = _managed.t;
+                _unmanaged.err = _managed.err;
+
+                return _unmanaged;
+            }
+
+            public unsafe ResultConstPtrGameEngineError ToManaged()
+            {
+                _managed = new ResultConstPtrGameEngineError();
+
+                _managed.t = _unmanaged.t;
+                _managed.err = _unmanaged.err;
+
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    public partial struct ResultConstPtrGameEngineError
+    {
+        public IntPtr Ok()
+        {
+            if (err == Error.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<Error>(err);
+        }
+
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
 
     }
 
@@ -191,13 +305,13 @@ namespace My.Company
         public static GameEngine New()
         {
             var self = new GameEngine();
-            Interop.game_engine_new(ref self._context).Ok();
+            self._context = Interop.game_engine_new().Ok();
             return self;
         }
 
         public void Dispose()
         {
-            Interop.game_engine_destroy(ref _context).Ok();
+            Interop.game_engine_destroy(_context).Ok();
         }
 
         public void PlaceObject([MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position)
@@ -310,6 +424,13 @@ namespace My.Company
 
         public void Dispose() { }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         /// A highly dangerous 'use once type' that has ownership semantics!
         /// Once passed over an FFI boundary 'the other side' is meant to own
         /// (and free) it. Rust handles that fine, but if in C# you put this
@@ -321,6 +442,14 @@ namespace My.Company
             public IntPtr ptr;
             public ulong len;
             public ulong capacity;
+
+            public string ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged().String; }
+                finally { marshaller.Free(); }
+            }
+
         }
 
         public partial class InteropHelper

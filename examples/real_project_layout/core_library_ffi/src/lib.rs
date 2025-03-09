@@ -1,4 +1,4 @@
-use interoptopus::patterns::string::CStrPointer;
+use interoptopus::ffi::CStrPointer;
 use interoptopus::{ffi_function, function, pattern, Inventory, InventoryBuilder};
 
 pub mod engine;

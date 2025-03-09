@@ -2,11 +2,12 @@
 // work. Have a look at the documentation.
 
 use interoptopus::ffi_type;
+use interoptopus::patterns::result::FFIError;
 use std::fmt::{Display, Formatter};
 
 #[ffi_type(error)]
-#[derive(PartialOrd, PartialEq, Copy, Clone)]
-pub enum FFIError {
+#[derive(PartialOrd, PartialEq, Copy, Clone, Debug)]
+pub enum Error {
     Ok = 0,
     Null = 100,
     Panic = 200,
@@ -14,32 +15,19 @@ pub enum FFIError {
     Fail = 400,
 }
 
-#[derive(Debug)]
-pub enum Error {
-    Bad,
-}
-
 impl From<interoptopus::Error> for Error {
     fn from(_: interoptopus::Error) -> Self {
-        Self::Bad
+        Self::Fail
     }
 }
 
-impl From<Error> for FFIError {
-    fn from(x: Error) -> Self {
-        match x {
-            Error::Bad => Self::Fail,
-        }
-    }
-}
-
-impl Default for FFIError {
+impl Default for Error {
     fn default() -> Self {
         Self::Ok
     }
 }
 
-impl interoptopus::patterns::result::FFIError for FFIError {
+impl interoptopus::patterns::result::FFIError for Error {
     const SUCCESS: Self = Self::Ok;
     const NULL: Self = Self::Null;
     const PANIC: Self = Self::Panic;

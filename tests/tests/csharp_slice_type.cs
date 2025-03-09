@@ -4,8 +4,6 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
-using System.Reflection;
-using System.Linq.Expressions;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -47,27 +45,19 @@ namespace My.Company
 
     public partial struct SliceU8
     {
-        byte[] _managed;
+        GCHandle _handle;
         IntPtr _data;
         ulong _len;
-        bool _wePinned;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct SliceU8 : IEnumerable<byte>, IDisposable
     {
-        public int Count => _managed?.Length ?? (int)_len;
+        public int Count => (int) _len;
 
         public unsafe ReadOnlySpan<byte> ReadOnlySpan
         {
-            get
-            {
-                if (_managed is not null)
-                {
-                    return new ReadOnlySpan<byte>(_managed);
-                }
-                return new ReadOnlySpan<byte>(_data.ToPointer(), (int)_len);
-            }
+            get => new(_data.ToPointer(), (int)_len);
         }
 
         public unsafe byte this[int i]
@@ -75,52 +65,34 @@ namespace My.Company
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
-                if (_managed is not null)
-                {
-                    return _managed[i];
-                }
                 return Unsafe.Read<byte>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<byte>()));
             }
+
         }
 
-        public SliceU8(GCHandle handle, ulong count)
+        public SliceU8(IntPtr data, ulong len)
         {
-            _data = handle.AddrOfPinnedObject();
-            _len = count;
-        }
-
-        public SliceU8(IntPtr handle, ulong count)
-        {
-            _data = handle;
-            _len = count;
+            _data = data;
+            _len = len;
         }
 
         public SliceU8(byte[] managed)
         {
-            _managed = managed;
-            _data = GCHandle.Alloc(managed, GCHandleType.Pinned).AddrOfPinnedObject();
+            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            _data = _handle.AddrOfPinnedObject();
             _len = (ulong) managed.Length;
-            _wePinned = true;
         }
 
         public IEnumerator<byte> GetEnumerator()
         {
-            for (var i = 0; i < Count; ++i)
-            {
-                yield return this[i];
-            }
+            for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void Dispose()
         {
-            if (_wePinned && _data != IntPtr.Zero)
-            {
-                Marshal.FreeHGlobal(_data);
-                _data = IntPtr.Zero;
-            }
-            _managed = null;
+            if (_handle is { IsAllocated: true }) { _handle.Free(); }
         }
 
         [CustomMarshaller(typeof(SliceU8), MarshalMode.Default, typeof(Marshaller))]
@@ -132,7 +104,7 @@ namespace My.Company
             public IntPtr Data;
             public ulong Len;
 
-            public SliceU8 Managed()
+            public SliceU8 ToManaged()
             {
                 return new SliceU8(Data, Len);
             }
@@ -140,16 +112,28 @@ namespace My.Company
 
         public ref struct Marshaller
         {
-            private SliceU8 managed;
-            private Unmanaged native;
-            private Unmanaged sourceNative;
-            private GCHandle? pinned;
-            private SliceU8 marshalled;
+            private SliceU8 _managed;
+            private Unmanaged _unmanaged;
 
-            public void FromManaged(SliceU8 managed) { this.managed = managed; }
-            public Unmanaged ToUnmanaged() => new Unmanaged { Data = managed._data, Len = managed._len };
-            public void FromUnmanaged(Unmanaged unmanaged) { sourceNative = unmanaged; }
-            public unsafe SliceU8 ToManaged() => new SliceU8(sourceNative.Data, sourceNative.Len);
+            public void FromManaged(SliceU8 managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public Unmanaged ToUnmanaged()
+            {
+                _unmanaged = new Unmanaged();
+                _unmanaged.Data = _managed._data;
+                _unmanaged.Len = _managed._len;
+                return _unmanaged;
+            }
+
+            public unsafe SliceU8 ToManaged()
+            {
+                _managed = new SliceU8();
+                _managed._data = _unmanaged.Data;
+                _managed._len = _unmanaged.Len;
+                return _managed;
+            }
+
             public void Free() { }
         }
     }
@@ -241,6 +225,13 @@ namespace My.Company
 
         public void Dispose() { }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         /// A highly dangerous 'use once type' that has ownership semantics!
         /// Once passed over an FFI boundary 'the other side' is meant to own
         /// (and free) it. Rust handles that fine, but if in C# you put this
@@ -252,6 +243,14 @@ namespace My.Company
             public IntPtr ptr;
             public ulong len;
             public ulong capacity;
+
+            public string ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged().String; }
+                finally { marshaller.Free(); }
+            }
+
         }
 
         public partial class InteropHelper

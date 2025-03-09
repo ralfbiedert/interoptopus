@@ -4,8 +4,6 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
-using System.Reflection;
-using System.Linq.Expressions;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -33,8 +31,6 @@ namespace My.Company
     }
 
     /// A simple type in our FFI layer.
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
     public partial struct Vec2
     {
         public float x;
@@ -44,11 +40,31 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Vec2
     {
+        public Vec2(Vec2 other)
+        {
+            x = other.x;
+            y = other.y;
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
             public float x;
             public float y;
+
+            public Vec2 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
         }
 
         [CustomMarshaller(typeof(Vec2), MarshalMode.Default, typeof(Marshaller))]
@@ -175,6 +191,13 @@ namespace My.Company
 
         public void Dispose() { }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         /// A highly dangerous 'use once type' that has ownership semantics!
         /// Once passed over an FFI boundary 'the other side' is meant to own
         /// (and free) it. Rust handles that fine, but if in C# you put this
@@ -186,6 +209,14 @@ namespace My.Company
             public IntPtr ptr;
             public ulong len;
             public ulong capacity;
+
+            public string ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged().String; }
+                finally { marshaller.Free(); }
+            }
+
         }
 
         public partial class InteropHelper

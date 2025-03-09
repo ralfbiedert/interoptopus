@@ -3,6 +3,7 @@ use interoptopus::{ffi_function, ffi_type, function, Bindings, InventoryBuilder}
 use interoptopus_backend_csharp::{InteropBuilder, WriteTypes};
 
 #[ffi_type(error)]
+#[derive(Debug, PartialEq, Eq)]
 enum FFIError {
     Success,
     Null,

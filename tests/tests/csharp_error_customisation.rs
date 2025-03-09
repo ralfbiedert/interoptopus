@@ -4,6 +4,7 @@ use interoptopus_backend_csharp::{InteropBuilder, WriteTypes};
 use tests::backend_csharp::common_namespace_mappings;
 
 #[ffi_type(error)]
+#[derive(Debug, PartialEq, Eq)]
 enum FFIError {
     Success,
     Null,
