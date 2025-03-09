@@ -182,6 +182,7 @@ pub use interoptopus_proc::{ffi_constant, ffi_function, ffi_service, ffi_service
 mod backend;
 mod core;
 mod error;
+pub mod ffi;
 mod macros;
 pub mod patterns;
 pub mod testing;

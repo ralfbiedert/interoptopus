@@ -43,7 +43,7 @@ static EMPTY: &[u8] = b"\0";
 ///
 /// # Antipattern
 ///
-/// It's discouraged to use [`FFIOption`](crate::patterns::option::FFIOption) with [`CStrPointer`]
+/// It's discouraged to use [`FFIOption`](crate::patterns::option::Option) with [`CStrPointer`]
 /// and some backend might not generate proper bindings (like C#).
 ///
 /// Instead use [`CStrPointer`] alone since it already has a pointer that's nullable.
@@ -163,18 +163,18 @@ mod test {
 
 #[derive(Debug)]
 #[repr(C)]
-pub struct Utf8String {
+pub struct String {
     ptr: *mut u8,
     len: u64,
     capacity: u64,
 }
 
-unsafe impl Send for Utf8String {}
-unsafe impl Sync for Utf8String {}
+unsafe impl Send for String {}
+unsafe impl Sync for String {}
 
-impl Utf8String {
+impl String {
     #[must_use]
-    pub fn from_string(mut s: String) -> Self {
+    pub fn from_string(mut s: std::string::String) -> Self {
         let ptr = s.as_mut_ptr();
         let capacity = s.capacity() as u64;
         let len = s.len() as u64;
@@ -192,32 +192,32 @@ impl Utf8String {
 
     #[must_use]
     #[allow(clippy::cast_possible_truncation)]
-    pub fn into_string(self) -> String {
-        let rval = unsafe { String::from_raw_parts(self.ptr, self.len as usize, self.capacity as usize) };
+    pub fn into_string(self) -> std::string::String {
+        let rval = unsafe { std::string::String::from_raw_parts(self.ptr, self.len as usize, self.capacity as usize) };
         forget(self);
         rval
     }
 }
 
-impl Clone for Utf8String {
+impl Clone for String {
     fn clone(&self) -> Self {
-        Utf8String::from_string(self.as_str().to_string())
+        String::from_string(self.as_str().to_string())
     }
 }
 
-impl Drop for Utf8String {
+impl Drop for String {
     #[allow(clippy::cast_possible_truncation)]
     fn drop(&mut self) {
         if self.ptr.is_null() {
             return;
         }
         unsafe {
-            let _ = String::from_raw_parts(self.ptr, self.len as usize, self.capacity as usize);
+            let _ = std::string::String::from_raw_parts(self.ptr, self.len as usize, self.capacity as usize);
         }
     }
 }
 
-unsafe impl CTypeInfo for Utf8String {
+unsafe impl CTypeInfo for String {
     #[rustfmt::skip]
     fn type_info() -> CType {
         let fields = vec![
@@ -228,7 +228,6 @@ unsafe impl CTypeInfo for Utf8String {
 
         let doc = Documentation::from_lines(vec![
             " UTF-8 string marshalling helper.".to_string(),
-            String::new(),
             " A highly dangerous 'use once type' that has ownership semantics!".to_string(),
             " Once passed over an FFI boundary 'the other side' is meant to own".to_string(),
             " (and free) it. Rust handles that fine, but if in C# you put this".to_string(),

@@ -23,16 +23,16 @@ macro_rules! builtins {
         use interoptopus::lang::rust::FunctionInfo;
 
         #[$crate::ffi_function]
-        pub fn interoptopus_string_create(utf8: *const ::std::ffi::c_void, len: u64, rval: &mut ::std::mem::MaybeUninit<$crate::patterns::string::Utf8String>) -> i64 {
+        pub fn interoptopus_string_create(utf8: *const ::std::ffi::c_void, len: u64, rval: &mut ::std::mem::MaybeUninit<$crate::patterns::string::String>) -> i64 {
             let slice = unsafe { ::std::slice::from_raw_parts::<u8>(utf8.cast(), len as usize) };
             let vec = slice.to_vec();
             let string = unsafe { String::from_utf8_unchecked(vec) };
-            rval.write($crate::patterns::string::Utf8String::from_string(string));
+            rval.write($crate::patterns::string::String::from_string(string));
             0
         }
 
         #[$crate::ffi_function]
-        pub fn interoptopus_string_destroy(utf8: $crate::patterns::string::Utf8String) -> i64 {
+        pub fn interoptopus_string_destroy(utf8: $crate::patterns::string::String) -> i64 {
             0
         }
 

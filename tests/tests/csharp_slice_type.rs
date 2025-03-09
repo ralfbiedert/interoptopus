@@ -1,12 +1,12 @@
 use anyhow::Error;
-use interoptopus::patterns::slice::FFISlice;
+use interoptopus::patterns::slice::Slice;
 use interoptopus::{ffi_function, function, Bindings, Inventory, InventoryBuilder};
 use interoptopus_backend_csharp::InteropBuilder;
 use tests::backend_csharp::common_namespace_mappings;
 use tests::validate_output;
 
 #[ffi_function]
-fn sample_function(_: FFISlice<u8>) {}
+fn sample_function(_: Slice<u8>) {}
 
 fn ffi_inventory() -> Inventory {
     InventoryBuilder::new().register(function!(sample_function)).build()

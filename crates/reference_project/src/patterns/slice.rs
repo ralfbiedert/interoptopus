@@ -1,26 +1,26 @@
 use crate::types::{CallbackFFISlice, CharArray, Vec3f32};
-use interoptopus::patterns::slice::{FFISlice, FFISliceMut};
+use interoptopus::patterns::slice::{Slice, SliceMut};
 use interoptopus::{callback, ffi_function};
 
 static HUGE_VEC_SLICE: [Vec3f32; 100_000] = [Vec3f32 { x: 0.0, y: 0.0, z: 0.0 }; 100_000];
 
-callback!(CallbackHugeVecSlice(slice: FFISlice<Vec3f32>) -> Vec3f32);
-callback!(CallbackSliceMut(slice: FFISliceMut<'_, u8>) -> ());
+callback!(CallbackHugeVecSlice(slice: Slice<Vec3f32>) -> Vec3f32);
+callback!(CallbackSliceMut(slice: SliceMut<'_, u8>) -> ());
 callback!(CallbackU8(value: u8) -> u8);
 callback!(CallbackCharArray2(value: CharArray) -> ());
 
 #[ffi_function]
-pub fn pattern_ffi_slice_1(ffi_slice: FFISlice<u32>) -> u32 {
+pub fn pattern_ffi_slice_1(ffi_slice: Slice<u32>) -> u32 {
     ffi_slice.as_slice().len() as u32
 }
 
 #[ffi_function]
-pub fn pattern_ffi_slice_1b(ffi_slice: FFISliceMut<u32>) -> u32 {
+pub fn pattern_ffi_slice_1b(ffi_slice: SliceMut<u32>) -> u32 {
     ffi_slice.as_slice().len() as u32
 }
 
 #[ffi_function]
-pub fn pattern_ffi_slice_2(ffi_slice: FFISlice<Vec3f32>, i: i32) -> Vec3f32 {
+pub fn pattern_ffi_slice_2(ffi_slice: Slice<Vec3f32>, i: i32) -> Vec3f32 {
     ffi_slice
         .as_slice()
         .get(i as usize)
@@ -30,16 +30,16 @@ pub fn pattern_ffi_slice_2(ffi_slice: FFISlice<Vec3f32>, i: i32) -> Vec3f32 {
 
 #[ffi_function]
 pub fn pattern_ffi_slice_delegate(callback: CallbackFFISlice) -> u8 {
-    callback.call(FFISlice::from_slice(&[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]))
+    callback.call(Slice::from_slice(&[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]))
 }
 
 #[ffi_function]
 pub fn pattern_ffi_slice_delegate_huge(callback: CallbackHugeVecSlice) -> Vec3f32 {
-    callback.call(FFISlice::from_slice(&HUGE_VEC_SLICE))
+    callback.call(Slice::from_slice(&HUGE_VEC_SLICE))
 }
 
 #[ffi_function]
-pub fn pattern_ffi_slice_3(mut slice: FFISliceMut<u8>, callback: CallbackSliceMut) {
+pub fn pattern_ffi_slice_3(mut slice: SliceMut<u8>, callback: CallbackSliceMut) {
     if let [x, ..] = slice.as_slice_mut() {
         *x += 1;
     }
@@ -47,17 +47,17 @@ pub fn pattern_ffi_slice_3(mut slice: FFISliceMut<u8>, callback: CallbackSliceMu
 }
 
 #[ffi_function]
-pub fn pattern_ffi_slice_4(_slice: FFISlice<u8>, _slice2: FFISliceMut<u8>) {}
+pub fn pattern_ffi_slice_4(_slice: Slice<u8>, _slice2: SliceMut<u8>) {}
 
 /// It is (probably?) UB to call this function with the same FFI slice data at the same time.
 #[ffi_function]
-pub fn pattern_ffi_slice_5(slice: &FFISlice<u8>, slice2: &mut FFISliceMut<u8>) {
+pub fn pattern_ffi_slice_5(slice: &Slice<u8>, slice2: &mut SliceMut<u8>) {
     let _ = slice.as_slice().len();
     let _ = slice2.as_slice().len();
 }
 
 #[ffi_function]
-pub fn pattern_ffi_slice_6(slice: &FFISliceMut<u8>, callback: CallbackU8) {
+pub fn pattern_ffi_slice_6(slice: &SliceMut<u8>, callback: CallbackU8) {
     callback.call(slice.as_slice().first().copied().unwrap_or(0));
 }
 
@@ -76,7 +76,7 @@ pub fn pattern_ffi_slice_6(slice: &FFISliceMut<u8>, callback: CallbackU8) {
 // }
 
 #[ffi_function]
-pub fn pattern_ffi_slice_8(slice: &FFISliceMut<CharArray>, callback: CallbackCharArray2) {
+pub fn pattern_ffi_slice_8(slice: &SliceMut<CharArray>, callback: CallbackCharArray2) {
     callback.call(slice.as_slice().first().copied().unwrap());
 }
 

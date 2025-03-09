@@ -1,5 +1,5 @@
 use crate::error::{Error, FFIError};
-use interoptopus::patterns::result::{FFIResult, FFIResultType};
+use interoptopus::patterns::result::{FFIResultType, Result};
 use interoptopus::patterns::string::CStrPointer;
 use interoptopus::{ffi_service, ffi_service_method, ffi_type};
 
@@ -18,16 +18,16 @@ pub struct GameEngine {
 // FFI-compatible implementation of our service.
 #[ffi_service]
 impl GameEngine {
-    pub fn new() -> FFIResult<Self, Error> {
+    pub fn new() -> Result<Self, Error> {
         let engine = core_library::engine::GameEngine::new();
-        FFIResult::ok(Self { engine })
+        Result::ok(Self { engine })
     }
 
-    pub fn place_object(&mut self, name: CStrPointer, position: Vec2) -> FFIResult<(), Error> {
+    pub fn place_object(&mut self, name: CStrPointer, position: Vec2) -> Result<(), Error> {
         let name = name.as_str()?;
         let position = position.into_native();
         self.engine.place_object(name, position);
-        FFIResult::ok(())
+        Result::ok(())
     }
 
     #[ffi_service_method(on_panic = "return_default")]

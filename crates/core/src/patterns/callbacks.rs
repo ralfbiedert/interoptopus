@@ -6,13 +6,13 @@
 //!
 //!```
 //! use interoptopus::{ffi_function, callback};
-//! use interoptopus::patterns::slice::FFISlice;
+//! use interoptopus::patterns::slice::Slice;
 //!
-//! callback!(CallbackSlice(x: FFISlice<u8>) -> u8);
+//! callback!(CallbackSlice(x: Slice<u8>) -> u8);
 //!
 //! #[ffi_function]
 //! pub fn my_function(callback: CallbackSlice) {
-//!     callback.call(FFISlice::empty());
+//!     callback.call(Slice::empty());
 //! }
 //!
 //! ```
@@ -75,7 +75,7 @@
 //!
 //! The reasons for this are somewhat technical, but it boils down to us being unable to generally
 //! implement [`CTypeInfo`](crate::lang::rust::CTypeInfo) for _all_ types you may want to use;
-//! [`FFISlice`](crate::patterns::slice::FFISlice) here being one of them.
+//! [`FFISlice`](crate::patterns::slice::Slice) here being one of them.
 //! To fix this, you can replace `pub type CallbackSlice = ...` with a `callback!` call
 //! which should generate a helper type that works.
 //!
@@ -223,17 +223,17 @@ impl AsyncCallback {
 ///
 /// ```
 /// use interoptopus::callback;
-/// use interoptopus::patterns::slice::FFISlice;
+/// use interoptopus::patterns::slice::Slice;
 ///
-/// callback!(MyCallback(slice: FFISlice<u8>) -> u8);
+/// callback!(MyCallback(slice: Slice<u8>) -> u8);
 /// ```
 ///
 /// The generated type definition similar to:
 ///
 /// ```
-/// # use interoptopus::patterns::slice::FFISlice;
+/// # use interoptopus::patterns::slice::Slice;
 /// #[repr(transparent)]
-/// pub struct MyCallback(Option<extern "C" fn(FFISlice<u8>) -> u8>);
+/// pub struct MyCallback(Option<extern "C" fn(Slice<u8>) -> u8>);
 /// ```
 ///
 /// You can also create the callback from Rust for testing:

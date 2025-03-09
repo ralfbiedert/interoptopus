@@ -6,11 +6,11 @@
 //!
 //! ```
 //! use interoptopus::ffi_function;
-//! use interoptopus::patterns::option::FFIOption;
+//! use interoptopus::patterns::option::Option;
 //!
 //! #[ffi_function]
 //! #[no_mangle]
-//! pub extern "C" fn set_value(x: FFIOption<u8>) {
+//! pub extern "C" fn set_value(x: Option<u8>) {
 //!     let _ = x.into_option();
 //! }
 //! ```
@@ -30,7 +30,7 @@
 use crate::lang::c::{CType, CompositeType, Documentation, Field, Layout, Meta, PrimitiveType, Representation, Visibility};
 use crate::lang::rust::CTypeInfo;
 
-use crate::patterns::primitives::FFIBool;
+use crate::patterns::primitives::Bool;
 use crate::patterns::TypePattern;
 use crate::util::capitalize_first_letter;
 #[cfg(feature = "serde")]
@@ -45,38 +45,38 @@ use serde::{Deserialize, Serialize};
 #[repr(C)]
 #[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Eq, Default, Deserialize, Serialize))]
 #[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Eq, Default))]
-pub struct FFIOption<T> {
+pub struct Option<T> {
     t: T,
-    is_some: FFIBool,
+    is_some: Bool,
 }
 
-impl<T> FFIOption<T> {
+impl<T> Option<T> {
     pub const fn some(data: T) -> Self {
-        Self { is_some: FFIBool::TRUE, t: data }
+        Self { is_some: Bool::TRUE, t: data }
     }
 
     #[allow(clippy::missing_const_for_fn)]
-    pub fn into_option(self) -> Option<T> {
+    pub fn into_option(self) -> std::option::Option<T> {
         if self.is_some.is() {
-            Some(self.t)
+            std::option::Option::Some(self.t)
         } else {
-            None
+            std::option::Option::None
         }
     }
 
-    pub fn as_ref(&self) -> Option<&T> {
+    pub fn as_ref(&self) -> std::option::Option<&T> {
         if self.is_some.is() {
-            Some(&self.t)
+            std::option::Option::Some(&self.t)
         } else {
-            None
+            std::option::Option::None
         }
     }
 
-    pub fn as_mut(&mut self) -> Option<&mut T> {
+    pub fn as_mut(&mut self) -> std::option::Option<&mut T> {
         if self.is_some.is() {
-            Some(&mut self.t)
+            std::option::Option::Some(&mut self.t)
         } else {
-            None
+            std::option::Option::None
         }
     }
 
@@ -117,23 +117,23 @@ impl<T> FFIOption<T> {
     }
 }
 
-impl<T: Default> FFIOption<T> {
+impl<T: Default> Option<T> {
     #[must_use]
     pub fn none() -> Self {
-        Self { is_some: FFIBool::FALSE, t: T::default() }
+        Self { is_some: Bool::FALSE, t: T::default() }
     }
 }
 
-impl<T: Default> From<Option<T>> for FFIOption<T> {
-    fn from(option: Option<T>) -> Self {
+impl<T: Default> From<std::option::Option<T>> for Option<T> {
+    fn from(option: std::option::Option<T>) -> Self {
         match option {
-            Option::None => Self::none(),
-            Option::Some(t) => Self::some(t),
+            std::option::Option::None => Self::none(),
+            std::option::Option::Some(t) => Self::some(t),
         }
     }
 }
 
-unsafe impl<T> CTypeInfo for FFIOption<T>
+unsafe impl<T> CTypeInfo for Option<T>
 where
     T: CTypeInfo,
 {
@@ -157,11 +157,11 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::patterns::option::FFIOption;
+    use crate::patterns::option::Option;
 
     #[test]
     fn can_create() {
-        assert!(FFIOption::some(100).is_some());
-        assert!(FFIOption::<u8>::none().is_none());
+        assert!(Option::some(100).is_some());
+        assert!(Option::<u8>::none().is_none());
     }
 }

@@ -1,4 +1,4 @@
-use interoptopus::patterns::result::FFIResult;
+use interoptopus::patterns::result::Result;
 use interoptopus::{ffi_function, ffi_type};
 use std::fmt::{Display, Formatter};
 // This file may look complex but the Interoptopus parts are actually really simple,
@@ -59,16 +59,16 @@ impl Display for Error {
 impl std::error::Error for Error {}
 
 #[ffi_function]
-pub fn pattern_result_1(x: FFIResult<u32, FFIError>) -> FFIResult<u32, FFIError> {
+pub fn pattern_result_1(x: Result<u32, FFIError>) -> Result<u32, FFIError> {
     x
 }
 
 #[ffi_function]
-pub fn pattern_result_2() -> FFIResult<(), FFIError> {
-    FFIResult::ok(())
+pub fn pattern_result_2() -> Result<(), FFIError> {
+    Result::ok(())
 }
 
 #[ffi_function]
-pub fn pattern_result_3(x: FFIResult<(), FFIError>) -> FFIResult<(), FFIError> {
+pub fn pattern_result_3(x: Result<(), FFIError>) -> Result<(), FFIError> {
     x
 }

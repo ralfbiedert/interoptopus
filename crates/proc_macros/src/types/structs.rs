@@ -236,7 +236,7 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
                         let documentation = ::interoptopus::lang::c::Documentation::from_line(#doc_line);
                         let mut meta = ::interoptopus::lang::c::Meta::with_namespace_documentation(#namespace.to_string(), documentation);
                         let mut fields: ::std::vec::Vec<interoptopus::lang::c::Field> = ::std::vec::Vec::new();
-                        let mut generics: ::std::vec::Vec<String> = ::std::vec::Vec::new();
+                        let mut generics: ::std::vec::Vec<::std::string::String> = ::std::vec::Vec::new();
 
                         #let_name
 

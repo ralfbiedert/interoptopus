@@ -1,9 +1,9 @@
 use crate::patterns::result::FFIError;
 use crate::types::{UseCStrPtr, UseUtf8String};
 use interoptopus::ffi_function;
-use interoptopus::patterns::result::FFIResult;
-use interoptopus::patterns::slice::FFISlice;
-use interoptopus::patterns::string::{CStrPointer, Utf8String};
+use interoptopus::patterns::result::Result;
+use interoptopus::patterns::slice::Slice;
+use interoptopus::patterns::string::{CStrPointer, String};
 
 #[ffi_function]
 pub fn pattern_ascii_pointer_1(x: CStrPointer) -> u32 {
@@ -46,23 +46,23 @@ pub fn pattern_ascii_pointer_5(x: CStrPointer, i: u32) -> u8 {
 // }
 
 #[ffi_function]
-pub fn pattern_ascii_pointer_return_slice() -> FFISlice<'static, UseCStrPtr<'static>> {
-    FFISlice::empty()
+pub fn pattern_ascii_pointer_return_slice() -> Slice<'static, UseCStrPtr<'static>> {
+    Slice::empty()
 }
 
 #[ffi_function]
-pub fn pattern_string_1(x: Utf8String) -> Utf8String {
+pub fn pattern_string_1(x: String) -> String {
     x
 }
 
 #[ffi_function]
-pub fn pattern_string_2(x: Utf8String) -> u32 {
+pub fn pattern_string_2(x: String) -> u32 {
     x.into_string().len() as u32
 }
 
 #[ffi_function]
-pub fn pattern_string_3() -> Utf8String {
-    Utf8String::from_string("pattern_string_3".to_string())
+pub fn pattern_string_3() -> String {
+    String::from_string("pattern_string_3".to_string())
 }
 
 #[ffi_function]
@@ -71,27 +71,27 @@ pub fn pattern_string_4(x: UseUtf8String) -> UseUtf8String {
 }
 
 #[ffi_function]
-pub fn pattern_string_5(x: UseUtf8String) -> FFIResult<UseUtf8String, FFIError> {
-    FFIResult::ok(x)
+pub fn pattern_string_5(x: UseUtf8String) -> Result<UseUtf8String, FFIError> {
+    Result::ok(x)
 }
 
 #[ffi_function]
-pub fn pattern_string_6a(_: &UseUtf8String) -> FFIResult<(), FFIError> {
-    FFIResult::ok(())
+pub fn pattern_string_6a(_: &UseUtf8String) -> Result<(), FFIError> {
+    Result::ok(())
 }
 
 #[ffi_function]
-pub fn pattern_string_6b(y: &mut UseUtf8String) -> FFIResult<(), FFIError> {
-    *y = UseUtf8String { s1: Utf8String::from_string("s1".to_string()), s2: Utf8String::from_string("s2".to_string()) };
-    FFIResult::ok(())
+pub fn pattern_string_6b(y: &mut UseUtf8String) -> Result<(), FFIError> {
+    *y = UseUtf8String { s1: String::from_string("s1".to_string()), s2: String::from_string("s2".to_string()) };
+    Result::ok(())
 }
 
 #[ffi_function]
-pub fn pattern_string_7(x: FFISlice<Utf8String>, i: u64) -> FFIResult<Utf8String, FFIError> {
-    FFIResult::ok(x.as_slice()[i as usize].clone())
+pub fn pattern_string_7(x: Slice<String>, i: u64) -> Result<String, FFIError> {
+    Result::ok(x.as_slice()[i as usize].clone())
 }
 
 #[ffi_function]
-pub fn pattern_string_8(x: FFISlice<UseUtf8String>, i: u64) -> FFIResult<UseUtf8String, FFIError> {
-    FFIResult::ok(x.as_slice()[i as usize].clone())
+pub fn pattern_string_8(x: Slice<UseUtf8String>, i: u64) -> Result<UseUtf8String, FFIError> {
+    Result::ok(x.as_slice()[i as usize].clone())
 }

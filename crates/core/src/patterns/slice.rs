@@ -9,11 +9,11 @@
 //!
 //! ```
 //! use interoptopus::{ffi_function};
-//! use interoptopus::patterns::slice::FFISlice;
+//! use interoptopus::patterns::slice::Slice;
 //!
 //! #[ffi_function]
 //! #[no_mangle]
-//! pub extern "C" fn call_with_slice(ffi_slice: FFISlice<u32>) {
+//! pub extern "C" fn call_with_slice(ffi_slice: Slice<u32>) {
 //!     // ...
 //! }
 //! ```
@@ -48,21 +48,21 @@ use std::ptr::{null, null_mut};
 
 /// A representation of an array passed over an FFI boundary
 #[repr(C)]
-pub struct FFISlice<'a, T> {
+pub struct Slice<'a, T> {
     data: *const T,
     len: u64,
     _phantom: PhantomData<&'a T>,
 }
 
-impl<T> Copy for FFISlice<'_, T> {}
+impl<T> Copy for Slice<'_, T> {}
 
-impl<T> Clone for FFISlice<'_, T> {
+impl<T> Clone for Slice<'_, T> {
     fn clone(&self) -> Self {
         *self
     }
 }
 
-impl<T> Default for FFISlice<'_, T> {
+impl<T> Default for Slice<'_, T> {
     fn default() -> Self {
         const {
             assert!(size_of::<Self>() == 16);
@@ -72,10 +72,10 @@ impl<T> Default for FFISlice<'_, T> {
     }
 }
 
-impl<'a, T> FFISlice<'a, T> {
+impl<'a, T> Slice<'a, T> {
     /// Create new Self from a normal slice.
     pub const fn from_slice(slice: &'a [T]) -> Self {
-        FFISlice { data: slice.as_ptr(), len: slice.len() as u64, _phantom: PhantomData }
+        Slice { data: slice.as_ptr(), len: slice.len() as u64, _phantom: PhantomData }
     }
 
     /// Returns a safe Rust slice.
@@ -94,13 +94,13 @@ impl<'a, T> FFISlice<'a, T> {
     }
 }
 
-impl<'a, T> From<&'a [T]> for FFISlice<'a, T> {
+impl<'a, T> From<&'a [T]> for Slice<'a, T> {
     fn from(slice: &'a [T]) -> Self {
         Self::from_slice(slice)
     }
 }
 
-impl<T> FFISlice<'_, T>
+impl<T> Slice<'_, T>
 where
     T: 'static,
 {
@@ -112,7 +112,7 @@ where
     }
 }
 
-impl<T> Deref for FFISlice<'_, T> {
+impl<T> Deref for Slice<'_, T> {
     type Target = [T];
 
     fn deref(&self) -> &Self::Target {
@@ -120,7 +120,7 @@ impl<T> Deref for FFISlice<'_, T> {
     }
 }
 
-unsafe impl<T> CTypeInfo for FFISlice<'_, T>
+unsafe impl<T> CTypeInfo for Slice<'_, T>
 where
     T: CTypeInfo,
 {
@@ -146,22 +146,22 @@ where
 
 /// A representation of a mutable array passed over an FFI boundary
 #[repr(C)]
-pub struct FFISliceMut<'a, T> {
+pub struct SliceMut<'a, T> {
     data: *mut T,
     len: u64,
     _phantom: PhantomData<&'a mut T>,
 }
 
-impl<T> Default for FFISliceMut<'_, T> {
+impl<T> Default for SliceMut<'_, T> {
     fn default() -> Self {
         Self { data: null_mut(), len: 0, _phantom: PhantomData }
     }
 }
 
-impl<'a, T> FFISliceMut<'a, T> {
+impl<'a, T> SliceMut<'a, T> {
     /// Create new Self from a normal slice.
     pub fn from_slice(slice: &'a mut [T]) -> Self {
-        FFISliceMut { data: slice.as_mut_ptr(), len: slice.len() as u64, _phantom: PhantomData::default() }
+        SliceMut { data: slice.as_mut_ptr(), len: slice.len() as u64, _phantom: PhantomData::default() }
     }
 
     /// Returns a safe, mutable Rust slice.
@@ -194,7 +194,7 @@ impl<'a, T> FFISliceMut<'a, T> {
     }
 }
 
-impl<T> FFISliceMut<'_, T>
+impl<T> SliceMut<'_, T>
 where
     T: 'static,
 {
@@ -206,13 +206,13 @@ where
     }
 }
 
-impl<'a, T> From<&'a mut [T]> for FFISliceMut<'a, T> {
+impl<'a, T> From<&'a mut [T]> for SliceMut<'a, T> {
     fn from(slice: &'a mut [T]) -> Self {
         Self::from_slice(slice)
     }
 }
 
-impl<T> Deref for FFISliceMut<'_, T> {
+impl<T> Deref for SliceMut<'_, T> {
     type Target = [T];
 
     fn deref(&self) -> &Self::Target {
@@ -220,13 +220,13 @@ impl<T> Deref for FFISliceMut<'_, T> {
     }
 }
 
-impl<T> DerefMut for FFISliceMut<'_, T> {
+impl<T> DerefMut for SliceMut<'_, T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.as_slice_mut()
     }
 }
 
-unsafe impl<T> CTypeInfo for FFISliceMut<'_, T>
+unsafe impl<T> CTypeInfo for SliceMut<'_, T>
 where
     T: CTypeInfo,
 {
@@ -279,13 +279,13 @@ impl SliceType {
 
 #[cfg(test)]
 mod test {
-    use crate::patterns::slice::{FFISlice, FFISliceMut};
+    use crate::patterns::slice::{Slice, SliceMut};
 
     #[test]
     fn can_create_ref() {
         let slice = &[0, 1, 2, 3, 5];
-        let empty = FFISlice::<u8>::empty();
-        let some = FFISlice::<u8>::from_slice(slice);
+        let empty = Slice::<u8>::empty();
+        let some = Slice::<u8>::from_slice(slice);
 
         assert_eq!(empty.as_slice(), &[]);
         assert_eq!(some.as_slice(), slice);
@@ -294,8 +294,8 @@ mod test {
     #[test]
     fn can_create_mut() {
         let slice = &mut [0, 1, 2, 3, 5];
-        let empty = FFISliceMut::<u8>::empty();
-        let mut some = FFISliceMut::<u8>::from_slice(slice.as_mut());
+        let empty = SliceMut::<u8>::empty();
+        let mut some = SliceMut::<u8>::from_slice(slice.as_mut());
         let sub = &mut some[1..=2];
 
         sub[0] = 6;
@@ -308,9 +308,9 @@ mod test {
     #[test]
     fn multi_borrow_mut_slice() {
         let slice = &mut [0, 1, 2, 3, 5];
-        let empty = FFISliceMut::<u8>::empty();
+        let empty = SliceMut::<u8>::empty();
         let target: &mut [u8] = {
-            let mut some = FFISliceMut::<u8>::from_slice(slice.as_mut());
+            let mut some = SliceMut::<u8>::from_slice(slice.as_mut());
             some.as_slice_mut()
         };
         let sub = &mut target[1..=2];

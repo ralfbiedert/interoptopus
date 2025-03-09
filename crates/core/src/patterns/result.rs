@@ -180,20 +180,36 @@ pub trait FFIResultAsUnitT {
 
 #[repr(C)]
 #[derive(Debug)]
-pub struct FFIResult<T, E> {
+pub struct Result<T, E> {
     t: MaybeUninit<T>,
     err: E,
 }
 
-impl<T, E> FFIResultAsPtr for FFIResult<T, E> {
-    type AsPtr = FFIResult<*const T, E>;
+pub fn Ok<T, E>(t: T) -> Result<T, E>
+where
+    T: CTypeInfo,
+    E: CTypeInfo + FFIError,
+{
+    Result::ok(t)
 }
 
-impl<T, E> FFIResultAsUnitT for FFIResult<T, E> {
-    type AsUnitT = FFIResult<(), E>;
+pub fn Err<T, E>(e: E) -> Result<T, E>
+where
+    T: CTypeInfo,
+    E: CTypeInfo + FFIError,
+{
+    Result::err(e)
 }
 
-impl<T, E> FFIResult<T, E>
+impl<T, E> FFIResultAsPtr for Result<T, E> {
+    type AsPtr = Result<*const T, E>;
+}
+
+impl<T, E> FFIResultAsUnitT for Result<T, E> {
+    type AsUnitT = Result<(), E>;
+}
+
+impl<T, E> Result<T, E>
 where
     T: CTypeInfo,
     E: CTypeInfo + FFIError,
@@ -231,7 +247,7 @@ where
     }
 }
 
-impl<T, E> FFIResult<T, E>
+impl<T, E> Result<T, E>
 where
     T: CTypeInfo,
     E: CTypeInfo + FFIError,
@@ -241,20 +257,20 @@ where
     }
 }
 
-impl<T, E> From<Result<T, E>> for FFIResult<T, E>
+impl<T, E> From<std::result::Result<T, E>> for Result<T, E>
 where
     T: CTypeInfo,
     E: CTypeInfo + FFIError,
 {
-    fn from(x: Result<T, E>) -> Self {
+    fn from(x: std::result::Result<T, E>) -> Self {
         match x {
-            Ok(t) => Self::ok(t),
-            Err(err) => Self::error(err),
+            std::result::Result::Ok(t) => Self::ok(t),
+            std::result::Result::Err(err) => Self::error(err),
         }
     }
 }
 
-unsafe impl<T, E> CTypeInfo for FFIResult<T, E>
+unsafe impl<T, E> CTypeInfo for Result<T, E>
 where
     T: CTypeInfo,
     E: CTypeInfo + FFIError,
@@ -290,22 +306,22 @@ pub trait IntoFFIResult {
 }
 
 impl<T, E: FFIError> IntoFFIResult for Result<T, E> {
-    type FFIResult = FFIResult<T, E>;
+    type FFIResult = Result<T, E>;
 }
 
 ///
 /// At some point we want to get rid of these once `Try` ([try_trait_v2](https://github.com/rust-lang/rust/issues/84277)) stabilizes.
-pub fn result_to_ffi<T: CTypeInfo, E: CTypeInfo + crate::patterns::result::FFIError>(f: impl FnOnce() -> Result<T, E>) -> FFIResult<T, E> {
+pub fn result_to_ffi<T: CTypeInfo, E: CTypeInfo + crate::patterns::result::FFIError>(f: impl FnOnce() -> std::result::Result<T, E>) -> Result<T, E> {
     match f() {
-        Ok(x) => FFIResult::ok(x),
-        Err(e) => FFIResult::error(e),
+        std::result::Result::Ok(x) => Result::ok(x),
+        std::result::Result::Err(e) => Result::error(e),
     }
 }
 
 /// At some point we want to get rid of these once `Try` ([try_trait_v2](https://github.com/rust-lang/rust/issues/84277)) stabilizes.
-pub async fn result_to_ffi_async<T: CTypeInfo, E: CTypeInfo + crate::patterns::result::FFIError>(f: impl AsyncFnOnce() -> Result<T, E>) -> FFIResult<T, E> {
+pub async fn result_to_ffi_async<T: CTypeInfo, E: CTypeInfo + crate::patterns::result::FFIError>(f: impl AsyncFnOnce() -> std::result::Result<T, E>) -> Result<T, E> {
     match f().await {
-        Ok(x) => FFIResult::ok(x),
-        Err(e) => FFIResult::error(e),
+        std::result::Result::Ok(x) => Result::ok(x),
+        std::result::Result::Err(e) => Result::error(e),
     }
 }

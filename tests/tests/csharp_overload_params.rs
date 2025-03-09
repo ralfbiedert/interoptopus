@@ -1,10 +1,10 @@
 use anyhow::Error;
-use interoptopus::patterns::slice::FFISlice;
+use interoptopus::patterns::slice::Slice;
 use interoptopus::{callback, ffi_function, function, Bindings, InventoryBuilder};
 use interoptopus_backend_csharp::InteropBuilder;
 use tests::backend_csharp::common_namespace_mappings;
 
-callback!(Foo(slice: FFISlice<u8>) -> u8);
+callback!(Foo(slice: Slice<u8>) -> u8);
 
 /// Has documentation
 #[ffi_function]

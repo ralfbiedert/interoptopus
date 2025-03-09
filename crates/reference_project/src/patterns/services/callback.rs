@@ -2,9 +2,7 @@ use crate::patterns::callback::{
     MyCallback, MyCallbackContextual, MyCallbackNamespaced, MyCallbackVoid, SumDelegate1, SumDelegate2, SumDelegateReturn, SumDelegateReturn2,
 };
 use crate::patterns::result::FFIError;
-use interoptopus::patterns::result::FFIResult;
-use interoptopus::patterns::slice::FFISlice;
-use interoptopus::{ffi_service, ffi_type};
+use interoptopus::{ffi, ffi_service, ffi_type};
 
 #[ffi_type]
 #[derive(Copy, Clone)]
@@ -28,32 +26,32 @@ pub struct ServiceCallbacks {
 // Regular implementation of methods.
 #[ffi_service]
 impl ServiceCallbacks {
-    pub fn new() -> FFIResult<Self, FFIError> {
-        FFIResult::ok(Self { delegate_table: None })
+    pub fn new() -> ffi::Result<Self, FFIError> {
+        ffi::Ok(Self { delegate_table: None })
     }
 
-    pub fn callback_simple(&mut self, callback: MyCallback) -> FFIResult<(), FFIError> {
+    pub fn callback_simple(&mut self, callback: MyCallback) -> ffi::Result<(), FFIError> {
         callback.call(0);
-        FFIResult::ok(())
+        ffi::Ok(())
     }
 
-    pub fn callback_ffi_return(&mut self, callback: SumDelegateReturn) -> FFIResult<(), FFIError> {
+    pub fn callback_ffi_return(&mut self, callback: SumDelegateReturn) -> ffi::Result<(), FFIError> {
         callback.call(0, 0);
-        FFIResult::ok(())
+        ffi::Ok(())
     }
 
-    pub fn callback_with_slice(&mut self, callback: SumDelegateReturn, input: FFISlice<i32>) -> FFIResult<(), FFIError> {
+    pub fn callback_with_slice(&mut self, callback: SumDelegateReturn, input: ffi::Slice<i32>) -> ffi::Result<(), FFIError> {
         callback.call(input.as_slice()[0], input.as_slice()[1]);
-        FFIResult::ok(())
+        ffi::Ok(())
     }
 
     pub fn set_delegate_table(&mut self, table: CallbackTable) {
         self.delegate_table = Some(table);
     }
 
-    pub fn invoke_delegates(&self) -> FFIResult<(), FFIError> {
+    pub fn invoke_delegates(&self) -> ffi::Result<(), FFIError> {
         let Some(table) = &self.delegate_table else {
-            return FFIResult::ok(());
+            return ffi::Ok(());
         };
 
         table.my_callback.call(123);
@@ -61,6 +59,6 @@ impl ServiceCallbacks {
         table.sum_delegate_2.call(123, 123);
         table.sum_delegate_return.call(123, 123);
 
-        FFIResult::ok(())
+        ffi::Ok(())
     }
 }
