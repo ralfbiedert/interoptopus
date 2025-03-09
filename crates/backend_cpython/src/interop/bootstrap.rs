@@ -1,9 +1,9 @@
-use crate::converter::to_ctypes_name;
 use crate::Interop;
+use crate::converter::to_ctypes_name;
 use interoptopus::lang::c::CType;
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::IndentWriter;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 pub fn write_api_load_fuction(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     indented!(w, r"c_lib = None")?;

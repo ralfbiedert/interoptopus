@@ -1,6 +1,6 @@
 use crate::Interop;
 use interoptopus::writer::IndentWriter;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 pub fn write_imports(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     indented!(w, r"#include <stdint.h>")?;

@@ -1,15 +1,15 @@
 use crate::converters::{
     composite_to_typename, enum_to_typename, enum_variant_to_name, fnpointer_to_typename, named_callback_to_typename, opaque_to_typename, to_type_specifier,
 };
-use crate::interop::docs::write_documentation;
 use crate::interop::ToNamingStyle;
+use crate::interop::docs::write_documentation;
 use crate::{DocStyle, Indentation, Interop};
 use interoptopus::lang::c::{CType, CompositeType, EnumType, Field, FnPointerType, OpaqueType, Variant};
-use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::patterns::TypePattern;
+use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::util::sort_types_by_dependencies;
 use interoptopus::writer::IndentWriter;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     let mut known_function_pointers = vec![];

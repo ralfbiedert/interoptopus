@@ -1,10 +1,10 @@
-use crate::interop::{write_function_declaration, write_type_definition};
 use crate::Interop;
+use crate::interop::{write_function_declaration, write_type_definition};
+use interoptopus::Error;
 use interoptopus::lang::c::{CType, Function};
 use interoptopus::util::sort_types_by_dependencies;
 use interoptopus::writer::IndentWriter;
-use interoptopus::Error;
-use interoptopus::{indented, Bindings};
+use interoptopus::{Bindings, indented};
 
 /// Produces C API documentation.
 pub struct Markdown<'a> {

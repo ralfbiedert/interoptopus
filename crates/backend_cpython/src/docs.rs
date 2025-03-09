@@ -1,12 +1,12 @@
+use crate::Interop;
 use crate::interop::functions::write_function;
 use crate::interop::patterns::{write_pattern_class_ctor, write_pattern_class_method};
 use crate::interop::types::{write_enum, write_struct};
-use crate::Interop;
 use interoptopus::lang::c::{CType, CompositeType, Function};
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::writer::{IndentWriter, WriteFor};
-use interoptopus::{indented, non_service_functions};
 use interoptopus::{Bindings, Error};
+use interoptopus::{indented, non_service_functions};
 
 /// Configures Python documentation generation.
 #[derive(Clone, Debug, Default)]

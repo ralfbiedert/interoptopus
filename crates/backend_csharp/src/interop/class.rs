@@ -1,6 +1,6 @@
 use crate::Interop;
 use interoptopus::writer::IndentWriter;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 pub fn write_class_context(i: &Interop, class_name: &str, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) -> Result<(), Error> {
     i.debug(w, "write_class_context")?;

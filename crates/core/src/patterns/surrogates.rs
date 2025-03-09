@@ -49,7 +49,7 @@
 use crate::lang::c::CType;
 use crate::lang::rust::CTypeInfo;
 use std::marker::PhantomData;
-use std::mem::{transmute, ManuallyDrop};
+use std::mem::{ManuallyDrop, transmute};
 
 /// A marker trait for types that are surrogates for other types.
 ///

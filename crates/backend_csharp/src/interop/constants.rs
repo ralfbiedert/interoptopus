@@ -1,9 +1,9 @@
+use crate::Interop;
 use crate::converter::{constant_value_to_value, to_typespecifier_in_sync_fn_rval};
 use crate::interop::docs::write_documentation;
-use crate::Interop;
 use interoptopus::lang::c::Constant;
 use interoptopus::writer::IndentWriter;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 pub fn write_constants(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     for constant in i.inventory.constants() {

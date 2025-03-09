@@ -3,7 +3,7 @@ use crate::interop::docs::write_documentation;
 use crate::{DocStyle, Interop};
 use interoptopus::lang::c::{CType, Constant};
 use interoptopus::writer::IndentWriter;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 pub fn write_constants(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     for constant in i.inventory.constants() {

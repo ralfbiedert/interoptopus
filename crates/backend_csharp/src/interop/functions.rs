@@ -7,7 +7,7 @@ use crate::{FunctionNameFlavor, Interop};
 use interoptopus::lang::c::{AsyncRval, CType, Function, PrimitiveType};
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::{IndentWriter, WriteFor};
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 use std::iter::zip;
 
 pub fn write_functions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {

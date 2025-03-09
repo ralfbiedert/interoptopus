@@ -2,7 +2,7 @@ use crate::types::TypeRepresentation::Opaque;
 use crate::types::{Attributes, TypeRepresentation};
 use crate::util::extract_doc_lines;
 use proc_macro2::{Span, TokenStream};
-use quote::{quote, ToTokens};
+use quote::{ToTokens, quote};
 use syn::spanned::Spanned;
 use syn::{GenericParam, ItemStruct, Type};
 

@@ -49,10 +49,10 @@
 //! - will even react to benign API changes (e.g., just adding functions),
 //! - might even react to documentation changes (subject to change; feedback welcome).
 //!
+use crate::Inventory;
 use crate::lang::c::CType;
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::TypePattern;
-use crate::Inventory;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 

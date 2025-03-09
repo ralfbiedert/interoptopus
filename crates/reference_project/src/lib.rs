@@ -7,7 +7,7 @@
 //! Note, many items here are deliberately not documented as testing how and if documentation
 //! is generated is part of the test.
 
-use interoptopus::{builtins, constant, extra_type, function, pattern, Inventory, InventoryBuilder};
+use interoptopus::{Inventory, InventoryBuilder, builtins, constant, extra_type, function, pattern};
 
 pub mod constants;
 pub mod functions;

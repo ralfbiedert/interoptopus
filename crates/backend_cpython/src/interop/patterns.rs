@@ -1,14 +1,14 @@
+use crate::Interop;
 use crate::converter::{documentation, to_ctypes_name, to_type_hint_in, to_type_hint_out};
 use crate::interop::functions::write_param_helpers;
 use crate::interop::utils::write_success_enum_aware_rval;
-use crate::Interop;
 use interoptopus::lang::c::{CType, CompositeType, Function};
 use interoptopus::patterns::service::ServiceDefinition;
 use interoptopus::patterns::slice::SliceType;
 use interoptopus::patterns::{LibraryPattern, TypePattern};
 use interoptopus::util::longest_common_prefix;
 use interoptopus::writer::{IndentWriter, WriteFor};
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 pub fn write_slice(_i: &Interop, w: &mut IndentWriter, c: &SliceType, mutable: bool) -> Result<(), Error> {
     let data_type = c.target_type();

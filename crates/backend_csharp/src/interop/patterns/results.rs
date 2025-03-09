@@ -1,10 +1,10 @@
-use crate::converter::to_typespecifier_in_sync_fn_rval;
 use crate::Interop;
+use crate::converter::to_typespecifier_in_sync_fn_rval;
 use interoptopus::lang::c::CType;
-use interoptopus::patterns::result::{FFIErrorEnum, FFIResultType};
 use interoptopus::patterns::TypePattern;
+use interoptopus::patterns::result::{FFIErrorEnum, FFIResultType};
 use interoptopus::writer::IndentWriter;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 pub fn write_pattern_result(i: &Interop, w: &mut IndentWriter, result: &FFIResultType) -> Result<(), Error> {
     i.debug(w, "write_pattern_result")?;

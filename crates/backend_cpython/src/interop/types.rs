@@ -1,11 +1,11 @@
+use crate::Interop;
 use crate::converter::{to_ctypes_name, to_type_hint_in, to_type_hint_out};
 use crate::interop::patterns::{write_option, write_slice};
-use crate::Interop;
 use interoptopus::lang::c::{CType, CompositeType, EnumType, Layout};
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::sort_types_by_dependencies;
 use interoptopus::writer::{IndentWriter, WriteFor};
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 pub fn write_types(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     let all_types = i.inventory.ctypes().to_vec();

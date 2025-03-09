@@ -1,8 +1,8 @@
-use crate::interop::docs::write_documentation;
 use crate::Interop;
+use crate::interop::docs::write_documentation;
 use interoptopus::lang::c::{EnumType, Variant};
 use interoptopus::writer::{IndentWriter, WriteFor};
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 pub fn write_type_definition_enum(i: &Interop, w: &mut IndentWriter, the_type: &EnumType, write_for: WriteFor) -> Result<(), Error> {
     i.debug(w, "write_type_definition_enum")?;

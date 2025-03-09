@@ -1,8 +1,8 @@
-use crate::interop::ToNamingStyle;
 use crate::Interop;
+use crate::interop::ToNamingStyle;
 use interoptopus::lang::c::{CType, CompositeType, Constant, ConstantValue, EnumType, FnPointerType, Function, OpaqueType, PrimitiveType, PrimitiveValue, Variant};
-use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::patterns::TypePattern;
+use interoptopus::patterns::callbacks::NamedCallback;
 use interoptopus::util::safe_name;
 
 pub fn primitive_to_typename(x: PrimitiveType) -> String {

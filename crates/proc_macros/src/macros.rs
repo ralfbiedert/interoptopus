@@ -1,9 +1,9 @@
 /// Parse a `TokenStream` for an attribute into the corresponding `darling` struct.
 macro_rules! darling_parse {
     ($t:ty, $args:expr) => {{
-        use darling::ast::NestedMeta;
         use darling::Error;
         use darling::FromMeta;
+        use darling::ast::NestedMeta;
         use proc_macro2::TokenStream;
 
         let attr_args = match NestedMeta::parse_meta_list($args.into()) {

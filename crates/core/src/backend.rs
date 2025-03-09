@@ -1,5 +1,5 @@
-use crate::writer::IndentWriter;
 use crate::Error;
+use crate::writer::IndentWriter;
 use std::fs::File;
 use std::path::Path;
 

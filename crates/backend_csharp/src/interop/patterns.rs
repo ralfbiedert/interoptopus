@@ -5,11 +5,11 @@ pub mod results;
 pub mod services;
 pub mod slices;
 
-use crate::interop::patterns::services::write_pattern_service;
 use crate::Interop;
+use crate::interop::patterns::services::write_pattern_service;
+use interoptopus::Error;
 use interoptopus::patterns::LibraryPattern;
 use interoptopus::writer::IndentWriter;
-use interoptopus::Error;
 
 pub fn write_patterns(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     for pattern in i.inventory.patterns() {

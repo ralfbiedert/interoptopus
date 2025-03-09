@@ -22,9 +22,9 @@ use crate::interop::types::write_type_definitions;
 use derive_builder::Builder;
 use interoptopus::lang::c::{CType, Constant, Function, FunctionSignature, Meta};
 use interoptopus::patterns::TypePattern;
-use interoptopus::util::{is_global_type, NamespaceMappings};
+use interoptopus::util::{NamespaceMappings, is_global_type};
 use interoptopus::writer::IndentWriter;
-use interoptopus::{indented, Bindings, Error, Inventory};
+use interoptopus::{Bindings, Error, Inventory, indented};
 
 /// How to convert from Rust function names to C#
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]

@@ -1,12 +1,12 @@
-use crate::interop::FunctionNameFlavor;
 use crate::Interop;
+use crate::interop::FunctionNameFlavor;
 use heck::{ToLowerCamelCase, ToUpperCamelCase};
 use interoptopus::lang::c::{
     AsyncRval, CType, CompositeType, ConstantValue, EnumType, Field, FnPointerType, Function, FunctionSignature, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
 };
+use interoptopus::patterns::TypePattern;
 use interoptopus::patterns::callbacks::{AsyncCallback, NamedCallback};
 use interoptopus::patterns::slice::SliceType;
-use interoptopus::patterns::TypePattern;
 use interoptopus::util::{ctypes_from_type_recursive, safe_name};
 use std::collections::HashSet;
 
@@ -242,11 +242,7 @@ pub fn function_name_to_csharp_name(function: &Function, flavor: FunctionNameFla
 }
 
 pub fn field_name_to_csharp_name(field: &Field, rename_symbols: bool) -> String {
-    if rename_symbols {
-        field.name().to_lower_camel_case()
-    } else {
-        field.name().into()
-    }
+    if rename_symbols { field.name().to_lower_camel_case() } else { field.name().into() }
 }
 
 pub fn get_slice_type_argument(x: &SliceType) -> String {

@@ -1,5 +1,5 @@
 use interoptopus::ffi::CStrPointer;
-use interoptopus::{ffi_function, function, pattern, Inventory, InventoryBuilder};
+use interoptopus::{Inventory, InventoryBuilder, ffi_function, function, pattern};
 
 pub mod engine;
 pub mod error;

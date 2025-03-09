@@ -45,21 +45,13 @@ impl Not for Bool {
     type Output = Self;
 
     fn not(self) -> Self::Output {
-        if self.is() {
-            Self::FALSE
-        } else {
-            Self::TRUE
-        }
+        if self.is() { Self::FALSE } else { Self::TRUE }
     }
 }
 
 impl From<bool> for Bool {
     fn from(x: bool) -> Self {
-        if x {
-            Self::TRUE
-        } else {
-            Self::FALSE
-        }
+        if x { Self::TRUE } else { Self::FALSE }
     }
 }
 

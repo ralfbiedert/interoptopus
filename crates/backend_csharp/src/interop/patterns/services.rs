@@ -4,10 +4,10 @@ use crate::converter::{
 use crate::interop::docs::write_documentation;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::lang::c::{AsyncRval, CType, Function, PrimitiveType};
-use interoptopus::patterns::service::ServiceDefinition;
 use interoptopus::patterns::TypePattern;
+use interoptopus::patterns::service::ServiceDefinition;
 use interoptopus::writer::{IndentWriter, WriteFor};
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum MethodType {

@@ -1,8 +1,8 @@
-use crate::converter::to_typespecifier_in_sync_fn_rval;
 use crate::Interop;
+use crate::converter::to_typespecifier_in_sync_fn_rval;
 use interoptopus::lang::c::CompositeType;
 use interoptopus::writer::IndentWriter;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 pub fn write_pattern_option(i: &Interop, w: &mut IndentWriter, slice: &CompositeType) -> Result<(), Error> {
     i.debug(w, "write_pattern_option")?;

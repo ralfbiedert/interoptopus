@@ -1,5 +1,5 @@
 use crate::error::Error;
-use interoptopus::patterns::result::{result_to_ffi, Result};
+use interoptopus::patterns::result::{Result, result_to_ffi};
 use interoptopus::{ffi, ffi_service, ffi_service_method, ffi_type};
 
 // As a rule of thumb, in your FFI crate you shouldn't expose "native Rust" types, as often

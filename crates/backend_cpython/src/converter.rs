@@ -109,22 +109,14 @@ pub fn to_ctypes_name(the_type: &CType, with_type_annotations: bool) -> String {
 #[must_use]
 pub fn to_type_hint_in(the_type: &CType, is_parameter: bool) -> String {
     let type_hint = to_type_hint(the_type, is_parameter);
-    if type_hint.is_empty() {
-        format!("")
-    } else {
-        format!(": {type_hint}")
-    }
+    if type_hint.is_empty() { format!("") } else { format!(": {type_hint}") }
 }
 
 #[allow(clippy::useless_format)]
 #[must_use]
 pub fn to_type_hint_out(the_type: &CType) -> String {
     let type_hint = to_type_hint(the_type, false);
-    if type_hint.is_empty() {
-        format!("")
-    } else {
-        format!(" -> {type_hint}")
-    }
+    if type_hint.is_empty() { format!("") } else { format!(" -> {type_hint}") }
 }
 
 #[must_use]

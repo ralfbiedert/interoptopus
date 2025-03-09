@@ -4,7 +4,7 @@ use crate::util::{get_type_name, pascal_to_snake_case, prettyprint_tokenstream};
 use darling::FromMeta;
 use function_impl::MethodType;
 use proc_macro2::TokenStream;
-use quote::{quote, ToTokens};
+use quote::{ToTokens, quote};
 use syn::{ImplItem, ItemImpl, ReturnType, Visibility};
 
 pub mod function_impl;

@@ -172,7 +172,7 @@
 //! [rust-build-badge]: https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml/badge.svg
 //! [rust-build-url]: https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml
 
-pub use crate::core::{merge_inventories, non_service_functions, Inventory, InventoryBuilder, InventoryItem, Symbol};
+pub use crate::core::{Inventory, InventoryBuilder, InventoryItem, Symbol, merge_inventories, non_service_functions};
 pub use backend::Bindings;
 pub use error::Error;
 #[cfg(feature = "derive")]
