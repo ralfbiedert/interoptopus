@@ -292,3 +292,20 @@ pub trait IntoFFIResult {
 impl<T, E: FFIError> IntoFFIResult for Result<T, E> {
     type FFIResult = FFIResult<T, E>;
 }
+
+///
+/// At some point we want to get rid of these once `Try` ([try_trait_v2](https://github.com/rust-lang/rust/issues/84277)) stabilizes.
+pub fn result_to_ffi<T: CTypeInfo, E: CTypeInfo + crate::patterns::result::FFIError>(f: impl FnOnce() -> Result<T, E>) -> FFIResult<T, E> {
+    match f() {
+        Ok(x) => FFIResult::ok(x),
+        Err(e) => FFIResult::error(e),
+    }
+}
+
+/// At some point we want to get rid of these once `Try` ([try_trait_v2](https://github.com/rust-lang/rust/issues/84277)) stabilizes.
+pub async fn result_to_ffi_async<T: CTypeInfo, E: CTypeInfo + crate::patterns::result::FFIError>(f: impl AsyncFnOnce() -> Result<T, E>) -> FFIResult<T, E> {
+    match f().await {
+        Ok(x) => FFIResult::ok(x),
+        Err(e) => FFIResult::error(e),
+    }
+}

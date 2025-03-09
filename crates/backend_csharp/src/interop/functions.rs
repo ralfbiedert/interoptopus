@@ -1,9 +1,10 @@
 use crate::converter::{
     function_name_to_csharp_name, function_parameter_to_csharp_typename, function_rval_to_csharp_typename, has_ffi_error_rval, is_owned_slice,
-    pattern_to_native_in_signature, to_typespecifier_in_param, to_typespecifier_in_rval,
+    pattern_to_native_in_signature, to_typespecifier_in_async_rval, to_typespecifier_in_param, to_typespecifier_in_rval,
 };
+use crate::interop::docs::write_documentation;
 use crate::{FunctionNameFlavor, Interop};
-use interoptopus::lang::c::{CType, Documentation, Function, PrimitiveType};
+use interoptopus::lang::c::{AsyncRval, CType, Documentation, Function, PrimitiveType};
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, Error};
@@ -26,25 +27,9 @@ pub fn write_function(i: &Interop, w: &mut IndentWriter, function: &Function, wr
         write_documentation(w, function.meta().documentation())?;
         write_function_annotation(i, w, function)?;
     }
-
-    if i.has_custom_marshalled_delegate(function.signature()) {
-        write_function_declaration(i, w, function, true, false)?;
-        // write_function_declaration(i, w, function, false, true)?;
-        // write_function_native_wrapper_body(i, w, function)?;
-    } else {
-        write_function_declaration(i, w, function, false, false)?;
-    }
-
+    write_function_declaration(i, w, function, false)?;
     w.newline()?;
     write_function_overload(i, w, function, write_for)?;
-
-    Ok(())
-}
-
-pub fn write_documentation(w: &mut IndentWriter, documentation: &Documentation) -> Result<(), Error> {
-    for line in documentation.lines() {
-        indented!(w, r"///{}", line)?;
-    }
 
     Ok(())
 }
@@ -59,7 +44,7 @@ pub fn write_function_annotation(_i: &Interop, w: &mut IndentWriter, function: &
     Ok(())
 }
 
-pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &Function, native: bool, has_body: bool) -> Result<(), Error> {
+pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &Function, has_body: bool) -> Result<(), Error> {
     i.debug(w, "write_function_declaration")?;
 
     let rval = function_rval_to_csharp_typename(function);
@@ -72,10 +57,11 @@ pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &
         },
     );
 
-    // let visibility = if native { "private " } else { "public " };
+    let mut params = Vec::new();
+
+    let native = i.has_custom_marshalled_delegate(function.signature());
     let visibility = "public ";
 
-    let mut params = Vec::new();
     for p in function.signature().params() {
         let the_type = function_parameter_to_csharp_typename(p);
         let name = p.name();
@@ -89,7 +75,6 @@ pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &
     }
 
     let line_ending = if has_body { "" } else { ";" };
-
     let partial = if has_body { "" } else { "partial " };
 
     indented!(w, r"{}static {}{} {}({}){}", visibility, partial, rval, name, params.join(", "), line_ending)
@@ -125,10 +110,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         },
     );
 
-    let mut rval = match function.signature().rval() {
-        CType::Pattern(TypePattern::CStrPointer) => "string".to_string(),
-        _ => to_typespecifier_in_rval(function.signature().rval()),
-    };
+    let rval = to_typespecifier_in_async_rval(&function.async_rval());
 
     let mut params = Vec::new();
     for p in function.signature().params() {
@@ -190,11 +172,10 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         params.push(format!("{native} {name}"));
     }
 
-    if let Some(x) = async_rval {
+    if matches!(async_rval, AsyncRval::Async(_)) {
         params.pop();
         to_invoke.pop();
         to_invoke.push("cb".to_string());
-        rval = format!("Task<{}>", to_typespecifier_in_param(x));
     }
 
     let signature = format!(r"public static unsafe {} {}({})", rval, raw_name, params.join(", "));
@@ -210,13 +191,26 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     indented!(w, "{}", signature)?;
     indented!(w, r"{{")?;
 
-    if let Some(x) = async_rval {
-        indented!(w, [()], r"var cs = new TaskCompletionSource<{}>();", to_typespecifier_in_param(x))?;
+    if let AsyncRval::Async(ref x) = async_rval {
+        let task_type = match x {
+            CType::Pattern(TypePattern::Result(x)) if matches!(x.t(), CType::Pattern(TypePattern::Utf8String(_))) => "string".to_string(),
+            CType::Pattern(TypePattern::Result(x)) => to_typespecifier_in_rval(x.t()),
+            x => to_typespecifier_in_rval(&x),
+        };
+
+        indented!(w, [()], r"var cs = new TaskCompletionSource<{}>();", task_type)?;
         indented!(w, [()], r"GCHandle pinned = default;")?;
         indented!(w, [()], r"var cb = new AsyncHelper((x) => {{")?;
         indented!(w, [()()], r"var unmanaged = Marshal.PtrToStructure<{}.Unmanaged>(x);", to_typespecifier_in_param(x))?;
         indented!(w, [()()], r"var marshaller = new {}.Marshaller(unmanaged);", to_typespecifier_in_param(x))?;
-        indented!(w, [()()], r"cs.SetResult(marshaller.ToManaged());")?;
+        indented!(w, [()()], r"var managed = marshaller.ToManaged();")?;
+        match x {
+            CType::Pattern(TypePattern::Result(x)) => {
+                indented!(w, [()()], r"if (managed.IsOk()) {{ cs.SetResult(managed.Ok()); }}")?;
+                indented!(w, [()()], r"else {{ cs.SetException(new InteropException<{}>(managed.Err())); }}", x.e().the_enum().rust_name())?;
+            }
+            x => indented!(w, [()()], r"cs.SetResult(managed);")?,
+        };
         indented!(w, [()()], r"pinned.Free();")?;
         indented!(w, [()], r"}});")?;
         indented!(w, [()], r"pinned = GCHandle.Alloc(cb);")?;
@@ -257,7 +251,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         CType::Primitive(PrimitiveType::Void) => {
             indented!(w, [()()], r"{};", call)?;
         }
-        _ if async_rval.is_some() => {
+        _ if matches!(async_rval, AsyncRval::Async(_)) => {
             indented!(w, [()()], r"{call}.Ok();")?;
             indented!(w, [()()], r"return cs.Task;")?;
         }
@@ -280,7 +274,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         }
     }
 
-    if async_rval.is_some() {
+    if matches!(async_rval, AsyncRval::Async(_)) {
         indented!(w, [()], r"return cs.Task;")?;
     }
 

@@ -112,7 +112,7 @@
 //! ```
 //!
 
-use crate::lang::c::{CType, Function, OpaqueType};
+use crate::lang::c::{Function, OpaqueType};
 use crate::patterns::result::FFIResultAsPtr;
 use crate::util::longest_common_prefix;
 use std::fmt::Debug;
@@ -186,26 +186,6 @@ impl ServiceDefinition {
         longest_common_prefix(all_methods.as_slice())
     }
 }
-
-/// Walks the type until it finds the first "obvious" Opaque.
-///
-/// An Opaque is obvious if it is at a singular position (e.g., `*const Opaque`),
-/// but not within the fields of a struct.
-fn extract_obvious_opaque_from_parameter(param: &CType) -> Option<OpaqueType> {
-    match param {
-        CType::Primitive(_) => None,
-        CType::Enum(_) => None,
-        CType::Opaque(x) => Some(x.clone()),
-        CType::Composite(_) => None,
-        CType::FnPointer(_) => None,
-        CType::ReadPointer(x) => extract_obvious_opaque_from_parameter(x),
-        CType::ReadWritePointer(x) => extract_obvious_opaque_from_parameter(x),
-        CType::Pattern(_) => None,
-        CType::Array(_) => None,
-    }
-}
-
-// pub trait ServiceResult {}
 
 pub trait ServiceInfo {
     type CtorResult: FFIResultAsPtr;

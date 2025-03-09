@@ -38,7 +38,7 @@
 //! ```
 //!
 
-use crate::lang::c::{CType, CompositeType, Documentation, Field, FnPointerType, Layout, Meta, PrimitiveType, Representation, Visibility};
+use crate::lang::c::{CType, CompositeType, Documentation, Field, Layout, Meta, PrimitiveType, Representation, Visibility};
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::TypePattern;
 use crate::util::capitalize_first_letter;

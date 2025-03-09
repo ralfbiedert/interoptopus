@@ -1,6 +1,6 @@
 use crate::converter::{field_name_to_csharp_name, is_blittable, to_typespecifier_in_field};
-use crate::interop::functions::write_documentation;
-use crate::{Interop, Unsupported};
+use crate::interop::docs::write_documentation;
+use crate::Interop;
 use interoptopus::lang::c;
 use interoptopus::lang::c::{CType, CompositeType, Field, Layout, PrimitiveType};
 use interoptopus::patterns::TypePattern;
@@ -137,20 +137,6 @@ pub fn write_type_definition_composite_unmanaged_body_field(i: &Interop, w: &mut
             indented!(w, r"public {} {};", type_name, field_name)?;
         }
     }
-    Ok(())
-}
-
-pub fn write_type_definition_composite_annotation(i: &Interop, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
-    if the_type.repr().alignment().is_some() {
-        let comment = r"// THIS STRUCT IS BROKEN - C# does not support alignment of entire Rust types that do #[repr(align(...))]";
-        match i.unsupported {
-            Unsupported::Panic => panic!("{}", comment),
-            Unsupported::Comment => indented!(w, "{}", comment)?,
-        }
-    }
-
-    write_type_definition_composite_layout_annotation(w, the_type)?;
-
     Ok(())
 }
 

@@ -32,7 +32,7 @@ public class TestPatternServicesAsync
     public async void HandleNestedString()
     {
         var s = ServiceAsync.New();
-        var r = (await s.HandleNestedString("abc")).Ok();
+        var r = await s.HandleNestedString("abc");
         s.Dispose();
         Assert.Equal(r.s1, "abc");
         Assert.Equal(r.s2, "abc");

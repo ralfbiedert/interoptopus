@@ -1,15 +1,16 @@
-use crate::interop::patterns::slices::SliceKind;
 use crate::interop::FunctionNameFlavor;
 use crate::Interop;
 use heck::{ToLowerCamelCase, ToUpperCamelCase};
 use interoptopus::lang::c::{
-    CType, CompositeType, ConstantValue, EnumType, Field, FnPointerType, Function, FunctionSignature, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
+    AsyncRval, CType, CompositeType, ConstantValue, EnumType, Field, FnPointerType, Function, FunctionSignature, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
 };
 use interoptopus::patterns::callbacks::{AsyncCallback, NamedCallback};
+use interoptopus::patterns::result::FFIResultType;
 use interoptopus::patterns::slice::SliceType;
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::{ctypes_from_type_recursive, safe_name};
 use std::collections::HashSet;
+use std::fmt::format;
 
 /// Converts a primitive (Rust) type to a native C# type name, e.g., `f32` to `float`.
 pub fn primitive_to_typename(x: PrimitiveType) -> String {
@@ -191,6 +192,18 @@ pub fn to_typespecifier_in_rval(x: &CType) -> String {
             TypePattern::APIVersion => to_typespecifier_in_rval(&x.fallback_type()),
             _ => panic!("Pattern not explicitly handled"),
         },
+    }
+}
+
+pub fn to_typespecifier_in_async_rval(x: &AsyncRval) -> String {
+    match x {
+        AsyncRval::Async(CType::Pattern(TypePattern::Utf8String(_))) => "Task<string>".to_string(),
+        AsyncRval::Async(CType::Pattern(TypePattern::Result(x))) => match x.t() {
+            CType::Pattern(TypePattern::Utf8String(_)) => "Task<string>".to_string(),
+            x => format!("Task<{}>", to_typespecifier_in_rval(x)),
+        },
+        AsyncRval::Async(x) => format!("Task<{}>", to_typespecifier_in_rval(x)),
+        AsyncRval::Sync(x) => to_typespecifier_in_rval(x),
     }
 }
 

@@ -1,7 +1,7 @@
 use crate::patterns::callback::{
     MyCallback, MyCallbackContextual, MyCallbackNamespaced, MyCallbackVoid, SumDelegate1, SumDelegate2, SumDelegateReturn, SumDelegateReturn2,
 };
-use crate::patterns::result::{Error, FFIError};
+use crate::patterns::result::FFIError;
 use interoptopus::patterns::result::FFIResult;
 use interoptopus::patterns::slice::FFISlice;
 use interoptopus::{ffi_service, ffi_type};

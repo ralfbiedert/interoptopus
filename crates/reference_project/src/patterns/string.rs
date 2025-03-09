@@ -76,7 +76,7 @@ pub fn pattern_string_5(x: UseUtf8String) -> FFIResult<UseUtf8String, FFIError> 
 }
 
 #[ffi_function]
-pub fn pattern_string_6a(x: &UseUtf8String) -> FFIResult<(), FFIError> {
+pub fn pattern_string_6a(_: &UseUtf8String) -> FFIResult<(), FFIError> {
     FFIResult::ok(())
 }
 

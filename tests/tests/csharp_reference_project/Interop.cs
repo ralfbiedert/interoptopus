@@ -29,9 +29,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 11383153978358929544ul)
+            if (api_version != 14474581097001798023ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (11383153978358929544). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (14474581097001798023). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -669,7 +669,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_6a")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError pattern_string_6a(ref UseUtf8String x);
+        public static partial ResultFFIError pattern_string_6a(ref UseUtf8String ignored);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_string_6a 
@@ -1152,14 +1152,16 @@ namespace My.Company
         public static partial ResultFFIError service_async_return_after_ms(IntPtr _context, ulong x, ulong ms, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
-        public static unsafe Task<ResultU64FFIError> service_async_return_after_ms(IntPtr _context, ulong x, ulong ms)
+        public static unsafe Task<ulong> service_async_return_after_ms(IntPtr _context, ulong x, ulong ms)
         {
-            var cs = new TaskCompletionSource<ResultU64FFIError>();
+            var cs = new TaskCompletionSource<ulong>();
             GCHandle pinned = default;
             var cb = new AsyncHelper((x) => {
                 var unmanaged = Marshal.PtrToStructure<ResultU64FFIError.Unmanaged>(x);
                 var marshaller = new ResultU64FFIError.Marshaller(unmanaged);
-                cs.SetResult(marshaller.ToManaged());
+                var managed = marshaller.ToManaged();
+                if (managed.IsOk()) { cs.SetResult(managed.Ok()); }
+                else { cs.SetException(new InteropException<FFIError>(managed.Err())); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
@@ -1180,14 +1182,16 @@ namespace My.Company
         public static partial ResultFFIError service_async_process_struct(IntPtr _context, NestedArray x, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
-        public static unsafe Task<ResultNestedArrayFFIError> service_async_process_struct(IntPtr _context, NestedArray x)
+        public static unsafe Task<NestedArray> service_async_process_struct(IntPtr _context, NestedArray x)
         {
-            var cs = new TaskCompletionSource<ResultNestedArrayFFIError>();
+            var cs = new TaskCompletionSource<NestedArray>();
             GCHandle pinned = default;
             var cb = new AsyncHelper((x) => {
                 var unmanaged = Marshal.PtrToStructure<ResultNestedArrayFFIError.Unmanaged>(x);
                 var marshaller = new ResultNestedArrayFFIError.Marshaller(unmanaged);
-                cs.SetResult(marshaller.ToManaged());
+                var managed = marshaller.ToManaged();
+                if (managed.IsOk()) { cs.SetResult(managed.Ok()); }
+                else { cs.SetException(new InteropException<FFIError>(managed.Err())); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
@@ -1208,14 +1212,16 @@ namespace My.Company
         public static partial ResultFFIError service_async_handle_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
-        public static unsafe Task<ResultUtf8StringFFIError> service_async_handle_string(IntPtr _context, string s)
+        public static unsafe Task<string> service_async_handle_string(IntPtr _context, string s)
         {
-            var cs = new TaskCompletionSource<ResultUtf8StringFFIError>();
+            var cs = new TaskCompletionSource<string>();
             GCHandle pinned = default;
             var cb = new AsyncHelper((x) => {
                 var unmanaged = Marshal.PtrToStructure<ResultUtf8StringFFIError.Unmanaged>(x);
                 var marshaller = new ResultUtf8StringFFIError.Marshaller(unmanaged);
-                cs.SetResult(marshaller.ToManaged());
+                var managed = marshaller.ToManaged();
+                if (managed.IsOk()) { cs.SetResult(managed.Ok()); }
+                else { cs.SetException(new InteropException<FFIError>(managed.Err())); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
@@ -1238,14 +1244,16 @@ namespace My.Company
         public static partial ResultFFIError service_async_handle_nested_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
-        public static unsafe Task<ResultUseUtf8StringFFIError> service_async_handle_nested_string(IntPtr _context, string s)
+        public static unsafe Task<UseUtf8String> service_async_handle_nested_string(IntPtr _context, string s)
         {
-            var cs = new TaskCompletionSource<ResultUseUtf8StringFFIError>();
+            var cs = new TaskCompletionSource<UseUtf8String>();
             GCHandle pinned = default;
             var cb = new AsyncHelper((x) => {
                 var unmanaged = Marshal.PtrToStructure<ResultUseUtf8StringFFIError.Unmanaged>(x);
                 var marshaller = new ResultUseUtf8StringFFIError.Marshaller(unmanaged);
-                cs.SetResult(marshaller.ToManaged());
+                var managed = marshaller.ToManaged();
+                if (managed.IsOk()) { cs.SetResult(managed.Ok()); }
+                else { cs.SetException(new InteropException<FFIError>(managed.Err())); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
@@ -4305,6 +4313,9 @@ namespace My.Company
             throw new InteropException<FFIError>(err);
         }
 
+        public bool IsOk() { return err == FFIError.Ok; }
+        public FFIError Err() { return err; }
+
     }
 
 
@@ -4389,6 +4400,9 @@ namespace My.Company
             }
             throw new InteropException<FFIError>(err);
         }
+
+        public bool IsOk() { return err == FFIError.Ok; }
+        public FFIError Err() { return err; }
 
     }
 
@@ -4475,6 +4489,9 @@ namespace My.Company
             throw new InteropException<FFIError>(err);
         }
 
+        public bool IsOk() { return err == FFIError.Ok; }
+        public FFIError Err() { return err; }
+
     }
 
 
@@ -4559,6 +4576,9 @@ namespace My.Company
             }
             throw new InteropException<FFIError>(err);
         }
+
+        public bool IsOk() { return err == FFIError.Ok; }
+        public FFIError Err() { return err; }
 
     }
 
@@ -4645,6 +4665,9 @@ namespace My.Company
             throw new InteropException<FFIError>(err);
         }
 
+        public bool IsOk() { return err == FFIError.Ok; }
+        public FFIError Err() { return err; }
+
     }
 
 
@@ -4729,6 +4752,9 @@ namespace My.Company
             }
             throw new InteropException<FFIError>(err);
         }
+
+        public bool IsOk() { return err == FFIError.Ok; }
+        public FFIError Err() { return err; }
 
     }
 
@@ -4815,6 +4841,9 @@ namespace My.Company
             throw new InteropException<FFIError>(err);
         }
 
+        public bool IsOk() { return err == FFIError.Ok; }
+        public FFIError Err() { return err; }
+
     }
 
 
@@ -4900,6 +4929,9 @@ namespace My.Company
             throw new InteropException<FFIError>(err);
         }
 
+        public bool IsOk() { return err == FFIError.Ok; }
+        public FFIError Err() { return err; }
+
     }
 
 
@@ -4984,6 +5016,9 @@ namespace My.Company
             }
             throw new InteropException<FFIError>(err);
         }
+
+        public bool IsOk() { return err == FFIError.Ok; }
+        public FFIError Err() { return err; }
 
     }
 
@@ -5072,6 +5107,9 @@ namespace My.Company
             throw new InteropException<FFIError>(err);
         }
 
+        public bool IsOk() { return err == FFIError.Ok; }
+        public FFIError Err() { return err; }
+
     }
 
 
@@ -5157,6 +5195,9 @@ namespace My.Company
             throw new InteropException<FFIError>(err);
         }
 
+        public bool IsOk() { return err == FFIError.Ok; }
+        public FFIError Err() { return err; }
+
     }
 
 
@@ -5241,6 +5282,9 @@ namespace My.Company
             }
             throw new InteropException<FFIError>(err);
         }
+
+        public bool IsOk() { return err == FFIError.Ok; }
+        public FFIError Err() { return err; }
 
     }
 
@@ -5329,6 +5373,9 @@ namespace My.Company
             throw new InteropException<FFIError>(err);
         }
 
+        public bool IsOk() { return err == FFIError.Ok; }
+        public FFIError Err() { return err; }
+
     }
 
 
@@ -5415,6 +5462,9 @@ namespace My.Company
             }
             throw new InteropException<FFIError>(err);
         }
+
+        public bool IsOk() { return err == FFIError.Ok; }
+        public FFIError Err() { return err; }
 
     }
 
@@ -6630,28 +6680,28 @@ namespace My.Company
         }
 
         // Debug - write_pattern_service_method 
-        public Task<ResultU64FFIError> ReturnAfterMs(ulong x, ulong ms)
+        public Task<ulong> ReturnAfterMs(ulong x, ulong ms)
         {
             return Interop.service_async_return_after_ms(_context, x, ms);
         }
         // Debug - write_service_method_overload 
 
         // Debug - write_pattern_service_method 
-        public Task<ResultNestedArrayFFIError> ProcessStruct(NestedArray x)
+        public Task<NestedArray> ProcessStruct(NestedArray x)
         {
             return Interop.service_async_process_struct(_context, x);
         }
         // Debug - write_service_method_overload 
 
         // Debug - write_pattern_service_method 
-        public Task<ResultUtf8StringFFIError> HandleString(string s)
+        public Task<Utf8String> HandleString(string s)
         {
             return Interop.service_async_handle_string(_context, s);
         }
         // Debug - write_service_method_overload 
 
         // Debug - write_pattern_service_method 
-        public Task<ResultUseUtf8StringFFIError> HandleNestedString(string s)
+        public Task<UseUtf8String> HandleNestedString(string s)
         {
             return Interop.service_async_handle_nested_string(_context, s);
         }

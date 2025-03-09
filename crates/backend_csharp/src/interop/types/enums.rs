@@ -1,4 +1,4 @@
-use crate::interop::functions::write_documentation;
+use crate::interop::docs::write_documentation;
 use crate::Interop;
 use interoptopus::lang::c::{EnumType, Variant};
 use interoptopus::writer::{IndentWriter, WriteFor};

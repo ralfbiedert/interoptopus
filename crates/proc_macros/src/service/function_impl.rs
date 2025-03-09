@@ -131,13 +131,6 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
     let span_body = function.block.span();
     let span_service_ty = impl_block.self_ty.span();
 
-    // Determines what the first generated function parameter is, `&X` or `&mutX`
-    let ptr_type = if has_async {
-        quote_spanned!(span_service_ty => & #service_type)
-    } else {
-        quote_spanned!(span_service_ty => &mut #service_type)
-    };
-
     // Determines what the return type is, `()` or `X`
     let rval = match &function.sig.output {
         ReturnType::Default => quote_spanned!(span_rval=> ()),

@@ -3,7 +3,7 @@ use crate::patterns::result::FFIError;
 use crate::types::{NestedArray, UseUtf8String};
 use interoptopus::lang::rust::CTypeInfo;
 use interoptopus::patterns::asynk::{AsyncRuntime, AsyncThreadLocal};
-use interoptopus::patterns::result::FFIResult;
+use interoptopus::patterns::result::{result_to_ffi, result_to_ffi_async, FFIResult};
 use interoptopus::patterns::string::Utf8String;
 use interoptopus::{ffi_service, ffi_type};
 use std::future::Future;
@@ -14,27 +14,12 @@ pub struct ServiceAsync {
     runtime: Runtime,
 }
 
-fn f<T: CTypeInfo, E: CTypeInfo + interoptopus::patterns::result::FFIError>(f: impl FnOnce() -> Result<T, E>) -> FFIResult<T, E> {
-    match f() {
-        Ok(x) => FFIResult::ok(x),
-        Err(e) => FFIResult::error(e),
-    }
-}
-
-async fn f_async<T: CTypeInfo, E: CTypeInfo + interoptopus::patterns::result::FFIError>(ff: impl AsyncFnOnce() -> Result<T, E>) -> FFIResult<T, E> {
-    match ff().await {
-        Ok(x) => FFIResult::ok(x),
-        Err(e) => FFIResult::error(e),
-    }
-}
-
 #[ffi_service]
 impl ServiceAsync {
     pub fn new() -> FFIResult<Self, FFIError> {
-        // This is a workaround for the fact that tokio::runtime::Builder::new_multi_thread()
-        // cannot be used in a const context.
-        // See
-        f(|| {
+        result_to_ffi(|| {
+            // This is a workaround for the fact that tokio::runtime::Builder::new_multi_thread()
+            // cannot be used in a const context.
             let runtime = tokio::runtime::Builder::new_multi_thread()
                 .worker_threads(1)
                 .enable_all()
@@ -46,7 +31,7 @@ impl ServiceAsync {
     }
 
     pub async fn return_after_ms(_this: This, x: u64, ms: u64) -> FFIResult<u64, FFIError> {
-        f_async(async || {
+        result_to_ffi_async(async || {
             // tokio::fs::read("x.text").await?;
             tokio::time::sleep(std::time::Duration::from_millis(ms)).await;
             Ok(x)
@@ -66,6 +51,10 @@ impl ServiceAsync {
     pub async fn handle_nested_string(_this: This, s: Utf8String) -> FFIResult<UseUtf8String, FFIError> {
         FFIResult::ok(UseUtf8String { s1: s.clone(), s2: s.clone() })
     }
+
+    // pub async fn non_result_rval(_this: This, s: Utf8String) -> u8 {
+    //     0
+    // }
 
     // TODO: This must not compile.
     pub fn bad(&mut self) {}

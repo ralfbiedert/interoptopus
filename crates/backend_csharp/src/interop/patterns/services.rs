@@ -1,12 +1,14 @@
 use crate::converter::{function_name_to_csharp_name, pattern_to_native_in_signature, to_typespecifier_in_param, to_typespecifier_in_rval};
-use crate::interop::functions::write_documentation;
+use crate::interop::docs::write_documentation;
 use crate::{FunctionNameFlavor, Interop};
-use interoptopus::lang::c::{CType, Function, PrimitiveType};
+use interoptopus::lang::c::{AsyncRval, CType, Function, PrimitiveType};
 use interoptopus::patterns::service::ServiceDefinition;
 use interoptopus::patterns::TypePattern;
 use interoptopus::util::longest_common_prefix;
 use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{indented, Error};
+use std::iter;
+use std::iter::zip;
 
 pub enum MethodType {
     Ctor,
@@ -87,24 +89,20 @@ pub fn write_pattern_service_method(
 ) -> Result<(), Error> {
     i.debug(w, "write_pattern_service_method")?;
 
-    let async_rval = function.async_rval();
-
-    let mut rval = rval.to_string();
     let mut names = Vec::new();
     let mut to_invoke = Vec::new();
     let mut types = Vec::new();
-    // let mut to_wrap_delegates = Vec::new();
-    // let mut to_wrap_delegate_types = Vec::new();
+    let async_rval = function.async_rval();
 
     // For every parameter except the first, figure out how we should forward
     // it to the invocation we perform.
-    let skip = match method_type {
+    let skip_params = match method_type {
         MethodType::Ctor => 0,
         MethodType::Dtor => 1,
         MethodType::Regular => 1,
     };
 
-    for p in function.signature().params().iter().skip(skip) {
+    for p in function.signature().params().iter().skip(skip_params) {
         let name = p.name();
 
         // If we call the checked function we want to resolve a `SliceU8` to a `byte[]`,
@@ -142,12 +140,21 @@ pub fn write_pattern_service_method(
         types.push(native);
     }
 
-    if let Some(x) = async_rval {
-        names.pop();
-        types.pop();
-        to_invoke.pop();
-        rval = format!("Task<{}>", to_typespecifier_in_param(x));
-    }
+    let rval = match async_rval {
+        AsyncRval::Sync(_) => rval.to_string(),
+        AsyncRval::Async(CType::Pattern(TypePattern::Result(ref x))) => {
+            names.pop();
+            types.pop();
+            to_invoke.pop();
+            format!("Task<{}>", to_typespecifier_in_param(x.t()))
+        }
+        AsyncRval::Async(ref x) => {
+            names.pop();
+            types.pop();
+            to_invoke.pop();
+            format!("Task<{}>", to_typespecifier_in_param(&x))
+        }
+    };
 
     let method_to_invoke = function_name_to_csharp_name(
         function,
@@ -196,10 +203,10 @@ pub fn write_pattern_service_method(
 
     // Determine return value behavior and write function call.
     match function.signature().rval() {
-        CType::Pattern(TypePattern::FFIErrorEnum(e)) if async_rval.is_none() => {
+        CType::Pattern(TypePattern::FFIErrorEnum(_)) if async_rval.is_sync() => {
             indented!(w, [()], r"{fn_call}.Ok();")?;
         }
-        CType::Pattern(TypePattern::FFIErrorEnum(_)) if async_rval.is_some() => {
+        CType::Pattern(TypePattern::FFIErrorEnum(_)) if async_rval.is_async() => {
             indented!(w, [()], r"return {fn_call};")?;
         }
         CType::Pattern(TypePattern::CStrPointer) => {
@@ -239,7 +246,7 @@ pub fn write_service_method_overload(
 ) -> Result<(), Error> {
     i.debug(w, "write_service_method_overload")?;
 
-    if !i.has_overloadable(function.signature()) || function.async_rval().is_some() {
+    if !i.has_overloadable(function.signature()) || function.async_rval().is_async() {
         return Ok(());
     }
 

@@ -9,50 +9,42 @@ use interoptopus::{indented, Error};
 pub fn write_pattern_result(i: &Interop, w: &mut IndentWriter, result: &FFIResultType) -> Result<(), Error> {
     i.debug(w, "write_pattern_result")?;
     let enum_name = result.e().the_enum().rust_name();
-    let ffi_error = i
-        .inventory
-        .ctypes()
-        .iter()
-        .find_map(|x| match x {
-            CType::Pattern(TypePattern::FFIErrorEnum(e)) => Some(e),
-            _ => None,
-        })
-        .expect("When using result type there must be an FFIError in the inventory with an `ok` variant.");
-
     let context_type_name = result.composite().rust_name();
-    let data_type = result
-        .composite()
-        .fields()
-        .iter()
-        .find(|x| x.name().eq("t"))
-        .expect("Option must contain field called 't'.")
-        .the_type();
+    let e = result.e();
+    let t = result.t();
+    let e_name = e.the_enum().rust_name();
+    let success_variant = result.e().success_variant().name();
 
-    let type_string = match data_type {
+    let type_string = match t {
         CType::Pattern(TypePattern::Utf8String(_)) => "string".to_string(),
-        _ => to_typespecifier_in_rval(data_type),
+        _ => to_typespecifier_in_rval(t),
     };
 
     indented!(w, r"{} partial struct {}", i.visibility_types.to_access_modifier(), context_type_name)?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"public {} Ok()", type_string)?;
     indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"if (err == {enum_name}.{})", result.e().success_variant().name())?;
+    indented!(w, [()()], r"if (err == {enum_name}.{success_variant})")?;
     indented!(w, [()()], r"{{")?;
     indented!(w, [()()()], r"return t;")?;
     indented!(w, [()()], r"}}")?;
-    indented!(w, [()()], r"throw new InteropException<{}>(err);", ffi_error.the_enum().rust_name())?;
+    indented!(w, [()()], r"throw new InteropException<{e_name}>(err);")?;
     indented!(w, [()], r"}}")?;
+    w.newline()?;
+    indented!(w, [()], r"public bool IsOk() {{ return err == {enum_name}.{success_variant}; }}")?;
+    indented!(w, [()], r"public {enum_name} Err() {{ return err; }}")?;
     w.newline()?;
     indented!(w, r"}}")?;
     w.newline()?;
     Ok(())
 }
 
-pub fn write_pattern_result_void(i: &Interop, w: &mut IndentWriter, result: &FFIErrorEnum) -> Result<(), Error> {
+pub fn write_pattern_result_void(i: &Interop, w: &mut IndentWriter, error: &FFIErrorEnum) -> Result<(), Error> {
     i.debug(w, "write_pattern_result_void")?;
-    let enum_name = result.the_enum().rust_name();
-    let name = format!("Result{enum_name}");
+    let e_name = error.the_enum().rust_name();
+    let name = format!("Result{e_name}");
+    let success_variant = error.success_variant().name();
+
     indented!(w, r"public partial struct {name}")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"internal FFIError _err;")?;
@@ -61,21 +53,21 @@ pub fn write_pattern_result_void(i: &Interop, w: &mut IndentWriter, result: &FFI
     indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
     indented!(w, r"public partial struct {name}")?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"public {name}({enum_name} e) {{ _err = e; }}",)?;
+    indented!(w, [()], r"public {name}({e_name} e) {{ _err = e; }}",)?;
     w.newline()?;
-    for x in result.the_enum().variants() {
+    for x in error.the_enum().variants() {
         let vname = x.name();
         let vname_upper = vname.to_uppercase();
-        indented!(w, [()], r"public static {name} {vname_upper} => new {name}({enum_name}.{vname});",)?;
+        indented!(w, [()], r"public static {name} {vname_upper} => new {name}({e_name}.{vname});",)?;
     }
     w.newline()?;
     indented!(w, [()], r"public void Ok()")?;
     indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"if (_err == {enum_name}.{})", result.success_variant().name())?;
+    indented!(w, [()()], r"if (_err == {e_name}.{success_variant})")?;
     indented!(w, [()()], r"{{")?;
     indented!(w, [()()()], r"return;")?;
     indented!(w, [()()], r"}}")?;
-    indented!(w, [()()], r"throw new InteropException<{}>(_err);", result.the_enum().rust_name())?;
+    indented!(w, [()()], r"throw new InteropException<{e_name}>(_err);")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
     indented!(w, [()], r"[StructLayout(LayoutKind.Sequential)]")?;

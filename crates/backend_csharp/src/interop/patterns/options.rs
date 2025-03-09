@@ -7,7 +7,7 @@ use interoptopus::{indented, Error};
 pub fn write_pattern_option(i: &Interop, w: &mut IndentWriter, slice: &CompositeType) -> Result<(), Error> {
     i.debug(w, "write_pattern_option")?;
 
-    let context_type_name = slice.rust_name();
+    let name = slice.rust_name();
     let data_type = slice
         .fields()
         .iter()
@@ -18,16 +18,16 @@ pub fn write_pattern_option(i: &Interop, w: &mut IndentWriter, slice: &Composite
     let type_string = to_typespecifier_in_rval(data_type);
     let is_some = if i.rename_symbols { "isSome" } else { "is_some" };
 
-    indented!(w, r"{} partial struct {}", i.visibility_types.to_access_modifier(), context_type_name)?;
+    indented!(w, r"{} partial struct {}", i.visibility_types.to_access_modifier(), name)?;
     indented!(w, r"{{")?;
 
     // FromNullable
-    indented!(w, [()], r"public static {} FromNullable({}? nullable)", context_type_name, type_string)?;
+    indented!(w, [()], r"public static {name} FromNullable({type_string}? nullable)")?;
     indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"var result = new {}();", context_type_name)?;
+    indented!(w, [()()], r"var result = new {}();", name)?;
     indented!(w, [()()], r"if (nullable.HasValue)")?;
     indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"result.{} = 1;", is_some)?;
+    indented!(w, [()()()], r"result.{is_some} = 1;")?;
     indented!(w, [()()()], r"result.t = nullable.Value;")?;
     indented!(w, [()()], r"}}")?;
     w.newline()?;
@@ -36,9 +36,9 @@ pub fn write_pattern_option(i: &Interop, w: &mut IndentWriter, slice: &Composite
     w.newline()?;
 
     // ToNullable
-    indented!(w, [()], r"public {}? ToNullable()", type_string)?;
+    indented!(w, [()], r"public {type_string}? ToNullable()")?;
     indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"return this.{} == 1 ? this.t : ({}?)null;", is_some, type_string)?;
+    indented!(w, [()()], r"return this.{is_some} == 1 ? this.t : ({type_string}?)null;")?;
     indented!(w, [()], r"}}")?;
 
     indented!(w, r"}}")?;

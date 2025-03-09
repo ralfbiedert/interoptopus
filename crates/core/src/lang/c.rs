@@ -659,6 +659,29 @@ impl Meta {
     }
 }
 
+pub enum AsyncRval {
+    Sync(CType),
+    Async(CType),
+}
+
+impl AsyncRval {
+    #[must_use]
+    pub fn is_async(&self) -> bool {
+        match self {
+            Self::Async(_) => true,
+            _ => false,
+        }
+    }
+
+    #[must_use]
+    pub fn is_sync(&self) -> bool {
+        match self {
+            Self::Sync(_) => true,
+            _ => false,
+        }
+    }
+}
+
 /// A named, exported `#[no_mangle] extern "C" fn f()` function.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Function {
@@ -704,12 +727,18 @@ impl Function {
     }
 
     #[must_use]
-    pub fn async_rval(&self) -> Option<&CType> {
-        self.signature
+    pub fn async_rval(&self) -> AsyncRval {
+        let ctype = self
+            .signature
             .params
             .last()
             .and_then(|x| x.the_type().as_async_callback())
-            .map(|async_callback: &AsyncCallback| async_callback.target())
+            .map(|async_callback: &AsyncCallback| async_callback.target());
+
+        match ctype {
+            None => AsyncRval::Sync(self.signature.rval().clone()),
+            Some(x) => AsyncRval::Async(x.clone()),
+        }
     }
 }
 

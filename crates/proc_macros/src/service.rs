@@ -15,9 +15,6 @@ pub struct Attributes {
     debug: bool,
 
     #[darling(default)]
-    error: String,
-
-    #[darling(default)]
     prefix: String,
 }
 

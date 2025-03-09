@@ -1,5 +1,5 @@
 use crate::converter::{constant_value_to_value, to_typespecifier_in_rval};
-use crate::interop::functions::write_documentation;
+use crate::interop::docs::write_documentation;
 use crate::Interop;
 use interoptopus::lang::c::Constant;
 use interoptopus::writer::IndentWriter;
