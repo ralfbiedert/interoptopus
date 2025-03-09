@@ -5,7 +5,7 @@ edition = "2024"
 publish = false
 
 [lib]
-name = "core_library"
+name = "library"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
