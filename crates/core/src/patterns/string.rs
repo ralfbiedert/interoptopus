@@ -41,6 +41,18 @@ impl String {
     }
 }
 
+impl From<std::string::String> for String {
+    fn from(value: std::string::String) -> Self {
+        String::from_string(value)
+    }
+}
+
+impl From<String> for std::string::String {
+    fn from(value: String) -> Self {
+        value.into_string()
+    }
+}
+
 impl Clone for String {
     fn clone(&self) -> Self {
         String::from_string(self.as_str().to_string())

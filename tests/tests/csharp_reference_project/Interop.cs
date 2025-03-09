@@ -27,9 +27,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 11762183241484183491ul)
+            if (api_version != 11265075442944792215ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (11762183241484183491). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (11265075442944792215). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -161,7 +161,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "behavior_panics")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError behavior_panics();
+        public static partial ResultError behavior_panics();
 
         // Debug - write_function_overload 
         // Debug - no overload for behavior_panics 
@@ -540,7 +540,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "struct2")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError struct2(Vec3f32 a, ref Tupled b);
+        public static partial ResultError struct2(Vec3f32 a, ref Tupled b);
 
         // Debug - write_function_overload 
         // Debug - no overload for struct2 
@@ -659,7 +659,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_5")]
         // Debug - write_function_declaration 
-        public static partial ResultUseUtf8StringFFIError pattern_string_5(UseUtf8String x);
+        public static partial ResultUseUtf8StringError pattern_string_5(UseUtf8String x);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_string_5 
@@ -667,7 +667,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_6a")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError pattern_string_6a(ref UseUtf8String ignored);
+        public static partial ResultError pattern_string_6a(ref UseUtf8String ignored);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_string_6a 
@@ -675,7 +675,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_6b")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError pattern_string_6b(out UseUtf8String y);
+        public static partial ResultError pattern_string_6b(out UseUtf8String y);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_string_6b 
@@ -683,10 +683,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_7")]
         // Debug - write_function_declaration 
-        public static partial ResultUtf8StringFFIError pattern_string_7(SliceUtf8String x, ulong i);
+        public static partial ResultUtf8StringError pattern_string_7(SliceUtf8String x, ulong i);
 
         // Debug - write_function_overload 
-        public static unsafe ResultUtf8StringFFIError pattern_string_7(string[] x, ulong i)
+        public static unsafe ResultUtf8StringError pattern_string_7(string[] x, ulong i)
         {
             var x_wrapped = new SliceUtf8String(x);
             try
@@ -702,10 +702,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_8")]
         // Debug - write_function_declaration 
-        public static partial ResultUseUtf8StringFFIError pattern_string_8(SliceUseUtf8String x, ulong i);
+        public static partial ResultUseUtf8StringError pattern_string_8(SliceUseUtf8String x, ulong i);
 
         // Debug - write_function_overload 
-        public static unsafe ResultUseUtf8StringFFIError pattern_string_8(UseUtf8String[] x, ulong i)
+        public static unsafe ResultUseUtf8StringError pattern_string_8(UseUtf8String[] x, ulong i)
         {
             var x_wrapped = new SliceUseUtf8String(x);
             try
@@ -991,7 +991,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_result_1")]
         // Debug - write_function_declaration 
-        public static partial ResultU32FFIError pattern_result_1(ResultU32FFIError x);
+        public static partial ResultU32Error pattern_result_1(ResultU32Error x);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_result_1 
@@ -999,7 +999,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_result_2")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError pattern_result_2();
+        public static partial ResultError pattern_result_2();
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_result_2 
@@ -1007,7 +1007,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_result_3")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError pattern_result_3(ResultFFIError x);
+        public static partial ResultError pattern_result_3(ResultError x);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_result_3 
@@ -1096,10 +1096,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_7")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o);
+        public static partial ResultError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o);
 
         // Debug - write_function_overload 
-        public static unsafe ResultFFIError pattern_callback_7(SumDelegateReturnDelegate c1, SumDelegateReturn2Delegate c2, int x, int i, out int o)
+        public static unsafe ResultError pattern_callback_7(SumDelegateReturnDelegate c1, SumDelegateReturn2Delegate c2, int x, int i, out int o)
         {
             var c1_wrapped = new SumDelegateReturn(c1);
             var c2_wrapped = new SumDelegateReturn2(c2);
@@ -1131,7 +1131,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_async_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceAsyncFFIError service_async_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceAsyncError service_async_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_async_destroy 
@@ -1139,7 +1139,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceAsyncFFIError service_async_new();
+        public static partial ResultConstPtrServiceAsyncError service_async_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_async_new 
@@ -1147,7 +1147,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_return_after_ms")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError service_async_return_after_ms(IntPtr _context, ulong x, ulong ms, AsyncHelper _async_callback);
+        public static partial ResultError service_async_return_after_ms(IntPtr _context, ulong x, ulong ms, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
         public static unsafe Task<ulong> service_async_return_after_ms(IntPtr _context, ulong x, ulong ms)
@@ -1155,11 +1155,11 @@ namespace My.Company
             var cs = new TaskCompletionSource<ulong>();
             GCHandle pinned = default;
             var cb = new AsyncHelper((x) => {
-                var unmanaged = Marshal.PtrToStructure<ResultU64FFIError.Unmanaged>(x);
-                var marshaller = new ResultU64FFIError.Marshaller(unmanaged);
+                var unmanaged = Marshal.PtrToStructure<ResultU64Error.Unmanaged>(x);
+                var marshaller = new ResultU64Error.Marshaller(unmanaged);
                 var managed = marshaller.ToManaged();
                 if (managed.IsOk()) { cs.SetResult(managed.Ok()); }
-                else { cs.SetException(new InteropException<FFIError>(managed.Err())); }
+                else { cs.SetException(new InteropException<Error>(managed.Err())); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
@@ -1177,7 +1177,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_process_struct")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError service_async_process_struct(IntPtr _context, NestedArray x, AsyncHelper _async_callback);
+        public static partial ResultError service_async_process_struct(IntPtr _context, NestedArray x, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
         public static unsafe Task<NestedArray> service_async_process_struct(IntPtr _context, NestedArray x)
@@ -1185,11 +1185,11 @@ namespace My.Company
             var cs = new TaskCompletionSource<NestedArray>();
             GCHandle pinned = default;
             var cb = new AsyncHelper((x) => {
-                var unmanaged = Marshal.PtrToStructure<ResultNestedArrayFFIError.Unmanaged>(x);
-                var marshaller = new ResultNestedArrayFFIError.Marshaller(unmanaged);
+                var unmanaged = Marshal.PtrToStructure<ResultNestedArrayError.Unmanaged>(x);
+                var marshaller = new ResultNestedArrayError.Marshaller(unmanaged);
                 var managed = marshaller.ToManaged();
                 if (managed.IsOk()) { cs.SetResult(managed.Ok()); }
-                else { cs.SetException(new InteropException<FFIError>(managed.Err())); }
+                else { cs.SetException(new InteropException<Error>(managed.Err())); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
@@ -1207,7 +1207,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_handle_string")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError service_async_handle_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
+        public static partial ResultError service_async_handle_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
         public static unsafe Task<string> service_async_handle_string(IntPtr _context, string s)
@@ -1215,11 +1215,11 @@ namespace My.Company
             var cs = new TaskCompletionSource<string>();
             GCHandle pinned = default;
             var cb = new AsyncHelper((x) => {
-                var unmanaged = Marshal.PtrToStructure<ResultUtf8StringFFIError.Unmanaged>(x);
-                var marshaller = new ResultUtf8StringFFIError.Marshaller(unmanaged);
+                var unmanaged = Marshal.PtrToStructure<ResultUtf8StringError.Unmanaged>(x);
+                var marshaller = new ResultUtf8StringError.Marshaller(unmanaged);
                 var managed = marshaller.ToManaged();
                 if (managed.IsOk()) { cs.SetResult(managed.Ok()); }
-                else { cs.SetException(new InteropException<FFIError>(managed.Err())); }
+                else { cs.SetException(new InteropException<Error>(managed.Err())); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
@@ -1239,7 +1239,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_handle_nested_string")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError service_async_handle_nested_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
+        public static partial ResultError service_async_handle_nested_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
         public static unsafe Task<UseUtf8String> service_async_handle_nested_string(IntPtr _context, string s)
@@ -1247,11 +1247,11 @@ namespace My.Company
             var cs = new TaskCompletionSource<UseUtf8String>();
             GCHandle pinned = default;
             var cb = new AsyncHelper((x) => {
-                var unmanaged = Marshal.PtrToStructure<ResultUseUtf8StringFFIError.Unmanaged>(x);
-                var marshaller = new ResultUseUtf8StringFFIError.Marshaller(unmanaged);
+                var unmanaged = Marshal.PtrToStructure<ResultUseUtf8StringError.Unmanaged>(x);
+                var marshaller = new ResultUseUtf8StringError.Marshaller(unmanaged);
                 var managed = marshaller.ToManaged();
                 if (managed.IsOk()) { cs.SetResult(managed.Ok()); }
-                else { cs.SetException(new InteropException<FFIError>(managed.Err())); }
+                else { cs.SetException(new InteropException<Error>(managed.Err())); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
@@ -1271,7 +1271,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_fail")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError service_async_fail(IntPtr _context, AsyncHelper _async_callback);
+        public static partial ResultError service_async_fail(IntPtr _context, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
         public static unsafe Task service_async_fail(IntPtr _context)
@@ -1279,11 +1279,11 @@ namespace My.Company
             var cs = new TaskCompletionSource();
             GCHandle pinned = default;
             var cb = new AsyncHelper((x) => {
-                var unmanaged = Marshal.PtrToStructure<ResultFFIError.Unmanaged>(x);
-                var marshaller = new ResultFFIError.Marshaller(unmanaged);
+                var unmanaged = Marshal.PtrToStructure<ResultError.Unmanaged>(x);
+                var marshaller = new ResultError.Marshaller(unmanaged);
                 var managed = marshaller.ToManaged();
                 if (managed.IsOk()) { cs.SetResult(); }
-                else { cs.SetException(new InteropException<FFIError>(managed.Err())); }
+                else { cs.SetException(new InteropException<Error>(managed.Err())); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
@@ -1315,7 +1315,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_basic_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceBasicFFIError service_basic_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceBasicError service_basic_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_basic_destroy 
@@ -1323,7 +1323,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_basic_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceBasicFFIError service_basic_new();
+        public static partial ResultConstPtrServiceBasicError service_basic_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_basic_new 
@@ -1335,9 +1335,61 @@ namespace My.Company
         ///
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
+        [LibraryImport(NativeLib, EntryPoint = "service_main_destroy")]
+        // Debug - write_function_declaration 
+        public static partial ResultConstPtrServiceMainError service_main_destroy(IntPtr _context);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for service_main_destroy 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "service_main_new")]
+        // Debug - write_function_declaration 
+        public static partial ResultConstPtrServiceMainError service_main_new(uint value);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for service_main_new 
+
+        // Debug - write_function 
+        /// Destroys the given instance.
+        ///
+        /// # Safety
+        ///
+        /// The passed parameter MUST have been created with the corresponding init function;
+        /// passing any other value results in undefined behavior.
+        [LibraryImport(NativeLib, EntryPoint = "service_dependent_destroy")]
+        // Debug - write_function_declaration 
+        public static partial ResultConstPtrServiceDependentError service_dependent_destroy(IntPtr _context);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for service_dependent_destroy 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "service_dependent_from_main")]
+        // Debug - write_function_declaration 
+        public static partial ResultConstPtrServiceDependentError service_dependent_from_main(IntPtr main);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for service_dependent_from_main 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "service_dependent_get")]
+        // Debug - write_function_declaration 
+        public static partial uint service_dependent_get(IntPtr _context);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for service_dependent_get 
+
+        // Debug - write_function 
+        /// Destroys the given instance.
+        ///
+        /// # Safety
+        ///
+        /// The passed parameter MUST have been created with the corresponding init function;
+        /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_result_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceResultFFIError service_result_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceResultError service_result_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_result_destroy 
@@ -1345,7 +1397,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_result_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceResultFFIError service_result_new();
+        public static partial ResultConstPtrServiceResultError service_result_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_result_new 
@@ -1353,7 +1405,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_result_test")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError service_result_test(IntPtr _context);
+        public static partial ResultError service_result_test(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_result_test 
@@ -1367,7 +1419,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceOnPanicFFIError service_on_panic_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceOnPanicError service_on_panic_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_destroy 
@@ -1375,7 +1427,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceOnPanicFFIError service_on_panic_new();
+        public static partial ResultConstPtrServiceOnPanicError service_on_panic_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_new 
@@ -1385,7 +1437,7 @@ namespace My.Company
         /// need annotations.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_result")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError service_on_panic_return_result(IntPtr _context, uint anon1);
+        public static partial ResultError service_on_panic_return_result(IntPtr _context, uint anon1);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_return_result 
@@ -1418,7 +1470,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceCallbacksFFIError service_callbacks_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceCallbacksError service_callbacks_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_destroy 
@@ -1426,7 +1478,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceCallbacksFFIError service_callbacks_new();
+        public static partial ResultConstPtrServiceCallbacksError service_callbacks_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_new 
@@ -1434,10 +1486,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_simple")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError service_callbacks_callback_simple(IntPtr _context, MyCallback callback);
+        public static partial ResultError service_callbacks_callback_simple(IntPtr _context, MyCallback callback);
 
         // Debug - write_function_overload 
-        public static unsafe ResultFFIError service_callbacks_callback_simple(IntPtr _context, MyCallbackDelegate callback)
+        public static unsafe ResultError service_callbacks_callback_simple(IntPtr _context, MyCallbackDelegate callback)
         {
             var callback_wrapped = new MyCallback(callback);
             try
@@ -1453,10 +1505,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_ffi_return")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturn callback);
+        public static partial ResultError service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturn callback);
 
         // Debug - write_function_overload 
-        public static unsafe ResultFFIError service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturnDelegate callback)
+        public static unsafe ResultError service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturnDelegate callback)
         {
             var callback_wrapped = new SumDelegateReturn(callback);
             try
@@ -1472,10 +1524,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_with_slice")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturn callback, SliceI32 input);
+        public static partial ResultError service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturn callback, SliceI32 input);
 
         // Debug - write_function_overload 
-        public static unsafe ResultFFIError service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
+        public static unsafe ResultError service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
         {
             fixed (void* ptr_input = input)
             {
@@ -1503,7 +1555,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_invoke_delegates")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError service_callbacks_invoke_delegates(IntPtr _context);
+        public static partial ResultError service_callbacks_invoke_delegates(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_invoke_delegates 
@@ -1517,7 +1569,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceIgnoringMethodsFFIError service_ignoring_methods_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceIgnoringMethodsError service_ignoring_methods_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_ignoring_methods_destroy 
@@ -1525,7 +1577,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceIgnoringMethodsFFIError service_ignoring_methods_new();
+        public static partial ResultConstPtrServiceIgnoringMethodsError service_ignoring_methods_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_ignoring_methods_new 
@@ -1539,7 +1591,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceMultipleCtorsFFIError service_multiple_ctors_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_destroy 
@@ -1547,7 +1599,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceMultipleCtorsFFIError service_multiple_ctors_new_with(uint some_value);
+        public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_new_with(uint some_value);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_with 
@@ -1555,7 +1607,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_without")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceMultipleCtorsFFIError service_multiple_ctors_new_without();
+        public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_new_without();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_without 
@@ -1563,7 +1615,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with_string")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceMultipleCtorsFFIError service_multiple_ctors_new_with_string([MarshalAs(UnmanagedType.LPStr)] string anon0);
+        public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_new_with_string([MarshalAs(UnmanagedType.LPStr)] string anon0);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_with_string 
@@ -1571,7 +1623,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_failing")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceMultipleCtorsFFIError service_multiple_ctors_new_failing(byte some_value);
+        public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_new_failing(byte some_value);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_failing 
@@ -1585,7 +1637,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceVariousSlicesFFIError service_various_slices_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceVariousSlicesError service_various_slices_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_various_slices_destroy 
@@ -1593,7 +1645,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceVariousSlicesFFIError service_various_slices_new();
+        public static partial ResultConstPtrServiceVariousSlicesError service_various_slices_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_various_slices_new 
@@ -1699,10 +1751,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ffi_error")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError service_various_slices_mut_self_ffi_error(IntPtr _context, SliceMutU8 slice);
+        public static partial ResultError service_various_slices_mut_self_ffi_error(IntPtr _context, SliceMutU8 slice);
 
         // Debug - write_function_overload 
-        public static unsafe ResultFFIError service_various_slices_mut_self_ffi_error(IntPtr _context, Span<byte> slice)
+        public static unsafe ResultError service_various_slices_mut_self_ffi_error(IntPtr _context, Span<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
@@ -1720,10 +1772,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_no_error")]
         // Debug - write_function_declaration 
-        public static partial ResultFFIError service_various_slices_mut_self_no_error(IntPtr _context, SliceMutU8 slice);
+        public static partial ResultError service_various_slices_mut_self_no_error(IntPtr _context, SliceMutU8 slice);
 
         // Debug - write_function_overload 
-        public static unsafe ResultFFIError service_various_slices_mut_self_no_error(IntPtr _context, Span<byte> slice)
+        public static unsafe ResultError service_various_slices_mut_self_no_error(IntPtr _context, Span<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
@@ -1767,7 +1819,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_strings_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceStringsFFIError service_strings_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceStringsError service_strings_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_strings_destroy 
@@ -1775,7 +1827,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceStringsFFIError service_strings_new();
+        public static partial ResultConstPtrServiceStringsError service_strings_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_strings_new 
@@ -3716,7 +3768,7 @@ namespace My.Company
     public delegate void InteropDelegate_fn_CharArray_native(CharArray x0);
 
     // Debug - write_type_definition_enum 
-    public enum FFIError
+    public enum Error
     {
         Ok = 0,
         Null = 100,
@@ -3726,53 +3778,53 @@ namespace My.Company
     }
 
     // Debug - write_pattern_result_void 
-    public partial struct ResultFFIError
+    public partial struct ResultError
     {
-        internal FFIError _err;
+        internal Error _err;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultFFIError
+    public partial struct ResultError
     {
-        public ResultFFIError(FFIError e) { _err = e; }
+        public ResultError(Error e) { _err = e; }
 
-        public static ResultFFIError OK => new ResultFFIError(FFIError.Ok);
-        public static ResultFFIError NULL => new ResultFFIError(FFIError.Null);
-        public static ResultFFIError PANIC => new ResultFFIError(FFIError.Panic);
-        public static ResultFFIError DELEGATE => new ResultFFIError(FFIError.Delegate);
-        public static ResultFFIError FAIL => new ResultFFIError(FFIError.Fail);
+        public static ResultError OK => new ResultError(Error.Ok);
+        public static ResultError NULL => new ResultError(Error.Null);
+        public static ResultError PANIC => new ResultError(Error.Panic);
+        public static ResultError DELEGATE => new ResultError(Error.Delegate);
+        public static ResultError FAIL => new ResultError(Error.Fail);
 
         public void Ok()
         {
-            if (_err == FFIError.Ok)
+            if (_err == Error.Ok)
             {
                 return;
             }
-            throw new InteropException<FFIError>(_err);
+            throw new InteropException<Error>(_err);
         }
 
-        public bool IsOk() { return _err == FFIError.Ok; }
-        public FFIError Err() { return _err; }
+        public bool IsOk() { return _err == Error.Ok; }
+        public Error Err() { return _err; }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            public FFIError _err;
+            public Error _err;
         }
 
-        [CustomMarshaller(typeof(ResultFFIError), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
 
         public ref struct Marshaller
         {
-            private ResultFFIError _managed; // Used when converting managed -> unmanaged
+            private ResultError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultFFIError managed) { _managed = managed; }
+            public Marshaller(ResultError managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultFFIError managed) { _managed = managed; }
+            public void FromManaged(ResultError managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -3782,9 +3834,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultFFIError ToManaged()
+            public unsafe ResultError ToManaged()
             {
-                _managed = new ResultFFIError();
+                _managed = new ResultError();
                 _managed._err = _unmanaged._err;
                 return _managed;
             }
@@ -4264,19 +4316,19 @@ namespace My.Company
 
     // Debug - write_type_definition_composite 
     ///Result that contains value or an error.
-    public partial struct ResultConstPtrServiceAsyncFFIError
+    public partial struct ResultConstPtrServiceAsyncError
     {
         ///Element if err is `Ok`.
         IntPtr t;
         ///Error value.
-        FFIError err;
+        Error err;
     }
 
     // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultConstPtrServiceAsyncFFIError
+    public partial struct ResultConstPtrServiceAsyncError
     {
-        public ResultConstPtrServiceAsyncFFIError(ResultConstPtrServiceAsyncFFIError other)
+        public ResultConstPtrServiceAsyncError(ResultConstPtrServiceAsyncError other)
         {
             t = other.t;
             err = other.err;
@@ -4288,21 +4340,21 @@ namespace My.Company
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public IntPtr t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
-            public FFIError err;
+            public Error err;
         }
 
-        [CustomMarshaller(typeof(ResultConstPtrServiceAsyncFFIError), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultConstPtrServiceAsyncError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private ResultConstPtrServiceAsyncFFIError _managed; // Used when converting managed -> unmanaged
+            private ResultConstPtrServiceAsyncError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultConstPtrServiceAsyncFFIError managed) { _managed = managed; }
+            public Marshaller(ResultConstPtrServiceAsyncError managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultConstPtrServiceAsyncFFIError managed) { _managed = managed; }
+            public void FromManaged(ResultConstPtrServiceAsyncError managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -4317,9 +4369,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultConstPtrServiceAsyncFFIError ToManaged()
+            public unsafe ResultConstPtrServiceAsyncError ToManaged()
             {
-                _managed = new ResultConstPtrServiceAsyncFFIError();
+                _managed = new ResultConstPtrServiceAsyncError();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 _managed.t = _unmanaged.t;
@@ -4333,38 +4385,38 @@ namespace My.Company
     }
 
     // Debug - write_pattern_result 
-    public partial struct ResultConstPtrServiceAsyncFFIError
+    public partial struct ResultConstPtrServiceAsyncError
     {
         public IntPtr Ok()
         {
-            if (err == FFIError.Ok)
+            if (err == Error.Ok)
             {
                 return t;
             }
-            throw new InteropException<FFIError>(err);
+            throw new InteropException<Error>(err);
         }
 
-        public bool IsOk() { return err == FFIError.Ok; }
-        public FFIError Err() { return err; }
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
 
     }
 
 
     // Debug - write_type_definition_composite 
     ///Result that contains value or an error.
-    public partial struct ResultConstPtrServiceBasicFFIError
+    public partial struct ResultConstPtrServiceBasicError
     {
         ///Element if err is `Ok`.
         IntPtr t;
         ///Error value.
-        FFIError err;
+        Error err;
     }
 
     // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultConstPtrServiceBasicFFIError
+    public partial struct ResultConstPtrServiceBasicError
     {
-        public ResultConstPtrServiceBasicFFIError(ResultConstPtrServiceBasicFFIError other)
+        public ResultConstPtrServiceBasicError(ResultConstPtrServiceBasicError other)
         {
             t = other.t;
             err = other.err;
@@ -4376,21 +4428,21 @@ namespace My.Company
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public IntPtr t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
-            public FFIError err;
+            public Error err;
         }
 
-        [CustomMarshaller(typeof(ResultConstPtrServiceBasicFFIError), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultConstPtrServiceBasicError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private ResultConstPtrServiceBasicFFIError _managed; // Used when converting managed -> unmanaged
+            private ResultConstPtrServiceBasicError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultConstPtrServiceBasicFFIError managed) { _managed = managed; }
+            public Marshaller(ResultConstPtrServiceBasicError managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultConstPtrServiceBasicFFIError managed) { _managed = managed; }
+            public void FromManaged(ResultConstPtrServiceBasicError managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -4405,9 +4457,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultConstPtrServiceBasicFFIError ToManaged()
+            public unsafe ResultConstPtrServiceBasicError ToManaged()
             {
-                _managed = new ResultConstPtrServiceBasicFFIError();
+                _managed = new ResultConstPtrServiceBasicError();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 _managed.t = _unmanaged.t;
@@ -4421,38 +4473,38 @@ namespace My.Company
     }
 
     // Debug - write_pattern_result 
-    public partial struct ResultConstPtrServiceBasicFFIError
+    public partial struct ResultConstPtrServiceBasicError
     {
         public IntPtr Ok()
         {
-            if (err == FFIError.Ok)
+            if (err == Error.Ok)
             {
                 return t;
             }
-            throw new InteropException<FFIError>(err);
+            throw new InteropException<Error>(err);
         }
 
-        public bool IsOk() { return err == FFIError.Ok; }
-        public FFIError Err() { return err; }
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
 
     }
 
 
     // Debug - write_type_definition_composite 
     ///Result that contains value or an error.
-    public partial struct ResultConstPtrServiceCallbacksFFIError
+    public partial struct ResultConstPtrServiceCallbacksError
     {
         ///Element if err is `Ok`.
         IntPtr t;
         ///Error value.
-        FFIError err;
+        Error err;
     }
 
     // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultConstPtrServiceCallbacksFFIError
+    public partial struct ResultConstPtrServiceCallbacksError
     {
-        public ResultConstPtrServiceCallbacksFFIError(ResultConstPtrServiceCallbacksFFIError other)
+        public ResultConstPtrServiceCallbacksError(ResultConstPtrServiceCallbacksError other)
         {
             t = other.t;
             err = other.err;
@@ -4464,21 +4516,21 @@ namespace My.Company
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public IntPtr t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
-            public FFIError err;
+            public Error err;
         }
 
-        [CustomMarshaller(typeof(ResultConstPtrServiceCallbacksFFIError), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultConstPtrServiceCallbacksError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private ResultConstPtrServiceCallbacksFFIError _managed; // Used when converting managed -> unmanaged
+            private ResultConstPtrServiceCallbacksError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultConstPtrServiceCallbacksFFIError managed) { _managed = managed; }
+            public Marshaller(ResultConstPtrServiceCallbacksError managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultConstPtrServiceCallbacksFFIError managed) { _managed = managed; }
+            public void FromManaged(ResultConstPtrServiceCallbacksError managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -4493,9 +4545,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultConstPtrServiceCallbacksFFIError ToManaged()
+            public unsafe ResultConstPtrServiceCallbacksError ToManaged()
             {
-                _managed = new ResultConstPtrServiceCallbacksFFIError();
+                _managed = new ResultConstPtrServiceCallbacksError();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 _managed.t = _unmanaged.t;
@@ -4509,38 +4561,38 @@ namespace My.Company
     }
 
     // Debug - write_pattern_result 
-    public partial struct ResultConstPtrServiceCallbacksFFIError
+    public partial struct ResultConstPtrServiceCallbacksError
     {
         public IntPtr Ok()
         {
-            if (err == FFIError.Ok)
+            if (err == Error.Ok)
             {
                 return t;
             }
-            throw new InteropException<FFIError>(err);
+            throw new InteropException<Error>(err);
         }
 
-        public bool IsOk() { return err == FFIError.Ok; }
-        public FFIError Err() { return err; }
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
 
     }
 
 
     // Debug - write_type_definition_composite 
     ///Result that contains value or an error.
-    public partial struct ResultConstPtrServiceIgnoringMethodsFFIError
+    public partial struct ResultConstPtrServiceDependentError
     {
         ///Element if err is `Ok`.
         IntPtr t;
         ///Error value.
-        FFIError err;
+        Error err;
     }
 
     // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultConstPtrServiceIgnoringMethodsFFIError
+    public partial struct ResultConstPtrServiceDependentError
     {
-        public ResultConstPtrServiceIgnoringMethodsFFIError(ResultConstPtrServiceIgnoringMethodsFFIError other)
+        public ResultConstPtrServiceDependentError(ResultConstPtrServiceDependentError other)
         {
             t = other.t;
             err = other.err;
@@ -4552,21 +4604,21 @@ namespace My.Company
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public IntPtr t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
-            public FFIError err;
+            public Error err;
         }
 
-        [CustomMarshaller(typeof(ResultConstPtrServiceIgnoringMethodsFFIError), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultConstPtrServiceDependentError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private ResultConstPtrServiceIgnoringMethodsFFIError _managed; // Used when converting managed -> unmanaged
+            private ResultConstPtrServiceDependentError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultConstPtrServiceIgnoringMethodsFFIError managed) { _managed = managed; }
+            public Marshaller(ResultConstPtrServiceDependentError managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultConstPtrServiceIgnoringMethodsFFIError managed) { _managed = managed; }
+            public void FromManaged(ResultConstPtrServiceDependentError managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -4581,9 +4633,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultConstPtrServiceIgnoringMethodsFFIError ToManaged()
+            public unsafe ResultConstPtrServiceDependentError ToManaged()
             {
-                _managed = new ResultConstPtrServiceIgnoringMethodsFFIError();
+                _managed = new ResultConstPtrServiceDependentError();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 _managed.t = _unmanaged.t;
@@ -4597,38 +4649,38 @@ namespace My.Company
     }
 
     // Debug - write_pattern_result 
-    public partial struct ResultConstPtrServiceIgnoringMethodsFFIError
+    public partial struct ResultConstPtrServiceDependentError
     {
         public IntPtr Ok()
         {
-            if (err == FFIError.Ok)
+            if (err == Error.Ok)
             {
                 return t;
             }
-            throw new InteropException<FFIError>(err);
+            throw new InteropException<Error>(err);
         }
 
-        public bool IsOk() { return err == FFIError.Ok; }
-        public FFIError Err() { return err; }
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
 
     }
 
 
     // Debug - write_type_definition_composite 
     ///Result that contains value or an error.
-    public partial struct ResultConstPtrServiceMultipleCtorsFFIError
+    public partial struct ResultConstPtrServiceIgnoringMethodsError
     {
         ///Element if err is `Ok`.
         IntPtr t;
         ///Error value.
-        FFIError err;
+        Error err;
     }
 
     // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultConstPtrServiceMultipleCtorsFFIError
+    public partial struct ResultConstPtrServiceIgnoringMethodsError
     {
-        public ResultConstPtrServiceMultipleCtorsFFIError(ResultConstPtrServiceMultipleCtorsFFIError other)
+        public ResultConstPtrServiceIgnoringMethodsError(ResultConstPtrServiceIgnoringMethodsError other)
         {
             t = other.t;
             err = other.err;
@@ -4640,21 +4692,21 @@ namespace My.Company
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public IntPtr t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
-            public FFIError err;
+            public Error err;
         }
 
-        [CustomMarshaller(typeof(ResultConstPtrServiceMultipleCtorsFFIError), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultConstPtrServiceIgnoringMethodsError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private ResultConstPtrServiceMultipleCtorsFFIError _managed; // Used when converting managed -> unmanaged
+            private ResultConstPtrServiceIgnoringMethodsError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultConstPtrServiceMultipleCtorsFFIError managed) { _managed = managed; }
+            public Marshaller(ResultConstPtrServiceIgnoringMethodsError managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultConstPtrServiceMultipleCtorsFFIError managed) { _managed = managed; }
+            public void FromManaged(ResultConstPtrServiceIgnoringMethodsError managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -4669,9 +4721,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultConstPtrServiceMultipleCtorsFFIError ToManaged()
+            public unsafe ResultConstPtrServiceIgnoringMethodsError ToManaged()
             {
-                _managed = new ResultConstPtrServiceMultipleCtorsFFIError();
+                _managed = new ResultConstPtrServiceIgnoringMethodsError();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 _managed.t = _unmanaged.t;
@@ -4685,38 +4737,38 @@ namespace My.Company
     }
 
     // Debug - write_pattern_result 
-    public partial struct ResultConstPtrServiceMultipleCtorsFFIError
+    public partial struct ResultConstPtrServiceIgnoringMethodsError
     {
         public IntPtr Ok()
         {
-            if (err == FFIError.Ok)
+            if (err == Error.Ok)
             {
                 return t;
             }
-            throw new InteropException<FFIError>(err);
+            throw new InteropException<Error>(err);
         }
 
-        public bool IsOk() { return err == FFIError.Ok; }
-        public FFIError Err() { return err; }
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
 
     }
 
 
     // Debug - write_type_definition_composite 
     ///Result that contains value or an error.
-    public partial struct ResultConstPtrServiceOnPanicFFIError
+    public partial struct ResultConstPtrServiceMainError
     {
         ///Element if err is `Ok`.
         IntPtr t;
         ///Error value.
-        FFIError err;
+        Error err;
     }
 
     // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultConstPtrServiceOnPanicFFIError
+    public partial struct ResultConstPtrServiceMainError
     {
-        public ResultConstPtrServiceOnPanicFFIError(ResultConstPtrServiceOnPanicFFIError other)
+        public ResultConstPtrServiceMainError(ResultConstPtrServiceMainError other)
         {
             t = other.t;
             err = other.err;
@@ -4728,21 +4780,21 @@ namespace My.Company
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public IntPtr t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
-            public FFIError err;
+            public Error err;
         }
 
-        [CustomMarshaller(typeof(ResultConstPtrServiceOnPanicFFIError), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultConstPtrServiceMainError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private ResultConstPtrServiceOnPanicFFIError _managed; // Used when converting managed -> unmanaged
+            private ResultConstPtrServiceMainError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultConstPtrServiceOnPanicFFIError managed) { _managed = managed; }
+            public Marshaller(ResultConstPtrServiceMainError managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultConstPtrServiceOnPanicFFIError managed) { _managed = managed; }
+            public void FromManaged(ResultConstPtrServiceMainError managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -4757,9 +4809,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultConstPtrServiceOnPanicFFIError ToManaged()
+            public unsafe ResultConstPtrServiceMainError ToManaged()
             {
-                _managed = new ResultConstPtrServiceOnPanicFFIError();
+                _managed = new ResultConstPtrServiceMainError();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 _managed.t = _unmanaged.t;
@@ -4773,38 +4825,38 @@ namespace My.Company
     }
 
     // Debug - write_pattern_result 
-    public partial struct ResultConstPtrServiceOnPanicFFIError
+    public partial struct ResultConstPtrServiceMainError
     {
         public IntPtr Ok()
         {
-            if (err == FFIError.Ok)
+            if (err == Error.Ok)
             {
                 return t;
             }
-            throw new InteropException<FFIError>(err);
+            throw new InteropException<Error>(err);
         }
 
-        public bool IsOk() { return err == FFIError.Ok; }
-        public FFIError Err() { return err; }
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
 
     }
 
 
     // Debug - write_type_definition_composite 
     ///Result that contains value or an error.
-    public partial struct ResultConstPtrServiceResultFFIError
+    public partial struct ResultConstPtrServiceMultipleCtorsError
     {
         ///Element if err is `Ok`.
         IntPtr t;
         ///Error value.
-        FFIError err;
+        Error err;
     }
 
     // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultConstPtrServiceResultFFIError
+    public partial struct ResultConstPtrServiceMultipleCtorsError
     {
-        public ResultConstPtrServiceResultFFIError(ResultConstPtrServiceResultFFIError other)
+        public ResultConstPtrServiceMultipleCtorsError(ResultConstPtrServiceMultipleCtorsError other)
         {
             t = other.t;
             err = other.err;
@@ -4816,21 +4868,21 @@ namespace My.Company
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public IntPtr t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
-            public FFIError err;
+            public Error err;
         }
 
-        [CustomMarshaller(typeof(ResultConstPtrServiceResultFFIError), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultConstPtrServiceMultipleCtorsError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private ResultConstPtrServiceResultFFIError _managed; // Used when converting managed -> unmanaged
+            private ResultConstPtrServiceMultipleCtorsError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultConstPtrServiceResultFFIError managed) { _managed = managed; }
+            public Marshaller(ResultConstPtrServiceMultipleCtorsError managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultConstPtrServiceResultFFIError managed) { _managed = managed; }
+            public void FromManaged(ResultConstPtrServiceMultipleCtorsError managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -4845,9 +4897,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultConstPtrServiceResultFFIError ToManaged()
+            public unsafe ResultConstPtrServiceMultipleCtorsError ToManaged()
             {
-                _managed = new ResultConstPtrServiceResultFFIError();
+                _managed = new ResultConstPtrServiceMultipleCtorsError();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 _managed.t = _unmanaged.t;
@@ -4861,38 +4913,38 @@ namespace My.Company
     }
 
     // Debug - write_pattern_result 
-    public partial struct ResultConstPtrServiceResultFFIError
+    public partial struct ResultConstPtrServiceMultipleCtorsError
     {
         public IntPtr Ok()
         {
-            if (err == FFIError.Ok)
+            if (err == Error.Ok)
             {
                 return t;
             }
-            throw new InteropException<FFIError>(err);
+            throw new InteropException<Error>(err);
         }
 
-        public bool IsOk() { return err == FFIError.Ok; }
-        public FFIError Err() { return err; }
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
 
     }
 
 
     // Debug - write_type_definition_composite 
     ///Result that contains value or an error.
-    public partial struct ResultConstPtrServiceStringsFFIError
+    public partial struct ResultConstPtrServiceOnPanicError
     {
         ///Element if err is `Ok`.
         IntPtr t;
         ///Error value.
-        FFIError err;
+        Error err;
     }
 
     // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultConstPtrServiceStringsFFIError
+    public partial struct ResultConstPtrServiceOnPanicError
     {
-        public ResultConstPtrServiceStringsFFIError(ResultConstPtrServiceStringsFFIError other)
+        public ResultConstPtrServiceOnPanicError(ResultConstPtrServiceOnPanicError other)
         {
             t = other.t;
             err = other.err;
@@ -4904,21 +4956,21 @@ namespace My.Company
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public IntPtr t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
-            public FFIError err;
+            public Error err;
         }
 
-        [CustomMarshaller(typeof(ResultConstPtrServiceStringsFFIError), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultConstPtrServiceOnPanicError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private ResultConstPtrServiceStringsFFIError _managed; // Used when converting managed -> unmanaged
+            private ResultConstPtrServiceOnPanicError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultConstPtrServiceStringsFFIError managed) { _managed = managed; }
+            public Marshaller(ResultConstPtrServiceOnPanicError managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultConstPtrServiceStringsFFIError managed) { _managed = managed; }
+            public void FromManaged(ResultConstPtrServiceOnPanicError managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -4933,9 +4985,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultConstPtrServiceStringsFFIError ToManaged()
+            public unsafe ResultConstPtrServiceOnPanicError ToManaged()
             {
-                _managed = new ResultConstPtrServiceStringsFFIError();
+                _managed = new ResultConstPtrServiceOnPanicError();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 _managed.t = _unmanaged.t;
@@ -4949,38 +5001,38 @@ namespace My.Company
     }
 
     // Debug - write_pattern_result 
-    public partial struct ResultConstPtrServiceStringsFFIError
+    public partial struct ResultConstPtrServiceOnPanicError
     {
         public IntPtr Ok()
         {
-            if (err == FFIError.Ok)
+            if (err == Error.Ok)
             {
                 return t;
             }
-            throw new InteropException<FFIError>(err);
+            throw new InteropException<Error>(err);
         }
 
-        public bool IsOk() { return err == FFIError.Ok; }
-        public FFIError Err() { return err; }
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
 
     }
 
 
     // Debug - write_type_definition_composite 
     ///Result that contains value or an error.
-    public partial struct ResultConstPtrServiceVariousSlicesFFIError
+    public partial struct ResultConstPtrServiceResultError
     {
         ///Element if err is `Ok`.
         IntPtr t;
         ///Error value.
-        FFIError err;
+        Error err;
     }
 
     // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultConstPtrServiceVariousSlicesFFIError
+    public partial struct ResultConstPtrServiceResultError
     {
-        public ResultConstPtrServiceVariousSlicesFFIError(ResultConstPtrServiceVariousSlicesFFIError other)
+        public ResultConstPtrServiceResultError(ResultConstPtrServiceResultError other)
         {
             t = other.t;
             err = other.err;
@@ -4992,21 +5044,21 @@ namespace My.Company
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public IntPtr t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
-            public FFIError err;
+            public Error err;
         }
 
-        [CustomMarshaller(typeof(ResultConstPtrServiceVariousSlicesFFIError), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultConstPtrServiceResultError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private ResultConstPtrServiceVariousSlicesFFIError _managed; // Used when converting managed -> unmanaged
+            private ResultConstPtrServiceResultError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultConstPtrServiceVariousSlicesFFIError managed) { _managed = managed; }
+            public Marshaller(ResultConstPtrServiceResultError managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultConstPtrServiceVariousSlicesFFIError managed) { _managed = managed; }
+            public void FromManaged(ResultConstPtrServiceResultError managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -5021,9 +5073,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultConstPtrServiceVariousSlicesFFIError ToManaged()
+            public unsafe ResultConstPtrServiceResultError ToManaged()
             {
-                _managed = new ResultConstPtrServiceVariousSlicesFFIError();
+                _managed = new ResultConstPtrServiceResultError();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 _managed.t = _unmanaged.t;
@@ -5037,38 +5089,214 @@ namespace My.Company
     }
 
     // Debug - write_pattern_result 
-    public partial struct ResultConstPtrServiceVariousSlicesFFIError
+    public partial struct ResultConstPtrServiceResultError
     {
         public IntPtr Ok()
         {
-            if (err == FFIError.Ok)
+            if (err == Error.Ok)
             {
                 return t;
             }
-            throw new InteropException<FFIError>(err);
+            throw new InteropException<Error>(err);
         }
 
-        public bool IsOk() { return err == FFIError.Ok; }
-        public FFIError Err() { return err; }
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
 
     }
 
 
     // Debug - write_type_definition_composite 
     ///Result that contains value or an error.
-    public partial struct ResultNestedArrayFFIError
+    public partial struct ResultConstPtrServiceStringsError
+    {
+        ///Element if err is `Ok`.
+        IntPtr t;
+        ///Error value.
+        Error err;
+    }
+
+    // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct ResultConstPtrServiceStringsError
+    {
+        public ResultConstPtrServiceStringsError(ResultConstPtrServiceStringsError other)
+        {
+            t = other.t;
+            err = other.err;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public IntPtr t;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public Error err;
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceStringsError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private ResultConstPtrServiceStringsError _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(ResultConstPtrServiceStringsError managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(ResultConstPtrServiceStringsError managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.t = _managed.t;
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.err = _managed.err;
+
+                return _unmanaged;
+            }
+
+            public unsafe ResultConstPtrServiceStringsError ToManaged()
+            {
+                _managed = new ResultConstPtrServiceStringsError();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.t = _unmanaged.t;
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.err = _unmanaged.err;
+
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    // Debug - write_pattern_result 
+    public partial struct ResultConstPtrServiceStringsError
+    {
+        public IntPtr Ok()
+        {
+            if (err == Error.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<Error>(err);
+        }
+
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
+
+    }
+
+
+    // Debug - write_type_definition_composite 
+    ///Result that contains value or an error.
+    public partial struct ResultConstPtrServiceVariousSlicesError
+    {
+        ///Element if err is `Ok`.
+        IntPtr t;
+        ///Error value.
+        Error err;
+    }
+
+    // Debug - write_type_definition_composite_marshaller 
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct ResultConstPtrServiceVariousSlicesError
+    {
+        public ResultConstPtrServiceVariousSlicesError(ResultConstPtrServiceVariousSlicesError other)
+        {
+            t = other.t;
+            err = other.err;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public IntPtr t;
+            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public Error err;
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceVariousSlicesError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private ResultConstPtrServiceVariousSlicesError _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(ResultConstPtrServiceVariousSlicesError managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(ResultConstPtrServiceVariousSlicesError managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.t = _managed.t;
+                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
+                _unmanaged.err = _managed.err;
+
+                return _unmanaged;
+            }
+
+            public unsafe ResultConstPtrServiceVariousSlicesError ToManaged()
+            {
+                _managed = new ResultConstPtrServiceVariousSlicesError();
+
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.t = _unmanaged.t;
+                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
+                _managed.err = _unmanaged.err;
+
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    // Debug - write_pattern_result 
+    public partial struct ResultConstPtrServiceVariousSlicesError
+    {
+        public IntPtr Ok()
+        {
+            if (err == Error.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<Error>(err);
+        }
+
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
+
+    }
+
+
+    // Debug - write_type_definition_composite 
+    ///Result that contains value or an error.
+    public partial struct ResultNestedArrayError
     {
         ///Element if err is `Ok`.
         NestedArray t;
         ///Error value.
-        FFIError err;
+        Error err;
     }
 
     // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultNestedArrayFFIError
+    public partial struct ResultNestedArrayError
     {
-        public ResultNestedArrayFFIError(ResultNestedArrayFFIError other)
+        public ResultNestedArrayError(ResultNestedArrayError other)
         {
             t = other.t;
             err = other.err;
@@ -5080,21 +5308,21 @@ namespace My.Company
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public NestedArray.Unmanaged t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
-            public FFIError err;
+            public Error err;
         }
 
-        [CustomMarshaller(typeof(ResultNestedArrayFFIError), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultNestedArrayError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private ResultNestedArrayFFIError _managed; // Used when converting managed -> unmanaged
+            private ResultNestedArrayError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultNestedArrayFFIError managed) { _managed = managed; }
+            public Marshaller(ResultNestedArrayError managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultNestedArrayFFIError managed) { _managed = managed; }
+            public void FromManaged(ResultNestedArrayError managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -5110,9 +5338,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultNestedArrayFFIError ToManaged()
+            public unsafe ResultNestedArrayError ToManaged()
             {
-                _managed = new ResultNestedArrayFFIError();
+                _managed = new ResultNestedArrayError();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 var _t = new NestedArray.Marshaller(_unmanaged.t);
@@ -5127,38 +5355,38 @@ namespace My.Company
     }
 
     // Debug - write_pattern_result 
-    public partial struct ResultNestedArrayFFIError
+    public partial struct ResultNestedArrayError
     {
         public NestedArray Ok()
         {
-            if (err == FFIError.Ok)
+            if (err == Error.Ok)
             {
                 return t;
             }
-            throw new InteropException<FFIError>(err);
+            throw new InteropException<Error>(err);
         }
 
-        public bool IsOk() { return err == FFIError.Ok; }
-        public FFIError Err() { return err; }
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
 
     }
 
 
     // Debug - write_type_definition_composite 
     ///Result that contains value or an error.
-    public partial struct ResultU32FFIError
+    public partial struct ResultU32Error
     {
         ///Element if err is `Ok`.
         uint t;
         ///Error value.
-        FFIError err;
+        Error err;
     }
 
     // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultU32FFIError
+    public partial struct ResultU32Error
     {
-        public ResultU32FFIError(ResultU32FFIError other)
+        public ResultU32Error(ResultU32Error other)
         {
             t = other.t;
             err = other.err;
@@ -5170,21 +5398,21 @@ namespace My.Company
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public uint t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
-            public FFIError err;
+            public Error err;
         }
 
-        [CustomMarshaller(typeof(ResultU32FFIError), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultU32Error), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private ResultU32FFIError _managed; // Used when converting managed -> unmanaged
+            private ResultU32Error _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultU32FFIError managed) { _managed = managed; }
+            public Marshaller(ResultU32Error managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultU32FFIError managed) { _managed = managed; }
+            public void FromManaged(ResultU32Error managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -5199,9 +5427,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultU32FFIError ToManaged()
+            public unsafe ResultU32Error ToManaged()
             {
-                _managed = new ResultU32FFIError();
+                _managed = new ResultU32Error();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 _managed.t = _unmanaged.t;
@@ -5215,38 +5443,38 @@ namespace My.Company
     }
 
     // Debug - write_pattern_result 
-    public partial struct ResultU32FFIError
+    public partial struct ResultU32Error
     {
         public uint Ok()
         {
-            if (err == FFIError.Ok)
+            if (err == Error.Ok)
             {
                 return t;
             }
-            throw new InteropException<FFIError>(err);
+            throw new InteropException<Error>(err);
         }
 
-        public bool IsOk() { return err == FFIError.Ok; }
-        public FFIError Err() { return err; }
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
 
     }
 
 
     // Debug - write_type_definition_composite 
     ///Result that contains value or an error.
-    public partial struct ResultU64FFIError
+    public partial struct ResultU64Error
     {
         ///Element if err is `Ok`.
         ulong t;
         ///Error value.
-        FFIError err;
+        Error err;
     }
 
     // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultU64FFIError
+    public partial struct ResultU64Error
     {
-        public ResultU64FFIError(ResultU64FFIError other)
+        public ResultU64Error(ResultU64Error other)
         {
             t = other.t;
             err = other.err;
@@ -5258,21 +5486,21 @@ namespace My.Company
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public ulong t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
-            public FFIError err;
+            public Error err;
         }
 
-        [CustomMarshaller(typeof(ResultU64FFIError), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultU64Error), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private ResultU64FFIError _managed; // Used when converting managed -> unmanaged
+            private ResultU64Error _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultU64FFIError managed) { _managed = managed; }
+            public Marshaller(ResultU64Error managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultU64FFIError managed) { _managed = managed; }
+            public void FromManaged(ResultU64Error managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -5287,9 +5515,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultU64FFIError ToManaged()
+            public unsafe ResultU64Error ToManaged()
             {
-                _managed = new ResultU64FFIError();
+                _managed = new ResultU64Error();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 _managed.t = _unmanaged.t;
@@ -5303,38 +5531,38 @@ namespace My.Company
     }
 
     // Debug - write_pattern_result 
-    public partial struct ResultU64FFIError
+    public partial struct ResultU64Error
     {
         public ulong Ok()
         {
-            if (err == FFIError.Ok)
+            if (err == Error.Ok)
             {
                 return t;
             }
-            throw new InteropException<FFIError>(err);
+            throw new InteropException<Error>(err);
         }
 
-        public bool IsOk() { return err == FFIError.Ok; }
-        public FFIError Err() { return err; }
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
 
     }
 
 
     // Debug - write_type_definition_composite 
     ///Result that contains value or an error.
-    public partial struct ResultUseUtf8StringFFIError
+    public partial struct ResultUseUtf8StringError
     {
         ///Element if err is `Ok`.
         UseUtf8String t;
         ///Error value.
-        FFIError err;
+        Error err;
     }
 
     // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultUseUtf8StringFFIError
+    public partial struct ResultUseUtf8StringError
     {
-        public ResultUseUtf8StringFFIError(ResultUseUtf8StringFFIError other)
+        public ResultUseUtf8StringError(ResultUseUtf8StringError other)
         {
             t = other.t;
             err = other.err;
@@ -5346,21 +5574,21 @@ namespace My.Company
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public UseUtf8String.Unmanaged t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
-            public FFIError err;
+            public Error err;
         }
 
-        [CustomMarshaller(typeof(ResultUseUtf8StringFFIError), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultUseUtf8StringError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private ResultUseUtf8StringFFIError _managed; // Used when converting managed -> unmanaged
+            private ResultUseUtf8StringError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultUseUtf8StringFFIError managed) { _managed = managed; }
+            public Marshaller(ResultUseUtf8StringError managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultUseUtf8StringFFIError managed) { _managed = managed; }
+            public void FromManaged(ResultUseUtf8StringError managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -5376,9 +5604,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultUseUtf8StringFFIError ToManaged()
+            public unsafe ResultUseUtf8StringError ToManaged()
             {
-                _managed = new ResultUseUtf8StringFFIError();
+                _managed = new ResultUseUtf8StringError();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 var _t = new UseUtf8String.Marshaller(_unmanaged.t);
@@ -5393,38 +5621,38 @@ namespace My.Company
     }
 
     // Debug - write_pattern_result 
-    public partial struct ResultUseUtf8StringFFIError
+    public partial struct ResultUseUtf8StringError
     {
         public UseUtf8String Ok()
         {
-            if (err == FFIError.Ok)
+            if (err == Error.Ok)
             {
                 return t;
             }
-            throw new InteropException<FFIError>(err);
+            throw new InteropException<Error>(err);
         }
 
-        public bool IsOk() { return err == FFIError.Ok; }
-        public FFIError Err() { return err; }
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
 
     }
 
 
     // Debug - write_type_definition_composite 
     ///Result that contains value or an error.
-    public partial struct ResultUtf8StringFFIError
+    public partial struct ResultUtf8StringError
     {
         ///Element if err is `Ok`.
         string t;
         ///Error value.
-        FFIError err;
+        Error err;
     }
 
     // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultUtf8StringFFIError
+    public partial struct ResultUtf8StringError
     {
-        public ResultUtf8StringFFIError(ResultUtf8StringFFIError other)
+        public ResultUtf8StringError(ResultUtf8StringError other)
         {
             t = other.t;
             err = other.err;
@@ -5436,21 +5664,21 @@ namespace My.Company
             // Debug - write_type_definition_composite_unmanaged_body_field 
             public Utf8String.Unmanaged t;
             // Debug - write_type_definition_composite_unmanaged_body_field 
-            public FFIError err;
+            public Error err;
         }
 
-        [CustomMarshaller(typeof(ResultUtf8StringFFIError), MarshalMode.Default, typeof(Marshaller))]
+        [CustomMarshaller(typeof(ResultUtf8StringError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
-            private ResultUtf8StringFFIError _managed; // Used when converting managed -> unmanaged
+            private ResultUtf8StringError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-            public Marshaller(ResultUtf8StringFFIError managed) { _managed = managed; }
+            public Marshaller(ResultUtf8StringError managed) { _managed = managed; }
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-            public void FromManaged(ResultUtf8StringFFIError managed) { _managed = managed; }
+            public void FromManaged(ResultUtf8StringError managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             public unsafe Unmanaged ToUnmanaged()
@@ -5466,9 +5694,9 @@ namespace My.Company
                 return _unmanaged;
             }
 
-            public unsafe ResultUtf8StringFFIError ToManaged()
+            public unsafe ResultUtf8StringError ToManaged()
             {
-                _managed = new ResultUtf8StringFFIError();
+                _managed = new ResultUtf8StringError();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 var _t = new Utf8String.Marshaller(_unmanaged.t);
@@ -5483,19 +5711,19 @@ namespace My.Company
     }
 
     // Debug - write_pattern_result 
-    public partial struct ResultUtf8StringFFIError
+    public partial struct ResultUtf8StringError
     {
         public string Ok()
         {
-            if (err == FFIError.Ok)
+            if (err == Error.Ok)
             {
                 return t;
             }
-            throw new InteropException<FFIError>(err);
+            throw new InteropException<Error>(err);
         }
 
-        public bool IsOk() { return err == FFIError.Ok; }
-        public FFIError Err() { return err; }
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
 
     }
 
@@ -6492,8 +6720,8 @@ namespace My.Company
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate ResultFFIError SumDelegateReturnNative(int x, int y, IntPtr callback_data); // 'True' native callback signature
-    public delegate ResultFFIError SumDelegateReturnDelegate(int x, int y); // Our C# signature
+    public delegate ResultError SumDelegateReturnNative(int x, int y, IntPtr callback_data); // 'True' native callback signature
+    public delegate ResultError SumDelegateReturnDelegate(int x, int y); // Our C# signature
 
     public partial class SumDelegateReturn
     {
@@ -6517,7 +6745,7 @@ namespace My.Company
         }
 
         // Helper to invoke managed code from the native invocation.
-        private ResultFFIError CallTrampoline(int x, int y, IntPtr callback_data)
+        private ResultError CallTrampoline(int x, int y, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
@@ -6527,17 +6755,17 @@ namespace My.Company
             catch (Exception e)
             {
                 _exception = e;
-                return new ResultFFIError(FFIError.Panic);
+                return new ResultError(Error.Panic);
             }
         }
 
         // Invokes the callback.
-        public ResultFFIError Call(int x, int y)
+        public ResultError Call(int x, int y)
         {
             var __target = Marshal.GetDelegateForFunctionPointer<SumDelegateReturnNative>(_ptr);
             // TODO
             // return __target(x, y);
-            return new ResultFFIError(FFIError.Panic);
+            return new ResultError(Error.Panic);
         }
 
         public void Dispose()
@@ -6782,6 +7010,63 @@ namespace My.Company
 
 
     // Debug - write_pattern_service 
+    public partial class ServiceMain : IDisposable
+    {
+        private IntPtr _context;
+
+        private ServiceMain() {}
+
+        // Debug - write_pattern_service_method 
+        public static ServiceMain New(uint value)
+        {
+            var self = new ServiceMain();
+            self._context = Interop.service_main_new(value).Ok();
+            return self;
+        }
+
+        // Debug - write_pattern_service_method 
+        public void Dispose()
+        {
+            Interop.service_main_destroy(_context).Ok();
+        }
+
+        public IntPtr Context => _context;
+    }
+
+
+    // Debug - write_pattern_service 
+    public partial class ServiceDependent : IDisposable
+    {
+        private IntPtr _context;
+
+        private ServiceDependent() {}
+
+        // Debug - write_pattern_service_method 
+        public static ServiceDependent FromMain(IntPtr main)
+        {
+            var self = new ServiceDependent();
+            self._context = Interop.service_dependent_from_main(main).Ok();
+            return self;
+        }
+
+        // Debug - write_pattern_service_method 
+        public void Dispose()
+        {
+            Interop.service_dependent_destroy(_context).Ok();
+        }
+
+        // Debug - write_pattern_service_method 
+        public uint Get()
+        {
+            return Interop.service_dependent_get(_context);
+        }
+        // Debug - write_service_method_overload 
+
+        public IntPtr Context => _context;
+    }
+
+
+    // Debug - write_pattern_service 
     public partial class ServiceResult : IDisposable
     {
         private IntPtr _context;
@@ -6896,7 +7181,7 @@ namespace My.Company
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public ResultFFIError CallbackSimple(MyCallbackDelegate callback)
+        public ResultError CallbackSimple(MyCallbackDelegate callback)
         {
             return Interop.service_callbacks_callback_simple(_context, callback);
         }
@@ -6909,7 +7194,7 @@ namespace My.Company
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public ResultFFIError CallbackFfiReturn(SumDelegateReturnDelegate callback)
+        public ResultError CallbackFfiReturn(SumDelegateReturnDelegate callback)
         {
             return Interop.service_callbacks_callback_ffi_return(_context, callback);
         }
@@ -6922,7 +7207,7 @@ namespace My.Company
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public ResultFFIError CallbackWithSlice(SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
+        public ResultError CallbackWithSlice(SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
         {
             return Interop.service_callbacks_callback_with_slice(_context, callback, input);
         }
@@ -7111,7 +7396,7 @@ namespace My.Company
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public ResultFFIError MutSelfFfiError(Span<byte> slice)
+        public ResultError MutSelfFfiError(Span<byte> slice)
         {
             return Interop.service_various_slices_mut_self_ffi_error(_context, slice);
         }
@@ -7124,7 +7409,7 @@ namespace My.Company
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public ResultFFIError MutSelfNoError(Span<byte> slice)
+        public ResultError MutSelfNoError(Span<byte> slice)
         {
             return Interop.service_various_slices_mut_self_no_error(_context, slice);
         }

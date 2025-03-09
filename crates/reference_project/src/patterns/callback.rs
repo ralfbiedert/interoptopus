@@ -1,4 +1,4 @@
-use crate::patterns::result::FFIError;
+use crate::patterns::result::Error;
 use interoptopus::{callback, ffi_function, ffi_type};
 use std::ffi::c_void;
 use std::ptr::null;
@@ -9,7 +9,7 @@ callback!(MyCallbackVoid(ptr: *const c_void));
 callback!(MyCallbackContextual(context: *const c_void, value: u32));
 callback!(SumDelegate1());
 callback!(SumDelegate2(x: i32, y: i32) -> i32);
-callback!(SumDelegateReturn(x: i32, y: i32) -> FFIError);
+callback!(SumDelegateReturn(x: i32, y: i32) -> Error);
 callback!(SumDelegateReturn2(x: i32, y: i32));
 
 #[ffi_type]
@@ -49,7 +49,7 @@ pub fn pattern_callback_6() -> SumDelegate2 {
 }
 
 #[ffi_function]
-pub fn pattern_callback_7(c1: SumDelegateReturn, c2: SumDelegateReturn2, x: i32, i: i32, o: &mut i32) -> FFIError {
+pub fn pattern_callback_7(c1: SumDelegateReturn, c2: SumDelegateReturn2, x: i32, i: i32, o: &mut i32) -> Error {
     *o = i - 1;
 
     // Call both callbacks. In C#, if the callback throws an exception, we might not re-enter
@@ -65,7 +65,7 @@ pub fn pattern_callback_7(c1: SumDelegateReturn, c2: SumDelegateReturn2, x: i32,
 
     *o = i + 1;
 
-    FFIError::Ok
+    Error::Ok
 }
 
 pub extern "C" fn exposed_sum1(x: *const c_void) {

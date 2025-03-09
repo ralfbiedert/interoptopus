@@ -21,10 +21,10 @@ pub mod patterns {
     pub mod result;
     pub mod string;
     pub mod services {
-        pub mod _tmp;
         pub mod asynk;
         pub mod basic;
         pub mod callback;
+        pub mod dependent;
         pub mod ignored;
         pub mod multiple_ctors;
         pub mod on_panic;
@@ -151,6 +151,8 @@ pub fn ffi_inventory() -> Inventory {
             // Patterns
             .register(pattern!(patterns::services::asynk::ServiceAsync))
             .register(pattern!(patterns::services::basic::ServiceBasic))
+            .register(pattern!(patterns::services::dependent::ServiceMain))
+            .register(pattern!(patterns::services::dependent::ServiceDependent))
             .register(pattern!(patterns::services::result::ServiceResult))
             .register(pattern!(patterns::services::on_panic::ServiceOnPanic))
             .register(pattern!(patterns::services::callback::ServiceCallbacks))

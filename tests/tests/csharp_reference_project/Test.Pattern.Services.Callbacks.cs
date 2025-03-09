@@ -32,7 +32,7 @@ public class TestPatternServicesCallbacks
             Assert.Equal(x, 1);
             Assert.Equal(y, 2);
             called = true;
-            return ResultFFIError.OK;
+            return ResultError.OK;
         }, slice).Ok();
 
         Assert.True(called);

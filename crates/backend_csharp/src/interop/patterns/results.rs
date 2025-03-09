@@ -47,7 +47,7 @@ pub fn write_pattern_result_void(i: &Interop, w: &mut IndentWriter, error: &FFIE
 
     indented!(w, r"public partial struct {name}")?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"internal FFIError _err;")?;
+    indented!(w, [()], r"internal {enum_name} _err;")?;
     indented!(w, r"}}")?;
     w.newline()?;
     indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
@@ -76,7 +76,7 @@ pub fn write_pattern_result_void(i: &Interop, w: &mut IndentWriter, error: &FFIE
     indented!(w, [()], r"[StructLayout(LayoutKind.Sequential)]")?;
     indented!(w, [()], r"public unsafe struct Unmanaged")?;
     indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"public FFIError _err;")?;
+    indented!(w, [()()], r"public {enum_name} _err;")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
     indented!(w, [()], r"[CustomMarshaller(typeof({name}), MarshalMode.Default, typeof(Marshaller))]")?;

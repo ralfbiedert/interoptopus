@@ -241,6 +241,40 @@ pub(crate) fn extract_namespaces_from_types(types: &[CType], into: &mut HashSet<
     }
 }
 
+pub fn holds_opaque_without_ref(typ: &CType) -> bool {
+    match typ {
+        CType::Primitive(_) => false,
+        CType::Array(x) => holds_opaque_without_ref(x.array_type()),
+        CType::Enum(_) => false,
+        CType::Opaque(_) => true,
+        CType::Composite(x) => {
+            for field in x.fields() {
+                if holds_opaque_without_ref(field.the_type()) {
+                    return true;
+                }
+            }
+            false
+        }
+        CType::FnPointer(_) => false,
+        CType::ReadPointer(_) => false,
+        CType::ReadWritePointer(_) => false,
+        CType::Pattern(x) => match x {
+            TypePattern::CStrPointer => false,
+            TypePattern::Utf8String(_) => false,
+            TypePattern::APIVersion => false,
+            TypePattern::FFIErrorEnum(_) => false,
+            TypePattern::Slice(x) => holds_opaque_without_ref(x.target_type()),
+            TypePattern::SliceMut(x) => holds_opaque_without_ref(x.target_type()),
+            TypePattern::Option(x) => holds_opaque_without_ref(&x.into_ctype()),
+            TypePattern::Result(x) => holds_opaque_without_ref(x.t()),
+            TypePattern::Bool => false,
+            TypePattern::CChar => false,
+            TypePattern::NamedCallback(_) => false,
+            TypePattern::AsyncCallback(_) => false,
+        },
+    }
+}
+
 /// Maps an internal namespace like `common` to a language namespace like `Company.Common`.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct NamespaceMappings {

@@ -53,7 +53,7 @@ pub fn ffi_service(attr: TokenStream, input: &TokenStream) -> TokenStream {
         }
     }
 
-    let rval = rval.expect("Must have had ctor rval");
+    let rval = rval.expect("Service must have a constructor, a method without a `self` param, returning an `ffi::Result<Self, _>`).");
     let ffi_functions = function_descriptors.iter().map(|x| x.ffi_function_tokens.clone()).collect::<Vec<_>>();
     let ffi_dtor = generate_service_dtor(&attributes, &item);
     let ffi_method_ident = function_descriptors

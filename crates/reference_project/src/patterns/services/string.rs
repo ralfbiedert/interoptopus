@@ -1,4 +1,4 @@
-use crate::patterns::result::FFIError;
+use crate::patterns::result::Error;
 use interoptopus::{ffi, ffi_service, ffi_service_method, ffi_type};
 
 /// Some struct we want to expose as a class.
@@ -8,7 +8,7 @@ pub struct ServiceStrings {}
 // Regular implementation of methods.
 #[ffi_service]
 impl ServiceStrings {
-    pub fn new() -> ffi::Result<Self, FFIError> {
+    pub fn new() -> ffi::Result<Self, Error> {
         ffi::Result::ok(Self {})
     }
 

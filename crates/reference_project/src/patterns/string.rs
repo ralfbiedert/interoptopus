@@ -1,4 +1,4 @@
-use crate::patterns::result::FFIError;
+use crate::patterns::result::Error;
 use crate::types::{UseCStrPtr, UseUtf8String};
 use interoptopus::ffi::{CStrPointer, Slice};
 use interoptopus::{ffi, ffi_function};
@@ -69,27 +69,27 @@ pub fn pattern_string_4(x: UseUtf8String) -> UseUtf8String {
 }
 
 #[ffi_function]
-pub fn pattern_string_5(x: UseUtf8String) -> ffi::Result<UseUtf8String, FFIError> {
+pub fn pattern_string_5(x: UseUtf8String) -> ffi::Result<UseUtf8String, Error> {
     ffi::Ok(x)
 }
 
 #[ffi_function]
-pub fn pattern_string_6a(_: &UseUtf8String) -> ffi::Result<(), FFIError> {
+pub fn pattern_string_6a(_: &UseUtf8String) -> ffi::Result<(), Error> {
     ffi::Ok(())
 }
 
 #[ffi_function]
-pub fn pattern_string_6b(y: &mut UseUtf8String) -> ffi::Result<(), FFIError> {
+pub fn pattern_string_6b(y: &mut UseUtf8String) -> ffi::Result<(), Error> {
     *y = UseUtf8String { s1: ffi::String::from_string("s1".to_string()), s2: ffi::String::from_string("s2".to_string()) };
     ffi::Ok(())
 }
 
 #[ffi_function]
-pub fn pattern_string_7(x: ffi::Slice<ffi::String>, i: u64) -> ffi::Result<ffi::String, FFIError> {
+pub fn pattern_string_7(x: ffi::Slice<ffi::String>, i: u64) -> ffi::Result<ffi::String, Error> {
     ffi::Ok(x.as_slice()[i as usize].clone())
 }
 
 #[ffi_function]
-pub fn pattern_string_8(x: ffi::Slice<UseUtf8String>, i: u64) -> ffi::Result<UseUtf8String, FFIError> {
+pub fn pattern_string_8(x: ffi::Slice<UseUtf8String>, i: u64) -> ffi::Result<UseUtf8String, Error> {
     ffi::Ok(x.as_slice()[i as usize].clone())
 }

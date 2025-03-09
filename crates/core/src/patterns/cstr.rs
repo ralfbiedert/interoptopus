@@ -26,13 +26,12 @@
 //! void call_with_string(uint8_t* s);
 //! ```
 //!
-use crate::lang::c::{CType, CompositeType, Documentation, Field, Layout, Meta, PrimitiveType, Representation};
+use crate::lang::c::CType;
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::TypePattern;
 use crate::Error;
 use std::ffi::CStr;
 use std::marker::PhantomData;
-use std::mem::forget;
 use std::option::Option::None;
 use std::os::raw::c_char;
 use std::ptr::null;

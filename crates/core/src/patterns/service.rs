@@ -137,14 +137,14 @@ impl ServiceDefinition {
         let the_type = &constructors
             .first()
             .map(|x| x.signature().rval())
-            .expect("Must have type")
+            .expect("Service must have constructor with an rval.")
             .as_result()
-            .expect("Must be a result")
+            .expect("Service must return a result type.")
             .t()
             .pointer_target()
-            .expect("Must be a pointer")
+            .expect("Service return type must have a pointer target.")
             .as_opaque_type()
-            .expect("Must be a opaque type");
+            .expect("Service return type must target an opaque type.");
 
         Self { the_type: (*the_type).clone(), constructors, destructor, methods }
     }

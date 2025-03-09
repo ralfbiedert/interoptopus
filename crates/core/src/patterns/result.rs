@@ -185,6 +185,7 @@ pub struct Result<T, E> {
     err: E,
 }
 
+#[allow(non_snake_case)]
 pub fn Ok<T, E>(t: T) -> Result<T, E>
 where
     T: CTypeInfo,
@@ -193,6 +194,7 @@ where
     Result::ok(t)
 }
 
+#[allow(non_snake_case)]
 pub fn Err<T, E>(e: E) -> Result<T, E>
 where
     T: CTypeInfo,

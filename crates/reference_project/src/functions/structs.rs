@@ -1,4 +1,4 @@
-use crate::patterns::result::FFIError;
+use crate::patterns::result::Error;
 use crate::types::{BoolField, Tupled, Vec3f32};
 use interoptopus::ffi_function;
 use interoptopus::patterns::result::Result;
@@ -9,7 +9,7 @@ pub fn struct1(x: Tupled) -> Tupled {
 }
 
 #[ffi_function]
-pub fn struct2(_a: Vec3f32, _b: Option<&Tupled>) -> Result<(), FFIError> {
+pub fn struct2(_a: Vec3f32, _b: Option<&Tupled>) -> Result<(), Error> {
     Result::ok(())
 }
 

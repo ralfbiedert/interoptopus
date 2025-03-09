@@ -1,6 +1,6 @@
 use crate::lang::c::{CType, Constant, Function};
 use crate::patterns::LibraryPattern;
-use crate::util::{ctypes_from_functions_types, extract_namespaces_from_types};
+use crate::util::{ctypes_from_functions_types, extract_namespaces_from_types, holds_opaque_without_ref};
 use std::collections::HashSet;
 
 /// Tells the [`InventoryBuilder`] what to register.
@@ -104,10 +104,11 @@ impl InventoryBuilder {
     #[must_use]
     pub fn validate(self) -> Self {
         for x in &self.functions {
-            let has_opaque_param = x.signature().params().iter().any(|x| x.the_type().as_opaque_type().is_some());
-            let has_opaque_rval = x.signature().rval().as_opaque_type().is_some();
+            let has_opaque_param = x.signature().params().iter().any(|x| holds_opaque_without_ref(x.the_type()));
+            assert!(!has_opaque_param, "Function `{}` has a (nested) opaque parameter. This can cause UB.", x.name());
 
-            assert!(!(has_opaque_param || has_opaque_rval), "Function {} has an opaque parameter or return value. This can cause UB.", x.name());
+            let has_opaque_rval = holds_opaque_without_ref(x.signature().rval());
+            assert!(!has_opaque_rval, "Function `{}` has a (nested) opaque return value. This can cause UB.", x.name());
         }
 
         self

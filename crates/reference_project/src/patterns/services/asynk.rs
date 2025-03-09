@@ -1,5 +1,5 @@
 use crate::patterns::result::Error;
-use crate::patterns::result::FFIError;
+use crate::patterns::result::ErrorXX;
 use crate::types::{NestedArray, UseUtf8String};
 use interoptopus::ffi;
 use interoptopus::patterns::asynk::{AsyncRuntime, AsyncThreadLocal};
@@ -15,7 +15,7 @@ pub struct ServiceAsync {
 
 #[ffi_service]
 impl ServiceAsync {
-    pub fn new() -> ffi::Result<Self, FFIError> {
+    pub fn new() -> ffi::Result<Self, Error> {
         result_to_ffi(|| {
             // This is a workaround for the fact that tokio::runtime::Builder::new_multi_thread()
             // cannot be used in a const context.
@@ -23,13 +23,13 @@ impl ServiceAsync {
                 .worker_threads(1)
                 .enable_all()
                 .build()
-                .map_err(|_| Error::Bad)?;
+                .map_err(|_| ErrorXX::Bad)?;
 
             Ok(Self { runtime })
         })
     }
 
-    pub async fn return_after_ms(_this: This, x: u64, ms: u64) -> ffi::Result<u64, FFIError> {
+    pub async fn return_after_ms(_this: This, x: u64, ms: u64) -> ffi::Result<u64, Error> {
         result_to_ffi_async(async || {
             // tokio::fs::read("x.text").await?;
             tokio::time::sleep(std::time::Duration::from_millis(ms)).await;
@@ -38,26 +38,22 @@ impl ServiceAsync {
         .await
     }
 
-    pub async fn process_struct(_this: This, mut x: NestedArray) -> ffi::Result<NestedArray, FFIError> {
+    pub async fn process_struct(_this: This, mut x: NestedArray) -> ffi::Result<NestedArray, Error> {
         x.field_int += 1;
         ffi::Ok(x)
     }
 
-    pub async fn handle_string(_this: This, s: ffi::String) -> ffi::Result<ffi::String, FFIError> {
+    pub async fn handle_string(_this: This, s: ffi::String) -> ffi::Result<ffi::String, Error> {
         ffi::Ok(s)
     }
 
-    pub async fn handle_nested_string(_this: This, s: ffi::String) -> ffi::Result<UseUtf8String, FFIError> {
+    pub async fn handle_nested_string(_this: This, s: ffi::String) -> ffi::Result<UseUtf8String, Error> {
         ffi::Result::ok(UseUtf8String { s1: s.clone(), s2: s.clone() })
     }
 
-    pub async fn fail(_this: This) -> ffi::Result<(), FFIError> {
-        ffi::Result::error(FFIError::Fail)
+    pub async fn fail(_this: This) -> ffi::Result<(), Error> {
+        ffi::Result::error(Error::Fail)
     }
-
-    // pub async fn non_result_rval(_this: This, s: Utf8String) -> u8 {
-    //     0
-    // }
 
     // TODO: This must not compile.
     pub fn bad(&mut self) {}

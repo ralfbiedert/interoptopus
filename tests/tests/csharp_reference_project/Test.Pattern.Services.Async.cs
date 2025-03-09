@@ -89,7 +89,7 @@ public class TestPatternServicesAsync
         catch (Exception e)
         {
             exceptionThrown = true;
-            Assert.IsType<InteropException<FFIError>>(e);
+            Assert.IsType<InteropException<Error>>(e);
         }
         s.Dispose();
 
