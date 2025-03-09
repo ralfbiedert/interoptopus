@@ -14,7 +14,8 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
 - Service methods that return void (`()`) can now be used without a `#[ffi_service_method]` annotation. On a Rust panic
   they will silently return. If this is not acceptable you must return `Result` or specify a different panic behavior
   via that attribute.
-- `#[ffi_type(patterns(ffi_error))]` is now `#[ffi_type(error)]`.
+- `#[ffi_type(patterns(ffi_error))]` is now `#[ffi_type]` only.
+- `#[ffi_service_ctor]` has been removed and is inferred.
 - `AsciiPointer` is now called `CStrPointer`, since it can contain non-ASCII data (e.g., when called from C#).
 - We fixed capitalization in some backends, e.g., a `Sliceu8` is now `SliceU8`.
 - When using `InventoryBuilder` you should call `.validate().inventory()` now.
@@ -29,6 +30,10 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
 - Backend-related testing functions were moved into an internal `tests` project, as the code was mostly specific to our
   project needs anyway.
 - The core generation trait was renamed from `Interop` to `GenerateInterop`.
+- The preferred way to return errors is now via `ffi:Result`
+- We now support UTF-8 strings via `ffi::String`
+- We support async-async calls (from C#)
+- Items were generally renamed from `FFIxxx` to `ffi::Xxx`
 
 #### All Backends
 
@@ -53,6 +58,13 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
   used unsafe before you'll get a massive speed boost. If you shipped safe bindings to customers without a `.csproj`
   file so far, you should now ship them with a `.csproj` file that enables that flag instead.
 - Arrays are properly supported!
+- Async calls are supported
+- Exception in callbacks should be properly handled
+
+#### Python / C Backend
+
+- Contributors wanted! Right now I don't have much bandwidth to work on these backends, so they lack support for
+  many of the new features.
 
 ### 0.13 → 0.14
 

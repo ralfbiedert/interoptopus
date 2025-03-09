@@ -46,7 +46,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_create")]
         // Debug - write_function_declaration 
-        public static partial long interoptopus_string_create(IntPtr utf8, ulong len, out Utf8String rval);
+        public static partial long interoptopus_string_create(IntPtr utf8, ulong len, ref Utf8String rval);
 
         // Debug - write_function_overload 
         // Debug - no overload for interoptopus_string_create 
@@ -97,7 +97,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "array_3")]
         // Debug - write_function_declaration 
-        public static partial void array_3(out Array arr);
+        public static partial void array_3(ref Array arr);
 
         // Debug - write_function_overload 
         // Debug - no overload for array_3 
@@ -137,7 +137,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "nested_array_2")]
         // Debug - write_function_declaration 
-        public static partial void nested_array_2(out NestedArray result);
+        public static partial void nested_array_2(ref NestedArray result);
 
         // Debug - write_function_overload 
         // Debug - no overload for nested_array_2 
@@ -490,7 +490,7 @@ namespace My.Company
         /// Parameter x must point to valid data.
         [LibraryImport(NativeLib, EntryPoint = "ptr3")]
         // Debug - write_function_declaration 
-        public static partial IntPtr ptr3(out long x);
+        public static partial IntPtr ptr3(ref long x);
 
         // Debug - write_function_overload 
         // Debug - no overload for ptr3 
@@ -506,7 +506,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "ref2")]
         // Debug - write_function_declaration 
-        public static partial IntPtr ref2(out long x);
+        public static partial IntPtr ref2(ref long x);
 
         // Debug - write_function_overload 
         // Debug - no overload for ref2 
@@ -524,7 +524,7 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "ref4")]
         [return: MarshalAs(UnmanagedType.U1)]
         // Debug - write_function_declaration 
-        public static partial bool ref4(out long x);
+        public static partial bool ref4(ref long x);
 
         // Debug - write_function_overload 
         // Debug - no overload for ref4 
@@ -675,7 +675,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_6b")]
         // Debug - write_function_declaration 
-        public static partial ResultError pattern_string_6b(out UseString y);
+        public static partial ResultError pattern_string_6b(ref UseString y);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_string_6b 
@@ -1096,16 +1096,16 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_7")]
         // Debug - write_function_declaration 
-        public static partial ResultError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o);
+        public static partial ResultError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, ref int o);
 
         // Debug - write_function_overload 
-        public static unsafe ResultError pattern_callback_7(SumDelegateReturnDelegate c1, SumDelegateReturn2Delegate c2, int x, int i, out int o)
+        public static unsafe ResultError pattern_callback_7(SumDelegateReturnDelegate c1, SumDelegateReturn2Delegate c2, int x, int i, ref int o)
         {
             var c1_wrapped = new SumDelegateReturn(c1);
             var c2_wrapped = new SumDelegateReturn2(c2);
             try
             {
-                return pattern_callback_7(c1_wrapped, c2_wrapped, x, i, out o);
+                return pattern_callback_7(c1_wrapped, c2_wrapped, x, i, ref o);
             }
             finally
             {
@@ -1140,7 +1140,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_surrogates_1")]
         // Debug - write_function_declaration 
-        public static partial void pattern_surrogates_1(Local s, out Container c);
+        public static partial void pattern_surrogates_1(Local s, ref Container c);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_surrogates_1 
@@ -1720,7 +1720,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref")]
         // Debug - write_function_declaration 
-        public static partial byte service_various_slices_mut_self_ref(IntPtr _context, ref byte x, out byte y);
+        public static partial byte service_various_slices_mut_self_ref(IntPtr _context, ref byte x, ref byte y);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_various_slices_mut_self_ref 
@@ -1728,17 +1728,17 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice")]
         // Debug - write_function_declaration 
-        public static partial byte service_various_slices_mut_self_ref_slice(IntPtr _context, ref byte x, out byte y, SliceU8 slice);
+        public static partial byte service_various_slices_mut_self_ref_slice(IntPtr _context, ref byte x, ref byte y, SliceU8 slice);
 
         // Debug - write_function_overload 
-        public static unsafe byte service_various_slices_mut_self_ref_slice(IntPtr _context, ref byte x, out byte y, ReadOnlySpan<byte> slice)
+        public static unsafe byte service_various_slices_mut_self_ref_slice(IntPtr _context, ref byte x, ref byte y, ReadOnlySpan<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                 try
                 {
-                    return service_various_slices_mut_self_ref_slice(_context, ref x, out y, slice_slice);
+                    return service_various_slices_mut_self_ref_slice(_context, ref x, ref y, slice_slice);
                 }
                 finally
                 {
@@ -1749,10 +1749,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice_limited")]
         // Debug - write_function_declaration 
-        public static partial byte service_various_slices_mut_self_ref_slice_limited(IntPtr _context, ref byte x, out byte y, SliceU8 slice, SliceU8 slice2);
+        public static partial byte service_various_slices_mut_self_ref_slice_limited(IntPtr _context, ref byte x, ref byte y, SliceU8 slice, SliceU8 slice2);
 
         // Debug - write_function_overload 
-        public static unsafe byte service_various_slices_mut_self_ref_slice_limited(IntPtr _context, ref byte x, out byte y, ReadOnlySpan<byte> slice, ReadOnlySpan<byte> slice2)
+        public static unsafe byte service_various_slices_mut_self_ref_slice_limited(IntPtr _context, ref byte x, ref byte y, ReadOnlySpan<byte> slice, ReadOnlySpan<byte> slice2)
         {
             fixed (void* ptr_slice = slice)
             {
@@ -1762,7 +1762,7 @@ namespace My.Company
                     var slice2_slice = new SliceU8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
                     try
                     {
-                        return service_various_slices_mut_self_ref_slice_limited(_context, ref x, out y, slice_slice, slice2_slice);
+                        return service_various_slices_mut_self_ref_slice_limited(_context, ref x, ref y, slice_slice, slice2_slice);
                     }
                     finally
                     {
@@ -8193,36 +8193,36 @@ namespace My.Company
         }
 
         // Debug - write_pattern_service_method 
-        public byte MutSelfRef(ref byte x, out byte y)
+        public byte MutSelfRef(ref byte x, ref byte y)
         {
-            return Interop.service_various_slices_mut_self_ref(_context, ref x, out y);
+            return Interop.service_various_slices_mut_self_ref(_context, ref x, ref y);
         }
         // Debug - write_service_method_overload 
 
         // Debug - write_pattern_service_method 
-        public byte MutSelfRefSlice(ref byte x, out byte y, SliceU8 slice)
+        public byte MutSelfRefSlice(ref byte x, ref byte y, SliceU8 slice)
         {
-            return Interop.service_various_slices_mut_self_ref_slice(_context, ref x, out y, slice);
+            return Interop.service_various_slices_mut_self_ref_slice(_context, ref x, ref y, slice);
         }
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public byte MutSelfRefSlice(ref byte x, out byte y, ReadOnlySpan<byte> slice)
+        public byte MutSelfRefSlice(ref byte x, ref byte y, ReadOnlySpan<byte> slice)
         {
-            return Interop.service_various_slices_mut_self_ref_slice(_context, ref x, out y, slice);
+            return Interop.service_various_slices_mut_self_ref_slice(_context, ref x, ref y, slice);
         }
 
         // Debug - write_pattern_service_method 
-        public byte MutSelfRefSliceLimited(ref byte x, out byte y, SliceU8 slice, SliceU8 slice2)
+        public byte MutSelfRefSliceLimited(ref byte x, ref byte y, SliceU8 slice, SliceU8 slice2)
         {
-            return Interop.service_various_slices_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
+            return Interop.service_various_slices_mut_self_ref_slice_limited(_context, ref x, ref y, slice, slice2);
         }
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public byte MutSelfRefSliceLimited(ref byte x, out byte y, ReadOnlySpan<byte> slice, ReadOnlySpan<byte> slice2)
+        public byte MutSelfRefSliceLimited(ref byte x, ref byte y, ReadOnlySpan<byte> slice, ReadOnlySpan<byte> slice2)
         {
-            return Interop.service_various_slices_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
+            return Interop.service_various_slices_mut_self_ref_slice_limited(_context, ref x, ref y, slice, slice2);
         }
 
         // Debug - write_pattern_service_method 

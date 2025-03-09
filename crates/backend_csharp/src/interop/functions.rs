@@ -119,9 +119,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         let the_type = function_parameter_to_csharp_typename(p);
 
         let mut fallback = || {
-            if native.contains("out ") {
-                to_invoke.push(format!("out {name}"));
-            } else if native.contains("ref ") {
+            if native.contains("ref ") {
                 to_invoke.push(format!("ref {name}"));
             } else {
                 to_invoke.push(name.to_string());

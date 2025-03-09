@@ -58,7 +58,8 @@ public class TestPatternStrings
         var r1 = new UseString { s1 = "hello", s2 = "world" };
         Interop.pattern_string_6a(ref r1);
 
-        Interop.pattern_string_6b(out var y).Ok();
+        var y = new UseString { s1 = "", s2 = "" };
+        Interop.pattern_string_6b(ref y).Ok();
         Assert.Equal(y.s1, "s1");
         Assert.Equal(y.s2, "s2");
     }
@@ -106,7 +107,7 @@ public class TestPatternStrings
         var w = new UseString { s1 = "hello", s2 = "world" };
         for (var i = 0; i < 1024 * 1024; i++)
         {
-            var r2 = Interop.pattern_string_6b(out var y);
+            var r2 = Interop.pattern_string_6b(ref w);
         }
     }
 }

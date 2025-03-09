@@ -16,7 +16,7 @@ public class TestRefs
     public void ref2()
     {
         var x = 123l;
-        var rval = Interop.ref2(out x);
+        var rval = Interop.ref2(ref x);
         Assert.Equal(-123l, Marshal.ReadInt64(rval));
         Assert.Equal(-123l, x);
     }
@@ -33,7 +33,7 @@ public class TestRefs
     public void ref4()
     {
         var x = 123l;
-        var rval = Interop.ref4(out x);
+        var rval = Interop.ref4(ref x);
         Assert.Equal(true, rval);
     }
 

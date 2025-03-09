@@ -108,7 +108,7 @@ public class TestPatternDelegates
         try
         {
             // Interop.pattern_callback_7(C1, C2, 3, 7, out rval);
-            Interop.pattern_callback_7(cc1, cc2, 3, 7, out rval).Ok();
+            Interop.pattern_callback_7(cc1, cc2, 3, 7, ref rval).Ok();
             cc1.Dispose();
             cc2.Dispose();
         }

@@ -37,7 +37,8 @@ public class TestArrayBasic
     [Fact]
     public void array_3()
     {
-        Interop.array_3(out var result);
+        var result = new Array() { data = new byte[16] };
+        Interop.array_3(ref result);
         Assert.Equal(42, result.data[0]);
     }
 }

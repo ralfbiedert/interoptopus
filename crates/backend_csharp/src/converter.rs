@@ -145,7 +145,7 @@ pub fn to_typespecifier_in_param(x: &CType) -> String {
             CType::Pattern(TypePattern::CChar) => "IntPtr".to_string(),
             CType::Pattern(TypePattern::Slice(y)) => format!("ref {}>", composite_to_typename(y.composite_type())),
             CType::Pattern(TypePattern::SliceMut(y)) => format!("ref {}", composite_to_typename(y.composite_type())),
-            _ => format!("out {}", to_typespecifier_in_param(z)),
+            _ => format!("ref {}", to_typespecifier_in_param(z)),
         },
         CType::FnPointer(x) => fnpointer_to_typename(x),
         CType::Pattern(x) => match x {

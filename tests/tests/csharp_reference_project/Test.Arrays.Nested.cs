@@ -24,7 +24,8 @@ public class TestArrayNested
     [Fact]
     public void nested_array_2()
     {
-        Interop.nested_array_2(out var result);
+        var result = CreateNestedArray();
+        Interop.nested_array_2(ref result);
         Assert.Equal(EnumRenamed.X, result.field_enum);
         Assert.Equal(new Vec3f32
         {
@@ -41,15 +42,7 @@ public class TestArrayNested
     [Fact]
     public void nested_array_3()
     {
-        var result = Interop.nested_array_3(new NestedArray
-        {
-            field_array = [1, 2, 3, 4, 5],
-            field_array_2 = [1, 2, 3, 4, 5],
-            field_struct = new Array
-            {
-                data = Enumerable.Range(1, 16).Select(i => (byte)i).ToArray()
-            }
-        });
+        var result = Interop.nested_array_3(CreateNestedArray());
         Assert.Equal(2, result);
     }
 
@@ -68,4 +61,20 @@ public class TestArrayNested
             });
         });
     }
+
+    private static NestedArray CreateNestedArray()
+    {
+
+        return new NestedArray
+        {
+            field_array = [1, 2, 3, 4, 5],
+            field_array_2 = [1, 2, 3, 4, 5],
+            field_struct = new Array
+            {
+                data = Enumerable.Range(1, 16).Select(i => (byte)i).ToArray()
+            }
+        };
+    }
 }
+
+

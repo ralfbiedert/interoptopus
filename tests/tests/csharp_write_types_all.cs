@@ -36,7 +36,7 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_create")]
-        public static partial long interoptopus_string_create(IntPtr utf8, ulong len, out Utf8String rval);
+        public static partial long interoptopus_string_create(IntPtr utf8, ulong len, ref Utf8String rval);
 
 
         [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_destroy")]
@@ -68,7 +68,7 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "array_3")]
-        public static partial void array_3(out Array arr);
+        public static partial void array_3(ref Array arr);
 
 
         [LibraryImport(NativeLib, EntryPoint = "char_array_1")]
@@ -88,7 +88,7 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "nested_array_2")]
-        public static partial void nested_array_2(out NestedArray result);
+        public static partial void nested_array_2(ref NestedArray result);
 
 
         [LibraryImport(NativeLib, EntryPoint = "nested_array_3")]
@@ -283,7 +283,7 @@ namespace My.Company
         ///
         /// Parameter x must point to valid data.
         [LibraryImport(NativeLib, EntryPoint = "ptr3")]
-        public static partial IntPtr ptr3(out long x);
+        public static partial IntPtr ptr3(ref long x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "ref1")]
@@ -291,7 +291,7 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "ref2")]
-        public static partial IntPtr ref2(out long x);
+        public static partial IntPtr ref2(ref long x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "ref3")]
@@ -301,7 +301,7 @@ namespace My.Company
 
         [LibraryImport(NativeLib, EntryPoint = "ref4")]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static partial bool ref4(out long x);
+        public static partial bool ref4(ref long x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "struct1")]
@@ -390,7 +390,7 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_6b")]
-        public static partial ResultError pattern_string_6b(out UseString y);
+        public static partial ResultError pattern_string_6b(ref UseString y);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_7")]
@@ -714,15 +714,15 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_7")]
-        public static partial ResultError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, out int o);
+        public static partial ResultError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, ref int o);
 
-        public static unsafe ResultError pattern_callback_7(SumDelegateReturnDelegate c1, SumDelegateReturn2Delegate c2, int x, int i, out int o)
+        public static unsafe ResultError pattern_callback_7(SumDelegateReturnDelegate c1, SumDelegateReturn2Delegate c2, int x, int i, ref int o)
         {
             var c1_wrapped = new SumDelegateReturn(c1);
             var c2_wrapped = new SumDelegateReturn2(c2);
             try
             {
-                return pattern_callback_7(c1_wrapped, c2_wrapped, x, i, out o);
+                return pattern_callback_7(c1_wrapped, c2_wrapped, x, i, ref o);
             }
             finally
             {
@@ -752,7 +752,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_surrogates_1")]
-        public static partial void pattern_surrogates_1(Local s, out Container c);
+        public static partial void pattern_surrogates_1(Local s, ref Container c);
 
 
         /// Destroys the given instance.
@@ -1174,20 +1174,20 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref")]
-        public static partial byte service_various_slices_mut_self_ref(IntPtr _context, ref byte x, out byte y);
+        public static partial byte service_various_slices_mut_self_ref(IntPtr _context, ref byte x, ref byte y);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice")]
-        public static partial byte service_various_slices_mut_self_ref_slice(IntPtr _context, ref byte x, out byte y, SliceU8 slice);
+        public static partial byte service_various_slices_mut_self_ref_slice(IntPtr _context, ref byte x, ref byte y, SliceU8 slice);
 
-        public static unsafe byte service_various_slices_mut_self_ref_slice(IntPtr _context, ref byte x, out byte y, ReadOnlySpan<byte> slice)
+        public static unsafe byte service_various_slices_mut_self_ref_slice(IntPtr _context, ref byte x, ref byte y, ReadOnlySpan<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
                 var slice_slice = new SliceU8(new IntPtr(ptr_slice), (ulong) slice.Length);
                 try
                 {
-                    return service_various_slices_mut_self_ref_slice(_context, ref x, out y, slice_slice);
+                    return service_various_slices_mut_self_ref_slice(_context, ref x, ref y, slice_slice);
                 }
                 finally
                 {
@@ -1196,9 +1196,9 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice_limited")]
-        public static partial byte service_various_slices_mut_self_ref_slice_limited(IntPtr _context, ref byte x, out byte y, SliceU8 slice, SliceU8 slice2);
+        public static partial byte service_various_slices_mut_self_ref_slice_limited(IntPtr _context, ref byte x, ref byte y, SliceU8 slice, SliceU8 slice2);
 
-        public static unsafe byte service_various_slices_mut_self_ref_slice_limited(IntPtr _context, ref byte x, out byte y, ReadOnlySpan<byte> slice, ReadOnlySpan<byte> slice2)
+        public static unsafe byte service_various_slices_mut_self_ref_slice_limited(IntPtr _context, ref byte x, ref byte y, ReadOnlySpan<byte> slice, ReadOnlySpan<byte> slice2)
         {
             fixed (void* ptr_slice = slice)
             {
@@ -1208,7 +1208,7 @@ namespace My.Company
                     var slice2_slice = new SliceU8(new IntPtr(ptr_slice2), (ulong) slice2.Length);
                     try
                     {
-                        return service_various_slices_mut_self_ref_slice_limited(_context, ref x, out y, slice_slice, slice2_slice);
+                        return service_various_slices_mut_self_ref_slice_limited(_context, ref x, ref y, slice_slice, slice2_slice);
                     }
                     finally
                     {
@@ -8290,29 +8290,29 @@ namespace My.Company
             Interop.service_various_slices_mut_self_void(_context, slice);
         }
 
-        public byte MutSelfRef(ref byte x, out byte y)
+        public byte MutSelfRef(ref byte x, ref byte y)
         {
-            return Interop.service_various_slices_mut_self_ref(_context, ref x, out y);
+            return Interop.service_various_slices_mut_self_ref(_context, ref x, ref y);
         }
 
-        public byte MutSelfRefSlice(ref byte x, out byte y, SliceU8 slice)
+        public byte MutSelfRefSlice(ref byte x, ref byte y, SliceU8 slice)
         {
-            return Interop.service_various_slices_mut_self_ref_slice(_context, ref x, out y, slice);
+            return Interop.service_various_slices_mut_self_ref_slice(_context, ref x, ref y, slice);
         }
 
-        public byte MutSelfRefSlice(ref byte x, out byte y, ReadOnlySpan<byte> slice)
+        public byte MutSelfRefSlice(ref byte x, ref byte y, ReadOnlySpan<byte> slice)
         {
-            return Interop.service_various_slices_mut_self_ref_slice(_context, ref x, out y, slice);
+            return Interop.service_various_slices_mut_self_ref_slice(_context, ref x, ref y, slice);
         }
 
-        public byte MutSelfRefSliceLimited(ref byte x, out byte y, SliceU8 slice, SliceU8 slice2)
+        public byte MutSelfRefSliceLimited(ref byte x, ref byte y, SliceU8 slice, SliceU8 slice2)
         {
-            return Interop.service_various_slices_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
+            return Interop.service_various_slices_mut_self_ref_slice_limited(_context, ref x, ref y, slice, slice2);
         }
 
-        public byte MutSelfRefSliceLimited(ref byte x, out byte y, ReadOnlySpan<byte> slice, ReadOnlySpan<byte> slice2)
+        public byte MutSelfRefSliceLimited(ref byte x, ref byte y, ReadOnlySpan<byte> slice, ReadOnlySpan<byte> slice2)
         {
-            return Interop.service_various_slices_mut_self_ref_slice_limited(_context, ref x, out y, slice, slice2);
+            return Interop.service_various_slices_mut_self_ref_slice_limited(_context, ref x, ref y, slice, slice2);
         }
 
         public void MutSelfFfiError(SliceMutU8 slice)
