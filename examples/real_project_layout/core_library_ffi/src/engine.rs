@@ -1,5 +1,4 @@
 use crate::error::Error;
-use interoptopus::ffi::CStrPointer;
 use interoptopus::patterns::result::{result_to_ffi, Result};
 use interoptopus::{ffi, ffi_service, ffi_service_method, ffi_type};
 

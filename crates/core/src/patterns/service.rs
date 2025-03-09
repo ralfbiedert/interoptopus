@@ -43,6 +43,7 @@
 //! # impl std::error::Error for Error {}
 //! #
 //! # #[ffi_type(error)]
+//! # #[derive(PartialOrd, PartialEq, Debug, Copy, Clone)]
 //! # pub enum MyFFIError {
 //! #     Ok = 0,
 //! #     NullPassed = 1,
@@ -64,7 +65,7 @@
 //! #     }
 //! # }
 //! #
-//! use interoptopus::{ffi_type, ffi_service, ffi_service_ctor, ffi_service_method};
+//! use interoptopus::{ffi, ffi_type, ffi_service, ffi_service_method};
 //! use interoptopus::patterns::result::FFIError;
 //!
 //! #[ffi_type(opaque)]
@@ -72,16 +73,15 @@
 //!     pub some_value: u32,
 //! }
 //!
-//! #[ffi_service(error = "MyFFIError", prefix = "simple_service_")]
+//! #[ffi_service]
 //! impl SimpleService {
 //!
-//!     #[ffi_service_ctor]
-//!     pub fn new_with(some_value: u32) -> Result<Self, Error> {
-//!         Ok(Self { some_value })
+//!     pub fn new_with(some_value: u32) -> ffi::Result<Self, MyFFIError> {
+//!         ffi::Ok(Self { some_value })
 //!     }
 //!
-//!     pub fn maybe_fails(&self, x: u32) -> Result<(), Error> {
-//!         Ok(())
+//!     pub fn maybe_fails(&self, x: u32) -> ffi::Result<(), MyFFIError> {
+//!         ffi::Ok(())
 //!     }
 //!
 //!     #[ffi_service_method(on_panic = "return_default")]

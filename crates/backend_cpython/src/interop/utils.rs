@@ -3,7 +3,9 @@ use interoptopus::lang::c::Function;
 use interoptopus::writer::IndentWriter;
 use interoptopus::{indented, Error};
 
-pub fn write_success_enum_aware_rval(_i: &Interop, w: &mut IndentWriter, function: &Function, args: &str, ret: bool) -> Result<(), Error> {
+pub fn write_success_enum_aware_rval(i: &Interop, w: &mut IndentWriter, function: &Function, args: &str, ret: bool) -> Result<(), Error> {
+    i.debug(w, "write_success_enum_aware_rval")?;
+
     if ret {
         indented!(w, [()], r"return c_lib.{}({})", function.name(), &args)?;
     } else {

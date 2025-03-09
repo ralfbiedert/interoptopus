@@ -54,6 +54,7 @@ use std::mem::MaybeUninit;
 ///
 /// // The error FFI users should see
 /// #[ffi_type(error)]
+/// #[derive(PartialOrd, PartialEq)]
 /// enum MyFFIError {
 ///     Ok = 0,
 ///     NullPassed = 1,

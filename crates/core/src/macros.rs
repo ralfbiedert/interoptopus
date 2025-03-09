@@ -68,7 +68,7 @@ macro_rules! extra_type {
 /// Their implementation can be found in the [`FFIError`](crate::patterns::result::FFIError) example.
 ///
 /// ```rust
-/// use interoptopus::{ffi_type, ffi_service, ffi_service_ctor, Inventory, InventoryBuilder, pattern};
+/// use interoptopus::{ffi, ffi_type, ffi_service, Inventory, InventoryBuilder, pattern};
 ///
 /// # use std::fmt::{Display, Formatter};
 /// # use interoptopus::patterns::result::FFIError;
@@ -87,6 +87,7 @@ macro_rules! extra_type {
 /// # impl std::error::Error for Error {}
 /// #
 /// # #[ffi_type(error)]
+/// # #[derive(Copy, Clone, Debug, PartialOrd, PartialEq)]
 /// # pub enum MyFFIError {
 /// #     Ok = 0,
 /// #     NullPassed = 1,
@@ -114,12 +115,11 @@ macro_rules! extra_type {
 ///     pub some_value: u32,
 /// }
 ///
-/// #[ffi_service(error = "MyFFIError", prefix = "simple_service_")]
+/// #[ffi_service]
 /// impl SimpleService {
 ///
-///     #[ffi_service_ctor]
-///     pub fn new_with(some_value: u32) -> Result<Self, Error> {
-///         Ok(Self { some_value })
+///     pub fn new_with(some_value: u32) -> ffi::Result<Self, MyFFIError> {
+///         ffi::Ok(Self { some_value })
 ///     }
 /// }
 ///

@@ -194,6 +194,8 @@ pub fn write_pattern_class(i: &Interop, w: &mut IndentWriter, class: &ServiceDef
 }
 
 pub fn write_pattern_class_ctor(i: &Interop, w: &mut IndentWriter, class: &ServiceDefinition, ctor: &Function, write_for: WriteFor) -> Result<(), Error> {
+    i.debug(w, "write_pattern_class_ctor")?;
+
     let context_type_name = class.the_type().rust_name();
     let mut all_functions = class.constructors().to_vec();
     all_functions.extend_from_slice(class.methods());
@@ -210,10 +212,10 @@ pub fn write_pattern_class_ctor(i: &Interop, w: &mut IndentWriter, class: &Servi
     }
 
     indented!(w, [()()], r"{}", documentation(ctor.meta().documentation()))?;
-    indented!(w, [()()], r"ctx = ctypes.c_void_p()")?;
     w.indent();
     write_param_helpers(i, w, ctor)?;
-    write_success_enum_aware_rval(i, w, ctor, &i.get_method_args(ctor, "ctx"), false)?;
+    let invokes = i.function_args_to_string(ctor, false, true);
+    indented!(w, [()], r"ctx = c_lib.{}({invokes}).t", ctor.name())?;
     w.unindent();
     indented!(w, [()()], r"self = {}({}.__api_lock, ctx)", context_type_name, context_type_name)?;
     indented!(w, [()()], r"return self")?;
@@ -223,6 +225,7 @@ pub fn write_pattern_class_ctor(i: &Interop, w: &mut IndentWriter, class: &Servi
 }
 
 pub fn write_pattern_class_method(i: &Interop, w: &mut IndentWriter, class: &ServiceDefinition, function: &Function, write_for: WriteFor) -> Result<(), Error> {
+    i.debug(w, "write_pattern_class_method")?;
     let mut all_functions = class.constructors().to_vec();
     all_functions.extend_from_slice(class.methods());
     all_functions.push(class.destructor().clone());

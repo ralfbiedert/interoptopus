@@ -3049,8 +3049,7 @@ class ServiceAsync:
     @staticmethod
     def new() -> ServiceAsync:
         """"""
-        ctx = ctypes.c_void_p()
-        c_lib.service_async_new(ctx, )
+        ctx = c_lib.service_async_new().t
         self = ServiceAsync(ServiceAsync.__api_lock, ctx)
         return self
 
@@ -3096,8 +3095,7 @@ class ServiceBasic:
     @staticmethod
     def new() -> ServiceBasic:
         """"""
-        ctx = ctypes.c_void_p()
-        c_lib.service_basic_new(ctx, )
+        ctx = c_lib.service_basic_new().t
         self = ServiceBasic(ServiceBasic.__api_lock, ctx)
         return self
 
@@ -3119,8 +3117,7 @@ class ServiceMain:
     @staticmethod
     def new() -> ServiceMain:
         """"""
-        ctx = ctypes.c_void_p()
-        c_lib.service_main_new(ctx, )
+        ctx = c_lib.service_main_new().t
         self = ServiceMain(ServiceMain.__api_lock, ctx)
         return self
 
@@ -3142,8 +3139,7 @@ class ServiceDependent:
     @staticmethod
     def from_main() -> ServiceDependent:
         """"""
-        ctx = ctypes.c_void_p()
-        c_lib.service_dependent_from_main(ctx, )
+        ctx = c_lib.service_dependent_from_main().t
         self = ServiceDependent(ServiceDependent.__api_lock, ctx)
         return self
 
@@ -3169,8 +3165,7 @@ class ServiceResult:
     @staticmethod
     def new() -> ServiceResult:
         """"""
-        ctx = ctypes.c_void_p()
-        c_lib.service_result_new(ctx, )
+        ctx = c_lib.service_result_new().t
         self = ServiceResult(ServiceResult.__api_lock, ctx)
         return self
 
@@ -3197,8 +3192,7 @@ class ServiceOnPanic:
     @staticmethod
     def new() -> ServiceOnPanic:
         """"""
-        ctx = ctypes.c_void_p()
-        c_lib.service_on_panic_new(ctx, )
+        ctx = c_lib.service_on_panic_new().t
         self = ServiceOnPanic(ServiceOnPanic.__api_lock, ctx)
         return self
 
@@ -3236,8 +3230,7 @@ class ServiceCallbacks:
     @staticmethod
     def new() -> ServiceCallbacks:
         """"""
-        ctx = ctypes.c_void_p()
-        c_lib.service_callbacks_new(ctx, )
+        ctx = c_lib.service_callbacks_new().t
         self = ServiceCallbacks(ServiceCallbacks.__api_lock, ctx)
         return self
 
@@ -3291,8 +3284,7 @@ class ServiceIgnoringMethods:
     @staticmethod
     def new() -> ServiceIgnoringMethods:
         """"""
-        ctx = ctypes.c_void_p()
-        c_lib.service_ignoring_methods_new(ctx, )
+        ctx = c_lib.service_ignoring_methods_new().t
         self = ServiceIgnoringMethods(ServiceIgnoringMethods.__api_lock, ctx)
         return self
 
@@ -3315,34 +3307,30 @@ class ServiceMultipleCtors:
     @staticmethod
     def new_with() -> ServiceMultipleCtors:
         """"""
-        ctx = ctypes.c_void_p()
-        c_lib.service_multiple_ctors_new_with(ctx, )
+        ctx = c_lib.service_multiple_ctors_new_with().t
         self = ServiceMultipleCtors(ServiceMultipleCtors.__api_lock, ctx)
         return self
 
     @staticmethod
     def new_without() -> ServiceMultipleCtors:
         """"""
-        ctx = ctypes.c_void_p()
-        c_lib.service_multiple_ctors_new_without(ctx, )
+        ctx = c_lib.service_multiple_ctors_new_without().t
         self = ServiceMultipleCtors(ServiceMultipleCtors.__api_lock, ctx)
         return self
 
     @staticmethod
     def new_with_string() -> ServiceMultipleCtors:
         """"""
-        ctx = ctypes.c_void_p()
         if not hasattr(anon0, "__ctypes_from_outparam__"):
             anon0 = ctypes.cast(anon0, ctypes.POINTER(ctypes.c_char))
-        c_lib.service_multiple_ctors_new_with_string(ctx, )
+        ctx = c_lib.service_multiple_ctors_new_with_string().t
         self = ServiceMultipleCtors(ServiceMultipleCtors.__api_lock, ctx)
         return self
 
     @staticmethod
     def new_failing() -> ServiceMultipleCtors:
         """"""
-        ctx = ctypes.c_void_p()
-        c_lib.service_multiple_ctors_new_failing(ctx, )
+        ctx = c_lib.service_multiple_ctors_new_failing().t
         self = ServiceMultipleCtors(ServiceMultipleCtors.__api_lock, ctx)
         return self
 
@@ -3365,8 +3353,7 @@ class ServiceVariousSlices:
     @staticmethod
     def new() -> ServiceVariousSlices:
         """"""
-        ctx = ctypes.c_void_p()
-        c_lib.service_various_slices_new(ctx, )
+        ctx = c_lib.service_various_slices_new().t
         self = ServiceVariousSlices(ServiceVariousSlices.__api_lock, ctx)
         return self
 
@@ -3448,8 +3435,7 @@ class ServiceStrings:
     @staticmethod
     def new() -> ServiceStrings:
         """"""
-        ctx = ctypes.c_void_p()
-        c_lib.service_strings_new(ctx, )
+        ctx = c_lib.service_strings_new().t
         self = ServiceStrings(ServiceStrings.__api_lock, ctx)
         return self
 

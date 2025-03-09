@@ -27,7 +27,7 @@
 //!
 //! ```
 //! # use interoptopus::ffi_function;
-//! # use interoptopus::patterns::string::CStrPointer;
+//! # use interoptopus::ffi::CStrPointer;
 //! # use std::ffi::CStr;
 //!
 //! #[ffi_function]

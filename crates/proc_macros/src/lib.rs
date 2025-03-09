@@ -193,6 +193,7 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # impl std::error::Error for Error {}
 /// #
 /// # #[ffi_type(error)]
+/// # #[derive(PartialOrd, PartialEq, Debug, Copy, Clone)]
 /// # pub enum MyFFIError {
 /// #     Ok = 0,
 /// #     NullPassed = 1,
@@ -214,17 +215,15 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// #     }
 /// # }
 /// #
-/// use interoptopus::{ffi_type, ffi_service, ffi_service_ctor};
+/// use interoptopus::{ffi, ffi_type, ffi_service};
 ///
 /// #[ffi_type(opaque)]
 /// pub struct SimpleService { }
 ///
-/// #[ffi_service(error = "MyFFIError")]
+/// #[ffi_service]
 /// impl SimpleService {
-///
-///     #[ffi_service_ctor]
-///     pub fn new_with(some_value: u32) -> Result<Self, Error> {
-///         Ok(Self { })
+///     pub fn new_with(some_value: u32) -> ffi::Result<Self, MyFFIError> {
+///         ffi::Ok(Self { })
 ///     }
 /// }
 /// ```
@@ -300,6 +299,7 @@ pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # impl std::error::Error for Error {}
 /// #
 /// # #[ffi_type(error)]
+/// # #[derive(PartialOrd, PartialEq, Debug, Copy, Clone)]
 /// # pub enum MyFFIError {
 /// #     Ok = 0,
 /// #     NullPassed = 1,
@@ -321,20 +321,18 @@ pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// #     }
 /// # }
 /// #
-/// use interoptopus::{ffi_type, ffi_service, ffi_service_ctor, ffi_service_method};
+/// use interoptopus::{ffi, ffi_type, ffi_service, ffi_service_method};
 ///
 /// #[ffi_type(opaque)]
 /// pub struct SimpleService { }
 ///
-/// #[ffi_service(error = "MyFFIError")]
+/// #[ffi_service]
 /// impl SimpleService {
 ///
-///     #[ffi_service_ctor]
-///     pub fn new_with(some_value: u32) -> Result<Self, Error> {
-///         Ok(Self { })
+///     pub fn new_with(some_value: u32) -> ffi::Result<Self, MyFFIError> {
+///         ffi::Ok(Self { })
 ///     }
 ///
-///     #[ffi_service_method(on_panic = "return_default")]
 ///     #[allow(unconditional_panic)]
 ///     pub fn oops(&self, x: u32) -> u32 {
 ///         let array = vec![0, 1, 2];
@@ -343,8 +341,6 @@ pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         array[5]
 ///     }
 ///
-///
-///     #[ffi_service_method(on_panic = "undefined_behavior")]
 ///     pub fn return_value(&self) -> u32 {
 ///         // If this method ever panicked the entire application calling
 ///         // you (not just your library) will crash or worse.

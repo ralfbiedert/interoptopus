@@ -2,7 +2,6 @@
 // work. Have a look at the documentation.
 
 use interoptopus::ffi_type;
-use interoptopus::patterns::result::FFIError;
 use std::fmt::{Display, Formatter};
 
 #[ffi_type(error)]

@@ -19,7 +19,7 @@ use crate::interop::utils::write_utils;
 use derive_builder::Builder;
 use interoptopus::lang::c::Function;
 use interoptopus::writer::IndentWriter;
-use interoptopus::{Bindings, Error, Inventory};
+use interoptopus::{indented, Bindings, Error, Inventory};
 
 /// Generates Python `ctypes` files, **get this with [`InteropBuilder`]**.🐙
 #[derive(Clone, Debug, Default, Builder)]
@@ -28,12 +28,20 @@ pub struct Interop {
     /// Namespace for callback helpers, e.g., `callbacks`.
     #[builder(default = "\"callbacks\".to_string()")]
     callback_namespace: String,
-
+    debug: bool,
     pub(crate) inventory: Inventory,
 }
 
 #[allow(clippy::unused_self)]
 impl Interop {
+    fn debug(&self, w: &mut IndentWriter, marker: &str) -> Result<(), Error> {
+        if !self.debug {
+            return Ok(());
+        }
+
+        indented!(w, r"# Debug - {} ", marker)
+    }
+
     #[must_use]
     fn function_args_to_string(&self, function: &Function, type_hints: bool, skip_first: bool) -> String {
         let skip = usize::from(skip_first);
