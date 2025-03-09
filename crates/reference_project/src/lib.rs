@@ -19,22 +19,23 @@ pub mod patterns {
     pub mod option;
     pub mod primitive;
     pub mod result;
-    pub mod string;
-    pub mod services {
-        pub mod asynk;
-        pub mod basic;
-        pub mod callback;
-        pub mod dependent;
-        pub mod ignored;
-        pub mod multiple_ctors;
-        pub mod on_panic;
-        pub mod result;
-        pub mod slice;
-        pub mod string;
-    }
     pub mod slice;
+    pub mod string;
     pub mod surrogate;
 }
+pub mod services {
+    pub mod asynk;
+    pub mod basic;
+    pub mod callback;
+    pub mod dependent;
+    pub mod ignored;
+    pub mod multiple_ctors;
+    pub mod on_panic;
+    pub mod result;
+    pub mod slice;
+    pub mod string;
+}
+
 pub mod types;
 
 pub fn ffi_inventory() -> Inventory {
@@ -149,18 +150,18 @@ pub fn ffi_inventory() -> Inventory {
             .register(constant!(constants::COMPUTED_I32))
             // Extra Types
             .register(extra_type!(types::ExtraType<f32>))
-            // Patterns
-            .register(pattern!(patterns::services::asynk::ServiceAsync))
-            .register(pattern!(patterns::services::basic::ServiceBasic))
-            .register(pattern!(patterns::services::dependent::ServiceMain))
-            .register(pattern!(patterns::services::dependent::ServiceDependent))
-            .register(pattern!(patterns::services::result::ServiceResult))
-            .register(pattern!(patterns::services::on_panic::ServiceOnPanic))
-            .register(pattern!(patterns::services::callback::ServiceCallbacks))
-            .register(pattern!(patterns::services::ignored::ServiceIgnoringMethods))
-            .register(pattern!(patterns::services::multiple_ctors::ServiceMultipleCtors))
-            .register(pattern!(patterns::services::slice::ServiceVariousSlices))
-            .register(pattern!(patterns::services::string::ServiceStrings))
+            // Services
+            .register(pattern!(services::asynk::ServiceAsync))
+            .register(pattern!(services::basic::ServiceBasic))
+            .register(pattern!(services::dependent::ServiceMain))
+            .register(pattern!(services::dependent::ServiceDependent))
+            .register(pattern!(services::result::ServiceResult))
+            .register(pattern!(services::on_panic::ServiceOnPanic))
+            .register(pattern!(services::callback::ServiceCallbacks))
+            .register(pattern!(services::ignored::ServiceIgnoringMethods))
+            .register(pattern!(services::multiple_ctors::ServiceMultipleCtors))
+            .register(pattern!(services::slice::ServiceVariousSlices))
+            .register(pattern!(services::string::ServiceStrings))
             .validate()
             .build()
     }

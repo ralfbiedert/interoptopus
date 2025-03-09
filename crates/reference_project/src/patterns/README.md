@@ -10,4 +10,4 @@ Advanced "convenience patterns" that will make your life easier, esp. from C# an
 | [`slice.rs`](slice.rs)          | Receiving slices over FFI.                                                 |
 | [`string.rs`](string.rs)        | Passing strings over FFI.                                                  |
 | [`surrogate.rs`](surrogates.rs) | Exporting types over FFI you don't control.                                |
-| [`services/`](services/)        | How to export "classes" to C# / Python. 🔥                                 |
+| [`services/`](../services/)     | How to export "classes" to C# / Python. 🔥                                 |
