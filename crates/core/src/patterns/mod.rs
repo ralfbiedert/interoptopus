@@ -91,6 +91,7 @@ pub mod api_guard;
 pub mod asynk;
 pub mod builtins;
 pub mod callbacks;
+pub mod cstr;
 pub mod option;
 pub mod primitives;
 pub mod result;

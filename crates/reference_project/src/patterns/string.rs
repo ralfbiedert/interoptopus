@@ -1,18 +1,16 @@
 use crate::patterns::result::FFIError;
 use crate::types::{UseCStrPtr, UseUtf8String};
-use interoptopus::ffi_function;
-use interoptopus::patterns::result::Result;
-use interoptopus::patterns::slice::Slice;
-use interoptopus::patterns::string::{CStrPointer, String};
+use interoptopus::ffi::{CStrPointer, Slice};
+use interoptopus::{ffi, ffi_function};
 
 #[ffi_function]
-pub fn pattern_ascii_pointer_1(x: CStrPointer) -> u32 {
+pub fn pattern_ascii_pointer_1(x: ffi::CStrPointer) -> u32 {
     x.as_c_str().map(|x| x.to_bytes().len()).unwrap_or(0) as u32
 }
 
 #[ffi_function]
-pub fn pattern_ascii_pointer_2() -> CStrPointer<'static> {
-    CStrPointer::empty()
+pub fn pattern_ascii_pointer_2() -> ffi::CStrPointer<'static> {
+    ffi::CStrPointer::empty()
 }
 
 // NOTE: In some languages (C#) this can be a bad idea, because
@@ -21,18 +19,18 @@ pub fn pattern_ascii_pointer_2() -> CStrPointer<'static> {
 // you use the output parameter again that helper struct got
 // deallocated.
 #[ffi_function]
-pub fn pattern_ascii_pointer_3(x: CStrPointer) -> CStrPointer {
+pub fn pattern_ascii_pointer_3(x: ffi::CStrPointer) -> ffi::CStrPointer {
     x
 }
 
 #[ffi_function]
-pub fn pattern_ascii_pointer_4(x: CStrPointer, l: u32) -> CStrPointer {
+pub fn pattern_ascii_pointer_4(x: ffi::CStrPointer, l: u32) -> ffi::CStrPointer {
     let bytes = x.as_c_str().unwrap().to_bytes();
     CStrPointer::from_slice_with_nul(&bytes[l as usize..]).unwrap()
 }
 
 #[ffi_function]
-pub fn pattern_ascii_pointer_5(x: CStrPointer, i: u32) -> u8 {
+pub fn pattern_ascii_pointer_5(x: ffi::CStrPointer, i: u32) -> u8 {
     let bytes = x.as_c_str().unwrap().to_bytes();
     bytes[i as usize]
 }
@@ -46,23 +44,23 @@ pub fn pattern_ascii_pointer_5(x: CStrPointer, i: u32) -> u8 {
 // }
 
 #[ffi_function]
-pub fn pattern_ascii_pointer_return_slice() -> Slice<'static, UseCStrPtr<'static>> {
+pub fn pattern_ascii_pointer_return_slice() -> ffi::Slice<'static, UseCStrPtr<'static>> {
     Slice::empty()
 }
 
 #[ffi_function]
-pub fn pattern_string_1(x: String) -> String {
+pub fn pattern_string_1(x: ffi::String) -> ffi::String {
     x
 }
 
 #[ffi_function]
-pub fn pattern_string_2(x: String) -> u32 {
+pub fn pattern_string_2(x: ffi::String) -> u32 {
     x.into_string().len() as u32
 }
 
 #[ffi_function]
-pub fn pattern_string_3() -> String {
-    String::from_string("pattern_string_3".to_string())
+pub fn pattern_string_3() -> ffi::String {
+    ffi::String::from_string("pattern_string_3".to_string())
 }
 
 #[ffi_function]
@@ -71,27 +69,27 @@ pub fn pattern_string_4(x: UseUtf8String) -> UseUtf8String {
 }
 
 #[ffi_function]
-pub fn pattern_string_5(x: UseUtf8String) -> Result<UseUtf8String, FFIError> {
-    Result::ok(x)
+pub fn pattern_string_5(x: UseUtf8String) -> ffi::Result<UseUtf8String, FFIError> {
+    ffi::Ok(x)
 }
 
 #[ffi_function]
-pub fn pattern_string_6a(_: &UseUtf8String) -> Result<(), FFIError> {
-    Result::ok(())
+pub fn pattern_string_6a(_: &UseUtf8String) -> ffi::Result<(), FFIError> {
+    ffi::Ok(())
 }
 
 #[ffi_function]
-pub fn pattern_string_6b(y: &mut UseUtf8String) -> Result<(), FFIError> {
-    *y = UseUtf8String { s1: String::from_string("s1".to_string()), s2: String::from_string("s2".to_string()) };
-    Result::ok(())
+pub fn pattern_string_6b(y: &mut UseUtf8String) -> ffi::Result<(), FFIError> {
+    *y = UseUtf8String { s1: ffi::String::from_string("s1".to_string()), s2: ffi::String::from_string("s2".to_string()) };
+    ffi::Ok(())
 }
 
 #[ffi_function]
-pub fn pattern_string_7(x: Slice<String>, i: u64) -> Result<String, FFIError> {
-    Result::ok(x.as_slice()[i as usize].clone())
+pub fn pattern_string_7(x: ffi::Slice<ffi::String>, i: u64) -> ffi::Result<ffi::String, FFIError> {
+    ffi::Ok(x.as_slice()[i as usize].clone())
 }
 
 #[ffi_function]
-pub fn pattern_string_8(x: Slice<UseUtf8String>, i: u64) -> Result<UseUtf8String, FFIError> {
-    Result::ok(x.as_slice()[i as usize].clone())
+pub fn pattern_string_8(x: ffi::Slice<UseUtf8String>, i: u64) -> ffi::Result<UseUtf8String, FFIError> {
+    ffi::Ok(x.as_slice()[i as usize].clone())
 }

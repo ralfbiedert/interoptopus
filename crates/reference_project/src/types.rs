@@ -1,9 +1,7 @@
 //! All supported type patterns.
 
 use interoptopus::lang::rust::CTypeInfo;
-use interoptopus::patterns::slice::Slice;
-use interoptopus::patterns::string::{CStrPointer, String};
-use interoptopus::{callback, ffi_type};
+use interoptopus::{callback, ffi, ffi_type};
 use std::fmt::Debug;
 use std::marker::PhantomData;
 
@@ -171,14 +169,14 @@ pub struct ExtraType<T> {
 
 #[ffi_type]
 pub struct UseCStrPtr<'a> {
-    pub ascii_string: CStrPointer<'a>,
+    pub ascii_string: ffi::CStrPointer<'a>,
 }
 
 #[ffi_type]
 #[derive(Clone)]
 pub struct UseUtf8String {
-    pub s1: String,
-    pub s2: String,
+    pub s1: ffi::String,
+    pub s2: ffi::String,
 }
 
 /// This can also be used for the `class` pattern.
@@ -273,7 +271,7 @@ pub type FnPtrCharArray = extern "C" fn(CharArray);
 // This does not work since we can't express the for<'x> bounds in our CTypeInfo implementation.
 // pub type CallbackFFISlice = extern "C" fn(FFISlice<u8>) -> u8;
 
-callback!(CallbackFFISlice(slice: Slice<u8>) -> u8);
+callback!(CallbackFFISlice(slice: ffi::Slice<u8>) -> u8);
 
 pub mod ambiguous1 {
     use interoptopus::ffi_type;

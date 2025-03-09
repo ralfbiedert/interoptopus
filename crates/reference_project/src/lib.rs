@@ -25,7 +25,6 @@ pub mod patterns {
         pub mod asynk;
         pub mod basic;
         pub mod callback;
-        pub mod converter;
         pub mod ignored;
         pub mod multiple_ctors;
         pub mod on_panic;
