@@ -13,9 +13,7 @@ jobs:
   Build:
     strategy:
       matrix:
-        os: [ windows-latest ]
-        # WTF?
-        # os: [windows-latest, ubuntu-latest]
+        os: [ windows-latest, ubuntu-latest ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Code
