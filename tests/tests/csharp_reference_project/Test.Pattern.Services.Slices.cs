@@ -8,8 +8,8 @@ public class TestPatternServicesSlices
     {
         var s = ServiceVariousSlices.New();
         var slice = s.ReturnSliceMut();
-        s.Dispose();
         slice[0] = 44;
+        s.Dispose();
     }
 
     [Fact]
@@ -20,5 +20,6 @@ public class TestPatternServicesSlices
         Assert.Equal(slice.Count, 64);
         Assert.Equal(123, (int) slice[0]);
         Assert.Equal(123, (int) slice[1]);
+        s.Dispose();
     }
 }

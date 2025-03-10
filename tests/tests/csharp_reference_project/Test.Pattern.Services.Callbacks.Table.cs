@@ -32,6 +32,7 @@ public class TestPatternServicesCallbacksTable
         GC.Collect();
     
         service.InvokeDelegates();
+        service.Dispose();
     }
 
 }

@@ -19,6 +19,7 @@ public class TestPatternServicesCallbacks
         }).Ok();
 
         Assert.True(called);
+        callbacks.Dispose();
     }
 
     [Fact]
@@ -38,6 +39,7 @@ public class TestPatternServicesCallbacks
         }, slice).Ok();
 
         Assert.True(called);
+        callbacks.Dispose();
     }
 
 }
