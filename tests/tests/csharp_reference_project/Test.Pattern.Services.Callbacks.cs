@@ -1,3 +1,4 @@
+using System;
 using My.Company;
 using Xunit;
 
@@ -26,6 +27,7 @@ public class TestPatternServicesCallbacks
         var callbacks = ServiceCallbacks.New();
         var called = false;
         var slice = new[] { 1, 2, 3 };
+
 
         callbacks.CallbackWithSlice((x, y) =>
         {

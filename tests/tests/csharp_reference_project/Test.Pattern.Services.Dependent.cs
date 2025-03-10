@@ -9,6 +9,7 @@ public class TestPatternServicesDependent
         var main = ServiceMain.New(123);
         var dependent = ServiceDependent.FromMain(main.Context);
 
+
         var rval = dependent.Get();
         Assert.Equal(123u, rval);
 
