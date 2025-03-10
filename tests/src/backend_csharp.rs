@@ -23,6 +23,9 @@ pub fn run_dotnet_command_if_installed(path: impl AsRef<Path>, command: &str) ->
     if output.status.success() {
         Ok(output.status.to_string())
     } else {
+        dbg!(path.as_ref());
+        dbg!(command);
+        dbg!(output.status);
         dbg!(String::from_utf8(output.stdout)?);
         dbg!(String::from_utf8(output.stderr)?);
         Err(anyhow!("Test failed"))
