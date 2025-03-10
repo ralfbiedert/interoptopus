@@ -10,7 +10,7 @@ pub fn common_namespace_mappings() -> NamespaceMappings {
 
 /// If `dotnet` is installed, run the command as `dotnet command` from `path`, ignore and succeed otherwise.
 pub fn run_dotnet_command_if_installed(path: impl AsRef<Path>, command: &str) -> Result<String, anyhow::Error> {
-    let child = match Command::new("dotnet").arg(command).current_dir(path).spawn() {
+    let child = match Command::new("dotnet").arg(command).current_dir(path.as_ref()).spawn() {
         Ok(x) => x,
         Err(x @ std::io::Error { .. }) if x.kind() == ErrorKind::NotFound => {
             return Ok("dotnet not found, skipped".to_string());
