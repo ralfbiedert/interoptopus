@@ -10,7 +10,7 @@ use std::iter::FromIterator;
 /// # Example
 ///
 /// ```
-/// use interoptopus::util::safe_name;
+/// use interoptopus::backend::util::safe_name;
 ///
 /// assert_eq!(safe_name("fn(u32) -> u8"), "fn_u32_rval_u8");
 /// ```
@@ -82,7 +82,7 @@ pub fn sort_types_by_dependencies(mut types: Vec<CType>) -> Vec<CType> {
 ///
 /// ```rust
 /// # use interoptopus::lang::c::{Function, FunctionSignature, Meta};
-/// # use interoptopus::util::longest_common_prefix;
+/// # use interoptopus::backend::util::longest_common_prefix;
 ///
 /// let functions = [
 ///     Function::new("my_lib_f".to_string(), FunctionSignature::default(), Meta::default()),
@@ -393,18 +393,6 @@ macro_rules! here {
     };
 }
 
-/// Logs an error if compiled with feature `log`.
-#[cfg(feature = "log")]
-#[inline]
-pub fn log_error<S: AsRef<str>, F: Fn() -> S>(f: F) {
-    log::error!("{}", f().as_ref());
-}
-
-/// Logs an error if compiled with feature `log`.
-#[cfg(not(feature = "log"))]
-#[inline(always)]
-pub fn log_error<S: AsRef<str>, F: Fn() -> S>(_f: F) {}
-
 /// Capitalizes the first letter of a string.
 #[must_use]
 pub fn capitalize_first_letter(s: &str) -> String {
@@ -417,7 +405,7 @@ pub fn capitalize_first_letter(s: &str) -> String {
 
 #[cfg(test)]
 mod test {
-    use crate::util::IdPrettifier;
+    use crate::backend::util::IdPrettifier;
 
     #[test]
     fn is_pretty() {

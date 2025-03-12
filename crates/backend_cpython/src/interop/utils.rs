@@ -1,6 +1,6 @@
 use crate::Interop;
+use interoptopus::backend::writer::IndentWriter;
 use interoptopus::lang::c::Function;
-use interoptopus::writer::IndentWriter;
 use interoptopus::{Error, indented};
 
 pub fn write_success_enum_aware_rval(i: &Interop, w: &mut IndentWriter, function: &Function, args: &str, ret: bool) -> Result<(), Error> {

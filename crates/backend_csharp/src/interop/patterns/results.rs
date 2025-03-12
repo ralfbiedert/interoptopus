@@ -5,10 +5,10 @@ use crate::interop::types::composite::{
     write_type_definition_composite_body, write_type_definition_composite_layout_annotation, write_type_definition_composite_marshaller_field_from_unmanaged,
     write_type_definition_composite_marshaller_field_to_unmanaged, write_type_definition_composite_unmanaged_body_field,
 };
+use interoptopus::backend::writer::{IndentWriter, WriteFor};
 use interoptopus::lang::c::{CType, Field};
 use interoptopus::patterns::TypePattern;
 use interoptopus::patterns::result::{FFIErrorEnum, FFIResultType};
-use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{Error, indented};
 
 pub fn write_pattern_result(i: &Interop, w: &mut IndentWriter, result: &FFIResultType) -> Result<(), Error> {

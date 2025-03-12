@@ -28,10 +28,10 @@
 //! }
 //! ```
 
+use crate::backend::util::capitalize_first_letter;
 use crate::lang::c::{CType, CompositeType, Documentation, EnumType, Field, Layout, Meta, PrimitiveType, Representation, Variant, Visibility};
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::TypePattern;
-use crate::util::capitalize_first_letter;
 use std::any::Any;
 use std::fmt::Debug;
 use std::mem::MaybeUninit;

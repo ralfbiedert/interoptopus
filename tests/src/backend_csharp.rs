@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use interoptopus::util::NamespaceMappings;
+use interoptopus::backend::util::NamespaceMappings;
 use std::io::ErrorKind;
 use std::path::Path;
 use std::process::Command;

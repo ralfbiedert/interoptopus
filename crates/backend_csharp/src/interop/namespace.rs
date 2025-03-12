@@ -1,5 +1,5 @@
 use crate::Interop;
-use interoptopus::writer::IndentWriter;
+use interoptopus::backend::writer::IndentWriter;
 use interoptopus::{Error, indented};
 
 pub fn write_namespace_context(i: &Interop, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) -> Result<(), Error> {

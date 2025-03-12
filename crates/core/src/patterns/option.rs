@@ -29,9 +29,9 @@
 use crate::lang::c::{CType, CompositeType, Documentation, Field, Layout, Meta, PrimitiveType, Representation, Visibility};
 use crate::lang::rust::CTypeInfo;
 
+use crate::backend::util::capitalize_first_letter;
 use crate::patterns::TypePattern;
-use crate::patterns::primitives::Bool;
-use crate::util::capitalize_first_letter;
+use crate::patterns::primitive::Bool;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 

@@ -1,4 +1,4 @@
-use interoptopus::patterns::surrogates::{CorrectSurrogate, Surrogate};
+use interoptopus::patterns::surrogate::{CorrectSurrogate, Surrogate};
 use interoptopus::{ffi_function, ffi_type};
 
 // Let's assume we can't implement `CTypeInfo` for this.

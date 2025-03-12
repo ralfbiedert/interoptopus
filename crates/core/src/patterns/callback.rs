@@ -215,7 +215,7 @@ impl AsyncCallback {
 /// Defines a callback type, akin to a `fn f(T) -> R` wrapped in an [Option](std::option).
 ///
 /// A named delegate will be emitted in languages supporting them, otherwise a regular
-/// function pointer. For details, please see the [**callbacks module**](crate::patterns::callbacks).
+/// function pointer. For details, please see the [**callbacks module**](crate::patterns::callback).
 ///
 /// # Example
 ///
@@ -321,7 +321,7 @@ macro_rules! callback {
                 let meta = Meta::with_namespace_documentation(namespace, Documentation::new());
                 let sig = FunctionSignature::new(params, rval);
                 let fn_pointer = FnPointerType::new_named(sig, stringify!($name).to_string());
-                let named_callback = $crate::patterns::callbacks::NamedCallback::with_meta(fn_pointer, meta);
+                let named_callback = $crate::patterns::callback::NamedCallback::with_meta(fn_pointer, meta);
 
                 CType::Pattern($crate::patterns::TypePattern::NamedCallback(named_callback))
             }

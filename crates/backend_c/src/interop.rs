@@ -17,7 +17,7 @@ use crate::interop::types::write_type_definitions;
 use derive_builder::Builder;
 use heck::{ToLowerCamelCase, ToShoutySnakeCase, ToSnakeCase, ToUpperCamelCase};
 use interoptopus::Bindings;
-use interoptopus::writer::IndentWriter;
+use interoptopus::backend::writer::IndentWriter;
 use interoptopus::{Error, Inventory};
 
 /// How to lay out functions.

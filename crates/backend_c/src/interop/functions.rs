@@ -2,8 +2,8 @@ use crate::converters::{function_name_to_c_name, to_type_specifier};
 use crate::interop::ToNamingStyle;
 use crate::interop::docs::write_documentation;
 use crate::{DocStyle, Functions, Interop};
+use interoptopus::backend::writer::IndentWriter;
 use interoptopus::lang::c::{CType, Function};
-use interoptopus::writer::IndentWriter;
 use interoptopus::{Error, indented};
 
 pub fn write_functions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {

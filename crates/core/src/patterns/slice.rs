@@ -37,10 +37,10 @@
 //! ```
 //!
 
+use crate::backend::util::capitalize_first_letter;
 use crate::lang::c::{CType, CompositeType, Documentation, Field, Layout, Meta, PrimitiveType, Representation, Visibility};
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::TypePattern;
-use crate::util::capitalize_first_letter;
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
 use std::ptr::{null, null_mut};

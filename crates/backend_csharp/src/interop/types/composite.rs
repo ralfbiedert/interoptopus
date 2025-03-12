@@ -1,10 +1,10 @@
 use crate::Interop;
 use crate::converter::{field_name_to_csharp_name, is_blittable, to_typespecifier_in_field};
 use crate::interop::docs::write_documentation;
+use interoptopus::backend::writer::{IndentWriter, WriteFor};
 use interoptopus::lang::c;
 use interoptopus::lang::c::{CType, CompositeType, Field, Layout, PrimitiveType};
 use interoptopus::patterns::TypePattern;
-use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{Error, indented};
 
 pub fn write_type_definition_composite(i: &Interop, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {

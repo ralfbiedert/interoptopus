@@ -1,11 +1,12 @@
 use crate::Interop;
 use crate::converter::{to_ctypes_name, to_type_hint_out};
 use crate::interop::patterns::write_library_call;
+use interoptopus::backend::non_service_functions;
+use interoptopus::backend::util::safe_name;
+use interoptopus::backend::writer::{IndentWriter, WriteFor};
 use interoptopus::lang::c::{CType, Function};
 use interoptopus::patterns::TypePattern;
-use interoptopus::util::safe_name;
-use interoptopus::writer::{IndentWriter, WriteFor};
-use interoptopus::{Error, indented, non_service_functions};
+use interoptopus::{Error, indented};
 
 pub fn write_function_proxies(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     for function in non_service_functions(&i.inventory) {

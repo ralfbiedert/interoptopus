@@ -96,8 +96,8 @@ impl From<CChar> for c_char {
 
 #[cfg(test)]
 mod test {
-    use crate::patterns::primitives::Bool;
-    use crate::patterns::primitives::CChar;
+    use crate::patterns::primitive::Bool;
+    use crate::patterns::primitive::CChar;
     use std::os::raw::c_char;
 
     #[test]

@@ -231,11 +231,11 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                         }
                         Ok(__res) => {
                             let __e = __res.unwrap_err();
-                            ::interoptopus::util::log_error(|| format!("Error in ({}): {:?}", stringify!(service_basic_new), __e));
+                            ::interoptopus::ffi::log_error(|| format!("Error in ({}): {:?}", stringify!(service_basic_new), __e));
                             #ctor_result::err(*__e)
                         }
                         Err(__e) => {
-                            ::interoptopus::util::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::patterns::result::get_panic_message(__e.as_ref())));
+                            ::interoptopus::ffi::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::patterns::result::get_panic_message(__e.as_ref())));
                             #ctor_result::panic()
                         }
                     }
@@ -259,7 +259,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                             match __result_result {
                                 Ok(__x) => __x,
                                 Err(__e) => {
-                                    ::interoptopus::util::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::patterns::result::get_panic_message(__e.as_ref())));
+                                    ::interoptopus::ffi::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::patterns::result::get_panic_message(__e.as_ref())));
                                     <#rval>::default()
                                 }
                             }
@@ -381,7 +381,7 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
             match __result_result {
                 Ok(_) => #ctor_result::ok(::std::ptr::null()),
                 Err(__e) => {
-                    ::interoptopus::util::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::patterns::result::get_panic_message(__e.as_ref())));
+                    ::interoptopus::ffi::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::patterns::result::get_panic_message(__e.as_ref())));
                     #ctor_result::panic()
                 }
             }

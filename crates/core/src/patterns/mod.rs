@@ -76,7 +76,7 @@
 use crate::lang::c::{CType, CompositeType, PrimitiveType};
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::builtins::Builtins;
-use crate::patterns::callbacks::{AsyncCallback, NamedCallback};
+use crate::patterns::callback::{AsyncCallback, NamedCallback};
 use crate::patterns::result::{FFIErrorEnum, FFIResultType};
 use crate::patterns::service::ServiceDefinition;
 use crate::patterns::slice::SliceType;
@@ -87,15 +87,15 @@ pub mod api_entry;
 pub mod api_guard;
 pub mod asynk;
 pub mod builtins;
-pub mod callbacks;
+pub mod callback;
 pub mod cstr;
 pub mod option;
-pub mod primitives;
+pub mod primitive;
 pub mod result;
 pub mod service;
 pub mod slice;
 pub mod string;
-pub mod surrogates;
+pub mod surrogate;
 
 /// A pattern on a library level, usually involving both methods and types.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]

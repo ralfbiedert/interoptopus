@@ -1,10 +1,10 @@
 use crate::Interop;
 use crate::converter::{named_callback_to_typename, to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval};
 use crate::interop::types::fnptrs::write_type_definition_fn_pointer_annotation;
+use interoptopus::backend::writer::IndentWriter;
 use interoptopus::lang::c::{CType, PrimitiveType};
 use interoptopus::patterns::TypePattern;
-use interoptopus::patterns::callbacks::NamedCallback;
-use interoptopus::writer::IndentWriter;
+use interoptopus::patterns::callback::NamedCallback;
 use interoptopus::{Error, indented};
 
 pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {

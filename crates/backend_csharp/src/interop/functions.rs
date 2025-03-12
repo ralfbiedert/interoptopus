@@ -4,9 +4,9 @@ use crate::converter::{
 };
 use crate::interop::docs::write_documentation;
 use crate::{FunctionNameFlavor, Interop};
+use interoptopus::backend::writer::{IndentWriter, WriteFor};
 use interoptopus::lang::c::{CType, Function, PrimitiveType, SugaredReturnType};
 use interoptopus::patterns::TypePattern;
-use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{Error, indented};
 use std::iter::zip;
 

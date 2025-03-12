@@ -20,10 +20,10 @@ use crate::interop::patterns::abi_guard::write_abi_guard;
 use crate::interop::patterns::write_patterns;
 use crate::interop::types::write_type_definitions;
 use derive_builder::Builder;
+use interoptopus::backend::util::{NamespaceMappings, is_global_type};
+use interoptopus::backend::writer::IndentWriter;
 use interoptopus::lang::c::{CType, Constant, Function, FunctionSignature, Meta};
 use interoptopus::patterns::TypePattern;
-use interoptopus::util::{NamespaceMappings, is_global_type};
-use interoptopus::writer::IndentWriter;
 use interoptopus::{Bindings, Error, Inventory, indented};
 
 /// How to convert from Rust function names to C#
