@@ -1,4 +1,4 @@
-//! Optional types that translate to binding with better semantics in supported languages.
+//! Convenience patterns in supported languages.
 //!
 //! Patterns are purely optional. If you want to use a certain pattern in your bindings
 //! you generally define one or more functions that use some of the types contained in this module.

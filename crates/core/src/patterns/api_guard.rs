@@ -1,4 +1,4 @@
-//! Helper to ensure the bindings match the used DLL.
+//! Ensures bindings match the used DLL.
 //!
 //! Using an API guard is as simple as defining and exporting a function `my_api_guard` returning an
 //! [`APIVersion`] as in the example below. Backends supporting API guards will automatically

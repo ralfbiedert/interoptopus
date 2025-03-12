@@ -1,3 +1,5 @@
+#![doc(hidden)]
+
 use crate::lang::c::Function;
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -17,6 +19,7 @@ impl Builtins {
     }
 }
 
+/// Emits helper functions used by String & co.
 #[macro_export]
 macro_rules! builtins {
     () => {{

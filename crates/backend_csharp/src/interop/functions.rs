@@ -4,7 +4,7 @@ use crate::converter::{
 };
 use crate::interop::docs::write_documentation;
 use crate::{FunctionNameFlavor, Interop};
-use interoptopus::lang::c::{AsyncRval, CType, Function, PrimitiveType};
+use interoptopus::lang::c::{CType, Function, PrimitiveType, SugaredReturnType};
 use interoptopus::patterns::TypePattern;
 use interoptopus::writer::{IndentWriter, WriteFor};
 use interoptopus::{Error, indented};
@@ -93,7 +93,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         return Ok(());
     }
 
-    let async_rval = function.async_rval();
+    let async_rval = function.sugared_return_type();
 
     let mut to_pin_name = Vec::new();
     let mut to_pin_slice_type = Vec::new();
@@ -110,7 +110,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         },
     );
 
-    let rval = to_typespecifier_in_async_fn_rval(&function.async_rval());
+    let rval = to_typespecifier_in_async_fn_rval(&function.sugared_return_type());
 
     let mut params = Vec::new();
     for p in function.signature().params() {
@@ -170,7 +170,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         params.push(format!("{native} {name}"));
     }
 
-    if matches!(async_rval, AsyncRval::Async(_)) {
+    if matches!(async_rval, SugaredReturnType::Async(_)) {
         params.pop();
         to_invoke.pop();
         to_invoke.push("cb".to_string());
@@ -189,7 +189,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     indented!(w, "{}", signature)?;
     indented!(w, r"{{")?;
 
-    if let AsyncRval::Async(ref x) = async_rval {
+    if let SugaredReturnType::Async(ref x) = async_rval {
         let task_type = match x {
             CType::Pattern(TypePattern::Result(x)) if matches!(x.t(), CType::Pattern(TypePattern::Utf8String(_))) => "string".to_string(),
             CType::Pattern(TypePattern::Result(x)) => to_typespecifier_in_sync_fn_rval(x.t()),
@@ -258,7 +258,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         CType::Primitive(PrimitiveType::Void) => {
             indented!(w, [()()], r"{};", call)?;
         }
-        _ if matches!(async_rval, AsyncRval::Async(_)) => {
+        _ if matches!(async_rval, SugaredReturnType::Async(_)) => {
             indented!(w, [()()], r"{call}.Ok();")?;
             indented!(w, [()()], r"return cs.Task;")?;
         }
@@ -281,7 +281,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         }
     }
 
-    if matches!(async_rval, AsyncRval::Async(_)) {
+    if matches!(async_rval, SugaredReturnType::Async(_)) {
         indented!(w, [()], r"return cs.Task;")?;
     }
 

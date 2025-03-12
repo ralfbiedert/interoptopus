@@ -1,8 +1,10 @@
+//! Strings over FFI, equivalent to [`std::string::String`].
 use crate::lang::c::{CType, CompositeType, Documentation, Field, Layout, Meta, PrimitiveType, Representation};
 use crate::lang::rust::CTypeInfo;
 use crate::patterns::TypePattern;
 use std::mem::forget;
 
+/// FFI analog of [`std::string::String`].
 #[derive(Debug)]
 #[repr(C)]
 pub struct String {

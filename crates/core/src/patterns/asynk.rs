@@ -1,3 +1,5 @@
+//! Transparent `async fn` support over FFI.
+
 use crate::lang::c::{CType, Documentation, FnPointerType, FunctionSignature, Meta, Parameter, PrimitiveType};
 use crate::lang::rust::CTypeInfo;
 use crate::patterns;
@@ -8,6 +10,8 @@ use std::ops::Deref;
 use std::ptr::null;
 use std::sync::Arc;
 
+/// When used as the last parameter, makes a function `async`.
+///
 /// TODO: Document must be thread safe
 #[derive(Clone, Copy)]
 #[repr(C)]
@@ -69,6 +73,7 @@ unsafe impl<T: CTypeInfo> CTypeInfo for AsyncCallback<T> {
     }
 }
 
+/// Used as `this: AsyncSelf` instead of `self` when using `Send` runtimes.
 pub struct AsyncSelf<S> {
     s: Arc<S>, // Self
 }
@@ -87,6 +92,7 @@ impl<S> Deref for AsyncSelf<S> {
     }
 }
 
+/// Used as `this: AsyncThreadLocal` instead of `self` on `!Send` runtimes.
 pub struct AsyncThreadLocal<S, T> {
     s: Arc<S>, // Self
     t: T,      // Thread locals from runtime
@@ -110,6 +116,8 @@ impl<S, T> Deref for AsyncThreadLocal<S, T> {
     }
 }
 
+// /// Helper to produce a `AsyncCallback` and `AsyncThreadLocal` from proc macros.
+#[doc(hidden)]
 pub trait AsyncProxy<S, T> {
     fn new(s: Arc<S>, t: T) -> Self;
 }
@@ -126,6 +134,7 @@ impl<S, T> AsyncProxy<S, T> for AsyncSelf<S> {
     }
 }
 
+/// Helper for async services using `Send` runtimes.
 pub trait AsyncRuntime {
     fn spawn<Fn, F>(&self, f: Fn)
     where
@@ -133,6 +142,7 @@ pub trait AsyncRuntime {
         F: Future<Output = ()> + Send + 'static;
 }
 
+/// Helper for async services using `!Send` runtimes.
 pub trait AsyncRuntimeThreadLocal {
     type ThreadLocal; // Thread local;
 

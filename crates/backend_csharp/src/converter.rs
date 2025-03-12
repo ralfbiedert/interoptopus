@@ -2,7 +2,8 @@ use crate::Interop;
 use crate::interop::FunctionNameFlavor;
 use heck::{ToLowerCamelCase, ToUpperCamelCase};
 use interoptopus::lang::c::{
-    AsyncRval, CType, CompositeType, ConstantValue, EnumType, Field, FnPointerType, Function, FunctionSignature, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
+    CType, CompositeType, ConstantValue, EnumType, Field, FnPointerType, Function, FunctionSignature, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
+    SugaredReturnType,
 };
 use interoptopus::patterns::TypePattern;
 use interoptopus::patterns::callbacks::{AsyncCallback, NamedCallback};
@@ -193,16 +194,16 @@ pub fn to_typespecifier_in_sync_fn_rval(x: &CType) -> String {
     }
 }
 
-pub fn to_typespecifier_in_async_fn_rval(x: &AsyncRval) -> String {
+pub fn to_typespecifier_in_async_fn_rval(x: &SugaredReturnType) -> String {
     match x {
-        AsyncRval::Async(CType::Pattern(TypePattern::Utf8String(_))) => "Task<string>".to_string(),
-        AsyncRval::Async(CType::Pattern(TypePattern::FFIErrorEnum(_))) => "Task".to_string(),
-        AsyncRval::Async(CType::Pattern(TypePattern::Result(x))) => match x.t() {
+        SugaredReturnType::Async(CType::Pattern(TypePattern::Utf8String(_))) => "Task<string>".to_string(),
+        SugaredReturnType::Async(CType::Pattern(TypePattern::FFIErrorEnum(_))) => "Task".to_string(),
+        SugaredReturnType::Async(CType::Pattern(TypePattern::Result(x))) => match x.t() {
             CType::Pattern(TypePattern::Utf8String(_)) => "Task<string>".to_string(),
             x => format!("Task<{}>", to_typespecifier_in_sync_fn_rval(x)),
         },
-        AsyncRval::Async(x) => format!("Task<{}>", to_typespecifier_in_sync_fn_rval(x)),
-        AsyncRval::Sync(x) => to_typespecifier_in_sync_fn_rval(x),
+        SugaredReturnType::Async(x) => format!("Task<{}>", to_typespecifier_in_sync_fn_rval(x)),
+        SugaredReturnType::Sync(x) => to_typespecifier_in_sync_fn_rval(x),
     }
 }
 

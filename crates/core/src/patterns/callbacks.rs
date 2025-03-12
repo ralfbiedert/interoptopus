@@ -1,4 +1,4 @@
-//! Useful when `extern "C" fn()` delegate types give compile errors.
+//! Named delegates in high level languages.
 //!
 //! # Example
 //!

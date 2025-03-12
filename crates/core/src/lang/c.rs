@@ -660,12 +660,13 @@ impl Meta {
     }
 }
 
-pub enum AsyncRval {
+/// Indicates the final desired return type in FFI'ed user code.
+pub enum SugaredReturnType {
     Sync(CType),
     Async(CType),
 }
 
-impl AsyncRval {
+impl SugaredReturnType {
     #[must_use]
     pub fn is_async(&self) -> bool {
         matches!(self, Self::Async(_))
@@ -721,8 +722,12 @@ impl Function {
         matches!(self.signature().rval(), CType::Pattern(TypePattern::FFIErrorEnum(_)))
     }
 
+    /// Indicates the return type of a method from user code.
+    ///
+    /// Sync methods have their return type as-is, in async methods
+    /// this indicates the type of the async callback helper.
     #[must_use]
-    pub fn async_rval(&self) -> AsyncRval {
+    pub fn sugared_return_type(&self) -> SugaredReturnType {
         let ctype = self
             .signature
             .params
@@ -731,8 +736,8 @@ impl Function {
             .map(|async_callback: &AsyncCallback| async_callback.target());
 
         match ctype {
-            None => AsyncRval::Sync(self.signature.rval().clone()),
-            Some(x) => AsyncRval::Async(x.clone()),
+            None => SugaredReturnType::Sync(self.signature.rval().clone()),
+            Some(x) => SugaredReturnType::Async(x.clone()),
         }
     }
 }

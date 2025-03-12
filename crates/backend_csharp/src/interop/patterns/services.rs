@@ -3,7 +3,7 @@ use crate::converter::{
 };
 use crate::interop::docs::write_documentation;
 use crate::{FunctionNameFlavor, Interop};
-use interoptopus::lang::c::{AsyncRval, CType, Function, PrimitiveType};
+use interoptopus::lang::c::{CType, Function, PrimitiveType, SugaredReturnType};
 use interoptopus::patterns::TypePattern;
 use interoptopus::patterns::service::ServiceDefinition;
 use interoptopus::writer::{IndentWriter, WriteFor};
@@ -72,7 +72,7 @@ pub fn write_pattern_service_method(
     let mut names = Vec::new();
     let mut to_invoke = Vec::new();
     let mut types = Vec::new();
-    let async_rval = function.async_rval();
+    let async_rval = function.sugared_return_type();
 
     // For every parameter except the first, figure out how we should forward
     // it to the invocation we perform.
@@ -131,7 +131,7 @@ pub fn write_pattern_service_method(
     let rval = match async_rval {
         // let fn_name = function_name_to_csharp_name(ctor, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix));
         // let rval = format!("static {context_type_name}");
-        AsyncRval::Sync(_) => match method_type {
+        SugaredReturnType::Sync(_) => match method_type {
             MethodType::Ctor => {
                 static_prefix = "static ";
                 class.the_type().rust_name().to_string()
@@ -143,13 +143,13 @@ pub fn write_pattern_service_method(
             },
             MethodType::Dtor => "void".to_string(),
         },
-        AsyncRval::Async(CType::Pattern(TypePattern::Result(_))) => {
+        SugaredReturnType::Async(CType::Pattern(TypePattern::Result(_))) => {
             names.pop();
             types.pop();
             to_invoke.pop();
             to_typespecifier_in_async_fn_rval(&async_rval)
         }
-        AsyncRval::Async(_) => {
+        SugaredReturnType::Async(_) => {
             names.pop();
             types.pop();
             to_invoke.pop();
@@ -240,7 +240,7 @@ pub fn write_pattern_service_method(
 pub fn write_service_method_overload(i: &Interop, w: &mut IndentWriter, class: &ServiceDefinition, function: &Function, write_for: WriteFor) -> Result<(), Error> {
     i.debug(w, "write_service_method_overload")?;
 
-    if !i.has_overloadable(function.signature()) || function.async_rval().is_async() {
+    if !i.has_overloadable(function.signature()) || function.sugared_return_type().is_async() {
         return Ok(());
     }
 
