@@ -1,5 +1,7 @@
 use anyhow::Error;
-use interoptopus::{ffi_function, ffi_type, function, Bindings, InventoryBuilder};
+use interoptopus::inventory::Bindings;
+use interoptopus::inventory::InventoryBuilder;
+use interoptopus::{ffi_function, ffi_type, function};
 use interoptopus_backend_csharp::{InteropBuilder, WriteTypes};
 
 #[ffi_type(error)]

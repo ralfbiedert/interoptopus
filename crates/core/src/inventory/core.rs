@@ -104,7 +104,7 @@ impl InventoryBuilder {
     /// # Panics
     ///
     /// If a function, type, or pattern is detected that doesn't make sense in interop
-    /// generation a panic will be raised.   
+    /// generation a panic will be raised.
     #[must_use]
     pub fn validate(self) -> Self {
         for x in &self.functions {

@@ -172,7 +172,6 @@
 //! [rust-build-badge]: https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml/badge.svg
 //! [rust-build-url]: https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml
 
-pub use crate::inventory::{Bindings, Inventory, InventoryBuilder, InventoryItem, Symbol};
 pub use error::Error;
 #[cfg(feature = "derive")]
 #[cfg_attr(docsrs, doc(cfg(feature = "derive")))] // does this work?
@@ -181,7 +180,7 @@ pub use interoptopus_proc::{ffi_constant, ffi_function, ffi_service, ffi_service
 pub mod backend;
 mod error;
 pub mod ffi;
-mod inventory;
+pub mod inventory;
 mod macros;
 pub mod patterns;
 

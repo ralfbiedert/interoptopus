@@ -1,5 +1,5 @@
 use anyhow::Error;
-use interoptopus::Bindings;
+use interoptopus::inventory::Bindings;
 use interoptopus_backend_cpython::InteropBuilder;
 use interoptopus_reference_project::ffi_inventory;
 use tests::validate_output;

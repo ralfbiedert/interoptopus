@@ -18,8 +18,9 @@ use crate::interop::types::write_types;
 use crate::interop::utils::write_utils;
 use derive_builder::Builder;
 use interoptopus::backend::writer::IndentWriter;
+use interoptopus::inventory::{Bindings, Inventory};
 use interoptopus::lang::c::Function;
-use interoptopus::{Bindings, Error, Inventory, indented};
+use interoptopus::{Error, indented};
 
 /// Generates Python `ctypes` files, **get this with [`InteropBuilder`]**.🐙
 #[derive(Clone, Debug, Default, Builder)]

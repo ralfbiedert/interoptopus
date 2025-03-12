@@ -45,6 +45,6 @@ macro_rules! builtins {
 
         let builtins = $crate::patterns::builtins::Builtins::new(vec![interoptopus_string_create::function_info(), interoptopus_string_destroy::function_info()]);
         let pattern = $crate::patterns::LibraryPattern::Builtins(builtins);
-        $crate::Symbol::Pattern(pattern)
+        $crate::inventory::Symbol::Pattern(pattern)
     }};
 }

@@ -1,3 +1,4 @@
+use interoptopus::inventory::{Bindings, InventoryBuilder};
 use interoptopus::{ffi_function, ffi_type};
 
 /// A simple type in our FFI layer.
@@ -17,7 +18,7 @@ pub fn my_function(input: Vec2) -> Vec2 {
 #[test]
 #[rustfmt::skip]
 fn generate_bindings() {
-    use interoptopus::{function, Bindings, InventoryBuilder};
+    use interoptopus::{function};
     use interoptopus_backend_csharp::InteropBuilder;
 
     // In a real project this should be a freestanding `my_inventory()` function inside

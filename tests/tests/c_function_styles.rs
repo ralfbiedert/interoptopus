@@ -1,6 +1,6 @@
 use anyhow::Error;
-use interoptopus::Bindings;
-use interoptopus::{ffi_function, function, Inventory, InventoryBuilder};
+use interoptopus::inventory::{Bindings, Inventory, InventoryBuilder};
+use interoptopus::{ffi_function, function};
 use interoptopus_backend_c::{Functions, InteropBuilder};
 use tests::{compile_output_c, validate_output};
 
