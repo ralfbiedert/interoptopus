@@ -118,6 +118,7 @@ def init_lib(path):
     c_lib.service_async_process_struct.argtypes = [ctypes.c_void_p, NestedArray, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultNestedArrayError), ctypes.c_void_p)]
     c_lib.service_async_handle_string.argtypes = [ctypes.c_void_p, Utf8String, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultUtf8StringError), ctypes.c_void_p)]
     c_lib.service_async_handle_nested_string.argtypes = [ctypes.c_void_p, Utf8String, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultUseStringError), ctypes.c_void_p)]
+    c_lib.service_async_callback_string.argtypes = [ctypes.c_void_p, Utf8String, ctypes.CFUNCTYPE(None, Utf8String, ctypes.c_void_p)]
     c_lib.service_async_fail.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(None, ctypes.POINTER(ctypes.c_int), ctypes.c_void_p)]
     c_lib.service_async_bad.argtypes = [ctypes.c_void_p]
     c_lib.service_basic_destroy.argtypes = [ctypes.c_void_p]
@@ -162,8 +163,9 @@ def init_lib(path):
     c_lib.service_various_slices_return_slice_mut.argtypes = [ctypes.c_void_p]
     c_lib.service_strings_destroy.argtypes = [ctypes.c_void_p]
     c_lib.service_strings_new.argtypes = []
-    c_lib.service_strings_pass_string.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_char)]
-    c_lib.service_strings_return_string.argtypes = [ctypes.c_void_p]
+    c_lib.service_strings_pass_cstr.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_char)]
+    c_lib.service_strings_return_cstr.argtypes = [ctypes.c_void_p]
+    c_lib.service_strings_callback_string.argtypes = [ctypes.c_void_p, Utf8String, ctypes.CFUNCTYPE(None, Utf8String, ctypes.c_void_p)]
 
     c_lib.interoptopus_string_create.restype = ctypes.c_int64
     c_lib.interoptopus_string_destroy.restype = ctypes.c_int64
@@ -299,7 +301,7 @@ def init_lib(path):
     c_lib.service_various_slices_return_slice_mut.restype = SliceMutU32
     c_lib.service_strings_destroy.restype = ResultConstPtrServiceStringsError
     c_lib.service_strings_new.restype = ResultConstPtrServiceStringsError
-    c_lib.service_strings_return_string.restype = ctypes.POINTER(ctypes.c_char)
+    c_lib.service_strings_return_cstr.restype = ctypes.POINTER(ctypes.c_char)
 
     c_lib.struct2.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.pattern_string_6a.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
@@ -3074,6 +3076,13 @@ class ServiceAsync:
         """"""
         return c_lib.service_async_handle_nested_string(self._ctx, s, _async_callback)
 
+    def callback_string(self, s, cb):
+        """"""
+        if not hasattr(cb, "__ctypes_from_outparam__"):
+            cb = callbacks.fn_Utf8String_ConstPtr(cb)
+
+        return c_lib.service_async_callback_string(self._ctx, s, cb)
+
     def fail(self, _async_callback):
         """"""
         return c_lib.service_async_fail(self._ctx, _async_callback)
@@ -3444,16 +3453,23 @@ class ServiceStrings:
 
     def __del__(self):
         c_lib.service_strings_destroy(self._ctx, )
-    def pass_string(self, anon1: bytes):
+    def pass_cstr(self, anon1: bytes):
         """"""
         if not hasattr(anon1, "__ctypes_from_outparam__"):
             anon1 = ctypes.cast(anon1, ctypes.POINTER(ctypes.c_char))
-        return c_lib.service_strings_pass_string(self._ctx, anon1)
+        return c_lib.service_strings_pass_cstr(self._ctx, anon1)
 
-    def return_string(self, ) -> bytes:
+    def return_cstr(self, ) -> bytes:
         """"""
-        rval = c_lib.service_strings_return_string(self._ctx, )
+        rval = c_lib.service_strings_return_cstr(self._ctx, )
         return ctypes.string_at(rval)
+
+    def callback_string(self, s, cb):
+        """"""
+        if not hasattr(cb, "__ctypes_from_outparam__"):
+            cb = callbacks.fn_Utf8String_ConstPtr(cb)
+
+        return c_lib.service_strings_callback_string(self._ctx, s, cb)
 
 
 

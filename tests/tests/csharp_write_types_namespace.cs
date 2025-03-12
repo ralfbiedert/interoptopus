@@ -22,9 +22,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 12956578643283540623ul)
+            if (api_version != 16750268310874482403ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (12956578643283540623). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (16750268310874482403). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -885,6 +885,24 @@ namespace My.Company
             return cs.Task;
         }
 
+        [LibraryImport(NativeLib, EntryPoint = "service_async_callback_string")]
+        public static partial void service_async_callback_string(IntPtr _context, Utf8String s, StringCallback cb);
+
+        public static unsafe void service_async_callback_string(IntPtr _context, string s, StringCallbackDelegate cb)
+        {
+            var s_wrapped = new Utf8String(s);
+            var cb_wrapped = new StringCallback(cb);
+            try
+            {
+                service_async_callback_string(_context, s_wrapped, cb_wrapped);
+            }
+            finally
+            {
+                s_wrapped.Dispose();
+                cb_wrapped.Dispose();
+            }
+        }
+
         [LibraryImport(NativeLib, EntryPoint = "service_async_fail")]
         public static partial ResultError service_async_fail(IntPtr _context, AsyncHelper _async_callback);
 
@@ -1283,13 +1301,31 @@ namespace My.Company
         public static partial ResultConstPtrServiceStringsError service_strings_new();
 
 
-        [LibraryImport(NativeLib, EntryPoint = "service_strings_pass_string")]
-        public static partial void service_strings_pass_string(IntPtr _context, [MarshalAs(UnmanagedType.LPStr)] string anon1);
+        [LibraryImport(NativeLib, EntryPoint = "service_strings_pass_cstr")]
+        public static partial void service_strings_pass_cstr(IntPtr _context, [MarshalAs(UnmanagedType.LPStr)] string anon1);
 
 
-        [LibraryImport(NativeLib, EntryPoint = "service_strings_return_string")]
-        public static partial IntPtr service_strings_return_string(IntPtr _context);
+        [LibraryImport(NativeLib, EntryPoint = "service_strings_return_cstr")]
+        public static partial IntPtr service_strings_return_cstr(IntPtr _context);
 
+
+        [LibraryImport(NativeLib, EntryPoint = "service_strings_callback_string")]
+        public static partial void service_strings_callback_string(IntPtr _context, Utf8String s, StringCallback cb);
+
+        public static unsafe void service_strings_callback_string(IntPtr _context, string s, StringCallbackDelegate cb)
+        {
+            var s_wrapped = new Utf8String(s);
+            var cb_wrapped = new StringCallback(cb);
+            try
+            {
+                service_strings_callback_string(_context, s_wrapped, cb_wrapped);
+            }
+            finally
+            {
+                s_wrapped.Dispose();
+                cb_wrapped.Dispose();
+            }
+        }
 
     }
 
@@ -6793,6 +6829,16 @@ namespace My.Company
             return Interop.service_async_handle_nested_string(_context, s);
         }
 
+        public void CallbackString(Utf8String s, StringCallback cb)
+        {
+            Interop.service_async_callback_string(_context, s, cb);
+        }
+
+        public void CallbackString(string s, StringCallbackDelegate cb)
+        {
+            Interop.service_async_callback_string(_context, s, cb);
+        }
+
         public Task Fail()
         {
             return Interop.service_async_fail(_context);
@@ -7201,15 +7247,25 @@ namespace My.Company
             Interop.service_strings_destroy(_context).Ok();
         }
 
-        public void PassString([MarshalAs(UnmanagedType.LPStr)] string anon1)
+        public void PassCstr([MarshalAs(UnmanagedType.LPStr)] string anon1)
         {
-            Interop.service_strings_pass_string(_context, anon1);
+            Interop.service_strings_pass_cstr(_context, anon1);
         }
 
-        public string ReturnString()
+        public string ReturnCstr()
         {
-            var s = Interop.service_strings_return_string(_context);
+            var s = Interop.service_strings_return_cstr(_context);
             return Marshal.PtrToStringAnsi(s);
+        }
+
+        public void CallbackString(Utf8String s, StringCallback cb)
+        {
+            Interop.service_strings_callback_string(_context, s, cb);
+        }
+
+        public void CallbackString(string s, StringCallbackDelegate cb)
+        {
+            Interop.service_strings_callback_string(_context, s, cb);
         }
 
         public IntPtr Context => _context;

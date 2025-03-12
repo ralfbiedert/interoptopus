@@ -1,5 +1,6 @@
+use crate::patterns::callback::StringCallback;
 use crate::patterns::result::Error;
-use interoptopus::{ffi, ffi_service, ffi_service_method, ffi_type};
+use interoptopus::{ffi, ffi_service, ffi_type};
 
 /// Some struct we want to expose as a class.
 #[ffi_type(opaque)]
@@ -12,11 +13,13 @@ impl ServiceStrings {
         ffi::Result::ok(Self {})
     }
 
-    pub fn pass_string(&mut self, _: ffi::CStrPointer) {}
+    pub fn pass_cstr(&mut self, _: ffi::CStrPointer) {}
 
-    // If we actually return a value we have to declare what happens upon panic.
-    #[ffi_service_method(on_panic = "abort")]
-    pub fn return_string(&mut self) -> ffi::CStrPointer {
+    pub fn return_cstr(&mut self) -> ffi::CStrPointer {
         ffi::CStrPointer::empty()
+    }
+
+    pub fn callback_string(&self, s: ffi::String, cb: StringCallback) {
+        cb.call(s.clone());
     }
 }

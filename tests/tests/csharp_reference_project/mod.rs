@@ -5,6 +5,8 @@ use interoptopus_reference_project::ffi_inventory;
 use tests::backend_csharp::{common_namespace_mappings, run_dotnet_command_if_installed};
 use tests::validate_output;
 
+const DEBUG: bool = false;
+
 #[test]
 fn reference_benchmarks_prerequisites() -> Result<(), Error> {
     let generated_common = InteropBuilder::new()
@@ -13,7 +15,7 @@ fn reference_benchmarks_prerequisites() -> Result<(), Error> {
         .namespace_mappings(common_namespace_mappings())
         .dll_name("interoptopus_reference_project")
         .write_types(WriteTypes::NamespaceAndInteroptopusGlobal)
-        .debug(false)
+        .debug(DEBUG)
         .build()?
         .to_string()?;
 
@@ -22,7 +24,7 @@ fn reference_benchmarks_prerequisites() -> Result<(), Error> {
         .namespace_mappings(common_namespace_mappings())
         .dll_name("interoptopus_reference_project")
         .write_types(WriteTypes::Namespace)
-        .debug(false)
+        .debug(DEBUG)
         .build()?
         .to_string()?;
 

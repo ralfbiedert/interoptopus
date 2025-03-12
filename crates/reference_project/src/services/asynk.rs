@@ -1,3 +1,4 @@
+use crate::patterns::callback::StringCallback;
 use crate::patterns::result::Error;
 use crate::patterns::result::ErrorXX;
 use crate::types::{NestedArray, UseString};
@@ -49,6 +50,10 @@ impl ServiceAsync {
 
     pub async fn handle_nested_string(_this: This, s: ffi::String) -> ffi::Result<UseString, Error> {
         ffi::Result::ok(UseString { s1: s.clone(), s2: s.clone() })
+    }
+
+    pub fn callback_string(&self, s: ffi::String, cb: StringCallback) {
+        cb.call(s.clone());
     }
 
     pub async fn fail(_this: This) -> ffi::Result<(), Error> {

@@ -806,6 +806,8 @@ ERROR service_async_handle_string(const SERVICEASYNC* _CONTEXT, UTF8STRING S, fp
 
 ERROR service_async_handle_nested_string(const SERVICEASYNC* _CONTEXT, UTF8STRING S, fptr_fn_ConstPtrResultUseStringError_ConstPtr _ASYNC_CALLBACK);
 
+void service_async_callback_string(const SERVICEASYNC* _CONTEXT, UTF8STRING S, STRINGCALLBACK CB);
+
 ERROR service_async_fail(const SERVICEASYNC* _CONTEXT, fptr_fn_ConstPtrError_ConstPtr _ASYNC_CALLBACK);
 
 void service_async_bad(SERVICEASYNC* _CONTEXT);
@@ -964,9 +966,11 @@ RESULTCONSTPTRSERVICESTRINGSERROR service_strings_destroy(SERVICESTRINGS* _CONTE
 
 RESULTCONSTPTRSERVICESTRINGSERROR service_strings_new();
 
-void service_strings_pass_string(SERVICESTRINGS* _CONTEXT, const char* ANON1);
+void service_strings_pass_cstr(SERVICESTRINGS* _CONTEXT, const char* ANON1);
 
-const char* service_strings_return_string(SERVICESTRINGS* _CONTEXT);
+const char* service_strings_return_cstr(SERVICESTRINGS* _CONTEXT);
+
+void service_strings_callback_string(const SERVICESTRINGS* _CONTEXT, UTF8STRING S, STRINGCALLBACK CB);
 
 
 #ifdef __cplusplus

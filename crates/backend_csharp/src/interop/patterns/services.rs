@@ -100,8 +100,17 @@ pub fn write_pattern_service_method(
                     to_invoke.push(name.to_string());
                 }
             }
-            CType::Pattern(TypePattern::Utf8String(_)) => {
+            // These two are a particularity how we generate overloads. Basically, we
+            // we (for now) can only generate one base method and one overload.
+            // Since async methods have an automatic overload due to the callbacks,
+            // we have to bend the string type to match the string mapping used there.
+            // In the future we should probably support more overload permutations we can
+            // remove this special case.
+            CType::Pattern(TypePattern::Utf8String(_)) if async_rval.is_async() => {
                 native = "string".to_string();
+                to_invoke.push(name.to_string());
+            }
+            CType::Pattern(TypePattern::Utf8String(_)) if async_rval.is_sync() => {
                 to_invoke.push(name.to_string());
             }
             _ => {

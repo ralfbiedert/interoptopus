@@ -146,4 +146,5 @@ public class TestPatternDelegates
         Assert.Equal("hello world", r2b);
     }
 
+
 }

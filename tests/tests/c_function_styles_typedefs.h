@@ -806,6 +806,8 @@ typedef ERROR (*service_async_handle_string)(const SERVICEASYNC*, UTF8STRING, fp
 
 typedef ERROR (*service_async_handle_nested_string)(const SERVICEASYNC*, UTF8STRING, fptr_fn_ConstPtrResultUseStringError_ConstPtr);
 
+typedef void (*service_async_callback_string)(const SERVICEASYNC*, UTF8STRING, STRINGCALLBACK);
+
 typedef ERROR (*service_async_fail)(const SERVICEASYNC*, fptr_fn_ConstPtrError_ConstPtr);
 
 typedef void (*service_async_bad)(SERVICEASYNC*);
@@ -964,9 +966,11 @@ typedef RESULTCONSTPTRSERVICESTRINGSERROR (*service_strings_destroy)(SERVICESTRI
 
 typedef RESULTCONSTPTRSERVICESTRINGSERROR (*service_strings_new)();
 
-typedef void (*service_strings_pass_string)(SERVICESTRINGS*, const char*);
+typedef void (*service_strings_pass_cstr)(SERVICESTRINGS*, const char*);
 
-typedef const char* (*service_strings_return_string)(SERVICESTRINGS*);
+typedef const char* (*service_strings_return_cstr)(SERVICESTRINGS*);
+
+typedef void (*service_strings_callback_string)(const SERVICESTRINGS*, UTF8STRING, STRINGCALLBACK);
 
 
 #ifdef __cplusplus
