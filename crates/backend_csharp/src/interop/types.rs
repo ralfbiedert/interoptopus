@@ -71,8 +71,6 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &CType
                 w.newline()?;
             }
             TypePattern::Result(x) => {
-                write_type_definition_composite(i, w, x.composite())?;
-                w.newline()?;
                 write_pattern_result(i, w, x)?;
                 w.newline()?;
             }

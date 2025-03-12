@@ -93,3 +93,8 @@ pub fn pattern_string_7(x: ffi::Slice<ffi::String>, i: u64) -> ffi::Result<ffi::
 pub fn pattern_string_8(x: ffi::Slice<UseString>, i: u64) -> ffi::Result<UseString, Error> {
     ffi::Ok(x.as_slice()[i as usize].clone())
 }
+
+#[ffi_function]
+pub fn pattern_string_9() -> ffi::Result<ffi::String, Error> {
+    ffi::Err(Error::Fail)
+}

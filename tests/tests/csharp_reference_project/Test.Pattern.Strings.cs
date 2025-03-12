@@ -1,3 +1,4 @@
+using System;
 using My.Company;
 using My.Company.Common;
 using Xunit;
@@ -88,6 +89,17 @@ public class TestPatternStrings
         Assert.Equal(r1.s1, "hello1");
         Assert.Equal(r2.s2, "world2");
     }
+
+        [Fact]
+        public void pattern_string_9()
+        {
+            var rval = Interop.pattern_string_9();
+
+            // Should not crash attempting to de-serialize a non-existing string
+
+            Assert.Equal(rval.Err(), Error.Fail);
+        }
+
 
     [Fact]
     public void string_by_ref_dont_leak()

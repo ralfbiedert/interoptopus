@@ -214,6 +214,18 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrGameEngineError
     {
+        public IntPtr Ok()
+        {
+            if (err == Error.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<Error>(err);
+        }
+
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
+
         public ResultConstPtrGameEngineError(ResultConstPtrGameEngineError other)
         {
             t = other.t;
@@ -269,31 +281,17 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrGameEngineError();
 
-                _managed.t = _unmanaged.t;
                 _managed.err = _unmanaged.err;
+                if (_managed.err == Error.Ok)
+                {
+                    _managed.t = _unmanaged.t;
+                }
 
                 return _managed;
             }
             public void Free() { }
         }
     }
-
-    public partial struct ResultConstPtrGameEngineError
-    {
-        public IntPtr Ok()
-        {
-            if (err == Error.Ok)
-            {
-                return t;
-            }
-            throw new InteropException<Error>(err);
-        }
-
-        public bool IsOk() { return err == Error.Ok; }
-        public Error Err() { return err; }
-
-    }
-
 
 
     public partial class GameEngine : IDisposable
