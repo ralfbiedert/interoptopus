@@ -729,6 +729,8 @@ typedef RESULTUTF8STRINGERROR (*pattern_string_7)(SLICEUTF8STRING, uint64_t);
 
 typedef RESULTUSESTRINGERROR (*pattern_string_8)(SLICEUSESTRING, uint64_t);
 
+typedef RESULTUTF8STRINGERROR (*pattern_string_9)();
+
 typedef uint32_t (*pattern_ffi_slice_1)(SLICEU32);
 
 typedef uint32_t (*pattern_ffi_slice_1b)(SLICEMUTU32);

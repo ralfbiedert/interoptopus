@@ -83,6 +83,7 @@ def init_lib(path):
     c_lib.pattern_string_6b.argtypes = [ctypes.POINTER(UseString)]
     c_lib.pattern_string_7.argtypes = [SliceUtf8String, ctypes.c_uint64]
     c_lib.pattern_string_8.argtypes = [SliceUseString, ctypes.c_uint64]
+    c_lib.pattern_string_9.argtypes = []
     c_lib.pattern_ffi_slice_1.argtypes = [SliceU32]
     c_lib.pattern_ffi_slice_1b.argtypes = [SliceMutU32]
     c_lib.pattern_ffi_slice_2.argtypes = [SliceVec3f32, ctypes.c_int32]
@@ -230,6 +231,7 @@ def init_lib(path):
     c_lib.pattern_string_6b.restype = ctypes.c_int
     c_lib.pattern_string_7.restype = ResultUtf8StringError
     c_lib.pattern_string_8.restype = ResultUseStringError
+    c_lib.pattern_string_9.restype = ResultUtf8StringError
     c_lib.pattern_ffi_slice_1.restype = ctypes.c_uint32
     c_lib.pattern_ffi_slice_1b.restype = ctypes.c_uint32
     c_lib.pattern_ffi_slice_2.restype = Vec3f32
@@ -573,6 +575,9 @@ def pattern_string_8(x: SliceUseString | ctypes.Array[UseString], i: int):
         x = SliceUseString(data=ctypes.cast(x, ctypes.POINTER(UseString)), len=len(x))
 
     return c_lib.pattern_string_8(x, i)
+
+def pattern_string_9():
+    return c_lib.pattern_string_9()
 
 def pattern_ffi_slice_1(ffi_slice: SliceU32 | ctypes.Array[ctypes.c_uint32]) -> int:
     if hasattr(ffi_slice, "_length_") and getattr(ffi_slice, "_type_", "") == ctypes.c_uint32:

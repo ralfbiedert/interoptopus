@@ -729,6 +729,8 @@ RESULTUTF8STRINGERROR pattern_string_7(SLICEUTF8STRING X, uint64_t I);
 
 RESULTUSESTRINGERROR pattern_string_8(SLICEUSESTRING X, uint64_t I);
 
+RESULTUTF8STRINGERROR pattern_string_9();
+
 uint32_t pattern_ffi_slice_1(SLICEU32 FFI_SLICE);
 
 uint32_t pattern_ffi_slice_1b(SLICEMUTU32 FFI_SLICE);

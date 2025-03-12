@@ -22,9 +22,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 18400386674043818275ul)
+            if (api_version != 2517290661643744151ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (18400386674043818275). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (2517290661643744151). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -424,6 +424,10 @@ namespace My.Company
                 x_wrapped.Dispose();
             }
         }
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_9")]
+        public static partial ResultUtf8StringError pattern_string_9();
+
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1")]
         public static partial uint pattern_ffi_slice_1(SliceU32 ffi_slice);
@@ -4954,6 +4958,18 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceAsyncError
     {
+        public IntPtr Ok()
+        {
+            if (err == Error.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<Error>(err);
+        }
+
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
+
         public ResultConstPtrServiceAsyncError(ResultConstPtrServiceAsyncError other)
         {
             t = other.t;
@@ -5009,31 +5025,17 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceAsyncError();
 
-                _managed.t = _unmanaged.t;
                 _managed.err = _unmanaged.err;
+                if (_managed.err == Error.Ok)
+                {
+                    _managed.t = _unmanaged.t;
+                }
 
                 return _managed;
             }
             public void Free() { }
         }
     }
-
-    public partial struct ResultConstPtrServiceAsyncError
-    {
-        public IntPtr Ok()
-        {
-            if (err == Error.Ok)
-            {
-                return t;
-            }
-            throw new InteropException<Error>(err);
-        }
-
-        public bool IsOk() { return err == Error.Ok; }
-        public Error Err() { return err; }
-
-    }
-
 
     ///Result that contains value or an error.
     public partial struct ResultConstPtrServiceBasicError
@@ -5047,6 +5049,18 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceBasicError
     {
+        public IntPtr Ok()
+        {
+            if (err == Error.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<Error>(err);
+        }
+
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
+
         public ResultConstPtrServiceBasicError(ResultConstPtrServiceBasicError other)
         {
             t = other.t;
@@ -5102,31 +5116,17 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceBasicError();
 
-                _managed.t = _unmanaged.t;
                 _managed.err = _unmanaged.err;
+                if (_managed.err == Error.Ok)
+                {
+                    _managed.t = _unmanaged.t;
+                }
 
                 return _managed;
             }
             public void Free() { }
         }
     }
-
-    public partial struct ResultConstPtrServiceBasicError
-    {
-        public IntPtr Ok()
-        {
-            if (err == Error.Ok)
-            {
-                return t;
-            }
-            throw new InteropException<Error>(err);
-        }
-
-        public bool IsOk() { return err == Error.Ok; }
-        public Error Err() { return err; }
-
-    }
-
 
     ///Result that contains value or an error.
     public partial struct ResultConstPtrServiceCallbacksError
@@ -5140,6 +5140,18 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceCallbacksError
     {
+        public IntPtr Ok()
+        {
+            if (err == Error.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<Error>(err);
+        }
+
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
+
         public ResultConstPtrServiceCallbacksError(ResultConstPtrServiceCallbacksError other)
         {
             t = other.t;
@@ -5195,31 +5207,17 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceCallbacksError();
 
-                _managed.t = _unmanaged.t;
                 _managed.err = _unmanaged.err;
+                if (_managed.err == Error.Ok)
+                {
+                    _managed.t = _unmanaged.t;
+                }
 
                 return _managed;
             }
             public void Free() { }
         }
     }
-
-    public partial struct ResultConstPtrServiceCallbacksError
-    {
-        public IntPtr Ok()
-        {
-            if (err == Error.Ok)
-            {
-                return t;
-            }
-            throw new InteropException<Error>(err);
-        }
-
-        public bool IsOk() { return err == Error.Ok; }
-        public Error Err() { return err; }
-
-    }
-
 
     ///Result that contains value or an error.
     public partial struct ResultConstPtrServiceDependentError
@@ -5233,6 +5231,18 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceDependentError
     {
+        public IntPtr Ok()
+        {
+            if (err == Error.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<Error>(err);
+        }
+
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
+
         public ResultConstPtrServiceDependentError(ResultConstPtrServiceDependentError other)
         {
             t = other.t;
@@ -5288,31 +5298,17 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceDependentError();
 
-                _managed.t = _unmanaged.t;
                 _managed.err = _unmanaged.err;
+                if (_managed.err == Error.Ok)
+                {
+                    _managed.t = _unmanaged.t;
+                }
 
                 return _managed;
             }
             public void Free() { }
         }
     }
-
-    public partial struct ResultConstPtrServiceDependentError
-    {
-        public IntPtr Ok()
-        {
-            if (err == Error.Ok)
-            {
-                return t;
-            }
-            throw new InteropException<Error>(err);
-        }
-
-        public bool IsOk() { return err == Error.Ok; }
-        public Error Err() { return err; }
-
-    }
-
 
     ///Result that contains value or an error.
     public partial struct ResultConstPtrServiceIgnoringMethodsError
@@ -5326,6 +5322,18 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceIgnoringMethodsError
     {
+        public IntPtr Ok()
+        {
+            if (err == Error.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<Error>(err);
+        }
+
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
+
         public ResultConstPtrServiceIgnoringMethodsError(ResultConstPtrServiceIgnoringMethodsError other)
         {
             t = other.t;
@@ -5381,31 +5389,17 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceIgnoringMethodsError();
 
-                _managed.t = _unmanaged.t;
                 _managed.err = _unmanaged.err;
+                if (_managed.err == Error.Ok)
+                {
+                    _managed.t = _unmanaged.t;
+                }
 
                 return _managed;
             }
             public void Free() { }
         }
     }
-
-    public partial struct ResultConstPtrServiceIgnoringMethodsError
-    {
-        public IntPtr Ok()
-        {
-            if (err == Error.Ok)
-            {
-                return t;
-            }
-            throw new InteropException<Error>(err);
-        }
-
-        public bool IsOk() { return err == Error.Ok; }
-        public Error Err() { return err; }
-
-    }
-
 
     ///Result that contains value or an error.
     public partial struct ResultConstPtrServiceMainError
@@ -5419,6 +5413,18 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceMainError
     {
+        public IntPtr Ok()
+        {
+            if (err == Error.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<Error>(err);
+        }
+
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
+
         public ResultConstPtrServiceMainError(ResultConstPtrServiceMainError other)
         {
             t = other.t;
@@ -5474,31 +5480,17 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceMainError();
 
-                _managed.t = _unmanaged.t;
                 _managed.err = _unmanaged.err;
+                if (_managed.err == Error.Ok)
+                {
+                    _managed.t = _unmanaged.t;
+                }
 
                 return _managed;
             }
             public void Free() { }
         }
     }
-
-    public partial struct ResultConstPtrServiceMainError
-    {
-        public IntPtr Ok()
-        {
-            if (err == Error.Ok)
-            {
-                return t;
-            }
-            throw new InteropException<Error>(err);
-        }
-
-        public bool IsOk() { return err == Error.Ok; }
-        public Error Err() { return err; }
-
-    }
-
 
     ///Result that contains value or an error.
     public partial struct ResultConstPtrServiceMultipleCtorsError
@@ -5512,6 +5504,18 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceMultipleCtorsError
     {
+        public IntPtr Ok()
+        {
+            if (err == Error.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<Error>(err);
+        }
+
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
+
         public ResultConstPtrServiceMultipleCtorsError(ResultConstPtrServiceMultipleCtorsError other)
         {
             t = other.t;
@@ -5567,31 +5571,17 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceMultipleCtorsError();
 
-                _managed.t = _unmanaged.t;
                 _managed.err = _unmanaged.err;
+                if (_managed.err == Error.Ok)
+                {
+                    _managed.t = _unmanaged.t;
+                }
 
                 return _managed;
             }
             public void Free() { }
         }
     }
-
-    public partial struct ResultConstPtrServiceMultipleCtorsError
-    {
-        public IntPtr Ok()
-        {
-            if (err == Error.Ok)
-            {
-                return t;
-            }
-            throw new InteropException<Error>(err);
-        }
-
-        public bool IsOk() { return err == Error.Ok; }
-        public Error Err() { return err; }
-
-    }
-
 
     ///Result that contains value or an error.
     public partial struct ResultConstPtrServiceOnPanicError
@@ -5605,6 +5595,18 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceOnPanicError
     {
+        public IntPtr Ok()
+        {
+            if (err == Error.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<Error>(err);
+        }
+
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
+
         public ResultConstPtrServiceOnPanicError(ResultConstPtrServiceOnPanicError other)
         {
             t = other.t;
@@ -5660,31 +5662,17 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceOnPanicError();
 
-                _managed.t = _unmanaged.t;
                 _managed.err = _unmanaged.err;
+                if (_managed.err == Error.Ok)
+                {
+                    _managed.t = _unmanaged.t;
+                }
 
                 return _managed;
             }
             public void Free() { }
         }
     }
-
-    public partial struct ResultConstPtrServiceOnPanicError
-    {
-        public IntPtr Ok()
-        {
-            if (err == Error.Ok)
-            {
-                return t;
-            }
-            throw new InteropException<Error>(err);
-        }
-
-        public bool IsOk() { return err == Error.Ok; }
-        public Error Err() { return err; }
-
-    }
-
 
     ///Result that contains value or an error.
     public partial struct ResultConstPtrServiceResultError
@@ -5698,6 +5686,18 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceResultError
     {
+        public IntPtr Ok()
+        {
+            if (err == Error.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<Error>(err);
+        }
+
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
+
         public ResultConstPtrServiceResultError(ResultConstPtrServiceResultError other)
         {
             t = other.t;
@@ -5753,31 +5753,17 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceResultError();
 
-                _managed.t = _unmanaged.t;
                 _managed.err = _unmanaged.err;
+                if (_managed.err == Error.Ok)
+                {
+                    _managed.t = _unmanaged.t;
+                }
 
                 return _managed;
             }
             public void Free() { }
         }
     }
-
-    public partial struct ResultConstPtrServiceResultError
-    {
-        public IntPtr Ok()
-        {
-            if (err == Error.Ok)
-            {
-                return t;
-            }
-            throw new InteropException<Error>(err);
-        }
-
-        public bool IsOk() { return err == Error.Ok; }
-        public Error Err() { return err; }
-
-    }
-
 
     ///Result that contains value or an error.
     public partial struct ResultConstPtrServiceStringsError
@@ -5791,6 +5777,18 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceStringsError
     {
+        public IntPtr Ok()
+        {
+            if (err == Error.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<Error>(err);
+        }
+
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
+
         public ResultConstPtrServiceStringsError(ResultConstPtrServiceStringsError other)
         {
             t = other.t;
@@ -5846,31 +5844,17 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceStringsError();
 
-                _managed.t = _unmanaged.t;
                 _managed.err = _unmanaged.err;
+                if (_managed.err == Error.Ok)
+                {
+                    _managed.t = _unmanaged.t;
+                }
 
                 return _managed;
             }
             public void Free() { }
         }
     }
-
-    public partial struct ResultConstPtrServiceStringsError
-    {
-        public IntPtr Ok()
-        {
-            if (err == Error.Ok)
-            {
-                return t;
-            }
-            throw new InteropException<Error>(err);
-        }
-
-        public bool IsOk() { return err == Error.Ok; }
-        public Error Err() { return err; }
-
-    }
-
 
     ///Result that contains value or an error.
     public partial struct ResultConstPtrServiceVariousSlicesError
@@ -5884,6 +5868,18 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceVariousSlicesError
     {
+        public IntPtr Ok()
+        {
+            if (err == Error.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<Error>(err);
+        }
+
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
+
         public ResultConstPtrServiceVariousSlicesError(ResultConstPtrServiceVariousSlicesError other)
         {
             t = other.t;
@@ -5939,31 +5935,17 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceVariousSlicesError();
 
-                _managed.t = _unmanaged.t;
                 _managed.err = _unmanaged.err;
+                if (_managed.err == Error.Ok)
+                {
+                    _managed.t = _unmanaged.t;
+                }
 
                 return _managed;
             }
             public void Free() { }
         }
     }
-
-    public partial struct ResultConstPtrServiceVariousSlicesError
-    {
-        public IntPtr Ok()
-        {
-            if (err == Error.Ok)
-            {
-                return t;
-            }
-            throw new InteropException<Error>(err);
-        }
-
-        public bool IsOk() { return err == Error.Ok; }
-        public Error Err() { return err; }
-
-    }
-
 
     ///Result that contains value or an error.
     public partial struct ResultNestedArrayError
@@ -5977,6 +5959,18 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultNestedArrayError
     {
+        public NestedArray Ok()
+        {
+            if (err == Error.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<Error>(err);
+        }
+
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
+
         public ResultNestedArrayError(ResultNestedArrayError other)
         {
             t = other.t;
@@ -6033,32 +6027,18 @@ namespace My.Company
             {
                 _managed = new ResultNestedArrayError();
 
-                var _t = new NestedArray.Marshaller(_unmanaged.t);
-                _managed.t = _t.ToManaged();
                 _managed.err = _unmanaged.err;
+                if (_managed.err == Error.Ok)
+                {
+                    var _t = new NestedArray.Marshaller(_unmanaged.t);
+                    _managed.t = _t.ToManaged();
+                }
 
                 return _managed;
             }
             public void Free() { }
         }
     }
-
-    public partial struct ResultNestedArrayError
-    {
-        public NestedArray Ok()
-        {
-            if (err == Error.Ok)
-            {
-                return t;
-            }
-            throw new InteropException<Error>(err);
-        }
-
-        public bool IsOk() { return err == Error.Ok; }
-        public Error Err() { return err; }
-
-    }
-
 
     ///Result that contains value or an error.
     public partial struct ResultU32Error
@@ -6072,6 +6052,18 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultU32Error
     {
+        public uint Ok()
+        {
+            if (err == Error.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<Error>(err);
+        }
+
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
+
         public ResultU32Error(ResultU32Error other)
         {
             t = other.t;
@@ -6127,31 +6119,17 @@ namespace My.Company
             {
                 _managed = new ResultU32Error();
 
-                _managed.t = _unmanaged.t;
                 _managed.err = _unmanaged.err;
+                if (_managed.err == Error.Ok)
+                {
+                    _managed.t = _unmanaged.t;
+                }
 
                 return _managed;
             }
             public void Free() { }
         }
     }
-
-    public partial struct ResultU32Error
-    {
-        public uint Ok()
-        {
-            if (err == Error.Ok)
-            {
-                return t;
-            }
-            throw new InteropException<Error>(err);
-        }
-
-        public bool IsOk() { return err == Error.Ok; }
-        public Error Err() { return err; }
-
-    }
-
 
     ///Result that contains value or an error.
     public partial struct ResultU64Error
@@ -6165,6 +6143,18 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultU64Error
     {
+        public ulong Ok()
+        {
+            if (err == Error.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<Error>(err);
+        }
+
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
+
         public ResultU64Error(ResultU64Error other)
         {
             t = other.t;
@@ -6220,31 +6210,17 @@ namespace My.Company
             {
                 _managed = new ResultU64Error();
 
-                _managed.t = _unmanaged.t;
                 _managed.err = _unmanaged.err;
+                if (_managed.err == Error.Ok)
+                {
+                    _managed.t = _unmanaged.t;
+                }
 
                 return _managed;
             }
             public void Free() { }
         }
     }
-
-    public partial struct ResultU64Error
-    {
-        public ulong Ok()
-        {
-            if (err == Error.Ok)
-            {
-                return t;
-            }
-            throw new InteropException<Error>(err);
-        }
-
-        public bool IsOk() { return err == Error.Ok; }
-        public Error Err() { return err; }
-
-    }
-
 
     ///Result that contains value or an error.
     public partial struct ResultUseStringError
@@ -6258,6 +6234,18 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultUseStringError
     {
+        public UseString Ok()
+        {
+            if (err == Error.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<Error>(err);
+        }
+
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
+
         public ResultUseStringError(ResultUseStringError other)
         {
             t = other.t;
@@ -6314,32 +6302,18 @@ namespace My.Company
             {
                 _managed = new ResultUseStringError();
 
-                var _t = new UseString.Marshaller(_unmanaged.t);
-                _managed.t = _t.ToManaged();
                 _managed.err = _unmanaged.err;
+                if (_managed.err == Error.Ok)
+                {
+                    var _t = new UseString.Marshaller(_unmanaged.t);
+                    _managed.t = _t.ToManaged();
+                }
 
                 return _managed;
             }
             public void Free() { }
         }
     }
-
-    public partial struct ResultUseStringError
-    {
-        public UseString Ok()
-        {
-            if (err == Error.Ok)
-            {
-                return t;
-            }
-            throw new InteropException<Error>(err);
-        }
-
-        public bool IsOk() { return err == Error.Ok; }
-        public Error Err() { return err; }
-
-    }
-
 
     ///Result that contains value or an error.
     public partial struct ResultUtf8StringError
@@ -6353,6 +6327,18 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultUtf8StringError
     {
+        public string Ok()
+        {
+            if (err == Error.Ok)
+            {
+                return t;
+            }
+            throw new InteropException<Error>(err);
+        }
+
+        public bool IsOk() { return err == Error.Ok; }
+        public Error Err() { return err; }
+
         public ResultUtf8StringError(ResultUtf8StringError other)
         {
             t = other.t;
@@ -6409,32 +6395,18 @@ namespace My.Company
             {
                 _managed = new ResultUtf8StringError();
 
-                var _t = new Utf8String.Marshaller(_unmanaged.t);
-                _managed.t = _t.ToManaged().String;
                 _managed.err = _unmanaged.err;
+                if (_managed.err == Error.Ok)
+                {
+                    var _t = new Utf8String.Marshaller(_unmanaged.t);
+                    _managed.t = _t.ToManaged().String;
+                }
 
                 return _managed;
             }
             public void Free() { }
         }
     }
-
-    public partial struct ResultUtf8StringError
-    {
-        public string Ok()
-        {
-            if (err == Error.Ok)
-            {
-                return t;
-            }
-            throw new InteropException<Error>(err);
-        }
-
-        public bool IsOk() { return err == Error.Ok; }
-        public Error Err() { return err; }
-
-    }
-
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
