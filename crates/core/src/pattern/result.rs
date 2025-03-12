@@ -4,7 +4,7 @@
 //! # Examples
 //!
 //! Functions returning a [`FFIError`] might receive special treatment in backends supporting
-//! exception handling. For example, a [`service`](crate::patterns::service) method defined
+//! exception handling. For example, a [`service`](crate::pattern::service) method defined
 //! as:
 //!
 //! ```
@@ -31,20 +31,20 @@
 use crate::backend::util::capitalize_first_letter;
 use crate::lang::c::{CType, CompositeType, Documentation, EnumType, Field, Layout, Meta, PrimitiveType, Representation, Variant, Visibility};
 use crate::lang::rust::CTypeInfo;
-use crate::patterns::TypePattern;
+use crate::pattern::TypePattern;
 use std::any::Any;
 use std::fmt::Debug;
 use std::mem::MaybeUninit;
 
 /// A trait you should implement for enums that signal errors in FFI calls.
 ///
-/// Once implemented, the enum can be used in [services](crate::patterns::service) to automatically
+/// Once implemented, the enum can be used in [services](crate::pattern::service) to automatically
 /// convert `Result<(), E>` types to FFI enums.
 ///
 /// # Example
 ///
 /// ```
-/// use interoptopus::patterns::result::FFIError;
+/// use interoptopus::pattern::result::FFIError;
 /// use interoptopus::ffi_type;
 ///
 /// // Some Error used in your application.
@@ -317,7 +317,7 @@ impl<T, E: FFIError> IntoFFIResult for Result<T, E> {
 
 ///
 /// At some point we want to get rid of these once `Try` ([try_trait_v2](https://github.com/rust-lang/rust/issues/84277)) stabilizes.
-pub fn result_to_ffi<T: CTypeInfo, E: CTypeInfo + crate::patterns::result::FFIError>(f: impl FnOnce() -> std::result::Result<T, E>) -> Result<T, E> {
+pub fn result_to_ffi<T: CTypeInfo, E: CTypeInfo + crate::pattern::result::FFIError>(f: impl FnOnce() -> std::result::Result<T, E>) -> Result<T, E> {
     match f() {
         std::result::Result::Ok(x) => Result::ok(x),
         std::result::Result::Err(e) => Result::error(e),
@@ -325,7 +325,7 @@ pub fn result_to_ffi<T: CTypeInfo, E: CTypeInfo + crate::patterns::result::FFIEr
 }
 
 /// At some point we want to get rid of these once `Try` ([try_trait_v2](https://github.com/rust-lang/rust/issues/84277)) stabilizes.
-pub async fn result_to_ffi_async<T: CTypeInfo, E: CTypeInfo + crate::patterns::result::FFIError>(
+pub async fn result_to_ffi_async<T: CTypeInfo, E: CTypeInfo + crate::pattern::result::FFIError>(
     f: impl std::ops::AsyncFnOnce() -> std::result::Result<T, E>,
 ) -> Result<T, E> {
     match f().await {

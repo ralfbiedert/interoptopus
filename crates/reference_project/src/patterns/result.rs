@@ -1,4 +1,4 @@
-use interoptopus::patterns::result::Result;
+use interoptopus::pattern::result::Result;
 use interoptopus::{ffi_function, ffi_type};
 use std::fmt::{Display, Formatter};
 // This file may look complex but the Interoptopus parts are actually really simple,
@@ -42,7 +42,7 @@ impl Default for Error {
 
 // Implement Interoptopus' `FFIError` trait for your FFIError enum.
 // Here you must map 3 "well known" variants to your enum.
-impl interoptopus::patterns::result::FFIError for Error {
+impl interoptopus::pattern::result::FFIError for Error {
     const SUCCESS: Self = Self::Ok;
     const NULL: Self = Self::Null;
     const PANIC: Self = Self::Panic;

@@ -22,7 +22,7 @@
 //!
 //! ```
 //!
-//! you would instead accept an [`CStrPointer`](crate::patterns::string::CStrPointer):
+//! you would instead accept an [`CStrPointer`](crate::pattern::string::CStrPointer):
 //!
 //! ```
 //! # use interoptopus::{ffi_function, ffi};
@@ -48,11 +48,11 @@
 //!
 //! - The pattern is **supported** and the backend will generate the raw, underlying type and / or
 //!   a language-specific abstraction that safely and conveniently handles it. Examples
-//!   include converting an [`CStrPointer`](string) to a C# `string`, or a [`service`](crate::patterns::service)
+//!   include converting an [`CStrPointer`](string) to a C# `string`, or a [`service`](crate::pattern::service)
 //!   to a Python `class`.
 //!
 //! - The pattern is not supported and will be **omitted, if the pattern was merely an aggregate** of
-//!   existing items. Examples include the [`service`](crate::patterns::service) pattern in C which will not
+//!   existing items. Examples include the [`service`](crate::pattern::service) pattern in C which will not
 //!   be emitted. However, this will not pose a problem as all constituent types and methods (functions)
 //!   are still available as raw bindings.
 //!
@@ -75,11 +75,11 @@
 
 use crate::lang::c::{CType, CompositeType, PrimitiveType};
 use crate::lang::rust::CTypeInfo;
-use crate::patterns::builtins::Builtins;
-use crate::patterns::callback::{AsyncCallback, NamedCallback};
-use crate::patterns::result::{FFIErrorEnum, FFIResultType};
-use crate::patterns::service::ServiceDefinition;
-use crate::patterns::slice::SliceType;
+use crate::pattern::builtins::Builtins;
+use crate::pattern::callback::{AsyncCallback, NamedCallback};
+use crate::pattern::result::{FFIErrorEnum, FFIResultType};
+use crate::pattern::service::ServiceDefinition;
+use crate::pattern::slice::SliceType;
 use std::ffi::c_char;
 
 #[doc(hidden)]

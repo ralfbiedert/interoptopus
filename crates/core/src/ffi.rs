@@ -1,11 +1,11 @@
 //! FFI-safe versions of common std Rust types.
 
-pub use crate::patterns::cstr::CStrPointer;
-pub use crate::patterns::option::Option;
-pub use crate::patterns::primitive::{Bool, CChar};
-pub use crate::patterns::result::{Err, Ok, Result};
-pub use crate::patterns::slice::{Slice, SliceMut};
-pub use crate::patterns::string::String;
+pub use crate::pattern::cstr::CStrPointer;
+pub use crate::pattern::option::Option;
+pub use crate::pattern::primitive::{Bool, CChar};
+pub use crate::pattern::result::{Err, Ok, Result};
+pub use crate::pattern::slice::{Slice, SliceMut};
+pub use crate::pattern::string::String;
 
 /// Logs an error if compiled with feature `log`.
 #[cfg(feature = "log")]

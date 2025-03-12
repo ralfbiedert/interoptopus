@@ -1,4 +1,4 @@
-use interoptopus::patterns::option::Option;
+use interoptopus::pattern::option::Option;
 use interoptopus::{ffi_function, ffi_type};
 
 #[ffi_type]

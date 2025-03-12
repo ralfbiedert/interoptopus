@@ -10,7 +10,7 @@ use interoptopus::backend::writer::{IndentWriter, WriteFor};
 use interoptopus::indented;
 use interoptopus::inventory::{Bindings, non_service_functions};
 use interoptopus::lang::c::{CType, CompositeType, Function};
-use interoptopus::patterns::{LibraryPattern, TypePattern};
+use interoptopus::pattern::{LibraryPattern, TypePattern};
 
 /// Configures C# documentation generation.
 #[derive(Clone, Debug, Default)]

@@ -1,5 +1,5 @@
 use interoptopus::lang::c::{CType, ConstantValue, Documentation, FnPointerType, PrimitiveType, PrimitiveValue};
-use interoptopus::patterns::TypePattern;
+use interoptopus::pattern::TypePattern;
 
 #[must_use]
 pub fn documentation(documentation: &Documentation) -> String {

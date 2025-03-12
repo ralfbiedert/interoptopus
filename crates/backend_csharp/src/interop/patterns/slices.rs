@@ -2,8 +2,8 @@ use crate::Interop;
 use crate::converter::{get_slice_type_argument, is_owned_slice};
 use interoptopus::backend::writer::IndentWriter;
 use interoptopus::lang::c::CType;
-use interoptopus::patterns::TypePattern;
-use interoptopus::patterns::slice::SliceType;
+use interoptopus::pattern::TypePattern;
+use interoptopus::pattern::slice::SliceType;
 use interoptopus::{Error, indented};
 
 #[derive(PartialEq, Eq, Debug, Clone, Copy)]

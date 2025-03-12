@@ -2,8 +2,8 @@ use crate::converter::function_name_to_csharp_name;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::writer::IndentWriter;
 use interoptopus::lang::c::CType;
-use interoptopus::patterns::TypePattern;
-use interoptopus::patterns::api_guard::inventory_hash;
+use interoptopus::pattern::TypePattern;
+use interoptopus::pattern::api_guard::inventory_hash;
 use interoptopus::{Error, indented};
 
 pub fn write_abi_guard(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {

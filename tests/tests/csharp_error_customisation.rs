@@ -12,7 +12,7 @@ enum FFIError {
     Panic,
 }
 
-impl interoptopus::patterns::result::FFIError for FFIError {
+impl interoptopus::pattern::result::FFIError for FFIError {
     const SUCCESS: Self = Self::Success;
     const NULL: Self = Self::Null;
     const PANIC: Self = Self::Panic;

@@ -2,7 +2,7 @@ use crate::Interop;
 use crate::converter::to_ctypes_name;
 use interoptopus::backend::writer::IndentWriter;
 use interoptopus::lang::c::CType;
-use interoptopus::patterns::TypePattern;
+use interoptopus::pattern::TypePattern;
 use interoptopus::{Error, indented};
 
 pub fn write_api_load_fuction(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {

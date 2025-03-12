@@ -26,7 +26,7 @@ impl Default for Error {
     }
 }
 
-impl interoptopus::patterns::result::FFIError for Error {
+impl interoptopus::pattern::result::FFIError for Error {
     const SUCCESS: Self = Self::Ok;
     const NULL: Self = Self::Null;
     const PANIC: Self = Self::Panic;

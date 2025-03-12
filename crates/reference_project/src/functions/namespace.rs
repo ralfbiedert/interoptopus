@@ -1,7 +1,7 @@
 use crate::types::common;
 use interoptopus::ffi_function;
-use interoptopus::patterns::option::Option;
-use interoptopus::patterns::slice::{Slice, SliceMut};
+use interoptopus::pattern::option::Option;
+use interoptopus::pattern::slice::{Slice, SliceMut};
 
 #[ffi_function]
 pub fn namespaced_type(x: common::Vec) -> common::Vec {

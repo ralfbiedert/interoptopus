@@ -13,7 +13,8 @@
 //! [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src).
 //!
 //! ```rust
-//! use interoptopus::{ffi_function, ffi_type, Inventory, InventoryBuilder, function};
+//! use interoptopus::{ffi_function, ffi_type, function};
+//! use interoptopus::inventory::{Inventory, InventoryBuilder};
 //!
 //! #[ffi_type]
 //! pub struct Vec2 {
@@ -51,7 +52,8 @@
 //!
 //! ```
 //! use interoptopus::backend::util::NamespaceMappings;
-//! use interoptopus::{Error, Bindings};
+//! use interoptopus::Error;
+//! use interoptopus::inventory::Bindings;
 //!
 //! #[test]
 //! fn bindings_cpython_cffi() -> Result<(), Error> {

@@ -40,7 +40,7 @@
 use crate::backend::util::capitalize_first_letter;
 use crate::lang::c::{CType, CompositeType, Documentation, Field, Layout, Meta, PrimitiveType, Representation, Visibility};
 use crate::lang::rust::CTypeInfo;
-use crate::patterns::TypePattern;
+use crate::pattern::TypePattern;
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
 use std::ptr::{null, null_mut};
@@ -283,7 +283,7 @@ impl SliceType {
 
 #[cfg(test)]
 mod test {
-    use crate::patterns::slice::{Slice, SliceMut};
+    use crate::pattern::slice::{Slice, SliceMut};
 
     #[test]
     fn can_create_ref() {

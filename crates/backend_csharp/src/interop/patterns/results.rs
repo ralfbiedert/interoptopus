@@ -7,8 +7,8 @@ use crate::interop::types::composite::{
 };
 use interoptopus::backend::writer::{IndentWriter, WriteFor};
 use interoptopus::lang::c::{CType, Field};
-use interoptopus::patterns::TypePattern;
-use interoptopus::patterns::result::{FFIErrorEnum, FFIResultType};
+use interoptopus::pattern::TypePattern;
+use interoptopus::pattern::result::{FFIErrorEnum, FFIResultType};
 use interoptopus::{Error, indented};
 
 pub fn write_pattern_result(i: &Interop, w: &mut IndentWriter, result: &FFIResultType) -> Result<(), Error> {

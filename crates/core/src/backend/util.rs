@@ -1,7 +1,7 @@
 //! Helpers for backend authors.
 
 use crate::lang::c::{CType, Function};
-use crate::patterns::TypePattern;
+use crate::pattern::TypePattern;
 use std::collections::{HashMap, HashSet};
 use std::iter::FromIterator;
 

@@ -2,8 +2,8 @@
 
 use crate::lang::c::{CType, Documentation, FnPointerType, FunctionSignature, Meta, Parameter, PrimitiveType};
 use crate::lang::rust::CTypeInfo;
-use crate::patterns;
-use crate::patterns::TypePattern;
+use crate::pattern;
+use crate::pattern::TypePattern;
 use std::ffi::c_void;
 use std::future::Future;
 use std::ops::Deref;
@@ -67,7 +67,7 @@ unsafe impl<T: CTypeInfo> CTypeInfo for AsyncCallback<T> {
         let sig = FunctionSignature::new(params, rval);
         let name = format!("AsyncCallback{}", T::type_info().name_within_lib());
         let fn_pointer = FnPointerType::new_named(sig, name);
-        let named_callback = patterns::AsyncCallback::with_meta(fn_pointer, meta);
+        let named_callback = pattern::AsyncCallback::with_meta(fn_pointer, meta);
 
         CType::Pattern(TypePattern::AsyncCallback(named_callback))
     }

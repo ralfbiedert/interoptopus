@@ -1,5 +1,5 @@
 use crate::types::{CallbackFFISlice, CharArray, Vec3f32};
-use interoptopus::patterns::slice::{Slice, SliceMut};
+use interoptopus::pattern::slice::{Slice, SliceMut};
 use interoptopus::{callback, ffi_function};
 
 static HUGE_VEC_SLICE: [Vec3f32; 100_000] = [Vec3f32 { x: 0.0, y: 0.0, z: 0.0 }; 100_000];
@@ -85,7 +85,7 @@ pub fn pattern_ffi_slice_8(slice: &SliceMut<CharArray>, callback: CallbackCharAr
 // #[cfg(test)]
 // mod test {
 //     use super::pattern_ffi_slice_3;
-//     use interoptopus::patterns::slice::FFISliceMut;
+//     use interoptopus::pattern::slice::FFISliceMut;
 //     use std::ffi::c_void;
 //
 //     #[allow(dead_code)]

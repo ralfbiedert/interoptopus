@@ -2,7 +2,7 @@
 
 use crate::lang::c::CType;
 use crate::lang::rust::CTypeInfo;
-use crate::patterns::TypePattern;
+use crate::pattern::TypePattern;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::ops::Not;
@@ -96,8 +96,8 @@ impl From<CChar> for c_char {
 
 #[cfg(test)]
 mod test {
-    use crate::patterns::primitive::Bool;
-    use crate::patterns::primitive::CChar;
+    use crate::pattern::primitive::Bool;
+    use crate::pattern::primitive::CChar;
     use std::os::raw::c_char;
 
     #[test]

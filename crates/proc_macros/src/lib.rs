@@ -178,7 +178,7 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// ```
 /// # use std::fmt::{Display, Formatter};
-/// # use interoptopus::patterns::result::FFIError;
+/// # use interoptopus::pattern::result::FFIError;
 /// # #[derive(Debug)]
 /// # pub enum Error {
 /// #     Bad,
@@ -283,7 +283,7 @@ pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// ```
 /// # use std::fmt::{Display, Formatter};
-/// # use interoptopus::patterns::result::FFIError;
+/// # use interoptopus::pattern::result::FFIError;
 /// #
 /// # #[derive(Debug)]
 /// # pub enum Error {

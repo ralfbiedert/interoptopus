@@ -6,9 +6,9 @@ use interoptopus::lang::c::{
     CType, CompositeType, ConstantValue, EnumType, Field, FnPointerType, Function, FunctionSignature, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
     SugaredReturnType,
 };
-use interoptopus::patterns::TypePattern;
-use interoptopus::patterns::callback::{AsyncCallback, NamedCallback};
-use interoptopus::patterns::slice::SliceType;
+use interoptopus::pattern::TypePattern;
+use interoptopus::pattern::callback::{AsyncCallback, NamedCallback};
+use interoptopus::pattern::slice::SliceType;
 use std::collections::HashSet;
 
 /// Converts a primitive (Rust) type to a native C# type name, e.g., `f32` to `float`.

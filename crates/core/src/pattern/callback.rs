@@ -6,7 +6,7 @@
 //!
 //!```
 //! use interoptopus::{ffi_function, callback};
-//! use interoptopus::patterns::slice::Slice;
+//! use interoptopus::pattern::slice::Slice;
 //!
 //! callback!(CallbackSlice(x: Slice<u8>) -> u8);
 //!
@@ -50,7 +50,7 @@
 //!
 //! ```ignore
 //! use interoptopus::ffi_function;
-//! use interoptopus::patterns::slice::FFISlice;
+//! use interoptopus::pattern::slice::FFISlice;
 //!
 //! pub type CallbackSlice = extern "C" fn(FFISlice<u8>);
 //!
@@ -75,7 +75,7 @@
 //!
 //! The reasons for this are somewhat technical, but it boils down to us being unable to generally
 //! implement [`CTypeInfo`](crate::lang::rust::CTypeInfo) for _all_ types you may want to use;
-//! [`FFISlice`](crate::patterns::slice::Slice) here being one of them.
+//! [`FFISlice`](crate::pattern::slice::Slice) here being one of them.
 //! To fix this, you can replace `pub type CallbackSlice = ...` with a `callback!` call
 //! which should generate a helper type that works.
 //!
@@ -215,7 +215,7 @@ impl AsyncCallback {
 /// Defines a callback type, akin to a `fn f(T) -> R` wrapped in an [Option](std::option).
 ///
 /// A named delegate will be emitted in languages supporting them, otherwise a regular
-/// function pointer. For details, please see the [**callbacks module**](crate::patterns::callback).
+/// function pointer. For details, please see the [**callbacks module**](crate::pattern::callback).
 ///
 /// # Example
 ///
@@ -223,7 +223,7 @@ impl AsyncCallback {
 ///
 /// ```
 /// use interoptopus::callback;
-/// use interoptopus::patterns::slice::Slice;
+/// use interoptopus::pattern::slice::Slice;
 ///
 /// callback!(MyCallback(slice: Slice<u8>) -> u8);
 /// ```
@@ -231,7 +231,7 @@ impl AsyncCallback {
 /// The generated type definition similar to:
 ///
 /// ```
-/// # use interoptopus::patterns::slice::Slice;
+/// # use interoptopus::pattern::slice::Slice;
 /// #[repr(transparent)]
 /// pub struct MyCallback(Option<extern "C" fn(Slice<u8>) -> u8>);
 /// ```
@@ -321,9 +321,9 @@ macro_rules! callback {
                 let meta = Meta::with_namespace_documentation(namespace, Documentation::new());
                 let sig = FunctionSignature::new(params, rval);
                 let fn_pointer = FnPointerType::new_named(sig, stringify!($name).to_string());
-                let named_callback = $crate::patterns::callback::NamedCallback::with_meta(fn_pointer, meta);
+                let named_callback = $crate::pattern::callback::NamedCallback::with_meta(fn_pointer, meta);
 
-                CType::Pattern($crate::patterns::TypePattern::NamedCallback(named_callback))
+                CType::Pattern($crate::pattern::TypePattern::NamedCallback(named_callback))
             }
         }
     };

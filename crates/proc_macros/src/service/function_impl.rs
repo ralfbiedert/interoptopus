@@ -215,7 +215,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 }
             };
 
-            let ctor_result = quote_spanned! {span_rval => <<#service_type as ::interoptopus::patterns::service::ServiceInfo>::CtorResult as ::interoptopus::patterns::result::FFIResultAsPtr>::AsPtr };
+            let ctor_result = quote_spanned! {span_rval => <<#service_type as ::interoptopus::pattern::service::ServiceInfo>::CtorResult as ::interoptopus::pattern::result::FFIResultAsPtr>::AsPtr };
 
             quote_spanned! { span_function =>
                 #method_attributes
@@ -235,7 +235,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                             #ctor_result::err(*__e)
                         }
                         Err(__e) => {
-                            ::interoptopus::ffi::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::patterns::result::get_panic_message(__e.as_ref())));
+                            ::interoptopus::ffi::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::pattern::result::get_panic_message(__e.as_ref())));
                             #ctor_result::panic()
                         }
                     }
@@ -259,7 +259,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                             match __result_result {
                                 Ok(__x) => __x,
                                 Err(__e) => {
-                                    ::interoptopus::ffi::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::patterns::result::get_panic_message(__e.as_ref())));
+                                    ::interoptopus::ffi::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::pattern::result::get_panic_message(__e.as_ref())));
                                     <#rval>::default()
                                 }
                             }
@@ -305,7 +305,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 let _ = ::std::sync::Arc::into_raw(__arc_restored);
 
                 let __async_fn = async move |__tlcontext| {
-                    let __context = <#first as ::interoptopus::patterns::asynk::AsyncProxy<_, _>>::new(__context, __tlcontext);
+                    let __context = <#first as ::interoptopus::pattern::asynk::AsyncProxy<_, _>>::new(__context, __tlcontext);
                     let __rval = <#without_lifetimes>::#orig_fn_ident( #(#arg_names),* ).await.into();
                     __async_callback.call(&__rval);
                     // We actually want move semantics for rval for types like `Utf8Strings` that
@@ -315,13 +315,13 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 };
 
                 <#without_lifetimes>::spawn(__this, __async_fn);
-                <#rval as ::interoptopus::patterns::result::FFIResultAsUnitT>::AsUnitT::ok(())
+                <#rval as ::interoptopus::pattern::result::FFIResultAsUnitT>::AsUnitT::ok(())
             };
 
             quote_spanned! { span_function =>
                 #method_attributes
 
-                pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),*, __async_callback: ::interoptopus::patterns::asynk::AsyncCallback<#rval>) -> <#rval as ::interoptopus::patterns::result::FFIResultAsUnitT>::AsUnitT {
+                pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),*, __async_callback: ::interoptopus::pattern::asynk::AsyncCallback<#rval>) -> <#rval as ::interoptopus::pattern::result::FFIResultAsUnitT>::AsUnitT {
                     #block
                 }
             }
@@ -345,7 +345,7 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
         quote_spanned!(span_service_ty => *mut #without_lifetimes)
     };
 
-    let ctor_result = quote_spanned! {span_service_ty => <<#without_lifetimes as ::interoptopus::patterns::service::ServiceInfo>::CtorResult as ::interoptopus::patterns::result::FFIResultAsPtr>::AsPtr };
+    let ctor_result = quote_spanned! {span_service_ty => <<#without_lifetimes as ::interoptopus::pattern::service::ServiceInfo>::CtorResult as ::interoptopus::pattern::result::FFIResultAsPtr>::AsPtr };
 
     let object_deconstruction = if has_async {
         quote_spanned! { span_service_ty =>
@@ -381,7 +381,7 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
             match __result_result {
                 Ok(_) => #ctor_result::ok(::std::ptr::null()),
                 Err(__e) => {
-                    ::interoptopus::ffi::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::patterns::result::get_panic_message(__e.as_ref())));
+                    ::interoptopus::ffi::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::pattern::result::get_panic_message(__e.as_ref())));
                     #ctor_result::panic()
                 }
             }

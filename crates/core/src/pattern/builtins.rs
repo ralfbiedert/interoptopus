@@ -26,7 +26,7 @@ macro_rules! builtins {
         use interoptopus::lang::rust::FunctionInfo;
 
         #[$crate::ffi_function]
-        pub fn interoptopus_string_create(utf8: *const ::std::ffi::c_void, len: u64, rval: &mut ::std::mem::MaybeUninit<$crate::patterns::string::String>) -> i64 {
+        pub fn interoptopus_string_create(utf8: *const ::std::ffi::c_void, len: u64, rval: &mut ::std::mem::MaybeUninit<$crate::pattern::string::String>) -> i64 {
             let slice = if utf8.is_null() {
                 &[]
             } else {
@@ -34,17 +34,17 @@ macro_rules! builtins {
             };
             let vec = slice.to_vec();
             let string = unsafe { String::from_utf8_unchecked(vec) };
-            rval.write($crate::patterns::string::String::from_string(string));
+            rval.write($crate::pattern::string::String::from_string(string));
             0
         }
 
         #[$crate::ffi_function]
-        pub fn interoptopus_string_destroy(utf8: $crate::patterns::string::String) -> i64 {
+        pub fn interoptopus_string_destroy(utf8: $crate::pattern::string::String) -> i64 {
             0
         }
 
-        let builtins = $crate::patterns::builtins::Builtins::new(vec![interoptopus_string_create::function_info(), interoptopus_string_destroy::function_info()]);
-        let pattern = $crate::patterns::LibraryPattern::Builtins(builtins);
+        let builtins = $crate::pattern::builtins::Builtins::new(vec![interoptopus_string_create::function_info(), interoptopus_string_destroy::function_info()]);
+        let pattern = $crate::pattern::LibraryPattern::Builtins(builtins);
         $crate::inventory::Symbol::Pattern(pattern)
     }};
 }

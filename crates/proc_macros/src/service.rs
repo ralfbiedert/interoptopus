@@ -83,12 +83,12 @@ pub fn ffi_service(attr: TokenStream, input: &TokenStream) -> TokenStream {
 
         #ffi_dtor_quote
 
-        impl <#lt> ::interoptopus::patterns::service::ServiceInfo for #service_type {
+        impl <#lt> ::interoptopus::pattern::service::ServiceInfo for #service_type {
             type CtorResult = #rval;
         }
 
-        impl <#lt> ::interoptopus::patterns::LibraryPatternInfo for #service_type {
-            fn pattern_info() -> ::interoptopus::patterns::LibraryPattern {
+        impl <#lt> ::interoptopus::pattern::LibraryPatternInfo for #service_type {
+            fn pattern_info() -> ::interoptopus::pattern::LibraryPattern {
 
                 use ::interoptopus::lang::rust::CTypeInfo;
                 use ::interoptopus::lang::rust::FunctionInfo;
@@ -116,13 +116,13 @@ pub fn ffi_service(attr: TokenStream, input: &TokenStream) -> TokenStream {
                     x::function_info()
                 };
 
-                let service = ::interoptopus::patterns::service::ServiceDefinition::new(
+                let service = ::interoptopus::pattern::service::ServiceDefinition::new(
                     ctors, dtor, methods,
                 );
 
                 service.assert_valid();
 
-                ::interoptopus::patterns::LibraryPattern::Service(service)
+                ::interoptopus::pattern::LibraryPattern::Service(service)
             }
         }
     };

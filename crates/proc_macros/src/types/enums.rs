@@ -74,11 +74,11 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
 
     let ctype_info_return = if attributes.error {
         quote! {
-            use ::interoptopus::patterns::result::FFIError as _;
+            use ::interoptopus::pattern::result::FFIError as _;
             let success_variant = Self::SUCCESS.variant_info();
             let panic_variant = Self::PANIC.variant_info();
-            let the_success_enum = ::interoptopus::patterns::result::FFIErrorEnum::new(rval, success_variant, panic_variant);
-            let the_pattern = ::interoptopus::patterns::TypePattern::FFIErrorEnum(the_success_enum);
+            let the_success_enum = ::interoptopus::pattern::result::FFIErrorEnum::new(rval, success_variant, panic_variant);
+            let the_pattern = ::interoptopus::pattern::TypePattern::FFIErrorEnum(the_success_enum);
             ::interoptopus::lang::c::CType::Pattern(the_pattern)
         }
     } else {

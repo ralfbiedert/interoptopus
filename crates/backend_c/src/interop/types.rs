@@ -7,8 +7,8 @@ use crate::{DocStyle, Indentation, Interop};
 use interoptopus::backend::util::sort_types_by_dependencies;
 use interoptopus::backend::writer::IndentWriter;
 use interoptopus::lang::c::{CType, CompositeType, EnumType, Field, FnPointerType, OpaqueType, Variant};
-use interoptopus::patterns::TypePattern;
-use interoptopus::patterns::callback::NamedCallback;
+use interoptopus::pattern::TypePattern;
+use interoptopus::pattern::callback::NamedCallback;
 use interoptopus::{Error, indented};
 
 pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {

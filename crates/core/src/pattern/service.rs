@@ -18,13 +18,13 @@
 //! To define a service you need the following parts:
 //!
 //! - An `opaque` type; the instance of a service
-//! - A Rust `Error` type mappable to an [`FFIError`](crate::patterns::result::FFIError) enum via `From<Error>`
+//! - A Rust `Error` type mappable to an [`FFIError`](crate::pattern::result::FFIError) enum via `From<Error>`
 //! - Some methods on the opaque type.
 //!
 //! # Example
 //!
 //! In this example we define a service called `SimpleService` with a constructor and two methods.
-//! The type `MyFFIError` is not shown, but implemented as in the [`FFIError`](crate::patterns::result::FFIError) example.
+//! The type `MyFFIError` is not shown, but implemented as in the [`FFIError`](crate::pattern::result::FFIError) example.
 //!
 //! ```
 //! # use std::fmt::{Display, Formatter};
@@ -66,7 +66,7 @@
 //! # }
 //! #
 //! use interoptopus::{ffi, ffi_type, ffi_service, ffi_service_method};
-//! use interoptopus::patterns::result::FFIError;
+//! use interoptopus::pattern::result::FFIError;
 //!
 //! #[ffi_type(opaque)]
 //! pub struct SimpleService {
@@ -114,7 +114,7 @@
 
 use crate::backend::util::longest_common_prefix;
 use crate::lang::c::{Function, OpaqueType};
-use crate::patterns::result::FFIResultAsPtr;
+use crate::pattern::result::FFIResultAsPtr;
 use std::fmt::Debug;
 use std::slice::from_ref;
 

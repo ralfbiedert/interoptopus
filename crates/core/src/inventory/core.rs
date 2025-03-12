@@ -2,7 +2,7 @@ use crate::Error;
 use crate::backend::util::{ctypes_from_functions_types, extract_namespaces_from_types, holds_opaque_without_ref};
 use crate::backend::writer::IndentWriter;
 use crate::lang::c::{CType, Constant, Function};
-use crate::patterns::LibraryPattern;
+use crate::pattern::LibraryPattern;
 use std::collections::HashSet;
 use std::fs::File;
 use std::path::Path;
@@ -26,7 +26,8 @@ pub enum Symbol {
 /// This function can be called from your unit tests and the returned [`Inventory`] used to create bindings.
 ///
 /// ```rust
-/// use interoptopus::{Inventory, InventoryBuilder, function, constant, extra_type, pattern, ffi_function, ffi_constant, ffi_type};
+/// use interoptopus::{function, constant, extra_type, pattern, ffi_function, ffi_constant, ffi_type};
+/// use interoptopus::inventory::{Inventory, InventoryBuilder};
 ///
 /// // First, define some items our DLL uses or needs.
 ///
@@ -198,7 +199,7 @@ impl Inventory {
         &self.namespaces
     }
 
-    /// Return all registered [`LibraryPattern`]. In contrast, [`TypePattern`](crate::patterns::TypePattern)
+    /// Return all registered [`LibraryPattern`]. In contrast, [`TypePattern`](crate::pattern::TypePattern)
     /// will be found inside the types returned via [`ctypes()`](Self::ctypes).
     #[must_use]
     pub fn patterns(&self) -> &[LibraryPattern] {
@@ -214,7 +215,7 @@ impl Inventory {
     /// Here we filter an inventory, keeping only types, removing all other items.
     ///
     /// ```rust
-    /// # use interoptopus::{Inventory, InventoryItem};
+    /// # use interoptopus::inventory::{Inventory, InventoryItem};
     /// #
     /// # let inventory = Inventory::default();
     /// #

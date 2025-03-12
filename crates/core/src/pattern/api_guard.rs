@@ -13,8 +13,9 @@
 //! create guards calling this function when loading the DLL.
 //!
 //! ```
-//! use interoptopus::{ffi_function, Inventory, InventoryBuilder, function};
-//! use interoptopus::patterns::api_guard::APIVersion;
+//! use interoptopus::{ffi_function, function};
+//! use interoptopus::inventory::{Inventory, InventoryBuilder};
+//! use interoptopus::pattern::api_guard::APIVersion;
 //!
 //! // Guard function used by backends.
 //! #[ffi_function]
@@ -52,7 +53,7 @@
 use crate::inventory::Inventory;
 use crate::lang::c::CType;
 use crate::lang::rust::CTypeInfo;
-use crate::patterns::TypePattern;
+use crate::pattern::TypePattern;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 

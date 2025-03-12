@@ -15,7 +15,7 @@ use crate::interop::types::fnptrs::write_type_definition_fn_pointer;
 use interoptopus::Error;
 use interoptopus::backend::writer::{IndentWriter, WriteFor};
 use interoptopus::lang::c::CType;
-use interoptopus::patterns::TypePattern;
+use interoptopus::pattern::TypePattern;
 
 pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     for the_type in i.inventory.ctypes() {

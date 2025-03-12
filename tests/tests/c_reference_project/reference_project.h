@@ -605,7 +605,7 @@ uint8_t nested_array_3(NESTEDARRAY INPUT);
 
 void behavior_sleep(uint64_t MILLIS);
 
-ERROR behavior_panics();
+void behavior_panics();
 
 uint8_t fnptr_1(fptr_fn_u8_rval_u8 CALLBACK, uint8_t VALUE);
 

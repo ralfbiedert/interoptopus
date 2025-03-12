@@ -2,13 +2,13 @@
 //!
 
 use crate::lang::c::Function;
-use crate::patterns::LibraryPattern;
+use crate::pattern::LibraryPattern;
 
 pub(crate) mod core;
 
 pub use core::{Bindings, Inventory, InventoryBuilder, InventoryItem, Symbol};
 
-/// Returns all functions not belonging to a [`service`](crate::patterns::service) pattern.
+/// Returns all functions not belonging to a [`service`](crate::pattern::service) pattern.
 ///
 /// Useful in backends like Python that can fully encapsulate services and should not expose their
 /// raw methods in the main namespace.
@@ -39,7 +39,7 @@ pub fn non_service_functions(inventory: &Inventory) -> Vec<&Function> {
 ///
 /// ```
 /// # mod my_crate {
-/// #     use interoptopus::Inventory;
+/// #     use interoptopus::inventory::Inventory;
 /// #     pub fn inventory_core() -> Inventory { Inventory::default() }
 /// #     pub fn inventory_ext() -> Inventory { Inventory::default() }
 /// # }

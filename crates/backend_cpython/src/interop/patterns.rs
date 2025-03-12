@@ -5,9 +5,9 @@ use crate::interop::utils::write_success_enum_aware_rval;
 use interoptopus::backend::util::longest_common_prefix;
 use interoptopus::backend::writer::{IndentWriter, WriteFor};
 use interoptopus::lang::c::{CType, CompositeType, Function};
-use interoptopus::patterns::service::ServiceDefinition;
-use interoptopus::patterns::slice::SliceType;
-use interoptopus::patterns::{LibraryPattern, TypePattern};
+use interoptopus::pattern::service::ServiceDefinition;
+use interoptopus::pattern::slice::SliceType;
+use interoptopus::pattern::{LibraryPattern, TypePattern};
 use interoptopus::{Error, indented};
 
 pub fn write_slice(_i: &Interop, w: &mut IndentWriter, c: &SliceType, mutable: bool) -> Result<(), Error> {

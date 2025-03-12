@@ -30,8 +30,8 @@ use crate::lang::c::{CType, CompositeType, Documentation, Field, Layout, Meta, P
 use crate::lang::rust::CTypeInfo;
 
 use crate::backend::util::capitalize_first_letter;
-use crate::patterns::TypePattern;
-use crate::patterns::primitive::Bool;
+use crate::pattern::TypePattern;
+use crate::pattern::primitive::Bool;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -156,7 +156,7 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::patterns::option::Option;
+    use crate::pattern::option::Option;
 
     #[test]
     fn can_create() {

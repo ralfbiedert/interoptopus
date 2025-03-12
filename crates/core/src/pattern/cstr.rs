@@ -28,7 +28,7 @@
 use crate::Error;
 use crate::lang::c::CType;
 use crate::lang::rust::CTypeInfo;
-use crate::patterns::TypePattern;
+use crate::pattern::TypePattern;
 use std::ffi::CStr;
 use std::marker::PhantomData;
 use std::option::Option::None;
@@ -41,7 +41,7 @@ static EMPTY: &[u8] = b"\0";
 ///
 /// # Antipattern
 ///
-/// It's discouraged to use [`FFIOption`](crate::patterns::option::Option) with [`CStrPointer`]
+/// It's discouraged to use [`FFIOption`](crate::pattern::option::Option) with [`CStrPointer`]
 /// and some backend might not generate proper bindings (like C#).
 ///
 /// Instead use [`CStrPointer`] alone since it already has a pointer that's nullable.
@@ -129,7 +129,7 @@ unsafe impl CTypeInfo for CStrPointer<'_> {
 
 #[cfg(test)]
 mod test {
-    use crate::patterns::cstr::CStrPointer;
+    use crate::pattern::cstr::CStrPointer;
     use std::ffi::CString;
 
     #[test]

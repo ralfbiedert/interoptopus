@@ -1,5 +1,5 @@
 use interoptopus::ffi_function;
-use interoptopus::patterns::primitive::{Bool, CChar};
+use interoptopus::pattern::primitive::{Bool, CChar};
 
 #[ffi_function]
 pub fn pattern_ffi_bool(ffi_bool: Bool) -> Bool {

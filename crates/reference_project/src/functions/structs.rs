@@ -1,7 +1,7 @@
 use crate::patterns::result::Error;
 use crate::types::{BoolField, Tupled, Vec3f32};
 use interoptopus::ffi_function;
-use interoptopus::patterns::result::Result;
+use interoptopus::pattern::result::Result;
 
 #[ffi_function]
 pub fn struct1(x: Tupled) -> Tupled {

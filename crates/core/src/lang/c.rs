@@ -10,9 +10,9 @@
 //! by a backend**.
 
 use crate::backend::util::{IdPrettifier, capitalize_first_letter, ctypes_from_type_recursive};
-use crate::patterns::TypePattern;
-use crate::patterns::callback::AsyncCallback;
-use crate::patterns::result::FFIResultType;
+use crate::pattern::TypePattern;
+use crate::pattern::callback::AsyncCallback;
+use crate::pattern::result::FFIResultType;
 use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
 // /// If a name like `abc::XXX` is given, strips the `abc::` part.

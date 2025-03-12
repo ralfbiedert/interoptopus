@@ -29,7 +29,8 @@
 //! ## Code you write ...
 //!
 //! ```rust
-//! use interoptopus::{ffi_function, ffi_type, Inventory, InventoryBuilder, function};
+//! use interoptopus::{ffi_function, ffi_type, function};
+//! use interoptopus::inventory::{Inventory, InventoryBuilder};
 //!
 //! #[ffi_type]
 //! pub struct Vec2 {
@@ -182,7 +183,7 @@ mod error;
 pub mod ffi;
 pub mod inventory;
 mod macros;
-pub mod patterns;
+pub mod pattern;
 
 pub mod lang {
     //! Abstractions for authors of backends.

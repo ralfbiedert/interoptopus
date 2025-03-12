@@ -4,7 +4,7 @@ use crate::interop::docs::write_documentation;
 use interoptopus::backend::writer::{IndentWriter, WriteFor};
 use interoptopus::lang::c;
 use interoptopus::lang::c::{CType, CompositeType, Field, Layout, PrimitiveType};
-use interoptopus::patterns::TypePattern;
+use interoptopus::pattern::TypePattern;
 use interoptopus::{Error, indented};
 
 pub fn write_type_definition_composite(i: &Interop, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {

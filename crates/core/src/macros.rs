@@ -5,7 +5,8 @@
 /// # Example
 ///
 /// ```rust
-/// use interoptopus::{ffi_function, Inventory, InventoryBuilder, function};
+/// use interoptopus::{ffi_function, function};
+/// use interoptopus::inventory::{Inventory, InventoryBuilder};
 ///
 /// #[ffi_function]
 /// pub fn my_function() { }
@@ -37,7 +38,8 @@ macro_rules! function {
 /// # Example
 ///
 /// ```rust
-/// use interoptopus::{ffi_type, Inventory, InventoryBuilder, extra_type};
+/// use interoptopus::{ffi_type, extra_type};
+/// use interoptopus::inventory::{Inventory, InventoryBuilder};
 ///
 /// #[ffi_type]
 /// pub struct S<T> {
@@ -60,18 +62,19 @@ macro_rules! extra_type {
 
 /// Register a pattern with an [`InventoryBuilder`].
 ///
-/// You only need to register [`LibraryPattern`](crate::patterns::LibraryPattern), as [`TypePattern`](crate::patterns::TypePattern) are detected automatically.
+/// You only need to register [`LibraryPattern`](crate::pattern::LibraryPattern), as [`TypePattern`](crate::pattern::TypePattern) are detected automatically.
 ///
 /// # Example
 ///
 /// Note, as this example focuses on the `pattern` macro it omits the definition of `Error` and `MyFFIError`.
-/// Their implementation can be found in the [`FFIError`](crate::patterns::result::FFIError) example.
+/// Their implementation can be found in the [`FFIError`](crate::pattern::result::FFIError) example.
 ///
 /// ```rust
-/// use interoptopus::{ffi, ffi_type, ffi_service, Inventory, InventoryBuilder, pattern};
+/// use interoptopus::{ffi, ffi_type, ffi_service, pattern};
+/// use interoptopus::inventory::{InventoryBuilder, Inventory};
 ///
 /// # use std::fmt::{Display, Formatter};
-/// # use interoptopus::patterns::result::FFIError;
+/// # use interoptopus::pattern::result::FFIError;
 /// #
 /// # #[derive(Debug)]
 /// # pub enum Error {
@@ -132,7 +135,7 @@ macro_rules! extra_type {
 #[macro_export]
 macro_rules! pattern {
     ($x:path) => {{
-        let info: $crate::patterns::LibraryPattern = <$x as $crate::patterns::LibraryPatternInfo>::pattern_info();
+        let info: $crate::pattern::LibraryPattern = <$x as $crate::pattern::LibraryPatternInfo>::pattern_info();
         $crate::inventory::Symbol::Pattern(info)
     }};
 }
@@ -144,7 +147,8 @@ macro_rules! pattern {
 /// # Example
 ///
 /// ```rust
-/// use interoptopus::{ffi_constant, Inventory, InventoryBuilder, constant};
+/// use interoptopus::{ffi_constant, constant};
+/// use interoptopus::inventory::{Inventory, InventoryBuilder};
 ///
 /// #[ffi_constant]
 /// pub const MY_CONSTANT: u32 = 123;

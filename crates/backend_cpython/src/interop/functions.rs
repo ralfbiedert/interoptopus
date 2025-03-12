@@ -5,7 +5,7 @@ use interoptopus::backend::util::safe_name;
 use interoptopus::backend::writer::{IndentWriter, WriteFor};
 use interoptopus::inventory::non_service_functions;
 use interoptopus::lang::c::{CType, Function};
-use interoptopus::patterns::TypePattern;
+use interoptopus::pattern::TypePattern;
 use interoptopus::{Error, indented};
 
 pub fn write_function_proxies(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {

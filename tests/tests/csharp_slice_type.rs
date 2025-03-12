@@ -1,7 +1,7 @@
 use anyhow::Error;
 use interoptopus::inventory::Bindings;
 use interoptopus::inventory::{Inventory, InventoryBuilder};
-use interoptopus::patterns::slice::Slice;
+use interoptopus::pattern::slice::Slice;
 use interoptopus::{ffi_function, function};
 use interoptopus_backend_csharp::InteropBuilder;
 use tests::backend_csharp::common_namespace_mappings;

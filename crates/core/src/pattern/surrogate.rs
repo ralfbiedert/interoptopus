@@ -9,7 +9,7 @@
 //!
 //! ```
 //! use interoptopus::{ffi_function, ffi_type};
-//! use interoptopus::patterns::surrogate::{CorrectSurrogate, Surrogate};
+//! use interoptopus::pattern::surrogate::{CorrectSurrogate, Surrogate};
 //! #
 //! # mod foreign {
 //! #    #[repr(C)]

@@ -175,7 +175,6 @@ def init_lib(path):
     c_lib.char_array_3.restype = ctypes.c_uint8
     c_lib.nested_array_1.restype = NestedArray
     c_lib.nested_array_3.restype = ctypes.c_uint8
-    c_lib.behavior_panics.restype = ctypes.c_int
     c_lib.fnptr_1.restype = ctypes.c_uint8
     c_lib.generic_1a.restype = ctypes.c_uint32
     c_lib.generic_1b.restype = ctypes.c_uint8
@@ -302,7 +301,6 @@ def init_lib(path):
     c_lib.service_strings_new.restype = ResultConstPtrServiceStringsError
     c_lib.service_strings_return_string.restype = ctypes.POINTER(ctypes.c_char)
 
-    c_lib.behavior_panics.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.struct2.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.pattern_string_6a.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
     c_lib.pattern_string_6b.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)

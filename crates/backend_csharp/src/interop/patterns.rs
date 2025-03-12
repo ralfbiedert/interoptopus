@@ -9,7 +9,7 @@ use crate::Interop;
 use crate::interop::patterns::services::write_pattern_service;
 use interoptopus::Error;
 use interoptopus::backend::writer::IndentWriter;
-use interoptopus::patterns::LibraryPattern;
+use interoptopus::pattern::LibraryPattern;
 
 pub fn write_patterns(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     for pattern in i.inventory.patterns() {

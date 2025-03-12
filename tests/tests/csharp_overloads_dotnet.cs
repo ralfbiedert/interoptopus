@@ -22,9 +22,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 2517290661643744151ul)
+            if (api_version != 12956578643283540623ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (2517290661643744151). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (12956578643283540623). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -100,7 +100,7 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "behavior_panics")]
-        public static partial ResultError behavior_panics();
+        public static partial void behavior_panics();
 
 
         [LibraryImport(NativeLib, EntryPoint = "fnptr_1")]

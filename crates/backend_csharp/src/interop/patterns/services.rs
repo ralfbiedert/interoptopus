@@ -5,8 +5,8 @@ use crate::interop::docs::write_documentation;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::writer::{IndentWriter, WriteFor};
 use interoptopus::lang::c::{CType, Function, PrimitiveType, SugaredReturnType};
-use interoptopus::patterns::TypePattern;
-use interoptopus::patterns::service::ServiceDefinition;
+use interoptopus::pattern::TypePattern;
+use interoptopus::pattern::service::ServiceDefinition;
 use interoptopus::{Error, indented};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]

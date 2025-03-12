@@ -605,7 +605,7 @@ typedef uint8_t (*nested_array_3)(NESTEDARRAY);
 
 typedef void (*behavior_sleep)(uint64_t);
 
-typedef ERROR (*behavior_panics)();
+typedef void (*behavior_panics)();
 
 typedef uint8_t (*fnptr_1)(fptr_fn_u8_rval_u8, uint8_t);
 

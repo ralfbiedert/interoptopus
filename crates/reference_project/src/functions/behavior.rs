@@ -1,10 +1,9 @@
-use crate::patterns::result::Error;
 use interoptopus::ffi_function;
 use std::time::Duration;
 
 #[ffi_function]
 #[allow(unreachable_code)]
-pub fn behavior_panics() -> Error {
+pub fn behavior_panics() {
     panic!("Oh no");
 }
 
