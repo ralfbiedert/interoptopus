@@ -1,11 +1,11 @@
 //! Helpers for dealing with an FFI inventory.
 //!
 
-use crate::lang::c::Function;
 use crate::pattern::LibraryPattern;
 
 pub(crate) mod core;
 
+use crate::lang::Function;
 pub use core::{Bindings, Inventory, InventoryBuilder, InventoryItem, Symbol};
 
 /// Returns all functions not belonging to a [`service`](crate::pattern::service) pattern.

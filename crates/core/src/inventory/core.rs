@@ -1,6 +1,6 @@
 use crate::Error;
 use crate::backend::{IndentWriter, ctypes_from_functions_types, extract_namespaces_from_types, holds_opaque_without_ref};
-use crate::lang::c::{CType, Constant, Function};
+use crate::lang::{CType, Constant, Function};
 use crate::pattern::LibraryPattern;
 use std::collections::HashSet;
 use std::fs::File;

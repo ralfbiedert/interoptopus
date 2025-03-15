@@ -1,7 +1,7 @@
 use crate::Interop;
 use crate::converter::{fnpointer_to_typename, to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval};
 use interoptopus::backend::IndentWriter;
-use interoptopus::lang::c::FnPointerType;
+use interoptopus::lang::FnPointerType;
 use interoptopus::{Error, indented};
 
 pub fn write_type_definition_fn_pointer(i: &Interop, w: &mut IndentWriter, the_type: &FnPointerType) -> Result<(), Error> {

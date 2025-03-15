@@ -5,7 +5,7 @@ use interoptopus::backend::IndentWriter;
 use interoptopus::backend::sort_types_by_dependencies;
 use interoptopus::indented;
 use interoptopus::inventory::Bindings;
-use interoptopus::lang::c::{CType, Function};
+use interoptopus::lang::{CType, Function};
 
 /// Produces C API documentation.
 pub struct Markdown<'a> {

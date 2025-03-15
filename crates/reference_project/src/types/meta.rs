@@ -1,6 +1,6 @@
 use crate::types::enums::EnumRenamedXYZ;
 use interoptopus::ffi_type;
-use interoptopus::lang::rust::CTypeInfo;
+use interoptopus::lang::TypeInfo;
 use std::marker::PhantomData;
 
 #[ffi_type(name = "StructRenamed")]
@@ -12,7 +12,7 @@ pub struct StructRenamedXYZ {
 pub struct Phantom<'a, T>
 where
     T: 'static,
-    T: CTypeInfo,
+    T: TypeInfo,
 {
     pub x: u32,
     pub p: PhantomData<&'a T>,

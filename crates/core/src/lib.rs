@@ -170,17 +170,6 @@ pub mod backend;
 mod error;
 pub mod ffi;
 pub mod inventory;
+pub mod lang;
 mod macros;
 pub mod pattern;
-
-pub mod lang {
-    //! Metadata for the Rust and C representation of language items.
-    //!
-    //! A a rule of thumb, types in the [`rust`](rust) module generate instances
-    //! of types in the [`c`](c) module.
-    //!
-    //! Normal users of Interoptopus probably won't have to concern
-    //! themselves with any of the items in this module.
-    pub mod c;
-    pub mod rust;
-}

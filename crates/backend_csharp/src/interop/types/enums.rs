@@ -1,7 +1,7 @@
 use crate::Interop;
 use crate::interop::docs::write_documentation;
 use interoptopus::backend::{IndentWriter, WriteFor};
-use interoptopus::lang::c::{EnumType, Variant};
+use interoptopus::lang::{EnumType, Variant};
 use interoptopus::{Error, indented};
 
 pub fn write_type_definition_enum(i: &Interop, w: &mut IndentWriter, the_type: &EnumType, write_for: WriteFor) -> Result<(), Error> {

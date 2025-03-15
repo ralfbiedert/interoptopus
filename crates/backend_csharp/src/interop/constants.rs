@@ -2,7 +2,7 @@ use crate::Interop;
 use crate::converter::{constant_value_to_value, to_typespecifier_in_sync_fn_rval};
 use crate::interop::docs::write_documentation;
 use interoptopus::backend::IndentWriter;
-use interoptopus::lang::c::Constant;
+use interoptopus::lang::Constant;
 use interoptopus::{Error, indented};
 
 pub fn write_constants(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {

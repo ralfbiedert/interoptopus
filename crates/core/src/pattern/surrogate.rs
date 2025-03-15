@@ -46,8 +46,8 @@
 //! Surrogates are a niche feature to save you some implementation overhead in certain situations.
 //! In most cases the right things to do is defining your own FFI types and export these instead.
 
-use crate::lang::c::CType;
-use crate::lang::rust::CTypeInfo;
+use crate::lang::CType;
+use crate::lang::TypeInfo;
 use std::marker::PhantomData;
 use std::mem::{ManuallyDrop, transmute};
 
@@ -64,19 +64,19 @@ pub unsafe trait CorrectSurrogate<T> {}
 
 /// A type mapper at the FFI boundary.
 #[repr(transparent)]
-pub struct Surrogate<T, L: CTypeInfo> {
+pub struct Surrogate<T, L: TypeInfo> {
     inner: T,
     _marker: PhantomData<L>,
 }
 
-unsafe impl<T, L: CTypeInfo + CorrectSurrogate<T>> CTypeInfo for Surrogate<T, L> {
+unsafe impl<T, L: TypeInfo + CorrectSurrogate<T>> TypeInfo for Surrogate<T, L> {
     fn type_info() -> CType {
         assert_eq!(size_of::<T>(), size_of::<L>());
         L::type_info()
     }
 }
 
-impl<T, L: CTypeInfo + CorrectSurrogate<T>> Surrogate<T, L> {
+impl<T, L: TypeInfo + CorrectSurrogate<T>> Surrogate<T, L> {
     /// Creates a new `Surrogate` from a `T`.
     pub const fn from_t(x: T) -> Self {
         Self { inner: x, _marker: PhantomData }

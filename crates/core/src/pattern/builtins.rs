@@ -1,6 +1,6 @@
 #![doc(hidden)]
 
-use crate::lang::c::Function;
+use crate::lang::Function;
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Builtins {
@@ -23,7 +23,7 @@ impl Builtins {
 #[macro_export]
 macro_rules! builtins {
     () => {{
-        use interoptopus::lang::rust::FunctionInfo;
+        use interoptopus::lang::FunctionInfo;
 
         #[$crate::ffi_function]
         pub fn interoptopus_string_create(utf8: *const ::std::ffi::c_void, len: u64, rval: &mut ::std::mem::MaybeUninit<$crate::pattern::string::String>) -> i64 {

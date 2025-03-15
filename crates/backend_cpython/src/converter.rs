@@ -1,4 +1,4 @@
-use interoptopus::lang::c::{CType, ConstantValue, Documentation, FnPointerType, PrimitiveType, PrimitiveValue};
+use interoptopus::lang::{CType, ConstantValue, Documentation, FnPointerType, PrimitiveType, PrimitiveValue};
 use interoptopus::pattern::TypePattern;
 
 #[must_use]

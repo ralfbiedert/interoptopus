@@ -32,34 +32,34 @@ pub fn rval_tokens(return_type: &ReturnType) -> TokenStream {
         match &**x {
             Type::Path(x) => {
                 let token = x.to_token_stream();
-                quote_spanned!(span=> < #token as ::interoptopus::lang::rust::CTypeInfo>::type_info())
+                quote_spanned!(span=> < #token as ::interoptopus::lang::TypeInfo>::type_info())
             }
             Type::Group(x) => {
                 let token = x.to_token_stream();
-                quote_spanned!(span=> < #token as ::interoptopus::lang::rust::CTypeInfo>::type_info())
+                quote_spanned!(span=> < #token as ::interoptopus::lang::TypeInfo>::type_info())
             }
             Type::Tuple(_) => {
                 // TODO: Check tuple is really empty.
-                quote_spanned!(span=> ::interoptopus::lang::c::CType::Primitive(::interoptopus::lang::c::PrimitiveType::Void))
+                quote_spanned!(span=> ::interoptopus::lang::CType::Primitive(::interoptopus::lang::PrimitiveType::Void))
             }
             Type::Reference(x) => {
                 let token = x.to_token_stream();
-                quote_spanned!(span=> < #token as ::interoptopus::lang::rust::CTypeInfo>::type_info())
+                quote_spanned!(span=> < #token as ::interoptopus::lang::TypeInfo>::type_info())
             }
             Type::Ptr(x) => {
                 let token = x.to_token_stream();
-                quote_spanned!(span=> < #token as ::interoptopus::lang::rust::CTypeInfo>::type_info())
+                quote_spanned!(span=> < #token as ::interoptopus::lang::TypeInfo>::type_info())
             }
             Type::Array(x) => {
                 let token = x.to_token_stream();
-                quote_spanned!(span=> < #token as ::interoptopus::lang::rust::CTypeInfo>::type_info())
+                quote_spanned!(span=> < #token as ::interoptopus::lang::TypeInfo>::type_info())
             }
             _ => {
                 panic!("Unsupported type at interface boundary found for rval: {x:?}.")
             }
         }
     } else {
-        quote_spanned!(span=> ::interoptopus::lang::c::CType::Primitive(interoptopus::lang::c::PrimitiveType::Void))
+        quote_spanned!(span=> ::interoptopus::lang::CType::Primitive(interoptopus::lang::PrimitiveType::Void))
     }
 }
 
@@ -126,7 +126,7 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
                 }
             };
 
-            args_type.push(quote! { < #token as ::interoptopus::lang::rust::CTypeInfo>::type_info() });
+            args_type.push(quote! { < #token as ::interoptopus::lang::TypeInfo>::type_info() });
         } else {
             panic!("Does not support methods.")
         }
@@ -148,27 +148,27 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
         #[allow(clippy::redundant_pub_crate, clippy::forget_non_drop)]
         pub(crate) struct #function_ident #generic_params { #phantom_fields }
 
-        unsafe impl #generic_params ::interoptopus::lang::rust::FunctionInfo for #function_ident #generic_params {
+        unsafe impl #generic_params ::interoptopus::lang::FunctionInfo for #function_ident #generic_params {
             type Signature = #signature;
 
-            fn function_info() -> ::interoptopus::lang::c::Function {
+            fn function_info() -> ::interoptopus::lang::Function {
 
                 let mut doc_lines = ::std::vec::Vec::new();
                 let mut params = ::std::vec::Vec::new();
 
                 #(
-                    params.push(::interoptopus::lang::c::Parameter::new(#args_name.to_string(), #args_type));
+                    params.push(::interoptopus::lang::Parameter::new(#args_name.to_string(), #args_type));
                 )*
 
                 #(
                     doc_lines.push(#docs.to_string());
                 )*
 
-                let mut signature = ::interoptopus::lang::c::FunctionSignature::new(params, #rval);
-                let documentation = ::interoptopus::lang::c::Documentation::from_lines(doc_lines);
-                let meta = ::interoptopus::lang::c::Meta::with_documentation(documentation);
+                let mut signature = ::interoptopus::lang::FunctionSignature::new(params, #rval);
+                let documentation = ::interoptopus::lang::Documentation::from_lines(doc_lines);
+                let meta = ::interoptopus::lang::Meta::with_documentation(documentation);
 
-                ::interoptopus::lang::c::Function::new(#function_ident_str.to_string(), signature, meta)
+                ::interoptopus::lang::Function::new(#function_ident_str.to_string(), signature, meta)
             }
         }
     };

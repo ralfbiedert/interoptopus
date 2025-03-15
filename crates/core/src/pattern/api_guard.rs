@@ -51,8 +51,8 @@
 //! - might even react to documentation changes (subject to change; feedback welcome).
 //!
 use crate::inventory::Inventory;
-use crate::lang::c::CType;
-use crate::lang::rust::CTypeInfo;
+use crate::lang::CType;
+use crate::lang::TypeInfo;
 use crate::pattern::TypePattern;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
@@ -80,7 +80,7 @@ impl APIVersion {
     }
 }
 
-unsafe impl CTypeInfo for APIVersion {
+unsafe impl TypeInfo for APIVersion {
     fn type_info() -> CType {
         CType::Pattern(TypePattern::APIVersion)
     }

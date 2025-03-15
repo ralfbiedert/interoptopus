@@ -1,6 +1,8 @@
 //! Helpers to introspect Rust code when generating bindings, mostly derived by the `#[ffi_...]` macros.
 
-use crate::lang::c::{ArrayType, CType, Constant, ConstantValue, FnPointerType, Function, FunctionSignature, Parameter, PrimitiveType, PrimitiveValue, Variant};
+use crate::lang::enums::Variant;
+use crate::lang::function::{FunctionSignature, Parameter};
+use crate::lang::{ArrayType, CType, Constant, FnPointerType, Function, PrimitiveType, PrimitiveValue};
 use std::mem::MaybeUninit;
 use std::ptr::NonNull;
 
@@ -20,7 +22,7 @@ pub unsafe trait ConstantInfo {
 ///
 /// This trait must be implemented correctly, or else the generated bindings disagree in
 /// their type layout from the actual Rust type, leading to immediate UB upon function invocation.
-pub unsafe trait CTypeInfo {
+pub unsafe trait TypeInfo {
     fn type_info() -> CType;
 }
 
@@ -57,7 +59,7 @@ macro_rules! impl_ctype_primitive {
         $rust_type:ty,
         $primitive:expr
     ) => {
-        unsafe impl CTypeInfo for $rust_type {
+        unsafe impl crate::lang::TypeInfo for $rust_type {
             fn type_info() -> CType {
                 CType::Primitive($primitive)
             }
@@ -70,7 +72,7 @@ macro_rules! impl_const_value_primitive {
         $rust_type:ty,
         $x:path
     ) => {
-        impl From<$rust_type> for ConstantValue {
+        impl From<$rust_type> for crate::lang::ConstantValue {
             fn from(x: $rust_type) -> Self {
                 Self::Primitive($x(x))
             }
@@ -120,72 +122,72 @@ impl_ctype_primitive!(Option<std::num::NonZeroI16>, PrimitiveType::I16);
 impl_ctype_primitive!(Option<std::num::NonZeroI32>, PrimitiveType::I32);
 impl_ctype_primitive!(Option<std::num::NonZeroI64>, PrimitiveType::I64);
 
-unsafe impl<T> CTypeInfo for NonNull<T>
+unsafe impl<T> TypeInfo for NonNull<T>
 where
-    T: CTypeInfo,
+    T: TypeInfo,
 {
     fn type_info() -> CType {
         CType::ReadWritePointer(Box::new(T::type_info()))
     }
 }
 
-unsafe impl<T> CTypeInfo for &'_ T
+unsafe impl<T> TypeInfo for &'_ T
 where
-    T: CTypeInfo + Sized + 'static,
+    T: TypeInfo + Sized + 'static,
 {
     fn type_info() -> CType {
         CType::ReadPointer(Box::new(T::type_info()))
     }
 }
 
-unsafe impl<T> CTypeInfo for &'_ mut T
+unsafe impl<T> TypeInfo for &'_ mut T
 where
-    T: CTypeInfo + Sized + 'static,
+    T: TypeInfo + Sized + 'static,
 {
     fn type_info() -> CType {
         CType::ReadWritePointer(Box::new(T::type_info()))
     }
 }
 
-unsafe impl<T> CTypeInfo for *const T
+unsafe impl<T> TypeInfo for *const T
 where
-    T: CTypeInfo + Sized + 'static,
+    T: TypeInfo + Sized + 'static,
 {
     fn type_info() -> CType {
         CType::ReadPointer(Box::new(T::type_info()))
     }
 }
 
-unsafe impl<T> CTypeInfo for *mut T
+unsafe impl<T> TypeInfo for *mut T
 where
-    T: CTypeInfo + Sized + 'static,
+    T: TypeInfo + Sized + 'static,
 {
     fn type_info() -> CType {
         CType::ReadWritePointer(Box::new(T::type_info()))
     }
 }
 
-unsafe impl<T> CTypeInfo for Option<&'_ T>
+unsafe impl<T> TypeInfo for Option<&'_ T>
 where
-    T: CTypeInfo + Sized + 'static,
+    T: TypeInfo + Sized + 'static,
 {
     fn type_info() -> CType {
         CType::ReadPointer(Box::new(T::type_info()))
     }
 }
 
-unsafe impl<T> CTypeInfo for Option<&'_ mut T>
+unsafe impl<T> TypeInfo for Option<&'_ mut T>
 where
-    T: CTypeInfo + Sized + 'static,
+    T: TypeInfo + Sized + 'static,
 {
     fn type_info() -> CType {
         CType::ReadWritePointer(Box::new(T::type_info()))
     }
 }
 
-unsafe impl<R> CTypeInfo for extern "C" fn() -> R
+unsafe impl<R> TypeInfo for extern "C" fn() -> R
 where
-    R: CTypeInfo,
+    R: TypeInfo,
 {
     fn type_info() -> CType {
         let sig = FunctionSignature::new(vec![], R::type_info());
@@ -193,9 +195,9 @@ where
     }
 }
 
-unsafe impl<R> CTypeInfo for Option<extern "C" fn() -> R>
+unsafe impl<R> TypeInfo for Option<extern "C" fn() -> R>
 where
-    R: CTypeInfo,
+    R: TypeInfo,
 {
     fn type_info() -> CType {
         let sig = FunctionSignature::new(vec![], R::type_info());
@@ -203,10 +205,10 @@ where
     }
 }
 
-unsafe impl<T1, R> CTypeInfo for extern "C" fn(T1) -> R
+unsafe impl<T1, R> TypeInfo for extern "C" fn(T1) -> R
 where
-    T1: CTypeInfo,
-    R: CTypeInfo,
+    T1: TypeInfo,
+    R: TypeInfo,
 {
     fn type_info() -> CType {
         let sig = FunctionSignature::new(vec![Parameter::new("x0".to_string(), T1::type_info())], R::type_info());
@@ -214,10 +216,10 @@ where
     }
 }
 
-unsafe impl<T1, R> CTypeInfo for Option<extern "C" fn(T1) -> R>
+unsafe impl<T1, R> TypeInfo for Option<extern "C" fn(T1) -> R>
 where
-    T1: CTypeInfo,
-    R: CTypeInfo,
+    T1: TypeInfo,
+    R: TypeInfo,
 {
     fn type_info() -> CType {
         let sig = FunctionSignature::new(vec![Parameter::new("x0".to_string(), T1::type_info())], R::type_info());
@@ -225,11 +227,11 @@ where
     }
 }
 
-unsafe impl<T1, T2, R> CTypeInfo for extern "C" fn(T1, T2) -> R
+unsafe impl<T1, T2, R> TypeInfo for extern "C" fn(T1, T2) -> R
 where
-    T1: CTypeInfo,
-    T2: CTypeInfo,
-    R: CTypeInfo,
+    T1: TypeInfo,
+    T2: TypeInfo,
+    R: TypeInfo,
 {
     fn type_info() -> CType {
         let sig = FunctionSignature::new(vec![Parameter::new("x0".to_string(), T1::type_info()), Parameter::new("x1".to_string(), T2::type_info())], R::type_info());
@@ -237,11 +239,11 @@ where
     }
 }
 
-unsafe impl<T1, T2, R> CTypeInfo for Option<extern "C" fn(T1, T2) -> R>
+unsafe impl<T1, T2, R> TypeInfo for Option<extern "C" fn(T1, T2) -> R>
 where
-    T1: CTypeInfo,
-    T2: CTypeInfo,
-    R: CTypeInfo,
+    T1: TypeInfo,
+    T2: TypeInfo,
+    R: TypeInfo,
 {
     fn type_info() -> CType {
         let sig = FunctionSignature::new(vec![Parameter::new("x0".to_string(), T1::type_info()), Parameter::new("x1".to_string(), T2::type_info())], R::type_info());
@@ -249,12 +251,12 @@ where
     }
 }
 
-unsafe impl<T1, T2, T3, R> CTypeInfo for extern "C" fn(T1, T2, T3) -> R
+unsafe impl<T1, T2, T3, R> TypeInfo for extern "C" fn(T1, T2, T3) -> R
 where
-    T1: CTypeInfo,
-    T2: CTypeInfo,
-    T3: CTypeInfo,
-    R: CTypeInfo,
+    T1: TypeInfo,
+    T2: TypeInfo,
+    T3: TypeInfo,
+    R: TypeInfo,
 {
     fn type_info() -> CType {
         let sig = FunctionSignature::new(
@@ -269,12 +271,12 @@ where
     }
 }
 
-unsafe impl<T1, T2, T3, R> CTypeInfo for Option<extern "C" fn(T1, T2, T3) -> R>
+unsafe impl<T1, T2, T3, R> TypeInfo for Option<extern "C" fn(T1, T2, T3) -> R>
 where
-    T1: CTypeInfo,
-    T2: CTypeInfo,
-    T3: CTypeInfo,
-    R: CTypeInfo,
+    T1: TypeInfo,
+    T2: TypeInfo,
+    T3: TypeInfo,
+    R: TypeInfo,
 {
     fn type_info() -> CType {
         let sig = FunctionSignature::new(
@@ -289,13 +291,13 @@ where
     }
 }
 
-unsafe impl<T1, T2, T3, T4, R> CTypeInfo for extern "C" fn(T1, T2, T3, T4) -> R
+unsafe impl<T1, T2, T3, T4, R> TypeInfo for extern "C" fn(T1, T2, T3, T4) -> R
 where
-    T1: CTypeInfo,
-    T2: CTypeInfo,
-    T3: CTypeInfo,
-    T4: CTypeInfo,
-    R: CTypeInfo,
+    T1: TypeInfo,
+    T2: TypeInfo,
+    T3: TypeInfo,
+    T4: TypeInfo,
+    R: TypeInfo,
 {
     fn type_info() -> CType {
         let sig = FunctionSignature::new(
@@ -311,13 +313,13 @@ where
     }
 }
 
-unsafe impl<T1, T2, T3, T4, R> CTypeInfo for Option<extern "C" fn(T1, T2, T3, T4) -> R>
+unsafe impl<T1, T2, T3, T4, R> TypeInfo for Option<extern "C" fn(T1, T2, T3, T4) -> R>
 where
-    T1: CTypeInfo,
-    T2: CTypeInfo,
-    T3: CTypeInfo,
-    T4: CTypeInfo,
-    R: CTypeInfo,
+    T1: TypeInfo,
+    T2: TypeInfo,
+    T3: TypeInfo,
+    T4: TypeInfo,
+    R: TypeInfo,
 {
     fn type_info() -> CType {
         let sig = FunctionSignature::new(
@@ -333,14 +335,14 @@ where
     }
 }
 
-unsafe impl<T1, T2, T3, T4, T5, R> CTypeInfo for extern "C" fn(T1, T2, T3, T4, T5) -> R
+unsafe impl<T1, T2, T3, T4, T5, R> TypeInfo for extern "C" fn(T1, T2, T3, T4, T5) -> R
 where
-    T1: CTypeInfo,
-    T2: CTypeInfo,
-    T3: CTypeInfo,
-    T4: CTypeInfo,
-    T5: CTypeInfo,
-    R: CTypeInfo,
+    T1: TypeInfo,
+    T2: TypeInfo,
+    T3: TypeInfo,
+    T4: TypeInfo,
+    T5: TypeInfo,
+    R: TypeInfo,
 {
     fn type_info() -> CType {
         let sig = FunctionSignature::new(
@@ -357,14 +359,14 @@ where
     }
 }
 
-unsafe impl<T1, T2, T3, T4, T5, R> CTypeInfo for Option<extern "C" fn(T1, T2, T3, T4, T5) -> R>
+unsafe impl<T1, T2, T3, T4, T5, R> TypeInfo for Option<extern "C" fn(T1, T2, T3, T4, T5) -> R>
 where
-    T1: CTypeInfo,
-    T2: CTypeInfo,
-    T3: CTypeInfo,
-    T4: CTypeInfo,
-    T5: CTypeInfo,
-    R: CTypeInfo,
+    T1: TypeInfo,
+    T2: TypeInfo,
+    T3: TypeInfo,
+    T4: TypeInfo,
+    T5: TypeInfo,
+    R: TypeInfo,
 {
     fn type_info() -> CType {
         let sig = FunctionSignature::new(
@@ -381,18 +383,18 @@ where
     }
 }
 
-unsafe impl<T, const N: usize> CTypeInfo for [T; N]
+unsafe impl<T, const N: usize> TypeInfo for [T; N]
 where
-    T: CTypeInfo,
+    T: TypeInfo,
 {
     fn type_info() -> CType {
         CType::Array(ArrayType::new(T::type_info(), N))
     }
 }
 
-unsafe impl<T> CTypeInfo for MaybeUninit<T>
+unsafe impl<T> TypeInfo for MaybeUninit<T>
 where
-    T: CTypeInfo,
+    T: TypeInfo,
 {
     fn type_info() -> CType {
         T::type_info()

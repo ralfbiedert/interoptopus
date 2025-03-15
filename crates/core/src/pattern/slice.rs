@@ -38,8 +38,8 @@
 //!
 
 use crate::backend::capitalize_first_letter;
-use crate::lang::c::{CType, CompositeType, Documentation, Field, Layout, Meta, PrimitiveType, Representation, Visibility};
-use crate::lang::rust::CTypeInfo;
+use crate::lang::{CType, CompositeType, Documentation, Field, Meta, PrimitiveType, Representation, Visibility};
+use crate::lang::{Layout, TypeInfo};
 use crate::pattern::TypePattern;
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
@@ -119,9 +119,9 @@ impl<T> Deref for Slice<'_, T> {
     }
 }
 
-unsafe impl<T> CTypeInfo for Slice<'_, T>
+unsafe impl<T> TypeInfo for Slice<'_, T>
 where
-    T: CTypeInfo,
+    T: TypeInfo,
 {
     #[rustfmt::skip]
     fn type_info() -> CType {
@@ -225,9 +225,9 @@ impl<T> DerefMut for SliceMut<'_, T> {
     }
 }
 
-unsafe impl<T> CTypeInfo for SliceMut<'_, T>
+unsafe impl<T> TypeInfo for SliceMut<'_, T>
 where
-    T: CTypeInfo,
+    T: TypeInfo,
 {
     #[rustfmt::skip]
     fn type_info() -> CType {

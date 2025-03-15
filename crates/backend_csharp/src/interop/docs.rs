@@ -1,6 +1,6 @@
 use crate::Interop;
 use interoptopus::backend::IndentWriter;
-use interoptopus::lang::c::Documentation;
+use interoptopus::lang::Documentation;
 use interoptopus::{Error, indented};
 
 pub fn write_file_header_comments(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {

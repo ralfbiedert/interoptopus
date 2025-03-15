@@ -29,8 +29,8 @@
 //! ```
 
 use crate::backend::capitalize_first_letter;
-use crate::lang::c::{CType, CompositeType, Documentation, EnumType, Field, Layout, Meta, PrimitiveType, Representation, Variant, Visibility};
-use crate::lang::rust::CTypeInfo;
+use crate::lang::TypeInfo;
+use crate::lang::{CType, CompositeType, Documentation, EnumType, Field, Layout, Meta, PrimitiveType, Representation, Variant, Visibility};
 use crate::pattern::TypePattern;
 use std::any::Any;
 use std::fmt::Debug;
@@ -189,8 +189,8 @@ pub struct Result<T, E> {
 #[allow(non_snake_case)]
 pub fn Ok<T, E>(t: T) -> Result<T, E>
 where
-    T: CTypeInfo,
-    E: CTypeInfo + FFIError,
+    T: TypeInfo,
+    E: TypeInfo + FFIError,
 {
     Result::ok(t)
 }
@@ -198,8 +198,8 @@ where
 #[allow(non_snake_case)]
 pub fn Err<T, E>(e: E) -> Result<T, E>
 where
-    T: CTypeInfo,
-    E: CTypeInfo + FFIError,
+    T: TypeInfo,
+    E: TypeInfo + FFIError,
 {
     Result::err(e)
 }
@@ -214,8 +214,8 @@ impl<T, E> FFIResultAsUnitT for Result<T, E> {
 
 impl<T, E> Result<T, E>
 where
-    T: CTypeInfo,
-    E: CTypeInfo + FFIError,
+    T: TypeInfo,
+    E: TypeInfo + FFIError,
 {
     pub const fn ok(t: T) -> Self {
         Self { t: MaybeUninit::new(t), err: E::SUCCESS }
@@ -255,8 +255,8 @@ where
 
 impl<T, E> Result<T, E>
 where
-    T: CTypeInfo,
-    E: CTypeInfo + FFIError,
+    T: TypeInfo,
+    E: TypeInfo + FFIError,
 {
     pub fn error(err: E) -> Self {
         Self { t: MaybeUninit::uninit(), err }
@@ -265,8 +265,8 @@ where
 
 impl<T, E> From<std::result::Result<T, E>> for Result<T, E>
 where
-    T: CTypeInfo,
-    E: CTypeInfo + FFIError,
+    T: TypeInfo,
+    E: TypeInfo + FFIError,
 {
     fn from(x: std::result::Result<T, E>) -> Self {
         match x {
@@ -276,10 +276,10 @@ where
     }
 }
 
-unsafe impl<T, E> CTypeInfo for Result<T, E>
+unsafe impl<T, E> TypeInfo for Result<T, E>
 where
-    T: CTypeInfo,
-    E: CTypeInfo + FFIError,
+    T: TypeInfo,
+    E: TypeInfo + FFIError,
 {
     fn type_info() -> CType {
         let t_is_void = matches!(T::type_info(), CType::Primitive(PrimitiveType::Void));
@@ -317,7 +317,7 @@ impl<T, E: FFIError> IntoFFIResult for Result<T, E> {
 
 ///
 /// At some point we want to get rid of these once `Try` ([try_trait_v2](https://github.com/rust-lang/rust/issues/84277)) stabilizes.
-pub fn result_to_ffi<T: CTypeInfo, E: CTypeInfo + crate::pattern::result::FFIError>(f: impl FnOnce() -> std::result::Result<T, E>) -> Result<T, E> {
+pub fn result_to_ffi<T: TypeInfo, E: TypeInfo + crate::pattern::result::FFIError>(f: impl FnOnce() -> std::result::Result<T, E>) -> Result<T, E> {
     match f() {
         std::result::Result::Ok(x) => Result::ok(x),
         std::result::Result::Err(e) => Result::error(e),
@@ -325,7 +325,7 @@ pub fn result_to_ffi<T: CTypeInfo, E: CTypeInfo + crate::pattern::result::FFIErr
 }
 
 /// At some point we want to get rid of these once `Try` ([try_trait_v2](https://github.com/rust-lang/rust/issues/84277)) stabilizes.
-pub async fn result_to_ffi_async<T: CTypeInfo, E: CTypeInfo + crate::pattern::result::FFIError>(
+pub async fn result_to_ffi_async<T: TypeInfo, E: TypeInfo + crate::pattern::result::FFIError>(
     f: impl std::ops::AsyncFnOnce() -> std::result::Result<T, E>,
 ) -> Result<T, E> {
     match f().await {

@@ -9,13 +9,13 @@ fn derive_variant_info(item: &ItemEnum, idents: &[Ident], names: &[String], valu
     let name_ident = syn::Ident::new(&name, item.ident.span());
 
     quote! {
-        unsafe impl ::interoptopus::lang::rust::VariantInfo for #name_ident {
-            fn variant_info(&self) -> ::interoptopus::lang::c::Variant {
+        unsafe impl ::interoptopus::lang::VariantInfo for #name_ident {
+            fn variant_info(&self) -> ::interoptopus::lang::Variant {
                 match self {
                     #(
                        Self::#idents => {
-                            let documentation = ::interoptopus::lang::c::Documentation::from_line(#docs);
-                            ::interoptopus::lang::c::Variant::new(#names.to_string(), #values as usize, documentation)
+                            let documentation = ::interoptopus::lang::Documentation::from_line(#docs);
+                            ::interoptopus::lang::Variant::new(#names.to_string(), #values as usize, documentation)
                        },
                     )*
                 }
@@ -79,10 +79,10 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
             let panic_variant = Self::PANIC.variant_info();
             let the_success_enum = ::interoptopus::pattern::result::FFIErrorEnum::new(rval, success_variant, panic_variant);
             let the_pattern = ::interoptopus::pattern::TypePattern::FFIErrorEnum(the_success_enum);
-            ::interoptopus::lang::c::CType::Pattern(the_pattern)
+            ::interoptopus::lang::CType::Pattern(the_pattern)
         }
     } else {
-        quote! { ::interoptopus::lang::c::CType::Enum(rval) }
+        quote! { ::interoptopus::lang::CType::Enum(rval) }
     };
 
     let attr_align = align.map_or_else(
@@ -96,8 +96,8 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
     let align = align.map_or_else(|| quote! { None }, |x| quote! { Some(#x) });
 
     let layout = match type_repr {
-        TypeRepresentation::C => quote! { ::interoptopus::lang::c::Layout::C },
-        TypeRepresentation::Transparent => quote! { ::interoptopus::lang::c::Layout::Transparent },
+        TypeRepresentation::C => quote! { ::interoptopus::lang::Layout::C },
+        TypeRepresentation::Transparent => quote! { ::interoptopus::lang::Layout::Transparent },
         TypeRepresentation::Primitive(_) => quote! { compile_error!("TODO") },
         _ => quote! { compile_error!("Unsupported repr for enum") },
     };
@@ -120,20 +120,20 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
 
         #variant_infos
 
-        unsafe impl ::interoptopus::lang::rust::CTypeInfo for #name_ident {
-            fn type_info() -> ::interoptopus::lang::c::CType {
-                use ::interoptopus::lang::rust::VariantInfo;
+        unsafe impl ::interoptopus::lang::TypeInfo for #name_ident {
+            fn type_info() -> ::interoptopus::lang::CType {
+                use ::interoptopus::lang::VariantInfo;
 
                 let mut variants = ::std::vec::Vec::new();
-                let documentation = ::interoptopus::lang::c::Documentation::from_line(#doc_line);
-                let mut meta = ::interoptopus::lang::c::Meta::with_namespace_documentation(#namespace.to_string(), documentation);
+                let documentation = ::interoptopus::lang::Documentation::from_line(#doc_line);
+                let mut meta = ::interoptopus::lang::Meta::with_namespace_documentation(#namespace.to_string(), documentation);
 
                 #({
                     variants.push(Self::#variant_idents.variant_info());
                 })*
 
-                let repr = ::interoptopus::lang::c::Representation::new(#layout, #align);
-                let rval = ::interoptopus::lang::c::EnumType::new(#ffi_name.to_string(), variants, meta, repr);
+                let repr = ::interoptopus::lang::Representation::new(#layout, #align);
+                let rval = ::interoptopus::lang::EnumType::new(#ffi_name.to_string(), variants, meta, repr);
 
                 #ctype_info_return
             }

@@ -26,9 +26,10 @@
 //! void set_value(optionu8 x);
 //! ```
 //!
+
 use crate::backend::capitalize_first_letter;
-use crate::lang::c::{CType, CompositeType, Documentation, Field, Layout, Meta, PrimitiveType, Representation, Visibility};
-use crate::lang::rust::CTypeInfo;
+use crate::lang::{CType, CompositeType, Documentation, Field, Meta, PrimitiveType, Representation, Visibility};
+use crate::lang::{Layout, TypeInfo};
 use crate::pattern::TypePattern;
 use crate::pattern::primitive::Bool;
 #[cfg(feature = "serde")]
@@ -131,9 +132,9 @@ impl<T: Default> From<std::option::Option<T>> for Option<T> {
     }
 }
 
-unsafe impl<T> CTypeInfo for Option<T>
+unsafe impl<T> TypeInfo for Option<T>
 where
-    T: CTypeInfo,
+    T: TypeInfo,
 {
     fn type_info() -> CType {
         let doc_t = Documentation::from_line("Element that is maybe valid.");

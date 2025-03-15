@@ -4,7 +4,7 @@ use crate::interop::patterns::write_library_call;
 use interoptopus::backend::safe_name;
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::inventory::non_service_functions;
-use interoptopus::lang::c::{CType, Function};
+use interoptopus::lang::{CType, Function};
 use interoptopus::pattern::TypePattern;
 use interoptopus::{Error, indented};
 

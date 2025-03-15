@@ -23,7 +23,7 @@ use derive_builder::Builder;
 use interoptopus::backend::IndentWriter;
 use interoptopus::backend::{NamespaceMappings, is_global_type};
 use interoptopus::inventory::{Bindings, Inventory};
-use interoptopus::lang::c::{CType, Constant, Function, FunctionSignature, Meta};
+use interoptopus::lang::{CType, Constant, Function, FunctionSignature, Meta};
 use interoptopus::pattern::TypePattern;
 use interoptopus::{Error, indented};
 
@@ -213,7 +213,7 @@ impl Interop {
     }
 
     fn has_ffi_error(&self, functions: &[Function]) -> bool {
-        functions.iter().any(interoptopus::lang::c::Function::returns_ffi_error)
+        functions.iter().any(interoptopus::lang::Function::returns_ffi_error)
     }
 
     #[must_use]

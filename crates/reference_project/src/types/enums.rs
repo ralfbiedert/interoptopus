@@ -1,7 +1,7 @@
 use crate::types::basic::Vec3f32;
 use interoptopus::ffi_type;
-use interoptopus::lang::c::CType;
-use interoptopus::lang::rust::CTypeInfo;
+use interoptopus::lang::CType;
+use interoptopus::lang::TypeInfo;
 
 /// Documented enum.
 #[ffi_type]
@@ -30,7 +30,7 @@ pub enum EnumPayload {
     // E(u8, u8, u8),
 }
 
-unsafe impl CTypeInfo for EnumPayload {
+unsafe impl TypeInfo for EnumPayload {
     fn type_info() -> CType {
         // CType::Enum()
         todo!()

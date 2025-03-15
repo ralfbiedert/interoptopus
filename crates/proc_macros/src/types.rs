@@ -70,23 +70,23 @@ pub enum TypeRepresentation {
 impl Attributes {
     pub fn visibility_for_field(&self, field: &Field, name: &str) -> TokenStream {
         let mut rval = if let Visibility::Public(_) = &field.vis {
-            quote! { interoptopus::lang::c::Visibility::Public }
+            quote! { interoptopus::lang::Visibility::Public }
         } else {
-            quote! { interoptopus::lang::c::Visibility::Private }
+            quote! { interoptopus::lang::Visibility::Private }
         };
 
         if let Some(x) = self.visibility.get(name) {
             rval = match x.as_str() {
-                "public" => quote! { interoptopus::lang::c::Visibility::Public },
-                "private" => quote! { interoptopus::lang::c::Visibility::Private },
+                "public" => quote! { interoptopus::lang::Visibility::Public },
+                "private" => quote! { interoptopus::lang::Visibility::Private },
                 _ => panic!("Visibility must be `public` or `private`"),
             };
         }
 
         if let Some(x) = self.visibility.get("_all") {
             rval = match x.as_str() {
-                "public" => quote! { interoptopus::lang::c::Visibility::Public },
-                "private" => quote! { interoptopus::lang::c::Visibility::Private },
+                "public" => quote! { interoptopus::lang::Visibility::Public },
+                "private" => quote! { interoptopus::lang::Visibility::Private },
                 _ => panic!("Visibility must be `public` or `private`"),
             };
         }

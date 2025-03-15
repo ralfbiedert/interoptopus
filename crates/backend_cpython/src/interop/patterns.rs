@@ -4,7 +4,7 @@ use crate::interop::functions::write_param_helpers;
 use crate::interop::utils::write_success_enum_aware_rval;
 use interoptopus::backend::longest_common_prefix;
 use interoptopus::backend::{IndentWriter, WriteFor};
-use interoptopus::lang::c::{CType, CompositeType, Function};
+use interoptopus::lang::{CType, CompositeType, Function};
 use interoptopus::pattern::service::ServiceDefinition;
 use interoptopus::pattern::slice::SliceType;
 use interoptopus::pattern::{LibraryPattern, TypePattern};

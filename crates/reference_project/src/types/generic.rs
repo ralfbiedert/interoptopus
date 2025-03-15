@@ -1,5 +1,5 @@
 use interoptopus::ffi_type;
-use interoptopus::lang::rust::CTypeInfo;
+use interoptopus::lang::TypeInfo;
 use std::fmt::Debug;
 
 #[ffi_type]
@@ -11,7 +11,7 @@ pub struct ExtraType<T> {
 pub struct Generic<'a, T>
 where
     T: 'static,
-    T: CTypeInfo,
+    T: TypeInfo,
 {
     pub x: &'a T,
 }
@@ -19,7 +19,7 @@ where
 #[ffi_type(opaque)]
 pub struct Generic2<T>
 where
-    T: CTypeInfo,
+    T: TypeInfo,
 {
     pub x: T,
 }

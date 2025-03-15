@@ -74,7 +74,7 @@
 //! ```
 //!
 //! The reasons for this are somewhat technical, but it boils down to us being unable to generally
-//! implement [`CTypeInfo`](crate::lang::rust::CTypeInfo) for _all_ types you may want to use;
+//! implement [`CTypeInfo`](crate::lang::info::TypeInfo) for _all_ types you may want to use;
 //! [`FFISlice`](crate::pattern::slice::Slice) here being one of them.
 //! To fix this, you can replace `pub type CallbackSlice = ...` with a `callback!` call
 //! which should generate a helper type that works.
@@ -111,7 +111,7 @@
 //! }
 //! ```
 
-use crate::lang::c::{CType, FnPointerType, Meta};
+use crate::lang::{CType, FnPointerType, Meta};
 
 /// Internal helper naming a generated callback type wrapper.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -299,16 +299,15 @@ macro_rules! callback {
             }
         }
 
-        unsafe impl $crate::lang::rust::CTypeInfo for $name {
-            fn type_info() -> $crate::lang::c::CType {
-                use $crate::lang::rust::CTypeInfo;
-                use $crate::lang::c::{CType, Meta, Documentation, PrimitiveType, Parameter, FunctionSignature, FnPointerType};
+        unsafe impl $crate::lang::TypeInfo for $name {
+            fn type_info() -> $crate::lang::CType {
+                use $crate::lang::{TypeInfo, CType, Meta, Documentation, PrimitiveType, Parameter, FunctionSignature, FnPointerType};
 
-                let rval = < $rval as CTypeInfo >::type_info();
+                let rval = < $rval as TypeInfo >::type_info();
 
                 let params = vec![
                 $(
-                    Parameter::new(stringify!($param).to_string(), < $ty as CTypeInfo >::type_info()),
+                    Parameter::new(stringify!($param).to_string(), < $ty as TypeInfo >::type_info()),
                 )*
                     Parameter::new("callback_data".to_string(), CType::ReadPointer(Box::new(CType::Primitive(PrimitiveType::Void)))),
                 ];

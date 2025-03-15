@@ -33,7 +33,7 @@ macro_rules! api_entry {
         ]
     ) => {
         pub struct $struct {
-            $($function: <$function as interoptopus::lang::rust::FunctionInfo>::Signature,)*
+            $($function: <$function as interoptopus::lang::FunctionInfo>::Signature,)*
         }
 
         #[interoptopus::ffi_function]
@@ -52,23 +52,23 @@ macro_rules! api_entry {
         }
 
 
-        unsafe impl interoptopus::lang::rust::CTypeInfo for $struct {
-            fn type_info() -> interoptopus::lang::c::CType {
+        unsafe impl interoptopus::lang::TypeInfo for $struct {
+            fn type_info() -> interoptopus::lang::CType {
                 let mut fields = Vec::new();
 
                 $(
                     {
-                        use interoptopus::lang::rust::FunctionInfo;
+                        use interoptopus::lang::FunctionInfo;
                         use $function as x;
-                        let function: interoptopus::lang::c::Function = x::function_info();
-                        let t = interoptopus::lang::c::CType::FnPointer(interoptopus::lang::c::FnPointerType::new(function.signature().clone()));
-                        let field = interoptopus::lang::c::Field::new(function.name().to_string(), t);
+                        let function: interoptopus::lang::Function = x::function_info();
+                        let t = interoptopus::lang::CType::FnPointer(interoptopus::lang::FnPointerType::new(function.signature().clone()));
+                        let field = interoptopus::lang::Field::new(function.name().to_string(), t);
                         fields.push(field);
                     }
                 )*
 
-                let composite = interoptopus::lang::c::CompositeType::new(stringify!($struct).to_string(), fields);
-                interoptopus::lang::c::CType::Composite(composite)
+                let composite = interoptopus::lang::CompositeType::new(stringify!($struct).to_string(), fields);
+                interoptopus::lang::CType::Composite(composite)
             }
         }
     };

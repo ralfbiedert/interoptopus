@@ -2,7 +2,7 @@ use crate::Interop;
 use crate::interop::FunctionNameFlavor;
 use heck::{ToLowerCamelCase, ToUpperCamelCase};
 use interoptopus::backend::{ctypes_from_type_recursive, safe_name};
-use interoptopus::lang::c::{
+use interoptopus::lang::{
     CType, CompositeType, ConstantValue, EnumType, Field, FnPointerType, Function, FunctionSignature, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
     SugaredReturnType,
 };

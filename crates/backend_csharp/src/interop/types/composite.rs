@@ -2,8 +2,7 @@ use crate::Interop;
 use crate::converter::{field_name_to_csharp_name, is_blittable, to_typespecifier_in_field};
 use crate::interop::docs::write_documentation;
 use interoptopus::backend::{IndentWriter, WriteFor};
-use interoptopus::lang::c;
-use interoptopus::lang::c::{CType, CompositeType, Field, Layout, PrimitiveType};
+use interoptopus::lang::{CType, CompositeType, Field, Layout, PrimitiveType, Visibility};
 use interoptopus::pattern::TypePattern;
 use interoptopus::{Error, indented};
 
@@ -186,8 +185,8 @@ pub fn write_type_definition_composite_body(i: &Interop, w: &mut IndentWriter, t
 pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &CompositeType) -> Result<(), Error> {
     let field_name = field_name_to_csharp_name(field, i.rename_symbols);
     let visibility = match field.visibility() {
-        c::Visibility::Public => "public ",
-        c::Visibility::Private => "",
+        Visibility::Public => "public ",
+        Visibility::Private => "",
         // c::Visibility::Private => "",
     };
 

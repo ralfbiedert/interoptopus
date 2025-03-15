@@ -21,7 +21,7 @@
 #[macro_export]
 macro_rules! function {
     ($x:ty) => {{
-        use $crate::lang::rust::FunctionInfo;
+        use $crate::lang::FunctionInfo;
         // use $x as fnc;
         let info = <$x>::function_info();
         $crate::inventory::Symbol::Function(info)
@@ -55,7 +55,7 @@ macro_rules! function {
 #[macro_export]
 macro_rules! extra_type {
     ($x:ty) => {{
-        let info = <$x as $crate::lang::rust::CTypeInfo>::type_info();
+        let info = <$x as $crate::lang::TypeInfo>::type_info();
         $crate::inventory::Symbol::Type(info)
     }};
 }
@@ -163,7 +163,7 @@ macro_rules! pattern {
 #[macro_export]
 macro_rules! constant {
     ($x:path) => {{
-        use $crate::lang::rust::ConstantInfo;
+        use $crate::lang::ConstantInfo;
         use $x as constant;
         let info = constant::constant_info();
         $crate::inventory::Symbol::Constant(info)

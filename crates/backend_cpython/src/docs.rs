@@ -6,7 +6,7 @@ use interoptopus::Error;
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::indented;
 use interoptopus::inventory::{Bindings, non_service_functions};
-use interoptopus::lang::c::{CType, CompositeType, Function};
+use interoptopus::lang::{CType, CompositeType, Function};
 use interoptopus::pattern::{LibraryPattern, TypePattern};
 
 /// Configures Python documentation generation.

@@ -1,6 +1,7 @@
 //! Strings over FFI, equivalent to [`std::string::String`].
-use crate::lang::c::{CType, CompositeType, Documentation, Field, Layout, Meta, PrimitiveType, Representation};
-use crate::lang::rust::CTypeInfo;
+
+use crate::lang::{CType, CompositeType, Documentation, Field, Meta, PrimitiveType, Representation};
+use crate::lang::{Layout, TypeInfo};
 use crate::pattern::TypePattern;
 use std::mem::forget;
 
@@ -75,7 +76,7 @@ impl Drop for String {
     }
 }
 
-unsafe impl CTypeInfo for String {
+unsafe impl TypeInfo for String {
     #[rustfmt::skip]
     fn type_info() -> CType {
         let fields = vec![

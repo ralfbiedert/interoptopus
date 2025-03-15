@@ -6,7 +6,7 @@ use crate::interop::docs::write_documentation;
 use crate::{DocStyle, Indentation, Interop};
 use interoptopus::backend::IndentWriter;
 use interoptopus::backend::sort_types_by_dependencies;
-use interoptopus::lang::c::{CType, CompositeType, EnumType, Field, FnPointerType, OpaqueType, Variant};
+use interoptopus::lang::{CType, CompositeType, EnumType, Field, FnPointerType, OpaqueType, Variant};
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::NamedCallback;
 use interoptopus::{Error, indented};

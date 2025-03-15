@@ -1,7 +1,7 @@
 use crate::types::basic::Vec3f32;
 use crate::types::enums::EnumRenamedXYZ;
 use interoptopus::ffi_type;
-use interoptopus::lang::rust::CTypeInfo;
+use interoptopus::lang::TypeInfo;
 
 #[ffi_type]
 #[derive(Debug, Copy, Clone)]
@@ -44,7 +44,7 @@ pub struct CharArray {
 #[ffi_type]
 pub struct GenericArray<T>
 where
-    T: CTypeInfo,
+    T: TypeInfo,
 {
     pub data: [T; 16],
 }

@@ -1,7 +1,7 @@
 //! Transparent `async fn` support over FFI.
 
-use crate::lang::c::{CType, Documentation, FnPointerType, FunctionSignature, Meta, Parameter, PrimitiveType};
-use crate::lang::rust::CTypeInfo;
+use crate::lang::TypeInfo;
+use crate::lang::{CType, Documentation, FnPointerType, FunctionSignature, Meta, Parameter, PrimitiveType};
 use crate::pattern;
 use crate::pattern::TypePattern;
 use std::ffi::c_void;
@@ -20,7 +20,7 @@ pub struct AsyncCallback<T>(Option<extern "C" fn(&T, *const c_void) -> ()>, *con
 unsafe impl<T> Send for AsyncCallback<T> {}
 unsafe impl<T> Sync for AsyncCallback<T> {}
 
-impl<T: CTypeInfo> AsyncCallback<T> {
+impl<T: TypeInfo> AsyncCallback<T> {
     ///   Creates a new instance of the callback using  `extern "C" fn`
     pub fn new(func: extern "C" fn(&T, *const c_void)) -> Self {
         Self(Some(func), null())
@@ -42,21 +42,21 @@ impl<T: CTypeInfo> AsyncCallback<T> {
         }
     }
 }
-impl<T: CTypeInfo> From<extern "C" fn(&T, *const c_void)> for AsyncCallback<T> {
+impl<T: TypeInfo> From<extern "C" fn(&T, *const c_void)> for AsyncCallback<T> {
     fn from(x: extern "C" fn(&T, *const c_void) -> ()) -> Self {
         Self(Some(x), null())
     }
 }
 
-impl<T: CTypeInfo> From<AsyncCallback<T>> for Option<extern "C" fn(&T, *const c_void)> {
+impl<T: TypeInfo> From<AsyncCallback<T>> for Option<extern "C" fn(&T, *const c_void)> {
     fn from(x: AsyncCallback<T>) -> Self {
         x.0
     }
 }
 
-unsafe impl<T: CTypeInfo> CTypeInfo for AsyncCallback<T> {
+unsafe impl<T: TypeInfo> TypeInfo for AsyncCallback<T> {
     fn type_info() -> CType {
-        let rval = <() as CTypeInfo>::type_info();
+        let rval = <() as TypeInfo>::type_info();
 
         let params = vec![
             Parameter::new("value_ptr".to_string(), CType::ReadPointer(Box::new(T::type_info()))),

@@ -89,7 +89,7 @@ pub extern "C" fn exposed_sum2(x: i32, y: i32, _: *const c_void) -> i32 {
 #[cfg(test)]
 mod tests {
     use super::{MyCallback, MyCallbackNamespaced};
-    use interoptopus::lang::rust::CTypeInfo;
+    use interoptopus::lang::TypeInfo;
 
     #[test]
     fn namespaces_assigned_correctly() {

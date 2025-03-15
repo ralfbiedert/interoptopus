@@ -90,8 +90,8 @@ pub fn ffi_service(attr: TokenStream, input: &TokenStream) -> TokenStream {
         impl <#lt> ::interoptopus::pattern::LibraryPatternInfo for #service_type {
             fn pattern_info() -> ::interoptopus::pattern::LibraryPattern {
 
-                use ::interoptopus::lang::rust::CTypeInfo;
-                use ::interoptopus::lang::rust::FunctionInfo;
+                use ::interoptopus::lang::TypeInfo;
+                use ::interoptopus::lang::FunctionInfo;
 
                 let mut methods = Vec::new();
                 let mut ctors = Vec::new();

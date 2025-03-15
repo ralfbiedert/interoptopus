@@ -1,6 +1,6 @@
 //! Helpers for backend authors.
 
-use crate::lang::c::{CType, Function};
+use crate::lang::{CType, Function};
 use crate::pattern::TypePattern;
 use std::collections::{HashMap, HashSet};
 use std::iter::FromIterator;
@@ -81,8 +81,8 @@ pub fn sort_types_by_dependencies(mut types: Vec<CType>) -> Vec<CType> {
 /// # Example
 ///
 /// ```rust
-/// # use interoptopus::lang::c::{Function, FunctionSignature, Meta};
 /// # use interoptopus::backend::longest_common_prefix;
+/// # use interoptopus::lang::Function;
 ///
 /// let functions = [
 ///     Function::new("my_lib_f".to_string(), FunctionSignature::default(), Meta::default()),

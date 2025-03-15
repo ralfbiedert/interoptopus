@@ -73,8 +73,7 @@
 //! in certain backends.
 //!
 
-use crate::lang::c::{CType, CompositeType, PrimitiveType};
-use crate::lang::rust::CTypeInfo;
+use crate::lang::{CType, CompositeType, PrimitiveType, TypeInfo};
 use crate::pattern::builtins::Builtins;
 use crate::pattern::callback::{AsyncCallback, NamedCallback};
 use crate::pattern::result::{FFIErrorEnum, FFIResultType};
