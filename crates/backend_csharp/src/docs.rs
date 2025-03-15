@@ -6,7 +6,7 @@ use crate::interop::patterns::services::{MethodType, write_pattern_service_metho
 use crate::interop::types::composite::write_type_definition_composite_body;
 use crate::interop::types::enums::write_type_definition_enum;
 use interoptopus::Error;
-use interoptopus::backend::writer::{IndentWriter, WriteFor};
+use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::indented;
 use interoptopus::inventory::{Bindings, non_service_functions};
 use interoptopus::lang::c::{CType, CompositeType, Function};

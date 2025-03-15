@@ -112,7 +112,7 @@
 //! ```
 //!
 
-use crate::backend::util::longest_common_prefix;
+use crate::backend::longest_common_prefix;
 use crate::lang::c::{Function, OpaqueType};
 use crate::pattern::result::FFIResultAsPtr;
 use std::fmt::Debug;

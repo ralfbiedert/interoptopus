@@ -5,7 +5,7 @@ use crate::interop::types::composite::{
     write_type_definition_composite_body, write_type_definition_composite_layout_annotation, write_type_definition_composite_marshaller_field_from_unmanaged,
     write_type_definition_composite_marshaller_field_to_unmanaged, write_type_definition_composite_unmanaged_body_field,
 };
-use interoptopus::backend::writer::{IndentWriter, WriteFor};
+use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::c::{CType, Field};
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::result::{FFIErrorEnum, FFIResultType};

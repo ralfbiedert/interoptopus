@@ -1,8 +1,8 @@
 use crate::Interop;
 use crate::interop::{write_function_declaration, write_type_definition};
 use interoptopus::Error;
-use interoptopus::backend::util::sort_types_by_dependencies;
-use interoptopus::backend::writer::IndentWriter;
+use interoptopus::backend::IndentWriter;
+use interoptopus::backend::sort_types_by_dependencies;
 use interoptopus::indented;
 use interoptopus::inventory::Bindings;
 use interoptopus::lang::c::{CType, Function};

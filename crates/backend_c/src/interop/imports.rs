@@ -1,5 +1,5 @@
 use crate::Interop;
-use interoptopus::backend::writer::IndentWriter;
+use interoptopus::backend::IndentWriter;
 use interoptopus::{Error, indented};
 
 pub fn write_imports(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {

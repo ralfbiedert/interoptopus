@@ -1,5 +1,5 @@
 use crate::Interop;
-use interoptopus::backend::writer::IndentWriter;
+use interoptopus::backend::IndentWriter;
 use interoptopus::lang::c;
 use interoptopus::{Error, indented};
 

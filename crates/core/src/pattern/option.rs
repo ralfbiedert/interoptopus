@@ -26,10 +26,9 @@
 //! void set_value(optionu8 x);
 //! ```
 //!
+use crate::backend::capitalize_first_letter;
 use crate::lang::c::{CType, CompositeType, Documentation, Field, Layout, Meta, PrimitiveType, Representation, Visibility};
 use crate::lang::rust::CTypeInfo;
-
-use crate::backend::util::capitalize_first_letter;
 use crate::pattern::TypePattern;
 use crate::pattern::primitive::Bool;
 #[cfg(feature = "serde")]

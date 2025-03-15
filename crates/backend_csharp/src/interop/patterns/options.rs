@@ -1,6 +1,6 @@
 use crate::Interop;
 use crate::converter::to_typespecifier_in_sync_fn_rval;
-use interoptopus::backend::writer::IndentWriter;
+use interoptopus::backend::IndentWriter;
 use interoptopus::lang::c::CompositeType;
 use interoptopus::{Error, indented};
 

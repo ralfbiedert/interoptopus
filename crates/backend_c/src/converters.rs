@@ -1,6 +1,6 @@
 use crate::Interop;
 use crate::interop::ToNamingStyle;
-use interoptopus::backend::util::safe_name;
+use interoptopus::backend::safe_name;
 use interoptopus::lang::c::{CType, CompositeType, Constant, ConstantValue, EnumType, FnPointerType, Function, OpaqueType, PrimitiveType, PrimitiveValue, Variant};
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::NamedCallback;

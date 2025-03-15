@@ -51,7 +51,7 @@
 //! with `cargo test`. In real projects you might want to add this code to another crate instead:
 //!
 //! ```
-//! use interoptopus::backend::util::NamespaceMappings;
+//! use interoptopus::backend::NamespaceMappings;
 //! use interoptopus::Error;
 //! use interoptopus::inventory::Bindings;
 //!

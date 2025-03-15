@@ -83,6 +83,7 @@ impl<'a> IndentWriter<'a> {
 }
 
 /// Writes a line of code, possibly with multiple indentations. Used in backends.
+#[doc(hidden)]
 #[macro_export]
 macro_rules! indented {
     ($w:expr, [ $($i:pat)+ ], $x:expr, $($param:expr),*) => {
@@ -132,6 +133,7 @@ macro_rules! indented {
 }
 
 /// Writes an unindented line of code. Used in backends.
+#[doc(hidden)]
 #[macro_export]
 macro_rules! unindented {
     ($w:expr, $x:expr, $($param:expr),*) => {

@@ -1,6 +1,6 @@
 use crate::Interop;
 use crate::converter::to_ctypes_name;
-use interoptopus::backend::writer::IndentWriter;
+use interoptopus::backend::IndentWriter;
 use interoptopus::lang::c::CType;
 use interoptopus::pattern::TypePattern;
 use interoptopus::{Error, indented};

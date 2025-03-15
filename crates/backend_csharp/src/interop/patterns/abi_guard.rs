@@ -1,6 +1,6 @@
 use crate::converter::function_name_to_csharp_name;
 use crate::{FunctionNameFlavor, Interop};
-use interoptopus::backend::writer::IndentWriter;
+use interoptopus::backend::IndentWriter;
 use interoptopus::lang::c::CType;
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::api_guard::inventory_hash;

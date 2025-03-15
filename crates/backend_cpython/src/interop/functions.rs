@@ -1,8 +1,8 @@
 use crate::Interop;
 use crate::converter::{to_ctypes_name, to_type_hint_out};
 use crate::interop::patterns::write_library_call;
-use interoptopus::backend::util::safe_name;
-use interoptopus::backend::writer::{IndentWriter, WriteFor};
+use interoptopus::backend::safe_name;
+use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::inventory::non_service_functions;
 use interoptopus::lang::c::{CType, Function};
 use interoptopus::pattern::TypePattern;

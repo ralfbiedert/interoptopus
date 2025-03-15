@@ -17,7 +17,7 @@ use crate::interop::patterns::write_patterns;
 use crate::interop::types::write_types;
 use crate::interop::utils::write_utils;
 use derive_builder::Builder;
-use interoptopus::backend::writer::IndentWriter;
+use interoptopus::backend::IndentWriter;
 use interoptopus::inventory::{Bindings, Inventory};
 use interoptopus::lang::c::Function;
 use interoptopus::{Error, indented};

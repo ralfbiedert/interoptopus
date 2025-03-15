@@ -1,5 +1,9 @@
-//! Components used by backends.
+//! Utilities for backends.
 
-pub mod testing;
-pub mod util;
-pub mod writer;
+mod testing;
+mod util;
+mod writer;
+
+pub use testing::assert_file_matches_generated;
+pub use util::*;
+pub use writer::{FOUR_SPACES, IndentWriter, WriteFor};

@@ -3,7 +3,7 @@ use crate::interop::functions::write_function;
 use crate::interop::patterns::{write_pattern_class_ctor, write_pattern_class_method};
 use crate::interop::types::{write_enum, write_struct};
 use interoptopus::Error;
-use interoptopus::backend::writer::{IndentWriter, WriteFor};
+use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::indented;
 use interoptopus::inventory::{Bindings, non_service_functions};
 use interoptopus::lang::c::{CType, CompositeType, Function};

@@ -129,18 +129,6 @@
 //! - **v0.15** - Massive cleanup, bugfix, UX overhaul (+syn2).
 //! - **v0.14** - Better inventory UX.
 //! - **v0.13** - Python backend uses `ctypes` now.
-//! - **v0.12** - Better compat using `#[ffi_service_method]`.
-//! - **v0.11** - C# switch ctors to static methods.
-//! - **v0.10** - C# flavors `DotNet` and `Unity` (incl. Burst).
-//! - **v0.9** - 150x faster C# slices, Python type hints.
-//! - **v0.8** - Moved testing functions to respective backends.
-//! - **v0.7** - Make patterns proc macros for better FFI docs.
-//! - **v0.6** - Renamed and clarified many patterns.
-//! - **v0.5** - More ergonomic slice usage in Rust and FFI.
-//! - **v0.4** - Enable logging support in auto-generated FFI calls.
-//! - **v0.3** - Better compatibility with generics.
-//! - **v0.2** - Introduced "patterns"; _working_ interop for C#.
-//! - **v0.1** - First version.
 //!
 //! Also see our [upgrade instructions](https://github.com/ralfbiedert/interoptopus/blob/master/UPGRADE_INSTRUCTIONS.md).
 //!
@@ -186,7 +174,7 @@ mod macros;
 pub mod pattern;
 
 pub mod lang {
-    //! Abstractions for authors of backends.
+    //! Metadata for the Rust and C representation of language items.
     //!
     //! A a rule of thumb, types in the [`rust`](rust) module generate instances
     //! of types in the [`c`](c) module.

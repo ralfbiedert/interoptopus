@@ -4,8 +4,8 @@ use crate::converters::{
 use crate::interop::ToNamingStyle;
 use crate::interop::docs::write_documentation;
 use crate::{DocStyle, Indentation, Interop};
-use interoptopus::backend::util::sort_types_by_dependencies;
-use interoptopus::backend::writer::IndentWriter;
+use interoptopus::backend::IndentWriter;
+use interoptopus::backend::sort_types_by_dependencies;
 use interoptopus::lang::c::{CType, CompositeType, EnumType, Field, FnPointerType, OpaqueType, Variant};
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::NamedCallback;

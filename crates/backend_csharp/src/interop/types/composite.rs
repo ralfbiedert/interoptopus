@@ -1,7 +1,7 @@
 use crate::Interop;
 use crate::converter::{field_name_to_csharp_name, is_blittable, to_typespecifier_in_field};
 use crate::interop::docs::write_documentation;
-use interoptopus::backend::writer::{IndentWriter, WriteFor};
+use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::c;
 use interoptopus::lang::c::{CType, CompositeType, Field, Layout, PrimitiveType};
 use interoptopus::pattern::TypePattern;

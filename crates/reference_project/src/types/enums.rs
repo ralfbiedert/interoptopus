@@ -1,4 +1,7 @@
+use crate::types::basic::Vec3f32;
 use interoptopus::ffi_type;
+use interoptopus::lang::c::CType;
+use interoptopus::lang::rust::CTypeInfo;
 
 /// Documented enum.
 #[ffi_type]
@@ -15,4 +18,21 @@ pub enum EnumDocumented {
 #[derive(Debug)]
 pub enum EnumRenamedXYZ {
     X,
+}
+
+// #[ffi_type]
+pub enum EnumPayload {
+    A,
+    B(Vec3f32),
+    C(u32),
+    // We don't support these for now
+    // D { x: Vec3f32 },
+    // E(u8, u8, u8),
+}
+
+unsafe impl CTypeInfo for EnumPayload {
+    fn type_info() -> CType {
+        // CType::Enum()
+        todo!()
+    }
 }

@@ -28,7 +28,7 @@
 //! }
 //! ```
 
-use crate::backend::util::capitalize_first_letter;
+use crate::backend::capitalize_first_letter;
 use crate::lang::c::{CType, CompositeType, Documentation, EnumType, Field, Layout, Meta, PrimitiveType, Representation, Variant, Visibility};
 use crate::lang::rust::CTypeInfo;
 use crate::pattern::TypePattern;

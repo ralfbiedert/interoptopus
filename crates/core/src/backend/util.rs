@@ -10,7 +10,7 @@ use std::iter::FromIterator;
 /// # Example
 ///
 /// ```
-/// use interoptopus::backend::util::safe_name;
+/// use interoptopus::backend::safe_name;
 ///
 /// assert_eq!(safe_name("fn(u32) -> u8"), "fn_u32_rval_u8");
 /// ```
@@ -82,7 +82,7 @@ pub fn sort_types_by_dependencies(mut types: Vec<CType>) -> Vec<CType> {
 ///
 /// ```rust
 /// # use interoptopus::lang::c::{Function, FunctionSignature, Meta};
-/// # use interoptopus::backend::util::longest_common_prefix;
+/// # use interoptopus::backend::longest_common_prefix;
 ///
 /// let functions = [
 ///     Function::new("my_lib_f".to_string(), FunctionSignature::default(), Meta::default()),
@@ -386,6 +386,7 @@ pub fn is_global_type(t: &CType) -> bool {
 ///
 /// println!(here!())
 /// ```
+#[doc(hidden)]
 #[macro_export]
 macro_rules! here {
     () => {

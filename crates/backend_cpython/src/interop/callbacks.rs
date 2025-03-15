@@ -1,7 +1,7 @@
 use crate::Interop;
 use crate::converter::fnpointer_to_typename;
-use interoptopus::backend::util::safe_name;
-use interoptopus::backend::writer::IndentWriter;
+use interoptopus::backend::safe_name;
+use interoptopus::backend::IndentWriter;
 use interoptopus::lang::c::CType;
 use interoptopus::pattern::TypePattern;
 use interoptopus::{Error, indented};

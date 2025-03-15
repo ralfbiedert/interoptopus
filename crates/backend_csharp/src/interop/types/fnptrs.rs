@@ -1,6 +1,6 @@
 use crate::Interop;
 use crate::converter::{fnpointer_to_typename, to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval};
-use interoptopus::backend::writer::IndentWriter;
+use interoptopus::backend::IndentWriter;
 use interoptopus::lang::c::FnPointerType;
 use interoptopus::{Error, indented};
 

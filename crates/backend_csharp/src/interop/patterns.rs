@@ -8,7 +8,7 @@ pub mod slices;
 use crate::Interop;
 use crate::interop::patterns::services::write_pattern_service;
 use interoptopus::Error;
-use interoptopus::backend::writer::IndentWriter;
+use interoptopus::backend::IndentWriter;
 use interoptopus::pattern::LibraryPattern;
 
 pub fn write_patterns(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {

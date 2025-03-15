@@ -1,6 +1,6 @@
 use crate::Interop;
 use crate::interop::docs::write_documentation;
-use interoptopus::backend::writer::{IndentWriter, WriteFor};
+use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::c::{EnumType, Variant};
 use interoptopus::{Error, indented};
 
