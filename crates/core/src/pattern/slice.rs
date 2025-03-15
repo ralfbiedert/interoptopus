@@ -38,7 +38,7 @@
 //!
 
 use crate::backend::capitalize_first_letter;
-use crate::lang::{CType, CompositeType, Documentation, Field, Meta, PrimitiveType, Representation, Visibility};
+use crate::lang::{Composite, Documentation, Field, Meta, Primitive, Representation, Type, Visibility};
 use crate::lang::{Layout, TypeInfo};
 use crate::pattern::TypePattern;
 use std::marker::PhantomData;
@@ -124,22 +124,22 @@ where
     T: TypeInfo,
 {
     #[rustfmt::skip]
-    fn type_info() -> CType {
+    fn type_info() -> Type {
         let doc_data = Documentation::from_line("Pointer to start of immutable data.");
         let doc_len = Documentation::from_line("Number of elements.");
 
         let fields = vec![
-            Field::with_documentation("data".to_string(), CType::ReadPointer(Box::new(T::type_info())), Visibility::Private, doc_data),
-            Field::with_documentation("len".to_string(), CType::Primitive(PrimitiveType::U64), Visibility::Private, doc_len),
+            Field::with_documentation("data".to_string(), Type::ReadPointer(Box::new(T::type_info())), Visibility::Private, doc_data),
+            Field::with_documentation("len".to_string(), Type::Primitive(Primitive::U64), Visibility::Private, doc_len),
         ];
 
         let doc = Documentation::from_line("A pointer to an array of data someone else owns which may not be modified.");
         let repr = Representation::new(Layout::C, None);
         let meta = Meta::with_namespace_documentation(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
         let name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
-        let composite = CompositeType::with_meta_repr(format!("Slice{name}"), fields, meta, repr);
+        let composite = Composite::with_meta_repr(format!("Slice{name}"), fields, meta, repr);
         let slice = SliceType::new(composite, T::type_info());
-        CType::Pattern(TypePattern::Slice(slice))
+        Type::Pattern(TypePattern::Slice(slice))
     }
 }
 
@@ -230,33 +230,33 @@ where
     T: TypeInfo,
 {
     #[rustfmt::skip]
-    fn type_info() -> CType {
+    fn type_info() -> Type {
         let doc_data = Documentation::from_line("Pointer to start of mutable data.");
         let doc_len = Documentation::from_line("Number of elements.");
         let fields = vec![
-            Field::with_documentation("data".to_string(), CType::ReadPointer(Box::new(T::type_info())), Visibility::Private, doc_data),
-            Field::with_documentation("len".to_string(), CType::Primitive(PrimitiveType::U64), Visibility::Private, doc_len),
+            Field::with_documentation("data".to_string(), Type::ReadPointer(Box::new(T::type_info())), Visibility::Private, doc_data),
+            Field::with_documentation("len".to_string(), Type::Primitive(Primitive::U64), Visibility::Private, doc_len),
         ];
 
         let doc = Documentation::from_line("A pointer to an array of data someone else owns which may be modified.");
         let repr = Representation::new(Layout::C, None);
         let meta = Meta::with_namespace_documentation(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
         let name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
-        let composite = CompositeType::with_meta_repr(format!("SliceMut{name}"), fields, meta, repr);
+        let composite = Composite::with_meta_repr(format!("SliceMut{name}"), fields, meta, repr);
         let slice = SliceType::new(composite, T::type_info());
-        CType::Pattern(TypePattern::SliceMut(slice))
+        Type::Pattern(TypePattern::SliceMut(slice))
     }
 }
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct SliceType {
-    composite_type: CompositeType,
-    target_type: Box<CType>,
+    composite_type: Composite,
+    target_type: Box<Type>,
 }
 
 impl SliceType {
     #[must_use]
-    pub fn new(composite_type: CompositeType, target_type: CType) -> Self {
+    pub fn new(composite_type: Composite, target_type: Type) -> Self {
         Self { composite_type, target_type: Box::new(target_type) }
     }
 
@@ -271,12 +271,12 @@ impl SliceType {
     }
 
     #[must_use]
-    pub fn composite_type(&self) -> &CompositeType {
+    pub fn composite_type(&self) -> &Composite {
         &self.composite_type
     }
 
     #[must_use]
-    pub fn target_type(&self) -> &CType {
+    pub fn target_type(&self) -> &Type {
         &self.target_type
     }
 }

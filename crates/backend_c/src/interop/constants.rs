@@ -2,7 +2,7 @@ use crate::converters::{const_name_to_name, constant_value_to_value, primitive_t
 use crate::interop::docs::write_documentation;
 use crate::{DocStyle, Interop};
 use interoptopus::backend::IndentWriter;
-use interoptopus::lang::{CType, Constant};
+use interoptopus::lang::{Constant, Type};
 use interoptopus::{Error, indented};
 
 pub fn write_constants(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
@@ -16,7 +16,7 @@ pub fn write_constants(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
 pub fn write_constant(i: &Interop, w: &mut IndentWriter, constant: &Constant) -> Result<(), Error> {
     let name = const_name_to_name(i, constant);
     let the_type = match constant.the_type() {
-        CType::Primitive(x) => primitive_to_typename(x),
+        Type::Primitive(x) => primitive_to_typename(x),
         _ => return Err(Error::Null),
     };
 

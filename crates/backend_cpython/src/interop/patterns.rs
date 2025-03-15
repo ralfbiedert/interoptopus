@@ -4,7 +4,7 @@ use crate::interop::functions::write_param_helpers;
 use crate::interop::utils::write_success_enum_aware_rval;
 use interoptopus::backend::longest_common_prefix;
 use interoptopus::backend::{IndentWriter, WriteFor};
-use interoptopus::lang::{CType, CompositeType, Function};
+use interoptopus::lang::{Composite, Function, Type};
 use interoptopus::pattern::service::ServiceDefinition;
 use interoptopus::pattern::slice::SliceType;
 use interoptopus::pattern::{LibraryPattern, TypePattern};
@@ -98,7 +98,7 @@ pub fn write_slice(_i: &Interop, w: &mut IndentWriter, c: &SliceType, mutable: b
     Ok(())
 }
 
-pub fn write_option(_i: &Interop, w: &mut IndentWriter, c: &CompositeType) -> Result<(), Error> {
+pub fn write_option(_i: &Interop, w: &mut IndentWriter, c: &Composite) -> Result<(), Error> {
     let data_type = c
         .fields()
         .iter()
@@ -263,7 +263,7 @@ pub fn write_library_call(i: &Interop, w: &mut IndentWriter, function: &Function
     };
 
     match function.signature().rval() {
-        CType::Pattern(TypePattern::CStrPointer) => {
+        Type::Pattern(TypePattern::CStrPointer) => {
             indented!(w, [()], r"rval = c_lib.{}({})", function.name(), &args)?;
             indented!(w, [()], r"return ctypes.string_at(rval)")?;
         }

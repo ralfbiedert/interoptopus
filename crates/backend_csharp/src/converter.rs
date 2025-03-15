@@ -3,8 +3,7 @@ use crate::interop::FunctionNameFlavor;
 use heck::{ToLowerCamelCase, ToUpperCamelCase};
 use interoptopus::backend::{ctypes_from_type_recursive, safe_name};
 use interoptopus::lang::{
-    CType, CompositeType, ConstantValue, EnumType, Field, FnPointerType, Function, FunctionSignature, OpaqueType, Parameter, PrimitiveType, PrimitiveValue,
-    SugaredReturnType,
+    Composite, ConstantValue, Enum, Field, FnPointer, Function, FunctionSignature, Opaque, Parameter, Primitive, PrimitiveValue, SugaredReturnType, Type,
 };
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::{AsyncCallback, NamedCallback};
@@ -12,49 +11,49 @@ use interoptopus::pattern::slice::SliceType;
 use std::collections::HashSet;
 
 /// Converts a primitive (Rust) type to a native C# type name, e.g., `f32` to `float`.
-pub fn primitive_to_typename(x: PrimitiveType) -> String {
+pub fn primitive_to_typename(x: Primitive) -> String {
     match x {
-        PrimitiveType::Void => "void".to_string(),
-        PrimitiveType::Bool => "bool".to_string(),
-        PrimitiveType::U8 => "byte".to_string(),
-        PrimitiveType::U16 => "ushort".to_string(),
-        PrimitiveType::U32 => "uint".to_string(),
-        PrimitiveType::U64 => "ulong".to_string(),
-        PrimitiveType::I8 => "sbyte".to_string(),
-        PrimitiveType::I16 => "short".to_string(),
-        PrimitiveType::I32 => "int".to_string(),
-        PrimitiveType::I64 => "long".to_string(),
-        PrimitiveType::F32 => "float".to_string(),
-        PrimitiveType::F64 => "double".to_string(),
+        Primitive::Void => "void".to_string(),
+        Primitive::Bool => "bool".to_string(),
+        Primitive::U8 => "byte".to_string(),
+        Primitive::U16 => "ushort".to_string(),
+        Primitive::U32 => "uint".to_string(),
+        Primitive::U64 => "ulong".to_string(),
+        Primitive::I8 => "sbyte".to_string(),
+        Primitive::I16 => "short".to_string(),
+        Primitive::I32 => "int".to_string(),
+        Primitive::I64 => "long".to_string(),
+        Primitive::F32 => "float".to_string(),
+        Primitive::F64 => "double".to_string(),
     }
 }
 
 /// Converts a Rust enum name such as `Error` to a C# enum name `Error`.
-pub fn enum_to_typename(x: &EnumType) -> String {
+pub fn enum_to_typename(x: &Enum) -> String {
     x.rust_name().to_string()
 }
 
 /// TODO Converts an opaque Rust struct `Context` to a C# struct.
-pub fn opaque_to_typename(_: &OpaqueType) -> String {
+pub fn opaque_to_typename(_: &Opaque) -> String {
     // x.name().to_string()
     "IntPtr".to_string()
 }
 
 pub fn has_ffi_error_rval(signature: &FunctionSignature) -> bool {
-    matches!(signature.rval(), CType::Pattern(TypePattern::FFIErrorEnum(_)))
+    matches!(signature.rval(), Type::Pattern(TypePattern::FFIErrorEnum(_)))
 }
 
 /// Converts an Rust struct name `Vec2` to a C# struct name `Vec2`.
-pub fn composite_to_typename(x: &CompositeType) -> String {
+pub fn composite_to_typename(x: &Composite) -> String {
     x.rust_name().to_string()
 }
 
 /// Checks if the type is on the C# side blittable, in particular, if it can be accessed via raw pointers and memcopied.
-pub fn is_blittable(x: &CType) -> bool {
+pub fn is_blittable(x: &Type) -> bool {
     match x {
-        CType::Primitive(_) => true,
-        CType::Composite(c) => c.fields().iter().all(|x| is_blittable(x.the_type())),
-        CType::Pattern(x) => match x {
+        Type::Primitive(_) => true,
+        Type::Composite(c) => c.fields().iter().all(|x| is_blittable(x.the_type())),
+        Type::Pattern(x) => match x {
             TypePattern::CStrPointer => false,
             TypePattern::APIVersion => true,
             TypePattern::FFIErrorEnum(_) => true,
@@ -66,12 +65,12 @@ pub fn is_blittable(x: &CType) -> bool {
             TypePattern::NamedCallback(_) => false,
             _ => panic!("Pattern not explicitly handled"),
         },
-        CType::Array(_) => false, // TODO: should check inner and maybe return true
-        CType::Enum(_) => true,
-        CType::Opaque(_) => true,
-        CType::FnPointer(_) => true,
-        CType::ReadPointer(_) => true,
-        CType::ReadWritePointer(_) => true,
+        Type::Array(_) => false, // TODO: should check inner and maybe return true
+        Type::Enum(_) => true,
+        Type::Opaque(_) => true,
+        Type::FnPointer(_) => true,
+        Type::ReadPointer(_) => true,
+        Type::ReadWritePointer(_) => true,
     }
 }
 
@@ -84,24 +83,24 @@ pub fn async_callback_to_typename(_: &AsyncCallback) -> String {
 }
 
 /// Converts an Rust `pub fn()` to a C# delegate name such as `InteropDelegate`.
-pub fn fnpointer_to_typename(x: &FnPointerType) -> String {
+pub fn fnpointer_to_typename(x: &FnPointer) -> String {
     ["InteropDelegate".to_string(), safe_name(&x.internal_name())].join("_")
 }
 
 /// Converts the `u32` part in a Rust field `x: u32` to a C# equivalent. Might convert pointers to `IntPtr`.
 #[allow(clippy::only_used_in_recursion)]
-pub fn to_typespecifier_in_field(x: &CType, field: &Field, composite: &CompositeType) -> String {
+pub fn to_typespecifier_in_field(x: &Type, field: &Field, composite: &Composite) -> String {
     match &x {
-        CType::Primitive(x) => primitive_to_typename(*x),
+        Type::Primitive(x) => primitive_to_typename(*x),
         // CType::Array(_) => panic!("Needs special handling in the writer."),
-        CType::Array(_) => "TODO".to_string(),
-        CType::Enum(x) => enum_to_typename(x),
-        CType::Opaque(x) => opaque_to_typename(x),
-        CType::Composite(x) => composite_to_typename(x),
-        CType::ReadPointer(_) => "IntPtr".to_string(),
-        CType::ReadWritePointer(_) => "IntPtr".to_string(),
-        CType::FnPointer(x) => fnpointer_to_typename(x),
-        CType::Pattern(x) => match x {
+        Type::Array(_) => "TODO".to_string(),
+        Type::Enum(x) => enum_to_typename(x),
+        Type::Opaque(x) => opaque_to_typename(x),
+        Type::Composite(x) => composite_to_typename(x),
+        Type::ReadPointer(_) => "IntPtr".to_string(),
+        Type::ReadWritePointer(_) => "IntPtr".to_string(),
+        Type::FnPointer(x) => fnpointer_to_typename(x),
+        Type::Pattern(x) => match x {
             TypePattern::CStrPointer => "string".to_string(),
             TypePattern::Utf8String(_) => "string".to_string(),
             TypePattern::FFIErrorEnum(e) => format!("Result{}", e.the_enum().rust_name()),
@@ -118,38 +117,38 @@ pub fn to_typespecifier_in_field(x: &CType, field: &Field, composite: &Composite
 }
 
 /// Converts the `u32` part in a Rust paramter `x: u32` to a C# equivalent. Might convert pointers to `out X` or `ref X`.
-pub fn to_typespecifier_in_param(x: &CType) -> String {
+pub fn to_typespecifier_in_param(x: &Type) -> String {
     match &x {
-        CType::Primitive(x) => match x {
-            PrimitiveType::Bool => "[MarshalAs(UnmanagedType.U1)] bool".to_string(),
+        Type::Primitive(x) => match x {
+            Primitive::Bool => "[MarshalAs(UnmanagedType.U1)] bool".to_string(),
             _ => primitive_to_typename(*x),
         },
-        CType::Array(_) => todo!(),
-        CType::Enum(x) => enum_to_typename(x),
-        CType::Opaque(x) => opaque_to_typename(x),
-        CType::Composite(x) => composite_to_typename(x),
-        CType::ReadPointer(z) => match &**z {
-            CType::Opaque(_) => "IntPtr".to_string(),
-            CType::Primitive(PrimitiveType::Void) => "IntPtr".to_string(),
-            CType::ReadPointer(_) => "ref IntPtr".to_string(),
-            CType::ReadWritePointer(_) => "ref IntPtr".to_string(),
-            CType::Pattern(TypePattern::CChar) => "IntPtr".to_string(),
-            CType::Pattern(TypePattern::Slice(y)) => format!("ref {}", composite_to_typename(y.composite_type())),
-            CType::Pattern(TypePattern::SliceMut(y)) => format!("ref {}", composite_to_typename(y.composite_type())),
+        Type::Array(_) => todo!(),
+        Type::Enum(x) => enum_to_typename(x),
+        Type::Opaque(x) => opaque_to_typename(x),
+        Type::Composite(x) => composite_to_typename(x),
+        Type::ReadPointer(z) => match &**z {
+            Type::Opaque(_) => "IntPtr".to_string(),
+            Type::Primitive(Primitive::Void) => "IntPtr".to_string(),
+            Type::ReadPointer(_) => "ref IntPtr".to_string(),
+            Type::ReadWritePointer(_) => "ref IntPtr".to_string(),
+            Type::Pattern(TypePattern::CChar) => "IntPtr".to_string(),
+            Type::Pattern(TypePattern::Slice(y)) => format!("ref {}", composite_to_typename(y.composite_type())),
+            Type::Pattern(TypePattern::SliceMut(y)) => format!("ref {}", composite_to_typename(y.composite_type())),
             _ => format!("ref {}", to_typespecifier_in_param(z)),
         },
-        CType::ReadWritePointer(z) => match &**z {
-            CType::Opaque(_) => "IntPtr".to_string(),
-            CType::Primitive(PrimitiveType::Void) => "IntPtr".to_string(),
-            CType::ReadPointer(_) => "ref IntPtr".to_string(),
-            CType::ReadWritePointer(_) => "ref IntPtr".to_string(),
-            CType::Pattern(TypePattern::CChar) => "IntPtr".to_string(),
-            CType::Pattern(TypePattern::Slice(y)) => format!("ref {}>", composite_to_typename(y.composite_type())),
-            CType::Pattern(TypePattern::SliceMut(y)) => format!("ref {}", composite_to_typename(y.composite_type())),
+        Type::ReadWritePointer(z) => match &**z {
+            Type::Opaque(_) => "IntPtr".to_string(),
+            Type::Primitive(Primitive::Void) => "IntPtr".to_string(),
+            Type::ReadPointer(_) => "ref IntPtr".to_string(),
+            Type::ReadWritePointer(_) => "ref IntPtr".to_string(),
+            Type::Pattern(TypePattern::CChar) => "IntPtr".to_string(),
+            Type::Pattern(TypePattern::Slice(y)) => format!("ref {}>", composite_to_typename(y.composite_type())),
+            Type::Pattern(TypePattern::SliceMut(y)) => format!("ref {}", composite_to_typename(y.composite_type())),
             _ => format!("ref {}", to_typespecifier_in_param(z)),
         },
-        CType::FnPointer(x) => fnpointer_to_typename(x),
-        CType::Pattern(x) => match x {
+        Type::FnPointer(x) => fnpointer_to_typename(x),
+        Type::Pattern(x) => match x {
             TypePattern::CStrPointer => "[MarshalAs(UnmanagedType.LPStr)] string".to_string(),
             TypePattern::FFIErrorEnum(e) => format!("Result{}", e.the_enum().rust_name()),
             TypePattern::Utf8String(x) => composite_to_typename(x),
@@ -167,17 +166,17 @@ pub fn to_typespecifier_in_param(x: &CType) -> String {
     }
 }
 
-pub fn to_typespecifier_in_sync_fn_rval(x: &CType) -> String {
+pub fn to_typespecifier_in_sync_fn_rval(x: &Type) -> String {
     match &x {
-        CType::Primitive(x) => primitive_to_typename(*x),
-        CType::Array(_) => todo!(),
-        CType::Enum(x) => enum_to_typename(x),
-        CType::Opaque(x) => opaque_to_typename(x),
-        CType::Composite(x) => composite_to_typename(x),
-        CType::ReadPointer(_) => "IntPtr".to_string(),
-        CType::ReadWritePointer(_) => "IntPtr".to_string(),
-        CType::FnPointer(x) => fnpointer_to_typename(x),
-        CType::Pattern(x) => match x {
+        Type::Primitive(x) => primitive_to_typename(*x),
+        Type::Array(_) => todo!(),
+        Type::Enum(x) => enum_to_typename(x),
+        Type::Opaque(x) => opaque_to_typename(x),
+        Type::Composite(x) => composite_to_typename(x),
+        Type::ReadPointer(_) => "IntPtr".to_string(),
+        Type::ReadWritePointer(_) => "IntPtr".to_string(),
+        Type::FnPointer(x) => fnpointer_to_typename(x),
+        Type::Pattern(x) => match x {
             TypePattern::CStrPointer => "IntPtr".to_string(),
             TypePattern::Utf8String(x) => composite_to_typename(x),
             TypePattern::FFIErrorEnum(e) => format!("Result{}", e.the_enum().rust_name()),
@@ -196,10 +195,10 @@ pub fn to_typespecifier_in_sync_fn_rval(x: &CType) -> String {
 
 pub fn to_typespecifier_in_async_fn_rval(x: &SugaredReturnType) -> String {
     match x {
-        SugaredReturnType::Async(CType::Pattern(TypePattern::Utf8String(_))) => "Task<string>".to_string(),
-        SugaredReturnType::Async(CType::Pattern(TypePattern::FFIErrorEnum(_))) => "Task".to_string(),
-        SugaredReturnType::Async(CType::Pattern(TypePattern::Result(x))) => match x.t() {
-            CType::Pattern(TypePattern::Utf8String(_)) => "Task<string>".to_string(),
+        SugaredReturnType::Async(Type::Pattern(TypePattern::Utf8String(_))) => "Task<string>".to_string(),
+        SugaredReturnType::Async(Type::Pattern(TypePattern::FFIErrorEnum(_))) => "Task".to_string(),
+        SugaredReturnType::Async(Type::Pattern(TypePattern::Result(x))) => match x.t() {
+            Type::Pattern(TypePattern::Utf8String(_)) => "Task<string>".to_string(),
             x => format!("Task<{}>", to_typespecifier_in_sync_fn_rval(x)),
         },
         SugaredReturnType::Async(x) => format!("Task<{}>", to_typespecifier_in_sync_fn_rval(x)),
@@ -254,7 +253,7 @@ pub fn is_owned_slice(slice: &SliceType) -> bool {
     let mut rval = HashSet::new();
     ctypes_from_type_recursive(slice.target_type(), &mut rval);
 
-    rval.iter().any(|x| matches!(x, CType::Pattern(TypePattern::Utf8String(_))))
+    rval.iter().any(|x| matches!(x, Type::Pattern(TypePattern::Utf8String(_))))
 }
 
 #[must_use]
@@ -262,7 +261,7 @@ pub fn pattern_to_native_in_signature(_: &Interop, param: &Parameter) -> String 
     let slice_type_name = |mutable: bool, slice: &SliceType| -> String {
         if is_owned_slice(slice) {
             match slice.target_type() {
-                CType::Pattern(TypePattern::Utf8String(_)) => "string[]".to_string(),
+                Type::Pattern(TypePattern::Utf8String(_)) => "string[]".to_string(),
                 _ => format!("{}[]", crate::converter::to_typespecifier_in_param(slice.target_type())),
             }
         } else if mutable {
@@ -272,7 +271,7 @@ pub fn pattern_to_native_in_signature(_: &Interop, param: &Parameter) -> String 
         }
     };
     match param.the_type() {
-        x @ CType::Pattern(p) => match p {
+        x @ Type::Pattern(p) => match p {
             TypePattern::Slice(p) => slice_type_name(false, p),
             TypePattern::SliceMut(p) => slice_type_name(true, p),
             TypePattern::NamedCallback(_) => {
@@ -282,8 +281,8 @@ pub fn pattern_to_native_in_signature(_: &Interop, param: &Parameter) -> String 
 
             _ => to_typespecifier_in_param(param.the_type()),
         },
-        CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {
-            CType::Pattern(x) => match x {
+        Type::ReadPointer(x) | Type::ReadWritePointer(x) => match &**x {
+            Type::Pattern(x) => match x {
                 TypePattern::Slice(p) => slice_type_name(false, p),
                 TypePattern::SliceMut(p) => slice_type_name(true, p),
                 _ => to_typespecifier_in_param(param.the_type()),

@@ -111,19 +111,19 @@
 //! }
 //! ```
 
-use crate::lang::{CType, FnPointerType, Meta};
+use crate::lang::{FnPointer, Meta, Type};
 
 /// Internal helper naming a generated callback type wrapper.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct NamedCallback {
-    fnpointer: FnPointerType,
+    fnpointer: FnPointer,
     meta: Meta,
 }
 
 impl NamedCallback {
     /// Creates a new named callback.
     #[must_use]
-    pub fn new(callback: FnPointerType) -> Self {
+    pub fn new(callback: FnPointer) -> Self {
         Self::with_meta(callback, Meta::new())
     }
 
@@ -133,7 +133,7 @@ impl NamedCallback {
     ///
     /// The provided pointer must have a name.
     #[must_use]
-    pub fn with_meta(callback: FnPointerType, meta: Meta) -> Self {
+    pub fn with_meta(callback: FnPointer, meta: Meta) -> Self {
         assert!(callback.name().is_some(), "The pointer provided to a named callback must have a name.");
         Self { fnpointer: callback, meta }
     }
@@ -156,7 +156,7 @@ impl NamedCallback {
 
     /// Returns the function pointer type.
     #[must_use]
-    pub const fn fnpointer(&self) -> &FnPointerType {
+    pub const fn fnpointer(&self) -> &FnPointer {
         &self.fnpointer
     }
 }
@@ -164,14 +164,14 @@ impl NamedCallback {
 /// Helper naming a (hidden) async callback trampoline.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct AsyncCallback {
-    fnpointer: FnPointerType,
+    fnpointer: FnPointer,
     meta: Meta,
 }
 
 impl AsyncCallback {
     /// Creates a new async callback.
     #[must_use]
-    pub fn new(callback: FnPointerType) -> Self {
+    pub fn new(callback: FnPointer) -> Self {
         Self::with_meta(callback, Meta::new())
     }
 
@@ -181,14 +181,14 @@ impl AsyncCallback {
     ///
     /// The provided pointer must have a name.
     #[must_use]
-    pub fn with_meta(callback: FnPointerType, meta: Meta) -> Self {
+    pub fn with_meta(callback: FnPointer, meta: Meta) -> Self {
         assert!(callback.name().is_some(), "The pointer provided to a named callback must have a name.");
         Self { fnpointer: callback, meta }
     }
 
     /// Gets the type's meta.
     #[must_use]
-    pub fn target(&self) -> &CType {
+    pub fn target(&self) -> &Type {
         self.fnpointer
             .signature()
             .params()
@@ -207,7 +207,7 @@ impl AsyncCallback {
 
     /// Returns the function pointer type.
     #[must_use]
-    pub const fn fnpointer(&self) -> &FnPointerType {
+    pub const fn fnpointer(&self) -> &FnPointer {
         &self.fnpointer
     }
 }
@@ -300,8 +300,8 @@ macro_rules! callback {
         }
 
         unsafe impl $crate::lang::TypeInfo for $name {
-            fn type_info() -> $crate::lang::CType {
-                use $crate::lang::{TypeInfo, CType, Meta, Documentation, PrimitiveType, Parameter, FunctionSignature, FnPointerType};
+            fn type_info() -> $crate::lang::Type {
+                use $crate::lang::{TypeInfo, Type, Meta, Documentation, Primitive, Parameter, FunctionSignature, FnPointer};
 
                 let rval = < $rval as TypeInfo >::type_info();
 
@@ -309,7 +309,7 @@ macro_rules! callback {
                 $(
                     Parameter::new(stringify!($param).to_string(), < $ty as TypeInfo >::type_info()),
                 )*
-                    Parameter::new("callback_data".to_string(), CType::ReadPointer(Box::new(CType::Primitive(PrimitiveType::Void)))),
+                    Parameter::new("callback_data".to_string(), Type::ReadPointer(Box::new(Type::Primitive(Primitive::Void)))),
                 ];
 
                 let mut namespace = ::std::string::String::new();
@@ -319,10 +319,10 @@ macro_rules! callback {
 
                 let meta = Meta::with_namespace_documentation(namespace, Documentation::new());
                 let sig = FunctionSignature::new(params, rval);
-                let fn_pointer = FnPointerType::new_named(sig, stringify!($name).to_string());
+                let fn_pointer = FnPointer::new_named(sig, stringify!($name).to_string());
                 let named_callback = $crate::pattern::callback::NamedCallback::with_meta(fn_pointer, meta);
 
-                CType::Pattern($crate::pattern::TypePattern::NamedCallback(named_callback))
+                Type::Pattern($crate::pattern::TypePattern::NamedCallback(named_callback))
             }
         }
     };

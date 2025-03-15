@@ -208,14 +208,14 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
 
     let rval_builder = if attributes.opaque {
         quote! {
-            let mut rval = ::interoptopus::lang::OpaqueType::new(name, meta);
-            ::interoptopus::lang::CType::Opaque(rval)
+            let mut rval = ::interoptopus::lang::Opaque::new(name, meta);
+            ::interoptopus::lang::Type::Opaque(rval)
         }
     } else {
         quote! {
             let repr = ::interoptopus::lang::Representation::new(#layout, #align);
-            let rval = ::interoptopus::lang::CompositeType::with_meta_repr(name, fields, meta, repr);
-            ::interoptopus::lang::CType::Composite(rval)
+            let rval = ::interoptopus::lang::Composite::with_meta_repr(name, fields, meta, repr);
+            ::interoptopus::lang::Type::Composite(rval)
         }
     };
 
@@ -232,7 +232,7 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
 
                 unsafe impl #param_param ::interoptopus::lang::TypeInfo for #struct_ident #param_struct #param_where {
 
-                    fn type_info() -> ::interoptopus::lang::CType {
+                    fn type_info() -> ::interoptopus::lang::Type {
                         let documentation = ::interoptopus::lang::Documentation::from_line(#doc_line);
                         let mut meta = ::interoptopus::lang::Meta::with_namespace_documentation(#namespace.to_string(), documentation);
                         let mut fields: ::std::vec::Vec<interoptopus::lang::Field> = ::std::vec::Vec::new();
@@ -255,7 +255,7 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
 
                 unsafe impl #param_param ::interoptopus::lang::TypeInfo for #struct_ident #param_struct #param_where {
 
-                    fn type_info() -> ::interoptopus::lang::CType {
+                    fn type_info() -> ::interoptopus::lang::Type {
                         < #first_field_type > :: type_info()
                     }
                 }

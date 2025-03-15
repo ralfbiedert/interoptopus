@@ -2,12 +2,12 @@ use crate::lang::function::FunctionSignature;
 
 /// Represents `extern "C" fn()` types in Rust and `(*f)().` in C.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct FnPointerType {
+pub struct FnPointer {
     name: Option<String>,
     signature: Box<FunctionSignature>,
 }
 
-impl FnPointerType {
+impl FnPointer {
     #[must_use]
     pub fn new(signature: FunctionSignature) -> Self {
         Self { signature: Box::new(signature), name: None }

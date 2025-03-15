@@ -1,7 +1,7 @@
 use crate::Interop;
 use crate::converter::{get_slice_type_argument, is_owned_slice};
 use interoptopus::backend::IndentWriter;
-use interoptopus::lang::CType;
+use interoptopus::lang::Type;
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::slice::SliceType;
 use interoptopus::{Error, indented};
@@ -151,7 +151,7 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
 
     let name = slice.rust_name();
     let user_type = match slice.target_type() {
-        CType::Pattern(TypePattern::Utf8String(_)) => "string".to_string(),
+        Type::Pattern(TypePattern::Utf8String(_)) => "string".to_string(),
         _ => get_slice_type_argument(slice),
     };
     let marshaller_type = get_slice_type_argument(slice);

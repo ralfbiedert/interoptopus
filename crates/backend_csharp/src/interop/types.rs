@@ -14,7 +14,7 @@ use crate::interop::types::enums::write_type_definition_enum;
 use crate::interop::types::fnptrs::write_type_definition_fn_pointer;
 use interoptopus::Error;
 use interoptopus::backend::{IndentWriter, WriteFor};
-use interoptopus::lang::CType;
+use interoptopus::lang::Type;
 use interoptopus::pattern::TypePattern;
 
 pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
@@ -25,30 +25,30 @@ pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), E
     Ok(())
 }
 
-pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &CType) -> Result<(), Error> {
+pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type) -> Result<(), Error> {
     if !i.should_emit_by_type(the_type) {
         return Ok(());
     }
 
     match the_type {
-        CType::Primitive(_) => {}
-        CType::Array(_) => {}
-        CType::Enum(e) => {
+        Type::Primitive(_) => {}
+        Type::Array(_) => {}
+        Type::Enum(e) => {
             write_type_definition_enum(i, w, e, WriteFor::Code)?;
             w.newline()?;
         }
-        CType::Opaque(_) => {}
-        CType::Composite(c) => {
+        Type::Opaque(_) => {}
+        Type::Composite(c) => {
             write_type_definition_composite(i, w, c)?;
             w.newline()?;
         }
-        CType::FnPointer(f) => {
+        Type::FnPointer(f) => {
             write_type_definition_fn_pointer(i, w, f)?;
             w.newline()?;
         }
-        CType::ReadPointer(_) => {}
-        CType::ReadWritePointer(_) => {}
-        CType::Pattern(x) => match x {
+        Type::ReadPointer(_) => {}
+        Type::ReadWritePointer(_) => {}
+        Type::Pattern(x) => match x {
             TypePattern::CStrPointer => {}
             TypePattern::FFIErrorEnum(e) => {
                 write_type_definition_enum(i, w, e.the_enum(), WriteFor::Code)?;

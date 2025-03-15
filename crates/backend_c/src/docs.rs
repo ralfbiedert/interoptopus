@@ -5,7 +5,7 @@ use interoptopus::backend::IndentWriter;
 use interoptopus::backend::sort_types_by_dependencies;
 use interoptopus::indented;
 use interoptopus::inventory::Bindings;
-use interoptopus::lang::{CType, Function};
+use interoptopus::lang::{Function, Type};
 
 /// Produces C API documentation.
 pub struct Markdown<'a> {
@@ -30,17 +30,17 @@ impl<'a> Markdown<'a> {
         Ok(())
     }
 
-    fn write_type_definition(&self, w: &mut IndentWriter, the_type: &CType, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
+    fn write_type_definition(&self, w: &mut IndentWriter, the_type: &Type, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
         let meta = match the_type {
-            CType::Primitive(_) => return Ok(()),
-            CType::Array(_) => return Ok(()),
-            CType::Enum(e) => e.meta(),
-            CType::Opaque(o) => o.meta(),
-            CType::Composite(c) => c.meta(),
-            CType::FnPointer(_) => return Ok(()),
-            CType::ReadPointer(_) => return Ok(()),
-            CType::ReadWritePointer(_) => return Ok(()),
-            CType::Pattern(_) => return Ok(()),
+            Type::Primitive(_) => return Ok(()),
+            Type::Array(_) => return Ok(()),
+            Type::Enum(e) => e.meta(),
+            Type::Opaque(o) => o.meta(),
+            Type::Composite(c) => c.meta(),
+            Type::FnPointer(_) => return Ok(()),
+            Type::ReadPointer(_) => return Ok(()),
+            Type::ReadWritePointer(_) => return Ok(()),
+            Type::Pattern(_) => return Ok(()),
         };
 
         w.newline()?;

@@ -4,7 +4,7 @@ use crate::interop::patterns::write_library_call;
 use interoptopus::backend::safe_name;
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::inventory::non_service_functions;
-use interoptopus::lang::{CType, Function};
+use interoptopus::lang::{Function, Type};
 use interoptopus::pattern::TypePattern;
 use interoptopus::{Error, indented};
 
@@ -41,12 +41,12 @@ pub fn write_function(i: &Interop, w: &mut IndentWriter, function: &Function, wr
 pub fn write_param_helpers(_i: &Interop, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
     for arg in function.signature().params() {
         match arg.the_type() {
-            CType::FnPointer(x) => {
+            Type::FnPointer(x) => {
                 indented!(w, [()], r#"if not hasattr({}, "__ctypes_from_outparam__"):"#, arg.name())?;
                 indented!(w, [()()], r"{} = callbacks.{}({})", arg.name(), safe_name(&x.internal_name()), arg.name())?;
                 w.newline()?;
             }
-            CType::Pattern(pattern) => match pattern {
+            Type::Pattern(pattern) => match pattern {
                 TypePattern::NamedCallback(x) => {
                     let x = x.fnpointer();
                     indented!(w, [()], r#"if not hasattr({}, "__ctypes_from_outparam__"):"#, arg.name())?;

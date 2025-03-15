@@ -1,6 +1,6 @@
 //! Strings over FFI, equivalent to [`std::string::String`].
 
-use crate::lang::{CType, CompositeType, Documentation, Field, Meta, PrimitiveType, Representation};
+use crate::lang::{Composite, Documentation, Field, Meta, Primitive, Representation, Type};
 use crate::lang::{Layout, TypeInfo};
 use crate::pattern::TypePattern;
 use std::mem::forget;
@@ -78,11 +78,11 @@ impl Drop for String {
 
 unsafe impl TypeInfo for String {
     #[rustfmt::skip]
-    fn type_info() -> CType {
+    fn type_info() -> Type {
         let fields = vec![
-            Field::new("ptr".to_string(), CType::ReadWritePointer(Box::new(CType::Primitive(PrimitiveType::U8)))),
-            Field::new("len".to_string(), CType::Primitive(PrimitiveType::U64)),
-            Field::new("capacity".to_string(), CType::Primitive(PrimitiveType::U64)),
+            Field::new("ptr".to_string(), Type::ReadWritePointer(Box::new(Type::Primitive(Primitive::U8)))),
+            Field::new("len".to_string(), Type::Primitive(Primitive::U64)),
+            Field::new("capacity".to_string(), Type::Primitive(Primitive::U64)),
         ];
 
         let doc = Documentation::from_lines(vec![
@@ -95,7 +95,7 @@ unsafe impl TypeInfo for String {
         ]);
         let repr = Representation::new(Layout::C, None);
         let meta = Meta::with_documentation(doc);
-        let composite = CompositeType::with_meta_repr("Utf8String".to_string(), fields, meta, repr);
-        CType::Pattern(TypePattern::Utf8String(composite))
+        let composite = Composite::with_meta_repr("Utf8String".to_string(), fields, meta, repr);
+        Type::Pattern(TypePattern::Utf8String(composite))
     }
 }

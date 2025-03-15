@@ -16,7 +16,7 @@ pub enum PrimitiveValue {
 
 /// A primitive type that natively exists in C and is FFI safe.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub enum PrimitiveType {
+pub enum Primitive {
     Void,
     Bool,
     U8,
@@ -31,7 +31,7 @@ pub enum PrimitiveType {
     F64,
 }
 
-impl PrimitiveType {
+impl Primitive {
     #[must_use]
     pub const fn rust_name(&self) -> &str {
         match self {

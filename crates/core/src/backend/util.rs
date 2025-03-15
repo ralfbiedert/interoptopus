@@ -1,6 +1,6 @@
 //! Helpers for backend authors.
 
-use crate::lang::{CType, Function};
+use crate::lang::{Function, Type};
 use crate::pattern::TypePattern;
 use std::collections::{HashMap, HashSet};
 use std::iter::FromIterator;
@@ -35,7 +35,7 @@ pub fn safe_name(name: &str) -> String {
 // TODO: Create a few unit tests for this.
 /// Sorts types so the latter entries will find their dependents earlier in this list.
 #[must_use]
-pub fn sort_types_by_dependencies(mut types: Vec<CType>) -> Vec<CType> {
+pub fn sort_types_by_dependencies(mut types: Vec<Type>) -> Vec<Type> {
     let mut rval = Vec::new();
 
     // Outer loop keeps iterating while there are still more types to sort.
@@ -82,7 +82,7 @@ pub fn sort_types_by_dependencies(mut types: Vec<CType>) -> Vec<CType> {
 ///
 /// ```rust
 /// # use interoptopus::backend::longest_common_prefix;
-/// # use interoptopus::lang::Function;
+/// # use interoptopus::lang::{Function, FunctionSignature, Meta};
 ///
 /// let functions = [
 ///     Function::new("my_lib_f".to_string(), FunctionSignature::default(), Meta::default()),
@@ -113,7 +113,7 @@ pub fn longest_common_prefix(functions: &[Function]) -> String {
 }
 
 /// Given some functions and types, return all used and nested types, without duplicates.
-pub(crate) fn ctypes_from_functions_types(functions: &[Function], extra_types: &[CType]) -> Vec<CType> {
+pub(crate) fn ctypes_from_functions_types(functions: &[Function], extra_types: &[Type]) -> Vec<Type> {
     let mut types = HashSet::new();
 
     for function in functions {
@@ -133,32 +133,32 @@ pub(crate) fn ctypes_from_functions_types(functions: &[Function], extra_types: &
 
 /// Recursive helper for [`ctypes_from_functions_types`].
 #[allow(clippy::implicit_hasher)]
-pub fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CType>) {
+pub fn ctypes_from_type_recursive(start: &Type, types: &mut HashSet<Type>) {
     types.insert(start.clone());
 
     match start {
-        CType::Composite(inner) => {
+        Type::Composite(inner) => {
             for field in inner.fields() {
                 ctypes_from_type_recursive(field.the_type(), types);
             }
         }
-        CType::Array(inner) => ctypes_from_type_recursive(inner.array_type(), types),
-        CType::FnPointer(inner) => {
+        Type::Array(inner) => ctypes_from_type_recursive(inner.array_type(), types),
+        Type::FnPointer(inner) => {
             ctypes_from_type_recursive(inner.signature().rval(), types);
             for param in inner.signature().params() {
                 ctypes_from_type_recursive(param.the_type(), types);
             }
         }
-        CType::ReadPointer(inner) => ctypes_from_type_recursive(inner, types),
-        CType::ReadWritePointer(inner) => ctypes_from_type_recursive(inner, types),
-        CType::Primitive(_) => {}
-        CType::Enum(_) => {}
-        CType::Opaque(_) => {}
+        Type::ReadPointer(inner) => ctypes_from_type_recursive(inner, types),
+        Type::ReadWritePointer(inner) => ctypes_from_type_recursive(inner, types),
+        Type::Primitive(_) => {}
+        Type::Enum(_) => {}
+        Type::Opaque(_) => {}
         // Note, patterns must _NEVER_ add themselves as fallbacks. Instead, each code generator should
         // decide on a case-by-case bases whether it wants to use the type's fallback, or generate an
         // entirely new pattern. The exception to this rule are patterns that can embed arbitrary
         // types; which we need to recursively inspect.
-        CType::Pattern(x) => match x {
+        Type::Pattern(x) => match x {
             TypePattern::AsyncCallback(x) => {
                 for field in x.fnpointer().signature().params() {
                     ctypes_from_type_recursive(field.the_type(), types);
@@ -194,25 +194,25 @@ pub fn ctypes_from_type_recursive(start: &CType, types: &mut HashSet<CType>) {
 }
 
 /// Extracts annotated namespace strings.
-pub(crate) fn extract_namespaces_from_types(types: &[CType], into: &mut HashSet<String>) {
+pub(crate) fn extract_namespaces_from_types(types: &[Type], into: &mut HashSet<String>) {
     for t in types {
         match t {
-            CType::Primitive(_) => {}
-            CType::Array(_) => {}
+            Type::Primitive(_) => {}
+            Type::Array(_) => {}
 
-            CType::Enum(x) => {
+            Type::Enum(x) => {
                 into.insert(x.meta().namespace().to_string());
             }
-            CType::Opaque(x) => {
+            Type::Opaque(x) => {
                 into.insert(x.meta().namespace().to_string());
             }
-            CType::Composite(x) => {
+            Type::Composite(x) => {
                 into.insert(x.meta().namespace().to_string());
             }
-            CType::FnPointer(_) => {}
-            CType::ReadPointer(_) => {}
-            CType::ReadWritePointer(_) => {}
-            CType::Pattern(x) => match x {
+            Type::FnPointer(_) => {}
+            Type::ReadPointer(_) => {}
+            Type::ReadWritePointer(_) => {}
+            Type::Pattern(x) => match x {
                 TypePattern::AsyncCallback(x) => {
                     into.insert(x.meta().namespace().to_string());
                 }
@@ -243,13 +243,13 @@ pub(crate) fn extract_namespaces_from_types(types: &[CType], into: &mut HashSet<
 }
 
 #[must_use]
-pub fn holds_opaque_without_ref(typ: &CType) -> bool {
+pub fn holds_opaque_without_ref(typ: &Type) -> bool {
     match typ {
-        CType::Primitive(_) => false,
-        CType::Array(x) => holds_opaque_without_ref(x.array_type()),
-        CType::Enum(_) => false,
-        CType::Opaque(_) => true,
-        CType::Composite(x) => {
+        Type::Primitive(_) => false,
+        Type::Array(x) => holds_opaque_without_ref(x.array_type()),
+        Type::Enum(_) => false,
+        Type::Opaque(_) => true,
+        Type::Composite(x) => {
             for field in x.fields() {
                 if holds_opaque_without_ref(field.the_type()) {
                     return true;
@@ -257,10 +257,10 @@ pub fn holds_opaque_without_ref(typ: &CType) -> bool {
             }
             false
         }
-        CType::FnPointer(_) => false,
-        CType::ReadPointer(_) => false,
-        CType::ReadWritePointer(_) => false,
-        CType::Pattern(x) => match x {
+        Type::FnPointer(_) => false,
+        Type::ReadPointer(_) => false,
+        Type::ReadWritePointer(_) => false,
+        Type::Pattern(x) => match x {
             TypePattern::CStrPointer => false,
             TypePattern::Utf8String(_) => false,
             TypePattern::APIVersion => false,
@@ -352,17 +352,17 @@ impl IdPrettifier {
 ///
 ///
 #[must_use]
-pub fn is_global_type(t: &CType) -> bool {
+pub fn is_global_type(t: &Type) -> bool {
     match t {
-        CType::Primitive(_) => true,
-        CType::Array(x) => is_global_type(x.array_type()),
-        CType::Enum(_) => false,
-        CType::Opaque(_) => false,
-        CType::Composite(_) => false,
-        CType::FnPointer(_) => false,
-        CType::ReadPointer(x) => is_global_type(x),
-        CType::ReadWritePointer(x) => is_global_type(x),
-        CType::Pattern(x) => match x {
+        Type::Primitive(_) => true,
+        Type::Array(x) => is_global_type(x.array_type()),
+        Type::Enum(_) => false,
+        Type::Opaque(_) => false,
+        Type::Composite(_) => false,
+        Type::FnPointer(_) => false,
+        Type::ReadPointer(x) => is_global_type(x),
+        Type::ReadWritePointer(x) => is_global_type(x),
+        Type::Pattern(x) => match x {
             TypePattern::CStrPointer => true,
             TypePattern::APIVersion => false,
             TypePattern::FFIErrorEnum(_) => false,

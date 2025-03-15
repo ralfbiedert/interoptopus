@@ -6,7 +6,7 @@ use crate::interop::types::composite::{
     write_type_definition_composite_marshaller_field_to_unmanaged, write_type_definition_composite_unmanaged_body_field,
 };
 use interoptopus::backend::{IndentWriter, WriteFor};
-use interoptopus::lang::{CType, Field};
+use interoptopus::lang::{Field, Type};
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::result::{FFIErrorEnum, FFIResultType};
 use interoptopus::{Error, indented};
@@ -22,7 +22,7 @@ pub fn write_pattern_result(i: &Interop, w: &mut IndentWriter, result: &FFIResul
     let success_variant = result.e().success_variant().name();
 
     let type_string = match t {
-        CType::Pattern(TypePattern::Utf8String(_)) => "string".to_string(),
+        Type::Pattern(TypePattern::Utf8String(_)) => "string".to_string(),
         _ => to_typespecifier_in_sync_fn_rval(t),
     };
 
@@ -119,7 +119,7 @@ pub fn write_pattern_result(i: &Interop, w: &mut IndentWriter, result: &FFIResul
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"_managed = new {}();", name)?;
     let field_t = Field::new("t".to_string(), t.clone());
-    let field_e = Field::new("err".to_string(), CType::Pattern(TypePattern::FFIErrorEnum(e.clone())));
+    let field_e = Field::new("err".to_string(), Type::Pattern(TypePattern::FFIErrorEnum(e.clone())));
     w.newline()?;
     w.indent();
     w.indent();

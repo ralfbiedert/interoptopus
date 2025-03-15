@@ -53,7 +53,7 @@ macro_rules! api_entry {
 
 
         unsafe impl interoptopus::lang::TypeInfo for $struct {
-            fn type_info() -> interoptopus::lang::CType {
+            fn type_info() -> interoptopus::lang::Type {
                 let mut fields = Vec::new();
 
                 $(
@@ -61,14 +61,14 @@ macro_rules! api_entry {
                         use interoptopus::lang::FunctionInfo;
                         use $function as x;
                         let function: interoptopus::lang::Function = x::function_info();
-                        let t = interoptopus::lang::CType::FnPointer(interoptopus::lang::FnPointerType::new(function.signature().clone()));
+                        let t = interoptopus::lang::Type::FnPointer(interoptopus::lang::FnPointer::new(function.signature().clone()));
                         let field = interoptopus::lang::Field::new(function.name().to_string(), t);
                         fields.push(field);
                     }
                 )*
 
-                let composite = interoptopus::lang::CompositeType::new(stringify!($struct).to_string(), fields);
-                interoptopus::lang::CType::Composite(composite)
+                let composite = interoptopus::lang::Composite::new(stringify!($struct).to_string(), fields);
+                interoptopus::lang::Type::Composite(composite)
             }
         }
     };

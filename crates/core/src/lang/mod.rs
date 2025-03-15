@@ -12,15 +12,15 @@ use crate::pattern::result::FFIResultType;
 use std::collections::HashSet;
 
 use crate::pattern::callback::AsyncCallback;
-pub use array::ArrayType;
-pub use composite::{CompositeType, Field, Layout, OpaqueType, Representation};
+pub use array::Array;
+pub use composite::{Composite, Field, Layout, Opaque, Representation};
 pub use constant::{Constant, ConstantValue};
-pub use enums::{EnumType, Variant};
-pub use fnpointer::FnPointerType;
+pub use enums::{Enum, Variant};
+pub use fnpointer::FnPointer;
 pub use function::{Function, FunctionSignature, Parameter, SugaredReturnType};
 pub use info::{ConstantInfo, FunctionInfo, TypeInfo, VariantInfo};
 pub use meta::{Documentation, Meta, Visibility};
-pub use primitive::{PrimitiveType, PrimitiveValue};
+pub use primitive::{Primitive, PrimitiveValue};
 
 mod array;
 mod composite;
@@ -34,43 +34,43 @@ mod primitive;
 
 /// A type that can exist at the FFI boundary.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub enum CType {
-    Primitive(PrimitiveType),
-    Array(ArrayType),
-    Enum(EnumType),
-    Opaque(OpaqueType),
-    Composite(CompositeType),
-    FnPointer(FnPointerType),
-    ReadPointer(Box<CType>),
-    ReadWritePointer(Box<CType>),
+pub enum Type {
+    Primitive(Primitive),
+    Array(Array),
+    Enum(Enum),
+    Opaque(Opaque),
+    Composite(Composite),
+    FnPointer(FnPointer),
+    ReadPointer(Box<Type>),
+    ReadWritePointer(Box<Type>),
     /// Special patterns with primitives existing on C-level but special semantics.
     /// useful to higher level languages.
     Pattern(TypePattern),
 }
 
-impl Default for CType {
+impl Default for Type {
     fn default() -> Self {
-        Self::Primitive(PrimitiveType::Void)
+        Self::Primitive(Primitive::Void)
     }
 }
 
-impl CType {
+impl Type {
     #[must_use]
     pub const fn size_of(&self) -> usize {
         match self {
             Self::Primitive(p) => match p {
-                PrimitiveType::Void => 0,
-                PrimitiveType::Bool => 1,
-                PrimitiveType::U8 => 1,
-                PrimitiveType::U16 => 2,
-                PrimitiveType::U32 => 4,
-                PrimitiveType::U64 => 8,
-                PrimitiveType::I8 => 1,
-                PrimitiveType::I16 => 2,
-                PrimitiveType::I32 => 4,
-                PrimitiveType::I64 => 8,
-                PrimitiveType::F32 => 4,
-                PrimitiveType::F64 => 8,
+                Primitive::Void => 0,
+                Primitive::Bool => 1,
+                Primitive::U8 => 1,
+                Primitive::U16 => 2,
+                Primitive::U32 => 4,
+                Primitive::U64 => 8,
+                Primitive::I8 => 1,
+                Primitive::I16 => 2,
+                Primitive::I32 => 4,
+                Primitive::I64 => 8,
+                Primitive::F32 => 4,
+                Primitive::F64 => 8,
             },
             // TODO
             _ => 999,
@@ -84,7 +84,7 @@ impl CType {
 
     #[must_use]
     pub const fn void() -> Self {
-        Self::Primitive(PrimitiveType::Void)
+        Self::Primitive(Primitive::Void)
     }
 
     /// Produces a name unique for that type with respect to this library.
@@ -140,7 +140,7 @@ impl CType {
 
     /// Convenience method attempting to convert the contained type as a composite.
     #[must_use]
-    pub const fn as_composite_type(&self) -> Option<&CompositeType> {
+    pub const fn as_composite_type(&self) -> Option<&Composite> {
         match self {
             Self::Composite(x) => Some(x),
             _ => None,
@@ -149,7 +149,7 @@ impl CType {
 
     /// Convenience method attempting to convert the contained type as an opaque.
     #[must_use]
-    pub const fn as_opaque_type(&self) -> Option<&OpaqueType> {
+    pub const fn as_opaque_type(&self) -> Option<&Opaque> {
         match self {
             Self::Opaque(x) => Some(x),
             _ => None,
@@ -184,10 +184,10 @@ impl CType {
         }
     }
 
-    /// Checks if this is a [`PrimitiveType::Void`].
+    /// Checks if this is a [`Primitive::Void`].
     #[must_use]
     pub const fn is_void(&self) -> bool {
-        matches!(self, Self::Primitive(PrimitiveType::Void))
+        matches!(self, Self::Primitive(Primitive::Void))
     }
 
     /// Returns the namespace of the type.

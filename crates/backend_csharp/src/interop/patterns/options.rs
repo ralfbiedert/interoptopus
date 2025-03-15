@@ -1,10 +1,10 @@
 use crate::Interop;
 use crate::converter::to_typespecifier_in_sync_fn_rval;
 use interoptopus::backend::IndentWriter;
-use interoptopus::lang::CompositeType;
+use interoptopus::lang::Composite;
 use interoptopus::{Error, indented};
 
-pub fn write_pattern_option(i: &Interop, w: &mut IndentWriter, slice: &CompositeType) -> Result<(), Error> {
+pub fn write_pattern_option(i: &Interop, w: &mut IndentWriter, slice: &Composite) -> Result<(), Error> {
     i.debug(w, "write_pattern_option")?;
 
     let name = slice.rust_name();

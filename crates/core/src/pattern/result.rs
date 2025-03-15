@@ -30,7 +30,7 @@
 
 use crate::backend::capitalize_first_letter;
 use crate::lang::TypeInfo;
-use crate::lang::{CType, CompositeType, Documentation, EnumType, Field, Layout, Meta, PrimitiveType, Representation, Variant, Visibility};
+use crate::lang::{Composite, Documentation, Enum, Field, Layout, Meta, Primitive, Representation, Type, Variant, Visibility};
 use crate::pattern::TypePattern;
 use std::any::Any;
 use std::fmt::Debug;
@@ -98,19 +98,19 @@ pub trait FFIError: PartialEq + Sized {
 /// Internal helper derived for enums that are an [`FFIError`].
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct FFIErrorEnum {
-    the_enum: EnumType,
+    the_enum: Enum,
     success_variant: Variant,
     panic_variant: Variant,
 }
 
 impl FFIErrorEnum {
     #[must_use]
-    pub const fn new(the_enum: EnumType, success_variant: Variant, panic_variant: Variant) -> Self {
+    pub const fn new(the_enum: Enum, success_variant: Variant, panic_variant: Variant) -> Self {
         Self { the_enum, success_variant, panic_variant }
     }
 
     #[must_use]
-    pub const fn the_enum(&self) -> &EnumType {
+    pub const fn the_enum(&self) -> &Enum {
         &self.the_enum
     }
 
@@ -127,30 +127,30 @@ impl FFIErrorEnum {
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct FFIResultType {
-    composite_type: CompositeType,
+    composite_type: Composite,
 }
 
 impl FFIResultType {
     #[must_use]
-    pub const fn new(composite_type: CompositeType) -> Self {
+    pub const fn new(composite_type: Composite) -> Self {
         Self { composite_type }
     }
 
     #[must_use]
-    pub fn t(&self) -> &CType {
+    pub fn t(&self) -> &Type {
         self.composite_type.fields()[0].the_type()
     }
 
     #[must_use]
     pub fn e(&self) -> &FFIErrorEnum {
         match self.composite_type.fields()[1].the_type() {
-            CType::Pattern(TypePattern::FFIErrorEnum(x)) => x,
+            Type::Pattern(TypePattern::FFIErrorEnum(x)) => x,
             _ => panic!("Expected FFIErrorEnum."),
         }
     }
 
     #[must_use]
-    pub const fn composite(&self) -> &CompositeType {
+    pub const fn composite(&self) -> &Composite {
         &self.composite_type
     }
 
@@ -281,8 +281,8 @@ where
     T: TypeInfo,
     E: TypeInfo + FFIError,
 {
-    fn type_info() -> CType {
-        let t_is_void = matches!(T::type_info(), CType::Primitive(PrimitiveType::Void));
+    fn type_info() -> Type {
+        let t_is_void = matches!(T::type_info(), Type::Primitive(Primitive::Void));
 
         if t_is_void {
             E::type_info()
@@ -300,9 +300,9 @@ where
             let meta = Meta::with_namespace_documentation(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
             let t_name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
             let e_name = capitalize_first_letter(E::type_info().name_within_lib().as_str());
-            let composite = CompositeType::with_meta_repr(format!("Result{t_name}{e_name}"), fields, meta, repr);
+            let composite = Composite::with_meta_repr(format!("Result{t_name}{e_name}"), fields, meta, repr);
             let result = FFIResultType::new(composite);
-            CType::Pattern(TypePattern::Result(result))
+            Type::Pattern(TypePattern::Result(result))
         }
     }
 }

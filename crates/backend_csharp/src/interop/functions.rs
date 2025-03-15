@@ -5,7 +5,7 @@ use crate::converter::{
 use crate::interop::docs::write_documentation;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::{IndentWriter, WriteFor};
-use interoptopus::lang::{CType, Function, PrimitiveType, SugaredReturnType};
+use interoptopus::lang::{Function, Primitive, SugaredReturnType, Type};
 use interoptopus::pattern::TypePattern;
 use interoptopus::{Error, indented};
 use std::iter::zip;
@@ -37,7 +37,7 @@ pub fn write_function(i: &Interop, w: &mut IndentWriter, function: &Function, wr
 pub fn write_function_annotation(_i: &Interop, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
     indented!(w, r#"[LibraryImport(NativeLib, EntryPoint = "{}")]"#, function.name())?;
 
-    if *function.signature().rval() == CType::Primitive(PrimitiveType::Bool) {
+    if *function.signature().rval() == Type::Primitive(Primitive::Bool) {
         indented!(w, r"[return: MarshalAs(UnmanagedType.U1)]")?;
     }
 
@@ -66,8 +66,8 @@ pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &
         let the_type = function_parameter_to_csharp_typename(p);
         let name = p.name();
 
-        if native && matches!(p.the_type(), CType::FnPointer(_) | CType::Pattern(TypePattern::NamedCallback(_))) {
-            let suffix = if matches!(p.the_type(), CType::FnPointer(_)) { "_native" } else { "" };
+        if native && matches!(p.the_type(), Type::FnPointer(_) | Type::Pattern(TypePattern::NamedCallback(_))) {
+            let suffix = if matches!(p.the_type(), Type::FnPointer(_)) { "_native" } else { "" };
             params.push(format!("{the_type}{suffix} {name}"));
         } else {
             params.push(format!("{the_type} {name}"));
@@ -127,7 +127,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         };
 
         match p.the_type() {
-            CType::Pattern(TypePattern::Slice(x) | TypePattern::SliceMut(x)) => {
+            Type::Pattern(TypePattern::Slice(x) | TypePattern::SliceMut(x)) => {
                 if is_owned_slice(x) {
                     to_wrap_name.push(name);
                     to_wrap_type.push(to_typespecifier_in_param(p.the_type()));
@@ -138,18 +138,18 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
                     to_invoke.push(format!("{name}_slice"));
                 }
             }
-            CType::Pattern(TypePattern::NamedCallback(_)) => {
+            Type::Pattern(TypePattern::NamedCallback(_)) => {
                 to_wrap_name.push(name);
                 to_wrap_type.push(to_typespecifier_in_param(p.the_type()));
                 to_invoke.push(format!("{name}_wrapped"));
             }
-            CType::Pattern(TypePattern::Utf8String(_)) => {
+            Type::Pattern(TypePattern::Utf8String(_)) => {
                 to_wrap_name.push(name);
                 to_wrap_type.push(to_typespecifier_in_param(p.the_type()));
                 to_invoke.push(format!("{name}_wrapped"));
             }
-            CType::ReadPointer(x) | CType::ReadWritePointer(x) => match &**x {
-                CType::Pattern(x) => match x {
+            Type::ReadPointer(x) | Type::ReadWritePointer(x) => match &**x {
+                Type::Pattern(x) => match x {
                     TypePattern::Slice(_) => {
                         to_pin_name.push(name);
                         to_pin_slice_type.push(the_type.replace("ref ", ""));
@@ -191,13 +191,13 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
 
     if let SugaredReturnType::Async(ref x) = async_rval {
         let task_type = match x {
-            CType::Pattern(TypePattern::Result(x)) if matches!(x.t(), CType::Pattern(TypePattern::Utf8String(_))) => "string".to_string(),
-            CType::Pattern(TypePattern::Result(x)) => to_typespecifier_in_sync_fn_rval(x.t()),
+            Type::Pattern(TypePattern::Result(x)) if matches!(x.t(), Type::Pattern(TypePattern::Utf8String(_))) => "string".to_string(),
+            Type::Pattern(TypePattern::Result(x)) => to_typespecifier_in_sync_fn_rval(x.t()),
             x => to_typespecifier_in_sync_fn_rval(x),
         };
 
         let task_completion_source = match x {
-            CType::Pattern(TypePattern::FFIErrorEnum(_)) => "TaskCompletionSource".to_string(),
+            Type::Pattern(TypePattern::FFIErrorEnum(_)) => "TaskCompletionSource".to_string(),
             _ => format!("TaskCompletionSource<{task_type}>"),
         };
 
@@ -208,11 +208,11 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         indented!(w, [()()], r"var marshaller = new {}.Marshaller(unmanaged);", to_typespecifier_in_param(x))?;
         indented!(w, [()()], r"var managed = marshaller.ToManaged();")?;
         match x {
-            CType::Pattern(TypePattern::FFIErrorEnum(x)) => {
+            Type::Pattern(TypePattern::FFIErrorEnum(x)) => {
                 indented!(w, [()()], r"if (managed.IsOk()) {{ cs.SetResult(); }}")?;
                 indented!(w, [()()], r"else {{ cs.SetException(new InteropException<{}>(managed.Err())); }}", x.the_enum().rust_name())?;
             }
-            CType::Pattern(TypePattern::Result(x)) => {
+            Type::Pattern(TypePattern::Result(x)) => {
                 indented!(w, [()()], r"if (managed.IsOk()) {{ cs.SetResult(managed.Ok()); }}")?;
                 indented!(w, [()()], r"else {{ cs.SetException(new InteropException<{}>(managed.Err())); }}", x.e().the_enum().rust_name())?;
             }
@@ -251,11 +251,11 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     let call = format!(r"{}({})", fn_name, to_invoke.join(", "));
 
     match function.signature().rval() {
-        CType::Pattern(TypePattern::CStrPointer) => {
+        Type::Pattern(TypePattern::CStrPointer) => {
             indented!(w, [()()], r"var s = {};", call)?;
             indented!(w, [()()], r"return Marshal.PtrToStringAnsi(s);")?;
         }
-        CType::Primitive(PrimitiveType::Void) => {
+        Type::Primitive(Primitive::Void) => {
             indented!(w, [()()], r"{};", call)?;
         }
         _ if matches!(async_rval, SugaredReturnType::Async(_)) => {

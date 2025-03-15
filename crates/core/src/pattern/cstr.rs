@@ -26,7 +26,7 @@
 //! ```
 //!
 use crate::Error;
-use crate::lang::CType;
+use crate::lang::Type;
 use crate::lang::TypeInfo;
 use crate::pattern::TypePattern;
 use std::ffi::CStr;
@@ -122,8 +122,8 @@ impl<'a> CStrPointer<'a> {
 }
 
 unsafe impl TypeInfo for CStrPointer<'_> {
-    fn type_info() -> CType {
-        CType::Pattern(TypePattern::CStrPointer)
+    fn type_info() -> Type {
+        Type::Pattern(TypePattern::CStrPointer)
     }
 }
 

@@ -79,10 +79,10 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
             let panic_variant = Self::PANIC.variant_info();
             let the_success_enum = ::interoptopus::pattern::result::FFIErrorEnum::new(rval, success_variant, panic_variant);
             let the_pattern = ::interoptopus::pattern::TypePattern::FFIErrorEnum(the_success_enum);
-            ::interoptopus::lang::CType::Pattern(the_pattern)
+            ::interoptopus::lang::Type::Pattern(the_pattern)
         }
     } else {
-        quote! { ::interoptopus::lang::CType::Enum(rval) }
+        quote! { ::interoptopus::lang::Type::Enum(rval) }
     };
 
     let attr_align = align.map_or_else(
@@ -121,7 +121,7 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
         #variant_infos
 
         unsafe impl ::interoptopus::lang::TypeInfo for #name_ident {
-            fn type_info() -> ::interoptopus::lang::CType {
+            fn type_info() -> ::interoptopus::lang::Type {
                 use ::interoptopus::lang::VariantInfo;
 
                 let mut variants = ::std::vec::Vec::new();
@@ -133,7 +133,7 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
                 })*
 
                 let repr = ::interoptopus::lang::Representation::new(#layout, #align);
-                let rval = ::interoptopus::lang::EnumType::new(#ffi_name.to_string(), variants, meta, repr);
+                let rval = ::interoptopus::lang::Enum::new(#ffi_name.to_string(), variants, meta, repr);
 
                 #ctype_info_return
             }

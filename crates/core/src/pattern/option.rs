@@ -28,7 +28,7 @@
 //!
 
 use crate::backend::capitalize_first_letter;
-use crate::lang::{CType, CompositeType, Documentation, Field, Meta, PrimitiveType, Representation, Visibility};
+use crate::lang::{Composite, Documentation, Field, Meta, Primitive, Representation, Type, Visibility};
 use crate::lang::{Layout, TypeInfo};
 use crate::pattern::TypePattern;
 use crate::pattern::primitive::Bool;
@@ -136,21 +136,21 @@ unsafe impl<T> TypeInfo for Option<T>
 where
     T: TypeInfo,
 {
-    fn type_info() -> CType {
+    fn type_info() -> Type {
         let doc_t = Documentation::from_line("Element that is maybe valid.");
         let doc_is_some = Documentation::from_line("Byte where `1` means element `t` is valid.");
 
         let fields = vec![
             Field::with_documentation("t".to_string(), T::type_info(), Visibility::Private, doc_t),
-            Field::with_documentation("is_some".to_string(), CType::Primitive(PrimitiveType::U8), Visibility::Private, doc_is_some),
+            Field::with_documentation("is_some".to_string(), Type::Primitive(Primitive::U8), Visibility::Private, doc_is_some),
         ];
 
         let doc = Documentation::from_line("Option type containing boolean flag and maybe valid data.");
         let repr = Representation::new(Layout::C, None);
         let meta = Meta::with_namespace_documentation(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
         let name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
-        let composite = CompositeType::with_meta_repr(format!("Option{name}"), fields, meta, repr);
-        CType::Pattern(TypePattern::Option(composite))
+        let composite = Composite::with_meta_repr(format!("Option{name}"), fields, meta, repr);
+        Type::Pattern(TypePattern::Option(composite))
     }
 }
 

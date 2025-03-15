@@ -3,14 +3,14 @@ use crate::lang::{Documentation, Meta};
 
 /// A (C-style) `enum` containing numbered variants.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct EnumType {
+pub struct Enum {
     name: String,
     variants: Vec<Variant>,
     repr: Representation,
     meta: Meta,
 }
 
-impl EnumType {
+impl Enum {
     #[must_use]
     pub const fn new(name: String, variants: Vec<Variant>, meta: Meta, repr: Representation) -> Self {
         Self { name, variants, repr, meta }
@@ -42,7 +42,7 @@ impl EnumType {
     }
 }
 
-/// Variant and value of a [`EnumType`].
+/// Variant and value of a [`Enum`].
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Variant {
     name: String,

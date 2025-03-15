@@ -4,7 +4,7 @@ use crate::converter::{
 use crate::interop::docs::write_documentation;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::{IndentWriter, WriteFor};
-use interoptopus::lang::{CType, Function, PrimitiveType, SugaredReturnType};
+use interoptopus::lang::{Function, Primitive, SugaredReturnType, Type};
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::service::ServiceDefinition;
 use interoptopus::{Error, indented};
@@ -90,7 +90,7 @@ pub fn write_pattern_service_method(
         let mut native = to_typespecifier_in_param(p.the_type());
 
         match p.the_type() {
-            CType::Pattern(TypePattern::NamedCallback(callback)) => {
+            Type::Pattern(TypePattern::NamedCallback(callback)) => {
                 let _ = callback.fnpointer().signature().rval();
                 if native.contains("out ") {
                     to_invoke.push(format!("out {name}"));
@@ -106,11 +106,11 @@ pub fn write_pattern_service_method(
             // we have to bend the string type to match the string mapping used there.
             // In the future we should probably support more overload permutations we can
             // remove this special case.
-            CType::Pattern(TypePattern::Utf8String(_)) if async_rval.is_async() => {
+            Type::Pattern(TypePattern::Utf8String(_)) if async_rval.is_async() => {
                 native = "string".to_string();
                 to_invoke.push(name.to_string());
             }
-            CType::Pattern(TypePattern::Utf8String(_)) if async_rval.is_sync() => {
+            Type::Pattern(TypePattern::Utf8String(_)) if async_rval.is_sync() => {
                 to_invoke.push(name.to_string());
             }
             _ => {
@@ -146,13 +146,13 @@ pub fn write_pattern_service_method(
                 class.the_type().rust_name().to_string()
             }
             MethodType::Regular => match function.signature().rval() {
-                CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
-                CType::Pattern(TypePattern::CStrPointer) => "string".to_string(),
+                Type::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
+                Type::Pattern(TypePattern::CStrPointer) => "string".to_string(),
                 x => to_typespecifier_in_sync_fn_rval(x),
             },
             MethodType::Dtor => "void".to_string(),
         },
-        SugaredReturnType::Async(CType::Pattern(TypePattern::Result(_))) => {
+        SugaredReturnType::Async(Type::Pattern(TypePattern::Result(_))) => {
             names.pop();
             types.pop();
             to_invoke.pop();
@@ -213,17 +213,17 @@ pub fn write_pattern_service_method(
 
     // Determine return value behavior and write function call.
     match function.signature().rval() {
-        CType::Pattern(TypePattern::FFIErrorEnum(_)) if async_rval.is_sync() => {
+        Type::Pattern(TypePattern::FFIErrorEnum(_)) if async_rval.is_sync() => {
             indented!(w, [()], r"{fn_call}.Ok();")?;
         }
-        CType::Pattern(TypePattern::FFIErrorEnum(_)) if async_rval.is_async() => {
+        Type::Pattern(TypePattern::FFIErrorEnum(_)) if async_rval.is_async() => {
             indented!(w, [()], r"return {fn_call};")?;
         }
-        CType::Pattern(TypePattern::CStrPointer) => {
+        Type::Pattern(TypePattern::CStrPointer) => {
             indented!(w, [()], r"var s = {fn_call};")?;
             indented!(w, [()], r"return Marshal.PtrToStringAnsi(s);")?;
         }
-        CType::Primitive(PrimitiveType::Void) => {
+        Type::Primitive(Primitive::Void) => {
             indented!(w, [()], r"{fn_call};",)?;
         }
         _ if matches!(method_type, MethodType::Ctor) => {
@@ -277,7 +277,7 @@ pub fn write_common_service_method_overload(i: &Interop, w: &mut IndentWriter, c
     // common C# types.
     let rval = match function.signature().rval() {
         // CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
-        CType::Pattern(TypePattern::CStrPointer) => "string".to_string(),
+        Type::Pattern(TypePattern::CStrPointer) => "string".to_string(),
         _ => to_typespecifier_in_sync_fn_rval(function.signature().rval()),
     };
 
@@ -337,7 +337,7 @@ pub fn write_common_service_method_overload(i: &Interop, w: &mut IndentWriter, c
         // CType::Pattern(TypePattern::FFIErrorEnum(_)) => {
         //     indented!(w, [()], r"{};", fn_call)?;
         // }
-        CType::Primitive(PrimitiveType::Void) => {
+        Type::Primitive(Primitive::Void) => {
             indented!(w, [()], r"{};", fn_call)?;
         }
         _ => {

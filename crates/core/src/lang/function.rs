@@ -1,12 +1,12 @@
 use crate::backend::IdPrettifier;
-use crate::lang::{CType, Meta};
+use crate::lang::{Meta, Type};
 use crate::pattern::TypePattern;
 use crate::pattern::callback::AsyncCallback;
 
 /// Indicates the final desired return type in FFI'ed user code.
 pub enum SugaredReturnType {
-    Sync(CType),
-    Async(CType),
+    Sync(Type),
+    Async(Type),
 }
 
 impl SugaredReturnType {
@@ -56,13 +56,13 @@ impl Function {
     }
 
     #[must_use]
-    pub fn first_param_type(&self) -> Option<&CType> {
+    pub fn first_param_type(&self) -> Option<&Type> {
         self.signature().params.first().map(|x| &x.the_type)
     }
 
     #[must_use]
     pub const fn returns_ffi_error(&self) -> bool {
-        matches!(self.signature().rval(), CType::Pattern(TypePattern::FFIErrorEnum(_)))
+        matches!(self.signature().rval(), Type::Pattern(TypePattern::FFIErrorEnum(_)))
     }
 
     /// Indicates the return type of a method from user code.
@@ -89,12 +89,12 @@ impl Function {
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, Default)]
 pub struct FunctionSignature {
     params: Vec<Parameter>,
-    rval: CType,
+    rval: Type,
 }
 
 impl FunctionSignature {
     #[must_use]
-    pub const fn new(params: Vec<Parameter>, rval: CType) -> Self {
+    pub const fn new(params: Vec<Parameter>, rval: Type) -> Self {
         Self { params, rval }
     }
 
@@ -104,7 +104,7 @@ impl FunctionSignature {
     }
 
     #[must_use]
-    pub const fn rval(&self) -> &CType {
+    pub const fn rval(&self) -> &Type {
         &self.rval
     }
 }
@@ -113,12 +113,12 @@ impl FunctionSignature {
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Parameter {
     name: String,
-    the_type: CType,
+    the_type: Type,
 }
 
 impl Parameter {
     #[must_use]
-    pub const fn new(name: String, the_type: CType) -> Self {
+    pub const fn new(name: String, the_type: Type) -> Self {
         Self { name, the_type }
     }
 
@@ -128,7 +128,7 @@ impl Parameter {
     }
 
     #[must_use]
-    pub const fn the_type(&self) -> &CType {
+    pub const fn the_type(&self) -> &Type {
         &self.the_type
     }
 }

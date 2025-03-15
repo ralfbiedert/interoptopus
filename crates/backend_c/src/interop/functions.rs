@@ -3,7 +3,7 @@ use crate::interop::ToNamingStyle;
 use crate::interop::docs::write_documentation;
 use crate::{DocStyle, Functions, Interop};
 use interoptopus::backend::IndentWriter;
-use interoptopus::lang::{CType, Function};
+use interoptopus::lang::{Function, Type};
 use interoptopus::{Error, indented};
 
 pub fn write_functions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
@@ -40,7 +40,7 @@ pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &
 
     for p in function.signature().params() {
         match p.the_type() {
-            CType::Array(a) => {
+            Type::Array(a) => {
                 params.push(format!("{} {}[{}]", to_type_specifier(i, a.array_type()), p.name().to_naming_style(&i.function_parameter_naming), a.len(),));
             }
             _ => {
@@ -73,7 +73,7 @@ fn write_function_as_typedef_declaration(i: &Interop, w: &mut IndentWriter, func
 
     for p in function.signature().params() {
         match p.the_type() {
-            CType::Array(a) => {
+            Type::Array(a) => {
                 params.push(format!("{} [{}]", to_type_specifier(i, a.array_type()), a.len(),));
             }
             _ => {

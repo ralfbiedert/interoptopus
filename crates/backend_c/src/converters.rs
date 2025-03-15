@@ -1,44 +1,44 @@
 use crate::Interop;
 use crate::interop::ToNamingStyle;
 use interoptopus::backend::safe_name;
-use interoptopus::lang::{CType, CompositeType, Constant, ConstantValue, EnumType, FnPointerType, Function, OpaqueType, PrimitiveType, PrimitiveValue, Variant};
+use interoptopus::lang::{Composite, Constant, ConstantValue, Enum, FnPointer, Function, Opaque, Primitive, PrimitiveValue, Type, Variant};
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::NamedCallback;
 
-pub fn primitive_to_typename(x: PrimitiveType) -> String {
+pub fn primitive_to_typename(x: Primitive) -> String {
     match x {
-        PrimitiveType::Void => "void".to_string(),
-        PrimitiveType::Bool => "bool".to_string(),
-        PrimitiveType::U8 => "uint8_t".to_string(),
-        PrimitiveType::U16 => "uint16_t".to_string(),
-        PrimitiveType::U32 => "uint32_t".to_string(),
-        PrimitiveType::U64 => "uint64_t".to_string(),
-        PrimitiveType::I8 => "int8_t".to_string(),
-        PrimitiveType::I16 => "int16_t".to_string(),
-        PrimitiveType::I32 => "int32_t".to_string(),
-        PrimitiveType::I64 => "int64_t".to_string(),
-        PrimitiveType::F32 => "float".to_string(),
-        PrimitiveType::F64 => "double".to_string(),
+        Primitive::Void => "void".to_string(),
+        Primitive::Bool => "bool".to_string(),
+        Primitive::U8 => "uint8_t".to_string(),
+        Primitive::U16 => "uint16_t".to_string(),
+        Primitive::U32 => "uint32_t".to_string(),
+        Primitive::U64 => "uint64_t".to_string(),
+        Primitive::I8 => "int8_t".to_string(),
+        Primitive::I16 => "int16_t".to_string(),
+        Primitive::I32 => "int32_t".to_string(),
+        Primitive::I64 => "int64_t".to_string(),
+        Primitive::F32 => "float".to_string(),
+        Primitive::F64 => "double".to_string(),
     }
 }
 
-pub fn enum_to_typename(g: &Interop, x: &EnumType) -> String {
+pub fn enum_to_typename(g: &Interop, x: &Enum) -> String {
     format!("{}{}", g.prefix, x.rust_name()).to_naming_style(&g.enum_variant_naming)
 }
 
-pub fn enum_variant_to_name(g: &Interop, the_enum: &EnumType, x: &Variant) -> String {
+pub fn enum_variant_to_name(g: &Interop, the_enum: &Enum, x: &Variant) -> String {
     format!("{}{}_{}", g.prefix, the_enum.rust_name().to_naming_style(&g.enum_variant_naming), x.name()).to_naming_style(&g.enum_variant_naming)
 }
 
-pub fn opaque_to_typename(g: &Interop, x: &OpaqueType) -> String {
+pub fn opaque_to_typename(g: &Interop, x: &Opaque) -> String {
     format!("{}{}", g.prefix, x.rust_name()).to_naming_style(&g.type_naming)
 }
 
-pub fn composite_to_typename(g: &Interop, x: &CompositeType) -> String {
+pub fn composite_to_typename(g: &Interop, x: &Composite) -> String {
     format!("{}{}", g.prefix, x.rust_name()).to_naming_style(&g.type_naming)
 }
 
-pub fn fnpointer_to_typename(g: &Interop, x: &FnPointerType) -> String {
+pub fn fnpointer_to_typename(g: &Interop, x: &FnPointer) -> String {
     let prefixed = format!("{}fptr", g.prefix);
     [prefixed, safe_name(&x.internal_name())].join("_")
 }
@@ -47,20 +47,20 @@ pub fn named_callback_to_typename(g: &Interop, x: &NamedCallback) -> String {
     format!("{}{}", g.prefix, x.name().to_naming_style(&g.type_naming))
 }
 
-pub fn to_type_specifier(g: &Interop, x: &CType) -> String {
+pub fn to_type_specifier(g: &Interop, x: &Type) -> String {
     match x {
-        CType::Primitive(x) => primitive_to_typename(*x),
-        CType::Enum(x) => enum_to_typename(g, x),
-        CType::Opaque(x) => opaque_to_typename(g, x),
-        CType::Composite(x) => composite_to_typename(g, x),
-        CType::ReadPointer(x) => format!("const {}*", to_type_specifier(g, x)),
-        CType::ReadWritePointer(x) => format!("{}*", to_type_specifier(g, x)),
-        CType::FnPointer(x) => fnpointer_to_typename(g, x),
-        CType::Pattern(TypePattern::CChar) => "char".to_string(),
-        CType::Pattern(TypePattern::NamedCallback(x)) => named_callback_to_typename(g, x),
-        CType::Pattern(x) => to_type_specifier(g, &x.fallback_type()),
+        Type::Primitive(x) => primitive_to_typename(*x),
+        Type::Enum(x) => enum_to_typename(g, x),
+        Type::Opaque(x) => opaque_to_typename(g, x),
+        Type::Composite(x) => composite_to_typename(g, x),
+        Type::ReadPointer(x) => format!("const {}*", to_type_specifier(g, x)),
+        Type::ReadWritePointer(x) => format!("{}*", to_type_specifier(g, x)),
+        Type::FnPointer(x) => fnpointer_to_typename(g, x),
+        Type::Pattern(TypePattern::CChar) => "char".to_string(),
+        Type::Pattern(TypePattern::NamedCallback(x)) => named_callback_to_typename(g, x),
+        Type::Pattern(x) => to_type_specifier(g, &x.fallback_type()),
         // TODO: This should be handled in nicer way so that arrays-of-arrays and other thing work properly
-        CType::Array(_) => panic!("Arrays need special handling in the writer."),
+        Type::Array(_) => panic!("Arrays need special handling in the writer."),
     }
 }
 

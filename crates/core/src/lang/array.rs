@@ -1,15 +1,15 @@
-use crate::lang::CType;
+use crate::lang::Type;
 
 /// A (C-style) `type[N]` containing a fixed number of elements of the same type.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct ArrayType {
-    array_type: Box<CType>,
+pub struct Array {
+    array_type: Box<Type>,
     len: usize,
 }
 
-impl ArrayType {
+impl Array {
     #[must_use]
-    pub fn new(array_type: CType, len: usize) -> Self {
+    pub fn new(array_type: Type, len: usize) -> Self {
         Self { array_type: Box::new(array_type), len }
     }
 
@@ -19,7 +19,7 @@ impl ArrayType {
     }
 
     #[must_use]
-    pub const fn array_type(&self) -> &CType {
+    pub const fn array_type(&self) -> &Type {
         &self.array_type
     }
 

@@ -1,6 +1,6 @@
 //! Additional support for primitives like `bool`.
 
-use crate::lang::CType;
+use crate::lang::Type;
 use crate::lang::TypeInfo;
 use crate::pattern::TypePattern;
 #[cfg(feature = "serde")]
@@ -36,8 +36,8 @@ impl Bool {
 }
 
 unsafe impl TypeInfo for Bool {
-    fn type_info() -> CType {
-        CType::Pattern(TypePattern::Bool)
+    fn type_info() -> Type {
+        Type::Pattern(TypePattern::Bool)
     }
 }
 
@@ -77,8 +77,8 @@ impl CChar {
 }
 
 unsafe impl TypeInfo for CChar {
-    fn type_info() -> CType {
-        CType::Pattern(TypePattern::CChar)
+    fn type_info() -> Type {
+        Type::Pattern(TypePattern::CChar)
     }
 }
 

@@ -2,18 +2,18 @@ use crate::Interop;
 use crate::converter::{field_name_to_csharp_name, is_blittable, to_typespecifier_in_field};
 use crate::interop::docs::write_documentation;
 use interoptopus::backend::{IndentWriter, WriteFor};
-use interoptopus::lang::{CType, CompositeType, Field, Layout, PrimitiveType, Visibility};
+use interoptopus::lang::{Composite, Field, Layout, Primitive, Type, Visibility};
 use interoptopus::pattern::TypePattern;
 use interoptopus::{Error, indented};
 
-pub fn write_type_definition_composite(i: &Interop, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
+pub fn write_type_definition_composite(i: &Interop, w: &mut IndentWriter, the_type: &Composite) -> Result<(), Error> {
     i.debug(w, "write_type_definition_composite")?;
     write_documentation(w, the_type.meta().documentation())?;
     write_type_definition_composite_body(i, w, the_type, WriteFor::Code)?;
     write_type_definition_composite_marshaller(i, w, the_type)
 }
 
-pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
+pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWriter, the_type: &Composite) -> Result<(), Error> {
     i.debug(w, "write_type_definition_composite_marshaller")?;
     let name = the_type.rust_name();
 
@@ -112,36 +112,36 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
     Ok(())
 }
 
-pub fn write_type_definition_composite_unmanaged_body_field(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &CompositeType) -> Result<(), Error> {
+pub fn write_type_definition_composite_unmanaged_body_field(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &Composite) -> Result<(), Error> {
     i.debug(w, "write_type_definition_composite_unmanaged_body_field")?;
 
     let field_name = field_name_to_csharp_name(field, i.rename_symbols);
     match field.the_type() {
-        CType::Array(a) => {
+        Type::Array(a) => {
             let type_name = to_typespecifier_in_field(a.array_type(), field, the_type);
             let size = a.len();
-            if matches!(a.array_type(), CType::Pattern(TypePattern::CChar)) {
+            if matches!(a.array_type(), Type::Pattern(TypePattern::CChar)) {
                 indented!(w, r"public fixed byte {}[{}];", field_name, size)?;
             } else {
                 indented!(w, r"public fixed {} {}[{}];", type_name, field_name, size)?;
             }
         }
-        CType::Primitive(PrimitiveType::Bool) => {
+        Type::Primitive(Primitive::Bool) => {
             indented!(w, r"public sbyte {};", field_name)?;
         }
-        CType::Composite(composite) => {
+        Type::Composite(composite) => {
             indented!(w, r"public {}.Unmanaged {};", composite.rust_name(), field_name)?;
         }
-        CType::Pattern(TypePattern::NamedCallback(x)) => {
+        Type::Pattern(TypePattern::NamedCallback(x)) => {
             indented!(w, r"public {}.Unmanaged {};", x.name(), field_name)?;
         }
-        CType::Pattern(TypePattern::CStrPointer) => {
+        Type::Pattern(TypePattern::CStrPointer) => {
             indented!(w, r"public IntPtr {};", field_name)?;
         }
-        CType::Pattern(TypePattern::Utf8String(_)) => {
+        Type::Pattern(TypePattern::Utf8String(_)) => {
             indented!(w, r"public Utf8String.Unmanaged {};", field_name)?;
         }
-        CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
+        Type::Pattern(TypePattern::FFIErrorEnum(e)) => {
             indented!(w, r"public {} {};", e.the_enum().rust_name(), field_name)?;
         }
 
@@ -154,7 +154,7 @@ pub fn write_type_definition_composite_unmanaged_body_field(i: &Interop, w: &mut
 }
 
 #[allow(clippy::unused_self)]
-pub fn write_type_definition_composite_layout_annotation(w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
+pub fn write_type_definition_composite_layout_annotation(w: &mut IndentWriter, the_type: &Composite) -> Result<(), Error> {
     match the_type.repr().layout() {
         Layout::C | Layout::Transparent | Layout::Opaque => indented!(w, r"[StructLayout(LayoutKind.Sequential)]"),
         Layout::Packed => indented!(w, r"[StructLayout(LayoutKind.Sequential, Pack = 1)]"),
@@ -162,7 +162,7 @@ pub fn write_type_definition_composite_layout_annotation(w: &mut IndentWriter, t
     }
 }
 
-pub fn write_type_definition_composite_body(i: &Interop, w: &mut IndentWriter, the_type: &CompositeType, write_for: WriteFor) -> Result<(), Error> {
+pub fn write_type_definition_composite_body(i: &Interop, w: &mut IndentWriter, the_type: &Composite, write_for: WriteFor) -> Result<(), Error> {
     indented!(w, r"{} partial struct {}", i.visibility_types.to_access_modifier(), the_type.rust_name())?;
     indented!(w, r"{{")?;
     w.indent();
@@ -182,7 +182,7 @@ pub fn write_type_definition_composite_body(i: &Interop, w: &mut IndentWriter, t
     Ok(())
 }
 
-pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &CompositeType) -> Result<(), Error> {
+pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &Composite) -> Result<(), Error> {
     let field_name = field_name_to_csharp_name(field, i.rename_symbols);
     let visibility = match field.visibility() {
         Visibility::Public => "public ",
@@ -191,10 +191,10 @@ pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWri
     };
 
     match field.the_type() {
-        CType::Array(a) => {
+        Type::Array(a) => {
             assert!(is_blittable(a.array_type()), "Array type is not blittable: {:?}", a.array_type());
 
-            let type_name = if matches!(a.array_type(), CType::Pattern(TypePattern::CChar)) {
+            let type_name = if matches!(a.array_type(), Type::Pattern(TypePattern::CChar)) {
                 "string".to_string()
             } else {
                 format!("{}[]", to_typespecifier_in_field(a.array_type(), field, the_type))
@@ -202,7 +202,7 @@ pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWri
 
             indented!(w, r"{}{} {};", visibility, type_name, field_name)?;
         }
-        CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
+        Type::Pattern(TypePattern::FFIErrorEnum(e)) => {
             let enum_name = e.the_enum().rust_name();
             indented!(w, r"{}{} {};", visibility, enum_name, field_name)?;
         }
@@ -214,17 +214,17 @@ pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWri
     Ok(())
 }
 
-pub fn write_type_definition_composite_marshaller_field_to_unmanaged(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &CompositeType) -> Result<(), Error> {
+pub fn write_type_definition_composite_marshaller_field_to_unmanaged(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &Composite) -> Result<(), Error> {
     i.debug(w, "write_type_definition_composite_marshaller_unmanaged_invoke")?;
 
     let name = field.name();
     match field.the_type() {
-        CType::Primitive(PrimitiveType::Bool) => indented!(w, "_unmanaged.{name} = (sbyte) (_managed.{name} ? 1 : 0);")?,
-        CType::Primitive(_) => indented!(w, "_unmanaged.{name} = _managed.{name};")?,
-        CType::Enum(_) => indented!(w, "_unmanaged.{name} = _managed.{name};")?,
-        CType::ReadPointer(_) => indented!(w, "_unmanaged.{name} = _managed.{name};")?,
-        CType::ReadWritePointer(_) => indented!(w, "_unmanaged.{name} = _managed.{name};")?,
-        CType::Array(x) => {
+        Type::Primitive(Primitive::Bool) => indented!(w, "_unmanaged.{name} = (sbyte) (_managed.{name} ? 1 : 0);")?,
+        Type::Primitive(_) => indented!(w, "_unmanaged.{name} = _managed.{name};")?,
+        Type::Enum(_) => indented!(w, "_unmanaged.{name} = _managed.{name};")?,
+        Type::ReadPointer(_) => indented!(w, "_unmanaged.{name} = _managed.{name};")?,
+        Type::ReadWritePointer(_) => indented!(w, "_unmanaged.{name} = _managed.{name};")?,
+        Type::Array(x) => {
             let array_type = to_typespecifier_in_field(x.array_type(), field, the_type);
             indented!(w, "fixed({}* _fixed = _unmanaged.{})", array_type, name)?;
             indented!(w, "{{")?;
@@ -235,12 +235,12 @@ pub fn write_type_definition_composite_marshaller_field_to_unmanaged(i: &Interop
             indented!(w, [()], "src.CopyTo(dst);")?;
             indented!(w, "}}")?;
         }
-        CType::Pattern(TypePattern::Bool) => indented!(w, "_unmanaged.{name} = (sbyte) (_managed.{name} ? 1 : 0);")?,
-        CType::Pattern(TypePattern::FFIErrorEnum(_)) => indented!(w, "_unmanaged.{name} = _managed.{name};")?,
-        CType::Pattern(TypePattern::CStrPointer) => {
+        Type::Pattern(TypePattern::Bool) => indented!(w, "_unmanaged.{name} = (sbyte) (_managed.{name} ? 1 : 0);")?,
+        Type::Pattern(TypePattern::FFIErrorEnum(_)) => indented!(w, "_unmanaged.{name} = _managed.{name};")?,
+        Type::Pattern(TypePattern::CStrPointer) => {
             indented!(w, "_unmanaged.{name} = Marshal.StringToHGlobalAnsi(_managed.{name});")?;
         }
-        CType::Pattern(TypePattern::Utf8String(_)) => {
+        Type::Pattern(TypePattern::Utf8String(_)) => {
             indented!(w, "var _{name} = new Utf8String.Marshaller(new Utf8String(_managed.{}));", name)?;
             indented!(w, "_unmanaged.{name} = _{name}.ToUnmanaged();")?;
         }
@@ -253,17 +253,17 @@ pub fn write_type_definition_composite_marshaller_field_to_unmanaged(i: &Interop
     Ok(())
 }
 
-pub fn write_type_definition_composite_marshaller_field_from_unmanaged(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &CompositeType) -> Result<(), Error> {
+pub fn write_type_definition_composite_marshaller_field_from_unmanaged(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &Composite) -> Result<(), Error> {
     i.debug(w, "write_type_definition_composite_marshaller_field_from_unmanaged")?;
 
     let name = field.name();
     match field.the_type() {
-        CType::Primitive(PrimitiveType::Bool) => indented!(w, "_managed.{name} = _unmanaged.{name} == 1 ? true : false;")?,
-        CType::Primitive(_) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
-        CType::Enum(_) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
-        CType::ReadPointer(_) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
-        CType::ReadWritePointer(_) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
-        CType::Array(x) => {
+        Type::Primitive(Primitive::Bool) => indented!(w, "_managed.{name} = _unmanaged.{name} == 1 ? true : false;")?,
+        Type::Primitive(_) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
+        Type::Enum(_) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
+        Type::ReadPointer(_) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
+        Type::ReadWritePointer(_) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
+        Type::Array(x) => {
             let array_type = to_typespecifier_in_field(x.array_type(), field, the_type);
             indented!(w, "fixed({}* _fixed = _unmanaged.{})", array_type, name)?;
             indented!(w, "{{")?;
@@ -273,11 +273,11 @@ pub fn write_type_definition_composite_marshaller_field_from_unmanaged(i: &Inter
             indented!(w, [()], "src.CopyTo(dst);")?;
             indented!(w, "}}")?;
         }
-        CType::Pattern(TypePattern::FFIErrorEnum(_)) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
-        CType::Pattern(TypePattern::CStrPointer) => {
+        Type::Pattern(TypePattern::FFIErrorEnum(_)) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
+        Type::Pattern(TypePattern::CStrPointer) => {
             indented!(w, "_managed.{name} = Marshal.PtrToStringAnsi(_unmanaged.{name});")?;
         }
-        CType::Pattern(TypePattern::Utf8String(_)) => {
+        Type::Pattern(TypePattern::Utf8String(_)) => {
             indented!(w, "var _{name} = new Utf8String.Marshaller(_unmanaged.{name});")?;
             indented!(w, "_managed.{name} = _{name}.ToManaged().String;")?;
         }

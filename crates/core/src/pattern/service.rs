@@ -113,7 +113,7 @@
 //!
 
 use crate::backend::longest_common_prefix;
-use crate::lang::{Function, OpaqueType};
+use crate::lang::{Function, Opaque};
 use crate::pattern::result::FFIResultAsPtr;
 use std::fmt::Debug;
 use std::slice::from_ref;
@@ -121,7 +121,7 @@ use std::slice::from_ref;
 /// Combines a receiver, constructor, destructor and multiple methods in one entity.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct ServiceDefinition {
-    the_type: OpaqueType,
+    the_type: Opaque,
     constructors: Vec<Function>,
     destructor: Function,
     methods: Vec<Function>,
@@ -160,7 +160,7 @@ impl ServiceDefinition {
     pub fn assert_valid(&self) {}
 
     #[must_use]
-    pub const fn the_type(&self) -> &OpaqueType {
+    pub const fn the_type(&self) -> &Opaque {
         &self.the_type
     }
 

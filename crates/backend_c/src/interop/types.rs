@@ -6,7 +6,7 @@ use crate::interop::docs::write_documentation;
 use crate::{DocStyle, Indentation, Interop};
 use interoptopus::backend::IndentWriter;
 use interoptopus::backend::sort_types_by_dependencies;
-use interoptopus::lang::{CType, CompositeType, EnumType, Field, FnPointerType, OpaqueType, Variant};
+use interoptopus::lang::{Composite, Enum, Field, FnPointer, Opaque, Type, Variant};
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::NamedCallback;
 use interoptopus::{Error, indented};
@@ -21,28 +21,28 @@ pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), E
     Ok(())
 }
 
-pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &CType, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
+pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
     match the_type {
-        CType::Primitive(_) => {}
-        CType::Array(_) => {}
-        CType::Enum(e) => {
+        Type::Primitive(_) => {}
+        Type::Array(_) => {}
+        Type::Enum(e) => {
             write_type_definition_enum(i, w, e)?;
             w.newline()?;
         }
-        CType::Opaque(o) => {
+        Type::Opaque(o) => {
             write_type_definition_opaque(i, w, o)?;
         }
-        CType::Composite(c) => {
+        Type::Composite(c) => {
             write_type_definition_composite(i, w, c)?;
             w.newline()?;
         }
-        CType::FnPointer(f) => {
+        Type::FnPointer(f) => {
             write_type_definition_fn_pointer(i, w, f, known_function_pointers)?;
             w.newline()?;
         }
-        CType::ReadPointer(_) => {}
-        CType::ReadWritePointer(_) => {}
-        CType::Pattern(p) => match p {
+        Type::ReadPointer(_) => {}
+        Type::ReadWritePointer(_) => {}
+        Type::Pattern(p) => match p {
             TypePattern::CStrPointer => {}
             TypePattern::NamedCallback(e) => {
                 write_type_definition_named_callback(i, w, e)?;
@@ -85,11 +85,11 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &CType
     Ok(())
 }
 
-fn write_type_definition_fn_pointer(i: &Interop, w: &mut IndentWriter, the_type: &FnPointerType, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
+fn write_type_definition_fn_pointer(i: &Interop, w: &mut IndentWriter, the_type: &FnPointer, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
     write_type_definition_fn_pointer_body(i, w, the_type, known_function_pointers)
 }
 
-fn write_type_definition_fn_pointer_body(i: &Interop, w: &mut IndentWriter, the_type: &FnPointerType, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
+fn write_type_definition_fn_pointer_body(i: &Interop, w: &mut IndentWriter, the_type: &FnPointer, known_function_pointers: &mut Vec<String>) -> Result<(), Error> {
     let rval = to_type_specifier(i, the_type.signature().rval());
     let name = fnpointer_to_typename(i, the_type);
 
@@ -126,7 +126,7 @@ fn write_type_definition_named_callback_body(i: &Interop, w: &mut IndentWriter, 
     Ok(())
 }
 
-fn write_type_definition_enum(i: &Interop, w: &mut IndentWriter, the_type: &EnumType) -> Result<(), Error> {
+fn write_type_definition_enum(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
     let name = enum_to_typename(i, the_type);
 
     if i.documentation == DocStyle::Inline {
@@ -142,7 +142,7 @@ fn write_type_definition_enum(i: &Interop, w: &mut IndentWriter, the_type: &Enum
     write_braced_declaration_closing(i, w, name.as_str())
 }
 
-fn write_type_definition_enum_variant(i: &Interop, w: &mut IndentWriter, variant: &Variant, the_enum: &EnumType) -> Result<(), Error> {
+fn write_type_definition_enum_variant(i: &Interop, w: &mut IndentWriter, variant: &Variant, the_enum: &Enum) -> Result<(), Error> {
     let variant_name = enum_variant_to_name(i, the_enum, variant);
     let variant_value = variant.value();
 
@@ -153,7 +153,7 @@ fn write_type_definition_enum_variant(i: &Interop, w: &mut IndentWriter, variant
     indented!(w, r"{} = {},", variant_name, variant_value)
 }
 
-fn write_type_definition_opaque(i: &Interop, w: &mut IndentWriter, the_type: &OpaqueType) -> Result<(), Error> {
+fn write_type_definition_opaque(i: &Interop, w: &mut IndentWriter, the_type: &Opaque) -> Result<(), Error> {
     if i.documentation == DocStyle::Inline {
         write_documentation(w, the_type.meta().documentation())?;
     }
@@ -167,12 +167,12 @@ fn write_type_definition_opaque(i: &Interop, w: &mut IndentWriter, the_type: &Op
     Ok(())
 }
 
-fn write_type_definition_opaque_body(i: &Interop, w: &mut IndentWriter, the_type: &OpaqueType) -> Result<(), Error> {
+fn write_type_definition_opaque_body(i: &Interop, w: &mut IndentWriter, the_type: &Opaque) -> Result<(), Error> {
     let name = opaque_to_typename(i, the_type);
     indented!(w, r"typedef struct {} {};", name, name)
 }
 
-fn write_type_definition_composite(i: &Interop, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
+fn write_type_definition_composite(i: &Interop, w: &mut IndentWriter, the_type: &Composite) -> Result<(), Error> {
     if i.documentation == DocStyle::Inline {
         write_documentation(w, the_type.meta().documentation())?;
     }
@@ -188,7 +188,7 @@ fn write_type_definition_composite(i: &Interop, w: &mut IndentWriter, the_type: 
     }
 }
 
-fn write_type_definition_composite_body(i: &Interop, w: &mut IndentWriter, the_type: &CompositeType) -> Result<(), Error> {
+fn write_type_definition_composite_body(i: &Interop, w: &mut IndentWriter, the_type: &Composite) -> Result<(), Error> {
     let name = composite_to_typename(i, the_type);
 
     let alignment = the_type.repr().alignment();
@@ -210,14 +210,14 @@ fn write_type_definition_composite_body(i: &Interop, w: &mut IndentWriter, the_t
     Ok(())
 }
 
-fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWriter, field: &Field, _the_type: &CompositeType) -> Result<(), Error> {
+fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWriter, field: &Field, _the_type: &Composite) -> Result<(), Error> {
     if i.documentation == DocStyle::Inline {
         write_documentation(w, field.documentation())?;
     }
 
     let field_name = field.name();
 
-    if let CType::Array(x) = field.the_type() {
+    if let Type::Array(x) = field.the_type() {
         let type_name = to_type_specifier(i, x.array_type());
         indented!(w, r"{} {}[{}];", type_name, field_name, x.len())
     } else {

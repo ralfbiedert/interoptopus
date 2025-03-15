@@ -2,7 +2,7 @@ use crate::Interop;
 use crate::converter::{named_callback_to_typename, to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval};
 use crate::interop::types::fnptrs::write_type_definition_fn_pointer_annotation;
 use interoptopus::backend::IndentWriter;
-use interoptopus::lang::{CType, PrimitiveType};
+use interoptopus::lang::{Primitive, Type};
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::NamedCallback;
 use interoptopus::{Error, indented};
@@ -12,7 +12,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
 
     let rval_safe = to_typespecifier_in_sync_fn_rval(the_type.fnpointer().signature().rval());
     let rval_unsafe = match the_type.fnpointer().signature().rval() {
-        CType::Composite(_) => format!("{rval_safe}.Unmanaged"),
+        Type::Composite(_) => format!("{rval_safe}.Unmanaged"),
         _ => rval_safe.clone(),
     };
 
@@ -27,14 +27,14 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
         params_native.push(format!("{} {}", i.to_native_callback_typespecifier(param.the_type()), param.name()));
 
         match param.the_type() {
-            CType::Pattern(TypePattern::Slice(_)) => params_invoke.push(format!("{}.ToManaged()", param.name())),
-            CType::Pattern(TypePattern::SliceMut(_)) => params_invoke.push(format!("{}.ToManaged()", param.name())),
-            CType::Pattern(TypePattern::Utf8String(_)) => {
+            Type::Pattern(TypePattern::Slice(_)) => params_invoke.push(format!("{}.ToManaged()", param.name())),
+            Type::Pattern(TypePattern::SliceMut(_)) => params_invoke.push(format!("{}.ToManaged()", param.name())),
+            Type::Pattern(TypePattern::Utf8String(_)) => {
                 params.pop();
                 params.push(format!("string {}", param.name()));
                 params_invoke.push(format!("{}.ToManaged()", param.name()));
             }
-            CType::Composite(_) => params_invoke.push(format!("{}.ToManaged()", param.name())),
+            Type::Composite(_) => params_invoke.push(format!("{}.ToManaged()", param.name())),
             _ => params_invoke.push(param.name().to_string()),
         }
     }
@@ -78,9 +78,9 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()()], r"try")?;
     indented!(w, [()()], r"{{")?;
     match the_type.fnpointer().signature().rval() {
-        CType::Primitive(PrimitiveType::Void) => indented!(w, [()()()], r"_managed({params_invoke});")?,
-        CType::Primitive(_) => indented!(w, [()()()], r"return _managed({params_invoke});")?,
-        CType::Pattern(TypePattern::FFIErrorEnum(_)) => indented!(w, [()()()], r"return _managed({params_invoke});")?,
+        Type::Primitive(Primitive::Void) => indented!(w, [()()()], r"_managed({params_invoke});")?,
+        Type::Primitive(_) => indented!(w, [()()()], r"return _managed({params_invoke});")?,
+        Type::Pattern(TypePattern::FFIErrorEnum(_)) => indented!(w, [()()()], r"return _managed({params_invoke});")?,
         _ => indented!(w, [()()()], r"return _managed({params_invoke}).ToUnmanaged();")?,
     }
     indented!(w, [()()], r"}}")?;
@@ -88,8 +88,8 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()()], r"{{")?;
     indented!(w, [()()()], r"_exception = e;")?;
     match the_type.fnpointer().signature().rval() {
-        CType::Primitive(PrimitiveType::Void) => indented!(w, [()()()], r"return;")?,
-        CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
+        Type::Primitive(Primitive::Void) => indented!(w, [()()()], r"return;")?,
+        Type::Pattern(TypePattern::FFIErrorEnum(e)) => {
             indented!(w, [()()()], r"return new {rval_unsafe}({}.{});", e.the_enum().rust_name(), e.panic_variant().name())?;
         }
         _ => indented!(w, [()()()], r"return default;")?,
@@ -108,8 +108,8 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
         indented!(w, [()()], r"// return __target({params_invoke});")?;
     }
     match the_type.fnpointer().signature().rval() {
-        CType::Primitive(PrimitiveType::Void) => indented!(w, [()()], r"return;")?,
-        CType::Pattern(TypePattern::FFIErrorEnum(e)) => {
+        Type::Primitive(Primitive::Void) => indented!(w, [()()], r"return;")?,
+        Type::Pattern(TypePattern::FFIErrorEnum(e)) => {
             indented!(w, [()()], r"return new {rval_safe}({}.{});", e.the_enum().rust_name(), e.panic_variant().name())?;
         }
         _ => indented!(w, [()()], r"return default;")?,

@@ -1,6 +1,6 @@
 use crate::Error;
 use crate::backend::{IndentWriter, ctypes_from_functions_types, extract_namespaces_from_types, holds_opaque_without_ref};
-use crate::lang::{CType, Constant, Function};
+use crate::lang::{Constant, Function, Type};
 use crate::pattern::LibraryPattern;
 use std::collections::HashSet;
 use std::fs::File;
@@ -13,7 +13,7 @@ use std::path::Path;
 pub enum Symbol {
     Function(Function),
     Constant(Constant),
-    Type(CType),
+    Type(Type),
     Pattern(LibraryPattern),
 }
 
@@ -56,7 +56,7 @@ pub enum Symbol {
 #[derive(Default, Debug)]
 pub struct InventoryBuilder {
     functions: Vec<Function>,
-    ctypes: Vec<CType>,
+    ctypes: Vec<Type>,
     constants: Vec<Constant>,
     patterns: Vec<LibraryPattern>,
 }
@@ -129,7 +129,7 @@ impl InventoryBuilder {
 #[derive(Clone, Debug, PartialOrd, PartialEq, Default)]
 pub struct Inventory {
     functions: Vec<Function>,
-    ctypes: Vec<CType>,
+    ctypes: Vec<Type>,
     constants: Vec<Constant>,
     patterns: Vec<LibraryPattern>,
     namespaces: Vec<String>,
@@ -142,7 +142,7 @@ pub struct Inventory {
 #[derive(Clone, Debug, PartialEq)]
 pub enum InventoryItem<'a> {
     Function(&'a Function),
-    CType(&'a CType),
+    CType(&'a Type),
     Constant(&'a Constant),
     Pattern(&'a LibraryPattern),
     Namespace(&'a str),
@@ -152,7 +152,7 @@ impl Inventory {
     /// Produce a new inventory for the given functions, constants and patterns.
     ///
     /// Type information will be automatically derived from the used fields and parameters.
-    pub(crate) fn new(functions: Vec<Function>, constants: Vec<Constant>, patterns: Vec<LibraryPattern>, extra_types: &[CType]) -> Self {
+    pub(crate) fn new(functions: Vec<Function>, constants: Vec<Constant>, patterns: Vec<LibraryPattern>, extra_types: &[Type]) -> Self {
         let mut ctypes = ctypes_from_functions_types(&functions, extra_types);
         let mut namespaces = HashSet::new();
 
@@ -182,7 +182,7 @@ impl Inventory {
     /// Returns all found types; this includes types directly used in fields and parameters, and
     /// all their recursive constitutents.
     #[must_use]
-    pub fn ctypes(&self) -> &[CType] {
+    pub fn ctypes(&self) -> &[Type] {
         &self.ctypes
     }
 
@@ -228,7 +228,7 @@ impl Inventory {
     #[must_use]
     pub fn filter<P: FnMut(InventoryItem) -> bool>(&self, mut predicate: P) -> Self {
         let functions: Vec<Function> = self.functions.iter().filter(|x| predicate(InventoryItem::Function(x))).cloned().collect();
-        let ctypes: Vec<CType> = self.ctypes.iter().filter(|x| predicate(InventoryItem::CType(x))).cloned().collect();
+        let ctypes: Vec<Type> = self.ctypes.iter().filter(|x| predicate(InventoryItem::CType(x))).cloned().collect();
         let constants: Vec<Constant> = self.constants.iter().filter(|x| predicate(InventoryItem::Constant(x))).cloned().collect();
         let patterns: Vec<LibraryPattern> = self.patterns.iter().filter(|x| predicate(InventoryItem::Pattern(x))).cloned().collect();
         let namespaces: Vec<String> = self.namespaces.iter().filter(|x| predicate(InventoryItem::Namespace(x))).cloned().collect();

@@ -40,7 +40,7 @@ pub fn rval_tokens(return_type: &ReturnType) -> TokenStream {
             }
             Type::Tuple(_) => {
                 // TODO: Check tuple is really empty.
-                quote_spanned!(span=> ::interoptopus::lang::CType::Primitive(::interoptopus::lang::PrimitiveType::Void))
+                quote_spanned!(span=> ::interoptopus::lang::Type::Primitive(::interoptopus::lang::Primitive::Void))
             }
             Type::Reference(x) => {
                 let token = x.to_token_stream();
@@ -59,7 +59,7 @@ pub fn rval_tokens(return_type: &ReturnType) -> TokenStream {
             }
         }
     } else {
-        quote_spanned!(span=> ::interoptopus::lang::CType::Primitive(interoptopus::lang::PrimitiveType::Void))
+        quote_spanned!(span=> ::interoptopus::lang::Type::Primitive(interoptopus::lang::Primitive::Void))
     }
 }
 

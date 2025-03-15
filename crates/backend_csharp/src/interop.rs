@@ -23,7 +23,7 @@ use derive_builder::Builder;
 use interoptopus::backend::IndentWriter;
 use interoptopus::backend::{NamespaceMappings, is_global_type};
 use interoptopus::inventory::{Bindings, Inventory};
-use interoptopus::lang::{CType, Constant, Function, FunctionSignature, Meta};
+use interoptopus::lang::{Constant, Function, FunctionSignature, Meta, Type};
 use interoptopus::pattern::TypePattern;
 use interoptopus::{Error, indented};
 
@@ -190,16 +190,16 @@ impl Interop {
 
     #[must_use]
     #[allow(clippy::match_like_matches_macro)]
-    pub fn should_emit_marshaller(&self, ctype: &CType) -> bool {
+    pub fn should_emit_marshaller(&self, ctype: &Type) -> bool {
         match ctype {
-            CType::Array(_) => true,
-            CType::Composite(_) => true,
+            Type::Array(_) => true,
+            Type::Composite(_) => true,
             _ => false,
         }
     }
 
     #[allow(dead_code)]
-    fn has_emittable_marshallers(&self, types: &[CType]) -> bool {
+    fn has_emittable_marshallers(&self, types: &[Type]) -> bool {
         types.iter().any(|x| self.should_emit_marshaller(x))
     }
 
@@ -222,11 +222,11 @@ impl Interop {
         rval
     }
 
-    fn is_custom_marshalled(&self, x: &CType) -> bool {
+    fn is_custom_marshalled(&self, x: &Type) -> bool {
         self.should_emit_marshaller(x)
             || match x {
-                CType::FnPointer(y) => self.has_custom_marshalled_delegate(y.signature()),
-                CType::Pattern(y) => match y {
+                Type::FnPointer(y) => self.has_custom_marshalled_delegate(y.signature()),
+                Type::Pattern(y) => match y {
                     TypePattern::NamedCallback(z) => self.has_custom_marshalled_delegate(z.fnpointer().signature()),
                     TypePattern::Slice(_) => true,
                     TypePattern::SliceMut(_) => true,
@@ -248,18 +248,18 @@ impl Interop {
         types.push(signature.rval().clone());
 
         types.iter().any(|x| match x {
-            CType::FnPointer(y) => self.has_custom_marshalled_types(y.signature()),
-            CType::Pattern(TypePattern::NamedCallback(z)) => self.has_custom_marshalled_types(z.fnpointer().signature()),
+            Type::FnPointer(y) => self.has_custom_marshalled_types(y.signature()),
+            Type::Pattern(TypePattern::NamedCallback(z)) => self.has_custom_marshalled_types(z.fnpointer().signature()),
             _ => false,
         })
     }
 
-    fn to_native_callback_typespecifier(&self, t: &CType) -> String {
+    fn to_native_callback_typespecifier(&self, t: &Type) -> String {
         match t {
-            CType::Pattern(TypePattern::Slice(_)) => format!("{}.Unmanaged", to_typespecifier_in_param(t)),
-            CType::Pattern(TypePattern::SliceMut(_)) => format!("{}.Unmanaged", to_typespecifier_in_param(t)),
-            CType::Pattern(TypePattern::Utf8String(_)) => format!("{}.Unmanaged", to_typespecifier_in_param(t)),
-            CType::Composite(_) => format!("{}.Unmanaged", to_typespecifier_in_param(t)),
+            Type::Pattern(TypePattern::Slice(_)) => format!("{}.Unmanaged", to_typespecifier_in_param(t)),
+            Type::Pattern(TypePattern::SliceMut(_)) => format!("{}.Unmanaged", to_typespecifier_in_param(t)),
+            Type::Pattern(TypePattern::Utf8String(_)) => format!("{}.Unmanaged", to_typespecifier_in_param(t)),
+            Type::Composite(_) => format!("{}.Unmanaged", to_typespecifier_in_param(t)),
             _ => to_typespecifier_in_param(t),
         }
     }
@@ -267,9 +267,9 @@ impl Interop {
     #[allow(clippy::match_like_matches_macro)]
     fn has_overloadable(&self, signature: &FunctionSignature) -> bool {
         signature.params().iter().any(|x| match x.the_type() {
-            CType::ReadPointer(p) => matches!(&**p, CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_))),
-            CType::ReadWritePointer(p) => matches!(&**p, CType::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_))),
-            CType::Pattern(p) => match p {
+            Type::ReadPointer(p) => matches!(&**p, Type::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_))),
+            Type::ReadWritePointer(p) => matches!(&**p, Type::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_))),
+            Type::Pattern(p) => match p {
                 TypePattern::Slice(_) => true,
                 TypePattern::SliceMut(_) => true,
                 TypePattern::NamedCallback(_) => true,
@@ -283,7 +283,7 @@ impl Interop {
 
     /// Checks whether for the given type and the current file a type definition should be emitted.
     #[must_use]
-    fn should_emit_by_type(&self, t: &CType) -> bool {
+    fn should_emit_by_type(&self, t: &Type) -> bool {
         if self.write_types == WriteTypes::All {
             return true;
         }
@@ -293,15 +293,15 @@ impl Interop {
         }
 
         match t {
-            CType::Primitive(_) => self.write_types == WriteTypes::NamespaceAndInteroptopusGlobal,
-            CType::Array(_) => false,
-            CType::Enum(x) => self.should_emit_by_meta(x.meta()),
-            CType::Opaque(x) => self.should_emit_by_meta(x.meta()),
-            CType::Composite(x) => self.should_emit_by_meta(x.meta()),
-            CType::FnPointer(_) => true,
-            CType::ReadPointer(_) => false,
-            CType::ReadWritePointer(_) => false,
-            CType::Pattern(x) => match x {
+            Type::Primitive(_) => self.write_types == WriteTypes::NamespaceAndInteroptopusGlobal,
+            Type::Array(_) => false,
+            Type::Enum(x) => self.should_emit_by_meta(x.meta()),
+            Type::Opaque(x) => self.should_emit_by_meta(x.meta()),
+            Type::Composite(x) => self.should_emit_by_meta(x.meta()),
+            Type::FnPointer(_) => true,
+            Type::ReadPointer(_) => false,
+            Type::ReadWritePointer(_) => false,
+            Type::Pattern(x) => match x {
                 TypePattern::CStrPointer => true,
                 TypePattern::APIVersion => true,
                 TypePattern::FFIErrorEnum(x) => self.should_emit_by_meta(x.the_enum().meta()),

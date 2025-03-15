@@ -46,7 +46,7 @@
 //! Surrogates are a niche feature to save you some implementation overhead in certain situations.
 //! In most cases the right things to do is defining your own FFI types and export these instead.
 
-use crate::lang::CType;
+use crate::lang::Type;
 use crate::lang::TypeInfo;
 use std::marker::PhantomData;
 use std::mem::{ManuallyDrop, transmute};
@@ -70,7 +70,7 @@ pub struct Surrogate<T, L: TypeInfo> {
 }
 
 unsafe impl<T, L: TypeInfo + CorrectSurrogate<T>> TypeInfo for Surrogate<T, L> {
-    fn type_info() -> CType {
+    fn type_info() -> Type {
         assert_eq!(size_of::<T>(), size_of::<L>());
         L::type_info()
     }

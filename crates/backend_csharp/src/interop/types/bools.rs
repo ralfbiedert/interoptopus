@@ -1,14 +1,14 @@
 use crate::Interop;
 use crate::converter::to_typespecifier_in_param;
 use interoptopus::backend::IndentWriter;
-use interoptopus::lang::CType;
+use interoptopus::lang::Type;
 use interoptopus::pattern::TypePattern;
 use interoptopus::{Error, indented};
 
 pub fn write_type_definition_ffibool(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     i.debug(w, "write_type_definition_ffibool")?;
 
-    let type_name = to_typespecifier_in_param(&CType::Pattern(TypePattern::Bool));
+    let type_name = to_typespecifier_in_param(&Type::Pattern(TypePattern::Bool));
 
     indented!(w, r"[Serializable]")?;
     indented!(w, r"[StructLayout(LayoutKind.Sequential)]")?;

@@ -3,7 +3,7 @@ use crate::converter::{to_ctypes_name, to_type_hint_in, to_type_hint_out};
 use crate::interop::patterns::{write_option, write_slice};
 use interoptopus::backend::sort_types_by_dependencies;
 use interoptopus::backend::{IndentWriter, WriteFor};
-use interoptopus::lang::{CType, CompositeType, EnumType, Layout};
+use interoptopus::lang::{Composite, Enum, Layout, Type};
 use interoptopus::pattern::TypePattern;
 use interoptopus::{Error, indented};
 
@@ -13,9 +13,9 @@ pub fn write_types(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
 
     for t in &sorted_types {
         match t {
-            CType::Composite(c) => write_struct(i, w, c, WriteFor::Code)?,
-            CType::Enum(e) => write_enum(i, w, e, WriteFor::Code)?,
-            CType::Pattern(p) => match p {
+            Type::Composite(c) => write_struct(i, w, c, WriteFor::Code)?,
+            Type::Enum(e) => write_enum(i, w, e, WriteFor::Code)?,
+            Type::Pattern(p) => match p {
                 TypePattern::FFIErrorEnum(e) => write_enum(i, w, e.the_enum(), WriteFor::Code)?,
                 TypePattern::Slice(c) => write_slice(i, w, c, false)?,
                 TypePattern::SliceMut(c) => write_slice(i, w, c, true)?,
@@ -36,7 +36,7 @@ pub fn write_types(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     Ok(())
 }
 
-pub fn write_struct(_i: &Interop, w: &mut IndentWriter, c: &CompositeType, write_for: WriteFor) -> Result<(), Error> {
+pub fn write_struct(_i: &Interop, w: &mut IndentWriter, c: &Composite, write_for: WriteFor) -> Result<(), Error> {
     let documentation = c.meta().documentation().lines().join("\n");
 
     indented!(w, r"class {}(ctypes.Structure):", c.rust_name())?;
@@ -111,7 +111,7 @@ pub fn write_struct(_i: &Interop, w: &mut IndentWriter, c: &CompositeType, write
         }
 
         match f.the_type() {
-            CType::Pattern(_) => indented!(w, [()()], r#"return ctypes.Structure.__get__(self, "{}")"#, f.name())?,
+            Type::Pattern(_) => indented!(w, [()()], r#"return ctypes.Structure.__get__(self, "{}")"#, f.name())?,
             _ => indented!(w, [()()], r#"return ctypes.Structure.__get__(self, "{}")"#, f.name())?,
         }
 
@@ -128,7 +128,7 @@ pub fn write_struct(_i: &Interop, w: &mut IndentWriter, c: &CompositeType, write
     Ok(())
 }
 
-pub fn write_enum(_i: &Interop, w: &mut IndentWriter, e: &EnumType, write_for: WriteFor) -> Result<(), Error> {
+pub fn write_enum(_i: &Interop, w: &mut IndentWriter, e: &Enum, write_for: WriteFor) -> Result<(), Error> {
     let documentation = e.meta().documentation().lines().join("\n");
 
     indented!(w, r"class {}:", e.rust_name())?;

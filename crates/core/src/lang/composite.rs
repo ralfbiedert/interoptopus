@@ -1,4 +1,4 @@
-use crate::lang::{CType, Documentation, Meta, PrimitiveType, Visibility};
+use crate::lang::{Documentation, Meta, Primitive, Type, Visibility};
 
 /// How a struct is laid out in memory.
 #[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -8,7 +8,7 @@ pub enum Layout {
     Packed,
     Opaque,
     /// For use with enum discriminant.
-    Primitive(PrimitiveType),
+    Primitive(Primitive),
 }
 
 /// How a type is represented in memory.
@@ -56,14 +56,14 @@ impl Representation {
 /// } MyComposite;
 /// ```
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct CompositeType {
+pub struct Composite {
     name: String,
     fields: Vec<Field>,
     repr: Representation,
     meta: Meta,
 }
 
-impl CompositeType {
+impl Composite {
     /// Creates a new composite with the given name and fields and no documentation.
     #[must_use]
     pub fn new(name: String, fields: Vec<Field>) -> Self {
@@ -95,7 +95,7 @@ impl CompositeType {
 
     /// If this were a wrapper over a pointer type, get the type of what we're pointing go.
     #[must_use]
-    pub fn try_deref_pointer(&self) -> Option<CType> {
+    pub fn try_deref_pointer(&self) -> Option<Type> {
         self.fields().first()?.the_type().try_deref_pointer().cloned()
     }
 
@@ -116,28 +116,28 @@ impl CompositeType {
     }
 
     #[must_use]
-    pub fn into_ctype(&self) -> CType {
-        CType::Composite(self.clone())
+    pub fn into_ctype(&self) -> Type {
+        Type::Composite(self.clone())
     }
 }
 
-/// Fields of a [`CompositeType`].
+/// Fields of a [`Composite`].
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Field {
     name: String,
     visibility: Visibility,
-    the_type: CType,
+    the_type: Type,
     documentation: Documentation,
 }
 
 impl Field {
     #[must_use]
-    pub fn new(name: String, the_type: CType) -> Self {
+    pub fn new(name: String, the_type: Type) -> Self {
         Self::with_documentation(name, the_type, Visibility::Public, Documentation::new())
     }
 
     #[must_use]
-    pub const fn with_documentation(name: String, the_type: CType, visibility: Visibility, documentation: Documentation) -> Self {
+    pub const fn with_documentation(name: String, the_type: Type, visibility: Visibility, documentation: Documentation) -> Self {
         Self { name, visibility, the_type, documentation }
     }
 
@@ -147,7 +147,7 @@ impl Field {
     }
 
     #[must_use]
-    pub const fn the_type(&self) -> &CType {
+    pub const fn the_type(&self) -> &Type {
         &self.the_type
     }
 
@@ -164,12 +164,12 @@ impl Field {
 
 /// A named `struct` that becomes a fieldless `typedef struct S S;` in C.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct OpaqueType {
+pub struct Opaque {
     name: String,
     meta: Meta,
 }
 
-impl OpaqueType {
+impl Opaque {
     #[must_use]
     pub const fn new(name: String, meta: Meta) -> Self {
         Self { name, meta }

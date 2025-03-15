@@ -2,7 +2,7 @@
 
 use crate::lang::enums::Variant;
 use crate::lang::function::{FunctionSignature, Parameter};
-use crate::lang::{ArrayType, CType, Constant, FnPointerType, Function, PrimitiveType, PrimitiveValue};
+use crate::lang::{Array, Constant, FnPointer, Function, Primitive, PrimitiveValue, Type};
 use std::mem::MaybeUninit;
 use std::ptr::NonNull;
 
@@ -23,7 +23,7 @@ pub unsafe trait ConstantInfo {
 /// This trait must be implemented correctly, or else the generated bindings disagree in
 /// their type layout from the actual Rust type, leading to immediate UB upon function invocation.
 pub unsafe trait TypeInfo {
-    fn type_info() -> CType;
+    fn type_info() -> Type;
 }
 
 /// Implemented for a function-helper produced by [`ffi_function`](crate::ffi_function), gives meta info for a function.
@@ -60,8 +60,8 @@ macro_rules! impl_ctype_primitive {
         $primitive:expr
     ) => {
         unsafe impl crate::lang::TypeInfo for $rust_type {
-            fn type_info() -> CType {
-                CType::Primitive($primitive)
+            fn type_info() -> Type {
+                Type::Primitive($primitive)
             }
         }
     };
@@ -92,42 +92,42 @@ impl_const_value_primitive!(f32, PrimitiveValue::F32);
 impl_const_value_primitive!(f64, PrimitiveValue::F64);
 impl_const_value_primitive!(bool, PrimitiveValue::Bool);
 
-impl_ctype_primitive!(std::ffi::c_void, PrimitiveType::Void);
-impl_ctype_primitive!((), PrimitiveType::Void);
-impl_ctype_primitive!(u8, PrimitiveType::U8);
-impl_ctype_primitive!(u16, PrimitiveType::U16);
-impl_ctype_primitive!(u32, PrimitiveType::U32);
-impl_ctype_primitive!(u64, PrimitiveType::U64);
-impl_ctype_primitive!(i8, PrimitiveType::I8);
-impl_ctype_primitive!(i16, PrimitiveType::I16);
-impl_ctype_primitive!(i32, PrimitiveType::I32);
-impl_ctype_primitive!(i64, PrimitiveType::I64);
-impl_ctype_primitive!(f32, PrimitiveType::F32);
-impl_ctype_primitive!(f64, PrimitiveType::F64);
-impl_ctype_primitive!(bool, PrimitiveType::Bool);
-impl_ctype_primitive!(std::num::NonZeroU8, PrimitiveType::U8);
-impl_ctype_primitive!(std::num::NonZeroU16, PrimitiveType::U16);
-impl_ctype_primitive!(std::num::NonZeroU32, PrimitiveType::U32);
-impl_ctype_primitive!(std::num::NonZeroU64, PrimitiveType::U64);
-impl_ctype_primitive!(std::num::NonZeroI8, PrimitiveType::I8);
-impl_ctype_primitive!(std::num::NonZeroI16, PrimitiveType::I16);
-impl_ctype_primitive!(std::num::NonZeroI32, PrimitiveType::I32);
-impl_ctype_primitive!(std::num::NonZeroI64, PrimitiveType::I64);
-impl_ctype_primitive!(Option<std::num::NonZeroU8>, PrimitiveType::U8);
-impl_ctype_primitive!(Option<std::num::NonZeroU16>, PrimitiveType::U16);
-impl_ctype_primitive!(Option<std::num::NonZeroU32>, PrimitiveType::U32);
-impl_ctype_primitive!(Option<std::num::NonZeroU64>, PrimitiveType::U64);
-impl_ctype_primitive!(Option<std::num::NonZeroI8>, PrimitiveType::I8);
-impl_ctype_primitive!(Option<std::num::NonZeroI16>, PrimitiveType::I16);
-impl_ctype_primitive!(Option<std::num::NonZeroI32>, PrimitiveType::I32);
-impl_ctype_primitive!(Option<std::num::NonZeroI64>, PrimitiveType::I64);
+impl_ctype_primitive!(std::ffi::c_void, Primitive::Void);
+impl_ctype_primitive!((), Primitive::Void);
+impl_ctype_primitive!(u8, Primitive::U8);
+impl_ctype_primitive!(u16, Primitive::U16);
+impl_ctype_primitive!(u32, Primitive::U32);
+impl_ctype_primitive!(u64, Primitive::U64);
+impl_ctype_primitive!(i8, Primitive::I8);
+impl_ctype_primitive!(i16, Primitive::I16);
+impl_ctype_primitive!(i32, Primitive::I32);
+impl_ctype_primitive!(i64, Primitive::I64);
+impl_ctype_primitive!(f32, Primitive::F32);
+impl_ctype_primitive!(f64, Primitive::F64);
+impl_ctype_primitive!(bool, Primitive::Bool);
+impl_ctype_primitive!(std::num::NonZeroU8, Primitive::U8);
+impl_ctype_primitive!(std::num::NonZeroU16, Primitive::U16);
+impl_ctype_primitive!(std::num::NonZeroU32, Primitive::U32);
+impl_ctype_primitive!(std::num::NonZeroU64, Primitive::U64);
+impl_ctype_primitive!(std::num::NonZeroI8, Primitive::I8);
+impl_ctype_primitive!(std::num::NonZeroI16, Primitive::I16);
+impl_ctype_primitive!(std::num::NonZeroI32, Primitive::I32);
+impl_ctype_primitive!(std::num::NonZeroI64, Primitive::I64);
+impl_ctype_primitive!(Option<std::num::NonZeroU8>, Primitive::U8);
+impl_ctype_primitive!(Option<std::num::NonZeroU16>, Primitive::U16);
+impl_ctype_primitive!(Option<std::num::NonZeroU32>, Primitive::U32);
+impl_ctype_primitive!(Option<std::num::NonZeroU64>, Primitive::U64);
+impl_ctype_primitive!(Option<std::num::NonZeroI8>, Primitive::I8);
+impl_ctype_primitive!(Option<std::num::NonZeroI16>, Primitive::I16);
+impl_ctype_primitive!(Option<std::num::NonZeroI32>, Primitive::I32);
+impl_ctype_primitive!(Option<std::num::NonZeroI64>, Primitive::I64);
 
 unsafe impl<T> TypeInfo for NonNull<T>
 where
     T: TypeInfo,
 {
-    fn type_info() -> CType {
-        CType::ReadWritePointer(Box::new(T::type_info()))
+    fn type_info() -> Type {
+        Type::ReadWritePointer(Box::new(T::type_info()))
     }
 }
 
@@ -135,8 +135,8 @@ unsafe impl<T> TypeInfo for &'_ T
 where
     T: TypeInfo + Sized + 'static,
 {
-    fn type_info() -> CType {
-        CType::ReadPointer(Box::new(T::type_info()))
+    fn type_info() -> Type {
+        Type::ReadPointer(Box::new(T::type_info()))
     }
 }
 
@@ -144,8 +144,8 @@ unsafe impl<T> TypeInfo for &'_ mut T
 where
     T: TypeInfo + Sized + 'static,
 {
-    fn type_info() -> CType {
-        CType::ReadWritePointer(Box::new(T::type_info()))
+    fn type_info() -> Type {
+        Type::ReadWritePointer(Box::new(T::type_info()))
     }
 }
 
@@ -153,8 +153,8 @@ unsafe impl<T> TypeInfo for *const T
 where
     T: TypeInfo + Sized + 'static,
 {
-    fn type_info() -> CType {
-        CType::ReadPointer(Box::new(T::type_info()))
+    fn type_info() -> Type {
+        Type::ReadPointer(Box::new(T::type_info()))
     }
 }
 
@@ -162,8 +162,8 @@ unsafe impl<T> TypeInfo for *mut T
 where
     T: TypeInfo + Sized + 'static,
 {
-    fn type_info() -> CType {
-        CType::ReadWritePointer(Box::new(T::type_info()))
+    fn type_info() -> Type {
+        Type::ReadWritePointer(Box::new(T::type_info()))
     }
 }
 
@@ -171,8 +171,8 @@ unsafe impl<T> TypeInfo for Option<&'_ T>
 where
     T: TypeInfo + Sized + 'static,
 {
-    fn type_info() -> CType {
-        CType::ReadPointer(Box::new(T::type_info()))
+    fn type_info() -> Type {
+        Type::ReadPointer(Box::new(T::type_info()))
     }
 }
 
@@ -180,8 +180,8 @@ unsafe impl<T> TypeInfo for Option<&'_ mut T>
 where
     T: TypeInfo + Sized + 'static,
 {
-    fn type_info() -> CType {
-        CType::ReadWritePointer(Box::new(T::type_info()))
+    fn type_info() -> Type {
+        Type::ReadWritePointer(Box::new(T::type_info()))
     }
 }
 
@@ -189,9 +189,9 @@ unsafe impl<R> TypeInfo for extern "C" fn() -> R
 where
     R: TypeInfo,
 {
-    fn type_info() -> CType {
+    fn type_info() -> Type {
         let sig = FunctionSignature::new(vec![], R::type_info());
-        CType::FnPointer(FnPointerType::new(sig))
+        Type::FnPointer(FnPointer::new(sig))
     }
 }
 
@@ -199,9 +199,9 @@ unsafe impl<R> TypeInfo for Option<extern "C" fn() -> R>
 where
     R: TypeInfo,
 {
-    fn type_info() -> CType {
+    fn type_info() -> Type {
         let sig = FunctionSignature::new(vec![], R::type_info());
-        CType::FnPointer(FnPointerType::new(sig))
+        Type::FnPointer(FnPointer::new(sig))
     }
 }
 
@@ -210,9 +210,9 @@ where
     T1: TypeInfo,
     R: TypeInfo,
 {
-    fn type_info() -> CType {
+    fn type_info() -> Type {
         let sig = FunctionSignature::new(vec![Parameter::new("x0".to_string(), T1::type_info())], R::type_info());
-        CType::FnPointer(FnPointerType::new(sig))
+        Type::FnPointer(FnPointer::new(sig))
     }
 }
 
@@ -221,9 +221,9 @@ where
     T1: TypeInfo,
     R: TypeInfo,
 {
-    fn type_info() -> CType {
+    fn type_info() -> Type {
         let sig = FunctionSignature::new(vec![Parameter::new("x0".to_string(), T1::type_info())], R::type_info());
-        CType::FnPointer(FnPointerType::new(sig))
+        Type::FnPointer(FnPointer::new(sig))
     }
 }
 
@@ -233,9 +233,9 @@ where
     T2: TypeInfo,
     R: TypeInfo,
 {
-    fn type_info() -> CType {
+    fn type_info() -> Type {
         let sig = FunctionSignature::new(vec![Parameter::new("x0".to_string(), T1::type_info()), Parameter::new("x1".to_string(), T2::type_info())], R::type_info());
-        CType::FnPointer(FnPointerType::new(sig))
+        Type::FnPointer(FnPointer::new(sig))
     }
 }
 
@@ -245,9 +245,9 @@ where
     T2: TypeInfo,
     R: TypeInfo,
 {
-    fn type_info() -> CType {
+    fn type_info() -> Type {
         let sig = FunctionSignature::new(vec![Parameter::new("x0".to_string(), T1::type_info()), Parameter::new("x1".to_string(), T2::type_info())], R::type_info());
-        CType::FnPointer(FnPointerType::new(sig))
+        Type::FnPointer(FnPointer::new(sig))
     }
 }
 
@@ -258,7 +258,7 @@ where
     T3: TypeInfo,
     R: TypeInfo,
 {
-    fn type_info() -> CType {
+    fn type_info() -> Type {
         let sig = FunctionSignature::new(
             vec![
                 Parameter::new("x0".to_string(), T1::type_info()),
@@ -267,7 +267,7 @@ where
             ],
             R::type_info(),
         );
-        CType::FnPointer(FnPointerType::new(sig))
+        Type::FnPointer(FnPointer::new(sig))
     }
 }
 
@@ -278,7 +278,7 @@ where
     T3: TypeInfo,
     R: TypeInfo,
 {
-    fn type_info() -> CType {
+    fn type_info() -> Type {
         let sig = FunctionSignature::new(
             vec![
                 Parameter::new("x0".to_string(), T1::type_info()),
@@ -287,7 +287,7 @@ where
             ],
             R::type_info(),
         );
-        CType::FnPointer(FnPointerType::new(sig))
+        Type::FnPointer(FnPointer::new(sig))
     }
 }
 
@@ -299,7 +299,7 @@ where
     T4: TypeInfo,
     R: TypeInfo,
 {
-    fn type_info() -> CType {
+    fn type_info() -> Type {
         let sig = FunctionSignature::new(
             vec![
                 Parameter::new("x0".to_string(), T1::type_info()),
@@ -309,7 +309,7 @@ where
             ],
             R::type_info(),
         );
-        CType::FnPointer(FnPointerType::new(sig))
+        Type::FnPointer(FnPointer::new(sig))
     }
 }
 
@@ -321,7 +321,7 @@ where
     T4: TypeInfo,
     R: TypeInfo,
 {
-    fn type_info() -> CType {
+    fn type_info() -> Type {
         let sig = FunctionSignature::new(
             vec![
                 Parameter::new("x0".to_string(), T1::type_info()),
@@ -331,7 +331,7 @@ where
             ],
             R::type_info(),
         );
-        CType::FnPointer(FnPointerType::new(sig))
+        Type::FnPointer(FnPointer::new(sig))
     }
 }
 
@@ -344,7 +344,7 @@ where
     T5: TypeInfo,
     R: TypeInfo,
 {
-    fn type_info() -> CType {
+    fn type_info() -> Type {
         let sig = FunctionSignature::new(
             vec![
                 Parameter::new("x0".to_string(), T1::type_info()),
@@ -355,7 +355,7 @@ where
             ],
             R::type_info(),
         );
-        CType::FnPointer(FnPointerType::new(sig))
+        Type::FnPointer(FnPointer::new(sig))
     }
 }
 
@@ -368,7 +368,7 @@ where
     T5: TypeInfo,
     R: TypeInfo,
 {
-    fn type_info() -> CType {
+    fn type_info() -> Type {
         let sig = FunctionSignature::new(
             vec![
                 Parameter::new("x0".to_string(), T1::type_info()),
@@ -379,7 +379,7 @@ where
             ],
             R::type_info(),
         );
-        CType::FnPointer(FnPointerType::new(sig))
+        Type::FnPointer(FnPointer::new(sig))
     }
 }
 
@@ -387,8 +387,8 @@ unsafe impl<T, const N: usize> TypeInfo for [T; N]
 where
     T: TypeInfo,
 {
-    fn type_info() -> CType {
-        CType::Array(ArrayType::new(T::type_info(), N))
+    fn type_info() -> Type {
+        Type::Array(Array::new(T::type_info(), N))
     }
 }
 
@@ -396,7 +396,7 @@ unsafe impl<T> TypeInfo for MaybeUninit<T>
 where
     T: TypeInfo,
 {
-    fn type_info() -> CType {
+    fn type_info() -> Type {
         T::type_info()
     }
 }

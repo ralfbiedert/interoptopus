@@ -73,7 +73,7 @@
 //! in certain backends.
 //!
 
-use crate::lang::{CType, CompositeType, PrimitiveType, TypeInfo};
+use crate::lang::{Composite, Primitive, Type, TypeInfo};
 use crate::pattern::builtins::Builtins;
 use crate::pattern::callback::{AsyncCallback, NamedCallback};
 use crate::pattern::result::{FFIErrorEnum, FFIResultType};
@@ -122,12 +122,12 @@ impl From<ServiceDefinition> for LibraryPattern {
 #[non_exhaustive]
 pub enum TypePattern {
     CStrPointer,
-    Utf8String(CompositeType),
+    Utf8String(Composite),
     APIVersion,
     FFIErrorEnum(FFIErrorEnum),
     Slice(SliceType),
     SliceMut(SliceType),
-    Option(CompositeType),
+    Option(Composite),
     Result(FFIResultType),
     Bool,
     CChar,
@@ -139,22 +139,22 @@ impl TypePattern {
     /// For languages like C that don't care about these patterns, give the
     /// C-equivalent fallback type.
     ///
-    /// This function will never return a [`CType::Pattern`] variant.
+    /// This function will never return a [`Type::Pattern`] variant.
     #[must_use]
-    pub fn fallback_type(&self) -> CType {
+    pub fn fallback_type(&self) -> Type {
         match self {
-            Self::CStrPointer => CType::ReadPointer(Box::new(CType::Pattern(Self::CChar))),
-            Self::FFIErrorEnum(e) => CType::Enum(e.the_enum().clone()),
-            Self::Slice(x) => CType::Composite(x.composite_type().clone()),
-            Self::SliceMut(x) => CType::Composite(x.composite_type().clone()),
-            Self::Option(x) => CType::Composite(x.clone()),
-            Self::Result(x) => CType::Composite(x.composite().clone()),
-            Self::NamedCallback(x) => CType::FnPointer(x.fnpointer().clone()),
-            Self::Bool => CType::Primitive(PrimitiveType::U8),
+            Self::CStrPointer => Type::ReadPointer(Box::new(Type::Pattern(Self::CChar))),
+            Self::FFIErrorEnum(e) => Type::Enum(e.the_enum().clone()),
+            Self::Slice(x) => Type::Composite(x.composite_type().clone()),
+            Self::SliceMut(x) => Type::Composite(x.composite_type().clone()),
+            Self::Option(x) => Type::Composite(x.clone()),
+            Self::Result(x) => Type::Composite(x.composite().clone()),
+            Self::NamedCallback(x) => Type::FnPointer(x.fnpointer().clone()),
+            Self::Bool => Type::Primitive(Primitive::U8),
             Self::CChar => c_char::type_info(),
-            Self::APIVersion => CType::Primitive(PrimitiveType::U64),
-            Self::AsyncCallback(x) => CType::FnPointer(x.fnpointer().clone()),
-            Self::Utf8String(x) => CType::Composite(x.clone()),
+            Self::APIVersion => Type::Primitive(Primitive::U64),
+            Self::AsyncCallback(x) => Type::FnPointer(x.fnpointer().clone()),
+            Self::Utf8String(x) => Type::Composite(x.clone()),
         }
     }
 }

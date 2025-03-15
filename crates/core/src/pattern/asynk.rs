@@ -1,7 +1,7 @@
 //! Transparent `async fn` support over FFI.
 
 use crate::lang::TypeInfo;
-use crate::lang::{CType, Documentation, FnPointerType, FunctionSignature, Meta, Parameter, PrimitiveType};
+use crate::lang::{Documentation, FnPointer, FunctionSignature, Meta, Parameter, Primitive, Type};
 use crate::pattern;
 use crate::pattern::TypePattern;
 use std::ffi::c_void;
@@ -55,21 +55,21 @@ impl<T: TypeInfo> From<AsyncCallback<T>> for Option<extern "C" fn(&T, *const c_v
 }
 
 unsafe impl<T: TypeInfo> TypeInfo for AsyncCallback<T> {
-    fn type_info() -> CType {
+    fn type_info() -> Type {
         let rval = <() as TypeInfo>::type_info();
 
         let params = vec![
-            Parameter::new("value_ptr".to_string(), CType::ReadPointer(Box::new(T::type_info()))),
-            Parameter::new("callback_data".to_string(), CType::ReadPointer(Box::new(CType::Primitive(PrimitiveType::Void)))),
+            Parameter::new("value_ptr".to_string(), Type::ReadPointer(Box::new(T::type_info()))),
+            Parameter::new("callback_data".to_string(), Type::ReadPointer(Box::new(Type::Primitive(Primitive::Void)))),
         ];
 
         let meta = Meta::with_documentation(Documentation::new());
         let sig = FunctionSignature::new(params, rval);
         let name = format!("AsyncCallback{}", T::type_info().name_within_lib());
-        let fn_pointer = FnPointerType::new_named(sig, name);
+        let fn_pointer = FnPointer::new_named(sig, name);
         let named_callback = pattern::AsyncCallback::with_meta(fn_pointer, meta);
 
-        CType::Pattern(TypePattern::AsyncCallback(named_callback))
+        Type::Pattern(TypePattern::AsyncCallback(named_callback))
     }
 }
 

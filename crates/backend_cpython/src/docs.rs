@@ -6,7 +6,7 @@ use interoptopus::Error;
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::indented;
 use interoptopus::inventory::{Bindings, non_service_functions};
-use interoptopus::lang::{CType, CompositeType, Function};
+use interoptopus::lang::{Composite, Function, Type};
 use interoptopus::pattern::{LibraryPattern, TypePattern};
 
 /// Configures Python documentation generation.
@@ -72,7 +72,7 @@ impl<'a> Markdown<'a> {
         indented!(w, r"Groups of related constants.")?;
 
         for the_type in self.interop.inventory.ctypes().iter().filter_map(|x| match x {
-            CType::Enum(e) => Some(e),
+            Type::Enum(e) => Some(e),
             _ => None,
         }) {
             let doc = the_type.meta().documentation().lines().first().cloned().unwrap_or_default();
@@ -85,15 +85,15 @@ impl<'a> Markdown<'a> {
 
         for the_type in self.interop.inventory.ctypes() {
             match the_type {
-                CType::Composite(c) => {
+                Type::Composite(c) => {
                     let doc = c.meta().documentation().lines().first().cloned().unwrap_or_default();
                     indented!(w, r" - **[{}](#{})** - {}", c.rust_name(), c.rust_name(), doc)?;
                 }
-                CType::Pattern(p @ TypePattern::Option(_)) => {
+                Type::Pattern(p @ TypePattern::Option(_)) => {
                     let c = p.fallback_type().as_composite_type().cloned().unwrap();
                     indented!(w, r" - **[{}](#{})** - A boolean flag and optionally data.", c.rust_name(), c.rust_name())?;
                 }
-                CType::Pattern(p @ TypePattern::Slice(_)) => {
+                Type::Pattern(p @ TypePattern::Slice(_)) => {
                     let c = p.fallback_type().as_composite_type().cloned().unwrap();
                     indented!(w, r" - **[{}](#{})** - A pointer and length of un-owned elements.", c.rust_name(), c.rust_name())?;
                 }
@@ -109,9 +109,9 @@ impl<'a> Markdown<'a> {
 
         for the_type in self.interop.inventory.ctypes() {
             match the_type {
-                CType::Composite(e) => self.write_composite(w, e)?,
-                CType::Pattern(p @ TypePattern::Option(_)) => self.write_composite(w, p.fallback_type().as_composite_type().unwrap())?,
-                CType::Pattern(p @ TypePattern::Slice(_)) => self.write_composite(w, p.fallback_type().as_composite_type().unwrap())?,
+                Type::Composite(e) => self.write_composite(w, e)?,
+                Type::Pattern(p @ TypePattern::Option(_)) => self.write_composite(w, p.fallback_type().as_composite_type().unwrap())?,
+                Type::Pattern(p @ TypePattern::Slice(_)) => self.write_composite(w, p.fallback_type().as_composite_type().unwrap())?,
                 _ => continue,
             }
 
@@ -123,7 +123,7 @@ impl<'a> Markdown<'a> {
         Ok(())
     }
 
-    fn write_composite(&self, w: &mut IndentWriter, composite: &CompositeType) -> Result<(), Error> {
+    fn write_composite(&self, w: &mut IndentWriter, composite: &Composite) -> Result<(), Error> {
         let meta = composite.meta();
 
         w.newline()?;
@@ -156,7 +156,7 @@ impl<'a> Markdown<'a> {
         indented!(w, r"# Enums ")?;
 
         for the_type in self.interop.inventory.ctypes() {
-            let CType::Enum(the_enum) = the_type else { continue };
+            let Type::Enum(the_enum) = the_type else { continue };
             let meta = the_enum.meta();
 
             w.newline()?;
