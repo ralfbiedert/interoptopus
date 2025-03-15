@@ -1,0 +1,64 @@
+thread 'rustc' panicked at compiler\rustc_hir_analysis\src\hir_ty_lowering\lint.rs:210:61:
+$ident: found ImplItem(ImplItem { ident: assert_receiver_is_total_eq#140, owner_id: DefId(0:1317 ~ interoptopus[b028]::lang::enums::{impl#14}::assert_receiver_is_total_eq), generics: Generics { params: [GenericParam { hir_id: HirId(DefId(0:1317 ~ interoptopus[b028]::lang::enums::{impl#14}::assert_receiver_is_total_eq).25), def_id: DefId(0:2503 ~ interoptopus[b028]::lang::enums::{impl#14}::assert_receiver_is_total_eq::'_), name: Fresh, span: crates\core\src\lang\enums.rs:45:41: 45:42 (#140), pure_wrt_drop: false, kind: Lifetime { kind: Elided(Ampersand) }, colon_span: None, source: Generics }], predicates: [], has_where_clause_predicates: false, where_clause_span: crates\core\src\lang\enums.rs:45:41: 45:43 (#140), span: crates\core\src\lang\enums.rs:45:41: 45:43 (#140) }, kind: Fn(FnSig { header: FnHeader { safety: Normal(Safe), constness: NotConst, asyncness: NotAsync, abi: Rust }, decl: FnDecl { inputs: [Ty { hir_id: HirId(DefId(0:1317 ~ interoptopus[b028]::lang::enums::{impl#14}::assert_receiver_is_total_eq).29), span: crates\core\src\lang\enums.rs:45:41: 45:43 (#140), kind: Ref(Lifetime { hir_id: HirId(DefId(0:1317 ~ interoptopus[b028]::lang::enums::{impl#14}::assert_receiver_is_total_eq).26), ident: '_#140, res: Param(DefId(0:2503 ~ interoptopus[b028]::lang::enums::{impl#14}::assert_receiver_is_total_eq::'_)) }, MutTy { ty: Ty { hir_id: HirId(DefId(0:1317 ~ interoptopus[b028]::lang::enums::{impl#14}::assert_receiver_is_total_eq).28), span: crates\core\src\lang\enums.rs:45:41: 45:43 (#0), kind: Path(Resolved(None, Path { span: crates\core\src\lang\enums.rs:45:41: 45:43 (#0), res: SelfTyAlias { alias_to: DefId(0:1316 ~ interoptopus[b028]::lang::enums::{impl#14}), forbid_generic: false, is_trait_impl: true }, segments: [PathSegment { ident: Self#0, hir_id: HirId(DefId(0:1317 ~ interoptopus[b028]::lang::enums::{impl#14}::assert_receiver_is_total_eq).27), res: SelfTyAlias { alias_to: DefId(0:1316 ~ interoptopus[b028]::lang::enums::{impl#14}), forbid_generic: false, is_trait_impl: true }, args: None, infer_args: true }] })) }, mutbl: Not }) }], output: Return(Ty { hir_id: HirId(DefId(0:1317 ~ interoptopus[b028]::lang::enums::{impl#14}::assert_receiver_is_total_eq).30), span: crates\core\src\lang\enums.rs:45:41: 45:43 (#140), kind: Tup([]) }), c_variadic: false, implicit_self: RefImm, lifetime_elision_allowed: true }, span: crates\core\src\lang\enums.rs:45:41: 45:43 (#140) }, BodyId { hir_id: HirId(DefId(0:1317 ~ interoptopus[b028]::lang::enums::{impl#14}::assert_receiver_is_total_eq).24) }), defaultness: Final, span: crates\core\src\lang\enums.rs:45:41: 45:43 (#140), vis_span: crates\core\src\lang\enums.rs:45:41: 45:41 (#140) })
+stack backtrace:
+   0:     0x7fff051315fe - std::backtrace_rs::backtrace::win64::trace
+                               at /rustc/efea9896f506baa08f40444e07774e827646d57a/library\std\src\..\..\backtrace\src\backtrace\win64.rs:85
+   1:     0x7fff051315fe - std::backtrace_rs::backtrace::trace_unsynchronized
+                               at /rustc/efea9896f506baa08f40444e07774e827646d57a/library\std\src\..\..\backtrace\src\backtrace\mod.rs:66
+   2:     0x7fff051315fe - std::backtrace::Backtrace::create
+                               at /rustc/efea9896f506baa08f40444e07774e827646d57a/library\std\src\backtrace.rs:331
+   3:     0x7fff0513153a - std::backtrace::Backtrace::force_capture
+                               at /rustc/efea9896f506baa08f40444e07774e827646d57a/library\std\src\backtrace.rs:312
+   4:     0x7fff066d00fd - core[fb5e722156b78956]::slice::sort::unstable::heapsort::heapsort::<((rustc_lint_defs[e36a5df4f7fe56ca]::Level, &str), usize), <((rustc_lint_defs[e36a5df4f7fe56ca]::Level, &str), usize) as core[fb5e722156b78956]::cmp::PartialOrd>::lt>
+   5:     0x7fff0514ee9e - std::panicking::rust_panic_with_hook
+                               at /rustc/efea9896f506baa08f40444e07774e827646d57a/library\std\src\panicking.rs:839
+   6:     0x7fff0514ebf9 - std::panicking::begin_panic_handler::closure$0
+                               at /rustc/efea9896f506baa08f40444e07774e827646d57a/library\std\src\panicking.rs:704
+   7:     0x7fff0514aaff - std::sys::backtrace::__rust_end_short_backtrace<std::panicking::begin_panic_handler::closure_env$0,never$>
+                               at /rustc/efea9896f506baa08f40444e07774e827646d57a/library\std\src\sys\backtrace.rs:168
+   8:     0x7fff0514e7fe - std::panicking::begin_panic_handler
+                               at /rustc/efea9896f506baa08f40444e07774e827646d57a/library\std\src\panicking.rs:695
+   9:     0x7fff07fabd51 - core::panicking::panic_fmt
+                               at /rustc/efea9896f506baa08f40444e07774e827646d57a/library\core\src\panicking.rs:75
+  10:     0x7fff07e37c35 - <rustc_hir[fb932b644d3ef517]::hir::YieldSource as core[fb5e722156b78956]::fmt::Display>::fmt
+  11:     0x7fff0660ee97 - <rustc_hir[fb932b644d3ef517]::hir::Node>::expect_item
+  12:     0x7fff049e8684 - <dyn rustc_hir_analysis[3831dc219e97703c]::hir_ty_lowering::HirTyLowerer>::lower_ty_maybe_return_type_notation
+  13:     0x7fff054f06cf - <dyn rustc_hir_analysis[3831dc219e97703c]::hir_ty_lowering::HirTyLowerer>::lower_ty
+  14:     0x7fff054e855d - <dyn rustc_hir_analysis[3831dc219e97703c]::hir_ty_lowering::HirTyLowerer>::lower_path
+  15:     0x7fff054eff6c - <dyn rustc_hir_analysis[3831dc219e97703c]::hir_ty_lowering::HirTyLowerer>::lower_ty
+  16:     0x7fff05351634 - <rustc_hir_typeck[36009252d7ef135b]::fn_ctxt::FnCtxt as rustc_hir_analysis[3831dc219e97703c]::hir_ty_lowering::HirTyLowerer>::record_ty
+  17:     0x7fff053519d7 - <rustc_hir_typeck[36009252d7ef135b]::gather_locals::GatherLocalsVisitor as rustc_hir[fb932b644d3ef517]::intravisit::Visitor>::visit_expr
+  18:     0x7fff053a5fca - rustc_hir_typeck[36009252d7ef135b]::typeck
+  19:     0x7fff053eb942 - <rustc_hir_typeck[36009252d7ef135b]::upvar::InferBorrowKind as rustc_hir_typeck[36009252d7ef135b]::expr_use_visitor::Delegate>::borrow
+  20:     0x7fff0539f7ff - rustc_hir_typeck[36009252d7ef135b]::typeck
+  21:     0x7fff05ee2aeb - rustc_query_impl[7e055f0198210b93]::plumbing::query_key_hash_verify_all
+  22:     0x7fff05e29fab - RINvNtNtCsa4eoanVeiba_18rustc_query_system5query8plumbing17try_execute_queryINtCsaOO130TIfoR_16rustc_query_impl13DynamicConfigINtNtCs9e40Nob4F72_21rustc_data_structures9vec_cache8VecCacheNtNtCsiDSHIWyv3Oa_10rustc_span6def_id10LocalDefIdINtNtNtCsb3yqv1AAQly
+  23:     0x7fff05eeac40 - rustc_query_impl[7e055f0198210b93]::plumbing::query_key_hash_verify_all
+  24:     0x7fff05411d54 - RINvMs6_NtCsbQenJj8Pbql_9hashbrown3rawINtB6_8RawTablejE14reserve_rehashNCINvNtNtCs5LgMjvor2an_8indexmap3map4core8get_hashTNtNtNtCsb3yqv1AAQly_12rustc_middle2ty9predicate6ClauseNtNtCsiDSHIWyv3Oa_10rustc_span13span_encoding4SpanEuE0ECs4P7EpBpu9fQ_18rustc_hir
+  25:     0x7fff05499b21 - rustc_hir_analysis[3831dc219e97703c]::check_crate
+  26:     0x7fff051c672f - rustc_interface[abf226499db44a20]::passes::resolver_for_lowering_raw
+  27:     0x7fff01b28299 - rustc_interface[abf226499db44a20]::passes::analysis
+  28:     0x7fff04cca51a - <alloc[e40381df750d7e9f]::sync::Arc<rustc_session[8ee92fa72edde2c9]::cstore::CrateSource>>::drop_slow
+  29:     0x7fff04bd8acb - RINvNtNtCsa4eoanVeiba_18rustc_query_system5query8plumbing17try_execute_queryINtCsaOO130TIfoR_16rustc_query_impl13DynamicConfigINtNtB4_6caches11SingleCacheINtNtNtCsb3yqv1AAQly_12rustc_middle5query5erase6ErasedAhj0_EEKb0_KB3s_KB3s_ENtNtB1f_8plumbing9QueryCtx
+  30:     0x7fff04ccff0f - rustc_query_impl[7e055f0198210b93]::query_system
+  31:     0x7fff01aeda12 - RINvNtNtCs8bv8A1MXmXN_3std3sys9backtrace28___rust_begin_short_backtraceNCNCNCINvMNtB6_6threadNtB1h_7Builder16spawn_unchecked_INtNtCsjzI7iLjHfL7_5alloc5boxed3BoxDINtNtNtCslA1UORVNEAk_4core3ops8function6FnOnceuEp6OutputuNtNtB2G_6marker4SendEL_EuEs_000uECsh5C
+  32:     0x7fff01ae5fa4 - RINvNtNtCs8bv8A1MXmXN_3std3sys9backtrace28___rust_begin_short_backtraceNCNCNCINvMNtB6_6threadNtB1h_7Builder16spawn_unchecked_INtNtCsjzI7iLjHfL7_5alloc5boxed3BoxDINtNtNtCslA1UORVNEAk_4core3ops8function6FnOnceuEp6OutputuNtNtB2G_6marker4SendEL_EuEs_000uECsh5C
+  33:     0x7fff01ade883 - RINvNtNtCs8bv8A1MXmXN_3std3sys9backtrace28___rust_begin_short_backtraceNCNCINvNtCseLgmIhHy22q_15rustc_interface4util26run_in_thread_with_globalsNCINvB1e_31run_in_thread_pool_with_globalsNCINvNtB1g_9interface12run_compileruNCNvCsh5CA43SKlqy_17rustc_driver_i
+  34:     0x7fff01af2c20 - RINvNtNtCs8bv8A1MXmXN_3std3sys9backtrace28___rust_begin_short_backtraceNCNCNCINvMNtB6_6threadNtB1h_7Builder16spawn_unchecked_INtNtCsjzI7iLjHfL7_5alloc5boxed3BoxDINtNtNtCslA1UORVNEAk_4core3ops8function6FnOnceuEp6OutputuNtNtB2G_6marker4SendEL_EuEs_000uECsh5C
+  35:     0x7fff0515f4ad - alloc::boxed::impl$28::call_once
+                               at /rustc/efea9896f506baa08f40444e07774e827646d57a/library\alloc\src\boxed.rs:1970
+  36:     0x7fff0515f4ad - alloc::boxed::impl$28::call_once
+                               at /rustc/efea9896f506baa08f40444e07774e827646d57a/library\alloc\src\boxed.rs:1970
+  37:     0x7fff0515f4ad - std::sys::pal::windows::thread::impl$0::new::thread_start
+                               at /rustc/efea9896f506baa08f40444e07774e827646d57a/library\std\src\sys\pal\windows\thread.rs:56
+  38:     0x7fffc4ef259d - BaseThreadInitThunk
+  39:     0x7fffc616af38 - RtlUserThreadStart
+
+
+rustc version: 1.87.0-nightly (efea9896f 2025-03-08)
+platform: x86_64-pc-windows-msvc
+
+query stack during panic:
+#0 [typeck] type-checking `lang::enums::<impl at crates\core\src\lang\enums.rs:45:41: 45:43>::assert_receiver_is_total_eq`
+#1 [analysis] running analysis passes on this crate
+end of query stack

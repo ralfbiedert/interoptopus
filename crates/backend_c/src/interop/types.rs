@@ -6,7 +6,7 @@ use crate::interop::docs::write_documentation;
 use crate::{DocStyle, Indentation, Interop};
 use interoptopus::backend::IndentWriter;
 use interoptopus::backend::sort_types_by_dependencies;
-use interoptopus::lang::{Composite, Enum, Field, FnPointer, Opaque, Type, Variant};
+use interoptopus::lang::{Composite, Enum, Field, FnPointer, Opaque, Type, Variant, VariantKind};
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::NamedCallback;
 use interoptopus::{Error, indented};
@@ -144,13 +144,16 @@ fn write_type_definition_enum(i: &Interop, w: &mut IndentWriter, the_type: &Enum
 
 fn write_type_definition_enum_variant(i: &Interop, w: &mut IndentWriter, variant: &Variant, the_enum: &Enum) -> Result<(), Error> {
     let variant_name = enum_variant_to_name(i, the_enum, variant);
-    let variant_value = variant.value();
+    let variant_kind = variant.kind();
 
     if i.documentation == DocStyle::Inline {
         write_documentation(w, variant.documentation())?;
     }
 
-    indented!(w, r"{} = {},", variant_name, variant_value)
+    match variant_kind {
+        VariantKind::Unit(variant_value) => indented!(w, r"{} = {},", variant_name, variant_value),
+        VariantKind::Typed(_) => todo!(),
+    }
 }
 
 fn write_type_definition_opaque(i: &Interop, w: &mut IndentWriter, the_type: &Opaque) -> Result<(), Error> {

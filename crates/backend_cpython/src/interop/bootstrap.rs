@@ -1,7 +1,7 @@
 use crate::Interop;
 use crate::converter::to_ctypes_name;
 use interoptopus::backend::IndentWriter;
-use interoptopus::lang::Type;
+use interoptopus::lang::{Type, VariantKind};
 use interoptopus::pattern::TypePattern;
 use interoptopus::{Error, indented};
 
@@ -31,8 +31,12 @@ pub fn write_api_load_fuction(i: &Interop, w: &mut IndentWriter) -> Result<(), E
     w.newline()?;
     for f in i.inventory.functions() {
         if let Type::Pattern(TypePattern::FFIErrorEnum(e)) = f.signature().rval() {
-            let value = e.success_variant().value();
-            indented!(w, [()], r"c_lib.{}.errcheck = lambda rval, _fptr, _args: _errcheck(rval, {})", f.name(), value)?;
+            let kind = e.success_variant().kind();
+
+            match kind {
+                VariantKind::Unit(v) => indented!(w, [()], r"c_lib.{}.errcheck = lambda rval, _fptr, _args: _errcheck(rval, {})", f.name(), v)?,
+                VariantKind::Typed(_) => todo!(),
+            }
         }
     }
 

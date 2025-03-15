@@ -3,7 +3,7 @@ use crate::converter::{to_ctypes_name, to_type_hint_in, to_type_hint_out};
 use crate::interop::patterns::{write_option, write_slice};
 use interoptopus::backend::sort_types_by_dependencies;
 use interoptopus::backend::{IndentWriter, WriteFor};
-use interoptopus::lang::{Composite, Enum, Layout, Type};
+use interoptopus::lang::{Composite, Enum, Layout, Type, VariantKind};
 use interoptopus::pattern::TypePattern;
 use interoptopus::{Error, indented};
 
@@ -142,7 +142,11 @@ pub fn write_enum(_i: &Interop, w: &mut IndentWriter, e: &Enum, write_for: Write
                 indented!(w, [()], r"# {}", line)?;
             }
         }
-        indented!(w, [()], r"{} = {}", v.name(), v.value())?;
+
+        match v.kind() {
+            VariantKind::Unit(x) => indented!(w, [()], r"{} = {}", v.name(), x)?,
+            VariantKind::Typed(_) => todo!(),
+        };
     }
 
     Ok(())

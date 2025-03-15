@@ -15,7 +15,7 @@ use crate::pattern::callback::AsyncCallback;
 pub use array::Array;
 pub use composite::{Composite, Field, Layout, Opaque, Representation};
 pub use constant::{Constant, ConstantValue};
-pub use enums::{Enum, Variant};
+pub use enums::{Enum, Variant, VariantKind};
 pub use fnpointer::FnPointer;
 pub use function::{Function, FunctionSignature, Parameter, SugaredReturnType};
 pub use info::{ConstantInfo, FunctionInfo, TypeInfo, VariantInfo};

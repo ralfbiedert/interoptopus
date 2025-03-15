@@ -1,12 +1,29 @@
 use crate::types::{Attributes, TypeRepresentation};
 use crate::util::extract_doc_lines;
 use proc_macro2::{Ident, Span, TokenStream};
-use quote::quote;
+use quote::{quote, quote_spanned};
+use std::iter::zip;
 use syn::{Expr, ItemEnum, Lit};
 
-fn derive_variant_info(item: &ItemEnum, idents: &[Ident], names: &[String], values: &[i32], docs: &[String]) -> TokenStream {
+pub enum VariantKind {
+    Unit(usize),
+    Typed(usize, Ident),
+}
+
+fn derive_variant_info(item: &ItemEnum, idents: &[Ident], names: &[String], values: &[VariantKind], docs: &[String]) -> TokenStream {
     let name = item.ident.to_string();
     let name_ident = syn::Ident::new(&name, item.ident.span());
+
+    let entries = zip(idents, values)
+        .map(|(id, x)| {
+            let span = id.span();
+            match x {
+                VariantKind::Unit(v) => quote_spanned! (span => ::interoptopus::lang::VariantKind::Unit(#v) ),
+                // TODO
+                VariantKind::Typed(i, v) => quote_spanned! (span => ::interoptopus::lang::VariantKind::Unit(#i) ),
+            }
+        })
+        .collect::<Vec<_>>();
 
     quote! {
         unsafe impl ::interoptopus::lang::VariantInfo for #name_ident {
@@ -15,7 +32,7 @@ fn derive_variant_info(item: &ItemEnum, idents: &[Ident], names: &[String], valu
                     #(
                        Self::#idents => {
                             let documentation = ::interoptopus::lang::Documentation::from_line(#docs);
-                            ::interoptopus::lang::Variant::new(#names.to_string(), #values as usize, documentation)
+                            ::interoptopus::lang::Variant::new(#names.to_string(), #entries, documentation)
                        },
                     )*
                 }
@@ -36,7 +53,7 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
 
     let mut variant_names = Vec::new();
     let mut variant_idents = Vec::new();
-    let mut variant_values = Vec::new();
+    let mut variant_kinds = Vec::new();
     let mut variant_docs = Vec::new();
     let mut next_id = 0;
 
@@ -50,7 +67,7 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
                     Lit::Int(x) => {
                         let number = x.base10_parse().expect("Must be number");
                         next_id = number + 1;
-                        number
+                        VariantKind::Unit(number)
                     }
                     _ => panic!("Unknown token."),
                 },
@@ -59,18 +76,18 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
         } else {
             let id = next_id;
             next_id += 1;
-            id
+            VariantKind::Unit(id)
         };
 
         if !attributes.skip.contains_key(&ident) {
             variant_idents.push(syn::Ident::new(&ident, span));
             variant_names.push(ident);
-            variant_values.push(this_id);
+            variant_kinds.push(this_id);
             variant_docs.push(variant_doc_line);
         }
     }
 
-    let variant_infos = derive_variant_info(&item, &variant_idents, &variant_names, &variant_values, &variant_docs);
+    let variant_infos = derive_variant_info(&item, &variant_idents, &variant_names, &variant_kinds, &variant_docs);
 
     let ctype_info_return = if attributes.error {
         quote! {

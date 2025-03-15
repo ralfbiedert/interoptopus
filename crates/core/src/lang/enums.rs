@@ -1,5 +1,5 @@
 use crate::lang::composite::Representation;
-use crate::lang::{Documentation, Meta};
+use crate::lang::{Composite, Documentation, Meta, Type, TypeInfo};
 
 /// A (C-style) `enum` containing numbered variants.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -42,18 +42,24 @@ impl Enum {
     }
 }
 
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub enum VariantKind {
+    Unit(usize),
+    Typed(Box<Type>),
+}
+
 /// Variant and value of a [`Enum`].
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Variant {
     name: String,
-    value: usize,
+    kind: VariantKind,
     documentation: Documentation,
 }
 
 impl Variant {
     #[must_use]
-    pub const fn new(name: String, value: usize, documentation: Documentation) -> Self {
-        Self { name, value, documentation }
+    pub const fn new(name: String, kind: VariantKind, documentation: Documentation) -> Self {
+        Self { name, kind, documentation }
     }
 
     #[must_use]
@@ -62,8 +68,8 @@ impl Variant {
     }
 
     #[must_use]
-    pub const fn value(&self) -> usize {
-        self.value
+    pub const fn kind(&self) -> &VariantKind {
+        &self.kind
     }
 
     #[must_use]
