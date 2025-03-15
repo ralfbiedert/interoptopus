@@ -1,5 +1,5 @@
 use crate::patterns::result::Error;
-use crate::types::{UseCStrPtr, UseString};
+use crate::types::string::{UseCStrPtr, UseString};
 use interoptopus::ffi::{CStrPointer, Slice};
 use interoptopus::{ffi, ffi_function};
 

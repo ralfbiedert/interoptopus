@@ -151,7 +151,7 @@ pub fn ffi_inventory() -> Inventory {
             .register(constant!(constants::F32_MIN_POSITIVE))
             .register(constant!(constants::COMPUTED_I32))
             // Extra Types
-            .register(extra_type!(types::ExtraType<f32>))
+            .register(extra_type!(types::generic::ExtraType<f32>))
             // Services
             .register(pattern!(services::asynk::ServiceAsync))
             .register(pattern!(services::basic::ServiceBasic))

@@ -1,7 +1,8 @@
 use crate::patterns::callback::StringCallback;
 use crate::patterns::result::Error;
 use crate::patterns::result::ErrorXX;
-use crate::types::{NestedArray, UseString};
+use crate::types::arrays::NestedArray;
+use crate::types::string::UseString;
 use interoptopus::ffi;
 use interoptopus::pattern::asynk::{AsyncRuntime, AsyncThreadLocal};
 use interoptopus::pattern::result::{result_to_ffi, result_to_ffi_async};

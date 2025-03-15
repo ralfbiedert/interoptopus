@@ -1,4 +1,6 @@
-use crate::types::{Array, CharArray, EnumRenamedXYZ, FixedString, NestedArray, Vec3f32};
+use crate::types::arrays::{Array, CharArray, FixedString, NestedArray};
+use crate::types::basic::Vec3f32;
+use crate::types::enums::EnumRenamedXYZ;
 use interoptopus::ffi_function;
 
 #[ffi_function]

@@ -1,4 +1,5 @@
-use crate::types::{Generic, Generic2, Generic3, Generic4, Phantom, Weird1, Weird2};
+use crate::types::generic::{Generic, Generic2, Generic3, Generic4, Weird1, Weird2};
+use crate::types::meta::Phantom;
 use interoptopus::ffi_function;
 
 #[ffi_function]

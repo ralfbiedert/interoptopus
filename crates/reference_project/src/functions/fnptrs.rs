@@ -1,4 +1,5 @@
-use crate::types::{CharArray, FnPtrCharArray, FnPtru8u8};
+use crate::types::aliases::{FnPtrCharArray, FnPtru8u8};
+use crate::types::arrays::CharArray;
 use interoptopus::ffi_function;
 
 #[ffi_function]

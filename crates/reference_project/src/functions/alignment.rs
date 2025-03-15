@@ -1,4 +1,4 @@
-use crate::types::{Packed1, Packed2};
+use crate::types::aligned::{Packed1, Packed2};
 use interoptopus::ffi_function;
 
 #[ffi_function]

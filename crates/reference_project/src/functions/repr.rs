@@ -1,4 +1,4 @@
-use crate::types::Transparent;
+use crate::types::transparent::Transparent;
 use interoptopus::ffi_function;
 
 #[ffi_function]

@@ -1,5 +1,5 @@
 use crate::patterns::result::Error;
-use crate::types::UseString;
+use crate::types::string::UseString;
 use interoptopus::{callback, ffi, ffi_function, ffi_type};
 use std::ffi::c_void;
 use std::ptr::null;

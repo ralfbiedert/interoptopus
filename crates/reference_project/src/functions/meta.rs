@@ -1,4 +1,7 @@
-use crate::types::{EnumDocumented, EnumRenamedXYZ, StructDocumented, StructRenamedXYZ, Visibility1, Visibility2, ambiguous1, ambiguous2};
+use crate::types::ambiguous::{ambiguous1, ambiguous2};
+use crate::types::basic::StructDocumented;
+use crate::types::enums::{EnumDocumented, EnumRenamedXYZ};
+use crate::types::meta::{StructRenamedXYZ, Visibility1, Visibility2};
 use interoptopus::ffi_function;
 
 #[ffi_function]

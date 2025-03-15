@@ -1,5 +1,6 @@
 use crate::patterns::result::Error;
-use crate::types::{BoolField, Tupled, Vec3f32};
+use crate::types::basic::{Tupled, Vec3f32};
+use crate::types::bool::BoolField;
 use interoptopus::ffi_function;
 use interoptopus::pattern::result::Result;
 
