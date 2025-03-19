@@ -1,7 +1,5 @@
 use crate::types::basic::Vec3f32;
 use interoptopus::ffi_type;
-use interoptopus::lang::TypeInfo;
-use interoptopus::lang::{Composite, Documentation, Enum, Type, Variant, VariantKind};
 
 /// Documented enum.
 #[ffi_type]
@@ -20,7 +18,7 @@ pub enum EnumRenamedXYZ {
     X,
 }
 
-// #[ffi_type]
+// #[ffi_type(debug)]
 pub enum EnumPayload {
     A,
     B(Vec3f32),
