@@ -116,7 +116,7 @@ impl Composite {
     }
 
     #[must_use]
-    pub fn into_ctype(&self) -> Type {
+    pub fn to_ctype(&self) -> Type {
         Type::Composite(self.clone())
     }
 }

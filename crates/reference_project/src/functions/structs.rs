@@ -11,7 +11,7 @@ pub fn struct1(x: Tupled) -> Tupled {
 
 #[ffi_function]
 pub fn struct2(_a: Vec3f32, _b: Option<&Tupled>) -> Result<(), ErrorREMOVEME> {
-    Result::ok(())
+    Result::Ok(())
 }
 
 #[ffi_function]

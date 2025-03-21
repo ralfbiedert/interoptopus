@@ -141,10 +141,6 @@ pub fn write_type_definition_composite_unmanaged_body_field(i: &Interop, w: &mut
         Type::Pattern(TypePattern::Utf8String(_)) => {
             indented!(w, r"public Utf8String.Unmanaged {};", field_name)?;
         }
-        Type::Pattern(TypePattern::FFIErrorEnum(e)) => {
-            indented!(w, r"public {} {};", e.the_enum().rust_name(), field_name)?;
-        }
-
         _ => {
             let type_name = to_typespecifier_in_field(field.the_type(), field, the_type);
             indented!(w, r"public {} {};", type_name, field_name)?;
@@ -202,10 +198,6 @@ pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWri
 
             indented!(w, r"{}{} {};", visibility, type_name, field_name)?;
         }
-        Type::Pattern(TypePattern::FFIErrorEnum(e)) => {
-            let enum_name = e.the_enum().rust_name();
-            indented!(w, r"{}{} {};", visibility, enum_name, field_name)?;
-        }
         _ => {
             let type_name = to_typespecifier_in_field(field.the_type(), field, the_type);
             indented!(w, r"{}{} {};", visibility, type_name, field_name)?;
@@ -236,7 +228,6 @@ pub fn write_type_definition_composite_marshaller_field_to_unmanaged(i: &Interop
             indented!(w, "}}")?;
         }
         Type::Pattern(TypePattern::Bool) => indented!(w, "_unmanaged.{name} = (sbyte) (_managed.{name} ? 1 : 0);")?,
-        Type::Pattern(TypePattern::FFIErrorEnum(_)) => indented!(w, "_unmanaged.{name} = _managed.{name};")?,
         Type::Pattern(TypePattern::CStrPointer) => {
             indented!(w, "_unmanaged.{name} = Marshal.StringToHGlobalAnsi(_managed.{name});")?;
         }
@@ -273,7 +264,6 @@ pub fn write_type_definition_composite_marshaller_field_from_unmanaged(i: &Inter
             indented!(w, [()], "src.CopyTo(dst);")?;
             indented!(w, "}}")?;
         }
-        Type::Pattern(TypePattern::FFIErrorEnum(_)) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
         Type::Pattern(TypePattern::CStrPointer) => {
             indented!(w, "_managed.{name} = Marshal.PtrToStringAnsi(_unmanaged.{name});")?;
         }

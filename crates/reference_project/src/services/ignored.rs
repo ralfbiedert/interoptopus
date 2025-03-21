@@ -7,7 +7,7 @@ pub struct ServiceIgnoringMethods {}
 #[ffi_service]
 impl ServiceIgnoringMethods {
     pub fn new() -> ffi::Result<Self, ErrorREMOVEME> {
-        ffi::Result::ok(Self {})
+        ffi::Result::Ok(Self {})
     }
 
     #[ffi_service_method(ignore)]

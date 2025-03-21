@@ -212,10 +212,6 @@ impl Interop {
         constants.iter().any(|x| self.should_emit_by_meta(x.meta()))
     }
 
-    fn has_ffi_error(&self, functions: &[Function]) -> bool {
-        functions.iter().any(interoptopus::lang::Function::returns_ffi_error)
-    }
-
     #[must_use]
     fn should_emit_by_meta(&self, meta: &Meta) -> bool {
         meta.namespace() == self.namespace_id
@@ -303,7 +299,6 @@ impl Interop {
             Type::Pattern(x) => match x {
                 TypePattern::CStrPointer => true,
                 TypePattern::APIVersion => true,
-                TypePattern::FFIErrorEnum(x) => self.should_emit_by_meta(x.the_enum().meta()),
                 TypePattern::Slice(x) => self.should_emit_by_meta(x.meta()),
                 TypePattern::SliceMut(x) => self.should_emit_by_meta(x.meta()),
                 TypePattern::Option(x) => self.should_emit_by_meta(x.meta()),

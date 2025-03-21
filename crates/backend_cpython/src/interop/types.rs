@@ -1,11 +1,11 @@
-use crate::Interop;
 use crate::converter::{to_ctypes_name, to_type_hint_in, to_type_hint_out};
 use crate::interop::patterns::{write_option, write_slice};
+use crate::Interop;
 use interoptopus::backend::sort_types_by_dependencies;
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Composite, Enum, Layout, Type, VariantKind};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{Error, indented};
+use interoptopus::{indented, Error};
 
 pub fn write_types(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     let all_types = i.inventory.ctypes().to_vec();
@@ -16,10 +16,9 @@ pub fn write_types(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
             Type::Composite(c) => write_struct(i, w, c, WriteFor::Code)?,
             Type::Enum(e) => write_enum(i, w, e, WriteFor::Code)?,
             Type::Pattern(p) => match p {
-                TypePattern::FFIErrorEnum(e) => write_enum(i, w, e.the_enum(), WriteFor::Code)?,
                 TypePattern::Slice(c) => write_slice(i, w, c, false)?,
                 TypePattern::SliceMut(c) => write_slice(i, w, c, true)?,
-                TypePattern::Result(c) => write_struct(i, w, c.composite(), WriteFor::Code)?,
+                TypePattern::Result(c) => write_enum(i, w, c.the_enum(), WriteFor::Code)?,
                 TypePattern::Utf8String(c) => write_struct(i, w, c, WriteFor::Code)?,
                 TypePattern::Option(c) => {
                     write_option(i, w, c)?;

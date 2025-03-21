@@ -1,13 +1,11 @@
-use crate::Interop;
 use crate::interop::FunctionNameFlavor;
+use crate::Interop;
 use heck::{ToLowerCamelCase, ToUpperCamelCase};
 use interoptopus::backend::{ctypes_from_type_recursive, safe_name};
-use interoptopus::lang::{
-    Composite, ConstantValue, Enum, Field, FnPointer, Function, FunctionSignature, Opaque, Parameter, Primitive, PrimitiveValue, SugaredReturnType, Type,
-};
-use interoptopus::pattern::TypePattern;
+use interoptopus::lang::{Composite, ConstantValue, Enum, Field, FnPointer, Function, Opaque, Parameter, Primitive, PrimitiveValue, SugaredReturnType, Type};
 use interoptopus::pattern::callback::{AsyncCallback, NamedCallback};
 use interoptopus::pattern::slice::SliceType;
+use interoptopus::pattern::TypePattern;
 use std::collections::HashSet;
 
 /// Converts a primitive (Rust) type to a native C# type name, e.g., `f32` to `float`.
@@ -39,10 +37,6 @@ pub fn opaque_to_typename(_: &Opaque) -> String {
     "IntPtr".to_string()
 }
 
-pub fn has_ffi_error_rval(signature: &FunctionSignature) -> bool {
-    matches!(signature.rval(), Type::Pattern(TypePattern::FFIErrorEnum(_)))
-}
-
 /// Converts an Rust struct name `Vec2` to a C# struct name `Vec2`.
 pub fn composite_to_typename(x: &Composite) -> String {
     x.rust_name().to_string()
@@ -56,7 +50,6 @@ pub fn is_blittable(x: &Type) -> bool {
         Type::Pattern(x) => match x {
             TypePattern::CStrPointer => false,
             TypePattern::APIVersion => true,
-            TypePattern::FFIErrorEnum(_) => true,
             TypePattern::Slice(_) => false,
             TypePattern::SliceMut(_) => false,
             TypePattern::Option(_) => true,
@@ -103,7 +96,6 @@ pub fn to_typespecifier_in_field(x: &Type, field: &Field, composite: &Composite)
         Type::Pattern(x) => match x {
             TypePattern::CStrPointer => "string".to_string(),
             TypePattern::Utf8String(_) => "string".to_string(),
-            TypePattern::FFIErrorEnum(e) => format!("Result{}", e.the_enum().rust_name()),
             TypePattern::Slice(x) => format!("Slice<{}>", get_slice_type_argument(x)),
             TypePattern::SliceMut(x) => format!("SliceMut<{}>", get_slice_type_argument(x)),
             TypePattern::Option(e) => composite_to_typename(e),
@@ -150,12 +142,11 @@ pub fn to_typespecifier_in_param(x: &Type) -> String {
         Type::FnPointer(x) => fnpointer_to_typename(x),
         Type::Pattern(x) => match x {
             TypePattern::CStrPointer => "[MarshalAs(UnmanagedType.LPStr)] string".to_string(),
-            TypePattern::FFIErrorEnum(e) => format!("Result{}", e.the_enum().rust_name()),
             TypePattern::Utf8String(x) => composite_to_typename(x),
             TypePattern::Slice(x) => composite_to_typename(x.composite_type()),
             TypePattern::SliceMut(x) => composite_to_typename(x.composite_type()),
             TypePattern::Option(x) => composite_to_typename(x),
-            TypePattern::Result(x) => composite_to_typename(x.composite()),
+            TypePattern::Result(x) => enum_to_typename(x.the_enum()),
             TypePattern::NamedCallback(x) => named_callback_to_typename(x),
             TypePattern::AsyncCallback(x) => async_callback_to_typename(x),
             TypePattern::Bool => "Bool".to_string(),
@@ -179,8 +170,7 @@ pub fn to_typespecifier_in_sync_fn_rval(x: &Type) -> String {
         Type::Pattern(x) => match x {
             TypePattern::CStrPointer => "IntPtr".to_string(),
             TypePattern::Utf8String(x) => composite_to_typename(x),
-            TypePattern::FFIErrorEnum(e) => format!("Result{}", e.the_enum().rust_name()),
-            TypePattern::Result(x) => composite_to_typename(x.composite()),
+            TypePattern::Result(x) => enum_to_typename(x.the_enum()),
             TypePattern::Slice(x) => composite_to_typename(x.composite_type()),
             TypePattern::SliceMut(x) => composite_to_typename(x.composite_type()),
             TypePattern::Option(x) => composite_to_typename(x),
@@ -196,7 +186,6 @@ pub fn to_typespecifier_in_sync_fn_rval(x: &Type) -> String {
 pub fn to_typespecifier_in_async_fn_rval(x: &SugaredReturnType) -> String {
     match x {
         SugaredReturnType::Async(Type::Pattern(TypePattern::Utf8String(_))) => "Task<string>".to_string(),
-        SugaredReturnType::Async(Type::Pattern(TypePattern::FFIErrorEnum(_))) => "Task".to_string(),
         SugaredReturnType::Async(Type::Pattern(TypePattern::Result(x))) => match x.t() {
             Type::Pattern(TypePattern::Utf8String(_)) => "Task<string>".to_string(),
             x => format!("Task<{}>", to_typespecifier_in_sync_fn_rval(x)),

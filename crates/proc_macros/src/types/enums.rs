@@ -65,7 +65,7 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
                 });
                 variants.push(tokens);
             }
-            VariantKind::Typed(x, ts) => {
+            VariantKind::Typed(_, ts) => {
                 let tokens = quote_spanned!(variant.ident.span() => {
                     let documentation = ::interoptopus::lang::Documentation::from_line(#variant_doc_line);
                     let ty = ::std::boxed::Box::new(<#ts as ::interoptopus::lang::TypeInfo>::type_info());

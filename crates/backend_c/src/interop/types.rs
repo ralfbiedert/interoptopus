@@ -1,15 +1,15 @@
 use crate::converters::{
     composite_to_typename, enum_to_typename, enum_variant_to_name, fnpointer_to_typename, named_callback_to_typename, opaque_to_typename, to_type_specifier,
 };
-use crate::interop::ToNamingStyle;
 use crate::interop::docs::write_documentation;
+use crate::interop::ToNamingStyle;
 use crate::{DocStyle, Indentation, Interop};
-use interoptopus::backend::IndentWriter;
 use interoptopus::backend::sort_types_by_dependencies;
+use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Composite, Enum, Field, FnPointer, Opaque, Type, Variant, VariantKind};
-use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::NamedCallback;
-use interoptopus::{Error, indented};
+use interoptopus::pattern::TypePattern;
+use interoptopus::{indented, Error};
 
 pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     let mut known_function_pointers = vec![];
@@ -48,10 +48,6 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type,
                 write_type_definition_named_callback(i, w, e)?;
                 w.newline()?;
             }
-            TypePattern::FFIErrorEnum(e) => {
-                write_type_definition_enum(i, w, e.the_enum())?;
-                w.newline()?;
-            }
             TypePattern::Slice(x) => {
                 write_type_definition_composite(i, w, x.composite_type())?;
                 w.newline()?;
@@ -69,7 +65,7 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type,
                 w.newline()?;
             }
             TypePattern::Result(x) => {
-                write_type_definition_composite(i, w, x.composite())?;
+                write_type_definition_enum(i, w, x.the_enum())?;
                 w.newline()?;
             }
             TypePattern::AsyncCallback(x) => {

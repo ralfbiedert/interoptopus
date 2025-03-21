@@ -227,16 +227,16 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                     match __result_result {
                         Ok(__res) if __res.is_ok() => {
                             #object_construction
-                            #ctor_result::ok(__raw)
+                            #ctor_result::Ok(__raw)
                         }
                         Ok(__res) => {
                             let __e = __res.unwrap_err();
                             ::interoptopus::ffi::log_error(|| format!("Error in ({}): {:?}", stringify!(service_basic_new), __e));
-                            #ctor_result::err(*__e)
+                            #ctor_result::Err(*__e)
                         }
                         Err(__e) => {
                             ::interoptopus::ffi::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::pattern::result::get_panic_message(__e.as_ref())));
-                            #ctor_result::panic()
+                            #ctor_result::Panic
                         }
                     }
                 }
@@ -315,7 +315,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 };
 
                 <#without_lifetimes>::spawn(__this, __async_fn);
-                <#rval as ::interoptopus::pattern::result::FFIResultAsUnitT>::AsUnitT::ok(())
+                <#rval as ::interoptopus::pattern::result::FFIResultAsUnitT>::AsUnitT::Ok(())
             };
 
             quote_spanned! { span_function =>
@@ -371,7 +371,7 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
         pub unsafe extern "C" fn #ffi_fn_ident(__context: #ptr_type) -> #ctor_result {
             // Checks the _contained_ pointer is not null, which usually means service was not initialized.
             if __context.is_null() {
-                return #ctor_result::null();
+                return #ctor_result::Null;
             }
 
             let __result_result = ::std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
@@ -379,10 +379,10 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
             }));
 
             match __result_result {
-                Ok(_) => #ctor_result::ok(::std::ptr::null()),
+                Ok(_) => #ctor_result::Ok(::std::ptr::null()),
                 Err(__e) => {
                     ::interoptopus::ffi::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::pattern::result::get_panic_message(__e.as_ref())));
-                    #ctor_result::panic()
+                    #ctor_result::Panic
                 }
             }
         }

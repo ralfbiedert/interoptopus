@@ -1,5 +1,5 @@
 use crate::lang::composite::Representation;
-use crate::lang::{Composite, Documentation, Meta, Type, TypeInfo};
+use crate::lang::{Documentation, Meta, Type};
 
 /// A (C-style) `enum` containing numbered variants.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -40,12 +40,39 @@ impl Enum {
     pub const fn repr(&self) -> &Representation {
         &self.repr
     }
+
+    #[must_use]
+    pub fn to_ctype(&self) -> Type {
+        Type::Enum(self.clone())
+    }
 }
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum VariantKind {
     Unit(usize),
     Typed(Box<Type>),
+}
+
+impl VariantKind {
+    #[must_use]
+    pub const fn is_unit(&self) -> bool {
+        matches!(self, Self::Unit(_))
+    }
+
+    #[must_use]
+    pub const fn is_typed(&self) -> bool {
+        matches!(self, Self::Typed(_))
+    }
+
+    #[must_use]
+    pub const fn as_unit(&self) -> Option<usize> {
+        if let Self::Unit(x) = self { Some(*x) } else { None }
+    }
+
+    #[must_use]
+    pub const fn as_typed(&self) -> Option<&Type> {
+        if let Self::Typed(x) = self { Some(x) } else { None }
+    }
 }
 
 /// Variant and value of a [`Enum`].

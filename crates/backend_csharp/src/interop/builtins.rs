@@ -1,9 +1,9 @@
 use crate::Interop;
 use interoptopus::backend::IndentWriter;
-use interoptopus::{Error, indented};
+use interoptopus::{indented, Error};
 
 pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
-    if i.write_types.write_interoptopus_globals() && i.has_ffi_error(i.inventory.functions()) {
+    if i.write_types.write_interoptopus_globals() {
         let error_text = &i.error_text;
 
         indented!(w, r"public class InteropException<T> : Exception")?;

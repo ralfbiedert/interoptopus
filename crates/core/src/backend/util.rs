@@ -1,6 +1,6 @@
 //! Helpers for backend authors.
 
-use crate::lang::{Function, Type};
+use crate::lang::{Function, Type, VariantKind};
 use crate::pattern::TypePattern;
 use std::collections::{HashMap, HashSet};
 use std::iter::FromIterator;
@@ -181,8 +181,11 @@ pub fn ctypes_from_type_recursive(start: &Type, types: &mut HashSet<Type>) {
                 }
             }
             TypePattern::Result(x) => {
-                for field in x.composite().fields() {
-                    ctypes_from_type_recursive(field.the_type(), types);
+                for variant in x.the_enum().variants() {
+                    match variant.kind() {
+                        VariantKind::Typed(x) => ctypes_from_type_recursive(x, types),
+                        VariantKind::Unit(_) => {}
+                    }
                 }
             }
             TypePattern::Bool => {}
@@ -245,7 +248,19 @@ pub fn holds_opaque_without_ref(typ: &Type) -> bool {
     match typ {
         Type::Primitive(_) => false,
         Type::Array(x) => holds_opaque_without_ref(x.array_type()),
-        Type::Enum(_) => false,
+        Type::Enum(x) => {
+            for variant in x.variants() {
+                match variant.kind() {
+                    VariantKind::Typed(x) => {
+                        if holds_opaque_without_ref(x) {
+                            return true;
+                        }
+                    }
+                    VariantKind::Unit(_) => {}
+                }
+            }
+            false
+        }
         Type::Opaque(_) => true,
         Type::Composite(x) => {
             for field in x.fields() {
@@ -264,8 +279,8 @@ pub fn holds_opaque_without_ref(typ: &Type) -> bool {
             TypePattern::APIVersion => false,
             TypePattern::Slice(x) => holds_opaque_without_ref(x.target_type()),
             TypePattern::SliceMut(x) => holds_opaque_without_ref(x.target_type()),
-            TypePattern::Option(x) => holds_opaque_without_ref(&x.into_ctype()),
-            TypePattern::Result(x) => holds_opaque_without_ref(x.t()),
+            TypePattern::Option(x) => holds_opaque_without_ref(&x.to_ctype()),
+            TypePattern::Result(x) => holds_opaque_without_ref(&x.the_enum().to_ctype()),
             TypePattern::Bool => false,
             TypePattern::CChar => false,
             TypePattern::NamedCallback(_) => false,
@@ -353,7 +368,19 @@ pub fn is_global_type(t: &Type) -> bool {
     match t {
         Type::Primitive(_) => true,
         Type::Array(x) => is_global_type(x.array_type()),
-        Type::Enum(_) => false,
+        Type::Enum(x) => {
+            for variant in x.variants() {
+                match variant.kind() {
+                    VariantKind::Typed(x) => {
+                        if !is_global_type(x) {
+                            return false;
+                        }
+                    }
+                    VariantKind::Unit(_) => {}
+                }
+            }
+            true
+        }
         Type::Opaque(_) => false,
         Type::Composite(_) => false,
         Type::FnPointer(_) => false,
@@ -365,7 +392,7 @@ pub fn is_global_type(t: &Type) -> bool {
             TypePattern::Slice(x) => is_global_type(x.target_type()),
             TypePattern::SliceMut(x) => is_global_type(x.target_type()),
             TypePattern::Option(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),
-            TypePattern::Result(x) => x.composite().fields().iter().all(|x| is_global_type(x.the_type())),
+            TypePattern::Result(x) => is_global_type(&x.the_enum().to_ctype()),
             TypePattern::Bool => true,
             TypePattern::CChar => true,
             TypePattern::NamedCallback(_) => false,

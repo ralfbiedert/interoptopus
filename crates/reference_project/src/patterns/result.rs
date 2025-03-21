@@ -65,7 +65,7 @@ pub fn pattern_result_1(x: Result<u32, ErrorREMOVEME>) -> Result<u32, ErrorREMOV
 
 #[ffi_function]
 pub fn pattern_result_2() -> Result<(), ErrorREMOVEME> {
-    Result::ok(())
+    Result::Ok(())
 }
 
 #[ffi_function]

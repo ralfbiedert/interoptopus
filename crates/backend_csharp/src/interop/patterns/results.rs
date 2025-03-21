@@ -1,24 +1,24 @@
-use crate::Interop;
 use crate::converter::to_typespecifier_in_sync_fn_rval;
 use crate::interop::docs::write_documentation;
 use crate::interop::types::composite::{
     write_type_definition_composite_body, write_type_definition_composite_layout_annotation, write_type_definition_composite_marshaller_field_from_unmanaged,
     write_type_definition_composite_marshaller_field_to_unmanaged, write_type_definition_composite_unmanaged_body_field,
 };
+use crate::Interop;
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Field, Type};
-use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::result::{FFIErrorEnum, FFIResultType};
-use interoptopus::{Error, indented};
+use interoptopus::pattern::TypePattern;
+use interoptopus::{indented, Error};
 
 pub fn write_pattern_result(i: &Interop, w: &mut IndentWriter, result: &FFIResultType) -> Result<(), Error> {
     i.debug(w, "write_pattern_result")?;
 
-    let enum_name = result.e().the_enum().rust_name();
+    let enum_name = result.e().rust_name();
     let name = result.composite().rust_name();
     let e = result.e();
     let t = result.t();
-    let e_name = e.the_enum().rust_name();
+    let e_name = e.rust_name();
     let success_variant = result.e().success_variant().name();
 
     let type_string = match t {
@@ -119,7 +119,7 @@ pub fn write_pattern_result(i: &Interop, w: &mut IndentWriter, result: &FFIResul
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"_managed = new {}();", name)?;
     let field_t = Field::new("t".to_string(), t.clone());
-    let field_e = Field::new("err".to_string(), Type::Pattern(TypePattern::FFIErrorEnum(e.clone())));
+    let field_e = Field::new("err".to_string(), e.clone());
     w.newline()?;
     w.indent();
     w.indent();

@@ -1,6 +1,6 @@
 use crate::converter::{
-    function_name_to_csharp_name, function_parameter_to_csharp_typename, function_rval_to_csharp_typename, has_ffi_error_rval, is_owned_slice,
-    pattern_to_native_in_signature, to_typespecifier_in_async_fn_rval, to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval,
+    function_name_to_csharp_name, function_parameter_to_csharp_typename, function_rval_to_csharp_typename, is_owned_slice, pattern_to_native_in_signature,
+    to_typespecifier_in_async_fn_rval, to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval,
 };
 use crate::interop::docs::write_documentation;
 use crate::{FunctionNameFlavor, Interop};
@@ -85,7 +85,6 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     i.debug(w, "write_function_overload")?;
 
     let has_overload = i.has_overloadable(function.signature());
-    let _has_error_enum = has_ffi_error_rval(function.signature());
 
     // If there is nothing to write, don't do it
     if !has_overload {
@@ -196,10 +195,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
             x => to_typespecifier_in_sync_fn_rval(x),
         };
 
-        let task_completion_source = match x {
-            Type::Pattern(TypePattern::FFIErrorEnum(_)) => "TaskCompletionSource".to_string(),
-            _ => format!("TaskCompletionSource<{task_type}>"),
-        };
+        let task_completion_source = format!("TaskCompletionSource<{task_type}>");
 
         indented!(w, [()], r"var cs = new {task_completion_source}();")?;
         indented!(w, [()], r"GCHandle pinned = default;")?;
@@ -208,10 +204,6 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         indented!(w, [()()], r"var marshaller = new {}.Marshaller(unmanaged);", to_typespecifier_in_param(x))?;
         indented!(w, [()()], r"var managed = marshaller.ToManaged();")?;
         match x {
-            Type::Pattern(TypePattern::FFIErrorEnum(x)) => {
-                indented!(w, [()()], r"if (managed.IsOk()) {{ cs.SetResult(); }}")?;
-                indented!(w, [()()], r"else {{ cs.SetException(new InteropException<{}>(managed.Err())); }}", x.the_enum().rust_name())?;
-            }
             Type::Pattern(TypePattern::Result(x)) => {
                 indented!(w, [()()], r"if (managed.IsOk()) {{ cs.SetResult(managed.Ok()); }}")?;
                 indented!(w, [()()], r"else {{ cs.SetException(new InteropException<{}>(managed.Err())); }}", x.e().the_enum().rust_name())?;

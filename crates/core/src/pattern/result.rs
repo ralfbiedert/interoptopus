@@ -29,12 +29,11 @@
 //! ```
 
 use crate::backend::capitalize_first_letter;
-use crate::lang::TypeInfo;
-use crate::lang::{Composite, Documentation, Enum, Field, Layout, Meta, Primitive, Representation, Type, Variant, Visibility};
+use crate::lang::{Composite, Documentation, Enum, Layout, Meta, Representation, Type, Variant};
+use crate::lang::{TypeInfo, VariantKind};
 use crate::pattern::TypePattern;
 use std::any::Any;
 use std::fmt::Debug;
-use std::mem::MaybeUninit;
 
 /// A trait you should implement for enums that signal errors in FFI calls.
 ///
@@ -142,11 +141,8 @@ impl FFIResultType {
     }
 
     #[must_use]
-    pub fn e(&self) -> &FFIErrorEnum {
-        match self.composite_type.fields()[1].the_type() {
-            Type::Pattern(TypePattern::FFIErrorEnum(x)) => x,
-            _ => panic!("Expected FFIErrorEnum."),
-        }
+    pub fn e(&self) -> &Type {
+        self.composite_type.fields()[1].the_type()
     }
 
     #[must_use]
@@ -179,29 +175,13 @@ pub trait FFIResultAsUnitT {
     type AsUnitT;
 }
 
-#[repr(C)]
+#[repr(C, u8)]
 #[derive(Debug)]
-pub struct Result<T, E> {
-    t: MaybeUninit<T>,
-    err: E,
-}
-
-#[allow(non_snake_case)]
-pub fn Ok<T, E>(t: T) -> Result<T, E>
-where
-    T: TypeInfo,
-    E: TypeInfo + FFIError,
-{
-    Result::ok(t)
-}
-
-#[allow(non_snake_case)]
-pub fn Err<T, E>(e: E) -> Result<T, E>
-where
-    T: TypeInfo,
-    E: TypeInfo + FFIError,
-{
-    Result::err(e)
+pub enum Result<T, E> {
+    Ok(T),
+    Err(E),
+    Panic,
+    Null,
 }
 
 impl<T, E> FFIResultAsPtr for Result<T, E> {
@@ -217,50 +197,59 @@ where
     T: TypeInfo,
     E: TypeInfo + FFIError,
 {
-    pub const fn ok(t: T) -> Self {
-        Self { t: MaybeUninit::new(t), err: E::SUCCESS }
-    }
-
-    pub const fn err(err: E) -> Self {
-        Self { t: MaybeUninit::uninit(), err }
-    }
-
-    #[must_use]
-    pub const fn panic() -> Self {
-        Self { t: MaybeUninit::uninit(), err: E::PANIC }
-    }
-
-    #[must_use]
-    pub const fn null() -> Self {
-        Self { t: MaybeUninit::uninit(), err: E::NULL }
-    }
+    // pub const fn ok(t: T) -> Self {
+    //     Self { t: MaybeUninit::new(t), err: E::SUCCESS }
+    // }
+    //
+    // pub const fn err(err: E) -> Self {
+    //     Self { t: MaybeUninit::uninit(), err }
+    // }
+    //
+    // #[must_use]
+    // pub const fn panic() -> Self {
+    //     Self { t: MaybeUninit::uninit(), err: E::PANIC }
+    // }
+    //
+    // #[must_use]
+    // pub const fn null() -> Self {
+    //     Self { t: MaybeUninit::uninit(), err: E::NULL }
+    // }
 
     #[must_use]
     pub fn is_ok(&self) -> bool {
-        self.err == E::SUCCESS
+        match self {
+            Self::Ok(_) => true,
+            Self::Err(_) => false,
+            Self::Panic => false,
+            Self::Null => false,
+        }
     }
 
     pub fn unwrap(self) -> T {
-        if self.is_ok() {
-            unsafe { self.t.assume_init() }
+        if let Self::Ok(t) = self {
+            t
         } else {
             panic!("Called `unwrap` on an `FFIResult` that is not `Ok`.")
         }
     }
 
     pub fn unwrap_err(&self) -> &E {
-        &self.err
+        if let Self::Err(err) = self {
+            err
+        } else {
+            panic!("Called `unwrap_err` on an `FFIResult` that is not `Err`.")
+        }
     }
 }
 
 impl<T, E> Result<T, E>
 where
     T: TypeInfo,
-    E: TypeInfo + FFIError,
+    E: TypeInfo,
 {
-    pub fn error(err: E) -> Self {
-        Self { t: MaybeUninit::uninit(), err }
-    }
+    // pub fn error(err: E) -> Self {
+    //     Self { t: MaybeUninit::uninit(), err }
+    // }
 }
 
 impl<T, E> From<std::result::Result<T, E>> for Result<T, E>
@@ -270,8 +259,8 @@ where
 {
     fn from(x: std::result::Result<T, E>) -> Self {
         match x {
-            std::result::Result::Ok(t) => Self::ok(t),
-            std::result::Result::Err(err) => Self::error(err),
+            std::result::Result::Ok(t) => Self::Ok(t),
+            std::result::Result::Err(err) => Self::Err(err),
         }
     }
 }
@@ -282,28 +271,24 @@ where
     E: TypeInfo + FFIError,
 {
     fn type_info() -> Type {
-        let t_is_void = matches!(T::type_info(), Type::Primitive(Primitive::Void));
+        let doc_t = Documentation::from_line("Element if err is `Ok`.");
+        let doc_err = Documentation::from_line("Error value.");
 
-        if t_is_void {
-            E::type_info()
-        } else {
-            let doc_t = Documentation::from_line("Element if err is `Ok`.");
-            let doc_err = Documentation::from_line("Error value.");
+        let variants = vec![
+            Variant::new("Ok".to_string(), VariantKind::Typed(Box::new(T::type_info())), doc_t),
+            Variant::new("Err".to_string(), VariantKind::Typed(Box::new(E::type_info())), doc_err),
+            Variant::new("Panic".to_string(), VariantKind::Unit(2), Documentation::new()),
+            Variant::new("Null".to_string(), VariantKind::Unit(3), Documentation::new()),
+        ];
 
-            let fields = vec![
-                Field::with_documentation("t".to_string(), T::type_info(), Visibility::Private, doc_t),
-                Field::with_documentation("err".to_string(), E::type_info(), Visibility::Private, doc_err),
-            ];
-
-            let doc = Documentation::from_line("Result that contains value or an error.");
-            let repr = Representation::new(Layout::C, None);
-            let meta = Meta::with_namespace_documentation(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
-            let t_name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
-            let e_name = capitalize_first_letter(E::type_info().name_within_lib().as_str());
-            let composite = Composite::with_meta_repr(format!("Result{t_name}{e_name}"), fields, meta, repr);
-            let result = FFIResultType::new(composite);
-            Type::Pattern(TypePattern::Result(result))
-        }
+        let doc = Documentation::from_line("Result that contains value or an error.");
+        let repr = Representation::new(Layout::C, None);
+        let meta = Meta::with_namespace_documentation(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
+        let t_name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
+        let e_name = capitalize_first_letter(E::type_info().name_within_lib().as_str());
+        let the_enum = Enum::new(format!("Result{t_name}{e_name}"), variants, meta, repr);
+        let result_enum = ResultType::new(the_enum);
+        Type::Pattern(TypePattern::Result(result_enum))
     }
 }
 
@@ -319,17 +304,47 @@ impl<T, E: FFIError> IntoFFIResult for Result<T, E> {
 /// At some point we want to get rid of these once `Try` ([try_trait_v2](https://github.com/rust-lang/rust/issues/84277)) stabilizes.
 pub fn result_to_ffi<T: TypeInfo, E: TypeInfo + crate::pattern::result::FFIError>(f: impl FnOnce() -> std::result::Result<T, E>) -> Result<T, E> {
     match f() {
-        std::result::Result::Ok(x) => Result::ok(x),
-        std::result::Result::Err(e) => Result::error(e),
+        std::result::Result::Ok(x) => Result::Ok(x),
+        std::result::Result::Err(e) => Result::Err(e),
     }
 }
 
 /// At some point we want to get rid of these once `Try` ([try_trait_v2](https://github.com/rust-lang/rust/issues/84277)) stabilizes.
-pub async fn result_to_ffi_async<T: TypeInfo, E: TypeInfo + crate::pattern::result::FFIError>(
-    f: impl std::ops::AsyncFnOnce() -> std::result::Result<T, E>,
-) -> Result<T, E> {
+pub async fn result_to_ffi_async<T: TypeInfo, E: TypeInfo>(f: impl std::ops::AsyncFnOnce() -> std::result::Result<T, E>) -> Result<T, E> {
     match f().await {
-        std::result::Result::Ok(x) => Result::ok(x),
-        std::result::Result::Err(e) => Result::error(e),
+        std::result::Result::Ok(x) => Result::Ok(x),
+        std::result::Result::Err(e) => Result::Err(e),
+    }
+}
+
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub struct ResultType {
+    the_enum: Enum,
+}
+
+impl ResultType {
+    #[must_use]
+    pub fn new(the_enum: Enum) -> Self {
+        Self { the_enum }
+    }
+
+    #[must_use]
+    pub fn meta(&self) -> &Meta {
+        self.the_enum.meta()
+    }
+
+    #[must_use]
+    pub fn t(&self) -> &Type {
+        self.the_enum.variants()[0].kind().as_typed().unwrap()
+    }
+
+    #[must_use]
+    pub fn e(&self) -> &Type {
+        self.the_enum.variants()[1].kind().as_typed().unwrap()
+    }
+
+    #[must_use]
+    pub fn the_enum(&self) -> &Enum {
+        &self.the_enum
     }
 }

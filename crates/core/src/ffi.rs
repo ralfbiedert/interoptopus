@@ -3,7 +3,7 @@
 pub use crate::pattern::cstr::CStrPointer;
 pub use crate::pattern::option::Option;
 pub use crate::pattern::primitive::{Bool, CChar};
-pub use crate::pattern::result::{Err, Ok, Result};
+pub use crate::pattern::result::{Result, Result::Err, Result::Ok};
 pub use crate::pattern::slice::{Slice, SliceMut};
 pub use crate::pattern::string::String;
 

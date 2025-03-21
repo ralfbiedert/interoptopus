@@ -42,15 +42,15 @@ impl ServiceAsync {
 
     pub async fn process_struct(_this: This, mut x: NestedArray) -> ffi::Result<NestedArray, ErrorREMOVEME> {
         x.field_int += 1;
-        ffi::Ok(x)
+        ffi::Result::Ok(x)
     }
 
     pub async fn handle_string(_this: This, s: ffi::String) -> ffi::Result<ffi::String, ErrorREMOVEME> {
-        ffi::Ok(s)
+        ffi::Result::Ok(s)
     }
 
     pub async fn handle_nested_string(_this: This, s: ffi::String) -> ffi::Result<UseString, ErrorREMOVEME> {
-        ffi::Result::ok(UseString { s1: s.clone(), s2: s.clone() })
+        ffi::Result::Ok(UseString { s1: s.clone(), s2: s.clone() })
     }
 
     pub fn callback_string(&self, s: ffi::String, cb: StringCallback) {
@@ -58,7 +58,7 @@ impl ServiceAsync {
     }
 
     pub async fn fail(_this: This) -> ffi::Result<(), ErrorREMOVEME> {
-        ffi::Result::error(ErrorREMOVEME::Fail)
+        ffi::Result::Err(ErrorREMOVEME::Fail)
     }
 
     // TODO: This must not compile.

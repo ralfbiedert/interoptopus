@@ -8,10 +8,10 @@
 
 use crate::backend::{capitalize_first_letter, ctypes_from_type_recursive};
 use crate::pattern::TypePattern;
-use crate::pattern::result::FFIResultType;
 use std::collections::HashSet;
 
 use crate::pattern::callback::AsyncCallback;
+use crate::pattern::result::ResultType;
 pub use array::Array;
 pub use composite::{Composite, Field, Layout, Opaque, Representation};
 pub use constant::{Constant, ConstantValue};
@@ -156,9 +156,8 @@ impl Type {
         }
     }
 
-    /// Convenience method attempting to convert the contained type as a composite.
     #[must_use]
-    pub const fn as_result(&self) -> Option<&FFIResultType> {
+    pub const fn as_result_type(&self) -> Option<&ResultType> {
         match self {
             Self::Pattern(TypePattern::Result(x)) => Some(x),
             _ => None,
@@ -180,6 +179,15 @@ impl Type {
         match self {
             Self::ReadPointer(x) => Some(x),
             Self::ReadWritePointer(x) => Some(x),
+            _ => None,
+        }
+    }
+
+    /// Convenience method attempting to convert the contained type as a composite.
+    #[must_use]
+    pub const fn as_result(&self) -> Option<&ResultType> {
+        match self {
+            Self::Pattern(TypePattern::Result(x)) => Some(x),
             _ => None,
         }
     }

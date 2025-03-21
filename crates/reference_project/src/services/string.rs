@@ -10,7 +10,7 @@ pub struct ServiceStrings {}
 #[ffi_service]
 impl ServiceStrings {
     pub fn new() -> ffi::Result<Self, ErrorREMOVEME> {
-        ffi::Result::ok(Self {})
+        ffi::Result::Ok(Self {})
     }
 
     pub fn pass_cstr(&mut self, _: ffi::CStrPointer) {}

@@ -5,9 +5,9 @@ use crate::interop::docs::write_documentation;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Function, Primitive, SugaredReturnType, Type};
-use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::service::ServiceDefinition;
-use interoptopus::{Error, indented};
+use interoptopus::pattern::TypePattern;
+use interoptopus::{indented, Error};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum MethodType {
@@ -146,7 +146,6 @@ pub fn write_pattern_service_method(
                 class.the_type().rust_name().to_string()
             }
             MethodType::Regular => match function.signature().rval() {
-                Type::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
                 Type::Pattern(TypePattern::CStrPointer) => "string".to_string(),
                 x => to_typespecifier_in_sync_fn_rval(x),
             },
@@ -213,12 +212,6 @@ pub fn write_pattern_service_method(
 
     // Determine return value behavior and write function call.
     match function.signature().rval() {
-        Type::Pattern(TypePattern::FFIErrorEnum(_)) if async_rval.is_sync() => {
-            indented!(w, [()], r"{fn_call}.Ok();")?;
-        }
-        Type::Pattern(TypePattern::FFIErrorEnum(_)) if async_rval.is_async() => {
-            indented!(w, [()], r"return {fn_call};")?;
-        }
         Type::Pattern(TypePattern::CStrPointer) => {
             indented!(w, [()], r"var s = {fn_call};")?;
             indented!(w, [()], r"return Marshal.PtrToStringAnsi(s);")?;

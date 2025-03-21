@@ -1,11 +1,11 @@
-use crate::Interop;
 use crate::converter::{named_callback_to_typename, to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval};
 use crate::interop::types::fnptrs::write_type_definition_fn_pointer_annotation;
+use crate::Interop;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Primitive, Type};
-use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::NamedCallback;
-use interoptopus::{Error, indented};
+use interoptopus::pattern::TypePattern;
+use interoptopus::{indented, Error};
 
 pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
     i.debug(w, "write_type_definition_named_callback")?;
@@ -80,7 +80,6 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     match the_type.fnpointer().signature().rval() {
         Type::Primitive(Primitive::Void) => indented!(w, [()()()], r"_managed({params_invoke});")?,
         Type::Primitive(_) => indented!(w, [()()()], r"return _managed({params_invoke});")?,
-        Type::Pattern(TypePattern::FFIErrorEnum(_)) => indented!(w, [()()()], r"return _managed({params_invoke});")?,
         _ => indented!(w, [()()()], r"return _managed({params_invoke}).ToUnmanaged();")?,
     }
     indented!(w, [()()], r"}}")?;
@@ -89,9 +88,6 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()()()], r"_exception = e;")?;
     match the_type.fnpointer().signature().rval() {
         Type::Primitive(Primitive::Void) => indented!(w, [()()()], r"return;")?,
-        Type::Pattern(TypePattern::FFIErrorEnum(e)) => {
-            indented!(w, [()()()], r"return new {rval_unsafe}({}.{});", e.the_enum().rust_name(), e.panic_variant().name())?;
-        }
         _ => indented!(w, [()()()], r"return default;")?,
     }
     indented!(w, [()()], r"}}")?;
@@ -109,9 +105,6 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     }
     match the_type.fnpointer().signature().rval() {
         Type::Primitive(Primitive::Void) => indented!(w, [()()], r"return;")?,
-        Type::Pattern(TypePattern::FFIErrorEnum(e)) => {
-            indented!(w, [()()], r"return new {rval_safe}({}.{});", e.the_enum().rust_name(), e.panic_variant().name())?;
-        }
         _ => indented!(w, [()()], r"return default;")?,
     }
     indented!(w, [()], r"}}")?;
