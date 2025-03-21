@@ -76,7 +76,7 @@
 use crate::lang::{Composite, Primitive, Type, TypeInfo};
 use crate::pattern::builtins::Builtins;
 use crate::pattern::callback::{AsyncCallback, NamedCallback};
-use crate::pattern::result::{FFIErrorEnum, FFIResultType};
+use crate::pattern::result::FFIResultType;
 use crate::pattern::service::ServiceDefinition;
 use crate::pattern::slice::SliceType;
 use std::ffi::c_char;
@@ -99,6 +99,7 @@ pub mod surrogate;
 /// A pattern on a library level, usually involving both methods and types.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 #[non_exhaustive]
+#[allow(clippy::large_enum_variant)]
 pub enum LibraryPattern {
     Service(ServiceDefinition),
     Builtins(Builtins),
@@ -124,7 +125,6 @@ pub enum TypePattern {
     CStrPointer,
     Utf8String(Composite),
     APIVersion,
-    FFIErrorEnum(FFIErrorEnum),
     Slice(SliceType),
     SliceMut(SliceType),
     Option(Composite),
@@ -144,7 +144,6 @@ impl TypePattern {
     pub fn fallback_type(&self) -> Type {
         match self {
             Self::CStrPointer => Type::ReadPointer(Box::new(Type::Pattern(Self::CChar))),
-            Self::FFIErrorEnum(e) => Type::Enum(e.the_enum().clone()),
             Self::Slice(x) => Type::Composite(x.composite_type().clone()),
             Self::SliceMut(x) => Type::Composite(x.composite_type().clone()),
             Self::Option(x) => Type::Composite(x.clone()),

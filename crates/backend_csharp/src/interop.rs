@@ -21,11 +21,11 @@ use crate::interop::patterns::write_patterns;
 use crate::interop::types::write_type_definitions;
 use derive_builder::Builder;
 use interoptopus::backend::IndentWriter;
-use interoptopus::backend::{NamespaceMappings, is_global_type};
+use interoptopus::backend::{is_global_type, NamespaceMappings};
 use interoptopus::inventory::{Bindings, Inventory};
 use interoptopus::lang::{Constant, Function, FunctionSignature, Meta, Type};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{Error, indented};
+use interoptopus::{indented, Error};
 
 /// How to convert from Rust function names to C#
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
@@ -218,8 +218,7 @@ impl Interop {
 
     #[must_use]
     fn should_emit_by_meta(&self, meta: &Meta) -> bool {
-        let rval = meta.namespace() == self.namespace_id;
-        rval
+        meta.namespace() == self.namespace_id
     }
 
     fn is_custom_marshalled(&self, x: &Type) -> bool {

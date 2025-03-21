@@ -35,10 +35,6 @@ pub struct Attributes {
     #[darling(default)]
     u64: bool,
 
-    /// The error pattern.
-    #[darling(default)]
-    error: bool,
-
     // Disabled for now
     // #[darling(default)]
     // align: Option<usize>,

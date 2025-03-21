@@ -113,7 +113,8 @@ pub fn longest_common_prefix(functions: &[Function]) -> String {
 }
 
 /// Given some functions and types, return all used and nested types, without duplicates.
-pub(crate) fn ctypes_from_functions_types(functions: &[Function], extra_types: &[Type]) -> Vec<Type> {
+#[must_use]
+pub fn ctypes_from_functions_types(functions: &[Function], extra_types: &[Type]) -> Vec<Type> {
     let mut types = HashSet::new();
 
     for function in functions {
@@ -165,7 +166,6 @@ pub fn ctypes_from_type_recursive(start: &Type, types: &mut HashSet<Type>) {
                 }
             }
             TypePattern::CStrPointer => {}
-            TypePattern::FFIErrorEnum(_) => {}
             TypePattern::NamedCallback(x) => {
                 let inner = x.fnpointer();
                 ctypes_from_type_recursive(inner.signature().rval(), types);
@@ -194,7 +194,8 @@ pub fn ctypes_from_type_recursive(start: &Type, types: &mut HashSet<Type>) {
 }
 
 /// Extracts annotated namespace strings.
-pub(crate) fn extract_namespaces_from_types(types: &[Type], into: &mut HashSet<String>) {
+#[allow(clippy::implicit_hasher)]
+pub fn extract_namespaces_from_types(types: &[Type], into: &mut HashSet<String>) {
     for t in types {
         match t {
             Type::Primitive(_) => {}
@@ -218,9 +219,6 @@ pub(crate) fn extract_namespaces_from_types(types: &[Type], into: &mut HashSet<S
                 }
                 TypePattern::CStrPointer => {}
                 TypePattern::APIVersion => {}
-                TypePattern::FFIErrorEnum(x) => {
-                    into.insert(x.the_enum().meta().namespace().to_string());
-                }
                 TypePattern::Slice(x) => {
                     into.insert(x.meta().namespace().to_string());
                 }
@@ -264,7 +262,6 @@ pub fn holds_opaque_without_ref(typ: &Type) -> bool {
             TypePattern::CStrPointer => false,
             TypePattern::Utf8String(_) => false,
             TypePattern::APIVersion => false,
-            TypePattern::FFIErrorEnum(_) => false,
             TypePattern::Slice(x) => holds_opaque_without_ref(x.target_type()),
             TypePattern::SliceMut(x) => holds_opaque_without_ref(x.target_type()),
             TypePattern::Option(x) => holds_opaque_without_ref(&x.into_ctype()),
@@ -365,7 +362,6 @@ pub fn is_global_type(t: &Type) -> bool {
         Type::Pattern(x) => match x {
             TypePattern::CStrPointer => true,
             TypePattern::APIVersion => false,
-            TypePattern::FFIErrorEnum(_) => false,
             TypePattern::Slice(x) => is_global_type(x.target_type()),
             TypePattern::SliceMut(x) => is_global_type(x.target_type()),
             TypePattern::Option(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),

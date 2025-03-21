@@ -1,4 +1,4 @@
-use crate::patterns::result::Error;
+use crate::patterns::result::ErrorREMOVEME;
 use interoptopus::{ffi, ffi_service, ffi_type};
 
 #[ffi_type(opaque)]
@@ -8,7 +8,7 @@ pub struct ServiceMain {
 
 #[ffi_service]
 impl ServiceMain {
-    pub fn new(value: u32) -> ffi::Result<Self, Error> {
+    pub fn new(value: u32) -> ffi::Result<Self, ErrorREMOVEME> {
         ffi::Ok(Self { value })
     }
 }
@@ -20,7 +20,7 @@ pub struct ServiceDependent {
 
 #[ffi_service]
 impl ServiceDependent {
-    pub fn from_main(main: &ServiceMain) -> ffi::Result<Self, Error> {
+    pub fn from_main(main: &ServiceMain) -> ffi::Result<Self, ErrorREMOVEME> {
         ffi::Ok(Self { value: main.value })
     }
 

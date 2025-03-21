@@ -1,4 +1,4 @@
-use crate::patterns::result::Error;
+use crate::patterns::result::ErrorREMOVEME;
 use interoptopus::{ffi, ffi_service, ffi_service_method, ffi_type};
 
 /// Some struct we want to expose as a class.
@@ -10,7 +10,7 @@ pub struct ServiceVariousSlices {
 // Regular implementation of methods.
 #[ffi_service]
 impl ServiceVariousSlices {
-    pub fn new() -> ffi::Result<Self, Error> {
+    pub fn new() -> ffi::Result<Self, ErrorREMOVEME> {
         ffi::Ok(Self { data: vec![123; 64] })
     }
 
@@ -41,11 +41,11 @@ impl ServiceVariousSlices {
 
     // This annotation isn't really needed, `ffi_error` is standard error handling.
     #[ffi_service_method(on_panic = "ffi_error")]
-    pub fn mut_self_ffi_error(&mut self, _slice: ffi::SliceMut<u8>) -> ffi::Result<(), Error> {
+    pub fn mut_self_ffi_error(&mut self, _slice: ffi::SliceMut<u8>) -> ffi::Result<(), ErrorREMOVEME> {
         ffi::Ok(())
     }
 
-    pub fn mut_self_no_error(&mut self, mut slice: ffi::SliceMut<u8>) -> ffi::Result<(), Error> {
+    pub fn mut_self_no_error(&mut self, mut slice: ffi::SliceMut<u8>) -> ffi::Result<(), ErrorREMOVEME> {
         slice.as_slice_mut();
         ffi::Ok(())
     }

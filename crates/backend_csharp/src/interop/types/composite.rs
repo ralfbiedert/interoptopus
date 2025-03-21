@@ -1,10 +1,10 @@
-use crate::Interop;
 use crate::converter::{field_name_to_csharp_name, is_blittable, to_typespecifier_in_field};
 use crate::interop::docs::write_documentation;
+use crate::Interop;
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Composite, Field, Layout, Primitive, Type, Visibility};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{Error, indented};
+use interoptopus::{indented, Error};
 
 pub fn write_type_definition_composite(i: &Interop, w: &mut IndentWriter, the_type: &Composite) -> Result<(), Error> {
     i.debug(w, "write_type_definition_composite")?;
@@ -248,7 +248,7 @@ pub fn write_type_definition_composite_marshaller_field_to_unmanaged(i: &Interop
             indented!(w, "var _{name} = new {}.Marshaller(_managed.{});", to_typespecifier_in_field(x, field, the_type), name)?;
             indented!(w, "_unmanaged.{name} = _{name}.ToUnmanaged();")?;
         }
-    };
+    }
 
     Ok(())
 }
@@ -286,7 +286,7 @@ pub fn write_type_definition_composite_marshaller_field_from_unmanaged(i: &Inter
             indented!(w, "var _{name} = new {}.Marshaller(_unmanaged.{});", to_typespecifier_in_field(x, field, the_type), name)?;
             indented!(w, "_managed.{name} = _{name}.ToManaged();")?;
         }
-    };
+    }
 
     Ok(())
 }

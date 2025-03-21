@@ -1,12 +1,13 @@
 use crate::types::{Attributes, TypeRepresentation};
 use crate::util::extract_doc_lines;
-use proc_macro2::{Ident, Span, TokenStream};
-use quote::{quote, quote_spanned};
+use proc_macro2::{Span, TokenStream};
+use quote::__private::ext::RepToTokensExt;
+use quote::{quote, quote_spanned, ToTokens};
 use syn::{Expr, Fields, ItemEnum, Lit};
 
 pub enum VariantKind {
     Unit(usize),
-    Typed(usize, Ident),
+    Typed(usize, TokenStream),
 }
 
 #[allow(clippy::too_many_lines)]
@@ -48,8 +49,8 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
         let variant_kind = match &variant.fields {
             Fields::Unit => VariantKind::Unit(discriminant),
             Fields::Unnamed(x) => {
-                dbg!(x);
-                todo!()
+                let field_ty = x.unnamed.next().expect("Must have one unnamed field");
+                VariantKind::Typed(discriminant, field_ty.to_token_stream())
             }
             Fields::Named(_) => panic!("Named variants are not supported."),
         };
@@ -64,24 +65,20 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
                 });
                 variants.push(tokens);
             }
-            VariantKind::Typed(_, _) => {}
+            VariantKind::Typed(x, ts) => {
+                let tokens = quote_spanned!(variant.ident.span() => {
+                    let documentation = ::interoptopus::lang::Documentation::from_line(#variant_doc_line);
+                    let ty = ::std::boxed::Box::new(<#ts as ::interoptopus::lang::TypeInfo>::type_info());
+                    let kind = ::interoptopus::lang::VariantKind::Typed(ty);
+                    let variant = ::interoptopus::lang::Variant::new(#ident.to_string(), kind, documentation);
+                    variants.push(variant);
+                });
+                variants.push(tokens);
+            }
         }
     }
 
     // let variant_infos = derive_variant_info(&item, &variant_idents, &variant_names, &variant_kinds, &variant_docs);
-
-    let ctype_info_return = if attributes.error {
-        quote! {
-            use ::interoptopus::pattern::result::FFIError as _;
-            let success_variant = Self::SUCCESS.variant_info();
-            let panic_variant = Self::PANIC.variant_info();
-            let the_success_enum = ::interoptopus::pattern::result::FFIErrorEnum::new(rval, success_variant, panic_variant);
-            let the_pattern = ::interoptopus::pattern::TypePattern::FFIErrorEnum(the_success_enum);
-            ::interoptopus::lang::Type::Pattern(the_pattern)
-        }
-    } else {
-        quote! { ::interoptopus::lang::Type::Enum(rval) }
-    };
 
     let attr_align = align.map_or_else(
         || quote! {},
@@ -128,8 +125,7 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
 
                 let repr = ::interoptopus::lang::Representation::new(#layout, #align);
                 let rval = ::interoptopus::lang::Enum::new(#ffi_name.to_string(), variants, meta, repr);
-
-                #ctype_info_return
+                ::interoptopus::lang::Type::Enum(rval)
             }
         }
     }

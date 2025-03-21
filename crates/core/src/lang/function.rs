@@ -1,6 +1,5 @@
 use crate::backend::IdPrettifier;
 use crate::lang::{Meta, Type};
-use crate::pattern::TypePattern;
 use crate::pattern::callback::AsyncCallback;
 
 /// Indicates the final desired return type in FFI'ed user code.
@@ -58,11 +57,6 @@ impl Function {
     #[must_use]
     pub fn first_param_type(&self) -> Option<&Type> {
         self.signature().params.first().map(|x| &x.the_type)
-    }
-
-    #[must_use]
-    pub const fn returns_ffi_error(&self) -> bool {
-        matches!(self.signature().rval(), Type::Pattern(TypePattern::FFIErrorEnum(_)))
     }
 
     /// Indicates the return type of a method from user code.
