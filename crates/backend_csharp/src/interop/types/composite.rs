@@ -118,7 +118,7 @@ pub fn write_type_definition_composite_unmanaged_body_field(i: &Interop, w: &mut
     let field_name = field_name_to_csharp_name(field, i.rename_symbols);
     match field.the_type() {
         Type::Array(a) => {
-            let type_name = to_typespecifier_in_field(a.array_type(), field, the_type);
+            let type_name = to_typespecifier_in_field(a.array_type());
             let size = a.len();
             if matches!(a.array_type(), Type::Pattern(TypePattern::CChar)) {
                 indented!(w, r"public fixed byte {}[{}];", field_name, size)?;
@@ -142,7 +142,7 @@ pub fn write_type_definition_composite_unmanaged_body_field(i: &Interop, w: &mut
             indented!(w, r"public Utf8String.Unmanaged {};", field_name)?;
         }
         _ => {
-            let type_name = to_typespecifier_in_field(field.the_type(), field, the_type);
+            let type_name = to_typespecifier_in_field(field.the_type());
             indented!(w, r"public {} {};", type_name, field_name)?;
         }
     }
@@ -178,6 +178,7 @@ pub fn write_type_definition_composite_body(i: &Interop, w: &mut IndentWriter, t
     Ok(())
 }
 
+#[allow(clippy::single_match_else)]
 pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &Composite) -> Result<(), Error> {
     let field_name = field_name_to_csharp_name(field, i.rename_symbols);
     let visibility = match field.visibility() {
@@ -193,13 +194,13 @@ pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWri
             let type_name = if matches!(a.array_type(), Type::Pattern(TypePattern::CChar)) {
                 "string".to_string()
             } else {
-                format!("{}[]", to_typespecifier_in_field(a.array_type(), field, the_type))
+                format!("{}[]", to_typespecifier_in_field(a.array_type()))
             };
 
             indented!(w, r"{}{} {};", visibility, type_name, field_name)?;
         }
         _ => {
-            let type_name = to_typespecifier_in_field(field.the_type(), field, the_type);
+            let type_name = to_typespecifier_in_field(field.the_type());
             indented!(w, r"{}{} {};", visibility, type_name, field_name)?;
         }
     }
@@ -217,7 +218,7 @@ pub fn write_type_definition_composite_marshaller_field_to_unmanaged(i: &Interop
         Type::ReadPointer(_) => indented!(w, "_unmanaged.{name} = _managed.{name};")?,
         Type::ReadWritePointer(_) => indented!(w, "_unmanaged.{name} = _managed.{name};")?,
         Type::Array(x) => {
-            let array_type = to_typespecifier_in_field(x.array_type(), field, the_type);
+            let array_type = to_typespecifier_in_field(x.array_type());
             indented!(w, "fixed({}* _fixed = _unmanaged.{})", array_type, name)?;
             indented!(w, "{{")?;
             indented!(w, [()], r#"if (_managed.{} == null) {{ throw new InvalidOperationException("Array '{}' must not be null"); }}"#, name, name)?;
@@ -236,7 +237,7 @@ pub fn write_type_definition_composite_marshaller_field_to_unmanaged(i: &Interop
             indented!(w, "_unmanaged.{name} = _{name}.ToUnmanaged();")?;
         }
         x => {
-            indented!(w, "var _{name} = new {}.Marshaller(_managed.{});", to_typespecifier_in_field(x, field, the_type), name)?;
+            indented!(w, "var _{name} = new {}.Marshaller(_managed.{});", to_typespecifier_in_field(x), name)?;
             indented!(w, "_unmanaged.{name} = _{name}.ToUnmanaged();")?;
         }
     }
@@ -255,7 +256,7 @@ pub fn write_type_definition_composite_marshaller_field_from_unmanaged(i: &Inter
         Type::ReadPointer(_) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
         Type::ReadWritePointer(_) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
         Type::Array(x) => {
-            let array_type = to_typespecifier_in_field(x.array_type(), field, the_type);
+            let array_type = to_typespecifier_in_field(x.array_type());
             indented!(w, "fixed({}* _fixed = _unmanaged.{})", array_type, name)?;
             indented!(w, "{{")?;
             indented!(w, [()], "_managed.{} = new {}[{}];", name, array_type, x.len())?;
@@ -273,7 +274,7 @@ pub fn write_type_definition_composite_marshaller_field_from_unmanaged(i: &Inter
         }
 
         x => {
-            indented!(w, "var _{name} = new {}.Marshaller(_unmanaged.{});", to_typespecifier_in_field(x, field, the_type), name)?;
+            indented!(w, "var _{name} = new {}.Marshaller(_unmanaged.{});", to_typespecifier_in_field(x), name)?;
             indented!(w, "_managed.{name} = _{name}.ToManaged();")?;
         }
     }

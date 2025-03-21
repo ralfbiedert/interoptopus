@@ -1,6 +1,5 @@
 use crate::patterns::callback::StringCallback;
-use crate::patterns::result::ErrorREMOVEME;
-use crate::patterns::result::ErrorREMOVEME2;
+use crate::patterns::result::Error;
 use crate::types::arrays::NestedArray;
 use crate::types::string::UseString;
 use interoptopus::ffi;
@@ -17,7 +16,7 @@ pub struct ServiceAsync {
 
 #[ffi_service]
 impl ServiceAsync {
-    pub fn new() -> ffi::Result<Self, ErrorREMOVEME> {
+    pub fn new() -> ffi::Result<Self, Error> {
         result_to_ffi(|| {
             // This is a workaround for the fact that tokio::runtime::Builder::new_multi_thread()
             // cannot be used in a const context.
@@ -25,13 +24,13 @@ impl ServiceAsync {
                 .worker_threads(1)
                 .enable_all()
                 .build()
-                .map_err(|_| ErrorREMOVEME2::Bad)?;
+                .map_err(|_| Error::Fail)?;
 
             Ok(Self { runtime })
         })
     }
 
-    pub async fn return_after_ms(_this: This, x: u64, ms: u64) -> ffi::Result<u64, ErrorREMOVEME> {
+    pub async fn return_after_ms(_this: This, x: u64, ms: u64) -> ffi::Result<u64, Error> {
         result_to_ffi_async(async || {
             // tokio::fs::read("x.text").await?;
             tokio::time::sleep(std::time::Duration::from_millis(ms)).await;
@@ -40,16 +39,16 @@ impl ServiceAsync {
         .await
     }
 
-    pub async fn process_struct(_this: This, mut x: NestedArray) -> ffi::Result<NestedArray, ErrorREMOVEME> {
+    pub async fn process_struct(_this: This, mut x: NestedArray) -> ffi::Result<NestedArray, Error> {
         x.field_int += 1;
         ffi::Result::Ok(x)
     }
 
-    pub async fn handle_string(_this: This, s: ffi::String) -> ffi::Result<ffi::String, ErrorREMOVEME> {
+    pub async fn handle_string(_this: This, s: ffi::String) -> ffi::Result<ffi::String, Error> {
         ffi::Result::Ok(s)
     }
 
-    pub async fn handle_nested_string(_this: This, s: ffi::String) -> ffi::Result<UseString, ErrorREMOVEME> {
+    pub async fn handle_nested_string(_this: This, s: ffi::String) -> ffi::Result<UseString, Error> {
         ffi::Result::Ok(UseString { s1: s.clone(), s2: s.clone() })
     }
 
@@ -57,8 +56,8 @@ impl ServiceAsync {
         cb.call(s.clone());
     }
 
-    pub async fn fail(_this: This) -> ffi::Result<(), ErrorREMOVEME> {
-        ffi::Result::Err(ErrorREMOVEME::Fail)
+    pub async fn fail(_this: This) -> ffi::Result<(), Error> {
+        ffi::Result::Err(Error::Fail)
     }
 
     // TODO: This must not compile.

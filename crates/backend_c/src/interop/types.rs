@@ -148,7 +148,7 @@ fn write_type_definition_enum_variant(i: &Interop, w: &mut IndentWriter, variant
 
     match variant_kind {
         VariantKind::Unit(variant_value) => indented!(w, r"{} = {},", variant_name, variant_value),
-        VariantKind::Typed(_) => todo!(),
+        VariantKind::Typed(_, _) => todo!(),
     }
 }
 

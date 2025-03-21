@@ -1,5 +1,6 @@
 using System;
 using My.Company;
+using My.Company.Common;
 using Xunit;
 
 public class TestPatternServicesCallbacks
@@ -35,7 +36,7 @@ public class TestPatternServicesCallbacks
             Assert.Equal(x, 1);
             Assert.Equal(y, 2);
             called = true;
-            return ResultError.OK;
+            return ResultError.Ok;
         }, slice).Ok();
 
         Assert.True(called);

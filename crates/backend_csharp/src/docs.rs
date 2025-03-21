@@ -1,16 +1,16 @@
-use crate::Interop;
 use crate::converter::{field_name_to_csharp_name, function_name_to_csharp_name};
-use crate::interop::FunctionNameFlavor;
 use crate::interop::functions::write_function;
-use crate::interop::patterns::services::{MethodType, write_pattern_service_method, write_service_method_overload};
+use crate::interop::patterns::services::{write_pattern_service_method, write_service_method_overload, MethodType};
 use crate::interop::types::composite::write_type_definition_composite_body;
 use crate::interop::types::enums::write_type_definition_enum;
-use interoptopus::Error;
+use crate::interop::FunctionNameFlavor;
+use crate::Interop;
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::indented;
-use interoptopus::inventory::{Bindings, non_service_functions};
+use interoptopus::inventory::{non_service_functions, Bindings};
 use interoptopus::lang::{Composite, Function, Type};
 use interoptopus::pattern::{LibraryPattern, TypePattern};
+use interoptopus::Error;
 
 /// Configures C# documentation generation.
 #[derive(Clone, Debug, Default)]
@@ -188,7 +188,7 @@ impl<'a> Markdown<'a> {
 
             indented!(w, r"#### Definition ")?;
             indented!(w, r"```csharp")?;
-            write_type_definition_enum(self.interop, w, the_enum, WriteFor::Docs)?;
+            write_type_definition_enum(self.interop, w, the_enum)?;
             indented!(w, r"```")?;
             w.newline()?;
             indented!(w, r"---")?;

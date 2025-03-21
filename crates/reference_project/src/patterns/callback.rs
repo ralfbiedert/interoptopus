@@ -1,4 +1,4 @@
-use crate::patterns::result::ErrorREMOVEME;
+use crate::patterns::result::Error;
 use crate::types::string::UseString;
 use interoptopus::{callback, ffi, ffi_function, ffi_type};
 use std::ffi::c_void;
@@ -10,7 +10,7 @@ callback!(MyCallbackVoid(ptr: *const c_void));
 callback!(MyCallbackContextual(context: *const c_void, value: u32));
 callback!(SumDelegate1());
 callback!(SumDelegate2(x: i32, y: i32) -> i32);
-callback!(SumDelegateReturn(x: i32, y: i32) -> ErrorREMOVEME);
+callback!(SumDelegateReturn(x: i32, y: i32) -> Error);
 callback!(SumDelegateReturn2(x: i32, y: i32));
 callback!(StringCallback(s: ffi::String));
 callback!(NestedStringCallback(s: UseString));
@@ -52,7 +52,7 @@ pub fn pattern_callback_6() -> SumDelegate2 {
 }
 
 #[ffi_function]
-pub fn pattern_callback_7(c1: SumDelegateReturn, c2: SumDelegateReturn2, x: i32, i: i32, o: &mut i32) -> ErrorREMOVEME {
+pub fn pattern_callback_7(c1: SumDelegateReturn, c2: SumDelegateReturn2, x: i32, i: i32, o: &mut i32) -> Error {
     *o = i - 1;
 
     // Call both callbacks. In C#, if the callback throws an exception, we might not re-enter
@@ -68,7 +68,7 @@ pub fn pattern_callback_7(c1: SumDelegateReturn, c2: SumDelegateReturn2, x: i32,
 
     *o = i + 1;
 
-    ErrorREMOVEME::Ok
+    Error::Ok
 }
 
 #[ffi_function]

@@ -183,7 +183,7 @@ pub fn ctypes_from_type_recursive(start: &Type, types: &mut HashSet<Type>) {
             TypePattern::Result(x) => {
                 for variant in x.the_enum().variants() {
                     match variant.kind() {
-                        VariantKind::Typed(x) => ctypes_from_type_recursive(x, types),
+                        VariantKind::Typed(_, t) => ctypes_from_type_recursive(t, types),
                         VariantKind::Unit(_) => {}
                     }
                 }
@@ -251,8 +251,8 @@ pub fn holds_opaque_without_ref(typ: &Type) -> bool {
         Type::Enum(x) => {
             for variant in x.variants() {
                 match variant.kind() {
-                    VariantKind::Typed(x) => {
-                        if holds_opaque_without_ref(x) {
+                    VariantKind::Typed(_, t) => {
+                        if holds_opaque_without_ref(t) {
                             return true;
                         }
                     }
@@ -371,8 +371,8 @@ pub fn is_global_type(t: &Type) -> bool {
         Type::Enum(x) => {
             for variant in x.variants() {
                 match variant.kind() {
-                    VariantKind::Typed(x) => {
-                        if !is_global_type(x) {
+                    VariantKind::Typed(_, t) => {
+                        if !is_global_type(t) {
                             return false;
                         }
                     }

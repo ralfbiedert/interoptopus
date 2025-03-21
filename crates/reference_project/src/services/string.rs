@@ -1,5 +1,5 @@
 use crate::patterns::callback::StringCallback;
-use crate::patterns::result::ErrorREMOVEME;
+use crate::patterns::result::Error;
 use interoptopus::{ffi, ffi_service, ffi_type};
 
 /// Some struct we want to expose as a class.
@@ -9,7 +9,7 @@ pub struct ServiceStrings {}
 // Regular implementation of methods.
 #[ffi_service]
 impl ServiceStrings {
-    pub fn new() -> ffi::Result<Self, ErrorREMOVEME> {
+    pub fn new() -> ffi::Result<Self, Error> {
         ffi::Result::Ok(Self {})
     }
 

@@ -144,7 +144,7 @@ pub fn write_enum(_i: &Interop, w: &mut IndentWriter, e: &Enum, write_for: Write
 
         match v.kind() {
             VariantKind::Unit(x) => indented!(w, [()], r"{} = {}", v.name(), x)?,
-            VariantKind::Typed(_) => todo!(),
+            VariantKind::Typed(_, _) => todo!(),
         };
     }
 

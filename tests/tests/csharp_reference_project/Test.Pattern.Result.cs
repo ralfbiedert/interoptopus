@@ -1,4 +1,5 @@
 using My.Company;
+using My.Company.Common;
 using Xunit;
 
 public class TestPatternResult
@@ -13,8 +14,8 @@ public class TestPatternResult
     [Fact]
     public void pattern_result_3()
     {
-        Interop.pattern_result_3(ResultError.OK).Ok();
-        Assert.Equal(ResultError.OK, Interop.pattern_result_3(ResultError.OK));
-        Assert.Equal(ResultError.FAIL, Interop.pattern_result_3(ResultError.FAIL));
+        Assert.True(Interop.pattern_result_3(ResultError.Ok).IsOk);
+        Assert.Equal(ResultError.Ok, Interop.pattern_result_3(ResultError.Ok));
+        Assert.Equal(ResultError.Null, Interop.pattern_result_3(ResultError.Null));
     }
 }

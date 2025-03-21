@@ -29,7 +29,7 @@
 //! ```
 
 use crate::backend::capitalize_first_letter;
-use crate::lang::{Composite, Documentation, Enum, Layout, Meta, Representation, Type, Variant};
+use crate::lang::{Composite, Documentation, Enum, Layout, Meta, Primitive, Representation, Type, Variant};
 use crate::lang::{TypeInfo, VariantKind};
 use crate::pattern::TypePattern;
 use std::any::Any;
@@ -275,8 +275,8 @@ where
         let doc_err = Documentation::from_line("Error value.");
 
         let variants = vec![
-            Variant::new("Ok".to_string(), VariantKind::Typed(Box::new(T::type_info())), doc_t),
-            Variant::new("Err".to_string(), VariantKind::Typed(Box::new(E::type_info())), doc_err),
+            Variant::new("Ok".to_string(), VariantKind::Typed(0, Box::new(T::type_info())), doc_t),
+            Variant::new("Err".to_string(), VariantKind::Typed(1, Box::new(E::type_info())), doc_err),
             Variant::new("Panic".to_string(), VariantKind::Unit(2), Documentation::new()),
             Variant::new("Null".to_string(), VariantKind::Unit(3), Documentation::new()),
         ];
@@ -286,7 +286,11 @@ where
         let meta = Meta::with_namespace_documentation(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
         let t_name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
         let e_name = capitalize_first_letter(E::type_info().name_within_lib().as_str());
-        let the_enum = Enum::new(format!("Result{t_name}{e_name}"), variants, meta, repr);
+        let name = match T::type_info() {
+            Type::Primitive(Primitive::Void) => format!("Result{e_name}"),
+            _ => format!("Result{t_name}{e_name}"),
+        };
+        let the_enum = Enum::new(name, variants, meta, repr);
         let result_enum = ResultType::new(the_enum);
         Type::Pattern(TypePattern::Result(result_enum))
     }

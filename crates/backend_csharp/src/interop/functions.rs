@@ -206,7 +206,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         match x {
             Type::Pattern(TypePattern::Result(x)) => {
                 indented!(w, [()()], r"if (managed.IsOk()) {{ cs.SetResult(managed.Ok()); }}")?;
-                indented!(w, [()()], r"else {{ cs.SetException(new InteropException<{}>(managed.Err())); }}", x.e().the_enum().rust_name())?;
+                indented!(w, [()()], r"else {{ cs.SetException(new InteropException<{}>(managed.Err())); }}", x.the_enum().rust_name())?;
             }
             _ => indented!(w, [()()], r"cs.SetResult(managed);")?,
         }

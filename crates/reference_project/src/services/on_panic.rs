@@ -1,4 +1,4 @@
-use crate::patterns::result::ErrorREMOVEME;
+use crate::patterns::result::Error;
 use interoptopus::{ffi, ffi_service, ffi_service_method, ffi_type};
 use std::ffi::CString;
 
@@ -11,13 +11,13 @@ pub struct ServiceOnPanic {
 // Regular implementation of methods.
 #[ffi_service]
 impl ServiceOnPanic {
-    pub fn new() -> ffi::Result<Self, ErrorREMOVEME> {
+    pub fn new() -> ffi::Result<Self, Error> {
         ffi::Ok(Self { c_string: CString::new("Hello new_with").unwrap() })
     }
 
     /// Methods returning a Result<(), _> are the default and do not
     /// need annotations.
-    pub fn return_result(&self, _: u32) -> ffi::Result<(), ErrorREMOVEME> {
+    pub fn return_result(&self, _: u32) -> ffi::Result<(), Error> {
         ffi::Ok(())
     }
 

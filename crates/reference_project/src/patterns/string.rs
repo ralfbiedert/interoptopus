@@ -1,4 +1,4 @@
-use crate::patterns::result::ErrorREMOVEME;
+use crate::patterns::result::Error;
 use crate::types::string::{UseCStrPtr, UseString};
 use interoptopus::ffi::{CStrPointer, Result, Slice};
 use interoptopus::{ffi, ffi_function};
@@ -69,32 +69,32 @@ pub fn pattern_string_4(x: UseString) -> UseString {
 }
 
 #[ffi_function]
-pub fn pattern_string_5(x: UseString) -> ffi::Result<UseString, ErrorREMOVEME> {
+pub fn pattern_string_5(x: UseString) -> ffi::Result<UseString, Error> {
     Result::Ok(x)
 }
 
 #[ffi_function]
-pub fn pattern_string_6a(_: &UseString) -> ffi::Result<(), ErrorREMOVEME> {
+pub fn pattern_string_6a(_: &UseString) -> ffi::Result<(), Error> {
     ffi::Ok(())
 }
 
 #[ffi_function]
-pub fn pattern_string_6b(y: &mut UseString) -> ffi::Result<(), ErrorREMOVEME> {
+pub fn pattern_string_6b(y: &mut UseString) -> ffi::Result<(), Error> {
     *y = UseString { s1: ffi::String::from_string("s1".to_string()), s2: ffi::String::from_string("s2".to_string()) };
     Result::Ok(())
 }
 
 #[ffi_function]
-pub fn pattern_string_7(x: ffi::Slice<ffi::String>, i: u64) -> ffi::Result<ffi::String, ErrorREMOVEME> {
+pub fn pattern_string_7(x: ffi::Slice<ffi::String>, i: u64) -> ffi::Result<ffi::String, Error> {
     Result::Ok(x.as_slice()[i as usize].clone())
 }
 
 #[ffi_function]
-pub fn pattern_string_8(x: ffi::Slice<UseString>, i: u64) -> ffi::Result<UseString, ErrorREMOVEME> {
+pub fn pattern_string_8(x: ffi::Slice<UseString>, i: u64) -> ffi::Result<UseString, Error> {
     Result::Ok(x.as_slice()[i as usize].clone())
 }
 
 #[ffi_function]
-pub fn pattern_string_9() -> ffi::Result<ffi::String, ErrorREMOVEME> {
-    Result::Err(ErrorREMOVEME::Fail)
+pub fn pattern_string_9() -> ffi::Result<ffi::String, Error> {
+    Result::Err(Error::Fail)
 }

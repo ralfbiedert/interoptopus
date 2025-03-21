@@ -50,7 +50,7 @@ impl Enum {
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum VariantKind {
     Unit(usize),
-    Typed(Box<Type>),
+    Typed(usize, Box<Type>),
 }
 
 impl VariantKind {
@@ -61,7 +61,7 @@ impl VariantKind {
 
     #[must_use]
     pub const fn is_typed(&self) -> bool {
-        matches!(self, Self::Typed(_))
+        matches!(self, Self::Typed(_, _))
     }
 
     #[must_use]
@@ -71,7 +71,7 @@ impl VariantKind {
 
     #[must_use]
     pub const fn as_typed(&self) -> Option<&Type> {
-        if let Self::Typed(x) = self { Some(x) } else { None }
+        if let Self::Typed(_, x) = self { Some(x) } else { None }
     }
 }
 

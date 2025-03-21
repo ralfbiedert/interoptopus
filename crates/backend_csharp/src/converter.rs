@@ -82,7 +82,7 @@ pub fn fnpointer_to_typename(x: &FnPointer) -> String {
 
 /// Converts the `u32` part in a Rust field `x: u32` to a C# equivalent. Might convert pointers to `IntPtr`.
 #[allow(clippy::only_used_in_recursion)]
-pub fn to_typespecifier_in_field(x: &Type, field: &Field, composite: &Composite) -> String {
+pub fn to_typespecifier_in_field(x: &Type) -> String {
     match &x {
         Type::Primitive(x) => primitive_to_typename(*x),
         // CType::Array(_) => panic!("Needs special handling in the writer."),
@@ -102,7 +102,7 @@ pub fn to_typespecifier_in_field(x: &Type, field: &Field, composite: &Composite)
             TypePattern::NamedCallback(e) => named_callback_to_typename(e),
             TypePattern::Bool => "Bool".to_string(),
             TypePattern::CChar => "sbyte".to_string(),
-            TypePattern::APIVersion => to_typespecifier_in_field(&x.fallback_type(), field, composite),
+            TypePattern::APIVersion => to_typespecifier_in_field(&x.fallback_type()),
             _ => panic!("Pattern not explicitly handled"),
         },
     }
