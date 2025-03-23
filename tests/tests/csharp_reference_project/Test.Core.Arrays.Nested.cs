@@ -1,5 +1,6 @@
 using System.Linq;
 using My.Company;
+using My.Company.Common;
 using Xunit;
 
 public class TestArrayNested

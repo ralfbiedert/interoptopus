@@ -1,5 +1,6 @@
 using System;
 using My.Company;
+using My.Company.Common;
 using Xunit;
 
 public class TestPatternServicesCallbacksTable
@@ -13,7 +14,7 @@ public class TestPatternServicesCallbacksTable
             my_callback = new MyCallback(value => 1),
             sum_delegate_1 = new SumDelegate1(() => { }),
             sum_delegate_2 = new SumDelegate2((x, y) => x + y),
-            sum_delegate_return = new SumDelegateReturn(((i, i1) => ResultError.OK)),
+            sum_delegate_return = new SumDelegateReturn(((i, i1) => ResultError.Ok)),
         };
         service.SetDelegateTable(_table);
     }

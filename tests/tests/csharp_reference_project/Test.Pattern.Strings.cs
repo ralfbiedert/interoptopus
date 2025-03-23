@@ -60,7 +60,7 @@ public class TestPatternStrings
         Interop.pattern_string_6a(ref r1);
 
         var y = new UseString { s1 = "", s2 = "" };
-        Interop.pattern_string_6b(ref y).Ok();
+        Interop.pattern_string_6b(ref y).AsOk();
         Assert.Equal(y.s1, "s1");
         Assert.Equal(y.s2, "s2");
     }
@@ -68,8 +68,8 @@ public class TestPatternStrings
     [Fact]
     public void pattern_string_7()
     {
-        var r1 = Interop.pattern_string_7(["hello", "world"], 0).Ok();
-        var r2 = Interop.pattern_string_7(["hello", "world"], 1).Ok();
+        var r1 = Interop.pattern_string_7(["hello", "world"], 0).AsOk();
+        var r2 = Interop.pattern_string_7(["hello", "world"], 1).AsOk();
         Assert.Equal(r1, "hello");
         Assert.Equal(r2, "world");
     }
@@ -83,8 +83,8 @@ public class TestPatternStrings
             new() { s1 = "hello2", s2 = "world2" },
         };
 
-        var r1 = Interop.pattern_string_8(x, 0).Ok();
-        var r2 = Interop.pattern_string_8(x, 1).Ok();
+        var r1 = Interop.pattern_string_8(x, 0).AsOk();
+        var r2 = Interop.pattern_string_8(x, 1).AsOk();
 
         Assert.Equal(r1.s1, "hello1");
         Assert.Equal(r2.s2, "world2");
@@ -97,7 +97,7 @@ public class TestPatternStrings
 
             // Should not crash attempting to de-serialize a non-existing string
 
-            Assert.Equal(rval.Err(), Error.Fail);
+            Assert.Equal(rval.AsErr(), Error.Fail);
         }
 
 

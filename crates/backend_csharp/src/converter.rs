@@ -1,11 +1,11 @@
-use crate::interop::FunctionNameFlavor;
 use crate::Interop;
+use crate::interop::FunctionNameFlavor;
 use heck::{ToLowerCamelCase, ToUpperCamelCase};
 use interoptopus::backend::{ctypes_from_type_recursive, safe_name};
 use interoptopus::lang::{Composite, ConstantValue, Enum, Field, FnPointer, Function, Opaque, Parameter, Primitive, PrimitiveValue, SugaredReturnType, Type};
+use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::{AsyncCallback, NamedCallback};
 use interoptopus::pattern::slice::SliceType;
-use interoptopus::pattern::TypePattern;
 use std::collections::HashSet;
 
 /// Converts a primitive (Rust) type to a native C# type name, e.g., `f32` to `float`.
@@ -108,6 +108,34 @@ pub fn to_typespecifier_in_field(x: &Type) -> String {
     }
 }
 
+/// Converts the `u32` part in a Rust field `x: u32` to a C# equivalent. Might convert pointers to `IntPtr`.
+#[allow(clippy::only_used_in_recursion)]
+pub fn to_typespecifier_in_field_unmanaged(x: &Type) -> String {
+    match &x {
+        Type::Primitive(x) => primitive_to_typename(*x),
+        // CType::Array(_) => panic!("Needs special handling in the writer."),
+        Type::Array(_) => "TODO".to_string(),
+        Type::Enum(x) => format!("{}.Unmanaged", enum_to_typename(x)),
+        Type::Opaque(x) => format!("{}.Unmanaged", opaque_to_typename(x)),
+        Type::Composite(x) => format!("{}.Unmanaged", composite_to_typename(x)),
+        Type::ReadPointer(_) => "IntPtr".to_string(),
+        Type::ReadWritePointer(_) => "IntPtr".to_string(),
+        Type::FnPointer(x) => fnpointer_to_typename(x),
+        Type::Pattern(x) => match x {
+            TypePattern::CStrPointer => "TODO".to_string(),
+            TypePattern::Utf8String(_) => "Utf8String.Unmanaged".to_string(),
+            TypePattern::Slice(x) => format!("Slice{}.Unmanaged.", get_slice_type_argument(x)),
+            TypePattern::SliceMut(x) => format!("SliceMut{}.Unmanaged", get_slice_type_argument(x)),
+            TypePattern::Option(e) => format!("{}.Unmanaged", composite_to_typename(e)),
+            TypePattern::NamedCallback(e) => format!("{}.Unmanaged", named_callback_to_typename(e)),
+            TypePattern::Bool => "TODO".to_string(),
+            TypePattern::CChar => "TODO".to_string(),
+            TypePattern::APIVersion => "TODO".to_string(),
+            _ => panic!("Pattern not explicitly handled"),
+        },
+    }
+}
+
 /// Converts the `u32` part in a Rust paramter `x: u32` to a C# equivalent. Might convert pointers to `out X` or `ref X`.
 pub fn to_typespecifier_in_param(x: &Type) -> String {
     match &x {
@@ -170,7 +198,7 @@ pub fn to_typespecifier_in_sync_fn_rval(x: &Type) -> String {
         Type::Pattern(x) => match x {
             TypePattern::CStrPointer => "IntPtr".to_string(),
             TypePattern::Utf8String(x) => composite_to_typename(x),
-            TypePattern::Result(x) => enum_to_typename(x.the_enum()),
+            TypePattern::Result(x) => format!("{}.Unmanaged", enum_to_typename(x.the_enum())),
             TypePattern::Slice(x) => composite_to_typename(x.composite_type()),
             TypePattern::SliceMut(x) => composite_to_typename(x.composite_type()),
             TypePattern::Option(x) => composite_to_typename(x),

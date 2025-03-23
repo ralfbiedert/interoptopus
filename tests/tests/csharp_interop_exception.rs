@@ -4,7 +4,7 @@ use interoptopus::inventory::InventoryBuilder;
 use interoptopus::{ffi_function, ffi_type, function};
 use interoptopus_backend_csharp::{InteropBuilder, WriteTypes};
 
-#[ffi_type(error)]
+#[ffi_type]
 #[derive(Debug, PartialEq, Eq)]
 enum FFIError {
     Success,

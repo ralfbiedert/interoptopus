@@ -1,9 +1,9 @@
-use crate::converter::to_typespecifier_in_field;
-use crate::interop::docs::write_documentation;
 use crate::Interop;
+use crate::converter::{to_typespecifier_in_field, to_typespecifier_in_field_unmanaged};
+use crate::interop::docs::write_documentation;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Enum, VariantKind};
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 pub fn write_type_definition_enum(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
     i.debug(w, "write_type_definition_enum")?;
@@ -19,80 +19,25 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
 
     indented!(w, r"public partial struct {}", name)?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"uint _variant;")?;
-    for variant in the_type.variants() {
-        match variant.kind() {
-            VariantKind::Unit(_) => {}
-            VariantKind::Typed(x, t) if !t.is_void() => {
-                let ty = to_typespecifier_in_field(t);
-                let vname = variant.name();
-                indented!(w, [()], r"{ty} _{vname};")?;
-            }
-            VariantKind::Typed(x, t) => {}
-        }
-    }
+    write_type_definition_enum_variant_fields_managed(i, w, the_type)?;
     indented!(w, r"}}")?;
     w.newline()?;
 
     indented!(w, r"public partial struct {}", name)?;
     indented!(w, r"{{")?;
-    for variant in the_type.variants() {
-        match variant.kind() {
-            VariantKind::Unit(x) => {
-                let vname = variant.name();
-                indented!(w, [()], r"public static {name} {vname} => new() {{ _variant = {x} }};")?;
-            }
-            VariantKind::Typed(x, t) if !t.is_void() => {
-                let vname = variant.name();
-                let ty = to_typespecifier_in_field(t);
-                indented!(w, [()], r"public static {name} {vname}({ty} value) => new() {{ _variant = {x}, _{vname} = value }};")?;
-            }
-            VariantKind::Typed(x, t) => {
-                let vname = variant.name();
-                indented!(w, [()], r"public static {name} {vname} => new() {{ _variant = {x} }};")?;
-            }
-        }
-    }
-    w.newline()?;
-    for variant in the_type.variants() {
-        match variant.kind() {
-            VariantKind::Unit(x) => {
-                let vname = variant.name();
-                indented!(w, [()], r"public bool Is{vname} => _variant == {x};")?;
-            }
-            VariantKind::Typed(x, t) => {
-                let vname = variant.name();
-                indented!(w, [()], r"public bool Is{vname} => _variant == {x};")?;
-            }
-        }
-    }
-    w.newline()?;
 
     indented!(w, [()], r"[StructLayout(LayoutKind.Explicit)]")?;
     indented!(w, [()], r"public unsafe struct Unmanaged")?;
     indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"[FieldOffset(0)]")?;
-    indented!(w, [()()], r"internal uint _variant;")?;
-    w.newline()?;
-    for variant in the_type.variants() {
-        match variant.kind() {
-            VariantKind::Unit(_) => {}
-            VariantKind::Typed(x, t) if !t.is_void() => {
-                let ty = to_typespecifier_in_field(t);
-                let vname = variant.name();
-                indented!(w, [()()], r"[FieldOffset(2)]")?;
-                indented!(w, [()()], r"internal {ty} {vname};")?;
-                w.newline()?;
-            }
-            VariantKind::Typed(x, t) => {}
-        }
-    }
+    write_type_definition_enum_variant_fields_unmanaged(i, w, the_type)?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
 
     indented!(w, [()], r"[CustomMarshaller(typeof({}), MarshalMode.Default, typeof(Marshaller))]", name)?;
     indented!(w, [()], r"private struct MarshallerMeta {{ }}")?;
     w.newline()?;
+
+    write_type_definition_enum_variant_utils(i, w, the_type)?;
 
     indented!(w, [()], r"public ref struct Marshaller")?;
     indented!(w, [()], r"{{")?;
@@ -123,6 +68,111 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
     indented!(w, r"}}")?;
     w.unindent();
     indented!(w, r"}}")?;
+
+    Ok(())
+}
+
+pub fn write_type_definition_enum_variant_fields_managed(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
+    i.debug(w, "write_type_definition_enum_variant_fields_managed")?;
+
+    indented!(w, [()], r"uint _variant;")?;
+    for variant in the_type.variants() {
+        match variant.kind() {
+            VariantKind::Unit(_) => {}
+            VariantKind::Typed(x, t) if !t.is_void() => {
+                let ty = to_typespecifier_in_field(t);
+                let vname = variant.name();
+                indented!(w, [()], r"{ty} _{vname};")?;
+            }
+            VariantKind::Typed(x, t) => {}
+        }
+    }
+
+    Ok(())
+}
+
+pub fn write_type_definition_enum_variant_fields_unmanaged(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
+    i.debug(w, "write_type_definition_enum_variant_fields_unmanaged")?;
+
+    indented!(w, [()()], r"[FieldOffset(0)]")?;
+    indented!(w, [()()], r"internal uint _variant;")?;
+    w.newline()?;
+    for variant in the_type.variants() {
+        match variant.kind() {
+            VariantKind::Unit(_) => {}
+            VariantKind::Typed(x, t) if !t.is_void() => {
+                let ty = to_typespecifier_in_field_unmanaged(t);
+                let vname = variant.name();
+                indented!(w, [()()], r"[FieldOffset(2)]")?;
+                indented!(w, [()()], r"internal {ty} {vname};")?;
+                w.newline()?;
+            }
+            VariantKind::Typed(x, t) => {}
+        }
+    }
+
+    Ok(())
+}
+
+pub fn write_type_definition_enum_variant_utils(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
+    i.debug(w, "write_type_definition_enum_variant_utils")?;
+    let name = the_type.rust_name();
+
+    // Constructors
+    for variant in the_type.variants() {
+        match variant.kind() {
+            VariantKind::Unit(x) => {
+                let vname = variant.name();
+                indented!(w, [()], r"public static {name} {vname} => new() {{ _variant = {x} }};")?;
+            }
+            VariantKind::Typed(x, t) if !t.is_void() => {
+                let vname = variant.name();
+                let ty = to_typespecifier_in_field(t);
+                indented!(w, [()], r"public static {name} {vname}({ty} value) => new() {{ _variant = {x}, _{vname} = value }};")?;
+            }
+            VariantKind::Typed(x, t) => {
+                let vname = variant.name();
+                indented!(w, [()], r"public static {name} {vname} => new() {{ _variant = {x} }};")?;
+            }
+        }
+    }
+    w.newline()?;
+
+    // Is... checks
+    for variant in the_type.variants() {
+        match variant.kind() {
+            VariantKind::Unit(x) => {
+                let vname = variant.name();
+                indented!(w, [()], r"public bool Is{vname} => _variant == {x};")?;
+            }
+            VariantKind::Typed(x, t) => {
+                let vname = variant.name();
+                indented!(w, [()], r"public bool Is{vname} => _variant == {x};")?;
+            }
+        }
+    }
+    w.newline()?;
+
+    // As... "unwraps"
+    for variant in the_type.variants() {
+        let throw = "throw new InteropException<string>(string.Empty);";
+        match variant.kind() {
+            VariantKind::Unit(x) => {
+                let vname = variant.name();
+                indented!(w, [()], r"public void As{vname}() {{ if (_variant != {x}) {throw} }}")?;
+            }
+            VariantKind::Typed(x, t) if !t.is_void() => {
+                let vname = variant.name();
+                let ty = to_typespecifier_in_field(t);
+                indented!(w, [()], r"public {ty} As{vname}() {{ if (_variant != {x}) {{ {throw} }} else {{ return _{vname}; }} }}")?;
+            }
+            VariantKind::Typed(x, t) => {
+                let vname = variant.name();
+                indented!(w, [()], r"public void As{vname}() {{ if (_variant != {x}) {throw} }}")?;
+            }
+        }
+    }
+    w.newline()?;
 
     Ok(())
 }

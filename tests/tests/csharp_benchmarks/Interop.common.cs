@@ -16,6 +16,181 @@ using My.Company.Common;
 namespace My.Company.Common
 {
 
+    /// Documented enum.
+    public partial struct EnumDocumented
+    {
+        uint _variant;
+    }
+
+    public partial struct EnumDocumented
+    {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+            [FieldOffset(0)]
+            internal uint _variant;
+
+        }
+
+        [CustomMarshaller(typeof(EnumDocumented), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public static EnumDocumented A => new() { _variant = 0 };
+        public static EnumDocumented B => new() { _variant = 1 };
+        public static EnumDocumented C => new() { _variant = 2 };
+
+        public bool IsA => _variant == 0;
+        public bool IsB => _variant == 1;
+        public bool IsC => _variant == 2;
+
+        public void AsA() { if (_variant != 0) throw new InteropException<string>(string.Empty); }
+        public void AsB() { if (_variant != 1) throw new InteropException<string>(string.Empty); }
+        public void AsC() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+
+        public ref struct Marshaller
+        {
+            private EnumDocumented _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(EnumDocumented managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(EnumDocumented managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+                _unmanaged._variant = _managed._variant;
+                return _unmanaged;
+            }
+
+            public unsafe EnumDocumented ToManaged()
+            {
+                _managed = new EnumDocumented();
+                _managed._variant = _unmanaged._variant;
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    public partial struct EnumRenamed
+    {
+        uint _variant;
+    }
+
+    public partial struct EnumRenamed
+    {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+            [FieldOffset(0)]
+            internal uint _variant;
+
+        }
+
+        [CustomMarshaller(typeof(EnumRenamed), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public static EnumRenamed X => new() { _variant = 0 };
+
+        public bool IsX => _variant == 0;
+
+        public void AsX() { if (_variant != 0) throw new InteropException<string>(string.Empty); }
+
+        public ref struct Marshaller
+        {
+            private EnumRenamed _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(EnumRenamed managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(EnumRenamed managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+                _unmanaged._variant = _managed._variant;
+                return _unmanaged;
+            }
+
+            public unsafe EnumRenamed ToManaged()
+            {
+                _managed = new EnumRenamed();
+                _managed._variant = _unmanaged._variant;
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    public partial struct Error
+    {
+        uint _variant;
+    }
+
+    public partial struct Error
+    {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+            [FieldOffset(0)]
+            internal uint _variant;
+
+        }
+
+        [CustomMarshaller(typeof(Error), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public static Error Ok => new() { _variant = 0 };
+        public static Error Null => new() { _variant = 100 };
+        public static Error Panic => new() { _variant = 200 };
+        public static Error Delegate => new() { _variant = 300 };
+        public static Error Fail => new() { _variant = 400 };
+
+        public bool IsOk => _variant == 0;
+        public bool IsNull => _variant == 100;
+        public bool IsPanic => _variant == 200;
+        public bool IsDelegate => _variant == 300;
+        public bool IsFail => _variant == 400;
+
+        public void AsOk() { if (_variant != 0) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 100) throw new InteropException<string>(string.Empty); }
+        public void AsPanic() { if (_variant != 200) throw new InteropException<string>(string.Empty); }
+        public void AsDelegate() { if (_variant != 300) throw new InteropException<string>(string.Empty); }
+        public void AsFail() { if (_variant != 400) throw new InteropException<string>(string.Empty); }
+
+        public ref struct Marshaller
+        {
+            private Error _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(Error managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(Error managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+                _unmanaged._variant = _managed._variant;
+                return _unmanaged;
+            }
+
+            public unsafe Error ToManaged()
+            {
+                _managed = new Error();
+                _managed._variant = _unmanaged._variant;
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
     public partial struct Vec
     {
         public double x;
@@ -1048,6 +1223,282 @@ namespace My.Company.Common
         }
     }
 
+
+    ///Result that contains value or an error.
+    public partial struct ResultError
+    {
+        uint _variant;
+        Error _Err;
+    }
+
+    public partial struct ResultError
+    {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(2)]
+            internal Error.Unmanaged Err;
+
+        }
+
+        [CustomMarshaller(typeof(ResultError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public static ResultError Ok => new() { _variant = 0 };
+        public static ResultError Err(Error value) => new() { _variant = 1, _Err = value };
+        public static ResultError Panic => new() { _variant = 2 };
+        public static ResultError Null => new() { _variant = 3 };
+
+        public bool IsOk => _variant == 0;
+        public bool IsErr => _variant == 1;
+        public bool IsPanic => _variant == 2;
+        public bool IsNull => _variant == 3;
+
+        public void AsOk() { if (_variant != 0) throw new InteropException<string>(string.Empty); }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+
+        public ref struct Marshaller
+        {
+            private ResultError _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(ResultError managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(ResultError managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+                _unmanaged._variant = _managed._variant;
+                return _unmanaged;
+            }
+
+            public unsafe ResultError ToManaged()
+            {
+                _managed = new ResultError();
+                _managed._variant = _unmanaged._variant;
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    ///Result that contains value or an error.
+    public partial struct ResultU32Error
+    {
+        uint _variant;
+        uint _Ok;
+        Error _Err;
+    }
+
+    public partial struct ResultU32Error
+    {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(2)]
+            internal uint Ok;
+
+            [FieldOffset(2)]
+            internal Error.Unmanaged Err;
+
+        }
+
+        [CustomMarshaller(typeof(ResultU32Error), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public static ResultU32Error Ok(uint value) => new() { _variant = 0, _Ok = value };
+        public static ResultU32Error Err(Error value) => new() { _variant = 1, _Err = value };
+        public static ResultU32Error Panic => new() { _variant = 2 };
+        public static ResultU32Error Null => new() { _variant = 3 };
+
+        public bool IsOk => _variant == 0;
+        public bool IsErr => _variant == 1;
+        public bool IsPanic => _variant == 2;
+        public bool IsNull => _variant == 3;
+
+        public uint AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+
+        public ref struct Marshaller
+        {
+            private ResultU32Error _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(ResultU32Error managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(ResultU32Error managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+                _unmanaged._variant = _managed._variant;
+                return _unmanaged;
+            }
+
+            public unsafe ResultU32Error ToManaged()
+            {
+                _managed = new ResultU32Error();
+                _managed._variant = _unmanaged._variant;
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    ///Result that contains value or an error.
+    public partial struct ResultU64Error
+    {
+        uint _variant;
+        ulong _Ok;
+        Error _Err;
+    }
+
+    public partial struct ResultU64Error
+    {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(2)]
+            internal ulong Ok;
+
+            [FieldOffset(2)]
+            internal Error.Unmanaged Err;
+
+        }
+
+        [CustomMarshaller(typeof(ResultU64Error), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public static ResultU64Error Ok(ulong value) => new() { _variant = 0, _Ok = value };
+        public static ResultU64Error Err(Error value) => new() { _variant = 1, _Err = value };
+        public static ResultU64Error Panic => new() { _variant = 2 };
+        public static ResultU64Error Null => new() { _variant = 3 };
+
+        public bool IsOk => _variant == 0;
+        public bool IsErr => _variant == 1;
+        public bool IsPanic => _variant == 2;
+        public bool IsNull => _variant == 3;
+
+        public ulong AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+
+        public ref struct Marshaller
+        {
+            private ResultU64Error _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(ResultU64Error managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(ResultU64Error managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+                _unmanaged._variant = _managed._variant;
+                return _unmanaged;
+            }
+
+            public unsafe ResultU64Error ToManaged()
+            {
+                _managed = new ResultU64Error();
+                _managed._variant = _unmanaged._variant;
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    ///Result that contains value or an error.
+    public partial struct ResultUtf8StringError
+    {
+        uint _variant;
+        string _Ok;
+        Error _Err;
+    }
+
+    public partial struct ResultUtf8StringError
+    {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(2)]
+            internal Utf8String.Unmanaged Ok;
+
+            [FieldOffset(2)]
+            internal Error.Unmanaged Err;
+
+        }
+
+        [CustomMarshaller(typeof(ResultUtf8StringError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public static ResultUtf8StringError Ok(string value) => new() { _variant = 0, _Ok = value };
+        public static ResultUtf8StringError Err(Error value) => new() { _variant = 1, _Err = value };
+        public static ResultUtf8StringError Panic => new() { _variant = 2 };
+        public static ResultUtf8StringError Null => new() { _variant = 3 };
+
+        public bool IsOk => _variant == 0;
+        public bool IsErr => _variant == 1;
+        public bool IsPanic => _variant == 2;
+        public bool IsNull => _variant == 3;
+
+        public string AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+
+        public ref struct Marshaller
+        {
+            private ResultUtf8StringError _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(ResultUtf8StringError managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(ResultUtf8StringError managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+                _unmanaged._variant = _managed._variant;
+                return _unmanaged;
+            }
+
+            public unsafe ResultUtf8StringError ToManaged()
+            {
+                _managed = new ResultUtf8StringError();
+                _managed._variant = _unmanaged._variant;
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]

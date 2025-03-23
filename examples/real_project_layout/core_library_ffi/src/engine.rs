@@ -19,7 +19,7 @@ pub struct GameEngine {
 impl GameEngine {
     pub fn new() -> Result<Self, Error> {
         let engine = core_library::engine::GameEngine::new();
-        Result::ok(Self { engine })
+        Result::Ok(Self { engine })
     }
 
     pub fn place_object(&mut self, name: ffi::CStrPointer, position: Vec2) -> ffi::Result<(), Error> {

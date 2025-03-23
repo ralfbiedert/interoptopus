@@ -5,9 +5,9 @@ use crate::interop::docs::write_documentation;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Function, Primitive, SugaredReturnType, Type};
-use interoptopus::pattern::service::ServiceDefinition;
 use interoptopus::pattern::TypePattern;
-use interoptopus::{indented, Error};
+use interoptopus::pattern::service::ServiceDefinition;
+use interoptopus::{Error, indented};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum MethodType {
@@ -220,10 +220,10 @@ pub fn write_pattern_service_method(
             indented!(w, [()], r"{fn_call};",)?;
         }
         _ if matches!(method_type, MethodType::Ctor) => {
-            indented!(w, [()], r"self._context = {fn_call}.Ok();")?;
+            indented!(w, [()], r"self._context = {fn_call}.AsOk();")?;
         }
         _ if matches!(method_type, MethodType::Dtor) => {
-            indented!(w, [()], r"{fn_call}.Ok();")?;
+            indented!(w, [()], r"{fn_call}.AsOk();")?;
         }
         _ => {
             indented!(w, [()], r"return {fn_call};")?;

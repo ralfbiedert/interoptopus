@@ -8,7 +8,7 @@ public class TestPatternResult
     public void pattern_result_1()
     {
         var x = new ResultU32Error();
-        Interop.pattern_result_1(x).Ok();
+        Interop.pattern_result_1(x).AsOk();
     }
 
     [Fact]

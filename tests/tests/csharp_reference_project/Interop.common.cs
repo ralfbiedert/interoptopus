@@ -23,11 +23,25 @@ namespace My.Company.Common
     // Debug - write_type_definition_enum_marshaller 
     public partial struct EnumDocumented
     {
+    // Debug - write_type_definition_enum_variant_fields_managed 
         uint _variant;
     }
 
     public partial struct EnumDocumented
     {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+    // Debug - write_type_definition_enum_variant_fields_unmanaged 
+            [FieldOffset(0)]
+            internal uint _variant;
+
+        }
+
+        [CustomMarshaller(typeof(EnumDocumented), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+    // Debug - write_type_definition_enum_variant_utils 
         public static EnumDocumented A => new() { _variant = 0 };
         public static EnumDocumented B => new() { _variant = 1 };
         public static EnumDocumented C => new() { _variant = 2 };
@@ -36,16 +50,9 @@ namespace My.Company.Common
         public bool IsB => _variant == 1;
         public bool IsC => _variant == 2;
 
-        [StructLayout(LayoutKind.Explicit)]
-        public unsafe struct Unmanaged
-        {
-            [FieldOffset(0)]
-            internal uint _variant;
-
-        }
-
-        [CustomMarshaller(typeof(EnumDocumented), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
+        public void AsA() { if (_variant != 0) throw new InteropException<string>(string.Empty); }
+        public void AsB() { if (_variant != 1) throw new InteropException<string>(string.Empty); }
+        public void AsC() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
 
         public ref struct Marshaller
         {
@@ -79,18 +86,16 @@ namespace My.Company.Common
     // Debug - write_type_definition_enum_marshaller 
     public partial struct EnumRenamed
     {
+    // Debug - write_type_definition_enum_variant_fields_managed 
         uint _variant;
     }
 
     public partial struct EnumRenamed
     {
-        public static EnumRenamed X => new() { _variant = 0 };
-
-        public bool IsX => _variant == 0;
-
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
+    // Debug - write_type_definition_enum_variant_fields_unmanaged 
             [FieldOffset(0)]
             internal uint _variant;
 
@@ -98,6 +103,13 @@ namespace My.Company.Common
 
         [CustomMarshaller(typeof(EnumRenamed), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
+
+    // Debug - write_type_definition_enum_variant_utils 
+        public static EnumRenamed X => new() { _variant = 0 };
+
+        public bool IsX => _variant == 0;
+
+        public void AsX() { if (_variant != 0) throw new InteropException<string>(string.Empty); }
 
         public ref struct Marshaller
         {
@@ -131,11 +143,25 @@ namespace My.Company.Common
     // Debug - write_type_definition_enum_marshaller 
     public partial struct Error
     {
+    // Debug - write_type_definition_enum_variant_fields_managed 
         uint _variant;
     }
 
     public partial struct Error
     {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+    // Debug - write_type_definition_enum_variant_fields_unmanaged 
+            [FieldOffset(0)]
+            internal uint _variant;
+
+        }
+
+        [CustomMarshaller(typeof(Error), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+    // Debug - write_type_definition_enum_variant_utils 
         public static Error Ok => new() { _variant = 0 };
         public static Error Null => new() { _variant = 100 };
         public static Error Panic => new() { _variant = 200 };
@@ -148,16 +174,11 @@ namespace My.Company.Common
         public bool IsDelegate => _variant == 300;
         public bool IsFail => _variant == 400;
 
-        [StructLayout(LayoutKind.Explicit)]
-        public unsafe struct Unmanaged
-        {
-            [FieldOffset(0)]
-            internal uint _variant;
-
-        }
-
-        [CustomMarshaller(typeof(Error), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
+        public void AsOk() { if (_variant != 0) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 100) throw new InteropException<string>(string.Empty); }
+        public void AsPanic() { if (_variant != 200) throw new InteropException<string>(string.Empty); }
+        public void AsDelegate() { if (_variant != 300) throw new InteropException<string>(string.Empty); }
+        public void AsFail() { if (_variant != 400) throw new InteropException<string>(string.Empty); }
 
         public ref struct Marshaller
         {
@@ -1253,12 +1274,29 @@ namespace My.Company.Common
     // Debug - write_type_definition_enum_marshaller 
     public partial struct ResultError
     {
+    // Debug - write_type_definition_enum_variant_fields_managed 
         uint _variant;
         Error _Err;
     }
 
     public partial struct ResultError
     {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+    // Debug - write_type_definition_enum_variant_fields_unmanaged 
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(2)]
+            internal Error.Unmanaged Err;
+
+        }
+
+        [CustomMarshaller(typeof(ResultError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+    // Debug - write_type_definition_enum_variant_utils 
         public static ResultError Ok => new() { _variant = 0 };
         public static ResultError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultError Panic => new() { _variant = 2 };
@@ -1269,19 +1307,10 @@ namespace My.Company.Common
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        [StructLayout(LayoutKind.Explicit)]
-        public unsafe struct Unmanaged
-        {
-            [FieldOffset(0)]
-            internal uint _variant;
-
-            [FieldOffset(2)]
-            internal Error Err;
-
-        }
-
-        [CustomMarshaller(typeof(ResultError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
+        public void AsOk() { if (_variant != 0) throw new InteropException<string>(string.Empty); }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
 
         public ref struct Marshaller
         {
@@ -1316,6 +1345,7 @@ namespace My.Company.Common
     // Debug - write_type_definition_enum_marshaller 
     public partial struct ResultU32Error
     {
+    // Debug - write_type_definition_enum_variant_fields_managed 
         uint _variant;
         uint _Ok;
         Error _Err;
@@ -1323,6 +1353,25 @@ namespace My.Company.Common
 
     public partial struct ResultU32Error
     {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+    // Debug - write_type_definition_enum_variant_fields_unmanaged 
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(2)]
+            internal uint Ok;
+
+            [FieldOffset(2)]
+            internal Error.Unmanaged Err;
+
+        }
+
+        [CustomMarshaller(typeof(ResultU32Error), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+    // Debug - write_type_definition_enum_variant_utils 
         public static ResultU32Error Ok(uint value) => new() { _variant = 0, _Ok = value };
         public static ResultU32Error Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultU32Error Panic => new() { _variant = 2 };
@@ -1333,22 +1382,10 @@ namespace My.Company.Common
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        [StructLayout(LayoutKind.Explicit)]
-        public unsafe struct Unmanaged
-        {
-            [FieldOffset(0)]
-            internal uint _variant;
-
-            [FieldOffset(2)]
-            internal uint Ok;
-
-            [FieldOffset(2)]
-            internal Error Err;
-
-        }
-
-        [CustomMarshaller(typeof(ResultU32Error), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
+        public uint AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
 
         public ref struct Marshaller
         {
@@ -1383,6 +1420,7 @@ namespace My.Company.Common
     // Debug - write_type_definition_enum_marshaller 
     public partial struct ResultU64Error
     {
+    // Debug - write_type_definition_enum_variant_fields_managed 
         uint _variant;
         ulong _Ok;
         Error _Err;
@@ -1390,6 +1428,25 @@ namespace My.Company.Common
 
     public partial struct ResultU64Error
     {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+    // Debug - write_type_definition_enum_variant_fields_unmanaged 
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(2)]
+            internal ulong Ok;
+
+            [FieldOffset(2)]
+            internal Error.Unmanaged Err;
+
+        }
+
+        [CustomMarshaller(typeof(ResultU64Error), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+    // Debug - write_type_definition_enum_variant_utils 
         public static ResultU64Error Ok(ulong value) => new() { _variant = 0, _Ok = value };
         public static ResultU64Error Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultU64Error Panic => new() { _variant = 2 };
@@ -1400,22 +1457,10 @@ namespace My.Company.Common
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        [StructLayout(LayoutKind.Explicit)]
-        public unsafe struct Unmanaged
-        {
-            [FieldOffset(0)]
-            internal uint _variant;
-
-            [FieldOffset(2)]
-            internal ulong Ok;
-
-            [FieldOffset(2)]
-            internal Error Err;
-
-        }
-
-        [CustomMarshaller(typeof(ResultU64Error), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
+        public ulong AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
 
         public ref struct Marshaller
         {
@@ -1450,6 +1495,7 @@ namespace My.Company.Common
     // Debug - write_type_definition_enum_marshaller 
     public partial struct ResultUtf8StringError
     {
+    // Debug - write_type_definition_enum_variant_fields_managed 
         uint _variant;
         string _Ok;
         Error _Err;
@@ -1457,6 +1503,25 @@ namespace My.Company.Common
 
     public partial struct ResultUtf8StringError
     {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+    // Debug - write_type_definition_enum_variant_fields_unmanaged 
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(2)]
+            internal Utf8String.Unmanaged Ok;
+
+            [FieldOffset(2)]
+            internal Error.Unmanaged Err;
+
+        }
+
+        [CustomMarshaller(typeof(ResultUtf8StringError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+    // Debug - write_type_definition_enum_variant_utils 
         public static ResultUtf8StringError Ok(string value) => new() { _variant = 0, _Ok = value };
         public static ResultUtf8StringError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultUtf8StringError Panic => new() { _variant = 2 };
@@ -1467,22 +1532,10 @@ namespace My.Company.Common
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        [StructLayout(LayoutKind.Explicit)]
-        public unsafe struct Unmanaged
-        {
-            [FieldOffset(0)]
-            internal uint _variant;
-
-            [FieldOffset(2)]
-            internal string Ok;
-
-            [FieldOffset(2)]
-            internal Error Err;
-
-        }
-
-        [CustomMarshaller(typeof(ResultUtf8StringError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
+        public string AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
 
         public ref struct Marshaller
         {

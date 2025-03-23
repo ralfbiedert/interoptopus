@@ -548,7 +548,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "struct2")]
         // Debug - write_function_declaration 
-        public static partial ResultError struct2(Vec3f32 a, ref Tupled b);
+        public static partial ResultError.Unmanaged struct2(Vec3f32 a, ref Tupled b);
 
         // Debug - write_function_overload 
         // Debug - no overload for struct2 
@@ -667,7 +667,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_5")]
         // Debug - write_function_declaration 
-        public static partial ResultUseStringError pattern_string_5(UseString x);
+        public static partial ResultUseStringError.Unmanaged pattern_string_5(UseString x);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_string_5 
@@ -675,7 +675,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_6a")]
         // Debug - write_function_declaration 
-        public static partial ResultError pattern_string_6a(ref UseString ignored);
+        public static partial ResultError.Unmanaged pattern_string_6a(ref UseString ignored);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_string_6a 
@@ -683,7 +683,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_6b")]
         // Debug - write_function_declaration 
-        public static partial ResultError pattern_string_6b(ref UseString y);
+        public static partial ResultError.Unmanaged pattern_string_6b(ref UseString y);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_string_6b 
@@ -691,10 +691,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_7")]
         // Debug - write_function_declaration 
-        public static partial ResultUtf8StringError pattern_string_7(SliceUtf8String x, ulong i);
+        public static partial ResultUtf8StringError.Unmanaged pattern_string_7(SliceUtf8String x, ulong i);
 
         // Debug - write_function_overload 
-        public static unsafe ResultUtf8StringError pattern_string_7(string[] x, ulong i)
+        public static unsafe ResultUtf8StringError.Unmanaged pattern_string_7(string[] x, ulong i)
         {
             var x_wrapped = new SliceUtf8String(x);
             try
@@ -710,10 +710,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_8")]
         // Debug - write_function_declaration 
-        public static partial ResultUseStringError pattern_string_8(SliceUseString x, ulong i);
+        public static partial ResultUseStringError.Unmanaged pattern_string_8(SliceUseString x, ulong i);
 
         // Debug - write_function_overload 
-        public static unsafe ResultUseStringError pattern_string_8(UseString[] x, ulong i)
+        public static unsafe ResultUseStringError.Unmanaged pattern_string_8(UseString[] x, ulong i)
         {
             var x_wrapped = new SliceUseString(x);
             try
@@ -729,7 +729,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_9")]
         // Debug - write_function_declaration 
-        public static partial ResultUtf8StringError pattern_string_9();
+        public static partial ResultUtf8StringError.Unmanaged pattern_string_9();
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_string_9 
@@ -1007,7 +1007,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_result_1")]
         // Debug - write_function_declaration 
-        public static partial ResultU32Error pattern_result_1(ResultU32Error x);
+        public static partial ResultU32Error.Unmanaged pattern_result_1(ResultU32Error x);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_result_1 
@@ -1015,7 +1015,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_result_2")]
         // Debug - write_function_declaration 
-        public static partial ResultError pattern_result_2();
+        public static partial ResultError.Unmanaged pattern_result_2();
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_result_2 
@@ -1023,7 +1023,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_result_3")]
         // Debug - write_function_declaration 
-        public static partial ResultError pattern_result_3(ResultError x);
+        public static partial ResultError.Unmanaged pattern_result_3(ResultError x);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_result_3 
@@ -1170,7 +1170,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_async_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceAsyncError service_async_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceAsyncError.Unmanaged service_async_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_async_destroy 
@@ -1178,7 +1178,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceAsyncError service_async_new();
+        public static partial ResultConstPtrServiceAsyncError.Unmanaged service_async_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_async_new 
@@ -1186,7 +1186,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_return_after_ms")]
         // Debug - write_function_declaration 
-        public static partial ResultError service_async_return_after_ms(IntPtr _context, ulong x, ulong ms, AsyncHelper _async_callback);
+        public static partial ResultError.Unmanaged service_async_return_after_ms(IntPtr _context, ulong x, ulong ms, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
         public static unsafe Task<ulong> service_async_return_after_ms(IntPtr _context, ulong x, ulong ms)
@@ -1197,14 +1197,14 @@ namespace My.Company
                 var unmanaged = Marshal.PtrToStructure<ResultU64Error.Unmanaged>(x);
                 var marshaller = new ResultU64Error.Marshaller(unmanaged);
                 var managed = marshaller.ToManaged();
-                if (managed.IsOk()) { cs.SetResult(managed.Ok()); }
-                else { cs.SetException(new InteropException<ResultU64Error>(managed.Err())); }
+                if (managed.IsOk) { cs.SetResult(managed.AsOk()); }
+                else { cs.SetException(new InteropException<ResultU64Error>(managed.AsErr())); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
             try
             {
-                service_async_return_after_ms(_context, x, ms, cb).Ok();
+                service_async_return_after_ms(_context, x, ms, cb).AsOk();
                 return cs.Task;
             }
             finally
@@ -1216,7 +1216,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_process_struct")]
         // Debug - write_function_declaration 
-        public static partial ResultError service_async_process_struct(IntPtr _context, NestedArray x, AsyncHelper _async_callback);
+        public static partial ResultError.Unmanaged service_async_process_struct(IntPtr _context, NestedArray x, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
         public static unsafe Task<NestedArray> service_async_process_struct(IntPtr _context, NestedArray x)
@@ -1227,14 +1227,14 @@ namespace My.Company
                 var unmanaged = Marshal.PtrToStructure<ResultNestedArrayError.Unmanaged>(x);
                 var marshaller = new ResultNestedArrayError.Marshaller(unmanaged);
                 var managed = marshaller.ToManaged();
-                if (managed.IsOk()) { cs.SetResult(managed.Ok()); }
-                else { cs.SetException(new InteropException<ResultNestedArrayError>(managed.Err())); }
+                if (managed.IsOk) { cs.SetResult(managed.AsOk()); }
+                else { cs.SetException(new InteropException<ResultNestedArrayError>(managed.AsErr())); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
             try
             {
-                service_async_process_struct(_context, x, cb).Ok();
+                service_async_process_struct(_context, x, cb).AsOk();
                 return cs.Task;
             }
             finally
@@ -1246,7 +1246,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_handle_string")]
         // Debug - write_function_declaration 
-        public static partial ResultError service_async_handle_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
+        public static partial ResultError.Unmanaged service_async_handle_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
         public static unsafe Task<string> service_async_handle_string(IntPtr _context, string s)
@@ -1257,15 +1257,15 @@ namespace My.Company
                 var unmanaged = Marshal.PtrToStructure<ResultUtf8StringError.Unmanaged>(x);
                 var marshaller = new ResultUtf8StringError.Marshaller(unmanaged);
                 var managed = marshaller.ToManaged();
-                if (managed.IsOk()) { cs.SetResult(managed.Ok()); }
-                else { cs.SetException(new InteropException<ResultUtf8StringError>(managed.Err())); }
+                if (managed.IsOk) { cs.SetResult(managed.AsOk()); }
+                else { cs.SetException(new InteropException<ResultUtf8StringError>(managed.AsErr())); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
             var s_wrapped = new Utf8String(s);
             try
             {
-                service_async_handle_string(_context, s_wrapped, cb).Ok();
+                service_async_handle_string(_context, s_wrapped, cb).AsOk();
                 return cs.Task;
             }
             finally
@@ -1278,7 +1278,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_handle_nested_string")]
         // Debug - write_function_declaration 
-        public static partial ResultError service_async_handle_nested_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
+        public static partial ResultError.Unmanaged service_async_handle_nested_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
         public static unsafe Task<UseString> service_async_handle_nested_string(IntPtr _context, string s)
@@ -1289,15 +1289,15 @@ namespace My.Company
                 var unmanaged = Marshal.PtrToStructure<ResultUseStringError.Unmanaged>(x);
                 var marshaller = new ResultUseStringError.Marshaller(unmanaged);
                 var managed = marshaller.ToManaged();
-                if (managed.IsOk()) { cs.SetResult(managed.Ok()); }
-                else { cs.SetException(new InteropException<ResultUseStringError>(managed.Err())); }
+                if (managed.IsOk) { cs.SetResult(managed.AsOk()); }
+                else { cs.SetException(new InteropException<ResultUseStringError>(managed.AsErr())); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
             var s_wrapped = new Utf8String(s);
             try
             {
-                service_async_handle_nested_string(_context, s_wrapped, cb).Ok();
+                service_async_handle_nested_string(_context, s_wrapped, cb).AsOk();
                 return cs.Task;
             }
             finally
@@ -1331,7 +1331,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_fail")]
         // Debug - write_function_declaration 
-        public static partial ResultError service_async_fail(IntPtr _context, AsyncHelper _async_callback);
+        public static partial ResultError.Unmanaged service_async_fail(IntPtr _context, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
         public static unsafe Task<void> service_async_fail(IntPtr _context)
@@ -1342,14 +1342,14 @@ namespace My.Company
                 var unmanaged = Marshal.PtrToStructure<ResultError.Unmanaged>(x);
                 var marshaller = new ResultError.Marshaller(unmanaged);
                 var managed = marshaller.ToManaged();
-                if (managed.IsOk()) { cs.SetResult(managed.Ok()); }
-                else { cs.SetException(new InteropException<ResultError>(managed.Err())); }
+                if (managed.IsOk) { cs.SetResult(managed.AsOk()); }
+                else { cs.SetException(new InteropException<ResultError>(managed.AsErr())); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
             try
             {
-                service_async_fail(_context, cb).Ok();
+                service_async_fail(_context, cb).AsOk();
                 return cs.Task;
             }
             finally
@@ -1375,7 +1375,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_basic_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceBasicError service_basic_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceBasicError.Unmanaged service_basic_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_basic_destroy 
@@ -1383,7 +1383,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_basic_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceBasicError service_basic_new();
+        public static partial ResultConstPtrServiceBasicError.Unmanaged service_basic_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_basic_new 
@@ -1397,7 +1397,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_main_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceMainError service_main_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceMainError.Unmanaged service_main_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_main_destroy 
@@ -1405,7 +1405,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_main_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceMainError service_main_new(uint value);
+        public static partial ResultConstPtrServiceMainError.Unmanaged service_main_new(uint value);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_main_new 
@@ -1419,7 +1419,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_dependent_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceDependentError service_dependent_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceDependentError.Unmanaged service_dependent_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_dependent_destroy 
@@ -1427,7 +1427,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_dependent_from_main")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceDependentError service_dependent_from_main(IntPtr main);
+        public static partial ResultConstPtrServiceDependentError.Unmanaged service_dependent_from_main(IntPtr main);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_dependent_from_main 
@@ -1449,7 +1449,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_result_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceResultError service_result_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceResultError.Unmanaged service_result_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_result_destroy 
@@ -1457,7 +1457,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_result_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceResultError service_result_new();
+        public static partial ResultConstPtrServiceResultError.Unmanaged service_result_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_result_new 
@@ -1465,7 +1465,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_result_test")]
         // Debug - write_function_declaration 
-        public static partial ResultError service_result_test(IntPtr _context);
+        public static partial ResultError.Unmanaged service_result_test(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_result_test 
@@ -1479,7 +1479,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceOnPanicError service_on_panic_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceOnPanicError.Unmanaged service_on_panic_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_destroy 
@@ -1487,7 +1487,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceOnPanicError service_on_panic_new();
+        public static partial ResultConstPtrServiceOnPanicError.Unmanaged service_on_panic_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_new 
@@ -1497,7 +1497,7 @@ namespace My.Company
         /// need annotations.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_result")]
         // Debug - write_function_declaration 
-        public static partial ResultError service_on_panic_return_result(IntPtr _context, uint anon1);
+        public static partial ResultError.Unmanaged service_on_panic_return_result(IntPtr _context, uint anon1);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_return_result 
@@ -1530,7 +1530,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceCallbacksError service_callbacks_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceCallbacksError.Unmanaged service_callbacks_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_destroy 
@@ -1538,7 +1538,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceCallbacksError service_callbacks_new();
+        public static partial ResultConstPtrServiceCallbacksError.Unmanaged service_callbacks_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_new 
@@ -1546,10 +1546,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_simple")]
         // Debug - write_function_declaration 
-        public static partial ResultError service_callbacks_callback_simple(IntPtr _context, MyCallback callback);
+        public static partial ResultError.Unmanaged service_callbacks_callback_simple(IntPtr _context, MyCallback callback);
 
         // Debug - write_function_overload 
-        public static unsafe ResultError service_callbacks_callback_simple(IntPtr _context, MyCallbackDelegate callback)
+        public static unsafe ResultError.Unmanaged service_callbacks_callback_simple(IntPtr _context, MyCallbackDelegate callback)
         {
             var callback_wrapped = new MyCallback(callback);
             try
@@ -1565,10 +1565,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_ffi_return")]
         // Debug - write_function_declaration 
-        public static partial ResultError service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturn callback);
+        public static partial ResultError.Unmanaged service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturn callback);
 
         // Debug - write_function_overload 
-        public static unsafe ResultError service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturnDelegate callback)
+        public static unsafe ResultError.Unmanaged service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturnDelegate callback)
         {
             var callback_wrapped = new SumDelegateReturn(callback);
             try
@@ -1584,10 +1584,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_with_slice")]
         // Debug - write_function_declaration 
-        public static partial ResultError service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturn callback, SliceI32 input);
+        public static partial ResultError.Unmanaged service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturn callback, SliceI32 input);
 
         // Debug - write_function_overload 
-        public static unsafe ResultError service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
+        public static unsafe ResultError.Unmanaged service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
         {
             fixed (void* ptr_input = input)
             {
@@ -1615,7 +1615,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_invoke_delegates")]
         // Debug - write_function_declaration 
-        public static partial ResultError service_callbacks_invoke_delegates(IntPtr _context);
+        public static partial ResultError.Unmanaged service_callbacks_invoke_delegates(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_invoke_delegates 
@@ -1629,7 +1629,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceIgnoringMethodsError service_ignoring_methods_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceIgnoringMethodsError.Unmanaged service_ignoring_methods_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_ignoring_methods_destroy 
@@ -1637,7 +1637,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceIgnoringMethodsError service_ignoring_methods_new();
+        public static partial ResultConstPtrServiceIgnoringMethodsError.Unmanaged service_ignoring_methods_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_ignoring_methods_new 
@@ -1651,7 +1651,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceMultipleCtorsError.Unmanaged service_multiple_ctors_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_destroy 
@@ -1659,7 +1659,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_new_with(uint some_value);
+        public static partial ResultConstPtrServiceMultipleCtorsError.Unmanaged service_multiple_ctors_new_with(uint some_value);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_with 
@@ -1667,7 +1667,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_without")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_new_without();
+        public static partial ResultConstPtrServiceMultipleCtorsError.Unmanaged service_multiple_ctors_new_without();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_without 
@@ -1675,7 +1675,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with_string")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_new_with_string([MarshalAs(UnmanagedType.LPStr)] string anon0);
+        public static partial ResultConstPtrServiceMultipleCtorsError.Unmanaged service_multiple_ctors_new_with_string([MarshalAs(UnmanagedType.LPStr)] string anon0);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_with_string 
@@ -1683,7 +1683,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_failing")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_new_failing(byte some_value);
+        public static partial ResultConstPtrServiceMultipleCtorsError.Unmanaged service_multiple_ctors_new_failing(byte some_value);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_failing 
@@ -1697,7 +1697,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceVariousSlicesError service_various_slices_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceVariousSlicesError.Unmanaged service_various_slices_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_various_slices_destroy 
@@ -1705,7 +1705,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceVariousSlicesError service_various_slices_new();
+        public static partial ResultConstPtrServiceVariousSlicesError.Unmanaged service_various_slices_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_various_slices_new 
@@ -1811,10 +1811,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ffi_error")]
         // Debug - write_function_declaration 
-        public static partial ResultError service_various_slices_mut_self_ffi_error(IntPtr _context, SliceMutU8 slice);
+        public static partial ResultError.Unmanaged service_various_slices_mut_self_ffi_error(IntPtr _context, SliceMutU8 slice);
 
         // Debug - write_function_overload 
-        public static unsafe ResultError service_various_slices_mut_self_ffi_error(IntPtr _context, Span<byte> slice)
+        public static unsafe ResultError.Unmanaged service_various_slices_mut_self_ffi_error(IntPtr _context, Span<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
@@ -1832,10 +1832,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_no_error")]
         // Debug - write_function_declaration 
-        public static partial ResultError service_various_slices_mut_self_no_error(IntPtr _context, SliceMutU8 slice);
+        public static partial ResultError.Unmanaged service_various_slices_mut_self_no_error(IntPtr _context, SliceMutU8 slice);
 
         // Debug - write_function_overload 
-        public static unsafe ResultError service_various_slices_mut_self_no_error(IntPtr _context, Span<byte> slice)
+        public static unsafe ResultError.Unmanaged service_various_slices_mut_self_no_error(IntPtr _context, Span<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
@@ -1879,7 +1879,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_strings_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceStringsError service_strings_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceStringsError.Unmanaged service_strings_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_strings_destroy 
@@ -1887,7 +1887,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceStringsError service_strings_new();
+        public static partial ResultConstPtrServiceStringsError.Unmanaged service_strings_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_strings_new 
@@ -1935,6 +1935,7 @@ namespace My.Company
     // Debug - write_type_definition_enum_marshaller 
     public partial struct EnumPayload
     {
+    // Debug - write_type_definition_enum_variant_fields_managed 
         uint _variant;
         Vec3f32 _B;
         uint _C;
@@ -1942,22 +1943,15 @@ namespace My.Company
 
     public partial struct EnumPayload
     {
-        public static EnumPayload A => new() { _variant = 0 };
-        public static EnumPayload B(Vec3f32 value) => new() { _variant = 1, _B = value };
-        public static EnumPayload C(uint value) => new() { _variant = 2, _C = value };
-
-        public bool IsA => _variant == 0;
-        public bool IsB => _variant == 1;
-        public bool IsC => _variant == 2;
-
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
+    // Debug - write_type_definition_enum_variant_fields_unmanaged 
             [FieldOffset(0)]
             internal uint _variant;
 
             [FieldOffset(2)]
-            internal Vec3f32 B;
+            internal Vec3f32.Unmanaged B;
 
             [FieldOffset(2)]
             internal uint C;
@@ -1966,6 +1960,19 @@ namespace My.Company
 
         [CustomMarshaller(typeof(EnumPayload), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
+
+    // Debug - write_type_definition_enum_variant_utils 
+        public static EnumPayload A => new() { _variant = 0 };
+        public static EnumPayload B(Vec3f32 value) => new() { _variant = 1, _B = value };
+        public static EnumPayload C(uint value) => new() { _variant = 2, _C = value };
+
+        public bool IsA => _variant == 0;
+        public bool IsB => _variant == 1;
+        public bool IsC => _variant == 2;
+
+        public void AsA() { if (_variant != 0) throw new InteropException<string>(string.Empty); }
+        public Vec3f32 AsB() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _B; } }
+        public uint AsC() { if (_variant != 2) { throw new InteropException<string>(string.Empty); } else { return _C; } }
 
         public ref struct Marshaller
         {
@@ -4758,6 +4765,7 @@ namespace My.Company
     // Debug - write_type_definition_enum_marshaller 
     public partial struct ResultConstPtrServiceAsyncError
     {
+    // Debug - write_type_definition_enum_variant_fields_managed 
         uint _variant;
         IntPtr _Ok;
         Error _Err;
@@ -4765,6 +4773,25 @@ namespace My.Company
 
     public partial struct ResultConstPtrServiceAsyncError
     {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+    // Debug - write_type_definition_enum_variant_fields_unmanaged 
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(2)]
+            internal IntPtr Ok;
+
+            [FieldOffset(2)]
+            internal Error.Unmanaged Err;
+
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceAsyncError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+    // Debug - write_type_definition_enum_variant_utils 
         public static ResultConstPtrServiceAsyncError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceAsyncError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceAsyncError Panic => new() { _variant = 2 };
@@ -4775,22 +4802,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        [StructLayout(LayoutKind.Explicit)]
-        public unsafe struct Unmanaged
-        {
-            [FieldOffset(0)]
-            internal uint _variant;
-
-            [FieldOffset(2)]
-            internal IntPtr Ok;
-
-            [FieldOffset(2)]
-            internal Error Err;
-
-        }
-
-        [CustomMarshaller(typeof(ResultConstPtrServiceAsyncError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
 
         public ref struct Marshaller
         {
@@ -4825,6 +4840,7 @@ namespace My.Company
     // Debug - write_type_definition_enum_marshaller 
     public partial struct ResultConstPtrServiceBasicError
     {
+    // Debug - write_type_definition_enum_variant_fields_managed 
         uint _variant;
         IntPtr _Ok;
         Error _Err;
@@ -4832,6 +4848,25 @@ namespace My.Company
 
     public partial struct ResultConstPtrServiceBasicError
     {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+    // Debug - write_type_definition_enum_variant_fields_unmanaged 
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(2)]
+            internal IntPtr Ok;
+
+            [FieldOffset(2)]
+            internal Error.Unmanaged Err;
+
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceBasicError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+    // Debug - write_type_definition_enum_variant_utils 
         public static ResultConstPtrServiceBasicError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceBasicError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceBasicError Panic => new() { _variant = 2 };
@@ -4842,22 +4877,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        [StructLayout(LayoutKind.Explicit)]
-        public unsafe struct Unmanaged
-        {
-            [FieldOffset(0)]
-            internal uint _variant;
-
-            [FieldOffset(2)]
-            internal IntPtr Ok;
-
-            [FieldOffset(2)]
-            internal Error Err;
-
-        }
-
-        [CustomMarshaller(typeof(ResultConstPtrServiceBasicError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
 
         public ref struct Marshaller
         {
@@ -4892,6 +4915,7 @@ namespace My.Company
     // Debug - write_type_definition_enum_marshaller 
     public partial struct ResultConstPtrServiceCallbacksError
     {
+    // Debug - write_type_definition_enum_variant_fields_managed 
         uint _variant;
         IntPtr _Ok;
         Error _Err;
@@ -4899,6 +4923,25 @@ namespace My.Company
 
     public partial struct ResultConstPtrServiceCallbacksError
     {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+    // Debug - write_type_definition_enum_variant_fields_unmanaged 
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(2)]
+            internal IntPtr Ok;
+
+            [FieldOffset(2)]
+            internal Error.Unmanaged Err;
+
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceCallbacksError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+    // Debug - write_type_definition_enum_variant_utils 
         public static ResultConstPtrServiceCallbacksError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceCallbacksError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceCallbacksError Panic => new() { _variant = 2 };
@@ -4909,22 +4952,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        [StructLayout(LayoutKind.Explicit)]
-        public unsafe struct Unmanaged
-        {
-            [FieldOffset(0)]
-            internal uint _variant;
-
-            [FieldOffset(2)]
-            internal IntPtr Ok;
-
-            [FieldOffset(2)]
-            internal Error Err;
-
-        }
-
-        [CustomMarshaller(typeof(ResultConstPtrServiceCallbacksError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
 
         public ref struct Marshaller
         {
@@ -4959,6 +4990,7 @@ namespace My.Company
     // Debug - write_type_definition_enum_marshaller 
     public partial struct ResultConstPtrServiceDependentError
     {
+    // Debug - write_type_definition_enum_variant_fields_managed 
         uint _variant;
         IntPtr _Ok;
         Error _Err;
@@ -4966,6 +4998,25 @@ namespace My.Company
 
     public partial struct ResultConstPtrServiceDependentError
     {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+    // Debug - write_type_definition_enum_variant_fields_unmanaged 
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(2)]
+            internal IntPtr Ok;
+
+            [FieldOffset(2)]
+            internal Error.Unmanaged Err;
+
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceDependentError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+    // Debug - write_type_definition_enum_variant_utils 
         public static ResultConstPtrServiceDependentError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceDependentError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceDependentError Panic => new() { _variant = 2 };
@@ -4976,22 +5027,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        [StructLayout(LayoutKind.Explicit)]
-        public unsafe struct Unmanaged
-        {
-            [FieldOffset(0)]
-            internal uint _variant;
-
-            [FieldOffset(2)]
-            internal IntPtr Ok;
-
-            [FieldOffset(2)]
-            internal Error Err;
-
-        }
-
-        [CustomMarshaller(typeof(ResultConstPtrServiceDependentError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
 
         public ref struct Marshaller
         {
@@ -5026,6 +5065,7 @@ namespace My.Company
     // Debug - write_type_definition_enum_marshaller 
     public partial struct ResultConstPtrServiceIgnoringMethodsError
     {
+    // Debug - write_type_definition_enum_variant_fields_managed 
         uint _variant;
         IntPtr _Ok;
         Error _Err;
@@ -5033,6 +5073,25 @@ namespace My.Company
 
     public partial struct ResultConstPtrServiceIgnoringMethodsError
     {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+    // Debug - write_type_definition_enum_variant_fields_unmanaged 
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(2)]
+            internal IntPtr Ok;
+
+            [FieldOffset(2)]
+            internal Error.Unmanaged Err;
+
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceIgnoringMethodsError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+    // Debug - write_type_definition_enum_variant_utils 
         public static ResultConstPtrServiceIgnoringMethodsError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceIgnoringMethodsError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceIgnoringMethodsError Panic => new() { _variant = 2 };
@@ -5043,22 +5102,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        [StructLayout(LayoutKind.Explicit)]
-        public unsafe struct Unmanaged
-        {
-            [FieldOffset(0)]
-            internal uint _variant;
-
-            [FieldOffset(2)]
-            internal IntPtr Ok;
-
-            [FieldOffset(2)]
-            internal Error Err;
-
-        }
-
-        [CustomMarshaller(typeof(ResultConstPtrServiceIgnoringMethodsError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
 
         public ref struct Marshaller
         {
@@ -5093,6 +5140,7 @@ namespace My.Company
     // Debug - write_type_definition_enum_marshaller 
     public partial struct ResultConstPtrServiceMainError
     {
+    // Debug - write_type_definition_enum_variant_fields_managed 
         uint _variant;
         IntPtr _Ok;
         Error _Err;
@@ -5100,6 +5148,25 @@ namespace My.Company
 
     public partial struct ResultConstPtrServiceMainError
     {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+    // Debug - write_type_definition_enum_variant_fields_unmanaged 
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(2)]
+            internal IntPtr Ok;
+
+            [FieldOffset(2)]
+            internal Error.Unmanaged Err;
+
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceMainError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+    // Debug - write_type_definition_enum_variant_utils 
         public static ResultConstPtrServiceMainError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceMainError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceMainError Panic => new() { _variant = 2 };
@@ -5110,22 +5177,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        [StructLayout(LayoutKind.Explicit)]
-        public unsafe struct Unmanaged
-        {
-            [FieldOffset(0)]
-            internal uint _variant;
-
-            [FieldOffset(2)]
-            internal IntPtr Ok;
-
-            [FieldOffset(2)]
-            internal Error Err;
-
-        }
-
-        [CustomMarshaller(typeof(ResultConstPtrServiceMainError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
 
         public ref struct Marshaller
         {
@@ -5160,6 +5215,7 @@ namespace My.Company
     // Debug - write_type_definition_enum_marshaller 
     public partial struct ResultConstPtrServiceMultipleCtorsError
     {
+    // Debug - write_type_definition_enum_variant_fields_managed 
         uint _variant;
         IntPtr _Ok;
         Error _Err;
@@ -5167,6 +5223,25 @@ namespace My.Company
 
     public partial struct ResultConstPtrServiceMultipleCtorsError
     {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+    // Debug - write_type_definition_enum_variant_fields_unmanaged 
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(2)]
+            internal IntPtr Ok;
+
+            [FieldOffset(2)]
+            internal Error.Unmanaged Err;
+
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceMultipleCtorsError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+    // Debug - write_type_definition_enum_variant_utils 
         public static ResultConstPtrServiceMultipleCtorsError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceMultipleCtorsError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceMultipleCtorsError Panic => new() { _variant = 2 };
@@ -5177,22 +5252,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        [StructLayout(LayoutKind.Explicit)]
-        public unsafe struct Unmanaged
-        {
-            [FieldOffset(0)]
-            internal uint _variant;
-
-            [FieldOffset(2)]
-            internal IntPtr Ok;
-
-            [FieldOffset(2)]
-            internal Error Err;
-
-        }
-
-        [CustomMarshaller(typeof(ResultConstPtrServiceMultipleCtorsError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
 
         public ref struct Marshaller
         {
@@ -5227,6 +5290,7 @@ namespace My.Company
     // Debug - write_type_definition_enum_marshaller 
     public partial struct ResultConstPtrServiceOnPanicError
     {
+    // Debug - write_type_definition_enum_variant_fields_managed 
         uint _variant;
         IntPtr _Ok;
         Error _Err;
@@ -5234,6 +5298,25 @@ namespace My.Company
 
     public partial struct ResultConstPtrServiceOnPanicError
     {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+    // Debug - write_type_definition_enum_variant_fields_unmanaged 
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(2)]
+            internal IntPtr Ok;
+
+            [FieldOffset(2)]
+            internal Error.Unmanaged Err;
+
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceOnPanicError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+    // Debug - write_type_definition_enum_variant_utils 
         public static ResultConstPtrServiceOnPanicError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceOnPanicError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceOnPanicError Panic => new() { _variant = 2 };
@@ -5244,22 +5327,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        [StructLayout(LayoutKind.Explicit)]
-        public unsafe struct Unmanaged
-        {
-            [FieldOffset(0)]
-            internal uint _variant;
-
-            [FieldOffset(2)]
-            internal IntPtr Ok;
-
-            [FieldOffset(2)]
-            internal Error Err;
-
-        }
-
-        [CustomMarshaller(typeof(ResultConstPtrServiceOnPanicError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
 
         public ref struct Marshaller
         {
@@ -5294,6 +5365,7 @@ namespace My.Company
     // Debug - write_type_definition_enum_marshaller 
     public partial struct ResultConstPtrServiceResultError
     {
+    // Debug - write_type_definition_enum_variant_fields_managed 
         uint _variant;
         IntPtr _Ok;
         Error _Err;
@@ -5301,6 +5373,25 @@ namespace My.Company
 
     public partial struct ResultConstPtrServiceResultError
     {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+    // Debug - write_type_definition_enum_variant_fields_unmanaged 
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(2)]
+            internal IntPtr Ok;
+
+            [FieldOffset(2)]
+            internal Error.Unmanaged Err;
+
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceResultError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+    // Debug - write_type_definition_enum_variant_utils 
         public static ResultConstPtrServiceResultError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceResultError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceResultError Panic => new() { _variant = 2 };
@@ -5311,22 +5402,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        [StructLayout(LayoutKind.Explicit)]
-        public unsafe struct Unmanaged
-        {
-            [FieldOffset(0)]
-            internal uint _variant;
-
-            [FieldOffset(2)]
-            internal IntPtr Ok;
-
-            [FieldOffset(2)]
-            internal Error Err;
-
-        }
-
-        [CustomMarshaller(typeof(ResultConstPtrServiceResultError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
 
         public ref struct Marshaller
         {
@@ -5361,6 +5440,7 @@ namespace My.Company
     // Debug - write_type_definition_enum_marshaller 
     public partial struct ResultConstPtrServiceStringsError
     {
+    // Debug - write_type_definition_enum_variant_fields_managed 
         uint _variant;
         IntPtr _Ok;
         Error _Err;
@@ -5368,6 +5448,25 @@ namespace My.Company
 
     public partial struct ResultConstPtrServiceStringsError
     {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+    // Debug - write_type_definition_enum_variant_fields_unmanaged 
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(2)]
+            internal IntPtr Ok;
+
+            [FieldOffset(2)]
+            internal Error.Unmanaged Err;
+
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceStringsError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+    // Debug - write_type_definition_enum_variant_utils 
         public static ResultConstPtrServiceStringsError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceStringsError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceStringsError Panic => new() { _variant = 2 };
@@ -5378,22 +5477,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        [StructLayout(LayoutKind.Explicit)]
-        public unsafe struct Unmanaged
-        {
-            [FieldOffset(0)]
-            internal uint _variant;
-
-            [FieldOffset(2)]
-            internal IntPtr Ok;
-
-            [FieldOffset(2)]
-            internal Error Err;
-
-        }
-
-        [CustomMarshaller(typeof(ResultConstPtrServiceStringsError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
 
         public ref struct Marshaller
         {
@@ -5428,6 +5515,7 @@ namespace My.Company
     // Debug - write_type_definition_enum_marshaller 
     public partial struct ResultConstPtrServiceVariousSlicesError
     {
+    // Debug - write_type_definition_enum_variant_fields_managed 
         uint _variant;
         IntPtr _Ok;
         Error _Err;
@@ -5435,6 +5523,25 @@ namespace My.Company
 
     public partial struct ResultConstPtrServiceVariousSlicesError
     {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+    // Debug - write_type_definition_enum_variant_fields_unmanaged 
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(2)]
+            internal IntPtr Ok;
+
+            [FieldOffset(2)]
+            internal Error.Unmanaged Err;
+
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceVariousSlicesError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+    // Debug - write_type_definition_enum_variant_utils 
         public static ResultConstPtrServiceVariousSlicesError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceVariousSlicesError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceVariousSlicesError Panic => new() { _variant = 2 };
@@ -5445,22 +5552,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        [StructLayout(LayoutKind.Explicit)]
-        public unsafe struct Unmanaged
-        {
-            [FieldOffset(0)]
-            internal uint _variant;
-
-            [FieldOffset(2)]
-            internal IntPtr Ok;
-
-            [FieldOffset(2)]
-            internal Error Err;
-
-        }
-
-        [CustomMarshaller(typeof(ResultConstPtrServiceVariousSlicesError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
 
         public ref struct Marshaller
         {
@@ -5495,6 +5590,7 @@ namespace My.Company
     // Debug - write_type_definition_enum_marshaller 
     public partial struct ResultNestedArrayError
     {
+    // Debug - write_type_definition_enum_variant_fields_managed 
         uint _variant;
         NestedArray _Ok;
         Error _Err;
@@ -5502,6 +5598,25 @@ namespace My.Company
 
     public partial struct ResultNestedArrayError
     {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+    // Debug - write_type_definition_enum_variant_fields_unmanaged 
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(2)]
+            internal NestedArray.Unmanaged Ok;
+
+            [FieldOffset(2)]
+            internal Error.Unmanaged Err;
+
+        }
+
+        [CustomMarshaller(typeof(ResultNestedArrayError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+    // Debug - write_type_definition_enum_variant_utils 
         public static ResultNestedArrayError Ok(NestedArray value) => new() { _variant = 0, _Ok = value };
         public static ResultNestedArrayError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultNestedArrayError Panic => new() { _variant = 2 };
@@ -5512,22 +5627,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        [StructLayout(LayoutKind.Explicit)]
-        public unsafe struct Unmanaged
-        {
-            [FieldOffset(0)]
-            internal uint _variant;
-
-            [FieldOffset(2)]
-            internal NestedArray Ok;
-
-            [FieldOffset(2)]
-            internal Error Err;
-
-        }
-
-        [CustomMarshaller(typeof(ResultNestedArrayError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
+        public NestedArray AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
 
         public ref struct Marshaller
         {
@@ -5562,6 +5665,7 @@ namespace My.Company
     // Debug - write_type_definition_enum_marshaller 
     public partial struct ResultUseStringError
     {
+    // Debug - write_type_definition_enum_variant_fields_managed 
         uint _variant;
         UseString _Ok;
         Error _Err;
@@ -5569,6 +5673,25 @@ namespace My.Company
 
     public partial struct ResultUseStringError
     {
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+    // Debug - write_type_definition_enum_variant_fields_unmanaged 
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(2)]
+            internal UseString.Unmanaged Ok;
+
+            [FieldOffset(2)]
+            internal Error.Unmanaged Err;
+
+        }
+
+        [CustomMarshaller(typeof(ResultUseStringError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+    // Debug - write_type_definition_enum_variant_utils 
         public static ResultUseStringError Ok(UseString value) => new() { _variant = 0, _Ok = value };
         public static ResultUseStringError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultUseStringError Panic => new() { _variant = 2 };
@@ -5579,22 +5702,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        [StructLayout(LayoutKind.Explicit)]
-        public unsafe struct Unmanaged
-        {
-            [FieldOffset(0)]
-            internal uint _variant;
-
-            [FieldOffset(2)]
-            internal UseString Ok;
-
-            [FieldOffset(2)]
-            internal Error Err;
-
-        }
-
-        [CustomMarshaller(typeof(ResultUseStringError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
+        public UseString AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
 
         public ref struct Marshaller
         {
@@ -7022,14 +7133,14 @@ namespace My.Company
         public static ServiceAsync New()
         {
             var self = new ServiceAsync();
-            self._context = Interop.service_async_new().Ok();
+            self._context = Interop.service_async_new().AsOk();
             return self;
         }
 
         // Debug - write_pattern_service_method 
         public void Dispose()
         {
-            Interop.service_async_destroy(_context).Ok();
+            Interop.service_async_destroy(_context).AsOk();
         }
 
         // Debug - write_pattern_service_method 
@@ -7102,14 +7213,14 @@ namespace My.Company
         public static ServiceBasic New()
         {
             var self = new ServiceBasic();
-            self._context = Interop.service_basic_new().Ok();
+            self._context = Interop.service_basic_new().AsOk();
             return self;
         }
 
         // Debug - write_pattern_service_method 
         public void Dispose()
         {
-            Interop.service_basic_destroy(_context).Ok();
+            Interop.service_basic_destroy(_context).AsOk();
         }
 
         public IntPtr Context => _context;
@@ -7127,14 +7238,14 @@ namespace My.Company
         public static ServiceMain New(uint value)
         {
             var self = new ServiceMain();
-            self._context = Interop.service_main_new(value).Ok();
+            self._context = Interop.service_main_new(value).AsOk();
             return self;
         }
 
         // Debug - write_pattern_service_method 
         public void Dispose()
         {
-            Interop.service_main_destroy(_context).Ok();
+            Interop.service_main_destroy(_context).AsOk();
         }
 
         public IntPtr Context => _context;
@@ -7152,14 +7263,14 @@ namespace My.Company
         public static ServiceDependent FromMain(IntPtr main)
         {
             var self = new ServiceDependent();
-            self._context = Interop.service_dependent_from_main(main).Ok();
+            self._context = Interop.service_dependent_from_main(main).AsOk();
             return self;
         }
 
         // Debug - write_pattern_service_method 
         public void Dispose()
         {
-            Interop.service_dependent_destroy(_context).Ok();
+            Interop.service_dependent_destroy(_context).AsOk();
         }
 
         // Debug - write_pattern_service_method 
@@ -7184,18 +7295,18 @@ namespace My.Company
         public static ServiceResult New()
         {
             var self = new ServiceResult();
-            self._context = Interop.service_result_new().Ok();
+            self._context = Interop.service_result_new().AsOk();
             return self;
         }
 
         // Debug - write_pattern_service_method 
         public void Dispose()
         {
-            Interop.service_result_destroy(_context).Ok();
+            Interop.service_result_destroy(_context).AsOk();
         }
 
         // Debug - write_pattern_service_method 
-        public ResultError Test()
+        public ResultError.Unmanaged Test()
         {
             return Interop.service_result_test(_context);
         }
@@ -7217,20 +7328,20 @@ namespace My.Company
         public static ServiceOnPanic New()
         {
             var self = new ServiceOnPanic();
-            self._context = Interop.service_on_panic_new().Ok();
+            self._context = Interop.service_on_panic_new().AsOk();
             return self;
         }
 
         // Debug - write_pattern_service_method 
         public void Dispose()
         {
-            Interop.service_on_panic_destroy(_context).Ok();
+            Interop.service_on_panic_destroy(_context).AsOk();
         }
 
         /// Methods returning a Result<(), _> are the default and do not
         /// need annotations.
         // Debug - write_pattern_service_method 
-        public ResultError ReturnResult(uint anon1)
+        public ResultError.Unmanaged ReturnResult(uint anon1)
         {
             return Interop.service_on_panic_return_result(_context, anon1);
         }
@@ -7270,51 +7381,51 @@ namespace My.Company
         public static ServiceCallbacks New()
         {
             var self = new ServiceCallbacks();
-            self._context = Interop.service_callbacks_new().Ok();
+            self._context = Interop.service_callbacks_new().AsOk();
             return self;
         }
 
         // Debug - write_pattern_service_method 
         public void Dispose()
         {
-            Interop.service_callbacks_destroy(_context).Ok();
+            Interop.service_callbacks_destroy(_context).AsOk();
         }
 
         // Debug - write_pattern_service_method 
-        public ResultError CallbackSimple(MyCallback callback)
+        public ResultError.Unmanaged CallbackSimple(MyCallback callback)
         {
             return Interop.service_callbacks_callback_simple(_context, callback);
         }
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public ResultError CallbackSimple(MyCallbackDelegate callback)
+        public ResultError.Unmanaged CallbackSimple(MyCallbackDelegate callback)
         {
             return Interop.service_callbacks_callback_simple(_context, callback);
         }
 
         // Debug - write_pattern_service_method 
-        public ResultError CallbackFfiReturn(SumDelegateReturn callback)
+        public ResultError.Unmanaged CallbackFfiReturn(SumDelegateReturn callback)
         {
             return Interop.service_callbacks_callback_ffi_return(_context, callback);
         }
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public ResultError CallbackFfiReturn(SumDelegateReturnDelegate callback)
+        public ResultError.Unmanaged CallbackFfiReturn(SumDelegateReturnDelegate callback)
         {
             return Interop.service_callbacks_callback_ffi_return(_context, callback);
         }
 
         // Debug - write_pattern_service_method 
-        public ResultError CallbackWithSlice(SumDelegateReturn callback, SliceI32 input)
+        public ResultError.Unmanaged CallbackWithSlice(SumDelegateReturn callback, SliceI32 input)
         {
             return Interop.service_callbacks_callback_with_slice(_context, callback, input);
         }
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public ResultError CallbackWithSlice(SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
+        public ResultError.Unmanaged CallbackWithSlice(SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
         {
             return Interop.service_callbacks_callback_with_slice(_context, callback, input);
         }
@@ -7327,7 +7438,7 @@ namespace My.Company
         // Debug - write_service_method_overload 
 
         // Debug - write_pattern_service_method 
-        public ResultError InvokeDelegates()
+        public ResultError.Unmanaged InvokeDelegates()
         {
             return Interop.service_callbacks_invoke_delegates(_context);
         }
@@ -7348,14 +7459,14 @@ namespace My.Company
         public static ServiceIgnoringMethods New()
         {
             var self = new ServiceIgnoringMethods();
-            self._context = Interop.service_ignoring_methods_new().Ok();
+            self._context = Interop.service_ignoring_methods_new().AsOk();
             return self;
         }
 
         // Debug - write_pattern_service_method 
         public void Dispose()
         {
-            Interop.service_ignoring_methods_destroy(_context).Ok();
+            Interop.service_ignoring_methods_destroy(_context).AsOk();
         }
 
         public IntPtr Context => _context;
@@ -7374,7 +7485,7 @@ namespace My.Company
         public static ServiceMultipleCtors NewWith(uint some_value)
         {
             var self = new ServiceMultipleCtors();
-            self._context = Interop.service_multiple_ctors_new_with(some_value).Ok();
+            self._context = Interop.service_multiple_ctors_new_with(some_value).AsOk();
             return self;
         }
 
@@ -7382,7 +7493,7 @@ namespace My.Company
         public static ServiceMultipleCtors NewWithout()
         {
             var self = new ServiceMultipleCtors();
-            self._context = Interop.service_multiple_ctors_new_without().Ok();
+            self._context = Interop.service_multiple_ctors_new_without().AsOk();
             return self;
         }
 
@@ -7390,7 +7501,7 @@ namespace My.Company
         public static ServiceMultipleCtors NewWithString([MarshalAs(UnmanagedType.LPStr)] string anon0)
         {
             var self = new ServiceMultipleCtors();
-            self._context = Interop.service_multiple_ctors_new_with_string(anon0).Ok();
+            self._context = Interop.service_multiple_ctors_new_with_string(anon0).AsOk();
             return self;
         }
 
@@ -7398,14 +7509,14 @@ namespace My.Company
         public static ServiceMultipleCtors NewFailing(byte some_value)
         {
             var self = new ServiceMultipleCtors();
-            self._context = Interop.service_multiple_ctors_new_failing(some_value).Ok();
+            self._context = Interop.service_multiple_ctors_new_failing(some_value).AsOk();
             return self;
         }
 
         // Debug - write_pattern_service_method 
         public void Dispose()
         {
-            Interop.service_multiple_ctors_destroy(_context).Ok();
+            Interop.service_multiple_ctors_destroy(_context).AsOk();
         }
 
         public IntPtr Context => _context;
@@ -7424,14 +7535,14 @@ namespace My.Company
         public static ServiceVariousSlices New()
         {
             var self = new ServiceVariousSlices();
-            self._context = Interop.service_various_slices_new().Ok();
+            self._context = Interop.service_various_slices_new().AsOk();
             return self;
         }
 
         // Debug - write_pattern_service_method 
         public void Dispose()
         {
-            Interop.service_various_slices_destroy(_context).Ok();
+            Interop.service_various_slices_destroy(_context).AsOk();
         }
 
         // Debug - write_pattern_service_method 
@@ -7496,27 +7607,27 @@ namespace My.Company
         }
 
         // Debug - write_pattern_service_method 
-        public ResultError MutSelfFfiError(SliceMutU8 slice)
+        public ResultError.Unmanaged MutSelfFfiError(SliceMutU8 slice)
         {
             return Interop.service_various_slices_mut_self_ffi_error(_context, slice);
         }
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public ResultError MutSelfFfiError(Span<byte> slice)
+        public ResultError.Unmanaged MutSelfFfiError(Span<byte> slice)
         {
             return Interop.service_various_slices_mut_self_ffi_error(_context, slice);
         }
 
         // Debug - write_pattern_service_method 
-        public ResultError MutSelfNoError(SliceMutU8 slice)
+        public ResultError.Unmanaged MutSelfNoError(SliceMutU8 slice)
         {
             return Interop.service_various_slices_mut_self_no_error(_context, slice);
         }
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public ResultError MutSelfNoError(Span<byte> slice)
+        public ResultError.Unmanaged MutSelfNoError(Span<byte> slice)
         {
             return Interop.service_various_slices_mut_self_no_error(_context, slice);
         }
@@ -7555,14 +7666,14 @@ namespace My.Company
         public static ServiceStrings New()
         {
             var self = new ServiceStrings();
-            self._context = Interop.service_strings_new().Ok();
+            self._context = Interop.service_strings_new().AsOk();
             return self;
         }
 
         // Debug - write_pattern_service_method 
         public void Dispose()
         {
-            Interop.service_strings_destroy(_context).Ok();
+            Interop.service_strings_destroy(_context).AsOk();
         }
 
         // Debug - write_pattern_service_method 

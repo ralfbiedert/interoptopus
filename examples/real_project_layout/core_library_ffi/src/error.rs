@@ -4,7 +4,7 @@
 use interoptopus::ffi_type;
 use std::fmt::{Display, Formatter};
 
-#[ffi_type(error)]
+#[ffi_type]
 #[derive(PartialOrd, PartialEq, Copy, Clone, Debug)]
 pub enum Error {
     Ok = 0,

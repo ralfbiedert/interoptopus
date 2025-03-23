@@ -140,6 +140,16 @@ namespace My.Company
 
 
 
+    public class InteropException<T> : Exception
+    {
+        public T Error { get; private set; }
+
+        public InteropException(T error): base($"Something went wrong: {error}")
+        {
+            Error = error;
+        }
+    }
+
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void AsyncHelperNative(IntPtr data, IntPtr callback_data);
     public delegate void AsyncHelperDelegate(IntPtr data);

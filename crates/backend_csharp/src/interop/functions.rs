@@ -7,7 +7,7 @@ use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Function, Primitive, SugaredReturnType, Type};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 use std::iter::zip;
 
 pub fn write_functions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
@@ -205,8 +205,8 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         indented!(w, [()()], r"var managed = marshaller.ToManaged();")?;
         match x {
             Type::Pattern(TypePattern::Result(x)) => {
-                indented!(w, [()()], r"if (managed.IsOk()) {{ cs.SetResult(managed.Ok()); }}")?;
-                indented!(w, [()()], r"else {{ cs.SetException(new InteropException<{}>(managed.Err())); }}", x.the_enum().rust_name())?;
+                indented!(w, [()()], r"if (managed.IsOk) {{ cs.SetResult(managed.AsOk()); }}")?;
+                indented!(w, [()()], r"else {{ cs.SetException(new InteropException<{}>(managed.AsErr())); }}", x.the_enum().rust_name())?;
             }
             _ => indented!(w, [()()], r"cs.SetResult(managed);")?,
         }
@@ -251,7 +251,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
             indented!(w, [()()], r"{};", call)?;
         }
         _ if matches!(async_rval, SugaredReturnType::Async(_)) => {
-            indented!(w, [()()], r"{call}.Ok();")?;
+            indented!(w, [()()], r"{call}.AsOk();")?;
             indented!(w, [()()], r"return cs.Task;")?;
         }
         _ => {
