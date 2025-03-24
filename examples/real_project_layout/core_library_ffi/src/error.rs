@@ -7,29 +7,13 @@ use std::fmt::{Display, Formatter};
 #[ffi_type]
 #[derive(PartialOrd, PartialEq, Copy, Clone, Debug)]
 pub enum Error {
-    Ok = 0,
-    Null = 100,
-    Panic = 200,
-    Delegate = 300,
-    Fail = 400,
+    Fail,
 }
 
 impl From<interoptopus::Error> for Error {
     fn from(_: interoptopus::Error) -> Self {
         Self::Fail
     }
-}
-
-impl Default for Error {
-    fn default() -> Self {
-        Self::Ok
-    }
-}
-
-impl interoptopus::pattern::result::FFIError for Error {
-    const SUCCESS: Self = Self::Ok;
-    const NULL: Self = Self::Null;
-    const PANIC: Self = Self::Panic;
 }
 
 impl Display for Error {

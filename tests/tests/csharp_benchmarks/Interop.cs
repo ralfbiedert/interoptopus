@@ -22,9 +22,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 11026466454465313054ul)
+            if (api_version != 10828331896780892909ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (11026466454465313054). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10828331896780892909). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -734,9 +734,9 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_7")]
-        public static partial Error pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, ref int o);
+        public static partial ResultError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, ref int o);
 
-        public static unsafe Error pattern_callback_7(SumDelegateReturnDelegate c1, SumDelegateReturn2Delegate c2, int x, int i, ref int o)
+        public static unsafe ResultError pattern_callback_7(SumDelegateReturnDelegate c1, SumDelegateReturn2Delegate c2, int x, int i, ref int o)
         {
             var c1_wrapped = new SumDelegateReturn(c1);
             var c2_wrapped = new SumDelegateReturn2(c2);

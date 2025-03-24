@@ -60,10 +60,6 @@ namespace My.Company
     public partial struct Error
     {
 
-
-
-
-
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -88,23 +84,11 @@ namespace My.Company
         [CustomMarshaller(typeof(Error), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
-        public static Error Ok => new() { _variant = 0 };
-        public static Error Null => new() { _variant = 100 };
-        public static Error Panic => new() { _variant = 200 };
-        public static Error Delegate => new() { _variant = 300 };
-        public static Error Fail => new() { _variant = 400 };
+        public static Error Fail => new() { _variant = 0 };
 
-        public bool IsOk => _variant == 0;
-        public bool IsNull => _variant == 100;
-        public bool IsPanic => _variant == 200;
-        public bool IsDelegate => _variant == 300;
-        public bool IsFail => _variant == 400;
+        public bool IsFail => _variant == 0;
 
-        public void AsOk() { if (_variant != 0) throw new InteropException(); }
-        public void AsNull() { if (_variant != 100) throw new InteropException(); }
-        public void AsPanic() { if (_variant != 200) throw new InteropException(); }
-        public void AsDelegate() { if (_variant != 300) throw new InteropException(); }
-        public void AsFail() { if (_variant != 400) throw new InteropException(); }
+        public void AsFail() { if (_variant != 0) throw new InteropException(); }
 
         public ref struct Marshaller
         {

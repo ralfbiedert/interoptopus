@@ -260,7 +260,7 @@ def init_lib(path):
     c_lib.pattern_callback_4.restype = ctypes.c_uint32
     c_lib.pattern_callback_5.restype = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
     c_lib.pattern_callback_6.restype = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)
-    c_lib.pattern_callback_7.restype = ctypes.c_int
+    c_lib.pattern_callback_7.restype = ResultError
     c_lib.service_async_destroy.restype = ResultConstPtrServiceAsyncError
     c_lib.service_async_new.restype = ResultConstPtrServiceAsyncError
     c_lib.service_async_return_after_ms.restype = ResultError
@@ -696,7 +696,7 @@ def pattern_callback_5():
 def pattern_callback_6():
     return c_lib.pattern_callback_6()
 
-def pattern_callback_7(c1, c2, x: int, i: int, o: ctypes.POINTER(ctypes.c_int32)) -> TODO:
+def pattern_callback_7(c1, c2, x: int, i: int, o: ctypes.POINTER(ctypes.c_int32)):
     if not hasattr(c1, "__ctypes_from_outparam__"):
         c1 = callbacks.fn_i32_i32_ConstPtr_rval_ResultError(c1)
 
@@ -782,11 +782,7 @@ class EnumRenamed:
 
 
 class Error:
-    Ok = 0
-    Null = 100
-    Panic = 200
-    Delegate = 300
-    Fail = 400
+    Fail = 0
 
 
 class Utf8String(ctypes.Structure):

@@ -35,65 +35,6 @@ use crate::pattern::TypePattern;
 use std::any::Any;
 use std::fmt::Debug;
 
-/// A trait you should implement for enums that signal errors in FFI calls.
-///
-/// Once implemented, the enum can be used in [services](crate::pattern::service) to automatically
-/// convert `Result<(), E>` types to FFI enums.
-///
-/// # Example
-///
-/// ```
-/// use interoptopus::pattern::result::FFIError;
-/// use interoptopus::ffi_type;
-///
-/// // Some Error used in your application.
-/// pub enum Error {
-///     Bad,
-/// }
-///
-/// // The error FFI users should see
-/// #[ffi_type]
-/// #[derive(PartialOrd, PartialEq)]
-/// enum MyFFIError {
-///     Ok = 0,
-///     NullPassed = 1,
-///     Panic = 2,
-///     OtherError = 3,
-/// }
-///
-/// // Gives special meaning to some of your error variants.
-/// impl FFIError for MyFFIError {
-///     const SUCCESS: Self = Self::Ok;
-///     const NULL: Self = Self::NullPassed;
-///     const PANIC: Self = Self::Panic;
-/// }
-///
-/// // How to map an `Error` to an `MyFFIError`.
-/// impl From<Error> for MyFFIError {
-///     fn from(x: Error) -> Self {
-///         match x {
-///             Error::Bad => Self::OtherError,
-///         }
-///     }
-/// }
-///
-/// ```
-pub trait FFIError: PartialEq + Sized {
-    /// The variant to return when everything went OK, usually the variant with value `0`.
-    const SUCCESS: Self;
-    /// Signals a null pointer was passed where an actual element was needed.
-    const NULL: Self;
-    /// This can indicate one of two things:
-    /// - Returned from Rust function this indicates a panic. Once this is observed no further calls
-    ///   should be attempted.
-    /// - Returned from a callback, this indicates "an unusual code flow like a panic" happened
-    ///   in hosting process (e.g., some callback code threw an exception). In that case
-    ///   you should probably attempt to return early and indicate an error.
-    const PANIC: Self;
-
-    // fn ok(self) -> Result<(), E>;
-}
-
 /// Internal helper derived for enums that are an [`FFIError`].
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct FFIErrorEnum {
@@ -195,26 +136,8 @@ impl<T, E> FFIResultAsUnitT for Result<T, E> {
 impl<T, E> Result<T, E>
 where
     T: TypeInfo,
-    E: TypeInfo + FFIError,
+    E: TypeInfo,
 {
-    // pub const fn ok(t: T) -> Self {
-    //     Self { t: MaybeUninit::new(t), err: E::SUCCESS }
-    // }
-    //
-    // pub const fn err(err: E) -> Self {
-    //     Self { t: MaybeUninit::uninit(), err }
-    // }
-    //
-    // #[must_use]
-    // pub const fn panic() -> Self {
-    //     Self { t: MaybeUninit::uninit(), err: E::PANIC }
-    // }
-    //
-    // #[must_use]
-    // pub const fn null() -> Self {
-    //     Self { t: MaybeUninit::uninit(), err: E::NULL }
-    // }
-
     #[must_use]
     pub fn is_ok(&self) -> bool {
         match self {
@@ -255,7 +178,7 @@ where
 impl<T, E> From<std::result::Result<T, E>> for Result<T, E>
 where
     T: TypeInfo,
-    E: TypeInfo + FFIError,
+    E: TypeInfo,
 {
     fn from(x: std::result::Result<T, E>) -> Self {
         match x {
@@ -268,7 +191,7 @@ where
 unsafe impl<T, E> TypeInfo for Result<T, E>
 where
     T: TypeInfo,
-    E: TypeInfo + FFIError,
+    E: TypeInfo,
 {
     fn type_info() -> Type {
         let doc_t = Documentation::from_line("Element if err is `Ok`.");
@@ -300,13 +223,13 @@ pub trait IntoFFIResult {
     type FFIResult;
 }
 
-impl<T, E: FFIError> IntoFFIResult for Result<T, E> {
+impl<T, E> IntoFFIResult for Result<T, E> {
     type FFIResult = Self;
 }
 
 ///
 /// At some point we want to get rid of these once `Try` ([try_trait_v2](https://github.com/rust-lang/rust/issues/84277)) stabilizes.
-pub fn result_to_ffi<T: TypeInfo, E: TypeInfo + crate::pattern::result::FFIError>(f: impl FnOnce() -> std::result::Result<T, E>) -> Result<T, E> {
+pub fn result_to_ffi<T: TypeInfo, E: TypeInfo>(f: impl FnOnce() -> std::result::Result<T, E>) -> Result<T, E> {
     match f() {
         std::result::Result::Ok(x) => Result::Ok(x),
         std::result::Result::Err(e) => Result::Err(e),

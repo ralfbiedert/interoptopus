@@ -74,7 +74,6 @@ macro_rules! extra_type {
 /// use interoptopus::inventory::{InventoryBuilder, Inventory};
 ///
 /// # use std::fmt::{Display, Formatter};
-/// # use interoptopus::pattern::result::FFIError;
 /// #
 /// # #[derive(Debug)]
 /// # pub enum Error {
@@ -98,11 +97,6 @@ macro_rules! extra_type {
 /// #     OtherError = 3,
 /// # }
 /// #
-/// # impl FFIError for MyFFIError {
-/// #     const SUCCESS: Self = Self::Ok;
-/// #     const NULL: Self = Self::NullPassed;
-/// #     const PANIC: Self = Self::Panic;
-/// # }
 /// #
 /// # impl From<Error> for MyFFIError {
 /// #     fn from(x: Error) -> Self {

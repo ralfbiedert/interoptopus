@@ -51,12 +51,6 @@
 //! #     OtherError = 3,
 //! # }
 //! #
-//! # impl FFIError for MyFFIError {
-//! #     const SUCCESS: Self = Self::Ok;
-//! #     const NULL: Self = Self::NullPassed;
-//! #     const PANIC: Self = Self::Panic;
-//! # }
-//! #
 //! # impl From<Error> for MyFFIError {
 //! #     fn from(x: Error) -> Self {
 //! #         match x {
@@ -66,7 +60,6 @@
 //! # }
 //! #
 //! use interoptopus::{ffi, ffi_type, ffi_service, ffi_service_method};
-//! use interoptopus::pattern::result::FFIError;
 //!
 //! #[ffi_type(opaque)]
 //! pub struct SimpleService {

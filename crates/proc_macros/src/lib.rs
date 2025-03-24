@@ -178,7 +178,6 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// ```
 /// # use std::fmt::{Display, Formatter};
-/// # use interoptopus::pattern::result::FFIError;
 /// # #[derive(Debug)]
 /// # pub enum Error {
 /// #     Bad,
@@ -199,12 +198,6 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// #     NullPassed = 1,
 /// #     Panic = 2,
 /// #     OtherError = 3,
-/// # }
-/// #
-/// # impl FFIError for MyFFIError {
-/// #     const SUCCESS: Self = Self::Ok;
-/// #     const NULL: Self = Self::NullPassed;
-/// #     const PANIC: Self = Self::Panic;
 /// # }
 /// #
 /// # impl From<Error> for MyFFIError {
@@ -283,7 +276,6 @@ pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// ```
 /// # use std::fmt::{Display, Formatter};
-/// # use interoptopus::pattern::result::FFIError;
 /// #
 /// # #[derive(Debug)]
 /// # pub enum Error {
@@ -305,12 +297,6 @@ pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// #     NullPassed = 1,
 /// #     Panic = 2,
 /// #     OtherError = 3,
-/// # }
-/// #
-/// # impl FFIError for MyFFIError {
-/// #     const SUCCESS: Self = Self::Ok;
-/// #     const NULL: Self = Self::NullPassed;
-/// #     const PANIC: Self = Self::Panic;
 /// # }
 /// #
 /// # impl From<Error> for MyFFIError {

@@ -8,26 +8,7 @@ use interoptopus::{ffi_function, ffi_type};
 #[ffi_type]
 #[derive(Debug, PartialOrd, PartialEq, Copy, Clone)]
 pub enum Error {
-    Ok = 0,
-    Null = 100,
-    Panic = 200,
-    Delegate = 300,
-    Fail = 400,
-}
-
-// Implement Default so we know what the "good" case is.
-impl Default for Error {
-    fn default() -> Self {
-        Self::Ok
-    }
-}
-
-// Implement Interoptopus' `FFIError` trait for your FFIError enum.
-// Here you must map 3 "well known" variants to your enum.
-impl interoptopus::pattern::result::FFIError for Error {
-    const SUCCESS: Self = Self::Ok;
-    const NULL: Self = Self::Null;
-    const PANIC: Self = Self::Panic;
+    Fail,
 }
 
 #[ffi_function]

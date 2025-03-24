@@ -41,11 +41,7 @@ typedef enum ENUMRENAMED
 
 typedef enum ERROR
     {
-    ERROR_OK = 0,
-    ERROR_NULL = 100,
-    ERROR_PANIC = 200,
-    ERROR_DELEGATE = 300,
-    ERROR_FAIL = 400,
+    ERROR_FAIL = 0,
     } ERROR;
 
 typedef struct GENERIC2U8 GENERIC2U8;
@@ -873,7 +869,7 @@ SUMDELEGATE1 pattern_callback_5();
 
 SUMDELEGATE2 pattern_callback_6();
 
-ERROR pattern_callback_7(SUMDELEGATERETURN C1, SUMDELEGATERETURN2 C2, int32_t X, int32_t I, int32_t* O);
+RESULTERROR pattern_callback_7(SUMDELEGATERETURN C1, SUMDELEGATERETURN2 C2, int32_t X, int32_t I, int32_t* O);
 
 void pattern_callback_8(STRINGCALLBACK CB, NESTEDSTRINGCALLBACK CB2, UTF8STRING S);
 

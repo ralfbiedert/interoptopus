@@ -22,9 +22,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 11026466454465313054ul)
+            if (api_version != 10828331896780892909ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (11026466454465313054). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10828331896780892909). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -734,9 +734,9 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_7")]
-        public static partial Error pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, ref int o);
+        public static partial ResultError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, ref int o);
 
-        public static unsafe Error pattern_callback_7(SumDelegateReturnDelegate c1, SumDelegateReturn2Delegate c2, int x, int i, ref int o)
+        public static unsafe ResultError pattern_callback_7(SumDelegateReturnDelegate c1, SumDelegateReturn2Delegate c2, int x, int i, ref int o)
         {
             var c1_wrapped = new SumDelegateReturn(c1);
             var c2_wrapped = new SumDelegateReturn2(c2);
@@ -1596,10 +1596,6 @@ namespace My.Company
     public partial struct Error
     {
 
-
-
-
-
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -1624,23 +1620,11 @@ namespace My.Company
         [CustomMarshaller(typeof(Error), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
-        public static Error Ok => new() { _variant = 0 };
-        public static Error Null => new() { _variant = 100 };
-        public static Error Panic => new() { _variant = 200 };
-        public static Error Delegate => new() { _variant = 300 };
-        public static Error Fail => new() { _variant = 400 };
+        public static Error Fail => new() { _variant = 0 };
 
-        public bool IsOk => _variant == 0;
-        public bool IsNull => _variant == 100;
-        public bool IsPanic => _variant == 200;
-        public bool IsDelegate => _variant == 300;
-        public bool IsFail => _variant == 400;
+        public bool IsFail => _variant == 0;
 
-        public void AsOk() { if (_variant != 0) throw new InteropException(); }
-        public void AsNull() { if (_variant != 100) throw new InteropException(); }
-        public void AsPanic() { if (_variant != 200) throw new InteropException(); }
-        public void AsDelegate() { if (_variant != 300) throw new InteropException(); }
-        public void AsFail() { if (_variant != 400) throw new InteropException(); }
+        public void AsFail() { if (_variant != 0) throw new InteropException(); }
 
         public ref struct Marshaller
         {

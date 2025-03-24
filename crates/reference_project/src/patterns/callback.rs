@@ -52,7 +52,7 @@ pub fn pattern_callback_6() -> SumDelegate2 {
 }
 
 #[ffi_function]
-pub fn pattern_callback_7(c1: SumDelegateReturn, c2: SumDelegateReturn2, x: i32, i: i32, o: &mut i32) -> Error {
+pub fn pattern_callback_7(c1: SumDelegateReturn, c2: SumDelegateReturn2, x: i32, i: i32, o: &mut i32) -> ffi::Result<(), Error> {
     *o = i - 1;
 
     // Call both callbacks. In C#, if the callback throws an exception, we might not re-enter
@@ -68,7 +68,7 @@ pub fn pattern_callback_7(c1: SumDelegateReturn, c2: SumDelegateReturn2, x: i32,
 
     *o = i + 1;
 
-    Error::Ok
+    ffi::Ok(())
 }
 
 #[ffi_function]
