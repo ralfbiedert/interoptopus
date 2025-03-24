@@ -30,6 +30,10 @@ namespace My.Company.Common
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct EnumDocumented
     {
+    // Debug - write_type_definition_enum_variant_unmanaged_types 
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -83,6 +87,7 @@ namespace My.Company.Common
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
                 return _unmanaged;
             }
 
@@ -90,6 +95,7 @@ namespace My.Company.Common
             {
                 _managed = new EnumDocumented();
                 _managed._variant = _unmanaged._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_managed 
                 return _managed;
             }
             public void Free() { }
@@ -107,6 +113,8 @@ namespace My.Company.Common
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct EnumRenamed
     {
+    // Debug - write_type_definition_enum_variant_unmanaged_types 
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -154,6 +162,7 @@ namespace My.Company.Common
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
                 return _unmanaged;
             }
 
@@ -161,6 +170,7 @@ namespace My.Company.Common
             {
                 _managed = new EnumRenamed();
                 _managed._variant = _unmanaged._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_managed 
                 return _managed;
             }
             public void Free() { }
@@ -178,6 +188,12 @@ namespace My.Company.Common
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Error
     {
+    // Debug - write_type_definition_enum_variant_unmanaged_types 
+
+
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -237,6 +253,7 @@ namespace My.Company.Common
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
                 return _unmanaged;
             }
 
@@ -244,6 +261,7 @@ namespace My.Company.Common
             {
                 _managed = new Error();
                 _managed._variant = _unmanaged._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_managed 
                 return _managed;
             }
             public void Free() { }
@@ -1324,6 +1342,17 @@ namespace My.Company.Common
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultError
     {
+    // Debug - write_type_definition_enum_variant_unmanaged_types 
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -1331,8 +1360,8 @@ namespace My.Company.Common
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
             public ResultError ToManaged()
             {
@@ -1383,6 +1412,8 @@ namespace My.Company.Common
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -1390,6 +1421,8 @@ namespace My.Company.Common
             {
                 _managed = new ResultError();
                 _managed._variant = _unmanaged._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_managed 
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -1410,6 +1443,23 @@ namespace My.Company.Common
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultU32Error
     {
+    // Debug - write_type_definition_enum_variant_unmanaged_types 
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal uint _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -1417,11 +1467,11 @@ namespace My.Company.Common
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal uint Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
             public ResultU32Error ToManaged()
             {
@@ -1472,6 +1522,9 @@ namespace My.Company.Common
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -1479,6 +1532,9 @@ namespace My.Company.Common
             {
                 _managed = new ResultU32Error();
                 _managed._variant = _unmanaged._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_managed 
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -1499,6 +1555,23 @@ namespace My.Company.Common
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultU64Error
     {
+    // Debug - write_type_definition_enum_variant_unmanaged_types 
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal ulong _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -1506,11 +1579,11 @@ namespace My.Company.Common
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal ulong Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
             public ResultU64Error ToManaged()
             {
@@ -1561,6 +1634,9 @@ namespace My.Company.Common
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -1568,6 +1644,9 @@ namespace My.Company.Common
             {
                 _managed = new ResultU64Error();
                 _managed._variant = _unmanaged._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_managed 
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -1588,6 +1667,23 @@ namespace My.Company.Common
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultUtf8StringError
     {
+    // Debug - write_type_definition_enum_variant_unmanaged_types 
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal Utf8String.Unmanaged _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -1595,11 +1691,11 @@ namespace My.Company.Common
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal Utf8String.Unmanaged Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
             public ResultUtf8StringError ToManaged()
             {
@@ -1650,6 +1746,9 @@ namespace My.Company.Common
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = new Utf8String(_managed._Ok).ToUnmanaged();
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -1657,6 +1756,9 @@ namespace My.Company.Common
             {
                 _managed = new ResultUtf8StringError();
                 _managed._variant = _unmanaged._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_managed 
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok.ToManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }

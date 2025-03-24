@@ -1,6 +1,6 @@
 use crate::types::{Attributes, TypeRepresentation};
 use crate::util::extract_doc_lines;
-use proc_macro2::{Span, TokenStream};
+use proc_macro2::TokenStream;
 use quote::__private::ext::RepToTokensExt;
 use quote::{quote, quote_spanned, ToTokens};
 use syn::{Expr, Fields, ItemEnum, Lit};
@@ -13,7 +13,7 @@ pub enum VariantKind {
 #[allow(clippy::too_many_lines)]
 pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: ItemEnum) -> TokenStream {
     let doc_line = extract_doc_lines(&item.attrs).join("\n");
-    let (type_repr, align) = attributes.type_repr_align();
+    let (type_repr, _) = attributes.type_repr_align();
 
     let span = item.ident.span();
     let name = item.ident.to_string();
@@ -78,18 +78,6 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
         }
     }
 
-    // let variant_infos = derive_variant_info(&item, &variant_idents, &variant_names, &variant_kinds, &variant_docs);
-
-    let attr_align = align.map_or_else(
-        || quote! {},
-        |x| {
-            let x_lit = syn::LitInt::new(&x.to_string(), Span::call_site());
-            quote! { , align( #x_lit ) }
-        },
-    );
-
-    let align = align.map_or_else(|| quote! { None }, |x| quote! { Some(#x) });
-
     let layout = match type_repr {
         TypeRepresentation::C => quote! { ::interoptopus::lang::Layout::C },
         TypeRepresentation::Transparent => quote! { ::interoptopus::lang::Layout::Transparent },
@@ -97,17 +85,12 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
         _ => quote! { compile_error!("Unsupported repr for enum") },
     };
 
-    let attr_repr = match type_repr {
-        TypeRepresentation::C => quote! { #[repr(C #attr_align)] },
-        TypeRepresentation::Transparent => quote! { #[repr(transparent #attr_align)] },
-        TypeRepresentation::Primitive(x) => quote! { #[repr(#x #attr_align)] },
-        _ => quote! { compile_error!("Unsupported repr for enum") },
-    };
+    let attr_align = quote! { #[repr(u32) ]};
 
     if item.attrs.iter().any(|attr| attr.path().is_ident("repr")) {
         panic!("Since 0.15 you must not add any `#[repr()] attributes to your enum; Interoptopus will handle that for you.");
     } else {
-        item.attrs.push(syn::parse_quote!(#attr_repr));
+        item.attrs.push(syn::parse_quote!(#attr_align));
     }
 
     quote! {
@@ -123,7 +106,7 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
                     #variants
                 })*
 
-                let repr = ::interoptopus::lang::Representation::new(#layout, #align);
+                let repr = ::interoptopus::lang::Representation::new(#layout, None);
                 let rval = ::interoptopus::lang::Enum::new(#ffi_name.to_string(), variants, meta, repr);
                 ::interoptopus::lang::Type::Enum(rval)
             }

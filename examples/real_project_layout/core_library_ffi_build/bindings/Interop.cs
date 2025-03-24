@@ -219,11 +219,11 @@ namespace My.Company
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(4)]
+            internal IntPtr _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(4)]
+            internal Error.Unmanaged _Err;
 
             public ResultConstPtrGameEngineError ToManaged()
             {
@@ -273,6 +273,8 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -280,6 +282,8 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrGameEngineError();
                 _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -302,8 +306,8 @@ namespace My.Company
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(4)]
+            internal Error.Unmanaged _Err;
 
             public ResultError ToManaged()
             {
@@ -353,6 +357,7 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 1) _unmanaged._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -360,6 +365,7 @@ namespace My.Company
             {
                 _managed = new ResultError();
                 _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }

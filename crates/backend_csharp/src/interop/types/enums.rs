@@ -2,7 +2,8 @@ use crate::converter::{to_typespecifier_in_field, to_typespecifier_in_field_unma
 use crate::interop::docs::write_documentation;
 use crate::Interop;
 use interoptopus::backend::IndentWriter;
-use interoptopus::lang::{Enum, VariantKind};
+use interoptopus::lang::{Enum, Type, VariantKind};
+use interoptopus::pattern::TypePattern;
 use interoptopus::{indented, Error};
 
 pub fn write_type_definition_enum(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
@@ -26,6 +27,8 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
     indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
     indented!(w, r"public partial struct {}", name)?;
     indented!(w, r"{{")?;
+
+    write_type_definition_enum_variant_unmanaged_types(i, w, the_type)?;
 
     indented!(w, [()], r"[StructLayout(LayoutKind.Explicit)]")?;
     indented!(w, [()], r"public unsafe struct Unmanaged")?;
@@ -70,6 +73,9 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
     indented!(w, [()], r"{{;")?;
     indented!(w, [()()], r"_unmanaged = new Unmanaged();")?;
     indented!(w, [()()], r"_unmanaged._variant = _managed._variant;")?;
+
+    write_type_definition_enum_variant_fields_to_unmanaged(i, w, the_type)?;
+
     indented!(w, [()()], r"return _unmanaged;")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
@@ -77,6 +83,9 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"_managed = new {}();", name)?;
     indented!(w, [()()], r"_managed._variant = _unmanaged._variant;")?;
+
+    write_type_definition_enum_variant_fields_to_managed(i, w, the_type)?;
+
     indented!(w, [()()], r"return _managed;")?;
     indented!(w, [()], r"}}")?;
     indented!(w, [()], r"public void Free() {{ }}")?;
@@ -106,6 +115,31 @@ pub fn write_type_definition_enum_variant_fields_managed(i: &Interop, w: &mut In
     Ok(())
 }
 
+pub fn write_type_definition_enum_variant_unmanaged_types(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
+    i.debug(w, "write_type_definition_enum_variant_unmanaged_types")?;
+
+    for variant in the_type.variants() {
+        match variant.kind() {
+            VariantKind::Unit(_) => {}
+            VariantKind::Typed(x, t) if !t.is_void() => {
+                let ty = to_typespecifier_in_field_unmanaged(t);
+                let vname = variant.name();
+                indented!(w, [()], r"[StructLayout(LayoutKind.Sequential)]")?;
+                indented!(w, [()], r"internal unsafe struct Unmanaged{vname}")?;
+                indented!(w, [()], r"{{")?;
+                indented!(w, [()()], r"internal uint _variant;")?;
+                indented!(w, [()()], r"internal {ty} _{vname};")?;
+                indented!(w, [()], r"}}")?;
+            }
+            VariantKind::Typed(x, t) => {}
+        }
+
+        w.newline()?;
+    }
+
+    Ok(())
+}
+
 pub fn write_type_definition_enum_variant_fields_unmanaged(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
     i.debug(w, "write_type_definition_enum_variant_fields_unmanaged")?;
 
@@ -116,10 +150,9 @@ pub fn write_type_definition_enum_variant_fields_unmanaged(i: &Interop, w: &mut 
         match variant.kind() {
             VariantKind::Unit(_) => {}
             VariantKind::Typed(x, t) if !t.is_void() => {
-                let ty = to_typespecifier_in_field_unmanaged(t);
                 let vname = variant.name();
-                indented!(w, [()()], r"[FieldOffset(2)]")?;
-                indented!(w, [()()], r"internal {ty} {vname};")?;
+                indented!(w, [()()], r"[FieldOffset(0)]")?;
+                indented!(w, [()()], r"internal Unmanaged{vname} _{vname};")?;
                 w.newline()?;
             }
             VariantKind::Typed(x, t) => {}
@@ -188,6 +221,60 @@ pub fn write_type_definition_enum_variant_utils(i: &Interop, w: &mut IndentWrite
         }
     }
     w.newline()?;
+
+    Ok(())
+}
+
+pub fn write_type_definition_enum_variant_fields_to_unmanaged(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
+    i.debug(w, "write_type_definition_enum_variant_fields_to_unmanaged")?;
+
+    for variant in the_type.variants() {
+        match variant.kind() {
+            VariantKind::Unit(x) => (),
+            VariantKind::Typed(x, t) if t.is_void() => (),
+            VariantKind::Typed(x, t) if !t.is_void() => {
+                let vname = variant.name();
+
+                let convert = match &**t {
+                    Type::Primitive(_) => format!("_managed._{vname}"),
+                    Type::ReadWritePointer(_) => format!("_managed._{vname}"),
+                    Type::ReadPointer(_) => format!("_managed._{vname}"),
+                    Type::Pattern(TypePattern::Utf8String(_)) => format!("new Utf8String(_managed._{vname}).ToUnmanaged()"),
+                    _ => format!("_managed._{vname}.ToUnmanaged()"),
+                };
+
+                indented!(w, [()()], r"if (_unmanaged._variant == {x}) _unmanaged._{vname}._{vname} = {convert};")?;
+            }
+            _ => panic!("This should never happen"),
+        }
+    }
+
+    Ok(())
+}
+
+pub fn write_type_definition_enum_variant_fields_to_managed(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
+    i.debug(w, "write_type_definition_enum_variant_fields_to_managed")?;
+
+    for variant in the_type.variants() {
+        match variant.kind() {
+            VariantKind::Unit(x) => (),
+            VariantKind::Typed(x, t) if t.is_void() => (),
+            VariantKind::Typed(x, t) if !t.is_void() => {
+                let vname = variant.name();
+
+                let convert = match &**t {
+                    Type::Primitive(_) => format!("_unmanaged._{vname}._{vname}"),
+                    Type::ReadWritePointer(_) => format!("_unmanaged._{vname}._{vname}"),
+                    Type::ReadPointer(_) => format!("_unmanaged._{vname}._{vname}"),
+                    Type::Pattern(TypePattern::Utf8String(_)) => format!("_unmanaged._{vname}._{vname}.ToManaged()"),
+                    _ => format!("_unmanaged._{vname}._{vname}.ToManaged()"),
+                };
+
+                indented!(w, [()()], r"if (_managed._variant == {x}) _managed._{vname} = {convert};")?;
+            }
+            _ => panic!("This should never happen"),
+        }
+    }
 
     Ok(())
 }

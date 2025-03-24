@@ -27,9 +27,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 75006280138558657ul)
+            if (api_version != 5335126409172716460ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (75006280138558657). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (5335126409172716460). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -173,6 +173,22 @@ namespace My.Company
 
         // Debug - write_function_overload 
         // Debug - no overload for enums_1 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "enums_2")]
+        // Debug - write_function_declaration 
+        public static partial EnumPayload enums_2(EnumPayload x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for enums_2 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "enums_3")]
+        // Debug - write_function_declaration 
+        public static partial IntPtr enums_3(ref EnumPayload x);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for enums_3 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "fnptr_1")]
@@ -1944,6 +1960,22 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct EnumPayload
     {
+    // Debug - write_type_definition_enum_variant_unmanaged_types 
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedB
+        {
+            internal uint _variant;
+            internal Vec3f32.Unmanaged _B;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedC
+        {
+            internal uint _variant;
+            internal uint _C;
+        }
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -1951,11 +1983,11 @@ namespace My.Company
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal Vec3f32.Unmanaged B;
+            [FieldOffset(0)]
+            internal UnmanagedB _B;
 
-            [FieldOffset(2)]
-            internal uint C;
+            [FieldOffset(0)]
+            internal UnmanagedC _C;
 
             public EnumPayload ToManaged()
             {
@@ -2003,6 +2035,9 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+                if (_unmanaged._variant == 1) _unmanaged._B._B = _managed._B.ToUnmanaged();
+                if (_unmanaged._variant == 2) _unmanaged._C._C = _managed._C;
                 return _unmanaged;
             }
 
@@ -2010,6 +2045,9 @@ namespace My.Company
             {
                 _managed = new EnumPayload();
                 _managed._variant = _unmanaged._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_managed 
+                if (_managed._variant == 1) _managed._B = _unmanaged._B._B.ToManaged();
+                if (_managed._variant == 2) _managed._C = _unmanaged._C._C;
                 return _managed;
             }
             public void Free() { }
@@ -4788,6 +4826,23 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceAsyncError
     {
+    // Debug - write_type_definition_enum_variant_unmanaged_types 
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -4795,11 +4850,11 @@ namespace My.Company
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
             public ResultConstPtrServiceAsyncError ToManaged()
             {
@@ -4850,6 +4905,9 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -4857,6 +4915,9 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceAsyncError();
                 _managed._variant = _unmanaged._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_managed 
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -4877,6 +4938,23 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceBasicError
     {
+    // Debug - write_type_definition_enum_variant_unmanaged_types 
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -4884,11 +4962,11 @@ namespace My.Company
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
             public ResultConstPtrServiceBasicError ToManaged()
             {
@@ -4939,6 +5017,9 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -4946,6 +5027,9 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceBasicError();
                 _managed._variant = _unmanaged._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_managed 
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -4966,6 +5050,23 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceCallbacksError
     {
+    // Debug - write_type_definition_enum_variant_unmanaged_types 
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -4973,11 +5074,11 @@ namespace My.Company
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
             public ResultConstPtrServiceCallbacksError ToManaged()
             {
@@ -5028,6 +5129,9 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5035,6 +5139,9 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceCallbacksError();
                 _managed._variant = _unmanaged._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_managed 
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5055,6 +5162,23 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceDependentError
     {
+    // Debug - write_type_definition_enum_variant_unmanaged_types 
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -5062,11 +5186,11 @@ namespace My.Company
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
             public ResultConstPtrServiceDependentError ToManaged()
             {
@@ -5117,6 +5241,9 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5124,6 +5251,9 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceDependentError();
                 _managed._variant = _unmanaged._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_managed 
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5144,6 +5274,23 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceIgnoringMethodsError
     {
+    // Debug - write_type_definition_enum_variant_unmanaged_types 
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -5151,11 +5298,11 @@ namespace My.Company
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
             public ResultConstPtrServiceIgnoringMethodsError ToManaged()
             {
@@ -5206,6 +5353,9 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5213,6 +5363,9 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceIgnoringMethodsError();
                 _managed._variant = _unmanaged._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_managed 
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5233,6 +5386,23 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceMainError
     {
+    // Debug - write_type_definition_enum_variant_unmanaged_types 
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -5240,11 +5410,11 @@ namespace My.Company
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
             public ResultConstPtrServiceMainError ToManaged()
             {
@@ -5295,6 +5465,9 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5302,6 +5475,9 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceMainError();
                 _managed._variant = _unmanaged._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_managed 
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5322,6 +5498,23 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceMultipleCtorsError
     {
+    // Debug - write_type_definition_enum_variant_unmanaged_types 
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -5329,11 +5522,11 @@ namespace My.Company
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
             public ResultConstPtrServiceMultipleCtorsError ToManaged()
             {
@@ -5384,6 +5577,9 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5391,6 +5587,9 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceMultipleCtorsError();
                 _managed._variant = _unmanaged._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_managed 
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5411,6 +5610,23 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceOnPanicError
     {
+    // Debug - write_type_definition_enum_variant_unmanaged_types 
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -5418,11 +5634,11 @@ namespace My.Company
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
             public ResultConstPtrServiceOnPanicError ToManaged()
             {
@@ -5473,6 +5689,9 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5480,6 +5699,9 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceOnPanicError();
                 _managed._variant = _unmanaged._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_managed 
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5500,6 +5722,23 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceResultError
     {
+    // Debug - write_type_definition_enum_variant_unmanaged_types 
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -5507,11 +5746,11 @@ namespace My.Company
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
             public ResultConstPtrServiceResultError ToManaged()
             {
@@ -5562,6 +5801,9 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5569,6 +5811,9 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceResultError();
                 _managed._variant = _unmanaged._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_managed 
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5589,6 +5834,23 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceStringsError
     {
+    // Debug - write_type_definition_enum_variant_unmanaged_types 
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -5596,11 +5858,11 @@ namespace My.Company
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
             public ResultConstPtrServiceStringsError ToManaged()
             {
@@ -5651,6 +5913,9 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5658,6 +5923,9 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceStringsError();
                 _managed._variant = _unmanaged._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_managed 
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5678,6 +5946,23 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceVariousSlicesError
     {
+    // Debug - write_type_definition_enum_variant_unmanaged_types 
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -5685,11 +5970,11 @@ namespace My.Company
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
             public ResultConstPtrServiceVariousSlicesError ToManaged()
             {
@@ -5740,6 +6025,9 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5747,6 +6035,9 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceVariousSlicesError();
                 _managed._variant = _unmanaged._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_managed 
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5767,6 +6058,23 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultNestedArrayError
     {
+    // Debug - write_type_definition_enum_variant_unmanaged_types 
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal NestedArray.Unmanaged _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -5774,11 +6082,11 @@ namespace My.Company
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal NestedArray.Unmanaged Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
             public ResultNestedArrayError ToManaged()
             {
@@ -5829,6 +6137,9 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok.ToUnmanaged();
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5836,6 +6147,9 @@ namespace My.Company
             {
                 _managed = new ResultNestedArrayError();
                 _managed._variant = _unmanaged._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_managed 
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok.ToManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5856,6 +6170,23 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultUseStringError
     {
+    // Debug - write_type_definition_enum_variant_unmanaged_types 
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal UseString.Unmanaged _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -5863,11 +6194,11 @@ namespace My.Company
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal UseString.Unmanaged Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
             public ResultUseStringError ToManaged()
             {
@@ -5918,6 +6249,9 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok.ToUnmanaged();
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5925,6 +6259,9 @@ namespace My.Company
             {
                 _managed = new ResultUseStringError();
                 _managed._variant = _unmanaged._variant;
+        // Debug - write_type_definition_enum_variant_fields_to_managed 
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok.ToManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }

@@ -18,7 +18,7 @@ pub enum EnumRenamedXYZ {
     X,
 }
 
-#[ffi_type]
+#[ffi_type(debug)]
 pub enum EnumPayload {
     A,
     B(Vec3f32),

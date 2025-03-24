@@ -175,7 +175,7 @@ pub trait FFIResultAsUnitT {
     type AsUnitT;
 }
 
-#[repr(C, u8)]
+#[repr(u32)]
 #[derive(Debug)]
 pub enum Result<T, E> {
     Ok(T),
