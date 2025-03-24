@@ -68,9 +68,9 @@ namespace My.Company.Common
         public bool IsB => _variant == 1;
         public bool IsC => _variant == 2;
 
-        public void AsA() { if (_variant != 0) throw new InteropException<string>(string.Empty); }
-        public void AsB() { if (_variant != 1) throw new InteropException<string>(string.Empty); }
-        public void AsC() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsA() { if (_variant != 0) throw new InteropException(); }
+        public void AsB() { if (_variant != 1) throw new InteropException(); }
+        public void AsC() { if (_variant != 2) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -145,7 +145,7 @@ namespace My.Company.Common
 
         public bool IsX => _variant == 0;
 
-        public void AsX() { if (_variant != 0) throw new InteropException<string>(string.Empty); }
+        public void AsX() { if (_variant != 0) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -232,11 +232,11 @@ namespace My.Company.Common
         public bool IsDelegate => _variant == 300;
         public bool IsFail => _variant == 400;
 
-        public void AsOk() { if (_variant != 0) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 100) throw new InteropException<string>(string.Empty); }
-        public void AsPanic() { if (_variant != 200) throw new InteropException<string>(string.Empty); }
-        public void AsDelegate() { if (_variant != 300) throw new InteropException<string>(string.Empty); }
-        public void AsFail() { if (_variant != 400) throw new InteropException<string>(string.Empty); }
+        public void AsOk() { if (_variant != 0) throw new InteropException(); }
+        public void AsNull() { if (_variant != 100) throw new InteropException(); }
+        public void AsPanic() { if (_variant != 200) throw new InteropException(); }
+        public void AsDelegate() { if (_variant != 300) throw new InteropException(); }
+        public void AsFail() { if (_variant != 400) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -1392,10 +1392,10 @@ namespace My.Company.Common
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public void AsOk() { if (_variant != 0) throw new InteropException<string>(string.Empty); }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public void AsOk() { if (_variant != 0) throw new InteropException(); }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -1502,10 +1502,10 @@ namespace My.Company.Common
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public uint AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public uint AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -1614,10 +1614,10 @@ namespace My.Company.Common
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public ulong AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public ulong AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -1726,10 +1726,10 @@ namespace My.Company.Common
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public string AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public string AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -1886,13 +1886,11 @@ namespace My.Company.Common
 
 
 
-    public class InteropException<T> : Exception
+    public class InteropException: Exception
     {
-        public T Error { get; private set; }
 
-        public InteropException(T error): base($"Something went wrong: {error}")
+        public InteropException(): base()
         {
-            Error = error;
         }
     }
 

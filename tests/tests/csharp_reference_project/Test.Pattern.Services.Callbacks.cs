@@ -20,14 +20,7 @@ public class TestPatternServicesCallbacks
         }).AsOk();
 
         Assert.True(called);
-        Interop.service_callbacks_callback_simple(callbacks.Context, x => x);
-        Interop.service_callbacks_destroy(IntPtr.Zero);
-        Interop.service_callbacks_destroy(IntPtr.Zero);
-        Interop.service_callbacks_destroy(IntPtr.Zero);
-        Interop.service_callbacks_destroy(IntPtr.Zero);
-        Interop.service_callbacks_destroy(IntPtr.Zero);
-        Interop.service_callbacks_destroy(callbacks.Context);
-        // callbacks.Dispose();
+        callbacks.Dispose();
     }
 
     [Fact]

@@ -210,7 +210,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
                     indented!(w, [()()], r"if (managed.IsOk) {{ cs.SetResult(managed.AsOk()); }}")?;
                 }
                 let rtype = to_typespecifier_in_sync_fn_rval(x.e());
-                indented!(w, [()()], r"else {{ cs.SetException(new InteropException<{rtype}>(managed.AsErr())); }}")?;
+                indented!(w, [()()], r"else {{ cs.SetException(new InteropException()); }}")?;
             }
             _ => indented!(w, [()()], r"cs.SetResult(managed);")?,
         }

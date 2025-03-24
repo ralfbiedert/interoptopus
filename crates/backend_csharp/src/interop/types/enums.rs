@@ -203,7 +203,7 @@ pub fn write_type_definition_enum_variant_utils(i: &Interop, w: &mut IndentWrite
 
     // As... "unwraps"
     for variant in the_type.variants() {
-        let throw = "throw new InteropException<string>(string.Empty);";
+        let throw = "throw new InteropException();";
         match variant.kind() {
             VariantKind::Unit(x) => {
                 let vname = variant.name();
