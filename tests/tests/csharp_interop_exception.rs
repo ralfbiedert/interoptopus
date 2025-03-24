@@ -35,13 +35,3 @@ fn has_exception() -> Result<(), Error> {
 
     Ok(())
 }
-
-#[test]
-fn no_exception() -> Result<(), Error> {
-    let inventory = InventoryBuilder::new().register(function!(doesnt_return_error)).build();
-    let generated = InteropBuilder::new().inventory(inventory).write_types(WriteTypes::All).build()?.to_string()?;
-
-    assert!(!generated.contains("InteropException"));
-
-    Ok(())
-}

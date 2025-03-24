@@ -1,15 +1,15 @@
 use crate::converters::{
     composite_to_typename, enum_to_typename, enum_variant_to_name, fnpointer_to_typename, named_callback_to_typename, opaque_to_typename, to_type_specifier,
 };
-use crate::interop::docs::write_documentation;
 use crate::interop::ToNamingStyle;
+use crate::interop::docs::write_documentation;
 use crate::{DocStyle, Indentation, Interop};
-use interoptopus::backend::sort_types_by_dependencies;
 use interoptopus::backend::IndentWriter;
+use interoptopus::backend::sort_types_by_dependencies;
 use interoptopus::lang::{Composite, Enum, Field, FnPointer, Opaque, Type, Variant, VariantKind};
-use interoptopus::pattern::callback::NamedCallback;
 use interoptopus::pattern::TypePattern;
-use interoptopus::{indented, Error};
+use interoptopus::pattern::callback::NamedCallback;
+use interoptopus::{Error, indented};
 
 pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     let mut known_function_pointers = vec![];
@@ -148,7 +148,7 @@ fn write_type_definition_enum_variant(i: &Interop, w: &mut IndentWriter, variant
 
     match variant_kind {
         VariantKind::Unit(variant_value) => indented!(w, r"{} = {},", variant_name, variant_value),
-        VariantKind::Typed(_, _) => todo!(),
+        VariantKind::Typed(_, _) => indented!(w, r"// TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN"),
     }
 }
 

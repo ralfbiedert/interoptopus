@@ -7,7 +7,7 @@ use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Function, Primitive, SugaredReturnType, Type};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 use std::iter::zip;
 
 pub fn write_functions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
@@ -209,7 +209,6 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
                 } else {
                     indented!(w, [()()], r"if (managed.IsOk) {{ cs.SetResult(managed.AsOk()); }}")?;
                 }
-                let rtype = to_typespecifier_in_sync_fn_rval(x.e());
                 indented!(w, [()()], r"else {{ cs.SetException(new InteropException()); }}")?;
             }
             _ => indented!(w, [()()], r"cs.SetResult(managed);")?,

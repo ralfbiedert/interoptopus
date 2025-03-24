@@ -2,7 +2,7 @@ use crate::types::{Attributes, TypeRepresentation};
 use crate::util::extract_doc_lines;
 use proc_macro2::TokenStream;
 use quote::__private::ext::RepToTokensExt;
-use quote::{quote, quote_spanned, ToTokens};
+use quote::{ToTokens, quote, quote_spanned};
 use syn::{Expr, Fields, ItemEnum, Lit};
 
 pub enum VariantKind {

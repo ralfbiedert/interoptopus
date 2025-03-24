@@ -21,11 +21,11 @@ use crate::interop::patterns::write_patterns;
 use crate::interop::types::write_type_definitions;
 use derive_builder::Builder;
 use interoptopus::backend::IndentWriter;
-use interoptopus::backend::{is_global_type, NamespaceMappings};
+use interoptopus::backend::{NamespaceMappings, is_global_type};
 use interoptopus::inventory::{Bindings, Inventory};
 use interoptopus::lang::{Constant, Function, FunctionSignature, Meta, Type};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 /// How to convert from Rust function names to C#
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
@@ -109,7 +109,6 @@ impl Default for Interop {
             debug: false,
             work_around_exception_in_callback_no_reentry: true,
             unsupported: Unsupported::Panic,
-            error_text: "Something went wrong: {error}".to_string(),
         }
     }
 }
@@ -154,9 +153,6 @@ pub struct Interop {
     /// How to handle unsupported constructs.
     #[builder(setter(into))]
     unsupported: Unsupported,
-    /// The string to use for reporting within `FFIError`. Use `{error}` to reference the inner error content.
-    #[builder(setter(into))]
-    error_text: String,
     pub(crate) inventory: Inventory,
 }
 

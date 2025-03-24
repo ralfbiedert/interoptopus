@@ -27,10 +27,26 @@ typedef enum ENUMDOCUMENTED
     ENUMDOCUMENTED_C = 2,
     } ENUMDOCUMENTED;
 
+typedef enum ENUMPAYLOAD
+    {
+    ENUMPAYLOAD_A = 0,
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    } ENUMPAYLOAD;
+
 typedef enum ENUMRENAMED
     {
     ENUMRENAMED_X = 0,
     } ENUMRENAMED;
+
+typedef enum ERROR
+    {
+    ERROR_OK = 0,
+    ERROR_NULL = 100,
+    ERROR_PANIC = 200,
+    ERROR_DELEGATE = 300,
+    ERROR_FAIL = 400,
+    } ERROR;
 
 typedef struct GENERIC2U8 GENERIC2U8;
 
@@ -77,15 +93,6 @@ typedef struct UTF8STRING
     uint64_t len;
     uint64_t capacity;
     } UTF8STRING;
-
-typedef enum ERROR
-    {
-    ERROR_OK = 0,
-    ERROR_NULL = 100,
-    ERROR_PANIC = 200,
-    ERROR_DELEGATE = 300,
-    ERROR_FAIL = 400,
-    } ERROR;
 
 typedef struct BOOLFIELD
     {
@@ -260,30 +267,47 @@ typedef struct SLICEMUTU8
     } SLICEMUTU8;
 
 /// Result that contains value or an error.
-typedef struct RESULTU32ERROR
+typedef enum RESULTERROR
     {
     /// Element if err is `Ok`.
-    uint32_t t;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
-    ERROR err;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTERROR_PANIC = 2,
+    RESULTERROR_NULL = 3,
+    } RESULTERROR;
+
+/// Result that contains value or an error.
+typedef enum RESULTU32ERROR
+    {
+    /// Element if err is `Ok`.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    /// Error value.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTU32ERROR_PANIC = 2,
+    RESULTU32ERROR_NULL = 3,
     } RESULTU32ERROR;
 
 /// Result that contains value or an error.
-typedef struct RESULTU64ERROR
+typedef enum RESULTU64ERROR
     {
     /// Element if err is `Ok`.
-    uint64_t t;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
-    ERROR err;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTU64ERROR_PANIC = 2,
+    RESULTU64ERROR_NULL = 3,
     } RESULTU64ERROR;
 
 /// Result that contains value or an error.
-typedef struct RESULTUTF8STRINGERROR
+typedef enum RESULTUTF8STRINGERROR
     {
     /// Element if err is `Ok`.
-    UTF8STRING t;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
-    ERROR err;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTUTF8STRINGERROR_PANIC = 2,
+    RESULTUTF8STRINGERROR_NULL = 3,
     } RESULTUTF8STRINGERROR;
 
 typedef struct ARRAY
@@ -382,111 +406,135 @@ typedef struct OPTIONVEC
     } OPTIONVEC;
 
 /// Result that contains value or an error.
-typedef struct RESULTCONSTPTRSERVICEASYNCERROR
+typedef enum RESULTCONSTPTRSERVICEASYNCERROR
     {
     /// Element if err is `Ok`.
-    const SERVICEASYNC* t;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
-    ERROR err;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTCONSTPTRSERVICEASYNCERROR_PANIC = 2,
+    RESULTCONSTPTRSERVICEASYNCERROR_NULL = 3,
     } RESULTCONSTPTRSERVICEASYNCERROR;
 
 /// Result that contains value or an error.
-typedef struct RESULTCONSTPTRSERVICEBASICERROR
+typedef enum RESULTCONSTPTRSERVICEBASICERROR
     {
     /// Element if err is `Ok`.
-    const SERVICEBASIC* t;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
-    ERROR err;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTCONSTPTRSERVICEBASICERROR_PANIC = 2,
+    RESULTCONSTPTRSERVICEBASICERROR_NULL = 3,
     } RESULTCONSTPTRSERVICEBASICERROR;
 
 /// Result that contains value or an error.
-typedef struct RESULTCONSTPTRSERVICECALLBACKSERROR
+typedef enum RESULTCONSTPTRSERVICECALLBACKSERROR
     {
     /// Element if err is `Ok`.
-    const SERVICECALLBACKS* t;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
-    ERROR err;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTCONSTPTRSERVICECALLBACKSERROR_PANIC = 2,
+    RESULTCONSTPTRSERVICECALLBACKSERROR_NULL = 3,
     } RESULTCONSTPTRSERVICECALLBACKSERROR;
 
 /// Result that contains value or an error.
-typedef struct RESULTCONSTPTRSERVICEDEPENDENTERROR
+typedef enum RESULTCONSTPTRSERVICEDEPENDENTERROR
     {
     /// Element if err is `Ok`.
-    const SERVICEDEPENDENT* t;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
-    ERROR err;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTCONSTPTRSERVICEDEPENDENTERROR_PANIC = 2,
+    RESULTCONSTPTRSERVICEDEPENDENTERROR_NULL = 3,
     } RESULTCONSTPTRSERVICEDEPENDENTERROR;
 
 /// Result that contains value or an error.
-typedef struct RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR
+typedef enum RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR
     {
     /// Element if err is `Ok`.
-    const SERVICEIGNORINGMETHODS* t;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
-    ERROR err;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR_PANIC = 2,
+    RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR_NULL = 3,
     } RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR;
 
 /// Result that contains value or an error.
-typedef struct RESULTCONSTPTRSERVICEMAINERROR
+typedef enum RESULTCONSTPTRSERVICEMAINERROR
     {
     /// Element if err is `Ok`.
-    const SERVICEMAIN* t;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
-    ERROR err;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTCONSTPTRSERVICEMAINERROR_PANIC = 2,
+    RESULTCONSTPTRSERVICEMAINERROR_NULL = 3,
     } RESULTCONSTPTRSERVICEMAINERROR;
 
 /// Result that contains value or an error.
-typedef struct RESULTCONSTPTRSERVICEMULTIPLECTORSERROR
+typedef enum RESULTCONSTPTRSERVICEMULTIPLECTORSERROR
     {
     /// Element if err is `Ok`.
-    const SERVICEMULTIPLECTORS* t;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
-    ERROR err;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTCONSTPTRSERVICEMULTIPLECTORSERROR_PANIC = 2,
+    RESULTCONSTPTRSERVICEMULTIPLECTORSERROR_NULL = 3,
     } RESULTCONSTPTRSERVICEMULTIPLECTORSERROR;
 
 /// Result that contains value or an error.
-typedef struct RESULTCONSTPTRSERVICEONPANICERROR
+typedef enum RESULTCONSTPTRSERVICEONPANICERROR
     {
     /// Element if err is `Ok`.
-    const SERVICEONPANIC* t;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
-    ERROR err;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTCONSTPTRSERVICEONPANICERROR_PANIC = 2,
+    RESULTCONSTPTRSERVICEONPANICERROR_NULL = 3,
     } RESULTCONSTPTRSERVICEONPANICERROR;
 
 /// Result that contains value or an error.
-typedef struct RESULTCONSTPTRSERVICERESULTERROR
+typedef enum RESULTCONSTPTRSERVICERESULTERROR
     {
     /// Element if err is `Ok`.
-    const SERVICERESULT* t;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
-    ERROR err;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTCONSTPTRSERVICERESULTERROR_PANIC = 2,
+    RESULTCONSTPTRSERVICERESULTERROR_NULL = 3,
     } RESULTCONSTPTRSERVICERESULTERROR;
 
 /// Result that contains value or an error.
-typedef struct RESULTCONSTPTRSERVICESTRINGSERROR
+typedef enum RESULTCONSTPTRSERVICESTRINGSERROR
     {
     /// Element if err is `Ok`.
-    const SERVICESTRINGS* t;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
-    ERROR err;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTCONSTPTRSERVICESTRINGSERROR_PANIC = 2,
+    RESULTCONSTPTRSERVICESTRINGSERROR_NULL = 3,
     } RESULTCONSTPTRSERVICESTRINGSERROR;
 
 /// Result that contains value or an error.
-typedef struct RESULTCONSTPTRSERVICEVARIOUSSLICESERROR
+typedef enum RESULTCONSTPTRSERVICEVARIOUSSLICESERROR
     {
     /// Element if err is `Ok`.
-    const SERVICEVARIOUSSLICES* t;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
-    ERROR err;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTCONSTPTRSERVICEVARIOUSSLICESERROR_PANIC = 2,
+    RESULTCONSTPTRSERVICEVARIOUSSLICESERROR_NULL = 3,
     } RESULTCONSTPTRSERVICEVARIOUSSLICESERROR;
 
 /// Result that contains value or an error.
-typedef struct RESULTUSESTRINGERROR
+typedef enum RESULTUSESTRINGERROR
     {
     /// Element if err is `Ok`.
-    USESTRING t;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
-    ERROR err;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTUSESTRINGERROR_PANIC = 2,
+    RESULTUSESTRINGERROR_NULL = 3,
     } RESULTUSESTRINGERROR;
 
 typedef uint8_t (*CALLBACKFFISLICE)(SLICEU8 SLICE, const void* CALLBACK_DATA);
@@ -511,11 +559,9 @@ typedef void (*SUMDELEGATE1)(const void* CALLBACK_DATA);
 
 typedef int32_t (*SUMDELEGATE2)(int32_t X, int32_t Y, const void* CALLBACK_DATA);
 
-typedef ERROR (*SUMDELEGATERETURN)(int32_t X, int32_t Y, const void* CALLBACK_DATA);
+typedef RESULTERROR (*SUMDELEGATERETURN)(int32_t X, int32_t Y, const void* CALLBACK_DATA);
 
 typedef void (*SUMDELEGATERETURN2)(int32_t X, int32_t Y, const void* CALLBACK_DATA);
-
-typedef void (*fptr_fn_ConstPtrError_ConstPtr)(const ERROR* x0, const void* x1);
 
 typedef struct CALLBACKTABLE
     {
@@ -548,6 +594,8 @@ typedef struct NESTEDARRAY
 
 typedef VEC3F32 (*CALLBACKHUGEVECSLICE)(SLICEVEC3F32 SLICE, const void* CALLBACK_DATA);
 
+typedef void (*fptr_fn_ConstPtrResultError_ConstPtr)(const RESULTERROR* x0, const void* x1);
+
 typedef void (*fptr_fn_ConstPtrResultU64Error_ConstPtr)(const RESULTU64ERROR* x0, const void* x1);
 
 typedef void (*fptr_fn_ConstPtrResultUtf8StringError_ConstPtr)(const RESULTUTF8STRINGERROR* x0, const void* x1);
@@ -564,12 +612,14 @@ typedef struct SLICEMUTCHARARRAY
     } SLICEMUTCHARARRAY;
 
 /// Result that contains value or an error.
-typedef struct RESULTNESTEDARRAYERROR
+typedef enum RESULTNESTEDARRAYERROR
     {
     /// Element if err is `Ok`.
-    NESTEDARRAY t;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
-    ERROR err;
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTNESTEDARRAYERROR_PANIC = 2,
+    RESULTNESTEDARRAYERROR_NULL = 3,
     } RESULTNESTEDARRAYERROR;
 
 typedef void (*CALLBACKCHARARRAY2)(CHARARRAY VALUE, const void* CALLBACK_DATA);
@@ -606,6 +656,12 @@ typedef uint8_t (*nested_array_3)(NESTEDARRAY);
 typedef void (*behavior_sleep)(uint64_t);
 
 typedef void (*behavior_panics)();
+
+typedef void (*enums_1)(ENUMPAYLOAD);
+
+typedef ENUMPAYLOAD (*enums_2)(ENUMPAYLOAD);
+
+typedef const ENUMPAYLOAD* (*enums_3)(ENUMPAYLOAD*);
 
 typedef uint8_t (*fnptr_1)(fptr_fn_u8_rval_u8, uint8_t);
 
@@ -695,7 +751,7 @@ typedef bool (*ref4)(int64_t*);
 
 typedef TUPLED (*struct1)(TUPLED);
 
-typedef ERROR (*struct2)(VEC3F32, const TUPLED*);
+typedef RESULTERROR (*struct2)(VEC3F32, const TUPLED*);
 
 typedef bool (*struct3)(BOOLFIELD);
 
@@ -721,9 +777,9 @@ typedef USESTRING (*pattern_string_4)(USESTRING);
 
 typedef RESULTUSESTRINGERROR (*pattern_string_5)(USESTRING);
 
-typedef ERROR (*pattern_string_6a)(const USESTRING*);
+typedef RESULTERROR (*pattern_string_6a)(const USESTRING*);
 
-typedef ERROR (*pattern_string_6b)(USESTRING*);
+typedef RESULTERROR (*pattern_string_6b)(USESTRING*);
 
 typedef RESULTUTF8STRINGERROR (*pattern_string_7)(SLICEUTF8STRING, uint64_t);
 
@@ -766,9 +822,9 @@ typedef char* (*pattern_ffi_cchar_mut_pointer)(char*);
 
 typedef RESULTU32ERROR (*pattern_result_1)(RESULTU32ERROR);
 
-typedef ERROR (*pattern_result_2)();
+typedef RESULTERROR (*pattern_result_2)();
 
-typedef ERROR (*pattern_result_3)(ERROR);
+typedef RESULTERROR (*pattern_result_3)(RESULTERROR);
 
 typedef uint64_t (*pattern_api_guard)();
 
@@ -798,17 +854,17 @@ typedef RESULTCONSTPTRSERVICEASYNCERROR (*service_async_destroy)(const SERVICEAS
 
 typedef RESULTCONSTPTRSERVICEASYNCERROR (*service_async_new)();
 
-typedef ERROR (*service_async_return_after_ms)(const SERVICEASYNC*, uint64_t, uint64_t, fptr_fn_ConstPtrResultU64Error_ConstPtr);
+typedef RESULTERROR (*service_async_return_after_ms)(const SERVICEASYNC*, uint64_t, uint64_t, fptr_fn_ConstPtrResultU64Error_ConstPtr);
 
-typedef ERROR (*service_async_process_struct)(const SERVICEASYNC*, NESTEDARRAY, fptr_fn_ConstPtrResultNestedArrayError_ConstPtr);
+typedef RESULTERROR (*service_async_process_struct)(const SERVICEASYNC*, NESTEDARRAY, fptr_fn_ConstPtrResultNestedArrayError_ConstPtr);
 
-typedef ERROR (*service_async_handle_string)(const SERVICEASYNC*, UTF8STRING, fptr_fn_ConstPtrResultUtf8StringError_ConstPtr);
+typedef RESULTERROR (*service_async_handle_string)(const SERVICEASYNC*, UTF8STRING, fptr_fn_ConstPtrResultUtf8StringError_ConstPtr);
 
-typedef ERROR (*service_async_handle_nested_string)(const SERVICEASYNC*, UTF8STRING, fptr_fn_ConstPtrResultUseStringError_ConstPtr);
+typedef RESULTERROR (*service_async_handle_nested_string)(const SERVICEASYNC*, UTF8STRING, fptr_fn_ConstPtrResultUseStringError_ConstPtr);
 
 typedef void (*service_async_callback_string)(const SERVICEASYNC*, UTF8STRING, STRINGCALLBACK);
 
-typedef ERROR (*service_async_fail)(const SERVICEASYNC*, fptr_fn_ConstPtrError_ConstPtr);
+typedef RESULTERROR (*service_async_fail)(const SERVICEASYNC*, fptr_fn_ConstPtrResultError_ConstPtr);
 
 typedef void (*service_async_bad)(SERVICEASYNC*);
 
@@ -854,7 +910,7 @@ typedef RESULTCONSTPTRSERVICERESULTERROR (*service_result_destroy)(SERVICERESULT
 
 typedef RESULTCONSTPTRSERVICERESULTERROR (*service_result_new)();
 
-typedef ERROR (*service_result_test)(const SERVICERESULT*);
+typedef RESULTERROR (*service_result_test)(const SERVICERESULT*);
 
 ///  Destroys the given instance.
 /// 
@@ -868,7 +924,7 @@ typedef RESULTCONSTPTRSERVICEONPANICERROR (*service_on_panic_new)();
 
 ///  Methods returning a Result<(), _> are the default and do not
 ///  need annotations.
-typedef ERROR (*service_on_panic_return_result)(const SERVICEONPANIC*, uint32_t);
+typedef RESULTERROR (*service_on_panic_return_result)(const SERVICEONPANIC*, uint32_t);
 
 ///  Methods returning a value need an `on_panic` annotation.
 typedef uint32_t (*service_on_panic_return_default_value)(const SERVICEONPANIC*, uint32_t);
@@ -887,15 +943,15 @@ typedef RESULTCONSTPTRSERVICECALLBACKSERROR (*service_callbacks_destroy)(SERVICE
 
 typedef RESULTCONSTPTRSERVICECALLBACKSERROR (*service_callbacks_new)();
 
-typedef ERROR (*service_callbacks_callback_simple)(SERVICECALLBACKS*, MYCALLBACK);
+typedef RESULTERROR (*service_callbacks_callback_simple)(SERVICECALLBACKS*, MYCALLBACK);
 
-typedef ERROR (*service_callbacks_callback_ffi_return)(SERVICECALLBACKS*, SUMDELEGATERETURN);
+typedef RESULTERROR (*service_callbacks_callback_ffi_return)(SERVICECALLBACKS*, SUMDELEGATERETURN);
 
-typedef ERROR (*service_callbacks_callback_with_slice)(SERVICECALLBACKS*, SUMDELEGATERETURN, SLICEI32);
+typedef RESULTERROR (*service_callbacks_callback_with_slice)(SERVICECALLBACKS*, SUMDELEGATERETURN, SLICEI32);
 
 typedef void (*service_callbacks_set_delegate_table)(SERVICECALLBACKS*, CALLBACKTABLE);
 
-typedef ERROR (*service_callbacks_invoke_delegates)(const SERVICECALLBACKS*);
+typedef RESULTERROR (*service_callbacks_invoke_delegates)(const SERVICECALLBACKS*);
 
 ///  Destroys the given instance.
 /// 
@@ -944,9 +1000,9 @@ typedef uint8_t (*service_various_slices_mut_self_ref_slice)(SERVICEVARIOUSSLICE
 
 typedef uint8_t (*service_various_slices_mut_self_ref_slice_limited)(SERVICEVARIOUSSLICES*, const uint8_t*, uint8_t*, SLICEU8, SLICEU8);
 
-typedef ERROR (*service_various_slices_mut_self_ffi_error)(SERVICEVARIOUSSLICES*, SLICEMUTU8);
+typedef RESULTERROR (*service_various_slices_mut_self_ffi_error)(SERVICEVARIOUSSLICES*, SLICEMUTU8);
 
-typedef ERROR (*service_various_slices_mut_self_no_error)(SERVICEVARIOUSSLICES*, SLICEMUTU8);
+typedef RESULTERROR (*service_various_slices_mut_self_no_error)(SERVICEVARIOUSSLICES*, SLICEMUTU8);
 
 ///  Warning, you _must_ discard the returned slice object before calling into this service
 ///  again, as otherwise undefined behavior might happen.

@@ -22,9 +22,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 14212958184566934813ul)
+            if (api_version != 1942093112364030349ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (14212958184566934813). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (1942093112364030349). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -104,7 +104,15 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "enums_1")]
-        public static partial void enums_1(EnumPayload x);
+        public static partial void enums_1(EnumPayload ignored);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "enums_2")]
+        public static partial EnumPayload enums_2(EnumPayload x);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "enums_3")]
+        public static partial IntPtr enums_3(ref EnumPayload x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "fnptr_1")]
@@ -313,7 +321,7 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "struct2")]
-        public static partial ResultError.Unmanaged struct2(Vec3f32 a, ref Tupled b);
+        public static partial ResultError struct2(Vec3f32 a, ref Tupled b);
 
 
         [LibraryImport(NativeLib, EntryPoint = "struct3")]
@@ -386,21 +394,21 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_5")]
-        public static partial ResultUseStringError.Unmanaged pattern_string_5(UseString x);
+        public static partial ResultUseStringError pattern_string_5(UseString x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_6a")]
-        public static partial ResultError.Unmanaged pattern_string_6a(ref UseString ignored);
+        public static partial ResultError pattern_string_6a(ref UseString ignored);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_6b")]
-        public static partial ResultError.Unmanaged pattern_string_6b(ref UseString y);
+        public static partial ResultError pattern_string_6b(ref UseString y);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_7")]
-        public static partial ResultUtf8StringError.Unmanaged pattern_string_7(SliceUtf8String x, ulong i);
+        public static partial ResultUtf8StringError pattern_string_7(SliceUtf8String x, ulong i);
 
-        public static unsafe ResultUtf8StringError.Unmanaged pattern_string_7(string[] x, ulong i)
+        public static unsafe ResultUtf8StringError pattern_string_7(string[] x, ulong i)
         {
             var x_wrapped = new SliceUtf8String(x);
             try
@@ -414,9 +422,9 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_8")]
-        public static partial ResultUseStringError.Unmanaged pattern_string_8(SliceUseString x, ulong i);
+        public static partial ResultUseStringError pattern_string_8(SliceUseString x, ulong i);
 
-        public static unsafe ResultUseStringError.Unmanaged pattern_string_8(UseString[] x, ulong i)
+        public static unsafe ResultUseStringError pattern_string_8(UseString[] x, ulong i)
         {
             var x_wrapped = new SliceUseString(x);
             try
@@ -430,7 +438,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_9")]
-        public static partial ResultUtf8StringError.Unmanaged pattern_string_9();
+        public static partial ResultUtf8StringError pattern_string_9();
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1")]
@@ -650,15 +658,15 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_result_1")]
-        public static partial ResultU32Error.Unmanaged pattern_result_1(ResultU32Error x);
+        public static partial ResultU32Error pattern_result_1(ResultU32Error x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_result_2")]
-        public static partial ResultError.Unmanaged pattern_result_2();
+        public static partial ResultError pattern_result_2();
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_result_3")]
-        public static partial ResultError.Unmanaged pattern_result_3(ResultError x);
+        public static partial ResultError pattern_result_3(ResultError x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_api_guard")]
@@ -770,15 +778,15 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_async_destroy")]
-        public static partial ResultConstPtrServiceAsyncError.Unmanaged service_async_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceAsyncError service_async_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_new")]
-        public static partial ResultConstPtrServiceAsyncError.Unmanaged service_async_new();
+        public static partial ResultConstPtrServiceAsyncError service_async_new();
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_return_after_ms")]
-        public static partial ResultError.Unmanaged service_async_return_after_ms(IntPtr _context, ulong x, ulong ms, AsyncHelper _async_callback);
+        public static partial ResultError service_async_return_after_ms(IntPtr _context, ulong x, ulong ms, AsyncHelper _async_callback);
 
         public static unsafe Task<ulong> service_async_return_after_ms(IntPtr _context, ulong x, ulong ms)
         {
@@ -788,14 +796,14 @@ namespace My.Company
                 var unmanaged = Marshal.PtrToStructure<ResultU64Error.Unmanaged>(x);
                 var marshaller = new ResultU64Error.Marshaller(unmanaged);
                 var managed = marshaller.ToManaged();
-                if (managed.IsOk()) { cs.SetResult(managed.Ok()); }
-                else { cs.SetException(new InteropException<ResultU64Error>(managed.Err())); }
+                if (managed.IsOk) { cs.SetResult(managed.AsOk()); }
+                else { cs.SetException(new InteropException()); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
             try
             {
-                service_async_return_after_ms(_context, x, ms, cb).Ok();
+                service_async_return_after_ms(_context, x, ms, cb).AsOk();
                 return cs.Task;
             }
             finally
@@ -805,7 +813,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_process_struct")]
-        public static partial ResultError.Unmanaged service_async_process_struct(IntPtr _context, NestedArray x, AsyncHelper _async_callback);
+        public static partial ResultError service_async_process_struct(IntPtr _context, NestedArray x, AsyncHelper _async_callback);
 
         public static unsafe Task<NestedArray> service_async_process_struct(IntPtr _context, NestedArray x)
         {
@@ -815,14 +823,14 @@ namespace My.Company
                 var unmanaged = Marshal.PtrToStructure<ResultNestedArrayError.Unmanaged>(x);
                 var marshaller = new ResultNestedArrayError.Marshaller(unmanaged);
                 var managed = marshaller.ToManaged();
-                if (managed.IsOk()) { cs.SetResult(managed.Ok()); }
-                else { cs.SetException(new InteropException<ResultNestedArrayError>(managed.Err())); }
+                if (managed.IsOk) { cs.SetResult(managed.AsOk()); }
+                else { cs.SetException(new InteropException()); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
             try
             {
-                service_async_process_struct(_context, x, cb).Ok();
+                service_async_process_struct(_context, x, cb).AsOk();
                 return cs.Task;
             }
             finally
@@ -832,7 +840,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_handle_string")]
-        public static partial ResultError.Unmanaged service_async_handle_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
+        public static partial ResultError service_async_handle_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
 
         public static unsafe Task<string> service_async_handle_string(IntPtr _context, string s)
         {
@@ -842,15 +850,15 @@ namespace My.Company
                 var unmanaged = Marshal.PtrToStructure<ResultUtf8StringError.Unmanaged>(x);
                 var marshaller = new ResultUtf8StringError.Marshaller(unmanaged);
                 var managed = marshaller.ToManaged();
-                if (managed.IsOk()) { cs.SetResult(managed.Ok()); }
-                else { cs.SetException(new InteropException<ResultUtf8StringError>(managed.Err())); }
+                if (managed.IsOk) { cs.SetResult(managed.AsOk()); }
+                else { cs.SetException(new InteropException()); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
             var s_wrapped = new Utf8String(s);
             try
             {
-                service_async_handle_string(_context, s_wrapped, cb).Ok();
+                service_async_handle_string(_context, s_wrapped, cb).AsOk();
                 return cs.Task;
             }
             finally
@@ -861,7 +869,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_handle_nested_string")]
-        public static partial ResultError.Unmanaged service_async_handle_nested_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
+        public static partial ResultError service_async_handle_nested_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
 
         public static unsafe Task<UseString> service_async_handle_nested_string(IntPtr _context, string s)
         {
@@ -871,15 +879,15 @@ namespace My.Company
                 var unmanaged = Marshal.PtrToStructure<ResultUseStringError.Unmanaged>(x);
                 var marshaller = new ResultUseStringError.Marshaller(unmanaged);
                 var managed = marshaller.ToManaged();
-                if (managed.IsOk()) { cs.SetResult(managed.Ok()); }
-                else { cs.SetException(new InteropException<ResultUseStringError>(managed.Err())); }
+                if (managed.IsOk) { cs.SetResult(managed.AsOk()); }
+                else { cs.SetException(new InteropException()); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
             var s_wrapped = new Utf8String(s);
             try
             {
-                service_async_handle_nested_string(_context, s_wrapped, cb).Ok();
+                service_async_handle_nested_string(_context, s_wrapped, cb).AsOk();
                 return cs.Task;
             }
             finally
@@ -908,24 +916,24 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_fail")]
-        public static partial ResultError.Unmanaged service_async_fail(IntPtr _context, AsyncHelper _async_callback);
+        public static partial ResultError service_async_fail(IntPtr _context, AsyncHelper _async_callback);
 
-        public static unsafe Task<void> service_async_fail(IntPtr _context)
+        public static unsafe Task service_async_fail(IntPtr _context)
         {
-            var cs = new TaskCompletionSource<void>();
+            var cs = new TaskCompletionSource();
             GCHandle pinned = default;
             var cb = new AsyncHelper((x) => {
                 var unmanaged = Marshal.PtrToStructure<ResultError.Unmanaged>(x);
                 var marshaller = new ResultError.Marshaller(unmanaged);
                 var managed = marshaller.ToManaged();
-                if (managed.IsOk()) { cs.SetResult(managed.Ok()); }
-                else { cs.SetException(new InteropException<ResultError>(managed.Err())); }
+                if (managed.IsOk) { cs.SetResult(); }
+                else { cs.SetException(new InteropException()); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
             try
             {
-                service_async_fail(_context, cb).Ok();
+                service_async_fail(_context, cb).AsOk();
                 return cs.Task;
             }
             finally
@@ -945,11 +953,11 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_basic_destroy")]
-        public static partial ResultConstPtrServiceBasicError.Unmanaged service_basic_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceBasicError service_basic_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_basic_new")]
-        public static partial ResultConstPtrServiceBasicError.Unmanaged service_basic_new();
+        public static partial ResultConstPtrServiceBasicError service_basic_new();
 
 
         /// Destroys the given instance.
@@ -959,11 +967,11 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_main_destroy")]
-        public static partial ResultConstPtrServiceMainError.Unmanaged service_main_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceMainError service_main_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_main_new")]
-        public static partial ResultConstPtrServiceMainError.Unmanaged service_main_new(uint value);
+        public static partial ResultConstPtrServiceMainError service_main_new(uint value);
 
 
         /// Destroys the given instance.
@@ -973,11 +981,11 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_dependent_destroy")]
-        public static partial ResultConstPtrServiceDependentError.Unmanaged service_dependent_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceDependentError service_dependent_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_dependent_from_main")]
-        public static partial ResultConstPtrServiceDependentError.Unmanaged service_dependent_from_main(IntPtr main);
+        public static partial ResultConstPtrServiceDependentError service_dependent_from_main(IntPtr main);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_dependent_get")]
@@ -991,15 +999,15 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_result_destroy")]
-        public static partial ResultConstPtrServiceResultError.Unmanaged service_result_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceResultError service_result_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_result_new")]
-        public static partial ResultConstPtrServiceResultError.Unmanaged service_result_new();
+        public static partial ResultConstPtrServiceResultError service_result_new();
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_result_test")]
-        public static partial ResultError.Unmanaged service_result_test(IntPtr _context);
+        public static partial ResultError service_result_test(IntPtr _context);
 
 
         /// Destroys the given instance.
@@ -1009,17 +1017,17 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_destroy")]
-        public static partial ResultConstPtrServiceOnPanicError.Unmanaged service_on_panic_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceOnPanicError service_on_panic_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_new")]
-        public static partial ResultConstPtrServiceOnPanicError.Unmanaged service_on_panic_new();
+        public static partial ResultConstPtrServiceOnPanicError service_on_panic_new();
 
 
         /// Methods returning a Result<(), _> are the default and do not
         /// need annotations.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_result")]
-        public static partial ResultError.Unmanaged service_on_panic_return_result(IntPtr _context, uint anon1);
+        public static partial ResultError service_on_panic_return_result(IntPtr _context, uint anon1);
 
 
         /// Methods returning a value need an `on_panic` annotation.
@@ -1040,17 +1048,17 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_destroy")]
-        public static partial ResultConstPtrServiceCallbacksError.Unmanaged service_callbacks_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceCallbacksError service_callbacks_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_new")]
-        public static partial ResultConstPtrServiceCallbacksError.Unmanaged service_callbacks_new();
+        public static partial ResultConstPtrServiceCallbacksError service_callbacks_new();
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_simple")]
-        public static partial ResultError.Unmanaged service_callbacks_callback_simple(IntPtr _context, MyCallback callback);
+        public static partial ResultError service_callbacks_callback_simple(IntPtr _context, MyCallback callback);
 
-        public static unsafe ResultError.Unmanaged service_callbacks_callback_simple(IntPtr _context, MyCallbackDelegate callback)
+        public static unsafe ResultError service_callbacks_callback_simple(IntPtr _context, MyCallbackDelegate callback)
         {
             var callback_wrapped = new MyCallback(callback);
             try
@@ -1064,9 +1072,9 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_ffi_return")]
-        public static partial ResultError.Unmanaged service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturn callback);
+        public static partial ResultError service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturn callback);
 
-        public static unsafe ResultError.Unmanaged service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturnDelegate callback)
+        public static unsafe ResultError service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturnDelegate callback)
         {
             var callback_wrapped = new SumDelegateReturn(callback);
             try
@@ -1080,9 +1088,9 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_with_slice")]
-        public static partial ResultError.Unmanaged service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturn callback, SliceI32 input);
+        public static partial ResultError service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturn callback, SliceI32 input);
 
-        public static unsafe ResultError.Unmanaged service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
+        public static unsafe ResultError service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
         {
             fixed (void* ptr_input = input)
             {
@@ -1104,7 +1112,7 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_invoke_delegates")]
-        public static partial ResultError.Unmanaged service_callbacks_invoke_delegates(IntPtr _context);
+        public static partial ResultError service_callbacks_invoke_delegates(IntPtr _context);
 
 
         /// Destroys the given instance.
@@ -1114,11 +1122,11 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_destroy")]
-        public static partial ResultConstPtrServiceIgnoringMethodsError.Unmanaged service_ignoring_methods_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceIgnoringMethodsError service_ignoring_methods_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_new")]
-        public static partial ResultConstPtrServiceIgnoringMethodsError.Unmanaged service_ignoring_methods_new();
+        public static partial ResultConstPtrServiceIgnoringMethodsError service_ignoring_methods_new();
 
 
         /// Destroys the given instance.
@@ -1128,23 +1136,23 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_destroy")]
-        public static partial ResultConstPtrServiceMultipleCtorsError.Unmanaged service_multiple_ctors_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with")]
-        public static partial ResultConstPtrServiceMultipleCtorsError.Unmanaged service_multiple_ctors_new_with(uint some_value);
+        public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_new_with(uint some_value);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_without")]
-        public static partial ResultConstPtrServiceMultipleCtorsError.Unmanaged service_multiple_ctors_new_without();
+        public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_new_without();
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with_string")]
-        public static partial ResultConstPtrServiceMultipleCtorsError.Unmanaged service_multiple_ctors_new_with_string([MarshalAs(UnmanagedType.LPStr)] string anon0);
+        public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_new_with_string([MarshalAs(UnmanagedType.LPStr)] string anon0);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_failing")]
-        public static partial ResultConstPtrServiceMultipleCtorsError.Unmanaged service_multiple_ctors_new_failing(byte some_value);
+        public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_new_failing(byte some_value);
 
 
         /// Destroys the given instance.
@@ -1154,11 +1162,11 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_destroy")]
-        public static partial ResultConstPtrServiceVariousSlicesError.Unmanaged service_various_slices_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceVariousSlicesError service_various_slices_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_new")]
-        public static partial ResultConstPtrServiceVariousSlicesError.Unmanaged service_various_slices_new();
+        public static partial ResultConstPtrServiceVariousSlicesError service_various_slices_new();
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self")]
@@ -1244,9 +1252,9 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ffi_error")]
-        public static partial ResultError.Unmanaged service_various_slices_mut_self_ffi_error(IntPtr _context, SliceMutU8 slice);
+        public static partial ResultError service_various_slices_mut_self_ffi_error(IntPtr _context, SliceMutU8 slice);
 
-        public static unsafe ResultError.Unmanaged service_various_slices_mut_self_ffi_error(IntPtr _context, Span<byte> slice)
+        public static unsafe ResultError service_various_slices_mut_self_ffi_error(IntPtr _context, Span<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
@@ -1262,9 +1270,9 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_no_error")]
-        public static partial ResultError.Unmanaged service_various_slices_mut_self_no_error(IntPtr _context, SliceMutU8 slice);
+        public static partial ResultError service_various_slices_mut_self_no_error(IntPtr _context, SliceMutU8 slice);
 
-        public static unsafe ResultError.Unmanaged service_various_slices_mut_self_no_error(IntPtr _context, Span<byte> slice)
+        public static unsafe ResultError service_various_slices_mut_self_no_error(IntPtr _context, Span<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
@@ -1298,11 +1306,11 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_strings_destroy")]
-        public static partial ResultConstPtrServiceStringsError.Unmanaged service_strings_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceStringsError service_strings_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_new")]
-        public static partial ResultConstPtrServiceStringsError.Unmanaged service_strings_new();
+        public static partial ResultConstPtrServiceStringsError service_strings_new();
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_pass_cstr")]
@@ -1339,14 +1347,31 @@ namespace My.Company
         uint _variant;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct EnumDocumented
     {
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
+            public EnumDocumented ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(EnumDocumented), MarshalMode.Default, typeof(Marshaller))]
@@ -1360,9 +1385,9 @@ namespace My.Company
         public bool IsB => _variant == 1;
         public bool IsC => _variant == 2;
 
-        public void AsA() { if (_variant != 0) throw new InteropException<string>(string.Empty); }
-        public void AsB() { if (_variant != 1) throw new InteropException<string>(string.Empty); }
-        public void AsC() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
+        public void AsA() { if (_variant != 0) throw new InteropException(); }
+        public void AsB() { if (_variant != 1) throw new InteropException(); }
+        public void AsC() { if (_variant != 2) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -1399,20 +1424,49 @@ namespace My.Company
         uint _C;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct EnumPayload
     {
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedB
+        {
+            internal uint _variant;
+            internal Vec3f32.Unmanaged _B;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedC
+        {
+            internal uint _variant;
+            internal uint _C;
+        }
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal Vec3f32.Unmanaged B;
+            [FieldOffset(0)]
+            internal UnmanagedB _B;
 
-            [FieldOffset(2)]
-            internal uint C;
+            [FieldOffset(0)]
+            internal UnmanagedC _C;
 
+            public EnumPayload ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(EnumPayload), MarshalMode.Default, typeof(Marshaller))]
@@ -1426,9 +1480,9 @@ namespace My.Company
         public bool IsB => _variant == 1;
         public bool IsC => _variant == 2;
 
-        public void AsA() { if (_variant != 0) throw new InteropException<string>(string.Empty); }
-        public Vec3f32 AsB() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _B; } }
-        public uint AsC() { if (_variant != 2) { throw new InteropException<string>(string.Empty); } else { return _C; } }
+        public void AsA() { if (_variant != 0) throw new InteropException(); }
+        public Vec3f32 AsB() { if (_variant != 1) { throw new InteropException(); } else { return _B; } }
+        public uint AsC() { if (_variant != 2) { throw new InteropException(); } else { return _C; } }
 
         public ref struct Marshaller
         {
@@ -1445,6 +1499,8 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 1) _unmanaged._B._B = _managed._B.ToUnmanaged();
+                if (_unmanaged._variant == 2) _unmanaged._C._C = _managed._C;
                 return _unmanaged;
             }
 
@@ -1452,6 +1508,8 @@ namespace My.Company
             {
                 _managed = new EnumPayload();
                 _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 1) _managed._B = _unmanaged._B._B.ToManaged();
+                if (_managed._variant == 2) _managed._C = _unmanaged._C._C;
                 return _managed;
             }
             public void Free() { }
@@ -1463,14 +1521,29 @@ namespace My.Company
         uint _variant;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct EnumRenamed
     {
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
+            public EnumRenamed ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(EnumRenamed), MarshalMode.Default, typeof(Marshaller))]
@@ -1480,7 +1553,7 @@ namespace My.Company
 
         public bool IsX => _variant == 0;
 
-        public void AsX() { if (_variant != 0) throw new InteropException<string>(string.Empty); }
+        public void AsX() { if (_variant != 0) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -1515,14 +1588,33 @@ namespace My.Company
         uint _variant;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Error
     {
+
+
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
+            public Error ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(Error), MarshalMode.Default, typeof(Marshaller))]
@@ -1540,11 +1632,11 @@ namespace My.Company
         public bool IsDelegate => _variant == 300;
         public bool IsFail => _variant == 400;
 
-        public void AsOk() { if (_variant != 0) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 100) throw new InteropException<string>(string.Empty); }
-        public void AsPanic() { if (_variant != 200) throw new InteropException<string>(string.Empty); }
-        public void AsDelegate() { if (_variant != 300) throw new InteropException<string>(string.Empty); }
-        public void AsFail() { if (_variant != 400) throw new InteropException<string>(string.Empty); }
+        public void AsOk() { if (_variant != 0) throw new InteropException(); }
+        public void AsNull() { if (_variant != 100) throw new InteropException(); }
+        public void AsPanic() { if (_variant != 200) throw new InteropException(); }
+        public void AsDelegate() { if (_variant != 300) throw new InteropException(); }
+        public void AsFail() { if (_variant != 400) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -5141,20 +5233,50 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceAsyncError
     {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
+            public ResultConstPtrServiceAsyncError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceAsyncError), MarshalMode.Default, typeof(Marshaller))]
@@ -5170,10 +5292,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -5190,6 +5312,8 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5197,6 +5321,8 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceAsyncError();
                 _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5211,20 +5337,50 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceBasicError
     {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
+            public ResultConstPtrServiceBasicError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceBasicError), MarshalMode.Default, typeof(Marshaller))]
@@ -5240,10 +5396,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -5260,6 +5416,8 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5267,6 +5425,8 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceBasicError();
                 _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5281,20 +5441,50 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceCallbacksError
     {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
+            public ResultConstPtrServiceCallbacksError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceCallbacksError), MarshalMode.Default, typeof(Marshaller))]
@@ -5310,10 +5500,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -5330,6 +5520,8 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5337,6 +5529,8 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceCallbacksError();
                 _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5351,20 +5545,50 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceDependentError
     {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
+            public ResultConstPtrServiceDependentError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceDependentError), MarshalMode.Default, typeof(Marshaller))]
@@ -5380,10 +5604,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -5400,6 +5624,8 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5407,6 +5633,8 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceDependentError();
                 _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5421,20 +5649,50 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceIgnoringMethodsError
     {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
+            public ResultConstPtrServiceIgnoringMethodsError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceIgnoringMethodsError), MarshalMode.Default, typeof(Marshaller))]
@@ -5450,10 +5708,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -5470,6 +5728,8 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5477,6 +5737,8 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceIgnoringMethodsError();
                 _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5491,20 +5753,50 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceMainError
     {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
+            public ResultConstPtrServiceMainError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceMainError), MarshalMode.Default, typeof(Marshaller))]
@@ -5520,10 +5812,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -5540,6 +5832,8 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5547,6 +5841,8 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceMainError();
                 _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5561,20 +5857,50 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceMultipleCtorsError
     {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
+            public ResultConstPtrServiceMultipleCtorsError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceMultipleCtorsError), MarshalMode.Default, typeof(Marshaller))]
@@ -5590,10 +5916,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -5610,6 +5936,8 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5617,6 +5945,8 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceMultipleCtorsError();
                 _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5631,20 +5961,50 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceOnPanicError
     {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
+            public ResultConstPtrServiceOnPanicError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceOnPanicError), MarshalMode.Default, typeof(Marshaller))]
@@ -5660,10 +6020,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -5680,6 +6040,8 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5687,6 +6049,8 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceOnPanicError();
                 _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5701,20 +6065,50 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceResultError
     {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
+            public ResultConstPtrServiceResultError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceResultError), MarshalMode.Default, typeof(Marshaller))]
@@ -5730,10 +6124,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -5750,6 +6144,8 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5757,6 +6153,8 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceResultError();
                 _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5771,20 +6169,50 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceStringsError
     {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
+            public ResultConstPtrServiceStringsError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceStringsError), MarshalMode.Default, typeof(Marshaller))]
@@ -5800,10 +6228,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -5820,6 +6248,8 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5827,6 +6257,8 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceStringsError();
                 _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5841,20 +6273,50 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceVariousSlicesError
     {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal IntPtr Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
+            public ResultConstPtrServiceVariousSlicesError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceVariousSlicesError), MarshalMode.Default, typeof(Marshaller))]
@@ -5870,10 +6332,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -5890,6 +6352,8 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5897,6 +6361,8 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrServiceVariousSlicesError();
                 _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5910,17 +6376,41 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultError
     {
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
+            public ResultError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultError), MarshalMode.Default, typeof(Marshaller))]
@@ -5936,10 +6426,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public void AsOk() { if (_variant != 0) throw new InteropException<string>(string.Empty); }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public void AsOk() { if (_variant != 0) throw new InteropException(); }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -5956,6 +6446,7 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -5963,6 +6454,7 @@ namespace My.Company
             {
                 _managed = new ResultError();
                 _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5977,20 +6469,50 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultNestedArrayError
     {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal NestedArray.Unmanaged _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal NestedArray.Unmanaged Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
+            public ResultNestedArrayError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultNestedArrayError), MarshalMode.Default, typeof(Marshaller))]
@@ -6006,10 +6528,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public NestedArray AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public NestedArray AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -6026,6 +6548,8 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok.ToUnmanaged();
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -6033,6 +6557,8 @@ namespace My.Company
             {
                 _managed = new ResultNestedArrayError();
                 _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok.ToManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -6047,20 +6573,50 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultU32Error
     {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal uint _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal uint Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
+            public ResultU32Error ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultU32Error), MarshalMode.Default, typeof(Marshaller))]
@@ -6076,10 +6632,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public uint AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public uint AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -6096,6 +6652,8 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -6103,6 +6661,8 @@ namespace My.Company
             {
                 _managed = new ResultU32Error();
                 _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -6117,20 +6677,50 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultU64Error
     {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal ulong _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal ulong Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
+            public ResultU64Error ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultU64Error), MarshalMode.Default, typeof(Marshaller))]
@@ -6146,10 +6736,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public ulong AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public ulong AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -6166,6 +6756,8 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -6173,6 +6765,8 @@ namespace My.Company
             {
                 _managed = new ResultU64Error();
                 _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -6187,20 +6781,50 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultUseStringError
     {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal UseString.Unmanaged _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal UseString.Unmanaged Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
+            public ResultUseStringError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultUseStringError), MarshalMode.Default, typeof(Marshaller))]
@@ -6216,10 +6840,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public UseString AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public UseString AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -6236,6 +6860,8 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok.ToUnmanaged();
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -6243,6 +6869,8 @@ namespace My.Company
             {
                 _managed = new ResultUseStringError();
                 _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok.ToManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -6257,20 +6885,50 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultUtf8StringError
     {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal Utf8String.Unmanaged _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(2)]
-            internal Utf8String.Unmanaged Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(2)]
-            internal Error.Unmanaged Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
+            public ResultUtf8StringError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultUtf8StringError), MarshalMode.Default, typeof(Marshaller))]
@@ -6286,10 +6944,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public string AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public string AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -6306,6 +6964,8 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = new Utf8String(_managed._Ok).ToUnmanaged();
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -6313,6 +6973,8 @@ namespace My.Company
             {
                 _managed = new ResultUtf8StringError();
                 _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok.ToManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -7613,8 +8275,8 @@ namespace My.Company
 
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate Error SumDelegateReturnNative(int x, int y, IntPtr callback_data); // 'True' native callback signature
-    public delegate Error SumDelegateReturnDelegate(int x, int y); // Our C# signature
+    public delegate ResultError.Unmanaged SumDelegateReturnNative(int x, int y, IntPtr callback_data); // 'True' native callback signature
+    public delegate ResultError SumDelegateReturnDelegate(int x, int y); // Our C# signature
 
     public partial class SumDelegateReturn
     {
@@ -7638,7 +8300,7 @@ namespace My.Company
         }
 
         // Helper to invoke managed code from the native invocation.
-        private Error CallTrampoline(int x, int y, IntPtr callback_data)
+        private ResultError.Unmanaged CallTrampoline(int x, int y, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
@@ -7653,7 +8315,7 @@ namespace My.Company
         }
 
         // Invokes the callback.
-        public Error Call(int x, int y)
+        public ResultError Call(int x, int y)
         {
             var __target = Marshal.GetDelegateForFunctionPointer<SumDelegateReturnNative>(_ptr);
             // TODO
@@ -7857,7 +8519,7 @@ namespace My.Company
             Interop.service_async_callback_string(_context, s, cb);
         }
 
-        public Task<void> Fail()
+        public Task Fail()
         {
             return Interop.service_async_fail(_context);
         }
@@ -7960,7 +8622,7 @@ namespace My.Company
             Interop.service_result_destroy(_context).AsOk();
         }
 
-        public ResultError.Unmanaged Test()
+        public ResultError Test()
         {
             return Interop.service_result_test(_context);
         }
@@ -7990,7 +8652,7 @@ namespace My.Company
 
         /// Methods returning a Result<(), _> are the default and do not
         /// need annotations.
-        public ResultError.Unmanaged ReturnResult(uint anon1)
+        public ResultError ReturnResult(uint anon1)
         {
             return Interop.service_on_panic_return_result(_context, anon1);
         }
@@ -8032,32 +8694,32 @@ namespace My.Company
             Interop.service_callbacks_destroy(_context).AsOk();
         }
 
-        public ResultError.Unmanaged CallbackSimple(MyCallback callback)
+        public ResultError CallbackSimple(MyCallback callback)
         {
             return Interop.service_callbacks_callback_simple(_context, callback);
         }
 
-        public ResultError.Unmanaged CallbackSimple(MyCallbackDelegate callback)
+        public ResultError CallbackSimple(MyCallbackDelegate callback)
         {
             return Interop.service_callbacks_callback_simple(_context, callback);
         }
 
-        public ResultError.Unmanaged CallbackFfiReturn(SumDelegateReturn callback)
+        public ResultError CallbackFfiReturn(SumDelegateReturn callback)
         {
             return Interop.service_callbacks_callback_ffi_return(_context, callback);
         }
 
-        public ResultError.Unmanaged CallbackFfiReturn(SumDelegateReturnDelegate callback)
+        public ResultError CallbackFfiReturn(SumDelegateReturnDelegate callback)
         {
             return Interop.service_callbacks_callback_ffi_return(_context, callback);
         }
 
-        public ResultError.Unmanaged CallbackWithSlice(SumDelegateReturn callback, SliceI32 input)
+        public ResultError CallbackWithSlice(SumDelegateReturn callback, SliceI32 input)
         {
             return Interop.service_callbacks_callback_with_slice(_context, callback, input);
         }
 
-        public ResultError.Unmanaged CallbackWithSlice(SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
+        public ResultError CallbackWithSlice(SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
         {
             return Interop.service_callbacks_callback_with_slice(_context, callback, input);
         }
@@ -8067,7 +8729,7 @@ namespace My.Company
             Interop.service_callbacks_set_delegate_table(_context, table);
         }
 
-        public ResultError.Unmanaged InvokeDelegates()
+        public ResultError InvokeDelegates()
         {
             return Interop.service_callbacks_invoke_delegates(_context);
         }
@@ -8208,22 +8870,22 @@ namespace My.Company
             return Interop.service_various_slices_mut_self_ref_slice_limited(_context, ref x, ref y, slice, slice2);
         }
 
-        public ResultError.Unmanaged MutSelfFfiError(SliceMutU8 slice)
+        public ResultError MutSelfFfiError(SliceMutU8 slice)
         {
             return Interop.service_various_slices_mut_self_ffi_error(_context, slice);
         }
 
-        public ResultError.Unmanaged MutSelfFfiError(Span<byte> slice)
+        public ResultError MutSelfFfiError(Span<byte> slice)
         {
             return Interop.service_various_slices_mut_self_ffi_error(_context, slice);
         }
 
-        public ResultError.Unmanaged MutSelfNoError(SliceMutU8 slice)
+        public ResultError MutSelfNoError(SliceMutU8 slice)
         {
             return Interop.service_various_slices_mut_self_no_error(_context, slice);
         }
 
-        public ResultError.Unmanaged MutSelfNoError(Span<byte> slice)
+        public ResultError MutSelfNoError(Span<byte> slice)
         {
             return Interop.service_various_slices_mut_self_no_error(_context, slice);
         }
@@ -8291,13 +8953,11 @@ namespace My.Company
 
 
 
-    public class InteropException<T> : Exception
+    public class InteropException: Exception
     {
-        public T Error { get; private set; }
 
-        public InteropException(T error): base($"Something went wrong: {error}")
+        public InteropException(): base()
         {
-            Error = error;
         }
     }
 

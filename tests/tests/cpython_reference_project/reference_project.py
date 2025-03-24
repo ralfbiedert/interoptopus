@@ -24,6 +24,9 @@ def init_lib(path):
     c_lib.nested_array_3.argtypes = [NestedArray]
     c_lib.behavior_sleep.argtypes = [ctypes.c_uint64]
     c_lib.behavior_panics.argtypes = []
+    c_lib.enums_1.argtypes = [ctypes.c_int]
+    c_lib.enums_2.argtypes = [ctypes.c_int]
+    c_lib.enums_3.argtypes = [ctypes.POINTER(ctypes.c_int)]
     c_lib.fnptr_1.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8), ctypes.c_uint8]
     c_lib.fnptr_2.argtypes = [ctypes.CFUNCTYPE(None, CharArray), CharArray]
     c_lib.generic_1a.argtypes = [Genericu32, Phantomu8]
@@ -102,14 +105,14 @@ def init_lib(path):
     c_lib.pattern_ffi_cchar_mut_pointer.argtypes = [ctypes.POINTER(ctypes.c_char)]
     c_lib.pattern_result_1.argtypes = [ResultU32Error]
     c_lib.pattern_result_2.argtypes = []
-    c_lib.pattern_result_3.argtypes = [ctypes.c_int]
+    c_lib.pattern_result_3.argtypes = [ResultError]
     c_lib.pattern_api_guard.argtypes = []
     c_lib.pattern_callback_1.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p), ctypes.c_uint32]
     c_lib.pattern_callback_2.argtypes = [ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p)]
     c_lib.pattern_callback_4.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p), ctypes.c_uint32]
     c_lib.pattern_callback_5.argtypes = []
     c_lib.pattern_callback_6.argtypes = []
-    c_lib.pattern_callback_7.argtypes = [ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p), ctypes.CFUNCTYPE(None, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p), ctypes.c_int32, ctypes.c_int32, ctypes.POINTER(ctypes.c_int32)]
+    c_lib.pattern_callback_7.argtypes = [ctypes.CFUNCTYPE(ResultError, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p), ctypes.CFUNCTYPE(None, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p), ctypes.c_int32, ctypes.c_int32, ctypes.POINTER(ctypes.c_int32)]
     c_lib.pattern_callback_8.argtypes = [ctypes.CFUNCTYPE(None, Utf8String, ctypes.c_void_p), ctypes.CFUNCTYPE(None, UseString, ctypes.c_void_p), Utf8String]
     c_lib.pattern_surrogates_1.argtypes = [Local, ctypes.POINTER(Container)]
     c_lib.service_async_destroy.argtypes = [ctypes.c_void_p]
@@ -119,7 +122,7 @@ def init_lib(path):
     c_lib.service_async_handle_string.argtypes = [ctypes.c_void_p, Utf8String, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultUtf8StringError), ctypes.c_void_p)]
     c_lib.service_async_handle_nested_string.argtypes = [ctypes.c_void_p, Utf8String, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultUseStringError), ctypes.c_void_p)]
     c_lib.service_async_callback_string.argtypes = [ctypes.c_void_p, Utf8String, ctypes.CFUNCTYPE(None, Utf8String, ctypes.c_void_p)]
-    c_lib.service_async_fail.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(None, ctypes.POINTER(ctypes.c_int), ctypes.c_void_p)]
+    c_lib.service_async_fail.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultError), ctypes.c_void_p)]
     c_lib.service_async_bad.argtypes = [ctypes.c_void_p]
     c_lib.service_basic_destroy.argtypes = [ctypes.c_void_p]
     c_lib.service_basic_new.argtypes = []
@@ -139,8 +142,8 @@ def init_lib(path):
     c_lib.service_callbacks_destroy.argtypes = [ctypes.c_void_p]
     c_lib.service_callbacks_new.argtypes = []
     c_lib.service_callbacks_callback_simple.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p)]
-    c_lib.service_callbacks_callback_ffi_return.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)]
-    c_lib.service_callbacks_callback_with_slice.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p), SliceI32]
+    c_lib.service_callbacks_callback_ffi_return.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ResultError, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)]
+    c_lib.service_callbacks_callback_with_slice.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(ResultError, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p), SliceI32]
     c_lib.service_callbacks_set_delegate_table.argtypes = [ctypes.c_void_p, CallbackTable]
     c_lib.service_callbacks_invoke_delegates.argtypes = [ctypes.c_void_p]
     c_lib.service_ignoring_methods_destroy.argtypes = [ctypes.c_void_p]
@@ -177,6 +180,8 @@ def init_lib(path):
     c_lib.char_array_3.restype = ctypes.c_uint8
     c_lib.nested_array_1.restype = NestedArray
     c_lib.nested_array_3.restype = ctypes.c_uint8
+    c_lib.enums_2.restype = ctypes.c_int
+    c_lib.enums_3.restype = ctypes.POINTER(ctypes.c_int)
     c_lib.fnptr_1.restype = ctypes.c_uint8
     c_lib.generic_1a.restype = ctypes.c_uint32
     c_lib.generic_1b.restype = ctypes.c_uint8
@@ -215,7 +220,7 @@ def init_lib(path):
     c_lib.ref3.restype = ctypes.c_bool
     c_lib.ref4.restype = ctypes.c_bool
     c_lib.struct1.restype = Tupled
-    c_lib.struct2.restype = ctypes.c_int
+    c_lib.struct2.restype = ResultError
     c_lib.struct3.restype = ctypes.c_bool
     c_lib.pattern_ascii_pointer_1.restype = ctypes.c_uint32
     c_lib.pattern_ascii_pointer_2.restype = ctypes.POINTER(ctypes.c_char)
@@ -228,8 +233,8 @@ def init_lib(path):
     c_lib.pattern_string_3.restype = Utf8String
     c_lib.pattern_string_4.restype = UseString
     c_lib.pattern_string_5.restype = ResultUseStringError
-    c_lib.pattern_string_6a.restype = ctypes.c_int
-    c_lib.pattern_string_6b.restype = ctypes.c_int
+    c_lib.pattern_string_6a.restype = ResultError
+    c_lib.pattern_string_6b.restype = ResultError
     c_lib.pattern_string_7.restype = ResultUtf8StringError
     c_lib.pattern_string_8.restype = ResultUseStringError
     c_lib.pattern_string_9.restype = ResultUtf8StringError
@@ -245,8 +250,8 @@ def init_lib(path):
     c_lib.pattern_ffi_cchar_const_pointer.restype = ctypes.POINTER(ctypes.c_char)
     c_lib.pattern_ffi_cchar_mut_pointer.restype = ctypes.POINTER(ctypes.c_char)
     c_lib.pattern_result_1.restype = ResultU32Error
-    c_lib.pattern_result_2.restype = ctypes.c_int
-    c_lib.pattern_result_3.restype = ctypes.c_int
+    c_lib.pattern_result_2.restype = ResultError
+    c_lib.pattern_result_3.restype = ResultError
     c_lib.pattern_api_guard.restype = ctypes.c_uint64
     c_lib.pattern_callback_1.restype = ctypes.c_uint32
     c_lib.pattern_callback_2.restype = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p)
@@ -256,11 +261,11 @@ def init_lib(path):
     c_lib.pattern_callback_7.restype = ctypes.c_int
     c_lib.service_async_destroy.restype = ResultConstPtrServiceAsyncError
     c_lib.service_async_new.restype = ResultConstPtrServiceAsyncError
-    c_lib.service_async_return_after_ms.restype = ctypes.c_int
-    c_lib.service_async_process_struct.restype = ctypes.c_int
-    c_lib.service_async_handle_string.restype = ctypes.c_int
-    c_lib.service_async_handle_nested_string.restype = ctypes.c_int
-    c_lib.service_async_fail.restype = ctypes.c_int
+    c_lib.service_async_return_after_ms.restype = ResultError
+    c_lib.service_async_process_struct.restype = ResultError
+    c_lib.service_async_handle_string.restype = ResultError
+    c_lib.service_async_handle_nested_string.restype = ResultError
+    c_lib.service_async_fail.restype = ResultError
     c_lib.service_basic_destroy.restype = ResultConstPtrServiceBasicError
     c_lib.service_basic_new.restype = ResultConstPtrServiceBasicError
     c_lib.service_main_destroy.restype = ResultConstPtrServiceMainError
@@ -270,18 +275,18 @@ def init_lib(path):
     c_lib.service_dependent_get.restype = ctypes.c_uint32
     c_lib.service_result_destroy.restype = ResultConstPtrServiceResultError
     c_lib.service_result_new.restype = ResultConstPtrServiceResultError
-    c_lib.service_result_test.restype = ctypes.c_int
+    c_lib.service_result_test.restype = ResultError
     c_lib.service_on_panic_destroy.restype = ResultConstPtrServiceOnPanicError
     c_lib.service_on_panic_new.restype = ResultConstPtrServiceOnPanicError
-    c_lib.service_on_panic_return_result.restype = ctypes.c_int
+    c_lib.service_on_panic_return_result.restype = ResultError
     c_lib.service_on_panic_return_default_value.restype = ctypes.c_uint32
     c_lib.service_on_panic_return_ub_on_panic.restype = ctypes.POINTER(ctypes.c_char)
     c_lib.service_callbacks_destroy.restype = ResultConstPtrServiceCallbacksError
     c_lib.service_callbacks_new.restype = ResultConstPtrServiceCallbacksError
-    c_lib.service_callbacks_callback_simple.restype = ctypes.c_int
-    c_lib.service_callbacks_callback_ffi_return.restype = ctypes.c_int
-    c_lib.service_callbacks_callback_with_slice.restype = ctypes.c_int
-    c_lib.service_callbacks_invoke_delegates.restype = ctypes.c_int
+    c_lib.service_callbacks_callback_simple.restype = ResultError
+    c_lib.service_callbacks_callback_ffi_return.restype = ResultError
+    c_lib.service_callbacks_callback_with_slice.restype = ResultError
+    c_lib.service_callbacks_invoke_delegates.restype = ResultError
     c_lib.service_ignoring_methods_destroy.restype = ResultConstPtrServiceIgnoringMethodsError
     c_lib.service_ignoring_methods_new.restype = ResultConstPtrServiceIgnoringMethodsError
     c_lib.service_multiple_ctors_destroy.restype = ResultConstPtrServiceMultipleCtorsError
@@ -295,33 +300,13 @@ def init_lib(path):
     c_lib.service_various_slices_mut_self_ref.restype = ctypes.c_uint8
     c_lib.service_various_slices_mut_self_ref_slice.restype = ctypes.c_uint8
     c_lib.service_various_slices_mut_self_ref_slice_limited.restype = ctypes.c_uint8
-    c_lib.service_various_slices_mut_self_ffi_error.restype = ctypes.c_int
-    c_lib.service_various_slices_mut_self_no_error.restype = ctypes.c_int
+    c_lib.service_various_slices_mut_self_ffi_error.restype = ResultError
+    c_lib.service_various_slices_mut_self_no_error.restype = ResultError
     c_lib.service_various_slices_return_slice.restype = SliceU32
     c_lib.service_various_slices_return_slice_mut.restype = SliceMutU32
     c_lib.service_strings_destroy.restype = ResultConstPtrServiceStringsError
     c_lib.service_strings_new.restype = ResultConstPtrServiceStringsError
     c_lib.service_strings_return_cstr.restype = ctypes.POINTER(ctypes.c_char)
-
-    c_lib.struct2.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.pattern_string_6a.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.pattern_string_6b.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.pattern_result_2.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.pattern_result_3.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.pattern_callback_7.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.service_async_return_after_ms.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.service_async_process_struct.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.service_async_handle_string.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.service_async_handle_nested_string.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.service_async_fail.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.service_result_test.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.service_on_panic_return_result.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.service_callbacks_callback_simple.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.service_callbacks_callback_ffi_return.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.service_callbacks_callback_with_slice.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.service_callbacks_invoke_delegates.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.service_various_slices_mut_self_ffi_error.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
-    c_lib.service_various_slices_mut_self_no_error.errcheck = lambda rval, _fptr, _args: _errcheck(rval, 0)
 
 
 def interoptopus_string_create(utf8: ctypes.c_void_p, len: int, rval: ctypes.POINTER(Utf8String)) -> int:
@@ -365,6 +350,15 @@ def behavior_sleep(millis: int):
 
 def behavior_panics():
     return c_lib.behavior_panics()
+
+def enums_1(ignored: ctypes.c_int):
+    return c_lib.enums_1(ignored)
+
+def enums_2(x: ctypes.c_int) -> ctypes.c_int:
+    return c_lib.enums_2(x)
+
+def enums_3(x: ctypes.POINTER(ctypes.c_int)) -> ctypes.POINTER(ctypes.c_int):
+    return c_lib.enums_3(x)
 
 def fnptr_1(callback, value: int) -> int:
     if not hasattr(callback, "__ctypes_from_outparam__"):
@@ -697,9 +691,9 @@ def pattern_callback_5():
 def pattern_callback_6():
     return c_lib.pattern_callback_6()
 
-def pattern_callback_7(c1, c2, x: int, i: int, o: ctypes.POINTER(ctypes.c_int32)):
+def pattern_callback_7(c1, c2, x: int, i: int, o: ctypes.POINTER(ctypes.c_int32)) -> ctypes.c_int:
     if not hasattr(c1, "__ctypes_from_outparam__"):
-        c1 = callbacks.fn_i32_i32_ConstPtr_rval_Error(c1)
+        c1 = callbacks.fn_i32_i32_ConstPtr_rval_ResultError(c1)
 
     if not hasattr(c2, "__ctypes_from_outparam__"):
         c2 = callbacks.fn_i32_i32_ConstPtr(c2)
@@ -772,8 +766,22 @@ class EnumDocumented:
     C = 2
 
 
+class EnumPayload:
+    A = 0
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+
+
 class EnumRenamed:
     X = 0
+
+
+class Error:
+    Ok = 0
+    Null = 100
+    Panic = 200
+    Delegate = 300
+    Fail = 400
 
 
 class Utf8String(ctypes.Structure):
@@ -822,14 +830,6 @@ class Utf8String(ctypes.Structure):
     @capacity.setter
     def capacity(self, value: int):
         return ctypes.Structure.__set__(self, "capacity", value)
-
-
-class Error:
-    Ok = 0
-    Null = 100
-    Panic = 200
-    Delegate = 300
-    Fail = 400
 
 
 class BoolField(ctypes.Structure):
@@ -1713,112 +1713,44 @@ class SliceMutU8(ctypes.Structure):
         return rval
 
 
-class ResultU32Error(ctypes.Structure):
+class ResultError:
     """Result that contains value or an error."""
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("t", ctypes.c_uint32),
-        ("err", ctypes.c_int),
-    ]
-
-    def __init__(self, t: int = None, err = None):
-        if t is not None:
-            self.t = t
-        if err is not None:
-            self.err = err
-
-    @property
-    def t(self) -> int:
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__get__(self, "t")
-
-    @t.setter
-    def t(self, value: int):
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__set__(self, "t", value)
-
-    @property
-    def err(self):
-        """Error value."""
-        return ctypes.Structure.__get__(self, "err")
-
-    @err.setter
-    def err(self, value):
-        """Error value."""
-        return ctypes.Structure.__set__(self, "err", value)
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
 
 
-class ResultU64Error(ctypes.Structure):
+class ResultU32Error:
     """Result that contains value or an error."""
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("t", ctypes.c_uint64),
-        ("err", ctypes.c_int),
-    ]
-
-    def __init__(self, t: int = None, err = None):
-        if t is not None:
-            self.t = t
-        if err is not None:
-            self.err = err
-
-    @property
-    def t(self) -> int:
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__get__(self, "t")
-
-    @t.setter
-    def t(self, value: int):
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__set__(self, "t", value)
-
-    @property
-    def err(self):
-        """Error value."""
-        return ctypes.Structure.__get__(self, "err")
-
-    @err.setter
-    def err(self, value):
-        """Error value."""
-        return ctypes.Structure.__set__(self, "err", value)
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
 
 
-class ResultUtf8StringError(ctypes.Structure):
+class ResultU64Error:
     """Result that contains value or an error."""
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
 
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("t", Utf8String),
-        ("err", ctypes.c_int),
-    ]
 
-    def __init__(self, t = None, err = None):
-        if t is not None:
-            self.t = t
-        if err is not None:
-            self.err = err
-
-    @property
-    def t(self):
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__get__(self, "t")
-
-    @t.setter
-    def t(self, value):
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__set__(self, "t", value)
-
-    @property
-    def err(self):
-        """Error value."""
-        return ctypes.Structure.__get__(self, "err")
-
-    @err.setter
-    def err(self, value):
-        """Error value."""
-        return ctypes.Structure.__set__(self, "err", value)
+class ResultUtf8StringError:
+    """Result that contains value or an error."""
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
 
 
 class Array(ctypes.Structure):
@@ -2274,436 +2206,124 @@ class OptionVec(ctypes.Structure):
         return self._is_some != 0
 
 
-class ResultConstPtrServiceAsyncError(ctypes.Structure):
+class ResultConstPtrServiceAsyncError:
     """Result that contains value or an error."""
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("t", ctypes.c_void_p),
-        ("err", ctypes.c_int),
-    ]
-
-    def __init__(self, t: ctypes.c_void_p = None, err = None):
-        if t is not None:
-            self.t = t
-        if err is not None:
-            self.err = err
-
-    @property
-    def t(self) -> ctypes.c_void_p:
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__get__(self, "t")
-
-    @t.setter
-    def t(self, value: ctypes.c_void_p):
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__set__(self, "t", value)
-
-    @property
-    def err(self):
-        """Error value."""
-        return ctypes.Structure.__get__(self, "err")
-
-    @err.setter
-    def err(self, value):
-        """Error value."""
-        return ctypes.Structure.__set__(self, "err", value)
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
 
 
-class ResultConstPtrServiceBasicError(ctypes.Structure):
+class ResultConstPtrServiceBasicError:
     """Result that contains value or an error."""
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("t", ctypes.c_void_p),
-        ("err", ctypes.c_int),
-    ]
-
-    def __init__(self, t: ctypes.c_void_p = None, err = None):
-        if t is not None:
-            self.t = t
-        if err is not None:
-            self.err = err
-
-    @property
-    def t(self) -> ctypes.c_void_p:
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__get__(self, "t")
-
-    @t.setter
-    def t(self, value: ctypes.c_void_p):
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__set__(self, "t", value)
-
-    @property
-    def err(self):
-        """Error value."""
-        return ctypes.Structure.__get__(self, "err")
-
-    @err.setter
-    def err(self, value):
-        """Error value."""
-        return ctypes.Structure.__set__(self, "err", value)
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
 
 
-class ResultConstPtrServiceCallbacksError(ctypes.Structure):
+class ResultConstPtrServiceCallbacksError:
     """Result that contains value or an error."""
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("t", ctypes.c_void_p),
-        ("err", ctypes.c_int),
-    ]
-
-    def __init__(self, t: ctypes.c_void_p = None, err = None):
-        if t is not None:
-            self.t = t
-        if err is not None:
-            self.err = err
-
-    @property
-    def t(self) -> ctypes.c_void_p:
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__get__(self, "t")
-
-    @t.setter
-    def t(self, value: ctypes.c_void_p):
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__set__(self, "t", value)
-
-    @property
-    def err(self):
-        """Error value."""
-        return ctypes.Structure.__get__(self, "err")
-
-    @err.setter
-    def err(self, value):
-        """Error value."""
-        return ctypes.Structure.__set__(self, "err", value)
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
 
 
-class ResultConstPtrServiceDependentError(ctypes.Structure):
+class ResultConstPtrServiceDependentError:
     """Result that contains value or an error."""
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("t", ctypes.c_void_p),
-        ("err", ctypes.c_int),
-    ]
-
-    def __init__(self, t: ctypes.c_void_p = None, err = None):
-        if t is not None:
-            self.t = t
-        if err is not None:
-            self.err = err
-
-    @property
-    def t(self) -> ctypes.c_void_p:
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__get__(self, "t")
-
-    @t.setter
-    def t(self, value: ctypes.c_void_p):
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__set__(self, "t", value)
-
-    @property
-    def err(self):
-        """Error value."""
-        return ctypes.Structure.__get__(self, "err")
-
-    @err.setter
-    def err(self, value):
-        """Error value."""
-        return ctypes.Structure.__set__(self, "err", value)
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
 
 
-class ResultConstPtrServiceIgnoringMethodsError(ctypes.Structure):
+class ResultConstPtrServiceIgnoringMethodsError:
     """Result that contains value or an error."""
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("t", ctypes.c_void_p),
-        ("err", ctypes.c_int),
-    ]
-
-    def __init__(self, t: ctypes.c_void_p = None, err = None):
-        if t is not None:
-            self.t = t
-        if err is not None:
-            self.err = err
-
-    @property
-    def t(self) -> ctypes.c_void_p:
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__get__(self, "t")
-
-    @t.setter
-    def t(self, value: ctypes.c_void_p):
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__set__(self, "t", value)
-
-    @property
-    def err(self):
-        """Error value."""
-        return ctypes.Structure.__get__(self, "err")
-
-    @err.setter
-    def err(self, value):
-        """Error value."""
-        return ctypes.Structure.__set__(self, "err", value)
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
 
 
-class ResultConstPtrServiceMainError(ctypes.Structure):
+class ResultConstPtrServiceMainError:
     """Result that contains value or an error."""
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("t", ctypes.c_void_p),
-        ("err", ctypes.c_int),
-    ]
-
-    def __init__(self, t: ctypes.c_void_p = None, err = None):
-        if t is not None:
-            self.t = t
-        if err is not None:
-            self.err = err
-
-    @property
-    def t(self) -> ctypes.c_void_p:
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__get__(self, "t")
-
-    @t.setter
-    def t(self, value: ctypes.c_void_p):
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__set__(self, "t", value)
-
-    @property
-    def err(self):
-        """Error value."""
-        return ctypes.Structure.__get__(self, "err")
-
-    @err.setter
-    def err(self, value):
-        """Error value."""
-        return ctypes.Structure.__set__(self, "err", value)
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
 
 
-class ResultConstPtrServiceMultipleCtorsError(ctypes.Structure):
+class ResultConstPtrServiceMultipleCtorsError:
     """Result that contains value or an error."""
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("t", ctypes.c_void_p),
-        ("err", ctypes.c_int),
-    ]
-
-    def __init__(self, t: ctypes.c_void_p = None, err = None):
-        if t is not None:
-            self.t = t
-        if err is not None:
-            self.err = err
-
-    @property
-    def t(self) -> ctypes.c_void_p:
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__get__(self, "t")
-
-    @t.setter
-    def t(self, value: ctypes.c_void_p):
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__set__(self, "t", value)
-
-    @property
-    def err(self):
-        """Error value."""
-        return ctypes.Structure.__get__(self, "err")
-
-    @err.setter
-    def err(self, value):
-        """Error value."""
-        return ctypes.Structure.__set__(self, "err", value)
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
 
 
-class ResultConstPtrServiceOnPanicError(ctypes.Structure):
+class ResultConstPtrServiceOnPanicError:
     """Result that contains value or an error."""
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("t", ctypes.c_void_p),
-        ("err", ctypes.c_int),
-    ]
-
-    def __init__(self, t: ctypes.c_void_p = None, err = None):
-        if t is not None:
-            self.t = t
-        if err is not None:
-            self.err = err
-
-    @property
-    def t(self) -> ctypes.c_void_p:
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__get__(self, "t")
-
-    @t.setter
-    def t(self, value: ctypes.c_void_p):
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__set__(self, "t", value)
-
-    @property
-    def err(self):
-        """Error value."""
-        return ctypes.Structure.__get__(self, "err")
-
-    @err.setter
-    def err(self, value):
-        """Error value."""
-        return ctypes.Structure.__set__(self, "err", value)
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
 
 
-class ResultConstPtrServiceResultError(ctypes.Structure):
+class ResultConstPtrServiceResultError:
     """Result that contains value or an error."""
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("t", ctypes.c_void_p),
-        ("err", ctypes.c_int),
-    ]
-
-    def __init__(self, t: ctypes.c_void_p = None, err = None):
-        if t is not None:
-            self.t = t
-        if err is not None:
-            self.err = err
-
-    @property
-    def t(self) -> ctypes.c_void_p:
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__get__(self, "t")
-
-    @t.setter
-    def t(self, value: ctypes.c_void_p):
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__set__(self, "t", value)
-
-    @property
-    def err(self):
-        """Error value."""
-        return ctypes.Structure.__get__(self, "err")
-
-    @err.setter
-    def err(self, value):
-        """Error value."""
-        return ctypes.Structure.__set__(self, "err", value)
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
 
 
-class ResultConstPtrServiceStringsError(ctypes.Structure):
+class ResultConstPtrServiceStringsError:
     """Result that contains value or an error."""
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("t", ctypes.c_void_p),
-        ("err", ctypes.c_int),
-    ]
-
-    def __init__(self, t: ctypes.c_void_p = None, err = None):
-        if t is not None:
-            self.t = t
-        if err is not None:
-            self.err = err
-
-    @property
-    def t(self) -> ctypes.c_void_p:
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__get__(self, "t")
-
-    @t.setter
-    def t(self, value: ctypes.c_void_p):
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__set__(self, "t", value)
-
-    @property
-    def err(self):
-        """Error value."""
-        return ctypes.Structure.__get__(self, "err")
-
-    @err.setter
-    def err(self, value):
-        """Error value."""
-        return ctypes.Structure.__set__(self, "err", value)
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
 
 
-class ResultConstPtrServiceVariousSlicesError(ctypes.Structure):
+class ResultConstPtrServiceVariousSlicesError:
     """Result that contains value or an error."""
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("t", ctypes.c_void_p),
-        ("err", ctypes.c_int),
-    ]
-
-    def __init__(self, t: ctypes.c_void_p = None, err = None):
-        if t is not None:
-            self.t = t
-        if err is not None:
-            self.err = err
-
-    @property
-    def t(self) -> ctypes.c_void_p:
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__get__(self, "t")
-
-    @t.setter
-    def t(self, value: ctypes.c_void_p):
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__set__(self, "t", value)
-
-    @property
-    def err(self):
-        """Error value."""
-        return ctypes.Structure.__get__(self, "err")
-
-    @err.setter
-    def err(self, value):
-        """Error value."""
-        return ctypes.Structure.__set__(self, "err", value)
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
 
 
-class ResultUseStringError(ctypes.Structure):
+class ResultUseStringError:
     """Result that contains value or an error."""
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("t", UseString),
-        ("err", ctypes.c_int),
-    ]
-
-    def __init__(self, t: UseString = None, err = None):
-        if t is not None:
-            self.t = t
-        if err is not None:
-            self.err = err
-
-    @property
-    def t(self) -> UseString:
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__get__(self, "t")
-
-    @t.setter
-    def t(self, value: UseString):
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__set__(self, "t", value)
-
-    @property
-    def err(self):
-        """Error value."""
-        return ctypes.Structure.__get__(self, "err")
-
-    @err.setter
-    def err(self, value):
-        """Error value."""
-        return ctypes.Structure.__set__(self, "err", value)
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
 
 
 class CallbackTable(ctypes.Structure):
@@ -2716,7 +2336,7 @@ class CallbackTable(ctypes.Structure):
         ("my_callback_contextual", ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_uint32, ctypes.c_void_p)),
         ("sum_delegate_1", ctypes.CFUNCTYPE(None, ctypes.c_void_p)),
         ("sum_delegate_2", ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)),
-        ("sum_delegate_return", ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)),
+        ("sum_delegate_return", ctypes.CFUNCTYPE(ResultError, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)),
         ("sum_delegate_return_2", ctypes.CFUNCTYPE(None, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)),
     ]
 
@@ -2981,40 +2601,14 @@ class SliceMutCharArray(ctypes.Structure):
         return self[len(self)-1]
 
 
-class ResultNestedArrayError(ctypes.Structure):
+class ResultNestedArrayError:
     """Result that contains value or an error."""
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("t", NestedArray),
-        ("err", ctypes.c_int),
-    ]
-
-    def __init__(self, t: NestedArray = None, err = None):
-        if t is not None:
-            self.t = t
-        if err is not None:
-            self.err = err
-
-    @property
-    def t(self) -> NestedArray:
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__get__(self, "t")
-
-    @t.setter
-    def t(self, value: NestedArray):
-        """Element if err is `Ok`."""
-        return ctypes.Structure.__set__(self, "t", value)
-
-    @property
-    def err(self):
-        """Error value."""
-        return ctypes.Structure.__get__(self, "err")
-
-    @err.setter
-    def err(self, value):
-        """Error value."""
-        return ctypes.Structure.__set__(self, "err", value)
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
 
 
 
@@ -3036,7 +2630,7 @@ class callbacks:
     fn_Utf8String_ConstPtr = ctypes.CFUNCTYPE(None, Utf8String, ctypes.c_void_p)
     fn_ConstPtr = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
     fn_i32_i32_ConstPtr_rval_i32 = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)
-    fn_i32_i32_ConstPtr_rval_Error = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)
+    fn_i32_i32_ConstPtr_rval_ResultError = ctypes.CFUNCTYPE(ResultError, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)
     fn_i32_i32_ConstPtr = ctypes.CFUNCTYPE(None, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)
 
 
@@ -3258,14 +2852,14 @@ class ServiceCallbacks:
     def callback_ffi_return(self, callback):
         """"""
         if not hasattr(callback, "__ctypes_from_outparam__"):
-            callback = callbacks.fn_i32_i32_ConstPtr_rval_Error(callback)
+            callback = callbacks.fn_i32_i32_ConstPtr_rval_ResultError(callback)
 
         return c_lib.service_callbacks_callback_ffi_return(self._ctx, callback)
 
     def callback_with_slice(self, callback, input: SliceI32 | ctypes.Array[ctypes.c_int32]):
         """"""
         if not hasattr(callback, "__ctypes_from_outparam__"):
-            callback = callbacks.fn_i32_i32_ConstPtr_rval_Error(callback)
+            callback = callbacks.fn_i32_i32_ConstPtr_rval_ResultError(callback)
 
         if hasattr(input, "_length_") and getattr(input, "_type_", "") == ctypes.c_int32:
             input = SliceI32(data=ctypes.cast(input, ctypes.POINTER(ctypes.c_int32)), len=len(input))

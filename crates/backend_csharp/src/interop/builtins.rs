@@ -1,15 +1,13 @@
 use crate::Interop;
 use interoptopus::backend::IndentWriter;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     if i.write_types.write_interoptopus_globals() {
-        let error_text = &i.error_text;
-
         indented!(w, r"public class InteropException: Exception")?;
         indented!(w, r"{{")?;
         w.newline()?;
-        indented!(w, [()], r#"public InteropException(): base()"#)?;
+        indented!(w, [()], r"public InteropException(): base()")?;
         indented!(w, [()], r"{{")?;
         indented!(w, [()], r"}}")?;
         indented!(w, r"}}")?;

@@ -59,6 +59,11 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Error
     {
+
+
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -95,11 +100,11 @@ namespace My.Company
         public bool IsDelegate => _variant == 300;
         public bool IsFail => _variant == 400;
 
-        public void AsOk() { if (_variant != 0) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 100) throw new InteropException<string>(string.Empty); }
-        public void AsPanic() { if (_variant != 200) throw new InteropException<string>(string.Empty); }
-        public void AsDelegate() { if (_variant != 300) throw new InteropException<string>(string.Empty); }
-        public void AsFail() { if (_variant != 400) throw new InteropException<string>(string.Empty); }
+        public void AsOk() { if (_variant != 0) throw new InteropException(); }
+        public void AsNull() { if (_variant != 100) throw new InteropException(); }
+        public void AsPanic() { if (_variant != 200) throw new InteropException(); }
+        public void AsDelegate() { if (_variant != 300) throw new InteropException(); }
+        public void AsFail() { if (_variant != 400) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -213,17 +218,33 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrGameEngineError
     {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(4)]
-            internal IntPtr _Ok;
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
 
-            [FieldOffset(4)]
-            internal Error.Unmanaged _Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
             public ResultConstPtrGameEngineError ToManaged()
             {
@@ -253,10 +274,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException<string>(string.Empty); } else { return _Ok; } }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -273,8 +294,8 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
-                if (_unmanaged._variant == 0) _unmanaged._Ok = _managed._Ok;
-                if (_unmanaged._variant == 1) _unmanaged._Err = _managed._Err.ToUnmanaged();
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -282,8 +303,8 @@ namespace My.Company
             {
                 _managed = new ResultConstPtrGameEngineError();
                 _managed._variant = _unmanaged._variant;
-                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok;
-                if (_managed._variant == 1) _managed._Err = _unmanaged._Err.ToManaged();
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -300,14 +321,24 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultError
     {
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
             [FieldOffset(0)]
             internal uint _variant;
 
-            [FieldOffset(4)]
-            internal Error.Unmanaged _Err;
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
 
             public ResultError ToManaged()
             {
@@ -337,10 +368,10 @@ namespace My.Company
         public bool IsPanic => _variant == 2;
         public bool IsNull => _variant == 3;
 
-        public void AsOk() { if (_variant != 0) throw new InteropException<string>(string.Empty); }
-        public Error AsErr() { if (_variant != 1) { throw new InteropException<string>(string.Empty); } else { return _Err; } }
-        public void AsPanic() { if (_variant != 2) throw new InteropException<string>(string.Empty); }
-        public void AsNull() { if (_variant != 3) throw new InteropException<string>(string.Empty); }
+        public void AsOk() { if (_variant != 0) throw new InteropException(); }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -357,7 +388,7 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
-                if (_unmanaged._variant == 1) _unmanaged._Err = _managed._Err.ToUnmanaged();
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
                 return _unmanaged;
             }
 
@@ -365,7 +396,7 @@ namespace My.Company
             {
                 _managed = new ResultError();
                 _managed._variant = _unmanaged._variant;
-                if (_managed._variant == 1) _managed._Err = _unmanaged._Err.ToManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
                 return _managed;
             }
             public void Free() { }
@@ -406,13 +437,11 @@ namespace My.Company
 
 
 
-    public class InteropException<T> : Exception
+    public class InteropException: Exception
     {
-        public T Error { get; private set; }
 
-        public InteropException(T error): base($"Something went wrong: {error}")
+        public InteropException(): base()
         {
-            Error = error;
         }
     }
 

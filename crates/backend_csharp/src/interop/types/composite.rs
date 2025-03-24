@@ -1,10 +1,10 @@
+use crate::Interop;
 use crate::converter::{field_name_to_csharp_name, is_blittable, to_typespecifier_in_field};
 use crate::interop::docs::write_documentation;
-use crate::Interop;
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Composite, Field, Layout, Primitive, Type, Visibility};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 pub fn write_type_definition_composite(i: &Interop, w: &mut IndentWriter, the_type: &Composite) -> Result<(), Error> {
     i.debug(w, "write_type_definition_composite")?;
@@ -112,7 +112,7 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
     Ok(())
 }
 
-pub fn write_type_definition_composite_unmanaged_body_field(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &Composite) -> Result<(), Error> {
+pub fn write_type_definition_composite_unmanaged_body_field(i: &Interop, w: &mut IndentWriter, field: &Field, _the_type: &Composite) -> Result<(), Error> {
     i.debug(w, "write_type_definition_composite_unmanaged_body_field")?;
 
     let field_name = field_name_to_csharp_name(field, i.rename_symbols);
@@ -179,7 +179,7 @@ pub fn write_type_definition_composite_body(i: &Interop, w: &mut IndentWriter, t
 }
 
 #[allow(clippy::single_match_else)]
-pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &Composite) -> Result<(), Error> {
+pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWriter, field: &Field, _: &Composite) -> Result<(), Error> {
     let field_name = field_name_to_csharp_name(field, i.rename_symbols);
     let visibility = match field.visibility() {
         Visibility::Public => "public ",
@@ -207,7 +207,7 @@ pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWri
     Ok(())
 }
 
-pub fn write_type_definition_composite_marshaller_field_to_unmanaged(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &Composite) -> Result<(), Error> {
+pub fn write_type_definition_composite_marshaller_field_to_unmanaged(i: &Interop, w: &mut IndentWriter, field: &Field, _: &Composite) -> Result<(), Error> {
     i.debug(w, "write_type_definition_composite_marshaller_unmanaged_invoke")?;
 
     let name = field.name();
@@ -245,7 +245,7 @@ pub fn write_type_definition_composite_marshaller_field_to_unmanaged(i: &Interop
     Ok(())
 }
 
-pub fn write_type_definition_composite_marshaller_field_from_unmanaged(i: &Interop, w: &mut IndentWriter, field: &Field, the_type: &Composite) -> Result<(), Error> {
+pub fn write_type_definition_composite_marshaller_field_from_unmanaged(i: &Interop, w: &mut IndentWriter, field: &Field, _: &Composite) -> Result<(), Error> {
     i.debug(w, "write_type_definition_composite_marshaller_field_from_unmanaged")?;
 
     let name = field.name();

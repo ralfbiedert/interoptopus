@@ -3,18 +3,18 @@ pub mod composite;
 pub mod enums;
 pub mod fnptrs;
 
+use crate::Interop;
 use crate::interop::patterns::callbacks::write_type_definition_named_callback;
 use crate::interop::patterns::options::write_pattern_option;
-use crate::interop::patterns::slices::{write_pattern_slice, SliceKind};
+use crate::interop::patterns::slices::{SliceKind, write_pattern_slice};
 use crate::interop::types::bools::write_type_definition_ffibool;
 use crate::interop::types::composite::write_type_definition_composite;
 use crate::interop::types::enums::write_type_definition_enum;
 use crate::interop::types::fnptrs::write_type_definition_fn_pointer;
-use crate::Interop;
+use interoptopus::Error;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Type;
 use interoptopus::pattern::TypePattern;
-use interoptopus::Error;
 
 pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     for the_type in i.inventory.ctypes() {

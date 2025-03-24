@@ -42,7 +42,7 @@
 //! #
 //! # impl std::error::Error for Error {}
 //! #
-//! # #[ffi_type(error)]
+//! # #[ffi_type]
 //! # #[derive(PartialOrd, PartialEq, Debug, Copy, Clone)]
 //! # pub enum MyFFIError {
 //! #     Ok = 0,

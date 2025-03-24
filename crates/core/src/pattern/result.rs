@@ -52,7 +52,7 @@ use std::fmt::Debug;
 /// }
 ///
 /// // The error FFI users should see
-/// #[ffi_type(error)]
+/// #[ffi_type]
 /// #[derive(PartialOrd, PartialEq)]
 /// enum MyFFIError {
 ///     Ok = 0,

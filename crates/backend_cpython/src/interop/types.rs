@@ -1,11 +1,11 @@
+use crate::Interop;
 use crate::converter::{to_ctypes_name, to_type_hint_in, to_type_hint_out};
 use crate::interop::patterns::{write_option, write_slice};
-use crate::Interop;
 use interoptopus::backend::sort_types_by_dependencies;
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Composite, Enum, Layout, Type, VariantKind};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 pub fn write_types(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     let all_types = i.inventory.ctypes().to_vec();
@@ -144,8 +144,8 @@ pub fn write_enum(_i: &Interop, w: &mut IndentWriter, e: &Enum, write_for: Write
 
         match v.kind() {
             VariantKind::Unit(x) => indented!(w, [()], r"{} = {}", v.name(), x)?,
-            VariantKind::Typed(_, _) => todo!(),
-        };
+            VariantKind::Typed(_, _) => indented!(w, r"# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN")?,
+        }
     }
 
     Ok(())

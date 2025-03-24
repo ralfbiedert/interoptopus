@@ -89,7 +89,7 @@ macro_rules! extra_type {
 /// #
 /// # impl std::error::Error for Error {}
 /// #
-/// # #[ffi_type(error)]
+/// # #[ffi_type]
 /// # #[derive(Copy, Clone, Debug, PartialOrd, PartialEq)]
 /// # pub enum MyFFIError {
 /// #     Ok = 0,

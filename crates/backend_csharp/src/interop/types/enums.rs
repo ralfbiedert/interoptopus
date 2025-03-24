@@ -1,10 +1,10 @@
+use crate::Interop;
 use crate::converter::{to_typespecifier_in_field, to_typespecifier_in_field_unmanaged};
 use crate::interop::docs::write_documentation;
-use crate::Interop;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Enum, Type, VariantKind};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 pub fn write_type_definition_enum(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
     i.debug(w, "write_type_definition_enum")?;
@@ -103,12 +103,12 @@ pub fn write_type_definition_enum_variant_fields_managed(i: &Interop, w: &mut In
     for variant in the_type.variants() {
         match variant.kind() {
             VariantKind::Unit(_) => {}
-            VariantKind::Typed(x, t) if !t.is_void() => {
+            VariantKind::Typed(_, t) if !t.is_void() => {
                 let ty = to_typespecifier_in_field(t);
                 let vname = variant.name();
                 indented!(w, [()], r"{ty} _{vname};")?;
             }
-            VariantKind::Typed(x, t) => {}
+            VariantKind::Typed(_, _) => {}
         }
     }
 
@@ -121,7 +121,7 @@ pub fn write_type_definition_enum_variant_unmanaged_types(i: &Interop, w: &mut I
     for variant in the_type.variants() {
         match variant.kind() {
             VariantKind::Unit(_) => {}
-            VariantKind::Typed(x, t) if !t.is_void() => {
+            VariantKind::Typed(_, t) if !t.is_void() => {
                 let ty = to_typespecifier_in_field_unmanaged(t);
                 let vname = variant.name();
                 indented!(w, [()], r"[StructLayout(LayoutKind.Sequential)]")?;
@@ -131,7 +131,7 @@ pub fn write_type_definition_enum_variant_unmanaged_types(i: &Interop, w: &mut I
                 indented!(w, [()()], r"internal {ty} _{vname};")?;
                 indented!(w, [()], r"}}")?;
             }
-            VariantKind::Typed(x, t) => {}
+            VariantKind::Typed(_, _) => {}
         }
 
         w.newline()?;
@@ -149,13 +149,13 @@ pub fn write_type_definition_enum_variant_fields_unmanaged(i: &Interop, w: &mut 
     for variant in the_type.variants() {
         match variant.kind() {
             VariantKind::Unit(_) => {}
-            VariantKind::Typed(x, t) if !t.is_void() => {
+            VariantKind::Typed(_, t) if !t.is_void() => {
                 let vname = variant.name();
                 indented!(w, [()()], r"[FieldOffset(0)]")?;
                 indented!(w, [()()], r"internal Unmanaged{vname} _{vname};")?;
                 w.newline()?;
             }
-            VariantKind::Typed(x, t) => {}
+            VariantKind::Typed(_, _) => {}
         }
     }
 
@@ -178,7 +178,7 @@ pub fn write_type_definition_enum_variant_utils(i: &Interop, w: &mut IndentWrite
                 let ty = to_typespecifier_in_field(t);
                 indented!(w, [()], r"public static {name} {vname}({ty} value) => new() {{ _variant = {x}, _{vname} = value }};")?;
             }
-            VariantKind::Typed(x, t) => {
+            VariantKind::Typed(x, _) => {
                 let vname = variant.name();
                 indented!(w, [()], r"public static {name} {vname} => new() {{ _variant = {x} }};")?;
             }
@@ -193,7 +193,7 @@ pub fn write_type_definition_enum_variant_utils(i: &Interop, w: &mut IndentWrite
                 let vname = variant.name();
                 indented!(w, [()], r"public bool Is{vname} => _variant == {x};")?;
             }
-            VariantKind::Typed(x, t) => {
+            VariantKind::Typed(x, _) => {
                 let vname = variant.name();
                 indented!(w, [()], r"public bool Is{vname} => _variant == {x};")?;
             }
@@ -214,7 +214,7 @@ pub fn write_type_definition_enum_variant_utils(i: &Interop, w: &mut IndentWrite
                 let ty = to_typespecifier_in_field(t);
                 indented!(w, [()], r"public {ty} As{vname}() {{ if (_variant != {x}) {{ {throw} }} else {{ return _{vname}; }} }}")?;
             }
-            VariantKind::Typed(x, t) => {
+            VariantKind::Typed(x, _) => {
                 let vname = variant.name();
                 indented!(w, [()], r"public void As{vname}() {{ if (_variant != {x}) {throw} }}")?;
             }
@@ -225,13 +225,14 @@ pub fn write_type_definition_enum_variant_utils(i: &Interop, w: &mut IndentWrite
     Ok(())
 }
 
+#[allow(clippy::match_wildcard_for_single_variants)]
 pub fn write_type_definition_enum_variant_fields_to_unmanaged(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
     i.debug(w, "write_type_definition_enum_variant_fields_to_unmanaged")?;
 
     for variant in the_type.variants() {
         match variant.kind() {
-            VariantKind::Unit(x) => (),
-            VariantKind::Typed(x, t) if t.is_void() => (),
+            VariantKind::Unit(_) => (),
+            VariantKind::Typed(_, t) if t.is_void() => (),
             VariantKind::Typed(x, t) if !t.is_void() => {
                 let vname = variant.name();
 
@@ -252,13 +253,14 @@ pub fn write_type_definition_enum_variant_fields_to_unmanaged(i: &Interop, w: &m
     Ok(())
 }
 
+#[allow(clippy::match_wildcard_for_single_variants)]
 pub fn write_type_definition_enum_variant_fields_to_managed(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
     i.debug(w, "write_type_definition_enum_variant_fields_to_managed")?;
 
     for variant in the_type.variants() {
         match variant.kind() {
-            VariantKind::Unit(x) => (),
-            VariantKind::Typed(x, t) if t.is_void() => (),
+            VariantKind::Unit(_) => (),
+            VariantKind::Typed(_, t) if t.is_void() => (),
             VariantKind::Typed(x, t) if !t.is_void() => {
                 let vname = variant.name();
 

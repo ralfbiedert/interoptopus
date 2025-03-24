@@ -27,9 +27,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 5335126409172716460ul)
+            if (api_version != 1942093112364030349ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (5335126409172716460). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (1942093112364030349). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -169,7 +169,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "enums_1")]
         // Debug - write_function_declaration 
-        public static partial void enums_1(EnumPayload x);
+        public static partial void enums_1(EnumPayload ignored);
 
         // Debug - write_function_overload 
         // Debug - no overload for enums_1 

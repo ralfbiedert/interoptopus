@@ -1,11 +1,11 @@
-use crate::interop::FunctionNameFlavor;
 use crate::Interop;
+use crate::interop::FunctionNameFlavor;
 use heck::{ToLowerCamelCase, ToUpperCamelCase};
 use interoptopus::backend::{ctypes_from_type_recursive, safe_name};
 use interoptopus::lang::{Composite, ConstantValue, Enum, Field, FnPointer, Function, Opaque, Parameter, Primitive, PrimitiveValue, SugaredReturnType, Type};
+use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::{AsyncCallback, NamedCallback};
 use interoptopus::pattern::slice::SliceType;
-use interoptopus::pattern::TypePattern;
 use std::collections::HashSet;
 
 /// Converts a primitive (Rust) type to a native C# type name, e.g., `f32` to `float`.
