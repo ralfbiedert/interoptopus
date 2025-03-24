@@ -10,7 +10,7 @@ callback!(MyCallbackVoid(ptr: *const c_void));
 callback!(MyCallbackContextual(context: *const c_void, value: u32));
 callback!(SumDelegate1());
 callback!(SumDelegate2(x: i32, y: i32) -> i32);
-callback!(SumDelegateReturn(x: i32, y: i32) -> Error);
+callback!(SumDelegateReturn(x: i32, y: i32) -> ffi::Result<(), Error>);
 callback!(SumDelegateReturn2(x: i32, y: i32));
 callback!(StringCallback(s: ffi::String));
 callback!(NestedStringCallback(s: UseString));

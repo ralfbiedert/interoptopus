@@ -34,15 +34,15 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "game_engine_destroy")]
-        public static partial ResultConstPtrGameEngineError.Unmanaged game_engine_destroy(IntPtr _context);
+        public static partial ResultConstPtrGameEngineError game_engine_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "game_engine_new")]
-        public static partial ResultConstPtrGameEngineError.Unmanaged game_engine_new();
+        public static partial ResultConstPtrGameEngineError game_engine_new();
 
 
         [LibraryImport(NativeLib, EntryPoint = "game_engine_place_object")]
-        public static partial ResultError.Unmanaged game_engine_place_object(IntPtr _context, [MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position);
+        public static partial ResultError game_engine_place_object(IntPtr _context, [MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position);
 
 
         [LibraryImport(NativeLib, EntryPoint = "game_engine_num_objects")]
@@ -56,6 +56,7 @@ namespace My.Company
         uint _variant;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Error
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -64,6 +65,19 @@ namespace My.Company
             [FieldOffset(0)]
             internal uint _variant;
 
+            public Error ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(Error), MarshalMode.Default, typeof(Marshaller))]
@@ -196,6 +210,7 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrGameEngineError
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -210,6 +225,19 @@ namespace My.Company
             [FieldOffset(2)]
             internal Error.Unmanaged Err;
 
+            public ResultConstPtrGameEngineError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrGameEngineError), MarshalMode.Default, typeof(Marshaller))]
@@ -265,6 +293,7 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultError
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -276,6 +305,19 @@ namespace My.Company
             [FieldOffset(2)]
             internal Error.Unmanaged Err;
 
+            public ResultError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultError), MarshalMode.Default, typeof(Marshaller))]
@@ -343,7 +385,7 @@ namespace My.Company
             Interop.game_engine_destroy(_context).AsOk();
         }
 
-        public ResultError.Unmanaged PlaceObject([MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position)
+        public ResultError PlaceObject([MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position)
         {
             return Interop.game_engine_place_object(_context, name, position);
         }

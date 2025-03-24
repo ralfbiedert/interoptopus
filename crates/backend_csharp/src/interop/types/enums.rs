@@ -1,9 +1,9 @@
-use crate::Interop;
 use crate::converter::{to_typespecifier_in_field, to_typespecifier_in_field_unmanaged};
 use crate::interop::docs::write_documentation;
+use crate::Interop;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Enum, VariantKind};
-use interoptopus::{Error, indented};
+use interoptopus::{indented, Error};
 
 pub fn write_type_definition_enum(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
     i.debug(w, "write_type_definition_enum")?;
@@ -23,6 +23,7 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
     indented!(w, r"}}")?;
     w.newline()?;
 
+    indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
     indented!(w, r"public partial struct {}", name)?;
     indented!(w, r"{{")?;
 
@@ -30,6 +31,20 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
     indented!(w, [()], r"public unsafe struct Unmanaged")?;
     indented!(w, [()], r"{{")?;
     write_type_definition_enum_variant_fields_unmanaged(i, w, the_type)?;
+    indented!(w, [()()], r"public {name} ToManaged()")?;
+    indented!(w, [()()], r"{{")?;
+    indented!(w, [()()()], r"var marshaller = new Marshaller(this);")?;
+    indented!(w, [()()()], r"try {{ return marshaller.ToManaged(); }}")?;
+    indented!(w, [()()()], r"finally {{ marshaller.Free(); }}")?;
+    indented!(w, [()()], r"}}")?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+
+    indented!(w, [()], r"public Unmanaged ToUnmanaged()")?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"var marshaller = new Marshaller(this);")?;
+    indented!(w, [()()], r"try {{ return marshaller.ToUnmanaged(); }}")?;
+    indented!(w, [()()], r"finally {{ marshaller.Free(); }}")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
 

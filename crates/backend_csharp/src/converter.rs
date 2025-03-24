@@ -1,11 +1,11 @@
-use crate::Interop;
 use crate::interop::FunctionNameFlavor;
+use crate::Interop;
 use heck::{ToLowerCamelCase, ToUpperCamelCase};
 use interoptopus::backend::{ctypes_from_type_recursive, safe_name};
 use interoptopus::lang::{Composite, ConstantValue, Enum, Field, FnPointer, Function, Opaque, Parameter, Primitive, PrimitiveValue, SugaredReturnType, Type};
-use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::{AsyncCallback, NamedCallback};
 use interoptopus::pattern::slice::SliceType;
+use interoptopus::pattern::TypePattern;
 use std::collections::HashSet;
 
 /// Converts a primitive (Rust) type to a native C# type name, e.g., `f32` to `float`.
@@ -198,7 +198,7 @@ pub fn to_typespecifier_in_sync_fn_rval(x: &Type) -> String {
         Type::Pattern(x) => match x {
             TypePattern::CStrPointer => "IntPtr".to_string(),
             TypePattern::Utf8String(x) => composite_to_typename(x),
-            TypePattern::Result(x) => format!("{}.Unmanaged", enum_to_typename(x.the_enum())),
+            TypePattern::Result(x) => enum_to_typename(x.the_enum()),
             TypePattern::Slice(x) => composite_to_typename(x.composite_type()),
             TypePattern::SliceMut(x) => composite_to_typename(x.composite_type()),
             TypePattern::Option(x) => composite_to_typename(x),
@@ -214,6 +214,7 @@ pub fn to_typespecifier_in_sync_fn_rval(x: &Type) -> String {
 pub fn to_typespecifier_in_async_fn_rval(x: &SugaredReturnType) -> String {
     match x {
         SugaredReturnType::Async(Type::Pattern(TypePattern::Utf8String(_))) => "Task<string>".to_string(),
+        SugaredReturnType::Async(Type::Pattern(TypePattern::Result(x))) if x.t().is_void() => "Task".to_string(),
         SugaredReturnType::Async(Type::Pattern(TypePattern::Result(x))) => match x.t() {
             Type::Pattern(TypePattern::Utf8String(_)) => "Task<string>".to_string(),
             x => format!("Task<{}>", to_typespecifier_in_sync_fn_rval(x)),

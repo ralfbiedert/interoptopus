@@ -27,6 +27,7 @@ namespace My.Company.Common
         uint _variant;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct EnumDocumented
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -36,6 +37,19 @@ namespace My.Company.Common
             [FieldOffset(0)]
             internal uint _variant;
 
+            public EnumDocumented ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(EnumDocumented), MarshalMode.Default, typeof(Marshaller))]
@@ -90,6 +104,7 @@ namespace My.Company.Common
         uint _variant;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct EnumRenamed
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -99,6 +114,19 @@ namespace My.Company.Common
             [FieldOffset(0)]
             internal uint _variant;
 
+            public EnumRenamed ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(EnumRenamed), MarshalMode.Default, typeof(Marshaller))]
@@ -147,6 +175,7 @@ namespace My.Company.Common
         uint _variant;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Error
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -156,6 +185,19 @@ namespace My.Company.Common
             [FieldOffset(0)]
             internal uint _variant;
 
+            public Error ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(Error), MarshalMode.Default, typeof(Marshaller))]
@@ -1279,6 +1321,7 @@ namespace My.Company.Common
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultError
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -1291,6 +1334,19 @@ namespace My.Company.Common
             [FieldOffset(2)]
             internal Error.Unmanaged Err;
 
+            public ResultError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultError), MarshalMode.Default, typeof(Marshaller))]
@@ -1351,6 +1407,7 @@ namespace My.Company.Common
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultU32Error
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -1366,6 +1423,19 @@ namespace My.Company.Common
             [FieldOffset(2)]
             internal Error.Unmanaged Err;
 
+            public ResultU32Error ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultU32Error), MarshalMode.Default, typeof(Marshaller))]
@@ -1426,6 +1496,7 @@ namespace My.Company.Common
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultU64Error
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -1441,6 +1512,19 @@ namespace My.Company.Common
             [FieldOffset(2)]
             internal Error.Unmanaged Err;
 
+            public ResultU64Error ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultU64Error), MarshalMode.Default, typeof(Marshaller))]
@@ -1501,6 +1585,7 @@ namespace My.Company.Common
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultUtf8StringError
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -1516,6 +1601,19 @@ namespace My.Company.Common
             [FieldOffset(2)]
             internal Error.Unmanaged Err;
 
+            public ResultUtf8StringError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultUtf8StringError), MarshalMode.Default, typeof(Marshaller))]

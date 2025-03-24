@@ -27,9 +27,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 14212958184566934813ul)
+            if (api_version != 75006280138558657ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (14212958184566934813). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (75006280138558657). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -548,7 +548,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "struct2")]
         // Debug - write_function_declaration 
-        public static partial ResultError.Unmanaged struct2(Vec3f32 a, ref Tupled b);
+        public static partial ResultError struct2(Vec3f32 a, ref Tupled b);
 
         // Debug - write_function_overload 
         // Debug - no overload for struct2 
@@ -667,7 +667,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_5")]
         // Debug - write_function_declaration 
-        public static partial ResultUseStringError.Unmanaged pattern_string_5(UseString x);
+        public static partial ResultUseStringError pattern_string_5(UseString x);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_string_5 
@@ -675,7 +675,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_6a")]
         // Debug - write_function_declaration 
-        public static partial ResultError.Unmanaged pattern_string_6a(ref UseString ignored);
+        public static partial ResultError pattern_string_6a(ref UseString ignored);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_string_6a 
@@ -683,7 +683,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_6b")]
         // Debug - write_function_declaration 
-        public static partial ResultError.Unmanaged pattern_string_6b(ref UseString y);
+        public static partial ResultError pattern_string_6b(ref UseString y);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_string_6b 
@@ -691,10 +691,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_7")]
         // Debug - write_function_declaration 
-        public static partial ResultUtf8StringError.Unmanaged pattern_string_7(SliceUtf8String x, ulong i);
+        public static partial ResultUtf8StringError pattern_string_7(SliceUtf8String x, ulong i);
 
         // Debug - write_function_overload 
-        public static unsafe ResultUtf8StringError.Unmanaged pattern_string_7(string[] x, ulong i)
+        public static unsafe ResultUtf8StringError pattern_string_7(string[] x, ulong i)
         {
             var x_wrapped = new SliceUtf8String(x);
             try
@@ -710,10 +710,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_8")]
         // Debug - write_function_declaration 
-        public static partial ResultUseStringError.Unmanaged pattern_string_8(SliceUseString x, ulong i);
+        public static partial ResultUseStringError pattern_string_8(SliceUseString x, ulong i);
 
         // Debug - write_function_overload 
-        public static unsafe ResultUseStringError.Unmanaged pattern_string_8(UseString[] x, ulong i)
+        public static unsafe ResultUseStringError pattern_string_8(UseString[] x, ulong i)
         {
             var x_wrapped = new SliceUseString(x);
             try
@@ -729,7 +729,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_9")]
         // Debug - write_function_declaration 
-        public static partial ResultUtf8StringError.Unmanaged pattern_string_9();
+        public static partial ResultUtf8StringError pattern_string_9();
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_string_9 
@@ -1007,7 +1007,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_result_1")]
         // Debug - write_function_declaration 
-        public static partial ResultU32Error.Unmanaged pattern_result_1(ResultU32Error x);
+        public static partial ResultU32Error pattern_result_1(ResultU32Error x);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_result_1 
@@ -1015,7 +1015,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_result_2")]
         // Debug - write_function_declaration 
-        public static partial ResultError.Unmanaged pattern_result_2();
+        public static partial ResultError pattern_result_2();
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_result_2 
@@ -1023,7 +1023,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_result_3")]
         // Debug - write_function_declaration 
-        public static partial ResultError.Unmanaged pattern_result_3(ResultError x);
+        public static partial ResultError pattern_result_3(ResultError x);
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_result_3 
@@ -1170,7 +1170,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_async_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceAsyncError.Unmanaged service_async_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceAsyncError service_async_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_async_destroy 
@@ -1178,7 +1178,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceAsyncError.Unmanaged service_async_new();
+        public static partial ResultConstPtrServiceAsyncError service_async_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_async_new 
@@ -1186,7 +1186,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_return_after_ms")]
         // Debug - write_function_declaration 
-        public static partial ResultError.Unmanaged service_async_return_after_ms(IntPtr _context, ulong x, ulong ms, AsyncHelper _async_callback);
+        public static partial ResultError service_async_return_after_ms(IntPtr _context, ulong x, ulong ms, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
         public static unsafe Task<ulong> service_async_return_after_ms(IntPtr _context, ulong x, ulong ms)
@@ -1198,7 +1198,7 @@ namespace My.Company
                 var marshaller = new ResultU64Error.Marshaller(unmanaged);
                 var managed = marshaller.ToManaged();
                 if (managed.IsOk) { cs.SetResult(managed.AsOk()); }
-                else { cs.SetException(new InteropException<ResultU64Error>(managed.AsErr())); }
+                else { cs.SetException(new InteropException<Error>(managed.AsErr())); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
@@ -1216,7 +1216,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_process_struct")]
         // Debug - write_function_declaration 
-        public static partial ResultError.Unmanaged service_async_process_struct(IntPtr _context, NestedArray x, AsyncHelper _async_callback);
+        public static partial ResultError service_async_process_struct(IntPtr _context, NestedArray x, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
         public static unsafe Task<NestedArray> service_async_process_struct(IntPtr _context, NestedArray x)
@@ -1228,7 +1228,7 @@ namespace My.Company
                 var marshaller = new ResultNestedArrayError.Marshaller(unmanaged);
                 var managed = marshaller.ToManaged();
                 if (managed.IsOk) { cs.SetResult(managed.AsOk()); }
-                else { cs.SetException(new InteropException<ResultNestedArrayError>(managed.AsErr())); }
+                else { cs.SetException(new InteropException<Error>(managed.AsErr())); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
@@ -1246,7 +1246,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_handle_string")]
         // Debug - write_function_declaration 
-        public static partial ResultError.Unmanaged service_async_handle_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
+        public static partial ResultError service_async_handle_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
         public static unsafe Task<string> service_async_handle_string(IntPtr _context, string s)
@@ -1258,7 +1258,7 @@ namespace My.Company
                 var marshaller = new ResultUtf8StringError.Marshaller(unmanaged);
                 var managed = marshaller.ToManaged();
                 if (managed.IsOk) { cs.SetResult(managed.AsOk()); }
-                else { cs.SetException(new InteropException<ResultUtf8StringError>(managed.AsErr())); }
+                else { cs.SetException(new InteropException<Error>(managed.AsErr())); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
@@ -1278,7 +1278,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_handle_nested_string")]
         // Debug - write_function_declaration 
-        public static partial ResultError.Unmanaged service_async_handle_nested_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
+        public static partial ResultError service_async_handle_nested_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
         public static unsafe Task<UseString> service_async_handle_nested_string(IntPtr _context, string s)
@@ -1290,7 +1290,7 @@ namespace My.Company
                 var marshaller = new ResultUseStringError.Marshaller(unmanaged);
                 var managed = marshaller.ToManaged();
                 if (managed.IsOk) { cs.SetResult(managed.AsOk()); }
-                else { cs.SetException(new InteropException<ResultUseStringError>(managed.AsErr())); }
+                else { cs.SetException(new InteropException<Error>(managed.AsErr())); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
@@ -1331,19 +1331,19 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_async_fail")]
         // Debug - write_function_declaration 
-        public static partial ResultError.Unmanaged service_async_fail(IntPtr _context, AsyncHelper _async_callback);
+        public static partial ResultError service_async_fail(IntPtr _context, AsyncHelper _async_callback);
 
         // Debug - write_function_overload 
-        public static unsafe Task<void> service_async_fail(IntPtr _context)
+        public static unsafe Task service_async_fail(IntPtr _context)
         {
-            var cs = new TaskCompletionSource<void>();
+            var cs = new TaskCompletionSource();
             GCHandle pinned = default;
             var cb = new AsyncHelper((x) => {
                 var unmanaged = Marshal.PtrToStructure<ResultError.Unmanaged>(x);
                 var marshaller = new ResultError.Marshaller(unmanaged);
                 var managed = marshaller.ToManaged();
-                if (managed.IsOk) { cs.SetResult(managed.AsOk()); }
-                else { cs.SetException(new InteropException<ResultError>(managed.AsErr())); }
+                if (managed.IsOk) { cs.SetResult(); }
+                else { cs.SetException(new InteropException<Error>(managed.AsErr())); }
                 pinned.Free();
             });
             pinned = GCHandle.Alloc(cb);
@@ -1375,7 +1375,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_basic_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceBasicError.Unmanaged service_basic_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceBasicError service_basic_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_basic_destroy 
@@ -1383,7 +1383,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_basic_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceBasicError.Unmanaged service_basic_new();
+        public static partial ResultConstPtrServiceBasicError service_basic_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_basic_new 
@@ -1397,7 +1397,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_main_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceMainError.Unmanaged service_main_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceMainError service_main_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_main_destroy 
@@ -1405,7 +1405,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_main_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceMainError.Unmanaged service_main_new(uint value);
+        public static partial ResultConstPtrServiceMainError service_main_new(uint value);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_main_new 
@@ -1419,7 +1419,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_dependent_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceDependentError.Unmanaged service_dependent_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceDependentError service_dependent_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_dependent_destroy 
@@ -1427,7 +1427,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_dependent_from_main")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceDependentError.Unmanaged service_dependent_from_main(IntPtr main);
+        public static partial ResultConstPtrServiceDependentError service_dependent_from_main(IntPtr main);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_dependent_from_main 
@@ -1449,7 +1449,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_result_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceResultError.Unmanaged service_result_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceResultError service_result_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_result_destroy 
@@ -1457,7 +1457,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_result_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceResultError.Unmanaged service_result_new();
+        public static partial ResultConstPtrServiceResultError service_result_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_result_new 
@@ -1465,7 +1465,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_result_test")]
         // Debug - write_function_declaration 
-        public static partial ResultError.Unmanaged service_result_test(IntPtr _context);
+        public static partial ResultError service_result_test(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_result_test 
@@ -1479,7 +1479,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceOnPanicError.Unmanaged service_on_panic_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceOnPanicError service_on_panic_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_destroy 
@@ -1487,7 +1487,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceOnPanicError.Unmanaged service_on_panic_new();
+        public static partial ResultConstPtrServiceOnPanicError service_on_panic_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_new 
@@ -1497,7 +1497,7 @@ namespace My.Company
         /// need annotations.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_result")]
         // Debug - write_function_declaration 
-        public static partial ResultError.Unmanaged service_on_panic_return_result(IntPtr _context, uint anon1);
+        public static partial ResultError service_on_panic_return_result(IntPtr _context, uint anon1);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_on_panic_return_result 
@@ -1530,7 +1530,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceCallbacksError.Unmanaged service_callbacks_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceCallbacksError service_callbacks_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_destroy 
@@ -1538,7 +1538,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceCallbacksError.Unmanaged service_callbacks_new();
+        public static partial ResultConstPtrServiceCallbacksError service_callbacks_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_new 
@@ -1546,10 +1546,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_simple")]
         // Debug - write_function_declaration 
-        public static partial ResultError.Unmanaged service_callbacks_callback_simple(IntPtr _context, MyCallback callback);
+        public static partial ResultError service_callbacks_callback_simple(IntPtr _context, MyCallback callback);
 
         // Debug - write_function_overload 
-        public static unsafe ResultError.Unmanaged service_callbacks_callback_simple(IntPtr _context, MyCallbackDelegate callback)
+        public static unsafe ResultError service_callbacks_callback_simple(IntPtr _context, MyCallbackDelegate callback)
         {
             var callback_wrapped = new MyCallback(callback);
             try
@@ -1565,10 +1565,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_ffi_return")]
         // Debug - write_function_declaration 
-        public static partial ResultError.Unmanaged service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturn callback);
+        public static partial ResultError service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturn callback);
 
         // Debug - write_function_overload 
-        public static unsafe ResultError.Unmanaged service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturnDelegate callback)
+        public static unsafe ResultError service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturnDelegate callback)
         {
             var callback_wrapped = new SumDelegateReturn(callback);
             try
@@ -1584,10 +1584,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_with_slice")]
         // Debug - write_function_declaration 
-        public static partial ResultError.Unmanaged service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturn callback, SliceI32 input);
+        public static partial ResultError service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturn callback, SliceI32 input);
 
         // Debug - write_function_overload 
-        public static unsafe ResultError.Unmanaged service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
+        public static unsafe ResultError service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
         {
             fixed (void* ptr_input = input)
             {
@@ -1615,7 +1615,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_invoke_delegates")]
         // Debug - write_function_declaration 
-        public static partial ResultError.Unmanaged service_callbacks_invoke_delegates(IntPtr _context);
+        public static partial ResultError service_callbacks_invoke_delegates(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_callbacks_invoke_delegates 
@@ -1629,7 +1629,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceIgnoringMethodsError.Unmanaged service_ignoring_methods_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceIgnoringMethodsError service_ignoring_methods_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_ignoring_methods_destroy 
@@ -1637,7 +1637,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceIgnoringMethodsError.Unmanaged service_ignoring_methods_new();
+        public static partial ResultConstPtrServiceIgnoringMethodsError service_ignoring_methods_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_ignoring_methods_new 
@@ -1651,7 +1651,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceMultipleCtorsError.Unmanaged service_multiple_ctors_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_destroy 
@@ -1659,7 +1659,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceMultipleCtorsError.Unmanaged service_multiple_ctors_new_with(uint some_value);
+        public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_new_with(uint some_value);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_with 
@@ -1667,7 +1667,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_without")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceMultipleCtorsError.Unmanaged service_multiple_ctors_new_without();
+        public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_new_without();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_without 
@@ -1675,7 +1675,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with_string")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceMultipleCtorsError.Unmanaged service_multiple_ctors_new_with_string([MarshalAs(UnmanagedType.LPStr)] string anon0);
+        public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_new_with_string([MarshalAs(UnmanagedType.LPStr)] string anon0);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_with_string 
@@ -1683,7 +1683,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_failing")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceMultipleCtorsError.Unmanaged service_multiple_ctors_new_failing(byte some_value);
+        public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_new_failing(byte some_value);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_multiple_ctors_new_failing 
@@ -1697,7 +1697,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceVariousSlicesError.Unmanaged service_various_slices_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceVariousSlicesError service_various_slices_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_various_slices_destroy 
@@ -1705,7 +1705,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceVariousSlicesError.Unmanaged service_various_slices_new();
+        public static partial ResultConstPtrServiceVariousSlicesError service_various_slices_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_various_slices_new 
@@ -1811,10 +1811,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ffi_error")]
         // Debug - write_function_declaration 
-        public static partial ResultError.Unmanaged service_various_slices_mut_self_ffi_error(IntPtr _context, SliceMutU8 slice);
+        public static partial ResultError service_various_slices_mut_self_ffi_error(IntPtr _context, SliceMutU8 slice);
 
         // Debug - write_function_overload 
-        public static unsafe ResultError.Unmanaged service_various_slices_mut_self_ffi_error(IntPtr _context, Span<byte> slice)
+        public static unsafe ResultError service_various_slices_mut_self_ffi_error(IntPtr _context, Span<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
@@ -1832,10 +1832,10 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_no_error")]
         // Debug - write_function_declaration 
-        public static partial ResultError.Unmanaged service_various_slices_mut_self_no_error(IntPtr _context, SliceMutU8 slice);
+        public static partial ResultError service_various_slices_mut_self_no_error(IntPtr _context, SliceMutU8 slice);
 
         // Debug - write_function_overload 
-        public static unsafe ResultError.Unmanaged service_various_slices_mut_self_no_error(IntPtr _context, Span<byte> slice)
+        public static unsafe ResultError service_various_slices_mut_self_no_error(IntPtr _context, Span<byte> slice)
         {
             fixed (void* ptr_slice = slice)
             {
@@ -1879,7 +1879,7 @@ namespace My.Company
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_strings_destroy")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceStringsError.Unmanaged service_strings_destroy(IntPtr _context);
+        public static partial ResultConstPtrServiceStringsError service_strings_destroy(IntPtr _context);
 
         // Debug - write_function_overload 
         // Debug - no overload for service_strings_destroy 
@@ -1887,7 +1887,7 @@ namespace My.Company
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_new")]
         // Debug - write_function_declaration 
-        public static partial ResultConstPtrServiceStringsError.Unmanaged service_strings_new();
+        public static partial ResultConstPtrServiceStringsError service_strings_new();
 
         // Debug - write_function_overload 
         // Debug - no overload for service_strings_new 
@@ -1941,6 +1941,7 @@ namespace My.Company
         uint _C;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct EnumPayload
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -1956,6 +1957,19 @@ namespace My.Company
             [FieldOffset(2)]
             internal uint C;
 
+            public EnumPayload ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(EnumPayload), MarshalMode.Default, typeof(Marshaller))]
@@ -4771,6 +4785,7 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceAsyncError
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -4786,6 +4801,19 @@ namespace My.Company
             [FieldOffset(2)]
             internal Error.Unmanaged Err;
 
+            public ResultConstPtrServiceAsyncError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceAsyncError), MarshalMode.Default, typeof(Marshaller))]
@@ -4846,6 +4874,7 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceBasicError
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -4861,6 +4890,19 @@ namespace My.Company
             [FieldOffset(2)]
             internal Error.Unmanaged Err;
 
+            public ResultConstPtrServiceBasicError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceBasicError), MarshalMode.Default, typeof(Marshaller))]
@@ -4921,6 +4963,7 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceCallbacksError
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -4936,6 +4979,19 @@ namespace My.Company
             [FieldOffset(2)]
             internal Error.Unmanaged Err;
 
+            public ResultConstPtrServiceCallbacksError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceCallbacksError), MarshalMode.Default, typeof(Marshaller))]
@@ -4996,6 +5052,7 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceDependentError
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -5011,6 +5068,19 @@ namespace My.Company
             [FieldOffset(2)]
             internal Error.Unmanaged Err;
 
+            public ResultConstPtrServiceDependentError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceDependentError), MarshalMode.Default, typeof(Marshaller))]
@@ -5071,6 +5141,7 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceIgnoringMethodsError
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -5086,6 +5157,19 @@ namespace My.Company
             [FieldOffset(2)]
             internal Error.Unmanaged Err;
 
+            public ResultConstPtrServiceIgnoringMethodsError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceIgnoringMethodsError), MarshalMode.Default, typeof(Marshaller))]
@@ -5146,6 +5230,7 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceMainError
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -5161,6 +5246,19 @@ namespace My.Company
             [FieldOffset(2)]
             internal Error.Unmanaged Err;
 
+            public ResultConstPtrServiceMainError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceMainError), MarshalMode.Default, typeof(Marshaller))]
@@ -5221,6 +5319,7 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceMultipleCtorsError
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -5236,6 +5335,19 @@ namespace My.Company
             [FieldOffset(2)]
             internal Error.Unmanaged Err;
 
+            public ResultConstPtrServiceMultipleCtorsError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceMultipleCtorsError), MarshalMode.Default, typeof(Marshaller))]
@@ -5296,6 +5408,7 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceOnPanicError
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -5311,6 +5424,19 @@ namespace My.Company
             [FieldOffset(2)]
             internal Error.Unmanaged Err;
 
+            public ResultConstPtrServiceOnPanicError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceOnPanicError), MarshalMode.Default, typeof(Marshaller))]
@@ -5371,6 +5497,7 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceResultError
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -5386,6 +5513,19 @@ namespace My.Company
             [FieldOffset(2)]
             internal Error.Unmanaged Err;
 
+            public ResultConstPtrServiceResultError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceResultError), MarshalMode.Default, typeof(Marshaller))]
@@ -5446,6 +5586,7 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceStringsError
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -5461,6 +5602,19 @@ namespace My.Company
             [FieldOffset(2)]
             internal Error.Unmanaged Err;
 
+            public ResultConstPtrServiceStringsError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceStringsError), MarshalMode.Default, typeof(Marshaller))]
@@ -5521,6 +5675,7 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultConstPtrServiceVariousSlicesError
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -5536,6 +5691,19 @@ namespace My.Company
             [FieldOffset(2)]
             internal Error.Unmanaged Err;
 
+            public ResultConstPtrServiceVariousSlicesError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultConstPtrServiceVariousSlicesError), MarshalMode.Default, typeof(Marshaller))]
@@ -5596,6 +5764,7 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultNestedArrayError
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -5611,6 +5780,19 @@ namespace My.Company
             [FieldOffset(2)]
             internal Error.Unmanaged Err;
 
+            public ResultNestedArrayError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultNestedArrayError), MarshalMode.Default, typeof(Marshaller))]
@@ -5671,6 +5853,7 @@ namespace My.Company
         Error _Err;
     }
 
+    [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultUseStringError
     {
         [StructLayout(LayoutKind.Explicit)]
@@ -5686,6 +5869,19 @@ namespace My.Company
             [FieldOffset(2)]
             internal Error.Unmanaged Err;
 
+            public ResultUseStringError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
         }
 
         [CustomMarshaller(typeof(ResultUseStringError), MarshalMode.Default, typeof(Marshaller))]
@@ -6925,8 +7121,8 @@ namespace My.Company
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate Error SumDelegateReturnNative(int x, int y, IntPtr callback_data); // 'True' native callback signature
-    public delegate Error SumDelegateReturnDelegate(int x, int y); // Our C# signature
+    public delegate ResultError.Unmanaged SumDelegateReturnNative(int x, int y, IntPtr callback_data); // 'True' native callback signature
+    public delegate ResultError SumDelegateReturnDelegate(int x, int y); // Our C# signature
 
     public partial class SumDelegateReturn
     {
@@ -6950,7 +7146,7 @@ namespace My.Company
         }
 
         // Helper to invoke managed code from the native invocation.
-        private Error CallTrampoline(int x, int y, IntPtr callback_data)
+        private ResultError.Unmanaged CallTrampoline(int x, int y, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
             try
@@ -6965,7 +7161,7 @@ namespace My.Company
         }
 
         // Invokes the callback.
-        public Error Call(int x, int y)
+        public ResultError Call(int x, int y)
         {
             var __target = Marshal.GetDelegateForFunctionPointer<SumDelegateReturnNative>(_ptr);
             // TODO
@@ -7185,7 +7381,7 @@ namespace My.Company
         }
 
         // Debug - write_pattern_service_method 
-        public Task<void> Fail()
+        public Task Fail()
         {
             return Interop.service_async_fail(_context);
         }
@@ -7306,7 +7502,7 @@ namespace My.Company
         }
 
         // Debug - write_pattern_service_method 
-        public ResultError.Unmanaged Test()
+        public ResultError Test()
         {
             return Interop.service_result_test(_context);
         }
@@ -7341,7 +7537,7 @@ namespace My.Company
         /// Methods returning a Result<(), _> are the default and do not
         /// need annotations.
         // Debug - write_pattern_service_method 
-        public ResultError.Unmanaged ReturnResult(uint anon1)
+        public ResultError ReturnResult(uint anon1)
         {
             return Interop.service_on_panic_return_result(_context, anon1);
         }
@@ -7392,40 +7588,40 @@ namespace My.Company
         }
 
         // Debug - write_pattern_service_method 
-        public ResultError.Unmanaged CallbackSimple(MyCallback callback)
+        public ResultError CallbackSimple(MyCallback callback)
         {
             return Interop.service_callbacks_callback_simple(_context, callback);
         }
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public ResultError.Unmanaged CallbackSimple(MyCallbackDelegate callback)
+        public ResultError CallbackSimple(MyCallbackDelegate callback)
         {
             return Interop.service_callbacks_callback_simple(_context, callback);
         }
 
         // Debug - write_pattern_service_method 
-        public ResultError.Unmanaged CallbackFfiReturn(SumDelegateReturn callback)
+        public ResultError CallbackFfiReturn(SumDelegateReturn callback)
         {
             return Interop.service_callbacks_callback_ffi_return(_context, callback);
         }
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public ResultError.Unmanaged CallbackFfiReturn(SumDelegateReturnDelegate callback)
+        public ResultError CallbackFfiReturn(SumDelegateReturnDelegate callback)
         {
             return Interop.service_callbacks_callback_ffi_return(_context, callback);
         }
 
         // Debug - write_pattern_service_method 
-        public ResultError.Unmanaged CallbackWithSlice(SumDelegateReturn callback, SliceI32 input)
+        public ResultError CallbackWithSlice(SumDelegateReturn callback, SliceI32 input)
         {
             return Interop.service_callbacks_callback_with_slice(_context, callback, input);
         }
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public ResultError.Unmanaged CallbackWithSlice(SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
+        public ResultError CallbackWithSlice(SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
         {
             return Interop.service_callbacks_callback_with_slice(_context, callback, input);
         }
@@ -7438,7 +7634,7 @@ namespace My.Company
         // Debug - write_service_method_overload 
 
         // Debug - write_pattern_service_method 
-        public ResultError.Unmanaged InvokeDelegates()
+        public ResultError InvokeDelegates()
         {
             return Interop.service_callbacks_invoke_delegates(_context);
         }
@@ -7607,27 +7803,27 @@ namespace My.Company
         }
 
         // Debug - write_pattern_service_method 
-        public ResultError.Unmanaged MutSelfFfiError(SliceMutU8 slice)
+        public ResultError MutSelfFfiError(SliceMutU8 slice)
         {
             return Interop.service_various_slices_mut_self_ffi_error(_context, slice);
         }
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public ResultError.Unmanaged MutSelfFfiError(Span<byte> slice)
+        public ResultError MutSelfFfiError(Span<byte> slice)
         {
             return Interop.service_various_slices_mut_self_ffi_error(_context, slice);
         }
 
         // Debug - write_pattern_service_method 
-        public ResultError.Unmanaged MutSelfNoError(SliceMutU8 slice)
+        public ResultError MutSelfNoError(SliceMutU8 slice)
         {
             return Interop.service_various_slices_mut_self_no_error(_context, slice);
         }
         // Debug - write_service_method_overload 
 
         // Debug - write_common_service_method_overload 
-        public ResultError.Unmanaged MutSelfNoError(Span<byte> slice)
+        public ResultError MutSelfNoError(Span<byte> slice)
         {
             return Interop.service_various_slices_mut_self_no_error(_context, slice);
         }

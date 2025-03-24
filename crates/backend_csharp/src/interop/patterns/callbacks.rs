@@ -13,6 +13,8 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     let rval_safe = to_typespecifier_in_sync_fn_rval(the_type.fnpointer().signature().rval());
     let rval_unsafe = match the_type.fnpointer().signature().rval() {
         Type::Composite(_) => format!("{rval_safe}.Unmanaged"),
+        Type::Enum(_) => format!("{rval_safe}.Unmanaged"),
+        Type::Pattern(TypePattern::Result(_)) => format!("{rval_safe}.Unmanaged"),
         _ => rval_safe.clone(),
     };
 

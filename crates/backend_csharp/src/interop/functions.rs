@@ -7,7 +7,7 @@ use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Function, Primitive, SugaredReturnType, Type};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{Error, indented};
+use interoptopus::{indented, Error};
 use std::iter::zip;
 
 pub fn write_functions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
@@ -189,13 +189,12 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     indented!(w, r"{{")?;
 
     if let SugaredReturnType::Async(ref x) = async_rval {
-        let task_type = match x {
-            Type::Pattern(TypePattern::Result(x)) if matches!(x.t(), Type::Pattern(TypePattern::Utf8String(_))) => "string".to_string(),
-            Type::Pattern(TypePattern::Result(x)) => to_typespecifier_in_sync_fn_rval(x.t()),
-            x => to_typespecifier_in_sync_fn_rval(x),
+        let task_completion_source = match x {
+            Type::Pattern(TypePattern::Result(x)) if matches!(x.t(), Type::Pattern(TypePattern::Utf8String(_))) => "TaskCompletionSource<string>".to_string(),
+            Type::Pattern(TypePattern::Result(x)) if x.t().is_void() => "TaskCompletionSource".to_string(),
+            Type::Pattern(TypePattern::Result(x)) => format!("TaskCompletionSource<{}>", to_typespecifier_in_sync_fn_rval(x.t())),
+            x => format!("TaskCompletionSource<{}>", to_typespecifier_in_sync_fn_rval(x)),
         };
-
-        let task_completion_source = format!("TaskCompletionSource<{task_type}>");
 
         indented!(w, [()], r"var cs = new {task_completion_source}();")?;
         indented!(w, [()], r"GCHandle pinned = default;")?;
@@ -205,8 +204,13 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         indented!(w, [()()], r"var managed = marshaller.ToManaged();")?;
         match x {
             Type::Pattern(TypePattern::Result(x)) => {
-                indented!(w, [()()], r"if (managed.IsOk) {{ cs.SetResult(managed.AsOk()); }}")?;
-                indented!(w, [()()], r"else {{ cs.SetException(new InteropException<{}>(managed.AsErr())); }}", x.the_enum().rust_name())?;
+                if x.t().is_void() {
+                    indented!(w, [()()], r"if (managed.IsOk) {{ cs.SetResult(); }}")?;
+                } else {
+                    indented!(w, [()()], r"if (managed.IsOk) {{ cs.SetResult(managed.AsOk()); }}")?;
+                }
+                let rtype = to_typespecifier_in_sync_fn_rval(x.e());
+                indented!(w, [()()], r"else {{ cs.SetException(new InteropException<{rtype}>(managed.AsErr())); }}")?;
             }
             _ => indented!(w, [()()], r"cs.SetResult(managed);")?,
         }
