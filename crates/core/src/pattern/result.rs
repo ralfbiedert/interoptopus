@@ -150,18 +150,12 @@ impl<T, E> IntoFFIResult for Result<T, E> {
 ///
 /// At some point we want to get rid of these once `Try` ([try_trait_v2](https://github.com/rust-lang/rust/issues/84277)) stabilizes.
 pub fn result_to_ffi<T: TypeInfo, E: TypeInfo>(f: impl FnOnce() -> std::result::Result<T, E>) -> Result<T, E> {
-    match f() {
-        std::result::Result::Ok(x) => Result::Ok(x),
-        std::result::Result::Err(e) => Result::Err(e),
-    }
+    f().into()
 }
 
 /// At some point we want to get rid of these once `Try` ([try_trait_v2](https://github.com/rust-lang/rust/issues/84277)) stabilizes.
 pub async fn result_to_ffi_async<T: TypeInfo, E: TypeInfo>(f: impl std::ops::AsyncFnOnce() -> std::result::Result<T, E>) -> Result<T, E> {
-    match f().await {
-        std::result::Result::Ok(x) => Result::Ok(x),
-        std::result::Result::Err(e) => Result::Err(e),
-    }
+    f().await.into()
 }
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]

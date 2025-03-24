@@ -115,11 +115,20 @@ impl<T> Option<T> {
     }
 }
 
-impl<T: Default> From<std::option::Option<T>> for Option<T> {
+impl<T> From<std::option::Option<T>> for Option<T> {
     fn from(option: std::option::Option<T>) -> Self {
         match option {
             Some(t) => Self::Some(t),
             None => Self::None,
+        }
+    }
+}
+
+impl<T> From<Option<T>> for std::option::Option<T> {
+    fn from(option: Option<T>) -> Self {
+        match option {
+            Option::Some(t) => Some(t),
+            Option::None => None,
         }
     }
 }
