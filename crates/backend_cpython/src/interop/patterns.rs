@@ -98,7 +98,7 @@ pub fn write_slice(_i: &Interop, w: &mut IndentWriter, c: &SliceType, mutable: b
     Ok(())
 }
 
-pub fn write_option(_i: &Interop, w: &mut IndentWriter, c: &Composite) -> Result<(), Error> {
+pub fn _write_option(_i: &Interop, w: &mut IndentWriter, c: &Composite) -> Result<(), Error> {
     let data_type = c
         .fields()
         .iter()

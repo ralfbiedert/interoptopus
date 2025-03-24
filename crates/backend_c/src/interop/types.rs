@@ -57,7 +57,7 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type,
                 w.newline()?;
             }
             TypePattern::Option(x) => {
-                write_type_definition_composite(i, w, x)?;
+                write_type_definition_enum(i, w, x.the_enum())?;
                 w.newline()?;
             }
             TypePattern::Utf8String(x) => {

@@ -42,7 +42,7 @@ def init_lib(path):
     c_lib.meta_documented.argtypes = [StructDocumented]
     c_lib.meta_visibility1.argtypes = [Visibility1, Visibility2]
     c_lib.meta_renamed.argtypes = [StructRenamed]
-    c_lib.namespaced_inner_option.argtypes = [OptionVec]
+    c_lib.namespaced_inner_option.argtypes = [TODO]
     c_lib.namespaced_inner_slice.argtypes = [SliceVec]
     c_lib.namespaced_inner_slice_mut.argtypes = [SliceMutVec]
     c_lib.namespaced_type.argtypes = [Vec]
@@ -97,8 +97,9 @@ def init_lib(path):
     c_lib.pattern_ffi_slice_8.argtypes = [ctypes.POINTER(SliceMutCharArray), ctypes.CFUNCTYPE(None, CharArray, ctypes.c_void_p)]
     c_lib.pattern_ffi_slice_delegate.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint8, SliceU8, ctypes.c_void_p)]
     c_lib.pattern_ffi_slice_delegate_huge.argtypes = [ctypes.CFUNCTYPE(Vec3f32, SliceVec3f32, ctypes.c_void_p)]
-    c_lib.pattern_ffi_option_1.argtypes = [OptionInner]
-    c_lib.pattern_ffi_option_2.argtypes = [OptionInner]
+    c_lib.pattern_ffi_option_1.argtypes = [TODO]
+    c_lib.pattern_ffi_option_2.argtypes = [TODO]
+    c_lib.pattern_ffi_option_3.argtypes = [TODO]
     c_lib.pattern_ffi_bool.argtypes = [ctypes.c_uint8]
     c_lib.pattern_ffi_cchar.argtypes = [ctypes.c_char]
     c_lib.pattern_ffi_cchar_const_pointer.argtypes = [ctypes.POINTER(ctypes.c_char)]
@@ -195,7 +196,7 @@ def init_lib(path):
     c_lib.meta_ambiguous_3.restype = ctypes.c_bool
     c_lib.meta_documented.restype = ctypes.c_int
     c_lib.meta_renamed.restype = ctypes.c_int
-    c_lib.namespaced_inner_option.restype = OptionVec
+    c_lib.namespaced_inner_option.restype = TODO
     c_lib.namespaced_inner_slice.restype = SliceVec
     c_lib.namespaced_inner_slice_mut.restype = SliceMutVec
     c_lib.namespaced_type.restype = Vec
@@ -243,8 +244,9 @@ def init_lib(path):
     c_lib.pattern_ffi_slice_2.restype = Vec3f32
     c_lib.pattern_ffi_slice_delegate.restype = ctypes.c_uint8
     c_lib.pattern_ffi_slice_delegate_huge.restype = Vec3f32
-    c_lib.pattern_ffi_option_1.restype = OptionInner
+    c_lib.pattern_ffi_option_1.restype = TODO
     c_lib.pattern_ffi_option_2.restype = Inner
+    c_lib.pattern_ffi_option_3.restype = TODO
     c_lib.pattern_ffi_bool.restype = ctypes.c_uint8
     c_lib.pattern_ffi_cchar.restype = ctypes.c_char
     c_lib.pattern_ffi_cchar_const_pointer.restype = ctypes.POINTER(ctypes.c_char)
@@ -351,10 +353,10 @@ def behavior_sleep(millis: int):
 def behavior_panics():
     return c_lib.behavior_panics()
 
-def enums_1(ignored: ctypes.c_int):
+def enums_1(ignored: TODO):
     return c_lib.enums_1(ignored)
 
-def enums_2(x: ctypes.c_int) -> ctypes.c_int:
+def enums_2(x: TODO) -> TODO:
     return c_lib.enums_2(x)
 
 def enums_3(x: ctypes.POINTER(ctypes.c_int)) -> ctypes.POINTER(ctypes.c_int):
@@ -402,17 +404,17 @@ def meta_ambiguous_2(x: Vec2) -> Vec2:
 def meta_ambiguous_3(x: Vec1, y: Vec2) -> bool:
     return c_lib.meta_ambiguous_3(x, y)
 
-def meta_documented(x: StructDocumented) -> ctypes.c_int:
+def meta_documented(x: StructDocumented) -> TODO:
     """ This function has documentation."""
     return c_lib.meta_documented(x)
 
 def meta_visibility1(x: Visibility1, y: Visibility2):
     return c_lib.meta_visibility1(x, y)
 
-def meta_renamed(x: StructRenamed) -> ctypes.c_int:
+def meta_renamed(x: StructRenamed) -> TODO:
     return c_lib.meta_renamed(x)
 
-def namespaced_inner_option(x: OptionVec) -> OptionVec:
+def namespaced_inner_option(x: TODO) -> TODO:
     return c_lib.namespaced_inner_option(x)
 
 def namespaced_inner_slice(x: SliceVec | ctypes.Array[Vec]) -> SliceVec:
@@ -637,11 +639,14 @@ def pattern_ffi_slice_delegate_huge(callback) -> Vec3f32:
 
     return c_lib.pattern_ffi_slice_delegate_huge(callback)
 
-def pattern_ffi_option_1(ffi_slice: OptionInner) -> OptionInner:
-    return c_lib.pattern_ffi_option_1(ffi_slice)
+def pattern_ffi_option_1(x: TODO) -> TODO:
+    return c_lib.pattern_ffi_option_1(x)
 
-def pattern_ffi_option_2(ffi_slice: OptionInner) -> Inner:
-    return c_lib.pattern_ffi_option_2(ffi_slice)
+def pattern_ffi_option_2(x: TODO) -> Inner:
+    return c_lib.pattern_ffi_option_2(x)
+
+def pattern_ffi_option_3(x: TODO) -> TODO:
+    return c_lib.pattern_ffi_option_3(x)
 
 def pattern_ffi_bool(ffi_bool):
     return c_lib.pattern_ffi_bool(ffi_bool)
@@ -691,7 +696,7 @@ def pattern_callback_5():
 def pattern_callback_6():
     return c_lib.pattern_callback_6()
 
-def pattern_callback_7(c1, c2, x: int, i: int, o: ctypes.POINTER(ctypes.c_int32)) -> ctypes.c_int:
+def pattern_callback_7(c1, c2, x: int, i: int, o: ctypes.POINTER(ctypes.c_int32)) -> TODO:
     if not hasattr(c1, "__ctypes_from_outparam__"):
         c1 = callbacks.fn_i32_i32_ConstPtr_rval_ResultError(c1)
 
@@ -1026,16 +1031,16 @@ class StructRenamed(ctypes.Structure):
         ("e", ctypes.c_int),
     ]
 
-    def __init__(self, e: ctypes.c_int = None):
+    def __init__(self, e: TODO = None):
         if e is not None:
             self.e = e
 
     @property
-    def e(self) -> ctypes.c_int:
+    def e(self) -> TODO:
         return ctypes.Structure.__get__(self, "e")
 
     @e.setter
-    def e(self, value: ctypes.c_int):
+    def e(self, value: TODO):
         return ctypes.Structure.__set__(self, "e", value)
 
 
@@ -1713,6 +1718,13 @@ class SliceMutU8(ctypes.Structure):
         return rval
 
 
+class OptionUtf8String:
+    """Option that contains Some(value) or None."""
+    # Element if Some().
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    None = 1
+
+
 class ResultError:
     """Result that contains value or an error."""
     # Element if err is `Ok`.
@@ -2156,54 +2168,18 @@ class SliceMutVec(ctypes.Structure):
         return self[len(self)-1]
 
 
-class OptionInner(ctypes.Structure):
-    """May optionally hold a value."""
-
-    _fields_ = [
-        ("_t", Inner),
-        ("_is_some", ctypes.c_uint8),
-    ]
-
-    @property
-    def value(self) -> Inner:
-        """Returns the value if it exists, or None."""
-        if self._is_some == 1:
-            return self._t
-        else:
-            return None
-
-    def is_some(self) -> bool:
-        """Returns true if the value exists."""
-        return self._is_some == 1
-
-    def is_none(self) -> bool:
-        """Returns true if the value does not exist."""
-        return self._is_some != 0
+class OptionInner:
+    """Option that contains Some(value) or None."""
+    # Element if Some().
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    None = 1
 
 
-class OptionVec(ctypes.Structure):
-    """May optionally hold a value."""
-
-    _fields_ = [
-        ("_t", Vec),
-        ("_is_some", ctypes.c_uint8),
-    ]
-
-    @property
-    def value(self) -> Vec:
-        """Returns the value if it exists, or None."""
-        if self._is_some == 1:
-            return self._t
-        else:
-            return None
-
-    def is_some(self) -> bool:
-        """Returns true if the value exists."""
-        return self._is_some == 1
-
-    def is_none(self) -> bool:
-        """Returns true if the value does not exist."""
-        return self._is_some != 0
+class OptionVec:
+    """Option that contains Some(value) or None."""
+    # Element if Some().
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    None = 1
 
 
 class ResultConstPtrServiceAsyncError:
@@ -2307,6 +2283,16 @@ class ResultConstPtrServiceStringsError:
 
 
 class ResultConstPtrServiceVariousSlicesError:
+    """Result that contains value or an error."""
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
+
+
+class ResultOptionUtf8StringError:
     """Result that contains value or an error."""
     # Element if err is `Ok`.
 # TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
@@ -2467,7 +2453,7 @@ class NestedArray(ctypes.Structure):
         ("field_struct", Array),
     ]
 
-    def __init__(self, field_enum: ctypes.c_int = None, field_vec: Vec3f32 = None, field_bool: bool = None, field_int: int = None, field_array = None, field_array_2 = None, field_struct: Array = None):
+    def __init__(self, field_enum: TODO = None, field_vec: Vec3f32 = None, field_bool: bool = None, field_int: int = None, field_array = None, field_array_2 = None, field_struct: Array = None):
         if field_enum is not None:
             self.field_enum = field_enum
         if field_vec is not None:
@@ -2484,11 +2470,11 @@ class NestedArray(ctypes.Structure):
             self.field_struct = field_struct
 
     @property
-    def field_enum(self) -> ctypes.c_int:
+    def field_enum(self) -> TODO:
         return ctypes.Structure.__get__(self, "field_enum")
 
     @field_enum.setter
-    def field_enum(self, value: ctypes.c_int):
+    def field_enum(self, value: TODO):
         return ctypes.Structure.__set__(self, "field_enum", value)
 
     @property
@@ -2538,6 +2524,13 @@ class NestedArray(ctypes.Structure):
     @field_struct.setter
     def field_struct(self, value: Array):
         return ctypes.Structure.__set__(self, "field_struct", value)
+
+
+class OptionResultOptionUtf8StringError:
+    """Option that contains Some(value) or None."""
+    # Element if Some().
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    None = 1
 
 
 class SliceMutCharArray(ctypes.Structure):
@@ -2599,6 +2592,13 @@ class SliceMutCharArray(ctypes.Structure):
     def last(self) -> CharArray:
         """Returns the last element of this slice."""
         return self[len(self)-1]
+
+
+class OptionOptionResultOptionUtf8StringError:
+    """Option that contains Some(value) or None."""
+    # Element if Some().
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    None = 1
 
 
 class ResultNestedArrayError:

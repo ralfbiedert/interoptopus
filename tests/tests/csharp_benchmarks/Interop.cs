@@ -22,9 +22,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 1942093112364030349ul)
+            if (api_version != 11026466454465313054ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (1942093112364030349). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (11026466454465313054). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -634,11 +634,15 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_1")]
-        public static partial OptionInner pattern_ffi_option_1(OptionInner ffi_slice);
+        public static partial OptionInner pattern_ffi_option_1(OptionInner x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_2")]
-        public static partial Inner pattern_ffi_option_2(OptionInner ffi_slice);
+        public static partial Inner pattern_ffi_option_2(OptionInner x);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_3")]
+        public static partial OptionOptionResultOptionUtf8StringError pattern_ffi_option_3(OptionOptionResultOptionUtf8StringError x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_bool")]
@@ -2142,7 +2146,7 @@ namespace My.Company
 
     public partial struct Inner
     {
-        float x;
+        public float x;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -3874,36 +3878,32 @@ namespace My.Company
         }
     }
 
-    ///Option type containing boolean flag and maybe valid data.
+    ///Option that contains Some(value) or None.
     public partial struct OptionInner
     {
-        ///Element that is maybe valid.
-        Inner t;
-        ///Byte where `1` means element `t` is valid.
-        byte is_some;
+        uint _variant;
+        Inner _Some;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct OptionInner
     {
-        public OptionInner(OptionInner other)
-        {
-            t = other.t;
-            is_some = other.is_some;
-        }
-
-        public Unmanaged ToUnmanaged()
-        {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
-        }
-
         [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedSome
+        {
+            internal uint _variant;
+            internal Inner.Unmanaged _Some;
+        }
+
+
+        [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
-            public Inner.Unmanaged t;
-            public byte is_some;
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(0)]
+            internal UnmanagedSome _Some;
 
             public OptionInner ToManaged()
             {
@@ -3913,8 +3913,24 @@ namespace My.Company
             }
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [CustomMarshaller(typeof(OptionInner), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
+
+        public static OptionInner Some(Inner value) => new() { _variant = 0, _Some = value };
+        public static OptionInner None => new() { _variant = 1 };
+
+        public bool IsSome => _variant == 0;
+        public bool IsNone => _variant == 1;
+
+        public Inner AsSome() { if (_variant != 0) { throw new InteropException(); } else { return _Some; } }
+        public void AsNone() { if (_variant != 1) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -3930,48 +3946,21 @@ namespace My.Company
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
-
-                var _t = new Inner.Marshaller(_managed.t);
-                _unmanaged.t = _t.ToUnmanaged();
-                _unmanaged.is_some = _managed.is_some;
-
+                _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Some._Some = _managed._Some.ToUnmanaged();
                 return _unmanaged;
             }
 
             public unsafe OptionInner ToManaged()
             {
                 _managed = new OptionInner();
-
-                var _t = new Inner.Marshaller(_unmanaged.t);
-                _managed.t = _t.ToManaged();
-                _managed.is_some = _unmanaged.is_some;
-
+                _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Some = _unmanaged._Some._Some.ToManaged();
                 return _managed;
             }
             public void Free() { }
         }
     }
-
-    public partial struct OptionInner
-    {
-        public static OptionInner FromNullable(Inner? nullable)
-        {
-            var result = new OptionInner();
-            if (nullable.HasValue)
-            {
-                result.is_some = 1;
-                result.t = nullable.Value;
-            }
-
-            return result;
-        }
-
-        public Inner? ToNullable()
-        {
-            return this.is_some == 1 ? this.t : (Inner?)null;
-        }
-    }
-
 
     ///Result that contains value or an error.
     public partial struct ResultConstPtrServiceAsyncError

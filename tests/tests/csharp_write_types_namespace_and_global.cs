@@ -22,9 +22,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 1942093112364030349ul)
+            if (api_version != 11026466454465313054ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (1942093112364030349). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (11026466454465313054). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -634,11 +634,15 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_1")]
-        public static partial OptionInner pattern_ffi_option_1(OptionInner ffi_slice);
+        public static partial OptionInner pattern_ffi_option_1(OptionInner x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_2")]
-        public static partial Inner pattern_ffi_option_2(OptionInner ffi_slice);
+        public static partial Inner pattern_ffi_option_2(OptionInner x);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_3")]
+        public static partial OptionOptionResultOptionUtf8StringError pattern_ffi_option_3(OptionOptionResultOptionUtf8StringError x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_bool")]
@@ -2368,7 +2372,7 @@ namespace My.Company
 
     public partial struct Inner
     {
-        float x;
+        public float x;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -4759,36 +4763,32 @@ namespace My.Company
         }
     }
 
-    ///Option type containing boolean flag and maybe valid data.
+    ///Option that contains Some(value) or None.
     public partial struct OptionInner
     {
-        ///Element that is maybe valid.
-        Inner t;
-        ///Byte where `1` means element `t` is valid.
-        byte is_some;
+        uint _variant;
+        Inner _Some;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct OptionInner
     {
-        public OptionInner(OptionInner other)
-        {
-            t = other.t;
-            is_some = other.is_some;
-        }
-
-        public Unmanaged ToUnmanaged()
-        {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
-        }
-
         [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedSome
+        {
+            internal uint _variant;
+            internal Inner.Unmanaged _Some;
+        }
+
+
+        [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
-            public Inner.Unmanaged t;
-            public byte is_some;
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(0)]
+            internal UnmanagedSome _Some;
 
             public OptionInner ToManaged()
             {
@@ -4798,8 +4798,24 @@ namespace My.Company
             }
         }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
         [CustomMarshaller(typeof(OptionInner), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
+
+        public static OptionInner Some(Inner value) => new() { _variant = 0, _Some = value };
+        public static OptionInner None => new() { _variant = 1 };
+
+        public bool IsSome => _variant == 0;
+        public bool IsNone => _variant == 1;
+
+        public Inner AsSome() { if (_variant != 0) { throw new InteropException(); } else { return _Some; } }
+        public void AsNone() { if (_variant != 1) throw new InteropException(); }
 
         public ref struct Marshaller
         {
@@ -4815,48 +4831,273 @@ namespace My.Company
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
-
-                var _t = new Inner.Marshaller(_managed.t);
-                _unmanaged.t = _t.ToUnmanaged();
-                _unmanaged.is_some = _managed.is_some;
-
+                _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Some._Some = _managed._Some.ToUnmanaged();
                 return _unmanaged;
             }
 
             public unsafe OptionInner ToManaged()
             {
                 _managed = new OptionInner();
-
-                var _t = new Inner.Marshaller(_unmanaged.t);
-                _managed.t = _t.ToManaged();
-                _managed.is_some = _unmanaged.is_some;
-
+                _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Some = _unmanaged._Some._Some.ToManaged();
                 return _managed;
             }
             public void Free() { }
         }
     }
 
-    public partial struct OptionInner
+    ///Option that contains Some(value) or None.
+    public partial struct OptionOptionResultOptionUtf8StringError
     {
-        public static OptionInner FromNullable(Inner? nullable)
-        {
-            var result = new OptionInner();
-            if (nullable.HasValue)
-            {
-                result.is_some = 1;
-                result.t = nullable.Value;
-            }
+        uint _variant;
+        OptionResultOptionUtf8StringError _Some;
+    }
 
-            return result;
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct OptionOptionResultOptionUtf8StringError
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedSome
+        {
+            internal uint _variant;
+            internal OptionResultOptionUtf8StringError.Unmanaged _Some;
         }
 
-        public Inner? ToNullable()
+
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
         {
-            return this.is_some == 1 ? this.t : (Inner?)null;
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(0)]
+            internal UnmanagedSome _Some;
+
+            public OptionOptionResultOptionUtf8StringError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
+        [CustomMarshaller(typeof(OptionOptionResultOptionUtf8StringError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public static OptionOptionResultOptionUtf8StringError Some(OptionResultOptionUtf8StringError value) => new() { _variant = 0, _Some = value };
+        public static OptionOptionResultOptionUtf8StringError None => new() { _variant = 1 };
+
+        public bool IsSome => _variant == 0;
+        public bool IsNone => _variant == 1;
+
+        public OptionResultOptionUtf8StringError AsSome() { if (_variant != 0) { throw new InteropException(); } else { return _Some; } }
+        public void AsNone() { if (_variant != 1) throw new InteropException(); }
+
+        public ref struct Marshaller
+        {
+            private OptionOptionResultOptionUtf8StringError _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(OptionOptionResultOptionUtf8StringError managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(OptionOptionResultOptionUtf8StringError managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+                _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Some._Some = _managed._Some.ToUnmanaged();
+                return _unmanaged;
+            }
+
+            public unsafe OptionOptionResultOptionUtf8StringError ToManaged()
+            {
+                _managed = new OptionOptionResultOptionUtf8StringError();
+                _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Some = _unmanaged._Some._Some.ToManaged();
+                return _managed;
+            }
+            public void Free() { }
         }
     }
 
+    ///Option that contains Some(value) or None.
+    public partial struct OptionResultOptionUtf8StringError
+    {
+        uint _variant;
+        ResultOptionUtf8StringError _Some;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct OptionResultOptionUtf8StringError
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedSome
+        {
+            internal uint _variant;
+            internal ResultOptionUtf8StringError.Unmanaged _Some;
+        }
+
+
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(0)]
+            internal UnmanagedSome _Some;
+
+            public OptionResultOptionUtf8StringError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
+        [CustomMarshaller(typeof(OptionResultOptionUtf8StringError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public static OptionResultOptionUtf8StringError Some(ResultOptionUtf8StringError value) => new() { _variant = 0, _Some = value };
+        public static OptionResultOptionUtf8StringError None => new() { _variant = 1 };
+
+        public bool IsSome => _variant == 0;
+        public bool IsNone => _variant == 1;
+
+        public ResultOptionUtf8StringError AsSome() { if (_variant != 0) { throw new InteropException(); } else { return _Some; } }
+        public void AsNone() { if (_variant != 1) throw new InteropException(); }
+
+        public ref struct Marshaller
+        {
+            private OptionResultOptionUtf8StringError _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(OptionResultOptionUtf8StringError managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(OptionResultOptionUtf8StringError managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+                _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Some._Some = _managed._Some.ToUnmanaged();
+                return _unmanaged;
+            }
+
+            public unsafe OptionResultOptionUtf8StringError ToManaged()
+            {
+                _managed = new OptionResultOptionUtf8StringError();
+                _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Some = _unmanaged._Some._Some.ToManaged();
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    ///Option that contains Some(value) or None.
+    public partial struct OptionUtf8String
+    {
+        uint _variant;
+        string _Some;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct OptionUtf8String
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedSome
+        {
+            internal uint _variant;
+            internal Utf8String.Unmanaged _Some;
+        }
+
+
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(0)]
+            internal UnmanagedSome _Some;
+
+            public OptionUtf8String ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
+        [CustomMarshaller(typeof(OptionUtf8String), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public static OptionUtf8String Some(string value) => new() { _variant = 0, _Some = value };
+        public static OptionUtf8String None => new() { _variant = 1 };
+
+        public bool IsSome => _variant == 0;
+        public bool IsNone => _variant == 1;
+
+        public string AsSome() { if (_variant != 0) { throw new InteropException(); } else { return _Some; } }
+        public void AsNone() { if (_variant != 1) throw new InteropException(); }
+
+        public ref struct Marshaller
+        {
+            private OptionUtf8String _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(OptionUtf8String managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(OptionUtf8String managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+                _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Some._Some = new Utf8String(_managed._Some).ToUnmanaged();
+                return _unmanaged;
+            }
+
+            public unsafe OptionUtf8String ToManaged()
+            {
+                _managed = new OptionUtf8String();
+                _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Some = _unmanaged._Some._Some.ToManaged();
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
 
     ///Result that contains value or an error.
     public partial struct ResultConstPtrServiceAsyncError
@@ -6189,6 +6430,110 @@ namespace My.Company
             public unsafe ResultNestedArrayError ToManaged()
             {
                 _managed = new ResultNestedArrayError();
+                _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok.ToManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    ///Result that contains value or an error.
+    public partial struct ResultOptionUtf8StringError
+    {
+        uint _variant;
+        OptionUtf8String _Ok;
+        Error _Err;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct ResultOptionUtf8StringError
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal OptionUtf8String.Unmanaged _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
+
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
+
+            public ResultOptionUtf8StringError ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
+        [CustomMarshaller(typeof(ResultOptionUtf8StringError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public static ResultOptionUtf8StringError Ok(OptionUtf8String value) => new() { _variant = 0, _Ok = value };
+        public static ResultOptionUtf8StringError Err(Error value) => new() { _variant = 1, _Err = value };
+        public static ResultOptionUtf8StringError Panic => new() { _variant = 2 };
+        public static ResultOptionUtf8StringError Null => new() { _variant = 3 };
+
+        public bool IsOk => _variant == 0;
+        public bool IsErr => _variant == 1;
+        public bool IsPanic => _variant == 2;
+        public bool IsNull => _variant == 3;
+
+        public OptionUtf8String AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        public ref struct Marshaller
+        {
+            private ResultOptionUtf8StringError _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(ResultOptionUtf8StringError managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(ResultOptionUtf8StringError managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+                _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok.ToUnmanaged();
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
+                return _unmanaged;
+            }
+
+            public unsafe ResultOptionUtf8StringError ToManaged()
+            {
+                _managed = new ResultOptionUtf8StringError();
                 _managed._variant = _unmanaged._variant;
                 if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok.ToManaged();
                 if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();

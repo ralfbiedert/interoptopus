@@ -34,11 +34,11 @@ pub fn to_type_hint(the_type: &Type, is_parameter: bool) -> String {
             Type::Primitive(Primitive::Void) => "ctypes.c_void_p".to_string(),
             _ => format!("ctypes.POINTER({})", to_ctypes_name(x, true)),
         },
-        Type::Enum(_) => "ctypes.c_int".to_string(), // is this correct?
+        Type::Enum(_) => "TODO".to_string(), // is this correct?
         Type::Composite(x) => x.rust_name().to_string(),
         Type::Pattern(x) => match x {
             TypePattern::CStrPointer => "bytes".to_string(),
-            TypePattern::Option(c) => c.rust_name().to_string(),
+            TypePattern::Option(_) => "TODO".to_string(),
             TypePattern::Slice(c) | TypePattern::SliceMut(c) => {
                 let mut res = c.rust_name().to_string();
                 let inner = to_ctypes_name(c.target_type(), false);
@@ -93,7 +93,7 @@ pub fn to_ctypes_name(the_type: &Type, with_type_annotations: bool) -> String {
             TypePattern::Utf8String(c) => c.rust_name().to_string(),
             TypePattern::Slice(c) => c.rust_name().to_string(),
             TypePattern::SliceMut(c) => c.rust_name().to_string(),
-            TypePattern::Option(x) => x.rust_name().to_string(),
+            TypePattern::Option(_) => "TODO".to_string(),
             TypePattern::Bool => "ctypes.c_uint8".to_string(),
             TypePattern::CChar => "ctypes.c_char".to_string(),
             TypePattern::NamedCallback(x) => fnpointer_to_typename(x.fnpointer()),

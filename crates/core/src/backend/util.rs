@@ -175,11 +175,7 @@ pub fn ctypes_from_type_recursive(start: &Type, types: &mut HashSet<Type>) {
             }
             TypePattern::Slice(x) => ctypes_from_type_recursive(x.target_type(), types),
             TypePattern::SliceMut(x) => ctypes_from_type_recursive(x.target_type(), types),
-            TypePattern::Option(x) => {
-                for field in x.fields() {
-                    ctypes_from_type_recursive(field.the_type(), types);
-                }
-            }
+            TypePattern::Option(x) => ctypes_from_type_recursive(x.t(), types),
             TypePattern::Result(x) => {
                 for variant in x.the_enum().variants() {
                     match variant.kind() {
@@ -279,7 +275,7 @@ pub fn holds_opaque_without_ref(typ: &Type) -> bool {
             TypePattern::APIVersion => false,
             TypePattern::Slice(x) => holds_opaque_without_ref(x.target_type()),
             TypePattern::SliceMut(x) => holds_opaque_without_ref(x.target_type()),
-            TypePattern::Option(x) => holds_opaque_without_ref(&x.to_ctype()),
+            TypePattern::Option(x) => holds_opaque_without_ref(&x.the_enum().to_ctype()),
             TypePattern::Result(x) => holds_opaque_without_ref(&x.the_enum().to_ctype()),
             TypePattern::Bool => false,
             TypePattern::CChar => false,
@@ -391,7 +387,7 @@ pub fn is_global_type(t: &Type) -> bool {
             TypePattern::APIVersion => false,
             TypePattern::Slice(x) => is_global_type(x.target_type()),
             TypePattern::SliceMut(x) => is_global_type(x.target_type()),
-            TypePattern::Option(x) => x.fields().iter().all(|x| is_global_type(x.the_type())),
+            TypePattern::Option(x) => is_global_type(&x.the_enum().to_ctype()),
             TypePattern::Result(x) => is_global_type(&x.the_enum().to_ctype()),
             TypePattern::Bool => true,
             TypePattern::CChar => true,

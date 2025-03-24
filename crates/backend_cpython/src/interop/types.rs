@@ -1,6 +1,6 @@
 use crate::Interop;
 use crate::converter::{to_ctypes_name, to_type_hint_in, to_type_hint_out};
-use crate::interop::patterns::{write_option, write_slice};
+use crate::interop::patterns::write_slice;
 use interoptopus::backend::sort_types_by_dependencies;
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Composite, Enum, Layout, Type, VariantKind};
@@ -20,9 +20,7 @@ pub fn write_types(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
                 TypePattern::SliceMut(c) => write_slice(i, w, c, true)?,
                 TypePattern::Result(c) => write_enum(i, w, c.the_enum(), WriteFor::Code)?,
                 TypePattern::Utf8String(c) => write_struct(i, w, c, WriteFor::Code)?,
-                TypePattern::Option(c) => {
-                    write_option(i, w, c)?;
-                }
+                TypePattern::Option(c) => write_enum(i, w, c.the_enum(), WriteFor::Code)?,
                 _ => continue,
             },
             _ => continue,

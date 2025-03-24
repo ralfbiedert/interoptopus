@@ -4,7 +4,8 @@ use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Composite;
 use interoptopus::{Error, indented};
 
-pub fn write_pattern_option(i: &Interop, w: &mut IndentWriter, slice: &Composite) -> Result<(), Error> {
+// TODO: Write helpers for options
+pub fn _write_pattern_option(i: &Interop, w: &mut IndentWriter, slice: &Composite) -> Result<(), Error> {
     i.debug(w, "write_pattern_option")?;
 
     let name = slice.rust_name();

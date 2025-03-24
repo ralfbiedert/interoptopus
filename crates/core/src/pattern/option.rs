@@ -28,10 +28,9 @@
 //!
 
 use crate::backend::capitalize_first_letter;
-use crate::lang::{Composite, Documentation, Field, Meta, Primitive, Representation, Type, Visibility};
+use crate::lang::{Documentation, Enum, Meta, Representation, Type, Variant, VariantKind};
 use crate::lang::{Layout, TypeInfo};
 use crate::pattern::TypePattern;
-use crate::pattern::primitive::Bool;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -41,50 +40,44 @@ use serde::{Deserialize, Serialize};
 ///
 /// The option will be considered `Some` if and only if `is_some` is `1`. All
 /// other values mean `None`.
-#[repr(C)]
+#[repr(u32)]
 #[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Eq, Default, Deserialize, Serialize))]
 #[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Eq, Default))]
-pub struct Option<T> {
-    t: T,
-    is_some: Bool,
+pub enum Option<T> {
+    Some(T),
+    #[default]
+    None,
 }
 
 impl<T> Option<T> {
-    pub const fn some(data: T) -> Self {
-        Self { is_some: Bool::TRUE, t: data }
-    }
-
     #[allow(clippy::missing_const_for_fn)]
     pub fn into_option(self) -> std::option::Option<T> {
-        if self.is_some.is() {
-            std::option::Option::Some(self.t)
-        } else {
-            std::option::Option::None
+        match self {
+            Self::Some(x) => Some(x),
+            Self::None => None,
         }
     }
 
     pub fn as_ref(&self) -> std::option::Option<&T> {
-        if self.is_some.is() {
-            std::option::Option::Some(&self.t)
-        } else {
-            std::option::Option::None
+        match self {
+            Self::Some(x) => Some(x),
+            Self::None => None,
         }
     }
 
     pub fn as_mut(&mut self) -> std::option::Option<&mut T> {
-        if self.is_some.is() {
-            std::option::Option::Some(&mut self.t)
-        } else {
-            std::option::Option::None
+        match self {
+            Self::Some(x) => Some(x),
+            Self::None => None,
         }
     }
 
     pub fn is_some(&self) -> bool {
-        self.is_some.is()
+        matches!(self, Self::Some(_))
     }
 
     pub fn is_none(&self) -> bool {
-        !self.is_some()
+        matches!(self, Self::None)
     }
 
     /// Get the value or panic.
@@ -94,8 +87,11 @@ impl<T> Option<T> {
     /// Panics if the value is `None`.
     #[track_caller]
     pub fn unwrap(self) -> T {
-        if self.is_some.is() {
-            self.t
+        if self.is_some() {
+            match self {
+                Self::Some(t) => t,
+                Self::None => unreachable!(),
+            }
         } else {
             panic!("Trying to unwrap None value");
         }
@@ -108,26 +104,22 @@ impl<T> Option<T> {
     /// Panics if the value is `None`.
     #[track_caller]
     pub fn unwrap_as_mut(&mut self) -> &mut T {
-        if self.is_some.is() {
-            &mut self.t
+        if self.is_some() {
+            match self {
+                Self::Some(t) => t,
+                Self::None => unreachable!(),
+            }
         } else {
             panic!("Trying to unwrap None value");
         }
     }
 }
 
-impl<T: Default> Option<T> {
-    #[must_use]
-    pub fn none() -> Self {
-        Self { is_some: Bool::FALSE, t: T::default() }
-    }
-}
-
 impl<T: Default> From<std::option::Option<T>> for Option<T> {
     fn from(option: std::option::Option<T>) -> Self {
         match option {
-            std::option::Option::None => Self::none(),
-            std::option::Option::Some(t) => Self::some(t),
+            Some(t) => Self::Some(t),
+            None => Self::None,
         }
     }
 }
@@ -137,20 +129,48 @@ where
     T: TypeInfo,
 {
     fn type_info() -> Type {
-        let doc_t = Documentation::from_line("Element that is maybe valid.");
-        let doc_is_some = Documentation::from_line("Byte where `1` means element `t` is valid.");
+        let doc_t = Documentation::from_line("Element if Some().");
 
-        let fields = vec![
-            Field::with_documentation("t".to_string(), T::type_info(), Visibility::Private, doc_t),
-            Field::with_documentation("is_some".to_string(), Type::Primitive(Primitive::U8), Visibility::Private, doc_is_some),
+        let variants = vec![
+            Variant::new("Some".to_string(), VariantKind::Typed(0, Box::new(T::type_info())), doc_t),
+            Variant::new("None".to_string(), VariantKind::Unit(1), Documentation::new()),
         ];
 
-        let doc = Documentation::from_line("Option type containing boolean flag and maybe valid data.");
+        let doc = Documentation::from_line("Option that contains Some(value) or None.");
         let repr = Representation::new(Layout::C, None);
         let meta = Meta::with_namespace_documentation(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
-        let name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
-        let composite = Composite::with_meta_repr(format!("Option{name}"), fields, meta, repr);
-        Type::Pattern(TypePattern::Option(composite))
+        let t_name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
+        let name = format!("Option{t_name}");
+        let the_enum = Enum::new(name, variants, meta, repr);
+        let option_enum = OptionType::new(the_enum);
+        Type::Pattern(TypePattern::Option(option_enum))
+    }
+}
+
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub struct OptionType {
+    the_enum: Enum,
+}
+
+impl OptionType {
+    #[must_use]
+    pub fn new(the_enum: Enum) -> Self {
+        Self { the_enum }
+    }
+
+    #[must_use]
+    pub fn meta(&self) -> &Meta {
+        self.the_enum.meta()
+    }
+
+    #[must_use]
+    pub fn t(&self) -> &Type {
+        self.the_enum.variants()[0].kind().as_typed().unwrap()
+    }
+
+    #[must_use]
+    pub fn the_enum(&self) -> &Enum {
+        &self.the_enum
     }
 }
 
@@ -160,7 +180,7 @@ mod test {
 
     #[test]
     fn can_create() {
-        assert!(Option::some(100).is_some());
-        assert!(Option::<u8>::none().is_none());
+        assert!(Option::Some(100).is_some());
+        assert!(Option::<u8>::None.is_none());
     }
 }

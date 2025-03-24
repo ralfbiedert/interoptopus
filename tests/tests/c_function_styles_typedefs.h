@@ -266,6 +266,14 @@ typedef struct SLICEMUTU8
     uint64_t len;
     } SLICEMUTU8;
 
+/// Option that contains Some(value) or None.
+typedef enum OPTIONUTF8STRING
+    {
+    /// Element if Some().
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    OPTIONUTF8STRING_NONE = 1,
+    } OPTIONUTF8STRING;
+
 /// Result that contains value or an error.
 typedef enum RESULTERROR
     {
@@ -387,22 +395,20 @@ typedef struct SLICEMUTVEC
     uint64_t len;
     } SLICEMUTVEC;
 
-/// Option type containing boolean flag and maybe valid data.
-typedef struct OPTIONINNER
+/// Option that contains Some(value) or None.
+typedef enum OPTIONINNER
     {
-    /// Element that is maybe valid.
-    INNER t;
-    /// Byte where `1` means element `t` is valid.
-    uint8_t is_some;
+    /// Element if Some().
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    OPTIONINNER_NONE = 1,
     } OPTIONINNER;
 
-/// Option type containing boolean flag and maybe valid data.
-typedef struct OPTIONVEC
+/// Option that contains Some(value) or None.
+typedef enum OPTIONVEC
     {
-    /// Element that is maybe valid.
-    VEC t;
-    /// Byte where `1` means element `t` is valid.
-    uint8_t is_some;
+    /// Element if Some().
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    OPTIONVEC_NONE = 1,
     } OPTIONVEC;
 
 /// Result that contains value or an error.
@@ -527,6 +533,17 @@ typedef enum RESULTCONSTPTRSERVICEVARIOUSSLICESERROR
     } RESULTCONSTPTRSERVICEVARIOUSSLICESERROR;
 
 /// Result that contains value or an error.
+typedef enum RESULTOPTIONUTF8STRINGERROR
+    {
+    /// Element if err is `Ok`.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    /// Error value.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTOPTIONUTF8STRINGERROR_PANIC = 2,
+    RESULTOPTIONUTF8STRINGERROR_NULL = 3,
+    } RESULTOPTIONUTF8STRINGERROR;
+
+/// Result that contains value or an error.
 typedef enum RESULTUSESTRINGERROR
     {
     /// Element if err is `Ok`.
@@ -592,6 +609,14 @@ typedef struct NESTEDARRAY
     ARRAY field_struct;
     } NESTEDARRAY;
 
+/// Option that contains Some(value) or None.
+typedef enum OPTIONRESULTOPTIONUTF8STRINGERROR
+    {
+    /// Element if Some().
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    OPTIONRESULTOPTIONUTF8STRINGERROR_NONE = 1,
+    } OPTIONRESULTOPTIONUTF8STRINGERROR;
+
 typedef VEC3F32 (*CALLBACKHUGEVECSLICE)(SLICEVEC3F32 SLICE, const void* CALLBACK_DATA);
 
 typedef void (*fptr_fn_ConstPtrResultError_ConstPtr)(const RESULTERROR* x0, const void* x1);
@@ -610,6 +635,14 @@ typedef struct SLICEMUTCHARARRAY
     /// Number of elements.
     uint64_t len;
     } SLICEMUTCHARARRAY;
+
+/// Option that contains Some(value) or None.
+typedef enum OPTIONOPTIONRESULTOPTIONUTF8STRINGERROR
+    {
+    /// Element if Some().
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    OPTIONOPTIONRESULTOPTIONUTF8STRINGERROR_NONE = 1,
+    } OPTIONOPTIONRESULTOPTIONUTF8STRINGERROR;
 
 /// Result that contains value or an error.
 typedef enum RESULTNESTEDARRAYERROR
@@ -811,6 +844,8 @@ typedef VEC3F32 (*pattern_ffi_slice_delegate_huge)(CALLBACKHUGEVECSLICE);
 typedef OPTIONINNER (*pattern_ffi_option_1)(OPTIONINNER);
 
 typedef INNER (*pattern_ffi_option_2)(OPTIONINNER);
+
+typedef OPTIONOPTIONRESULTOPTIONUTF8STRINGERROR (*pattern_ffi_option_3)(OPTIONOPTIONRESULTOPTIONUTF8STRINGERROR);
 
 typedef uint8_t (*pattern_ffi_bool)(uint8_t);
 
