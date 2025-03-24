@@ -215,7 +215,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 }
             };
 
-            let ctor_result = quote_spanned! {span_rval => <<#service_type as ::interoptopus::pattern::service::ServiceInfo>::CtorResult as ::interoptopus::pattern::result::FFIResultAsPtr>::AsPtr };
+            let ctor_result = quote_spanned! {span_rval => <<#service_type as ::interoptopus::pattern::service::ServiceInfo>::CtorResult as ::interoptopus::pattern::result::ResultAsPtr>::AsPtr };
 
             quote_spanned! { span_function =>
                 #method_attributes
@@ -315,13 +315,13 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 };
 
                 <#without_lifetimes>::spawn(__this, __async_fn);
-                <#rval as ::interoptopus::pattern::result::FFIResultAsUnitT>::AsUnitT::Ok(())
+                <#rval as ::interoptopus::pattern::result::ResultAsUnitT>::AsUnitT::Ok(())
             };
 
             quote_spanned! { span_function =>
                 #method_attributes
 
-                pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),*, __async_callback: ::interoptopus::pattern::asynk::AsyncCallback<#rval>) -> <#rval as ::interoptopus::pattern::result::FFIResultAsUnitT>::AsUnitT {
+                pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),*, __async_callback: ::interoptopus::pattern::asynk::AsyncCallback<#rval>) -> <#rval as ::interoptopus::pattern::result::ResultAsUnitT>::AsUnitT {
                     #block
                 }
             }
@@ -345,7 +345,7 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
         quote_spanned!(span_service_ty => *mut #without_lifetimes)
     };
 
-    let ctor_result = quote_spanned! {span_service_ty => <<#without_lifetimes as ::interoptopus::pattern::service::ServiceInfo>::CtorResult as ::interoptopus::pattern::result::FFIResultAsPtr>::AsPtr };
+    let ctor_result = quote_spanned! {span_service_ty => <<#without_lifetimes as ::interoptopus::pattern::service::ServiceInfo>::CtorResult as ::interoptopus::pattern::result::ResultAsPtr>::AsPtr };
 
     let object_deconstruction = if has_async {
         quote_spanned! { span_service_ty =>

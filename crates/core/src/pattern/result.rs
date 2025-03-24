@@ -29,73 +29,11 @@
 //! ```
 
 use crate::backend::capitalize_first_letter;
-use crate::lang::{Composite, Documentation, Enum, Layout, Meta, Primitive, Representation, Type, Variant};
+use crate::lang::{Documentation, Enum, Layout, Meta, Primitive, Representation, Type, Variant};
 use crate::lang::{TypeInfo, VariantKind};
 use crate::pattern::TypePattern;
 use std::any::Any;
 use std::fmt::Debug;
-
-/// Internal helper derived for enums that are an [`FFIError`].
-#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct FFIErrorEnum {
-    the_enum: Enum,
-    success_variant: Variant,
-    panic_variant: Variant,
-}
-
-impl FFIErrorEnum {
-    #[must_use]
-    pub const fn new(the_enum: Enum, success_variant: Variant, panic_variant: Variant) -> Self {
-        Self { the_enum, success_variant, panic_variant }
-    }
-
-    #[must_use]
-    pub const fn the_enum(&self) -> &Enum {
-        &self.the_enum
-    }
-
-    #[must_use]
-    pub const fn success_variant(&self) -> &Variant {
-        &self.success_variant
-    }
-
-    #[must_use]
-    pub const fn panic_variant(&self) -> &Variant {
-        &self.panic_variant
-    }
-}
-
-#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct FFIResultType {
-    composite_type: Composite,
-}
-
-impl FFIResultType {
-    #[must_use]
-    pub const fn new(composite_type: Composite) -> Self {
-        Self { composite_type }
-    }
-
-    #[must_use]
-    pub fn t(&self) -> &Type {
-        self.composite_type.fields()[0].the_type()
-    }
-
-    #[must_use]
-    pub fn e(&self) -> &Type {
-        self.composite_type.fields()[1].the_type()
-    }
-
-    #[must_use]
-    pub const fn composite(&self) -> &Composite {
-        &self.composite_type
-    }
-
-    #[must_use]
-    pub fn meta(&self) -> &Meta {
-        self.composite_type.meta()
-    }
-}
 
 /// Extracts a string message from a panic unwind.
 pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
@@ -108,14 +46,6 @@ pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
     }
 }
 
-pub trait FFIResultAsPtr {
-    type AsPtr;
-}
-
-pub trait FFIResultAsUnitT {
-    type AsUnitT;
-}
-
 #[repr(u32)]
 #[derive(Debug)]
 pub enum Result<T, E> {
@@ -125,11 +55,11 @@ pub enum Result<T, E> {
     Null,
 }
 
-impl<T, E> FFIResultAsPtr for Result<T, E> {
+impl<T, E> ResultAsPtr for Result<T, E> {
     type AsPtr = Result<*const T, E>;
 }
 
-impl<T, E> FFIResultAsUnitT for Result<T, E> {
+impl<T, E> ResultAsUnitT for Result<T, E> {
     type AsUnitT = Result<(), E>;
 }
 
@@ -163,16 +93,6 @@ where
             panic!("Called `unwrap_err` on an `FFIResult` that is not `Err`.")
         }
     }
-}
-
-impl<T, E> Result<T, E>
-where
-    T: TypeInfo,
-    E: TypeInfo,
-{
-    // pub fn error(err: E) -> Self {
-    //     Self { t: MaybeUninit::uninit(), err }
-    // }
 }
 
 impl<T, E> From<std::result::Result<T, E>> for Result<T, E>
@@ -274,4 +194,12 @@ impl ResultType {
     pub fn the_enum(&self) -> &Enum {
         &self.the_enum
     }
+}
+
+pub trait ResultAsPtr {
+    type AsPtr;
+}
+
+pub trait ResultAsUnitT {
+    type AsUnitT;
 }

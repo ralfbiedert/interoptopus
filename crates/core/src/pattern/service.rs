@@ -107,7 +107,7 @@
 
 use crate::backend::longest_common_prefix;
 use crate::lang::{Function, Opaque};
-use crate::pattern::result::FFIResultAsPtr;
+use crate::pattern::result::ResultAsPtr;
 use std::fmt::Debug;
 use std::slice::from_ref;
 
@@ -183,5 +183,5 @@ impl ServiceDefinition {
 }
 
 pub trait ServiceInfo {
-    type CtorResult: FFIResultAsPtr;
+    type CtorResult: ResultAsPtr;
 }
