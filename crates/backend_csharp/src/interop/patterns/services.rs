@@ -203,6 +203,7 @@ pub fn write_pattern_service_method(
         return Ok(());
     }
 
+    i.inline_hint(w, 0)?;
     indented!(w, "{}", signature)?;
     indented!(w, r"{{")?;
 
@@ -323,6 +324,7 @@ pub fn write_common_service_method_overload(i: &Interop, w: &mut IndentWriter, c
     }
 
     // Write signature.
+    i.inline_hint(w, 0)?;
     indented!(w, "{}", signature)?;
     indented!(w, r"{{")?;
 

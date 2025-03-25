@@ -60,11 +60,11 @@ static class Benchmark {
         result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_slice_4(short_byte, short_byte));
         writer.Add("pattern_ffi_slice_4(short_byte, short_byte)", result);
 
-        result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_slice_delegate_huge(slice => slice[0]));
-        writer.Add("pattern_ffi_slice_delegate_huge(slice => slice[0])", result);
-
         result = MeasureResult.Measure(Iterations, () => Interop.pattern_ascii_pointer_1("hello world"));
         writer.Add("pattern_ascii_pointer_1('hello world')", result);
+
+        result = MeasureResult.Measure(Iterations, () => Interop.pattern_string_2("hello world"));
+        writer.Add("pattern_string_2('hello world')", result);
 
         writer.Write("RESULTS.md");
     }

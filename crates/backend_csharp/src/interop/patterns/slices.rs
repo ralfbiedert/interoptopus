@@ -46,6 +46,7 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
     indented!(w, r"public unsafe ReadOnlySpan<{}> ReadOnlySpan", inner)?;
     indented!(w, r"{{")?;
     w.indent();
+    i.inline_hint(w, 0)?;
     indented!(w, r"get => new(_data.ToPointer(), (int)_len);")?;
     w.unindent();
     indented!(w, r"}}")?;
@@ -55,6 +56,7 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
     indented!(w, r"public unsafe {} this[int i]", inner)?;
     indented!(w, r"{{")?;
     w.indent();
+    i.inline_hint(w, 0)?;
     indented!(w, r"get")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"if (i >= Count) throw new IndexOutOfRangeException();")?;
@@ -62,6 +64,7 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
     indented!(w, r"}}")?;
     w.newline()?;
     if kind == SliceKind::SliceMut {
+        i.inline_hint(w, 0)?;
         indented!(w, r"set")?;
         indented!(w, r"{{")?;
         indented!(w, [()], r"if (i >= Count) throw new IndexOutOfRangeException();")?;
@@ -73,12 +76,14 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
     w.newline()?;
 
     ///////////////////
+    i.inline_hint(w, 0)?;
     indented!(w, r"public {}(IntPtr data, ulong len)", name)?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"_data = data;")?;
     indented!(w, [()], r"_len = len;")?;
     indented!(w, r"}}")?;
     w.newline()?;
+    i.inline_hint(w, 0)?;
     indented!(w, r"public {}({}[] managed)", name, inner)?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"_handle = GCHandle.Alloc(managed, GCHandleType.Pinned);")?;
@@ -86,13 +91,16 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
     indented!(w, [()], r"_len = (ulong) managed.Length;")?;
     indented!(w, r"}}")?;
     w.newline()?;
+    i.inline_hint(w, 0)?;
     indented!(w, r"public IEnumerator<{}> GetEnumerator()", inner)?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"for (var i = 0; i < Count; ++i) {{ yield return this[i]; }}")?;
     indented!(w, r"}}")?;
     w.newline()?;
+    i.inline_hint(w, 0)?;
     indented!(w, r"IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();")?;
     w.newline()?;
+    i.inline_hint(w, 0)?;
     indented!(w, r"public void Dispose()")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"if (_handle is {{ IsAllocated: true }}) {{ _handle.Free(); }}")?;
@@ -107,6 +115,7 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
     indented!(w, [()], r"public IntPtr Data;")?;
     indented!(w, [()], r"public ulong Len;")?;
     w.newline()?;
+    i.inline_hint(w, 1)?;
     indented!(w, [()], r"public {} ToManaged()", name)?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"return new {}(Data, Len);", name)?;
@@ -119,9 +128,12 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
     indented!(w, r"private {} _managed;", name)?;
     indented!(w, r"private Unmanaged _unmanaged;")?;
     w.newline()?;
+    i.inline_hint(w, 0)?;
     indented!(w, r"public void FromManaged({} managed) {{ _managed = managed; }}", name)?;
+    i.inline_hint(w, 0)?;
     indented!(w, r"public void FromUnmanaged(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
     w.newline()?;
+    i.inline_hint(w, 0)?;
     indented!(w, r"public Unmanaged ToUnmanaged()")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"_unmanaged = new Unmanaged();")?;
@@ -130,6 +142,7 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
     indented!(w, [()], r"return _unmanaged;")?;
     indented!(w, r"}}")?;
     w.newline()?;
+    i.inline_hint(w, 0)?;
     indented!(w, r"public unsafe {name} ToManaged()")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"_managed = new {name}();")?;
@@ -138,6 +151,7 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
     indented!(w, [()], r"return _managed;")?;
     indented!(w, r"}}")?;
     w.newline()?;
+    i.inline_hint(w, 0)?;
     indented!(w, r"public void Free() {{ }}")?;
     w.unindent();
     indented!(w, r"}}")?;
@@ -174,6 +188,7 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     indented!(w, r"public unsafe {} this[int i]", user_type)?;
     indented!(w, r"{{")?;
     w.indent();
+    i.inline_hint(w, 0)?;
     indented!(w, r"get")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"if (i >= Count) throw new IndexOutOfRangeException();")?;
@@ -185,11 +200,13 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     w.newline()?;
 
     ///////////////////
+    i.inline_hint(w, 0)?;
     indented!(w, r"public {name}({user_type}[] managed)")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"_managed = managed;")?;
     indented!(w, r"}}")?;
     w.newline()?;
+    i.inline_hint(w, 0)?;
     indented!(w, r"public IEnumerator<{user_type}> GetEnumerator()")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"for (var i = 0; i < Count; ++i) {{ yield return this[i]; }}")?;
@@ -197,6 +214,7 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     w.newline()?;
     indented!(w, r"IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();")?;
     w.newline()?;
+    i.inline_hint(w, 0)?;
     indented!(w, r"public void Dispose() {{ }}")?;
     w.newline()?;
     indented!(w, r"[CustomMarshaller(typeof({name}), MarshalMode.Default, typeof(Marshaller))]")?;
@@ -215,9 +233,12 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     indented!(w, r"private {} _managed;", name)?;
     indented!(w, r"private Unmanaged _unmanaged;")?;
     w.newline()?;
+    i.inline_hint(w, 0)?;
     indented!(w, r"public void FromManaged({} managed) {{ _managed = managed; }}", name)?;
+    i.inline_hint(w, 0)?;
     indented!(w, r"public void FromUnmanaged(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
     w.newline()?;
+    i.inline_hint(w, 0)?;
     indented!(w, r"public unsafe Unmanaged ToUnmanaged()")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"var size = sizeof({marshaller_type}.Unmanaged);")?;
@@ -235,6 +256,7 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     indented!(w, [()], r"return _unmanaged;")?;
     indented!(w, r"}}")?;
     w.newline()?;
+    i.inline_hint(w, 0)?;
     indented!(w, r"public unsafe {name} ToManaged()")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"_managed = new {name}();")?;

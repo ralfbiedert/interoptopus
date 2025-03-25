@@ -39,6 +39,7 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         // Constructors
         indented!(w, [()], r"public AsyncHelper() {{ }}")?;
         w.newline()?;
+        i.inline_hint(w, 1)?;
         indented!(w, [()], r"public AsyncHelper(AsyncHelperDelegate managed)")?;
         indented!(w, [()], r"{{")?;
         indented!(w, [()()], r"_managed = managed;")?;
@@ -48,12 +49,14 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         w.newline()?;
 
         // Methods
+        i.inline_hint(w, 1)?;
         indented!(w, [()], r"void Call(IntPtr data, IntPtr _)")?;
         indented!(w, [()], r"{{")?;
         indented!(w, [()()], r"_managed(data);")?;
         indented!(w, [()], r"}}")?;
         w.newline()?;
 
+        i.inline_hint(w, 1)?;
         indented!(w, [()], r"public void Dispose()")?;
         indented!(w, [()], r"{{")?;
         indented!(w, [()()], r"if (_ptr == IntPtr.Zero) return;")?;
@@ -83,10 +86,13 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, [()()], r"private Unmanaged _unmanaged;")?;
         w.newline()?;
 
+        i.inline_hint(w, 2)?;
         indented!(w, [()()], r"public void FromManaged(AsyncHelper managed) {{ _managed = managed; }}")?;
+        i.inline_hint(w, 2)?;
         indented!(w, [()()], r"public void FromUnmanaged(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
         w.newline()?;
 
+        i.inline_hint(w, 2)?;
         indented!(w, [()()], r"public Unmanaged ToUnmanaged()")?;
         indented!(w, [()()], r"{{")?;
         indented!(w, [()()()], r"_unmanaged = new Unmanaged();")?;
@@ -96,6 +102,7 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, [()()], r"}}")?;
         w.newline()?;
 
+        i.inline_hint(w, 2)?;
         indented!(w, [()()], r"public AsyncHelper ToManaged()")?;
         indented!(w, [()()], r"{{")?;
         indented!(w, [()()()], r"_managed = new AsyncHelper();")?;
@@ -104,6 +111,7 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, [()()], r"}}")?;
         w.newline()?;
 
+        i.inline_hint(w, 2)?;
         indented!(w, [()()], r"public void Free() {{ }}")?;
 
         indented!(w, [()], r"}}")?;
@@ -119,12 +127,15 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
         indented!(w, r"public partial struct Utf8String: IDisposable")?;
         indented!(w, r"{{")?;
+        i.inline_hint(w, 1)?;
         indented!(w, [()], r"public Utf8String(string s) {{ _s = s; }}")?;
         w.newline()?;
         indented!(w, [()], r"public string String => _s;")?;
         w.newline()?;
+        i.inline_hint(w, 1)?;
         indented!(w, [()], r"public void Dispose() {{ }}")?;
         w.newline()?;
+        i.inline_hint(w, 1)?;
         indented!(w, [()], r"public Unmanaged ToUnmanaged()")?;
         indented!(w, [()], r"{{")?;
         indented!(w, [()()], r"var marshaller = new Marshaller(this);")?;
@@ -145,6 +156,7 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, [()()], r"public ulong len;")?;
         indented!(w, [()()], r"public ulong capacity;")?;
         w.newline()?;
+        i.inline_hint(w, 2)?;
         indented!(w, [()()], r"public string ToManaged()")?;
         indented!(w, [()()], r"{{")?;
         indented!(w, [()()()], r"var marshaller = new Marshaller(this);")?;
@@ -158,9 +170,11 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, [()], r"public partial class InteropHelper")?;
         indented!(w, [()], r"{{")?;
         indented!(w, [()()], r#"[LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_create")]"#)?;
+        i.inline_hint(w, 2)?;
         indented!(w, [()()], r"public static partial long interoptopus_string_create(IntPtr utf8, ulong len, out Unmanaged rval);")?;
         w.newline()?;
         indented!(w, [()()], r#"[LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_destroy")]"#)?;
+        i.inline_hint(w, 2)?;
         indented!(w, [()()], r"public static partial long interoptopus_string_destroy(Unmanaged utf8);")?;
         indented!(w, [()], r"}}")?;
         w.newline()?;
@@ -175,14 +189,19 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, [()()], r"private Unmanaged _unmanaged; // Used when converting unmanaged -> managed")?;
         w.newline()?;
 
+        i.inline_hint(w, 2)?;
         indented!(w, [()()], r"public Marshaller(Utf8String managed) {{ _managed = managed; }}")?;
+        i.inline_hint(w, 2)?;
         indented!(w, [()()], r"public Marshaller(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
         w.newline()?;
 
+        i.inline_hint(w, 2)?;
         indented!(w, [()()], r"public void FromManaged(Utf8String managed) {{ _managed = managed; }}")?;
+        i.inline_hint(w, 2)?;
         indented!(w, [()()], r"public void FromUnmanaged(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
         w.newline()?;
 
+        i.inline_hint(w, 2)?;
         indented!(w, [()()], r"public unsafe Unmanaged ToUnmanaged()")?;
         indented!(w, [()()], r"{{")?;
         indented!(w, [()()()], r"var utf8Bytes = Encoding.UTF8.GetBytes(_managed._s);")?;
@@ -198,6 +217,7 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, [()()], r"}}")?;
         w.newline()?;
 
+        i.inline_hint(w, 2)?;
         indented!(w, [()()], r"public unsafe Utf8String ToManaged()")?;
         indented!(w, [()()], r"{{")?;
         indented!(w, [()()()], r"var span = new ReadOnlySpan<byte>((byte*)_unmanaged.ptr, (int)_unmanaged.len);")?;
@@ -211,6 +231,7 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, [()()], r"}}")?;
         w.newline()?;
 
+        i.inline_hint(w, 2)?;
         indented!(w, [()()], r"public void Free() {{ }}")?;
         indented!(w, [()], r"}}")?;
         indented!(w, r"}}")?;

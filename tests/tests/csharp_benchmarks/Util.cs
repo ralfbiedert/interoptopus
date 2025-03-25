@@ -44,6 +44,11 @@ namespace Interoptopus
         public static MeasureResult Measure(uint n, Run r)
         {
 
+            for (var i = 0; i < 10; i++)
+            {
+                r.Invoke();
+            }
+
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             for (var i = 0; i < n; i++)

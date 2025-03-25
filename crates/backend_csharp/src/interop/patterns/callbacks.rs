@@ -66,6 +66,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     w.newline()?;
     indented!(w, [()], r"public {}() {{ }}", name)?;
     w.newline()?;
+    i.inline_hint(w, 1)?;
     indented!(w, [()], r"public {}({}Delegate managed)", name, name)?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"_managed = managed;")?;
@@ -74,6 +75,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()], r"}}")?;
     w.newline()?;
     indented!(w, [()], r"// Helper to invoke managed code from the native invocation.")?;
+    i.inline_hint(w, 1)?;
     indented!(w, [()], r"private {rval_unsafe} CallTrampoline({params_unsafe_str})")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"// We ignore the last parameter, a generic callback pointer, as it's not needed in C#.")?;
@@ -96,6 +98,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()], r"}}")?;
     w.newline()?;
     indented!(w, [()], r"// Invokes the callback.")?;
+    i.inline_hint(w, 1)?;
     indented!(w, [()], r"public {rval_safe} Call({params_str})")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"var __target = Marshal.GetDelegateForFunctionPointer<{name}Native>(_ptr);")?;
@@ -111,6 +114,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     }
     indented!(w, [()], r"}}")?;
     w.newline()?;
+    i.inline_hint(w, 1)?;
     indented!(w, [()], r"public void Dispose()")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"// This means when the callback was invoked from Rust C# had an exception which")?;
@@ -134,12 +138,17 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()()], r"private {name} _managed;")?;
     indented!(w, [()()], r"private Unmanaged _unmanaged;")?;
     w.newline()?;
+    i.inline_hint(w, 2)?;
     indented!(w, [()()], r"public Marshaller({name} managed) {{ _managed = managed; }}")?;
+    i.inline_hint(w, 2)?;
     indented!(w, [()()], r"public Marshaller(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
     w.newline()?;
+    i.inline_hint(w, 2)?;
     indented!(w, [()()], r"public void FromManaged({name} managed) {{ _managed = managed; }}")?;
+    i.inline_hint(w, 2)?;
     indented!(w, [()()], r"public void FromUnmanaged(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
     w.newline()?;
+    i.inline_hint(w, 2)?;
     indented!(w, [()()], r"public Unmanaged ToUnmanaged()")?;
     indented!(w, [()()], r"{{")?;
     indented!(w, [()()()], r"_unmanaged = new Unmanaged();")?;
@@ -148,6 +157,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()()()], r"return _unmanaged;")?;
     indented!(w, [()()], r"}}")?;
     w.newline()?;
+    i.inline_hint(w, 2)?;
     indented!(w, [()()], r"public {name} ToManaged()")?;
     indented!(w, [()()], r"{{")?;
     indented!(w, [()()()], r"_managed = new {name}();")?;
@@ -155,6 +165,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()()()], r"return _managed;")?;
     indented!(w, [()()], r"}}")?;
     w.newline()?;
+    i.inline_hint(w, 2)?;
     indented!(w, [()()], r"public void Free() {{ }}")?;
     indented!(w, [()], r"}}")?; // Close ref struct Marshaller.
     indented!(w, r"}}")?;

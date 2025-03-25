@@ -24,8 +24,10 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "sample_function")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void sample_function(SliceU8 ignored);
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe void sample_function(ReadOnlySpan<byte> ignored)
         {
             fixed (void* ptr_ignored = ignored)
@@ -57,11 +59,13 @@ namespace My.Company
 
         public unsafe ReadOnlySpan<byte> ReadOnlySpan
         {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get => new(_data.ToPointer(), (int)_len);
         }
 
         public unsafe byte this[int i]
         {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
@@ -70,12 +74,14 @@ namespace My.Company
 
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceU8(IntPtr data, ulong len)
         {
             _data = data;
             _len = len;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceU8(byte[] managed)
         {
             _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
@@ -83,13 +89,16 @@ namespace My.Company
             _len = (ulong) managed.Length;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public IEnumerator<byte> GetEnumerator()
         {
             for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
             if (_handle is { IsAllocated: true }) { _handle.Free(); }
@@ -104,6 +113,7 @@ namespace My.Company
             public IntPtr Data;
             public ulong Len;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public SliceU8 ToManaged()
             {
                 return new SliceU8(Data, Len);
@@ -115,9 +125,12 @@ namespace My.Company
             private SliceU8 _managed;
             private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceU8 managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
@@ -126,6 +139,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe SliceU8 ToManaged()
             {
                 _managed = new SliceU8();
@@ -134,6 +148,7 @@ namespace My.Company
                 return _managed;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
     }
@@ -164,6 +179,7 @@ namespace My.Company
     {
         public AsyncHelper() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public AsyncHelper(AsyncHelperDelegate managed)
         {
             _managed = managed;
@@ -171,11 +187,13 @@ namespace My.Company
             _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         void Call(IntPtr data, IntPtr _)
         {
             _managed(data);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
             if (_ptr == IntPtr.Zero) return;
@@ -198,9 +216,12 @@ namespace My.Company
             private AsyncHelper _managed;
             private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(AsyncHelper managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
@@ -209,6 +230,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public AsyncHelper ToManaged()
             {
                 _managed = new AsyncHelper();
@@ -216,6 +238,7 @@ namespace My.Company
                 return _managed;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
     }
@@ -227,12 +250,15 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Utf8String: IDisposable
     {
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Utf8String(string s) { _s = s; }
 
         public string String => _s;
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -252,6 +278,7 @@ namespace My.Company
             public ulong len;
             public ulong capacity;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public string ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -264,9 +291,11 @@ namespace My.Company
         public partial class InteropHelper
         {
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_create")]
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public static partial long interoptopus_string_create(IntPtr utf8, ulong len, out Unmanaged rval);
 
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_destroy")]
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public static partial long interoptopus_string_destroy(Unmanaged utf8);
         }
 
@@ -278,12 +307,17 @@ namespace My.Company
             private Utf8String _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Utf8String managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Utf8String managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {
                 var utf8Bytes = Encoding.UTF8.GetBytes(_managed._s);
@@ -298,6 +332,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Utf8String ToManaged()
             {
                 var span = new ReadOnlySpan<byte>((byte*)_unmanaged.ptr, (int)_unmanaged.len);
@@ -310,6 +345,7 @@ namespace My.Company
                 return _managed;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
     }

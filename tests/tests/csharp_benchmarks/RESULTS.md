@@ -35,26 +35,17 @@ profile: --release
 
 | Construct | ns per call |
 | --- | --- |
-| `primitive_void()` | 27 |
-| `primitive_u8(0)` | 29 |
-| `primitive_u16(0)` | 27 |
-| `primitive_u32(0)` | 26 |
-| `primitive_u64(0)` | 26 |
-| `many_args_5(0, 0, 0, 0, 0)` | 27 |
-| `many_args_10(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)` | 28 |
-| `ptr(x)` | 27 |
-| `ptr_mut(x)` | 28 |
-| `ref_simple(x)` | 28 |
-| `ref_option(x)` | 27 |
-| `tupled(new Tupled())` | 26 |
-| `complex_args_1(new Vec3f32(), ref e)` | 26 |
-| `callback(x => x, 0)` | 62 |
-| `pattern_ffi_option_1(new OptionInner())` | 27 |
-| `pattern_ffi_slice_delegate(x => x[0])` | 68 |
-| `pattern_ffi_slice_delegate(x => x.Copied[0])` | 82 |
-| `pattern_ffi_slice_delegate_huge(x => x[0])` | 71 |
-| `pattern_ffi_slice_delegate_huge(x => x.Copied[0])` | 131743 |
-| `pattern_ffi_slice_2(short_vec, 0)` | 40 |
-| `pattern_ffi_slice_2(long_vec, 0)` | 40 |
-| `pattern_ffi_slice_4(short_byte, short_byte)` | 44 |
-| `pattern_ascii_pointer_1('hello world')` | 81 |
+| `primitive_void()` | 1 |
+| `primitive_u8(0)` | 1 |
+| `primitive_u16(0)` | 6 |
+| `primitive_u32(0)` | 1 |
+| `primitive_u64(0)` | 1 |
+| `pattern_ffi_option_1(new OptionInner())` | 26 |
+| `pattern_ffi_slice_delegate(x => x[0])` | 756 |
+| `pattern_ffi_slice_delegate_huge(x => x[0])` | 905 |
+| `pattern_ffi_slice_delegate_huge(callback_huge_prealloc)` | 36 |
+| `pattern_ffi_slice_2(short_vec, 0)` | 22 |
+| `pattern_ffi_slice_2(long_vec, 0)` | 15 |
+| `pattern_ffi_slice_4(short_byte, short_byte)` | 9 |
+| `pattern_ascii_pointer_1('hello world')` | 35 |
+| `pattern_string_2('hello world')` | 146 |

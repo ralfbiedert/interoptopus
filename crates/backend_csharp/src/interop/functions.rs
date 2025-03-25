@@ -77,6 +77,7 @@ pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &
     let line_ending = if has_body { "" } else { ";" };
     let partial = if has_body { "" } else { "partial " };
 
+    i.inline_hint(w, 0)?;
     indented!(w, r"{}static {}{} {}({}){}", visibility, partial, rval, name, params.join(", "), line_ending)
 }
 
@@ -185,6 +186,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         write_documentation(w, function.meta().documentation())?;
     }
 
+    i.inline_hint(w, 0)?;
     indented!(w, "{}", signature)?;
     indented!(w, r"{{")?;
 

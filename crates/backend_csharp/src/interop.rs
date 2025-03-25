@@ -174,6 +174,20 @@ impl Interop {
             .to_string()
     }
 
+    fn inline_hint(&self, w: &mut IndentWriter, level: usize) -> Result<(), Error> {
+        for _ in 0..level {
+            w.indent();
+        }
+
+        indented!(w, r"[MethodImpl(MethodImplOptions.AggressiveOptimization)]")?;
+
+        for _ in 0..level {
+            w.unindent();
+        }
+
+        Ok(())
+    }
+
     #[must_use]
     #[allow(dead_code)] // TODO?
     fn should_emit_delegate(&self) -> bool {

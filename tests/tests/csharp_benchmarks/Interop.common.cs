@@ -320,11 +320,13 @@ namespace My.Company.Common
 
         public unsafe ReadOnlySpan<Bool> ReadOnlySpan
         {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get => new(_data.ToPointer(), (int)_len);
         }
 
         public unsafe Bool this[int i]
         {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
@@ -333,12 +335,14 @@ namespace My.Company.Common
 
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceBool(IntPtr data, ulong len)
         {
             _data = data;
             _len = len;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceBool(Bool[] managed)
         {
             _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
@@ -346,13 +350,16 @@ namespace My.Company.Common
             _len = (ulong) managed.Length;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public IEnumerator<Bool> GetEnumerator()
         {
             for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
             if (_handle is { IsAllocated: true }) { _handle.Free(); }
@@ -367,6 +374,7 @@ namespace My.Company.Common
             public IntPtr Data;
             public ulong Len;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public SliceBool ToManaged()
             {
                 return new SliceBool(Data, Len);
@@ -378,9 +386,12 @@ namespace My.Company.Common
             private SliceBool _managed;
             private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceBool managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
@@ -389,6 +400,7 @@ namespace My.Company.Common
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe SliceBool ToManaged()
             {
                 _managed = new SliceBool();
@@ -397,6 +409,7 @@ namespace My.Company.Common
                 return _managed;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
     }
@@ -415,11 +428,13 @@ namespace My.Company.Common
 
         public unsafe ReadOnlySpan<int> ReadOnlySpan
         {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get => new(_data.ToPointer(), (int)_len);
         }
 
         public unsafe int this[int i]
         {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
@@ -428,12 +443,14 @@ namespace My.Company.Common
 
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceI32(IntPtr data, ulong len)
         {
             _data = data;
             _len = len;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceI32(int[] managed)
         {
             _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
@@ -441,13 +458,16 @@ namespace My.Company.Common
             _len = (ulong) managed.Length;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public IEnumerator<int> GetEnumerator()
         {
             for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
             if (_handle is { IsAllocated: true }) { _handle.Free(); }
@@ -462,6 +482,7 @@ namespace My.Company.Common
             public IntPtr Data;
             public ulong Len;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public SliceI32 ToManaged()
             {
                 return new SliceI32(Data, Len);
@@ -473,9 +494,12 @@ namespace My.Company.Common
             private SliceI32 _managed;
             private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceI32 managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
@@ -484,6 +508,7 @@ namespace My.Company.Common
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe SliceI32 ToManaged()
             {
                 _managed = new SliceI32();
@@ -492,6 +517,7 @@ namespace My.Company.Common
                 return _managed;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
     }
@@ -510,11 +536,13 @@ namespace My.Company.Common
 
         public unsafe ReadOnlySpan<uint> ReadOnlySpan
         {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get => new(_data.ToPointer(), (int)_len);
         }
 
         public unsafe uint this[int i]
         {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
@@ -523,12 +551,14 @@ namespace My.Company.Common
 
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceU32(IntPtr data, ulong len)
         {
             _data = data;
             _len = len;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceU32(uint[] managed)
         {
             _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
@@ -536,13 +566,16 @@ namespace My.Company.Common
             _len = (ulong) managed.Length;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public IEnumerator<uint> GetEnumerator()
         {
             for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
             if (_handle is { IsAllocated: true }) { _handle.Free(); }
@@ -557,6 +590,7 @@ namespace My.Company.Common
             public IntPtr Data;
             public ulong Len;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public SliceU32 ToManaged()
             {
                 return new SliceU32(Data, Len);
@@ -568,9 +602,12 @@ namespace My.Company.Common
             private SliceU32 _managed;
             private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceU32 managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
@@ -579,6 +616,7 @@ namespace My.Company.Common
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe SliceU32 ToManaged()
             {
                 _managed = new SliceU32();
@@ -587,6 +625,7 @@ namespace My.Company.Common
                 return _managed;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
     }
@@ -605,11 +644,13 @@ namespace My.Company.Common
 
         public unsafe ReadOnlySpan<byte> ReadOnlySpan
         {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get => new(_data.ToPointer(), (int)_len);
         }
 
         public unsafe byte this[int i]
         {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
@@ -618,12 +659,14 @@ namespace My.Company.Common
 
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceU8(IntPtr data, ulong len)
         {
             _data = data;
             _len = len;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceU8(byte[] managed)
         {
             _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
@@ -631,13 +674,16 @@ namespace My.Company.Common
             _len = (ulong) managed.Length;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public IEnumerator<byte> GetEnumerator()
         {
             for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
             if (_handle is { IsAllocated: true }) { _handle.Free(); }
@@ -652,6 +698,7 @@ namespace My.Company.Common
             public IntPtr Data;
             public ulong Len;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public SliceU8 ToManaged()
             {
                 return new SliceU8(Data, Len);
@@ -663,9 +710,12 @@ namespace My.Company.Common
             private SliceU8 _managed;
             private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceU8 managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
@@ -674,6 +724,7 @@ namespace My.Company.Common
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe SliceU8 ToManaged()
             {
                 _managed = new SliceU8();
@@ -682,6 +733,7 @@ namespace My.Company.Common
                 return _managed;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
     }
@@ -698,6 +750,7 @@ namespace My.Company.Common
 
         public unsafe string this[int i]
         {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
@@ -706,11 +759,13 @@ namespace My.Company.Common
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceUtf8String(string[] managed)
         {
             _managed = managed;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public IEnumerator<string> GetEnumerator()
         {
             for (var i = 0; i < Count; ++i) { yield return this[i]; }
@@ -718,6 +773,7 @@ namespace My.Company.Common
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose() { }
 
         [CustomMarshaller(typeof(SliceUtf8String), MarshalMode.Default, typeof(Marshaller))]
@@ -735,9 +791,12 @@ namespace My.Company.Common
             private SliceUtf8String _managed;
             private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceUtf8String managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {
                 var size = sizeof(Utf8String.Unmanaged);
@@ -755,6 +814,7 @@ namespace My.Company.Common
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe SliceUtf8String ToManaged()
             {
                 _managed = new SliceUtf8String();
@@ -779,11 +839,13 @@ namespace My.Company.Common
 
         public unsafe ReadOnlySpan<Vec> ReadOnlySpan
         {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get => new(_data.ToPointer(), (int)_len);
         }
 
         public unsafe Vec this[int i]
         {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
@@ -792,12 +854,14 @@ namespace My.Company.Common
 
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceVec(IntPtr data, ulong len)
         {
             _data = data;
             _len = len;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceVec(Vec[] managed)
         {
             _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
@@ -805,13 +869,16 @@ namespace My.Company.Common
             _len = (ulong) managed.Length;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public IEnumerator<Vec> GetEnumerator()
         {
             for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
             if (_handle is { IsAllocated: true }) { _handle.Free(); }
@@ -826,6 +893,7 @@ namespace My.Company.Common
             public IntPtr Data;
             public ulong Len;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public SliceVec ToManaged()
             {
                 return new SliceVec(Data, Len);
@@ -837,9 +905,12 @@ namespace My.Company.Common
             private SliceVec _managed;
             private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceVec managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
@@ -848,6 +919,7 @@ namespace My.Company.Common
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe SliceVec ToManaged()
             {
                 _managed = new SliceVec();
@@ -856,6 +928,7 @@ namespace My.Company.Common
                 return _managed;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
     }
@@ -874,17 +947,20 @@ namespace My.Company.Common
 
         public unsafe ReadOnlySpan<uint> ReadOnlySpan
         {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get => new(_data.ToPointer(), (int)_len);
         }
 
         public unsafe uint this[int i]
         {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
                 return Unsafe.Read<uint>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<uint>()));
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             set
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
@@ -892,12 +968,14 @@ namespace My.Company.Common
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceMutU32(IntPtr data, ulong len)
         {
             _data = data;
             _len = len;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceMutU32(uint[] managed)
         {
             _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
@@ -905,13 +983,16 @@ namespace My.Company.Common
             _len = (ulong) managed.Length;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public IEnumerator<uint> GetEnumerator()
         {
             for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
             if (_handle is { IsAllocated: true }) { _handle.Free(); }
@@ -926,6 +1007,7 @@ namespace My.Company.Common
             public IntPtr Data;
             public ulong Len;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public SliceMutU32 ToManaged()
             {
                 return new SliceMutU32(Data, Len);
@@ -937,9 +1019,12 @@ namespace My.Company.Common
             private SliceMutU32 _managed;
             private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceMutU32 managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
@@ -948,6 +1033,7 @@ namespace My.Company.Common
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe SliceMutU32 ToManaged()
             {
                 _managed = new SliceMutU32();
@@ -956,6 +1042,7 @@ namespace My.Company.Common
                 return _managed;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
     }
@@ -974,17 +1061,20 @@ namespace My.Company.Common
 
         public unsafe ReadOnlySpan<byte> ReadOnlySpan
         {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get => new(_data.ToPointer(), (int)_len);
         }
 
         public unsafe byte this[int i]
         {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
                 return Unsafe.Read<byte>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<byte>()));
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             set
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
@@ -992,12 +1082,14 @@ namespace My.Company.Common
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceMutU8(IntPtr data, ulong len)
         {
             _data = data;
             _len = len;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceMutU8(byte[] managed)
         {
             _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
@@ -1005,13 +1097,16 @@ namespace My.Company.Common
             _len = (ulong) managed.Length;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public IEnumerator<byte> GetEnumerator()
         {
             for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
             if (_handle is { IsAllocated: true }) { _handle.Free(); }
@@ -1026,6 +1121,7 @@ namespace My.Company.Common
             public IntPtr Data;
             public ulong Len;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public SliceMutU8 ToManaged()
             {
                 return new SliceMutU8(Data, Len);
@@ -1037,9 +1133,12 @@ namespace My.Company.Common
             private SliceMutU8 _managed;
             private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceMutU8 managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
@@ -1048,6 +1147,7 @@ namespace My.Company.Common
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe SliceMutU8 ToManaged()
             {
                 _managed = new SliceMutU8();
@@ -1056,6 +1156,7 @@ namespace My.Company.Common
                 return _managed;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
     }
@@ -1074,17 +1175,20 @@ namespace My.Company.Common
 
         public unsafe ReadOnlySpan<Vec> ReadOnlySpan
         {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get => new(_data.ToPointer(), (int)_len);
         }
 
         public unsafe Vec this[int i]
         {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
                 return Unsafe.Read<Vec>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<Vec>()));
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             set
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
@@ -1092,12 +1196,14 @@ namespace My.Company.Common
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceMutVec(IntPtr data, ulong len)
         {
             _data = data;
             _len = len;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceMutVec(Vec[] managed)
         {
             _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
@@ -1105,13 +1211,16 @@ namespace My.Company.Common
             _len = (ulong) managed.Length;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public IEnumerator<Vec> GetEnumerator()
         {
             for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
             if (_handle is { IsAllocated: true }) { _handle.Free(); }
@@ -1126,6 +1235,7 @@ namespace My.Company.Common
             public IntPtr Data;
             public ulong Len;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public SliceMutVec ToManaged()
             {
                 return new SliceMutVec(Data, Len);
@@ -1137,9 +1247,12 @@ namespace My.Company.Common
             private SliceMutVec _managed;
             private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceMutVec managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
@@ -1148,6 +1261,7 @@ namespace My.Company.Common
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe SliceMutVec ToManaged()
             {
                 _managed = new SliceMutVec();
@@ -1156,6 +1270,7 @@ namespace My.Company.Common
                 return _managed;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
     }
@@ -2041,6 +2156,7 @@ namespace My.Company.Common
 
         public MyCallbackNamespaced() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public MyCallbackNamespaced(MyCallbackNamespacedDelegate managed)
         {
             _managed = managed;
@@ -2049,6 +2165,7 @@ namespace My.Company.Common
         }
 
         // Helper to invoke managed code from the native invocation.
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         private uint CallTrampoline(uint value, IntPtr callback_data)
         {
             // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
@@ -2064,6 +2181,7 @@ namespace My.Company.Common
         }
 
         // Invokes the callback.
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public uint Call(uint value)
         {
             var __target = Marshal.GetDelegateForFunctionPointer<MyCallbackNamespacedNative>(_ptr);
@@ -2072,6 +2190,7 @@ namespace My.Company.Common
             return default;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
             // This means when the callback was invoked from Rust C# had an exception which
@@ -2095,12 +2214,17 @@ namespace My.Company.Common
             private MyCallbackNamespaced _managed;
             private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(MyCallbackNamespaced managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(MyCallbackNamespaced managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
@@ -2109,6 +2233,7 @@ namespace My.Company.Common
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public MyCallbackNamespaced ToManaged()
             {
                 _managed = new MyCallbackNamespaced();
@@ -2116,6 +2241,7 @@ namespace My.Company.Common
                 return _managed;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
     }
@@ -2134,10 +2260,15 @@ namespace My.Company.Common
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial class VecU8 : IDisposable
     {
-        public int Count { get { if (_ptr == IntPtr.Zero) { throw new InteropException(); } else { return (int) _len; } } } 
+        public int Count
+        {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            get { if (_ptr == IntPtr.Zero) { throw new InteropException(); } else { return (int) _len; } }
+        }
 
         public unsafe byte this[int i]
         {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get
             {
                 if (i >= Count) throw new IndexOutOfRangeException();
@@ -2163,9 +2294,12 @@ namespace My.Company.Common
             private VecU8 _managed;
             private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(VecU8 managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
                 if (_managed._ptr == IntPtr.Zero) throw new InteropException(); // Don't use for serialization if moved already.
@@ -2177,6 +2311,7 @@ namespace My.Company.Common
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe VecU8 ToManaged()
             {
                 _managed = new VecU8();
@@ -2186,9 +2321,11 @@ namespace My.Company.Common
                 return _managed;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
             if (_ptr == IntPtr.Zero) return;
@@ -2222,6 +2359,7 @@ namespace My.Company.Common
     {
         public AsyncHelper() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public AsyncHelper(AsyncHelperDelegate managed)
         {
             _managed = managed;
@@ -2229,11 +2367,13 @@ namespace My.Company.Common
             _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         void Call(IntPtr data, IntPtr _)
         {
             _managed(data);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
             if (_ptr == IntPtr.Zero) return;
@@ -2256,9 +2396,12 @@ namespace My.Company.Common
             private AsyncHelper _managed;
             private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(AsyncHelper managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
                 _unmanaged = new Unmanaged();
@@ -2267,6 +2410,7 @@ namespace My.Company.Common
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public AsyncHelper ToManaged()
             {
                 _managed = new AsyncHelper();
@@ -2274,6 +2418,7 @@ namespace My.Company.Common
                 return _managed;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
     }
@@ -2285,12 +2430,15 @@ namespace My.Company.Common
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Utf8String: IDisposable
     {
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Utf8String(string s) { _s = s; }
 
         public string String => _s;
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -2310,6 +2458,7 @@ namespace My.Company.Common
             public ulong len;
             public ulong capacity;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public string ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -2322,9 +2471,11 @@ namespace My.Company.Common
         public partial class InteropHelper
         {
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_create")]
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public static partial long interoptopus_string_create(IntPtr utf8, ulong len, out Unmanaged rval);
 
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_destroy")]
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public static partial long interoptopus_string_destroy(Unmanaged utf8);
         }
 
@@ -2336,12 +2487,17 @@ namespace My.Company.Common
             private Utf8String _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Utf8String managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Utf8String managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {
                 var utf8Bytes = Encoding.UTF8.GetBytes(_managed._s);
@@ -2356,6 +2512,7 @@ namespace My.Company.Common
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Utf8String ToManaged()
             {
                 var span = new ReadOnlySpan<byte>((byte*)_unmanaged.ptr, (int)_unmanaged.len);
@@ -2368,6 +2525,7 @@ namespace My.Company.Common
                 return _managed;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
     }
