@@ -2121,6 +2121,81 @@ namespace My.Company.Common
     }
 
 
+    // This must be a class because we only ever want to hold on to the
+    // same instance, as we overwrite fields when this is sent over the FFI
+    // boundary
+    public partial class VecU8
+    {
+        internal IntPtr _ptr;
+        internal ulong _len;
+        internal ulong _capacity;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial class VecU8 : IDisposable
+    {
+        public int Count { get { if (_ptr == IntPtr.Zero) { throw new InteropException(); } else { return (int) _len; } } } 
+
+        public unsafe byte this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                if (_ptr == IntPtr.Zero) throw new InteropException();
+                return Marshal.PtrToStructure<byte>(new IntPtr(_ptr.ToInt64() + i * sizeof(byte)));
+            }
+        }
+
+        [CustomMarshaller(typeof(VecU8), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr _ptr;
+            internal ulong _len;
+            internal ulong _capacity;
+
+        }
+
+        public ref struct Marshaller
+        {
+            private VecU8 _managed;
+            private Unmanaged _unmanaged;
+
+            public void FromManaged(VecU8 managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public Unmanaged ToUnmanaged()
+            {
+                if (_managed._ptr == IntPtr.Zero) throw new InteropException(); // Don't use for serialization if moved already.
+                _unmanaged = new Unmanaged();
+                _unmanaged._len = _managed._len;
+                _unmanaged._capacity = _managed._capacity;
+                _unmanaged._ptr = _managed._ptr;
+                _managed._ptr = IntPtr.Zero; // Mark this instance as moved.
+                return _unmanaged;
+            }
+
+            public unsafe VecU8 ToManaged()
+            {
+                _managed = new VecU8();
+                _managed._len = _unmanaged._len;
+                _managed._capacity = _unmanaged._capacity;
+                _managed._ptr = _unmanaged._ptr;
+                return _managed;
+            }
+
+            public void Free() { }
+        }
+
+        public void Dispose()
+        {
+            if (_ptr == IntPtr.Zero) return;
+            Interop.interoptopus_vec_TODO_destroy(this);
+        }
+    }
+
 
 
     public class InteropException: Exception

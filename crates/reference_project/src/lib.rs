@@ -8,7 +8,7 @@
 //! is generated is part of the test.
 
 use interoptopus::inventory::{Inventory, InventoryBuilder};
-use interoptopus::{builtins, constant, extra_type, function, pattern};
+use interoptopus::{constant, extra_type, function, pattern, string_utils};
 
 pub mod constants;
 pub mod functions;
@@ -23,6 +23,7 @@ pub mod patterns {
     pub mod slice;
     pub mod string;
     pub mod surrogate;
+    pub mod vec;
 }
 pub mod services {
     pub mod asynk;
@@ -43,7 +44,9 @@ pub fn ffi_inventory() -> Inventory {
     {
         InventoryBuilder::new()
             // Functions
-            .register(builtins!())
+            .register(string_utils!())
+            .register(function!(patterns::vec::interoptopus_vec_TODO_destroy))
+            // .register(vec_utils!(u8, u32))
             .register(function!(functions::alignment::alignment_1))
             .register(function!(functions::array::array_1))
             .register(function!(functions::array::array_2))
@@ -150,6 +153,10 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(patterns::callback::pattern_callback_7))
             .register(function!(patterns::callback::pattern_callback_8))
             .register(function!(patterns::surrogate::pattern_surrogates_1))
+            .register(function!(patterns::vec::pattern_vec_1))
+            .register(function!(patterns::vec::pattern_vec_2))
+            .register(function!(patterns::vec::pattern_vec_3))
+            .register(function!(patterns::vec::pattern_vec_4))
             // Constants
             .register(constant!(constants::U8))
             .register(constant!(constants::F32_MIN_POSITIVE))

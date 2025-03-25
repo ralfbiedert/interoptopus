@@ -184,6 +184,7 @@ pub fn ctypes_from_type_recursive(start: &Type, types: &mut HashSet<Type>) {
                     }
                 }
             }
+            TypePattern::Vec(x) => ctypes_from_type_recursive(x.t(), types),
             TypePattern::Bool => {}
             TypePattern::CChar => {}
             TypePattern::APIVersion => {}
@@ -234,6 +235,9 @@ pub fn extract_namespaces_from_types(types: &[Type], into: &mut HashSet<String>)
                 TypePattern::CChar => {}
                 TypePattern::NamedCallback(_) => {}
                 TypePattern::Utf8String(_) => {}
+                TypePattern::Vec(x) => {
+                    into.insert(x.meta().namespace().to_string());
+                }
             },
         }
     }
@@ -281,6 +285,7 @@ pub fn holds_opaque_without_ref(typ: &Type) -> bool {
             TypePattern::CChar => false,
             TypePattern::NamedCallback(_) => false,
             TypePattern::AsyncCallback(_) => false,
+            TypePattern::Vec(x) => holds_opaque_without_ref(x.t()),
         },
     }
 }
@@ -394,6 +399,7 @@ pub fn is_global_type(t: &Type) -> bool {
             TypePattern::NamedCallback(_) => false,
             TypePattern::AsyncCallback(_) => false,
             TypePattern::Utf8String(_) => true,
+            TypePattern::Vec(x) => is_global_type(x.t()),
         },
     }
 }

@@ -30,10 +30,15 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
 - Backend-related testing functions were moved into an internal `tests` project, as the code was mostly specific to our
   project needs anyway.
 - The core generation trait was renamed from `Interop` to `GenerateInterop`.
+- Items were generally renamed from `FFIxxx` to `ffi::Xxx`
 - The preferred way to return errors is now via `ffi:Result`
 - We now support UTF-8 strings via `ffi::String`
 - We support async-async calls (from C#)
-- Items were generally renamed from `FFIxxx` to `ffi::Xxx`
+- Enums can now carry data. For now only `E::A` and `E::B(T)` are supported.
+- `ffi::Result` and `ffi::Option` are now based on enums
+- Support for the old `FFIErrorEnum` style has been removed. Use `ffi::Result` instead. Error patterns are now much
+- easier to implement.
+- Likewise, `#[ffi_type(error)]` on enums has been removed.
 
 #### All Backends
 
@@ -60,6 +65,7 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
 - Arrays are properly supported!
 - Async calls are supported
 - Exception in callbacks should be properly handled
+- `String,` `Result`, `Option` and similar can now be deeply nested and generally work as expected.
 
 #### Python / C Backend
 

@@ -6,6 +6,7 @@ pub use crate::pattern::primitive::{Bool, CChar};
 pub use crate::pattern::result::{Result, Result::Err, Result::Ok};
 pub use crate::pattern::slice::{Slice, SliceMut};
 pub use crate::pattern::string::String;
+pub use crate::pattern::vec::Vec;
 
 /// Logs an error if compiled with feature `log`.
 #[cfg(feature = "log")]

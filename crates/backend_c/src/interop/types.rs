@@ -75,6 +75,10 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type,
             TypePattern::Bool => {}
             TypePattern::CChar => {}
             TypePattern::APIVersion => {}
+            TypePattern::Vec(x) => {
+                write_type_definition_composite(i, w, x.composite_type())?;
+                w.newline()?;
+            }
             _ => panic!("Pattern not explicitly handled"),
         },
     }

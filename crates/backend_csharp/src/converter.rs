@@ -177,6 +177,7 @@ pub fn to_typespecifier_in_param(x: &Type) -> String {
             TypePattern::SliceMut(x) => composite_to_typename(x.composite_type()),
             TypePattern::Option(x) => enum_to_typename(x.the_enum()),
             TypePattern::Result(x) => enum_to_typename(x.the_enum()),
+            TypePattern::Vec(x) => composite_to_typename(x.composite_type()),
             TypePattern::NamedCallback(x) => named_callback_to_typename(x),
             TypePattern::AsyncCallback(x) => async_callback_to_typename(x),
             TypePattern::Bool => "Bool".to_string(),
@@ -208,6 +209,7 @@ pub fn to_typespecifier_in_sync_fn_rval(x: &Type) -> String {
             TypePattern::Bool => "Bool".to_string(),
             TypePattern::CChar => "sbyte".to_string(),
             TypePattern::APIVersion => to_typespecifier_in_sync_fn_rval(&x.fallback_type()),
+            TypePattern::Vec(x) => composite_to_typename(x.composite_type()),
             _ => panic!("Pattern not explicitly handled"),
         },
     }

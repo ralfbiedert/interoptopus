@@ -22,9 +22,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 10828331896780892909ul)
+            if (api_version != 8157956992078584141ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10828331896780892909). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (8157956992078584141). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -54,6 +54,11 @@ namespace My.Company
                 utf8_wrapped.Dispose();
             }
         }
+
+        /// TODO: This should be macro generated.
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_TODO_destroy")]
+        public static partial void interoptopus_vec_TODO_destroy(VecU8 ignored);
+
 
         [LibraryImport(NativeLib, EntryPoint = "alignment_1")]
         public static partial Packed2 alignment_1(Packed1 a);
@@ -773,6 +778,22 @@ namespace My.Company
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_surrogates_1")]
         public static partial void pattern_surrogates_1(Local s, ref Container c);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_1")]
+        public static partial VecU8 pattern_vec_1();
+
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_2")]
+        public static partial void pattern_vec_2(VecU8 ignored);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_3")]
+        public static partial VecU8 pattern_vec_3(VecU8 v);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_4")]
+        public static partial VecU8 pattern_vec_4(ref VecU8 v);
 
 
         /// Destroys the given instance.
@@ -8333,6 +8354,81 @@ namespace My.Company
         }
     }
 
+
+    // This must be a class because we only ever want to hold on to the
+    // same instance, as we overwrite fields when this is sent over the FFI
+    // boundary
+    public partial class VecU8
+    {
+        internal IntPtr _ptr;
+        internal ulong _len;
+        internal ulong _capacity;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial class VecU8 : IDisposable
+    {
+        public int Count { get { if (_ptr == IntPtr.Zero) { throw new InteropException(); } else { return (int) _len; } } } 
+
+        public unsafe byte this[int i]
+        {
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                if (_ptr == IntPtr.Zero) throw new InteropException();
+                return Marshal.PtrToStructure<byte>(new IntPtr(_ptr.ToInt64() + i * sizeof(byte)));
+            }
+        }
+
+        [CustomMarshaller(typeof(VecU8), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr _ptr;
+            internal ulong _len;
+            internal ulong _capacity;
+
+        }
+
+        public ref struct Marshaller
+        {
+            private VecU8 _managed;
+            private Unmanaged _unmanaged;
+
+            public void FromManaged(VecU8 managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public Unmanaged ToUnmanaged()
+            {
+                if (_managed._ptr == IntPtr.Zero) throw new InteropException(); // Don't use for serialization if moved already.
+                _unmanaged = new Unmanaged();
+                _unmanaged._len = _managed._len;
+                _unmanaged._capacity = _managed._capacity;
+                _unmanaged._ptr = _managed._ptr;
+                _managed._ptr = IntPtr.Zero; // Mark this instance as moved.
+                return _unmanaged;
+            }
+
+            public unsafe VecU8 ToManaged()
+            {
+                _managed = new VecU8();
+                _managed._len = _unmanaged._len;
+                _managed._capacity = _unmanaged._capacity;
+                _managed._ptr = _unmanaged._ptr;
+                return _managed;
+            }
+
+            public void Free() { }
+        }
+
+        public void Dispose()
+        {
+            if (_ptr == IntPtr.Zero) return;
+            Interop.interoptopus_vec_TODO_destroy(this);
+        }
+    }
 
 
     public partial class ServiceAsync : IDisposable

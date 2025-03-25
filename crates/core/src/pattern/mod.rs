@@ -80,6 +80,7 @@ use crate::pattern::option::OptionType;
 use crate::pattern::result::ResultType;
 use crate::pattern::service::ServiceDefinition;
 use crate::pattern::slice::SliceType;
+use crate::pattern::vec::VecType;
 use std::ffi::c_char;
 
 #[doc(hidden)]
@@ -96,6 +97,7 @@ pub mod service;
 pub mod slice;
 pub mod string;
 pub mod surrogate;
+pub mod vec;
 
 /// A pattern on a library level, usually involving both methods and types.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -134,6 +136,7 @@ pub enum TypePattern {
     CChar,
     NamedCallback(NamedCallback),
     AsyncCallback(AsyncCallback),
+    Vec(VecType),
 }
 
 impl TypePattern {
@@ -155,6 +158,7 @@ impl TypePattern {
             Self::APIVersion => Type::Primitive(Primitive::U64),
             Self::AsyncCallback(x) => Type::FnPointer(x.fnpointer().clone()),
             Self::Utf8String(x) => Type::Composite(x.clone()),
+            Self::Vec(x) => Type::Composite(x.composite_type().clone()),
         }
     }
 }

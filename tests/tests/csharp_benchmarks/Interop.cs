@@ -22,9 +22,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 10828331896780892909ul)
+            if (api_version != 8157956992078584141ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10828331896780892909). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (8157956992078584141). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -54,6 +54,11 @@ namespace My.Company
                 utf8_wrapped.Dispose();
             }
         }
+
+        /// TODO: This should be macro generated.
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_TODO_destroy")]
+        public static partial void interoptopus_vec_TODO_destroy(VecU8 ignored);
+
 
         [LibraryImport(NativeLib, EntryPoint = "alignment_1")]
         public static partial Packed2 alignment_1(Packed1 a);
@@ -773,6 +778,22 @@ namespace My.Company
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_surrogates_1")]
         public static partial void pattern_surrogates_1(Local s, ref Container c);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_1")]
+        public static partial VecU8 pattern_vec_1();
+
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_2")]
+        public static partial void pattern_vec_2(VecU8 ignored);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_3")]
+        public static partial VecU8 pattern_vec_3(VecU8 v);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_4")]
+        public static partial VecU8 pattern_vec_4(ref VecU8 v);
 
 
         /// Destroys the given instance.

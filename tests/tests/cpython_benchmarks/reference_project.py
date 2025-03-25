@@ -12,6 +12,7 @@ def init_lib(path):
 
     c_lib.interoptopus_string_create.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(Utf8String)]
     c_lib.interoptopus_string_destroy.argtypes = [Utf8String]
+    c_lib.interoptopus_vec_TODO_destroy.argtypes = [VecU8]
     c_lib.alignment_1.argtypes = [Packed1]
     c_lib.array_1.argtypes = [Array]
     c_lib.array_2.argtypes = []
@@ -116,6 +117,10 @@ def init_lib(path):
     c_lib.pattern_callback_7.argtypes = [ctypes.CFUNCTYPE(ResultError, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p), ctypes.CFUNCTYPE(None, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p), ctypes.c_int32, ctypes.c_int32, ctypes.POINTER(ctypes.c_int32)]
     c_lib.pattern_callback_8.argtypes = [ctypes.CFUNCTYPE(None, Utf8String, ctypes.c_void_p), ctypes.CFUNCTYPE(None, UseString, ctypes.c_void_p), Utf8String]
     c_lib.pattern_surrogates_1.argtypes = [Local, ctypes.POINTER(Container)]
+    c_lib.pattern_vec_1.argtypes = []
+    c_lib.pattern_vec_2.argtypes = [VecU8]
+    c_lib.pattern_vec_3.argtypes = [VecU8]
+    c_lib.pattern_vec_4.argtypes = [ctypes.POINTER(VecU8)]
     c_lib.service_async_destroy.argtypes = [ctypes.c_void_p]
     c_lib.service_async_new.argtypes = []
     c_lib.service_async_return_after_ms.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint64, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultU64Error), ctypes.c_void_p)]
@@ -261,6 +266,9 @@ def init_lib(path):
     c_lib.pattern_callback_5.restype = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
     c_lib.pattern_callback_6.restype = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)
     c_lib.pattern_callback_7.restype = ResultError
+    c_lib.pattern_vec_1.restype = VecU8
+    c_lib.pattern_vec_3.restype = VecU8
+    c_lib.pattern_vec_4.restype = VecU8
     c_lib.service_async_destroy.restype = ResultConstPtrServiceAsyncError
     c_lib.service_async_new.restype = ResultConstPtrServiceAsyncError
     c_lib.service_async_return_after_ms.restype = ResultError
@@ -316,6 +324,10 @@ def interoptopus_string_create(utf8: ctypes.c_void_p, len: int, rval: ctypes.POI
 
 def interoptopus_string_destroy(utf8) -> int:
     return c_lib.interoptopus_string_destroy(utf8)
+
+def interoptopus_vec_TODO_destroy(ignored):
+    """ TODO: This should be macro generated."""
+    return c_lib.interoptopus_vec_TODO_destroy(ignored)
 
 def alignment_1(a: Packed1) -> Packed2:
     return c_lib.alignment_1(a)
@@ -716,6 +728,18 @@ def pattern_callback_8(cb, cb2, s):
 
 def pattern_surrogates_1(s: Local, c: ctypes.POINTER(Container)):
     return c_lib.pattern_surrogates_1(s, c)
+
+def pattern_vec_1():
+    return c_lib.pattern_vec_1()
+
+def pattern_vec_2(ignored):
+    return c_lib.pattern_vec_2(ignored)
+
+def pattern_vec_3(v):
+    return c_lib.pattern_vec_3(v)
+
+def pattern_vec_4(v: ctypes.POINTER(VecU8)):
+    return c_lib.pattern_vec_4(v)
 
 
 

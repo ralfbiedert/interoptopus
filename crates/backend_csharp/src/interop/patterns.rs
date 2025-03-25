@@ -4,6 +4,7 @@ pub mod options;
 pub mod results;
 pub mod services;
 pub mod slices;
+pub mod vec;
 
 use crate::Interop;
 use crate::interop::patterns::services::write_pattern_service;

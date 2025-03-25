@@ -314,6 +314,19 @@ typedef enum RESULTUTF8STRINGERROR
     RESULTUTF8STRINGERROR_NULL = 3,
     } RESULTUTF8STRINGERROR;
 
+///  Vec marshalling helper.
+///  A highly dangerous 'use once type' that has ownership semantics!
+///  Once passed over an FFI boundary 'the other side' is meant to own
+///  (and free) it. Rust handles that fine, but if in C# you put this
+///  in a struct and then call Rust multiple times with that struct 
+///  you'll free the same pointer multiple times, and get UB!
+typedef struct VECU8
+    {
+    uint8_t* ptr;
+    uint64_t len;
+    uint64_t capacity;
+    } VECU8;
+
 typedef struct ARRAY
     {
     uint8_t data[16];
@@ -662,6 +675,9 @@ int64_t interoptopus_string_create(const void* UTF8, uint64_t LEN, UTF8STRING* R
 
 int64_t interoptopus_string_destroy(UTF8STRING UTF8);
 
+///  TODO: This should be macro generated.
+void interoptopus_vec_TODO_destroy(VECU8 IGNORED);
+
 PACKED2 alignment_1(PACKED1 A);
 
 uint8_t array_1(ARRAY X);
@@ -874,6 +890,14 @@ RESULTERROR pattern_callback_7(SUMDELEGATERETURN C1, SUMDELEGATERETURN2 C2, int3
 void pattern_callback_8(STRINGCALLBACK CB, NESTEDSTRINGCALLBACK CB2, UTF8STRING S);
 
 void pattern_surrogates_1(LOCAL S, CONTAINER* C);
+
+VECU8 pattern_vec_1();
+
+void pattern_vec_2(VECU8 IGNORED);
+
+VECU8 pattern_vec_3(VECU8 V);
+
+VECU8 pattern_vec_4(const VECU8* V);
 
 ///  Destroys the given instance.
 /// 
