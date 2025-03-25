@@ -69,6 +69,7 @@ namespace Interoptopus
 
         public void Add(string name, MeasureResult result)
         {
+            Console.WriteLine($"{name}: {result.MicroPer1000()}");
             Entries.Add(new Entry()
             {
                 Name = name,
