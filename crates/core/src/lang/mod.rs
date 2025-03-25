@@ -18,7 +18,7 @@ pub use constant::{Constant, ConstantValue};
 pub use enums::{Enum, Variant, VariantKind};
 pub use fnpointer::FnPointer;
 pub use function::{Function, FunctionSignature, Parameter, SugaredReturnType};
-pub use info::{ConstantInfo, FunctionInfo, TypeInfo, VariantInfo};
+pub use info::{ConstantInfo, FunctionInfo, TypeInfo};
 pub use meta::{Documentation, Meta, Visibility};
 pub use primitive::{Primitive, PrimitiveValue};
 

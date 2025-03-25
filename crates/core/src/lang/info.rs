@@ -1,6 +1,5 @@
 //! Helpers to introspect Rust code when generating bindings, mostly derived by the `#[ffi_...]` macros.
 
-use crate::lang::enums::Variant;
 use crate::lang::function::{FunctionSignature, Parameter};
 use crate::lang::{Array, Constant, FnPointer, Function, Primitive, PrimitiveValue, Type};
 use std::mem::MaybeUninit;
@@ -42,16 +41,6 @@ pub unsafe trait FunctionInfo {
     // type Surrogate;
 
     fn function_info() -> Function;
-}
-
-/// Implemented for an enum via [`ffi_type`](crate::ffi_type) allows us to translate a variant into its meta information.
-///
-/// # Safety
-///
-/// This trait must be implemented correctly, or else the generated bindings disagree on variant values
-/// with their Rust counterparts, leading to UB when invoked with non-existent numbers.
-pub unsafe trait VariantInfo {
-    fn variant_info(&self) -> Variant;
 }
 
 macro_rules! impl_ctype_primitive {
