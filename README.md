@@ -24,7 +24,6 @@ you actually wanted to expose.
 ### Code you write ...
 
 ```rust
-#
 #[ffi_type]
 pub struct Vec2 {
     pub x: f32,
