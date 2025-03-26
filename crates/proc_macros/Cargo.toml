@@ -2,7 +2,7 @@
 name = "interoptopus_proc"
 description = "Macros to produce Interoptopus item info."
 authors = ["Ralf Biedert <rb@xr.io>"]
-version = "0.14.23"
+version = "0.15.0-alpha.0"
 edition = "2024"
 rust-version = "1.85"
 license = "MIT"
