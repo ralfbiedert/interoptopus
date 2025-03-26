@@ -17,10 +17,10 @@ impl ServiceStrings {
         ffi::Result::Ok(Self {})
     }
 
-    pub fn pass_cstr(&mut self, _: ffi::CStrPointer) {}
+    pub fn pass_cstr(&mut self, _: ffi::CStrPtr) {}
 
-    pub fn return_cstr(&mut self) -> ffi::CStrPointer {
-        ffi::CStrPointer::empty()
+    pub fn return_cstr(&mut self) -> ffi::CStrPtr {
+        ffi::CStrPtr::empty()
     }
 
     pub fn callback_string(&self, s: ffi::String, cb: StringCallback) {

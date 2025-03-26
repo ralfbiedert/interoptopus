@@ -22,7 +22,7 @@ impl GameEngine {
         Result::Ok(Self { engine })
     }
 
-    pub fn place_object(&mut self, name: ffi::CStrPointer, position: Vec2) -> ffi::Result<(), Error> {
+    pub fn place_object(&mut self, name: ffi::CStrPtr, position: Vec2) -> ffi::Result<(), Error> {
         result_to_ffi(|| {
             let name = name.as_str()?;
             let position = position.into_native();

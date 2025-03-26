@@ -18,7 +18,7 @@ impl ServiceMultipleCtors {
         ffi::Ok(Self { data: vec![1, 2, 3] })
     }
 
-    pub fn new_with_string(_: ffi::CStrPointer) -> ffi::Result<Self, Error> {
+    pub fn new_with_string(_: ffi::CStrPtr) -> ffi::Result<Self, Error> {
         ffi::Ok(Self { data: vec![1, 2, 3] })
     }
 

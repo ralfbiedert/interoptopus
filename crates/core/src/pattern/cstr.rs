@@ -9,7 +9,7 @@
 //! use interoptopus::ffi;
 //!
 //! #[ffi_function]
-//! pub extern "C" fn call_with_string(s: ffi::CStrPointer) {
+//! pub extern "C" fn call_with_string(s: ffi::CStrPtr) {
 //!     //
 //! }
 //! ```
@@ -41,31 +41,31 @@ static EMPTY: &[u8] = b"\0";
 ///
 /// # Antipattern
 ///
-/// It's discouraged to use [`FFIOption`](crate::pattern::option::Option) with [`CStrPointer`]
+/// It's discouraged to use [`FFIOption`](crate::pattern::option::Option) with [`CStrPtr`]
 /// and some backend might not generate proper bindings (like C#).
 ///
-/// Instead use [`CStrPointer`] alone since it already has a pointer that's nullable.
-/// In this case, [`CStrPointer::as_c_str()`] will return [`None`] and [`CStrPointer::as_str`]
+/// Instead use [`CStrPtr`] alone since it already has a pointer that's nullable.
+/// In this case, [`CStrPtr::as_c_str()`] will return [`None`] and [`CStrPtr::as_str`]
 /// will return an [`Error::Null`].
 #[repr(transparent)]
 #[derive(Debug)]
-pub struct CStrPointer<'a> {
+pub struct CStrPtr<'a> {
     ptr: *const c_char,
     _phantom: PhantomData<&'a ()>,
 }
 
 // Safety: `CStrPointer` is a transparent wrapper around a pointer. From Rust
 //         we only allow safe construction, from interop it's up to the FFI caller.
-unsafe impl Send for CStrPointer<'_> {}
-unsafe impl Sync for CStrPointer<'_> {}
+unsafe impl Send for CStrPtr<'_> {}
+unsafe impl Sync for CStrPtr<'_> {}
 
-impl Default for CStrPointer<'_> {
+impl Default for CStrPtr<'_> {
     fn default() -> Self {
         Self { ptr: null(), _phantom: PhantomData::default() }
     }
 }
 
-impl<'a> CStrPointer<'a> {
+impl<'a> CStrPtr<'a> {
     #[must_use]
     pub fn empty() -> Self {
         Self { ptr: EMPTY.as_ptr().cast(), _phantom: PhantomData::default() }
@@ -121,7 +121,7 @@ impl<'a> CStrPointer<'a> {
     }
 }
 
-unsafe impl TypeInfo for CStrPointer<'_> {
+unsafe impl TypeInfo for CStrPtr<'_> {
     fn type_info() -> Type {
         Type::Pattern(TypePattern::CStrPointer)
     }
@@ -129,7 +129,7 @@ unsafe impl TypeInfo for CStrPointer<'_> {
 
 #[cfg(test)]
 mod test {
-    use crate::pattern::cstr::CStrPointer;
+    use crate::pattern::cstr::CStrPtr;
     use std::ffi::CString;
 
     #[test]
@@ -137,7 +137,7 @@ mod test {
         let s = "hello world";
         let cstr = CString::new(s).unwrap();
 
-        let ptr_some = CStrPointer::from_cstr(&cstr);
+        let ptr_some = CStrPtr::from_cstr(&cstr);
 
         assert_eq!(s, ptr_some.as_str().unwrap());
     }
@@ -145,7 +145,7 @@ mod test {
     #[test]
     fn from_slice_with_nul_works() {
         let s = b"hello\0world";
-        let ptr_some = CStrPointer::from_slice_with_nul(&s[..]).unwrap();
+        let ptr_some = CStrPtr::from_slice_with_nul(&s[..]).unwrap();
 
         assert_eq!("hello", ptr_some.as_str().unwrap());
     }
@@ -153,7 +153,7 @@ mod test {
     #[test]
     fn from_slice_with_nul_fails_if_not_nul() {
         let s = b"hello world";
-        let ptr_some = CStrPointer::from_slice_with_nul(&s[..]);
+        let ptr_some = CStrPtr::from_slice_with_nul(&s[..]);
 
         assert!(ptr_some.is_err());
     }

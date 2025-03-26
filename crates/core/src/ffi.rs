@@ -1,6 +1,6 @@
 //! FFI-safe versions of common std Rust types.
 
-pub use crate::pattern::cstr::CStrPointer;
+pub use crate::pattern::cstr::CStrPtr;
 pub use crate::pattern::option::{Option, Option::None, Option::Some};
 pub use crate::pattern::primitive::{Bool, CChar};
 pub use crate::pattern::result::{Result, Result::Err, Result::Ok};

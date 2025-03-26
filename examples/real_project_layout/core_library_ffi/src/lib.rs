@@ -1,4 +1,4 @@
-use interoptopus::ffi::CStrPointer;
+use interoptopus::ffi::CStrPtr;
 use interoptopus::inventory::{Inventory, InventoryBuilder};
 use interoptopus::{ffi_function, function, pattern};
 
@@ -7,7 +7,7 @@ pub mod error;
 
 // As in `engine`, we create matching functions that are better suited for an FFI boundary.
 #[ffi_function]
-pub fn start_server(server_name: CStrPointer) {
+pub fn start_server(server_name: CStrPtr) {
     let Ok(name) = server_name.as_str() else {
         return;
     };

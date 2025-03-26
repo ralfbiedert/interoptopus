@@ -1,16 +1,16 @@
 use crate::patterns::result::Error;
 use crate::types::string::{UseCStrPtr, UseString};
-use interoptopus::ffi::{CStrPointer, Result, Slice};
+use interoptopus::ffi::{CStrPtr, Result, Slice};
 use interoptopus::{ffi, ffi_function};
 
 #[ffi_function]
-pub fn pattern_ascii_pointer_1(x: ffi::CStrPointer) -> u32 {
+pub fn pattern_ascii_pointer_1(x: ffi::CStrPtr) -> u32 {
     x.as_c_str().map(|x| x.to_bytes().len()).unwrap_or(0) as u32
 }
 
 #[ffi_function]
-pub fn pattern_ascii_pointer_2() -> ffi::CStrPointer<'static> {
-    ffi::CStrPointer::empty()
+pub fn pattern_ascii_pointer_2() -> ffi::CStrPtr<'static> {
+    ffi::CStrPtr::empty()
 }
 
 // NOTE: In some languages (C#) this can be a bad idea, because
@@ -19,18 +19,18 @@ pub fn pattern_ascii_pointer_2() -> ffi::CStrPointer<'static> {
 // you use the output parameter again that helper struct got
 // deallocated.
 #[ffi_function]
-pub fn pattern_ascii_pointer_3(x: ffi::CStrPointer) -> ffi::CStrPointer {
+pub fn pattern_ascii_pointer_3(x: ffi::CStrPtr) -> ffi::CStrPtr {
     x
 }
 
 #[ffi_function]
-pub fn pattern_ascii_pointer_4(x: ffi::CStrPointer, l: u32) -> ffi::CStrPointer {
+pub fn pattern_ascii_pointer_4(x: ffi::CStrPtr, l: u32) -> ffi::CStrPtr {
     let bytes = x.as_c_str().unwrap().to_bytes();
-    CStrPointer::from_slice_with_nul(&bytes[l as usize..]).unwrap()
+    CStrPtr::from_slice_with_nul(&bytes[l as usize..]).unwrap()
 }
 
 #[ffi_function]
-pub fn pattern_ascii_pointer_5(x: ffi::CStrPointer, i: u32) -> u8 {
+pub fn pattern_ascii_pointer_5(x: ffi::CStrPtr, i: u32) -> u8 {
     let bytes = x.as_c_str().unwrap().to_bytes();
     bytes[i as usize]
 }
