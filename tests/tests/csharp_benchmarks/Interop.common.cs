@@ -2447,7 +2447,7 @@ namespace My.Company.Common
     {
         private AsyncHelperDelegate _managed;
         private AsyncHelperNative _native;
-        private IntPtr _ptr;
+        internal IntPtr _ptr;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]

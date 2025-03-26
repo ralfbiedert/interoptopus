@@ -70,7 +70,7 @@ static class Benchmark {
 
         result = MeasureResult.Measure(Iterations, async () =>
         {
-            await serviceAsync.Success();
+            await serviceAsync.Success2();
         });
         writer.Add("await serviceAsync.Success()", result);
 

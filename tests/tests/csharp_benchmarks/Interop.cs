@@ -16,34 +16,58 @@ using My.Company.Common;
 namespace My.Company
 {
 
-    struct AsyncXX<T, E>
+    public delegate void AxxH(IntPtr data, IntPtr callback_data);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct Axx
+    {
+        internal IntPtr _ptr;
+        internal IntPtr _ts;
+    }
+
+    public struct AsyncXX
     {
         private readonly GCHandle _pinned;
         private AsyncHelper _helper;
+        private IntPtr _ptr;
+        private AxxH _native;
 
         public AsyncXX()
         {
-            _helper = new AsyncHelper((x) => {
-                var unmanaged = Marshal.PtrToStructure<ResultError.Unmanaged>(x);
-                var marshaller = new ResultError.Marshaller(unmanaged);
-                var managed = marshaller.ToManaged();
-                // if (managed.IsOk) { cs.SetResult(); }
-                // else { cs.SetException(new InteropException()); }
-            });
+            _native = Call;
+            _ptr = Marshal.GetFunctionPointerForDelegate(_native);
         }
 
-        void Foo()
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        void Call(IntPtr data, IntPtr csPtr)
         {
+            var handle = GCHandle.FromIntPtr(csPtr);
+            var cs = (TaskCompletionSource) handle.Target;
+            var unmanaged = Marshal.PtrToStructure<ResultError.Unmanaged>(data);
+            var marshaller = new ResultError.Marshaller(unmanaged);
+            var managed = marshaller.ToManaged();
+            if (managed.IsOk) { cs.SetResult(); }
+            else { cs.SetException(new InteropException()); }
+        }
 
+        public (Axx, Task) Foo()
+        {
+            var ts = new TaskCompletionSource();
+            var handle = GCHandle.Alloc(ts, GCHandleType.Normal);
+            var ax = new Axx {
+                _ptr = _ptr,
+                _ts = GCHandle.ToIntPtr(handle),
+            };
+            return (ax, ts.Task);
         }
     }
 
     public static partial class Interop
     {
-        private static readonly GCHandle _pinned;
-        private static readonly AsyncHelper _cb;
-        
+
         public const string NativeLib = "interoptopus_reference_project";
+
+        public static AsyncXX XXX;
 
         static Interop()
         {
@@ -53,15 +77,7 @@ namespace My.Company
                 throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (13717282704452174362). You probably forgot to update / copy either the bindings or the library.");
             }
 
-            _cb = new AsyncHelper((x) => {
-                var unmanaged = Marshal.PtrToStructure<ResultError.Unmanaged>(x);
-                var marshaller = new ResultError.Marshaller(unmanaged);
-                var managed = marshaller.ToManaged();
-                // if (managed.IsOk) { cs.SetResult(); }
-                // else { cs.SetException(new InteropException()); }
-            });
-            _pinned = GCHandle.Alloc(_cb);
-
+            XXX = new AsyncXX();
         }
 
         public const byte U8 = (byte) 255;
@@ -1125,6 +1141,11 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_async_success(IntPtr _context, AsyncHelper _async_callback);
 
+        [LibraryImport(NativeLib, EntryPoint = "service_async_success")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultError service_async_success2(IntPtr _context, Axx _async_callback);
+
+
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe Task service_async_success(IntPtr _context)
         {
@@ -1151,17 +1172,18 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static unsafe Task service_async_success2(IntPtr _context, AsyncHelper cb, TaskCompletionSource cs)
+        public static unsafe Task service_async_success2(IntPtr _context)
         {
+            var (ax, tsk) = XXX.Foo();
             try
             {
-                service_async_success(_context, cb).AsOk();
-                return cs.Task;
+                service_async_success2(_context, ax).AsOk();
+                return tsk;
             }
             finally
             {
             }
-            return cs.Task;
+            return tsk;
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_fail")]
@@ -7408,7 +7430,7 @@ namespace My.Company
         public Task Success2()
         {
             var cs = new TaskCompletionSource();
-            return Interop.service_async_success2(_context, _cb, cs);
+            return Interop.service_async_success2(_context);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
