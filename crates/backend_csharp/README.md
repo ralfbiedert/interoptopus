@@ -13,7 +13,8 @@ supported constructs can be found in the
 [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src).
 
 ```rust
-use interoptopus::{ffi_function, ffi_type, Inventory, InventoryBuilder, function};
+use interoptopus::{ffi_function, ffi_type, function};
+use interoptopus::inventory::{Inventory, InventoryBuilder};
 
 #[ffi_type]
 pub struct Vec2 {
@@ -30,7 +31,7 @@ pub fn my_inventory() -> Inventory {
     InventoryBuilder::new()
         .register(function!(my_function))
         .validate()
-        .inventory()
+        .build()
 }
 ```
 
@@ -51,12 +52,13 @@ Create a unit test in `tests/bindings.rs` which will generate your bindings when
 with `cargo test`. In real projects you might want to add this code to another crate instead:
 
 ```rust
-use interoptopus::util::NamespaceMappings;
-use interoptopus::{Error, Interop};
+use interoptopus::backend::NamespaceMappings;
+use interoptopus::Error;
+use interoptopus::inventory::Bindings;
 
 #[test]
 fn bindings_csharp() -> Result<(), Error> {
-    use interoptopus_backend_csharp::{Config, Generator};
+    use interoptopus_backend_csharp::{Config, Generate};
 
     let config = Config {
         dll_name: "example_library".to_string(),

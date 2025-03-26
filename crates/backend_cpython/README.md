@@ -1,9 +1,9 @@
-Generates CPython bindings for [Interoptopus](https://github.com/ralfbiedert/interoptopus).
+Generates `CPython` bindings for [Interoptopus](https://github.com/ralfbiedert/interoptopus).
 
 ## Usage
 
 Assuming you have written a crate containing your FFI logic called `example_library_ffi` and
-want to generate **CPython bindings** for Python 3.7+, follow the instructions below.
+want to generate **`CPython` bindings** for Python 3.7+, follow the instructions below.
 
 #### Inside Your Library
 
@@ -13,7 +13,8 @@ supported constructs can be found in the
 [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src).
 
 ```rust
-use interoptopus::{ffi_function, ffi_type, Inventory, InventoryBuilder, function};
+use interoptopus::{ffi_function, ffi_type, function};
+use interoptopus::inventory::{Inventory, InventoryBuilder};
 
 #[ffi_type]
 pub struct Vec2 {
@@ -22,7 +23,6 @@ pub struct Vec2 {
 }
 
 #[ffi_function]
-#[no_mangle]
 pub fn my_function(input: Vec2) -> Vec2 {
     input
 }
@@ -30,7 +30,7 @@ pub fn my_function(input: Vec2) -> Vec2 {
 pub fn my_inventory() -> Inventory {
     InventoryBuilder::new()
         .register(function!(my_function))
-        .inventory()
+        .build()
 }
 ```
 
@@ -51,12 +51,13 @@ Create a unit test in `tests/bindings.rs` which will generate your bindings when
 with `cargo test`. In real projects you might want to add this code to another crate instead:
 
 ```rust
-use interoptopus::util::NamespaceMappings;
-use interoptopus::{Error, Interop};
+use interoptopus::backend::NamespaceMappings;
+use interoptopus::Error;
+use interoptopus::inventory::Bindings;
 
 #[test]
 fn bindings_cpython_cffi() -> Result<(), Error> {
-    use interoptopus_backend_cpython::{Config, Generator};
+    use interoptopus_backend_cpython::{Config, Generate};
 
     let library = example_library_ffi::my_inventory();
 
