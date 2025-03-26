@@ -1,3 +1,5 @@
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+
 //! Generates C# bindings for [Interoptopus](https://github.com/ralfbiedert/interoptopus).
 //!
 //! # Usage
@@ -118,6 +120,7 @@
 mod converter;
 mod docs;
 pub(crate) mod interop;
+pub(crate) mod utils;
 
 pub use docs::{Markdown, MarkdownConfig};
 pub use interop::{FunctionNameFlavor, Interop, InteropBuilder, InteropBuilderError, Unsupported, Visibility, WriteTypes};

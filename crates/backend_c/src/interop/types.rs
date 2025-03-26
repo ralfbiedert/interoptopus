@@ -130,7 +130,7 @@ fn write_type_definition_enum(i: &Interop, w: &mut IndentWriter, the_type: &Enum
     let name = enum_to_typename(i, the_type);
 
     if i.documentation == DocStyle::Inline {
-        write_documentation(w, the_type.meta().documentation())?;
+        write_documentation(w, the_type.meta().docs())?;
     }
 
     write_braced_declaration_opening(i, w, &format!("typedef enum {name}"))?;
@@ -147,7 +147,7 @@ fn write_type_definition_enum_variant(i: &Interop, w: &mut IndentWriter, variant
     let variant_kind = variant.kind();
 
     if i.documentation == DocStyle::Inline {
-        write_documentation(w, variant.documentation())?;
+        write_documentation(w, variant.docs())?;
     }
 
     match variant_kind {
@@ -158,7 +158,7 @@ fn write_type_definition_enum_variant(i: &Interop, w: &mut IndentWriter, variant
 
 fn write_type_definition_opaque(i: &Interop, w: &mut IndentWriter, the_type: &Opaque) -> Result<(), Error> {
     if i.documentation == DocStyle::Inline {
-        write_documentation(w, the_type.meta().documentation())?;
+        write_documentation(w, the_type.meta().docs())?;
     }
 
     write_type_definition_opaque_body(i, w, the_type)?;
@@ -177,7 +177,7 @@ fn write_type_definition_opaque_body(i: &Interop, w: &mut IndentWriter, the_type
 
 fn write_type_definition_composite(i: &Interop, w: &mut IndentWriter, the_type: &Composite) -> Result<(), Error> {
     if i.documentation == DocStyle::Inline {
-        write_documentation(w, the_type.meta().documentation())?;
+        write_documentation(w, the_type.meta().docs())?;
     }
 
     let name = composite_to_typename(i, the_type);
@@ -215,13 +215,13 @@ fn write_type_definition_composite_body(i: &Interop, w: &mut IndentWriter, the_t
 
 fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWriter, field: &Field, _the_type: &Composite) -> Result<(), Error> {
     if i.documentation == DocStyle::Inline {
-        write_documentation(w, field.documentation())?;
+        write_documentation(w, field.docs())?;
     }
 
     let field_name = field.name();
 
     if let Type::Array(x) = field.the_type() {
-        let type_name = to_type_specifier(i, x.array_type());
+        let type_name = to_type_specifier(i, x.the_type());
         indented!(w, r"{} {}[{}];", type_name, field_name, x.len())
     } else {
         let field_name = field.name();

@@ -8,7 +8,7 @@ use interoptopus::{Error, indented};
 
 pub fn write_type_definition_composite(i: &Interop, w: &mut IndentWriter, the_type: &Composite) -> Result<(), Error> {
     i.debug(w, "write_type_definition_composite")?;
-    write_documentation(w, the_type.meta().documentation())?;
+    write_documentation(w, the_type.meta().docs())?;
     write_type_definition_composite_body(i, w, the_type, WriteFor::Code)?;
     write_type_definition_composite_marshaller(i, w, the_type)
 }
@@ -118,9 +118,9 @@ pub fn write_type_definition_composite_unmanaged_body_field(i: &Interop, w: &mut
     let field_name = field_name_to_csharp_name(field, i.rename_symbols);
     match field.the_type() {
         Type::Array(a) => {
-            let type_name = to_typespecifier_in_field(a.array_type());
+            let type_name = to_typespecifier_in_field(a.the_type());
             let size = a.len();
-            if matches!(a.array_type(), Type::Pattern(TypePattern::CChar)) {
+            if matches!(a.the_type(), Type::Pattern(TypePattern::CChar)) {
                 indented!(w, r"public fixed byte {}[{}];", field_name, size)?;
             } else {
                 indented!(w, r"public fixed {} {}[{}];", type_name, field_name, size)?;
@@ -165,7 +165,7 @@ pub fn write_type_definition_composite_body(i: &Interop, w: &mut IndentWriter, t
 
     for field in the_type.fields() {
         if write_for == WriteFor::Code {
-            write_documentation(w, field.documentation())?;
+            write_documentation(w, field.docs())?;
         }
 
         write_type_definition_composite_body_field(i, w, field, the_type)?;
@@ -189,12 +189,12 @@ pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWri
 
     match field.the_type() {
         Type::Array(a) => {
-            assert!(is_blittable(a.array_type()), "Array type is not blittable: {:?}", a.array_type());
+            assert!(is_blittable(a.the_type()), "Array type is not blittable: {:?}", a.the_type());
 
-            let type_name = if matches!(a.array_type(), Type::Pattern(TypePattern::CChar)) {
+            let type_name = if matches!(a.the_type(), Type::Pattern(TypePattern::CChar)) {
                 "string".to_string()
             } else {
-                format!("{}[]", to_typespecifier_in_field(a.array_type()))
+                format!("{}[]", to_typespecifier_in_field(a.the_type()))
             };
 
             indented!(w, r"{}{} {};", visibility, type_name, field_name)?;
@@ -218,7 +218,7 @@ pub fn write_type_definition_composite_marshaller_field_to_unmanaged(i: &Interop
         Type::ReadPointer(_) => indented!(w, "_unmanaged.{name} = _managed.{name};")?,
         Type::ReadWritePointer(_) => indented!(w, "_unmanaged.{name} = _managed.{name};")?,
         Type::Array(x) => {
-            let array_type = to_typespecifier_in_field(x.array_type());
+            let array_type = to_typespecifier_in_field(x.the_type());
             indented!(w, "fixed({}* _fixed = _unmanaged.{})", array_type, name)?;
             indented!(w, "{{")?;
             indented!(w, [()], r#"if (_managed.{} == null) {{ throw new InvalidOperationException("Array '{}' must not be null"); }}"#, name, name)?;
@@ -256,7 +256,7 @@ pub fn write_type_definition_composite_marshaller_field_from_unmanaged(i: &Inter
         Type::ReadPointer(_) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
         Type::ReadWritePointer(_) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
         Type::Array(x) => {
-            let array_type = to_typespecifier_in_field(x.array_type());
+            let array_type = to_typespecifier_in_field(x.the_type());
             indented!(w, "fixed({}* _fixed = _unmanaged.{})", array_type, name)?;
             indented!(w, "{{")?;
             indented!(w, [()], "_managed.{} = new {}[{}];", name, array_type, x.len())?;

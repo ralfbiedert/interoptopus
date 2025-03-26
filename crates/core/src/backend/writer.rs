@@ -2,17 +2,17 @@
 use crate::Error;
 use std::io::Write;
 
-/// You might not realize how hard it can be to type exactly 4 spaces.
+/// You wouldn't believe how hard typing exactly 4 spaces is.
 pub const FOUR_SPACES: &str = "    ";
 
-/// In some places we can write for docs or for actual code generation.
+/// Whether backends should emit signatures for code or documentation.
 #[derive(PartialOrd, PartialEq, Eq, Copy, Clone, Debug)]
 pub enum WriteFor {
     Code,
     Docs,
 }
 
-/// Convenience helper to allow backends to write code with indentation.
+/// Emits code, line by line, with indentation.
 pub struct IndentWriter<'a> {
     one_indent: String,
     current_level: usize,

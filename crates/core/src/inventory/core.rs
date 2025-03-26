@@ -1,5 +1,5 @@
 use crate::Error;
-use crate::backend::{IndentWriter, ctypes_from_functions_types, extract_namespaces_from_types, holds_opaque_without_ref};
+use crate::backend::{IndentWriter, extract_namespaces_from_types, holds_opaque_without_ref, types_from_functions_types};
 use crate::lang::{Constant, Function, Type};
 use crate::pattern::LibraryPattern;
 use std::collections::HashSet;
@@ -8,7 +8,7 @@ use std::path::Path;
 
 /// Tells the [`InventoryBuilder`] what to register.
 ///
-/// Most users won't need to touch this enum directly, as its variants are usually created via the [`function`](crate::function), [`constant`](crate::constant), [`extra_type`](crate::extra_type) and [`pattern`](crate::pattern) macros.
+/// Most users won't need to touch this enum directly, as its variants are usually created via the [`function`](crate::function), [`constant`](crate::constant), [`extra_type`](crate::extra_type) and [`pattern`](crate::pattern!) macros.
 #[derive(Debug)]
 pub enum Symbol {
     Function(Function),
@@ -70,7 +70,7 @@ impl InventoryBuilder {
 
     /// Registers a symbol.
     ///
-    /// Call this with the result of a [`function`](crate::function), [`constant`](crate::constant), [`extra_type`](crate::extra_type) or [`pattern`](crate::pattern) macro,
+    /// Call this with the result of a [`function`](crate::function), [`constant`](crate::constant), [`extra_type`](crate::extra_type) or [`pattern`](crate::pattern!) macro,
     /// see the example above.
     #[must_use]
     pub fn register(mut self, s: Symbol) -> Self {
@@ -153,13 +153,13 @@ impl Inventory {
     ///
     /// Type information will be automatically derived from the used fields and parameters.
     pub(crate) fn new(functions: Vec<Function>, constants: Vec<Constant>, patterns: Vec<LibraryPattern>, extra_types: &[Type]) -> Self {
-        let mut ctypes = ctypes_from_functions_types(&functions, extra_types);
+        let mut ctypes = types_from_functions_types(&functions, extra_types);
         let mut namespaces = HashSet::new();
 
         // Extract namespace information
         extract_namespaces_from_types(&ctypes, &mut namespaces);
-        namespaces.extend(functions.iter().map(|x| x.meta().namespace().to_string()));
-        namespaces.extend(constants.iter().map(|x| x.meta().namespace().to_string()));
+        namespaces.extend(functions.iter().map(|x| x.meta().module().to_string()));
+        namespaces.extend(constants.iter().map(|x| x.meta().module().to_string()));
 
         let mut namespaces = namespaces.iter().cloned().collect::<Vec<String>>();
         namespaces.sort();

@@ -155,7 +155,7 @@ pub fn write_pattern_class(i: &Interop, w: &mut IndentWriter, class: &ServiceDef
     all_functions.push(class.destructor().clone());
 
     let _common_prefix = longest_common_prefix(&all_functions);
-    let documentation = class.the_type().meta().documentation().lines().join("\n");
+    let documentation = class.the_type().meta().docs().lines().join("\n");
 
     indented!(w, r"class {}:", context_type_name)?;
     if !documentation.is_empty() {
@@ -211,7 +211,7 @@ pub fn write_pattern_class_ctor(i: &Interop, w: &mut IndentWriter, class: &Servi
         return Ok(());
     }
 
-    indented!(w, [()()], r"{}", documentation(ctor.meta().documentation()))?;
+    indented!(w, [()()], r"{}", documentation(ctor.meta().docs()))?;
     w.indent();
     write_param_helpers(i, w, ctor)?;
     let invokes = i.function_args_to_string(ctor, false, true);
@@ -241,7 +241,7 @@ pub fn write_pattern_class_method(i: &Interop, w: &mut IndentWriter, class: &Ser
         return Ok(());
     }
 
-    indented!(w, [()()], r"{}", documentation(function.meta().documentation()))?;
+    indented!(w, [()()], r"{}", documentation(function.meta().docs()))?;
 
     w.indent();
     write_param_helpers(i, w, function)?;

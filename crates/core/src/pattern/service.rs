@@ -1,4 +1,4 @@
-//! For building something like a service or 'class' in object oriented languages.
+//! Becomes a service class in object oriented languages.
 //!
 //! Services provide a convenient way to manage state and memory between method invocations.
 //! They are similar to classes in object oriented languages, but we refrained from naming them
@@ -18,21 +18,14 @@
 //! To define a service you need the following parts:
 //!
 //! - An `opaque` type; the instance of a service
-//! - A Rust `Error` type mappable to an [`FFIError`](crate::pattern::result::FFIError) enum via `From<Error>`
-//! - Some methods on the opaque type.
+//! - A service implementation with at least one constructor (returning `ffi::Result<Self, _>`)
 //!
 //! # Example
 //!
 //! In this example we define a service called `SimpleService` with a constructor and two methods.
-//! The type `MyFFIError` is not shown, but implemented as in the [`FFIError`](crate::pattern::result::FFIError) example.
 //!
 //! ```
 //! # use std::fmt::{Display, Formatter};
-//! #
-//! # #[derive(Debug)]
-//! # pub enum Error {
-//! #     Bad,
-//! # }
 //! #
 //! # impl Display for Error {
 //! #     fn fmt(&self, _: &mut Formatter<'_>) -> std::fmt::Result {
@@ -44,19 +37,8 @@
 //! #
 //! # #[ffi_type]
 //! # #[derive(PartialOrd, PartialEq, Debug, Copy, Clone)]
-//! # pub enum MyFFIError {
-//! #     Ok = 0,
-//! #     NullPassed = 1,
-//! #     Panic = 2,
-//! #     OtherError = 3,
-//! # }
-//! #
-//! # impl From<Error> for MyFFIError {
-//! #     fn from(x: Error) -> Self {
-//! #         match x {
-//! #             Error::Bad => Self::OtherError,
-//! #         }
-//! #     }
+//! # pub enum Error {
+//! #     Bad = 3,
 //! # }
 //! #
 //! use interoptopus::{ffi, ffi_type, ffi_service, ffi_service_method};
@@ -69,15 +51,14 @@
 //! #[ffi_service]
 //! impl SimpleService {
 //!
-//!     pub fn new_with(some_value: u32) -> ffi::Result<Self, MyFFIError> {
+//!     pub fn new_with(some_value: u32) -> ffi::Result<Self, Error> {
 //!         ffi::Ok(Self { some_value })
 //!     }
 //!
-//!     pub fn maybe_fails(&self, x: u32) -> ffi::Result<(), MyFFIError> {
+//!     pub fn maybe_fails(&self, x: u32) -> ffi::Result<(), Error> {
 //!         ffi::Ok(())
 //!     }
 //!
-//!     #[ffi_service_method(on_panic = "return_default")]
 //!     pub fn just_return_value(&self) -> u32 {
 //!         self.some_value
 //!     }

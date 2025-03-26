@@ -2,6 +2,7 @@ use crate::converter::{
     function_name_to_csharp_name, pattern_to_native_in_signature, to_typespecifier_in_async_fn_rval, to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval,
 };
 use crate::interop::docs::write_documentation;
+use crate::utils::sugared_return_type;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Function, Primitive, SugaredReturnType, Type};
@@ -21,7 +22,7 @@ pub fn write_pattern_service(i: &Interop, w: &mut IndentWriter, class: &ServiceD
 
     let context_type_name = class.the_type().rust_name();
 
-    write_documentation(w, class.the_type().meta().documentation())?;
+    write_documentation(w, class.the_type().meta().docs())?;
     indented!(w, r"{} partial class {} : IDisposable", i.visibility_types.to_access_modifier(), context_type_name)?;
     indented!(w, r"{{")?;
     w.indent();
@@ -31,7 +32,7 @@ pub fn write_pattern_service(i: &Interop, w: &mut IndentWriter, class: &ServiceD
     w.newline()?;
 
     for ctor in class.constructors() {
-        write_documentation(w, ctor.meta().documentation())?;
+        write_documentation(w, ctor.meta().docs())?;
         write_pattern_service_method(i, w, class, ctor, MethodType::Ctor, WriteFor::Code)?;
         w.newline()?;
     }
@@ -41,7 +42,7 @@ pub fn write_pattern_service(i: &Interop, w: &mut IndentWriter, class: &ServiceD
     w.newline()?;
 
     for function in class.methods() {
-        write_documentation(w, function.meta().documentation())?;
+        write_documentation(w, function.meta().docs())?;
         write_pattern_service_method(i, w, class, function, MethodType::Regular, WriteFor::Code)?;
         write_service_method_overload(i, w, class, function, WriteFor::Code)?;
         w.newline()?;
@@ -72,7 +73,7 @@ pub fn write_pattern_service_method(
     let mut names = Vec::new();
     let mut to_invoke = Vec::new();
     let mut types = Vec::new();
-    let async_rval = function.sugared_return_type();
+    let async_rval = sugared_return_type(function);
 
     // For every parameter except the first, figure out how we should forward
     // it to the invocation we perform.
@@ -243,13 +244,13 @@ pub fn write_pattern_service_method(
 pub fn write_service_method_overload(i: &Interop, w: &mut IndentWriter, class: &ServiceDefinition, function: &Function, write_for: WriteFor) -> Result<(), Error> {
     i.debug(w, "write_service_method_overload")?;
 
-    if !i.has_overloadable(function.signature()) || function.sugared_return_type().is_async() {
+    if !i.has_overloadable(function.signature()) || sugared_return_type(function).is_async() {
         return Ok(());
     }
 
     if write_for == WriteFor::Code {
         w.newline()?;
-        write_documentation(w, function.meta().documentation())?;
+        write_documentation(w, function.meta().docs())?;
     }
 
     write_common_service_method_overload(i, w, class, function, write_for)?;

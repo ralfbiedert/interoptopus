@@ -8,8 +8,8 @@ pub enum Visibility {
 /// Additional information for user-defined types.
 #[derive(Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Meta {
-    documentation: Documentation,
-    namespace: String,
+    docs: Docs,
+    module: String,
 }
 
 impl Meta {
@@ -19,39 +19,39 @@ impl Meta {
     }
 
     #[must_use]
-    pub const fn with_namespace_documentation(namespace: String, documentation: Documentation) -> Self {
-        Self { documentation, namespace }
+    pub const fn with_module_docs(module: String, docs: Docs) -> Self {
+        Self { docs, module }
     }
 
     #[must_use]
-    pub const fn with_documentation(documentation: Documentation) -> Self {
-        Self::with_namespace_documentation(String::new(), documentation)
+    pub const fn with_docs(docs: Docs) -> Self {
+        Self::with_module_docs(String::new(), docs)
     }
 
     #[must_use]
-    pub const fn documentation(&self) -> &Documentation {
-        &self.documentation
+    pub const fn docs(&self) -> &Docs {
+        &self.docs
     }
 
     #[must_use]
-    pub fn namespace(&self) -> &str {
-        &self.namespace
+    pub fn module(&self) -> &str {
+        &self.module
     }
 
     /// Convenience method used in generators
     #[must_use]
-    pub fn is_namespace(&self, namespace: &str) -> bool {
-        self.namespace == namespace
+    pub fn is_module(&self, module: &str) -> bool {
+        self.module == module
     }
 }
 
 /// Markdown generated from the `///` you put on Rust code.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, Default)]
-pub struct Documentation {
+pub struct Docs {
     lines: Vec<String>,
 }
 
-impl Documentation {
+impl Docs {
     #[must_use]
     pub fn new() -> Self {
         Self::default()

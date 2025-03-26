@@ -39,7 +39,7 @@ impl<'a> Markdown<'a> {
         indented!(w, r"Freestanding callables inside the module.")?;
 
         for the_type in non_service_functions(&self.interop.inventory) {
-            let doc = the_type.meta().documentation().lines().first().cloned().unwrap_or_default();
+            let doc = the_type.meta().docs().lines().first().cloned().unwrap_or_default();
 
             indented!(w, r" - **[{}](#{})** - {}", the_type.name(), the_type.name(), doc)?;
         }
@@ -53,7 +53,7 @@ impl<'a> Markdown<'a> {
             _ => panic!("Pattern not explicitly handled"),
         }) {
             let prefix = pattern.common_prefix();
-            let doc = pattern.the_type().meta().documentation().lines().first().cloned().unwrap_or_default();
+            let doc = pattern.the_type().meta().docs().lines().first().cloned().unwrap_or_default();
             let name = pattern.the_type().rust_name();
 
             indented!(w, r" - **[{}](#{})** - {}", name, name, doc)?;
@@ -61,13 +61,13 @@ impl<'a> Markdown<'a> {
             for x in pattern.constructors() {
                 let func_name = function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
                 let target = format!("{name}.{func_name}");
-                let doc = x.meta().documentation().lines().first().cloned().unwrap_or_default();
+                let doc = x.meta().docs().lines().first().cloned().unwrap_or_default();
                 indented!(w, r"     - **[{}](#{})** <sup>**ctor**</sup> - {}", func_name, target, doc)?;
             }
             for x in pattern.methods() {
                 let func_name = function_name_to_csharp_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
                 let target = format!("{name}.{func_name}");
-                let doc = x.meta().documentation().lines().first().cloned().unwrap_or_default();
+                let doc = x.meta().docs().lines().first().cloned().unwrap_or_default();
                 indented!(w, r"     - **[{}](#{})** - {}", func_name, target, doc)?;
             }
         }
@@ -80,7 +80,7 @@ impl<'a> Markdown<'a> {
             Type::Enum(e) => Some(e),
             _ => None,
         }) {
-            let doc = the_type.meta().documentation().lines().first().cloned().unwrap_or_default();
+            let doc = the_type.meta().docs().lines().first().cloned().unwrap_or_default();
             indented!(w, r" - **[{}](#{})** - {}", the_type.rust_name(), the_type.rust_name(), doc)?;
         }
 
@@ -91,7 +91,7 @@ impl<'a> Markdown<'a> {
         for the_type in self.interop.inventory.ctypes() {
             match the_type {
                 Type::Composite(c) => {
-                    let doc = c.meta().documentation().lines().first().cloned().unwrap_or_default();
+                    let doc = c.meta().docs().lines().first().cloned().unwrap_or_default();
                     indented!(w, r" - **[{}](#{})** - {}", c.rust_name(), c.rust_name(), doc)?;
                 }
                 Type::Pattern(p @ TypePattern::Option(_)) => {
@@ -141,7 +141,7 @@ impl<'a> Markdown<'a> {
         indented!(w, r#" ### <a name="{}">**{}**</a>"#, composite.rust_name(), composite.rust_name())?;
         w.newline()?;
 
-        for line in meta.documentation().lines() {
+        for line in meta.docs().lines() {
             indented!(w, r"{}", line.trim())?;
         }
 
@@ -149,7 +149,7 @@ impl<'a> Markdown<'a> {
 
         indented!(w, r"#### Fields ")?;
         for f in composite.fields() {
-            let doc = f.documentation().lines().join("\n");
+            let doc = f.docs().lines().join("\n");
             let name = field_name_to_csharp_name(f, self.interop.rename_symbols);
             indented!(w, r"- **{}** - {} ", name, doc)?;
         }
@@ -175,14 +175,14 @@ impl<'a> Markdown<'a> {
             indented!(w, r#" ### <a name="{}">**{}**</a>"#, the_type.name_within_lib(), the_type.name_within_lib())?;
             w.newline()?;
 
-            for line in meta.documentation().lines() {
+            for line in meta.docs().lines() {
                 indented!(w, r"{}", line.trim())?;
             }
             w.newline()?;
 
             indented!(w, r"#### Variants ")?;
             for v in the_enum.variants() {
-                let doc = v.documentation().lines().join("\n");
+                let doc = v.docs().lines().join("\n");
                 indented!(w, r"- **{}** - {} ", v.name(), doc)?;
             }
 
@@ -211,7 +211,7 @@ impl<'a> Markdown<'a> {
     fn write_function(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
         indented!(w, r#"### <a name="{}">**{}**</a>"#, function.name(), function.name())?;
 
-        for line in function.meta().documentation().lines() {
+        for line in function.meta().docs().lines() {
             if line.trim().starts_with('#') {
                 write!(w.writer(), "##")?;
             }
@@ -237,7 +237,7 @@ impl<'a> Markdown<'a> {
             _ => panic!("Pattern not explicitly handled"),
         }) {
             let prefix = pattern.common_prefix();
-            let doc = pattern.the_type().meta().documentation().lines();
+            let doc = pattern.the_type().meta().docs().lines();
             let class_name = pattern.the_type().rust_name();
 
             indented!(w, r#"## <a name="{}">**{}**</a>"#, class_name, class_name)?;
@@ -255,7 +255,7 @@ impl<'a> Markdown<'a> {
                 let target = fname.to_string();
                 indented!(w, r#"### <a name="{}">**{}**</a> <sup>ctor</sup>"#, target, target)?;
 
-                let doc = x.meta().documentation().lines();
+                let doc = x.meta().docs().lines();
                 for line in doc {
                     let line = line.replace(" # ", " #### ");
                     let line = line.replace(" ## ", " ##### ");
@@ -278,7 +278,7 @@ impl<'a> Markdown<'a> {
 
                 indented!(w, r#"### <a name="{}">**{}**</a>"#, target, target)?;
 
-                let doc = x.meta().documentation().lines();
+                let doc = x.meta().docs().lines();
                 for line in doc {
                     let line = line.replace(" # ", " #### ");
                     let line = line.replace(" ## ", " ##### ");

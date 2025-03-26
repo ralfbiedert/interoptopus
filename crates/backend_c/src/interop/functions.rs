@@ -16,7 +16,7 @@ pub fn write_functions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
 
 fn write_function(i: &Interop, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
     if i.documentation == DocStyle::Inline {
-        write_documentation(w, function.meta().documentation())?;
+        write_documentation(w, function.meta().docs())?;
     }
 
     match i.function_style {
@@ -41,7 +41,7 @@ pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &
     for p in function.signature().params() {
         match p.the_type() {
             Type::Array(a) => {
-                params.push(format!("{} {}[{}]", to_type_specifier(i, a.array_type()), p.name().to_naming_style(&i.function_parameter_naming), a.len(),));
+                params.push(format!("{} {}[{}]", to_type_specifier(i, a.the_type()), p.name().to_naming_style(&i.function_parameter_naming), a.len(),));
             }
             _ => {
                 params.push(format!("{} {}", to_type_specifier(i, p.the_type()), p.name().to_naming_style(&i.function_parameter_naming)));
@@ -74,7 +74,7 @@ fn write_function_as_typedef_declaration(i: &Interop, w: &mut IndentWriter, func
     for p in function.signature().params() {
         match p.the_type() {
             Type::Array(a) => {
-                params.push(format!("{} [{}]", to_type_specifier(i, a.array_type()), a.len(),));
+                params.push(format!("{} [{}]", to_type_specifier(i, a.the_type()), a.len(),));
             }
             _ => {
                 params.push(to_type_specifier(i, p.the_type()).to_string());

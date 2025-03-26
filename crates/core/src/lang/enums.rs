@@ -1,5 +1,5 @@
 use crate::lang::composite::Representation;
-use crate::lang::{Documentation, Meta, Type};
+use crate::lang::{Docs, Meta, Type};
 
 /// A (C-style) `enum` containing numbered variants.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -42,11 +42,12 @@ impl Enum {
     }
 
     #[must_use]
-    pub fn to_ctype(&self) -> Type {
+    pub fn to_type(&self) -> Type {
         Type::Enum(self.clone())
     }
 }
 
+/// If this is a unit variant `E::A` or typed variant `E::B(T)`.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum VariantKind {
     Unit(usize),
@@ -80,13 +81,13 @@ impl VariantKind {
 pub struct Variant {
     name: String,
     kind: VariantKind,
-    documentation: Documentation,
+    docs: Docs,
 }
 
 impl Variant {
     #[must_use]
-    pub const fn new(name: String, kind: VariantKind, documentation: Documentation) -> Self {
-        Self { name, kind, documentation }
+    pub const fn new(name: String, kind: VariantKind, docs: Docs) -> Self {
+        Self { name, kind, docs }
     }
 
     #[must_use]
@@ -100,7 +101,7 @@ impl Variant {
     }
 
     #[must_use]
-    pub const fn documentation(&self) -> &Documentation {
-        &self.documentation
+    pub const fn docs(&self) -> &Docs {
+        &self.docs
     }
 }

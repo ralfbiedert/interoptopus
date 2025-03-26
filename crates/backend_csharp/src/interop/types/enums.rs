@@ -1,14 +1,14 @@
+use crate::Interop;
 use crate::converter::{to_typespecifier_in_field, to_typespecifier_in_field_unmanaged};
 use crate::interop::docs::write_documentation;
-use crate::Interop;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Enum, Type, VariantKind};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 pub fn write_type_definition_enum(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
     i.debug(w, "write_type_definition_enum")?;
-    write_documentation(w, the_type.meta().documentation())?;
+    write_documentation(w, the_type.meta().docs())?;
     write_type_definition_enum_marshaller(i, w, the_type)?;
 
     Ok(())

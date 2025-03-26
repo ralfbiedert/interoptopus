@@ -3,6 +3,7 @@ use crate::converter::{
     to_typespecifier_in_async_fn_rval, to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval,
 };
 use crate::interop::docs::write_documentation;
+use crate::utils::sugared_return_type;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Function, Primitive, SugaredReturnType, Type};
@@ -24,7 +25,7 @@ pub fn write_functions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
 pub fn write_function(i: &Interop, w: &mut IndentWriter, function: &Function, write_for: WriteFor) -> Result<(), Error> {
     i.debug(w, "write_function")?;
     if write_for == WriteFor::Code {
-        write_documentation(w, function.meta().documentation())?;
+        write_documentation(w, function.meta().docs())?;
         write_function_annotation(i, w, function)?;
     }
     write_function_declaration(i, w, function, false)?;
@@ -93,7 +94,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         return Ok(());
     }
 
-    let async_rval = function.sugared_return_type();
+    let async_rval = sugared_return_type(function);
 
     let mut to_pin_name = Vec::new();
     let mut to_pin_slice_type = Vec::new();
@@ -110,7 +111,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         },
     );
 
-    let rval = to_typespecifier_in_async_fn_rval(&function.sugared_return_type());
+    let rval = to_typespecifier_in_async_fn_rval(&sugared_return_type(function));
 
     let mut params = Vec::new();
     for p in function.signature().params() {
@@ -183,7 +184,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     }
 
     if write_for == WriteFor::Code {
-        write_documentation(w, function.meta().documentation())?;
+        write_documentation(w, function.meta().docs())?;
     }
 
     i.inline_hint(w, 0)?;

@@ -1,12 +1,9 @@
 //! Metadata for the Rust and C representation of language items.
 //!
-//! A a rule of thumb, types in the [`rust`](info) module generate instances
-//! of types in the [`c`](c) module.
-//!
 //! Normal users of Interoptopus probably won't have to concern
 //! themselves with any of the items in this module.
 
-use crate::backend::{capitalize_first_letter, ctypes_from_type_recursive};
+use crate::backend::{capitalize_first_letter, types_from_type_recursive};
 use crate::pattern::TypePattern;
 use std::collections::HashSet;
 
@@ -17,9 +14,9 @@ pub use composite::{Composite, Field, Layout, Opaque, Representation};
 pub use constant::{Constant, ConstantValue};
 pub use enums::{Enum, Variant, VariantKind};
 pub use fnpointer::FnPointer;
-pub use function::{Function, FunctionSignature, Parameter, SugaredReturnType};
+pub use function::{Function, Parameter, Signature, SugaredReturnType};
 pub use info::{ConstantInfo, FunctionInfo, TypeInfo};
-pub use meta::{Documentation, Meta, Visibility};
+pub use meta::{Docs, Meta, Visibility};
 pub use primitive::{Primitive, PrimitiveValue};
 
 mod array;
@@ -89,9 +86,9 @@ impl Type {
 
     /// Produces a name unique for that type with respect to this library.
     ///
-    /// The name here is supposed to uniquely determine a type relative to a library ([`crate::Inventory`]).
+    /// The name here is supposed to uniquely determine a type relative to a library [`Inventory`](crate::inventory::Inventory).
     ///
-    /// Backends may instead match on the `CType` variant and determine a more appropriate
+    /// Backends may instead match on the [`Type`] variant and determine a more appropriate
     /// name on a case-by-case basis; including changing a name entirely.
     #[must_use]
     pub fn name_within_lib(&self) -> String {
@@ -116,7 +113,7 @@ impl Type {
     pub fn embedded_types(&self) -> Vec<Self> {
         let mut hash_set: HashSet<Self> = HashSet::new();
 
-        ctypes_from_type_recursive(self, &mut hash_set);
+        types_from_type_recursive(self, &mut hash_set);
 
         hash_set.remove(self);
         hash_set.iter().cloned().collect()
@@ -202,11 +199,11 @@ impl Type {
     #[must_use]
     pub fn namespace(&self) -> Option<&str> {
         match self {
-            Self::Array(t) => t.array_type().namespace(),
-            Self::Enum(t) => Some(t.meta().namespace()),
-            Self::Opaque(t) => Some(t.meta().namespace()),
-            Self::Composite(t) => Some(t.meta().namespace()),
-            Self::Pattern(TypePattern::NamedCallback(t)) => Some(t.meta().namespace()),
+            Self::Array(t) => t.the_type().namespace(),
+            Self::Enum(t) => Some(t.meta().module()),
+            Self::Opaque(t) => Some(t.meta().module()),
+            Self::Composite(t) => Some(t.meta().module()),
+            Self::Pattern(TypePattern::NamedCallback(t)) => Some(t.meta().module()),
             _ => None,
         }
     }

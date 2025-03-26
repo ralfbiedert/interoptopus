@@ -24,8 +24,8 @@ pub fn ffi_constant(_attr: TokenStream, input: &TokenStream) -> TokenStream {
         unsafe impl ::interoptopus::lang::ConstantInfo for #const_ident {
             fn constant_info() -> interoptopus::lang::Constant {
 
-                let documentation = ::interoptopus::lang::Documentation::from_line(#doc_line);
-                let meta = ::interoptopus::lang::Meta::with_documentation(documentation);
+                let docs = ::interoptopus::lang::Docs::from_line(#doc_line);
+                let meta = ::interoptopus::lang::Meta::with_docs(docs);
                 let value = ::interoptopus::lang::ConstantValue::from(#const_ident);
 
                 ::interoptopus::lang::Constant::new(#const_name.to_string(), value, meta)

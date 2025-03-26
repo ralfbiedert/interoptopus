@@ -1,4 +1,4 @@
-/// Register a function with an [`InventoryBuilder`].
+/// Register a function with an [`InventoryBuilder`](crate::inventory::InventoryBuilder).
 ///
 /// You must also annotate the function with [`#[ffi_function]`](crate::ffi_function).
 ///
@@ -28,7 +28,7 @@ macro_rules! function {
     }};
 }
 
-/// Register an extra type with an [`InventoryBuilder`].
+/// Register an extra type with an [`InventoryBuilder`](crate::inventory::InventoryBuilder).
 ///
 /// You must also annotate the type with [`#[ffi_type]`](crate::ffi_type) and `#[repr(C)]`.
 ///
@@ -60,25 +60,15 @@ macro_rules! extra_type {
     }};
 }
 
-/// Register a pattern with an [`InventoryBuilder`].
+/// Register a pattern with an [`InventoryBuilder`](crate::inventory::InventoryBuilder).
 ///
 /// You only need to register [`LibraryPattern`](crate::pattern::LibraryPattern), as [`TypePattern`](crate::pattern::TypePattern) are detected automatically.
-///
-/// # Example
-///
-/// Note, as this example focuses on the `pattern` macro it omits the definition of `Error` and `MyFFIError`.
-/// Their implementation can be found in the [`FFIError`](crate::pattern::result::FFIError) example.
 ///
 /// ```rust
 /// use interoptopus::{ffi, ffi_type, ffi_service, pattern};
 /// use interoptopus::inventory::{InventoryBuilder, Inventory};
 ///
 /// # use std::fmt::{Display, Formatter};
-/// #
-/// # #[derive(Debug)]
-/// # pub enum Error {
-/// #     Bad,
-/// # }
 /// #
 /// # impl Display for Error {
 /// #     fn fmt(&self, _: &mut Formatter<'_>) -> std::fmt::Result {
@@ -90,20 +80,8 @@ macro_rules! extra_type {
 /// #
 /// # #[ffi_type]
 /// # #[derive(Copy, Clone, Debug, PartialOrd, PartialEq)]
-/// # pub enum MyFFIError {
-/// #     Ok = 0,
-/// #     NullPassed = 1,
-/// #     Panic = 2,
-/// #     OtherError = 3,
-/// # }
-/// #
-/// #
-/// # impl From<Error> for MyFFIError {
-/// #     fn from(x: Error) -> Self {
-/// #         match x {
-/// #             Error::Bad => Self::OtherError,
-/// #         }
-/// #     }
+/// # pub enum Error {
+/// #     Bad,
 /// # }
 /// #
 ///
@@ -115,7 +93,7 @@ macro_rules! extra_type {
 /// #[ffi_service]
 /// impl SimpleService {
 ///
-///     pub fn new_with(some_value: u32) -> ffi::Result<Self, MyFFIError> {
+///     pub fn new_with(some_value: u32) -> ffi::Result<Self, Error> {
 ///         ffi::Ok(Self { some_value })
 ///     }
 /// }
@@ -134,7 +112,7 @@ macro_rules! pattern {
     }};
 }
 
-/// Register a constant with an [`InventoryBuilder`].
+/// Register a constant with an [`InventoryBuilder`](crate::inventory::InventoryBuilder).
 ///
 /// You must also annotate the constant with [`#[ffi_constant]`](crate::ffi_constant).
 ///

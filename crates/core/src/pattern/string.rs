@@ -1,6 +1,6 @@
-//! Strings over FFI, equivalent to [`std::string::String`].
+//! Like a regular [`String`](std::string::String), but FFI safe.
 
-use crate::lang::{Composite, Documentation, Field, Meta, Primitive, Representation, Type};
+use crate::lang::{Composite, Docs, Field, Meta, Primitive, Representation, Type};
 use crate::lang::{Layout, TypeInfo};
 use crate::pattern::TypePattern;
 use std::mem::forget;
@@ -85,7 +85,7 @@ unsafe impl TypeInfo for String {
             Field::new("capacity".to_string(), Type::Primitive(Primitive::U64)),
         ];
 
-        let doc = Documentation::from_lines(vec![
+        let doc = Docs::from_lines(vec![
             " UTF-8 string marshalling helper.".to_string(),
             " A highly dangerous 'use once type' that has ownership semantics!".to_string(),
             " Once passed over an FFI boundary 'the other side' is meant to own".to_string(),
@@ -94,13 +94,13 @@ unsafe impl TypeInfo for String {
             " you'll free the same pointer multiple times, and get UB!".to_string(),
         ]);
         let repr = Representation::new(Layout::C, None);
-        let meta = Meta::with_documentation(doc);
+        let meta = Meta::with_docs(doc);
         let composite = Composite::with_meta_repr("Utf8String".to_string(), fields, meta, repr);
         Type::Pattern(TypePattern::Utf8String(composite))
     }
 }
 
-/// Emits helper functions used by String & co.
+/// Emits helper functions used by [`String`](crate::pattern::string::String).
 #[macro_export]
 macro_rules! string_utils {
     () => {{

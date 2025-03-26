@@ -58,19 +58,19 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
         match variant_kind {
             VariantKind::Unit(x) => {
                 let tokens = quote_spanned!(variant.ident.span() => {
-                    let documentation = ::interoptopus::lang::Documentation::from_line(#variant_doc_line);
+                    let docs = ::interoptopus::lang::Docs::from_line(#variant_doc_line);
                     let kind = ::interoptopus::lang::VariantKind::Unit(#x);
-                    let variant = ::interoptopus::lang::Variant::new(#ident.to_string(), kind, documentation);
+                    let variant = ::interoptopus::lang::Variant::new(#ident.to_string(), kind, docs);
                     variants.push(variant);
                 });
                 variants.push(tokens);
             }
             VariantKind::Typed(x, ts) => {
                 let tokens = quote_spanned!(variant.ident.span() => {
-                    let documentation = ::interoptopus::lang::Documentation::from_line(#variant_doc_line);
+                    let docs = ::interoptopus::lang::Docs::from_line(#variant_doc_line);
                     let ty = ::std::boxed::Box::new(<#ts as ::interoptopus::lang::TypeInfo>::type_info());
                     let kind = ::interoptopus::lang::VariantKind::Typed(#x, ty);
-                    let variant = ::interoptopus::lang::Variant::new(#ident.to_string(), kind, documentation);
+                    let variant = ::interoptopus::lang::Variant::new(#ident.to_string(), kind, docs);
                     variants.push(variant);
                 });
                 variants.push(tokens);
@@ -99,8 +99,8 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
         unsafe impl ::interoptopus::lang::TypeInfo for #name_ident {
             fn type_info() -> ::interoptopus::lang::Type {
                 let mut variants = ::std::vec::Vec::new();
-                let documentation = ::interoptopus::lang::Documentation::from_line(#doc_line);
-                let mut meta = ::interoptopus::lang::Meta::with_namespace_documentation(#namespace.to_string(), documentation);
+                let docs = ::interoptopus::lang::Docs::from_line(#doc_line);
+                let mut meta = ::interoptopus::lang::Meta::with_module_docs(#namespace.to_string(), docs);
 
                 #({
                     #variants

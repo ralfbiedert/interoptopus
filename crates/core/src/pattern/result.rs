@@ -1,9 +1,9 @@
-//! For return enums with defined `Ok` variants; may translate to exceptions if not met.
+//! Like a regular [`Result`](std::result::Result), but FFI safe.
 //!
 //!
 //! # Examples
 //!
-//! Functions returning a [`FFIError`] might receive special treatment in backends supporting
+//! Functions returning a [`Result`] might receive special treatment in backends supporting
 //! exception handling. For example, a [`service`](crate::pattern::service) method defined
 //! as:
 //!
@@ -29,7 +29,7 @@
 //! ```
 
 use crate::backend::capitalize_first_letter;
-use crate::lang::{Documentation, Enum, Layout, Meta, Primitive, Representation, Type, Variant};
+use crate::lang::{Docs, Enum, Layout, Meta, Primitive, Representation, Type, Variant};
 use crate::lang::{TypeInfo, VariantKind};
 use crate::pattern::TypePattern;
 use std::any::Any;
@@ -51,7 +51,9 @@ pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
 pub enum Result<T, E> {
     Ok(T),
     Err(E),
+    /// Internal variant used when a panic occurred.
     Panic,
+    /// Internal variant used when null was passed where it shouldn't.
     Null,
 }
 
@@ -68,6 +70,7 @@ where
     T: TypeInfo,
     E: TypeInfo,
 {
+    /// Returns `true` if the result is `Ok`.
     #[must_use]
     pub fn is_ok(&self) -> bool {
         match self {
@@ -78,6 +81,7 @@ where
         }
     }
 
+    /// Returns the `Ok` variant if it exists, otherwise panics.
     pub fn unwrap(self) -> T {
         if let Self::Ok(t) = self {
             t
@@ -86,7 +90,8 @@ where
         }
     }
 
-    pub fn unwrap_err(&self) -> &E {
+    /// Returns the `Err` variant if it exists, otherwise panics.
+    pub fn unwrap_err(self) -> E {
         if let Self::Err(err) = self {
             err
         } else {
@@ -114,19 +119,19 @@ where
     E: TypeInfo,
 {
     fn type_info() -> Type {
-        let doc_t = Documentation::from_line("Element if err is `Ok`.");
-        let doc_err = Documentation::from_line("Error value.");
+        let doc_t = Docs::from_line("Element if err is `Ok`.");
+        let doc_err = Docs::from_line("Error value.");
 
         let variants = vec![
             Variant::new("Ok".to_string(), VariantKind::Typed(0, Box::new(T::type_info())), doc_t),
             Variant::new("Err".to_string(), VariantKind::Typed(1, Box::new(E::type_info())), doc_err),
-            Variant::new("Panic".to_string(), VariantKind::Unit(2), Documentation::new()),
-            Variant::new("Null".to_string(), VariantKind::Unit(3), Documentation::new()),
+            Variant::new("Panic".to_string(), VariantKind::Unit(2), Docs::new()),
+            Variant::new("Null".to_string(), VariantKind::Unit(3), Docs::new()),
         ];
 
-        let doc = Documentation::from_line("Result that contains value or an error.");
+        let doc = Docs::from_line("Result that contains value or an error.");
         let repr = Representation::new(Layout::C, None);
-        let meta = Meta::with_namespace_documentation(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
+        let meta = Meta::with_module_docs(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
         let t_name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
         let e_name = capitalize_first_letter(E::type_info().name_within_lib().as_str());
         let name = match T::type_info() {

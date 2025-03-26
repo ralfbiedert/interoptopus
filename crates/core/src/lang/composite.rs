@@ -1,4 +1,4 @@
-use crate::lang::{Documentation, Meta, Primitive, Type, Visibility};
+use crate::lang::{Docs, Meta, Primitive, Type, Visibility};
 
 /// How a struct is laid out in memory.
 #[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -93,12 +93,6 @@ impl Composite {
         &self.fields
     }
 
-    /// If this were a wrapper over a pointer type, get the type of what we're pointing go.
-    #[must_use]
-    pub fn try_deref_pointer(&self) -> Option<Type> {
-        self.fields().first()?.the_type().try_deref_pointer().cloned()
-    }
-
     /// True if this struct has no contained fields (which happens to be illegal in C99).
     #[must_use]
     pub fn is_empty(&self) -> bool {
@@ -116,7 +110,7 @@ impl Composite {
     }
 
     #[must_use]
-    pub fn to_ctype(&self) -> Type {
+    pub fn to_type(&self) -> Type {
         Type::Composite(self.clone())
     }
 }
@@ -125,20 +119,20 @@ impl Composite {
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Field {
     name: String,
-    visibility: Visibility,
+    vis: Visibility,
     the_type: Type,
-    documentation: Documentation,
+    docs: Docs,
 }
 
 impl Field {
     #[must_use]
     pub fn new(name: String, the_type: Type) -> Self {
-        Self::with_documentation(name, the_type, Visibility::Public, Documentation::new())
+        Self::with_docs(name, the_type, Visibility::Public, Docs::new())
     }
 
     #[must_use]
-    pub const fn with_documentation(name: String, the_type: Type, visibility: Visibility, documentation: Documentation) -> Self {
-        Self { name, visibility, the_type, documentation }
+    pub const fn with_docs(name: String, the_type: Type, vis: Visibility, docs: Docs) -> Self {
+        Self { name, vis, the_type, docs }
     }
 
     #[must_use]
@@ -153,12 +147,12 @@ impl Field {
 
     #[must_use]
     pub const fn visibility(&self) -> &Visibility {
-        &self.visibility
+        &self.vis
     }
 
     #[must_use]
-    pub const fn documentation(&self) -> &Documentation {
-        &self.documentation
+    pub const fn docs(&self) -> &Docs {
+        &self.docs
     }
 }
 

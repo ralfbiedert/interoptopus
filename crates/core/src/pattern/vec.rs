@@ -1,5 +1,6 @@
+//! Like a regular [`Vec`](std::vec::Vec), but FFI safe.<sup>🚧</sup>
 use crate::backend::capitalize_first_letter;
-use crate::lang::{Composite, Documentation, Field, Layout, Meta, Primitive, Representation, Type, TypeInfo};
+use crate::lang::{Composite, Docs, Field, Layout, Meta, Primitive, Representation, Type, TypeInfo};
 use crate::pattern::TypePattern;
 use std::mem::forget;
 
@@ -87,7 +88,7 @@ where
             Field::new("capacity".to_string(), Type::Primitive(Primitive::U64)),
         ];
 
-        let doc = Documentation::from_lines(vec![
+        let doc = Docs::from_lines(vec![
             " Vec marshalling helper.".to_string(),
             " A highly dangerous 'use once type' that has ownership semantics!".to_string(),
             " Once passed over an FFI boundary 'the other side' is meant to own".to_string(),
@@ -96,7 +97,7 @@ where
             " you'll free the same pointer multiple times, and get UB!".to_string(),
         ]);
         let repr = Representation::new(Layout::C, None);
-        let meta = Meta::with_documentation(doc);
+        let meta = Meta::with_docs(doc);
         let name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
         let composite = Composite::with_meta_repr(format!("Vec{name}"), fields, meta, repr);
         let vec_type = VecType::new(composite, Box::new(T::type_info()));
@@ -137,7 +138,7 @@ impl VecType {
     }
 }
 
-/// Emits helper functions used by String & co.
+/// Emits helper functions used by [`Vec`](crate::pattern::vec::Vec).
 #[macro_export]
 macro_rules! vec_utils {
     ($x:ty) => {{

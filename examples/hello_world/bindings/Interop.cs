@@ -272,8 +272,9 @@ namespace My.Company
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {
-                var utf8Bytes = Encoding.UTF8.GetBytes(_managed._s);
-                var len = utf8Bytes.Length;
+                var source = _managed._s.AsSpan();
+                Span<byte> utf8Bytes = stackalloc byte[Encoding.UTF8.GetByteCount(source)];
+                var len = Encoding.UTF8.GetBytes(source, utf8Bytes);
 
                 fixed (byte* p = utf8Bytes)
                 {

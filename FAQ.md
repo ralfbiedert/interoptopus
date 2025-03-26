@@ -128,7 +128,7 @@
   performance overhead of about 30-40ns per pinned slice, but uses only safe C#:
 
   | Construct | ns per call |
-            | --- | --- |
+    | --- | --- |
   | `pattern_ffi_slice_delegate(x => x[0])` | 195 |
   | `pattern_ffi_slice_delegate(x => x.Copied[0])` | 1307 |
   | `pattern_ffi_slice_delegate_huge(x => x[0])` | 190 |

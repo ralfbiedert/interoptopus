@@ -1,12 +1,11 @@
 use crate::Interop;
 use crate::interop::FunctionNameFlavor;
 use heck::{ToLowerCamelCase, ToUpperCamelCase};
-use interoptopus::backend::{ctypes_from_type_recursive, safe_name};
+use interoptopus::backend::{safe_name, types_from_type};
 use interoptopus::lang::{Composite, ConstantValue, Enum, Field, FnPointer, Function, Opaque, Parameter, Primitive, PrimitiveValue, SugaredReturnType, Type};
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::{AsyncCallback, NamedCallback};
 use interoptopus::pattern::slice::SliceType;
-use std::collections::HashSet;
 
 /// Converts a primitive (Rust) type to a native C# type name, e.g., `f32` to `float`.
 pub fn primitive_to_typename(x: Primitive) -> String {
@@ -272,10 +271,9 @@ pub fn get_slice_type_argument(x: &SliceType) -> String {
 }
 
 pub fn is_owned_slice(slice: &SliceType) -> bool {
-    let mut rval = HashSet::new();
-    ctypes_from_type_recursive(slice.target_type(), &mut rval);
-
-    rval.iter().any(|x| matches!(x, Type::Pattern(TypePattern::Utf8String(_))))
+    types_from_type(slice.target_type())
+        .iter()
+        .any(|x| matches!(x, Type::Pattern(TypePattern::Utf8String(_))))
 }
 
 #[must_use]

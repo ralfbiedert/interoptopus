@@ -1,6 +1,5 @@
-use crate::backend::IdPrettifier;
+use crate::backend::Prettifier;
 use crate::lang::{Meta, Type};
-use crate::pattern::callback::AsyncCallback;
 
 /// Indicates the final desired return type in FFI'ed user code.
 pub enum SugaredReturnType {
@@ -25,22 +24,22 @@ impl SugaredReturnType {
 pub struct Function {
     name: String,
     meta: Meta,
-    signature: FunctionSignature,
+    signature: Signature,
 }
 
 impl Function {
     #[must_use]
-    pub const fn new(name: String, signature: FunctionSignature, meta: Meta) -> Self {
+    pub const fn new(name: String, signature: Signature, meta: Meta) -> Self {
         Self { name, meta, signature }
     }
 
     #[must_use]
     pub fn name(&self) -> &str {
-        &self.name
+        self.name.as_str()
     }
 
     #[must_use]
-    pub const fn signature(&self) -> &FunctionSignature {
+    pub const fn signature(&self) -> &Signature {
         &self.signature
     }
 
@@ -50,43 +49,19 @@ impl Function {
     }
 
     #[must_use]
-    pub fn prettifier(&self) -> IdPrettifier {
-        IdPrettifier::from_rust_lower(self.name())
-    }
-
-    #[must_use]
-    pub fn first_param_type(&self) -> Option<&Type> {
-        self.signature().params.first().map(|x| &x.the_type)
-    }
-
-    /// Indicates the return type of a method from user code.
-    ///
-    /// Sync methods have their return type as-is, in async methods
-    /// this indicates the type of the async callback helper.
-    #[must_use]
-    pub fn sugared_return_type(&self) -> SugaredReturnType {
-        let ctype = self
-            .signature
-            .params
-            .last()
-            .and_then(|x| x.the_type().as_async_callback())
-            .map(|async_callback: &AsyncCallback| async_callback.target());
-
-        match ctype {
-            None => SugaredReturnType::Sync(self.signature.rval().clone()),
-            Some(x) => SugaredReturnType::Async(x.clone()),
-        }
+    pub fn prettifier(&self) -> Prettifier {
+        Prettifier::from_rust_lower(self.name())
     }
 }
 
 /// Represents multiple `in` and a single `out` parameters.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, Default)]
-pub struct FunctionSignature {
+pub struct Signature {
     params: Vec<Parameter>,
     rval: Type,
 }
 
-impl FunctionSignature {
+impl Signature {
     #[must_use]
     pub const fn new(params: Vec<Parameter>, rval: Type) -> Self {
         Self { params, rval }
@@ -103,7 +78,7 @@ impl FunctionSignature {
     }
 }
 
-/// Parameters of a [`FunctionSignature`].
+/// Parameters of a [`Signature`].
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Parameter {
     name: String,

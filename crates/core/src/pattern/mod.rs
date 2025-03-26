@@ -1,7 +1,7 @@
-//! Convenience patterns in supported languages.
+//! Convenience patterns like [services](crate::pattern::service), [strings](crate::pattern::string), [results](crate::pattern::result::Result) and [options](crate::pattern::option::Option).
 //!
-//! Patterns are purely optional. If you want to use a certain pattern in your bindings
-//! you generally define one or more functions that use some of the types contained in this module.
+//! Patterns are optional types and constructs you can use. Most patterns are automatically applied
+//! once you use their corresponding type.  
 //!
 //! Backends which support a pattern will then generate _additional_ language-specific helpers
 //! and bindings  for it. In any case, regardless whether a pattern is supported by a backend or not,
@@ -9,37 +9,40 @@
 //!
 //! ## Pattern Usage
 //!
-//! Unless otherwise stated patterns are used by, well, using them in signatures. For example,
-//! instead of making `x` a type `*const u8` (or similar) in the following `print` function:
+//! For example, instead of accepting a `*const u8` (or similar) and returning `0` on success
 //!
 //! ```
 //! # use interoptopus::ffi_function;
 //!
 //! #[ffi_function]
-//! pub fn print_ptr(x: *const u8) {
-//!    // Write unsafe code to convert `x`
+//! pub fn write_file(file: *const u8) -> i8 {
+//!    let file = unsafe { /* ... */ };
+//!    0
 //! }
 //!
 //! ```
 //!
-//! you would instead accept an [`CStrPointer`](crate::pattern::string::CStrPointer):
+//! you would instead accept an [`ffi::String`](crate::pattern::string::String) and return an [`ffi::Result`](crate::pattern::result::Result):
 //!
 //! ```
-//! # use interoptopus::{ffi_function, ffi};
-//! # use std::ffi::CStr;
+//! # use interoptopus::{ffi_function, ffi_type, ffi};
+//! #
+//! # #[ffi_type]
+//! # pub enum MyError {
+//! #    Bad
+//! # }
 //!
 //! #[ffi_function]
-//! pub fn print_ascii(x: ffi::CStrPointer) {
-//!    // Call `x.as_str()` and handle Result
+//! pub fn write_file(file: ffi::String) -> ffi::Result<(), MyError> {
+//!    let file = file.as_str();
+//!    ffi::Ok(())
 //! }
 //!
 //! ```
-//!
-//! This has the added benefit that any backend supporting a specific pattern will also
-//! generate more **idiomatic code in the binding**. In the example above, C# might
-//! emit a `ref ubyte` or `IntPtr` type for the `print_ptr`, but will use a correctly marshalled
-//! `string` type for `print_ascii`.
-//!
+//! That way you won't have to write `unsafe` code, _and_ you get more idiomatic code in most
+//! backends. For example, in C# you might end up with a simple `WriteFile("foo.txt")` call
+//! that automatically converts the used `string` to UTF-8, and in turn converts a failed result
+//! to a CLR exception.
 //!
 //! ## Pattern Backend Support
 //!
@@ -48,31 +51,23 @@
 //!
 //! - The pattern is **supported** and the backend will generate the raw, underlying type and / or
 //!   a language-specific abstraction that safely and conveniently handles it. Examples
-//!   include converting an [`CStrPointer`](string) to a C# `string`, or a [`service`](crate::pattern::service)
+//!   include converting a [`String`](crate::pattern::string::String) to a C# `string`, or a [`service`]
 //!   to a Python `class`.
 //!
 //! - The pattern is not supported and will be **omitted, if the pattern was merely an aggregate** of
-//!   existing items. Examples include the [`service`](crate::pattern::service) pattern in C which will not
+//!   existing items. Examples include the [`service`] pattern in C which will not
 //!   be emitted. However, this will not pose a problem as all constituent types and methods (functions)
 //!   are still available as raw bindings.
 //!
 //! - The pattern is not supported and will be **replaced with a fallback type**. Examples include
 //!   the [`CStrPointer`](string) which will become a regular `*const char` in C.
 //!
-//! In other words, regardless of which pattern was used, the involved methods and types will always
-//! be accessible from any language.
 //!
 //! # Pattern Composition
 //!
-//! Due to a lack of expressiveness in other languages, pattern composition is often limited. Things that work
-//! easily in Rust (e.g., a nested `FFISlice<FFIOption<CStrPointer>>`), aren't supported in other languages.
-//! You therefore should rather err on the side of conservatism when designing APIs.
-//!
-//! While we aim to guarantee that 'flat' patterns either work, or gracefully fall-back
-//! to a more primitive representation, nested patterns through generics might simply fail to compile
-//! in certain backends.
-//!
-
+//! Due to a lack of expressiveness in other languages, patterns usually compose without issues in Rust, but
+//! not in all backends. For example, something like `Slice<Result<Option<String>, Error>>` is supported in
+//! Rust without issues, but its UX might suffer in Python.
 use crate::lang::{Composite, Primitive, Type, TypeInfo};
 use crate::pattern::builtins::Builtins;
 use crate::pattern::callback::{AsyncCallback, NamedCallback};
@@ -150,8 +145,8 @@ impl TypePattern {
             Self::CStrPointer => Type::ReadPointer(Box::new(Type::Pattern(Self::CChar))),
             Self::Slice(x) => Type::Composite(x.composite_type().clone()),
             Self::SliceMut(x) => Type::Composite(x.composite_type().clone()),
-            Self::Option(x) => x.the_enum().to_ctype(),
-            Self::Result(x) => x.the_enum().to_ctype(),
+            Self::Option(x) => x.the_enum().to_type(),
+            Self::Result(x) => x.the_enum().to_type(),
             Self::NamedCallback(x) => Type::FnPointer(x.fnpointer().clone()),
             Self::Bool => Type::Primitive(Primitive::U8),
             Self::CChar => c_char::type_info(),

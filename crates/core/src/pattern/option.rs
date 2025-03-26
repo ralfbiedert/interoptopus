@@ -1,4 +1,4 @@
-//! Like a regular [`Option`] but FFI safe.
+//! Like a regular [`Option`](std::option::Option), but FFI safe.
 //!
 //! # Example
 //!
@@ -14,32 +14,15 @@
 //! }
 //! ```
 //!
-//! On C FFI level the following binding code is generated:
-//!
-//! ```c
-//! typedef struct optionu8
-//!     {
-//!     uint8_t t;
-//!     uint8_t is_some;
-//!     } optionu8;
-//!
-//! void set_value(optionu8 x);
-//! ```
-//!
 
 use crate::backend::capitalize_first_letter;
-use crate::lang::{Documentation, Enum, Meta, Representation, Type, Variant, VariantKind};
+use crate::lang::{Docs, Enum, Meta, Representation, Type, Variant, VariantKind};
 use crate::lang::{Layout, TypeInfo};
 use crate::pattern::TypePattern;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
 /// An option-like type at the FFI boundary where a regular [`Option`] doesn't work.
-///
-/// # C API
-///
-/// The option will be considered `Some` if and only if `is_some` is `1`. All
-/// other values mean `None`.
 #[repr(u32)]
 #[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Eq, Default, Deserialize, Serialize))]
 #[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Eq, Default))]
@@ -138,16 +121,16 @@ where
     T: TypeInfo,
 {
     fn type_info() -> Type {
-        let doc_t = Documentation::from_line("Element if Some().");
+        let doc_t = Docs::from_line("Element if Some().");
 
         let variants = vec![
             Variant::new("Some".to_string(), VariantKind::Typed(0, Box::new(T::type_info())), doc_t),
-            Variant::new("None".to_string(), VariantKind::Unit(1), Documentation::new()),
+            Variant::new("None".to_string(), VariantKind::Unit(1), Docs::new()),
         ];
 
-        let doc = Documentation::from_line("Option that contains Some(value) or None.");
+        let doc = Docs::from_line("Option that contains Some(value) or None.");
         let repr = Representation::new(Layout::C, None);
-        let meta = Meta::with_namespace_documentation(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
+        let meta = Meta::with_module_docs(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
         let t_name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
         let name = format!("Option{t_name}");
         let the_enum = Enum::new(name, variants, meta, repr);

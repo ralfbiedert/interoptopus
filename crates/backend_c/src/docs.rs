@@ -49,7 +49,7 @@ impl<'a> Markdown<'a> {
         indented!(w, r"## {} ", the_type.name_within_lib())?;
         w.newline()?;
 
-        for line in meta.documentation().lines() {
+        for line in meta.docs().lines() {
             indented!(w, r"{}", line.trim())?;
             w.newline()?;
         }
@@ -74,7 +74,7 @@ impl<'a> Markdown<'a> {
     fn write_function(&self, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
         indented!(w, r"## {} ", function.name())?;
 
-        for line in function.meta().documentation().lines() {
+        for line in function.meta().docs().lines() {
             if line.trim().starts_with('#') {
                 write!(w.writer(), "##")?;
             }

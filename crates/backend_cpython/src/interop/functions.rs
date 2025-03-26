@@ -19,7 +19,7 @@ pub fn write_function_proxies(i: &Interop, w: &mut IndentWriter) -> Result<(), E
 pub fn write_function(i: &Interop, w: &mut IndentWriter, function: &Function, write_for: WriteFor) -> Result<(), Error> {
     let rval_sig = to_type_hint_out(function.signature().rval());
     let args = i.function_args_to_string(function, true, false);
-    let documentation = function.meta().documentation().lines().join("\n");
+    let documentation = function.meta().docs().lines().join("\n");
 
     indented!(w, r"def {}({}){}:", function.name(), args, rval_sig)?;
 

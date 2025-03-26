@@ -75,19 +75,19 @@ pub fn sort_types_by_dependencies(mut types: Vec<Type>) -> Vec<Type> {
     rval
 }
 
-/// Given a number of functions like [`lib_x`, `lib_y`] return the longest common prefix `lib_`.
+/// For some functions `lib_x`, `lib_y` return the longest common prefix `lib_`.
 ///
 ///
 /// # Example
 ///
 /// ```rust
 /// # use interoptopus::backend::longest_common_prefix;
-/// # use interoptopus::lang::{Function, FunctionSignature, Meta};
+/// # use interoptopus::lang::{Function, Signature, Meta};
 ///
 /// let functions = [
-///     Function::new("my_lib_f".to_string(), FunctionSignature::default(), Meta::default()),
-///     Function::new("my_lib_g".to_string(), FunctionSignature::default(), Meta::default()),
-///     Function::new("my_lib_h".to_string(), FunctionSignature::default(), Meta::default()),
+///     Function::new("my_lib_f".to_string(), Signature::default(), Meta::default()),
+///     Function::new("my_lib_g".to_string(), Signature::default(), Meta::default()),
+///     Function::new("my_lib_h".to_string(), Signature::default(), Meta::default()),
 /// ];
 ///
 /// assert_eq!(longest_common_prefix(&functions), "my_lib_".to_string());
@@ -112,46 +112,56 @@ pub fn longest_common_prefix(functions: &[Function]) -> String {
     String::from_iter(&longest_common)
 }
 
-/// Given some functions and types, return all used and nested types, without duplicates.
+/// Return all used and nested types, without duplicates.
 #[must_use]
-pub fn ctypes_from_functions_types(functions: &[Function], extra_types: &[Type]) -> Vec<Type> {
+#[allow(clippy::redundant_pub_crate)]
+pub(crate) fn types_from_functions_types(functions: &[Function], extra_types: &[Type]) -> Vec<Type> {
     let mut types = HashSet::new();
 
     for function in functions {
-        ctypes_from_type_recursive(function.signature().rval(), &mut types);
+        types_from_type_recursive(function.signature().rval(), &mut types);
 
         for param in function.signature().params() {
-            ctypes_from_type_recursive(param.the_type(), &mut types);
+            types_from_type_recursive(param.the_type(), &mut types);
         }
     }
 
     for ty in extra_types {
-        ctypes_from_type_recursive(ty, &mut types);
+        types_from_type_recursive(ty, &mut types);
     }
 
     types.iter().cloned().collect()
 }
 
-/// Recursive helper for [`ctypes_from_functions_types`].
+/// Given a type, returns all nested types used by it.
 #[allow(clippy::implicit_hasher)]
-pub fn ctypes_from_type_recursive(start: &Type, types: &mut HashSet<Type>) {
+#[allow(clippy::redundant_pub_crate)]
+#[must_use]
+pub fn types_from_type(start: &Type) -> Vec<Type> {
+    types_from_functions_types(&[], &[start.clone()])
+}
+
+/// Recursively checks.
+#[allow(clippy::implicit_hasher)]
+#[allow(clippy::redundant_pub_crate)]
+pub(crate) fn types_from_type_recursive(start: &Type, types: &mut HashSet<Type>) {
     types.insert(start.clone());
 
     match start {
         Type::Composite(inner) => {
             for field in inner.fields() {
-                ctypes_from_type_recursive(field.the_type(), types);
+                types_from_type_recursive(field.the_type(), types);
             }
         }
-        Type::Array(inner) => ctypes_from_type_recursive(inner.array_type(), types),
+        Type::Array(inner) => types_from_type_recursive(inner.the_type(), types),
         Type::FnPointer(inner) => {
-            ctypes_from_type_recursive(inner.signature().rval(), types);
+            types_from_type_recursive(inner.signature().rval(), types);
             for param in inner.signature().params() {
-                ctypes_from_type_recursive(param.the_type(), types);
+                types_from_type_recursive(param.the_type(), types);
             }
         }
-        Type::ReadPointer(inner) => ctypes_from_type_recursive(inner, types),
-        Type::ReadWritePointer(inner) => ctypes_from_type_recursive(inner, types),
+        Type::ReadPointer(inner) => types_from_type_recursive(inner, types),
+        Type::ReadWritePointer(inner) => types_from_type_recursive(inner, types),
         Type::Primitive(_) => {}
         Type::Enum(_) => {}
         Type::Opaque(_) => {}
@@ -162,29 +172,29 @@ pub fn ctypes_from_type_recursive(start: &Type, types: &mut HashSet<Type>) {
         Type::Pattern(x) => match x {
             TypePattern::AsyncCallback(x) => {
                 for field in x.fnpointer().signature().params() {
-                    ctypes_from_type_recursive(field.the_type(), types);
+                    types_from_type_recursive(field.the_type(), types);
                 }
             }
             TypePattern::CStrPointer => {}
             TypePattern::NamedCallback(x) => {
                 let inner = x.fnpointer();
-                ctypes_from_type_recursive(inner.signature().rval(), types);
+                types_from_type_recursive(inner.signature().rval(), types);
                 for param in inner.signature().params() {
-                    ctypes_from_type_recursive(param.the_type(), types);
+                    types_from_type_recursive(param.the_type(), types);
                 }
             }
-            TypePattern::Slice(x) => ctypes_from_type_recursive(x.target_type(), types),
-            TypePattern::SliceMut(x) => ctypes_from_type_recursive(x.target_type(), types),
-            TypePattern::Option(x) => ctypes_from_type_recursive(x.t(), types),
+            TypePattern::Slice(x) => types_from_type_recursive(x.target_type(), types),
+            TypePattern::SliceMut(x) => types_from_type_recursive(x.target_type(), types),
+            TypePattern::Option(x) => types_from_type_recursive(x.t(), types),
             TypePattern::Result(x) => {
                 for variant in x.the_enum().variants() {
                     match variant.kind() {
-                        VariantKind::Typed(_, t) => ctypes_from_type_recursive(t, types),
+                        VariantKind::Typed(_, t) => types_from_type_recursive(t, types),
                         VariantKind::Unit(_) => {}
                     }
                 }
             }
-            TypePattern::Vec(x) => ctypes_from_type_recursive(x.t(), types),
+            TypePattern::Vec(x) => types_from_type_recursive(x.t(), types),
             TypePattern::Bool => {}
             TypePattern::CChar => {}
             TypePattern::APIVersion => {}
@@ -195,59 +205,62 @@ pub fn ctypes_from_type_recursive(start: &Type, types: &mut HashSet<Type>) {
 
 /// Extracts annotated namespace strings.
 #[allow(clippy::implicit_hasher)]
-pub fn extract_namespaces_from_types(types: &[Type], into: &mut HashSet<String>) {
+#[allow(clippy::redundant_pub_crate)]
+pub(crate) fn extract_namespaces_from_types(types: &[Type], into: &mut HashSet<String>) {
     for t in types {
         match t {
             Type::Primitive(_) => {}
             Type::Array(_) => {}
 
             Type::Enum(x) => {
-                into.insert(x.meta().namespace().to_string());
+                into.insert(x.meta().module().to_string());
             }
             Type::Opaque(x) => {
-                into.insert(x.meta().namespace().to_string());
+                into.insert(x.meta().module().to_string());
             }
             Type::Composite(x) => {
-                into.insert(x.meta().namespace().to_string());
+                into.insert(x.meta().module().to_string());
             }
             Type::FnPointer(_) => {}
             Type::ReadPointer(_) => {}
             Type::ReadWritePointer(_) => {}
             Type::Pattern(x) => match x {
                 TypePattern::AsyncCallback(x) => {
-                    into.insert(x.meta().namespace().to_string());
+                    into.insert(x.meta().module().to_string());
                 }
                 TypePattern::CStrPointer => {}
                 TypePattern::APIVersion => {}
                 TypePattern::Slice(x) => {
-                    into.insert(x.meta().namespace().to_string());
+                    into.insert(x.meta().module().to_string());
                 }
                 TypePattern::SliceMut(x) => {
-                    into.insert(x.meta().namespace().to_string());
+                    into.insert(x.meta().module().to_string());
                 }
                 TypePattern::Option(x) => {
-                    into.insert(x.meta().namespace().to_string());
+                    into.insert(x.meta().module().to_string());
                 }
                 TypePattern::Result(x) => {
-                    into.insert(x.meta().namespace().to_string());
+                    into.insert(x.meta().module().to_string());
                 }
                 TypePattern::Bool => {}
                 TypePattern::CChar => {}
                 TypePattern::NamedCallback(_) => {}
                 TypePattern::Utf8String(_) => {}
                 TypePattern::Vec(x) => {
-                    into.insert(x.meta().namespace().to_string());
+                    into.insert(x.meta().module().to_string());
                 }
             },
         }
     }
 }
 
+/// Checks whether the given type holds an opaque not behind some pointer.
 #[must_use]
-pub fn holds_opaque_without_ref(typ: &Type) -> bool {
+#[allow(clippy::redundant_pub_crate)]
+pub(crate) fn holds_opaque_without_ref(typ: &Type) -> bool {
     match typ {
         Type::Primitive(_) => false,
-        Type::Array(x) => holds_opaque_without_ref(x.array_type()),
+        Type::Array(x) => holds_opaque_without_ref(x.the_type()),
         Type::Enum(x) => {
             for variant in x.variants() {
                 match variant.kind() {
@@ -279,8 +292,8 @@ pub fn holds_opaque_without_ref(typ: &Type) -> bool {
             TypePattern::APIVersion => false,
             TypePattern::Slice(x) => holds_opaque_without_ref(x.target_type()),
             TypePattern::SliceMut(x) => holds_opaque_without_ref(x.target_type()),
-            TypePattern::Option(x) => holds_opaque_without_ref(&x.the_enum().to_ctype()),
-            TypePattern::Result(x) => holds_opaque_without_ref(&x.the_enum().to_ctype()),
+            TypePattern::Option(x) => holds_opaque_without_ref(&x.the_enum().to_type()),
+            TypePattern::Result(x) => holds_opaque_without_ref(&x.the_enum().to_type()),
             TypePattern::Bool => false,
             TypePattern::CChar => false,
             TypePattern::NamedCallback(_) => false,
@@ -290,7 +303,7 @@ pub fn holds_opaque_without_ref(typ: &Type) -> bool {
     }
 }
 
-/// Maps an internal namespace like `common` to a language namespace like `Company.Common`.
+/// Maps something like `common` to `Company.Common` in C# and similar.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct NamespaceMappings {
     mappings: HashMap<String, String>,
@@ -328,12 +341,12 @@ impl NamespaceMappings {
     }
 }
 
-/// Allows, for example, `my_id` to be converted to `MyId`.
-pub struct IdPrettifier {
+/// Converts, for example, identifiers like `my_id` to `MyId`.
+pub struct Prettifier {
     tokens: Vec<String>,
 }
 
-impl IdPrettifier {
+impl Prettifier {
     /// Creates a new prettifier from a `my_name` identifier.
     #[must_use]
     pub fn from_rust_lower(id: &str) -> Self {
@@ -354,7 +367,7 @@ impl IdPrettifier {
     }
 }
 
-/// Checks whether the given type should be "the same type everywhere".
+/// Checks whether the given type does not contained anything user-defined.
 ///
 /// In complex setups we sometimes want to use types between two (otherwise unrelated) bindings.
 /// For example, we would like to produce a `FFISlice<u8>` in library A, and consume that in
@@ -368,7 +381,7 @@ impl IdPrettifier {
 pub fn is_global_type(t: &Type) -> bool {
     match t {
         Type::Primitive(_) => true,
-        Type::Array(x) => is_global_type(x.array_type()),
+        Type::Array(x) => is_global_type(x.the_type()),
         Type::Enum(x) => {
             for variant in x.variants() {
                 match variant.kind() {
@@ -392,8 +405,8 @@ pub fn is_global_type(t: &Type) -> bool {
             TypePattern::APIVersion => false,
             TypePattern::Slice(x) => is_global_type(x.target_type()),
             TypePattern::SliceMut(x) => is_global_type(x.target_type()),
-            TypePattern::Option(x) => is_global_type(&x.the_enum().to_ctype()),
-            TypePattern::Result(x) => is_global_type(&x.the_enum().to_ctype()),
+            TypePattern::Option(x) => is_global_type(&x.the_enum().to_type()),
+            TypePattern::Result(x) => is_global_type(&x.the_enum().to_type()),
             TypePattern::Bool => true,
             TypePattern::CChar => true,
             TypePattern::NamedCallback(_) => false,
@@ -421,7 +434,8 @@ macro_rules! here {
 
 /// Capitalizes the first letter of a string.
 #[must_use]
-pub fn capitalize_first_letter(s: &str) -> String {
+#[allow(clippy::redundant_pub_crate)]
+pub(crate) fn capitalize_first_letter(s: &str) -> String {
     let mut chars = s.chars();
     match chars.next() {
         None => String::new(),
@@ -431,11 +445,11 @@ pub fn capitalize_first_letter(s: &str) -> String {
 
 #[cfg(test)]
 mod test {
-    use crate::backend::util::IdPrettifier;
+    use crate::backend::util::Prettifier;
 
     #[test]
     fn is_pretty() {
-        assert_eq!(IdPrettifier::from_rust_lower("hello_world").to_camel_case(), "HelloWorld");
-        assert_eq!(IdPrettifier::from_rust_lower("single").to_camel_case(), "Single");
+        assert_eq!(Prettifier::from_rust_lower("hello_world").to_camel_case(), "HelloWorld");
+        assert_eq!(Prettifier::from_rust_lower("single").to_camel_case(), "Single");
     }
 }

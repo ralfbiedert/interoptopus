@@ -1,6 +1,6 @@
 use crate::Interop;
 use interoptopus::backend::IndentWriter;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     if i.write_types.write_interoptopus_globals() {

@@ -19,7 +19,7 @@ impl Array {
     }
 
     #[must_use]
-    pub const fn array_type(&self) -> &Type {
+    pub const fn the_type(&self) -> &Type {
         &self.array_type
     }
 

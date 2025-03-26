@@ -164,11 +164,11 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
                     doc_lines.push(#docs.to_string());
                 )*
 
-                let mut signature = ::interoptopus::lang::FunctionSignature::new(params, #rval);
-                let documentation = ::interoptopus::lang::Documentation::from_lines(doc_lines);
-                let meta = ::interoptopus::lang::Meta::with_documentation(documentation);
+                let sig = ::interoptopus::lang::Signature::new(params, #rval);
+                let docs = ::interoptopus::lang::Docs::from_lines(doc_lines);
+                let meta = ::interoptopus::lang::Meta::with_docs(docs);
 
-                ::interoptopus::lang::Function::new(#function_ident_str.to_string(), signature, meta)
+                ::interoptopus::lang::Function::new(#function_ident_str.to_string(), sig, meta)
             }
         }
     };

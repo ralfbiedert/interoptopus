@@ -47,7 +47,6 @@ static class Benchmark {
         result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_slice_delegate_huge(x => x[0]));
         writer.Add("pattern_ffi_slice_delegate_huge(x => x[0])", result);
 
-
         result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_slice_delegate_huge(callback_huge_prealloc));
         writer.Add("pattern_ffi_slice_delegate_huge(callback_huge_prealloc)", result);
 

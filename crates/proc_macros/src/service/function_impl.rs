@@ -232,7 +232,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                         Ok(__res) => {
                             let __e = __res.unwrap_err();
                             ::interoptopus::ffi::log_error(|| format!("Error in ({}): {:?}", stringify!(service_basic_new), __e));
-                            #ctor_result::Err(*__e)
+                            #ctor_result::Err(__e)
                         }
                         Err(__e) => {
                             ::interoptopus::ffi::log_error(|| format!("Panic in ({}): {}", stringify!(#ffi_fn_ident), ::interoptopus::pattern::result::get_panic_message(__e.as_ref())));

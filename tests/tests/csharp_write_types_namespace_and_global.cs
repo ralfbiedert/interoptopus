@@ -1587,6 +1587,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal uint _variant;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public EnumDocumented ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -1595,6 +1596,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -1622,12 +1624,17 @@ namespace My.Company
             private EnumDocumented _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(EnumDocumented managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(EnumDocumented managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -1635,6 +1642,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe EnumDocumented ToManaged()
             {
                 _managed = new EnumDocumented();
@@ -1682,6 +1690,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedC _C;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public EnumPayload ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -1690,6 +1699,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -1717,12 +1727,17 @@ namespace My.Company
             private EnumPayload _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(EnumPayload managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(EnumPayload managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -1732,6 +1747,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe EnumPayload ToManaged()
             {
                 _managed = new EnumPayload();
@@ -1759,6 +1775,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal uint _variant;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public EnumRenamed ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -1767,6 +1784,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -1788,12 +1806,17 @@ namespace My.Company
             private EnumRenamed _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(EnumRenamed managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(EnumRenamed managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -1801,6 +1824,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe EnumRenamed ToManaged()
             {
                 _managed = new EnumRenamed();
@@ -1826,6 +1850,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal uint _variant;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Error ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -1834,6 +1859,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -1855,12 +1881,17 @@ namespace My.Company
             private Error _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Error managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Error managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -1868,6 +1899,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Error ToManaged()
             {
                 _managed = new Error();
@@ -5134,6 +5166,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedSome _Some;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public OptionInner ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -5142,6 +5175,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -5166,12 +5200,17 @@ namespace My.Company
             private OptionInner _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(OptionInner managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(OptionInner managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -5180,6 +5219,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe OptionInner ToManaged()
             {
                 _managed = new OptionInner();
@@ -5218,6 +5258,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedSome _Some;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public OptionOptionResultOptionUtf8StringError ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -5226,6 +5267,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -5250,12 +5292,17 @@ namespace My.Company
             private OptionOptionResultOptionUtf8StringError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(OptionOptionResultOptionUtf8StringError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(OptionOptionResultOptionUtf8StringError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -5264,6 +5311,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe OptionOptionResultOptionUtf8StringError ToManaged()
             {
                 _managed = new OptionOptionResultOptionUtf8StringError();
@@ -5302,6 +5350,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedSome _Some;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public OptionResultOptionUtf8StringError ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -5310,6 +5359,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -5334,12 +5384,17 @@ namespace My.Company
             private OptionResultOptionUtf8StringError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(OptionResultOptionUtf8StringError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(OptionResultOptionUtf8StringError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -5348,6 +5403,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe OptionResultOptionUtf8StringError ToManaged()
             {
                 _managed = new OptionResultOptionUtf8StringError();
@@ -5386,6 +5442,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedSome _Some;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public OptionUtf8String ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -5394,6 +5451,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -5418,12 +5476,17 @@ namespace My.Company
             private OptionUtf8String _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(OptionUtf8String managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(OptionUtf8String managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -5432,6 +5495,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe OptionUtf8String ToManaged()
             {
                 _managed = new OptionUtf8String();
@@ -5482,6 +5546,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedErr _Err;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public ResultConstPtrServiceAsyncError ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -5490,6 +5555,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -5520,12 +5586,17 @@ namespace My.Company
             private ResultConstPtrServiceAsyncError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(ResultConstPtrServiceAsyncError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(ResultConstPtrServiceAsyncError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -5535,6 +5606,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe ResultConstPtrServiceAsyncError ToManaged()
             {
                 _managed = new ResultConstPtrServiceAsyncError();
@@ -5586,6 +5658,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedErr _Err;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public ResultConstPtrServiceBasicError ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -5594,6 +5667,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -5624,12 +5698,17 @@ namespace My.Company
             private ResultConstPtrServiceBasicError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(ResultConstPtrServiceBasicError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(ResultConstPtrServiceBasicError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -5639,6 +5718,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe ResultConstPtrServiceBasicError ToManaged()
             {
                 _managed = new ResultConstPtrServiceBasicError();
@@ -5690,6 +5770,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedErr _Err;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public ResultConstPtrServiceCallbacksError ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -5698,6 +5779,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -5728,12 +5810,17 @@ namespace My.Company
             private ResultConstPtrServiceCallbacksError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(ResultConstPtrServiceCallbacksError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(ResultConstPtrServiceCallbacksError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -5743,6 +5830,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe ResultConstPtrServiceCallbacksError ToManaged()
             {
                 _managed = new ResultConstPtrServiceCallbacksError();
@@ -5794,6 +5882,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedErr _Err;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public ResultConstPtrServiceDependentError ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -5802,6 +5891,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -5832,12 +5922,17 @@ namespace My.Company
             private ResultConstPtrServiceDependentError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(ResultConstPtrServiceDependentError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(ResultConstPtrServiceDependentError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -5847,6 +5942,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe ResultConstPtrServiceDependentError ToManaged()
             {
                 _managed = new ResultConstPtrServiceDependentError();
@@ -5898,6 +5994,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedErr _Err;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public ResultConstPtrServiceIgnoringMethodsError ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -5906,6 +6003,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -5936,12 +6034,17 @@ namespace My.Company
             private ResultConstPtrServiceIgnoringMethodsError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(ResultConstPtrServiceIgnoringMethodsError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(ResultConstPtrServiceIgnoringMethodsError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -5951,6 +6054,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe ResultConstPtrServiceIgnoringMethodsError ToManaged()
             {
                 _managed = new ResultConstPtrServiceIgnoringMethodsError();
@@ -6002,6 +6106,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedErr _Err;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public ResultConstPtrServiceMainError ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -6010,6 +6115,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -6040,12 +6146,17 @@ namespace My.Company
             private ResultConstPtrServiceMainError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(ResultConstPtrServiceMainError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(ResultConstPtrServiceMainError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -6055,6 +6166,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe ResultConstPtrServiceMainError ToManaged()
             {
                 _managed = new ResultConstPtrServiceMainError();
@@ -6106,6 +6218,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedErr _Err;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public ResultConstPtrServiceMultipleCtorsError ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -6114,6 +6227,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -6144,12 +6258,17 @@ namespace My.Company
             private ResultConstPtrServiceMultipleCtorsError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(ResultConstPtrServiceMultipleCtorsError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(ResultConstPtrServiceMultipleCtorsError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -6159,6 +6278,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe ResultConstPtrServiceMultipleCtorsError ToManaged()
             {
                 _managed = new ResultConstPtrServiceMultipleCtorsError();
@@ -6210,6 +6330,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedErr _Err;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public ResultConstPtrServiceOnPanicError ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -6218,6 +6339,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -6248,12 +6370,17 @@ namespace My.Company
             private ResultConstPtrServiceOnPanicError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(ResultConstPtrServiceOnPanicError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(ResultConstPtrServiceOnPanicError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -6263,6 +6390,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe ResultConstPtrServiceOnPanicError ToManaged()
             {
                 _managed = new ResultConstPtrServiceOnPanicError();
@@ -6314,6 +6442,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedErr _Err;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public ResultConstPtrServiceResultError ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -6322,6 +6451,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -6352,12 +6482,17 @@ namespace My.Company
             private ResultConstPtrServiceResultError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(ResultConstPtrServiceResultError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(ResultConstPtrServiceResultError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -6367,6 +6502,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe ResultConstPtrServiceResultError ToManaged()
             {
                 _managed = new ResultConstPtrServiceResultError();
@@ -6418,6 +6554,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedErr _Err;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public ResultConstPtrServiceStringsError ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -6426,6 +6563,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -6456,12 +6594,17 @@ namespace My.Company
             private ResultConstPtrServiceStringsError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(ResultConstPtrServiceStringsError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(ResultConstPtrServiceStringsError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -6471,6 +6614,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe ResultConstPtrServiceStringsError ToManaged()
             {
                 _managed = new ResultConstPtrServiceStringsError();
@@ -6522,6 +6666,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedErr _Err;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public ResultConstPtrServiceVariousSlicesError ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -6530,6 +6675,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -6560,12 +6706,17 @@ namespace My.Company
             private ResultConstPtrServiceVariousSlicesError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(ResultConstPtrServiceVariousSlicesError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(ResultConstPtrServiceVariousSlicesError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -6575,6 +6726,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe ResultConstPtrServiceVariousSlicesError ToManaged()
             {
                 _managed = new ResultConstPtrServiceVariousSlicesError();
@@ -6616,6 +6768,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedErr _Err;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public ResultError ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -6624,6 +6777,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -6654,12 +6808,17 @@ namespace My.Company
             private ResultError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(ResultError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(ResultError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -6668,6 +6827,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe ResultError ToManaged()
             {
                 _managed = new ResultError();
@@ -6718,6 +6878,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedErr _Err;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public ResultNestedArrayError ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -6726,6 +6887,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -6756,12 +6918,17 @@ namespace My.Company
             private ResultNestedArrayError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(ResultNestedArrayError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(ResultNestedArrayError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -6771,6 +6938,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe ResultNestedArrayError ToManaged()
             {
                 _managed = new ResultNestedArrayError();
@@ -6822,6 +6990,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedErr _Err;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public ResultOptionUtf8StringError ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -6830,6 +6999,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -6860,12 +7030,17 @@ namespace My.Company
             private ResultOptionUtf8StringError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(ResultOptionUtf8StringError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(ResultOptionUtf8StringError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -6875,6 +7050,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe ResultOptionUtf8StringError ToManaged()
             {
                 _managed = new ResultOptionUtf8StringError();
@@ -6926,6 +7102,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedErr _Err;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public ResultU32Error ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -6934,6 +7111,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -6964,12 +7142,17 @@ namespace My.Company
             private ResultU32Error _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(ResultU32Error managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(ResultU32Error managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -6979,6 +7162,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe ResultU32Error ToManaged()
             {
                 _managed = new ResultU32Error();
@@ -7030,6 +7214,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedErr _Err;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public ResultU64Error ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -7038,6 +7223,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -7068,12 +7254,17 @@ namespace My.Company
             private ResultU64Error _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(ResultU64Error managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(ResultU64Error managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -7083,6 +7274,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe ResultU64Error ToManaged()
             {
                 _managed = new ResultU64Error();
@@ -7134,6 +7326,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedErr _Err;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public ResultUseStringError ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -7142,6 +7335,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -7172,12 +7366,17 @@ namespace My.Company
             private ResultUseStringError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(ResultUseStringError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(ResultUseStringError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -7187,6 +7386,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe ResultUseStringError ToManaged()
             {
                 _managed = new ResultUseStringError();
@@ -7238,6 +7438,7 @@ namespace My.Company
             [FieldOffset(0)]
             internal UnmanagedErr _Err;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public ResultUtf8StringError ToManaged()
             {
                 var marshaller = new Marshaller(this);
@@ -7246,6 +7447,7 @@ namespace My.Company
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
         {
             var marshaller = new Marshaller(this);
@@ -7276,12 +7478,17 @@ namespace My.Company
             private ResultUtf8StringError _managed; // Used when converting managed -> unmanaged
             private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(ResultUtf8StringError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(ResultUtf8StringError managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -7291,6 +7498,7 @@ namespace My.Company
                 return _unmanaged;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe ResultUtf8StringError ToManaged()
             {
                 _managed = new ResultUtf8StringError();
@@ -9647,8 +9855,9 @@ namespace My.Company
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {
-                var utf8Bytes = Encoding.UTF8.GetBytes(_managed._s);
-                var len = utf8Bytes.Length;
+                var source = _managed._s.AsSpan();
+                Span<byte> utf8Bytes = stackalloc byte[Encoding.UTF8.GetByteCount(source)];
+                var len = Encoding.UTF8.GetBytes(source, utf8Bytes);
 
                 fixed (byte* p = utf8Bytes)
                 {

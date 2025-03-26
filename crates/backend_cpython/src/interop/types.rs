@@ -34,7 +34,7 @@ pub fn write_types(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
 }
 
 pub fn write_struct(_i: &Interop, w: &mut IndentWriter, c: &Composite, write_for: WriteFor) -> Result<(), Error> {
-    let documentation = c.meta().documentation().lines().join("\n");
+    let documentation = c.meta().docs().lines().join("\n");
 
     indented!(w, r"class {}(ctypes.Structure):", c.rust_name())?;
     if !documentation.is_empty() && write_for == WriteFor::Code {
@@ -93,7 +93,7 @@ pub fn write_struct(_i: &Interop, w: &mut IndentWriter, c: &Composite, write_for
 
     // Fields
     for f in c.fields() {
-        let documentation = f.documentation().lines().join("\n");
+        let documentation = f.docs().lines().join("\n");
 
         w.newline()?;
 
@@ -126,7 +126,7 @@ pub fn write_struct(_i: &Interop, w: &mut IndentWriter, c: &Composite, write_for
 }
 
 pub fn write_enum(_i: &Interop, w: &mut IndentWriter, e: &Enum, write_for: WriteFor) -> Result<(), Error> {
-    let documentation = e.meta().documentation().lines().join("\n");
+    let documentation = e.meta().docs().lines().join("\n");
 
     indented!(w, r"class {}:", e.rust_name())?;
     if !documentation.is_empty() && write_for == WriteFor::Code {
@@ -135,7 +135,7 @@ pub fn write_enum(_i: &Interop, w: &mut IndentWriter, e: &Enum, write_for: Write
 
     for v in e.variants() {
         if write_for == WriteFor::Code {
-            for line in v.documentation().lines() {
+            for line in v.docs().lines() {
                 indented!(w, [()], r"# {}", line)?;
             }
         }

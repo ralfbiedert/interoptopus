@@ -1,8 +1,8 @@
-use interoptopus::lang::{ConstantValue, Documentation, FnPointer, Primitive, PrimitiveValue, Type};
+use interoptopus::lang::{ConstantValue, Docs, FnPointer, Primitive, PrimitiveValue, Type};
 use interoptopus::pattern::TypePattern;
 
 #[must_use]
-pub fn documentation(documentation: &Documentation) -> String {
+pub fn documentation(documentation: &Docs) -> String {
     let docs: String = documentation.lines().join("\n");
     format!(r#""""{docs}""""#)
 }
@@ -74,7 +74,7 @@ pub fn to_ctypes_name(the_type: &Type, with_type_annotations: bool) -> String {
         },
         Type::Enum(_) => "ctypes.c_int".to_string(), // is this correct?
         Type::Composite(x) => x.rust_name().to_string(),
-        Type::Array(x) => format!("{} * {}", to_ctypes_name(x.array_type(), with_type_annotations), x.len()),
+        Type::Array(x) => format!("{} * {}", to_ctypes_name(x.the_type(), with_type_annotations), x.len()),
         Type::Opaque(_) => "ERROR".to_string(),
         Type::FnPointer(x) => fnpointer_to_typename(x),
         Type::ReadPointer(x) => match &**x {

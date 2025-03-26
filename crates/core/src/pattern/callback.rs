@@ -1,4 +1,4 @@
-//! Named delegates in high level languages.
+//! Named delegates in higher languages.
 //!
 //! # Example
 //!
@@ -15,20 +15,6 @@
 //!     callback.call(Slice::empty());
 //! }
 //!
-//! ```
-//! Backends supporting this pattern might generate the equivalent to the following pseudo-code:
-//!
-//! ```csharp
-//! public delegate uint CallbackSlice(Sliceu8 x0);
-//!
-//! void my_function(CallbackSlice callback);
-//! ```
-//!
-//! Backends not supporting this pattern, and C FFI, will see the equivalent of the following C code:
-//! ```c
-//! typedef void (*fptr_fn_Sliceu8)(my_library_slicemutu8 x0);
-//!
-//! void my_function(fptr_fn_Sliceu8 callback);
 //! ```
 //!
 //!
@@ -74,7 +60,7 @@
 //! ```
 //!
 //! The reasons for this are somewhat technical, but it boils down to us being unable to generally
-//! implement [`CTypeInfo`](crate::lang::info::TypeInfo) for _all_ types you may want to use;
+//! implement [`TypeInfo`](crate::lang::TypeInfo) for _all_ types you may want to use;
 //! [`FFISlice`](crate::pattern::slice::Slice) here being one of them.
 //! To fix this, you can replace `pub type CallbackSlice = ...` with a `callback!` call
 //! which should generate a helper type that works.
@@ -212,7 +198,7 @@ impl AsyncCallback {
     }
 }
 
-/// Defines a callback type, akin to a `fn f(T) -> R` wrapped in an [Option](std::option).
+/// Defines a callback type, akin to a `fn f(T) -> R` wrapped in an [`Option`](std::option).
 ///
 /// A named delegate will be emitted in languages supporting them, otherwise a regular
 /// function pointer. For details, please see the [**callbacks module**](crate::pattern::callback).
@@ -301,7 +287,7 @@ macro_rules! callback {
 
         unsafe impl $crate::lang::TypeInfo for $name {
             fn type_info() -> $crate::lang::Type {
-                use $crate::lang::{TypeInfo, Type, Meta, Documentation, Primitive, Parameter, FunctionSignature, FnPointer};
+                use $crate::lang::{TypeInfo, Type, Meta, Docs, Primitive, Parameter, Signature, FnPointer};
 
                 let rval = < $rval as TypeInfo >::type_info();
 
@@ -317,8 +303,8 @@ macro_rules! callback {
                     namespace = ::std::string::String::from($ns);
                 )*
 
-                let meta = Meta::with_namespace_documentation(namespace, Documentation::new());
-                let sig = FunctionSignature::new(params, rval);
+                let meta = Meta::with_module_docs(namespace, Docs::new());
+                let sig = Signature::new(params, rval);
                 let fn_pointer = FnPointer::new_named(sig, stringify!($name).to_string());
                 let named_callback = $crate::pattern::callback::NamedCallback::with_meta(fn_pointer, meta);
 

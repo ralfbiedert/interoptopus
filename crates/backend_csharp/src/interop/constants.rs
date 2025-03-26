@@ -22,6 +22,6 @@ pub fn write_constant(i: &Interop, w: &mut IndentWriter, constant: &Constant) ->
     let name = constant.name();
     let value = constant_value_to_value(constant.value());
 
-    write_documentation(w, constant.meta().documentation())?;
+    write_documentation(w, constant.meta().docs())?;
     indented!(w, r"public const {} {} = ({}) {};", rval, name, rval, value)
 }

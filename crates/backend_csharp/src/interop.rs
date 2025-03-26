@@ -21,11 +21,11 @@ use crate::interop::patterns::write_patterns;
 use crate::interop::types::write_type_definitions;
 use derive_builder::Builder;
 use interoptopus::backend::IndentWriter;
-use interoptopus::backend::{is_global_type, NamespaceMappings};
+use interoptopus::backend::{NamespaceMappings, is_global_type};
 use interoptopus::inventory::{Bindings, Inventory};
-use interoptopus::lang::{Constant, Function, FunctionSignature, Meta, Type};
+use interoptopus::lang::{Constant, Function, Meta, Signature, Type};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 /// How to convert from Rust function names to C#
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
@@ -224,7 +224,7 @@ impl Interop {
 
     #[must_use]
     fn should_emit_by_meta(&self, meta: &Meta) -> bool {
-        meta.namespace() == self.namespace_id
+        meta.module() == self.namespace_id
     }
 
     fn is_custom_marshalled(&self, x: &Type) -> bool {
@@ -241,14 +241,14 @@ impl Interop {
             }
     }
 
-    fn has_custom_marshalled_types(&self, signature: &FunctionSignature) -> bool {
+    fn has_custom_marshalled_types(&self, signature: &Signature) -> bool {
         let mut types = signature.params().iter().map(|x| x.the_type().clone()).collect::<Vec<_>>();
         types.push(signature.rval().clone());
 
         types.iter().any(|x| self.is_custom_marshalled(x))
     }
 
-    fn has_custom_marshalled_delegate(&self, signature: &FunctionSignature) -> bool {
+    fn has_custom_marshalled_delegate(&self, signature: &Signature) -> bool {
         let mut types = signature.params().iter().map(|x| x.the_type().clone()).collect::<Vec<_>>();
         types.push(signature.rval().clone());
 
@@ -270,7 +270,7 @@ impl Interop {
     }
 
     #[allow(clippy::match_like_matches_macro)]
-    fn has_overloadable(&self, signature: &FunctionSignature) -> bool {
+    fn has_overloadable(&self, signature: &Signature) -> bool {
         signature.params().iter().any(|x| match x.the_type() {
             Type::ReadPointer(p) => matches!(&**p, Type::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_))),
             Type::ReadWritePointer(p) => matches!(&**p, Type::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_))),

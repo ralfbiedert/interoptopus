@@ -1,11 +1,11 @@
 //! Helpers to introspect Rust code when generating bindings, mostly derived by the `#[ffi_...]` macros.
 
-use crate::lang::function::{FunctionSignature, Parameter};
+use crate::lang::function::{Parameter, Signature};
 use crate::lang::{Array, Constant, FnPointer, Function, Primitive, PrimitiveValue, Type};
 use std::mem::MaybeUninit;
 use std::ptr::NonNull;
 
-/// Implemented for a constant-helper produced by [`ffi_constant`](crate::ffi_constant), gives meta info for a constant.
+/// Used by [`ffi_constant`](crate::ffi_constant) to give constant meta info.
 ///
 /// # Safety
 ///
@@ -15,7 +15,7 @@ pub unsafe trait ConstantInfo {
     fn constant_info() -> Constant;
 }
 
-/// Implemented for a type via [`ffi_type`](crate::ffi_type), gives meta info for a type.
+/// Used by [`ffi_type`](crate::ffi_type) to give type meta info.
 ///
 /// # Safety
 ///
@@ -25,7 +25,7 @@ pub unsafe trait TypeInfo {
     fn type_info() -> Type;
 }
 
-/// Implemented for a function-helper produced by [`ffi_function`](crate::ffi_function), gives meta info for a function.
+/// Used by [`ffi_function`](crate::ffi_function) to give function meta info.
 ///
 /// # Safety
 ///
@@ -179,7 +179,7 @@ where
     R: TypeInfo,
 {
     fn type_info() -> Type {
-        let sig = FunctionSignature::new(vec![], R::type_info());
+        let sig = Signature::new(vec![], R::type_info());
         Type::FnPointer(FnPointer::new(sig))
     }
 }
@@ -189,7 +189,7 @@ where
     R: TypeInfo,
 {
     fn type_info() -> Type {
-        let sig = FunctionSignature::new(vec![], R::type_info());
+        let sig = Signature::new(vec![], R::type_info());
         Type::FnPointer(FnPointer::new(sig))
     }
 }
@@ -200,7 +200,7 @@ where
     R: TypeInfo,
 {
     fn type_info() -> Type {
-        let sig = FunctionSignature::new(vec![Parameter::new("x0".to_string(), T1::type_info())], R::type_info());
+        let sig = Signature::new(vec![Parameter::new("x0".to_string(), T1::type_info())], R::type_info());
         Type::FnPointer(FnPointer::new(sig))
     }
 }
@@ -211,7 +211,7 @@ where
     R: TypeInfo,
 {
     fn type_info() -> Type {
-        let sig = FunctionSignature::new(vec![Parameter::new("x0".to_string(), T1::type_info())], R::type_info());
+        let sig = Signature::new(vec![Parameter::new("x0".to_string(), T1::type_info())], R::type_info());
         Type::FnPointer(FnPointer::new(sig))
     }
 }
@@ -223,7 +223,7 @@ where
     R: TypeInfo,
 {
     fn type_info() -> Type {
-        let sig = FunctionSignature::new(vec![Parameter::new("x0".to_string(), T1::type_info()), Parameter::new("x1".to_string(), T2::type_info())], R::type_info());
+        let sig = Signature::new(vec![Parameter::new("x0".to_string(), T1::type_info()), Parameter::new("x1".to_string(), T2::type_info())], R::type_info());
         Type::FnPointer(FnPointer::new(sig))
     }
 }
@@ -235,7 +235,7 @@ where
     R: TypeInfo,
 {
     fn type_info() -> Type {
-        let sig = FunctionSignature::new(vec![Parameter::new("x0".to_string(), T1::type_info()), Parameter::new("x1".to_string(), T2::type_info())], R::type_info());
+        let sig = Signature::new(vec![Parameter::new("x0".to_string(), T1::type_info()), Parameter::new("x1".to_string(), T2::type_info())], R::type_info());
         Type::FnPointer(FnPointer::new(sig))
     }
 }
@@ -248,7 +248,7 @@ where
     R: TypeInfo,
 {
     fn type_info() -> Type {
-        let sig = FunctionSignature::new(
+        let sig = Signature::new(
             vec![
                 Parameter::new("x0".to_string(), T1::type_info()),
                 Parameter::new("x1".to_string(), T2::type_info()),
@@ -268,7 +268,7 @@ where
     R: TypeInfo,
 {
     fn type_info() -> Type {
-        let sig = FunctionSignature::new(
+        let sig = Signature::new(
             vec![
                 Parameter::new("x0".to_string(), T1::type_info()),
                 Parameter::new("x1".to_string(), T2::type_info()),
@@ -289,7 +289,7 @@ where
     R: TypeInfo,
 {
     fn type_info() -> Type {
-        let sig = FunctionSignature::new(
+        let sig = Signature::new(
             vec![
                 Parameter::new("x0".to_string(), T1::type_info()),
                 Parameter::new("x1".to_string(), T2::type_info()),
@@ -311,7 +311,7 @@ where
     R: TypeInfo,
 {
     fn type_info() -> Type {
-        let sig = FunctionSignature::new(
+        let sig = Signature::new(
             vec![
                 Parameter::new("x0".to_string(), T1::type_info()),
                 Parameter::new("x1".to_string(), T2::type_info()),
@@ -334,7 +334,7 @@ where
     R: TypeInfo,
 {
     fn type_info() -> Type {
-        let sig = FunctionSignature::new(
+        let sig = Signature::new(
             vec![
                 Parameter::new("x0".to_string(), T1::type_info()),
                 Parameter::new("x1".to_string(), T2::type_info()),
@@ -358,7 +358,7 @@ where
     R: TypeInfo,
 {
     fn type_info() -> Type {
-        let sig = FunctionSignature::new(
+        let sig = Signature::new(
             vec![
                 Parameter::new("x0".to_string(), T1::type_info()),
                 Parameter::new("x1".to_string(), T2::type_info()),

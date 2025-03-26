@@ -1,25 +1,25 @@
-use crate::lang::function::FunctionSignature;
+use crate::lang::function::Signature;
 
 /// Represents `extern "C" fn()` types in Rust and `(*f)().` in C.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct FnPointer {
     name: Option<String>,
-    signature: Box<FunctionSignature>,
+    signature: Box<Signature>,
 }
 
 impl FnPointer {
     #[must_use]
-    pub fn new(signature: FunctionSignature) -> Self {
+    pub fn new(signature: Signature) -> Self {
         Self { signature: Box::new(signature), name: None }
     }
 
     #[must_use]
-    pub fn new_named(signature: FunctionSignature, name: String) -> Self {
+    pub fn new_named(signature: Signature, name: String) -> Self {
         Self { signature: Box::new(signature), name: Some(name) }
     }
 
     #[must_use]
-    pub const fn signature(&self) -> &FunctionSignature {
+    pub const fn signature(&self) -> &Signature {
         &self.signature
     }
 

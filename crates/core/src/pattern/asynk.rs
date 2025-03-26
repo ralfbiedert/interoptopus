@@ -1,7 +1,7 @@
 //! Transparent `async fn` support over FFI.
 
 use crate::lang::TypeInfo;
-use crate::lang::{Documentation, FnPointer, FunctionSignature, Meta, Parameter, Primitive, Type};
+use crate::lang::{Docs, FnPointer, Meta, Parameter, Primitive, Signature, Type};
 use crate::pattern;
 use crate::pattern::TypePattern;
 use std::ffi::c_void;
@@ -63,8 +63,8 @@ unsafe impl<T: TypeInfo> TypeInfo for AsyncCallback<T> {
             Parameter::new("callback_data".to_string(), Type::ReadPointer(Box::new(Type::Primitive(Primitive::Void)))),
         ];
 
-        let meta = Meta::with_documentation(Documentation::new());
-        let sig = FunctionSignature::new(params, rval);
+        let meta = Meta::with_docs(Docs::new());
+        let sig = Signature::new(params, rval);
         let name = format!("AsyncCallback{}", T::type_info().name_within_lib());
         let fn_pointer = FnPointer::new_named(sig, name);
         let named_callback = pattern::AsyncCallback::with_meta(fn_pointer, meta);

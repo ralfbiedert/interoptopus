@@ -160,9 +160,9 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
     } else {
         quote! {
                 #({
-                    let documentation = ::interoptopus::lang::Documentation::from_line(#field_docs);
+                    let docs = ::interoptopus::lang::Docs::from_line(#field_docs);
                     let the_type = #field_type_info;
-                    let field = ::interoptopus::lang::Field::with_documentation(#field_names.to_string(), the_type, #field_visibilities, documentation);
+                    let field = ::interoptopus::lang::Field::with_docs(#field_names.to_string(), the_type, #field_visibilities, docs);
                     fields.push(field);
                 })*
         }
@@ -233,8 +233,8 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
                 unsafe impl #param_param ::interoptopus::lang::TypeInfo for #struct_ident #param_struct #param_where {
 
                     fn type_info() -> ::interoptopus::lang::Type {
-                        let documentation = ::interoptopus::lang::Documentation::from_line(#doc_line);
-                        let mut meta = ::interoptopus::lang::Meta::with_namespace_documentation(#namespace.to_string(), documentation);
+                        let docs = ::interoptopus::lang::Docs::from_line(#doc_line);
+                        let mut meta = ::interoptopus::lang::Meta::with_module_docs(#namespace.to_string(), docs);
                         let mut fields: ::std::vec::Vec<interoptopus::lang::Field> = ::std::vec::Vec::new();
                         let mut generics: ::std::vec::Vec<::std::string::String> = ::std::vec::Vec::new();
 

@@ -38,7 +38,7 @@
 //!
 
 use crate::backend::capitalize_first_letter;
-use crate::lang::{Composite, Documentation, Field, Meta, Primitive, Representation, Type, Visibility};
+use crate::lang::{Composite, Docs, Field, Meta, Primitive, Representation, Type, Visibility};
 use crate::lang::{Layout, TypeInfo};
 use crate::pattern::TypePattern;
 use std::marker::PhantomData;
@@ -125,17 +125,17 @@ where
 {
     #[rustfmt::skip]
     fn type_info() -> Type {
-        let doc_data = Documentation::from_line("Pointer to start of immutable data.");
-        let doc_len = Documentation::from_line("Number of elements.");
+        let doc_data = Docs::from_line("Pointer to start of immutable data.");
+        let doc_len = Docs::from_line("Number of elements.");
 
         let fields = vec![
-            Field::with_documentation("data".to_string(), Type::ReadPointer(Box::new(T::type_info())), Visibility::Private, doc_data),
-            Field::with_documentation("len".to_string(), Type::Primitive(Primitive::U64), Visibility::Private, doc_len),
+            Field::with_docs("data".to_string(), Type::ReadPointer(Box::new(T::type_info())), Visibility::Private, doc_data),
+            Field::with_docs("len".to_string(), Type::Primitive(Primitive::U64), Visibility::Private, doc_len),
         ];
 
-        let doc = Documentation::from_line("A pointer to an array of data someone else owns which may not be modified.");
+        let doc = Docs::from_line("A pointer to an array of data someone else owns which may not be modified.");
         let repr = Representation::new(Layout::C, None);
-        let meta = Meta::with_namespace_documentation(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
+        let meta = Meta::with_module_docs(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
         let name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
         let composite = Composite::with_meta_repr(format!("Slice{name}"), fields, meta, repr);
         let slice = SliceType::new(composite, T::type_info());
@@ -231,16 +231,16 @@ where
 {
     #[rustfmt::skip]
     fn type_info() -> Type {
-        let doc_data = Documentation::from_line("Pointer to start of mutable data.");
-        let doc_len = Documentation::from_line("Number of elements.");
+        let doc_data = Docs::from_line("Pointer to start of mutable data.");
+        let doc_len = Docs::from_line("Number of elements.");
         let fields = vec![
-            Field::with_documentation("data".to_string(), Type::ReadPointer(Box::new(T::type_info())), Visibility::Private, doc_data),
-            Field::with_documentation("len".to_string(), Type::Primitive(Primitive::U64), Visibility::Private, doc_len),
+            Field::with_docs("data".to_string(), Type::ReadPointer(Box::new(T::type_info())), Visibility::Private, doc_data),
+            Field::with_docs("len".to_string(), Type::Primitive(Primitive::U64), Visibility::Private, doc_len),
         ];
 
-        let doc = Documentation::from_line("A pointer to an array of data someone else owns which may be modified.");
+        let doc = Docs::from_line("A pointer to an array of data someone else owns which may be modified.");
         let repr = Representation::new(Layout::C, None);
-        let meta = Meta::with_namespace_documentation(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
+        let meta = Meta::with_module_docs(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
         let name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
         let composite = Composite::with_meta_repr(format!("SliceMut{name}"), fields, meta, repr);
         let slice = SliceType::new(composite, T::type_info());
