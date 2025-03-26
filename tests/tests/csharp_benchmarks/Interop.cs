@@ -7429,7 +7429,6 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Task Success2()
         {
-            var cs = new TaskCompletionSource();
             return Interop.service_async_success2(_context);
         }
 

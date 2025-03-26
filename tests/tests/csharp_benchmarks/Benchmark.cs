@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Interoptopus;
 using My.Company;
 using My.Company.Common;
@@ -68,11 +69,12 @@ static class Benchmark {
         result = MeasureResult.Measure(Iterations, () => Interop.pattern_string_2("hello world"));
         writer.Add("pattern_string_2('hello world')", result);
 
-        result = MeasureResult.Measure(Iterations, async () =>
-        {
-            await serviceAsync.Success2();
-        });
+        result = MeasureResult.Measure(Iterations, async () => { await new TaskCompletionSource().Task; });
+        writer.Add("await new TaskCompletionSource().Task", result);
+
+        result = MeasureResult.Measure(Iterations, async () => { await serviceAsync.Success2(); });
         writer.Add("await serviceAsync.Success()", result);
+
 
         writer.Write("RESULTS.md");
     }

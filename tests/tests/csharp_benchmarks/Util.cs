@@ -44,7 +44,7 @@ namespace Interoptopus
         public static MeasureResult Measure(uint n, Run r)
         {
 
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < n; i++)
             {
                 r.Invoke();
             }
@@ -74,7 +74,7 @@ namespace Interoptopus
 
         public void Add(string name, MeasureResult result)
         {
-            Console.WriteLine($"{name}: {result.MicroPer1000()}");
+            Console.WriteLine($"{name}: {result.MicroPer1000():F2}");
             Entries.Add(new Entry()
             {
                 Name = name,
@@ -127,7 +127,7 @@ profile: --release
             sw.Write(header);
             foreach (var entry in Entries)
             {
-                sw.WriteLine($"| `{entry.Name}` | {(long) entry.Result.MicroPer1000()} |");
+                sw.WriteLine($"| `{entry.Name}` | {(long) entry.Result.MicroPer1000():F2} |");
             }
         }
     }
