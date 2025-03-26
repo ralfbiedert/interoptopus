@@ -15,17 +15,53 @@ using My.Company.Common;
 
 namespace My.Company
 {
+
+    struct AsyncXX<T, E>
+    {
+        private readonly GCHandle _pinned;
+        private AsyncHelper _helper;
+
+        public AsyncXX()
+        {
+            _helper = new AsyncHelper((x) => {
+                var unmanaged = Marshal.PtrToStructure<ResultError.Unmanaged>(x);
+                var marshaller = new ResultError.Marshaller(unmanaged);
+                var managed = marshaller.ToManaged();
+                // if (managed.IsOk) { cs.SetResult(); }
+                // else { cs.SetException(new InteropException()); }
+            });
+        }
+
+        void Foo()
+        {
+
+        }
+    }
+
     public static partial class Interop
     {
+        private static readonly GCHandle _pinned;
+        private static readonly AsyncHelper _cb;
+        
         public const string NativeLib = "interoptopus_reference_project";
 
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 14644184848435680608ul)
+            if (api_version != 13717282704452174362ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (14644184848435680608). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (13717282704452174362). You probably forgot to update / copy either the bindings or the library.");
             }
+
+            _cb = new AsyncHelper((x) => {
+                var unmanaged = Marshal.PtrToStructure<ResultError.Unmanaged>(x);
+                var marshaller = new ResultError.Marshaller(unmanaged);
+                var managed = marshaller.ToManaged();
+                // if (managed.IsOk) { cs.SetResult(); }
+                // else { cs.SetException(new InteropException()); }
+            });
+            _pinned = GCHandle.Alloc(_cb);
+
         }
 
         public const byte U8 = (byte) 255;
@@ -1083,6 +1119,49 @@ namespace My.Company
                 s_wrapped.Dispose();
                 cb_wrapped.Dispose();
             }
+        }
+
+        [LibraryImport(NativeLib, EntryPoint = "service_async_success")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultError service_async_success(IntPtr _context, AsyncHelper _async_callback);
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static unsafe Task service_async_success(IntPtr _context)
+        {
+            var cs = new TaskCompletionSource();
+            GCHandle pinned = default;
+            var cb = new AsyncHelper((x) => {
+                var unmanaged = Marshal.PtrToStructure<ResultError.Unmanaged>(x);
+                var marshaller = new ResultError.Marshaller(unmanaged);
+                var managed = marshaller.ToManaged();
+                if (managed.IsOk) { cs.SetResult(); }
+                else { cs.SetException(new InteropException()); }
+                pinned.Free();
+            });
+            pinned = GCHandle.Alloc(cb);
+            try
+            {
+                service_async_success(_context, cb).AsOk();
+                return cs.Task;
+            }
+            finally
+            {
+            }
+            return cs.Task;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static unsafe Task service_async_success2(IntPtr _context, AsyncHelper cb, TaskCompletionSource cs)
+        {
+            try
+            {
+                service_async_success(_context, cb).AsOk();
+                return cs.Task;
+            }
+            finally
+            {
+            }
+            return cs.Task;
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_fail")]
@@ -7250,12 +7329,24 @@ namespace My.Company
     }
 
 
-
     public partial class ServiceAsync : IDisposable
     {
         private IntPtr _context;
 
-        private ServiceAsync() {}
+        private AsyncHelper _cb;
+        private GCHandle _pinned;
+
+        private ServiceAsync()
+        {
+            _cb = new AsyncHelper((x) => {
+                var unmanaged = Marshal.PtrToStructure<ResultError.Unmanaged>(x);
+                var marshaller = new ResultError.Marshaller(unmanaged);
+                var managed = marshaller.ToManaged();
+                // if (managed.IsOk) { cs.SetResult(); }
+                // else { cs.SetException(new InteropException()); }
+            });
+            _pinned = GCHandle.Alloc(_cb);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static ServiceAsync New()
@@ -7305,6 +7396,19 @@ namespace My.Company
         public void CallbackString(string s, StringCallbackDelegate cb)
         {
             Interop.service_async_callback_string(_context, s, cb);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Task Success()
+        {
+            return Interop.service_async_success(_context);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Task Success2()
+        {
+            var cs = new TaskCompletionSource();
+            return Interop.service_async_success2(_context, _cb, cs);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]

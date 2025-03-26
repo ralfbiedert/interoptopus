@@ -1,6 +1,8 @@
 using System;
+using System.Runtime.InteropServices;
 using Interoptopus;
 using My.Company;
+using My.Company.Common;
 
 static class Benchmark {
 
@@ -20,6 +22,7 @@ static class Benchmark {
         var long_vec = new Vec3f32[100_000];
         var tupled = new Tupled();
         var callback_huge_prealloc = new CallbackHugeVecSlice(x => x[0]);
+        var serviceAsync = ServiceAsync.New();
 
         MeasureResult.Calibrate(Iterations, () => {});
 
@@ -64,6 +67,12 @@ static class Benchmark {
 
         result = MeasureResult.Measure(Iterations, () => Interop.pattern_string_2("hello world"));
         writer.Add("pattern_string_2('hello world')", result);
+
+        result = MeasureResult.Measure(Iterations, async () =>
+        {
+            await serviceAsync.Success();
+        });
+        writer.Add("await serviceAsync.Success()", result);
 
         writer.Write("RESULTS.md");
     }

@@ -56,6 +56,10 @@ impl ServiceAsync {
         cb.call(s.clone());
     }
 
+    pub async fn success(_this: This) -> ffi::Result<(), Error> {
+        ffi::Result::Ok(())
+    }
+
     pub async fn fail(_this: This) -> ffi::Result<(), Error> {
         ffi::Result::Err(Error::Fail)
     }
