@@ -21,11 +21,11 @@ use crate::interop::patterns::write_patterns;
 use crate::interop::types::write_type_definitions;
 use derive_builder::Builder;
 use interoptopus::backend::IndentWriter;
-use interoptopus::backend::{NamespaceMappings, is_global_type};
+use interoptopus::backend::{is_global_type, NamespaceMappings};
 use interoptopus::inventory::{Bindings, Inventory};
 use interoptopus::lang::{Constant, Function, FunctionSignature, Meta, Type};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{Error, indented};
+use interoptopus::{indented, Error};
 
 /// How to convert from Rust function names to C#
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
@@ -174,14 +174,14 @@ impl Interop {
             .to_string()
     }
 
-    fn inline_hint(&self, w: &mut IndentWriter, level: usize) -> Result<(), Error> {
-        for _ in 0..level {
+    fn inline_hint(&self, w: &mut IndentWriter, indents: usize) -> Result<(), Error> {
+        for _ in 0..indents {
             w.indent();
         }
 
         indented!(w, r"[MethodImpl(MethodImplOptions.AggressiveOptimization)]")?;
 
-        for _ in 0..level {
+        for _ in 0..indents {
             w.unindent();
         }
 

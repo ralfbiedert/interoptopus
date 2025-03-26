@@ -1,10 +1,10 @@
-use crate::Interop;
 use crate::converter::{to_typespecifier_in_field, to_typespecifier_in_field_unmanaged};
 use crate::interop::docs::write_documentation;
+use crate::Interop;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Enum, Type, VariantKind};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{Error, indented};
+use interoptopus::{indented, Error};
 
 pub fn write_type_definition_enum(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
     i.debug(w, "write_type_definition_enum")?;
@@ -34,6 +34,7 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
     indented!(w, [()], r"public unsafe struct Unmanaged")?;
     indented!(w, [()], r"{{")?;
     write_type_definition_enum_variant_fields_unmanaged(i, w, the_type)?;
+    i.inline_hint(w, 2)?;
     indented!(w, [()()], r"public {name} ToManaged()")?;
     indented!(w, [()()], r"{{")?;
     indented!(w, [()()()], r"var marshaller = new Marshaller(this);")?;
@@ -43,6 +44,7 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
     indented!(w, [()], r"}}")?;
     w.newline()?;
 
+    i.inline_hint(w, 1)?;
     indented!(w, [()], r"public Unmanaged ToUnmanaged()")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"var marshaller = new Marshaller(this);")?;
@@ -63,12 +65,17 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
     indented!(w, [()], r"private {} _managed; // Used when converting managed -> unmanaged", name)?;
     indented!(w, [()], r"private Unmanaged _unmanaged; // Used when converting unmanaged -> managed")?;
     w.newline()?;
+    i.inline_hint(w, 1)?;
     indented!(w, [()], r"public Marshaller({} managed) {{ _managed = managed; }}", name)?;
+    i.inline_hint(w, 1)?;
     indented!(w, [()], r"public Marshaller(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
     w.newline()?;
+    i.inline_hint(w, 1)?;
     indented!(w, [()], r"public void FromManaged({} managed) {{ _managed = managed; }}", name)?;
+    i.inline_hint(w, 1)?;
     indented!(w, [()], r"public void FromUnmanaged(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
     w.newline()?;
+    i.inline_hint(w, 1)?;
     indented!(w, [()], r"public unsafe Unmanaged ToUnmanaged()")?;
     indented!(w, [()], r"{{;")?;
     indented!(w, [()()], r"_unmanaged = new Unmanaged();")?;
@@ -79,6 +86,7 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
     indented!(w, [()()], r"return _unmanaged;")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
+    i.inline_hint(w, 1)?;
     indented!(w, [()], r"public unsafe {} ToManaged()", name)?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"_managed = new {}();", name)?;

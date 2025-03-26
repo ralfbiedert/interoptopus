@@ -1,6 +1,6 @@
 use crate::Interop;
 use interoptopus::backend::IndentWriter;
-use interoptopus::{Error, indented};
+use interoptopus::{indented, Error};
 
 pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     if i.write_types.write_interoptopus_globals() {
@@ -204,8 +204,9 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         i.inline_hint(w, 2)?;
         indented!(w, [()()], r"public unsafe Unmanaged ToUnmanaged()")?;
         indented!(w, [()()], r"{{")?;
-        indented!(w, [()()()], r"var utf8Bytes = Encoding.UTF8.GetBytes(_managed._s);")?;
-        indented!(w, [()()()], r"var len = utf8Bytes.Length;")?;
+        indented!(w, [()()()], r"var source = _managed._s.AsSpan();")?;
+        indented!(w, [()()()], r"Span<byte> utf8Bytes = stackalloc byte[Encoding.UTF8.GetByteCount(source)];")?;
+        indented!(w, [()()()], r"var len = Encoding.UTF8.GetBytes(source, utf8Bytes);")?;
         w.newline()?;
         indented!(w, [()()()], r"fixed (byte* p = utf8Bytes)")?;
         indented!(w, [()()()], r"{{")?;

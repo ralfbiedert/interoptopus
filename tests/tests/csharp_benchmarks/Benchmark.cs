@@ -19,7 +19,6 @@ static class Benchmark {
         var short_byte = new byte[10];
         var long_vec = new Vec3f32[100_000];
         var tupled = new Tupled();
-
         var callback_huge_prealloc = new CallbackHugeVecSlice(x => x[0]);
 
         MeasureResult.Calibrate(Iterations, () => {});
@@ -39,14 +38,15 @@ static class Benchmark {
         result = MeasureResult.Measure(Iterations, () => Interop.primitive_u64(0));
         writer.Add("primitive_u64(0)", result);
 
-        result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_option_1(new OptionInner()));
-        writer.Add("pattern_ffi_option_1(new OptionInner())", result);
+        result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_option_1(OptionInner.None));
+        writer.Add("pattern_ffi_option_1(OptionInner.None)", result);
 
         result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_slice_delegate(x => x[0]));
         writer.Add("pattern_ffi_slice_delegate(x => x[0])", result);
 
         result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_slice_delegate_huge(x => x[0]));
         writer.Add("pattern_ffi_slice_delegate_huge(x => x[0])", result);
+
 
         result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_slice_delegate_huge(callback_huge_prealloc));
         writer.Add("pattern_ffi_slice_delegate_huge(callback_huge_prealloc)", result);
