@@ -1077,6 +1077,8 @@ RESULTCONSTPTRSERVICESTRINGSERROR service_strings_destroy(SERVICESTRINGS* _CONTE
 
 RESULTCONSTPTRSERVICESTRINGSERROR service_strings_new();
 
+RESULTCONSTPTRSERVICESTRINGSERROR service_strings_new_string(UTF8STRING X);
+
 void service_strings_pass_cstr(SERVICESTRINGS* _CONTEXT, const char* ANON1);
 
 const char* service_strings_return_cstr(SERVICESTRINGS* _CONTEXT);

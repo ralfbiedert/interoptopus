@@ -101,9 +101,9 @@ pub fn write_pattern_service_method(
                     to_invoke.push(name.to_string());
                 }
             }
-            // These two are a particularity how we generate overloads. Basically, we
-            // we (for now) can only generate one base method and one overload.
-            // Since async methods have an automatic overload due to the callbacks,
+            // These two are a particularity based on how we generate overloads.
+            // For now, we can only generate one base method and one overload.
+            // Since async methods have an automatic overload due to the callback,
             // we have to bend the string type to match the string mapping used there.
             // In the future we should probably support more overload permutations we can
             // remove this special case.

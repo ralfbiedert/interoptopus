@@ -1,8 +1,15 @@
 using My.Company;
+using My.Company.Common;
 using Xunit;
 
 public class TestPatternServicesString
 {
+    [Fact]
+    public void NewStr()
+    {
+        ServiceStrings.NewString("hello world".Utf8()).Dispose();
+    }
+
     [Fact]
     public void CallbackString()
     {

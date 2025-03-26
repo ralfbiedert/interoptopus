@@ -95,5 +95,4 @@ public class TestPatternServicesAsync
 
         Assert.True(exceptionThrown);
     }
-
 }

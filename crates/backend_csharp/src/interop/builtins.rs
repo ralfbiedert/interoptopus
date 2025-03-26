@@ -239,6 +239,11 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         w.newline()?;
 
         // --------------------------------
+
+        indented!(w, [()], r"public static class StringExtensions")?;
+        indented!(w, [()], r"{{")?;
+        indented!(w, [()()], r"public static Utf8String Utf8(this string s) {{ return new Utf8String(s); }}")?;
+        indented!(w, [()], r"}}")?;
     }
 
     Ok(())

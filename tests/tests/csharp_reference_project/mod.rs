@@ -5,7 +5,7 @@ use interoptopus_reference_project::ffi_inventory;
 use tests::backend_csharp::{common_namespace_mappings, run_dotnet_command_if_installed};
 use tests::validate_output;
 
-const DEBUG: bool = true;
+const DEBUG: bool = false;
 
 #[test]
 fn reference_benchmarks_prerequisites() -> Result<(), Error> {

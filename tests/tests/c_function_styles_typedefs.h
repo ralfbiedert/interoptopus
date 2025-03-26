@@ -1077,6 +1077,8 @@ typedef RESULTCONSTPTRSERVICESTRINGSERROR (*service_strings_destroy)(SERVICESTRI
 
 typedef RESULTCONSTPTRSERVICESTRINGSERROR (*service_strings_new)();
 
+typedef RESULTCONSTPTRSERVICESTRINGSERROR (*service_strings_new_string)(UTF8STRING);
+
 typedef void (*service_strings_pass_cstr)(SERVICESTRINGS*, const char*);
 
 typedef const char* (*service_strings_return_cstr)(SERVICESTRINGS*);

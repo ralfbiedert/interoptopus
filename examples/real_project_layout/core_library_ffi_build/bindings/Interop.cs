@@ -650,4 +650,8 @@ namespace My.Company
         }
     }
 
+        public static class StringExtensions
+        {
+            public static Utf8String Utf8(this string s) { return new Utf8String(s); }
+        }
 }

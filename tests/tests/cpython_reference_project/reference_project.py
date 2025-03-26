@@ -172,6 +172,7 @@ def init_lib(path):
     c_lib.service_various_slices_return_slice_mut.argtypes = [ctypes.c_void_p]
     c_lib.service_strings_destroy.argtypes = [ctypes.c_void_p]
     c_lib.service_strings_new.argtypes = []
+    c_lib.service_strings_new_string.argtypes = [Utf8String]
     c_lib.service_strings_pass_cstr.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_char)]
     c_lib.service_strings_return_cstr.argtypes = [ctypes.c_void_p]
     c_lib.service_strings_callback_string.argtypes = [ctypes.c_void_p, Utf8String, ctypes.CFUNCTYPE(None, Utf8String, ctypes.c_void_p)]
@@ -316,6 +317,7 @@ def init_lib(path):
     c_lib.service_various_slices_return_slice_mut.restype = SliceMutU32
     c_lib.service_strings_destroy.restype = ResultConstPtrServiceStringsError
     c_lib.service_strings_new.restype = ResultConstPtrServiceStringsError
+    c_lib.service_strings_new_string.restype = ResultConstPtrServiceStringsError
     c_lib.service_strings_return_cstr.restype = ctypes.POINTER(ctypes.c_char)
 
 
@@ -3062,6 +3064,13 @@ class ServiceStrings:
     def new() -> ServiceStrings:
         """"""
         ctx = c_lib.service_strings_new().t
+        self = ServiceStrings(ServiceStrings.__api_lock, ctx)
+        return self
+
+    @staticmethod
+    def new_string() -> ServiceStrings:
+        """"""
+        ctx = c_lib.service_strings_new_string().t
         self = ServiceStrings(ServiceStrings.__api_lock, ctx)
         return self
 

@@ -13,6 +13,10 @@ impl ServiceStrings {
         ffi::Result::Ok(Self {})
     }
 
+    pub fn new_string(_x: ffi::String) -> ffi::Result<Self, Error> {
+        ffi::Result::Ok(Self {})
+    }
+
     pub fn pass_cstr(&mut self, _: ffi::CStrPointer) {}
 
     pub fn return_cstr(&mut self) -> ffi::CStrPointer {

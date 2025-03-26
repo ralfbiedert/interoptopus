@@ -164,7 +164,7 @@ pub fn to_typespecifier_in_param(x: &Type) -> String {
             Type::ReadPointer(_) => "ref IntPtr".to_string(),
             Type::ReadWritePointer(_) => "ref IntPtr".to_string(),
             Type::Pattern(TypePattern::CChar) => "IntPtr".to_string(),
-            Type::Pattern(TypePattern::Slice(y)) => format!("ref {}>", composite_to_typename(y.composite_type())),
+            Type::Pattern(TypePattern::Slice(y)) => format!("ref {}", composite_to_typename(y.composite_type())),
             Type::Pattern(TypePattern::SliceMut(y)) => format!("ref {}", composite_to_typename(y.composite_type())),
             _ => format!("ref {}", to_typespecifier_in_param(z)),
         },

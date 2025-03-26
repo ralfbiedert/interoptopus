@@ -22,9 +22,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 8157956992078584141ul)
+            if (api_version != 14644184848435680608ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (8157956992078584141). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (14644184848435680608). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -1536,6 +1536,24 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceStringsError service_strings_new();
 
+
+        [LibraryImport(NativeLib, EntryPoint = "service_strings_new_string")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultConstPtrServiceStringsError service_strings_new_string(Utf8String x);
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static unsafe ResultConstPtrServiceStringsError service_strings_new_string(string x)
+        {
+            var x_wrapped = new Utf8String(x);
+            try
+            {
+                return service_strings_new_string(x_wrapped);
+            }
+            finally
+            {
+                x_wrapped.Dispose();
+            }
+        }
 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_pass_cstr")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -10151,6 +10169,14 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static ServiceStrings NewString(Utf8String x)
+        {
+            var self = new ServiceStrings();
+            self._context = Interop.service_strings_new_string(x).AsOk();
+            return self;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
             Interop.service_strings_destroy(_context).AsOk();
@@ -10382,4 +10408,8 @@ namespace My.Company
         }
     }
 
+        public static class StringExtensions
+        {
+            public static Utf8String Utf8(this string s) { return new Utf8String(s); }
+        }
 }

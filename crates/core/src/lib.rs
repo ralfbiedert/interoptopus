@@ -27,7 +27,6 @@
 //! ```rust
 //! # use interoptopus::{ffi_function, ffi_type, function};
 //! # use interoptopus::inventory::{Inventory, InventoryBuilder};
-//! #
 //! #[ffi_type]
 //! pub struct Vec2 {
 //!     pub x: f32,
@@ -144,7 +143,7 @@
 //! [license-badge]: https://img.shields.io/badge/license-MIT-blue.svg
 //! [docs.rs-badge]: https://docs.rs/interoptopus/badge.svg
 //! [docs.rs-url]: https://docs.rs/interoptopus/
-//! [rust-version-badge]: https://img.shields.io/badge/rust-1.83%2B-blue.svg?maxAge=3600
+//! [rust-version-badge]: https://img.shields.io/badge/rust-1.85%2B-blue.svg?maxAge=3600
 //! [rust-version-url]: https://github.com/ralfbiedert/interoptopus
 //! [rust-build-badge]: https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml/badge.svg
 //! [rust-build-url]: https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml
