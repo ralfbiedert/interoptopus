@@ -24,7 +24,6 @@ you actually wanted to expose.
 ### Code you write ...
 
 ```rust
-#
 #[ffi_type]
 pub struct Vec2 {
     pub x: f32,
@@ -92,17 +91,27 @@ Detailed call cost tables can be found here: <sup>🔥</sup>
 - [**C# call overhead**](https://github.com/ralfbiedert/interoptopus/blob/master/tests/tests/csharp_benchmarks/RESULTS.md)
 - [**Python call overhead**](https://github.com/ralfbiedert/interoptopus/blob/master/tests/tests/cpython_benchmarks/RESULTS.md)
 
-For a quick overview, this table lists the most common call types in _ns / call_:
+For a quick overview, this table lists some common round trip times in _ns / call_:
 
 | Construct | C# | Python |
 | --- | --- | --- |
-| `primitive_void()` | 7 | 272 |
-| `primitive_u32(0)` | 8 | 392 |
-| `many_args_5(0, 0, 0, 0, 0)` | 10 | 786 |
-| `callback(x => x, 0)` | 43 | 1168 |
+| `primitive_void()` | 3 | (TODO) |
+| `primitive_u64(0)` | 4 | |
+| `pattern_option(Option.None)` | 14 | |
+| `pattern_delegate_adhoc(x => x[0])` | 477 <sup>1</sup> |
+| `pattern_delegate_retained(delegate)` | 21 | |
+| `pattern_ascii_pointer("hello world")` | 20 | |
+| `pattern_utf8_string("hello world")` | 52 | |
+| `await serviceAsync.Success()` | 361 <sup>2</sup> | |
+
+ <sup>1</sup> First time delegate creation and pinning is expensive in C# (100's of ns). We
+ recommend you retain the delegate instead for >20x faster calls, [see for example here](https://github.com/ralfbiedert/interoptopus/blob/master/tests/tests/csharp_reference_project/Test.Pattern.Callbacks.cs).<br/>
+ <sup>2</sup> Preliminary numbers for full round trip to tokio and back. Although async calls have some intrinsic overhead
+  (e.g., spawning a new `TaskCompletionSource` is ~100ns), some of that overhead appears to be a
+  benchmarking effect when spin-waiting for a newly spawned task. In essence, if your application
+  benefits from async this overhead is negligible, but simple getters or setters shouldn't needlessly be made async.
 
 <br/>
-
 
 
 ### Feature Flags
@@ -141,7 +150,7 @@ PRs are very welcome!
 [license-badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [docs.rs-badge]: https://docs.rs/interoptopus/badge.svg
 [docs.rs-url]: https://docs.rs/interoptopus/
-[rust-version-badge]: https://img.shields.io/badge/rust-1.83%2B-blue.svg?maxAge=3600
+[rust-version-badge]: https://img.shields.io/badge/rust-1.85%2B-blue.svg?maxAge=3600
 [rust-version-url]: https://github.com/ralfbiedert/interoptopus
 [rust-build-badge]: https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml/badge.svg
 [rust-build-url]: https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml
