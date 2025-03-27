@@ -75,7 +75,7 @@
 //! ## Supported Rust Constructs
 //!
 //! See the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src) for an overview:
-//! - [functions](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/functions.rs) (freestanding functions and delegates)
+//! - [functions](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/functions) (freestanding functions and delegates)
 //! - [types](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/types) (composites, enums, opaques, references, ...)
 //! - [constants](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/constants.rs) (primitive constants; results of const evaluation)
 //! - [patterns](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/patterns) (ASCII pointers, options, slices, classes, ...)
