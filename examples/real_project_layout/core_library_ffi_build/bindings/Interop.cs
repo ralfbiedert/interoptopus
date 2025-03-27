@@ -436,12 +436,13 @@ namespace My.Company
         public void Dispose()
         {
             Interop.game_engine_destroy(_context).AsOk();
+            _context = IntPtr.Zero;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public ResultError PlaceObject([MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position)
+        public void PlaceObject([MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position)
         {
-            return Interop.game_engine_place_object(_context, name, position);
+            Interop.game_engine_place_object(_context, name, position).AsOk();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]

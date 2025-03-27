@@ -9366,6 +9366,7 @@ namespace My.Company
         public static ServiceAsync New()
         {
             var self = new ServiceAsync();
+            return Interop.service_async_new().AsOk();
             self._context = Interop.service_async_new().AsOk();
             return self;
         }
@@ -9373,6 +9374,7 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
+            return Interop.service_async_destroy(_context).AsOk();
             Interop.service_async_destroy(_context).AsOk();
         }
 
@@ -9380,29 +9382,34 @@ namespace My.Company
         public Task<ulong> ReturnAfterMs(ulong x, ulong ms)
         {
             return Interop.service_async_return_after_ms(_context, x, ms);
+            Interop.service_async_return_after_ms(_context, x, ms).AsOk();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Task<NestedArray> ProcessStruct(NestedArray x)
         {
             return Interop.service_async_process_struct(_context, x);
+            Interop.service_async_process_struct(_context, x).AsOk();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Task<string> HandleString(string s)
         {
             return Interop.service_async_handle_string(_context, s);
+            Interop.service_async_handle_string(_context, s).AsOk();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Task<UseString> HandleNestedString(string s)
         {
             return Interop.service_async_handle_nested_string(_context, s);
+            Interop.service_async_handle_nested_string(_context, s).AsOk();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void CallbackString(Utf8String s, StringCallback cb)
         {
+            Interop.service_async_callback_string(_context, s, cb);
             Interop.service_async_callback_string(_context, s, cb);
         }
 
@@ -9416,17 +9423,20 @@ namespace My.Company
         public Task Success()
         {
             return Interop.service_async_success(_context);
+            Interop.service_async_success(_context).AsOk();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Task Fail()
         {
             return Interop.service_async_fail(_context);
+            Interop.service_async_fail(_context).AsOk();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Bad()
         {
+            Interop.service_async_bad(_context);
             Interop.service_async_bad(_context);
         }
 
@@ -9444,6 +9454,7 @@ namespace My.Company
         public static ServiceBasic New()
         {
             var self = new ServiceBasic();
+            return Interop.service_basic_new().AsOk();
             self._context = Interop.service_basic_new().AsOk();
             return self;
         }
@@ -9451,6 +9462,7 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
+            return Interop.service_basic_destroy(_context).AsOk();
             Interop.service_basic_destroy(_context).AsOk();
         }
 
@@ -9468,6 +9480,7 @@ namespace My.Company
         public static ServiceMain New(uint value)
         {
             var self = new ServiceMain();
+            return Interop.service_main_new(value).AsOk();
             self._context = Interop.service_main_new(value).AsOk();
             return self;
         }
@@ -9475,6 +9488,7 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
+            return Interop.service_main_destroy(_context).AsOk();
             Interop.service_main_destroy(_context).AsOk();
         }
 
@@ -9492,6 +9506,7 @@ namespace My.Company
         public static ServiceDependent FromMain(IntPtr main)
         {
             var self = new ServiceDependent();
+            return Interop.service_dependent_from_main(main).AsOk();
             self._context = Interop.service_dependent_from_main(main).AsOk();
             return self;
         }
@@ -9499,12 +9514,14 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
+            return Interop.service_dependent_destroy(_context).AsOk();
             Interop.service_dependent_destroy(_context).AsOk();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public uint Get()
         {
+            return Interop.service_dependent_get(_context);
             return Interop.service_dependent_get(_context);
         }
 
@@ -9522,6 +9539,7 @@ namespace My.Company
         public static ServiceResult New()
         {
             var self = new ServiceResult();
+            return Interop.service_result_new().AsOk();
             self._context = Interop.service_result_new().AsOk();
             return self;
         }
@@ -9529,13 +9547,15 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
+            return Interop.service_result_destroy(_context).AsOk();
             Interop.service_result_destroy(_context).AsOk();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public ResultError Test()
         {
-            return Interop.service_result_test(_context);
+            Interop.service_result_test(_context).AsOk();
+            Interop.service_result_test(_context).AsOk();
         }
 
         public IntPtr Context => _context;
@@ -9553,6 +9573,7 @@ namespace My.Company
         public static ServiceOnPanic New()
         {
             var self = new ServiceOnPanic();
+            return Interop.service_on_panic_new().AsOk();
             self._context = Interop.service_on_panic_new().AsOk();
             return self;
         }
@@ -9560,6 +9581,7 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
+            return Interop.service_on_panic_destroy(_context).AsOk();
             Interop.service_on_panic_destroy(_context).AsOk();
         }
 
@@ -9568,13 +9590,15 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public ResultError ReturnResult(uint anon1)
         {
-            return Interop.service_on_panic_return_result(_context, anon1);
+            Interop.service_on_panic_return_result(_context, anon1).AsOk();
+            Interop.service_on_panic_return_result(_context, anon1).AsOk();
         }
 
         /// Methods returning a value need an `on_panic` annotation.
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public uint ReturnDefaultValue(uint x)
         {
+            return Interop.service_on_panic_return_default_value(_context, x);
             return Interop.service_on_panic_return_default_value(_context, x);
         }
 
@@ -9583,6 +9607,8 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public string ReturnUbOnPanic()
         {
+            var s = Interop.service_on_panic_return_ub_on_panic(_context);
+            return Marshal.PtrToStringAnsi(s);
             var s = Interop.service_on_panic_return_ub_on_panic(_context);
             return Marshal.PtrToStringAnsi(s);
         }
@@ -9602,6 +9628,7 @@ namespace My.Company
         public static ServiceCallbacks New()
         {
             var self = new ServiceCallbacks();
+            return Interop.service_callbacks_new().AsOk();
             self._context = Interop.service_callbacks_new().AsOk();
             return self;
         }
@@ -9609,13 +9636,15 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
+            return Interop.service_callbacks_destroy(_context).AsOk();
             Interop.service_callbacks_destroy(_context).AsOk();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public ResultError CallbackSimple(MyCallback callback)
         {
-            return Interop.service_callbacks_callback_simple(_context, callback);
+            Interop.service_callbacks_callback_simple(_context, callback).AsOk();
+            Interop.service_callbacks_callback_simple(_context, callback).AsOk();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -9627,7 +9656,8 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public ResultError CallbackFfiReturn(SumDelegateReturn callback)
         {
-            return Interop.service_callbacks_callback_ffi_return(_context, callback);
+            Interop.service_callbacks_callback_ffi_return(_context, callback).AsOk();
+            Interop.service_callbacks_callback_ffi_return(_context, callback).AsOk();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -9639,7 +9669,8 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public ResultError CallbackWithSlice(SumDelegateReturn callback, SliceI32 input)
         {
-            return Interop.service_callbacks_callback_with_slice(_context, callback, input);
+            Interop.service_callbacks_callback_with_slice(_context, callback, input).AsOk();
+            Interop.service_callbacks_callback_with_slice(_context, callback, input).AsOk();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -9652,12 +9683,14 @@ namespace My.Company
         public void SetDelegateTable(CallbackTable table)
         {
             Interop.service_callbacks_set_delegate_table(_context, table);
+            Interop.service_callbacks_set_delegate_table(_context, table);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public ResultError InvokeDelegates()
         {
-            return Interop.service_callbacks_invoke_delegates(_context);
+            Interop.service_callbacks_invoke_delegates(_context).AsOk();
+            Interop.service_callbacks_invoke_delegates(_context).AsOk();
         }
 
         public IntPtr Context => _context;
@@ -9674,6 +9707,7 @@ namespace My.Company
         public static ServiceIgnoringMethods New()
         {
             var self = new ServiceIgnoringMethods();
+            return Interop.service_ignoring_methods_new().AsOk();
             self._context = Interop.service_ignoring_methods_new().AsOk();
             return self;
         }
@@ -9681,6 +9715,7 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
+            return Interop.service_ignoring_methods_destroy(_context).AsOk();
             Interop.service_ignoring_methods_destroy(_context).AsOk();
         }
 
@@ -9699,6 +9734,7 @@ namespace My.Company
         public static ServiceMultipleCtors NewWith(uint some_value)
         {
             var self = new ServiceMultipleCtors();
+            return Interop.service_multiple_ctors_new_with(some_value).AsOk();
             self._context = Interop.service_multiple_ctors_new_with(some_value).AsOk();
             return self;
         }
@@ -9707,6 +9743,7 @@ namespace My.Company
         public static ServiceMultipleCtors NewWithout()
         {
             var self = new ServiceMultipleCtors();
+            return Interop.service_multiple_ctors_new_without().AsOk();
             self._context = Interop.service_multiple_ctors_new_without().AsOk();
             return self;
         }
@@ -9715,6 +9752,7 @@ namespace My.Company
         public static ServiceMultipleCtors NewWithString([MarshalAs(UnmanagedType.LPStr)] string anon0)
         {
             var self = new ServiceMultipleCtors();
+            return Interop.service_multiple_ctors_new_with_string(anon0).AsOk();
             self._context = Interop.service_multiple_ctors_new_with_string(anon0).AsOk();
             return self;
         }
@@ -9723,6 +9761,7 @@ namespace My.Company
         public static ServiceMultipleCtors NewFailing(byte some_value)
         {
             var self = new ServiceMultipleCtors();
+            return Interop.service_multiple_ctors_new_failing(some_value).AsOk();
             self._context = Interop.service_multiple_ctors_new_failing(some_value).AsOk();
             return self;
         }
@@ -9730,6 +9769,7 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
+            return Interop.service_multiple_ctors_destroy(_context).AsOk();
             Interop.service_multiple_ctors_destroy(_context).AsOk();
         }
 
@@ -9748,6 +9788,7 @@ namespace My.Company
         public static ServiceVariousSlices New()
         {
             var self = new ServiceVariousSlices();
+            return Interop.service_various_slices_new().AsOk();
             self._context = Interop.service_various_slices_new().AsOk();
             return self;
         }
@@ -9755,12 +9796,14 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
+            return Interop.service_various_slices_destroy(_context).AsOk();
             Interop.service_various_slices_destroy(_context).AsOk();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public byte MutSelf(SliceU8 slice)
         {
+            return Interop.service_various_slices_mut_self(_context, slice);
             return Interop.service_various_slices_mut_self(_context, slice);
         }
 
@@ -9775,6 +9818,7 @@ namespace My.Company
         public void MutSelfVoid(SliceBool slice)
         {
             Interop.service_various_slices_mut_self_void(_context, slice);
+            Interop.service_various_slices_mut_self_void(_context, slice);
         }
 
         /// Single line.
@@ -9788,11 +9832,13 @@ namespace My.Company
         public byte MutSelfRef(ref byte x, ref byte y)
         {
             return Interop.service_various_slices_mut_self_ref(_context, ref x, ref y);
+            return Interop.service_various_slices_mut_self_ref(_context, ref x, ref y);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public byte MutSelfRefSlice(ref byte x, ref byte y, SliceU8 slice)
         {
+            return Interop.service_various_slices_mut_self_ref_slice(_context, ref x, ref y, slice);
             return Interop.service_various_slices_mut_self_ref_slice(_context, ref x, ref y, slice);
         }
 
@@ -9806,6 +9852,7 @@ namespace My.Company
         public byte MutSelfRefSliceLimited(ref byte x, ref byte y, SliceU8 slice, SliceU8 slice2)
         {
             return Interop.service_various_slices_mut_self_ref_slice_limited(_context, ref x, ref y, slice, slice2);
+            return Interop.service_various_slices_mut_self_ref_slice_limited(_context, ref x, ref y, slice, slice2);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -9817,7 +9864,8 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public ResultError MutSelfFfiError(SliceMutU8 slice)
         {
-            return Interop.service_various_slices_mut_self_ffi_error(_context, slice);
+            Interop.service_various_slices_mut_self_ffi_error(_context, slice).AsOk();
+            Interop.service_various_slices_mut_self_ffi_error(_context, slice).AsOk();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -9829,7 +9877,8 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public ResultError MutSelfNoError(SliceMutU8 slice)
         {
-            return Interop.service_various_slices_mut_self_no_error(_context, slice);
+            Interop.service_various_slices_mut_self_no_error(_context, slice).AsOk();
+            Interop.service_various_slices_mut_self_no_error(_context, slice).AsOk();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -9844,6 +9893,7 @@ namespace My.Company
         public SliceU32 ReturnSlice()
         {
             return Interop.service_various_slices_return_slice(_context);
+            return Interop.service_various_slices_return_slice(_context);
         }
 
         /// Warning, you _must_ discard the returned slice object before calling into this service
@@ -9851,6 +9901,7 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceMutU32 ReturnSliceMut()
         {
+            return Interop.service_various_slices_return_slice_mut(_context);
             return Interop.service_various_slices_return_slice_mut(_context);
         }
 
@@ -9869,6 +9920,7 @@ namespace My.Company
         public static ServiceStrings New()
         {
             var self = new ServiceStrings();
+            return Interop.service_strings_new().AsOk();
             self._context = Interop.service_strings_new().AsOk();
             return self;
         }
@@ -9877,6 +9929,7 @@ namespace My.Company
         public static ServiceStrings NewString(Utf8String x)
         {
             var self = new ServiceStrings();
+            return Interop.service_strings_new_string(x).AsOk();
             self._context = Interop.service_strings_new_string(x).AsOk();
             return self;
         }
@@ -9884,12 +9937,14 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
+            return Interop.service_strings_destroy(_context).AsOk();
             Interop.service_strings_destroy(_context).AsOk();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void PassCstr([MarshalAs(UnmanagedType.LPStr)] string anon1)
         {
+            Interop.service_strings_pass_cstr(_context, anon1);
             Interop.service_strings_pass_cstr(_context, anon1);
         }
 
@@ -9898,11 +9953,14 @@ namespace My.Company
         {
             var s = Interop.service_strings_return_cstr(_context);
             return Marshal.PtrToStringAnsi(s);
+            var s = Interop.service_strings_return_cstr(_context);
+            return Marshal.PtrToStringAnsi(s);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void CallbackString(Utf8String s, StringCallback cb)
         {
+            Interop.service_strings_callback_string(_context, s, cb);
             Interop.service_strings_callback_string(_context, s, cb);
         }
 

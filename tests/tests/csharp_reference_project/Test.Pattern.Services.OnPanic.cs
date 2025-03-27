@@ -8,7 +8,7 @@ public class TestPatternServicesOnPanic
     public void ReturnResult()
     {
         var service = ServiceOnPanic.New();
-        service.ReturnResult(123); // TODO: Should be .Ok()
+        service.ReturnResult(123);
         service.Dispose();
     }
 
@@ -16,7 +16,7 @@ public class TestPatternServicesOnPanic
     public void ReturnDefaultValue()
     {
         var service = ServiceOnPanic.New();
-        Assert.Equal(service.ReturnDefaultValue(123u), 123u);
+        Assert.Equal(123u, service.ReturnDefaultValue(123u));
         service.Dispose();
     }
 
@@ -24,7 +24,7 @@ public class TestPatternServicesOnPanic
     public void ReturnUbOnPanic()
     {
         var service = ServiceOnPanic.New();
-        Assert.Equal(service.ReturnUbOnPanic(), "Hello new_with");
+        Assert.Equal("Hello new_with", service.ReturnUbOnPanic());
         service.Dispose();
     }
 }

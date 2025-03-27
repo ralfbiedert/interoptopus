@@ -1,14 +1,15 @@
 use crate::converter::{
-    function_name_to_csharp_name, pattern_to_native_in_signature, to_typespecifier_in_async_fn_rval, to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval,
+    function_name_to_csharp_name, pattern_to_native_in_signature, to_typespecifier_in_async_fn_rval, to_typespecifier_in_field, to_typespecifier_in_param,
+    to_typespecifier_in_sync_fn_rval,
 };
 use crate::interop::docs::write_documentation;
 use crate::utils::sugared_return_type;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Function, Primitive, SugaredReturnType, Type};
-use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::service::ServiceDefinition;
-use interoptopus::{Error, indented};
+use interoptopus::pattern::TypePattern;
+use interoptopus::{indented, Error};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum MethodType {
@@ -139,8 +140,6 @@ pub fn write_pattern_service_method(
     let mut static_prefix = "";
 
     let rval = match async_rval {
-        // let fn_name = function_name_to_csharp_name(ctor, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix));
-        // let rval = format!("static {context_type_name}");
         SugaredReturnType::Sync(_) => match method_type {
             MethodType::Ctor => {
                 static_prefix = "static ";
@@ -148,6 +147,8 @@ pub fn write_pattern_service_method(
             }
             MethodType::Regular => match function.signature().rval() {
                 Type::Pattern(TypePattern::CStrPointer) => "string".to_string(),
+                Type::Pattern(TypePattern::Result(x)) if x.t().is_void() => "void".to_string(),
+                Type::Pattern(TypePattern::Result(x)) => to_typespecifier_in_field(x.t()),
                 x => to_typespecifier_in_sync_fn_rval(x),
             },
             MethodType::Dtor => "void".to_string(),
@@ -213,12 +214,12 @@ pub fn write_pattern_service_method(
     }
 
     // Determine return value behavior and write function call.
-    match function.signature().rval() {
-        Type::Pattern(TypePattern::CStrPointer) => {
+    match async_rval {
+        SugaredReturnType::Sync(Type::Pattern(TypePattern::CStrPointer)) => {
             indented!(w, [()], r"var s = {fn_call};")?;
             indented!(w, [()], r"return Marshal.PtrToStringAnsi(s);")?;
         }
-        Type::Primitive(Primitive::Void) => {
+        SugaredReturnType::Sync(Type::Primitive(Primitive::Void)) => {
             indented!(w, [()], r"{fn_call};",)?;
         }
         _ if matches!(method_type, MethodType::Ctor) => {
@@ -226,6 +227,13 @@ pub fn write_pattern_service_method(
         }
         _ if matches!(method_type, MethodType::Dtor) => {
             indented!(w, [()], r"{fn_call}.AsOk();")?;
+            indented!(w, [()], r"_context = IntPtr.Zero;")?;
+        }
+        SugaredReturnType::Sync(Type::Pattern(TypePattern::Result(x))) if x.t().is_void() => {
+            indented!(w, [()], r"{fn_call}.AsOk();")?;
+        }
+        SugaredReturnType::Sync(Type::Pattern(TypePattern::Result(x))) if !x.t().is_void() => {
+            indented!(w, [()], r"return {fn_call}.AsOk();")?;
         }
         _ => {
             indented!(w, [()], r"return {fn_call};")?;

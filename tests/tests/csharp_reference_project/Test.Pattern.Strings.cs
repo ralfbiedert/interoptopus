@@ -8,8 +8,7 @@ public class TestPatternStrings
     [Fact]
     public void pattern_ascii_pointer_1()
     {
-        var x = Interop.pattern_ascii_pointer_1("hello world");
-        Assert.Equal(x, 11u);
+        Assert.Equal(11u, Interop.pattern_ascii_pointer_1("hello world"));
     }
 
     [Fact]
@@ -20,37 +19,32 @@ public class TestPatternStrings
         // Assert.Equal(string.IsNullOrEmpty(rval));
     }
     
-
     [Fact]
     public void pattern_string_1()
     {
-        var i = new Utf8String("hello world");
-        var o = Interop.pattern_string_1(i);
-        Assert.Equal(o.String, "hello world");
+        Assert.Equal("hello world", Interop.pattern_string_1("hello world").String);
+        Assert.Equal("hello world", Interop.pattern_string_1("hello world".Utf8()).String);
     }
 
     [Fact]
     public void pattern_string_2()
     {
-        var l = Interop.pattern_string_2("hello world");
-        Assert.Equal(l, 11u);
+        Assert.Equal(11u, Interop.pattern_string_2("hello world"));
     }
 
     [Fact]
     public void pattern_string_3()
     {
-        var s = Interop.pattern_string_3();
-        Assert.Equal(s.String, "pattern_string_3");
+        Assert.Equal("pattern_string_3", Interop.pattern_string_3().String);
     }
-
 
     [Fact]
     public void pattern_string_4()
     {
         var w = new UseString { s1 = "hello", s2 = "world" };
         var s = Interop.pattern_string_4(w);
-        Assert.Equal(s.s1, "hello");
-        Assert.Equal(s.s2, "world");
+        Assert.Equal("hello", s.s1);
+        Assert.Equal("world", s.s2);
     }
 
     [Fact]
@@ -61,8 +55,8 @@ public class TestPatternStrings
 
         var y = new UseString { s1 = "", s2 = "" };
         Interop.pattern_string_6b(ref y).AsOk();
-        Assert.Equal(y.s1, "s1");
-        Assert.Equal(y.s2, "s2");
+        Assert.Equal("s1", y.s1);
+        Assert.Equal("s2", y.s2);
     }
 
     [Fact]
@@ -70,8 +64,8 @@ public class TestPatternStrings
     {
         var r1 = Interop.pattern_string_7(["hello", "world"], 0).AsOk();
         var r2 = Interop.pattern_string_7(["hello", "world"], 1).AsOk();
-        Assert.Equal(r1, "hello");
-        Assert.Equal(r2, "world");
+        Assert.Equal("hello", r1);
+        Assert.Equal("world", r2);
     }
 
     [Fact]
@@ -86,19 +80,19 @@ public class TestPatternStrings
         var r1 = Interop.pattern_string_8(x, 0).AsOk();
         var r2 = Interop.pattern_string_8(x, 1).AsOk();
 
-        Assert.Equal(r1.s1, "hello1");
-        Assert.Equal(r2.s2, "world2");
+        Assert.Equal("hello1", r1.s1);
+        Assert.Equal("world2", r2.s2);
     }
 
-        [Fact]
-        public void pattern_string_9()
-        {
-            var rval = Interop.pattern_string_9();
+    [Fact]
+    public void pattern_string_9()
+    {
+        var rval = Interop.pattern_string_9();
 
-            // Should not crash attempting to de-serialize a non-existing string
+        // Should not crash attempting to de-serialize a non-existing string
 
-            Assert.Equal(rval.AsErr(), Error.Fail);
-        }
+        Assert.Equal(rval.AsErr(), Error.Fail);
+    }
 
 
     [Fact]
