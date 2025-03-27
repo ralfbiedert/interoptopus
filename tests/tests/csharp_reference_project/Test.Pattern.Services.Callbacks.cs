@@ -17,7 +17,7 @@ public class TestPatternServicesCallbacks
             called = true;
             Assert.Equal(x, 0u);
             return x;
-        }).AsOk();
+        });
 
         Assert.True(called);
         callbacks.Dispose();
@@ -37,7 +37,7 @@ public class TestPatternServicesCallbacks
             Assert.Equal(y, 2);
             called = true;
             return ResultError.Ok;
-        }, slice).AsOk();
+        }, slice);
 
         Assert.True(called);
         callbacks.Dispose();

@@ -1,10 +1,10 @@
-use crate::converter::{to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval};
 use crate::Interop;
+use crate::converter::{to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval};
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Type;
-use interoptopus::pattern::callback::AsyncCallback;
 use interoptopus::pattern::TypePattern;
-use interoptopus::{indented, Error};
+use interoptopus::pattern::callback::AsyncCallback;
+use interoptopus::{Error, indented};
 
 pub fn write_pattern_async_trampoline(i: &Interop, w: &mut IndentWriter, asynk: &AsyncCallback) -> Result<(), Error> {
     i.debug(w, "write_pattern_async_trampoline")?;

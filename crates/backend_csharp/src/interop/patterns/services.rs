@@ -7,9 +7,9 @@ use crate::utils::sugared_return_type;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Function, Primitive, SugaredReturnType, Type};
-use interoptopus::pattern::service::ServiceDefinition;
 use interoptopus::pattern::TypePattern;
-use interoptopus::{indented, Error};
+use interoptopus::pattern::service::ServiceDefinition;
+use interoptopus::{Error, indented};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum MethodType {
@@ -275,14 +275,7 @@ pub fn write_common_service_method_overload(i: &Interop, w: &mut IndentWriter, c
     let mut types = Vec::new();
 
     let fn_name = function_name_to_csharp_name(function, FunctionNameFlavor::CSharpMethodNameWithoutClass(&class.common_prefix()));
-
-    // Write checked method. These are "normal" methods that accept
-    // common C# types.
-    let rval = match function.signature().rval() {
-        // CType::Pattern(TypePattern::FFIErrorEnum(_)) => "void".to_string(),
-        Type::Pattern(TypePattern::CStrPointer) => "string".to_string(),
-        _ => to_typespecifier_in_sync_fn_rval(function.signature().rval()),
-    };
+    let async_rval = sugared_return_type(function);
 
     // For every parameter except the first, figure out how we should forward
     // it to the invocation we perform.
@@ -306,6 +299,29 @@ pub fn write_common_service_method_overload(i: &Interop, w: &mut IndentWriter, c
         names.push(name);
         types.push(native);
     }
+
+    // Write checked method. These are "normal" methods that accept
+    // common C# types.
+    let rval = match async_rval {
+        SugaredReturnType::Sync(_) => match function.signature().rval() {
+            Type::Pattern(TypePattern::CStrPointer) => "string".to_string(),
+            Type::Pattern(TypePattern::Result(x)) if x.t().is_void() => "void".to_string(),
+            Type::Pattern(TypePattern::Result(x)) => to_typespecifier_in_field(x.t()),
+            x => to_typespecifier_in_sync_fn_rval(x),
+        },
+        SugaredReturnType::Async(Type::Pattern(TypePattern::Result(_))) => {
+            names.pop();
+            types.pop();
+            to_invoke.pop();
+            to_typespecifier_in_async_fn_rval(&async_rval)
+        }
+        SugaredReturnType::Async(_) => {
+            names.pop();
+            types.pop();
+            to_invoke.pop();
+            to_typespecifier_in_async_fn_rval(&async_rval)
+        }
+    };
 
     let method_to_invoke = function_name_to_csharp_name(
         function,
@@ -337,15 +353,22 @@ pub fn write_common_service_method_overload(i: &Interop, w: &mut IndentWriter, c
     indented!(w, "{}", signature)?;
     indented!(w, r"{{")?;
 
-    match function.signature().rval() {
-        // CType::Pattern(TypePattern::FFIErrorEnum(_)) => {
-        //     indented!(w, [()], r"{};", fn_call)?;
-        // }
-        Type::Primitive(Primitive::Void) => {
-            indented!(w, [()], r"{};", fn_call)?;
+    match async_rval {
+        SugaredReturnType::Sync(Type::Pattern(TypePattern::CStrPointer)) => {
+            indented!(w, [()], r"var s = {fn_call};")?;
+            indented!(w, [()], r"return Marshal.PtrToStringAnsi(s);")?;
+        }
+        SugaredReturnType::Sync(Type::Primitive(Primitive::Void)) => {
+            indented!(w, [()], r"{fn_call};",)?;
+        }
+        SugaredReturnType::Sync(Type::Pattern(TypePattern::Result(x))) if x.t().is_void() => {
+            indented!(w, [()], r"{fn_call}.AsOk();")?;
+        }
+        SugaredReturnType::Sync(Type::Pattern(TypePattern::Result(x))) if !x.t().is_void() => {
+            indented!(w, [()], r"return {fn_call}.AsOk();")?;
         }
         _ => {
-            indented!(w, [()], r"return {};", fn_call)?;
+            indented!(w, [()], r"return {fn_call};")?;
         }
     }
 

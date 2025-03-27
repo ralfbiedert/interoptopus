@@ -22,9 +22,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 9159727345274541140ul)
+            if (api_version != 11458689350268229902ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (9159727345274541140). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (11458689350268229902). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -1182,6 +1182,26 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultOptionEnumPayloadError service_result_result_option_enum(IntPtr _context);
 
+
+        [LibraryImport(NativeLib, EntryPoint = "service_result_result_slice")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultU32Error service_result_result_slice(IntPtr _context, SliceU32 slice, ulong i);
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static unsafe ResultU32Error service_result_result_slice(IntPtr _context, ReadOnlySpan<uint> slice, ulong i)
+        {
+            fixed (void* ptr_slice = slice)
+            {
+                var slice_slice = new SliceU32(new IntPtr(ptr_slice), (ulong) slice.Length);
+                try
+                {
+                    return service_result_result_slice(_context, slice_slice, i);
+                }
+                finally
+                {
+                }
+            }
+        }
 
         /// Destroys the given instance.
         ///
@@ -7870,6 +7890,18 @@ namespace My.Company
             return Interop.service_result_result_option_enum(_context).AsOk();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public uint ResultSlice(SliceU32 slice, ulong i)
+        {
+            return Interop.service_result_result_slice(_context, slice, i).AsOk();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public uint ResultSlice(ReadOnlySpan<uint> slice, ulong i)
+        {
+            return Interop.service_result_result_slice(_context, slice, i).AsOk();
+        }
+
         public IntPtr Context => _context;
     }
 
@@ -7953,9 +7985,9 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public ResultError CallbackSimple(MyCallbackDelegate callback)
+        public void CallbackSimple(MyCallbackDelegate callback)
         {
-            return Interop.service_callbacks_callback_simple(_context, callback);
+            Interop.service_callbacks_callback_simple(_context, callback).AsOk();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -7965,9 +7997,9 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public ResultError CallbackFfiReturn(SumDelegateReturnDelegate callback)
+        public void CallbackFfiReturn(SumDelegateReturnDelegate callback)
         {
-            return Interop.service_callbacks_callback_ffi_return(_context, callback);
+            Interop.service_callbacks_callback_ffi_return(_context, callback).AsOk();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -7977,9 +8009,9 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public ResultError CallbackWithSlice(SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
+        public void CallbackWithSlice(SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
         {
-            return Interop.service_callbacks_callback_with_slice(_context, callback, input);
+            Interop.service_callbacks_callback_with_slice(_context, callback, input).AsOk();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -8158,9 +8190,9 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public ResultError MutSelfFfiError(Span<byte> slice)
+        public void MutSelfFfiError(Span<byte> slice)
         {
-            return Interop.service_various_slices_mut_self_ffi_error(_context, slice);
+            Interop.service_various_slices_mut_self_ffi_error(_context, slice).AsOk();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -8170,9 +8202,9 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public ResultError MutSelfNoError(Span<byte> slice)
+        public void MutSelfNoError(Span<byte> slice)
         {
-            return Interop.service_various_slices_mut_self_no_error(_context, slice);
+            Interop.service_various_slices_mut_self_no_error(_context, slice).AsOk();
         }
 
         /// Warning, you _must_ discard the returned slice object before calling into this service

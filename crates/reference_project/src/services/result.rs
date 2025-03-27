@@ -26,4 +26,8 @@ impl ServiceResult {
     pub fn result_option_enum(&self) -> ffi::Result<ffi::Option<EnumPayload>, Error> {
         ffi::Ok(ffi::Some(EnumPayload::C(123)))
     }
+
+    pub fn result_slice(&self, slice: ffi::Slice<u32>, i: u64) -> ffi::Result<u32, Error> {
+        ffi::Ok(slice[i as usize])
+    }
 }
