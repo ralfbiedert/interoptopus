@@ -141,6 +141,10 @@ def init_lib(path):
     c_lib.service_result_destroy.argtypes = [ctypes.c_void_p]
     c_lib.service_result_new.argtypes = []
     c_lib.service_result_test.argtypes = [ctypes.c_void_p]
+    c_lib.service_result_result_u32.argtypes = [ctypes.c_void_p]
+    c_lib.service_result_result_string.argtypes = [ctypes.c_void_p]
+    c_lib.service_result_result_option_enum.argtypes = [ctypes.c_void_p]
+    c_lib.service_result_result_slice.argtypes = [ctypes.c_void_p, SliceU32, ctypes.c_uint64]
     c_lib.service_on_panic_destroy.argtypes = [ctypes.c_void_p]
     c_lib.service_on_panic_new.argtypes = []
     c_lib.service_on_panic_return_result.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
@@ -289,6 +293,10 @@ def init_lib(path):
     c_lib.service_result_destroy.restype = ResultConstPtrServiceResultError
     c_lib.service_result_new.restype = ResultConstPtrServiceResultError
     c_lib.service_result_test.restype = ResultError
+    c_lib.service_result_result_u32.restype = ResultU32Error
+    c_lib.service_result_result_string.restype = ResultUtf8StringError
+    c_lib.service_result_result_option_enum.restype = ResultOptionEnumPayloadError
+    c_lib.service_result_result_slice.restype = ResultU32Error
     c_lib.service_on_panic_destroy.restype = ResultConstPtrServiceOnPanicError
     c_lib.service_on_panic_new.restype = ResultConstPtrServiceOnPanicError
     c_lib.service_on_panic_return_result.restype = ResultError
@@ -1742,6 +1750,13 @@ class SliceMutU8(ctypes.Structure):
         return rval
 
 
+class OptionEnumPayload:
+    """Option that contains Some(value) or None."""
+    # Element if Some().
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    None = 1
+
+
 class OptionUtf8String:
     """Option that contains Some(value) or None."""
     # Element if Some().
@@ -2316,6 +2331,16 @@ class ResultConstPtrServiceVariousSlicesError:
     Null = 3
 
 
+class ResultOptionEnumPayloadError:
+    """Result that contains value or an error."""
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
+
+
 class ResultOptionUtf8StringError:
     """Result that contains value or an error."""
     # Element if err is `Ok`.
@@ -2808,6 +2833,25 @@ class ServiceResult:
     def test(self, ):
         """"""
         return c_lib.service_result_test(self._ctx, )
+
+    def result_u32(self, ):
+        """"""
+        return c_lib.service_result_result_u32(self._ctx, )
+
+    def result_string(self, ):
+        """"""
+        return c_lib.service_result_result_string(self._ctx, )
+
+    def result_option_enum(self, ):
+        """"""
+        return c_lib.service_result_result_option_enum(self._ctx, )
+
+    def result_slice(self, slice: SliceU32 | ctypes.Array[ctypes.c_uint32], i: int):
+        """"""
+        if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == ctypes.c_uint32:
+            slice = SliceU32(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint32)), len=len(slice))
+
+        return c_lib.service_result_result_slice(self._ctx, slice, i)
 
 
 

@@ -263,6 +263,14 @@ typedef struct SLICEMUTU8
     } SLICEMUTU8;
 
 /// Option that contains Some(value) or None.
+typedef enum OPTIONENUMPAYLOAD
+    {
+    /// Element if Some().
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    OPTIONENUMPAYLOAD_NONE = 1,
+    } OPTIONENUMPAYLOAD;
+
+/// Option that contains Some(value) or None.
 typedef enum OPTIONUTF8STRING
     {
     /// Element if Some().
@@ -540,6 +548,17 @@ typedef enum RESULTCONSTPTRSERVICEVARIOUSSLICESERROR
     RESULTCONSTPTRSERVICEVARIOUSSLICESERROR_PANIC = 2,
     RESULTCONSTPTRSERVICEVARIOUSSLICESERROR_NULL = 3,
     } RESULTCONSTPTRSERVICEVARIOUSSLICESERROR;
+
+/// Result that contains value or an error.
+typedef enum RESULTOPTIONENUMPAYLOADERROR
+    {
+    /// Element if err is `Ok`.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    /// Error value.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTOPTIONENUMPAYLOADERROR_PANIC = 2,
+    RESULTOPTIONENUMPAYLOADERROR_NULL = 3,
+    } RESULTOPTIONENUMPAYLOADERROR;
 
 /// Result that contains value or an error.
 typedef enum RESULTOPTIONUTF8STRINGERROR
@@ -968,6 +987,14 @@ RESULTCONSTPTRSERVICERESULTERROR service_result_destroy(SERVICERESULT* _CONTEXT)
 RESULTCONSTPTRSERVICERESULTERROR service_result_new();
 
 RESULTERROR service_result_test(const SERVICERESULT* _CONTEXT);
+
+RESULTU32ERROR service_result_result_u32(const SERVICERESULT* _CONTEXT);
+
+RESULTUTF8STRINGERROR service_result_result_string(const SERVICERESULT* _CONTEXT);
+
+RESULTOPTIONENUMPAYLOADERROR service_result_result_option_enum(const SERVICERESULT* _CONTEXT);
+
+RESULTU32ERROR service_result_result_slice(const SERVICERESULT* _CONTEXT, SLICEU32 SLICE, uint64_t I);
 
 ///  Destroys the given instance.
 /// 
