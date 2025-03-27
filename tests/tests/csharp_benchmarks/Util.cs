@@ -74,7 +74,7 @@ namespace Interoptopus
 
         public void Add(string name, MeasureResult result)
         {
-            Console.WriteLine($"{name}: {result.MicroPer1000():F2}");
+            Console.WriteLine($"{name}: {result.MicroPer1000():F0}");
             Entries.Add(new Entry()
             {
                 Name = name,
@@ -112,9 +112,9 @@ The following system was used:
 
 ```
 System: AMD Ryzen 9 7950X3D, 64 GB RAM; Windows 11
-rustc: stable (i.e., 1.82 or later)
+rustc: stable (i.e., 1.85 or later)
 profile: --release
-.NET: v8.0
+.NET: v9.0
 ```
 
 ## Results
@@ -127,7 +127,7 @@ profile: --release
             sw.Write(header);
             foreach (var entry in Entries)
             {
-                sw.WriteLine($"| `{entry.Name}` | {(long) entry.Result.MicroPer1000():F2} |");
+                sw.WriteLine($"| `{entry.Name}` | {(long) entry.Result.MicroPer1000():F0} |");
             }
         }
     }

@@ -7,12 +7,20 @@ using Xunit;
 public class TestPatternDelegates
 {
     [Fact]
-    public void pattern_callback_1()
+    public void pattern_callback_1_adhoc()
     {
         var x = Interop.pattern_callback_1(value => value + 1, 0);
         Assert.Equal(1u, x);
     }
-    
+
+    [Fact]
+    public void pattern_callback_1_retained()
+    {
+        var cb = new MyCallback(value => value + 1);
+        var x = Interop.pattern_callback_1(cb, 0);
+        Assert.Equal(1u, x);
+    }
+
     [Fact]
     public void pattern_callback_2()
     {

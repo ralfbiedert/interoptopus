@@ -26,28 +26,28 @@ The following system was used:
 
 ```
 System: AMD Ryzen 9 7950X3D, 64 GB RAM; Windows 11
-rustc: stable (i.e., 1.82 or later)
+rustc: stable (i.e., 1.85 or later)
 profile: --release
-.NET: v8.0
+.NET: v9.0
 ```
 
 ## Results
 
 | Construct | ns per call |
 | --- | --- |
-| `primitive_void()` | 4.00 |
-| `primitive_u8(0)` | 4.00 |
-| `primitive_u16(0)` | 4.00 |
-| `primitive_u32(0)` | 4.00 |
-| `primitive_u64(0)` | 4.00 |
-| `pattern_ffi_option_1(OptionInner.None)` | 16.00 |
-| `pattern_ffi_slice_delegate(x => x[0])` | 436.00 |
-| `pattern_ffi_slice_delegate_huge(x => x[0])` | 450.00 |
-| `pattern_ffi_slice_delegate_huge(callback_huge_prealloc)` | 34.00 |
-| `pattern_ffi_slice_2(short_vec, 0)` | 16.00 |
-| `pattern_ffi_slice_2(long_vec, 0)` | 16.00 |
-| `pattern_ffi_slice_4(short_byte, short_byte)` | 11.00 |
-| `pattern_ascii_pointer_1('hello world')` | 29.00 |
-| `pattern_string_2('hello world')` | 62.00 |
-| `await new TaskCompletionSource().Task` | 91.00 |
-| `await serviceAsync.Success()` | 390.00 |
+| `primitive_void()` | 4 |
+| `primitive_u8(0)` | 3 |
+| `primitive_u16(0)` | 3 |
+| `primitive_u32(0)` | 3 |
+| `primitive_u64(0)` | 4 |
+| `pattern_ffi_option_1(OptionInner.None)` | 16 |
+| `pattern_ffi_slice_delegate(x => x[0])` | 435 |
+| `pattern_ffi_slice_delegate_huge(x => x[0])` | 439 |
+| `pattern_ffi_slice_delegate_huge(callback_huge_prealloc)` | 32 |
+| `pattern_ffi_slice_2(short_vec, 0)` | 15 |
+| `pattern_ffi_slice_2(long_vec, 0)` | 15 |
+| `pattern_ffi_slice_4(short_byte, short_byte)` | 11 |
+| `pattern_ascii_pointer_1('hello world')` | 28 |
+| `pattern_string_2('hello world')` | 61 |
+| `await new TaskCompletionSource().Task` | 88 |
+| `await serviceAsync.Success()` | 358 |
