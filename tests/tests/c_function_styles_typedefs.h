@@ -919,6 +919,8 @@ typedef RESULTERROR (*service_async_handle_nested_string)(const SERVICEASYNC*, U
 
 typedef void (*service_async_callback_string)(const SERVICEASYNC*, UTF8STRING, STRINGCALLBACK);
 
+typedef RESULTERROR (*service_async_success)(const SERVICEASYNC*, fptr_fn_ConstPtrResultError_ConstPtr);
+
 typedef RESULTERROR (*service_async_fail)(const SERVICEASYNC*, fptr_fn_ConstPtrResultError_ConstPtr);
 
 typedef void (*service_async_bad)(SERVICEASYNC*);

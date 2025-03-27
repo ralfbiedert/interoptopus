@@ -2447,7 +2447,7 @@ namespace My.Company.Common
     {
         private AsyncHelperDelegate _managed;
         private AsyncHelperNative _native;
-        internal IntPtr _ptr;
+        private IntPtr _ptr;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -2630,5 +2630,14 @@ namespace My.Company.Common
         public static class StringExtensions
         {
             public static Utf8String Utf8(this string s) { return new Utf8String(s); }
+        }
+
+        public delegate void AsyncCallbackCommon(IntPtr data, IntPtr callback_data);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public partial struct AsyncCallbackCommonNative
+        {
+            internal IntPtr _ptr;
+            internal IntPtr _ts;
         }
 }

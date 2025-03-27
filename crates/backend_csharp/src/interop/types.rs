@@ -4,6 +4,7 @@ pub mod enums;
 pub mod fnptrs;
 
 use crate::Interop;
+use crate::interop::patterns::asynk::write_pattern_async_trampoline;
 use crate::interop::patterns::callbacks::write_type_definition_named_callback;
 use crate::interop::patterns::slices::{SliceKind, write_pattern_slice};
 use crate::interop::patterns::vec::write_pattern_vec;
@@ -83,7 +84,10 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type)
             TypePattern::Utf8String(_) => {}
             TypePattern::CChar => {}
             TypePattern::APIVersion => {}
-            TypePattern::AsyncCallback(_) => {}
+            TypePattern::AsyncCallback(x) => {
+                write_pattern_async_trampoline(i, w, x)?;
+                w.newline()?;
+            }
             _ => panic!("Pattern not explicitly handled"),
         },
     }

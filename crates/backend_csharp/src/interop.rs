@@ -17,6 +17,7 @@ use crate::interop::functions::write_functions;
 use crate::interop::imports::write_imports;
 use crate::interop::namespace::write_namespace_context;
 use crate::interop::patterns::abi_guard::write_abi_guard;
+use crate::interop::patterns::asynk::write_pattern_async_trampoline_initializers;
 use crate::interop::patterns::write_patterns;
 use crate::interop::types::write_type_definitions;
 use derive_builder::Builder;
@@ -337,6 +338,9 @@ impl Interop {
                         w.newline()?;
 
                         write_abi_guard(self, w)?;
+                        w.newline()?;
+
+                        write_pattern_async_trampoline_initializers(self, w)?;
                         w.newline()?;
 
                         write_constants(self, w)?;

@@ -919,6 +919,8 @@ RESULTERROR service_async_handle_nested_string(const SERVICEASYNC* _CONTEXT, UTF
 
 void service_async_callback_string(const SERVICEASYNC* _CONTEXT, UTF8STRING S, STRINGCALLBACK CB);
 
+RESULTERROR service_async_success(const SERVICEASYNC* _CONTEXT, fptr_fn_ConstPtrResultError_ConstPtr _ASYNC_CALLBACK);
+
 RESULTERROR service_async_fail(const SERVICEASYNC* _CONTEXT, fptr_fn_ConstPtrResultError_ConstPtr _ASYNC_CALLBACK);
 
 void service_async_bad(SERVICEASYNC* _CONTEXT);

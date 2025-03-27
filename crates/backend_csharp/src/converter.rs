@@ -71,7 +71,7 @@ pub fn named_callback_to_typename(x: &NamedCallback) -> String {
 }
 
 pub fn async_callback_to_typename(_: &AsyncCallback) -> String {
-    "AsyncHelper".to_string()
+    "AsyncCallbackCommonNative".to_string()
 }
 
 /// Converts an Rust `pub fn()` to a C# delegate name such as `InteropDelegate`.

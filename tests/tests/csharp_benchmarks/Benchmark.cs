@@ -72,9 +72,8 @@ static class Benchmark {
         result = MeasureResult.Measure(Iterations, async () => { await new TaskCompletionSource().Task; });
         writer.Add("await new TaskCompletionSource().Task", result);
 
-        result = MeasureResult.Measure(Iterations, async () => { await serviceAsync.Success2(); });
+        result = MeasureResult.Measure(Iterations, async () => { await serviceAsync.Success(); });
         writer.Add("await serviceAsync.Success()", result);
-
 
         writer.Write("RESULTS.md");
     }

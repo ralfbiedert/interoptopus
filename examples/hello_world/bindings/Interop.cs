@@ -23,6 +23,7 @@ namespace My.Company
         }
 
 
+
         /// Function using the type.
         [LibraryImport(NativeLib, EntryPoint = "my_function")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -306,5 +307,14 @@ namespace My.Company
         public static class StringExtensions
         {
             public static Utf8String Utf8(this string s) { return new Utf8String(s); }
+        }
+
+        public delegate void AsyncCallbackCommon(IntPtr data, IntPtr callback_data);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public partial struct AsyncCallbackCommonNative
+        {
+            internal IntPtr _ptr;
+            internal IntPtr _ts;
         }
 }

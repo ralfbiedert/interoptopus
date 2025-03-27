@@ -22,11 +22,17 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 14644184848435680608ul)
+            if (api_version != 13717282704452174362ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (14644184848435680608). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (13717282704452174362). You probably forgot to update / copy either the bindings or the library.");
             }
         }
+
+        public static AsyncTrampolineResultError _trampolineResultError = new();
+        public static AsyncTrampolineResultNestedArrayError _trampolineResultNestedArrayError = new();
+        public static AsyncTrampolineResultU64Error _trampolineResultU64Error = new();
+        public static AsyncTrampolineResultUseStringError _trampolineResultUseStringError = new();
+        public static AsyncTrampolineResultUtf8StringError _trampolineResultUtf8StringError = new();
 
         public const byte U8 = (byte) 255;
 
@@ -947,122 +953,82 @@ namespace My.Company
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_return_after_ms")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultError service_async_return_after_ms(IntPtr _context, ulong x, ulong ms, AsyncHelper _async_callback);
+        public static partial ResultError service_async_return_after_ms(IntPtr _context, ulong x, ulong ms, AsyncCallbackCommonNative _async_callback);
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe Task<ulong> service_async_return_after_ms(IntPtr _context, ulong x, ulong ms)
         {
-            var cs = new TaskCompletionSource<ulong>();
-            GCHandle pinned = default;
-            var cb = new AsyncHelper((x) => {
-                var unmanaged = Marshal.PtrToStructure<ResultU64Error.Unmanaged>(x);
-                var marshaller = new ResultU64Error.Marshaller(unmanaged);
-                var managed = marshaller.ToManaged();
-                if (managed.IsOk) { cs.SetResult(managed.AsOk()); }
-                else { cs.SetException(new InteropException()); }
-                pinned.Free();
-            });
-            pinned = GCHandle.Alloc(cb);
+            var (_cb, _cs) = _trampolineResultU64Error.NewCall();
             try
             {
-                service_async_return_after_ms(_context, x, ms, cb).AsOk();
-                return cs.Task;
+                service_async_return_after_ms(_context, x, ms, _cb).AsOk();
+                return _cs;
             }
             finally
             {
             }
-            return cs.Task;
+            return _cs;
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_process_struct")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultError service_async_process_struct(IntPtr _context, NestedArray x, AsyncHelper _async_callback);
+        public static partial ResultError service_async_process_struct(IntPtr _context, NestedArray x, AsyncCallbackCommonNative _async_callback);
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe Task<NestedArray> service_async_process_struct(IntPtr _context, NestedArray x)
         {
-            var cs = new TaskCompletionSource<NestedArray>();
-            GCHandle pinned = default;
-            var cb = new AsyncHelper((x) => {
-                var unmanaged = Marshal.PtrToStructure<ResultNestedArrayError.Unmanaged>(x);
-                var marshaller = new ResultNestedArrayError.Marshaller(unmanaged);
-                var managed = marshaller.ToManaged();
-                if (managed.IsOk) { cs.SetResult(managed.AsOk()); }
-                else { cs.SetException(new InteropException()); }
-                pinned.Free();
-            });
-            pinned = GCHandle.Alloc(cb);
+            var (_cb, _cs) = _trampolineResultNestedArrayError.NewCall();
             try
             {
-                service_async_process_struct(_context, x, cb).AsOk();
-                return cs.Task;
+                service_async_process_struct(_context, x, _cb).AsOk();
+                return _cs;
             }
             finally
             {
             }
-            return cs.Task;
+            return _cs;
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_handle_string")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultError service_async_handle_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
+        public static partial ResultError service_async_handle_string(IntPtr _context, Utf8String s, AsyncCallbackCommonNative _async_callback);
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe Task<string> service_async_handle_string(IntPtr _context, string s)
         {
-            var cs = new TaskCompletionSource<string>();
-            GCHandle pinned = default;
-            var cb = new AsyncHelper((x) => {
-                var unmanaged = Marshal.PtrToStructure<ResultUtf8StringError.Unmanaged>(x);
-                var marshaller = new ResultUtf8StringError.Marshaller(unmanaged);
-                var managed = marshaller.ToManaged();
-                if (managed.IsOk) { cs.SetResult(managed.AsOk()); }
-                else { cs.SetException(new InteropException()); }
-                pinned.Free();
-            });
-            pinned = GCHandle.Alloc(cb);
+            var (_cb, _cs) = _trampolineResultUtf8StringError.NewCall();
             var s_wrapped = new Utf8String(s);
             try
             {
-                service_async_handle_string(_context, s_wrapped, cb).AsOk();
-                return cs.Task;
+                service_async_handle_string(_context, s_wrapped, _cb).AsOk();
+                return _cs;
             }
             finally
             {
                 s_wrapped.Dispose();
             }
-            return cs.Task;
+            return _cs;
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_handle_nested_string")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultError service_async_handle_nested_string(IntPtr _context, Utf8String s, AsyncHelper _async_callback);
+        public static partial ResultError service_async_handle_nested_string(IntPtr _context, Utf8String s, AsyncCallbackCommonNative _async_callback);
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe Task<UseString> service_async_handle_nested_string(IntPtr _context, string s)
         {
-            var cs = new TaskCompletionSource<UseString>();
-            GCHandle pinned = default;
-            var cb = new AsyncHelper((x) => {
-                var unmanaged = Marshal.PtrToStructure<ResultUseStringError.Unmanaged>(x);
-                var marshaller = new ResultUseStringError.Marshaller(unmanaged);
-                var managed = marshaller.ToManaged();
-                if (managed.IsOk) { cs.SetResult(managed.AsOk()); }
-                else { cs.SetException(new InteropException()); }
-                pinned.Free();
-            });
-            pinned = GCHandle.Alloc(cb);
+            var (_cb, _cs) = _trampolineResultUseStringError.NewCall();
             var s_wrapped = new Utf8String(s);
             try
             {
-                service_async_handle_nested_string(_context, s_wrapped, cb).AsOk();
-                return cs.Task;
+                service_async_handle_nested_string(_context, s_wrapped, _cb).AsOk();
+                return _cs;
             }
             finally
             {
                 s_wrapped.Dispose();
             }
-            return cs.Task;
+            return _cs;
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_callback_string")]
@@ -1085,33 +1051,42 @@ namespace My.Company
             }
         }
 
-        [LibraryImport(NativeLib, EntryPoint = "service_async_fail")]
+        [LibraryImport(NativeLib, EntryPoint = "service_async_success")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultError service_async_fail(IntPtr _context, AsyncHelper _async_callback);
+        public static partial ResultError service_async_success(IntPtr _context, AsyncCallbackCommonNative _async_callback);
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static unsafe Task service_async_fail(IntPtr _context)
+        public static unsafe Task service_async_success(IntPtr _context)
         {
-            var cs = new TaskCompletionSource();
-            GCHandle pinned = default;
-            var cb = new AsyncHelper((x) => {
-                var unmanaged = Marshal.PtrToStructure<ResultError.Unmanaged>(x);
-                var marshaller = new ResultError.Marshaller(unmanaged);
-                var managed = marshaller.ToManaged();
-                if (managed.IsOk) { cs.SetResult(); }
-                else { cs.SetException(new InteropException()); }
-                pinned.Free();
-            });
-            pinned = GCHandle.Alloc(cb);
+            var (_cb, _cs) = _trampolineResultError.NewCall();
             try
             {
-                service_async_fail(_context, cb).AsOk();
-                return cs.Task;
+                service_async_success(_context, _cb).AsOk();
+                return _cs;
             }
             finally
             {
             }
-            return cs.Task;
+            return _cs;
+        }
+
+        [LibraryImport(NativeLib, EntryPoint = "service_async_fail")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultError service_async_fail(IntPtr _context, AsyncCallbackCommonNative _async_callback);
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static unsafe Task service_async_fail(IntPtr _context)
+        {
+            var (_cb, _cs) = _trampolineResultError.NewCall();
+            try
+            {
+                service_async_fail(_context, _cb).AsOk();
+                return _cs;
+            }
+            finally
+            {
+            }
+            return _cs;
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_bad")]
@@ -9074,6 +9049,226 @@ namespace My.Company
     }
 
 
+    public struct AsyncTrampolineResultError
+    {
+        private static ulong Id = 0;
+        private static Dictionary<ulong, TaskCompletionSource> InFlight = new(1024);
+        private AsyncCallbackCommon _delegate;
+        private IntPtr _callback_ptr;
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public AsyncTrampolineResultError()
+        {
+            _delegate = Call;
+            _callback_ptr = Marshal.GetFunctionPointerForDelegate(_delegate);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        void Call(IntPtr data, IntPtr csPtr)
+        {
+            TaskCompletionSource tcs;
+            
+            lock (InFlight) { InFlight.Remove((ulong) csPtr, out tcs); }
+            
+            var unmanaged = Marshal.PtrToStructure<ResultError.Unmanaged>(data);
+            var managed = unmanaged.ToManaged();
+            if (managed.IsOk) { tcs.SetResult(); }
+            else { tcs.SetException(new InteropException()); }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public (AsyncCallbackCommonNative, Task) NewCall()
+        {
+            var tcs = new TaskCompletionSource();
+            var id = Id++;
+            
+            lock (InFlight) { InFlight.TryAdd(id, tcs); }
+            
+            var ac = new AsyncCallbackCommonNative {
+                _ptr = _callback_ptr,
+                _ts = (IntPtr) id,
+            };
+
+            return (ac, tcs.Task);
+        }
+    }
+
+    public struct AsyncTrampolineResultNestedArrayError
+    {
+        private static ulong Id = 0;
+        private static Dictionary<ulong, TaskCompletionSource<NestedArray>> InFlight = new(1024);
+        private AsyncCallbackCommon _delegate;
+        private IntPtr _callback_ptr;
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public AsyncTrampolineResultNestedArrayError()
+        {
+            _delegate = Call;
+            _callback_ptr = Marshal.GetFunctionPointerForDelegate(_delegate);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        void Call(IntPtr data, IntPtr csPtr)
+        {
+            TaskCompletionSource<NestedArray> tcs;
+            
+            lock (InFlight) { InFlight.Remove((ulong) csPtr, out tcs); }
+            
+            var unmanaged = Marshal.PtrToStructure<ResultNestedArrayError.Unmanaged>(data);
+            var managed = unmanaged.ToManaged();
+            if (managed.IsOk) { tcs.SetResult(managed.AsOk()); }
+            else { tcs.SetException(new InteropException()); }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public (AsyncCallbackCommonNative, Task<NestedArray>) NewCall()
+        {
+            var tcs = new TaskCompletionSource<NestedArray>();
+            var id = Id++;
+            
+            lock (InFlight) { InFlight.TryAdd(id, tcs); }
+            
+            var ac = new AsyncCallbackCommonNative {
+                _ptr = _callback_ptr,
+                _ts = (IntPtr) id,
+            };
+
+            return (ac, tcs.Task);
+        }
+    }
+
+    public struct AsyncTrampolineResultU64Error
+    {
+        private static ulong Id = 0;
+        private static Dictionary<ulong, TaskCompletionSource<ulong>> InFlight = new(1024);
+        private AsyncCallbackCommon _delegate;
+        private IntPtr _callback_ptr;
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public AsyncTrampolineResultU64Error()
+        {
+            _delegate = Call;
+            _callback_ptr = Marshal.GetFunctionPointerForDelegate(_delegate);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        void Call(IntPtr data, IntPtr csPtr)
+        {
+            TaskCompletionSource<ulong> tcs;
+            
+            lock (InFlight) { InFlight.Remove((ulong) csPtr, out tcs); }
+            
+            var unmanaged = Marshal.PtrToStructure<ResultU64Error.Unmanaged>(data);
+            var managed = unmanaged.ToManaged();
+            if (managed.IsOk) { tcs.SetResult(managed.AsOk()); }
+            else { tcs.SetException(new InteropException()); }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public (AsyncCallbackCommonNative, Task<ulong>) NewCall()
+        {
+            var tcs = new TaskCompletionSource<ulong>();
+            var id = Id++;
+            
+            lock (InFlight) { InFlight.TryAdd(id, tcs); }
+            
+            var ac = new AsyncCallbackCommonNative {
+                _ptr = _callback_ptr,
+                _ts = (IntPtr) id,
+            };
+
+            return (ac, tcs.Task);
+        }
+    }
+
+    public struct AsyncTrampolineResultUseStringError
+    {
+        private static ulong Id = 0;
+        private static Dictionary<ulong, TaskCompletionSource<UseString>> InFlight = new(1024);
+        private AsyncCallbackCommon _delegate;
+        private IntPtr _callback_ptr;
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public AsyncTrampolineResultUseStringError()
+        {
+            _delegate = Call;
+            _callback_ptr = Marshal.GetFunctionPointerForDelegate(_delegate);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        void Call(IntPtr data, IntPtr csPtr)
+        {
+            TaskCompletionSource<UseString> tcs;
+            
+            lock (InFlight) { InFlight.Remove((ulong) csPtr, out tcs); }
+            
+            var unmanaged = Marshal.PtrToStructure<ResultUseStringError.Unmanaged>(data);
+            var managed = unmanaged.ToManaged();
+            if (managed.IsOk) { tcs.SetResult(managed.AsOk()); }
+            else { tcs.SetException(new InteropException()); }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public (AsyncCallbackCommonNative, Task<UseString>) NewCall()
+        {
+            var tcs = new TaskCompletionSource<UseString>();
+            var id = Id++;
+            
+            lock (InFlight) { InFlight.TryAdd(id, tcs); }
+            
+            var ac = new AsyncCallbackCommonNative {
+                _ptr = _callback_ptr,
+                _ts = (IntPtr) id,
+            };
+
+            return (ac, tcs.Task);
+        }
+    }
+
+    public struct AsyncTrampolineResultUtf8StringError
+    {
+        private static ulong Id = 0;
+        private static Dictionary<ulong, TaskCompletionSource<string>> InFlight = new(1024);
+        private AsyncCallbackCommon _delegate;
+        private IntPtr _callback_ptr;
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public AsyncTrampolineResultUtf8StringError()
+        {
+            _delegate = Call;
+            _callback_ptr = Marshal.GetFunctionPointerForDelegate(_delegate);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        void Call(IntPtr data, IntPtr csPtr)
+        {
+            TaskCompletionSource<string> tcs;
+            
+            lock (InFlight) { InFlight.Remove((ulong) csPtr, out tcs); }
+            
+            var unmanaged = Marshal.PtrToStructure<ResultUtf8StringError.Unmanaged>(data);
+            var managed = unmanaged.ToManaged();
+            if (managed.IsOk) { tcs.SetResult(managed.AsOk()); }
+            else { tcs.SetException(new InteropException()); }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public (AsyncCallbackCommonNative, Task<string>) NewCall()
+        {
+            var tcs = new TaskCompletionSource<string>();
+            var id = Id++;
+            
+            lock (InFlight) { InFlight.TryAdd(id, tcs); }
+            
+            var ac = new AsyncCallbackCommonNative {
+                _ptr = _callback_ptr,
+                _ts = (IntPtr) id,
+            };
+
+            return (ac, tcs.Task);
+        }
+    }
+
     // This must be a class because we only ever want to hold on to the
     // same instance, as we overwrite fields when this is sent over the FFI
     // boundary
@@ -9215,6 +9410,12 @@ namespace My.Company
         public void CallbackString(string s, StringCallbackDelegate cb)
         {
             Interop.service_async_callback_string(_context, s, cb);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Task Success()
+        {
+            return Interop.service_async_success(_context);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -9915,5 +10116,14 @@ namespace My.Company
         public static class StringExtensions
         {
             public static Utf8String Utf8(this string s) { return new Utf8String(s); }
+        }
+
+        public delegate void AsyncCallbackCommon(IntPtr data, IntPtr callback_data);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public partial struct AsyncCallbackCommonNative
+        {
+            internal IntPtr _ptr;
+            internal IntPtr _ts;
         }
 }

@@ -128,6 +128,7 @@ def init_lib(path):
     c_lib.service_async_handle_string.argtypes = [ctypes.c_void_p, Utf8String, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultUtf8StringError), ctypes.c_void_p)]
     c_lib.service_async_handle_nested_string.argtypes = [ctypes.c_void_p, Utf8String, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultUseStringError), ctypes.c_void_p)]
     c_lib.service_async_callback_string.argtypes = [ctypes.c_void_p, Utf8String, ctypes.CFUNCTYPE(None, Utf8String, ctypes.c_void_p)]
+    c_lib.service_async_success.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultError), ctypes.c_void_p)]
     c_lib.service_async_fail.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultError), ctypes.c_void_p)]
     c_lib.service_async_bad.argtypes = [ctypes.c_void_p]
     c_lib.service_basic_destroy.argtypes = [ctypes.c_void_p]
@@ -276,6 +277,7 @@ def init_lib(path):
     c_lib.service_async_process_struct.restype = ResultError
     c_lib.service_async_handle_string.restype = ResultError
     c_lib.service_async_handle_nested_string.restype = ResultError
+    c_lib.service_async_success.restype = ResultError
     c_lib.service_async_fail.restype = ResultError
     c_lib.service_basic_destroy.restype = ResultConstPtrServiceBasicError
     c_lib.service_basic_new.restype = ResultConstPtrServiceBasicError
@@ -2698,6 +2700,10 @@ class ServiceAsync:
             cb = callbacks.fn_Utf8String_ConstPtr(cb)
 
         return c_lib.service_async_callback_string(self._ctx, s, cb)
+
+    def success(self, _async_callback):
+        """"""
+        return c_lib.service_async_success(self._ctx, _async_callback)
 
     def fail(self, _async_callback):
         """"""

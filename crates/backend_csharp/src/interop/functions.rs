@@ -1,6 +1,6 @@
 use crate::converter::{
     function_name_to_csharp_name, function_parameter_to_csharp_typename, function_rval_to_csharp_typename, is_owned_slice, pattern_to_native_in_signature,
-    to_typespecifier_in_async_fn_rval, to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval,
+    to_typespecifier_in_async_fn_rval, to_typespecifier_in_param,
 };
 use crate::interop::docs::write_documentation;
 use crate::utils::sugared_return_type;
@@ -174,7 +174,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     if matches!(async_rval, SugaredReturnType::Async(_)) {
         params.pop();
         to_invoke.pop();
-        to_invoke.push("cb".to_string());
+        to_invoke.push("_cb".to_string());
     }
 
     let signature = format!(r"public static unsafe {} {}({})", rval, raw_name, params.join(", "));
@@ -192,33 +192,8 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     indented!(w, r"{{")?;
 
     if let SugaredReturnType::Async(ref x) = async_rval {
-        let task_completion_source = match x {
-            Type::Pattern(TypePattern::Result(x)) if matches!(x.t(), Type::Pattern(TypePattern::Utf8String(_))) => "TaskCompletionSource<string>".to_string(),
-            Type::Pattern(TypePattern::Result(x)) if x.t().is_void() => "TaskCompletionSource".to_string(),
-            Type::Pattern(TypePattern::Result(x)) => format!("TaskCompletionSource<{}>", to_typespecifier_in_sync_fn_rval(x.t())),
-            x => format!("TaskCompletionSource<{}>", to_typespecifier_in_sync_fn_rval(x)),
-        };
-
-        indented!(w, [()], r"var cs = new {task_completion_source}();")?;
-        indented!(w, [()], r"GCHandle pinned = default;")?;
-        indented!(w, [()], r"var cb = new AsyncHelper((x) => {{")?;
-        indented!(w, [()()], r"var unmanaged = Marshal.PtrToStructure<{}.Unmanaged>(x);", to_typespecifier_in_param(x))?;
-        indented!(w, [()()], r"var marshaller = new {}.Marshaller(unmanaged);", to_typespecifier_in_param(x))?;
-        indented!(w, [()()], r"var managed = marshaller.ToManaged();")?;
-        match x {
-            Type::Pattern(TypePattern::Result(x)) => {
-                if x.t().is_void() {
-                    indented!(w, [()()], r"if (managed.IsOk) {{ cs.SetResult(); }}")?;
-                } else {
-                    indented!(w, [()()], r"if (managed.IsOk) {{ cs.SetResult(managed.AsOk()); }}")?;
-                }
-                indented!(w, [()()], r"else {{ cs.SetException(new InteropException()); }}")?;
-            }
-            _ => indented!(w, [()()], r"cs.SetResult(managed);")?,
-        }
-        indented!(w, [()()], r"pinned.Free();")?;
-        indented!(w, [()], r"}});")?;
-        indented!(w, [()], r"pinned = GCHandle.Alloc(cb);")?;
+        let trampoline = format!("_trampoline{}", to_typespecifier_in_param(x));
+        indented!(w, [()], r"var (_cb, _cs) = {trampoline}.NewCall();")?;
     }
 
     if !to_pin_name.is_empty() {
@@ -250,15 +225,15 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
 
     match function.signature().rval() {
         Type::Pattern(TypePattern::CStrPointer) => {
-            indented!(w, [()()], r"var s = {};", call)?;
-            indented!(w, [()()], r"return Marshal.PtrToStringAnsi(s);")?;
+            indented!(w, [()()], r"var _s = {};", call)?;
+            indented!(w, [()()], r"return Marshal.PtrToStringAnsi(_s);")?;
         }
         Type::Primitive(Primitive::Void) => {
             indented!(w, [()()], r"{};", call)?;
         }
         _ if matches!(async_rval, SugaredReturnType::Async(_)) => {
             indented!(w, [()()], r"{call}.AsOk();")?;
-            indented!(w, [()()], r"return cs.Task;")?;
+            indented!(w, [()()], r"return _cs;")?;
         }
         _ => {
             indented!(w, [()()], r"return {call};")?;
@@ -280,7 +255,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     }
 
     if matches!(async_rval, SugaredReturnType::Async(_)) {
-        indented!(w, [()], r"return cs.Task;")?;
+        indented!(w, [()], r"return _cs;")?;
     }
 
     indented!(w, r"}}")

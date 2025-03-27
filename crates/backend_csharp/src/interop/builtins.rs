@@ -244,6 +244,18 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, [()], r"{{")?;
         indented!(w, [()()], r"public static Utf8String Utf8(this string s) {{ return new Utf8String(s); }}")?;
         indented!(w, [()], r"}}")?;
+        w.newline()?;
+
+        // --------------------------------
+
+        indented!(w, [()], r"public delegate void AsyncCallbackCommon(IntPtr data, IntPtr callback_data);")?;
+        w.newline()?;
+        indented!(w, [()], r"[StructLayout(LayoutKind.Sequential)]")?;
+        indented!(w, [()], r"public partial struct AsyncCallbackCommonNative")?;
+        indented!(w, [()], r"{{")?;
+        indented!(w, [()()], r"internal IntPtr _ptr;")?;
+        indented!(w, [()()], r"internal IntPtr _ts;")?;
+        indented!(w, [()], r"}}")?;
     }
 
     Ok(())
