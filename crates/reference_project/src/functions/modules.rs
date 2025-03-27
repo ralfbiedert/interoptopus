@@ -3,6 +3,8 @@ use interoptopus::ffi_function;
 use interoptopus::pattern::option::Option;
 use interoptopus::pattern::slice::{Slice, SliceMut};
 
+// These functions use types that have a namespace attribute.
+
 #[ffi_function]
 pub fn namespaced_type(x: common::Vec) -> common::Vec {
     x

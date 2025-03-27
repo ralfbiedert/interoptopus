@@ -75,7 +75,8 @@ See the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree
 - [functions](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/functions) (freestanding functions and delegates)
 - [types](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/types) (composites, enums, opaques, references, ...)
 - [constants](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/constants.rs) (primitive constants; results of const evaluation)
-- [patterns](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/patterns) (ASCII pointers, options, slices, classes, ...)
+- [patterns](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/patterns) (ASCII pointers, options, slices, ...)
+- [services](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/services) (turn to classes in C# and Python, and async methods)
 
 
 ### Performance 🏁
