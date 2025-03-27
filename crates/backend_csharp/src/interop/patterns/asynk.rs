@@ -1,10 +1,10 @@
-use crate::Interop;
 use crate::converter::{to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval};
+use crate::Interop;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Type;
-use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::AsyncCallback;
-use interoptopus::{Error, indented};
+use interoptopus::pattern::TypePattern;
+use interoptopus::{indented, Error};
 
 pub fn write_pattern_async_trampoline(i: &Interop, w: &mut IndentWriter, asynk: &AsyncCallback) -> Result<(), Error> {
     i.debug(w, "write_pattern_async_trampoline")?;
@@ -32,14 +32,14 @@ pub fn write_pattern_async_trampoline(i: &Interop, w: &mut IndentWriter, asynk: 
     indented!(w, [()], r"private AsyncCallbackCommon _delegate;")?;
     indented!(w, [()], r"private IntPtr _callback_ptr;")?;
     w.newline()?;
-    indented!(w, [()], r"[MethodImpl(MethodImplOptions.AggressiveOptimization)]")?;
+    i.inline_hint(w, 1)?;
     indented!(w, [()], r"public AsyncTrampoline{inner}()")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"_delegate = Call;")?;
     indented!(w, [()()], r"_callback_ptr = Marshal.GetFunctionPointerForDelegate(_delegate);")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
-    indented!(w, [()], r"[MethodImpl(MethodImplOptions.AggressiveOptimization)]")?;
+    i.inline_hint(w, 1)?;
     indented!(w, [()], r"void Call(IntPtr data, IntPtr csPtr)")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"{task_completion_source} tcs;")?;
@@ -61,7 +61,7 @@ pub fn write_pattern_async_trampoline(i: &Interop, w: &mut IndentWriter, asynk: 
     }
     indented!(w, [()], r"}}")?;
     w.newline()?;
-    indented!(w, [()], r"[MethodImpl(MethodImplOptions.AggressiveOptimization)]")?;
+    i.inline_hint(w, 1)?;
     indented!(w, [()], r"public (AsyncCallbackCommonNative, {task}) NewCall()")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"var tcs = new {task_completion_source}();")?;
