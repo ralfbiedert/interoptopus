@@ -21,18 +21,11 @@ pub struct NestedArray {
     pub field_struct: Array,
 }
 
-// #[repr(transparent)]
 #[ffi_type]
 #[derive(Copy, Clone, Debug)]
 pub struct FixedString<const N: usize> {
     pub data: [u8; N],
 }
-
-// unsafe impl<const N: usize> CTypeInfo for FixedString<N> {
-//     fn type_info() -> CType {
-//         CType::Array(ArrayType::new(CType::Pattern(TypePattern::CChar), N))
-//     }
-// }
 
 #[ffi_type]
 #[derive(Copy, Clone)]
