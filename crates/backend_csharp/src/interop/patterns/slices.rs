@@ -164,7 +164,7 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     i.debug(w, "write_pattern_marshalling_slice")?;
 
     let name = slice.rust_name();
-    let user_type = match slice.target_type() {
+    let user_type = match slice.t() {
         Type::Pattern(TypePattern::Utf8String(_)) => "string".to_string(),
         _ => get_slice_type_argument(slice),
     };
@@ -217,6 +217,8 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     i.inline_hint(w, 0)?;
     indented!(w, r"public void Dispose() {{ }}")?;
     w.newline()?;
+    write_pattern_slice_to_unmanaged(i, w)?;
+    w.newline()?;
     indented!(w, r"[CustomMarshaller(typeof({name}), MarshalMode.Default, typeof(Marshaller))]")?;
     indented!(w, r"private struct MarshallerMeta {{ }}")?;
     w.newline()?;
@@ -225,6 +227,8 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     indented!(w, r"{{")?;
     indented!(w, [()], r"public IntPtr Data;")?;
     indented!(w, [()], r"public ulong Len;")?;
+    w.newline()?;
+    write_pattern_slice_to_managed(i, w, name)?;
     indented!(w, r"}}")?;
     w.newline()?;
     indented!(w, r"public ref struct Marshaller")?;
@@ -234,7 +238,11 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     indented!(w, r"private Unmanaged _unmanaged;")?;
     w.newline()?;
     i.inline_hint(w, 0)?;
-    indented!(w, r"public void FromManaged({} managed) {{ _managed = managed; }}", name)?;
+    indented!(w, r"public Marshaller(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
+    i.inline_hint(w, 0)?;
+    indented!(w, r"public Marshaller({name} managed) {{ _managed = managed; }}")?;
+    i.inline_hint(w, 0)?;
+    indented!(w, r"public void FromManaged({name} managed) {{ _managed = managed; }}")?;
     i.inline_hint(w, 0)?;
     indented!(w, r"public void FromUnmanaged(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
     w.newline()?;
@@ -270,5 +278,27 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     indented!(w, r"}}")?;
     w.unindent();
     indented!(w, r"}}")?;
+    Ok(())
+}
+
+pub fn write_pattern_slice_to_managed(_: &Interop, w: &mut IndentWriter, managed: &str) -> Result<(), Error> {
+    indented!(w, [()], r"public {managed} ToManaged()")?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"var marshaller = new Marshaller(this);")?;
+    indented!(w, [()()], r"try {{ return marshaller.ToManaged(); }}")?;
+    indented!(w, [()()], r"finally {{ marshaller.Free(); }}")?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+    Ok(())
+}
+
+pub fn write_pattern_slice_to_unmanaged(_: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
+    indented!(w, r"public Unmanaged ToUnmanaged()")?;
+    indented!(w, r"{{")?;
+    indented!(w, [()], r"var marshaller = new Marshaller(this);")?;
+    indented!(w, [()], r"try {{ return marshaller.ToUnmanaged(); }}")?;
+    indented!(w, [()], r"finally {{ marshaller.Free(); }}")?;
+    indented!(w, r"}}")?;
+    w.newline()?;
     Ok(())
 }

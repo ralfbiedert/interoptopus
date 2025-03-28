@@ -11,7 +11,7 @@ use interoptopus::pattern::{LibraryPattern, TypePattern};
 use interoptopus::{Error, indented};
 
 pub fn write_slice(_i: &Interop, w: &mut IndentWriter, c: &SliceType, mutable: bool) -> Result<(), Error> {
-    let data_type = c.target_type();
+    let data_type = c.t();
     let data_type_python = to_ctypes_name(data_type, true);
     let hint_in = to_type_hint_in(data_type, false);
     let hint_out = to_type_hint_out(data_type);

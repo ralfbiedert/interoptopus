@@ -12,7 +12,12 @@ def init_lib(path):
 
     c_lib.interoptopus_string_create.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(Utf8String)]
     c_lib.interoptopus_string_destroy.argtypes = [Utf8String]
-    c_lib.interoptopus_vec_TODO_destroy.argtypes = [VecU8]
+    c_lib.interoptopus_vec_create_18289942533122229086.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(VecU8)]
+    c_lib.interoptopus_vec_destroy_17895994407320212994.argtypes = [VecU8]
+    c_lib.interoptopus_vec_create_1491625606766217421.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(VecUtf8String)]
+    c_lib.interoptopus_vec_destroy_2831836161306219799.argtypes = [VecUtf8String]
+    c_lib.interoptopus_vec_create_8489828321293410959.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(VecVec3f32)]
+    c_lib.interoptopus_vec_destroy_18428593021019987507.argtypes = [VecVec3f32]
     c_lib.alignment_1.argtypes = [Packed1]
     c_lib.array_1.argtypes = [Array]
     c_lib.array_2.argtypes = []
@@ -121,6 +126,10 @@ def init_lib(path):
     c_lib.pattern_vec_2.argtypes = [VecU8]
     c_lib.pattern_vec_3.argtypes = [VecU8]
     c_lib.pattern_vec_4.argtypes = [ctypes.POINTER(VecU8)]
+    c_lib.pattern_vec_5.argtypes = [VecUtf8String]
+    c_lib.pattern_vec_6.argtypes = [VecVec3f32]
+    c_lib.pattern_vec_7.argtypes = [UseSliceAndVec]
+    c_lib.pattern_vec_8.argtypes = [UseSliceAndVec]
     c_lib.service_async_destroy.argtypes = [ctypes.c_void_p]
     c_lib.service_async_new.argtypes = []
     c_lib.service_async_return_after_ms.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint64, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultU64Error), ctypes.c_void_p)]
@@ -184,6 +193,12 @@ def init_lib(path):
 
     c_lib.interoptopus_string_create.restype = ctypes.c_int64
     c_lib.interoptopus_string_destroy.restype = ctypes.c_int64
+    c_lib.interoptopus_vec_create_18289942533122229086.restype = ctypes.c_int64
+    c_lib.interoptopus_vec_destroy_17895994407320212994.restype = ctypes.c_int64
+    c_lib.interoptopus_vec_create_1491625606766217421.restype = ctypes.c_int64
+    c_lib.interoptopus_vec_destroy_2831836161306219799.restype = ctypes.c_int64
+    c_lib.interoptopus_vec_create_8489828321293410959.restype = ctypes.c_int64
+    c_lib.interoptopus_vec_destroy_18428593021019987507.restype = ctypes.c_int64
     c_lib.alignment_1.restype = Packed2
     c_lib.array_1.restype = ctypes.c_uint8
     c_lib.array_2.restype = Array
@@ -275,6 +290,9 @@ def init_lib(path):
     c_lib.pattern_vec_1.restype = VecU8
     c_lib.pattern_vec_3.restype = VecU8
     c_lib.pattern_vec_4.restype = VecU8
+    c_lib.pattern_vec_5.restype = VecUtf8String
+    c_lib.pattern_vec_6.restype = VecVec3f32
+    c_lib.pattern_vec_8.restype = UseSliceAndVec
     c_lib.service_async_destroy.restype = ResultConstPtrServiceAsyncError
     c_lib.service_async_new.restype = ResultConstPtrServiceAsyncError
     c_lib.service_async_return_after_ms.restype = ResultError
@@ -337,9 +355,23 @@ def interoptopus_string_create(utf8: ctypes.c_void_p, len: int, rval: ctypes.POI
 def interoptopus_string_destroy(utf8) -> int:
     return c_lib.interoptopus_string_destroy(utf8)
 
-def interoptopus_vec_TODO_destroy(ignored):
-    """ TODO: This should be macro generated."""
-    return c_lib.interoptopus_vec_TODO_destroy(ignored)
+def interoptopus_vec_create_18289942533122229086(data: ctypes.c_void_p, len: int, rval: ctypes.POINTER(VecU8)) -> int:
+    return c_lib.interoptopus_vec_create_18289942533122229086(data, len, rval)
+
+def interoptopus_vec_destroy_17895994407320212994(ignored) -> int:
+    return c_lib.interoptopus_vec_destroy_17895994407320212994(ignored)
+
+def interoptopus_vec_create_1491625606766217421(data: ctypes.c_void_p, len: int, rval: ctypes.POINTER(VecUtf8String)) -> int:
+    return c_lib.interoptopus_vec_create_1491625606766217421(data, len, rval)
+
+def interoptopus_vec_destroy_2831836161306219799(ignored) -> int:
+    return c_lib.interoptopus_vec_destroy_2831836161306219799(ignored)
+
+def interoptopus_vec_create_8489828321293410959(data: ctypes.c_void_p, len: int, rval: ctypes.POINTER(VecVec3f32)) -> int:
+    return c_lib.interoptopus_vec_create_8489828321293410959(data, len, rval)
+
+def interoptopus_vec_destroy_18428593021019987507(ignored) -> int:
+    return c_lib.interoptopus_vec_destroy_18428593021019987507(ignored)
 
 def alignment_1(a: Packed1) -> Packed2:
     return c_lib.alignment_1(a)
@@ -752,6 +784,18 @@ def pattern_vec_3(v):
 
 def pattern_vec_4(v: ctypes.POINTER(VecU8)):
     return c_lib.pattern_vec_4(v)
+
+def pattern_vec_5(v):
+    return c_lib.pattern_vec_5(v)
+
+def pattern_vec_6(v):
+    return c_lib.pattern_vec_6(v)
+
+def pattern_vec_7(ignored: UseSliceAndVec):
+    return c_lib.pattern_vec_7(ignored)
+
+def pattern_vec_8(v: UseSliceAndVec) -> UseSliceAndVec:
+    return c_lib.pattern_vec_8(v)
 
 
 
@@ -1902,6 +1946,37 @@ class Genericu8(ctypes.Structure):
     @x.setter
     def x(self, value: ctypes.POINTER(ctypes.c_uint8)):
         return ctypes.Structure.__set__(self, "x", value)
+
+
+class UseSliceAndVec(ctypes.Structure):
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("s1", SliceUtf8String),
+        ("s2", VecUtf8String),
+    ]
+
+    def __init__(self, s1: SliceUtf8String = None, s2 = None):
+        if s1 is not None:
+            self.s1 = s1
+        if s2 is not None:
+            self.s2 = s2
+
+    @property
+    def s1(self) -> SliceUtf8String:
+        return ctypes.Structure.__get__(self, "s1")
+
+    @s1.setter
+    def s1(self, value: SliceUtf8String):
+        return ctypes.Structure.__set__(self, "s1", value)
+
+    @property
+    def s2(self):
+        return ctypes.Structure.__get__(self, "s2")
+
+    @s2.setter
+    def s2(self, value):
+        return ctypes.Structure.__set__(self, "s2", value)
 
 
 class Weird2u8(ctypes.Structure):

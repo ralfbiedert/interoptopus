@@ -9,6 +9,12 @@ mod freestanding;
 pub struct Attributes {
     #[darling(default)]
     debug: bool,
+
+    #[darling(default)]
+    export_unique: bool,
+
+    #[darling(default)]
+    export_as: String,
 }
 
 pub fn ffi_function(attr: TokenStream, input: TokenStream) -> TokenStream {

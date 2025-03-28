@@ -6,6 +6,7 @@ use interoptopus::lang::{Composite, ConstantValue, Enum, Field, FnPointer, Funct
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::{AsyncCallback, NamedCallback};
 use interoptopus::pattern::slice::SliceType;
+use interoptopus::pattern::vec::VecType;
 
 /// Converts a primitive (Rust) type to a native C# type name, e.g., `f32` to `float`.
 pub fn primitive_to_typename(x: Primitive) -> String {
@@ -95,14 +96,15 @@ pub fn to_typespecifier_in_field(x: &Type) -> String {
         Type::Pattern(x) => match x {
             TypePattern::CStrPointer => "string".to_string(),
             TypePattern::Utf8String(_) => "string".to_string(),
-            TypePattern::Slice(x) => format!("Slice<{}>", get_slice_type_argument(x)),
-            TypePattern::SliceMut(x) => format!("SliceMut<{}>", get_slice_type_argument(x)),
+            TypePattern::Slice(x) => format!("Slice{}", get_slice_type_argument(x)),
+            TypePattern::SliceMut(x) => format!("SliceMut{}", get_slice_type_argument(x)),
             TypePattern::Option(e) => enum_to_typename(e.the_enum()),
             TypePattern::Result(e) => enum_to_typename(e.the_enum()),
             TypePattern::NamedCallback(e) => named_callback_to_typename(e),
             TypePattern::Bool => "Bool".to_string(),
             TypePattern::CChar => "sbyte".to_string(),
             TypePattern::APIVersion => to_typespecifier_in_field(&x.fallback_type()),
+            TypePattern::Vec(x) => composite_to_typename(x.composite_type()),
             _ => panic!("Pattern not explicitly handled"),
         },
     }
@@ -267,27 +269,33 @@ pub fn field_name_to_csharp_name(field: &Field, rename_symbols: bool) -> String 
 }
 
 pub fn get_slice_type_argument(x: &SliceType) -> String {
-    to_typespecifier_in_param(x.target_type())
+    to_typespecifier_in_param(x.t())
+}
+
+pub fn get_vec_type_argument(x: &VecType) -> String {
+    to_typespecifier_in_param(x.t())
 }
 
 pub fn is_owned_slice(slice: &SliceType) -> bool {
-    types_from_type(slice.target_type())
-        .iter()
-        .any(|x| matches!(x, Type::Pattern(TypePattern::Utf8String(_))))
+    types_from_type(slice.t()).iter().any(|x| matches!(x, Type::Pattern(TypePattern::Utf8String(_))))
+}
+
+pub fn is_owned_vec(vec: &VecType) -> bool {
+    types_from_type(vec.t()).iter().any(|x| matches!(x, Type::Pattern(TypePattern::Utf8String(_))))
 }
 
 #[must_use]
 pub fn pattern_to_native_in_signature(_: &Interop, param: &Parameter) -> String {
     let slice_type_name = |mutable: bool, slice: &SliceType| -> String {
         if is_owned_slice(slice) {
-            match slice.target_type() {
+            match slice.t() {
                 Type::Pattern(TypePattern::Utf8String(_)) => "string[]".to_string(),
-                _ => format!("{}[]", crate::converter::to_typespecifier_in_param(slice.target_type())),
+                _ => format!("{}[]", crate::converter::to_typespecifier_in_param(slice.t())),
             }
         } else if mutable {
-            format!("Span<{}>", to_typespecifier_in_param(slice.target_type()))
+            format!("Span<{}>", to_typespecifier_in_param(slice.t()))
         } else {
-            format!("ReadOnlySpan<{}>", to_typespecifier_in_param(slice.target_type()))
+            format!("ReadOnlySpan<{}>", to_typespecifier_in_param(slice.t()))
         }
     };
     match param.the_type() {

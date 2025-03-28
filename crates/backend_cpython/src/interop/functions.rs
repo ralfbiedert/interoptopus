@@ -58,7 +58,7 @@ pub fn write_param_helpers(_i: &Interop, w: &mut IndentWriter, function: &Functi
                     indented!(w, [()()], r"{} = ctypes.cast({}, ctypes.POINTER(ctypes.c_char))", arg.name(), arg.name())?;
                 }
                 TypePattern::Slice(t) | TypePattern::SliceMut(t) => {
-                    let inner = to_ctypes_name(t.target_type(), false);
+                    let inner = to_ctypes_name(t.t(), false);
                     indented!(w, [()], r#"if hasattr({}, "_length_") and getattr({}, "_type_", "") == {}:"#, arg.name(), arg.name(), inner)?;
 
                     indented!(

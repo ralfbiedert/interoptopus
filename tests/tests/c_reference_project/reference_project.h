@@ -335,6 +335,19 @@ typedef struct VECU8
     uint64_t capacity;
     } VECU8;
 
+///  Vec marshalling helper.
+///  A highly dangerous 'use once type' that has ownership semantics!
+///  Once passed over an FFI boundary 'the other side' is meant to own
+///  (and free) it. Rust handles that fine, but if in C# you put this
+///  in a struct and then call Rust multiple times with that struct 
+///  you'll free the same pointer multiple times, and get UB!
+typedef struct VECUTF8STRING
+    {
+    UTF8STRING* ptr;
+    uint64_t len;
+    uint64_t capacity;
+    } VECUTF8STRING;
+
 typedef struct ARRAY
     {
     uint8_t data[16];
@@ -359,6 +372,12 @@ typedef struct GENERICU8
     {
     const uint8_t* x;
     } GENERICU8;
+
+typedef struct USESLICEANDVEC
+    {
+    SLICEUTF8STRING s1;
+    VECUTF8STRING s2;
+    } USESLICEANDVEC;
 
 typedef struct WEIRD2U8
     {
@@ -608,6 +627,19 @@ typedef RESULTERROR (*SUMDELEGATERETURN)(int32_t X, int32_t Y, const void* CALLB
 
 typedef void (*SUMDELEGATERETURN2)(int32_t X, int32_t Y, const void* CALLBACK_DATA);
 
+///  Vec marshalling helper.
+///  A highly dangerous 'use once type' that has ownership semantics!
+///  Once passed over an FFI boundary 'the other side' is meant to own
+///  (and free) it. Rust handles that fine, but if in C# you put this
+///  in a struct and then call Rust multiple times with that struct 
+///  you'll free the same pointer multiple times, and get UB!
+typedef struct VECVEC3F32
+    {
+    VEC3F32* ptr;
+    uint64_t len;
+    uint64_t capacity;
+    } VECVEC3F32;
+
 typedef struct CALLBACKTABLE
     {
     MYCALLBACK my_callback;
@@ -694,8 +726,17 @@ int64_t interoptopus_string_create(const void* UTF8, uint64_t LEN, UTF8STRING* R
 
 int64_t interoptopus_string_destroy(UTF8STRING UTF8);
 
-///  TODO: This should be macro generated.
-void interoptopus_vec_TODO_destroy(VECU8 IGNORED);
+int64_t interoptopus_vec_create_18289942533122229086(const void* DATA, uint64_t LEN, VECU8* RVAL);
+
+int64_t interoptopus_vec_destroy_17895994407320212994(VECU8 IGNORED);
+
+int64_t interoptopus_vec_create_1491625606766217421(const void* DATA, uint64_t LEN, VECUTF8STRING* RVAL);
+
+int64_t interoptopus_vec_destroy_2831836161306219799(VECUTF8STRING IGNORED);
+
+int64_t interoptopus_vec_create_8489828321293410959(const void* DATA, uint64_t LEN, VECVEC3F32* RVAL);
+
+int64_t interoptopus_vec_destroy_18428593021019987507(VECVEC3F32 IGNORED);
 
 PACKED2 alignment_1(PACKED1 A);
 
@@ -917,6 +958,14 @@ void pattern_vec_2(VECU8 IGNORED);
 VECU8 pattern_vec_3(VECU8 V);
 
 VECU8 pattern_vec_4(const VECU8* V);
+
+VECUTF8STRING pattern_vec_5(VECUTF8STRING V);
+
+VECVEC3F32 pattern_vec_6(VECVEC3F32 V);
+
+void pattern_vec_7(USESLICEANDVEC IGNORED);
+
+USESLICEANDVEC pattern_vec_8(USESLICEANDVEC V);
 
 ///  Destroys the given instance.
 /// 

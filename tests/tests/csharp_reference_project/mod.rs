@@ -8,7 +8,7 @@ use tests::validate_output;
 const DEBUG: bool = false;
 
 #[test]
-fn reference_benchmarks_prerequisites() -> Result<(), Error> {
+fn prerequisites() -> Result<(), Error> {
     let generated_common = InteropBuilder::new()
         .inventory(ffi_inventory())
         .namespace_id("common")

@@ -13,3 +13,4 @@ pub mod namespaces;
 pub mod opaque;
 pub mod string;
 pub mod transparent;
+pub mod vec;

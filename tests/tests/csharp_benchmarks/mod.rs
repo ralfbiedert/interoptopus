@@ -6,7 +6,7 @@ use tests::backend_csharp::common_namespace_mappings;
 use tests::validate_output;
 
 #[test]
-fn reference_benchmarks_prerequisites() -> Result<(), Error> {
+fn prerequisites() -> Result<(), Error> {
     let generated_common = InteropBuilder::new()
         .inventory(ffi_inventory())
         .namespace_id("common".to_string())

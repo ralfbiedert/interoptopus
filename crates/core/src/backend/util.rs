@@ -183,8 +183,8 @@ pub(crate) fn types_from_type_recursive(start: &Type, types: &mut HashSet<Type>)
                     types_from_type_recursive(param.the_type(), types);
                 }
             }
-            TypePattern::Slice(x) => types_from_type_recursive(x.target_type(), types),
-            TypePattern::SliceMut(x) => types_from_type_recursive(x.target_type(), types),
+            TypePattern::Slice(x) => types_from_type_recursive(x.t(), types),
+            TypePattern::SliceMut(x) => types_from_type_recursive(x.t(), types),
             TypePattern::Option(x) => types_from_type_recursive(x.t(), types),
             TypePattern::Result(x) => {
                 for variant in x.the_enum().variants() {
@@ -290,8 +290,8 @@ pub(crate) fn holds_opaque_without_ref(typ: &Type) -> bool {
             TypePattern::CStrPointer => false,
             TypePattern::Utf8String(_) => false,
             TypePattern::APIVersion => false,
-            TypePattern::Slice(x) => holds_opaque_without_ref(x.target_type()),
-            TypePattern::SliceMut(x) => holds_opaque_without_ref(x.target_type()),
+            TypePattern::Slice(x) => holds_opaque_without_ref(x.t()),
+            TypePattern::SliceMut(x) => holds_opaque_without_ref(x.t()),
             TypePattern::Option(x) => holds_opaque_without_ref(&x.the_enum().to_type()),
             TypePattern::Result(x) => holds_opaque_without_ref(&x.the_enum().to_type()),
             TypePattern::Bool => false,
@@ -403,8 +403,8 @@ pub fn is_global_type(t: &Type) -> bool {
         Type::Pattern(x) => match x {
             TypePattern::CStrPointer => true,
             TypePattern::APIVersion => false,
-            TypePattern::Slice(x) => is_global_type(x.target_type()),
-            TypePattern::SliceMut(x) => is_global_type(x.target_type()),
+            TypePattern::Slice(x) => is_global_type(x.t()),
+            TypePattern::SliceMut(x) => is_global_type(x.t()),
             TypePattern::Option(x) => is_global_type(&x.the_enum().to_type()),
             TypePattern::Result(x) => is_global_type(&x.the_enum().to_type()),
             TypePattern::Bool => true,

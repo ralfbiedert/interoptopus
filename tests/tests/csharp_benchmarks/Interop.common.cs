@@ -300,6 +300,7 @@ namespace My.Company.Common
             public void FromManaged(Vec managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -800,6 +801,14 @@ namespace My.Company.Common
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose() { }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
+
         [CustomMarshaller(typeof(SliceUtf8String), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
@@ -808,6 +817,14 @@ namespace My.Company.Common
         {
             public IntPtr Data;
             public ulong Len;
+
+            public SliceUtf8String ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+
         }
 
         public ref struct Marshaller
@@ -815,6 +832,10 @@ namespace My.Company.Common
             private SliceUtf8String _managed;
             private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(SliceUtf8String managed) { _managed = managed; }
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceUtf8String managed) { _managed = managed; }
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -2294,6 +2315,12 @@ namespace My.Company.Common
             // the time to rethrow it.
             if (_exception != null) throw _exception;
         }
+    public Unmanaged ToUnmanaged()
+    {
+        var marshaller = new Marshaller(this);
+        try { return marshaller.ToUnmanaged(); }
+        finally { marshaller.Free(); }
+    }
 
         [CustomMarshaller(typeof(MyCallbackNamespaced), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -2303,6 +2330,13 @@ namespace My.Company.Common
         {
             internal IntPtr Callback;
             internal IntPtr Data;
+            public MyCallbackNamespaced ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+
         }
 
         public ref struct Marshaller
@@ -2356,6 +2390,26 @@ namespace My.Company.Common
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial class VecU8 : IDisposable
     {
+        /// Allocates an empty vec on the native side.
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public VecU8() { /* TODO - create empty vec */ }
+
+        // An internal helper to create an empty object.
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        private VecU8(bool _) { }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public unsafe VecU8(Span<byte> _data)
+        {
+            fixed (void* _data_ptr = _data)
+            {
+                InteropHelper.interoptopus_vec_create((IntPtr) _data_ptr, (ulong)_data.Length, out var _out);
+                _len = _out._len;
+                _capacity = _out._capacity;
+                _ptr = _out._ptr;
+            }
+        }
+
         public int Count
         {
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -2372,6 +2426,20 @@ namespace My.Company.Common
                 return Marshal.PtrToStructure<byte>(new IntPtr(_ptr.ToInt64() + i * sizeof(byte)));
             }
         }
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
+        public partial class InteropHelper
+        {
+            [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_create_18289942533122229086")]
+            public static partial long interoptopus_vec_create(IntPtr vec, ulong len, out Unmanaged rval);
+            [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_destroy_17895994407320212994")]
+            public static partial long interoptopus_vec_destroy(Unmanaged vec);
+        }
 
         [CustomMarshaller(typeof(VecU8), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
@@ -2382,6 +2450,13 @@ namespace My.Company.Common
             internal IntPtr _ptr;
             internal ulong _len;
             internal ulong _capacity;
+            public VecU8 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+
 
         }
 
@@ -2390,6 +2465,10 @@ namespace My.Company.Common
             private VecU8 _managed;
             private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(VecU8 managed) { _managed = managed; }
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(VecU8 managed) { _managed = managed; }
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -2410,7 +2489,7 @@ namespace My.Company.Common
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe VecU8 ToManaged()
             {
-                _managed = new VecU8();
+                _managed = new VecU8(true);
                 _managed._len = _unmanaged._len;
                 _managed._capacity = _unmanaged._capacity;
                 _managed._ptr = _unmanaged._ptr;
@@ -2425,7 +2504,158 @@ namespace My.Company.Common
         public void Dispose()
         {
             if (_ptr == IntPtr.Zero) return;
-            Interop.interoptopus_vec_TODO_destroy(this);
+            var _unmanaged = new Unmanaged();
+            _unmanaged._ptr = _unmanaged._ptr;
+            _unmanaged._len = _unmanaged._len;
+            _unmanaged._capacity = _unmanaged._capacity;
+            InteropHelper.interoptopus_vec_destroy(_unmanaged);
+            _ptr = IntPtr.Zero;
+            _len = 0;
+            _capacity = 0;
+        }
+    }
+
+    // This must be a class because we only ever want to hold on to the
+    // same instance, as we overwrite fields when this is sent over the FFI
+    // boundary
+    public partial class VecUtf8String
+    {
+        internal IntPtr _ptr;
+        internal ulong _len;
+        internal ulong _capacity;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial class VecUtf8String : IDisposable
+    {
+        /// Allocates an empty vec on the native side.
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public VecUtf8String() { /* TODO - create empty vec */ }
+
+        // An internal helper to create an empty object.
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        private VecUtf8String(bool _) { }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public unsafe VecUtf8String(Span<string> _data)
+        {
+            var _temp = new Utf8String.Unmanaged[_data.Length];
+            for (var i = 0; i < _data.Length; ++i)
+            {
+                _temp[i] = new Utf8String(_data[i]).ToUnmanaged();
+            }
+            fixed (void* _data_ptr = _temp)
+            {
+                InteropHelper.interoptopus_vec_create((IntPtr) _data_ptr, (ulong)_data.Length, out var _out);
+                _len = _out._len;
+                _capacity = _out._capacity;
+                _ptr = _out._ptr;
+            }
+        }
+
+        public int Count
+        {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            get { if (_ptr == IntPtr.Zero) { throw new InteropException(); } else { return (int) _len; } }
+        }
+
+        public unsafe string this[int i]
+        {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                if (_ptr == IntPtr.Zero) throw new InteropException();
+                var _element = Marshal.PtrToStructure<Utf8String.Unmanaged>(new IntPtr(_ptr.ToInt64() + i * sizeof(Utf8String.Unmanaged)));
+                return _element.ToManaged();
+            }
+        }
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
+        public partial class InteropHelper
+        {
+            [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_create_1491625606766217421")]
+            public static partial long interoptopus_vec_create(IntPtr vec, ulong len, out Unmanaged rval);
+            [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_destroy_2831836161306219799")]
+            public static partial long interoptopus_vec_destroy(Unmanaged vec);
+        }
+
+        [CustomMarshaller(typeof(VecUtf8String), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr _ptr;
+            internal ulong _len;
+            internal ulong _capacity;
+            public VecUtf8String ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+
+
+        }
+
+        public ref struct Marshaller
+        {
+            private VecUtf8String _managed;
+            private Unmanaged _unmanaged;
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(VecUtf8String managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void FromManaged(VecUtf8String managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Unmanaged ToUnmanaged()
+            {
+                if (_managed._ptr == IntPtr.Zero) throw new InteropException(); // Don't use for serialization if moved already.
+                _unmanaged = new Unmanaged();
+                _unmanaged._len = _managed._len;
+                _unmanaged._capacity = _managed._capacity;
+                _unmanaged._ptr = _managed._ptr;
+                _managed._ptr = IntPtr.Zero; // Mark this instance as moved.
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public unsafe VecUtf8String ToManaged()
+            {
+                _managed = new VecUtf8String(true);
+                _managed._len = _unmanaged._len;
+                _managed._capacity = _unmanaged._capacity;
+                _managed._ptr = _unmanaged._ptr;
+                return _managed;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void Free() { }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void Dispose()
+        {
+            if (_ptr == IntPtr.Zero) return;
+            var _unmanaged = new Unmanaged();
+            _unmanaged._ptr = _unmanaged._ptr;
+            _unmanaged._len = _unmanaged._len;
+            _unmanaged._capacity = _unmanaged._capacity;
+            InteropHelper.interoptopus_vec_destroy(_unmanaged);
+            _ptr = IntPtr.Zero;
+            _len = 0;
+            _capacity = 0;
         }
     }
 

@@ -276,7 +276,7 @@ impl SliceType {
     }
 
     #[must_use]
-    pub fn target_type(&self) -> &Type {
+    pub fn t(&self) -> &Type {
         &self.target_type
     }
 }

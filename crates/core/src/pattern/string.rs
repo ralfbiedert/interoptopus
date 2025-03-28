@@ -102,7 +102,7 @@ unsafe impl TypeInfo for String {
 
 /// Emits helper functions used by [`String`](crate::pattern::string::String).
 #[macro_export]
-macro_rules! string_utils {
+macro_rules! builtins_string {
     () => {{
         use ::interoptopus::lang::FunctionInfo;
 

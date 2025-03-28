@@ -22,9 +22,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 11458689350268229902ul)
+            if (api_version != 9907711392285720952ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (11458689350268229902). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (9907711392285720952). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -64,10 +64,34 @@ namespace My.Company
             }
         }
 
-        /// TODO: This should be macro generated.
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_TODO_destroy")]
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_18289942533122229086")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void interoptopus_vec_TODO_destroy(VecU8 ignored);
+        public static partial long interoptopus_vec_create_18289942533122229086(IntPtr data, ulong len, ref VecU8 rval);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_17895994407320212994")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial long interoptopus_vec_destroy_17895994407320212994(VecU8 ignored);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_1491625606766217421")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial long interoptopus_vec_create_1491625606766217421(IntPtr data, ulong len, ref VecUtf8String rval);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_2831836161306219799")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial long interoptopus_vec_destroy_2831836161306219799(VecUtf8String ignored);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_8489828321293410959")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial long interoptopus_vec_create_8489828321293410959(IntPtr data, ulong len, ref VecVec3f32 rval);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_18428593021019987507")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial long interoptopus_vec_destroy_18428593021019987507(VecVec3f32 ignored);
 
 
         [LibraryImport(NativeLib, EntryPoint = "alignment_1")]
@@ -935,6 +959,26 @@ namespace My.Company
         public static partial VecU8 pattern_vec_4(ref VecU8 v);
 
 
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_5")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial VecUtf8String pattern_vec_5(VecUtf8String v);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_6")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial VecVec3f32 pattern_vec_6(VecVec3f32 v);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_7")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void pattern_vec_7(UseSliceAndVec ignored);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_8")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial UseSliceAndVec pattern_vec_8(UseSliceAndVec v);
+
+
         /// Destroys the given instance.
         ///
         /// # Safety
@@ -1751,6 +1795,7 @@ namespace My.Company
             public void FromManaged(Array managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -1832,6 +1877,7 @@ namespace My.Company
             public void FromManaged(BoolField managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -1921,26 +1967,19 @@ namespace My.Company
             public void FromManaged(CallbackTable managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
 
-                var _my_callback = new MyCallback.Marshaller(_managed.my_callback);
-                _unmanaged.my_callback = _my_callback.ToUnmanaged();
-                var _my_callback_namespaced = new MyCallbackNamespaced.Marshaller(_managed.my_callback_namespaced);
-                _unmanaged.my_callback_namespaced = _my_callback_namespaced.ToUnmanaged();
-                var _my_callback_void = new MyCallbackVoid.Marshaller(_managed.my_callback_void);
-                _unmanaged.my_callback_void = _my_callback_void.ToUnmanaged();
-                var _my_callback_contextual = new MyCallbackContextual.Marshaller(_managed.my_callback_contextual);
-                _unmanaged.my_callback_contextual = _my_callback_contextual.ToUnmanaged();
-                var _sum_delegate_1 = new SumDelegate1.Marshaller(_managed.sum_delegate_1);
-                _unmanaged.sum_delegate_1 = _sum_delegate_1.ToUnmanaged();
-                var _sum_delegate_2 = new SumDelegate2.Marshaller(_managed.sum_delegate_2);
-                _unmanaged.sum_delegate_2 = _sum_delegate_2.ToUnmanaged();
-                var _sum_delegate_return = new SumDelegateReturn.Marshaller(_managed.sum_delegate_return);
-                _unmanaged.sum_delegate_return = _sum_delegate_return.ToUnmanaged();
-                var _sum_delegate_return_2 = new SumDelegateReturn2.Marshaller(_managed.sum_delegate_return_2);
-                _unmanaged.sum_delegate_return_2 = _sum_delegate_return_2.ToUnmanaged();
+                _unmanaged.my_callback = _managed.my_callback != null ? _managed.my_callback.ToUnmanaged() : default;
+                _unmanaged.my_callback_namespaced = _managed.my_callback_namespaced != null ? _managed.my_callback_namespaced.ToUnmanaged() : default;
+                _unmanaged.my_callback_void = _managed.my_callback_void != null ? _managed.my_callback_void.ToUnmanaged() : default;
+                _unmanaged.my_callback_contextual = _managed.my_callback_contextual != null ? _managed.my_callback_contextual.ToUnmanaged() : default;
+                _unmanaged.sum_delegate_1 = _managed.sum_delegate_1 != null ? _managed.sum_delegate_1.ToUnmanaged() : default;
+                _unmanaged.sum_delegate_2 = _managed.sum_delegate_2 != null ? _managed.sum_delegate_2.ToUnmanaged() : default;
+                _unmanaged.sum_delegate_return = _managed.sum_delegate_return != null ? _managed.sum_delegate_return.ToUnmanaged() : default;
+                _unmanaged.sum_delegate_return_2 = _managed.sum_delegate_return_2 != null ? _managed.sum_delegate_return_2.ToUnmanaged() : default;
 
                 return _unmanaged;
             }
@@ -1949,22 +1988,14 @@ namespace My.Company
             {
                 _managed = new CallbackTable();
 
-                var _my_callback = new MyCallback.Marshaller(_unmanaged.my_callback);
-                _managed.my_callback = _my_callback.ToManaged();
-                var _my_callback_namespaced = new MyCallbackNamespaced.Marshaller(_unmanaged.my_callback_namespaced);
-                _managed.my_callback_namespaced = _my_callback_namespaced.ToManaged();
-                var _my_callback_void = new MyCallbackVoid.Marshaller(_unmanaged.my_callback_void);
-                _managed.my_callback_void = _my_callback_void.ToManaged();
-                var _my_callback_contextual = new MyCallbackContextual.Marshaller(_unmanaged.my_callback_contextual);
-                _managed.my_callback_contextual = _my_callback_contextual.ToManaged();
-                var _sum_delegate_1 = new SumDelegate1.Marshaller(_unmanaged.sum_delegate_1);
-                _managed.sum_delegate_1 = _sum_delegate_1.ToManaged();
-                var _sum_delegate_2 = new SumDelegate2.Marshaller(_unmanaged.sum_delegate_2);
-                _managed.sum_delegate_2 = _sum_delegate_2.ToManaged();
-                var _sum_delegate_return = new SumDelegateReturn.Marshaller(_unmanaged.sum_delegate_return);
-                _managed.sum_delegate_return = _sum_delegate_return.ToManaged();
-                var _sum_delegate_return_2 = new SumDelegateReturn2.Marshaller(_unmanaged.sum_delegate_return_2);
-                _managed.sum_delegate_return_2 = _sum_delegate_return_2.ToManaged();
+                _managed.my_callback = _unmanaged.my_callback.ToManaged();
+                _managed.my_callback_namespaced = _unmanaged.my_callback_namespaced.ToManaged();
+                _managed.my_callback_void = _unmanaged.my_callback_void.ToManaged();
+                _managed.my_callback_contextual = _unmanaged.my_callback_contextual.ToManaged();
+                _managed.sum_delegate_1 = _unmanaged.sum_delegate_1.ToManaged();
+                _managed.sum_delegate_2 = _unmanaged.sum_delegate_2.ToManaged();
+                _managed.sum_delegate_return = _unmanaged.sum_delegate_return.ToManaged();
+                _managed.sum_delegate_return_2 = _unmanaged.sum_delegate_return_2.ToManaged();
 
                 return _managed;
             }
@@ -2022,14 +2053,13 @@ namespace My.Company
             public void FromManaged(CharArray managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
 
-                var _str = new FixedString.Marshaller(_managed.str);
-                _unmanaged.str = _str.ToUnmanaged();
-                var _str_2 = new FixedString.Marshaller(_managed.str_2);
-                _unmanaged.str_2 = _str_2.ToUnmanaged();
+                _unmanaged.str = _managed.str.ToUnmanaged();
+                _unmanaged.str_2 = _managed.str_2.ToUnmanaged();
 
                 return _unmanaged;
             }
@@ -2038,10 +2068,8 @@ namespace My.Company
             {
                 _managed = new CharArray();
 
-                var _str = new FixedString.Marshaller(_unmanaged.str);
-                _managed.str = _str.ToManaged();
-                var _str_2 = new FixedString.Marshaller(_unmanaged.str_2);
-                _managed.str_2 = _str_2.ToManaged();
+                _managed.str = _unmanaged.str.ToManaged();
+                _managed.str_2 = _unmanaged.str_2.ToManaged();
 
                 return _managed;
             }
@@ -2096,12 +2124,12 @@ namespace My.Company
             public void FromManaged(Container managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
 
-                var _foreign = new Local.Marshaller(_managed.foreign);
-                _unmanaged.foreign = _foreign.ToUnmanaged();
+                _unmanaged.foreign = _managed.foreign.ToUnmanaged();
 
                 return _unmanaged;
             }
@@ -2110,8 +2138,7 @@ namespace My.Company
             {
                 _managed = new Container();
 
-                var _foreign = new Local.Marshaller(_unmanaged.foreign);
-                _managed.foreign = _foreign.ToManaged();
+                _managed.foreign = _unmanaged.foreign.ToManaged();
 
                 return _managed;
             }
@@ -2166,6 +2193,7 @@ namespace My.Company
             public void FromManaged(ExtraTypef32 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -2234,6 +2262,7 @@ namespace My.Company
             public void FromManaged(FixedString managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -2315,6 +2344,7 @@ namespace My.Company
             public void FromManaged(Genericu32 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -2383,6 +2413,7 @@ namespace My.Company
             public void FromManaged(Genericu8 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -2451,6 +2482,7 @@ namespace My.Company
             public void FromManaged(Inner managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -2519,6 +2551,7 @@ namespace My.Company
             public void FromManaged(Local managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -2605,13 +2638,13 @@ namespace My.Company
             public void FromManaged(NestedArray managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
 
                 _unmanaged.field_enum = _managed.field_enum;
-                var _field_vec = new Vec3f32.Marshaller(_managed.field_vec);
-                _unmanaged.field_vec = _field_vec.ToUnmanaged();
+                _unmanaged.field_vec = _managed.field_vec.ToUnmanaged();
                 _unmanaged.field_bool = (sbyte) (_managed.field_bool ? 1 : 0);
                 _unmanaged.field_int = _managed.field_int;
                 fixed(ushort* _fixed = _unmanaged.field_array)
@@ -2630,8 +2663,7 @@ namespace My.Company
                     var dst = new Span<ushort>(_fixed, 5);
                     src.CopyTo(dst);
                 }
-                var _field_struct = new Array.Marshaller(_managed.field_struct);
-                _unmanaged.field_struct = _field_struct.ToUnmanaged();
+                _unmanaged.field_struct = _managed.field_struct.ToUnmanaged();
 
                 return _unmanaged;
             }
@@ -2641,8 +2673,7 @@ namespace My.Company
                 _managed = new NestedArray();
 
                 _managed.field_enum = _unmanaged.field_enum;
-                var _field_vec = new Vec3f32.Marshaller(_unmanaged.field_vec);
-                _managed.field_vec = _field_vec.ToManaged();
+                _managed.field_vec = _unmanaged.field_vec.ToManaged();
                 _managed.field_bool = _unmanaged.field_bool == 1 ? true : false;
                 _managed.field_int = _unmanaged.field_int;
                 fixed(ushort* _fixed = _unmanaged.field_array)
@@ -2659,8 +2690,7 @@ namespace My.Company
                     var dst = new Span<ushort>(_managed.field_array_2, 0, 5);
                     src.CopyTo(dst);
                 }
-                var _field_struct = new Array.Marshaller(_unmanaged.field_struct);
-                _managed.field_struct = _field_struct.ToManaged();
+                _managed.field_struct = _unmanaged.field_struct.ToManaged();
 
                 return _managed;
             }
@@ -2718,6 +2748,7 @@ namespace My.Company
             public void FromManaged(Packed1 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -2791,6 +2822,7 @@ namespace My.Company
             public void FromManaged(Packed2 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -2861,6 +2893,7 @@ namespace My.Company
             public void FromManaged(Phantomu8 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -2931,6 +2964,7 @@ namespace My.Company
             public void FromManaged(StructDocumented managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -2999,6 +3033,7 @@ namespace My.Company
             public void FromManaged(StructRenamed managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -3067,6 +3102,7 @@ namespace My.Company
             public void FromManaged(Tupled managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -3135,6 +3171,7 @@ namespace My.Company
             public void FromManaged(UseCStrPtr managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -3149,6 +3186,80 @@ namespace My.Company
                 _managed = new UseCStrPtr();
 
                 _managed.ascii_string = Marshal.PtrToStringAnsi(_unmanaged.ascii_string);
+
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    public partial struct UseSliceAndVec
+    {
+        public SliceUtf8String s1;
+        public VecUtf8String s2;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct UseSliceAndVec
+    {
+        public UseSliceAndVec(UseSliceAndVec other)
+        {
+            s1 = other.s1;
+            s2 = other.s2;
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public SliceUtf8String.Unmanaged s1;
+            public VecUtf8String.Unmanaged s2;
+
+            public UseSliceAndVec ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        [CustomMarshaller(typeof(UseSliceAndVec), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private UseSliceAndVec _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(UseSliceAndVec managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(UseSliceAndVec managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+
+                _unmanaged.s1 = _managed.s1.ToUnmanaged();
+                _unmanaged.s2 = _managed.s2.ToUnmanaged();
+
+                return _unmanaged;
+            }
+
+            public unsafe UseSliceAndVec ToManaged()
+            {
+                _managed = new UseSliceAndVec();
+
+                _managed.s1 = _unmanaged.s1.ToManaged();
+                _managed.s2 = _unmanaged.s2.ToManaged();
 
                 return _managed;
             }
@@ -3206,14 +3317,13 @@ namespace My.Company
             public void FromManaged(UseString managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
 
-                var _s1 = new Utf8String.Marshaller(new Utf8String(_managed.s1));
-                _unmanaged.s1 = _s1.ToUnmanaged();
-                var _s2 = new Utf8String.Marshaller(new Utf8String(_managed.s2));
-                _unmanaged.s2 = _s2.ToUnmanaged();
+                _unmanaged.s1 = new Utf8String(_managed.s1).ToUnmanaged();
+                _unmanaged.s2 = new Utf8String(_managed.s2).ToUnmanaged();
 
                 return _unmanaged;
             }
@@ -3222,10 +3332,8 @@ namespace My.Company
             {
                 _managed = new UseString();
 
-                var _s1 = new Utf8String.Marshaller(_unmanaged.s1);
-                _managed.s1 = _s1.ToManaged().String;
-                var _s2 = new Utf8String.Marshaller(_unmanaged.s2);
-                _managed.s2 = _s2.ToManaged().String;
+                _managed.s1 = _unmanaged.s1.ToManaged();
+                _managed.s2 = _unmanaged.s2.ToManaged();
 
                 return _managed;
             }
@@ -3283,6 +3391,7 @@ namespace My.Company
             public void FromManaged(Vec1 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -3356,6 +3465,7 @@ namespace My.Company
             public void FromManaged(Vec2 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -3432,6 +3542,7 @@ namespace My.Company
             public void FromManaged(Vec3f32 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -3507,6 +3618,7 @@ namespace My.Company
             public void FromManaged(Visibility1 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -3580,6 +3692,7 @@ namespace My.Company
             public void FromManaged(Visibility2 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -3650,6 +3763,7 @@ namespace My.Company
             public void FromManaged(Weird1u32 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -3724,6 +3838,7 @@ namespace My.Company
             public void FromManaged(Weird2u8 managed) { _managed = managed; }
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {;
                 _unmanaged = new Unmanaged();
@@ -3915,6 +4030,14 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose() { }
 
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
+
         [CustomMarshaller(typeof(SliceUseString), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
@@ -3923,6 +4046,14 @@ namespace My.Company
         {
             public IntPtr Data;
             public ulong Len;
+
+            public SliceUseString ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+
         }
 
         public ref struct Marshaller
@@ -3930,6 +4061,10 @@ namespace My.Company
             private SliceUseString _managed;
             private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(SliceUseString managed) { _managed = managed; }
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceUseString managed) { _managed = managed; }
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -5998,6 +6133,12 @@ namespace My.Company
             // the time to rethrow it.
             if (_exception != null) throw _exception;
         }
+    public Unmanaged ToUnmanaged()
+    {
+        var marshaller = new Marshaller(this);
+        try { return marshaller.ToUnmanaged(); }
+        finally { marshaller.Free(); }
+    }
 
         [CustomMarshaller(typeof(CallbackCharArray2), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -6007,6 +6148,13 @@ namespace My.Company
         {
             internal IntPtr Callback;
             internal IntPtr Data;
+            public CallbackCharArray2 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+
         }
 
         public ref struct Marshaller
@@ -6107,6 +6255,12 @@ namespace My.Company
             // the time to rethrow it.
             if (_exception != null) throw _exception;
         }
+    public Unmanaged ToUnmanaged()
+    {
+        var marshaller = new Marshaller(this);
+        try { return marshaller.ToUnmanaged(); }
+        finally { marshaller.Free(); }
+    }
 
         [CustomMarshaller(typeof(CallbackFFISlice), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -6116,6 +6270,13 @@ namespace My.Company
         {
             internal IntPtr Callback;
             internal IntPtr Data;
+            public CallbackFFISlice ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+
         }
 
         public ref struct Marshaller
@@ -6216,6 +6377,12 @@ namespace My.Company
             // the time to rethrow it.
             if (_exception != null) throw _exception;
         }
+    public Unmanaged ToUnmanaged()
+    {
+        var marshaller = new Marshaller(this);
+        try { return marshaller.ToUnmanaged(); }
+        finally { marshaller.Free(); }
+    }
 
         [CustomMarshaller(typeof(CallbackHugeVecSlice), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -6225,6 +6392,13 @@ namespace My.Company
         {
             internal IntPtr Callback;
             internal IntPtr Data;
+            public CallbackHugeVecSlice ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+
         }
 
         public ref struct Marshaller
@@ -6325,6 +6499,12 @@ namespace My.Company
             // the time to rethrow it.
             if (_exception != null) throw _exception;
         }
+    public Unmanaged ToUnmanaged()
+    {
+        var marshaller = new Marshaller(this);
+        try { return marshaller.ToUnmanaged(); }
+        finally { marshaller.Free(); }
+    }
 
         [CustomMarshaller(typeof(CallbackSliceMut), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -6334,6 +6514,13 @@ namespace My.Company
         {
             internal IntPtr Callback;
             internal IntPtr Data;
+            public CallbackSliceMut ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+
         }
 
         public ref struct Marshaller
@@ -6434,6 +6621,12 @@ namespace My.Company
             // the time to rethrow it.
             if (_exception != null) throw _exception;
         }
+    public Unmanaged ToUnmanaged()
+    {
+        var marshaller = new Marshaller(this);
+        try { return marshaller.ToUnmanaged(); }
+        finally { marshaller.Free(); }
+    }
 
         [CustomMarshaller(typeof(CallbackU8), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -6443,6 +6636,13 @@ namespace My.Company
         {
             internal IntPtr Callback;
             internal IntPtr Data;
+            public CallbackU8 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+
         }
 
         public ref struct Marshaller
@@ -6543,6 +6743,12 @@ namespace My.Company
             // the time to rethrow it.
             if (_exception != null) throw _exception;
         }
+    public Unmanaged ToUnmanaged()
+    {
+        var marshaller = new Marshaller(this);
+        try { return marshaller.ToUnmanaged(); }
+        finally { marshaller.Free(); }
+    }
 
         [CustomMarshaller(typeof(MyCallback), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -6552,6 +6758,13 @@ namespace My.Company
         {
             internal IntPtr Callback;
             internal IntPtr Data;
+            public MyCallback ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+
         }
 
         public ref struct Marshaller
@@ -6652,6 +6865,12 @@ namespace My.Company
             // the time to rethrow it.
             if (_exception != null) throw _exception;
         }
+    public Unmanaged ToUnmanaged()
+    {
+        var marshaller = new Marshaller(this);
+        try { return marshaller.ToUnmanaged(); }
+        finally { marshaller.Free(); }
+    }
 
         [CustomMarshaller(typeof(MyCallbackContextual), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -6661,6 +6880,13 @@ namespace My.Company
         {
             internal IntPtr Callback;
             internal IntPtr Data;
+            public MyCallbackContextual ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+
         }
 
         public ref struct Marshaller
@@ -6761,6 +6987,12 @@ namespace My.Company
             // the time to rethrow it.
             if (_exception != null) throw _exception;
         }
+    public Unmanaged ToUnmanaged()
+    {
+        var marshaller = new Marshaller(this);
+        try { return marshaller.ToUnmanaged(); }
+        finally { marshaller.Free(); }
+    }
 
         [CustomMarshaller(typeof(MyCallbackVoid), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -6770,6 +7002,13 @@ namespace My.Company
         {
             internal IntPtr Callback;
             internal IntPtr Data;
+            public MyCallbackVoid ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+
         }
 
         public ref struct Marshaller
@@ -6870,6 +7109,12 @@ namespace My.Company
             // the time to rethrow it.
             if (_exception != null) throw _exception;
         }
+    public Unmanaged ToUnmanaged()
+    {
+        var marshaller = new Marshaller(this);
+        try { return marshaller.ToUnmanaged(); }
+        finally { marshaller.Free(); }
+    }
 
         [CustomMarshaller(typeof(NestedStringCallback), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -6879,6 +7124,13 @@ namespace My.Company
         {
             internal IntPtr Callback;
             internal IntPtr Data;
+            public NestedStringCallback ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+
         }
 
         public ref struct Marshaller
@@ -6979,6 +7231,12 @@ namespace My.Company
             // the time to rethrow it.
             if (_exception != null) throw _exception;
         }
+    public Unmanaged ToUnmanaged()
+    {
+        var marshaller = new Marshaller(this);
+        try { return marshaller.ToUnmanaged(); }
+        finally { marshaller.Free(); }
+    }
 
         [CustomMarshaller(typeof(StringCallback), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -6988,6 +7246,13 @@ namespace My.Company
         {
             internal IntPtr Callback;
             internal IntPtr Data;
+            public StringCallback ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+
         }
 
         public ref struct Marshaller
@@ -7088,6 +7353,12 @@ namespace My.Company
             // the time to rethrow it.
             if (_exception != null) throw _exception;
         }
+    public Unmanaged ToUnmanaged()
+    {
+        var marshaller = new Marshaller(this);
+        try { return marshaller.ToUnmanaged(); }
+        finally { marshaller.Free(); }
+    }
 
         [CustomMarshaller(typeof(SumDelegate1), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -7097,6 +7368,13 @@ namespace My.Company
         {
             internal IntPtr Callback;
             internal IntPtr Data;
+            public SumDelegate1 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+
         }
 
         public ref struct Marshaller
@@ -7197,6 +7475,12 @@ namespace My.Company
             // the time to rethrow it.
             if (_exception != null) throw _exception;
         }
+    public Unmanaged ToUnmanaged()
+    {
+        var marshaller = new Marshaller(this);
+        try { return marshaller.ToUnmanaged(); }
+        finally { marshaller.Free(); }
+    }
 
         [CustomMarshaller(typeof(SumDelegate2), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -7206,6 +7490,13 @@ namespace My.Company
         {
             internal IntPtr Callback;
             internal IntPtr Data;
+            public SumDelegate2 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+
         }
 
         public ref struct Marshaller
@@ -7306,6 +7597,12 @@ namespace My.Company
             // the time to rethrow it.
             if (_exception != null) throw _exception;
         }
+    public Unmanaged ToUnmanaged()
+    {
+        var marshaller = new Marshaller(this);
+        try { return marshaller.ToUnmanaged(); }
+        finally { marshaller.Free(); }
+    }
 
         [CustomMarshaller(typeof(SumDelegateReturn), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -7315,6 +7612,13 @@ namespace My.Company
         {
             internal IntPtr Callback;
             internal IntPtr Data;
+            public SumDelegateReturn ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+
         }
 
         public ref struct Marshaller
@@ -7415,6 +7719,12 @@ namespace My.Company
             // the time to rethrow it.
             if (_exception != null) throw _exception;
         }
+    public Unmanaged ToUnmanaged()
+    {
+        var marshaller = new Marshaller(this);
+        try { return marshaller.ToUnmanaged(); }
+        finally { marshaller.Free(); }
+    }
 
         [CustomMarshaller(typeof(SumDelegateReturn2), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -7424,6 +7734,13 @@ namespace My.Company
         {
             internal IntPtr Callback;
             internal IntPtr Data;
+            public SumDelegateReturn2 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+
         }
 
         public ref struct Marshaller
@@ -7681,6 +7998,144 @@ namespace My.Company
             };
 
             return (ac, tcs.Task);
+        }
+    }
+
+    // This must be a class because we only ever want to hold on to the
+    // same instance, as we overwrite fields when this is sent over the FFI
+    // boundary
+    public partial class VecVec3f32
+    {
+        internal IntPtr _ptr;
+        internal ulong _len;
+        internal ulong _capacity;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial class VecVec3f32 : IDisposable
+    {
+        /// Allocates an empty vec on the native side.
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public VecVec3f32() { /* TODO - create empty vec */ }
+
+        // An internal helper to create an empty object.
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        private VecVec3f32(bool _) { }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public unsafe VecVec3f32(Span<Vec3f32> _data)
+        {
+            fixed (void* _data_ptr = _data)
+            {
+                InteropHelper.interoptopus_vec_create((IntPtr) _data_ptr, (ulong)_data.Length, out var _out);
+                _len = _out._len;
+                _capacity = _out._capacity;
+                _ptr = _out._ptr;
+            }
+        }
+
+        public int Count
+        {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            get { if (_ptr == IntPtr.Zero) { throw new InteropException(); } else { return (int) _len; } }
+        }
+
+        public unsafe Vec3f32 this[int i]
+        {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                if (_ptr == IntPtr.Zero) throw new InteropException();
+                return Marshal.PtrToStructure<Vec3f32>(new IntPtr(_ptr.ToInt64() + i * sizeof(Vec3f32)));
+            }
+        }
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
+        public partial class InteropHelper
+        {
+            [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_create_8489828321293410959")]
+            public static partial long interoptopus_vec_create(IntPtr vec, ulong len, out Unmanaged rval);
+            [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_destroy_18428593021019987507")]
+            public static partial long interoptopus_vec_destroy(Unmanaged vec);
+        }
+
+        [CustomMarshaller(typeof(VecVec3f32), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr _ptr;
+            internal ulong _len;
+            internal ulong _capacity;
+            public VecVec3f32 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+
+
+        }
+
+        public ref struct Marshaller
+        {
+            private VecVec3f32 _managed;
+            private Unmanaged _unmanaged;
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(VecVec3f32 managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void FromManaged(VecVec3f32 managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Unmanaged ToUnmanaged()
+            {
+                if (_managed._ptr == IntPtr.Zero) throw new InteropException(); // Don't use for serialization if moved already.
+                _unmanaged = new Unmanaged();
+                _unmanaged._len = _managed._len;
+                _unmanaged._capacity = _managed._capacity;
+                _unmanaged._ptr = _managed._ptr;
+                _managed._ptr = IntPtr.Zero; // Mark this instance as moved.
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public unsafe VecVec3f32 ToManaged()
+            {
+                _managed = new VecVec3f32(true);
+                _managed._len = _unmanaged._len;
+                _managed._capacity = _unmanaged._capacity;
+                _managed._ptr = _unmanaged._ptr;
+                return _managed;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void Free() { }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void Dispose()
+        {
+            if (_ptr == IntPtr.Zero) return;
+            var _unmanaged = new Unmanaged();
+            _unmanaged._ptr = _unmanaged._ptr;
+            _unmanaged._len = _unmanaged._len;
+            _unmanaged._capacity = _unmanaged._capacity;
+            InteropHelper.interoptopus_vec_destroy(_unmanaged);
+            _ptr = IntPtr.Zero;
+            _len = 0;
+            _capacity = 0;
         }
     }
 

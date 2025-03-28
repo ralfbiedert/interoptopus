@@ -75,6 +75,7 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
     indented!(w, [()], r"public void FromManaged({} managed) {{ _managed = managed; }}", name)?;
     indented!(w, [()], r"public void FromUnmanaged(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
     w.newline()?;
+    i.inline_hint(w, 1)?;
     indented!(w, [()], r"public unsafe Unmanaged ToUnmanaged()")?;
     indented!(w, [()], r"{{;")?;
     indented!(w, [()()], r"_unmanaged = new Unmanaged();")?;
@@ -134,6 +135,15 @@ pub fn write_type_definition_composite_unmanaged_body_field(i: &Interop, w: &mut
         }
         Type::Pattern(TypePattern::NamedCallback(x)) => {
             indented!(w, r"public {}.Unmanaged {};", x.name(), field_name)?;
+        }
+        Type::Pattern(TypePattern::Slice(x)) => {
+            indented!(w, r"public {}.Unmanaged {};", x.rust_name(), field_name)?;
+        }
+        Type::Pattern(TypePattern::SliceMut(x)) => {
+            indented!(w, r"public {}.Unmanaged {};", x.rust_name(), field_name)?;
+        }
+        Type::Pattern(TypePattern::Vec(x)) => {
+            indented!(w, r"public {}.Unmanaged {};", x.rust_name(), field_name)?;
         }
         Type::Pattern(TypePattern::CStrPointer) => {
             indented!(w, r"public IntPtr {};", field_name)?;
@@ -233,12 +243,13 @@ pub fn write_type_definition_composite_marshaller_field_to_unmanaged(i: &Interop
             indented!(w, "_unmanaged.{name} = Marshal.StringToHGlobalAnsi(_managed.{name});")?;
         }
         Type::Pattern(TypePattern::Utf8String(_)) => {
-            indented!(w, "var _{name} = new Utf8String.Marshaller(new Utf8String(_managed.{}));", name)?;
-            indented!(w, "_unmanaged.{name} = _{name}.ToUnmanaged();")?;
+            indented!(w, "_unmanaged.{name} = new Utf8String(_managed.{name}).ToUnmanaged();")?;
         }
-        x => {
-            indented!(w, "var _{name} = new {}.Marshaller(_managed.{});", to_typespecifier_in_field(x), name)?;
-            indented!(w, "_unmanaged.{name} = _{name}.ToUnmanaged();")?;
+        Type::Pattern(TypePattern::NamedCallback(_)) => {
+            indented!(w, "_unmanaged.{name} = _managed.{name} != null ? _managed.{name}.ToUnmanaged() : default;")?;
+        }
+        _ => {
+            indented!(w, "_unmanaged.{name} = _managed.{name}.ToUnmanaged();")?;
         }
     }
 
@@ -269,13 +280,10 @@ pub fn write_type_definition_composite_marshaller_field_from_unmanaged(i: &Inter
             indented!(w, "_managed.{name} = Marshal.PtrToStringAnsi(_unmanaged.{name});")?;
         }
         Type::Pattern(TypePattern::Utf8String(_)) => {
-            indented!(w, "var _{name} = new Utf8String.Marshaller(_unmanaged.{name});")?;
-            indented!(w, "_managed.{name} = _{name}.ToManaged().String;")?;
+            indented!(w, "_managed.{name} = _unmanaged.{name}.ToManaged();")?;
         }
-
-        x => {
-            indented!(w, "var _{name} = new {}.Marshaller(_unmanaged.{});", to_typespecifier_in_field(x), name)?;
-            indented!(w, "_managed.{name} = _{name}.ToManaged();")?;
+        _ => {
+            indented!(w, "_managed.{name} = _unmanaged.{name}.ToManaged();")?;
         }
     }
 

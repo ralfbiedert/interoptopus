@@ -41,7 +41,7 @@ pub fn to_type_hint(the_type: &Type, is_parameter: bool) -> String {
             TypePattern::Option(_) => "TODO".to_string(),
             TypePattern::Slice(c) | TypePattern::SliceMut(c) => {
                 let mut res = c.rust_name().to_string();
-                let inner = to_ctypes_name(c.target_type(), false);
+                let inner = to_ctypes_name(c.t(), false);
                 if is_parameter {
                     res = format!("{res} | ctypes.Array[{inner}]");
                 }

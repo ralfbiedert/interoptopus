@@ -1,5 +1,6 @@
 use proc_macro2::TokenStream;
 use quote::{ToTokens, quote, quote_spanned};
+use std::hash::{DefaultHasher, Hash, Hasher};
 use syn::spanned::Spanned;
 use syn::{FnArg, GenericParam, ItemFn, Pat, ReturnType, Signature, Type};
 
@@ -63,8 +64,8 @@ pub fn rval_tokens(return_type: &ReturnType) -> TokenStream {
     }
 }
 
-#[allow(clippy::equatable_if_let, clippy::useless_let_if_seq)]
-pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStream) -> TokenStream {
+#[allow(clippy::equatable_if_let, clippy::useless_let_if_seq, clippy::too_many_lines)]
+pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream) -> TokenStream {
     let mut item_fn = syn::parse2::<ItemFn>(input).expect("Must be a function.");
     let docs = util::extract_doc_lines(&item_fn.attrs);
 
@@ -88,9 +89,23 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
     }
 
     let function_ident = item_fn.sig.ident.clone();
-    let function_ident_str = function_ident.to_string();
     let mut generic_params = quote! {};
     let mut phantom_fields = quote! {};
+
+    let export_name = if !ffi_attributes.export_as.is_empty() {
+        ffi_attributes.export_as.clone()
+    } else if ffi_attributes.export_unique {
+        let signature_tokens = quote::quote! { #item_fn.sig };
+        let original_name = item_fn.sig.ident.to_string();
+        let mut hasher = DefaultHasher::new();
+
+        signature_tokens.to_string().hash(&mut hasher);
+        let hash = hasher.finish();
+
+        format!("{original_name}_{hash}")
+    } else {
+        function_ident.to_string()
+    };
 
     if !generic_parameters.is_empty() {
         generic_params = quote! { < #(#generic_parameters,)* > };
@@ -141,6 +156,8 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
         item_fn.attrs.push(syn::parse_quote!(#[unsafe(no_mangle)]));
     }
 
+    item_fn.attrs.push(syn::parse_quote!(#[unsafe(export_name = #export_name)]));
+
     let rval = quote! {
         #item_fn
 
@@ -168,7 +185,7 @@ pub fn ffi_function_freestanding(_ffi_attributes: &Attributes, input: TokenStrea
                 let docs = ::interoptopus::lang::Docs::from_lines(doc_lines);
                 let meta = ::interoptopus::lang::Meta::with_docs(docs);
 
-                ::interoptopus::lang::Function::new(#function_ident_str.to_string(), sig, meta)
+                ::interoptopus::lang::Function::new(#export_name.to_string(), sig, meta)
             }
         }
     };

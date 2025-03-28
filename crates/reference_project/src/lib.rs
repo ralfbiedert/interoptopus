@@ -8,7 +8,7 @@
 //! is generated is part of the test.
 
 use interoptopus::inventory::{Inventory, InventoryBuilder};
-use interoptopus::{constant, extra_type, function, pattern, string_utils};
+use interoptopus::{builtins_string, builtins_vec, constant, extra_type, ffi, function, pattern};
 
 pub mod constants;
 pub mod functions;
@@ -44,9 +44,10 @@ pub fn ffi_inventory() -> Inventory {
     {
         InventoryBuilder::new()
             // Functions
-            .register(string_utils!())
-            .register(function!(patterns::vec::interoptopus_vec_TODO_destroy))
-            // .register(vec_utils!(u8, u32))
+            .register(builtins_string!())
+            .register(builtins_vec!(u8))
+            .register(builtins_vec!(ffi::String))
+            .register(builtins_vec!(types::basic::Vec3f32))
             .register(function!(functions::alignment::alignment_1))
             .register(function!(functions::array::array_1))
             .register(function!(functions::array::array_2))
@@ -157,6 +158,10 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(patterns::vec::pattern_vec_2))
             .register(function!(patterns::vec::pattern_vec_3))
             .register(function!(patterns::vec::pattern_vec_4))
+            .register(function!(patterns::vec::pattern_vec_5))
+            .register(function!(patterns::vec::pattern_vec_6))
+            .register(function!(patterns::vec::pattern_vec_7))
+            .register(function!(patterns::vec::pattern_vec_8))
             // Constants
             .register(constant!(constants::U8))
             .register(constant!(constants::F32_MIN_POSITIVE))

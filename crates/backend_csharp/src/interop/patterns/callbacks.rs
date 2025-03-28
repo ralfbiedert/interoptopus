@@ -122,6 +122,12 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()()], r"// the time to rethrow it.")?;
     indented!(w, [()()], r"if (_exception != null) throw _exception;")?;
     indented!(w, [()], r"}}")?;
+    indented!(w, r"public Unmanaged ToUnmanaged()")?;
+    indented!(w, r"{{")?;
+    indented!(w, [()], r"var marshaller = new Marshaller(this);")?;
+    indented!(w, [()], r"try {{ return marshaller.ToUnmanaged(); }}")?;
+    indented!(w, [()], r"finally {{ marshaller.Free(); }}")?;
+    indented!(w, r"}}")?;
     w.newline()?;
     indented!(w, [()], r"[CustomMarshaller(typeof({name}), MarshalMode.Default, typeof(Marshaller))]")?;
     indented!(w, [()], r"private struct MarshallerMeta {{  }}")?;
@@ -131,6 +137,14 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"internal IntPtr Callback;")?;
     indented!(w, [()()], r"internal IntPtr Data;")?;
+    indented!(w, [()()], r"public {name} ToManaged()")?;
+    indented!(w, [()()], r"{{")?;
+    indented!(w, [()()()], r"var marshaller = new Marshaller(this);")?;
+    indented!(w, [()()()], r"try {{ return marshaller.ToManaged(); }}")?;
+    indented!(w, [()()()], r"finally {{ marshaller.Free(); }}")?;
+    indented!(w, [()()], r"}}")?;
+    w.newline()?;
+
     indented!(w, [()], r"}}")?;
     w.newline()?;
     indented!(w, [()], r"public ref struct Marshaller")?;

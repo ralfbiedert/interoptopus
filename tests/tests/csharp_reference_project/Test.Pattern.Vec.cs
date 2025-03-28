@@ -88,4 +88,63 @@ public class TestPatternVec
         vec2.Dispose();
     }
 
+    [Fact]
+    public void pattern_ffi_vec_5()
+    {
+
+        var v = new [] { "1", "2", "3" };
+        var v1 = new VecUtf8String(v);
+        var v2 = Interop.pattern_vec_5(v1);
+
+        Assert.Equal(v[0], v2[0]);
+        Assert.Equal(v[1], v2[1]);
+        Assert.Equal(v[2], v2[2]);
+    }
+
+
+    [Fact]
+    public void pattern_ffi_vec_6()
+    {
+        var v = new Vec3f32[]
+        {
+            new() { x = 1, y = 1, z = 1 },
+            new() { x = 2, y = 2, z = 2 },
+            new() { x = 3, y = 3, z = 3 },
+        };
+
+        var v1 = new VecVec3f32(v);
+        var v2 = Interop.pattern_vec_6(v1);
+
+        Assert.Equal(v[0], v2[0]);
+        Assert.Equal(v[1], v2[1]);
+        Assert.Equal(v[2], v2[2]);
+    }
+
+    [Fact]
+    public void pattern_ffi_vec_7()
+    {
+        var v = new [] { "1", "2", "3" };
+        var v1 = new UseSliceAndVec { s1 = new SliceUtf8String(v), s2 = new VecUtf8String(v) };
+        Interop.pattern_vec_7(v1);
+
+        // Assert.Equal(v[0], v2.s1[0]);
+        // Assert.Equal(v[1], v2.s1[1]);
+        // Assert.Equal(v[2], v2.s1[2]);
+
+    }
+
+    [Fact]
+    public void pattern_ffi_vec_8()
+    {
+        var v = new [] { "1", "2", "3" };
+        var v1 = new UseSliceAndVec { s1 = new SliceUtf8String(v), s2 = new VecUtf8String(v) };
+
+        // TODO: This rval deserialziation of slice inside composite has some issues
+        // var v2 = Interop.pattern_vec_8(v1);
+        //
+        // Assert.Equal(v[0], v2.s1[0]);
+        // Assert.Equal(v[1], v2.s1[1]);
+        // Assert.Equal(v[2], v2.s1[2]);
+    }
+
 }

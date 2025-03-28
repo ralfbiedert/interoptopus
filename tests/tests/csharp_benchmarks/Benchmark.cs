@@ -69,6 +69,15 @@ static class Benchmark {
         result = MeasureResult.Measure(Iterations, () => Interop.pattern_string_2("hello world"));
         writer.Add("pattern_string_2('hello world')", result);
 
+        result = MeasureResult.Measure(Iterations, () => new VecU8([]));
+        writer.Add("new VecU8([])", result);
+
+        result = MeasureResult.Measure(Iterations, () => new VecUtf8String([]));
+        writer.Add("new VecUtf8String([])", result);
+
+        result = MeasureResult.Measure(Iterations, () => Interop.pattern_vec_1());
+        writer.Add("pattern_vec_u8_return()", result);
+
         result = MeasureResult.Measure(Iterations, async () => { await new TaskCompletionSource().Task; });
         writer.Add("await new TaskCompletionSource().Task", result);
 
