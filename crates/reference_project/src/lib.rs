@@ -63,6 +63,7 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(functions::enums::enums_1))
             .register(function!(functions::enums::enums_2))
             .register(function!(functions::enums::enums_3))
+            .register(function!(functions::enums::enums_4))
             .register(function!(functions::fnptrs::fnptr_1))
             .register(function!(functions::fnptrs::fnptr_2))
             .register(function!(functions::generic::generic_1a))

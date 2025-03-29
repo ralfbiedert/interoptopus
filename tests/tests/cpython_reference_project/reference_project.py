@@ -33,6 +33,7 @@ def init_lib(path):
     c_lib.enums_1.argtypes = [ctypes.c_int]
     c_lib.enums_2.argtypes = [ctypes.c_int]
     c_lib.enums_3.argtypes = [ctypes.POINTER(ctypes.c_int)]
+    c_lib.enums_4.argtypes = [ctypes.c_int]
     c_lib.fnptr_1.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8), ctypes.c_uint8]
     c_lib.fnptr_2.argtypes = [ctypes.CFUNCTYPE(None, CharArray), CharArray]
     c_lib.generic_1a.argtypes = [Genericu32, Phantomu8]
@@ -209,6 +210,7 @@ def init_lib(path):
     c_lib.nested_array_3.restype = ctypes.c_uint8
     c_lib.enums_2.restype = ctypes.c_int
     c_lib.enums_3.restype = ctypes.POINTER(ctypes.c_int)
+    c_lib.enums_4.restype = Utf8String
     c_lib.fnptr_1.restype = ctypes.c_uint8
     c_lib.generic_1a.restype = ctypes.c_uint32
     c_lib.generic_1b.restype = ctypes.c_uint8
@@ -417,6 +419,9 @@ def enums_2(x: TODO) -> TODO:
 
 def enums_3(x: ctypes.POINTER(ctypes.c_int)) -> ctypes.POINTER(ctypes.c_int):
     return c_lib.enums_3(x)
+
+def enums_4(x: TODO):
+    return c_lib.enums_4(x)
 
 def fnptr_1(callback, value: int) -> int:
     if not hasattr(callback, "__ctypes_from_outparam__"):
@@ -849,12 +854,6 @@ class EnumDocumented:
     B = 1
     #  Variant B.
     C = 2
-
-
-class EnumPayload:
-    A = 0
-# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
 
 
 class EnumRenamed:
@@ -1794,13 +1793,6 @@ class SliceMutU8(ctypes.Structure):
         return rval
 
 
-class OptionEnumPayload:
-    """Option that contains Some(value) or None."""
-    # Element if Some().
-# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    None = 1
-
-
 class OptionUtf8String:
     """Option that contains Some(value) or None."""
     # Element if Some().
@@ -1846,6 +1838,12 @@ class ResultUtf8StringError:
 # TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     Panic = 2
     Null = 3
+
+
+class EnumPayload:
+    A = 0
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
 
 
 class Array(ctypes.Structure):
@@ -1946,6 +1944,48 @@ class Genericu8(ctypes.Structure):
     @x.setter
     def x(self, value: ctypes.POINTER(ctypes.c_uint8)):
         return ctypes.Structure.__set__(self, "x", value)
+
+
+class Layer1Utf8String(ctypes.Structure):
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("maybe_1", TODO),
+        ("maybe_2", VecUtf8String),
+        ("maybe_3", Utf8String),
+    ]
+
+    def __init__(self, maybe_1: TODO = None, maybe_2 = None, maybe_3 = None):
+        if maybe_1 is not None:
+            self.maybe_1 = maybe_1
+        if maybe_2 is not None:
+            self.maybe_2 = maybe_2
+        if maybe_3 is not None:
+            self.maybe_3 = maybe_3
+
+    @property
+    def maybe_1(self) -> TODO:
+        return ctypes.Structure.__get__(self, "maybe_1")
+
+    @maybe_1.setter
+    def maybe_1(self, value: TODO):
+        return ctypes.Structure.__set__(self, "maybe_1", value)
+
+    @property
+    def maybe_2(self):
+        return ctypes.Structure.__get__(self, "maybe_2")
+
+    @maybe_2.setter
+    def maybe_2(self, value):
+        return ctypes.Structure.__set__(self, "maybe_2", value)
+
+    @property
+    def maybe_3(self):
+        return ctypes.Structure.__get__(self, "maybe_3")
+
+    @maybe_3.setter
+    def maybe_3(self, value):
+        return ctypes.Structure.__set__(self, "maybe_3", value)
 
 
 class UseSliceAndVec(ctypes.Structure):
@@ -2406,16 +2446,6 @@ class ResultConstPtrServiceVariousSlicesError:
     Null = 3
 
 
-class ResultOptionEnumPayloadError:
-    """Result that contains value or an error."""
-    # Element if err is `Ok`.
-# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    # Error value.
-# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    Panic = 2
-    Null = 3
-
-
 class ResultOptionUtf8StringError:
     """Result that contains value or an error."""
     # Element if err is `Ok`.
@@ -2564,6 +2594,59 @@ class CharArray(ctypes.Structure):
         return ctypes.Structure.__set__(self, "str_2", value)
 
 
+class Layer2Utf8String(ctypes.Structure):
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("layer_1", Layer1Utf8String),
+        ("vec", Vec3f32),
+        ("the_enum", ctypes.c_int),
+        ("strings", VecUtf8String),
+    ]
+
+    def __init__(self, layer_1: Layer1Utf8String = None, vec: Vec3f32 = None, the_enum: TODO = None, strings = None):
+        if layer_1 is not None:
+            self.layer_1 = layer_1
+        if vec is not None:
+            self.vec = vec
+        if the_enum is not None:
+            self.the_enum = the_enum
+        if strings is not None:
+            self.strings = strings
+
+    @property
+    def layer_1(self) -> Layer1Utf8String:
+        return ctypes.Structure.__get__(self, "layer_1")
+
+    @layer_1.setter
+    def layer_1(self, value: Layer1Utf8String):
+        return ctypes.Structure.__set__(self, "layer_1", value)
+
+    @property
+    def vec(self) -> Vec3f32:
+        return ctypes.Structure.__get__(self, "vec")
+
+    @vec.setter
+    def vec(self, value: Vec3f32):
+        return ctypes.Structure.__set__(self, "vec", value)
+
+    @property
+    def the_enum(self) -> TODO:
+        return ctypes.Structure.__get__(self, "the_enum")
+
+    @the_enum.setter
+    def the_enum(self, value: TODO):
+        return ctypes.Structure.__set__(self, "the_enum", value)
+
+    @property
+    def strings(self):
+        return ctypes.Structure.__get__(self, "strings")
+
+    @strings.setter
+    def strings(self, value):
+        return ctypes.Structure.__set__(self, "strings", value)
+
+
 class NestedArray(ctypes.Structure):
 
     # These fields represent the underlying C data layout
@@ -2650,11 +2733,23 @@ class NestedArray(ctypes.Structure):
         return ctypes.Structure.__set__(self, "field_struct", value)
 
 
+class OptionEnumPayload:
+    """Option that contains Some(value) or None."""
+    # Element if Some().
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    None = 1
+
+
 class OptionResultOptionUtf8StringError:
     """Option that contains Some(value) or None."""
     # Element if Some().
 # TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     None = 1
+
+
+class Layer3:
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
 
 
 class SliceMutCharArray(ctypes.Structure):
@@ -2726,6 +2821,16 @@ class OptionOptionResultOptionUtf8StringError:
 
 
 class ResultNestedArrayError:
+    """Result that contains value or an error."""
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
+
+
+class ResultOptionEnumPayloadError:
     """Result that contains value or an error."""
     # Element if err is `Ok`.
 # TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN

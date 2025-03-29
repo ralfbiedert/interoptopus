@@ -3,7 +3,8 @@ use crate::util::extract_doc_lines;
 use proc_macro2::TokenStream;
 use quote::__private::ext::RepToTokensExt;
 use quote::{ToTokens, quote, quote_spanned};
-use syn::{Expr, Fields, ItemEnum, Lit};
+use syn::spanned::Spanned;
+use syn::{Expr, Fields, GenericParam, ItemEnum, Lit};
 
 pub enum VariantKind {
     Unit(usize),
@@ -11,6 +12,7 @@ pub enum VariantKind {
 }
 
 #[allow(clippy::too_many_lines)]
+#[allow(clippy::useless_let_if_seq)]
 pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: ItemEnum) -> TokenStream {
     let doc_line = extract_doc_lines(&item.attrs).join("\n");
     let (type_repr, _) = attributes.type_repr_align();
@@ -23,6 +25,40 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
     let mut variants = Vec::new();
 
     let mut next_id = 0;
+
+    let mut has_generics = false;
+    let mut generic_parameter_tokens = Vec::new();
+    let mut generic_struct_tokens = Vec::new();
+    let mut generic_where_tokens = Vec::new();
+
+    for generic in &item.generics.params {
+        match generic {
+            GenericParam::Lifetime(lt) => {
+                let ident = lt.lifetime.ident.clone();
+                let lt = syn::Lifetime::new(&format!("'{ident}"), item.span());
+                generic_parameter_tokens.push(quote! { #lt });
+                generic_struct_tokens.push(quote! { #lt });
+            }
+            GenericParam::Type(ty) => {
+                let ident = ty.ident.clone();
+                let whre = ty.bounds.to_token_stream();
+                generic_parameter_tokens.push(quote! { #ident });
+                generic_struct_tokens.push(quote! { #ident });
+                generic_where_tokens.push(quote! { #ident: interoptopus::lang::TypeInfo });
+                if !whre.to_string().is_empty() {
+                    generic_where_tokens.push(quote! { #ident: #whre });
+                }
+            }
+            GenericParam::Const(x) => {
+                let ident = x.ident.clone();
+                let ty = x.ty.to_token_stream();
+                generic_parameter_tokens.push(quote! { const #ident: #ty });
+                generic_struct_tokens.push(quote! { #ident });
+            }
+        }
+
+        has_generics = true;
+    }
 
     for variant in &item.variants {
         let ident = variant.ident.to_string();
@@ -93,10 +129,20 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
         item.attrs.push(syn::parse_quote!(#attr_align));
     }
 
+    let mut param_param = quote! {};
+    let mut param_struct = quote! {};
+    let mut param_where = quote! {};
+
+    if has_generics {
+        param_param = quote! { < #(#generic_parameter_tokens),* > };
+        param_struct = quote! { < #(#generic_struct_tokens),* > };
+        param_where = quote! { where #(#generic_where_tokens),*  };
+    }
+
     quote! {
         #item
 
-        unsafe impl ::interoptopus::lang::TypeInfo for #name_ident {
+        unsafe impl #param_param  ::interoptopus::lang::TypeInfo for #name_ident #param_struct #param_where {
             fn type_info() -> ::interoptopus::lang::Type {
                 let mut variants = ::std::vec::Vec::new();
                 let docs = ::interoptopus::lang::Docs::from_line(#doc_line);

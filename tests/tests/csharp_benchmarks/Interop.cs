@@ -22,9 +22,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 9907711392285720952ul)
+            if (api_version != 10037235396236877392ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (9907711392285720952). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10037235396236877392). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -167,6 +167,11 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "enums_3")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial IntPtr enums_3(ref EnumPayload x);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "enums_4")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial Utf8String enums_4(Layer3 x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "fnptr_1")]
@@ -1748,6 +1753,109 @@ namespace My.Company
         }
     }
 
+    public partial struct Layer3
+    {
+        uint _variant;
+        Layer1Utf8String _A;
+        Layer2Utf8String _B;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Layer3
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedA
+        {
+            internal uint _variant;
+            internal Layer1Utf8String.Unmanaged _A;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedB
+        {
+            internal uint _variant;
+            internal Layer2Utf8String.Unmanaged _B;
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(0)]
+            internal UnmanagedA _A;
+
+            [FieldOffset(0)]
+            internal UnmanagedB _B;
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Layer3 ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
+        [CustomMarshaller(typeof(Layer3), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public static Layer3 A(Layer1Utf8String value) => new() { _variant = 0, _A = value };
+        public static Layer3 B(Layer2Utf8String value) => new() { _variant = 1, _B = value };
+
+        public bool IsA => _variant == 0;
+        public bool IsB => _variant == 1;
+
+        public Layer1Utf8String AsA() { if (_variant != 0) { throw new InteropException(); } else { return _A; } }
+        public Layer2Utf8String AsB() { if (_variant != 1) { throw new InteropException(); } else { return _B; } }
+
+        public ref struct Marshaller
+        {
+            private Layer3 _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Layer3 managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void FromManaged(Layer3 managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+                _unmanaged._variant = _managed._variant;
+                if (_unmanaged._variant == 0) _unmanaged._A._A = _managed._A.ToUnmanaged();
+                if (_unmanaged._variant == 1) _unmanaged._B._B = _managed._B.ToUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public unsafe Layer3 ToManaged()
+            {
+                _managed = new Layer3();
+                _managed._variant = _unmanaged._variant;
+                if (_managed._variant == 0) _managed._A = _unmanaged._A._A.ToManaged();
+                if (_managed._variant == 1) _managed._B = _unmanaged._B._B.ToManaged();
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
     public partial struct Array
     {
         public byte[] data;
@@ -2497,6 +2605,169 @@ namespace My.Company
                 _managed = new Inner();
 
                 _managed.x = _unmanaged.x;
+
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    public partial struct Layer1Utf8String
+    {
+        public OptionUtf8String maybe_1;
+        public VecUtf8String maybe_2;
+        public string maybe_3;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Layer1Utf8String
+    {
+        public Layer1Utf8String(Layer1Utf8String other)
+        {
+            maybe_1 = other.maybe_1;
+            maybe_2 = other.maybe_2;
+            maybe_3 = other.maybe_3;
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public OptionUtf8String.Unmanaged maybe_1;
+            public VecUtf8String.Unmanaged maybe_2;
+            public Utf8String.Unmanaged maybe_3;
+
+            public Layer1Utf8String ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        [CustomMarshaller(typeof(Layer1Utf8String), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private Layer1Utf8String _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(Layer1Utf8String managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(Layer1Utf8String managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+
+                _unmanaged.maybe_1 = _managed.maybe_1.ToUnmanaged();
+                _unmanaged.maybe_2 = _managed.maybe_2.ToUnmanaged();
+                _unmanaged.maybe_3 = new Utf8String(_managed.maybe_3).ToUnmanaged();
+
+                return _unmanaged;
+            }
+
+            public unsafe Layer1Utf8String ToManaged()
+            {
+                _managed = new Layer1Utf8String();
+
+                _managed.maybe_1 = _unmanaged.maybe_1.ToManaged();
+                _managed.maybe_2 = _unmanaged.maybe_2.ToManaged();
+                _managed.maybe_3 = _unmanaged.maybe_3.ToManaged();
+
+                return _managed;
+            }
+            public void Free() { }
+        }
+    }
+
+    public partial struct Layer2Utf8String
+    {
+        public Layer1Utf8String layer_1;
+        public Vec3f32 vec;
+        public EnumPayload the_enum;
+        public VecUtf8String strings;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct Layer2Utf8String
+    {
+        public Layer2Utf8String(Layer2Utf8String other)
+        {
+            layer_1 = other.layer_1;
+            vec = other.vec;
+            the_enum = other.the_enum;
+            strings = other.strings;
+        }
+
+        public Unmanaged ToUnmanaged()
+        {
+            var marshaller = new Marshaller(this);
+            try { return marshaller.ToUnmanaged(); }
+            finally { marshaller.Free(); }
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public Layer1Utf8String.Unmanaged layer_1;
+            public Vec3f32.Unmanaged vec;
+            public EnumPayload the_enum;
+            public VecUtf8String.Unmanaged strings;
+
+            public Layer2Utf8String ToManaged()
+            {
+                var marshaller = new Marshaller(this);
+                try { return marshaller.ToManaged(); }
+                finally { marshaller.Free(); }
+            }
+        }
+
+        [CustomMarshaller(typeof(Layer2Utf8String), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private Layer2Utf8String _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            public Marshaller(Layer2Utf8String managed) { _managed = managed; }
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            public void FromManaged(Layer2Utf8String managed) { _managed = managed; }
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public unsafe Unmanaged ToUnmanaged()
+            {;
+                _unmanaged = new Unmanaged();
+
+                _unmanaged.layer_1 = _managed.layer_1.ToUnmanaged();
+                _unmanaged.vec = _managed.vec.ToUnmanaged();
+                _unmanaged.the_enum = _managed.the_enum;
+                _unmanaged.strings = _managed.strings.ToUnmanaged();
+
+                return _unmanaged;
+            }
+
+            public unsafe Layer2Utf8String ToManaged()
+            {
+                _managed = new Layer2Utf8String();
+
+                _managed.layer_1 = _unmanaged.layer_1.ToManaged();
+                _managed.vec = _unmanaged.vec.ToManaged();
+                _managed.the_enum = _unmanaged.the_enum;
+                _managed.strings = _unmanaged.strings.ToManaged();
 
                 return _managed;
             }

@@ -1,3 +1,5 @@
+// This show how potentially colliding items can be renamed.
+
 pub mod ambiguous1 {
     use interoptopus::ffi_type;
 

@@ -1,4 +1,5 @@
 using My.Company;
+using My.Company.Common;
 using Xunit;
 
 public class TestEnums
@@ -66,6 +67,35 @@ public class TestEnums
         Assert.Equal(EnumPayload.A, e1);
         Assert.Equal(v2, e2.AsB());
         Assert.Equal(246u, e3.AsC());
+    }
+
+    [Fact]
+    public void enum4()
+    {
+        var l1 = new Layer1Utf8String()
+        {
+            maybe_1 = OptionUtf8String.None,
+            maybe_2 = new VecUtf8String(new[]
+            {
+                "hello",
+                "world"
+            }),
+            maybe_3 = "hello world"
+        };
+        var l2 = new Layer2Utf8String()
+        {
+            layer_1 = l1,
+            strings = new VecUtf8String(new[]
+            {
+                "hello",
+                "world"
+            }),
+            vec = new Vec3f32(),
+            the_enum = EnumPayload.A
+        };
+        var l3 = Layer3.B(l2);
+
+        Assert.Equal("hello world", Interop.enums_4(l3).String);
     }
 
 }

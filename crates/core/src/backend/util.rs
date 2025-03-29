@@ -163,7 +163,14 @@ pub(crate) fn types_from_type_recursive(start: &Type, types: &mut HashSet<Type>)
         Type::ReadPointer(inner) => types_from_type_recursive(inner, types),
         Type::ReadWritePointer(inner) => types_from_type_recursive(inner, types),
         Type::Primitive(_) => {}
-        Type::Enum(_) => {}
+        Type::Enum(x) => {
+            for variant in x.variants() {
+                match variant.kind() {
+                    VariantKind::Unit(_) => {}
+                    VariantKind::Typed(_, x) => types_from_type_recursive(x, types),
+                }
+            }
+        }
         Type::Opaque(_) => {}
         // Note, patterns must _NEVER_ add themselves as fallbacks. Instead, each code generator should
         // decide on a case-by-case bases whether it wants to use the type's fallback, or generate an

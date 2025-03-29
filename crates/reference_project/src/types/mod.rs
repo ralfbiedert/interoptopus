@@ -6,6 +6,7 @@ pub mod ambiguous;
 pub mod arrays;
 pub mod basic;
 pub mod bool;
+pub mod complex;
 pub mod enums;
 pub mod generic;
 pub mod meta;

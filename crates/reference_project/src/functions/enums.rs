@@ -1,6 +1,7 @@
 use crate::types::basic::Vec3f32;
+use crate::types::complex::Layer3;
 use crate::types::enums::EnumPayload;
-use interoptopus::ffi_function;
+use interoptopus::{ffi, ffi_function};
 
 #[ffi_function]
 pub fn enums_1(_: EnumPayload) {}
@@ -23,4 +24,12 @@ pub fn enums_3(x: &mut EnumPayload) -> &EnumPayload {
     }
 
     x
+}
+
+#[ffi_function]
+pub fn enums_4(x: Layer3<ffi::String>) -> ffi::String {
+    match x {
+        Layer3::A(x) => x.maybe_3,
+        Layer3::B(x) => x.layer_1.maybe_3,
+    }
 }

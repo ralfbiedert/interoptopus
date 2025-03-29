@@ -145,6 +145,9 @@ pub fn write_type_definition_composite_unmanaged_body_field(i: &Interop, w: &mut
         Type::Pattern(TypePattern::Vec(x)) => {
             indented!(w, r"public {}.Unmanaged {};", x.rust_name(), field_name)?;
         }
+        Type::Pattern(TypePattern::Option(x)) => {
+            indented!(w, r"public {}.Unmanaged {};", x.the_enum().rust_name(), field_name)?;
+        }
         Type::Pattern(TypePattern::CStrPointer) => {
             indented!(w, r"public IntPtr {};", field_name)?;
         }

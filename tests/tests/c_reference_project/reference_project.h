@@ -27,13 +27,6 @@ typedef enum ENUMDOCUMENTED
     ENUMDOCUMENTED_C = 2,
     } ENUMDOCUMENTED;
 
-typedef enum ENUMPAYLOAD
-    {
-    ENUMPAYLOAD_A = 0,
-    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    } ENUMPAYLOAD;
-
 typedef enum ENUMRENAMED
     {
     ENUMRENAMED_X = 0,
@@ -263,14 +256,6 @@ typedef struct SLICEMUTU8
     } SLICEMUTU8;
 
 /// Option that contains Some(value) or None.
-typedef enum OPTIONENUMPAYLOAD
-    {
-    /// Element if Some().
-    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    OPTIONENUMPAYLOAD_NONE = 1,
-    } OPTIONENUMPAYLOAD;
-
-/// Option that contains Some(value) or None.
 typedef enum OPTIONUTF8STRING
     {
     /// Element if Some().
@@ -348,6 +333,13 @@ typedef struct VECUTF8STRING
     uint64_t capacity;
     } VECUTF8STRING;
 
+typedef enum ENUMPAYLOAD
+    {
+    ENUMPAYLOAD_A = 0,
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    } ENUMPAYLOAD;
+
 typedef struct ARRAY
     {
     uint8_t data[16];
@@ -372,6 +364,13 @@ typedef struct GENERICU8
     {
     const uint8_t* x;
     } GENERICU8;
+
+typedef struct LAYER1UTF8STRING
+    {
+    OPTIONUTF8STRING maybe_1;
+    VECUTF8STRING maybe_2;
+    UTF8STRING maybe_3;
+    } LAYER1UTF8STRING;
 
 typedef struct USESLICEANDVEC
     {
@@ -569,17 +568,6 @@ typedef enum RESULTCONSTPTRSERVICEVARIOUSSLICESERROR
     } RESULTCONSTPTRSERVICEVARIOUSSLICESERROR;
 
 /// Result that contains value or an error.
-typedef enum RESULTOPTIONENUMPAYLOADERROR
-    {
-    /// Element if err is `Ok`.
-    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    /// Error value.
-    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTOPTIONENUMPAYLOADERROR_PANIC = 2,
-    RESULTOPTIONENUMPAYLOADERROR_NULL = 3,
-    } RESULTOPTIONENUMPAYLOADERROR;
-
-/// Result that contains value or an error.
 typedef enum RESULTOPTIONUTF8STRINGERROR
     {
     /// Element if err is `Ok`.
@@ -658,6 +646,14 @@ typedef struct CHARARRAY
     FIXEDSTRING str_2;
     } CHARARRAY;
 
+typedef struct LAYER2UTF8STRING
+    {
+    LAYER1UTF8STRING layer_1;
+    VEC3F32 vec;
+    ENUMPAYLOAD the_enum;
+    VECUTF8STRING strings;
+    } LAYER2UTF8STRING;
+
 typedef struct NESTEDARRAY
     {
     ENUMRENAMED field_enum;
@@ -668,6 +664,14 @@ typedef struct NESTEDARRAY
     uint16_t field_array_2[5];
     ARRAY field_struct;
     } NESTEDARRAY;
+
+/// Option that contains Some(value) or None.
+typedef enum OPTIONENUMPAYLOAD
+    {
+    /// Element if Some().
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    OPTIONENUMPAYLOAD_NONE = 1,
+    } OPTIONENUMPAYLOAD;
 
 /// Option that contains Some(value) or None.
 typedef enum OPTIONRESULTOPTIONUTF8STRINGERROR
@@ -684,6 +688,12 @@ typedef void (*fptr_fn_ConstPtrResultError_ConstPtr)(const RESULTERROR* x0, cons
 typedef void (*fptr_fn_ConstPtrResultU64Error_ConstPtr)(const RESULTU64ERROR* x0, const void* x1);
 
 typedef void (*fptr_fn_ConstPtrResultUtf8StringError_ConstPtr)(const RESULTUTF8STRINGERROR* x0, const void* x1);
+
+typedef enum LAYER3
+    {
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    } LAYER3;
 
 typedef void (*fptr_fn_CharArray)(CHARARRAY x0);
 
@@ -714,6 +724,17 @@ typedef enum RESULTNESTEDARRAYERROR
     RESULTNESTEDARRAYERROR_PANIC = 2,
     RESULTNESTEDARRAYERROR_NULL = 3,
     } RESULTNESTEDARRAYERROR;
+
+/// Result that contains value or an error.
+typedef enum RESULTOPTIONENUMPAYLOADERROR
+    {
+    /// Element if err is `Ok`.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    /// Error value.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTOPTIONENUMPAYLOADERROR_PANIC = 2,
+    RESULTOPTIONENUMPAYLOADERROR_NULL = 3,
+    } RESULTOPTIONENUMPAYLOADERROR;
 
 typedef void (*CALLBACKCHARARRAY2)(CHARARRAY VALUE, const void* CALLBACK_DATA);
 
@@ -767,6 +788,8 @@ void enums_1(ENUMPAYLOAD IGNORED);
 ENUMPAYLOAD enums_2(ENUMPAYLOAD X);
 
 const ENUMPAYLOAD* enums_3(ENUMPAYLOAD* X);
+
+UTF8STRING enums_4(LAYER3 X);
 
 uint8_t fnptr_1(fptr_fn_u8_rval_u8 CALLBACK, uint8_t VALUE);
 
