@@ -140,11 +140,11 @@ public class TestPatternVec
         var v1 = new UseSliceAndVec { s1 = new SliceUtf8String(v), s2 = new VecUtf8String(v) };
 
         // TODO: This rval deserialziation of slice inside composite has some issues
-        // var v2 = Interop.pattern_vec_8(v1);
-        //
-        // Assert.Equal(v[0], v2.s1[0]);
-        // Assert.Equal(v[1], v2.s1[1]);
-        // Assert.Equal(v[2], v2.s1[2]);
+        var v2 = Interop.pattern_vec_8(v1);
+
+        Assert.Equal(v[0], v2.s1[0]);
+        Assert.Equal(v[1], v2.s1[1]);
+        Assert.Equal(v[2], v2.s1[2]);
     }
 
 }

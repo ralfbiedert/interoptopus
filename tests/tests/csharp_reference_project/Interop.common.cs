@@ -763,13 +763,13 @@ namespace My.Company.Common
         }
     }
 
-    public partial struct SliceUtf8String
+    public partial class SliceUtf8String
     {
         string[] _managed;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct SliceUtf8String : IEnumerable<string>, IDisposable
+    public partial class SliceUtf8String : IEnumerable<string>, IDisposable
     {
         public int Count => _managed?.Length ?? (int) 0;
 

@@ -1,10 +1,10 @@
-use crate::Interop;
 use crate::converter::{get_slice_type_argument, is_owned_slice};
+use crate::Interop;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Type;
-use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::slice::SliceType;
-use interoptopus::{Error, indented};
+use interoptopus::pattern::TypePattern;
+use interoptopus::{indented, Error};
 
 #[derive(PartialEq, Eq, Debug, Clone, Copy)]
 pub enum SliceKind {
@@ -170,7 +170,7 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     };
     let marshaller_type = get_slice_type_argument(slice);
 
-    indented!(w, r"public partial struct {}", name)?;
+    indented!(w, r"public partial class {}", name)?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"{user_type}[] _managed;")?;
     indented!(w, r"}}")?;
@@ -178,7 +178,7 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
 
     ////
     indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
-    indented!(w, r"public partial struct {} : IEnumerable<{}>, IDisposable", name, user_type)?;
+    indented!(w, r"public partial class {} : IEnumerable<{}>, IDisposable", name, user_type)?;
     indented!(w, r"{{")?;
     w.indent();
     indented!(w, r"public int Count => _managed?.Length ?? (int) 0;")?;

@@ -59,7 +59,6 @@ public class TestEnums
         var e2 = EnumPayload.B(v1);
         var e3 = EnumPayload.C(123);
 
-
         Interop.enums_3(ref e1);
         Interop.enums_3(ref e2);
         Interop.enums_3(ref e3);
