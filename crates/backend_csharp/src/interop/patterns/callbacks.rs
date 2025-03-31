@@ -1,11 +1,11 @@
-use crate::Interop;
 use crate::converter::{named_callback_to_typename, to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval};
 use crate::interop::types::fnptrs::write_type_definition_fn_pointer_annotation;
+use crate::Interop;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Primitive, Type};
-use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::NamedCallback;
-use interoptopus::{Error, indented};
+use interoptopus::pattern::TypePattern;
+use interoptopus::{indented, Error};
 
 pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
     i.debug(w, "write_type_definition_named_callback")?;
@@ -31,11 +31,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
         match param.the_type() {
             Type::Pattern(TypePattern::Slice(_)) => params_invoke.push(format!("{}.ToManaged()", param.name())),
             Type::Pattern(TypePattern::SliceMut(_)) => params_invoke.push(format!("{}.ToManaged()", param.name())),
-            Type::Pattern(TypePattern::Utf8String(_)) => {
-                params.pop();
-                params.push(format!("string {}", param.name()));
-                params_invoke.push(format!("{}.ToManaged()", param.name()));
-            }
+            Type::Pattern(TypePattern::Utf8String(_)) => params_invoke.push(format!("{}.ToManaged()", param.name())),
             Type::Composite(_) => params_invoke.push(format!("{}.ToManaged()", param.name())),
             _ => params_invoke.push(param.name().to_string()),
         }

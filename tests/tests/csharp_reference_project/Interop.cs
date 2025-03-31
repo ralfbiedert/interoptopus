@@ -4324,17 +4324,9 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public unsafe void Dispose()
+        public void Dispose()
         {
             if (!_weAllocated) return;
-            var size = sizeof(UseString.Unmanaged);
-            for (var i = 0; i < (int) _len; ++i)
-            {
-                var dst = IntPtr.Add(_hglobal, i * size);
-                var x = Marshal.PtrToStructure<UseString.Unmanaged>(dst);
-                var managed = x.ToManaged();
-            }
-
             Marshal.FreeHGlobal(_hglobal);
             _weAllocated = false;
         }

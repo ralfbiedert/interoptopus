@@ -8,6 +8,7 @@ public class TestPatternStrings
     [Fact]
     public void pattern_ascii_pointer_1()
     {
+        var x = new Utf8String("hello world");
         Assert.Equal(11u, Interop.pattern_ascii_pointer_1("hello world"));
     }
 

@@ -544,21 +544,52 @@ namespace My.Company
             public void Free() { }
         }
     }
-    public partial struct Utf8String
+    public partial class Utf8String
     {
-        string _s;
+        public IntPtr _ptr;
+        public ulong _len;
+        public ulong _capacity;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct Utf8String: IDisposable
+    public partial class Utf8String: IDisposable
     {
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Utf8String(string s) { _s = s; }
+        public unsafe Utf8String(string s)
+        {
+            var source = s.AsSpan();
+            Span<byte> utf8Bytes = stackalloc byte[Encoding.UTF8.GetByteCount(source)];
+            var len = Encoding.UTF8.GetBytes(source, utf8Bytes);
 
-        public string String => _s;
+            fixed (byte* p = utf8Bytes)
+            {
+                InteropHelper.interoptopus_string_create((IntPtr) p, (ulong)len, out var rval);
+                _ptr = rval._ptr;
+                _len = rval._len;
+                _capacity = rval._capacity;
+            }
+
+        }
+
+        public string String
+        {
+            get
+            {
+                var span = new ReadOnlySpan<byte>((byte*) _ptr, (int)_len);
+                var s = Encoding.UTF8.GetString(span);
+                return s;
+            }
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose() { }
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._ptr = _ptr
+            _unmanaged._len = _len
+            _unmanaged._capacity = _capacity
+            InteropHelper.interoptopus_string_destroy(_unmanaged);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged ToUnmanaged()
@@ -576,15 +607,15 @@ namespace My.Company
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            public IntPtr ptr;
-            public ulong len;
-            public ulong capacity;
+            public IntPtr _ptr;
+            public ulong _len;
+            public ulong _capacity;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public string ToManaged()
+            public Utf8String ToManaged()
             {
                 var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged().String; }
+                try { return marshaller.ToManaged(); }
                 finally { marshaller.Free(); }
             }
 
@@ -622,29 +653,21 @@ namespace My.Company
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {
-                var source = _managed._s.AsSpan();
-                Span<byte> utf8Bytes = stackalloc byte[Encoding.UTF8.GetByteCount(source)];
-                var len = Encoding.UTF8.GetBytes(source, utf8Bytes);
-
-                fixed (byte* p = utf8Bytes)
-                {
-                    InteropHelper.interoptopus_string_create((IntPtr)p, (ulong)len, out var rval);
-                    _unmanaged = rval;
-                }
-
+                var _unmanaged = new Unmanaged();
+                _unmanaged._ptr = _managed._ptr;
+                _unmanaged._len = _managed._len;
+                _unmanaged._capacity = _managed._capacity;
+                _ptr = IntPtr.Zero;
                 return _unmanaged;
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Utf8String ToManaged()
             {
-                var span = new ReadOnlySpan<byte>((byte*)_unmanaged.ptr, (int)_unmanaged.len);
-
-                _managed = new Utf8String();
-                _managed._s = Encoding.UTF8.GetString(span);
-
-                InteropHelper.interoptopus_string_destroy(_unmanaged);
-
+                var _managed = new Managed();
+                _managed._ptr = _unmanaged._ptr;
+                _managed._len = _unmanaged._len;
+                _managed._capacity = _unmanaged._capacity;
                 return _managed;
             }
 
