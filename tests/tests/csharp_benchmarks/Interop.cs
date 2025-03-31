@@ -4283,11 +4283,13 @@ namespace My.Company
 
     public partial class SliceUseString
     {
-        UseString[] _managed;
+        ulong _len;
+        IntPtr _hglobal;
+        bool _weAllocated;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class SliceUseString : IEnumerable<UseString>, IDisposable
+    public partial class SliceUseString : IDisposable
     {
         public int Count => _managed?.Length ?? (int) 0;
 
@@ -4296,9 +4298,10 @@ namespace My.Company
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get
             {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                if (_managed is not null) { return _managed[i]; }
-                return default;
+                if (i >= (int) _len) throw new IndexOutOfRangeException();
+                if (_hglobal == IntPtr.Zero) { throw new Exception(); }
+                // TODO
+                throw new Exception();
             }
         }
 
@@ -4307,20 +4310,25 @@ namespace My.Company
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceUseString(UseString[] managed)
-        {
-            _managed = managed;
+            {
+            var size = sizeof(UseString.Unmanaged);
+            _hglobal  = Marshal.AllocHGlobal(size * managed.Length);
+            _weAllocated = true;
+            for (var i = 0; i < managed.Length; ++i)
+            {
+                var unmanaged = managed[i].ToUnmanaged();
+                var dst = IntPtr.Add(_hglobal, i * size);
+                Marshal.StructureToPtr(unmanaged, dst, false);
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public IEnumerator<UseString> GetEnumerator()
+        public void Dispose()
         {
-            for (var i = 0; i < Count; ++i) { yield return this[i]; }
+            if (!_weAllocated) return;
+            Marshal.FreeHGlobal(_hglobal);
+            _weAllocated = false;
         }
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public void Dispose() { }
 
         public Unmanaged ToUnmanaged()
         {
@@ -4365,18 +4373,9 @@ namespace My.Company
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {
-                var size = sizeof(UseString.Unmanaged);
                 _unmanaged = new Unmanaged();
-                _unmanaged.Data = Marshal.AllocHGlobal(size * _managed.Count);
-                _unmanaged.Len = (ulong) _managed.Count;
-                for (var i = 0; i < _managed.Count; ++i)
-                {
-                    var _marshaller = new UseString.Marshaller();
-                    _marshaller.FromManaged(new UseString(_managed._managed[i]));
-                    var unmanaged = _marshaller.ToUnmanaged();
-                    var dst = IntPtr.Add(_unmanaged.Data, i * size);
-                    Marshal.StructureToPtr(unmanaged, dst, false);
-                }
+                _unmanaged.Data = _managed._hglobal;
+                _unmanaged.Len = _managed._len;
                 return _unmanaged;
             }
 
@@ -4384,6 +4383,9 @@ namespace My.Company
             public unsafe SliceUseString ToManaged()
             {
                 _managed = new SliceUseString();
+                _managed._weAllocated = false;
+                _managed._hglobal = _unmanaged.Data;
+                _managed._len = _unmanaged.Len;
                 return _managed;
             }
 

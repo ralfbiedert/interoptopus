@@ -765,22 +765,25 @@ namespace My.Company.Common
 
     public partial class SliceUtf8String
     {
-        string[] _managed;
+        ulong _len;
+        IntPtr _hglobal;
+        bool _weAllocated;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class SliceUtf8String : IEnumerable<string>, IDisposable
+    public partial class SliceUtf8String : IDisposable
     {
-        public int Count => _managed?.Length ?? (int) 0;
+        public int Count => (int) _len;
 
         public unsafe string this[int i]
         {
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get
             {
-                if (i >= Count) throw new IndexOutOfRangeException();
-                if (_managed is not null) { return _managed[i]; }
-                return default;
+                if (i >= (int) _len) throw new IndexOutOfRangeException();
+                if (_hglobal == IntPtr.Zero) { throw new Exception(); }
+                // TODO
+                throw new Exception();
             }
         }
 
@@ -788,21 +791,27 @@ namespace My.Company.Common
         public SliceUtf8String() { }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceUtf8String(string[] managed)
+        public unsafe SliceUtf8String(string[] managed)
         {
-            _managed = managed;
+            var size = sizeof(Utf8String.Unmanaged);
+            _hglobal  = Marshal.AllocHGlobal(size * managed.Length);
+            _weAllocated = true;
+            _len = (ulong) managed.Length;
+            for (var i = 0; i < managed.Length; ++i)
+            {
+                var unmanaged = new Utf8String(managed[i]).ToUnmanaged();
+                var dst = IntPtr.Add(_hglobal, i * size);
+                Marshal.StructureToPtr(unmanaged, dst, false);
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public IEnumerator<string> GetEnumerator()
+        public void Dispose()
         {
-            for (var i = 0; i < Count; ++i) { yield return this[i]; }
+            if (!_weAllocated) return;
+            Marshal.FreeHGlobal(_hglobal);
+            _weAllocated = false;
         }
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public void Dispose() { }
 
         public Unmanaged ToUnmanaged()
         {
@@ -847,18 +856,9 @@ namespace My.Company.Common
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {
-                var size = sizeof(Utf8String.Unmanaged);
                 _unmanaged = new Unmanaged();
-                _unmanaged.Data = Marshal.AllocHGlobal(size * _managed.Count);
-                _unmanaged.Len = (ulong) _managed.Count;
-                for (var i = 0; i < _managed.Count; ++i)
-                {
-                    var _marshaller = new Utf8String.Marshaller();
-                    _marshaller.FromManaged(new Utf8String(_managed._managed[i]));
-                    var unmanaged = _marshaller.ToUnmanaged();
-                    var dst = IntPtr.Add(_unmanaged.Data, i * size);
-                    Marshal.StructureToPtr(unmanaged, dst, false);
-                }
+                _unmanaged.Data = _managed._hglobal;
+                _unmanaged.Len = _managed._len;
                 return _unmanaged;
             }
 
@@ -866,10 +866,13 @@ namespace My.Company.Common
             public unsafe SliceUtf8String ToManaged()
             {
                 _managed = new SliceUtf8String();
+                _managed._weAllocated = false;
+                _managed._hglobal = _unmanaged.Data;
+                _managed._len = _unmanaged.Len;
                 return _managed;
             }
 
-            public void Free() { Marshal.FreeHGlobal(_unmanaged.Data); }
+            public void Free() { }
         }
     }
 
