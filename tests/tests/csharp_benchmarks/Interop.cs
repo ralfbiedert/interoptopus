@@ -22,9 +22,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 10037235396236877392ul)
+            if (api_version != 17579909819157354056ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10037235396236877392). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (17579909819157354056). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -739,6 +739,24 @@ namespace My.Company
                 {
                     callback_wrapped.Dispose();
                 }
+            }
+        }
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_9")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial Utf8String pattern_ffi_slice_9(SliceUseString slice);
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static unsafe Utf8String pattern_ffi_slice_9(UseString[] slice)
+        {
+            var slice_wrapped = new SliceUseString(slice);
+            try
+            {
+                return pattern_ffi_slice_9(slice_wrapped);
+            }
+            finally
+            {
+                slice_wrapped.Dispose();
             }
         }
 
@@ -4263,13 +4281,13 @@ namespace My.Company
         }
     }
 
-    public partial struct SliceUseString
+    public partial class SliceUseString
     {
         UseString[] _managed;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct SliceUseString : IEnumerable<UseString>, IDisposable
+    public partial class SliceUseString : IEnumerable<UseString>, IDisposable
     {
         public int Count => _managed?.Length ?? (int) 0;
 
@@ -4283,6 +4301,9 @@ namespace My.Company
                 return default;
             }
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public SliceUseString() { }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceUseString(UseString[] managed)
