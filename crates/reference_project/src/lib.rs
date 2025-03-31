@@ -133,6 +133,7 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(patterns::slice::pattern_ffi_slice_6))
             // .register(function!(patterns::slice::pattern_ffi_slice_7))
             .register(function!(patterns::slice::pattern_ffi_slice_8))
+            .register(function!(patterns::slice::pattern_ffi_slice_9))
             .register(function!(patterns::slice::pattern_ffi_slice_delegate))
             .register(function!(patterns::slice::pattern_ffi_slice_delegate_huge))
             .register(function!(patterns::option::pattern_ffi_option_1))

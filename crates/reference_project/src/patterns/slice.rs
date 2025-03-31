@@ -1,5 +1,6 @@
 use crate::types::arrays::CharArray;
 use crate::types::basic::Vec3f32;
+use crate::types::string::UseString;
 use interoptopus::pattern::slice::{Slice, SliceMut};
 use interoptopus::{callback, ffi, ffi_function};
 
@@ -80,4 +81,9 @@ pub fn pattern_ffi_slice_6(slice: &SliceMut<u8>, callback: CallbackU8) {
 #[ffi_function]
 pub fn pattern_ffi_slice_8(slice: &SliceMut<CharArray>, callback: CallbackCharArray2) {
     callback.call(slice.as_slice().first().copied().unwrap());
+}
+
+#[ffi_function]
+pub fn pattern_ffi_slice_9(slice: Slice<UseString>) -> ffi::String {
+    slice.as_slice()[0].s1.clone()
 }

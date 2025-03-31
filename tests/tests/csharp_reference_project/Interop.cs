@@ -22,9 +22,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 10037235396236877392ul)
+            if (api_version != 17579909819157354056ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (10037235396236877392). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (17579909819157354056). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -739,6 +739,24 @@ namespace My.Company
                 {
                     callback_wrapped.Dispose();
                 }
+            }
+        }
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_9")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial Utf8String pattern_ffi_slice_9(SliceUseString slice);
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static unsafe Utf8String pattern_ffi_slice_9(UseString[] slice)
+        {
+            var slice_wrapped = new SliceUseString(slice);
+            try
+            {
+                return pattern_ffi_slice_9(slice_wrapped);
+            }
+            finally
+            {
+                slice_wrapped.Dispose();
             }
         }
 
@@ -4265,52 +4283,44 @@ namespace My.Company
 
     public partial class SliceUseString
     {
-        ulong _len;
-        IntPtr _hglobal;
-        bool _weAllocated;
+        UseString[] _managed;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class SliceUseString : IDisposable
+    public partial class SliceUseString : IEnumerable<UseString>, IDisposable
     {
-        public int Count => (int) _len;
+        public int Count => _managed?.Length ?? (int) 0;
 
         public unsafe UseString this[int i]
         {
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get
             {
-                if (i >= (int) _len) throw new IndexOutOfRangeException();
-                if (_hglobal == IntPtr.Zero) { throw new Exception(); }
-                throw new Exception("TODO");
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public unsafe SliceUseString(UseString[] managed)
-        {
-            var size = sizeof(UseString.Unmanaged);
-            _hglobal  = Marshal.AllocHGlobal(size * managed.Length);
-            _weAllocated = true;
-            for (var i = 0; i < managed.Length; ++i)
-            {
-                var unmanaged = managed[i].ToUnmanaged();
-                var dst = IntPtr.Add(_hglobal, i * size);
-                Marshal.StructureToPtr(unmanaged, dst, false);
+                if (i >= Count) throw new IndexOutOfRangeException();
+                if (_managed is not null) { return _managed[i]; }
+                return default;
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceUseString() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public SliceUseString(UseString[] managed)
+        {
+            _managed = managed;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public void Dispose()
+        public IEnumerator<UseString> GetEnumerator()
         {
-            if (!_weAllocated) return;
-            Marshal.FreeHGlobal(_hglobal);
-            _weAllocated = false;
+            for (var i = 0; i < Count; ++i) { yield return this[i]; }
         }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void Dispose() { }
 
         public Unmanaged ToUnmanaged()
         {
@@ -4357,8 +4367,16 @@ namespace My.Company
             {
                 var size = sizeof(UseString.Unmanaged);
                 _unmanaged = new Unmanaged();
-                _unmanaged.Data = _managed._hglobal;
-                _unmanaged.Len = _managed._len;
+                _unmanaged.Data = Marshal.AllocHGlobal(size * _managed.Count);
+                _unmanaged.Len = (ulong) _managed.Count;
+                for (var i = 0; i < _managed.Count; ++i)
+                {
+                    var _marshaller = new UseString.Marshaller();
+                    _marshaller.FromManaged(new UseString(_managed._managed[i]));
+                    var unmanaged = _marshaller.ToUnmanaged();
+                    var dst = IntPtr.Add(_unmanaged.Data, i * size);
+                    Marshal.StructureToPtr(unmanaged, dst, false);
+                }
                 return _unmanaged;
             }
 
@@ -4366,13 +4384,10 @@ namespace My.Company
             public unsafe SliceUseString ToManaged()
             {
                 _managed = new SliceUseString();
-                _managed._weAllocated = false;
-                _managed._hglobal = _unmanaged.Data;
-                _managed._len = _unmanaged.Len;
                 return _managed;
             }
 
-            public void Free() {  }
+            public void Free() { Marshal.FreeHGlobal(_unmanaged.Data); }
         }
     }
 

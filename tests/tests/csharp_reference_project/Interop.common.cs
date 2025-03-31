@@ -785,6 +785,9 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public SliceUtf8String() { }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public SliceUtf8String(string[] managed)
         {
             _managed = managed;

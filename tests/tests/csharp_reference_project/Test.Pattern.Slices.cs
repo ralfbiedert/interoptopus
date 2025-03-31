@@ -80,5 +80,16 @@ public class TestPatternSlices
         Assert.Equal(0, result.x);
     }
 
+    [Fact]
+    public void pattern_ffi_slice_9()
+    {
+        var use_string = new UseString()
+        {
+            s1 = "hello",
+            s2 = "world"
+        };
+
+        Assert.Equal("hello", Interop.pattern_ffi_slice_9([use_string]).String);
+    }
 
 }

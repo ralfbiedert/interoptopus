@@ -201,6 +201,10 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
 
     ///////////////////
     i.inline_hint(w, 0)?;
+    indented!(w, r"public {name}() {{ }}")?;
+    w.newline()?;
+
+    i.inline_hint(w, 0)?;
     indented!(w, r"public {name}({user_type}[] managed)")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"_managed = managed;")?;
