@@ -13,7 +13,7 @@ pub enum SliceKind {
 }
 
 pub fn write_pattern_slice(i: &Interop, w: &mut IndentWriter, slice: &SliceType, kind: SliceKind) -> Result<(), Error> {
-    if is_directly_serializable(&slice.to_type()) {
+    if is_directly_serializable(slice.t()) {
         write_pattern_fast_slice(i, w, slice, kind)
     } else {
         write_pattern_marshalling_slice(i, w, slice)
@@ -26,8 +26,7 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
     let name = slice.rust_name();
     let inner = get_slice_type_argument(slice);
 
-    indented!(w, r"[StructLayout(LayoutKind.Sequential)]")?;
-    indented!(w, r"public partial struct {}", name)?;
+    indented!(w, r"public partial class {}", name)?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"GCHandle _handle;")?;
     indented!(w, [()], r"IntPtr _data;")?;
@@ -37,7 +36,7 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
 
     ////
     indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
-    indented!(w, r"public partial struct {} : IEnumerable<{}>, IDisposable", name, inner)?;
+    indented!(w, r"public partial class {name} : IEnumerable<{inner}>, IDisposable")?;
     indented!(w, r"{{")?;
     w.indent();
     indented!(w, r"public int Count => (int) _len;")?;
@@ -78,14 +77,15 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
 
     ///////////////////
     i.inline_hint(w, 0)?;
-    indented!(w, r"public {}(IntPtr data, ulong len)", name)?;
+    indented!(w, r"public {name}() {{ }}")?;
+    indented!(w, r"public {name}(IntPtr data, ulong len)")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"_data = data;")?;
     indented!(w, [()], r"_len = len;")?;
     indented!(w, r"}}")?;
     w.newline()?;
     i.inline_hint(w, 0)?;
-    indented!(w, r"public {}({}[] managed)", name, inner)?;
+    indented!(w, r"public {name}({inner}[] managed)")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"_handle = GCHandle.Alloc(managed, GCHandleType.Pinned);")?;
     indented!(w, [()], r"_data = _handle.AddrOfPinnedObject();")?;

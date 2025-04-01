@@ -71,17 +71,13 @@ public class TestEnums
     [Fact]
     public void enum4()
     {
-        var a = new Utf8String("hello");
-        var b = new Utf8String("world");
-        var x = new[]
-        {
-            a,
-            b
-        };
+        // var a = Utf8String.From("hello");
+        // var b = Utf8String.From("world");
         // a.Dispose();
         // b.Dispose();
-
-        var v = new VecUtf8String(x);
+        var a = new Utf8String("hello");
+        var b = new Utf8String("world");
+        var v = new VecUtf8String();
 
         var l1 = new Layer1Utf8String()
         {

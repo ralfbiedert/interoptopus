@@ -132,7 +132,7 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, [()], r"private Utf8String() {{ }}")?;
         w.newline()?;
         i.inline_hint(w, 1)?;
-        indented!(w, [()], r"public unsafe Utf8String(string s)")?;
+        indented!(w, [()], r"public unsafe Utf8String From(string s)")?;
         indented!(w, [()], r"{{")?;
         indented!(w, [()()], r"var source = s.AsSpan();")?;
         indented!(w, [()()], r"Span<byte> utf8Bytes = stackalloc byte[Encoding.UTF8.GetByteCount(source)];")?;

@@ -8,7 +8,7 @@ use interoptopus::{indented, Error};
 
 pub fn write_pattern_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) -> Result<(), Error> {
     i.debug(w, "write_pattern_vec")?;
-    if is_directly_serializable(&vec.to_type()) {
+    if is_directly_serializable(vec.t()) {
         write_pattern_fast_vec(i, w, vec)
     } else {
         write_pattern_marshalling_vec(i, w, vec)

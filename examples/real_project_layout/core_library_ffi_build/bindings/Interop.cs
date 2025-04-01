@@ -557,7 +557,7 @@ namespace My.Company
         private Utf8String() { }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public unsafe Utf8String(string s)
+        public unsafe Utf8String From(string s)
         {
             var source = s.AsSpan();
             Span<byte> utf8Bytes = stackalloc byte[Encoding.UTF8.GetByteCount(source)];
@@ -594,11 +594,24 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged._ptr = _ptr;
+            _unmanaged._len = _len;
+            _unmanaged._capacity = _capacity;
+            _ptr = IntPtr.Zero;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._ptr = _ptr;
+            _unmanaged._len = _len;
+            _unmanaged._capacity = _capacity;
+            return _unmanaged;
         }
 
         /// A highly dangerous 'use once type' that has ownership semantics!
@@ -614,11 +627,13 @@ namespace My.Company
             public ulong _capacity;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Utf8String ToManaged()
+            public Utf8String IntoManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+            var _managed = new Utf8String();
+            _managed._ptr = _ptr;
+            _managed._len = _len;
+            _managed._capacity = _capacity;
+            return _managed;
             }
 
         }
@@ -655,22 +670,13 @@ namespace My.Company
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Unmanaged ToUnmanaged()
             {
-                var _unmanaged = new Unmanaged();
-                _unmanaged._ptr = _managed._ptr;
-                _unmanaged._len = _managed._len;
-                _unmanaged._capacity = _managed._capacity;
-                _managed._ptr = IntPtr.Zero;
-                return _unmanaged;
+                return _managed.IntoUnmanaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Utf8String ToManaged()
             {
-                var _managed = new Utf8String();
-                _managed._ptr = _unmanaged._ptr;
-                _managed._len = _unmanaged._len;
-                _managed._capacity = _unmanaged._capacity;
-                return _managed;
+                return _unmanaged.IntoManaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]

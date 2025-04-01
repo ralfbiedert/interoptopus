@@ -273,11 +273,7 @@ impl Interop {
     #[allow(clippy::match_like_matches_macro)]
     fn has_overloadable(&self, signature: &Signature) -> bool {
         signature.params().iter().any(|x| match x.the_type() {
-            Type::ReadPointer(p) => matches!(&**p, Type::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_))),
-            Type::ReadWritePointer(p) => matches!(&**p, Type::Pattern(TypePattern::Slice(_) | TypePattern::SliceMut(_))),
             Type::Pattern(p) => match p {
-                TypePattern::Slice(_) => true,
-                TypePattern::SliceMut(_) => true,
                 TypePattern::NamedCallback(_) => true,
                 TypePattern::AsyncCallback(_) => true,
                 _ => false,
