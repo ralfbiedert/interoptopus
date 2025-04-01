@@ -136,6 +136,11 @@ impl VecType {
     pub const fn meta(&self) -> &Meta {
         self.composite_type.meta()
     }
+
+    #[must_use]
+    pub fn to_type(&self) -> Type {
+        Type::Pattern(TypePattern::Vec(self.clone()))
+    }
 }
 
 /// Emits helper functions used by [`Vec`](crate::pattern::vec::Vec).

@@ -1,10 +1,10 @@
-use crate::Interop;
 use crate::converter::{field_name_to_csharp_name, is_blittable, to_typespecifier_in_field};
 use crate::interop::docs::write_documentation;
+use crate::Interop;
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Composite, Field, Layout, Primitive, Type, Visibility};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{Error, indented};
+use interoptopus::{indented, Error};
 
 pub fn write_type_definition_composite(i: &Interop, w: &mut IndentWriter, the_type: &Composite) -> Result<(), Error> {
     i.debug(w, "write_type_definition_composite")?;
@@ -244,9 +244,6 @@ pub fn write_type_definition_composite_marshaller_field_to_unmanaged(i: &Interop
         Type::Pattern(TypePattern::Bool) => indented!(w, "_unmanaged.{name} = (sbyte) (_managed.{name} ? 1 : 0);")?,
         Type::Pattern(TypePattern::CStrPointer) => {
             indented!(w, "_unmanaged.{name} = Marshal.StringToHGlobalAnsi(_managed.{name});")?;
-        }
-        Type::Pattern(TypePattern::Utf8String(_)) => {
-            indented!(w, "_unmanaged.{name} = new Utf8String(_managed.{name}).ToUnmanaged();")?;
         }
         Type::Pattern(TypePattern::NamedCallback(_)) => {
             indented!(w, "_unmanaged.{name} = _managed.{name} != null ? _managed.{name}.ToUnmanaged() : default;")?;

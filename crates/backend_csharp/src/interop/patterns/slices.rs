@@ -1,4 +1,4 @@
-use crate::converter::{get_slice_type_argument, is_owned_slice};
+use crate::converter::{get_slice_type_argument, is_directly_serializable};
 use crate::Interop;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Type;
@@ -13,10 +13,10 @@ pub enum SliceKind {
 }
 
 pub fn write_pattern_slice(i: &Interop, w: &mut IndentWriter, slice: &SliceType, kind: SliceKind) -> Result<(), Error> {
-    if is_owned_slice(slice) {
-        write_pattern_marshalling_slice(i, w, slice)
-    } else {
+    if is_directly_serializable(&slice.to_type()) {
         write_pattern_fast_slice(i, w, slice, kind)
+    } else {
+        write_pattern_marshalling_slice(i, w, slice)
     }
 }
 
@@ -26,6 +26,7 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
     let name = slice.rust_name();
     let inner = get_slice_type_argument(slice);
 
+    indented!(w, r"[StructLayout(LayoutKind.Sequential)]")?;
     indented!(w, r"public partial struct {}", name)?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"GCHandle _handle;")?;
@@ -106,6 +107,8 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
     indented!(w, [()], r"if (_handle is {{ IsAllocated: true }}) {{ _handle.Free(); }}")?;
     indented!(w, r"}}")?;
     w.newline()?;
+    write_pattern_slice_to_unmanaged(i, w)?;
+    w.newline()?;
     indented!(w, r"[CustomMarshaller(typeof({}), MarshalMode.Default, typeof(Marshaller))]", name)?;
     indented!(w, r"private struct MarshallerMeta {{ }}")?;
     w.newline()?;
@@ -128,6 +131,10 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
     indented!(w, r"private {} _managed;", name)?;
     indented!(w, r"private Unmanaged _unmanaged;")?;
     w.newline()?;
+    i.inline_hint(w, 0)?;
+    indented!(w, r"public Marshaller(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
+    i.inline_hint(w, 0)?;
+    indented!(w, r"public Marshaller({name} managed) {{ _managed = managed; }}")?;
     i.inline_hint(w, 0)?;
     indented!(w, r"public void FromManaged({} managed) {{ _managed = managed; }}", name)?;
     i.inline_hint(w, 0)?;
@@ -170,11 +177,11 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     };
     let marshaller_type = get_slice_type_argument(slice);
 
+    indented!(w, r"[StructLayout(LayoutKind.Sequential)]")?;
     indented!(w, r"public partial class {}", name)?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"ulong _len;")?;
     indented!(w, [()], r"IntPtr _hglobal;")?;
-    indented!(w, [()], r"bool _weAllocated;")?;
     indented!(w, r"}}")?;
     w.newline()?;
 
@@ -212,7 +219,6 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     indented!(w, r"{{")?;
     indented!(w, [()], r"var size = sizeof({marshaller_type}.Unmanaged);")?;
     indented!(w, [()], r"_hglobal  = Marshal.AllocHGlobal(size * managed.Length);")?;
-    indented!(w, [()], r"_weAllocated = true;")?;
     indented!(w, [()], r"_len = (ulong) managed.Length;")?;
     indented!(w, [()], r"for (var i = 0; i < managed.Length; ++i)")?;
     indented!(w, [()], r"{{")?;
@@ -228,9 +234,7 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     i.inline_hint(w, 0)?;
     indented!(w, r"public void Dispose()")?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"if (!_weAllocated) return;")?;
     indented!(w, [()], r"Marshal.FreeHGlobal(_hglobal);")?;
-    indented!(w, [()], r"_weAllocated = false;")?;
     indented!(w, r"}}")?;
     w.newline()?;
     write_pattern_slice_to_unmanaged(i, w)?;

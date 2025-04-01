@@ -92,7 +92,7 @@ public class TestPatternVec
     public void pattern_ffi_vec_5()
     {
 
-        var v = new [] { "1", "2", "3" };
+        var v = new [] { "1".Utf8(), "2".Utf8(), "3".Utf8() };
         var v1 = new VecUtf8String(v);
         var v2 = Interop.pattern_vec_5(v1);
 
@@ -123,7 +123,7 @@ public class TestPatternVec
     [Fact]
     public void pattern_ffi_vec_7()
     {
-        var v = new [] { "1", "2", "3" };
+        var v = new [] { "1".Utf8(), "2".Utf8(), "3".Utf8() };
         var v1 = new UseSliceAndVec { s1 = new SliceUtf8String(v), s2 = new VecUtf8String(v) };
         Interop.pattern_vec_7(v1);
 
@@ -136,7 +136,7 @@ public class TestPatternVec
     [Fact]
     public void pattern_ffi_vec_8()
     {
-        var v = new [] { "1", "2", "3" };
+        var v = new [] { "1".Utf8(), "2".Utf8(), "3".Utf8() };
         var v1 = new UseSliceAndVec { s1 = new SliceUtf8String(v), s2 = new VecUtf8String(v) };
 
         // TODO: This rval deserialziation of slice inside composite has some issues

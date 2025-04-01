@@ -71,23 +71,31 @@ public class TestEnums
     [Fact]
     public void enum4()
     {
+        var a = new Utf8String("hello");
+        var b = new Utf8String("world");
+        var x = new[]
+        {
+            a,
+            b
+        };
+        // a.Dispose();
+        // b.Dispose();
+
+        var v = new VecUtf8String(x);
+
         var l1 = new Layer1Utf8String()
         {
             maybe_1 = OptionUtf8String.None,
-            maybe_2 = new VecUtf8String(new[]
-            {
-                "hello",
-                "world"
-            }),
-            maybe_3 = "hello world"
+            maybe_2 = v,
+            maybe_3 = "hello world".Utf8()
         };
         var l2 = new Layer2Utf8String()
         {
             layer_1 = l1,
             strings = new VecUtf8String(new[]
             {
-                "hello",
-                "world"
+                "hello".Utf8(),
+                "world".Utf8()
             }),
             vec = new Vec3f32(),
             the_enum = EnumPayload.A

@@ -136,9 +136,9 @@ public class TestPatternDelegates
     [Fact]
     public void pattern_callback_8()
     {
-        var r1 = string.Empty;
-        var r2a = string.Empty;
-        var r2b = string.Empty;
+        var r1 = new Utf8String("");
+        var r2a = new Utf8String("");
+        var r2b = new Utf8String("");
 
         Interop.pattern_callback_8((s) =>
         {
@@ -147,11 +147,11 @@ public class TestPatternDelegates
         {
             r2a = s.s1;
             r2b = s.s2;
-        }, "hello world");
+        }, "hello world".Utf8());
 
-        Assert.Equal("hello world", r1);
-        Assert.Equal("hello world", r2a);
-        Assert.Equal("hello world", r2b);
+        Assert.Equal("hello world", r1.String);
+        Assert.Equal("hello world", r2a.String);
+        Assert.Equal("hello world", r2b.String);
     }
 
 

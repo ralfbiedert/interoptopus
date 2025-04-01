@@ -546,14 +546,16 @@ namespace My.Company
     }
     public partial class Utf8String
     {
-        public IntPtr _ptr;
-        public ulong _len;
-        public ulong _capacity;
+        IntPtr _ptr;
+        ulong _len;
+        ulong _capacity;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial class Utf8String: IDisposable
     {
+        private Utf8String() { }
+
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public unsafe Utf8String(string s)
         {
@@ -571,7 +573,7 @@ namespace My.Company
 
         }
 
-        public string String
+        public unsafe string String
         {
             get
             {
@@ -582,12 +584,12 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public void Dispose() { }
+        public void Dispose()
         {
             var _unmanaged = new Unmanaged();
-            _unmanaged._ptr = _ptr
-            _unmanaged._len = _len
-            _unmanaged._capacity = _capacity
+            _unmanaged._ptr = _ptr;
+            _unmanaged._len = _len;
+            _unmanaged._capacity = _capacity;
             InteropHelper.interoptopus_string_destroy(_unmanaged);
         }
 
@@ -657,14 +659,14 @@ namespace My.Company
                 _unmanaged._ptr = _managed._ptr;
                 _unmanaged._len = _managed._len;
                 _unmanaged._capacity = _managed._capacity;
-                _ptr = IntPtr.Zero;
+                _managed._ptr = IntPtr.Zero;
                 return _unmanaged;
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe Utf8String ToManaged()
             {
-                var _managed = new Managed();
+                var _managed = new Utf8String();
                 _managed._ptr = _unmanaged._ptr;
                 _managed._len = _unmanaged._len;
                 _managed._capacity = _unmanaged._capacity;

@@ -32,7 +32,7 @@ public class TestPatternServicesResult
     public void ResultString()
     {
         var service = ServiceResult.New();
-        Assert.Equal("hello world", service.ResultString());
+        Assert.Equal("hello world", service.ResultString().String);
         service.Dispose();
     }
 

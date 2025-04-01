@@ -1,5 +1,5 @@
 use crate::converter::{
-    function_name_to_csharp_name, function_parameter_to_csharp_typename, function_rval_to_csharp_typename, is_owned_slice, pattern_to_native_in_signature,
+    function_name_to_csharp_name, function_parameter_to_csharp_typename, function_rval_to_csharp_typename, pattern_to_native_in_signature,
     to_typespecifier_in_async_fn_rval, to_typespecifier_in_param,
 };
 use crate::interop::docs::write_documentation;
@@ -8,7 +8,7 @@ use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Function, Primitive, SugaredReturnType, Type};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{Error, indented};
+use interoptopus::{indented, Error};
 use std::iter::zip;
 
 pub fn write_functions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
@@ -140,11 +140,6 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
                 }
             }
             Type::Pattern(TypePattern::NamedCallback(_)) => {
-                to_wrap_name.push(name);
-                to_wrap_type.push(to_typespecifier_in_param(p.the_type()));
-                to_invoke.push(format!("{name}_wrapped"));
-            }
-            Type::Pattern(TypePattern::Utf8String(_)) => {
                 to_wrap_name.push(name);
                 to_wrap_type.push(to_typespecifier_in_param(p.the_type()));
                 to_invoke.push(format!("{name}_wrapped"));

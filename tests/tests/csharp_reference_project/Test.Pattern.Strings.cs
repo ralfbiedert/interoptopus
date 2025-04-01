@@ -23,14 +23,14 @@ public class TestPatternStrings
     [Fact]
     public void pattern_string_1()
     {
-        Assert.Equal("hello world", Interop.pattern_string_1("hello world").String);
+        Assert.Equal("hello world", Interop.pattern_string_1("hello world".Utf8()).String);
         Assert.Equal("hello world", Interop.pattern_string_1("hello world".Utf8()).String);
     }
 
     [Fact]
     public void pattern_string_2()
     {
-        Assert.Equal(11u, Interop.pattern_string_2("hello world"));
+        Assert.Equal(11u, Interop.pattern_string_2("hello world".Utf8()));
     }
 
     [Fact]
@@ -42,31 +42,31 @@ public class TestPatternStrings
     [Fact]
     public void pattern_string_4()
     {
-        var w = new UseString { s1 = "hello", s2 = "world" };
+        var w = new UseString { s1 = "hello".Utf8(), s2 = "world".Utf8() };
         var s = Interop.pattern_string_4(w);
-        Assert.Equal("hello", s.s1);
-        Assert.Equal("world", s.s2);
+        Assert.Equal("hello", s.s1.String);
+        Assert.Equal("world", s.s2.String);
     }
 
     [Fact]
     public void pattern_string_6()
     {
-        var r1 = new UseString { s1 = "hello", s2 = "world" };
+        var r1 = new UseString { s1 = "hello".Utf8(), s2 = "world".Utf8() };
         Interop.pattern_string_6a(ref r1);
 
-        var y = new UseString { s1 = "", s2 = "" };
+        var y = new UseString { s1 = "".Utf8(), s2 = "".Utf8() };
         Interop.pattern_string_6b(ref y).AsOk();
-        Assert.Equal("s1", y.s1);
-        Assert.Equal("s2", y.s2);
+        Assert.Equal("s1", y.s1.String);
+        Assert.Equal("s2", y.s2.String);
     }
 
     [Fact]
     public void pattern_string_7()
     {
-        var r1 = Interop.pattern_string_7(["hello", "world"], 0).AsOk();
-        var r2 = Interop.pattern_string_7(["hello", "world"], 1).AsOk();
-        Assert.Equal("hello", r1);
-        Assert.Equal("world", r2);
+        var r1 = Interop.pattern_string_7(["hello".Utf8(), "world".Utf8()], 0).AsOk();
+        var r2 = Interop.pattern_string_7(["hello".Utf8(), "world".Utf8()], 1).AsOk();
+        Assert.Equal("hello", r1.String);
+        Assert.Equal("world", r2.String);
     }
 
     [Fact]
@@ -74,15 +74,15 @@ public class TestPatternStrings
     {
         var x = new UseString[]
         {
-            new() { s1 = "hello1", s2 = "world1" },
-            new() { s1 = "hello2", s2 = "world2" },
+            new() { s1 = "hello1".Utf8(), s2 = "world1".Utf8() },
+            new() { s1 = "hello2".Utf8(), s2 = "world2".Utf8() },
         };
 
         var r1 = Interop.pattern_string_8(x, 0).AsOk();
         var r2 = Interop.pattern_string_8(x, 1).AsOk();
 
-        Assert.Equal("hello1", r1.s1);
-        Assert.Equal("world2", r2.s2);
+        Assert.Equal("hello1", r1.s1.String);
+        Assert.Equal("world2", r2.s2.String);
     }
 
     [Fact]
@@ -100,7 +100,7 @@ public class TestPatternStrings
     public void string_by_ref_dont_leak()
     {
         // TODO - Can we somehow measure memory use?
-        var w = new UseString { s1 = "hello", s2 = "world" };
+        var w = new UseString { s1 = "hello".Utf8(), s2 = "world".Utf8() };
         for (var i = 0; i < 1024 * 1024; i++)
         {
             Interop.pattern_string_6a(ref w);
@@ -111,7 +111,7 @@ public class TestPatternStrings
     public void string_by_out_dont_leak()
     {
         // TODO - Can we somehow measure memory use?
-        var w = new UseString { s1 = "hello", s2 = "world" };
+        var w = new UseString { s1 = "hello".Utf8(), s2 = "world".Utf8() };
         for (var i = 0; i < 1024 * 1024; i++)
         {
             var r2 = Interop.pattern_string_6b(ref w);

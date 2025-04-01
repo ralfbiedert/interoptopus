@@ -1,17 +1,17 @@
+use crate::converter::{get_vec_type_argument, is_directly_serializable, to_typespecifier_in_param};
 use crate::Interop;
-use crate::converter::{get_vec_type_argument, is_owned_vec, to_typespecifier_in_param};
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Parameter, Type};
-use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::vec::VecType;
-use interoptopus::{Error, indented};
+use interoptopus::pattern::TypePattern;
+use interoptopus::{indented, Error};
 
 pub fn write_pattern_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) -> Result<(), Error> {
     i.debug(w, "write_pattern_vec")?;
-    if is_owned_vec(vec) {
-        write_pattern_marshalling_vec(i, w, vec)
-    } else {
+    if is_directly_serializable(&vec.to_type()) {
         write_pattern_fast_vec(i, w, vec)
+    } else {
+        write_pattern_marshalling_vec(i, w, vec)
     }
 }
 
@@ -140,11 +140,7 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     i.debug(w, "write_pattern_fast_vec")?;
 
     let name = vec.rust_name();
-    let user_type = match vec.t() {
-        Type::Pattern(TypePattern::Utf8String(_)) => "string".to_string(),
-        _ => get_vec_type_argument(vec),
-    };
-    let marshaller_type = get_vec_type_argument(vec);
+    let the_type = get_vec_type_argument(vec);
 
     write_pattern_vec_struct(i, w, vec)?;
 
@@ -165,12 +161,12 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     w.newline()?;
 
     i.inline_hint(w, 0)?;
-    indented!(w, r"public unsafe {name}(Span<{user_type}> _data)")?;
+    indented!(w, r"public unsafe {name}(Span<{the_type}> _data)")?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"var _temp = new {marshaller_type}.Unmanaged[_data.Length];")?;
+    indented!(w, [()], r"var _temp = new {the_type}.Unmanaged[_data.Length];")?;
     indented!(w, [()], r"for (var i = 0; i < _data.Length; ++i)")?;
     indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"_temp[i] = new {marshaller_type}(_data[i]).ToUnmanaged();")?;
+    indented!(w, [()()], r"_temp[i] = new {the_type}(_data[i]).ToUnmanaged();")?;
     indented!(w, [()], r"}}")?;
     indented!(w, [()], r"fixed (void* _data_ptr = _temp)")?;
     indented!(w, [()], r"{{")?;
@@ -188,7 +184,7 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     indented!(w, [()], r"get {{ if (_ptr == IntPtr.Zero) {{ throw new InteropException(); }} else {{ return (int) _len; }} }}")?;
     indented!(w, r"}}")?;
     w.newline()?;
-    indented!(w, r"public unsafe {user_type} this[int i]")?;
+    indented!(w, r"public unsafe {the_type} this[int i]")?;
     indented!(w, r"{{")?;
     w.indent();
     i.inline_hint(w, 0)?;
@@ -196,7 +192,7 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     indented!(w, r"{{")?;
     indented!(w, [()], r"if (i >= Count) throw new IndexOutOfRangeException();")?;
     indented!(w, [()], r"if (_ptr == IntPtr.Zero) throw new InteropException();")?;
-    indented!(w, [()], r"var _element = Marshal.PtrToStructure<{marshaller_type}.Unmanaged>(new IntPtr(_ptr.ToInt64() + i * sizeof({marshaller_type}.Unmanaged)));")?;
+    indented!(w, [()], r"var _element = Marshal.PtrToStructure<{the_type}.Unmanaged>(new IntPtr(_ptr.ToInt64() + i * sizeof({the_type}.Unmanaged)));")?;
     indented!(w, [()], r"return _element.ToManaged();")?;
     indented!(w, r"}}")?;
     w.unindent();

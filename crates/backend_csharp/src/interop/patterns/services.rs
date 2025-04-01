@@ -7,9 +7,9 @@ use crate::utils::sugared_return_type;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Function, Primitive, SugaredReturnType, Type};
-use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::service::ServiceDefinition;
-use interoptopus::{Error, indented};
+use interoptopus::pattern::TypePattern;
+use interoptopus::{indented, Error};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum MethodType {
@@ -102,19 +102,6 @@ pub fn write_pattern_service_method(
                     to_invoke.push(name.to_string());
                 }
             }
-            // These two are a particularity based on how we generate overloads.
-            // For now, we can only generate one base method and one overload.
-            // Since async methods have an automatic overload due to the callback,
-            // we have to bend the string type to match the string mapping used there.
-            // In the future we should probably support more overload permutations we can
-            // remove this special case.
-            Type::Pattern(TypePattern::Utf8String(_)) if async_rval.is_async() => {
-                native = "string".to_string();
-                to_invoke.push(name.to_string());
-            }
-            Type::Pattern(TypePattern::Utf8String(_)) if async_rval.is_sync() => {
-                to_invoke.push(name.to_string());
-            }
             _ => {
                 // Forward `ref` and `out` accordingly.
                 if native.contains("out ") {
@@ -146,7 +133,6 @@ pub fn write_pattern_service_method(
                 class.the_type().rust_name().to_string()
             }
             MethodType::Regular => match function.signature().rval() {
-                Type::Pattern(TypePattern::CStrPointer) => "string".to_string(),
                 Type::Pattern(TypePattern::Result(x)) if x.t().is_void() => "void".to_string(),
                 Type::Pattern(TypePattern::Result(x)) => to_typespecifier_in_field(x.t()),
                 x => to_typespecifier_in_sync_fn_rval(x),
@@ -215,10 +201,6 @@ pub fn write_pattern_service_method(
 
     // Determine return value behavior and write function call.
     match async_rval {
-        SugaredReturnType::Sync(Type::Pattern(TypePattern::CStrPointer)) => {
-            indented!(w, [()], r"var s = {fn_call};")?;
-            indented!(w, [()], r"return Marshal.PtrToStringAnsi(s);")?;
-        }
         SugaredReturnType::Sync(Type::Primitive(Primitive::Void)) => {
             indented!(w, [()], r"{fn_call};",)?;
         }

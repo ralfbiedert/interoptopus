@@ -23,9 +23,9 @@ public class TestPatternServicesAsync
     public async void HandleString()
     {
         var s = ServiceAsync.New();
-        var r = await s.HandleString("abc");
+        var r = await s.HandleString("abc".Utf8());
         s.Dispose();
-        Assert.Equal(r, "abc");
+        Assert.Equal(r, "abc".Utf8());
     }
 
 
@@ -33,10 +33,10 @@ public class TestPatternServicesAsync
     public async void HandleNestedString()
     {
         var s = ServiceAsync.New();
-        var r = await s.HandleNestedString("abc");
+        var r = await s.HandleNestedString("abc".Utf8());
         s.Dispose();
-        Assert.Equal(r.s1, "abc");
-        Assert.Equal(r.s2, "abc");
+        Assert.Equal(r.s1.String, "abc");
+        Assert.Equal(r.s2.String, "abc");
     }
 
 

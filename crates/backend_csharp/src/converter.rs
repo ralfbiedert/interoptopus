@@ -1,12 +1,12 @@
-use crate::Interop;
 use crate::interop::FunctionNameFlavor;
+use crate::Interop;
 use heck::{ToLowerCamelCase, ToUpperCamelCase};
-use interoptopus::backend::{safe_name, types_from_type};
+use interoptopus::backend::safe_name;
 use interoptopus::lang::{Composite, ConstantValue, Enum, Field, FnPointer, Function, Opaque, Parameter, Primitive, PrimitiveValue, SugaredReturnType, Type};
-use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::{AsyncCallback, NamedCallback};
 use interoptopus::pattern::slice::SliceType;
 use interoptopus::pattern::vec::VecType;
+use interoptopus::pattern::TypePattern;
 
 /// Converts a primitive (Rust) type to a native C# type name, e.g., `f32` to `float`.
 pub fn primitive_to_typename(x: Primitive) -> String {
@@ -95,7 +95,7 @@ pub fn to_typespecifier_in_field(x: &Type) -> String {
         Type::FnPointer(x) => fnpointer_to_typename(x),
         Type::Pattern(x) => match x {
             TypePattern::CStrPointer => "string".to_string(),
-            TypePattern::Utf8String(_) => "string".to_string(),
+            TypePattern::Utf8String(_) => "Utf8String".to_string(),
             TypePattern::Slice(x) => format!("Slice{}", get_slice_type_argument(x)),
             TypePattern::SliceMut(x) => format!("SliceMut{}", get_slice_type_argument(x)),
             TypePattern::Option(e) => enum_to_typename(e.the_enum()),
@@ -221,7 +221,7 @@ pub fn to_typespecifier_in_async_fn_rval(x: &SugaredReturnType) -> String {
         SugaredReturnType::Async(Type::Pattern(TypePattern::Utf8String(_))) => "Task<string>".to_string(),
         SugaredReturnType::Async(Type::Pattern(TypePattern::Result(x))) if x.t().is_void() => "Task".to_string(),
         SugaredReturnType::Async(Type::Pattern(TypePattern::Result(x))) => match x.t() {
-            Type::Pattern(TypePattern::Utf8String(_)) => "Task<string>".to_string(),
+            Type::Pattern(TypePattern::Utf8String(_)) => "Task<Utf8String>".to_string(),
             x => format!("Task<{}>", to_typespecifier_in_sync_fn_rval(x)),
         },
         SugaredReturnType::Async(x) => format!("Task<{}>", to_typespecifier_in_sync_fn_rval(x)),
@@ -276,22 +276,39 @@ pub fn get_vec_type_argument(x: &VecType) -> String {
     to_typespecifier_in_param(x.t())
 }
 
-pub fn is_owned_slice(slice: &SliceType) -> bool {
-    types_from_type(slice.t()).iter().any(|x| matches!(x, Type::Pattern(TypePattern::Utf8String(_))))
-}
-
-pub fn is_owned_vec(vec: &VecType) -> bool {
-    types_from_type(vec.t()).iter().any(|x| matches!(x, Type::Pattern(TypePattern::Utf8String(_))))
+pub fn is_directly_serializable(t: &Type) -> bool {
+    match t {
+        Type::Primitive(_) => true,
+        Type::Array(_) => false,
+        Type::Enum(_) => false,
+        Type::Opaque(_) => false,
+        Type::Composite(x) => x.fields().iter().all(|x| is_directly_serializable(x.the_type())),
+        Type::FnPointer(_) => true,
+        Type::ReadPointer(_) => true,
+        Type::ReadWritePointer(_) => true,
+        Type::Pattern(p) => match p {
+            TypePattern::CStrPointer => true,
+            TypePattern::Utf8String(_) => false,
+            TypePattern::APIVersion => true,
+            TypePattern::Slice(_) => true,
+            TypePattern::SliceMut(_) => true,
+            TypePattern::Option(_) => false,
+            TypePattern::Result(_) => false,
+            TypePattern::Bool => true,
+            TypePattern::CChar => true,
+            TypePattern::NamedCallback(_) => true,
+            TypePattern::AsyncCallback(_) => true,
+            TypePattern::Vec(_) => false,
+            _ => todo!("Not implemented yet"),
+        },
+    }
 }
 
 #[must_use]
 pub fn pattern_to_native_in_signature(_: &Interop, param: &Parameter) -> String {
     let slice_type_name = |mutable: bool, slice: &SliceType| -> String {
-        if is_owned_slice(slice) {
-            match slice.t() {
-                Type::Pattern(TypePattern::Utf8String(_)) => "string[]".to_string(),
-                _ => format!("{}[]", crate::converter::to_typespecifier_in_param(slice.t())),
-            }
+        if !is_directly_serializable(&slice.to_type()) {
+            format!("{}[]", to_typespecifier_in_param(slice.t()))
         } else if mutable {
             format!("Span<{}>", to_typespecifier_in_param(slice.t()))
         } else {
@@ -305,8 +322,6 @@ pub fn pattern_to_native_in_signature(_: &Interop, param: &Parameter) -> String 
             TypePattern::NamedCallback(_) => {
                 format!("{}Delegate", to_typespecifier_in_param(x))
             }
-            TypePattern::Utf8String(_) => "string".to_string(),
-
             _ => to_typespecifier_in_param(param.the_type()),
         },
         Type::ReadPointer(x) | Type::ReadWritePointer(x) => match &**x {

@@ -1,10 +1,10 @@
-use crate::Interop;
 use crate::converter::{to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval};
+use crate::Interop;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Type;
-use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::AsyncCallback;
-use interoptopus::{Error, indented};
+use interoptopus::pattern::TypePattern;
+use interoptopus::{indented, Error};
 
 pub fn write_pattern_async_trampoline(i: &Interop, w: &mut IndentWriter, asynk: &AsyncCallback) -> Result<(), Error> {
     i.debug(w, "write_pattern_async_trampoline")?;
@@ -12,14 +12,12 @@ pub fn write_pattern_async_trampoline(i: &Interop, w: &mut IndentWriter, asynk: 
     let inner = to_typespecifier_in_param(asynk.target());
 
     let task_completion_source = match asynk.target() {
-        Type::Pattern(TypePattern::Result(x)) if matches!(x.t(), Type::Pattern(TypePattern::Utf8String(_))) => "TaskCompletionSource<string>".to_string(),
         Type::Pattern(TypePattern::Result(x)) if x.t().is_void() => "TaskCompletionSource".to_string(),
         Type::Pattern(TypePattern::Result(x)) => format!("TaskCompletionSource<{}>", to_typespecifier_in_sync_fn_rval(x.t())),
         x => format!("TaskCompletionSource<{}>", to_typespecifier_in_sync_fn_rval(x)),
     };
 
     let task = match asynk.target() {
-        Type::Pattern(TypePattern::Result(x)) if matches!(x.t(), Type::Pattern(TypePattern::Utf8String(_))) => "Task<string>".to_string(),
         Type::Pattern(TypePattern::Result(x)) if x.t().is_void() => "Task".to_string(),
         Type::Pattern(TypePattern::Result(x)) => format!("Task<{}>", to_typespecifier_in_sync_fn_rval(x.t())),
         x => format!("Task<{}>", to_typespecifier_in_sync_fn_rval(x)),

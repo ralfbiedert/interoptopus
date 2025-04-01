@@ -23,12 +23,12 @@ public class TestPatternOptions
         // Don't try this at home
         var x = OptionOptionResultOptionUtf8StringError.Some(
             OptionResultOptionUtf8StringError.Some(
-                ResultOptionUtf8StringError.Ok(OptionUtf8String.Some("hello world"))
+                ResultOptionUtf8StringError.Ok(OptionUtf8String.Some("hello world".Utf8()))
             )
         );
 
         var rval = Interop.pattern_ffi_option_3(x).AsSome().AsSome().AsOk().AsSome();
-        Assert.Equal("hello world", rval);
+        Assert.Equal("hello world".Utf8(), rval);
     }
 
 }

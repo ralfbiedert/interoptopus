@@ -279,6 +279,11 @@ impl SliceType {
     pub fn t(&self) -> &Type {
         &self.target_type
     }
+
+    #[must_use]
+    pub fn to_type(&self) -> Type {
+        Type::Pattern(TypePattern::Slice(self.clone()))
+    }
 }
 
 #[cfg(test)]
