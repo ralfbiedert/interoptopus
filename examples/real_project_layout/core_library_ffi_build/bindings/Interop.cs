@@ -559,18 +559,20 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public unsafe Utf8String From(string s)
         {
+            var rval = new Utf8String();
             var source = s.AsSpan();
             Span<byte> utf8Bytes = stackalloc byte[Encoding.UTF8.GetByteCount(source)];
             var len = Encoding.UTF8.GetBytes(source, utf8Bytes);
 
             fixed (byte* p = utf8Bytes)
             {
-                InteropHelper.interoptopus_string_create((IntPtr) p, (ulong)len, out var rval);
-                _ptr = rval._ptr;
-                _len = rval._len;
-                _capacity = rval._capacity;
+                InteropHelper.interoptopus_string_create((IntPtr) p, (ulong)len, out var s);
+                rval._ptr = s._ptr;
+                rval._len = s._len;
+                rval._capacity = s._capacity;
             }
 
+            return rval;
         }
 
         public unsafe string String

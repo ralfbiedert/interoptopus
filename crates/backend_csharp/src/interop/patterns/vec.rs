@@ -166,7 +166,7 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     indented!(w, [()], r"var _temp = new {the_type}.Unmanaged[_data.Length];")?;
     indented!(w, [()], r"for (var i = 0; i < _data.Length; ++i)")?;
     indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"_temp[i] = new {the_type}(_data[i]).ToUnmanaged();")?;
+    indented!(w, [()()], r"_temp[i] = _data[i].IntoUnmanaged();")?;
     indented!(w, [()], r"}}")?;
     indented!(w, [()], r"fixed (void* _data_ptr = _temp)")?;
     indented!(w, [()], r"{{")?;
@@ -193,7 +193,7 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     indented!(w, [()], r"if (i >= Count) throw new IndexOutOfRangeException();")?;
     indented!(w, [()], r"if (_ptr == IntPtr.Zero) throw new InteropException();")?;
     indented!(w, [()], r"var _element = Marshal.PtrToStructure<{the_type}.Unmanaged>(new IntPtr(_ptr.ToInt64() + i * sizeof({the_type}.Unmanaged)));")?;
-    indented!(w, [()], r"return _element.ToManaged();")?;
+    indented!(w, [()], r"return _element.IntoManaged();")?;
     indented!(w, r"}}")?;
     w.unindent();
     indented!(w, r"}}")?;

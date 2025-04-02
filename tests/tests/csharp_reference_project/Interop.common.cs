@@ -398,18 +398,24 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceBool(IntPtr data, ulong len)
+        SliceBool() { }
+
+        public SliceBool From(IntPtr data, ulong len)
         {
-            _data = data;
-            _len = len;
+            var rval = new SliceBool();
+            rval._data = data;
+            rval._len = len;
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceBool(Bool[] managed)
+        public SliceBool From(Bool[] managed)
         {
-            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
-            _data = _handle.AddrOfPinnedObject();
-            _len = (ulong) managed.Length;
+            var rval = new SliceBool();
+            rval._handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            rval._data = _handle.AddrOfPinnedObject();
+            rval._len = (ulong) managed.Length;
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -445,7 +451,7 @@ namespace My.Company.Common
             public ulong Len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceBool ToManaged()
+            public Bool ToManaged()
             {
                 return new SliceBool(Data, Len);
             }
@@ -519,18 +525,24 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceI32(IntPtr data, ulong len)
+        SliceI32() { }
+
+        public SliceI32 From(IntPtr data, ulong len)
         {
-            _data = data;
-            _len = len;
+            var rval = new SliceI32();
+            rval._data = data;
+            rval._len = len;
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceI32(int[] managed)
+        public SliceI32 From(int[] managed)
         {
-            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
-            _data = _handle.AddrOfPinnedObject();
-            _len = (ulong) managed.Length;
+            var rval = new SliceI32();
+            rval._handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            rval._data = _handle.AddrOfPinnedObject();
+            rval._len = (ulong) managed.Length;
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -566,7 +578,7 @@ namespace My.Company.Common
             public ulong Len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceI32 ToManaged()
+            public int ToManaged()
             {
                 return new SliceI32(Data, Len);
             }
@@ -640,18 +652,24 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceU32(IntPtr data, ulong len)
+        SliceU32() { }
+
+        public SliceU32 From(IntPtr data, ulong len)
         {
-            _data = data;
-            _len = len;
+            var rval = new SliceU32();
+            rval._data = data;
+            rval._len = len;
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceU32(uint[] managed)
+        public SliceU32 From(uint[] managed)
         {
-            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
-            _data = _handle.AddrOfPinnedObject();
-            _len = (ulong) managed.Length;
+            var rval = new SliceU32();
+            rval._handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            rval._data = _handle.AddrOfPinnedObject();
+            rval._len = (ulong) managed.Length;
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -687,7 +705,7 @@ namespace My.Company.Common
             public ulong Len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceU32 ToManaged()
+            public uint ToManaged()
             {
                 return new SliceU32(Data, Len);
             }
@@ -719,7 +737,7 @@ namespace My.Company.Common
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe SliceU32 ToManaged()
             {
-                _managed = new SliceU32;
+                _managed = new SliceU32();
                 _managed._data = _unmanaged.Data;
                 _managed._len = _unmanaged.Len;
                 return _managed;
@@ -761,18 +779,24 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceU8(IntPtr data, ulong len)
+        SliceU8() { }
+
+        public SliceU8 From(IntPtr data, ulong len)
         {
-            _data = data;
-            _len = len;
+            var rval = new SliceU8();
+            rval._data = data;
+            rval._len = len;
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceU8(byte[] managed)
+        public SliceU8 From(byte[] managed)
         {
-            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
-            _data = _handle.AddrOfPinnedObject();
-            _len = (ulong) managed.Length;
+            var rval = new SliceU8();
+            rval._handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            rval._data = _handle.AddrOfPinnedObject();
+            rval._len = (ulong) managed.Length;
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -808,7 +832,7 @@ namespace My.Company.Common
             public ulong Len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceU8 ToManaged()
+            public byte ToManaged()
             {
                 return new SliceU8(Data, Len);
             }
@@ -877,20 +901,22 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceUtf8String() { }
+        SliceUtf8String() { }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public unsafe SliceUtf8String(string[] managed)
+        public unsafe SliceUtf8String From(string[] managed)
         {
+            var rval = new SliceUtf8String();
             var size = sizeof(Utf8String.Unmanaged);
-            _hglobal  = Marshal.AllocHGlobal(size * managed.Length);
-            _len = (ulong) managed.Length;
+            rval._hglobal  = Marshal.AllocHGlobal(size * managed.Length);
+            rval._len = (ulong) managed.Length;
             for (var i = 0; i < managed.Length; ++i)
             {
-                var unmanaged = new Utf8String(managed[i]).ToUnmanaged();
+                var unmanaged = managed[i].ToUnmanaged();
                 var dst = IntPtr.Add(_hglobal, i * size);
                 Marshal.StructureToPtr(unmanaged, dst, false);
             }
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -993,18 +1019,24 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceVec(IntPtr data, ulong len)
+        SliceVec() { }
+
+        public SliceVec From(IntPtr data, ulong len)
         {
-            _data = data;
-            _len = len;
+            var rval = new SliceVec();
+            rval._data = data;
+            rval._len = len;
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceVec(Vec[] managed)
+        public SliceVec From(Vec[] managed)
         {
-            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
-            _data = _handle.AddrOfPinnedObject();
-            _len = (ulong) managed.Length;
+            var rval = new SliceVec();
+            rval._handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            rval._data = _handle.AddrOfPinnedObject();
+            rval._len = (ulong) managed.Length;
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -1040,7 +1072,7 @@ namespace My.Company.Common
             public ulong Len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceVec ToManaged()
+            public Vec ToManaged()
             {
                 return new SliceVec(Data, Len);
             }
@@ -1120,18 +1152,24 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceMutU32(IntPtr data, ulong len)
+        SliceMutU32() { }
+
+        public SliceMutU32 From(IntPtr data, ulong len)
         {
-            _data = data;
-            _len = len;
+            var rval = new SliceMutU32();
+            rval._data = data;
+            rval._len = len;
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceMutU32(uint[] managed)
+        public SliceMutU32 From(uint[] managed)
         {
-            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
-            _data = _handle.AddrOfPinnedObject();
-            _len = (ulong) managed.Length;
+            var rval = new SliceMutU32();
+            rval._handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            rval._data = _handle.AddrOfPinnedObject();
+            rval._len = (ulong) managed.Length;
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -1167,7 +1205,7 @@ namespace My.Company.Common
             public ulong Len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceMutU32 ToManaged()
+            public uint ToManaged()
             {
                 return new SliceMutU32(Data, Len);
             }
@@ -1247,18 +1285,24 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceMutU8(IntPtr data, ulong len)
+        SliceMutU8() { }
+
+        public SliceMutU8 From(IntPtr data, ulong len)
         {
-            _data = data;
-            _len = len;
+            var rval = new SliceMutU8();
+            rval._data = data;
+            rval._len = len;
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceMutU8(byte[] managed)
+        public SliceMutU8 From(byte[] managed)
         {
-            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
-            _data = _handle.AddrOfPinnedObject();
-            _len = (ulong) managed.Length;
+            var rval = new SliceMutU8();
+            rval._handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            rval._data = _handle.AddrOfPinnedObject();
+            rval._len = (ulong) managed.Length;
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -1294,7 +1338,7 @@ namespace My.Company.Common
             public ulong Len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceMutU8 ToManaged()
+            public byte ToManaged()
             {
                 return new SliceMutU8(Data, Len);
             }
@@ -1374,18 +1418,24 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceMutVec(IntPtr data, ulong len)
+        SliceMutVec() { }
+
+        public SliceMutVec From(IntPtr data, ulong len)
         {
-            _data = data;
-            _len = len;
+            var rval = new SliceMutVec();
+            rval._data = data;
+            rval._len = len;
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceMutVec(Vec[] managed)
+        public SliceMutVec From(Vec[] managed)
         {
-            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
-            _data = _handle.AddrOfPinnedObject();
-            _len = (ulong) managed.Length;
+            var rval = new SliceMutVec();
+            rval._handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            rval._data = _handle.AddrOfPinnedObject();
+            rval._len = (ulong) managed.Length;
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -1421,7 +1471,7 @@ namespace My.Company.Common
             public ulong Len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceMutVec ToManaged()
+            public Vec ToManaged()
             {
                 return new SliceMutVec(Data, Len);
             }
@@ -2764,7 +2814,7 @@ namespace My.Company.Common
             var _temp = new Utf8String.Unmanaged[_data.Length];
             for (var i = 0; i < _data.Length; ++i)
             {
-                _temp[i] = new Utf8String(_data[i]).ToUnmanaged();
+                _temp[i] = _data[i].IntoUnmanaged();
             }
             fixed (void* _data_ptr = _temp)
             {
@@ -2789,7 +2839,7 @@ namespace My.Company.Common
                 if (i >= Count) throw new IndexOutOfRangeException();
                 if (_ptr == IntPtr.Zero) throw new InteropException();
                 var _element = Marshal.PtrToStructure<Utf8String.Unmanaged>(new IntPtr(_ptr.ToInt64() + i * sizeof(Utf8String.Unmanaged)));
-                return _element.ToManaged();
+                return _element.IntoManaged();
             }
         }
         public Unmanaged ToUnmanaged()
@@ -2985,18 +3035,20 @@ namespace My.Company.Common
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public unsafe Utf8String From(string s)
         {
+            var rval = new Utf8String();
             var source = s.AsSpan();
             Span<byte> utf8Bytes = stackalloc byte[Encoding.UTF8.GetByteCount(source)];
             var len = Encoding.UTF8.GetBytes(source, utf8Bytes);
 
             fixed (byte* p = utf8Bytes)
             {
-                InteropHelper.interoptopus_string_create((IntPtr) p, (ulong)len, out var rval);
-                _ptr = rval._ptr;
-                _len = rval._len;
-                _capacity = rval._capacity;
+                InteropHelper.interoptopus_string_create((IntPtr) p, (ulong)len, out var s);
+                rval._ptr = s._ptr;
+                rval._len = s._len;
+                rval._capacity = s._capacity;
             }
 
+            return rval;
         }
 
         public unsafe string String

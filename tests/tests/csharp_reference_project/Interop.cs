@@ -856,7 +856,7 @@ namespace My.Company
 
         // Debug - write_function_overload 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static unsafe void pattern_ffi_slice_3(Span<byte> slice, CallbackSliceMutDelegate callback)
+        public static unsafe void pattern_ffi_slice_3(SliceMutU8 slice, CallbackSliceMutDelegate callback)
         {
             var callback_wrapped = new CallbackSliceMut(callback);
             try
@@ -896,12 +896,12 @@ namespace My.Company
 
         // Debug - write_function_overload 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static unsafe void pattern_ffi_slice_6(Span<byte> slice, CallbackU8Delegate callback)
+        public static unsafe void pattern_ffi_slice_6(ref SliceMutU8 slice, CallbackU8Delegate callback)
         {
             var callback_wrapped = new CallbackU8(callback);
             try
             {
-                pattern_ffi_slice_6(slice, callback_wrapped);
+                pattern_ffi_slice_6(ref slice, callback_wrapped);
             }
             finally
             {
@@ -917,12 +917,12 @@ namespace My.Company
 
         // Debug - write_function_overload 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static unsafe void pattern_ffi_slice_8(Span<CharArray> slice, CallbackCharArray2Delegate callback)
+        public static unsafe void pattern_ffi_slice_8(ref SliceMutCharArray slice, CallbackCharArray2Delegate callback)
         {
             var callback_wrapped = new CallbackCharArray2(callback);
             try
             {
-                pattern_ffi_slice_8(slice, callback_wrapped);
+                pattern_ffi_slice_8(ref slice, callback_wrapped);
             }
             finally
             {
@@ -1754,7 +1754,7 @@ namespace My.Company
 
         // Debug - write_function_overload 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static unsafe ResultError service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
+        public static unsafe ResultError service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturnDelegate callback, SliceI32 input)
         {
             var callback_wrapped = new SumDelegateReturn(callback);
             try
@@ -4845,18 +4845,24 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceUseCStrPtr(IntPtr data, ulong len)
+        SliceUseCStrPtr() { }
+
+        public SliceUseCStrPtr From(IntPtr data, ulong len)
         {
-            _data = data;
-            _len = len;
+            var rval = new SliceUseCStrPtr();
+            rval._data = data;
+            rval._len = len;
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceUseCStrPtr(UseCStrPtr[] managed)
+        public SliceUseCStrPtr From(UseCStrPtr[] managed)
         {
-            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
-            _data = _handle.AddrOfPinnedObject();
-            _len = (ulong) managed.Length;
+            var rval = new SliceUseCStrPtr();
+            rval._handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            rval._data = _handle.AddrOfPinnedObject();
+            rval._len = (ulong) managed.Length;
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -4892,7 +4898,7 @@ namespace My.Company
             public ulong Len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceUseCStrPtr ToManaged()
+            public UseCStrPtr ToManaged()
             {
                 return new SliceUseCStrPtr(Data, Len);
             }
@@ -4961,20 +4967,22 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceUseString() { }
+        SliceUseString() { }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public unsafe SliceUseString(UseString[] managed)
+        public unsafe SliceUseString From(UseString[] managed)
         {
+            var rval = new SliceUseString();
             var size = sizeof(UseString.Unmanaged);
-            _hglobal  = Marshal.AllocHGlobal(size * managed.Length);
-            _len = (ulong) managed.Length;
+            rval._hglobal  = Marshal.AllocHGlobal(size * managed.Length);
+            rval._len = (ulong) managed.Length;
             for (var i = 0; i < managed.Length; ++i)
             {
                 var unmanaged = managed[i].ToUnmanaged();
                 var dst = IntPtr.Add(_hglobal, i * size);
                 Marshal.StructureToPtr(unmanaged, dst, false);
             }
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -5077,18 +5085,24 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceVec3f32(IntPtr data, ulong len)
+        SliceVec3f32() { }
+
+        public SliceVec3f32 From(IntPtr data, ulong len)
         {
-            _data = data;
-            _len = len;
+            var rval = new SliceVec3f32();
+            rval._data = data;
+            rval._len = len;
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceVec3f32(Vec3f32[] managed)
+        public SliceVec3f32 From(Vec3f32[] managed)
         {
-            _handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
-            _data = _handle.AddrOfPinnedObject();
-            _len = (ulong) managed.Length;
+            var rval = new SliceVec3f32();
+            rval._handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
+            rval._data = _handle.AddrOfPinnedObject();
+            rval._len = (ulong) managed.Length;
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -5124,7 +5138,7 @@ namespace My.Company
             public ulong Len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceVec3f32 ToManaged()
+            public Vec3f32 ToManaged()
             {
                 return new SliceVec3f32(Data, Len);
             }
@@ -5193,20 +5207,22 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceMutCharArray() { }
+        SliceMutCharArray() { }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public unsafe SliceMutCharArray(CharArray[] managed)
+        public unsafe SliceMutCharArray From(CharArray[] managed)
         {
+            var rval = new SliceMutCharArray();
             var size = sizeof(CharArray.Unmanaged);
-            _hglobal  = Marshal.AllocHGlobal(size * managed.Length);
-            _len = (ulong) managed.Length;
+            rval._hglobal  = Marshal.AllocHGlobal(size * managed.Length);
+            rval._len = (ulong) managed.Length;
             for (var i = 0; i < managed.Length; ++i)
             {
                 var unmanaged = managed[i].ToUnmanaged();
                 var dst = IntPtr.Add(_hglobal, i * size);
                 Marshal.StructureToPtr(unmanaged, dst, false);
             }
+            return rval;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -9628,7 +9644,7 @@ namespace My.Company
 
         // Debug - write_common_service_method_overload 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public void CallbackWithSlice(SumDelegateReturnDelegate callback, ReadOnlySpan<int> input)
+        public void CallbackWithSlice(SumDelegateReturnDelegate callback, SliceI32 input)
         {
             Interop.service_callbacks_callback_with_slice(_context, callback, input).AsOk();
         }

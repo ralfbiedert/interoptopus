@@ -306,30 +306,11 @@ pub fn is_directly_serializable(t: &Type) -> bool {
 
 #[must_use]
 pub fn pattern_to_native_in_signature(_: &Interop, param: &Parameter) -> String {
-    let slice_type_name = |mutable: bool, slice: &SliceType| -> String {
-        if !is_directly_serializable(&slice.to_type()) {
-            format!("{}[]", to_typespecifier_in_param(slice.t()))
-        } else if mutable {
-            format!("Span<{}>", to_typespecifier_in_param(slice.t()))
-        } else {
-            format!("ReadOnlySpan<{}>", to_typespecifier_in_param(slice.t()))
-        }
-    };
     match param.the_type() {
         x @ Type::Pattern(p) => match p {
-            TypePattern::Slice(p) => slice_type_name(false, p),
-            TypePattern::SliceMut(p) => slice_type_name(true, p),
             TypePattern::NamedCallback(_) => {
                 format!("{}Delegate", to_typespecifier_in_param(x))
             }
-            _ => to_typespecifier_in_param(param.the_type()),
-        },
-        Type::ReadPointer(x) | Type::ReadWritePointer(x) => match &**x {
-            Type::Pattern(x) => match x {
-                TypePattern::Slice(p) => slice_type_name(false, p),
-                TypePattern::SliceMut(p) => slice_type_name(true, p),
-                _ => to_typespecifier_in_param(param.the_type()),
-            },
             _ => to_typespecifier_in_param(param.the_type()),
         },
 
