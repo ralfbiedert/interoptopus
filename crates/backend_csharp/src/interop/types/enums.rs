@@ -230,6 +230,26 @@ pub fn write_type_definition_enum_variant_utils(i: &Interop, w: &mut IndentWrite
     }
     w.newline()?;
 
+    // Somewhat of a ToString implementation.
+    indented!(w, [()], r"public override readonly string ToString() {{")?;
+    indented!(w, [()()], r"return _variant switch {{")?;
+    for variant in the_type.variants() {
+        let vname = format!(r#""{}""#, variant.name());
+        match variant.kind() {
+            VariantKind::Unit(x) => {
+                indented!(w, [()()], r"{x} => {vname},")?;
+            }
+            VariantKind::Typed(x, _) => {
+                indented!(w, [()()], r"{x} => {vname},")?;
+            }
+        }
+    }
+    let throw = "throw new InteropException()";
+    indented!(w, [()()], r"_ => {throw}")?;
+    indented!(w, [()()], r"}};")?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+
     Ok(())
 }
 
