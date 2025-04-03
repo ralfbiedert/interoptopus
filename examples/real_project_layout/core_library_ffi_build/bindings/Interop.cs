@@ -98,6 +98,13 @@ namespace My.Company
 
         public void AsFail() { if (_variant != 0) throw new InteropException(); }
 
+        public override readonly string ToString() {
+            return _variant switch {
+            0 => "Fail",
+            _ => throw new InteropException()
+            };
+        }
+
         public ref struct Marshaller
         {
             private Error _managed; // Used when converting managed -> unmanaged
@@ -280,6 +287,16 @@ namespace My.Company
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
+        public override readonly string ToString() {
+            return _variant switch {
+            0 => "Ok",
+            1 => "Err",
+            2 => "Panic",
+            3 => "Null",
+            _ => throw new InteropException()
+            };
+        }
+
         public ref struct Marshaller
         {
             private ResultConstPtrGameEngineError _managed; // Used when converting managed -> unmanaged
@@ -381,6 +398,16 @@ namespace My.Company
         public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        public override readonly string ToString() {
+            return _variant switch {
+            0 => "Ok",
+            1 => "Err",
+            2 => "Panic",
+            3 => "Null",
+            _ => throw new InteropException()
+            };
+        }
 
         public ref struct Marshaller
         {
