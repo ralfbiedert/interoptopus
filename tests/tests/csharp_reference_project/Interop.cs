@@ -2087,7 +2087,7 @@ namespace My.Company
             internal UnmanagedC _C;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public EnumPayload ToManaged()
+            public EnumPayload IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -2096,7 +2096,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -2201,7 +2201,7 @@ namespace My.Company
             internal UnmanagedB _B;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Layer3 ToManaged()
+            public Layer3 IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -2210,7 +2210,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -2262,8 +2262,8 @@ namespace My.Company
                 _managed = new Layer3();
                 _managed._variant = _unmanaged._variant;
         // Debug - write_type_definition_enum_variant_fields_to_managed 
-                if (_managed._variant == 0) _managed._A = _unmanaged._A._A.ToManaged();
-                if (_managed._variant == 1) _managed._B = _unmanaged._B._B.ToManaged();
+                if (_managed._variant == 0) _managed._A = _unmanaged._A._A.IntoManaged();
+                if (_managed._variant == 1) _managed._B = _unmanaged._B._B.IntoManaged();
                 return _managed;
             }
             public void Free() { }
@@ -2633,9 +2633,9 @@ namespace My.Company
                 _managed = new CharArray();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.str = _unmanaged.str.ToManaged();
+                _managed.str = _unmanaged.str.IntoManaged();
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.str_2 = _unmanaged.str_2.ToManaged();
+                _managed.str_2 = _unmanaged.str_2.IntoManaged();
 
                 return _managed;
             }
@@ -3178,11 +3178,11 @@ namespace My.Company
                 _managed = new Layer1Utf8String();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.maybe_1 = _unmanaged.maybe_1.ToManaged();
+                _managed.maybe_1 = _unmanaged.maybe_1.IntoManaged();
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.maybe_2 = _unmanaged.maybe_2.ToManaged();
+                _managed.maybe_2 = _unmanaged.maybe_2.IntoManaged();
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.maybe_3 = _unmanaged.maybe_3.ToManaged();
+                _managed.maybe_3 = _unmanaged.maybe_3.IntoManaged();
 
                 return _managed;
             }
@@ -3274,13 +3274,13 @@ namespace My.Company
                 _managed = new Layer2Utf8String();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.layer_1 = _unmanaged.layer_1.ToManaged();
+                _managed.layer_1 = _unmanaged.layer_1.IntoManaged();
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 _managed.vec = _unmanaged.vec.ToManaged();
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 _managed.the_enum = _unmanaged.the_enum;
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.strings = _unmanaged.strings.ToManaged();
+                _managed.strings = _unmanaged.strings.IntoManaged();
 
                 return _managed;
             }
@@ -3502,7 +3502,7 @@ namespace My.Company
                     src.CopyTo(dst);
                 }
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.field_struct = _unmanaged.field_struct.ToManaged();
+                _managed.field_struct = _unmanaged.field_struct.IntoManaged();
 
                 return _managed;
             }
@@ -4120,7 +4120,7 @@ namespace My.Company
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
                 _managed.s1 = _unmanaged.s1.ToManaged();
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.s2 = _unmanaged.s2.ToManaged();
+                _managed.s2 = _unmanaged.s2.IntoManaged();
 
                 return _managed;
             }
@@ -4200,9 +4200,9 @@ namespace My.Company
                 _managed = new UseString();
 
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.s1 = _unmanaged.s1.ToManaged();
+                _managed.s1 = _unmanaged.s1.IntoManaged();
                 // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.s2 = _unmanaged.s2.ToManaged();
+                _managed.s2 = _unmanaged.s2.IntoManaged();
 
                 return _managed;
             }
@@ -5327,7 +5327,7 @@ namespace My.Company
             internal UnmanagedSome _Some;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public OptionEnumPayload ToManaged()
+            public OptionEnumPayload IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -5336,7 +5336,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -5387,7 +5387,7 @@ namespace My.Company
                 _managed = new OptionEnumPayload();
                 _managed._variant = _unmanaged._variant;
         // Debug - write_type_definition_enum_variant_fields_to_managed 
-                if (_managed._variant == 0) _managed._Some = _unmanaged._Some._Some.ToManaged();
+                if (_managed._variant == 0) _managed._Some = _unmanaged._Some._Some.IntoManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5427,7 +5427,7 @@ namespace My.Company
             internal UnmanagedSome _Some;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public OptionInner ToManaged()
+            public OptionInner IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -5436,7 +5436,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -5539,7 +5539,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceAsyncError ToManaged()
+            public ResultConstPtrServiceAsyncError IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -5548,7 +5548,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -5607,7 +5607,7 @@ namespace My.Company
                 _managed._variant = _unmanaged._variant;
         // Debug - write_type_definition_enum_variant_fields_to_managed 
                 if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
-                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.IntoManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5659,7 +5659,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceBasicError ToManaged()
+            public ResultConstPtrServiceBasicError IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -5668,7 +5668,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -5727,7 +5727,7 @@ namespace My.Company
                 _managed._variant = _unmanaged._variant;
         // Debug - write_type_definition_enum_variant_fields_to_managed 
                 if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
-                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.IntoManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5779,7 +5779,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceCallbacksError ToManaged()
+            public ResultConstPtrServiceCallbacksError IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -5788,7 +5788,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -5847,7 +5847,7 @@ namespace My.Company
                 _managed._variant = _unmanaged._variant;
         // Debug - write_type_definition_enum_variant_fields_to_managed 
                 if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
-                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.IntoManaged();
                 return _managed;
             }
             public void Free() { }
@@ -5899,7 +5899,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceDependentError ToManaged()
+            public ResultConstPtrServiceDependentError IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -5908,7 +5908,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -5967,7 +5967,7 @@ namespace My.Company
                 _managed._variant = _unmanaged._variant;
         // Debug - write_type_definition_enum_variant_fields_to_managed 
                 if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
-                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.IntoManaged();
                 return _managed;
             }
             public void Free() { }
@@ -6019,7 +6019,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceIgnoringMethodsError ToManaged()
+            public ResultConstPtrServiceIgnoringMethodsError IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -6028,7 +6028,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -6087,7 +6087,7 @@ namespace My.Company
                 _managed._variant = _unmanaged._variant;
         // Debug - write_type_definition_enum_variant_fields_to_managed 
                 if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
-                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.IntoManaged();
                 return _managed;
             }
             public void Free() { }
@@ -6139,7 +6139,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceMainError ToManaged()
+            public ResultConstPtrServiceMainError IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -6148,7 +6148,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -6207,7 +6207,7 @@ namespace My.Company
                 _managed._variant = _unmanaged._variant;
         // Debug - write_type_definition_enum_variant_fields_to_managed 
                 if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
-                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.IntoManaged();
                 return _managed;
             }
             public void Free() { }
@@ -6259,7 +6259,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceMultipleCtorsError ToManaged()
+            public ResultConstPtrServiceMultipleCtorsError IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -6268,7 +6268,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -6327,7 +6327,7 @@ namespace My.Company
                 _managed._variant = _unmanaged._variant;
         // Debug - write_type_definition_enum_variant_fields_to_managed 
                 if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
-                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.IntoManaged();
                 return _managed;
             }
             public void Free() { }
@@ -6379,7 +6379,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceOnPanicError ToManaged()
+            public ResultConstPtrServiceOnPanicError IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -6388,7 +6388,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -6447,7 +6447,7 @@ namespace My.Company
                 _managed._variant = _unmanaged._variant;
         // Debug - write_type_definition_enum_variant_fields_to_managed 
                 if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
-                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.IntoManaged();
                 return _managed;
             }
             public void Free() { }
@@ -6499,7 +6499,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceResultError ToManaged()
+            public ResultConstPtrServiceResultError IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -6508,7 +6508,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -6567,7 +6567,7 @@ namespace My.Company
                 _managed._variant = _unmanaged._variant;
         // Debug - write_type_definition_enum_variant_fields_to_managed 
                 if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
-                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.IntoManaged();
                 return _managed;
             }
             public void Free() { }
@@ -6619,7 +6619,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceStringsError ToManaged()
+            public ResultConstPtrServiceStringsError IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -6628,7 +6628,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -6687,7 +6687,7 @@ namespace My.Company
                 _managed._variant = _unmanaged._variant;
         // Debug - write_type_definition_enum_variant_fields_to_managed 
                 if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
-                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.IntoManaged();
                 return _managed;
             }
             public void Free() { }
@@ -6739,7 +6739,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceVariousSlicesError ToManaged()
+            public ResultConstPtrServiceVariousSlicesError IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -6748,7 +6748,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -6807,7 +6807,7 @@ namespace My.Company
                 _managed._variant = _unmanaged._variant;
         // Debug - write_type_definition_enum_variant_fields_to_managed 
                 if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
-                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.IntoManaged();
                 return _managed;
             }
             public void Free() { }
@@ -6859,7 +6859,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultNestedArrayError ToManaged()
+            public ResultNestedArrayError IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -6868,7 +6868,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -6926,8 +6926,8 @@ namespace My.Company
                 _managed = new ResultNestedArrayError();
                 _managed._variant = _unmanaged._variant;
         // Debug - write_type_definition_enum_variant_fields_to_managed 
-                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok.ToManaged();
-                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok.IntoManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.IntoManaged();
                 return _managed;
             }
             public void Free() { }
@@ -6979,7 +6979,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultOptionEnumPayloadError ToManaged()
+            public ResultOptionEnumPayloadError IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -6988,7 +6988,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -7046,8 +7046,8 @@ namespace My.Company
                 _managed = new ResultOptionEnumPayloadError();
                 _managed._variant = _unmanaged._variant;
         // Debug - write_type_definition_enum_variant_fields_to_managed 
-                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok.ToManaged();
-                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok.IntoManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.IntoManaged();
                 return _managed;
             }
             public void Free() { }
@@ -7099,7 +7099,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultUseStringError ToManaged()
+            public ResultUseStringError IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -7108,7 +7108,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -7166,8 +7166,8 @@ namespace My.Company
                 _managed = new ResultUseStringError();
                 _managed._variant = _unmanaged._variant;
         // Debug - write_type_definition_enum_variant_fields_to_managed 
-                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok.ToManaged();
-                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
+                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok.IntoManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.IntoManaged();
                 return _managed;
             }
             public void Free() { }
@@ -9172,7 +9172,7 @@ namespace My.Company
                 return Marshal.PtrToStructure<Vec3f32>(new IntPtr(_ptr.ToInt64() + i * sizeof(Vec3f32)));
             }
         }
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -9196,7 +9196,7 @@ namespace My.Company
             internal IntPtr _ptr;
             internal ulong _len;
             internal ulong _capacity;
-            public VecVec3f32 ToManaged()
+            public VecVec3f32 IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -9221,7 +9221,7 @@ namespace My.Company
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
+            public Unmanaged IntoUnmanaged()
             {
                 if (_managed._ptr == IntPtr.Zero) throw new InteropException(); // Don't use for serialization if moved already.
                 _unmanaged = new Unmanaged();

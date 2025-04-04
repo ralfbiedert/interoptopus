@@ -104,7 +104,7 @@ pub fn write_pattern_fast_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) 
     indented!(w, r"public void FromUnmanaged(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
     w.newline()?;
     i.inline_hint(w, 0)?;
-    indented!(w, r"public Unmanaged ToUnmanaged()")?;
+    indented!(w, r"public Unmanaged IntoUnmanaged()")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"if (_managed._ptr == IntPtr.Zero) throw new InteropException(); // Don't use for serialization if moved already.")?;
     indented!(w, [()], r"_unmanaged = new Unmanaged();")?;
@@ -243,7 +243,7 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     indented!(w, r"}}")?;
     w.newline()?;
     i.inline_hint(w, 0)?;
-    indented!(w, r"public unsafe {name} ToManaged()")?;
+    indented!(w, r"public unsafe {name} IntoManaged()")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"_managed = new {name}(true);")?;
     indented!(w, [()], r"_managed._len = _unmanaged._len;")?;
@@ -325,7 +325,7 @@ pub fn write_pattern_vec_interop_helper(i: &Interop, w: &mut IndentWriter, vec: 
 }
 
 pub fn write_pattern_vec_to_managed(_: &Interop, w: &mut IndentWriter, managed: &str) -> Result<(), Error> {
-    indented!(w, [()], r"public {managed} ToManaged()")?;
+    indented!(w, [()], r"public {managed} IntoManaged()")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"var marshaller = new Marshaller(this);")?;
     indented!(w, [()()], r"try {{ return marshaller.ToManaged(); }}")?;
@@ -336,7 +336,7 @@ pub fn write_pattern_vec_to_managed(_: &Interop, w: &mut IndentWriter, managed: 
 }
 
 pub fn write_pattern_vec_to_unmanaged(_: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
-    indented!(w, r"public Unmanaged ToUnmanaged()")?;
+    indented!(w, r"public Unmanaged IntoUnmanaged()")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"var marshaller = new Marshaller(this);")?;
     indented!(w, [()], r"try {{ return marshaller.ToUnmanaged(); }}")?;

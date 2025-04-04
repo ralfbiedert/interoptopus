@@ -1,4 +1,4 @@
-use crate::converter::{field_name_to_csharp_name, is_blittable, to_typespecifier_in_field};
+use crate::converter::{field_name_to_csharp_name, is_blittable, is_directly_serializable, to_typespecifier_in_field};
 use crate::interop::docs::write_documentation;
 use crate::Interop;
 use interoptopus::backend::{IndentWriter, WriteFor};
@@ -280,10 +280,13 @@ pub fn write_type_definition_composite_marshaller_field_from_unmanaged(i: &Inter
             indented!(w, "_managed.{name} = Marshal.PtrToStringAnsi(_unmanaged.{name});")?;
         }
         Type::Pattern(TypePattern::Utf8String(_)) => {
+            indented!(w, "_managed.{name} = _unmanaged.{name}.IntoManaged();")?;
+        }
+        _ if is_directly_serializable(field.the_type()) => {
             indented!(w, "_managed.{name} = _unmanaged.{name}.ToManaged();")?;
         }
         _ => {
-            indented!(w, "_managed.{name} = _unmanaged.{name}.ToManaged();")?;
+            indented!(w, "_managed.{name} = _unmanaged.{name}.IntoManaged();")?;
         }
     }
 

@@ -1,4 +1,4 @@
-use crate::converter::{to_typespecifier_in_field, to_typespecifier_in_field_unmanaged};
+use crate::converter::{is_directly_serializable, to_typespecifier_in_field, to_typespecifier_in_field_unmanaged};
 use crate::interop::docs::write_documentation;
 use crate::Interop;
 use interoptopus::backend::IndentWriter;
@@ -35,7 +35,7 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
     indented!(w, [()], r"{{")?;
     write_type_definition_enum_variant_fields_unmanaged(i, w, the_type)?;
     i.inline_hint(w, 2)?;
-    indented!(w, [()()], r"public {name} ToManaged()")?;
+    indented!(w, [()()], r"public {name} IntoManaged()")?;
     indented!(w, [()()], r"{{")?;
     indented!(w, [()()()], r"var marshaller = new Marshaller(this);")?;
     indented!(w, [()()()], r"try {{ return marshaller.ToManaged(); }}")?;
@@ -45,7 +45,7 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
     w.newline()?;
 
     i.inline_hint(w, 1)?;
-    indented!(w, [()], r"public Unmanaged ToUnmanaged()")?;
+    indented!(w, [()], r"public Unmanaged IntoUnmanaged()")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"var marshaller = new Marshaller(this);")?;
     indented!(w, [()()], r"try {{ return marshaller.ToUnmanaged(); }}")?;
@@ -275,8 +275,9 @@ pub fn write_type_definition_enum_variant_fields_to_managed(i: &Interop, w: &mut
                     Type::Primitive(_) => format!("_unmanaged._{vname}._{vname}"),
                     Type::ReadWritePointer(_) => format!("_unmanaged._{vname}._{vname}"),
                     Type::ReadPointer(_) => format!("_unmanaged._{vname}._{vname}"),
-                    Type::Pattern(TypePattern::Utf8String(_)) => format!("_unmanaged._{vname}._{vname}.ToManaged()"),
-                    _ => format!("_unmanaged._{vname}._{vname}.ToManaged()"),
+                    Type::Pattern(TypePattern::Utf8String(_)) => format!("_unmanaged._{vname}._{vname}.IntoManaged()"),
+                    _ if is_directly_serializable(t) => format!("_unmanaged._{vname}._{vname}.ToManaged()"),
+                    _ => format!("_unmanaged._{vname}._{vname}.IntoManaged()"),
                 };
 
                 indented!(w, [()()], r"if (_managed._variant == {x}) _managed._{vname} = {convert};")?;

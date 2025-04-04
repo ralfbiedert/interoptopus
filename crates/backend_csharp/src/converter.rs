@@ -42,31 +42,6 @@ pub fn composite_to_typename(x: &Composite) -> String {
     x.rust_name().to_string()
 }
 
-/// Checks if the type is on the C# side blittable, in particular, if it can be accessed via raw pointers and memcopied.
-pub fn is_blittable(x: &Type) -> bool {
-    match x {
-        Type::Primitive(_) => true,
-        Type::Composite(c) => c.fields().iter().all(|x| is_blittable(x.the_type())),
-        Type::Pattern(x) => match x {
-            TypePattern::CStrPointer => false,
-            TypePattern::APIVersion => true,
-            TypePattern::Slice(_) => false,
-            TypePattern::SliceMut(_) => false,
-            TypePattern::Option(_) => true,
-            TypePattern::Bool => true,
-            TypePattern::CChar => true,
-            TypePattern::NamedCallback(_) => false,
-            _ => panic!("Pattern not explicitly handled"),
-        },
-        Type::Array(_) => false, // TODO: should check inner and maybe return true
-        Type::Enum(_) => true,
-        Type::Opaque(_) => true,
-        Type::FnPointer(_) => true,
-        Type::ReadPointer(_) => true,
-        Type::ReadWritePointer(_) => true,
-    }
-}
-
 pub fn named_callback_to_typename(x: &NamedCallback) -> String {
     x.name().to_string()
 }
@@ -276,6 +251,32 @@ pub fn get_vec_type_argument(x: &VecType) -> String {
     to_typespecifier_in_param(x.t())
 }
 
+/// Checks if the type is on the C# side blittable, in particular, if it can be accessed via raw pointers and memcopied.
+pub fn is_blittable(x: &Type) -> bool {
+    match x {
+        Type::Primitive(_) => true,
+        Type::Composite(c) => c.fields().iter().all(|x| is_blittable(x.the_type())),
+        Type::Pattern(x) => match x {
+            TypePattern::CStrPointer => false,
+            TypePattern::APIVersion => true,
+            TypePattern::Slice(_) => false,
+            TypePattern::SliceMut(_) => false,
+            TypePattern::Option(_) => true,
+            TypePattern::Bool => true,
+            TypePattern::CChar => true,
+            TypePattern::NamedCallback(_) => false,
+            _ => panic!("Pattern not explicitly handled"),
+        },
+        Type::Array(_) => false, // TODO: should check inner and maybe return true
+        Type::Enum(_) => true,
+        Type::Opaque(_) => true,
+        Type::FnPointer(_) => true,
+        Type::ReadPointer(_) => true,
+        Type::ReadWritePointer(_) => true,
+    }
+}
+
+// TODO - This should probably be merged with `is_blittable`
 pub fn is_directly_serializable(t: &Type) -> bool {
     match t {
         Type::Primitive(_) => true,
