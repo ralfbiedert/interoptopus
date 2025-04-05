@@ -55,7 +55,7 @@ namespace My.Company.Common
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
             return _unmanaged;
         }
@@ -139,7 +139,7 @@ namespace My.Company.Common
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
             return _unmanaged;
         }
@@ -217,7 +217,7 @@ namespace My.Company.Common
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
             return _unmanaged;
         }
@@ -1471,7 +1471,7 @@ namespace My.Company.Common
         public Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
             if (_variant == 0) _unmanaged._Some._Some = _Some.IntoUnmanaged();
             return _unmanaged;
@@ -1566,7 +1566,7 @@ namespace My.Company.Common
         public Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
             if (_variant == 0) _unmanaged._Some._Some = _Some.IntoUnmanaged();
             return _unmanaged;
@@ -1661,7 +1661,7 @@ namespace My.Company.Common
         public Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
             if (_variant == 0) _unmanaged._Some._Some = _Some.IntoUnmanaged();
             return _unmanaged;
@@ -1756,7 +1756,7 @@ namespace My.Company.Common
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
             if (_variant == 0) _unmanaged._Some._Some = _Some.ToUnmanaged();
             return _unmanaged;
@@ -1853,7 +1853,7 @@ namespace My.Company.Common
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -1967,7 +1967,7 @@ namespace My.Company.Common
         public Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok.IntoUnmanaged();
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
@@ -2082,7 +2082,7 @@ namespace My.Company.Common
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
@@ -2197,7 +2197,7 @@ namespace My.Company.Common
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
@@ -2312,7 +2312,7 @@ namespace My.Company.Common
         public Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok.IntoUnmanaged();
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();

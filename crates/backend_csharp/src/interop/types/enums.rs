@@ -57,7 +57,7 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
     indented!(w, [()], r"public Unmanaged {into}Unmanaged()")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"var _unmanaged = new Unmanaged();")?;
-    indented!(w, [()()()], r"_unmanaged._variant = _variant;")?;
+    indented!(w, [()()], r"_unmanaged._variant = _variant;")?;
     write_type_definition_enum_variant_fields_to_unmanaged(i, w, the_type)?;
     indented!(w, [()()], r"return _unmanaged;")?;
     indented!(w, [()], r"}}")?;

@@ -1375,7 +1375,7 @@ namespace My.Company
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
             if (_variant == 1) _unmanaged._B._B = _B.ToUnmanaged();
             if (_variant == 2) _unmanaged._C._C = _C;
             return _unmanaged;
@@ -1476,7 +1476,7 @@ namespace My.Company
         public Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
             if (_variant == 0) _unmanaged._A._A = _A.IntoUnmanaged();
             if (_variant == 1) _unmanaged._B._B = _B.IntoUnmanaged();
             return _unmanaged;
@@ -3981,7 +3981,7 @@ namespace My.Company
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
             if (_variant == 0) _unmanaged._Some._Some = _Some.ToUnmanaged();
             return _unmanaged;
         }
@@ -4068,7 +4068,7 @@ namespace My.Company
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
             if (_variant == 0) _unmanaged._Some._Some = _Some.ToUnmanaged();
             return _unmanaged;
         }
@@ -4168,7 +4168,7 @@ namespace My.Company
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -4275,7 +4275,7 @@ namespace My.Company
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -4382,7 +4382,7 @@ namespace My.Company
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -4489,7 +4489,7 @@ namespace My.Company
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -4596,7 +4596,7 @@ namespace My.Company
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -4703,7 +4703,7 @@ namespace My.Company
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -4810,7 +4810,7 @@ namespace My.Company
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -4917,7 +4917,7 @@ namespace My.Company
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -5024,7 +5024,7 @@ namespace My.Company
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -5131,7 +5131,7 @@ namespace My.Company
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -5238,7 +5238,7 @@ namespace My.Company
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -5345,7 +5345,7 @@ namespace My.Company
         public Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok.IntoUnmanaged();
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -5452,7 +5452,7 @@ namespace My.Company
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok.ToUnmanaged();
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -5559,7 +5559,7 @@ namespace My.Company
         public Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok.IntoUnmanaged();
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
