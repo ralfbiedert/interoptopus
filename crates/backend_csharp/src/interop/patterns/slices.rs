@@ -2,8 +2,6 @@ use crate::Interop;
 use crate::converter::{is_blittable, slice_t};
 use crate::utils::{MoveSemantics, write_common_marshaller};
 use interoptopus::backend::IndentWriter;
-use interoptopus::lang::Type;
-use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::slice::SliceType;
 use interoptopus::{Error, indented};
 

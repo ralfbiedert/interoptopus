@@ -1,7 +1,7 @@
 use crate::Interop;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Function, SugaredReturnType};
-use interoptopus::pattern::callback::{AsyncCallback, NamedCallback};
+use interoptopus::pattern::callback::AsyncCallback;
 use interoptopus::{Error, indented};
 
 /// Indicates the return type of a method from user code.

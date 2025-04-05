@@ -302,7 +302,7 @@ pub fn params(function: &Function, method_type: MethodType, is_overload: bool) -
 
         // If we call the checked function we want to resolve a `SliceU8` to a `byte[]`,
         // but if we call the unchecked version we want to keep that `Sliceu8` in our signature.
-        let mut native = if is_overload {
+        let native = if is_overload {
             param_to_type_overloaded(p.the_type())
         } else {
             param_to_type(p.the_type())
