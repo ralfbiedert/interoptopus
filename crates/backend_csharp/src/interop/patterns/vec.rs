@@ -1,5 +1,6 @@
 use crate::Interop;
 use crate::converter::{is_blittable, param_to_type, vec_t};
+use crate::utils::{MoveSemantics, write_common_marshaller};
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Parameter, Type};
 use interoptopus::pattern::TypePattern;
@@ -70,6 +71,8 @@ pub fn write_pattern_fast_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) 
     w.newline()?;
     write_pattern_vec_to_unmanaged(i, w)?;
     w.newline()?;
+    write_pattern_vec_dispose(i, w, vec)?;
+    w.newline()?;
     write_pattern_vec_interop_helper(i, w, vec)?;
     w.newline()?;
     indented!(w, r"[CustomMarshaller(typeof({}), MarshalMode.Default, typeof(Marshaller))]", name)?;
@@ -86,40 +89,8 @@ pub fn write_pattern_fast_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) 
     w.newline()?;
     indented!(w, r"}}")?;
     w.newline()?;
-    indented!(w, r"public ref struct Marshaller")?;
-    indented!(w, r"{{")?;
-    w.indent();
-    indented!(w, r"private {} _managed;", name)?;
-    indented!(w, r"private Unmanaged _unmanaged;")?;
-    w.newline()?;
-    i.inline_hint(w, 0)?;
-    indented!(w, r"public Marshaller(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
-    i.inline_hint(w, 0)?;
-    indented!(w, r"public Marshaller({name} managed) {{ _managed = managed; }}")?;
-    i.inline_hint(w, 0)?;
-    indented!(w, r"public void FromManaged({} managed) {{ _managed = managed; }}", name)?;
-    i.inline_hint(w, 0)?;
-    indented!(w, r"public void FromUnmanaged(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
-    w.newline()?;
-    i.inline_hint(w, 0)?;
-    indented!(w, r"public Unmanaged ToUnmanaged()")?;
-    indented!(w, r"{{")?;
-    indented!(w, [()], r"return _managed.IntoUnmanaged();")?;
-    indented!(w, r"}}")?;
-    w.newline()?;
-    i.inline_hint(w, 0)?;
-    indented!(w, r"public unsafe {name} ToManaged()")?;
-    indented!(w, r"{{")?;
-    indented!(w, [()], r"return _unmanaged.IntoManaged();")?;
-    indented!(w, r"}}")?;
-    w.newline()?;
-    i.inline_hint(w, 0)?;
-    indented!(w, r"public void Free() {{ }}")?;
     w.unindent();
-    indented!(w, r"}}")?;
-    w.newline()?;
-    write_pattern_vec_dispose(i, w, vec)?;
-    w.unindent();
+    write_common_marshaller(i, w, name, MoveSemantics::Move)?;
     indented!(w, r"}}")?;
     Ok(())
 }
@@ -182,10 +153,11 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     indented!(w, r"}}")?;
     w.unindent();
     indented!(w, r"}}")?;
-
     write_pattern_vec_to_unmanaged(i, w)?;
+    w.newline()?;
+    write_pattern_vec_dispose(i, w, vec)?;
+    w.newline()?;
     write_pattern_vec_interop_helper(i, w, vec)?;
-
     w.newline()?;
     indented!(w, r"[CustomMarshaller(typeof({}), MarshalMode.Default, typeof(Marshaller))]", name)?;
     indented!(w, r"private struct MarshallerMeta {{ }}")?;
@@ -199,41 +171,10 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     write_pattern_vec_to_managed(i, w, name)?;
     w.newline()?;
     indented!(w, r"}}")?;
-    w.newline()?;
-    indented!(w, r"public ref struct Marshaller")?;
-    indented!(w, r"{{")?;
-    w.indent();
-    indented!(w, r"private {} _managed;", name)?;
-    indented!(w, r"private Unmanaged _unmanaged;")?;
-    w.newline()?;
-    i.inline_hint(w, 0)?;
-    indented!(w, r"public Marshaller(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
-    i.inline_hint(w, 0)?;
-    indented!(w, r"public Marshaller({name} managed) {{ _managed = managed; }}")?;
-    i.inline_hint(w, 0)?;
-    indented!(w, r"public void FromManaged({} managed) {{ _managed = managed; }}", name)?;
-    i.inline_hint(w, 0)?;
-    indented!(w, r"public void FromUnmanaged(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
-    w.newline()?;
-    i.inline_hint(w, 0)?;
-    indented!(w, r"public Unmanaged ToUnmanaged()")?;
-    indented!(w, r"{{")?;
-    indented!(w, [()], r"return _managed.IntoUnmanaged();")?;
-    indented!(w, r"}}")?;
-    w.newline()?;
-    i.inline_hint(w, 0)?;
-    indented!(w, r"public unsafe {name} ToManaged()")?;
-    indented!(w, r"{{")?;
-    indented!(w, [()], r"return _unmanaged.IntoManaged();")?;
-    indented!(w, r"}}")?;
-    w.newline()?;
-    i.inline_hint(w, 0)?;
-    indented!(w, r"public void Free() {{ }}")?;
     w.unindent();
-    indented!(w, r"}}")?;
     w.newline()?;
-    write_pattern_vec_dispose(i, w, vec)?;
-    w.unindent();
+    write_common_marshaller(i, w, name, MoveSemantics::Move)?;
+    w.newline()?;
     indented!(w, r"}}")?;
     Ok(())
 }

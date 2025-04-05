@@ -289,75 +289,58 @@ namespace My.Company.Common
     {
         public Vec() { }
 
-        public Vec(Vec other)
-        {
-            x = other.x;
-            z = other.z;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            _unmanaged.z = z;
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public double x;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public double z;
 
             public Vec ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Vec();
+                _managed.x = x;
+                _managed.z = z;
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(Vec), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private Vec _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Vec _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Vec managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Vec managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.x = _managed.x;
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.z = _managed.z;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Vec ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe Vec ToManaged()
-            {
-                _managed = new Vec();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.x = _unmanaged.x;
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.z = _unmanaged.z;
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_fn_pointer 
@@ -466,29 +449,27 @@ namespace My.Company.Common
             private Unmanaged _unmanaged;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(SliceBool managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceBool managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceBool ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public SliceBool ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_pattern_fast_slice 
@@ -588,29 +569,27 @@ namespace My.Company.Common
             private Unmanaged _unmanaged;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(SliceI32 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceI32 managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceI32 ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public SliceI32 ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_pattern_fast_slice 
@@ -710,29 +689,27 @@ namespace My.Company.Common
             private Unmanaged _unmanaged;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(SliceU32 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceU32 managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceU32 ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public SliceU32 ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_pattern_fast_slice 
@@ -832,29 +809,27 @@ namespace My.Company.Common
             private Unmanaged _unmanaged;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(SliceU8 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceU8 managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceU8 ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public SliceU8 ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_pattern_marshalling_slice 
@@ -943,28 +918,27 @@ namespace My.Company.Common
             private Unmanaged _unmanaged;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(SliceUtf8String managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceUtf8String managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceUtf8String ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public SliceUtf8String ToManaged() { return _unmanaged.ToManaged(); }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_pattern_fast_slice 
@@ -1064,29 +1038,27 @@ namespace My.Company.Common
             private Unmanaged _unmanaged;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(SliceVec managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceVec managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceVec ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public SliceVec ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_pattern_fast_slice 
@@ -1192,29 +1164,27 @@ namespace My.Company.Common
             private Unmanaged _unmanaged;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(SliceMutU32 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceMutU32 managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceMutU32 ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public SliceMutU32 ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_pattern_fast_slice 
@@ -1320,29 +1290,27 @@ namespace My.Company.Common
             private Unmanaged _unmanaged;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(SliceMutU8 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceMutU8 managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceMutU8 ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public SliceMutU8 ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_pattern_fast_slice 
@@ -1448,29 +1416,27 @@ namespace My.Company.Common
             private Unmanaged _unmanaged;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(SliceMutVec managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceMutVec managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceMutVec ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public SliceMutVec ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_enum 
@@ -2577,31 +2543,27 @@ namespace My.Company.Common
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(MyCallbackNamespaced managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(MyCallbackNamespaced managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public MyCallbackNamespaced ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public MyCallbackNamespaced ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
-    }
 
+    }
 
     // Debug - write_pattern_vec 
     // Debug - write_pattern_fast_vec 
@@ -2665,6 +2627,20 @@ namespace My.Company.Common
             return rval;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void Dispose()
+        {
+            if (_ptr == IntPtr.Zero) return;
+            var _unmanaged = new Unmanaged();
+            _unmanaged._ptr = _unmanaged._ptr;
+            _unmanaged._len = _unmanaged._len;
+            _unmanaged._capacity = _unmanaged._capacity;
+            InteropHelper.interoptopus_vec_destroy(_unmanaged);
+            _ptr = IntPtr.Zero;
+            _len = 0;
+            _capacity = 0;
+        }
+
         public partial class InteropHelper
         {
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_create_18289942533122229086")]
@@ -2702,43 +2678,27 @@ namespace My.Company.Common
             private Unmanaged _unmanaged;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(VecU8 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(VecU8 managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.IntoUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe VecU8 ToManaged()
-            {
-                return _unmanaged.IntoManaged();
-            }
+            public VecU8 ToManaged() { return _unmanaged.IntoManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public void Dispose()
-        {
-            if (_ptr == IntPtr.Zero) return;
-            var _unmanaged = new Unmanaged();
-            _unmanaged._ptr = _unmanaged._ptr;
-            _unmanaged._len = _unmanaged._len;
-            _unmanaged._capacity = _unmanaged._capacity;
-            InteropHelper.interoptopus_vec_destroy(_unmanaged);
-            _ptr = IntPtr.Zero;
-            _len = 0;
-            _capacity = 0;
-        }
     }
 
     // Debug - write_pattern_vec 
@@ -2807,6 +2767,21 @@ namespace My.Company.Common
             _ptr = IntPtr.Zero; // Mark this instance as moved.
             return rval;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void Dispose()
+        {
+            if (_ptr == IntPtr.Zero) return;
+            var _unmanaged = new Unmanaged();
+            _unmanaged._ptr = _unmanaged._ptr;
+            _unmanaged._len = _unmanaged._len;
+            _unmanaged._capacity = _unmanaged._capacity;
+            InteropHelper.interoptopus_vec_destroy(_unmanaged);
+            _ptr = IntPtr.Zero;
+            _len = 0;
+            _capacity = 0;
+        }
+
         public partial class InteropHelper
         {
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_create_1491625606766217421")]
@@ -2843,43 +2818,28 @@ namespace My.Company.Common
             private Unmanaged _unmanaged;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(VecUtf8String managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(VecUtf8String managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.IntoUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe VecUtf8String ToManaged()
-            {
-                return _unmanaged.IntoManaged();
-            }
+            public VecUtf8String ToManaged() { return _unmanaged.IntoManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public void Dispose()
-        {
-            if (_ptr == IntPtr.Zero) return;
-            var _unmanaged = new Unmanaged();
-            _unmanaged._ptr = _unmanaged._ptr;
-            _unmanaged._len = _unmanaged._len;
-            _unmanaged._capacity = _unmanaged._capacity;
-            InteropHelper.interoptopus_vec_destroy(_unmanaged);
-            _ptr = IntPtr.Zero;
-            _len = 0;
-            _capacity = 0;
-        }
+
     }
 
 

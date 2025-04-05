@@ -175,7 +175,7 @@ impl Interop {
             .to_string()
     }
 
-    fn inline_hint(&self, w: &mut IndentWriter, indents: usize) -> Result<(), Error> {
+    pub(crate) fn inline_hint(&self, w: &mut IndentWriter, indents: usize) -> Result<(), Error> {
         for _ in 0..indents {
             w.indent();
         }

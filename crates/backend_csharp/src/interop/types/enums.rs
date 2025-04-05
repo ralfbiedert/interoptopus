@@ -1,5 +1,5 @@
 use crate::Interop;
-use crate::converter::{field_to_type, field_to_type_unmanaged, is_blittable};
+use crate::converter::{field_to_type, field_to_type_declaration_unmanaged, field_to_type_unmanaged, is_blittable};
 use crate::interop::docs::write_documentation;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Enum, Type, VariantKind};

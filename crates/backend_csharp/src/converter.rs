@@ -2,6 +2,7 @@ use crate::Interop;
 use crate::interop::FunctionNameFlavor;
 use heck::{ToLowerCamelCase, ToUpperCamelCase};
 use interoptopus::backend::safe_name;
+use interoptopus::indented;
 use interoptopus::lang::{Composite, ConstantValue, Enum, Field, FnPointer, Function, Opaque, Parameter, Primitive, PrimitiveValue, SugaredReturnType, Type};
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::{AsyncCallback, NamedCallback};
@@ -35,8 +36,9 @@ pub fn fnpointer_to_type(x: &FnPointer) -> String {
 #[allow(clippy::only_used_in_recursion)]
 pub fn field_to_type(x: &Type) -> String {
     match &x {
+        Type::Primitive(Primitive::Bool) => "bool".to_string(),
         Type::Primitive(x) => primitive_to_type(*x),
-        Type::Array(_) => "TODO".to_string(),
+        Type::Array(a) => format!("{}[]", field_to_type(a.the_type())),
         Type::Enum(x) => x.rust_name().to_string(),
         Type::Opaque(x) => "IntPtr".to_string(),
         Type::Composite(x) => x.rust_name().to_string(),
@@ -63,9 +65,10 @@ pub fn field_to_type(x: &Type) -> String {
 /// Converts the `u32` part in a Rust field `x: u32` to a C# equivalent. Might convert pointers to `IntPtr`.
 #[allow(clippy::only_used_in_recursion)]
 pub fn field_to_type_unmanaged(x: &Type) -> String {
-    match &x {
+    match x {
+        Type::Primitive(Primitive::Bool) => "byte".to_string(),
         Type::Primitive(x) => primitive_to_type(*x),
-        Type::Array(_) => "TODO".to_string(),
+        Type::Array(x) => field_to_type(x.the_type()),
         Type::Enum(x) => format!("{}.Unmanaged", x.rust_name()),
         Type::Opaque(x) => "TODO".to_string(),
         Type::Composite(x) => format!("{}.Unmanaged", x.rust_name()),
@@ -73,20 +76,36 @@ pub fn field_to_type_unmanaged(x: &Type) -> String {
         Type::ReadWritePointer(_) => "IntPtr".to_string(),
         Type::FnPointer(x) => fnpointer_to_type(x),
         Type::Pattern(x) => match x {
-            TypePattern::CStrPointer => "TODO".to_string(),
+            TypePattern::CStrPointer => "IntPtr".to_string(),
             TypePattern::Utf8String(_) => "Utf8String.Unmanaged".to_string(),
-            TypePattern::Slice(x) => format!("Slice{}.Unmanaged.", slice_t(x)),
+            TypePattern::Slice(x) => format!("Slice{}.Unmanaged", slice_t(x)),
             TypePattern::SliceMut(x) => format!("SliceMut{}.Unmanaged", slice_t(x)),
             TypePattern::Option(e) => format!("{}.Unmanaged", e.the_enum().rust_name()),
             TypePattern::Result(e) => format!("{}.Unmanaged", e.the_enum().rust_name()),
             TypePattern::NamedCallback(e) => format!("{}.Unmanaged", e.name()),
-            TypePattern::Bool => "Bool".to_string(),
+            TypePattern::Bool => "byte".to_string(),
             TypePattern::CChar => "sbyte".to_string(),
             TypePattern::APIVersion => field_to_type(&x.fallback_type()),
             TypePattern::AsyncCallback(_) => todo!("Async callbacks not supported in fields"),
-            TypePattern::Vec(_) => "TODO".to_string(),
+            TypePattern::Vec(x) => format!("{}.Unmanaged", x.composite_type().rust_name()),
         },
     }
+}
+
+/// Converts the `u32` part in a Rust field `x: u32` to a C# equivalent. Might convert pointers to `IntPtr`.
+#[allow(clippy::only_used_in_recursion)]
+pub fn field_to_type_declaration_unmanaged(x: &Field) -> String {
+    let name = match x.the_type() {
+        Type::Array(a) => format!("{}[{}]", x.name(), a.len()),
+        _ => x.name().to_string(),
+    };
+
+    let ty = match x.the_type() {
+        Type::Array(x) => format!("fixed {}", field_to_type(x.the_type())),
+        _ => field_to_type_unmanaged(x.the_type()),
+    };
+
+    format!("{ty} {name}")
 }
 
 /// Converts the `u32` part in a Rust paramter `x: u32` to a C# equivalent. Might convert pointers to `out X` or `ref X`.
@@ -158,6 +177,30 @@ pub fn param_to_managed(x: &Parameter) -> String {
         Type::ReadWritePointer(_) => x.name().to_string(),
         _ if is_blittable(x.the_type()) => format!("{}.ToManaged()", x.name()),
         _ => format!("{}.IntoManaged()", x.name()),
+    }
+}
+
+pub fn field_to_managed(x: &Field) -> String {
+    match x.the_type() {
+        Type::Primitive(Primitive::Bool) => format!("{} == 1", x.name()),
+        Type::Primitive(_) => x.name().to_string(),
+        Type::ReadPointer(_) => x.name().to_string(),
+        Type::ReadWritePointer(_) => x.name().to_string(),
+        Type::Pattern(TypePattern::CStrPointer) => "string.Empty".to_string(),
+        _ if is_blittable(x.the_type()) => format!("{}.ToManaged()", x.name()),
+        _ => format!("{}.IntoManaged()", x.name()),
+    }
+}
+
+pub fn field_to_unmanaged(x: &Field) -> String {
+    match x.the_type() {
+        Type::Primitive(Primitive::Bool) => format!("(byte) ({} ? 1 : 0)", x.name()),
+        Type::Primitive(_) => x.name().to_string(),
+        Type::ReadPointer(_) => x.name().to_string(),
+        Type::ReadWritePointer(_) => x.name().to_string(),
+        Type::Pattern(TypePattern::CStrPointer) => "IntPtr.Zero".to_string(),
+        _ if is_blittable(x.the_type()) => format!("{}.ToUnmanaged()", x.name()),
+        _ => format!("{}.IntoUnmanaged()", x.name()),
     }
 }
 

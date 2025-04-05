@@ -2277,81 +2277,55 @@ namespace My.Company
     {
         public Array() { }
 
-        public Array(Array other)
-        {
-            data = other.data;
-        }
-
         public Unmanaged IntoUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            // TODO
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public fixed byte data[16];
 
             public Array IntoManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Array();
+            // TODO
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(Array), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private Array _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Array _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Array managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Array managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                fixed(byte* _fixed = _unmanaged.data)
-                {
-                    if (_managed.data == null) { throw new InvalidOperationException("Array 'data' must not be null"); }
-                    if (_managed.data.Length != 16) { throw new InvalidOperationException("Array size mismatch for 'data'"); }
-                    var src = new ReadOnlySpan<byte>(_managed.data, 0, 16);
-                    var dst = new Span<byte>(_fixed, 16);
-                    src.CopyTo(dst);
-                }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Array ToManaged() { return _unmanaged.IntoManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe Array ToManaged()
-            {
-                _managed = new Array();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                fixed(byte* _fixed = _unmanaged.data)
-                {
-                    _managed.data = new byte[16];
-                    var src = new ReadOnlySpan<byte>(_fixed, 16);
-                    var dst = new Span<byte>(_managed.data, 0, 16);
-                    src.CopyTo(dst);
-                }
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -2366,68 +2340,55 @@ namespace My.Company
     {
         public BoolField() { }
 
-        public BoolField(BoolField other)
-        {
-            val = other.val;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.val = (byte) (val ? 1 : 0);
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
-            public sbyte val;
+            public byte val;
 
             public BoolField ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new BoolField();
+                _managed.val = val == 1;
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(BoolField), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private BoolField _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private BoolField _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(BoolField managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(BoolField managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.val = (sbyte) (_managed.val ? 1 : 0);
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public BoolField ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe BoolField ToManaged()
-            {
-                _managed = new BoolField();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.val = _unmanaged.val == 1 ? true : false;
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -2449,117 +2410,76 @@ namespace My.Company
     {
         public CallbackTable() { }
 
-        public CallbackTable(CallbackTable other)
-        {
-            my_callback = other.my_callback;
-            my_callback_namespaced = other.my_callback_namespaced;
-            my_callback_void = other.my_callback_void;
-            my_callback_contextual = other.my_callback_contextual;
-            sum_delegate_1 = other.sum_delegate_1;
-            sum_delegate_2 = other.sum_delegate_2;
-            sum_delegate_return = other.sum_delegate_return;
-            sum_delegate_return_2 = other.sum_delegate_return_2;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.my_callback = my_callback.ToUnmanaged();
+            _unmanaged.my_callback_namespaced = my_callback_namespaced.ToUnmanaged();
+            _unmanaged.my_callback_void = my_callback_void.ToUnmanaged();
+            _unmanaged.my_callback_contextual = my_callback_contextual.ToUnmanaged();
+            _unmanaged.sum_delegate_1 = sum_delegate_1.ToUnmanaged();
+            _unmanaged.sum_delegate_2 = sum_delegate_2.ToUnmanaged();
+            _unmanaged.sum_delegate_return = sum_delegate_return.ToUnmanaged();
+            _unmanaged.sum_delegate_return_2 = sum_delegate_return_2.ToUnmanaged();
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public MyCallback.Unmanaged my_callback;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public MyCallbackNamespaced.Unmanaged my_callback_namespaced;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public MyCallbackVoid.Unmanaged my_callback_void;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public MyCallbackContextual.Unmanaged my_callback_contextual;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public SumDelegate1.Unmanaged sum_delegate_1;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public SumDelegate2.Unmanaged sum_delegate_2;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public SumDelegateReturn.Unmanaged sum_delegate_return;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public SumDelegateReturn2.Unmanaged sum_delegate_return_2;
 
             public CallbackTable ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new CallbackTable();
+                _managed.my_callback = my_callback.ToManaged();
+                _managed.my_callback_namespaced = my_callback_namespaced.ToManaged();
+                _managed.my_callback_void = my_callback_void.ToManaged();
+                _managed.my_callback_contextual = my_callback_contextual.ToManaged();
+                _managed.sum_delegate_1 = sum_delegate_1.ToManaged();
+                _managed.sum_delegate_2 = sum_delegate_2.ToManaged();
+                _managed.sum_delegate_return = sum_delegate_return.ToManaged();
+                _managed.sum_delegate_return_2 = sum_delegate_return_2.ToManaged();
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(CallbackTable), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private CallbackTable _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private CallbackTable _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(CallbackTable managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(CallbackTable managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.my_callback = _managed.my_callback != null ? _managed.my_callback.ToUnmanaged() : default;
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.my_callback_namespaced = _managed.my_callback_namespaced != null ? _managed.my_callback_namespaced.ToUnmanaged() : default;
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.my_callback_void = _managed.my_callback_void != null ? _managed.my_callback_void.ToUnmanaged() : default;
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.my_callback_contextual = _managed.my_callback_contextual != null ? _managed.my_callback_contextual.ToUnmanaged() : default;
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.sum_delegate_1 = _managed.sum_delegate_1 != null ? _managed.sum_delegate_1.ToUnmanaged() : default;
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.sum_delegate_2 = _managed.sum_delegate_2 != null ? _managed.sum_delegate_2.ToUnmanaged() : default;
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.sum_delegate_return = _managed.sum_delegate_return != null ? _managed.sum_delegate_return.ToUnmanaged() : default;
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.sum_delegate_return_2 = _managed.sum_delegate_return_2 != null ? _managed.sum_delegate_return_2.ToUnmanaged() : default;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public CallbackTable ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe CallbackTable ToManaged()
-            {
-                _managed = new CallbackTable();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.my_callback = _unmanaged.my_callback.ToManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.my_callback_namespaced = _unmanaged.my_callback_namespaced.ToManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.my_callback_void = _unmanaged.my_callback_void.ToManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.my_callback_contextual = _unmanaged.my_callback_contextual.ToManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.sum_delegate_1 = _unmanaged.sum_delegate_1.ToManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.sum_delegate_2 = _unmanaged.sum_delegate_2.ToManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.sum_delegate_return = _unmanaged.sum_delegate_return.ToManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.sum_delegate_return_2 = _unmanaged.sum_delegate_return_2.ToManaged();
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -2575,75 +2495,58 @@ namespace My.Company
     {
         public CharArray() { }
 
-        public CharArray(CharArray other)
-        {
-            str = other.str;
-            str_2 = other.str_2;
-        }
-
         public Unmanaged IntoUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.str = str.IntoUnmanaged();
+            _unmanaged.str_2 = str_2.IntoUnmanaged();
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public FixedString.Unmanaged str;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public FixedString.Unmanaged str_2;
 
             public CharArray IntoManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new CharArray();
+                _managed.str = str.IntoManaged();
+                _managed.str_2 = str_2.IntoManaged();
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(CharArray), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private CharArray _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private CharArray _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(CharArray managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(CharArray managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.str = _managed.str.IntoUnmanaged();
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.str_2 = _managed.str_2.IntoUnmanaged();
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public CharArray ToManaged() { return _unmanaged.IntoManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe CharArray ToManaged()
-            {
-                _managed = new CharArray();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.str = _unmanaged.str.IntoManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.str_2 = _unmanaged.str_2.IntoManaged();
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -2658,68 +2561,55 @@ namespace My.Company
     {
         public Container() { }
 
-        public Container(Container other)
-        {
-            foreign = other.foreign;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.foreign = foreign.ToUnmanaged();
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public Local.Unmanaged foreign;
 
             public Container ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Container();
+                _managed.foreign = foreign.ToManaged();
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(Container), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private Container _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Container _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Container managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Container managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.foreign = _managed.foreign.ToUnmanaged();
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Container ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe Container ToManaged()
-            {
-                _managed = new Container();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.foreign = _unmanaged.foreign.ToManaged();
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -2734,68 +2624,55 @@ namespace My.Company
     {
         public ExtraTypef32() { }
 
-        public ExtraTypef32(ExtraTypef32 other)
-        {
-            x = other.x;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public float x;
 
             public ExtraTypef32 ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new ExtraTypef32();
+                _managed.x = x;
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(ExtraTypef32), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private ExtraTypef32 _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private ExtraTypef32 _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(ExtraTypef32 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(ExtraTypef32 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.x = _managed.x;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public ExtraTypef32 ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe ExtraTypef32 ToManaged()
-            {
-                _managed = new ExtraTypef32();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.x = _unmanaged.x;
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -2810,81 +2687,55 @@ namespace My.Company
     {
         public FixedString() { }
 
-        public FixedString(FixedString other)
-        {
-            data = other.data;
-        }
-
         public Unmanaged IntoUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            // TODO
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public fixed byte data[32];
 
             public FixedString IntoManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new FixedString();
+            // TODO
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(FixedString), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private FixedString _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private FixedString _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(FixedString managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(FixedString managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                fixed(byte* _fixed = _unmanaged.data)
-                {
-                    if (_managed.data == null) { throw new InvalidOperationException("Array 'data' must not be null"); }
-                    if (_managed.data.Length != 32) { throw new InvalidOperationException("Array size mismatch for 'data'"); }
-                    var src = new ReadOnlySpan<byte>(_managed.data, 0, 32);
-                    var dst = new Span<byte>(_fixed, 32);
-                    src.CopyTo(dst);
-                }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public FixedString ToManaged() { return _unmanaged.IntoManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe FixedString ToManaged()
-            {
-                _managed = new FixedString();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                fixed(byte* _fixed = _unmanaged.data)
-                {
-                    _managed.data = new byte[32];
-                    var src = new ReadOnlySpan<byte>(_fixed, 32);
-                    var dst = new Span<byte>(_managed.data, 0, 32);
-                    src.CopyTo(dst);
-                }
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -2899,68 +2750,55 @@ namespace My.Company
     {
         public Genericu32() { }
 
-        public Genericu32(Genericu32 other)
-        {
-            x = other.x;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public IntPtr x;
 
             public Genericu32 ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Genericu32();
+                _managed.x = x;
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(Genericu32), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private Genericu32 _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Genericu32 _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Genericu32 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Genericu32 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.x = _managed.x;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Genericu32 ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe Genericu32 ToManaged()
-            {
-                _managed = new Genericu32();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.x = _unmanaged.x;
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -2975,68 +2813,55 @@ namespace My.Company
     {
         public Genericu8() { }
 
-        public Genericu8(Genericu8 other)
-        {
-            x = other.x;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public IntPtr x;
 
             public Genericu8 ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Genericu8();
+                _managed.x = x;
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(Genericu8), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private Genericu8 _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Genericu8 _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Genericu8 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Genericu8 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.x = _managed.x;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Genericu8 ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe Genericu8 ToManaged()
-            {
-                _managed = new Genericu8();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.x = _unmanaged.x;
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -3051,68 +2876,55 @@ namespace My.Company
     {
         public Inner() { }
 
-        public Inner(Inner other)
-        {
-            x = other.x;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public float x;
 
             public Inner ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Inner();
+                _managed.x = x;
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(Inner), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private Inner _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Inner _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Inner managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Inner managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.x = _managed.x;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Inner ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe Inner ToManaged()
-            {
-                _managed = new Inner();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.x = _unmanaged.x;
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -3129,82 +2941,61 @@ namespace My.Company
     {
         public Layer1Utf8String() { }
 
-        public Layer1Utf8String(Layer1Utf8String other)
-        {
-            maybe_1 = other.maybe_1;
-            maybe_2 = other.maybe_2;
-            maybe_3 = other.maybe_3;
-        }
-
         public Unmanaged IntoUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.maybe_1 = maybe_1.IntoUnmanaged();
+            _unmanaged.maybe_2 = maybe_2.IntoUnmanaged();
+            _unmanaged.maybe_3 = maybe_3.IntoUnmanaged();
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public OptionUtf8String.Unmanaged maybe_1;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public VecUtf8String.Unmanaged maybe_2;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public Utf8String.Unmanaged maybe_3;
 
             public Layer1Utf8String IntoManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Layer1Utf8String();
+                _managed.maybe_1 = maybe_1.IntoManaged();
+                _managed.maybe_2 = maybe_2.IntoManaged();
+                _managed.maybe_3 = maybe_3.IntoManaged();
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(Layer1Utf8String), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private Layer1Utf8String _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Layer1Utf8String _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Layer1Utf8String managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Layer1Utf8String managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.maybe_1 = _managed.maybe_1.IntoUnmanaged();
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.maybe_2 = _managed.maybe_2.IntoUnmanaged();
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.maybe_3 = _managed.maybe_3.IntoUnmanaged();
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Layer1Utf8String ToManaged() { return _unmanaged.IntoManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe Layer1Utf8String ToManaged()
-            {
-                _managed = new Layer1Utf8String();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.maybe_1 = _unmanaged.maybe_1.IntoManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.maybe_2 = _unmanaged.maybe_2.IntoManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.maybe_3 = _unmanaged.maybe_3.IntoManaged();
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -3222,89 +3013,64 @@ namespace My.Company
     {
         public Layer2Utf8String() { }
 
-        public Layer2Utf8String(Layer2Utf8String other)
-        {
-            layer_1 = other.layer_1;
-            vec = other.vec;
-            the_enum = other.the_enum;
-            strings = other.strings;
-        }
-
         public Unmanaged IntoUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.layer_1 = layer_1.IntoUnmanaged();
+            _unmanaged.vec = vec.ToUnmanaged();
+            _unmanaged.the_enum = the_enum.IntoUnmanaged();
+            _unmanaged.strings = strings.IntoUnmanaged();
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public Layer1Utf8String.Unmanaged layer_1;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public Vec3f32.Unmanaged vec;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
-            public EnumPayload the_enum;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public EnumPayload.Unmanaged the_enum;
             public VecUtf8String.Unmanaged strings;
 
             public Layer2Utf8String IntoManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Layer2Utf8String();
+                _managed.layer_1 = layer_1.IntoManaged();
+                _managed.vec = vec.ToManaged();
+                _managed.the_enum = the_enum.IntoManaged();
+                _managed.strings = strings.IntoManaged();
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(Layer2Utf8String), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private Layer2Utf8String _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Layer2Utf8String _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Layer2Utf8String managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Layer2Utf8String managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.layer_1 = _managed.layer_1.IntoUnmanaged();
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.vec = _managed.vec.ToUnmanaged();
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.the_enum = _managed.the_enum;
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.strings = _managed.strings.IntoUnmanaged();
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Layer2Utf8String ToManaged() { return _unmanaged.IntoManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe Layer2Utf8String ToManaged()
-            {
-                _managed = new Layer2Utf8String();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.layer_1 = _unmanaged.layer_1.IntoManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.vec = _unmanaged.vec.ToManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.the_enum = _unmanaged.the_enum;
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.strings = _unmanaged.strings.IntoManaged();
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -3319,68 +3085,55 @@ namespace My.Company
     {
         public Local() { }
 
-        public Local(Local other)
-        {
-            x = other.x;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public uint x;
 
             public Local ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Local();
+                _managed.x = x;
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(Local), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private Local _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Local _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Local managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Local managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.x = _managed.x;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Local ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe Local ToManaged()
-            {
-                _managed = new Local();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.x = _unmanaged.x;
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -3401,136 +3154,73 @@ namespace My.Company
     {
         public NestedArray() { }
 
-        public NestedArray(NestedArray other)
-        {
-            field_enum = other.field_enum;
-            field_vec = other.field_vec;
-            field_bool = other.field_bool;
-            field_int = other.field_int;
-            field_array = other.field_array;
-            field_array_2 = other.field_array_2;
-            field_struct = other.field_struct;
-        }
-
         public Unmanaged IntoUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.field_enum = field_enum.IntoUnmanaged();
+            _unmanaged.field_vec = field_vec.ToUnmanaged();
+            _unmanaged.field_bool = (byte) (field_bool ? 1 : 0);
+            _unmanaged.field_int = field_int;
+            // TODO
+            // TODO
+            _unmanaged.field_struct = field_struct.IntoUnmanaged();
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
-            public EnumRenamed field_enum;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public EnumRenamed.Unmanaged field_enum;
             public Vec3f32.Unmanaged field_vec;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
-            public sbyte field_bool;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
+            public byte field_bool;
             public int field_int;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public fixed ushort field_array[5];
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public fixed ushort field_array_2[5];
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public Array.Unmanaged field_struct;
 
             public NestedArray IntoManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new NestedArray();
+                _managed.field_enum = field_enum.IntoManaged();
+                _managed.field_vec = field_vec.ToManaged();
+                _managed.field_bool = field_bool == 1;
+                _managed.field_int = field_int;
+            // TODO
+            // TODO
+                _managed.field_struct = field_struct.IntoManaged();
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(NestedArray), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private NestedArray _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private NestedArray _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(NestedArray managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(NestedArray managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.field_enum = _managed.field_enum;
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.field_vec = _managed.field_vec.ToUnmanaged();
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.field_bool = (sbyte) (_managed.field_bool ? 1 : 0);
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.field_int = _managed.field_int;
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                fixed(ushort* _fixed = _unmanaged.field_array)
-                {
-                    if (_managed.field_array == null) { throw new InvalidOperationException("Array 'field_array' must not be null"); }
-                    if (_managed.field_array.Length != 5) { throw new InvalidOperationException("Array size mismatch for 'field_array'"); }
-                    var src = new ReadOnlySpan<ushort>(_managed.field_array, 0, 5);
-                    var dst = new Span<ushort>(_fixed, 5);
-                    src.CopyTo(dst);
-                }
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                fixed(ushort* _fixed = _unmanaged.field_array_2)
-                {
-                    if (_managed.field_array_2 == null) { throw new InvalidOperationException("Array 'field_array_2' must not be null"); }
-                    if (_managed.field_array_2.Length != 5) { throw new InvalidOperationException("Array size mismatch for 'field_array_2'"); }
-                    var src = new ReadOnlySpan<ushort>(_managed.field_array_2, 0, 5);
-                    var dst = new Span<ushort>(_fixed, 5);
-                    src.CopyTo(dst);
-                }
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.field_struct = _managed.field_struct.IntoUnmanaged();
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public NestedArray ToManaged() { return _unmanaged.IntoManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe NestedArray ToManaged()
-            {
-                _managed = new NestedArray();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.field_enum = _unmanaged.field_enum;
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.field_vec = _unmanaged.field_vec.ToManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.field_bool = _unmanaged.field_bool == 1 ? true : false;
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.field_int = _unmanaged.field_int;
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                fixed(ushort* _fixed = _unmanaged.field_array)
-                {
-                    _managed.field_array = new ushort[5];
-                    var src = new ReadOnlySpan<ushort>(_fixed, 5);
-                    var dst = new Span<ushort>(_managed.field_array, 0, 5);
-                    src.CopyTo(dst);
-                }
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                fixed(ushort* _fixed = _unmanaged.field_array_2)
-                {
-                    _managed.field_array_2 = new ushort[5];
-                    var src = new ReadOnlySpan<ushort>(_fixed, 5);
-                    var dst = new Span<ushort>(_managed.field_array_2, 0, 5);
-                    src.CopyTo(dst);
-                }
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.field_struct = _unmanaged.field_struct.IntoManaged();
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -3546,75 +3236,58 @@ namespace My.Company
     {
         public Packed1() { }
 
-        public Packed1(Packed1 other)
-        {
-            x = other.x;
-            y = other.y;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            _unmanaged.y = y;
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public byte x;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public ushort y;
 
             public Packed1 ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Packed1();
+                _managed.x = x;
+                _managed.y = y;
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(Packed1), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private Packed1 _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Packed1 _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Packed1 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Packed1 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.x = _managed.x;
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.y = _managed.y;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Packed1 ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe Packed1 ToManaged()
-            {
-                _managed = new Packed1();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.x = _unmanaged.x;
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.y = _unmanaged.y;
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -3630,75 +3303,58 @@ namespace My.Company
     {
         public Packed2() { }
 
-        public Packed2(Packed2 other)
-        {
-            y = other.y;
-            x = other.x;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.y = y;
+            _unmanaged.x = x;
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public ushort y;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public byte x;
 
             public Packed2 ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Packed2();
+                _managed.y = y;
+                _managed.x = x;
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(Packed2), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private Packed2 _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Packed2 _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Packed2 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Packed2 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.y = _managed.y;
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.x = _managed.x;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Packed2 ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe Packed2 ToManaged()
-            {
-                _managed = new Packed2();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.y = _unmanaged.y;
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.x = _unmanaged.x;
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -3713,68 +3369,55 @@ namespace My.Company
     {
         public Phantomu8() { }
 
-        public Phantomu8(Phantomu8 other)
-        {
-            x = other.x;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public uint x;
 
             public Phantomu8 ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Phantomu8();
+                _managed.x = x;
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(Phantomu8), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private Phantomu8 _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Phantomu8 _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Phantomu8 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Phantomu8 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.x = _managed.x;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Phantomu8 ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe Phantomu8 ToManaged()
-            {
-                _managed = new Phantomu8();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.x = _unmanaged.x;
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -3791,68 +3434,55 @@ namespace My.Company
     {
         public StructDocumented() { }
 
-        public StructDocumented(StructDocumented other)
-        {
-            x = other.x;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public float x;
 
             public StructDocumented ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new StructDocumented();
+                _managed.x = x;
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(StructDocumented), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private StructDocumented _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private StructDocumented _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(StructDocumented managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(StructDocumented managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.x = _managed.x;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public StructDocumented ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe StructDocumented ToManaged()
-            {
-                _managed = new StructDocumented();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.x = _unmanaged.x;
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -3867,68 +3497,55 @@ namespace My.Company
     {
         public StructRenamed() { }
 
-        public StructRenamed(StructRenamed other)
-        {
-            e = other.e;
-        }
-
         public Unmanaged IntoUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.e = e.IntoUnmanaged();
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
-            public EnumRenamed e;
+            public EnumRenamed.Unmanaged e;
 
             public StructRenamed IntoManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new StructRenamed();
+                _managed.e = e.IntoManaged();
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(StructRenamed), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private StructRenamed _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private StructRenamed _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(StructRenamed managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(StructRenamed managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.e = _managed.e;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public StructRenamed ToManaged() { return _unmanaged.IntoManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe StructRenamed ToManaged()
-            {
-                _managed = new StructRenamed();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.e = _unmanaged.e;
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -3943,68 +3560,55 @@ namespace My.Company
     {
         public Tupled() { }
 
-        public Tupled(Tupled other)
-        {
-            x0 = other.x0;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x0 = x0;
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public byte x0;
 
             public Tupled ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Tupled();
+                _managed.x0 = x0;
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(Tupled), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private Tupled _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Tupled _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Tupled managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Tupled managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.x0 = _managed.x0;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Tupled ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe Tupled ToManaged()
-            {
-                _managed = new Tupled();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.x0 = _unmanaged.x0;
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -4019,68 +3623,55 @@ namespace My.Company
     {
         public UseCStrPtr() { }
 
-        public UseCStrPtr(UseCStrPtr other)
-        {
-            ascii_string = other.ascii_string;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.ascii_string = IntPtr.Zero;
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public IntPtr ascii_string;
 
             public UseCStrPtr ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new UseCStrPtr();
+                _managed.ascii_string = string.Empty;
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(UseCStrPtr), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private UseCStrPtr _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private UseCStrPtr _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(UseCStrPtr managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(UseCStrPtr managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.ascii_string = Marshal.StringToHGlobalAnsi(_managed.ascii_string);
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public UseCStrPtr ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe UseCStrPtr ToManaged()
-            {
-                _managed = new UseCStrPtr();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.ascii_string = Marshal.PtrToStringAnsi(_unmanaged.ascii_string);
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -4096,75 +3687,58 @@ namespace My.Company
     {
         public UseSliceAndVec() { }
 
-        public UseSliceAndVec(UseSliceAndVec other)
-        {
-            s1 = other.s1;
-            s2 = other.s2;
-        }
-
         public Unmanaged IntoUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.s1 = s1.ToUnmanaged();
+            _unmanaged.s2 = s2.IntoUnmanaged();
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public SliceUtf8String.Unmanaged s1;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public VecUtf8String.Unmanaged s2;
 
             public UseSliceAndVec IntoManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new UseSliceAndVec();
+                _managed.s1 = s1.ToManaged();
+                _managed.s2 = s2.IntoManaged();
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(UseSliceAndVec), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private UseSliceAndVec _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private UseSliceAndVec _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(UseSliceAndVec managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(UseSliceAndVec managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.s1 = _managed.s1.ToUnmanaged();
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.s2 = _managed.s2.IntoUnmanaged();
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public UseSliceAndVec ToManaged() { return _unmanaged.IntoManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe UseSliceAndVec ToManaged()
-            {
-                _managed = new UseSliceAndVec();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.s1 = _unmanaged.s1.ToManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.s2 = _unmanaged.s2.IntoManaged();
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -4180,75 +3754,58 @@ namespace My.Company
     {
         public UseString() { }
 
-        public UseString(UseString other)
-        {
-            s1 = other.s1;
-            s2 = other.s2;
-        }
-
         public Unmanaged IntoUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.s1 = s1.IntoUnmanaged();
+            _unmanaged.s2 = s2.IntoUnmanaged();
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public Utf8String.Unmanaged s1;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public Utf8String.Unmanaged s2;
 
             public UseString IntoManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new UseString();
+                _managed.s1 = s1.IntoManaged();
+                _managed.s2 = s2.IntoManaged();
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(UseString), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private UseString _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private UseString _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(UseString managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(UseString managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.s1 = _managed.s1.IntoUnmanaged();
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.s2 = _managed.s2.IntoUnmanaged();
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public UseString ToManaged() { return _unmanaged.IntoManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe UseString ToManaged()
-            {
-                _managed = new UseString();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.s1 = _unmanaged.s1.IntoManaged();
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.s2 = _unmanaged.s2.IntoManaged();
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -4264,75 +3821,58 @@ namespace My.Company
     {
         public Vec1() { }
 
-        public Vec1(Vec1 other)
-        {
-            x = other.x;
-            y = other.y;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            _unmanaged.y = y;
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public float x;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public float y;
 
             public Vec1 ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Vec1();
+                _managed.x = x;
+                _managed.y = y;
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(Vec1), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private Vec1 _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Vec1 _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Vec1 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Vec1 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.x = _managed.x;
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.y = _managed.y;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Vec1 ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe Vec1 ToManaged()
-            {
-                _managed = new Vec1();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.x = _unmanaged.x;
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.y = _unmanaged.y;
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -4348,75 +3888,58 @@ namespace My.Company
     {
         public Vec2() { }
 
-        public Vec2(Vec2 other)
-        {
-            x = other.x;
-            z = other.z;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            _unmanaged.z = z;
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public double x;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public double z;
 
             public Vec2 ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Vec2();
+                _managed.x = x;
+                _managed.z = z;
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(Vec2), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private Vec2 _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Vec2 _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Vec2 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Vec2 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.x = _managed.x;
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.z = _managed.z;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Vec2 ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe Vec2 ToManaged()
-            {
-                _managed = new Vec2();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.x = _unmanaged.x;
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.z = _unmanaged.z;
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -4433,82 +3956,61 @@ namespace My.Company
     {
         public Vec3f32() { }
 
-        public Vec3f32(Vec3f32 other)
-        {
-            x = other.x;
-            y = other.y;
-            z = other.z;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            _unmanaged.y = y;
+            _unmanaged.z = z;
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public float x;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public float y;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public float z;
 
             public Vec3f32 ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Vec3f32();
+                _managed.x = x;
+                _managed.y = y;
+                _managed.z = z;
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(Vec3f32), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private Vec3f32 _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Vec3f32 _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Vec3f32 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Vec3f32 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.x = _managed.x;
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.y = _managed.y;
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.z = _managed.z;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Vec3f32 ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe Vec3f32 ToManaged()
-            {
-                _managed = new Vec3f32();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.x = _unmanaged.x;
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.y = _unmanaged.y;
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.z = _unmanaged.z;
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -4524,75 +4026,58 @@ namespace My.Company
     {
         public Visibility1() { }
 
-        public Visibility1(Visibility1 other)
-        {
-            pblc = other.pblc;
-            prvt = other.prvt;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.pblc = pblc;
+            _unmanaged.prvt = prvt;
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public byte pblc;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public byte prvt;
 
             public Visibility1 ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Visibility1();
+                _managed.pblc = pblc;
+                _managed.prvt = prvt;
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(Visibility1), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private Visibility1 _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Visibility1 _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Visibility1 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Visibility1 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.pblc = _managed.pblc;
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.prvt = _managed.prvt;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Visibility1 ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe Visibility1 ToManaged()
-            {
-                _managed = new Visibility1();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.pblc = _unmanaged.pblc;
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.prvt = _unmanaged.prvt;
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -4608,75 +4093,58 @@ namespace My.Company
     {
         public Visibility2() { }
 
-        public Visibility2(Visibility2 other)
-        {
-            pblc1 = other.pblc1;
-            pblc2 = other.pblc2;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.pblc1 = pblc1;
+            _unmanaged.pblc2 = pblc2;
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public byte pblc1;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public byte pblc2;
 
             public Visibility2 ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Visibility2();
+                _managed.pblc1 = pblc1;
+                _managed.pblc2 = pblc2;
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(Visibility2), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private Visibility2 _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Visibility2 _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Visibility2 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Visibility2 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.pblc1 = _managed.pblc1;
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.pblc2 = _managed.pblc2;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Visibility2 ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe Visibility2 ToManaged()
-            {
-                _managed = new Visibility2();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.pblc1 = _unmanaged.pblc1;
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.pblc2 = _unmanaged.pblc2;
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -4691,68 +4159,55 @@ namespace My.Company
     {
         public Weird1u32() { }
 
-        public Weird1u32(Weird1u32 other)
-        {
-            x = other.x;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public uint x;
 
             public Weird1u32 ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Weird1u32();
+                _managed.x = x;
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(Weird1u32), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private Weird1u32 _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Weird1u32 _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Weird1u32 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Weird1u32 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.x = _managed.x;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Weird1u32 ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe Weird1u32 ToManaged()
-            {
-                _managed = new Weird1u32();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.x = _unmanaged.x;
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_composite 
@@ -4769,95 +4224,61 @@ namespace My.Company
     {
         public Weird2u8() { }
 
-        public Weird2u8(Weird2u8 other)
-        {
-            t = other.t;
-            a = other.a;
-            r = other.r;
-        }
-
         public Unmanaged IntoUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.t = t;
+            // TODO
+            _unmanaged.r = r;
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public unsafe struct Unmanaged
         {
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public byte t;
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public fixed byte a[5];
-            // Debug - write_type_definition_composite_unmanaged_body_field 
             public IntPtr r;
 
             public Weird2u8 IntoManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Weird2u8();
+                _managed.t = t;
+            // TODO
+                _managed.r = r;
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(Weird2u8), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private Weird2u8 _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Weird2u8 _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Weird2u8 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Weird2u8 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.t = _managed.t;
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                fixed(byte* _fixed = _unmanaged.a)
-                {
-                    if (_managed.a == null) { throw new InvalidOperationException("Array 'a' must not be null"); }
-                    if (_managed.a.Length != 5) { throw new InvalidOperationException("Array size mismatch for 'a'"); }
-                    var src = new ReadOnlySpan<byte>(_managed.a, 0, 5);
-                    var dst = new Span<byte>(_fixed, 5);
-                    src.CopyTo(dst);
-                }
-                // Debug - write_type_definition_composite_marshaller_unmanaged_invoke 
-                _unmanaged.r = _managed.r;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Weird2u8 ToManaged() { return _unmanaged.IntoManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe Weird2u8 ToManaged()
-            {
-                _managed = new Weird2u8();
-
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.t = _unmanaged.t;
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                fixed(byte* _fixed = _unmanaged.a)
-                {
-                    _managed.a = new byte[5];
-                    var src = new ReadOnlySpan<byte>(_fixed, 5);
-                    var dst = new Span<byte>(_managed.a, 0, 5);
-                    src.CopyTo(dst);
-                }
-                // Debug - write_type_definition_composite_marshaller_field_from_unmanaged 
-                _managed.r = _unmanaged.r;
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_fn_pointer 
@@ -4966,29 +4387,27 @@ namespace My.Company
             private Unmanaged _unmanaged;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(SliceUseCStrPtr managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceUseCStrPtr managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceUseCStrPtr ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public SliceUseCStrPtr ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_pattern_marshalling_slice 
@@ -5077,28 +4496,27 @@ namespace My.Company
             private Unmanaged _unmanaged;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(SliceUseString managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceUseString managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceUseString ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public SliceUseString ToManaged() { return _unmanaged.ToManaged(); }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_pattern_fast_slice 
@@ -5198,29 +4616,27 @@ namespace My.Company
             private Unmanaged _unmanaged;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(SliceVec3f32 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceVec3f32 managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceVec3f32 ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public SliceVec3f32 ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_pattern_marshalling_slice 
@@ -5309,28 +4725,27 @@ namespace My.Company
             private Unmanaged _unmanaged;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(SliceMutCharArray managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SliceMutCharArray managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceMutCharArray ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public SliceMutCharArray ToManaged() { return _unmanaged.ToManaged(); }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     // Debug - write_type_definition_enum 
@@ -7309,31 +6724,27 @@ namespace My.Company
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(CallbackCharArray2 managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(CallbackCharArray2 managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public CallbackCharArray2 ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public CallbackCharArray2 ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
-    }
 
+    }
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -7431,31 +6842,27 @@ namespace My.Company
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(CallbackFFISlice managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(CallbackFFISlice managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public CallbackFFISlice ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public CallbackFFISlice ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
-    }
 
+    }
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -7553,31 +6960,27 @@ namespace My.Company
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(CallbackHugeVecSlice managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(CallbackHugeVecSlice managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public CallbackHugeVecSlice ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public CallbackHugeVecSlice ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
-    }
 
+    }
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -7675,31 +7078,27 @@ namespace My.Company
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(CallbackSliceMut managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(CallbackSliceMut managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public CallbackSliceMut ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public CallbackSliceMut ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
-    }
 
+    }
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -7797,31 +7196,27 @@ namespace My.Company
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(CallbackU8 managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(CallbackU8 managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public CallbackU8 ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public CallbackU8 ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
-    }
 
+    }
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -7919,31 +7314,27 @@ namespace My.Company
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(MyCallback managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(MyCallback managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public MyCallback ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public MyCallback ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
-    }
 
+    }
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -8041,31 +7432,27 @@ namespace My.Company
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(MyCallbackContextual managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(MyCallbackContextual managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public MyCallbackContextual ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public MyCallbackContextual ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
-    }
 
+    }
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -8163,31 +7550,27 @@ namespace My.Company
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(MyCallbackVoid managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(MyCallbackVoid managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public MyCallbackVoid ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public MyCallbackVoid ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
-    }
 
+    }
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -8285,31 +7668,27 @@ namespace My.Company
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(NestedStringCallback managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(NestedStringCallback managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public NestedStringCallback ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public NestedStringCallback ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
-    }
 
+    }
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -8407,31 +7786,27 @@ namespace My.Company
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(StringCallback managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(StringCallback managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public StringCallback ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public StringCallback ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
-    }
 
+    }
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -8529,31 +7904,27 @@ namespace My.Company
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(SumDelegate1 managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SumDelegate1 managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SumDelegate1 ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public SumDelegate1 ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
-    }
 
+    }
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -8651,31 +8022,27 @@ namespace My.Company
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(SumDelegate2 managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SumDelegate2 managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SumDelegate2 ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public SumDelegate2 ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
-    }
 
+    }
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -8773,31 +8140,27 @@ namespace My.Company
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(SumDelegateReturn managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SumDelegateReturn managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SumDelegateReturn ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public SumDelegateReturn ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
-    }
 
+    }
 
     // Debug - write_type_definition_named_callback 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -8895,31 +8258,27 @@ namespace My.Company
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(SumDelegateReturn2 managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(SumDelegateReturn2 managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.ToUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SumDelegateReturn2 ToManaged()
-            {
-                return _unmanaged.ToManaged();
-            }
+            public SumDelegateReturn2 ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
-    }
 
+    }
 
     // Debug - write_pattern_async_trampoline 
     public class AsyncTrampolineResultError
@@ -9208,6 +8567,20 @@ namespace My.Company
             return rval;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void Dispose()
+        {
+            if (_ptr == IntPtr.Zero) return;
+            var _unmanaged = new Unmanaged();
+            _unmanaged._ptr = _unmanaged._ptr;
+            _unmanaged._len = _unmanaged._len;
+            _unmanaged._capacity = _unmanaged._capacity;
+            InteropHelper.interoptopus_vec_destroy(_unmanaged);
+            _ptr = IntPtr.Zero;
+            _len = 0;
+            _capacity = 0;
+        }
+
         public partial class InteropHelper
         {
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_create_8489828321293410959")]
@@ -9245,43 +8618,27 @@ namespace My.Company
             private Unmanaged _unmanaged;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(VecVec3f32 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(VecVec3f32 managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged ToUnmanaged()
-            {
-                return _managed.IntoUnmanaged();
-            }
+            public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe VecVec3f32 ToManaged()
-            {
-                return _unmanaged.IntoManaged();
-            }
+            public VecVec3f32 ToManaged() { return _unmanaged.IntoManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public void Dispose()
-        {
-            if (_ptr == IntPtr.Zero) return;
-            var _unmanaged = new Unmanaged();
-            _unmanaged._ptr = _unmanaged._ptr;
-            _unmanaged._len = _unmanaged._len;
-            _unmanaged._capacity = _unmanaged._capacity;
-            InteropHelper.interoptopus_vec_destroy(_unmanaged);
-            _ptr = IntPtr.Zero;
-            _len = 0;
-            _capacity = 0;
-        }
     }
 
 

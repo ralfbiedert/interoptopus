@@ -1,6 +1,7 @@
 use crate::Interop;
 use crate::converter::{is_blittable, param_to_managed, param_to_type, rval_to_type_sync, rval_to_type_unmanaged};
 use crate::interop::types::fnptrs::write_type_definition_fn_pointer_annotation;
+use crate::utils::{MoveSemantics, write_common_marshaller};
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Primitive, Type};
 use interoptopus::pattern::TypePattern;
@@ -136,38 +137,9 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
 
     indented!(w, [()], r"}}")?;
     w.newline()?;
-    indented!(w, [()], r"public ref struct Marshaller")?;
-    indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"private {name} _managed;")?;
-    indented!(w, [()()], r"private Unmanaged _unmanaged;")?;
-    w.newline()?;
-    i.inline_hint(w, 2)?;
-    indented!(w, [()()], r"public Marshaller({name} managed) {{ _managed = managed; }}")?;
-    i.inline_hint(w, 2)?;
-    indented!(w, [()()], r"public Marshaller(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
-    w.newline()?;
-    i.inline_hint(w, 2)?;
-    indented!(w, [()()], r"public void FromManaged({name} managed) {{ _managed = managed; }}")?;
-    i.inline_hint(w, 2)?;
-    indented!(w, [()()], r"public void FromUnmanaged(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
-    w.newline()?;
-    i.inline_hint(w, 2)?;
-    indented!(w, [()()], r"public Unmanaged ToUnmanaged()")?;
-    indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"return _managed.ToUnmanaged();")?;
-    indented!(w, [()()], r"}}")?;
-    w.newline()?;
-    i.inline_hint(w, 2)?;
-    indented!(w, [()()], r"public {name} ToManaged()")?;
-    indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"return _unmanaged.ToManaged();")?;
-    indented!(w, [()()], r"}}")?;
-    w.newline()?;
-    i.inline_hint(w, 2)?;
-    indented!(w, [()()], r"public void Free() {{ }}")?;
-    indented!(w, [()], r"}}")?; // Close ref struct Marshaller.
+
+    write_common_marshaller(i, w, &name, MoveSemantics::Copy)?;
     indented!(w, r"}}")?;
-    w.newline()?;
 
     Ok(())
 }
