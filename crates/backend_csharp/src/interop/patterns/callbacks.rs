@@ -4,7 +4,6 @@ use crate::interop::types::fnptrs::write_type_definition_fn_pointer_annotation;
 use crate::utils::{MoveSemantics, write_common_marshaller};
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Primitive, Type};
-use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::NamedCallback;
 use interoptopus::{Error, indented};
 

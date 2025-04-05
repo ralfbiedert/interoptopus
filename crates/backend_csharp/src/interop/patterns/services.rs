@@ -3,10 +3,10 @@ use crate::interop::docs::write_documentation;
 use crate::utils::sugared_return_type;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::{IndentWriter, WriteFor};
-use interoptopus::lang::{Function, Parameter, Primitive, SugaredReturnType, Type};
+use interoptopus::lang::{Function, Primitive, SugaredReturnType, Type};
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::service::ServiceDefinition;
-use interoptopus::{Error, function, indented};
+use interoptopus::{Error, indented};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum MethodType {

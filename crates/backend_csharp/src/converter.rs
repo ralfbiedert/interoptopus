@@ -1,13 +1,8 @@
-use crate::Interop;
 use crate::interop::FunctionNameFlavor;
 use heck::{ToLowerCamelCase, ToUpperCamelCase};
 use interoptopus::backend::safe_name;
-use interoptopus::indented;
-use interoptopus::lang::{
-    Composite, ConstantValue, Enum, Field, FnPointer, Function, Opaque, Parameter, Primitive, PrimitiveValue, SugaredReturnType, Type, VariantKind,
-};
+use interoptopus::lang::{ConstantValue, Field, FnPointer, Function, Parameter, Primitive, PrimitiveValue, SugaredReturnType, Type, VariantKind};
 use interoptopus::pattern::TypePattern;
-use interoptopus::pattern::callback::{AsyncCallback, NamedCallback};
 use interoptopus::pattern::slice::SliceType;
 use interoptopus::pattern::vec::VecType;
 
@@ -335,7 +330,6 @@ pub fn is_blittable(t: &Type) -> bool {
             TypePattern::NamedCallback(_) => true,
             TypePattern::AsyncCallback(_) => true,
             TypePattern::Vec(_) => false,
-            _ => todo!("Not implemented yet"),
         },
     }
 }

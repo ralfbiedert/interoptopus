@@ -73,20 +73,20 @@ namespace My.Company
             internal uint _variant;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Error IntoManaged()
+            public Error ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Error();
+                _managed._variant = _variant;
+                return _managed;
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged IntoUnmanaged()
+        public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+                _unmanaged._variant = _variant;
+            return _unmanaged;
         }
 
         [CustomMarshaller(typeof(Error), MarshalMode.Default, typeof(Marshaller))]
@@ -100,36 +100,31 @@ namespace My.Company
 
         public ref struct Marshaller
         {
-            private Error _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Error _managed;
+            private Unmanaged _unmanaged;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Error managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Error managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
-                _unmanaged._variant = _managed._variant;
-                return _unmanaged;
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Error ToManaged()
-            {
-                _managed = new Error();
-                _managed._variant = _unmanaged._variant;
-                return _managed;
-            }
+            public Error ToManaged() { return _unmanaged.ToManaged(); }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     public partial struct Vec2
@@ -143,17 +138,12 @@ namespace My.Company
     {
         public Vec2() { }
 
-        public Vec2(Vec2 other)
-        {
-            x = other.x;
-            y = other.y;
-        }
-
         public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            _unmanaged.y = y;
+            return _unmanaged;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -164,48 +154,42 @@ namespace My.Company
 
             public Vec2 ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new Vec2();
+                _managed.x = x;
+                _managed.y = y;
+                return _managed;
             }
         }
 
         [CustomMarshaller(typeof(Vec2), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
-
         public ref struct Marshaller
         {
-            private Vec2 _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private Vec2 _managed;
+            private Unmanaged _unmanaged;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Vec2 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(Vec2 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-                _unmanaged.x = _managed.x;
-                _unmanaged.y = _managed.y;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Vec2 ToManaged() { return _unmanaged.ToManaged(); }
 
-                return _unmanaged;
-            }
-
-            public unsafe Vec2 ToManaged()
-            {
-                _managed = new Vec2();
-
-                _managed.x = _unmanaged.x;
-                _managed.y = _unmanaged.y;
-
-                return _managed;
-            }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     ///Result that contains value or an error.
@@ -248,20 +232,24 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrGameEngineError IntoManaged()
+            public ResultConstPtrGameEngineError ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new ResultConstPtrGameEngineError();
+                _managed._variant = _variant;
+                if (_variant == 0) _managed._Ok = _Ok._Ok;
+                if (_variant == 1) _managed._Err = _Err._Err.ToManaged();
+                return _managed;
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged IntoUnmanaged()
+        public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+                _unmanaged._variant = _variant;
+            if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
         }
 
         [CustomMarshaller(typeof(ResultConstPtrGameEngineError), MarshalMode.Default, typeof(Marshaller))]
@@ -284,40 +272,31 @@ namespace My.Company
 
         public ref struct Marshaller
         {
-            private ResultConstPtrGameEngineError _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private ResultConstPtrGameEngineError _managed;
+            private Unmanaged _unmanaged;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(ResultConstPtrGameEngineError managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(ResultConstPtrGameEngineError managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
-                _unmanaged._variant = _managed._variant;
-                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
-                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.IntoUnmanaged();
-                return _unmanaged;
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe ResultConstPtrGameEngineError ToManaged()
-            {
-                _managed = new ResultConstPtrGameEngineError();
-                _managed._variant = _unmanaged._variant;
-                if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
-                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.IntoManaged();
-                return _managed;
-            }
+            public ResultConstPtrGameEngineError ToManaged() { return _unmanaged.ToManaged(); }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
     ///Result that contains value or an error.
@@ -350,20 +329,22 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultError IntoManaged()
+            public ResultError ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new ResultError();
+                _managed._variant = _variant;
+                if (_variant == 1) _managed._Err = _Err._Err.ToManaged();
+                return _managed;
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged IntoUnmanaged()
+        public Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var _unmanaged = new Unmanaged();
+                _unmanaged._variant = _variant;
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
         }
 
         [CustomMarshaller(typeof(ResultError), MarshalMode.Default, typeof(Marshaller))]
@@ -386,38 +367,31 @@ namespace My.Company
 
         public ref struct Marshaller
         {
-            private ResultError _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+            private ResultError _managed;
+            private Unmanaged _unmanaged;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(ResultError managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromManaged(ResultError managed) { _managed = managed; }
+
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {;
-                _unmanaged = new Unmanaged();
-                _unmanaged._variant = _managed._variant;
-                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.IntoUnmanaged();
-                return _unmanaged;
-            }
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe ResultError ToManaged()
-            {
-                _managed = new ResultError();
-                _managed._variant = _unmanaged._variant;
-                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.IntoManaged();
-                return _managed;
-            }
+            public ResultError ToManaged() { return _unmanaged.ToManaged(); }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public void Free() { }
         }
+
     }
 
 
