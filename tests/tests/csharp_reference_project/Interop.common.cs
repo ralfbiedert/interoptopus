@@ -274,7 +274,7 @@ namespace My.Company.Common
     {
         public Vec() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -288,7 +288,7 @@ namespace My.Company.Common
             public double x;
             public double z;
 
-            public Vec ToManaged()
+            public unsafe Vec ToManaged()
             {
                 var _managed = new Vec();
                 _managed.x = x;

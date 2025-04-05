@@ -1,11 +1,10 @@
-use crate::Interop;
 use crate::converter::{field_name, field_to_managed, field_to_type, field_to_type_declaration_unmanaged, field_to_unmanaged, is_blittable};
 use crate::interop::docs::write_documentation;
-use crate::utils::{MoveSemantics, write_common_marshaller};
+use crate::utils::{write_common_marshaller, MoveSemantics};
+use crate::Interop;
 use interoptopus::backend::{IndentWriter, WriteFor};
-use interoptopus::lang::{Composite, Field, Layout, Primitive, Type, Visibility};
-use interoptopus::pattern::TypePattern;
-use interoptopus::{Error, indented};
+use interoptopus::lang::{Composite, Field, Layout, Type, Visibility};
+use interoptopus::{indented, Error};
 
 pub fn write_type_definition_composite(i: &Interop, w: &mut IndentWriter, the_type: &Composite) -> Result<(), Error> {
     i.debug(w, "write_type_definition_composite")?;
@@ -31,15 +30,22 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
 
     indented!(w, [()], r"public {name}() {{ }}")?;
     w.newline()?;
-    indented!(w, [()], r"public Unmanaged {into}Unmanaged()")?;
+    indented!(w, [()], r"public unsafe Unmanaged {into}Unmanaged()")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"var _unmanaged = new Unmanaged();")?;
     for field in the_type.fields() {
         let name = field.name();
 
         match field.the_type() {
-            Type::Array(a) => {
-                indented!(w, [()()], "// TODO")?;
+            Type::Array(x) => {
+                let array_type = field_to_type(x.the_type());
+                indented!(w, [()()], "{{")?;
+                indented!(w, [()()()], r#"if ({} == null) {{ throw new InvalidOperationException("Array '{}' must not be null"); }}"#, name, name)?;
+                indented!(w, [()()()], r#"if ({}.Length != {}) {{ throw new InvalidOperationException("Array size mismatch for '{}'"); }}"#, name, x.len(), name)?;
+                indented!(w, [()()()], "var src = new ReadOnlySpan<{}>({}, 0, {});", array_type, name, x.len())?;
+                indented!(w, [()()()], "var dst = new Span<{array_type}>(_unmanaged.{name}, {});", x.len())?;
+                indented!(w, [()()()], "src.CopyTo(dst);")?;
+                indented!(w, [()()], "}}")?;
             }
             _ => {
                 let to_unmanaged = field_to_unmanaged(field);
@@ -62,15 +68,22 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
         indented!(w, [()()], r"public {field_decl};")?;
     }
     w.newline()?;
-    indented!(w, [()()], r"public {name} {into}Managed()")?;
+    indented!(w, [()()], r"public unsafe {name} {into}Managed()")?;
     indented!(w, [()()], r"{{")?;
     indented!(w, [()()()], r"var _managed = new {name}();")?;
     for field in the_type.fields() {
         let name = field.name();
 
         match field.the_type() {
-            Type::Array(a) => {
-                indented!(w, [()()], "// TODO")?;
+            Type::Array(x) => {
+                let array_type = field_to_type(x.the_type());
+                indented!(w, [()()()], "fixed({}* _fixed = {})", array_type, name)?;
+                indented!(w, [()()()], "{{")?;
+                indented!(w, [()()()()], "_managed.{} = new {}[{}];", name, array_type, x.len())?;
+                indented!(w, [()()()()], "var src = new ReadOnlySpan<{array_type}>(_fixed, {});", x.len())?;
+                indented!(w, [()()()()], "var dst = new Span<{}>(_managed.{}, 0, {});", array_type, name, x.len())?;
+                indented!(w, [()()()()], "src.CopyTo(dst);")?;
+                indented!(w, [()()()], "}}")?;
             }
             _ => {
                 let to_unmanaged = field_to_managed(field);

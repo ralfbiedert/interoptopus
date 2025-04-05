@@ -2267,10 +2267,16 @@ namespace My.Company
     {
         public Array() { }
 
-        public Unmanaged IntoUnmanaged()
+        public unsafe Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-            // TODO
+            {
+                if (data == null) { throw new InvalidOperationException("Array 'data' must not be null"); }
+                if (data.Length != 16) { throw new InvalidOperationException("Array size mismatch for 'data'"); }
+                var src = new ReadOnlySpan<byte>(data, 0, 16);
+                var dst = new Span<byte>(_unmanaged.data, 16);
+                src.CopyTo(dst);
+            }
             return _unmanaged;
         }
 
@@ -2279,10 +2285,16 @@ namespace My.Company
         {
             public fixed byte data[16];
 
-            public Array IntoManaged()
+            public unsafe Array IntoManaged()
             {
                 var _managed = new Array();
-            // TODO
+                fixed(byte* _fixed = data)
+                {
+                    _managed.data = new byte[16];
+                    var src = new ReadOnlySpan<byte>(_fixed, 16);
+                    var dst = new Span<byte>(_managed.data, 0, 16);
+                    src.CopyTo(dst);
+                }
                 return _managed;
             }
         }
@@ -2330,7 +2342,7 @@ namespace My.Company
     {
         public BoolField() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.val = (byte) (val ? 1 : 0);
@@ -2342,7 +2354,7 @@ namespace My.Company
         {
             public byte val;
 
-            public BoolField ToManaged()
+            public unsafe BoolField ToManaged()
             {
                 var _managed = new BoolField();
                 _managed.val = val == 1;
@@ -2400,7 +2412,7 @@ namespace My.Company
     {
         public CallbackTable() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.my_callback = my_callback?.ToUnmanaged() ?? default;
@@ -2426,7 +2438,7 @@ namespace My.Company
             public SumDelegateReturn.Unmanaged sum_delegate_return;
             public SumDelegateReturn2.Unmanaged sum_delegate_return_2;
 
-            public CallbackTable ToManaged()
+            public unsafe CallbackTable ToManaged()
             {
                 var _managed = new CallbackTable();
                 _managed.my_callback = my_callback.ToManaged();
@@ -2485,7 +2497,7 @@ namespace My.Company
     {
         public CharArray() { }
 
-        public Unmanaged IntoUnmanaged()
+        public unsafe Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.str = str.IntoUnmanaged();
@@ -2499,7 +2511,7 @@ namespace My.Company
             public FixedString.Unmanaged str;
             public FixedString.Unmanaged str_2;
 
-            public CharArray IntoManaged()
+            public unsafe CharArray IntoManaged()
             {
                 var _managed = new CharArray();
                 _managed.str = str.IntoManaged();
@@ -2551,7 +2563,7 @@ namespace My.Company
     {
         public Container() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.foreign = foreign.ToUnmanaged();
@@ -2563,7 +2575,7 @@ namespace My.Company
         {
             public Local.Unmanaged foreign;
 
-            public Container ToManaged()
+            public unsafe Container ToManaged()
             {
                 var _managed = new Container();
                 _managed.foreign = foreign.ToManaged();
@@ -2614,7 +2626,7 @@ namespace My.Company
     {
         public ExtraTypef32() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -2626,7 +2638,7 @@ namespace My.Company
         {
             public float x;
 
-            public ExtraTypef32 ToManaged()
+            public unsafe ExtraTypef32 ToManaged()
             {
                 var _managed = new ExtraTypef32();
                 _managed.x = x;
@@ -2677,10 +2689,16 @@ namespace My.Company
     {
         public FixedString() { }
 
-        public Unmanaged IntoUnmanaged()
+        public unsafe Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-            // TODO
+            {
+                if (data == null) { throw new InvalidOperationException("Array 'data' must not be null"); }
+                if (data.Length != 32) { throw new InvalidOperationException("Array size mismatch for 'data'"); }
+                var src = new ReadOnlySpan<byte>(data, 0, 32);
+                var dst = new Span<byte>(_unmanaged.data, 32);
+                src.CopyTo(dst);
+            }
             return _unmanaged;
         }
 
@@ -2689,10 +2707,16 @@ namespace My.Company
         {
             public fixed byte data[32];
 
-            public FixedString IntoManaged()
+            public unsafe FixedString IntoManaged()
             {
                 var _managed = new FixedString();
-            // TODO
+                fixed(byte* _fixed = data)
+                {
+                    _managed.data = new byte[32];
+                    var src = new ReadOnlySpan<byte>(_fixed, 32);
+                    var dst = new Span<byte>(_managed.data, 0, 32);
+                    src.CopyTo(dst);
+                }
                 return _managed;
             }
         }
@@ -2740,7 +2764,7 @@ namespace My.Company
     {
         public Genericu32() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -2752,7 +2776,7 @@ namespace My.Company
         {
             public IntPtr x;
 
-            public Genericu32 ToManaged()
+            public unsafe Genericu32 ToManaged()
             {
                 var _managed = new Genericu32();
                 _managed.x = x;
@@ -2803,7 +2827,7 @@ namespace My.Company
     {
         public Genericu8() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -2815,7 +2839,7 @@ namespace My.Company
         {
             public IntPtr x;
 
-            public Genericu8 ToManaged()
+            public unsafe Genericu8 ToManaged()
             {
                 var _managed = new Genericu8();
                 _managed.x = x;
@@ -2866,7 +2890,7 @@ namespace My.Company
     {
         public Inner() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -2878,7 +2902,7 @@ namespace My.Company
         {
             public float x;
 
-            public Inner ToManaged()
+            public unsafe Inner ToManaged()
             {
                 var _managed = new Inner();
                 _managed.x = x;
@@ -2931,7 +2955,7 @@ namespace My.Company
     {
         public Layer1Utf8String() { }
 
-        public Unmanaged IntoUnmanaged()
+        public unsafe Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.maybe_1 = maybe_1.IntoUnmanaged();
@@ -2947,7 +2971,7 @@ namespace My.Company
             public VecUtf8String.Unmanaged maybe_2;
             public Utf8String.Unmanaged maybe_3;
 
-            public Layer1Utf8String IntoManaged()
+            public unsafe Layer1Utf8String IntoManaged()
             {
                 var _managed = new Layer1Utf8String();
                 _managed.maybe_1 = maybe_1.IntoManaged();
@@ -3003,7 +3027,7 @@ namespace My.Company
     {
         public Layer2Utf8String() { }
 
-        public Unmanaged IntoUnmanaged()
+        public unsafe Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.layer_1 = layer_1.IntoUnmanaged();
@@ -3021,7 +3045,7 @@ namespace My.Company
             public EnumPayload.Unmanaged the_enum;
             public VecUtf8String.Unmanaged strings;
 
-            public Layer2Utf8String IntoManaged()
+            public unsafe Layer2Utf8String IntoManaged()
             {
                 var _managed = new Layer2Utf8String();
                 _managed.layer_1 = layer_1.IntoManaged();
@@ -3075,7 +3099,7 @@ namespace My.Company
     {
         public Local() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -3087,7 +3111,7 @@ namespace My.Company
         {
             public uint x;
 
-            public Local ToManaged()
+            public unsafe Local ToManaged()
             {
                 var _managed = new Local();
                 _managed.x = x;
@@ -3144,15 +3168,27 @@ namespace My.Company
     {
         public NestedArray() { }
 
-        public Unmanaged IntoUnmanaged()
+        public unsafe Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.field_enum = field_enum.ToUnmanaged();
             _unmanaged.field_vec = field_vec.ToUnmanaged();
             _unmanaged.field_bool = (byte) (field_bool ? 1 : 0);
             _unmanaged.field_int = field_int;
-            // TODO
-            // TODO
+            {
+                if (field_array == null) { throw new InvalidOperationException("Array 'field_array' must not be null"); }
+                if (field_array.Length != 5) { throw new InvalidOperationException("Array size mismatch for 'field_array'"); }
+                var src = new ReadOnlySpan<ushort>(field_array, 0, 5);
+                var dst = new Span<ushort>(_unmanaged.field_array, 5);
+                src.CopyTo(dst);
+            }
+            {
+                if (field_array_2 == null) { throw new InvalidOperationException("Array 'field_array_2' must not be null"); }
+                if (field_array_2.Length != 5) { throw new InvalidOperationException("Array size mismatch for 'field_array_2'"); }
+                var src = new ReadOnlySpan<ushort>(field_array_2, 0, 5);
+                var dst = new Span<ushort>(_unmanaged.field_array_2, 5);
+                src.CopyTo(dst);
+            }
             _unmanaged.field_struct = field_struct.IntoUnmanaged();
             return _unmanaged;
         }
@@ -3168,15 +3204,27 @@ namespace My.Company
             public fixed ushort field_array_2[5];
             public Array.Unmanaged field_struct;
 
-            public NestedArray IntoManaged()
+            public unsafe NestedArray IntoManaged()
             {
                 var _managed = new NestedArray();
                 _managed.field_enum = field_enum.ToManaged();
                 _managed.field_vec = field_vec.ToManaged();
                 _managed.field_bool = field_bool == 1;
                 _managed.field_int = field_int;
-            // TODO
-            // TODO
+                fixed(ushort* _fixed = field_array)
+                {
+                    _managed.field_array = new ushort[5];
+                    var src = new ReadOnlySpan<ushort>(_fixed, 5);
+                    var dst = new Span<ushort>(_managed.field_array, 0, 5);
+                    src.CopyTo(dst);
+                }
+                fixed(ushort* _fixed = field_array_2)
+                {
+                    _managed.field_array_2 = new ushort[5];
+                    var src = new ReadOnlySpan<ushort>(_fixed, 5);
+                    var dst = new Span<ushort>(_managed.field_array_2, 0, 5);
+                    src.CopyTo(dst);
+                }
                 _managed.field_struct = field_struct.IntoManaged();
                 return _managed;
             }
@@ -3226,7 +3274,7 @@ namespace My.Company
     {
         public Packed1() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -3240,7 +3288,7 @@ namespace My.Company
             public byte x;
             public ushort y;
 
-            public Packed1 ToManaged()
+            public unsafe Packed1 ToManaged()
             {
                 var _managed = new Packed1();
                 _managed.x = x;
@@ -3293,7 +3341,7 @@ namespace My.Company
     {
         public Packed2() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.y = y;
@@ -3307,7 +3355,7 @@ namespace My.Company
             public ushort y;
             public byte x;
 
-            public Packed2 ToManaged()
+            public unsafe Packed2 ToManaged()
             {
                 var _managed = new Packed2();
                 _managed.y = y;
@@ -3359,7 +3407,7 @@ namespace My.Company
     {
         public Phantomu8() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -3371,7 +3419,7 @@ namespace My.Company
         {
             public uint x;
 
-            public Phantomu8 ToManaged()
+            public unsafe Phantomu8 ToManaged()
             {
                 var _managed = new Phantomu8();
                 _managed.x = x;
@@ -3424,7 +3472,7 @@ namespace My.Company
     {
         public StructDocumented() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -3436,7 +3484,7 @@ namespace My.Company
         {
             public float x;
 
-            public StructDocumented ToManaged()
+            public unsafe StructDocumented ToManaged()
             {
                 var _managed = new StructDocumented();
                 _managed.x = x;
@@ -3487,7 +3535,7 @@ namespace My.Company
     {
         public StructRenamed() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.e = e.ToUnmanaged();
@@ -3499,7 +3547,7 @@ namespace My.Company
         {
             public EnumRenamed.Unmanaged e;
 
-            public StructRenamed ToManaged()
+            public unsafe StructRenamed ToManaged()
             {
                 var _managed = new StructRenamed();
                 _managed.e = e.ToManaged();
@@ -3550,7 +3598,7 @@ namespace My.Company
     {
         public Tupled() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x0 = x0;
@@ -3562,7 +3610,7 @@ namespace My.Company
         {
             public byte x0;
 
-            public Tupled ToManaged()
+            public unsafe Tupled ToManaged()
             {
                 var _managed = new Tupled();
                 _managed.x0 = x0;
@@ -3613,7 +3661,7 @@ namespace My.Company
     {
         public UseCStrPtr() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.ascii_string = IntPtr.Zero;
@@ -3625,7 +3673,7 @@ namespace My.Company
         {
             public IntPtr ascii_string;
 
-            public UseCStrPtr ToManaged()
+            public unsafe UseCStrPtr ToManaged()
             {
                 var _managed = new UseCStrPtr();
                 _managed.ascii_string = string.Empty;
@@ -3677,7 +3725,7 @@ namespace My.Company
     {
         public UseSliceAndVec() { }
 
-        public Unmanaged IntoUnmanaged()
+        public unsafe Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.s1 = s1.ToUnmanaged();
@@ -3691,7 +3739,7 @@ namespace My.Company
             public SliceUtf8String.Unmanaged s1;
             public VecUtf8String.Unmanaged s2;
 
-            public UseSliceAndVec IntoManaged()
+            public unsafe UseSliceAndVec IntoManaged()
             {
                 var _managed = new UseSliceAndVec();
                 _managed.s1 = s1.ToManaged();
@@ -3744,7 +3792,7 @@ namespace My.Company
     {
         public UseString() { }
 
-        public Unmanaged IntoUnmanaged()
+        public unsafe Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.s1 = s1.IntoUnmanaged();
@@ -3758,7 +3806,7 @@ namespace My.Company
             public Utf8String.Unmanaged s1;
             public Utf8String.Unmanaged s2;
 
-            public UseString IntoManaged()
+            public unsafe UseString IntoManaged()
             {
                 var _managed = new UseString();
                 _managed.s1 = s1.IntoManaged();
@@ -3811,7 +3859,7 @@ namespace My.Company
     {
         public Vec1() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -3825,7 +3873,7 @@ namespace My.Company
             public float x;
             public float y;
 
-            public Vec1 ToManaged()
+            public unsafe Vec1 ToManaged()
             {
                 var _managed = new Vec1();
                 _managed.x = x;
@@ -3878,7 +3926,7 @@ namespace My.Company
     {
         public Vec2() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -3892,7 +3940,7 @@ namespace My.Company
             public double x;
             public double z;
 
-            public Vec2 ToManaged()
+            public unsafe Vec2 ToManaged()
             {
                 var _managed = new Vec2();
                 _managed.x = x;
@@ -3946,7 +3994,7 @@ namespace My.Company
     {
         public Vec3f32() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -3962,7 +4010,7 @@ namespace My.Company
             public float y;
             public float z;
 
-            public Vec3f32 ToManaged()
+            public unsafe Vec3f32 ToManaged()
             {
                 var _managed = new Vec3f32();
                 _managed.x = x;
@@ -4016,7 +4064,7 @@ namespace My.Company
     {
         public Visibility1() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.pblc = pblc;
@@ -4030,7 +4078,7 @@ namespace My.Company
             public byte pblc;
             public byte prvt;
 
-            public Visibility1 ToManaged()
+            public unsafe Visibility1 ToManaged()
             {
                 var _managed = new Visibility1();
                 _managed.pblc = pblc;
@@ -4083,7 +4131,7 @@ namespace My.Company
     {
         public Visibility2() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.pblc1 = pblc1;
@@ -4097,7 +4145,7 @@ namespace My.Company
             public byte pblc1;
             public byte pblc2;
 
-            public Visibility2 ToManaged()
+            public unsafe Visibility2 ToManaged()
             {
                 var _managed = new Visibility2();
                 _managed.pblc1 = pblc1;
@@ -4149,7 +4197,7 @@ namespace My.Company
     {
         public Weird1u32() { }
 
-        public Unmanaged ToUnmanaged()
+        public unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -4161,7 +4209,7 @@ namespace My.Company
         {
             public uint x;
 
-            public Weird1u32 ToManaged()
+            public unsafe Weird1u32 ToManaged()
             {
                 var _managed = new Weird1u32();
                 _managed.x = x;
@@ -4214,11 +4262,17 @@ namespace My.Company
     {
         public Weird2u8() { }
 
-        public Unmanaged IntoUnmanaged()
+        public unsafe Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.t = t;
-            // TODO
+            {
+                if (a == null) { throw new InvalidOperationException("Array 'a' must not be null"); }
+                if (a.Length != 5) { throw new InvalidOperationException("Array size mismatch for 'a'"); }
+                var src = new ReadOnlySpan<byte>(a, 0, 5);
+                var dst = new Span<byte>(_unmanaged.a, 5);
+                src.CopyTo(dst);
+            }
             _unmanaged.r = r;
             return _unmanaged;
         }
@@ -4230,11 +4284,17 @@ namespace My.Company
             public fixed byte a[5];
             public IntPtr r;
 
-            public Weird2u8 IntoManaged()
+            public unsafe Weird2u8 IntoManaged()
             {
                 var _managed = new Weird2u8();
                 _managed.t = t;
-            // TODO
+                fixed(byte* _fixed = a)
+                {
+                    _managed.a = new byte[5];
+                    var src = new ReadOnlySpan<byte>(_fixed, 5);
+                    var dst = new Span<byte>(_managed.a, 0, 5);
+                    src.CopyTo(dst);
+                }
                 _managed.r = r;
                 return _managed;
             }
