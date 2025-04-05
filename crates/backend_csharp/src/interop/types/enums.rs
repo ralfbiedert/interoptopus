@@ -1,11 +1,10 @@
-use crate::Interop;
-use crate::converter::{field_to_managed, field_to_type, field_to_type_declaration_unmanaged, field_to_type_unmanaged, field_to_unmanaged, is_blittable};
+use crate::converter::{field_to_managed, field_to_type, field_to_type_unmanaged, field_to_unmanaged, is_blittable};
 use crate::interop::docs::write_documentation;
-use crate::utils::{MoveSemantics, write_common_marshaller};
+use crate::utils::{write_common_marshaller, MoveSemantics};
+use crate::Interop;
 use interoptopus::backend::IndentWriter;
-use interoptopus::lang::{Enum, Field, Type, VariantKind};
-use interoptopus::pattern::TypePattern;
-use interoptopus::{Error, indented};
+use interoptopus::lang::{Enum, Field, VariantKind};
+use interoptopus::{indented, Error};
 
 pub fn write_type_definition_enum(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
     i.debug(w, "write_type_definition_enum")?;
@@ -43,7 +42,7 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
     indented!(w, [()], r"{{")?;
     write_type_definition_enum_variant_fields_unmanaged(i, w, the_type)?;
     i.inline_hint(w, 2)?;
-    indented!(w, [()()], r"public {name} {into}Managed()")?;
+    indented!(w, [()()], r"internal {name} {into}Managed()")?;
     indented!(w, [()()], r"{{")?;
     indented!(w, [()()()], r"var _managed = new {name}();")?;
     indented!(w, [()()()], r"_managed._variant = _variant;")?;
@@ -54,7 +53,7 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
     w.newline()?;
 
     i.inline_hint(w, 1)?;
-    indented!(w, [()], r"public Unmanaged {into}Unmanaged()")?;
+    indented!(w, [()], r"internal Unmanaged {into}Unmanaged()")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"var _unmanaged = new Unmanaged();")?;
     indented!(w, [()()], r"_unmanaged._variant = _variant;")?;

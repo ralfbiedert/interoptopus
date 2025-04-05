@@ -2082,7 +2082,7 @@ namespace My.Company
             internal UnmanagedC _C;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public EnumPayload ToManaged()
+            internal EnumPayload ToManaged()
             {
                 var _managed = new EnumPayload();
                 _managed._variant = _variant;
@@ -2094,7 +2094,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -2191,7 +2191,7 @@ namespace My.Company
             internal UnmanagedB _B;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Layer3 IntoManaged()
+            internal Layer3 IntoManaged()
             {
                 var _managed = new Layer3();
                 _managed._variant = _variant;
@@ -2203,7 +2203,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged IntoUnmanaged()
+        internal Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -4831,7 +4831,7 @@ namespace My.Company
             internal UnmanagedSome _Some;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public OptionEnumPayload ToManaged()
+            internal OptionEnumPayload ToManaged()
             {
                 var _managed = new OptionEnumPayload();
                 _managed._variant = _variant;
@@ -4842,7 +4842,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -4926,7 +4926,7 @@ namespace My.Company
             internal UnmanagedSome _Some;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public OptionInner ToManaged()
+            internal OptionInner ToManaged()
             {
                 var _managed = new OptionInner();
                 _managed._variant = _variant;
@@ -4937,7 +4937,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -5033,7 +5033,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceAsyncError ToManaged()
+            internal ResultConstPtrServiceAsyncError ToManaged()
             {
                 var _managed = new ResultConstPtrServiceAsyncError();
                 _managed._variant = _variant;
@@ -5045,7 +5045,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -5148,7 +5148,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceBasicError ToManaged()
+            internal ResultConstPtrServiceBasicError ToManaged()
             {
                 var _managed = new ResultConstPtrServiceBasicError();
                 _managed._variant = _variant;
@@ -5160,7 +5160,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -5263,7 +5263,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceCallbacksError ToManaged()
+            internal ResultConstPtrServiceCallbacksError ToManaged()
             {
                 var _managed = new ResultConstPtrServiceCallbacksError();
                 _managed._variant = _variant;
@@ -5275,7 +5275,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -5378,7 +5378,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceDependentError ToManaged()
+            internal ResultConstPtrServiceDependentError ToManaged()
             {
                 var _managed = new ResultConstPtrServiceDependentError();
                 _managed._variant = _variant;
@@ -5390,7 +5390,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -5493,7 +5493,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceIgnoringMethodsError ToManaged()
+            internal ResultConstPtrServiceIgnoringMethodsError ToManaged()
             {
                 var _managed = new ResultConstPtrServiceIgnoringMethodsError();
                 _managed._variant = _variant;
@@ -5505,7 +5505,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -5608,7 +5608,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceMainError ToManaged()
+            internal ResultConstPtrServiceMainError ToManaged()
             {
                 var _managed = new ResultConstPtrServiceMainError();
                 _managed._variant = _variant;
@@ -5620,7 +5620,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -5723,7 +5723,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceMultipleCtorsError ToManaged()
+            internal ResultConstPtrServiceMultipleCtorsError ToManaged()
             {
                 var _managed = new ResultConstPtrServiceMultipleCtorsError();
                 _managed._variant = _variant;
@@ -5735,7 +5735,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -5838,7 +5838,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceOnPanicError ToManaged()
+            internal ResultConstPtrServiceOnPanicError ToManaged()
             {
                 var _managed = new ResultConstPtrServiceOnPanicError();
                 _managed._variant = _variant;
@@ -5850,7 +5850,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -5953,7 +5953,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceResultError ToManaged()
+            internal ResultConstPtrServiceResultError ToManaged()
             {
                 var _managed = new ResultConstPtrServiceResultError();
                 _managed._variant = _variant;
@@ -5965,7 +5965,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -6068,7 +6068,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceStringsError ToManaged()
+            internal ResultConstPtrServiceStringsError ToManaged()
             {
                 var _managed = new ResultConstPtrServiceStringsError();
                 _managed._variant = _variant;
@@ -6080,7 +6080,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -6183,7 +6183,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrServiceVariousSlicesError ToManaged()
+            internal ResultConstPtrServiceVariousSlicesError ToManaged()
             {
                 var _managed = new ResultConstPtrServiceVariousSlicesError();
                 _managed._variant = _variant;
@@ -6195,7 +6195,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -6298,7 +6298,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultNestedArrayError IntoManaged()
+            internal ResultNestedArrayError IntoManaged()
             {
                 var _managed = new ResultNestedArrayError();
                 _managed._variant = _variant;
@@ -6310,7 +6310,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged IntoUnmanaged()
+        internal Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -6413,7 +6413,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultOptionEnumPayloadError ToManaged()
+            internal ResultOptionEnumPayloadError ToManaged()
             {
                 var _managed = new ResultOptionEnumPayloadError();
                 _managed._variant = _variant;
@@ -6425,7 +6425,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -6528,7 +6528,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultUseStringError IntoManaged()
+            internal ResultUseStringError IntoManaged()
             {
                 var _managed = new ResultUseStringError();
                 _managed._variant = _variant;
@@ -6540,7 +6540,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged IntoUnmanaged()
+        internal Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;

@@ -42,7 +42,7 @@ namespace My.Company.Common
             internal uint _variant;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public EnumDocumented ToManaged()
+            internal EnumDocumented ToManaged()
             {
                 var _managed = new EnumDocumented();
                 _managed._variant = _variant;
@@ -52,7 +52,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -126,7 +126,7 @@ namespace My.Company.Common
             internal uint _variant;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public EnumRenamed ToManaged()
+            internal EnumRenamed ToManaged()
             {
                 var _managed = new EnumRenamed();
                 _managed._variant = _variant;
@@ -136,7 +136,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -204,7 +204,7 @@ namespace My.Company.Common
             internal uint _variant;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Error ToManaged()
+            internal Error ToManaged()
             {
                 var _managed = new Error();
                 _managed._variant = _variant;
@@ -214,7 +214,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -1457,7 +1457,7 @@ namespace My.Company.Common
             internal UnmanagedSome _Some;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public OptionOptionResultOptionUtf8StringError IntoManaged()
+            internal OptionOptionResultOptionUtf8StringError IntoManaged()
             {
                 var _managed = new OptionOptionResultOptionUtf8StringError();
                 _managed._variant = _variant;
@@ -1468,7 +1468,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged IntoUnmanaged()
+        internal Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -1552,7 +1552,7 @@ namespace My.Company.Common
             internal UnmanagedSome _Some;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public OptionResultOptionUtf8StringError IntoManaged()
+            internal OptionResultOptionUtf8StringError IntoManaged()
             {
                 var _managed = new OptionResultOptionUtf8StringError();
                 _managed._variant = _variant;
@@ -1563,7 +1563,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged IntoUnmanaged()
+        internal Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -1647,7 +1647,7 @@ namespace My.Company.Common
             internal UnmanagedSome _Some;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public OptionUtf8String IntoManaged()
+            internal OptionUtf8String IntoManaged()
             {
                 var _managed = new OptionUtf8String();
                 _managed._variant = _variant;
@@ -1658,7 +1658,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged IntoUnmanaged()
+        internal Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -1742,7 +1742,7 @@ namespace My.Company.Common
             internal UnmanagedSome _Some;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public OptionVec ToManaged()
+            internal OptionVec ToManaged()
             {
                 var _managed = new OptionVec();
                 _managed._variant = _variant;
@@ -1753,7 +1753,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -1839,7 +1839,7 @@ namespace My.Company.Common
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultError ToManaged()
+            internal ResultError ToManaged()
             {
                 var _managed = new ResultError();
                 _managed._variant = _variant;
@@ -1850,7 +1850,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -1952,7 +1952,7 @@ namespace My.Company.Common
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultOptionUtf8StringError IntoManaged()
+            internal ResultOptionUtf8StringError IntoManaged()
             {
                 var _managed = new ResultOptionUtf8StringError();
                 _managed._variant = _variant;
@@ -1964,7 +1964,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged IntoUnmanaged()
+        internal Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -2067,7 +2067,7 @@ namespace My.Company.Common
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultU32Error ToManaged()
+            internal ResultU32Error ToManaged()
             {
                 var _managed = new ResultU32Error();
                 _managed._variant = _variant;
@@ -2079,7 +2079,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -2182,7 +2182,7 @@ namespace My.Company.Common
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultU64Error ToManaged()
+            internal ResultU64Error ToManaged()
             {
                 var _managed = new ResultU64Error();
                 _managed._variant = _variant;
@@ -2194,7 +2194,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -2297,7 +2297,7 @@ namespace My.Company.Common
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultUtf8StringError IntoManaged()
+            internal ResultUtf8StringError IntoManaged()
             {
                 var _managed = new ResultUtf8StringError();
                 _managed._variant = _variant;
@@ -2309,7 +2309,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged IntoUnmanaged()
+        internal Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
