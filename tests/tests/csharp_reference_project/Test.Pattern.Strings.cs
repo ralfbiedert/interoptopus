@@ -8,7 +8,7 @@ public class TestPatternStrings
     [Fact]
     public void pattern_ascii_pointer_1()
     {
-        var x = new Utf8String("hello world");
+        var x = Utf8String.From("hello world");
         Assert.Equal(11u, Interop.pattern_ascii_pointer_1("hello world"));
     }
 
@@ -63,8 +63,9 @@ public class TestPatternStrings
     [Fact]
     public void pattern_string_7()
     {
-        var r1 = Interop.pattern_string_7(["hello".Utf8(), "world".Utf8()], 0).AsOk();
-        var r2 = Interop.pattern_string_7(["hello".Utf8(), "world".Utf8()], 1).AsOk();
+        var slice = SliceUtf8String.From(new[] { "hello".Utf8(), "world".Utf8() });
+        var r1 = Interop.pattern_string_7(slice, 0).AsOk();
+        var r2 = Interop.pattern_string_7(slice, 1).AsOk();
         Assert.Equal("hello", r1.String);
         Assert.Equal("world", r2.String);
     }
@@ -78,8 +79,10 @@ public class TestPatternStrings
             new() { s1 = "hello2".Utf8(), s2 = "world2".Utf8() },
         };
 
-        var r1 = Interop.pattern_string_8(x, 0).AsOk();
-        var r2 = Interop.pattern_string_8(x, 1).AsOk();
+        var slice = SliceUseString.From(x);
+
+        var r1 = Interop.pattern_string_8(slice, 0).AsOk();
+        var r2 = Interop.pattern_string_8(slice, 1).AsOk();
 
         Assert.Equal("hello1", r1.s1.String);
         Assert.Equal("world2", r2.s2.String);

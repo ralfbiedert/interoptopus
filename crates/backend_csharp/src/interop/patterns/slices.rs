@@ -1,10 +1,10 @@
-use crate::converter::{get_slice_type_argument, is_directly_serializable};
 use crate::Interop;
+use crate::converter::{get_slice_type_argument, is_directly_serializable};
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Type;
-use interoptopus::pattern::slice::SliceType;
 use interoptopus::pattern::TypePattern;
-use interoptopus::{indented, Error};
+use interoptopus::pattern::slice::SliceType;
+use interoptopus::{Error, indented};
 
 #[derive(PartialEq, Eq, Debug, Clone, Copy)]
 pub enum SliceKind {
@@ -79,7 +79,7 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
     i.inline_hint(w, 0)?;
     indented!(w, r"{name}() {{ }}")?;
     w.newline()?;
-    indented!(w, r"public {name} From(IntPtr data, ulong len)")?;
+    indented!(w, r"public static {name} From(IntPtr data, ulong len)")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"var rval = new {name}();")?;
     indented!(w, [()], r"rval._data = data;")?;
@@ -88,11 +88,11 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
     indented!(w, r"}}")?;
     w.newline()?;
     i.inline_hint(w, 0)?;
-    indented!(w, r"public {name} From({inner}[] managed)")?;
+    indented!(w, r"public static {name} From({inner}[] managed)")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"var rval = new {name}();")?;
     indented!(w, [()], r"rval._handle = GCHandle.Alloc(managed, GCHandleType.Pinned);")?;
-    indented!(w, [()], r"rval._data = _handle.AddrOfPinnedObject();")?;
+    indented!(w, [()], r"rval._data = rval._handle.AddrOfPinnedObject();")?;
     indented!(w, [()], r"rval._len = (ulong) managed.Length;")?;
     indented!(w, [()], r"return rval;")?;
     indented!(w, r"}}")?;
@@ -124,9 +124,9 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
     indented!(w, [()], r"public ulong Len;")?;
     w.newline()?;
     i.inline_hint(w, 1)?;
-    indented!(w, [()], r"public {inner} ToManaged()")?;
+    indented!(w, [()], r"public {name} ToManaged()")?;
     indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"return new {name}(Data, Len);")?;
+    indented!(w, [()()], r"return {name}.From(Data, Len);")?;
     indented!(w, [()], r"}}")?;
     indented!(w, r"}}")?;
     w.newline()?;
@@ -176,10 +176,7 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     i.debug(w, "write_pattern_marshalling_slice")?;
 
     let name = slice.rust_name();
-    let user_type = match slice.t() {
-        Type::Pattern(TypePattern::Utf8String(_)) => "string".to_string(),
-        _ => get_slice_type_argument(slice),
-    };
+    let user_type = get_slice_type_argument(slice);
     let marshaller_type = get_slice_type_argument(slice);
 
     indented!(w, r"[StructLayout(LayoutKind.Sequential)]")?;
@@ -220,7 +217,7 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     w.newline()?;
 
     i.inline_hint(w, 0)?;
-    indented!(w, r"public unsafe {name} From({user_type}[] managed)")?;
+    indented!(w, r"public static unsafe {name} From({user_type}[] managed)")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"var rval = new {name}();")?;
     indented!(w, [()], r"var size = sizeof({marshaller_type}.Unmanaged);")?;
@@ -228,8 +225,8 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     indented!(w, [()], r"rval._len = (ulong) managed.Length;")?;
     indented!(w, [()], r"for (var i = 0; i < managed.Length; ++i)")?;
     indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"var unmanaged = managed[i].ToUnmanaged();")?;
-    indented!(w, [()()], r"var dst = IntPtr.Add(_hglobal, i * size);")?;
+    indented!(w, [()()], r"var unmanaged = managed[i].IntoUnmanaged();")?;
+    indented!(w, [()()], r"var dst = IntPtr.Add(rval._hglobal, i * size);")?;
     indented!(w, [()()], r"Marshal.StructureToPtr(unmanaged, dst, false);")?;
     indented!(w, [()], r"}}")?;
     indented!(w, [()], r"return rval;")?;
@@ -283,7 +280,6 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     indented!(w, r"public unsafe {name} ToManaged()")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"_managed = new {name}();")?;
-    indented!(w, [()], r"_managed._weAllocated = false;")?;
     indented!(w, [()], r"_managed._hglobal = _unmanaged.Data;")?;
     indented!(w, [()], r"_managed._len = _unmanaged.Len;")?;
     indented!(w, [()], r"return _managed;")?;

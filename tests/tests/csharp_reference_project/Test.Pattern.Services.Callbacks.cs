@@ -28,8 +28,7 @@ public class TestPatternServicesCallbacks
     {
         var callbacks = ServiceCallbacks.New();
         var called = false;
-        var slice = new[] { 1, 2, 3 };
-
+        var slice = SliceI32.From(new[] { 1, 2, 3 });
 
         callbacks.CallbackWithSlice((x, y) =>
         {

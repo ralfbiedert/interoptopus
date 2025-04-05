@@ -1,10 +1,10 @@
-use crate::converter::{get_vec_type_argument, is_directly_serializable, to_typespecifier_in_param};
 use crate::Interop;
+use crate::converter::{get_vec_type_argument, is_directly_serializable, to_typespecifier_in_param};
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Parameter, Type};
-use interoptopus::pattern::vec::VecType;
 use interoptopus::pattern::TypePattern;
-use interoptopus::{indented, Error};
+use interoptopus::pattern::vec::VecType;
+use interoptopus::{Error, indented};
 
 pub fn write_pattern_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) -> Result<(), Error> {
     i.debug(w, "write_pattern_vec")?;
@@ -104,7 +104,7 @@ pub fn write_pattern_fast_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) 
     indented!(w, r"public void FromUnmanaged(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
     w.newline()?;
     i.inline_hint(w, 0)?;
-    indented!(w, r"public Unmanaged IntoUnmanaged()")?;
+    indented!(w, r"public Unmanaged ToUnmanaged()")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"if (_managed._ptr == IntPtr.Zero) throw new InteropException(); // Don't use for serialization if moved already.")?;
     indented!(w, [()], r"_unmanaged = new Unmanaged();")?;
@@ -243,7 +243,7 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     indented!(w, r"}}")?;
     w.newline()?;
     i.inline_hint(w, 0)?;
-    indented!(w, r"public unsafe {name} IntoManaged()")?;
+    indented!(w, r"public unsafe {name} ToManaged()")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"_managed = new {name}(true);")?;
     indented!(w, [()], r"_managed._len = _unmanaged._len;")?;

@@ -1,10 +1,10 @@
-use crate::converter::{to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval};
 use crate::Interop;
+use crate::converter::{to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval};
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Type;
-use interoptopus::pattern::callback::AsyncCallback;
 use interoptopus::pattern::TypePattern;
-use interoptopus::{indented, Error};
+use interoptopus::pattern::callback::AsyncCallback;
+use interoptopus::{Error, indented};
 
 pub fn write_pattern_async_trampoline(i: &Interop, w: &mut IndentWriter, asynk: &AsyncCallback) -> Result<(), Error> {
     i.debug(w, "write_pattern_async_trampoline")?;
@@ -45,7 +45,7 @@ pub fn write_pattern_async_trampoline(i: &Interop, w: &mut IndentWriter, asynk: 
     indented!(w, [()()], r"lock (InFlight) {{ InFlight.Remove((ulong) csPtr, out tcs); }}")?;
     indented!(w, [()()], r"")?;
     indented!(w, [()()], r"var unmanaged = Marshal.PtrToStructure<{inner}.Unmanaged>(data);")?;
-    indented!(w, [()()], r"var managed = unmanaged.ToManaged();")?;
+    indented!(w, [()()], r"var managed = unmanaged.IntoManaged();")?;
     match asynk.target() {
         Type::Pattern(TypePattern::Result(x)) => {
             if x.t().is_void() {

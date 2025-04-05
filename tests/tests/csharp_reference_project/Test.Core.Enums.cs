@@ -75,8 +75,8 @@ public class TestEnums
         // var b = Utf8String.From("world");
         // a.Dispose();
         // b.Dispose();
-        var a = new Utf8String("hello");
-        var b = new Utf8String("world");
+        var a = Utf8String.From("hello");
+        var b = Utf8String.From("world");
         var v = new VecUtf8String();
 
         var l1 = new Layer1Utf8String()

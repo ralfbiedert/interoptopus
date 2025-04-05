@@ -73,7 +73,7 @@ namespace My.Company
             internal uint _variant;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Error ToManaged()
+            public Error IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -82,7 +82,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -141,6 +141,8 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Vec2
     {
+        public Vec2() { }
+
         public Vec2(Vec2 other)
         {
             x = other.x;
@@ -246,7 +248,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrGameEngineError ToManaged()
+            public ResultConstPtrGameEngineError IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -255,7 +257,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -301,7 +303,7 @@ namespace My.Company
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
                 if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
-                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.IntoUnmanaged();
                 return _unmanaged;
             }
 
@@ -311,7 +313,7 @@ namespace My.Company
                 _managed = new ResultConstPtrGameEngineError();
                 _managed._variant = _unmanaged._variant;
                 if (_managed._variant == 0) _managed._Ok = _unmanaged._Ok._Ok;
-                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.IntoManaged();
                 return _managed;
             }
             public void Free() { }
@@ -348,7 +350,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultError ToManaged()
+            public ResultError IntoManaged()
             {
                 var marshaller = new Marshaller(this);
                 try { return marshaller.ToManaged(); }
@@ -357,7 +359,7 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        public Unmanaged IntoUnmanaged()
         {
             var marshaller = new Marshaller(this);
             try { return marshaller.ToUnmanaged(); }
@@ -402,7 +404,7 @@ namespace My.Company
             {;
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
-                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.IntoUnmanaged();
                 return _unmanaged;
             }
 
@@ -411,7 +413,7 @@ namespace My.Company
             {
                 _managed = new ResultError();
                 _managed._variant = _unmanaged._variant;
-                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.ToManaged();
+                if (_managed._variant == 1) _managed._Err = _unmanaged._Err._Err.IntoManaged();
                 return _managed;
             }
             public void Free() { }
@@ -557,7 +559,7 @@ namespace My.Company
         private Utf8String() { }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public unsafe Utf8String From(string s)
+        public static unsafe Utf8String From(string s)
         {
             var rval = new Utf8String();
             var source = s.AsSpan();
@@ -566,10 +568,10 @@ namespace My.Company
 
             fixed (byte* p = utf8Bytes)
             {
-                InteropHelper.interoptopus_string_create((IntPtr) p, (ulong)len, out var s);
-                rval._ptr = s._ptr;
-                rval._len = s._len;
-                rval._capacity = s._capacity;
+                InteropHelper.interoptopus_string_create((IntPtr) p, (ulong)len, out var native);
+                rval._ptr = native._ptr;
+                rval._len = native._len;
+                rval._capacity = native._capacity;
             }
 
             return rval;
@@ -688,7 +690,7 @@ namespace My.Company
 
         public static class StringExtensions
         {
-            public static Utf8String Utf8(this string s) { return new Utf8String(s); }
+            public static Utf8String Utf8(this string s) { return Utf8String.From(s); }
         }
 
         public delegate void AsyncCallbackCommon(IntPtr data, IntPtr callback_data);

@@ -7,7 +7,7 @@ public class TestPatternSlices
     [Fact]
     public void pattern_ffi_slice_1()
     {
-        var data = new uint[100_000];
+        var data = SliceU32.From(new uint[100_000]);
         var result = Interop.pattern_ffi_slice_1(data);
         Assert.Equal(100_000u, result);
     }
@@ -22,7 +22,9 @@ public class TestPatternSlices
             new() { x = 7.0f, y = 8.0f, z = 9.0f },
         };
 
-        var result = Interop.pattern_ffi_slice_2(data, 1);
+        var slice = SliceVec3f32.From(data);
+
+        var result = Interop.pattern_ffi_slice_2(slice, 1);
 
         Assert.Equal(4.0f, result.x);
         Assert.Equal(5.0f, result.y);
@@ -32,7 +34,7 @@ public class TestPatternSlices
     [Fact]
     public void pattern_ffi_slice_3()
     {
-        var data = new byte[100_000];
+        var data = SliceMutU8.From(new byte[100_000]);
 
         Interop.pattern_ffi_slice_3(data, (slice) =>
         {
@@ -47,16 +49,16 @@ public class TestPatternSlices
     [Fact]
     public void pattern_ffi_slice_5()
     {
-        var data1 = new byte[100_000];
-        var data2 = new byte[100_000];
-        Interop.pattern_ffi_slice_5(data1, data2);
+        var data1 = SliceU8.From(new byte[100_000]);
+        var data2 = SliceMutU8.From(new byte[100_000]);
+        Interop.pattern_ffi_slice_5(ref data1, ref data2);
     }
 
     [Fact]
     public void pattern_ffi_slice_6()
     {
-        var data = new byte[] {1, 2, 3};
-        Interop.pattern_ffi_slice_6(data, x =>
+        var data = SliceMutU8.From(new byte[] {1, 2, 3});
+        Interop.pattern_ffi_slice_6(ref data, x =>
         {
             Assert.Equal(1, x);
             return 0;

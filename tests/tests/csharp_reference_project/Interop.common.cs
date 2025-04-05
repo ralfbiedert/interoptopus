@@ -287,6 +287,8 @@ namespace My.Company.Common
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct Vec
     {
+        public Vec() { }
+
         public Vec(Vec other)
         {
             x = other.x;
@@ -400,7 +402,7 @@ namespace My.Company.Common
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         SliceBool() { }
 
-        public SliceBool From(IntPtr data, ulong len)
+        public static SliceBool From(IntPtr data, ulong len)
         {
             var rval = new SliceBool();
             rval._data = data;
@@ -409,11 +411,11 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceBool From(Bool[] managed)
+        public static SliceBool From(Bool[] managed)
         {
             var rval = new SliceBool();
             rval._handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
-            rval._data = _handle.AddrOfPinnedObject();
+            rval._data = rval._handle.AddrOfPinnedObject();
             rval._len = (ulong) managed.Length;
             return rval;
         }
@@ -451,9 +453,9 @@ namespace My.Company.Common
             public ulong Len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Bool ToManaged()
+            public SliceBool ToManaged()
             {
-                return new SliceBool(Data, Len);
+                return SliceBool.From(Data, Len);
             }
         }
 
@@ -527,7 +529,7 @@ namespace My.Company.Common
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         SliceI32() { }
 
-        public SliceI32 From(IntPtr data, ulong len)
+        public static SliceI32 From(IntPtr data, ulong len)
         {
             var rval = new SliceI32();
             rval._data = data;
@@ -536,11 +538,11 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceI32 From(int[] managed)
+        public static SliceI32 From(int[] managed)
         {
             var rval = new SliceI32();
             rval._handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
-            rval._data = _handle.AddrOfPinnedObject();
+            rval._data = rval._handle.AddrOfPinnedObject();
             rval._len = (ulong) managed.Length;
             return rval;
         }
@@ -578,9 +580,9 @@ namespace My.Company.Common
             public ulong Len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public int ToManaged()
+            public SliceI32 ToManaged()
             {
-                return new SliceI32(Data, Len);
+                return SliceI32.From(Data, Len);
             }
         }
 
@@ -654,7 +656,7 @@ namespace My.Company.Common
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         SliceU32() { }
 
-        public SliceU32 From(IntPtr data, ulong len)
+        public static SliceU32 From(IntPtr data, ulong len)
         {
             var rval = new SliceU32();
             rval._data = data;
@@ -663,11 +665,11 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceU32 From(uint[] managed)
+        public static SliceU32 From(uint[] managed)
         {
             var rval = new SliceU32();
             rval._handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
-            rval._data = _handle.AddrOfPinnedObject();
+            rval._data = rval._handle.AddrOfPinnedObject();
             rval._len = (ulong) managed.Length;
             return rval;
         }
@@ -705,9 +707,9 @@ namespace My.Company.Common
             public ulong Len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public uint ToManaged()
+            public SliceU32 ToManaged()
             {
-                return new SliceU32(Data, Len);
+                return SliceU32.From(Data, Len);
             }
         }
 
@@ -781,7 +783,7 @@ namespace My.Company.Common
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         SliceU8() { }
 
-        public SliceU8 From(IntPtr data, ulong len)
+        public static SliceU8 From(IntPtr data, ulong len)
         {
             var rval = new SliceU8();
             rval._data = data;
@@ -790,11 +792,11 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceU8 From(byte[] managed)
+        public static SliceU8 From(byte[] managed)
         {
             var rval = new SliceU8();
             rval._handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
-            rval._data = _handle.AddrOfPinnedObject();
+            rval._data = rval._handle.AddrOfPinnedObject();
             rval._len = (ulong) managed.Length;
             return rval;
         }
@@ -832,9 +834,9 @@ namespace My.Company.Common
             public ulong Len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public byte ToManaged()
+            public SliceU8 ToManaged()
             {
-                return new SliceU8(Data, Len);
+                return SliceU8.From(Data, Len);
             }
         }
 
@@ -888,7 +890,7 @@ namespace My.Company.Common
     {
         public int Count => (int) _len;
 
-        public unsafe string this[int i]
+        public unsafe Utf8String this[int i]
         {
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             get
@@ -904,7 +906,7 @@ namespace My.Company.Common
         SliceUtf8String() { }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public unsafe SliceUtf8String From(string[] managed)
+        public static unsafe SliceUtf8String From(Utf8String[] managed)
         {
             var rval = new SliceUtf8String();
             var size = sizeof(Utf8String.Unmanaged);
@@ -912,8 +914,8 @@ namespace My.Company.Common
             rval._len = (ulong) managed.Length;
             for (var i = 0; i < managed.Length; ++i)
             {
-                var unmanaged = managed[i].ToUnmanaged();
-                var dst = IntPtr.Add(_hglobal, i * size);
+                var unmanaged = managed[i].IntoUnmanaged();
+                var dst = IntPtr.Add(rval._hglobal, i * size);
                 Marshal.StructureToPtr(unmanaged, dst, false);
             }
             return rval;
@@ -978,7 +980,6 @@ namespace My.Company.Common
             public unsafe SliceUtf8String ToManaged()
             {
                 _managed = new SliceUtf8String();
-                _managed._weAllocated = false;
                 _managed._hglobal = _unmanaged.Data;
                 _managed._len = _unmanaged.Len;
                 return _managed;
@@ -1021,7 +1022,7 @@ namespace My.Company.Common
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         SliceVec() { }
 
-        public SliceVec From(IntPtr data, ulong len)
+        public static SliceVec From(IntPtr data, ulong len)
         {
             var rval = new SliceVec();
             rval._data = data;
@@ -1030,11 +1031,11 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceVec From(Vec[] managed)
+        public static SliceVec From(Vec[] managed)
         {
             var rval = new SliceVec();
             rval._handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
-            rval._data = _handle.AddrOfPinnedObject();
+            rval._data = rval._handle.AddrOfPinnedObject();
             rval._len = (ulong) managed.Length;
             return rval;
         }
@@ -1072,9 +1073,9 @@ namespace My.Company.Common
             public ulong Len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Vec ToManaged()
+            public SliceVec ToManaged()
             {
-                return new SliceVec(Data, Len);
+                return SliceVec.From(Data, Len);
             }
         }
 
@@ -1154,7 +1155,7 @@ namespace My.Company.Common
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         SliceMutU32() { }
 
-        public SliceMutU32 From(IntPtr data, ulong len)
+        public static SliceMutU32 From(IntPtr data, ulong len)
         {
             var rval = new SliceMutU32();
             rval._data = data;
@@ -1163,11 +1164,11 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceMutU32 From(uint[] managed)
+        public static SliceMutU32 From(uint[] managed)
         {
             var rval = new SliceMutU32();
             rval._handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
-            rval._data = _handle.AddrOfPinnedObject();
+            rval._data = rval._handle.AddrOfPinnedObject();
             rval._len = (ulong) managed.Length;
             return rval;
         }
@@ -1205,9 +1206,9 @@ namespace My.Company.Common
             public ulong Len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public uint ToManaged()
+            public SliceMutU32 ToManaged()
             {
-                return new SliceMutU32(Data, Len);
+                return SliceMutU32.From(Data, Len);
             }
         }
 
@@ -1287,7 +1288,7 @@ namespace My.Company.Common
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         SliceMutU8() { }
 
-        public SliceMutU8 From(IntPtr data, ulong len)
+        public static SliceMutU8 From(IntPtr data, ulong len)
         {
             var rval = new SliceMutU8();
             rval._data = data;
@@ -1296,11 +1297,11 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceMutU8 From(byte[] managed)
+        public static SliceMutU8 From(byte[] managed)
         {
             var rval = new SliceMutU8();
             rval._handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
-            rval._data = _handle.AddrOfPinnedObject();
+            rval._data = rval._handle.AddrOfPinnedObject();
             rval._len = (ulong) managed.Length;
             return rval;
         }
@@ -1338,9 +1339,9 @@ namespace My.Company.Common
             public ulong Len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public byte ToManaged()
+            public SliceMutU8 ToManaged()
             {
-                return new SliceMutU8(Data, Len);
+                return SliceMutU8.From(Data, Len);
             }
         }
 
@@ -1420,7 +1421,7 @@ namespace My.Company.Common
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         SliceMutVec() { }
 
-        public SliceMutVec From(IntPtr data, ulong len)
+        public static SliceMutVec From(IntPtr data, ulong len)
         {
             var rval = new SliceMutVec();
             rval._data = data;
@@ -1429,11 +1430,11 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SliceMutVec From(Vec[] managed)
+        public static SliceMutVec From(Vec[] managed)
         {
             var rval = new SliceMutVec();
             rval._handle = GCHandle.Alloc(managed, GCHandleType.Pinned);
-            rval._data = _handle.AddrOfPinnedObject();
+            rval._data = rval._handle.AddrOfPinnedObject();
             rval._len = (ulong) managed.Length;
             return rval;
         }
@@ -1471,9 +1472,9 @@ namespace My.Company.Common
             public ulong Len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Vec ToManaged()
+            public SliceMutVec ToManaged()
             {
-                return new SliceMutVec(Data, Len);
+                return SliceMutVec.From(Data, Len);
             }
         }
 
@@ -1597,7 +1598,7 @@ namespace My.Company.Common
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
         // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
-                if (_unmanaged._variant == 0) _unmanaged._Some._Some = _managed._Some.ToUnmanaged();
+                if (_unmanaged._variant == 0) _unmanaged._Some._Some = _managed._Some.IntoUnmanaged();
                 return _unmanaged;
             }
 
@@ -1697,7 +1698,7 @@ namespace My.Company.Common
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
         // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
-                if (_unmanaged._variant == 0) _unmanaged._Some._Some = _managed._Some.ToUnmanaged();
+                if (_unmanaged._variant == 0) _unmanaged._Some._Some = _managed._Some.IntoUnmanaged();
                 return _unmanaged;
             }
 
@@ -1797,7 +1798,7 @@ namespace My.Company.Common
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
         // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
-                if (_unmanaged._variant == 0) _unmanaged._Some._Some = _managed._Some.ToUnmanaged();
+                if (_unmanaged._variant == 0) _unmanaged._Some._Some = _managed._Some.IntoUnmanaged();
                 return _unmanaged;
             }
 
@@ -2005,7 +2006,7 @@ namespace My.Company.Common
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
         // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
-                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.IntoUnmanaged();
                 return _unmanaged;
             }
 
@@ -2123,8 +2124,8 @@ namespace My.Company.Common
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
         // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
-                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok.ToUnmanaged();
-                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok.IntoUnmanaged();
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.IntoUnmanaged();
                 return _unmanaged;
             }
 
@@ -2244,7 +2245,7 @@ namespace My.Company.Common
                 _unmanaged._variant = _managed._variant;
         // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
                 if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
-                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.IntoUnmanaged();
                 return _unmanaged;
             }
 
@@ -2364,7 +2365,7 @@ namespace My.Company.Common
                 _unmanaged._variant = _managed._variant;
         // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
                 if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok;
-                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.IntoUnmanaged();
                 return _unmanaged;
             }
 
@@ -2483,8 +2484,8 @@ namespace My.Company.Common
                 _unmanaged = new Unmanaged();
                 _unmanaged._variant = _managed._variant;
         // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
-                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok.ToUnmanaged();
-                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.ToUnmanaged();
+                if (_unmanaged._variant == 0) _unmanaged._Ok._Ok = _managed._Ok.IntoUnmanaged();
+                if (_unmanaged._variant == 1) _unmanaged._Err._Err = _managed._Err.IntoUnmanaged();
                 return _unmanaged;
             }
 
@@ -2745,7 +2746,7 @@ namespace My.Company.Common
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Unmanaged IntoUnmanaged()
+            public Unmanaged ToUnmanaged()
             {
                 if (_managed._ptr == IntPtr.Zero) throw new InteropException(); // Don't use for serialization if moved already.
                 _unmanaged = new Unmanaged();
@@ -2903,7 +2904,7 @@ namespace My.Company.Common
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe VecUtf8String IntoManaged()
+            public unsafe VecUtf8String ToManaged()
             {
                 _managed = new VecUtf8String(true);
                 _managed._len = _unmanaged._len;
@@ -3033,7 +3034,7 @@ namespace My.Company.Common
         private Utf8String() { }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public unsafe Utf8String From(string s)
+        public static unsafe Utf8String From(string s)
         {
             var rval = new Utf8String();
             var source = s.AsSpan();
@@ -3042,10 +3043,10 @@ namespace My.Company.Common
 
             fixed (byte* p = utf8Bytes)
             {
-                InteropHelper.interoptopus_string_create((IntPtr) p, (ulong)len, out var s);
-                rval._ptr = s._ptr;
-                rval._len = s._len;
-                rval._capacity = s._capacity;
+                InteropHelper.interoptopus_string_create((IntPtr) p, (ulong)len, out var native);
+                rval._ptr = native._ptr;
+                rval._len = native._len;
+                rval._capacity = native._capacity;
             }
 
             return rval;
@@ -3164,7 +3165,7 @@ namespace My.Company.Common
 
         public static class StringExtensions
         {
-            public static Utf8String Utf8(this string s) { return new Utf8String(s); }
+            public static Utf8String Utf8(this string s) { return Utf8String.From(s); }
         }
 
         public delegate void AsyncCallbackCommon(IntPtr data, IntPtr callback_data);

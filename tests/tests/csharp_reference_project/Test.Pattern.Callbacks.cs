@@ -136,9 +136,9 @@ public class TestPatternDelegates
     [Fact]
     public void pattern_callback_8()
     {
-        var r1 = new Utf8String("");
-        var r2a = new Utf8String("");
-        var r2b = new Utf8String("");
+        var r1 = Utf8String.From("");
+        var r2a = Utf8String.From("");
+        var r2b = Utf8String.From("");
 
         Interop.pattern_callback_8((s) =>
         {

@@ -1,10 +1,10 @@
+use crate::Interop;
 use crate::converter::{is_directly_serializable, to_typespecifier_in_field, to_typespecifier_in_field_unmanaged};
 use crate::interop::docs::write_documentation;
-use crate::Interop;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Enum, Type, VariantKind};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 pub fn write_type_definition_enum(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
     i.debug(w, "write_type_definition_enum")?;
@@ -248,7 +248,8 @@ pub fn write_type_definition_enum_variant_fields_to_unmanaged(i: &Interop, w: &m
                     Type::Primitive(_) => format!("_managed._{vname}"),
                     Type::ReadWritePointer(_) => format!("_managed._{vname}"),
                     Type::ReadPointer(_) => format!("_managed._{vname}"),
-                    _ => format!("_managed._{vname}.ToUnmanaged()"),
+                    _ if is_directly_serializable(t) => format!("_managed._{vname}.ToUnmanaged()"),
+                    _ => format!("_managed._{vname}.IntoUnmanaged()"),
                 };
 
                 indented!(w, [()()], r"if (_unmanaged._variant == {x}) _unmanaged._{vname}._{vname} = {convert};")?;

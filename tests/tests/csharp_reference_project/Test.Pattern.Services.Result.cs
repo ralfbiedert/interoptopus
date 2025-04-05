@@ -48,7 +48,7 @@ public class TestPatternServicesResult
     public void ResultSlice()
     {
         var service = ServiceResult.New();
-        var slice = new uint[] {0, 1, 2};
+        var slice = SliceU32.From(new uint[] {0, 1, 2});
         Assert.Equal(2u, service.ResultSlice(slice, 2ul));
         service.Dispose();
     }

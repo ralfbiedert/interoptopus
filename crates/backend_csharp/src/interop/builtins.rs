@@ -1,6 +1,6 @@
 use crate::Interop;
 use interoptopus::backend::IndentWriter;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     if i.write_types.write_interoptopus_globals() {
@@ -132,7 +132,7 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, [()], r"private Utf8String() {{ }}")?;
         w.newline()?;
         i.inline_hint(w, 1)?;
-        indented!(w, [()], r"public unsafe Utf8String From(string s)")?;
+        indented!(w, [()], r"public static unsafe Utf8String From(string s)")?;
         indented!(w, [()], r"{{")?;
         indented!(w, [()()], r"var rval = new Utf8String();")?;
         indented!(w, [()()], r"var source = s.AsSpan();")?;
@@ -141,10 +141,10 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         w.newline()?;
         indented!(w, [()()], r"fixed (byte* p = utf8Bytes)")?;
         indented!(w, [()()], r"{{")?;
-        indented!(w, [()()()], r"InteropHelper.interoptopus_string_create((IntPtr) p, (ulong)len, out var s);")?;
-        indented!(w, [()()()], r"rval._ptr = s._ptr;")?;
-        indented!(w, [()()()], r"rval._len = s._len;")?;
-        indented!(w, [()()()], r"rval._capacity = s._capacity;")?;
+        indented!(w, [()()()], r"InteropHelper.interoptopus_string_create((IntPtr) p, (ulong)len, out var native);")?;
+        indented!(w, [()()()], r"rval._ptr = native._ptr;")?;
+        indented!(w, [()()()], r"rval._len = native._len;")?;
+        indented!(w, [()()()], r"rval._capacity = native._capacity;")?;
         indented!(w, [()()], r"}}")?;
         w.newline()?;
         indented!(w, [()()], r"return rval;")?;
@@ -274,7 +274,7 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
 
         indented!(w, [()], r"public static class StringExtensions")?;
         indented!(w, [()], r"{{")?;
-        indented!(w, [()()], r"public static Utf8String Utf8(this string s) {{ return new Utf8String(s); }}")?;
+        indented!(w, [()()], r"public static Utf8String Utf8(this string s) {{ return Utf8String.From(s); }}")?;
         indented!(w, [()], r"}}")?;
         w.newline()?;
 
