@@ -1,5 +1,5 @@
 use crate::Interop;
-use crate::converter::{param_to_type, rval_to_type_sync};
+use crate::converter::{is_blittable, param_to_type, rval_to_type_sync};
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Type;
 use interoptopus::pattern::TypePattern;
@@ -10,6 +10,7 @@ pub fn write_pattern_async_trampoline(i: &Interop, w: &mut IndentWriter, asynk: 
     i.debug(w, "write_pattern_async_trampoline")?;
 
     let inner = param_to_type(asynk.t());
+    let inner_into = if is_blittable(asynk.t()) { "To" } else { "Into" };
 
     let task_completion_source = match asynk.t() {
         Type::Pattern(TypePattern::Result(x)) if x.t().is_void() => "TaskCompletionSource".to_string(),
@@ -45,7 +46,7 @@ pub fn write_pattern_async_trampoline(i: &Interop, w: &mut IndentWriter, asynk: 
     indented!(w, [()()], r"lock (InFlight) {{ InFlight.Remove((ulong) csPtr, out tcs); }}")?;
     indented!(w, [()()], r"")?;
     indented!(w, [()()], r"var unmanaged = Marshal.PtrToStructure<{inner}.Unmanaged>(data);")?;
-    indented!(w, [()()], r"var managed = unmanaged.IntoManaged();")?;
+    indented!(w, [()()], r"var managed = unmanaged.{inner_into}Managed();")?;
     match asynk.t() {
         Type::Pattern(TypePattern::Result(x)) => {
             if x.t().is_void() {

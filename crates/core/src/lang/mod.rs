@@ -84,6 +84,11 @@ impl Type {
         Self::Primitive(Primitive::Void)
     }
 
+    #[must_use]
+    pub fn to_type(&self) -> Self {
+        self.clone()
+    }
+
     /// Produces a name unique for that type with respect to this library.
     ///
     /// The name here is supposed to uniquely determine a type relative to a library [`Inventory`](crate::inventory::Inventory).

@@ -1,8 +1,9 @@
 use crate::Interop;
-use crate::converter::{field_to_type, field_to_type_declaration_unmanaged, field_to_type_unmanaged, is_blittable};
+use crate::converter::{field_to_managed, field_to_type, field_to_type_declaration_unmanaged, field_to_type_unmanaged, field_to_unmanaged, is_blittable};
 use crate::interop::docs::write_documentation;
+use crate::utils::{MoveSemantics, write_common_marshaller};
 use interoptopus::backend::IndentWriter;
-use interoptopus::lang::{Enum, Type, VariantKind};
+use interoptopus::lang::{Enum, Field, Type, VariantKind};
 use interoptopus::pattern::TypePattern;
 use interoptopus::{Error, indented};
 
@@ -17,15 +18,22 @@ pub fn write_type_definition_enum(i: &Interop, w: &mut IndentWriter, the_type: &
 pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
     i.debug(w, "write_type_definition_enum_marshaller")?;
     let name = the_type.rust_name();
+    let self_kind = if is_blittable(&the_type.to_type()) { "struct" } else { "class" };
+    let into = if is_blittable(&the_type.to_type()) { "To" } else { "Into" };
+    let move_semantics = if is_blittable(&the_type.to_type()) {
+        MoveSemantics::Copy
+    } else {
+        MoveSemantics::Move
+    };
 
-    indented!(w, r"public partial struct {}", name)?;
+    indented!(w, r"public partial {self_kind} {}", name)?;
     indented!(w, r"{{")?;
     write_type_definition_enum_variant_fields_managed(i, w, the_type)?;
     indented!(w, r"}}")?;
     w.newline()?;
 
     indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
-    indented!(w, r"public partial struct {}", name)?;
+    indented!(w, r"public partial {self_kind} {}", name)?;
     indented!(w, r"{{")?;
 
     write_type_definition_enum_variant_unmanaged_types(i, w, the_type)?;
@@ -35,21 +43,23 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
     indented!(w, [()], r"{{")?;
     write_type_definition_enum_variant_fields_unmanaged(i, w, the_type)?;
     i.inline_hint(w, 2)?;
-    indented!(w, [()()], r"public {name} IntoManaged()")?;
+    indented!(w, [()()], r"public {name} {into}Managed()")?;
     indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"var marshaller = new Marshaller(this);")?;
-    indented!(w, [()()()], r"try {{ return marshaller.ToManaged(); }}")?;
-    indented!(w, [()()()], r"finally {{ marshaller.Free(); }}")?;
+    indented!(w, [()()()], r"var _managed = new {name}();")?;
+    indented!(w, [()()()], r"_managed._variant = _variant;")?;
+    write_type_definition_enum_variant_fields_to_managed(i, w, the_type)?;
+    indented!(w, [()()()], r"return _managed;")?;
     indented!(w, [()()], r"}}")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
 
     i.inline_hint(w, 1)?;
-    indented!(w, [()], r"public Unmanaged IntoUnmanaged()")?;
+    indented!(w, [()], r"public Unmanaged {into}Unmanaged()")?;
     indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"var marshaller = new Marshaller(this);")?;
-    indented!(w, [()()], r"try {{ return marshaller.ToUnmanaged(); }}")?;
-    indented!(w, [()()], r"finally {{ marshaller.Free(); }}")?;
+    indented!(w, [()()], r"var _unmanaged = new Unmanaged();")?;
+    indented!(w, [()()()], r"_unmanaged._variant = _variant;")?;
+    write_type_definition_enum_variant_fields_to_unmanaged(i, w, the_type)?;
+    indented!(w, [()()], r"return _unmanaged;")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
 
@@ -59,46 +69,8 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
 
     write_type_definition_enum_variant_utils(i, w, the_type)?;
 
-    indented!(w, [()], r"public ref struct Marshaller")?;
-    indented!(w, [()], r"{{")?;
-    w.indent();
-    indented!(w, [()], r"private {} _managed; // Used when converting managed -> unmanaged", name)?;
-    indented!(w, [()], r"private Unmanaged _unmanaged; // Used when converting unmanaged -> managed")?;
-    w.newline()?;
-    i.inline_hint(w, 1)?;
-    indented!(w, [()], r"public Marshaller({} managed) {{ _managed = managed; }}", name)?;
-    i.inline_hint(w, 1)?;
-    indented!(w, [()], r"public Marshaller(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
-    w.newline()?;
-    i.inline_hint(w, 1)?;
-    indented!(w, [()], r"public void FromManaged({} managed) {{ _managed = managed; }}", name)?;
-    i.inline_hint(w, 1)?;
-    indented!(w, [()], r"public void FromUnmanaged(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
-    w.newline()?;
-    i.inline_hint(w, 1)?;
-    indented!(w, [()], r"public unsafe Unmanaged ToUnmanaged()")?;
-    indented!(w, [()], r"{{;")?;
-    indented!(w, [()()], r"_unmanaged = new Unmanaged();")?;
-    indented!(w, [()()], r"_unmanaged._variant = _managed._variant;")?;
+    write_common_marshaller(i, w, name, move_semantics)?;
 
-    write_type_definition_enum_variant_fields_to_unmanaged(i, w, the_type)?;
-
-    indented!(w, [()()], r"return _unmanaged;")?;
-    indented!(w, [()], r"}}")?;
-    w.newline()?;
-    i.inline_hint(w, 1)?;
-    indented!(w, [()], r"public unsafe {} ToManaged()", name)?;
-    indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"_managed = new {}();", name)?;
-    indented!(w, [()()], r"_managed._variant = _unmanaged._variant;")?;
-
-    write_type_definition_enum_variant_fields_to_managed(i, w, the_type)?;
-
-    indented!(w, [()()], r"return _managed;")?;
-    indented!(w, [()], r"}}")?;
-    indented!(w, [()], r"public void Free() {{ }}")?;
-    indented!(w, r"}}")?;
-    w.unindent();
     indented!(w, r"}}")?;
 
     Ok(())
@@ -243,16 +215,8 @@ pub fn write_type_definition_enum_variant_fields_to_unmanaged(i: &Interop, w: &m
             VariantKind::Typed(_, t) if t.is_void() => (),
             VariantKind::Typed(x, t) if !t.is_void() => {
                 let vname = variant.name();
-
-                let convert = match &**t {
-                    Type::Primitive(_) => format!("_managed._{vname}"),
-                    Type::ReadWritePointer(_) => format!("_managed._{vname}"),
-                    Type::ReadPointer(_) => format!("_managed._{vname}"),
-                    _ if is_blittable(t) => format!("_managed._{vname}.ToUnmanaged()"),
-                    _ => format!("_managed._{vname}.IntoUnmanaged()"),
-                };
-
-                indented!(w, [()()], r"if (_unmanaged._variant == {x}) _unmanaged._{vname}._{vname} = {convert};")?;
+                let convert = field_to_unmanaged(&Field::new(vname.to_string(), t.to_type()));
+                indented!(w, [()()], r"if (_variant == {x}) _unmanaged._{vname}._{vname} = _{convert};")?;
             }
             _ => panic!("This should never happen"),
         }
@@ -271,17 +235,8 @@ pub fn write_type_definition_enum_variant_fields_to_managed(i: &Interop, w: &mut
             VariantKind::Typed(_, t) if t.is_void() => (),
             VariantKind::Typed(x, t) if !t.is_void() => {
                 let vname = variant.name();
-
-                let convert = match &**t {
-                    Type::Primitive(_) => format!("_unmanaged._{vname}._{vname}"),
-                    Type::ReadWritePointer(_) => format!("_unmanaged._{vname}._{vname}"),
-                    Type::ReadPointer(_) => format!("_unmanaged._{vname}._{vname}"),
-                    Type::Pattern(TypePattern::Utf8String(_)) => format!("_unmanaged._{vname}._{vname}.IntoManaged()"),
-                    _ if is_blittable(t) => format!("_unmanaged._{vname}._{vname}.ToManaged()"),
-                    _ => format!("_unmanaged._{vname}._{vname}.IntoManaged()"),
-                };
-
-                indented!(w, [()()], r"if (_managed._variant == {x}) _managed._{vname} = {convert};")?;
+                let convert = field_to_managed(&Field::new(vname.to_string(), t.to_type()));
+                indented!(w, [()()()], r"if (_variant == {x}) _managed._{vname} = _{vname}._{convert};")?;
             }
             _ => panic!("This should never happen"),
         }

@@ -3,7 +3,9 @@ use crate::interop::FunctionNameFlavor;
 use heck::{ToLowerCamelCase, ToUpperCamelCase};
 use interoptopus::backend::safe_name;
 use interoptopus::indented;
-use interoptopus::lang::{Composite, ConstantValue, Enum, Field, FnPointer, Function, Opaque, Parameter, Primitive, PrimitiveValue, SugaredReturnType, Type};
+use interoptopus::lang::{
+    Composite, ConstantValue, Enum, Field, FnPointer, Function, Opaque, Parameter, Primitive, PrimitiveValue, SugaredReturnType, Type, VariantKind,
+};
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::{AsyncCallback, NamedCallback};
 use interoptopus::pattern::slice::SliceType;
@@ -302,7 +304,19 @@ pub fn is_blittable(t: &Type) -> bool {
     match t {
         Type::Array(_) => false,
         Type::Composite(x) => x.fields().iter().all(|x| is_blittable(x.the_type())),
-        Type::Enum(_) => false,
+        Type::Enum(e) => {
+            for v in e.variants() {
+                let blittable = match v.kind() {
+                    VariantKind::Unit(_) => true,
+                    VariantKind::Typed(_, t) => is_blittable(t),
+                };
+
+                if !blittable {
+                    return false;
+                }
+            }
+            true
+        }
         Type::FnPointer(_) => true,
         Type::Opaque(_) => false,
         Type::Primitive(_) => true,
@@ -314,8 +328,8 @@ pub fn is_blittable(t: &Type) -> bool {
             TypePattern::APIVersion => true,
             TypePattern::Slice(_) => true,
             TypePattern::SliceMut(_) => true,
-            TypePattern::Option(_) => false,
-            TypePattern::Result(_) => false,
+            TypePattern::Option(x) => is_blittable(&x.the_enum().to_type()),
+            TypePattern::Result(x) => is_blittable(&x.the_enum().to_type()),
             TypePattern::Bool => true,
             TypePattern::CChar => true,
             TypePattern::NamedCallback(_) => true,
