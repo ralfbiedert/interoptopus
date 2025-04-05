@@ -1,6 +1,5 @@
 use crate::converter::{
-    function_name_to_csharp_name, function_parameter_to_csharp_typename, function_rval_to_csharp_typename, pattern_to_native_in_signature,
-    to_typespecifier_in_async_fn_rval, to_typespecifier_in_param,
+    function_name_to_csharp_name, pattern_to_native_in_signature, to_typespecifier_in_async_fn_rval, to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval,
 };
 use crate::interop::docs::write_documentation;
 use crate::utils::sugared_return_type;
@@ -8,7 +7,7 @@ use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Function, Primitive, SugaredReturnType, Type};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 use std::iter::zip;
 
 pub fn write_functions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
@@ -48,7 +47,7 @@ pub fn write_function_annotation(_i: &Interop, w: &mut IndentWriter, function: &
 pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &Function, has_body: bool) -> Result<(), Error> {
     i.debug(w, "write_function_declaration")?;
 
-    let rval = function_rval_to_csharp_typename(function);
+    let rval = to_typespecifier_in_sync_fn_rval(function.signature().rval());
     let name = function_name_to_csharp_name(
         function,
         if i.rename_symbols {
@@ -64,7 +63,7 @@ pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &
     let visibility = "public ";
 
     for p in function.signature().params() {
-        let the_type = function_parameter_to_csharp_typename(p);
+        let the_type = to_typespecifier_in_param(p.the_type());
         let name = p.name();
 
         if native && matches!(p.the_type(), Type::FnPointer(_) | Type::Pattern(TypePattern::NamedCallback(_))) {
@@ -115,7 +114,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     for p in function.signature().params() {
         let name = p.name();
         let native = pattern_to_native_in_signature(i, p);
-        let the_type = function_parameter_to_csharp_typename(p);
+        let the_type = to_typespecifier_in_param(p.the_type());
 
         let mut fallback = || {
             if native.contains("ref ") {

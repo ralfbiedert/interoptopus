@@ -1,5 +1,5 @@
 use crate::Interop;
-use crate::converter::{get_slice_type_argument, is_directly_serializable};
+use crate::converter::{get_slice_type_argument, is_blittable};
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Type;
 use interoptopus::pattern::TypePattern;
@@ -13,7 +13,7 @@ pub enum SliceKind {
 }
 
 pub fn write_pattern_slice(i: &Interop, w: &mut IndentWriter, slice: &SliceType, kind: SliceKind) -> Result<(), Error> {
-    if is_directly_serializable(slice.t()) {
+    if is_blittable(slice.t()) {
         write_pattern_fast_slice(i, w, slice, kind)
     } else {
         write_pattern_marshalling_slice(i, w, slice)

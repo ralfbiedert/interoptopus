@@ -1,5 +1,5 @@
 use crate::Interop;
-use crate::converter::{is_directly_serializable, named_callback_to_typename, to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval};
+use crate::converter::{is_blittable, to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval};
 use crate::interop::types::fnptrs::write_type_definition_fn_pointer_annotation;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Primitive, Type};
@@ -18,7 +18,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
         _ => rval_safe.clone(),
     };
 
-    let name = named_callback_to_typename(the_type);
+    let name = the_type.name().to_string();
     let visibility = i.visibility_types.to_access_modifier();
 
     let mut params = Vec::new();
@@ -33,7 +33,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
             Type::Opaque(_) => params_invoke.push(param.name().to_string()),
             Type::ReadPointer(_) => params_invoke.push(param.name().to_string()),
             Type::ReadWritePointer(_) => params_invoke.push(param.name().to_string()),
-            x if is_directly_serializable(x) => params_invoke.push(format!("{}.ToManaged()", param.name())),
+            x if is_blittable(x) => params_invoke.push(format!("{}.ToManaged()", param.name())),
             _ => params_invoke.push(format!("{}.IntoManaged()", param.name())),
         }
     }
@@ -81,7 +81,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     match the_type.fnpointer().signature().rval() {
         Type::Primitive(Primitive::Void) => indented!(w, [()()()], r"_managed({params_invoke});")?,
         Type::Primitive(_) => indented!(w, [()()()], r"return _managed({params_invoke});")?,
-        t if is_directly_serializable(t) => indented!(w, [()()()], r"return _managed({params_invoke}).ToUnmanaged();")?,
+        t if is_blittable(t) => indented!(w, [()()()], r"return _managed({params_invoke}).ToUnmanaged();")?,
         t => indented!(w, [()()()], r"return _managed({params_invoke}).IntoUnmanaged();")?,
     }
     indented!(w, [()()], r"}}")?;

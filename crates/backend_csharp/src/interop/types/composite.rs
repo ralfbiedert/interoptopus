@@ -1,5 +1,5 @@
 use crate::Interop;
-use crate::converter::{field_name_to_csharp_name, is_blittable, is_directly_serializable, to_typespecifier_in_field};
+use crate::converter::{field_name_to_csharp_name, is_blittable, to_typespecifier_in_field};
 use crate::interop::docs::write_documentation;
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Composite, Field, Layout, Primitive, Type, Visibility};
@@ -16,8 +16,8 @@ pub fn write_type_definition_composite(i: &Interop, w: &mut IndentWriter, the_ty
 pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWriter, the_type: &Composite) -> Result<(), Error> {
     i.debug(w, "write_type_definition_composite_marshaller")?;
     let name = the_type.rust_name();
-    let self_kind = if is_directly_serializable(&the_type.to_type()) { "struct" } else { "class" };
-    let into = if is_directly_serializable(&the_type.to_type()) { "To" } else { "Into" };
+    let self_kind = if is_blittable(&the_type.to_type()) { "struct" } else { "class" };
+    let into = if is_blittable(&the_type.to_type()) { "To" } else { "Into" };
 
     indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
     indented!(w, r"public partial {self_kind} {}", name)?;
@@ -177,7 +177,7 @@ pub fn write_type_definition_composite_layout_annotation(w: &mut IndentWriter, t
 
 pub fn write_type_definition_composite_body(i: &Interop, w: &mut IndentWriter, the_type: &Composite, write_for: WriteFor) -> Result<(), Error> {
     let visibility = i.visibility_types.to_access_modifier();
-    let self_kind = if is_directly_serializable(&the_type.to_type()) { "struct" } else { "class" };
+    let self_kind = if is_blittable(&the_type.to_type()) { "struct" } else { "class" };
     let rust_name = the_type.rust_name();
 
     indented!(w, r"{visibility} partial {self_kind} {rust_name}")?;
@@ -210,7 +210,7 @@ pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWri
 
     match field.the_type() {
         Type::Array(a) => {
-            assert!(is_blittable(a.the_type()), "Array type is not blittable: {:?}", a.the_type());
+            todo!("TODO");
 
             let type_name = if matches!(a.the_type(), Type::Pattern(TypePattern::CChar)) {
                 "string".to_string()
@@ -256,7 +256,7 @@ pub fn write_type_definition_composite_marshaller_field_to_unmanaged(i: &Interop
         Type::Pattern(TypePattern::NamedCallback(_)) => {
             indented!(w, "_unmanaged.{name} = _managed.{name} != null ? _managed.{name}.ToUnmanaged() : default;")?;
         }
-        _ if is_directly_serializable(field.the_type()) => {
+        _ if is_blittable(field.the_type()) => {
             indented!(w, "_unmanaged.{name} = _managed.{name}.ToUnmanaged();")?;
         }
         _ => {
@@ -293,7 +293,7 @@ pub fn write_type_definition_composite_marshaller_field_from_unmanaged(i: &Inter
         Type::Pattern(TypePattern::Utf8String(_)) => {
             indented!(w, "_managed.{name} = _unmanaged.{name}.IntoManaged();")?;
         }
-        _ if is_directly_serializable(field.the_type()) => {
+        _ if is_blittable(field.the_type()) => {
             indented!(w, "_managed.{name} = _unmanaged.{name}.ToManaged();")?;
         }
         _ => {

@@ -1,5 +1,5 @@
 use crate::Interop;
-use crate::converter::{is_directly_serializable, to_typespecifier_in_field, to_typespecifier_in_field_unmanaged};
+use crate::converter::{is_blittable, to_typespecifier_in_field, to_typespecifier_in_field_unmanaged};
 use crate::interop::docs::write_documentation;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Enum, Type, VariantKind};
@@ -248,7 +248,7 @@ pub fn write_type_definition_enum_variant_fields_to_unmanaged(i: &Interop, w: &m
                     Type::Primitive(_) => format!("_managed._{vname}"),
                     Type::ReadWritePointer(_) => format!("_managed._{vname}"),
                     Type::ReadPointer(_) => format!("_managed._{vname}"),
-                    _ if is_directly_serializable(t) => format!("_managed._{vname}.ToUnmanaged()"),
+                    _ if is_blittable(t) => format!("_managed._{vname}.ToUnmanaged()"),
                     _ => format!("_managed._{vname}.IntoUnmanaged()"),
                 };
 
@@ -277,7 +277,7 @@ pub fn write_type_definition_enum_variant_fields_to_managed(i: &Interop, w: &mut
                     Type::ReadWritePointer(_) => format!("_unmanaged._{vname}._{vname}"),
                     Type::ReadPointer(_) => format!("_unmanaged._{vname}._{vname}"),
                     Type::Pattern(TypePattern::Utf8String(_)) => format!("_unmanaged._{vname}._{vname}.IntoManaged()"),
-                    _ if is_directly_serializable(t) => format!("_unmanaged._{vname}._{vname}.ToManaged()"),
+                    _ if is_blittable(t) => format!("_unmanaged._{vname}._{vname}.ToManaged()"),
                     _ => format!("_unmanaged._{vname}._{vname}.IntoManaged()"),
                 };
 

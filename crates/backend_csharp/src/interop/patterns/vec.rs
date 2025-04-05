@@ -1,5 +1,5 @@
 use crate::Interop;
-use crate::converter::{get_vec_type_argument, is_directly_serializable, to_typespecifier_in_param};
+use crate::converter::{get_vec_type_argument, is_blittable, to_typespecifier_in_param};
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Parameter, Type};
 use interoptopus::pattern::TypePattern;
@@ -8,7 +8,7 @@ use interoptopus::{Error, indented};
 
 pub fn write_pattern_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) -> Result<(), Error> {
     i.debug(w, "write_pattern_vec")?;
-    if is_directly_serializable(vec.t()) {
+    if is_blittable(vec.t()) {
         write_pattern_fast_vec(i, w, vec)
     } else {
         write_pattern_marshalling_vec(i, w, vec)
