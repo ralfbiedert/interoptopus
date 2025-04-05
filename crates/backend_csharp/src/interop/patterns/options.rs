@@ -1,5 +1,5 @@
 use crate::Interop;
-use crate::converter::to_typespecifier_in_sync_fn_rval;
+use crate::converter::rval_to_type_sync;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Composite;
 use interoptopus::{Error, indented};
@@ -16,7 +16,7 @@ pub fn _write_pattern_option(i: &Interop, w: &mut IndentWriter, slice: &Composit
         .expect("Option must contain field called 't'.")
         .the_type();
 
-    let type_string = to_typespecifier_in_sync_fn_rval(data_type);
+    let type_string = rval_to_type_sync(data_type);
     let is_some = if i.rename_symbols { "isSome" } else { "is_some" };
 
     indented!(w, r"{} partial struct {}", i.visibility_types.to_access_modifier(), name)?;

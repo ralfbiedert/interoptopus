@@ -1,5 +1,5 @@
 use crate::Interop;
-use crate::converter::{is_blittable, to_typespecifier_in_field, to_typespecifier_in_field_unmanaged};
+use crate::converter::{field_to_type, field_to_type_unmanaged, is_blittable};
 use crate::interop::docs::write_documentation;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Enum, Type, VariantKind};
@@ -112,7 +112,7 @@ pub fn write_type_definition_enum_variant_fields_managed(i: &Interop, w: &mut In
         match variant.kind() {
             VariantKind::Unit(_) => {}
             VariantKind::Typed(_, t) if !t.is_void() => {
-                let ty = to_typespecifier_in_field(t);
+                let ty = field_to_type(t);
                 let vname = variant.name();
                 indented!(w, [()], r"{ty} _{vname};")?;
             }
@@ -130,7 +130,7 @@ pub fn write_type_definition_enum_variant_unmanaged_types(i: &Interop, w: &mut I
         match variant.kind() {
             VariantKind::Unit(_) => {}
             VariantKind::Typed(_, t) if !t.is_void() => {
-                let ty = to_typespecifier_in_field_unmanaged(t);
+                let ty = field_to_type_unmanaged(t);
                 let vname = variant.name();
                 indented!(w, [()], r"[StructLayout(LayoutKind.Sequential)]")?;
                 indented!(w, [()], r"internal unsafe struct Unmanaged{vname}")?;
@@ -183,7 +183,7 @@ pub fn write_type_definition_enum_variant_utils(i: &Interop, w: &mut IndentWrite
             }
             VariantKind::Typed(x, t) if !t.is_void() => {
                 let vname = variant.name();
-                let ty = to_typespecifier_in_field(t);
+                let ty = field_to_type(t);
                 indented!(w, [()], r"public static {name} {vname}({ty} value) => new() {{ _variant = {x}, _{vname} = value }};")?;
             }
             VariantKind::Typed(x, _) => {
@@ -219,7 +219,7 @@ pub fn write_type_definition_enum_variant_utils(i: &Interop, w: &mut IndentWrite
             }
             VariantKind::Typed(x, t) if !t.is_void() => {
                 let vname = variant.name();
-                let ty = to_typespecifier_in_field(t);
+                let ty = field_to_type(t);
                 indented!(w, [()], r"public {ty} As{vname}() {{ if (_variant != {x}) {{ {throw} }} else {{ return _{vname}; }} }}")?;
             }
             VariantKind::Typed(x, _) => {

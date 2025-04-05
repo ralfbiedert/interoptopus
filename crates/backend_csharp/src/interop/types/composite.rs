@@ -1,5 +1,5 @@
 use crate::Interop;
-use crate::converter::{field_name_to_csharp_name, is_blittable, to_typespecifier_in_field};
+use crate::converter::{field_name, field_to_type, is_blittable};
 use crate::interop::docs::write_documentation;
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Composite, Field, Layout, Primitive, Type, Visibility};
@@ -120,10 +120,10 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
 pub fn write_type_definition_composite_unmanaged_body_field(i: &Interop, w: &mut IndentWriter, field: &Field, _the_type: &Composite) -> Result<(), Error> {
     i.debug(w, "write_type_definition_composite_unmanaged_body_field")?;
 
-    let field_name = field_name_to_csharp_name(field, i.rename_symbols);
+    let field_name = field_name(field, i.rename_symbols);
     match field.the_type() {
         Type::Array(a) => {
-            let type_name = to_typespecifier_in_field(a.the_type());
+            let type_name = field_to_type(a.the_type());
             let size = a.len();
             if matches!(a.the_type(), Type::Pattern(TypePattern::CChar)) {
                 indented!(w, r"public fixed byte {}[{}];", field_name, size)?;
@@ -159,7 +159,7 @@ pub fn write_type_definition_composite_unmanaged_body_field(i: &Interop, w: &mut
             indented!(w, r"public Utf8String.Unmanaged {};", field_name)?;
         }
         _ => {
-            let type_name = to_typespecifier_in_field(field.the_type());
+            let type_name = field_to_type(field.the_type());
             indented!(w, r"public {} {};", type_name, field_name)?;
         }
     }
@@ -201,7 +201,7 @@ pub fn write_type_definition_composite_body(i: &Interop, w: &mut IndentWriter, t
 
 #[allow(clippy::single_match_else)]
 pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWriter, field: &Field, _: &Composite) -> Result<(), Error> {
-    let field_name = field_name_to_csharp_name(field, i.rename_symbols);
+    let field_name = field_name(field, i.rename_symbols);
     let visibility = match field.visibility() {
         Visibility::Public => "public ",
         Visibility::Private => "",
@@ -210,18 +210,18 @@ pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWri
 
     match field.the_type() {
         Type::Array(a) => {
-            todo!("TODO");
+            // todo!("TODO");
 
             let type_name = if matches!(a.the_type(), Type::Pattern(TypePattern::CChar)) {
                 "string".to_string()
             } else {
-                format!("{}[]", to_typespecifier_in_field(a.the_type()))
+                format!("{}[]", field_to_type(a.the_type()))
             };
 
             indented!(w, r"{}{} {};", visibility, type_name, field_name)?;
         }
         _ => {
-            let type_name = to_typespecifier_in_field(field.the_type());
+            let type_name = field_to_type(field.the_type());
             indented!(w, r"{}{} {};", visibility, type_name, field_name)?;
         }
     }
@@ -239,7 +239,7 @@ pub fn write_type_definition_composite_marshaller_field_to_unmanaged(i: &Interop
         Type::ReadPointer(_) => indented!(w, "_unmanaged.{name} = _managed.{name};")?,
         Type::ReadWritePointer(_) => indented!(w, "_unmanaged.{name} = _managed.{name};")?,
         Type::Array(x) => {
-            let array_type = to_typespecifier_in_field(x.the_type());
+            let array_type = field_to_type(x.the_type());
             indented!(w, "fixed({}* _fixed = _unmanaged.{})", array_type, name)?;
             indented!(w, "{{")?;
             indented!(w, [()], r#"if (_managed.{} == null) {{ throw new InvalidOperationException("Array '{}' must not be null"); }}"#, name, name)?;
@@ -278,7 +278,7 @@ pub fn write_type_definition_composite_marshaller_field_from_unmanaged(i: &Inter
         Type::ReadPointer(_) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
         Type::ReadWritePointer(_) => indented!(w, "_managed.{name} = _unmanaged.{name};")?,
         Type::Array(x) => {
-            let array_type = to_typespecifier_in_field(x.the_type());
+            let array_type = field_to_type(x.the_type());
             indented!(w, "fixed({}* _fixed = _unmanaged.{})", array_type, name)?;
             indented!(w, "{{")?;
             indented!(w, [()], "_managed.{} = new {}[{}];", name, array_type, x.len())?;

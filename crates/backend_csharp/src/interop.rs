@@ -8,7 +8,7 @@ pub mod namespace;
 pub mod patterns;
 pub mod types;
 
-use crate::converter::to_typespecifier_in_param;
+use crate::converter::param_to_type;
 use crate::interop::builtins::write_builtins;
 use crate::interop::class::{write_class_context, write_native_lib_string};
 use crate::interop::constants::write_constants;
@@ -22,11 +22,11 @@ use crate::interop::patterns::write_patterns;
 use crate::interop::types::write_type_definitions;
 use derive_builder::Builder;
 use interoptopus::backend::IndentWriter;
-use interoptopus::backend::{is_global_type, NamespaceMappings};
+use interoptopus::backend::{NamespaceMappings, is_global_type};
 use interoptopus::inventory::{Bindings, Inventory};
 use interoptopus::lang::{Constant, Function, Meta, Signature, Type};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 /// How to convert from Rust function names to C#
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
@@ -262,11 +262,11 @@ impl Interop {
 
     fn to_native_callback_typespecifier(&self, t: &Type) -> String {
         match t {
-            Type::Pattern(TypePattern::Slice(_)) => format!("{}.Unmanaged", to_typespecifier_in_param(t)),
-            Type::Pattern(TypePattern::SliceMut(_)) => format!("{}.Unmanaged", to_typespecifier_in_param(t)),
-            Type::Pattern(TypePattern::Utf8String(_)) => format!("{}.Unmanaged", to_typespecifier_in_param(t)),
-            Type::Composite(_) => format!("{}.Unmanaged", to_typespecifier_in_param(t)),
-            _ => to_typespecifier_in_param(t),
+            Type::Pattern(TypePattern::Slice(_)) => format!("{}.Unmanaged", param_to_type(t)),
+            Type::Pattern(TypePattern::SliceMut(_)) => format!("{}.Unmanaged", param_to_type(t)),
+            Type::Pattern(TypePattern::Utf8String(_)) => format!("{}.Unmanaged", param_to_type(t)),
+            Type::Composite(_) => format!("{}.Unmanaged", param_to_type(t)),
+            _ => param_to_type(t),
         }
     }
 

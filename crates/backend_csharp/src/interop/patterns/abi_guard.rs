@@ -1,4 +1,4 @@
-use crate::converter::function_name_to_csharp_name;
+use crate::converter::function_name;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Type;
@@ -25,7 +25,7 @@ pub fn write_abi_guard(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         } else {
             FunctionNameFlavor::RawFFIName
         };
-        let fn_call = function_name_to_csharp_name(api_guard, flavor);
+        let fn_call = function_name(api_guard, flavor);
         indented!(w, [()], r"var api_version = {}.{}();", i.class, fn_call)?;
         indented!(w, [()], r"if (api_version != {}ul)", version)?;
         indented!(w, [()], r"{{")?;

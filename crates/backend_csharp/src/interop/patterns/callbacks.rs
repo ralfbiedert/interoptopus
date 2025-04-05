@@ -1,5 +1,5 @@
 use crate::Interop;
-use crate::converter::{is_blittable, to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval};
+use crate::converter::{is_blittable, param_to_type, rval_to_type_sync};
 use crate::interop::types::fnptrs::write_type_definition_fn_pointer_annotation;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Primitive, Type};
@@ -10,7 +10,7 @@ use interoptopus::{Error, indented};
 pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
     i.debug(w, "write_type_definition_named_callback")?;
 
-    let rval_safe = to_typespecifier_in_sync_fn_rval(the_type.fnpointer().signature().rval());
+    let rval_safe = rval_to_type_sync(the_type.fnpointer().signature().rval());
     let rval_unsafe = match the_type.fnpointer().signature().rval() {
         Type::Composite(_) => format!("{rval_safe}.Unmanaged"),
         Type::Enum(_) => format!("{rval_safe}.Unmanaged"),
@@ -25,7 +25,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     let mut params_native = Vec::new();
     let mut params_invoke = Vec::new();
     for param in the_type.fnpointer().signature().params() {
-        params.push(format!("{} {}", to_typespecifier_in_param(param.the_type()), param.name()));
+        params.push(format!("{} {}", param_to_type(param.the_type()), param.name()));
         params_native.push(format!("{} {}", i.to_native_callback_typespecifier(param.the_type()), param.name()));
 
         match param.the_type() {

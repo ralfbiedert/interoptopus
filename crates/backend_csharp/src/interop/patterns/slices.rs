@@ -1,5 +1,5 @@
 use crate::Interop;
-use crate::converter::{get_slice_type_argument, is_blittable};
+use crate::converter::{is_blittable, slice_t};
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Type;
 use interoptopus::pattern::TypePattern;
@@ -24,7 +24,7 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
     i.debug(w, "write_pattern_fast_slice")?;
 
     let name = slice.rust_name();
-    let inner = get_slice_type_argument(slice);
+    let inner = slice_t(slice);
 
     indented!(w, r"public partial class {name}")?;
     indented!(w, r"{{")?;
@@ -176,8 +176,8 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     i.debug(w, "write_pattern_marshalling_slice")?;
 
     let name = slice.rust_name();
-    let user_type = get_slice_type_argument(slice);
-    let marshaller_type = get_slice_type_argument(slice);
+    let user_type = slice_t(slice);
+    let marshaller_type = slice_t(slice);
 
     indented!(w, r"[StructLayout(LayoutKind.Sequential)]")?;
     indented!(w, r"public partial class {name}")?;

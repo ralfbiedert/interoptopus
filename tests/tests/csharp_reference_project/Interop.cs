@@ -34,15 +34,10 @@ namespace My.Company
         }
 
         // Debug - write_pattern_async_trampoline_initializers 
-        // Debug - write_pattern_async_trampoline_initializer 
         public static AsyncTrampolineResultError _trampolineResultError = new();
-        // Debug - write_pattern_async_trampoline_initializer 
         public static AsyncTrampolineResultNestedArrayError _trampolineResultNestedArrayError = new();
-        // Debug - write_pattern_async_trampoline_initializer 
         public static AsyncTrampolineResultU64Error _trampolineResultU64Error = new();
-        // Debug - write_pattern_async_trampoline_initializer 
         public static AsyncTrampolineResultUseStringError _trampolineResultUseStringError = new();
-        // Debug - write_pattern_async_trampoline_initializer 
         public static AsyncTrampolineResultUtf8StringError _trampolineResultUtf8StringError = new();
 
         // Debug - write_constant 

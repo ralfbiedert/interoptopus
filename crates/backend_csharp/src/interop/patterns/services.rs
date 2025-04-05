@@ -1,15 +1,12 @@
-use crate::converter::{
-    function_name_to_csharp_name, pattern_to_native_in_signature, to_typespecifier_in_async_fn_rval, to_typespecifier_in_field, to_typespecifier_in_param,
-    to_typespecifier_in_sync_fn_rval,
-};
+use crate::converter::{field_to_type, function_name, param_to_type, pattern_to_native_in_signature, rval_to_type_async, rval_to_type_sync};
 use crate::interop::docs::write_documentation;
 use crate::utils::sugared_return_type;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Function, Primitive, SugaredReturnType, Type};
-use interoptopus::pattern::service::ServiceDefinition;
 use interoptopus::pattern::TypePattern;
-use interoptopus::{indented, Error};
+use interoptopus::pattern::service::ServiceDefinition;
+use interoptopus::{Error, indented};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum MethodType {
@@ -89,7 +86,7 @@ pub fn write_pattern_service_method(
 
         // If we call the checked function we want to resolve a `SliceU8` to a `byte[]`,
         // but if we call the unchecked version we want to keep that `Sliceu8` in our signature.
-        let mut native = to_typespecifier_in_param(p.the_type());
+        let mut native = param_to_type(p.the_type());
 
         match p.the_type() {
             Type::Pattern(TypePattern::NamedCallback(callback)) => {
@@ -119,8 +116,8 @@ pub fn write_pattern_service_method(
     }
 
     let fn_name = match method_type {
-        MethodType::Ctor => function_name_to_csharp_name(function, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix)),
-        MethodType::Regular => function_name_to_csharp_name(function, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix)),
+        MethodType::Ctor => function_name(function, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix)),
+        MethodType::Regular => function_name(function, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix)),
         MethodType::Dtor => "Dispose".to_string(),
     };
 
@@ -134,8 +131,8 @@ pub fn write_pattern_service_method(
             }
             MethodType::Regular => match function.signature().rval() {
                 Type::Pattern(TypePattern::Result(x)) if x.t().is_void() => "void".to_string(),
-                Type::Pattern(TypePattern::Result(x)) => to_typespecifier_in_field(x.t()),
-                x => to_typespecifier_in_sync_fn_rval(x),
+                Type::Pattern(TypePattern::Result(x)) => field_to_type(x.t()),
+                x => rval_to_type_sync(x),
             },
             MethodType::Dtor => "void".to_string(),
         },
@@ -143,17 +140,17 @@ pub fn write_pattern_service_method(
             names.pop();
             types.pop();
             to_invoke.pop();
-            to_typespecifier_in_async_fn_rval(&async_rval)
+            rval_to_type_async(&async_rval)
         }
         SugaredReturnType::Async(_) => {
             names.pop();
             types.pop();
             to_invoke.pop();
-            to_typespecifier_in_async_fn_rval(&async_rval)
+            rval_to_type_async(&async_rval)
         }
     };
 
-    let method_to_invoke = function_name_to_csharp_name(
+    let method_to_invoke = function_name(
         function,
         if i.rename_symbols {
             FunctionNameFlavor::CSharpMethodNameWithClass
@@ -256,7 +253,7 @@ pub fn write_common_service_method_overload(i: &Interop, w: &mut IndentWriter, c
     let mut to_invoke = Vec::new();
     let mut types = Vec::new();
 
-    let fn_name = function_name_to_csharp_name(function, FunctionNameFlavor::CSharpMethodNameWithoutClass(&class.common_prefix()));
+    let fn_name = function_name(function, FunctionNameFlavor::CSharpMethodNameWithoutClass(&class.common_prefix()));
     let async_rval = sugared_return_type(function);
 
     // For every parameter except the first, figure out how we should forward
@@ -288,24 +285,24 @@ pub fn write_common_service_method_overload(i: &Interop, w: &mut IndentWriter, c
         SugaredReturnType::Sync(_) => match function.signature().rval() {
             Type::Pattern(TypePattern::CStrPointer) => "string".to_string(),
             Type::Pattern(TypePattern::Result(x)) if x.t().is_void() => "void".to_string(),
-            Type::Pattern(TypePattern::Result(x)) => to_typespecifier_in_field(x.t()),
-            x => to_typespecifier_in_sync_fn_rval(x),
+            Type::Pattern(TypePattern::Result(x)) => field_to_type(x.t()),
+            x => rval_to_type_sync(x),
         },
         SugaredReturnType::Async(Type::Pattern(TypePattern::Result(_))) => {
             names.pop();
             types.pop();
             to_invoke.pop();
-            to_typespecifier_in_async_fn_rval(&async_rval)
+            rval_to_type_async(&async_rval)
         }
         SugaredReturnType::Async(_) => {
             names.pop();
             types.pop();
             to_invoke.pop();
-            to_typespecifier_in_async_fn_rval(&async_rval)
+            rval_to_type_async(&async_rval)
         }
     };
 
-    let method_to_invoke = function_name_to_csharp_name(
+    let method_to_invoke = function_name(
         function,
         if i.rename_symbols {
             FunctionNameFlavor::CSharpMethodNameWithClass

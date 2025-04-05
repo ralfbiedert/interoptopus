@@ -1,5 +1,5 @@
 use crate::Interop;
-use crate::converter::{get_vec_type_argument, is_blittable, to_typespecifier_in_param};
+use crate::converter::{is_blittable, param_to_type, vec_t};
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Parameter, Type};
 use interoptopus::pattern::TypePattern;
@@ -19,7 +19,7 @@ pub fn write_pattern_fast_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) 
     i.debug(w, "write_pattern_fast_vec")?;
 
     let name = vec.rust_name();
-    let inner = to_typespecifier_in_param(vec.t());
+    let inner = param_to_type(vec.t());
 
     write_pattern_vec_struct(i, w, vec)?;
 
@@ -137,7 +137,7 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     i.debug(w, "write_pattern_fast_vec")?;
 
     let name = vec.rust_name();
-    let the_type = get_vec_type_argument(vec);
+    let the_type = vec_t(vec);
 
     write_pattern_vec_struct(i, w, vec)?;
 

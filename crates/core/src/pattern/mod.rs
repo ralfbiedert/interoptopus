@@ -118,7 +118,6 @@ impl From<ServiceDefinition> for LibraryPattern {
 /// A pattern on a type level.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 #[allow(clippy::large_enum_variant)]
-#[non_exhaustive]
 pub enum TypePattern {
     CStrPointer,
     Utf8String(Composite),

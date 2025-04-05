@@ -172,9 +172,9 @@ impl AsyncCallback {
         Self { fnpointer: callback, meta }
     }
 
-    /// Gets the type's meta.
+    /// Gets the async type's target.
     #[must_use]
-    pub fn target(&self) -> &Type {
+    pub fn t(&self) -> &Type {
         self.fnpointer
             .signature()
             .params()

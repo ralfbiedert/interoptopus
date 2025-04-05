@@ -1,6 +1,4 @@
-use crate::converter::{
-    function_name_to_csharp_name, pattern_to_native_in_signature, to_typespecifier_in_async_fn_rval, to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval,
-};
+use crate::converter::{function_name, param_to_type, pattern_to_native_in_signature, rval_to_type_async, rval_to_type_sync};
 use crate::interop::docs::write_documentation;
 use crate::utils::sugared_return_type;
 use crate::{FunctionNameFlavor, Interop};
@@ -47,8 +45,8 @@ pub fn write_function_annotation(_i: &Interop, w: &mut IndentWriter, function: &
 pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &Function, has_body: bool) -> Result<(), Error> {
     i.debug(w, "write_function_declaration")?;
 
-    let rval = to_typespecifier_in_sync_fn_rval(function.signature().rval());
-    let name = function_name_to_csharp_name(
+    let rval = rval_to_type_sync(function.signature().rval());
+    let name = function_name(
         function,
         if i.rename_symbols {
             FunctionNameFlavor::CSharpMethodNameWithClass
@@ -63,7 +61,7 @@ pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &
     let visibility = "public ";
 
     for p in function.signature().params() {
-        let the_type = to_typespecifier_in_param(p.the_type());
+        let the_type = param_to_type(p.the_type());
         let name = p.name();
 
         if native && matches!(p.the_type(), Type::FnPointer(_) | Type::Pattern(TypePattern::NamedCallback(_))) {
@@ -99,7 +97,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     let mut to_wrap_name = Vec::new();
     let mut to_wrap_type = Vec::new();
 
-    let raw_name = function_name_to_csharp_name(
+    let raw_name = function_name(
         function,
         if i.rename_symbols {
             FunctionNameFlavor::CSharpMethodNameWithClass
@@ -108,13 +106,13 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         },
     );
 
-    let rval = to_typespecifier_in_async_fn_rval(&sugared_return_type(function));
+    let rval = rval_to_type_async(&sugared_return_type(function));
 
     let mut params = Vec::new();
     for p in function.signature().params() {
         let name = p.name();
         let native = pattern_to_native_in_signature(i, p);
-        let the_type = to_typespecifier_in_param(p.the_type());
+        let the_type = param_to_type(p.the_type());
 
         let mut fallback = || {
             if native.contains("ref ") {
@@ -126,7 +124,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         match p.the_type() {
             Type::Pattern(TypePattern::NamedCallback(_)) => {
                 to_wrap_name.push(name);
-                to_wrap_type.push(to_typespecifier_in_param(p.the_type()));
+                to_wrap_type.push(param_to_type(p.the_type()));
                 to_invoke.push(format!("{name}_wrapped"));
             }
             _ => fallback(),
@@ -156,7 +154,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     indented!(w, r"{{")?;
 
     if let SugaredReturnType::Async(ref x) = async_rval {
-        let trampoline = format!("_trampoline{}", to_typespecifier_in_param(x));
+        let trampoline = format!("_trampoline{}", param_to_type(x));
         indented!(w, [()], r"var (_cb, _cs) = {trampoline}.NewCall();")?;
     }
 
@@ -167,7 +165,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     indented!(w, [()], r"try")?;
     indented!(w, [()], r"{{")?;
 
-    let fn_name = function_name_to_csharp_name(
+    let fn_name = function_name(
         function,
         if i.rename_symbols {
             FunctionNameFlavor::CSharpMethodNameWithClass

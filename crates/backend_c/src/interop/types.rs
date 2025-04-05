@@ -79,7 +79,6 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type,
                 write_type_definition_composite(i, w, x.composite_type())?;
                 w.newline()?;
             }
-            _ => panic!("Pattern not explicitly handled"),
         },
     }
     Ok(())

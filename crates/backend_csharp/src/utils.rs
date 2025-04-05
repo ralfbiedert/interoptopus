@@ -12,7 +12,7 @@ pub fn sugared_return_type(f: &Function) -> SugaredReturnType {
         .params()
         .last()
         .and_then(|x| x.the_type().as_async_callback())
-        .map(|async_callback: &AsyncCallback| async_callback.target());
+        .map(|async_callback: &AsyncCallback| async_callback.t());
 
     match ctype {
         None => SugaredReturnType::Sync(f.signature().rval().clone()),

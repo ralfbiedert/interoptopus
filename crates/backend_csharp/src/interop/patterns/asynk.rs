@@ -1,5 +1,5 @@
 use crate::Interop;
-use crate::converter::{to_typespecifier_in_param, to_typespecifier_in_sync_fn_rval};
+use crate::converter::{param_to_type, rval_to_type_sync};
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Type;
 use interoptopus::pattern::TypePattern;
@@ -9,18 +9,18 @@ use interoptopus::{Error, indented};
 pub fn write_pattern_async_trampoline(i: &Interop, w: &mut IndentWriter, asynk: &AsyncCallback) -> Result<(), Error> {
     i.debug(w, "write_pattern_async_trampoline")?;
 
-    let inner = to_typespecifier_in_param(asynk.target());
+    let inner = param_to_type(asynk.t());
 
-    let task_completion_source = match asynk.target() {
+    let task_completion_source = match asynk.t() {
         Type::Pattern(TypePattern::Result(x)) if x.t().is_void() => "TaskCompletionSource".to_string(),
-        Type::Pattern(TypePattern::Result(x)) => format!("TaskCompletionSource<{}>", to_typespecifier_in_sync_fn_rval(x.t())),
-        x => format!("TaskCompletionSource<{}>", to_typespecifier_in_sync_fn_rval(x)),
+        Type::Pattern(TypePattern::Result(x)) => format!("TaskCompletionSource<{}>", rval_to_type_sync(x.t())),
+        x => format!("TaskCompletionSource<{}>", rval_to_type_sync(x)),
     };
 
-    let task = match asynk.target() {
+    let task = match asynk.t() {
         Type::Pattern(TypePattern::Result(x)) if x.t().is_void() => "Task".to_string(),
-        Type::Pattern(TypePattern::Result(x)) => format!("Task<{}>", to_typespecifier_in_sync_fn_rval(x.t())),
-        x => format!("Task<{}>", to_typespecifier_in_sync_fn_rval(x)),
+        Type::Pattern(TypePattern::Result(x)) => format!("Task<{}>", rval_to_type_sync(x.t())),
+        x => format!("Task<{}>", rval_to_type_sync(x)),
     };
 
     indented!(w, r"public struct AsyncTrampoline{inner}")?;
@@ -46,7 +46,7 @@ pub fn write_pattern_async_trampoline(i: &Interop, w: &mut IndentWriter, asynk: 
     indented!(w, [()()], r"")?;
     indented!(w, [()()], r"var unmanaged = Marshal.PtrToStructure<{inner}.Unmanaged>(data);")?;
     indented!(w, [()()], r"var managed = unmanaged.IntoManaged();")?;
-    match asynk.target() {
+    match asynk.t() {
         Type::Pattern(TypePattern::Result(x)) => {
             if x.t().is_void() {
                 indented!(w, [()()], r"if (managed.IsOk) {{ tcs.SetResult(); }}")?;
@@ -84,18 +84,10 @@ pub fn write_pattern_async_trampoline_initializers(i: &Interop, w: &mut IndentWr
 
     for the_type in i.inventory.ctypes() {
         if let Type::Pattern(TypePattern::AsyncCallback(c)) = the_type {
-            write_pattern_async_trampoline_initializer(i, w, c)?;
+            let inner = param_to_type(c.t());
+            indented!(w, r"public static AsyncTrampoline{inner} _trampoline{inner} = new();")?;
         }
     }
-
-    Ok(())
-}
-
-pub fn write_pattern_async_trampoline_initializer(i: &Interop, w: &mut IndentWriter, asynk: &AsyncCallback) -> Result<(), Error> {
-    i.debug(w, "write_pattern_async_trampoline_initializer")?;
-    let inner = to_typespecifier_in_param(asynk.target());
-
-    indented!(w, r"public static AsyncTrampoline{inner} _trampoline{inner} = new();")?;
 
     Ok(())
 }
