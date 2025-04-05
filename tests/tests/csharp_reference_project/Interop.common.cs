@@ -435,11 +435,12 @@ namespace My.Company.Common
             if (_handle is { IsAllocated: true }) { _handle.Free(); }
         }
 
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var unmanaged = new Unmanaged();
+            unmanaged._data = _data;
+            unmanaged._len = _len; 
+            return unmanaged;
         }
 
 
@@ -449,13 +450,13 @@ namespace My.Company.Common
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
         {
-            public IntPtr Data;
-            public ulong Len;
+            public IntPtr _data;
+            public ulong _len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceBool ToManaged()
+            internal SliceBool ToManaged()
             {
-                return SliceBool.From(Data, Len);
+                return SliceBool.From(_data, _len);
             }
         }
 
@@ -476,19 +477,13 @@ namespace My.Company.Common
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
-                _unmanaged = new Unmanaged();
-                _unmanaged.Data = _managed._data;
-                _unmanaged.Len = _managed._len;
-                return _unmanaged;
+                return _managed.ToUnmanaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe SliceBool ToManaged()
+            public SliceBool ToManaged()
             {
-                _managed = new SliceBool();
-                _managed._data = _unmanaged.Data;
-                _managed._len = _unmanaged.Len;
-                return _managed;
+                return _unmanaged.ToManaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -562,11 +557,12 @@ namespace My.Company.Common
             if (_handle is { IsAllocated: true }) { _handle.Free(); }
         }
 
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var unmanaged = new Unmanaged();
+            unmanaged._data = _data;
+            unmanaged._len = _len; 
+            return unmanaged;
         }
 
 
@@ -576,13 +572,13 @@ namespace My.Company.Common
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
         {
-            public IntPtr Data;
-            public ulong Len;
+            public IntPtr _data;
+            public ulong _len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceI32 ToManaged()
+            internal SliceI32 ToManaged()
             {
-                return SliceI32.From(Data, Len);
+                return SliceI32.From(_data, _len);
             }
         }
 
@@ -603,19 +599,13 @@ namespace My.Company.Common
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
-                _unmanaged = new Unmanaged();
-                _unmanaged.Data = _managed._data;
-                _unmanaged.Len = _managed._len;
-                return _unmanaged;
+                return _managed.ToUnmanaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe SliceI32 ToManaged()
+            public SliceI32 ToManaged()
             {
-                _managed = new SliceI32();
-                _managed._data = _unmanaged.Data;
-                _managed._len = _unmanaged.Len;
-                return _managed;
+                return _unmanaged.ToManaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -689,11 +679,12 @@ namespace My.Company.Common
             if (_handle is { IsAllocated: true }) { _handle.Free(); }
         }
 
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var unmanaged = new Unmanaged();
+            unmanaged._data = _data;
+            unmanaged._len = _len; 
+            return unmanaged;
         }
 
 
@@ -703,13 +694,13 @@ namespace My.Company.Common
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
         {
-            public IntPtr Data;
-            public ulong Len;
+            public IntPtr _data;
+            public ulong _len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceU32 ToManaged()
+            internal SliceU32 ToManaged()
             {
-                return SliceU32.From(Data, Len);
+                return SliceU32.From(_data, _len);
             }
         }
 
@@ -730,19 +721,13 @@ namespace My.Company.Common
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
-                _unmanaged = new Unmanaged();
-                _unmanaged.Data = _managed._data;
-                _unmanaged.Len = _managed._len;
-                return _unmanaged;
+                return _managed.ToUnmanaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe SliceU32 ToManaged()
+            public SliceU32 ToManaged()
             {
-                _managed = new SliceU32();
-                _managed._data = _unmanaged.Data;
-                _managed._len = _unmanaged.Len;
-                return _managed;
+                return _unmanaged.ToManaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -816,11 +801,12 @@ namespace My.Company.Common
             if (_handle is { IsAllocated: true }) { _handle.Free(); }
         }
 
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var unmanaged = new Unmanaged();
+            unmanaged._data = _data;
+            unmanaged._len = _len; 
+            return unmanaged;
         }
 
 
@@ -830,13 +816,13 @@ namespace My.Company.Common
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
         {
-            public IntPtr Data;
-            public ulong Len;
+            public IntPtr _data;
+            public ulong _len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceU8 ToManaged()
+            internal SliceU8 ToManaged()
             {
-                return SliceU8.From(Data, Len);
+                return SliceU8.From(_data, _len);
             }
         }
 
@@ -857,19 +843,13 @@ namespace My.Company.Common
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
-                _unmanaged = new Unmanaged();
-                _unmanaged.Data = _managed._data;
-                _unmanaged.Len = _managed._len;
-                return _unmanaged;
+                return _managed.ToUnmanaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe SliceU8 ToManaged()
+            public SliceU8 ToManaged()
             {
-                _managed = new SliceU8();
-                _managed._data = _unmanaged.Data;
-                _managed._len = _unmanaged.Len;
-                return _managed;
+                return _unmanaged.ToManaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -878,11 +858,10 @@ namespace My.Company.Common
     }
 
     // Debug - write_pattern_marshalling_slice 
-    [StructLayout(LayoutKind.Sequential)]
     public partial class SliceUtf8String
     {
+        IntPtr _data;
         ulong _len;
-        IntPtr _hglobal;
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
@@ -896,7 +875,7 @@ namespace My.Company.Common
             get
             {
                 if (i >= (int) _len) throw new IndexOutOfRangeException();
-                if (_hglobal == IntPtr.Zero) { throw new Exception(); }
+                if (_data == IntPtr.Zero) { throw new Exception(); }
                 // TODO
                 throw new Exception();
             }
@@ -910,12 +889,12 @@ namespace My.Company.Common
         {
             var rval = new SliceUtf8String();
             var size = sizeof(Utf8String.Unmanaged);
-            rval._hglobal  = Marshal.AllocHGlobal(size * managed.Length);
+            rval._data  = Marshal.AllocHGlobal(size * managed.Length);
             rval._len = (ulong) managed.Length;
             for (var i = 0; i < managed.Length; ++i)
             {
                 var unmanaged = managed[i].IntoUnmanaged();
-                var dst = IntPtr.Add(rval._hglobal, i * size);
+                var dst = IntPtr.Add(rval._data, i * size);
                 Marshal.StructureToPtr(unmanaged, dst, false);
             }
             return rval;
@@ -924,14 +903,17 @@ namespace My.Company.Common
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
-            Marshal.FreeHGlobal(_hglobal);
+            if (_data == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_data);
+            _data = IntPtr.Zero;
         }
 
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var unmanaged = new Unmanaged();
+            unmanaged._data = _data;
+            unmanaged._len = _len; 
+            return unmanaged;
         }
 
 
@@ -941,14 +923,16 @@ namespace My.Company.Common
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
         {
-            public IntPtr Data;
-            public ulong Len;
+            public IntPtr _data;
+            public ulong _len;
 
-            public SliceUtf8String ToManaged()
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal unsafe SliceUtf8String ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var _managed = new SliceUtf8String();
+                _managed._data = _data;
+                _managed._len = _len;
+                return _managed;
             }
 
         }
@@ -968,21 +952,15 @@ namespace My.Company.Common
             public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
+            public Unmanaged ToUnmanaged()
             {
-                _unmanaged = new Unmanaged();
-                _unmanaged.Data = _managed._hglobal;
-                _unmanaged.Len = _managed._len;
-                return _unmanaged;
+                return _managed.ToUnmanaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe SliceUtf8String ToManaged()
+            public SliceUtf8String ToManaged()
             {
-                _managed = new SliceUtf8String();
-                _managed._hglobal = _unmanaged.Data;
-                _managed._len = _unmanaged.Len;
-                return _managed;
+                return _unmanaged.ToManaged();
             }
 
             public void Free() { }
@@ -1055,11 +1033,12 @@ namespace My.Company.Common
             if (_handle is { IsAllocated: true }) { _handle.Free(); }
         }
 
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var unmanaged = new Unmanaged();
+            unmanaged._data = _data;
+            unmanaged._len = _len; 
+            return unmanaged;
         }
 
 
@@ -1069,13 +1048,13 @@ namespace My.Company.Common
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
         {
-            public IntPtr Data;
-            public ulong Len;
+            public IntPtr _data;
+            public ulong _len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceVec ToManaged()
+            internal SliceVec ToManaged()
             {
-                return SliceVec.From(Data, Len);
+                return SliceVec.From(_data, _len);
             }
         }
 
@@ -1096,19 +1075,13 @@ namespace My.Company.Common
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
-                _unmanaged = new Unmanaged();
-                _unmanaged.Data = _managed._data;
-                _unmanaged.Len = _managed._len;
-                return _unmanaged;
+                return _managed.ToUnmanaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe SliceVec ToManaged()
+            public SliceVec ToManaged()
             {
-                _managed = new SliceVec();
-                _managed._data = _unmanaged.Data;
-                _managed._len = _unmanaged.Len;
-                return _managed;
+                return _unmanaged.ToManaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -1188,11 +1161,12 @@ namespace My.Company.Common
             if (_handle is { IsAllocated: true }) { _handle.Free(); }
         }
 
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var unmanaged = new Unmanaged();
+            unmanaged._data = _data;
+            unmanaged._len = _len; 
+            return unmanaged;
         }
 
 
@@ -1202,13 +1176,13 @@ namespace My.Company.Common
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
         {
-            public IntPtr Data;
-            public ulong Len;
+            public IntPtr _data;
+            public ulong _len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceMutU32 ToManaged()
+            internal SliceMutU32 ToManaged()
             {
-                return SliceMutU32.From(Data, Len);
+                return SliceMutU32.From(_data, _len);
             }
         }
 
@@ -1229,19 +1203,13 @@ namespace My.Company.Common
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
-                _unmanaged = new Unmanaged();
-                _unmanaged.Data = _managed._data;
-                _unmanaged.Len = _managed._len;
-                return _unmanaged;
+                return _managed.ToUnmanaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe SliceMutU32 ToManaged()
+            public SliceMutU32 ToManaged()
             {
-                _managed = new SliceMutU32();
-                _managed._data = _unmanaged.Data;
-                _managed._len = _unmanaged.Len;
-                return _managed;
+                return _unmanaged.ToManaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -1321,11 +1289,12 @@ namespace My.Company.Common
             if (_handle is { IsAllocated: true }) { _handle.Free(); }
         }
 
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var unmanaged = new Unmanaged();
+            unmanaged._data = _data;
+            unmanaged._len = _len; 
+            return unmanaged;
         }
 
 
@@ -1335,13 +1304,13 @@ namespace My.Company.Common
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
         {
-            public IntPtr Data;
-            public ulong Len;
+            public IntPtr _data;
+            public ulong _len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceMutU8 ToManaged()
+            internal SliceMutU8 ToManaged()
             {
-                return SliceMutU8.From(Data, Len);
+                return SliceMutU8.From(_data, _len);
             }
         }
 
@@ -1362,19 +1331,13 @@ namespace My.Company.Common
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
-                _unmanaged = new Unmanaged();
-                _unmanaged.Data = _managed._data;
-                _unmanaged.Len = _managed._len;
-                return _unmanaged;
+                return _managed.ToUnmanaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe SliceMutU8 ToManaged()
+            public SliceMutU8 ToManaged()
             {
-                _managed = new SliceMutU8();
-                _managed._data = _unmanaged.Data;
-                _managed._len = _unmanaged.Len;
-                return _managed;
+                return _unmanaged.ToManaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -1454,11 +1417,12 @@ namespace My.Company.Common
             if (_handle is { IsAllocated: true }) { _handle.Free(); }
         }
 
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            var unmanaged = new Unmanaged();
+            unmanaged._data = _data;
+            unmanaged._len = _len; 
+            return unmanaged;
         }
 
 
@@ -1468,13 +1432,13 @@ namespace My.Company.Common
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
         {
-            public IntPtr Data;
-            public ulong Len;
+            public IntPtr _data;
+            public ulong _len;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public SliceMutVec ToManaged()
+            internal SliceMutVec ToManaged()
             {
-                return SliceMutVec.From(Data, Len);
+                return SliceMutVec.From(_data, _len);
             }
         }
 
@@ -1495,19 +1459,13 @@ namespace My.Company.Common
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
-                _unmanaged = new Unmanaged();
-                _unmanaged.Data = _managed._data;
-                _unmanaged.Len = _managed._len;
-                return _unmanaged;
+                return _managed.ToUnmanaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe SliceMutVec ToManaged()
+            public SliceMutVec ToManaged()
             {
-                _managed = new SliceMutVec();
-                _managed._data = _unmanaged.Data;
-                _managed._len = _unmanaged.Len;
-                return _managed;
+                return _unmanaged.ToManaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -2540,7 +2498,7 @@ namespace My.Company.Common
     public partial class MyCallbackNamespaced : IDisposable
     {
 
-        public MyCallbackNamespaced() { }
+        internal MyCallbackNamespaced() { }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public MyCallbackNamespaced(MyCallbackNamespacedDelegate managed)
@@ -2568,7 +2526,7 @@ namespace My.Company.Common
 
         // Invokes the callback.
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public uint Call(uint value)
+        internal uint Call(uint value)
         {
             var __target = Marshal.GetDelegateForFunctionPointer<MyCallbackNamespacedNative>(_ptr);
             // TODO
@@ -2584,12 +2542,15 @@ namespace My.Company.Common
             // the time to rethrow it.
             if (_exception != null) throw _exception;
         }
-    public Unmanaged ToUnmanaged()
-    {
-        var marshaller = new Marshaller(this);
-        try { return marshaller.ToUnmanaged(); }
-        finally { marshaller.Free(); }
-    }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged ToUnmanaged()
+        {
+            var rval = new Unmanaged();
+            rval._callback = _ptr;
+            rval._data = IntPtr.Zero;
+            return rval;
+        }
 
         [CustomMarshaller(typeof(MyCallbackNamespaced), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta {  }
@@ -2597,13 +2558,14 @@ namespace My.Company.Common
         [StructLayout(LayoutKind.Sequential)]
         public struct Unmanaged
         {
-            internal IntPtr Callback;
-            internal IntPtr Data;
+            internal IntPtr _callback;
+            internal IntPtr _data;
+
             public MyCallbackNamespaced ToManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var rval = new MyCallbackNamespaced();
+                rval._ptr = _callback;
+                return rval;
             }
 
         }
@@ -2626,18 +2588,13 @@ namespace My.Company.Common
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
-                _unmanaged = new Unmanaged();
-                _unmanaged.Callback = _managed?._ptr ?? IntPtr.Zero;
-                _unmanaged.Data = IntPtr.Zero;
-                return _unmanaged;
+                return _managed.ToUnmanaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public MyCallbackNamespaced ToManaged()
             {
-                _managed = new MyCallbackNamespaced();
-                _managed._ptr = _unmanaged.Callback;
-                return _managed;
+                return _unmanaged.ToManaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -2695,19 +2652,25 @@ namespace My.Company.Common
                 return Marshal.PtrToStructure<byte>(new IntPtr(_ptr.ToInt64() + i * sizeof(byte)));
             }
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged IntoUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            if (_ptr == IntPtr.Zero) throw new InteropException(); // Don't use for serialization if moved already.
+            var rval = new Unmanaged();
+            rval._len = _len;
+            rval._capacity = _capacity;
+            rval._ptr = _ptr;
+            _ptr = IntPtr.Zero; // Mark this instance as moved.
+            return rval;
         }
 
         public partial class InteropHelper
         {
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_create_18289942533122229086")]
-            public static partial long interoptopus_vec_create(IntPtr vec, ulong len, out Unmanaged rval);
+            internal static partial long interoptopus_vec_create(IntPtr vec, ulong len, out Unmanaged rval);
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_destroy_17895994407320212994")]
-            public static partial long interoptopus_vec_destroy(Unmanaged vec);
+            internal static partial long interoptopus_vec_destroy(Unmanaged vec);
         }
 
         [CustomMarshaller(typeof(VecU8), MarshalMode.Default, typeof(Marshaller))]
@@ -2719,11 +2682,15 @@ namespace My.Company.Common
             internal IntPtr _ptr;
             internal ulong _len;
             internal ulong _capacity;
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public VecU8 IntoManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var rval = new VecU8();
+                rval._len = _len;
+                rval._capacity = _capacity;
+                rval._ptr = _ptr;
+                return rval;
             }
 
 
@@ -2746,23 +2713,13 @@ namespace My.Company.Common
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
-                if (_managed._ptr == IntPtr.Zero) throw new InteropException(); // Don't use for serialization if moved already.
-                _unmanaged = new Unmanaged();
-                _unmanaged._len = _managed._len;
-                _unmanaged._capacity = _managed._capacity;
-                _unmanaged._ptr = _managed._ptr;
-                _managed._ptr = IntPtr.Zero; // Mark this instance as moved.
-                return _unmanaged;
+                return _managed.IntoUnmanaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe VecU8 ToManaged()
             {
-                _managed = new VecU8();
-                _managed._len = _unmanaged._len;
-                _managed._capacity = _unmanaged._capacity;
-                _managed._ptr = _unmanaged._ptr;
-                return _managed;
+                return _unmanaged.IntoManaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -2839,19 +2796,23 @@ namespace My.Company.Common
                 return _element.IntoManaged();
             }
         }
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Unmanaged IntoUnmanaged()
         {
-            var marshaller = new Marshaller(this);
-            try { return marshaller.ToUnmanaged(); }
-            finally { marshaller.Free(); }
+            if (_ptr == IntPtr.Zero) throw new InteropException(); // Don't use for serialization if moved already.
+            var rval = new Unmanaged();
+            rval._len = _len;
+            rval._capacity = _capacity;
+            rval._ptr = _ptr;
+            _ptr = IntPtr.Zero; // Mark this instance as moved.
+            return rval;
         }
-
         public partial class InteropHelper
         {
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_create_1491625606766217421")]
-            public static partial long interoptopus_vec_create(IntPtr vec, ulong len, out Unmanaged rval);
+            internal static partial long interoptopus_vec_create(IntPtr vec, ulong len, out Unmanaged rval);
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_destroy_2831836161306219799")]
-            public static partial long interoptopus_vec_destroy(Unmanaged vec);
+            internal static partial long interoptopus_vec_destroy(Unmanaged vec);
         }
 
         [CustomMarshaller(typeof(VecUtf8String), MarshalMode.Default, typeof(Marshaller))]
@@ -2863,11 +2824,14 @@ namespace My.Company.Common
             internal IntPtr _ptr;
             internal ulong _len;
             internal ulong _capacity;
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public VecUtf8String IntoManaged()
             {
-                var marshaller = new Marshaller(this);
-                try { return marshaller.ToManaged(); }
-                finally { marshaller.Free(); }
+                var rval = new VecUtf8String();
+                rval._len = _len;
+                rval._capacity = _capacity;
+                rval._ptr = _ptr;
+                return rval;
             }
 
 
@@ -2890,23 +2854,13 @@ namespace My.Company.Common
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged ToUnmanaged()
             {
-                if (_managed._ptr == IntPtr.Zero) throw new InteropException(); // Don't use for serialization if moved already.
-                _unmanaged = new Unmanaged();
-                _unmanaged._len = _managed._len;
-                _unmanaged._capacity = _managed._capacity;
-                _unmanaged._ptr = _managed._ptr;
-                _managed._ptr = IntPtr.Zero; // Mark this instance as moved.
-                return _unmanaged;
+                return _managed.IntoUnmanaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe VecUtf8String ToManaged()
             {
-                _managed = new VecUtf8String();
-                _managed._len = _unmanaged._len;
-                _managed._capacity = _unmanaged._capacity;
-                _managed._ptr = _unmanaged._ptr;
-                return _managed;
+                return _unmanaged.IntoManaged();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]

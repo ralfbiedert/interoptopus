@@ -1,4 +1,4 @@
-use crate::converter::{function_name, param_to_type, pattern_to_native_in_signature, rval_to_type_async, rval_to_type_sync};
+use crate::converter::{function_name, param_to_type, param_to_type_overloaded, rval_to_type_async, rval_to_type_sync};
 use crate::interop::docs::write_documentation;
 use crate::utils::sugared_return_type;
 use crate::{FunctionNameFlavor, Interop};
@@ -111,8 +111,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     let mut params = Vec::new();
     for p in function.signature().params() {
         let name = p.name();
-        let native = pattern_to_native_in_signature(i, p);
-        let the_type = param_to_type(p.the_type());
+        let native = param_to_type_overloaded(p.the_type());
 
         let mut fallback = || {
             if native.contains("ref ") {
@@ -121,6 +120,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
                 to_invoke.push(name.to_string());
             }
         };
+
         match p.the_type() {
             Type::Pattern(TypePattern::NamedCallback(_)) => {
                 to_wrap_name.push(name);

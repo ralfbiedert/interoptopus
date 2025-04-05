@@ -1,5 +1,5 @@
 use crate::Interop;
-use crate::converter::{is_blittable, param_to_type, rval_to_type_sync};
+use crate::converter::{is_blittable, param_to_managed, param_to_type, rval_to_type_sync, rval_to_type_unmanaged};
 use crate::interop::types::fnptrs::write_type_definition_fn_pointer_annotation;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Primitive, Type};
@@ -11,12 +11,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     i.debug(w, "write_type_definition_named_callback")?;
 
     let rval_safe = rval_to_type_sync(the_type.fnpointer().signature().rval());
-    let rval_unsafe = match the_type.fnpointer().signature().rval() {
-        Type::Composite(_) => format!("{rval_safe}.Unmanaged"),
-        Type::Enum(_) => format!("{rval_safe}.Unmanaged"),
-        Type::Pattern(TypePattern::Result(_)) => format!("{rval_safe}.Unmanaged"),
-        _ => rval_safe.clone(),
-    };
+    let rval_unsafe = rval_to_type_unmanaged(the_type.fnpointer().signature().rval());
 
     let name = the_type.name().to_string();
     let visibility = i.visibility_types.to_access_modifier();
@@ -27,15 +22,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     for param in the_type.fnpointer().signature().params() {
         params.push(format!("{} {}", param_to_type(param.the_type()), param.name()));
         params_native.push(format!("{} {}", i.to_native_callback_typespecifier(param.the_type()), param.name()));
-
-        match param.the_type() {
-            Type::Primitive(_) => params_invoke.push(param.name().to_string()),
-            Type::Opaque(_) => params_invoke.push(param.name().to_string()),
-            Type::ReadPointer(_) => params_invoke.push(param.name().to_string()),
-            Type::ReadWritePointer(_) => params_invoke.push(param.name().to_string()),
-            x if is_blittable(x) => params_invoke.push(format!("{}.ToManaged()", param.name())),
-            _ => params_invoke.push(format!("{}.IntoManaged()", param.name())),
-        }
+        params_invoke.push(param_to_managed(param));
     }
 
     params.pop();
@@ -61,7 +48,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, r"public partial class {} : IDisposable", name)?;
     indented!(w, r"{{")?;
     w.newline()?;
-    indented!(w, [()], r"public {}() {{ }}", name)?;
+    indented!(w, [()], r"internal {}() {{ }}", name)?;
     w.newline()?;
     i.inline_hint(w, 1)?;
     indented!(w, [()], r"public {}({}Delegate managed)", name, name)?;
@@ -97,7 +84,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     w.newline()?;
     indented!(w, [()], r"// Invokes the callback.")?;
     i.inline_hint(w, 1)?;
-    indented!(w, [()], r"public {rval_safe} Call({params_str})")?;
+    indented!(w, [()], r"internal {rval_safe} Call({params_str})")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"var __target = Marshal.GetDelegateForFunctionPointer<{name}Native>(_ptr);")?;
     indented!(w, [()()], r"// TODO")?;
@@ -120,12 +107,15 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()()], r"// the time to rethrow it.")?;
     indented!(w, [()()], r"if (_exception != null) throw _exception;")?;
     indented!(w, [()], r"}}")?;
-    indented!(w, r"public Unmanaged ToUnmanaged()")?;
-    indented!(w, r"{{")?;
-    indented!(w, [()], r"var marshaller = new Marshaller(this);")?;
-    indented!(w, [()], r"try {{ return marshaller.ToUnmanaged(); }}")?;
-    indented!(w, [()], r"finally {{ marshaller.Free(); }}")?;
-    indented!(w, r"}}")?;
+    w.newline()?;
+    i.inline_hint(w, 1)?;
+    indented!(w, [()], r"internal Unmanaged ToUnmanaged()")?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"var rval = new Unmanaged();")?;
+    indented!(w, [()()], r"rval._callback = _ptr;")?;
+    indented!(w, [()()], r"rval._data = IntPtr.Zero;")?;
+    indented!(w, [()()], r"return rval;")?;
+    indented!(w, [()], r"}}")?;
     w.newline()?;
     indented!(w, [()], r"[CustomMarshaller(typeof({name}), MarshalMode.Default, typeof(Marshaller))]")?;
     indented!(w, [()], r"private struct MarshallerMeta {{  }}")?;
@@ -133,13 +123,14 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()], r"[StructLayout(LayoutKind.Sequential)]")?;
     indented!(w, [()], r"public struct Unmanaged")?;
     indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"internal IntPtr Callback;")?;
-    indented!(w, [()()], r"internal IntPtr Data;")?;
+    indented!(w, [()()], r"internal IntPtr _callback;")?;
+    indented!(w, [()()], r"internal IntPtr _data;")?;
+    w.newline()?;
     indented!(w, [()()], r"public {name} ToManaged()")?;
     indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"var marshaller = new Marshaller(this);")?;
-    indented!(w, [()()()], r"try {{ return marshaller.ToManaged(); }}")?;
-    indented!(w, [()()()], r"finally {{ marshaller.Free(); }}")?;
+    indented!(w, [()()()], r"var rval = new {name}();")?;
+    indented!(w, [()()()], r"rval._ptr = _callback;")?;
+    indented!(w, [()()()], r"return rval;")?;
     indented!(w, [()()], r"}}")?;
     w.newline()?;
 
@@ -163,18 +154,13 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     i.inline_hint(w, 2)?;
     indented!(w, [()()], r"public Unmanaged ToUnmanaged()")?;
     indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"_unmanaged = new Unmanaged();")?;
-    indented!(w, [()()()], r"_unmanaged.Callback = _managed?._ptr ?? IntPtr.Zero;")?;
-    indented!(w, [()()()], r"_unmanaged.Data = IntPtr.Zero;")?;
-    indented!(w, [()()()], r"return _unmanaged;")?;
+    indented!(w, [()()()], r"return _managed.ToUnmanaged();")?;
     indented!(w, [()()], r"}}")?;
     w.newline()?;
     i.inline_hint(w, 2)?;
     indented!(w, [()()], r"public {name} ToManaged()")?;
     indented!(w, [()()], r"{{")?;
-    indented!(w, [()()()], r"_managed = new {name}();")?;
-    indented!(w, [()()()], r"_managed._ptr = _unmanaged.Callback;")?;
-    indented!(w, [()()()], r"return _managed;")?;
+    indented!(w, [()()()], r"return _unmanaged.ToManaged();")?;
     indented!(w, [()()], r"}}")?;
     w.newline()?;
     i.inline_hint(w, 2)?;

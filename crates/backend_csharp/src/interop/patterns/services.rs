@@ -1,12 +1,12 @@
-use crate::converter::{field_to_type, function_name, param_to_type, pattern_to_native_in_signature, rval_to_type_async, rval_to_type_sync};
+use crate::converter::{field_to_type, function_name, param_to_type, param_to_type_overloaded, rval_to_type_async, rval_to_type_sync};
 use crate::interop::docs::write_documentation;
 use crate::utils::sugared_return_type;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::{IndentWriter, WriteFor};
-use interoptopus::lang::{Function, Primitive, SugaredReturnType, Type};
+use interoptopus::lang::{Function, Parameter, Primitive, SugaredReturnType, Type};
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::service::ServiceDefinition;
-use interoptopus::{Error, indented};
+use interoptopus::{Error, function, indented};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum MethodType {
@@ -68,52 +68,8 @@ pub fn write_pattern_service_method(
     i.debug(w, "write_pattern_service_method")?;
 
     let common_prefix = class.common_prefix();
-    let mut names = Vec::new();
-    let mut to_invoke = Vec::new();
-    let mut types = Vec::new();
     let async_rval = sugared_return_type(function);
-
-    // For every parameter except the first, figure out how we should forward
-    // it to the invocation we perform.
-    let skip_params = match method_type {
-        MethodType::Ctor => 0,
-        MethodType::Dtor => 1,
-        MethodType::Regular => 1,
-    };
-
-    for p in function.signature().params().iter().skip(skip_params) {
-        let name = p.name();
-
-        // If we call the checked function we want to resolve a `SliceU8` to a `byte[]`,
-        // but if we call the unchecked version we want to keep that `Sliceu8` in our signature.
-        let mut native = param_to_type(p.the_type());
-
-        match p.the_type() {
-            Type::Pattern(TypePattern::NamedCallback(callback)) => {
-                let _ = callback.fnpointer().signature().rval();
-                if native.contains("out ") {
-                    to_invoke.push(format!("out {name}"));
-                } else if native.contains("ref ") {
-                    to_invoke.push(format!("ref {name}"));
-                } else {
-                    to_invoke.push(name.to_string());
-                }
-            }
-            _ => {
-                // Forward `ref` and `out` accordingly.
-                if native.contains("out ") {
-                    to_invoke.push(format!("out {name}"));
-                } else if native.contains("ref ") {
-                    to_invoke.push(format!("ref {name}"));
-                } else {
-                    to_invoke.push(name.to_string());
-                }
-            }
-        }
-
-        names.push(name);
-        types.push(native);
-    }
+    let (mut names, mut types, mut to_invoke) = params(function, method_type, false);
 
     let fn_name = match method_type {
         MethodType::Ctor => function_name(function, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix)),
@@ -249,35 +205,9 @@ pub fn write_service_method_overload(i: &Interop, w: &mut IndentWriter, class: &
 pub fn write_common_service_method_overload(i: &Interop, w: &mut IndentWriter, class: &ServiceDefinition, function: &Function, write_for: WriteFor) -> Result<(), Error> {
     i.debug(w, "write_common_service_method_overload")?;
 
-    let mut names = Vec::new();
-    let mut to_invoke = Vec::new();
-    let mut types = Vec::new();
-
     let fn_name = function_name(function, FunctionNameFlavor::CSharpMethodNameWithoutClass(&class.common_prefix()));
     let async_rval = sugared_return_type(function);
-
-    // For every parameter except the first, figure out how we should forward
-    // it to the invocation we perform.
-    for p in function.signature().params().iter().skip(1) {
-        let name = p.name();
-
-        // If we call the checked function we want to resolve a `SliceU8` to a `byte[]`,
-        // but if we call the unchecked version we want to keep that `Sliceu8` in our signature.
-        // let native = i.to_typespecifier_in_param(p.the_type());
-        let native = pattern_to_native_in_signature(i, p);
-
-        // Forward `ref` and `out` accordingly.
-        if native.contains("out ") {
-            to_invoke.push(format!("out {name}"));
-        } else if native.contains("ref ") {
-            to_invoke.push(format!("ref {name}"));
-        } else {
-            to_invoke.push(name.to_string());
-        }
-
-        names.push(name);
-        types.push(native);
-    }
+    let (mut names, mut types, mut to_invoke) = params(function, MethodType::Regular, true);
 
     // Write checked method. These are "normal" methods that accept
     // common C# types.
@@ -354,4 +284,41 @@ pub fn write_common_service_method_overload(i: &Interop, w: &mut IndentWriter, c
     indented!(w, r"}}")?;
 
     Ok(())
+}
+
+pub fn params(function: &Function, method_type: MethodType, is_overload: bool) -> (Vec<String>, Vec<String>, Vec<String>) {
+    let mut names = Vec::new();
+    let mut to_invoke = Vec::new();
+    let mut types = Vec::new();
+
+    let skip_params = match method_type {
+        MethodType::Ctor => 0,
+        MethodType::Dtor => 1,
+        MethodType::Regular => 1,
+    };
+
+    for p in function.signature().params().iter().skip(skip_params) {
+        let name = p.name();
+
+        // If we call the checked function we want to resolve a `SliceU8` to a `byte[]`,
+        // but if we call the unchecked version we want to keep that `Sliceu8` in our signature.
+        let mut native = if is_overload {
+            param_to_type_overloaded(p.the_type())
+        } else {
+            param_to_type(p.the_type())
+        };
+
+        if native.contains("out ") {
+            to_invoke.push(format!("out {name}"));
+        } else if native.contains("ref ") {
+            to_invoke.push(format!("ref {name}"));
+        } else {
+            to_invoke.push(name.to_string());
+        }
+
+        names.push(name.to_string());
+        types.push(native);
+    }
+
+    (names, types, to_invoke)
 }

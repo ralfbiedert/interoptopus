@@ -67,10 +67,10 @@ pub fn write_pattern_fast_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) 
     indented!(w, r"}}")?;
     w.unindent();
     indented!(w, r"}}")?;
-
+    w.newline()?;
     write_pattern_vec_to_unmanaged(i, w)?;
+    w.newline()?;
     write_pattern_vec_interop_helper(i, w, vec)?;
-
     w.newline()?;
     indented!(w, r"[CustomMarshaller(typeof({}), MarshalMode.Default, typeof(Marshaller))]", name)?;
     indented!(w, r"private struct MarshallerMeta {{ }}")?;
@@ -81,6 +81,7 @@ pub fn write_pattern_fast_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) 
     indented!(w, [()], r"internal IntPtr _ptr;")?;
     indented!(w, [()], r"internal ulong _len;")?;
     indented!(w, [()], r"internal ulong _capacity;")?;
+    w.newline()?;
     write_pattern_vec_to_managed(i, w, name)?;
     w.newline()?;
     indented!(w, r"}}")?;
@@ -103,23 +104,13 @@ pub fn write_pattern_fast_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) 
     i.inline_hint(w, 0)?;
     indented!(w, r"public Unmanaged ToUnmanaged()")?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"if (_managed._ptr == IntPtr.Zero) throw new InteropException(); // Don't use for serialization if moved already.")?;
-    indented!(w, [()], r"_unmanaged = new Unmanaged();")?;
-    indented!(w, [()], r"_unmanaged._len = _managed._len;")?;
-    indented!(w, [()], r"_unmanaged._capacity = _managed._capacity;")?;
-    indented!(w, [()], r"_unmanaged._ptr = _managed._ptr;")?;
-    indented!(w, [()], r"_managed._ptr = IntPtr.Zero; // Mark this instance as moved.")?;
-    indented!(w, [()], r"return _unmanaged;")?;
+    indented!(w, [()], r"return _managed.IntoUnmanaged();")?;
     indented!(w, r"}}")?;
     w.newline()?;
     i.inline_hint(w, 0)?;
     indented!(w, r"public unsafe {name} ToManaged()")?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"_managed = new {name}();")?;
-    indented!(w, [()], r"_managed._len = _unmanaged._len;")?;
-    indented!(w, [()], r"_managed._capacity = _unmanaged._capacity;")?;
-    indented!(w, [()], r"_managed._ptr = _unmanaged._ptr;")?;
-    indented!(w, [()], r"return _managed;")?;
+    indented!(w, [()], r"return _unmanaged.IntoManaged();")?;
     indented!(w, r"}}")?;
     w.newline()?;
     i.inline_hint(w, 0)?;
@@ -227,23 +218,13 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     i.inline_hint(w, 0)?;
     indented!(w, r"public Unmanaged ToUnmanaged()")?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"if (_managed._ptr == IntPtr.Zero) throw new InteropException(); // Don't use for serialization if moved already.")?;
-    indented!(w, [()], r"_unmanaged = new Unmanaged();")?;
-    indented!(w, [()], r"_unmanaged._len = _managed._len;")?;
-    indented!(w, [()], r"_unmanaged._capacity = _managed._capacity;")?;
-    indented!(w, [()], r"_unmanaged._ptr = _managed._ptr;")?;
-    indented!(w, [()], r"_managed._ptr = IntPtr.Zero; // Mark this instance as moved.")?;
-    indented!(w, [()], r"return _unmanaged;")?;
+    indented!(w, [()], r"return _managed.IntoUnmanaged();")?;
     indented!(w, r"}}")?;
     w.newline()?;
     i.inline_hint(w, 0)?;
     indented!(w, r"public unsafe {name} ToManaged()")?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"_managed = new {name}();")?;
-    indented!(w, [()], r"_managed._len = _unmanaged._len;")?;
-    indented!(w, [()], r"_managed._capacity = _unmanaged._capacity;")?;
-    indented!(w, [()], r"_managed._ptr = _unmanaged._ptr;")?;
-    indented!(w, [()], r"return _managed;")?;
+    indented!(w, [()], r"return _unmanaged.IntoManaged();")?;
     indented!(w, r"}}")?;
     w.newline()?;
     i.inline_hint(w, 0)?;
@@ -303,7 +284,7 @@ pub fn write_pattern_vec_interop_helper(i: &Interop, w: &mut IndentWriter, vec: 
                 if let Type::Pattern(TypePattern::Vec(x)) = x.as_ref() {
                     if x == vec {
                         indented!(w, [()], r#"[LibraryImport(Interop.NativeLib, EntryPoint = "{name}")]"#)?;
-                        indented!(w, [()], r"public static partial long interoptopus_vec_create(IntPtr vec, ulong len, out Unmanaged rval);")?;
+                        indented!(w, [()], r"internal static partial long interoptopus_vec_create(IntPtr vec, ulong len, out Unmanaged rval);")?;
                     }
                 }
             }
@@ -311,31 +292,38 @@ pub fn write_pattern_vec_interop_helper(i: &Interop, w: &mut IndentWriter, vec: 
 
         if name.starts_with("interoptopus_vec_destroy") && first_param == Some(Type::Pattern(TypePattern::Vec(vec.clone()))) {
             indented!(w, [()], r#"[LibraryImport(Interop.NativeLib, EntryPoint = "{name}")]"#)?;
-            indented!(w, [()], r"public static partial long interoptopus_vec_destroy(Unmanaged vec);")?;
+            indented!(w, [()], r"internal static partial long interoptopus_vec_destroy(Unmanaged vec);")?;
         }
     }
     indented!(w, r"}}")?;
     Ok(())
 }
 
-pub fn write_pattern_vec_to_managed(_: &Interop, w: &mut IndentWriter, managed: &str) -> Result<(), Error> {
+pub fn write_pattern_vec_to_managed(i: &Interop, w: &mut IndentWriter, managed: &str) -> Result<(), Error> {
+    i.inline_hint(w, 1)?;
     indented!(w, [()], r"public {managed} IntoManaged()")?;
     indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"var marshaller = new Marshaller(this);")?;
-    indented!(w, [()()], r"try {{ return marshaller.ToManaged(); }}")?;
-    indented!(w, [()()], r"finally {{ marshaller.Free(); }}")?;
+    indented!(w, [()()], r"var rval = new {managed}();")?;
+    indented!(w, [()()], r"rval._len = _len;")?;
+    indented!(w, [()()], r"rval._capacity = _capacity;")?;
+    indented!(w, [()()], r"rval._ptr = _ptr;")?;
+    indented!(w, [()()], r"return rval;")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
     Ok(())
 }
 
-pub fn write_pattern_vec_to_unmanaged(_: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
+pub fn write_pattern_vec_to_unmanaged(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
+    i.inline_hint(w, 0)?;
     indented!(w, r"public Unmanaged IntoUnmanaged()")?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"var marshaller = new Marshaller(this);")?;
-    indented!(w, [()], r"try {{ return marshaller.ToUnmanaged(); }}")?;
-    indented!(w, [()], r"finally {{ marshaller.Free(); }}")?;
+    indented!(w, [()], r"if (_ptr == IntPtr.Zero) throw new InteropException(); // Don't use for serialization if moved already.")?;
+    indented!(w, [()], r"var rval = new Unmanaged();")?;
+    indented!(w, [()], r"rval._len = _len;")?;
+    indented!(w, [()], r"rval._capacity = _capacity;")?;
+    indented!(w, [()], r"rval._ptr = _ptr;")?;
+    indented!(w, [()], r"_ptr = IntPtr.Zero; // Mark this instance as moved.")?;
+    indented!(w, [()], r"return rval;")?;
     indented!(w, r"}}")?;
-    w.newline()?;
     Ok(())
 }

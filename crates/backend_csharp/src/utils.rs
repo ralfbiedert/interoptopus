@@ -1,3 +1,4 @@
+use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Function, SugaredReturnType};
 use interoptopus::pattern::callback::AsyncCallback;
 
@@ -19,3 +20,6 @@ pub fn sugared_return_type(f: &Function) -> SugaredReturnType {
         Some(x) => SugaredReturnType::Async(x.clone()),
     }
 }
+
+
+pub fn common_marshaller()

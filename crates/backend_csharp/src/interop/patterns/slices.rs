@@ -120,13 +120,13 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
     indented!(w, r"[StructLayout(LayoutKind.Sequential)]")?;
     indented!(w, r"public struct Unmanaged")?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"public IntPtr Data;")?;
-    indented!(w, [()], r"public ulong Len;")?;
+    indented!(w, [()], r"public IntPtr _data;")?;
+    indented!(w, [()], r"public ulong _len;")?;
     w.newline()?;
     i.inline_hint(w, 1)?;
-    indented!(w, [()], r"public {name} ToManaged()")?;
+    indented!(w, [()], r"internal {name} ToManaged()")?;
     indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"return {name}.From(Data, Len);")?;
+    indented!(w, [()()], r"return {name}.From(_data, _len);")?;
     indented!(w, [()], r"}}")?;
     indented!(w, r"}}")?;
     w.newline()?;
@@ -148,19 +148,13 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
     i.inline_hint(w, 0)?;
     indented!(w, r"public Unmanaged ToUnmanaged()")?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"_unmanaged = new Unmanaged();")?;
-    indented!(w, [()], r"_unmanaged.Data = _managed._data;")?;
-    indented!(w, [()], r"_unmanaged.Len = _managed._len;")?;
-    indented!(w, [()], r"return _unmanaged;")?;
+    indented!(w, [()], r"return _managed.ToUnmanaged();")?;
     indented!(w, r"}}")?;
     w.newline()?;
     i.inline_hint(w, 0)?;
-    indented!(w, r"public unsafe {name} ToManaged()")?;
+    indented!(w, r"public {name} ToManaged()")?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"_managed = new {name}();")?;
-    indented!(w, [()], r"_managed._data = _unmanaged.Data;")?;
-    indented!(w, [()], r"_managed._len = _unmanaged.Len;")?;
-    indented!(w, [()], r"return _managed;")?;
+    indented!(w, [()], r"return _unmanaged.ToManaged();")?;
     indented!(w, r"}}")?;
     w.newline()?;
     i.inline_hint(w, 0)?;
@@ -179,11 +173,10 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     let user_type = slice_t(slice);
     let marshaller_type = slice_t(slice);
 
-    indented!(w, r"[StructLayout(LayoutKind.Sequential)]")?;
     indented!(w, r"public partial class {name}")?;
     indented!(w, r"{{")?;
+    indented!(w, [()], r"IntPtr _data;")?;
     indented!(w, [()], r"ulong _len;")?;
-    indented!(w, [()], r"IntPtr _hglobal;")?;
     indented!(w, r"}}")?;
     w.newline()?;
 
@@ -203,7 +196,7 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     indented!(w, r"get")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"if (i >= (int) _len) throw new IndexOutOfRangeException();")?;
-    indented!(w, [()], r"if (_hglobal == IntPtr.Zero) {{ throw new Exception(); }}")?;
+    indented!(w, [()], r"if (_data == IntPtr.Zero) {{ throw new Exception(); }}")?;
     indented!(w, [()], r"// TODO")?;
     indented!(w, [()], r"throw new Exception();")?;
     indented!(w, r"}}")?;
@@ -221,12 +214,12 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     indented!(w, r"{{")?;
     indented!(w, [()], r"var rval = new {name}();")?;
     indented!(w, [()], r"var size = sizeof({marshaller_type}.Unmanaged);")?;
-    indented!(w, [()], r"rval._hglobal  = Marshal.AllocHGlobal(size * managed.Length);")?;
+    indented!(w, [()], r"rval._data  = Marshal.AllocHGlobal(size * managed.Length);")?;
     indented!(w, [()], r"rval._len = (ulong) managed.Length;")?;
     indented!(w, [()], r"for (var i = 0; i < managed.Length; ++i)")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"var unmanaged = managed[i].IntoUnmanaged();")?;
-    indented!(w, [()()], r"var dst = IntPtr.Add(rval._hglobal, i * size);")?;
+    indented!(w, [()()], r"var dst = IntPtr.Add(rval._data, i * size);")?;
     indented!(w, [()()], r"Marshal.StructureToPtr(unmanaged, dst, false);")?;
     indented!(w, [()], r"}}")?;
     indented!(w, [()], r"return rval;")?;
@@ -235,7 +228,9 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     i.inline_hint(w, 0)?;
     indented!(w, r"public void Dispose()")?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"Marshal.FreeHGlobal(_hglobal);")?;
+    indented!(w, [()], r"if (_data == IntPtr.Zero) return;")?;
+    indented!(w, [()], r"Marshal.FreeHGlobal(_data);")?;
+    indented!(w, [()], r"_data = IntPtr.Zero;")?;
     indented!(w, r"}}")?;
     w.newline()?;
     write_pattern_slice_to_unmanaged(i, w)?;
@@ -246,8 +241,8 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     indented!(w, r"[StructLayout(LayoutKind.Sequential)]")?;
     indented!(w, r"public struct Unmanaged")?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"public IntPtr Data;")?;
-    indented!(w, [()], r"public ulong Len;")?;
+    indented!(w, [()], r"public IntPtr _data;")?;
+    indented!(w, [()], r"public ulong _len;")?;
     w.newline()?;
     write_pattern_slice_to_managed(i, w, name)?;
     indented!(w, r"}}")?;
@@ -268,21 +263,15 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     indented!(w, r"public void FromUnmanaged(Unmanaged unmanaged) {{ _unmanaged = unmanaged; }}")?;
     w.newline()?;
     i.inline_hint(w, 0)?;
-    indented!(w, r"public unsafe Unmanaged ToUnmanaged()")?;
+    indented!(w, r"public Unmanaged ToUnmanaged()")?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"_unmanaged = new Unmanaged();")?;
-    indented!(w, [()], r"_unmanaged.Data = _managed._hglobal;")?;
-    indented!(w, [()], r"_unmanaged.Len = _managed._len;")?;
-    indented!(w, [()], r"return _unmanaged;")?;
+    indented!(w, [()], r"return _managed.ToUnmanaged();")?;
     indented!(w, r"}}")?;
     w.newline()?;
     i.inline_hint(w, 0)?;
-    indented!(w, r"public unsafe {name} ToManaged()")?;
+    indented!(w, r"public {name} ToManaged()")?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"_managed = new {name}();")?;
-    indented!(w, [()], r"_managed._hglobal = _unmanaged.Data;")?;
-    indented!(w, [()], r"_managed._len = _unmanaged.Len;")?;
-    indented!(w, [()], r"return _managed;")?;
+    indented!(w, [()], r"return _unmanaged.ToManaged();")?;
     indented!(w, r"}}")?;
     w.newline()?;
     indented!(w, r"public void Free() {{ }}")?;
@@ -293,23 +282,27 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     Ok(())
 }
 
-pub fn write_pattern_slice_to_managed(_: &Interop, w: &mut IndentWriter, managed: &str) -> Result<(), Error> {
-    indented!(w, [()], r"public {managed} ToManaged()")?;
+pub fn write_pattern_slice_to_managed(i: &Interop, w: &mut IndentWriter, managed: &str) -> Result<(), Error> {
+    i.inline_hint(w, 1)?;
+    indented!(w, [()], r"internal unsafe {managed} ToManaged()")?;
     indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"var marshaller = new Marshaller(this);")?;
-    indented!(w, [()()], r"try {{ return marshaller.ToManaged(); }}")?;
-    indented!(w, [()()], r"finally {{ marshaller.Free(); }}")?;
+    indented!(w, [()()], r"var _managed = new {managed}();")?;
+    indented!(w, [()()], r"_managed._data = _data;")?;
+    indented!(w, [()()], r"_managed._len = _len;")?;
+    indented!(w, [()()], r"return _managed;")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
+
     Ok(())
 }
 
 pub fn write_pattern_slice_to_unmanaged(_: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
-    indented!(w, r"public Unmanaged ToUnmanaged()")?;
+    indented!(w, r"internal Unmanaged ToUnmanaged()")?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"var marshaller = new Marshaller(this);")?;
-    indented!(w, [()], r"try {{ return marshaller.ToUnmanaged(); }}")?;
-    indented!(w, [()], r"finally {{ marshaller.Free(); }}")?;
+    indented!(w, [()], r"var unmanaged = new Unmanaged();")?;
+    indented!(w, [()], r"unmanaged._data = _data;")?;
+    indented!(w, [()], r"unmanaged._len = _len; ")?;
+    indented!(w, [()], r"return unmanaged;")?;
     indented!(w, r"}}")?;
     w.newline()?;
     Ok(())

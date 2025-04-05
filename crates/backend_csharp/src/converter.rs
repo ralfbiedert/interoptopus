@@ -138,6 +138,29 @@ pub fn param_to_type(x: &Type) -> String {
     }
 }
 
+/// Converts the `u32` part in a Rust paramter `x: u32` to a C# equivalent in overloaded functions.
+pub fn param_to_type_overloaded(x: &Type) -> String {
+    match x {
+        Type::Pattern(p) => match p {
+            TypePattern::NamedCallback(_) => {
+                format!("{}Delegate", param_to_type(x))
+            }
+            _ => param_to_type(x),
+        },
+        x => param_to_type(x),
+    }
+}
+
+pub fn param_to_managed(x: &Parameter) -> String {
+    match x.the_type() {
+        Type::Primitive(_) => x.name().to_string(),
+        Type::ReadPointer(_) => x.name().to_string(),
+        Type::ReadWritePointer(_) => x.name().to_string(),
+        _ if is_blittable(x.the_type()) => format!("{}.ToManaged()", x.name()),
+        _ => format!("{}.IntoManaged()", x.name()),
+    }
+}
+
 /// Converts the `u32` part in a Rust rval `-> u32` to a C# equivalent for synchronous calls.
 pub fn rval_to_type_sync(x: &Type) -> String {
     match &x {
@@ -163,6 +186,13 @@ pub fn rval_to_type_sync(x: &Type) -> String {
             TypePattern::Vec(x) => x.composite_type().rust_name().to_string(),
             TypePattern::AsyncCallback(_) => panic!("AsyncCallback not supported in rvals"),
         },
+    }
+}
+
+pub fn rval_to_type_unmanaged(x: &Type) -> String {
+    match &x {
+        Type::Primitive(_) => rval_to_type_sync(x),
+        _ => format!("{}.Unmanaged", rval_to_type_sync(x)),
     }
 }
 
@@ -248,19 +278,5 @@ pub fn is_blittable(t: &Type) -> bool {
             TypePattern::Vec(_) => false,
             _ => todo!("Not implemented yet"),
         },
-    }
-}
-
-#[must_use]
-pub fn pattern_to_native_in_signature(_: &Interop, param: &Parameter) -> String {
-    match param.the_type() {
-        x @ Type::Pattern(p) => match p {
-            TypePattern::NamedCallback(_) => {
-                format!("{}Delegate", param_to_type(x))
-            }
-            _ => param_to_type(param.the_type()),
-        },
-
-        x => param_to_type(x),
     }
 }

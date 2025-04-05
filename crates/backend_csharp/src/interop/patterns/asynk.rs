@@ -23,7 +23,7 @@ pub fn write_pattern_async_trampoline(i: &Interop, w: &mut IndentWriter, asynk: 
         x => format!("Task<{}>", rval_to_type_sync(x)),
     };
 
-    indented!(w, r"public struct AsyncTrampoline{inner}")?;
+    indented!(w, r"public class AsyncTrampoline{inner}")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"private static ulong Id = 0;")?;
     indented!(w, [()], r"private static Dictionary<ulong, {task_completion_source}> InFlight = new(1024);")?;
@@ -31,14 +31,14 @@ pub fn write_pattern_async_trampoline(i: &Interop, w: &mut IndentWriter, asynk: 
     indented!(w, [()], r"private IntPtr _callback_ptr;")?;
     w.newline()?;
     i.inline_hint(w, 1)?;
-    indented!(w, [()], r"public AsyncTrampoline{inner}()")?;
+    indented!(w, [()], r"internal AsyncTrampoline{inner}()")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"_delegate = Call;")?;
     indented!(w, [()()], r"_callback_ptr = Marshal.GetFunctionPointerForDelegate(_delegate);")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
     i.inline_hint(w, 1)?;
-    indented!(w, [()], r"void Call(IntPtr data, IntPtr csPtr)")?;
+    indented!(w, [()], r"private static void Call(IntPtr data, IntPtr csPtr)")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"{task_completion_source} tcs;")?;
     indented!(w, [()()], r"")?;
@@ -60,7 +60,7 @@ pub fn write_pattern_async_trampoline(i: &Interop, w: &mut IndentWriter, asynk: 
     indented!(w, [()], r"}}")?;
     w.newline()?;
     i.inline_hint(w, 1)?;
-    indented!(w, [()], r"public (AsyncCallbackCommonNative, {task}) NewCall()")?;
+    indented!(w, [()], r"internal (AsyncCallbackCommonNative, {task}) NewCall()")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"var tcs = new {task_completion_source}();")?;
     indented!(w, [()()], r"var id = Id++;")?;
@@ -85,7 +85,7 @@ pub fn write_pattern_async_trampoline_initializers(i: &Interop, w: &mut IndentWr
     for the_type in i.inventory.ctypes() {
         if let Type::Pattern(TypePattern::AsyncCallback(c)) = the_type {
             let inner = param_to_type(c.t());
-            indented!(w, r"public static AsyncTrampoline{inner} _trampoline{inner} = new();")?;
+            indented!(w, r"internal static AsyncTrampoline{inner} _trampoline{inner} = new();")?;
         }
     }
 
