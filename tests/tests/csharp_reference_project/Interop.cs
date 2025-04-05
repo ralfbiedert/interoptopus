@@ -2413,14 +2413,14 @@ namespace My.Company
         public Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-            _unmanaged.my_callback = my_callback.ToUnmanaged();
-            _unmanaged.my_callback_namespaced = my_callback_namespaced.ToUnmanaged();
-            _unmanaged.my_callback_void = my_callback_void.ToUnmanaged();
-            _unmanaged.my_callback_contextual = my_callback_contextual.ToUnmanaged();
-            _unmanaged.sum_delegate_1 = sum_delegate_1.ToUnmanaged();
-            _unmanaged.sum_delegate_2 = sum_delegate_2.ToUnmanaged();
-            _unmanaged.sum_delegate_return = sum_delegate_return.ToUnmanaged();
-            _unmanaged.sum_delegate_return_2 = sum_delegate_return_2.ToUnmanaged();
+            _unmanaged.my_callback = my_callback?.ToUnmanaged() ?? default;
+            _unmanaged.my_callback_namespaced = my_callback_namespaced?.ToUnmanaged() ?? default;
+            _unmanaged.my_callback_void = my_callback_void?.ToUnmanaged() ?? default;
+            _unmanaged.my_callback_contextual = my_callback_contextual?.ToUnmanaged() ?? default;
+            _unmanaged.sum_delegate_1 = sum_delegate_1?.ToUnmanaged() ?? default;
+            _unmanaged.sum_delegate_2 = sum_delegate_2?.ToUnmanaged() ?? default;
+            _unmanaged.sum_delegate_return = sum_delegate_return?.ToUnmanaged() ?? default;
+            _unmanaged.sum_delegate_return_2 = sum_delegate_return_2?.ToUnmanaged() ?? default;
             return _unmanaged;
         }
 
