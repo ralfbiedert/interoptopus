@@ -36,21 +36,21 @@ profile: --release
 | Construct | ns per call |
 | --- | --- |
 | `primitive_void()` | 3 |
-| `primitive_u8(0)` | 4 |
-| `primitive_u16(0)` | 4 |
-| `primitive_u32(0)` | 4 |
-| `primitive_u64(0)` | 4 |
-| `pattern_ffi_option_1(OptionInner.None)` | 18 |
-| `pattern_ffi_slice_delegate(x => x[0])` | 949 |
-| `pattern_ffi_slice_delegate_huge(x => x[0])` | 1067 |
-| `pattern_ffi_slice_delegate_huge(callback_huge_prealloc)` | 21 |
-| `pattern_ffi_slice_2(short_vec, 0)` | 16 |
-| `pattern_ffi_slice_2(long_vec, 0)` | 23 |
-| `pattern_ffi_slice_4(short_byte, short_byte)` | 12 |
-| `pattern_ascii_pointer_1('hello world')` | 58 |
-| `pattern_string_2('hello world')` | 62 |
-| `new VecU8([])` | 85 |
-| `new VecUtf8String([])` | 14 |
-| `pattern_vec_u8_return()` | 37 |
-| `await new TaskCompletionSource().Task` | 101 |
-| `await serviceAsync.Success()` | 443 |
+| `primitive_u8(0)` | 3 |
+| `primitive_u16(0)` | 3 |
+| `primitive_u32(0)` | 3 |
+| `primitive_u64(0)` | 3 |
+| `pattern_ffi_option_1(OptionInner.None)` | 16 |
+| `pattern_ffi_slice_delegate(x => x[0])` | 452 |
+| `pattern_ffi_slice_delegate_huge(x => x[0])` | 943 |
+| `pattern_ffi_slice_delegate_huge(callback_huge_prealloc)` | 39 |
+| `pattern_ffi_slice_2(short_vec, 0)` | 6 |
+| `pattern_ffi_slice_2(long_vec, 0)` | 6 |
+| `pattern_ffi_slice_4(short_byte, short_byte)` | 6 |
+| `pattern_ascii_pointer_1('hello world')` | 30 |
+| `pattern_string_2('hello world')` | 64 |
+| `new VecU8([])` | 11 |
+| `new VecUtf8String([])` | 13 |
+| `pattern_vec_u8_return()` | 35 |
+| `await new TaskCompletionSource().Task` | 93 |
+| `await serviceAsync.Success()` | 383 |

@@ -25,7 +25,7 @@ public class TestPatternServicesAsync
         var s = ServiceAsync.New();
         var r = await s.HandleString("abc".Utf8());
         s.Dispose();
-        Assert.Equal(r, "abc".Utf8());
+        Assert.Equal(r.String, "abc");
     }
 
 

@@ -18,9 +18,10 @@ static class Benchmark {
 
 
         long x = 0;
-        var short_vec = new Vec3f32[10];
-        var short_byte = new byte[10];
-        var long_vec = new Vec3f32[100_000];
+        var short_vec = SliceVec3f32.From(new Vec3f32[10]);
+        var short_byte = SliceU8.From(new byte[10]);
+        var short_byte_mut = SliceMutU8.From(new byte[10]);
+        var long_vec = SliceVec3f32.From(new Vec3f32[100_000]);
         var tupled = new Tupled();
         var callback_huge_prealloc = new CallbackHugeVecSlice(x => x[0]);
         var serviceAsync = ServiceAsync.New();
@@ -60,19 +61,19 @@ static class Benchmark {
         result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_slice_2(long_vec, 0));
         writer.Add("pattern_ffi_slice_2(long_vec, 0)", result);
 
-        result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_slice_4(short_byte, short_byte));
+        result = MeasureResult.Measure(Iterations, () => Interop.pattern_ffi_slice_4(short_byte, short_byte_mut));
         writer.Add("pattern_ffi_slice_4(short_byte, short_byte)", result);
 
         result = MeasureResult.Measure(Iterations, () => Interop.pattern_ascii_pointer_1("hello world"));
         writer.Add("pattern_ascii_pointer_1('hello world')", result);
 
-        result = MeasureResult.Measure(Iterations, () => Interop.pattern_string_2("hello world"));
+        result = MeasureResult.Measure(Iterations, () => Interop.pattern_string_2("hello world".Utf8()));
         writer.Add("pattern_string_2('hello world')", result);
 
-        result = MeasureResult.Measure(Iterations, () => new VecU8([]));
+        result = MeasureResult.Measure(Iterations, () => VecU8.From([]));
         writer.Add("new VecU8([])", result);
 
-        result = MeasureResult.Measure(Iterations, () => new VecUtf8String([]));
+        result = MeasureResult.Measure(Iterations, () => VecUtf8String.From([]));
         writer.Add("new VecUtf8String([])", result);
 
         result = MeasureResult.Measure(Iterations, () => Interop.pattern_vec_1());

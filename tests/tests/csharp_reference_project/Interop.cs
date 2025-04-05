@@ -9194,24 +9194,22 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial class VecVec3f32 : IDisposable
     {
-        /// Allocates an empty vec on the native side.
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public VecVec3f32() { /* TODO - create empty vec */ }
-
         // An internal helper to create an empty object.
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        private VecVec3f32(bool _) { }
+        private VecVec3f32() { }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public unsafe VecVec3f32(Span<Vec3f32> _data)
+        public static unsafe VecVec3f32 From(Span<Vec3f32> _data)
         {
+            var rval = new VecVec3f32();
             fixed (void* _data_ptr = _data)
             {
                 InteropHelper.interoptopus_vec_create((IntPtr) _data_ptr, (ulong)_data.Length, out var _out);
-                _len = _out._len;
-                _capacity = _out._capacity;
-                _ptr = _out._ptr;
+                rval._len = _out._len;
+                rval._capacity = _out._capacity;
+                rval._ptr = _out._ptr;
             }
+            return rval;
         }
 
         public int Count
@@ -9293,7 +9291,7 @@ namespace My.Company
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe VecVec3f32 ToManaged()
             {
-                _managed = new VecVec3f32(true);
+                _managed = new VecVec3f32();
                 _managed._len = _unmanaged._len;
                 _managed._capacity = _unmanaged._capacity;
                 _managed._ptr = _unmanaged._ptr;

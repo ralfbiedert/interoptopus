@@ -29,26 +29,23 @@ pub fn write_pattern_fast_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) 
     indented!(w, r"{{")?;
     w.indent();
 
-    indented!(w, r"/// Allocates an empty vec on the native side.")?;
-    i.inline_hint(w, 0)?;
-    indented!(w, r"public {name}() {{ /* TODO - create empty vec */ }}")?;
-    w.newline()?;
-
     indented!(w, r"// An internal helper to create an empty object.")?;
     i.inline_hint(w, 0)?;
-    indented!(w, r"private {name}(bool _) {{ }}")?;
+    indented!(w, r"private {name}() {{ }}")?;
     w.newline()?;
 
     i.inline_hint(w, 0)?;
-    indented!(w, r"public unsafe {name}(Span<{inner}> _data)")?;
+    indented!(w, r"public static unsafe {name} From(Span<{inner}> _data)")?;
     indented!(w, r"{{")?;
+    indented!(w, [()], r"var rval = new {name}();")?;
     indented!(w, [()], r"fixed (void* _data_ptr = _data)")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"InteropHelper.interoptopus_vec_create((IntPtr) _data_ptr, (ulong)_data.Length, out var _out);")?;
-    indented!(w, [()()], r"_len = _out._len;")?;
-    indented!(w, [()()], r"_capacity = _out._capacity;")?;
-    indented!(w, [()()], r"_ptr = _out._ptr;")?;
+    indented!(w, [()()], r"rval._len = _out._len;")?;
+    indented!(w, [()()], r"rval._capacity = _out._capacity;")?;
+    indented!(w, [()()], r"rval._ptr = _out._ptr;")?;
     indented!(w, [()], r"}}")?;
+    indented!(w, [()], r"return rval;")?;
     indented!(w, r"}}")?;
     w.newline()?;
 
@@ -118,7 +115,7 @@ pub fn write_pattern_fast_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) 
     i.inline_hint(w, 0)?;
     indented!(w, r"public unsafe {name} ToManaged()")?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"_managed = new {name}(true);")?;
+    indented!(w, [()], r"_managed = new {name}();")?;
     indented!(w, [()], r"_managed._len = _unmanaged._len;")?;
     indented!(w, [()], r"_managed._capacity = _unmanaged._capacity;")?;
     indented!(w, [()], r"_managed._ptr = _unmanaged._ptr;")?;
@@ -150,19 +147,15 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     indented!(w, r"{{")?;
     w.indent();
 
-    indented!(w, r"/// Allocates an empty vec on the native side.")?;
-    i.inline_hint(w, 0)?;
-    indented!(w, r"public {name}() {{ /* TODO - create empty vec */ }}")?;
-    w.newline()?;
-
     indented!(w, r"// An internal helper to create an empty object.")?;
     i.inline_hint(w, 0)?;
-    indented!(w, r"private {name}(bool _) {{ }}")?;
+    indented!(w, r"private {name}() {{ }}")?;
     w.newline()?;
 
     i.inline_hint(w, 0)?;
-    indented!(w, r"public unsafe {name}(Span<{the_type}> _data)")?;
+    indented!(w, r"public static unsafe {name} From(Span<{the_type}> _data)")?;
     indented!(w, r"{{")?;
+    indented!(w, [()], r"var rval = new {name}();")?;
     indented!(w, [()], r"var _temp = new {the_type}.Unmanaged[_data.Length];")?;
     indented!(w, [()], r"for (var i = 0; i < _data.Length; ++i)")?;
     indented!(w, [()], r"{{")?;
@@ -171,10 +164,11 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     indented!(w, [()], r"fixed (void* _data_ptr = _temp)")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"InteropHelper.interoptopus_vec_create((IntPtr) _data_ptr, (ulong)_data.Length, out var _out);")?;
-    indented!(w, [()()], r"_len = _out._len;")?;
-    indented!(w, [()()], r"_capacity = _out._capacity;")?;
-    indented!(w, [()()], r"_ptr = _out._ptr;")?;
+    indented!(w, [()()], r"rval._len = _out._len;")?;
+    indented!(w, [()()], r"rval._capacity = _out._capacity;")?;
+    indented!(w, [()()], r"rval._ptr = _out._ptr;")?;
     indented!(w, [()], r"}}")?;
+    indented!(w, [()], r"return rval;")?;
     indented!(w, r"}}")?;
     w.newline()?;
 
@@ -245,7 +239,7 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     i.inline_hint(w, 0)?;
     indented!(w, r"public unsafe {name} ToManaged()")?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"_managed = new {name}(true);")?;
+    indented!(w, [()], r"_managed = new {name}();")?;
     indented!(w, [()], r"_managed._len = _unmanaged._len;")?;
     indented!(w, [()], r"_managed._capacity = _unmanaged._capacity;")?;
     indented!(w, [()], r"_managed._ptr = _unmanaged._ptr;")?;

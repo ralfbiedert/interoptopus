@@ -77,7 +77,7 @@ public class TestEnums
         // b.Dispose();
         var a = Utf8String.From("hello");
         var b = Utf8String.From("world");
-        var v = new VecUtf8String();
+        var v = VecUtf8String.From(new Utf8String[] { });
 
         var l1 = new Layer1Utf8String()
         {
@@ -88,7 +88,7 @@ public class TestEnums
         var l2 = new Layer2Utf8String()
         {
             layer_1 = l1,
-            strings = new VecUtf8String(new[]
+            strings = VecUtf8String.From(new[]
             {
                 "hello".Utf8(),
                 "world".Utf8()

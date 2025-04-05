@@ -2661,24 +2661,22 @@ namespace My.Company.Common
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial class VecU8 : IDisposable
     {
-        /// Allocates an empty vec on the native side.
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public VecU8() { /* TODO - create empty vec */ }
-
         // An internal helper to create an empty object.
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        private VecU8(bool _) { }
+        private VecU8() { }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public unsafe VecU8(Span<byte> _data)
+        public static unsafe VecU8 From(Span<byte> _data)
         {
+            var rval = new VecU8();
             fixed (void* _data_ptr = _data)
             {
                 InteropHelper.interoptopus_vec_create((IntPtr) _data_ptr, (ulong)_data.Length, out var _out);
-                _len = _out._len;
-                _capacity = _out._capacity;
-                _ptr = _out._ptr;
+                rval._len = _out._len;
+                rval._capacity = _out._capacity;
+                rval._ptr = _out._ptr;
             }
+            return rval;
         }
 
         public int Count
@@ -2760,7 +2758,7 @@ namespace My.Company.Common
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe VecU8 ToManaged()
             {
-                _managed = new VecU8(true);
+                _managed = new VecU8();
                 _managed._len = _unmanaged._len;
                 _managed._capacity = _unmanaged._capacity;
                 _managed._ptr = _unmanaged._ptr;
@@ -2801,17 +2799,14 @@ namespace My.Company.Common
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial class VecUtf8String : IDisposable
     {
-        /// Allocates an empty vec on the native side.
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public VecUtf8String() { /* TODO - create empty vec */ }
-
         // An internal helper to create an empty object.
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        private VecUtf8String(bool _) { }
+        private VecUtf8String() { }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public unsafe VecUtf8String(Span<Utf8String> _data)
+        public static unsafe VecUtf8String From(Span<Utf8String> _data)
         {
+            var rval = new VecUtf8String();
             var _temp = new Utf8String.Unmanaged[_data.Length];
             for (var i = 0; i < _data.Length; ++i)
             {
@@ -2820,10 +2815,11 @@ namespace My.Company.Common
             fixed (void* _data_ptr = _temp)
             {
                 InteropHelper.interoptopus_vec_create((IntPtr) _data_ptr, (ulong)_data.Length, out var _out);
-                _len = _out._len;
-                _capacity = _out._capacity;
-                _ptr = _out._ptr;
+                rval._len = _out._len;
+                rval._capacity = _out._capacity;
+                rval._ptr = _out._ptr;
             }
+            return rval;
         }
 
         public int Count
@@ -2906,7 +2902,7 @@ namespace My.Company.Common
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public unsafe VecUtf8String ToManaged()
             {
-                _managed = new VecUtf8String(true);
+                _managed = new VecUtf8String();
                 _managed._len = _unmanaged._len;
                 _managed._capacity = _unmanaged._capacity;
                 _managed._ptr = _unmanaged._ptr;
