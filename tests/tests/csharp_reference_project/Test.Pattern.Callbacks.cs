@@ -18,6 +18,7 @@ public class TestPatternDelegates
     {
         var cb = new MyCallback(value => value + 1);
         var x = Interop.pattern_callback_1(cb, 0);
+        cb.Dispose();
         Assert.Equal(1u, x);
     }
 
@@ -38,8 +39,9 @@ public class TestPatternDelegates
     [Fact]
     public void pattern_callback_4()
     {
-        var x = new MyCallbackNamespaced(value => value);
-        var y = Interop.pattern_callback_4(x, 5);
+        var cb = new MyCallbackNamespaced(value => value);
+        var y = Interop.pattern_callback_4(cb, 5);
+        cb.Dispose();
         Assert.Equal(y, 5u);
     }
 
@@ -48,6 +50,7 @@ public class TestPatternDelegates
     {
         var cb = Interop.pattern_callback_5();
         cb.Call();
+        cb.Dispose();
     }
 
 
@@ -70,7 +73,6 @@ public class TestPatternDelegates
             return x[0];
 
         });
-        // cb.Dispose();
     }
 
     [Fact]
@@ -111,7 +113,7 @@ public class TestPatternDelegates
         };
 
         var cc1 = new SumDelegateReturn(C1);
-        var cc2 = new SumDelegateReturn2(C2); 
+        var cc2 = new SumDelegateReturn2(C2);
 
         try
         {
@@ -136,23 +138,21 @@ public class TestPatternDelegates
     [Fact]
     public void pattern_callback_8()
     {
-        var r1 = Utf8String.From("");
-        var r2a = Utf8String.From("");
-        var r2b = Utf8String.From("");
+        var r1 = string.Empty;
+        var r2a = string.Empty;
+        var r2b = string.Empty;
 
         Interop.pattern_callback_8((s) =>
         {
-            r1 = s;
+            r1 = s.IntoString();
         }, s =>
         {
-            r2a = s.s1;
-            r2b = s.s2;
+            r2a = s.s1.IntoString();
+            r2b = s.s2.IntoString();
         }, "hello world".Utf8());
 
-        Assert.Equal("hello world", r1.String);
-        Assert.Equal("hello world", r2a.String);
-        Assert.Equal("hello world", r2b.String);
+        Assert.Equal("hello world", r1);
+        Assert.Equal("hello world", r2a);
+        Assert.Equal("hello world", r2b);
     }
-
-
 }

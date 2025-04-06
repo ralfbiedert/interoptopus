@@ -22,9 +22,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 17579909819157354056ul)
+            if (api_version != 5681111033621596136ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (17579909819157354056). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (5681111033621596136). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -49,6 +49,11 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_destroy")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial long interoptopus_string_destroy(Utf8String utf8);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_clone")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial long interoptopus_string_clone(ref Utf8String utf8, ref Utf8String rval);
 
 
         [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_18289942533122229086")]
@@ -469,6 +474,16 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_9")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultUtf8StringError pattern_string_9();
+
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_10")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void pattern_string_10(Utf8String ignored);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_11")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void pattern_string_11(ref Utf8String ignored);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1")]

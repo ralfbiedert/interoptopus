@@ -124,7 +124,18 @@ macro_rules! builtins_string {
             0
         }
 
-        let builtins = $crate::pattern::builtins::Builtins::new(vec![interoptopus_string_create::function_info(), interoptopus_string_destroy::function_info()]);
+        #[$crate::ffi_function]
+        pub fn interoptopus_string_clone(utf8: &$crate::pattern::string::String, rval: &mut ::std::mem::MaybeUninit<$crate::pattern::string::String>) -> i64 {
+            rval.write(utf8.clone());
+            0
+        }
+
+        let items = vec![
+            interoptopus_string_create::function_info(),
+            interoptopus_string_destroy::function_info(),
+            interoptopus_string_clone::function_info(),
+        ];
+        let builtins = $crate::pattern::builtins::Builtins::new(items);
         let pattern = $crate::pattern::LibraryPattern::Builtins(builtins);
         $crate::inventory::Symbol::Pattern(pattern)
     }};

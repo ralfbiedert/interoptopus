@@ -32,7 +32,7 @@ public class TestPatternServicesResult
     public void ResultString()
     {
         var service = ServiceResult.New();
-        Assert.Equal("hello world", service.ResultString().String);
+        Assert.Equal("hello world", service.ResultString().IntoString());
         service.Dispose();
     }
 
@@ -48,8 +48,9 @@ public class TestPatternServicesResult
     public void ResultSlice()
     {
         var service = ServiceResult.New();
-        var slice = SliceU32.From(new uint[] {0, 1, 2});
+        var slice = new uint[] {0, 1, 2}.Slice();
         Assert.Equal(2u, service.ResultSlice(slice, 2ul));
+        slice.Dispose();
         service.Dispose();
     }
 }

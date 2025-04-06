@@ -148,4 +148,12 @@ public class TestPatternVec
         // Assert.Equal(v[2], v2.s1[2]);
     }
 
+    [Fact]
+    public void vec_empty()
+    {
+        var empty = VecUtf8String.Empty();
+        Assert.Equal(0, empty.Count);
+        empty.Dispose();
+    }
+
 }

@@ -71,34 +71,32 @@ public class TestEnums
     [Fact]
     public void enum4()
     {
-        // var a = Utf8String.From("hello");
-        // var b = Utf8String.From("world");
-        // a.Dispose();
-        // b.Dispose();
-        var a = Utf8String.From("hello");
-        var b = Utf8String.From("world");
-        var v = VecUtf8String.From(new Utf8String[] { });
+        var a = "hello".Utf8();
+        var b = "world".Utf8();
+        var v = VecUtf8String.Empty();
 
         var l1 = new Layer1Utf8String()
         {
             maybe_1 = OptionUtf8String.None,
             maybe_2 = v,
-            maybe_3 = "hello world".Utf8()
+            maybe_3 = a.Clone()
         };
         var l2 = new Layer2Utf8String()
         {
             layer_1 = l1,
-            strings = VecUtf8String.From(new[]
+            strings = new[]
             {
-                "hello".Utf8(),
-                "world".Utf8()
-            }),
+                a.Clone(),
+                b.Clone()
+            }.IntoVec(),
             vec = new Vec3f32(),
             the_enum = EnumPayload.A
         };
         var l3 = Layer3.B(l2);
 
-        Assert.Equal("hello world", Interop.enums_4(l3).String);
+        Assert.Equal("hello", Interop.enums_4(l3).String);
+
+        l3.Dispose();
     }
 
 }

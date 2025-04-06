@@ -98,3 +98,9 @@ pub fn pattern_string_8(x: ffi::Slice<UseString>, i: u64) -> ffi::Result<UseStri
 pub fn pattern_string_9() -> ffi::Result<ffi::String, Error> {
     Result::Err(Error::Fail)
 }
+
+#[ffi_function]
+pub fn pattern_string_10(_: ffi::String) {}
+
+#[ffi_function]
+pub fn pattern_string_11(_: &ffi::String) {}

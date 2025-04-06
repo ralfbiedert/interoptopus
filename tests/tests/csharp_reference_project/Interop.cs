@@ -27,9 +27,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 17579909819157354056ul)
+            if (api_version != 5681111033621596136ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (17579909819157354056). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (5681111033621596136). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -67,6 +67,15 @@ namespace My.Company
 
         // Debug - write_function_overload 
         // Debug - no overload for interoptopus_string_destroy 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_clone")]
+        // Debug - write_function_declaration 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial long interoptopus_string_clone(ref Utf8String utf8, ref Utf8String rval);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for interoptopus_string_clone 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_18289942533122229086")]
@@ -815,6 +824,24 @@ namespace My.Company
 
         // Debug - write_function_overload 
         // Debug - no overload for pattern_string_9 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_10")]
+        // Debug - write_function_declaration 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void pattern_string_10(Utf8String ignored);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for pattern_string_10 
+
+        // Debug - write_function 
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_11")]
+        // Debug - write_function_declaration 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void pattern_string_11(ref Utf8String ignored);
+
+        // Debug - write_function_overload 
+        // Debug - no overload for pattern_string_11 
 
         // Debug - write_function 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1")]
@@ -2105,6 +2132,17 @@ namespace My.Company
             return _unmanaged;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+    // Debug - write_type_definition_enum_variant_fields_as_unmanaged 
+            if (_variant == 1) _unmanaged._B._B = _B.ToUnmanaged();
+            if (_variant == 2) _unmanaged._C._C = _C;
+            return _unmanaged;
+        }
+
         [CustomMarshaller(typeof(EnumPayload), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
@@ -2220,6 +2258,17 @@ namespace My.Company
             return _unmanaged;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+    // Debug - write_type_definition_enum_variant_fields_as_unmanaged 
+            if (_variant == 0) _unmanaged._A._A = _A.AsUnmanaged();
+            if (_variant == 1) _unmanaged._B._B = _B.AsUnmanaged();
+            return _unmanaged;
+        }
+
         [CustomMarshaller(typeof(Layer3), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
@@ -2274,7 +2323,22 @@ namespace My.Company
     {
         public Array() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            {
+                if (data == null) { throw new InvalidOperationException("Array 'data' must not be null"); }
+                if (data.Length != 16) { throw new InvalidOperationException("Array size mismatch for 'data'"); }
+                var src = new ReadOnlySpan<byte>(data, 0, 16);
+                var dst = new Span<byte>(_unmanaged.data, 16);
+                src.CopyTo(dst);
+            }
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             {
@@ -2292,6 +2356,7 @@ namespace My.Company
         {
             public fixed byte data[16];
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe Array ToManaged()
             {
                 var _managed = new Array();
@@ -2350,7 +2415,16 @@ namespace My.Company
     {
         public BoolField() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.val = (byte) (val ? 1 : 0);
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.val = (byte) (val ? 1 : 0);
@@ -2362,6 +2436,7 @@ namespace My.Company
         {
             public byte val;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe BoolField ToManaged()
             {
                 var _managed = new BoolField();
@@ -2421,7 +2496,23 @@ namespace My.Company
     {
         public CallbackTable() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.my_callback = my_callback?.ToUnmanaged() ?? default;
+            _unmanaged.my_callback_namespaced = my_callback_namespaced?.ToUnmanaged() ?? default;
+            _unmanaged.my_callback_void = my_callback_void?.ToUnmanaged() ?? default;
+            _unmanaged.my_callback_contextual = my_callback_contextual?.ToUnmanaged() ?? default;
+            _unmanaged.sum_delegate_1 = sum_delegate_1?.ToUnmanaged() ?? default;
+            _unmanaged.sum_delegate_2 = sum_delegate_2?.ToUnmanaged() ?? default;
+            _unmanaged.sum_delegate_return = sum_delegate_return?.ToUnmanaged() ?? default;
+            _unmanaged.sum_delegate_return_2 = sum_delegate_return_2?.ToUnmanaged() ?? default;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.my_callback = my_callback?.ToUnmanaged() ?? default;
@@ -2447,6 +2538,7 @@ namespace My.Company
             public SumDelegateReturn.Unmanaged sum_delegate_return;
             public SumDelegateReturn2.Unmanaged sum_delegate_return_2;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe CallbackTable ToManaged()
             {
                 var _managed = new CallbackTable();
@@ -2518,7 +2610,17 @@ namespace My.Company
     {
         public CharArray() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.str = str.ToUnmanaged();
+            _unmanaged.str_2 = str_2.ToUnmanaged();
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.str = str.ToUnmanaged();
@@ -2532,6 +2634,7 @@ namespace My.Company
             public FixedString.Unmanaged str;
             public FixedString.Unmanaged str_2;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe CharArray ToManaged()
             {
                 var _managed = new CharArray();
@@ -2585,7 +2688,16 @@ namespace My.Company
     {
         public Container() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.foreign = foreign.ToUnmanaged();
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.foreign = foreign.ToUnmanaged();
@@ -2597,6 +2709,7 @@ namespace My.Company
         {
             public Local.Unmanaged foreign;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe Container ToManaged()
             {
                 var _managed = new Container();
@@ -2649,7 +2762,16 @@ namespace My.Company
     {
         public ExtraTypef32() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -2661,6 +2783,7 @@ namespace My.Company
         {
             public float x;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe ExtraTypef32 ToManaged()
             {
                 var _managed = new ExtraTypef32();
@@ -2713,7 +2836,22 @@ namespace My.Company
     {
         public FixedString() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            {
+                if (data == null) { throw new InvalidOperationException("Array 'data' must not be null"); }
+                if (data.Length != 32) { throw new InvalidOperationException("Array size mismatch for 'data'"); }
+                var src = new ReadOnlySpan<byte>(data, 0, 32);
+                var dst = new Span<byte>(_unmanaged.data, 32);
+                src.CopyTo(dst);
+            }
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             {
@@ -2731,6 +2869,7 @@ namespace My.Company
         {
             public fixed byte data[32];
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe FixedString ToManaged()
             {
                 var _managed = new FixedString();
@@ -2789,7 +2928,16 @@ namespace My.Company
     {
         public Genericu32() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -2801,6 +2949,7 @@ namespace My.Company
         {
             public IntPtr x;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe Genericu32 ToManaged()
             {
                 var _managed = new Genericu32();
@@ -2853,7 +3002,16 @@ namespace My.Company
     {
         public Genericu8() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -2865,6 +3023,7 @@ namespace My.Company
         {
             public IntPtr x;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe Genericu8 ToManaged()
             {
                 var _managed = new Genericu8();
@@ -2917,7 +3076,16 @@ namespace My.Company
     {
         public Inner() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -2929,6 +3097,7 @@ namespace My.Company
         {
             public float x;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe Inner ToManaged()
             {
                 var _managed = new Inner();
@@ -2983,12 +3152,23 @@ namespace My.Company
     {
         public Layer1Utf8String() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.maybe_1 = maybe_1.IntoUnmanaged();
             _unmanaged.maybe_2 = maybe_2.IntoUnmanaged();
             _unmanaged.maybe_3 = maybe_3.IntoUnmanaged();
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.maybe_1 = maybe_1.AsUnmanaged();
+            _unmanaged.maybe_2 = maybe_2.AsUnmanaged();
+            _unmanaged.maybe_3 = maybe_3.AsUnmanaged();
             return _unmanaged;
         }
 
@@ -2999,6 +3179,7 @@ namespace My.Company
             public VecUtf8String.Unmanaged maybe_2;
             public Utf8String.Unmanaged maybe_3;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe Layer1Utf8String IntoManaged()
             {
                 var _managed = new Layer1Utf8String();
@@ -3062,6 +3243,7 @@ namespace My.Company
     {
         public Layer2Utf8String() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
@@ -3069,6 +3251,17 @@ namespace My.Company
             _unmanaged.vec = vec.ToUnmanaged();
             _unmanaged.the_enum = the_enum.ToUnmanaged();
             _unmanaged.strings = strings.IntoUnmanaged();
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.layer_1 = layer_1.AsUnmanaged();
+            _unmanaged.vec = vec.ToUnmanaged();
+            _unmanaged.the_enum = the_enum.ToUnmanaged();
+            _unmanaged.strings = strings.AsUnmanaged();
             return _unmanaged;
         }
 
@@ -3080,6 +3273,7 @@ namespace My.Company
             public EnumPayload.Unmanaged the_enum;
             public VecUtf8String.Unmanaged strings;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe Layer2Utf8String IntoManaged()
             {
                 var _managed = new Layer2Utf8String();
@@ -3140,7 +3334,16 @@ namespace My.Company
     {
         public Local() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -3152,6 +3355,7 @@ namespace My.Company
         {
             public uint x;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe Local ToManaged()
             {
                 var _managed = new Local();
@@ -3210,7 +3414,34 @@ namespace My.Company
     {
         public NestedArray() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.field_enum = field_enum.ToUnmanaged();
+            _unmanaged.field_vec = field_vec.ToUnmanaged();
+            _unmanaged.field_bool = (byte) (field_bool ? 1 : 0);
+            _unmanaged.field_int = field_int;
+            {
+                if (field_array == null) { throw new InvalidOperationException("Array 'field_array' must not be null"); }
+                if (field_array.Length != 5) { throw new InvalidOperationException("Array size mismatch for 'field_array'"); }
+                var src = new ReadOnlySpan<ushort>(field_array, 0, 5);
+                var dst = new Span<ushort>(_unmanaged.field_array, 5);
+                src.CopyTo(dst);
+            }
+            {
+                if (field_array_2 == null) { throw new InvalidOperationException("Array 'field_array_2' must not be null"); }
+                if (field_array_2.Length != 5) { throw new InvalidOperationException("Array size mismatch for 'field_array_2'"); }
+                var src = new ReadOnlySpan<ushort>(field_array_2, 0, 5);
+                var dst = new Span<ushort>(_unmanaged.field_array_2, 5);
+                src.CopyTo(dst);
+            }
+            _unmanaged.field_struct = field_struct.ToUnmanaged();
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.field_enum = field_enum.ToUnmanaged();
@@ -3246,6 +3477,7 @@ namespace My.Company
             public fixed ushort field_array_2[5];
             public Array.Unmanaged field_struct;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe NestedArray ToManaged()
             {
                 var _managed = new NestedArray();
@@ -3317,7 +3549,17 @@ namespace My.Company
     {
         public Packed1() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            _unmanaged.y = y;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -3331,6 +3573,7 @@ namespace My.Company
             public byte x;
             public ushort y;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe Packed1 ToManaged()
             {
                 var _managed = new Packed1();
@@ -3385,7 +3628,17 @@ namespace My.Company
     {
         public Packed2() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.y = y;
+            _unmanaged.x = x;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.y = y;
@@ -3399,6 +3652,7 @@ namespace My.Company
             public ushort y;
             public byte x;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe Packed2 ToManaged()
             {
                 var _managed = new Packed2();
@@ -3452,7 +3706,16 @@ namespace My.Company
     {
         public Phantomu8() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -3464,6 +3727,7 @@ namespace My.Company
         {
             public uint x;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe Phantomu8 ToManaged()
             {
                 var _managed = new Phantomu8();
@@ -3518,7 +3782,16 @@ namespace My.Company
     {
         public StructDocumented() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -3530,6 +3803,7 @@ namespace My.Company
         {
             public float x;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe StructDocumented ToManaged()
             {
                 var _managed = new StructDocumented();
@@ -3582,7 +3856,16 @@ namespace My.Company
     {
         public StructRenamed() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.e = e.ToUnmanaged();
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.e = e.ToUnmanaged();
@@ -3594,6 +3877,7 @@ namespace My.Company
         {
             public EnumRenamed.Unmanaged e;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe StructRenamed ToManaged()
             {
                 var _managed = new StructRenamed();
@@ -3646,7 +3930,16 @@ namespace My.Company
     {
         public Tupled() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x0 = x0;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x0 = x0;
@@ -3658,6 +3951,7 @@ namespace My.Company
         {
             public byte x0;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe Tupled ToManaged()
             {
                 var _managed = new Tupled();
@@ -3710,7 +4004,16 @@ namespace My.Company
     {
         public UseCStrPtr() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.ascii_string = IntPtr.Zero;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.ascii_string = IntPtr.Zero;
@@ -3722,6 +4025,7 @@ namespace My.Company
         {
             public IntPtr ascii_string;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe UseCStrPtr ToManaged()
             {
                 var _managed = new UseCStrPtr();
@@ -3775,11 +4079,21 @@ namespace My.Company
     {
         public UseSliceAndVec() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.s1 = s1.ToUnmanaged();
             _unmanaged.s2 = s2.IntoUnmanaged();
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.s1 = s1.ToUnmanaged();
+            _unmanaged.s2 = s2.AsUnmanaged();
             return _unmanaged;
         }
 
@@ -3789,6 +4103,7 @@ namespace My.Company
             public SliceUtf8String.Unmanaged s1;
             public VecUtf8String.Unmanaged s2;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe UseSliceAndVec IntoManaged()
             {
                 var _managed = new UseSliceAndVec();
@@ -3848,11 +4163,21 @@ namespace My.Company
     {
         public UseString() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.s1 = s1.IntoUnmanaged();
             _unmanaged.s2 = s2.IntoUnmanaged();
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.s1 = s1.AsUnmanaged();
+            _unmanaged.s2 = s2.AsUnmanaged();
             return _unmanaged;
         }
 
@@ -3862,6 +4187,7 @@ namespace My.Company
             public Utf8String.Unmanaged s1;
             public Utf8String.Unmanaged s2;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe UseString IntoManaged()
             {
                 var _managed = new UseString();
@@ -3921,7 +4247,17 @@ namespace My.Company
     {
         public Vec1() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            _unmanaged.y = y;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -3935,6 +4271,7 @@ namespace My.Company
             public float x;
             public float y;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe Vec1 ToManaged()
             {
                 var _managed = new Vec1();
@@ -3989,7 +4326,17 @@ namespace My.Company
     {
         public Vec2() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            _unmanaged.z = z;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -4003,6 +4350,7 @@ namespace My.Company
             public double x;
             public double z;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe Vec2 ToManaged()
             {
                 var _managed = new Vec2();
@@ -4058,7 +4406,18 @@ namespace My.Company
     {
         public Vec3f32() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            _unmanaged.y = y;
+            _unmanaged.z = z;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -4074,6 +4433,7 @@ namespace My.Company
             public float y;
             public float z;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe Vec3f32 ToManaged()
             {
                 var _managed = new Vec3f32();
@@ -4129,7 +4489,17 @@ namespace My.Company
     {
         public Visibility1() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.pblc = pblc;
+            _unmanaged.prvt = prvt;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.pblc = pblc;
@@ -4143,6 +4513,7 @@ namespace My.Company
             public byte pblc;
             public byte prvt;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe Visibility1 ToManaged()
             {
                 var _managed = new Visibility1();
@@ -4197,7 +4568,17 @@ namespace My.Company
     {
         public Visibility2() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.pblc1 = pblc1;
+            _unmanaged.pblc2 = pblc2;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.pblc1 = pblc1;
@@ -4211,6 +4592,7 @@ namespace My.Company
             public byte pblc1;
             public byte pblc2;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe Visibility2 ToManaged()
             {
                 var _managed = new Visibility2();
@@ -4264,7 +4646,16 @@ namespace My.Company
     {
         public Weird1u32() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -4276,6 +4667,7 @@ namespace My.Company
         {
             public uint x;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe Weird1u32 ToManaged()
             {
                 var _managed = new Weird1u32();
@@ -4330,7 +4722,24 @@ namespace My.Company
     {
         public Weird2u8() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.t = t;
+            {
+                if (a == null) { throw new InvalidOperationException("Array 'a' must not be null"); }
+                if (a.Length != 5) { throw new InvalidOperationException("Array size mismatch for 'a'"); }
+                var src = new ReadOnlySpan<byte>(a, 0, 5);
+                var dst = new Span<byte>(_unmanaged.a, 5);
+                src.CopyTo(dst);
+            }
+            _unmanaged.r = r;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.t = t;
@@ -4352,6 +4761,7 @@ namespace My.Company
             public fixed byte a[5];
             public IntPtr r;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe Weird2u8 ToManaged()
             {
                 var _managed = new Weird2u8();
@@ -4473,6 +4883,7 @@ namespace My.Company
         public void Dispose()
         {
             if (_handle is { IsAllocated: true }) { _handle.Free(); }
+            _data = IntPtr.Zero;
         }
 
         internal Unmanaged ToUnmanaged()
@@ -4529,6 +4940,12 @@ namespace My.Company
 
     }
 
+        public static class SliceUseCStrPtrExtensions
+        {
+            public static SliceUseCStrPtr Slice(this UseCStrPtr[] s) { return SliceUseCStrPtr.From(s); }
+        }
+
+
     // Debug - write_pattern_marshalling_slice 
     public partial class SliceUseString
     {
@@ -4565,7 +4982,7 @@ namespace My.Company
             rval._len = (ulong) managed.Length;
             for (var i = 0; i < managed.Length; ++i)
             {
-                var unmanaged = managed[i].IntoUnmanaged();
+                var unmanaged = managed[i].AsUnmanaged();
                 var dst = IntPtr.Add(rval._data, i * size);
                 Marshal.StructureToPtr(unmanaged, dst, false);
             }
@@ -4638,6 +5055,12 @@ namespace My.Company
 
     }
 
+        public static class SliceUseStringExtensions
+        {
+            public static SliceUseString Slice(this UseString[] s) { return SliceUseString.From(s); }
+        }
+
+
     // Debug - write_pattern_fast_slice 
     public partial class SliceVec3f32
     {
@@ -4702,6 +5125,7 @@ namespace My.Company
         public void Dispose()
         {
             if (_handle is { IsAllocated: true }) { _handle.Free(); }
+            _data = IntPtr.Zero;
         }
 
         internal Unmanaged ToUnmanaged()
@@ -4757,6 +5181,12 @@ namespace My.Company
         }
 
     }
+
+        public static class SliceVec3f32Extensions
+        {
+            public static SliceVec3f32 Slice(this Vec3f32[] s) { return SliceVec3f32.From(s); }
+        }
+
 
     // Debug - write_pattern_fast_slice 
     public partial class SliceMutCharArray
@@ -4828,6 +5258,7 @@ namespace My.Company
         public void Dispose()
         {
             if (_handle is { IsAllocated: true }) { _handle.Free(); }
+            _data = IntPtr.Zero;
         }
 
         internal Unmanaged ToUnmanaged()
@@ -4884,6 +5315,12 @@ namespace My.Company
 
     }
 
+        public static class SliceMutCharArrayExtensions
+        {
+            public static SliceMutCharArray SliceMut(this CharArray[] s) { return SliceMutCharArray.From(s); }
+        }
+
+
     // Debug - write_type_definition_enum 
     ///Option that contains Some(value) or None.
     // Debug - write_type_definition_enum_marshaller 
@@ -4934,6 +5371,16 @@ namespace My.Company
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+            if (_variant == 0) _unmanaged._Some._Some = _Some.ToUnmanaged();
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+    // Debug - write_type_definition_enum_variant_fields_as_unmanaged 
             if (_variant == 0) _unmanaged._Some._Some = _Some.ToUnmanaged();
             return _unmanaged;
         }
@@ -5030,6 +5477,16 @@ namespace My.Company
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+            if (_variant == 0) _unmanaged._Some._Some = _Some.ToUnmanaged();
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+    // Debug - write_type_definition_enum_variant_fields_as_unmanaged 
             if (_variant == 0) _unmanaged._Some._Some = _Some.ToUnmanaged();
             return _unmanaged;
         }
@@ -5139,6 +5596,17 @@ namespace My.Company
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+            if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+    // Debug - write_type_definition_enum_variant_fields_as_unmanaged 
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -5260,6 +5728,17 @@ namespace My.Company
             return _unmanaged;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+    // Debug - write_type_definition_enum_variant_fields_as_unmanaged 
+            if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
+        }
+
         [CustomMarshaller(typeof(ResultConstPtrServiceBasicError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
@@ -5371,6 +5850,17 @@ namespace My.Company
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+            if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+    // Debug - write_type_definition_enum_variant_fields_as_unmanaged 
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -5492,6 +5982,17 @@ namespace My.Company
             return _unmanaged;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+    // Debug - write_type_definition_enum_variant_fields_as_unmanaged 
+            if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
+        }
+
         [CustomMarshaller(typeof(ResultConstPtrServiceDependentError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
@@ -5603,6 +6104,17 @@ namespace My.Company
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+            if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+    // Debug - write_type_definition_enum_variant_fields_as_unmanaged 
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -5724,6 +6236,17 @@ namespace My.Company
             return _unmanaged;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+    // Debug - write_type_definition_enum_variant_fields_as_unmanaged 
+            if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
+        }
+
         [CustomMarshaller(typeof(ResultConstPtrServiceMainError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
@@ -5835,6 +6358,17 @@ namespace My.Company
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+            if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+    // Debug - write_type_definition_enum_variant_fields_as_unmanaged 
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -5956,6 +6490,17 @@ namespace My.Company
             return _unmanaged;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+    // Debug - write_type_definition_enum_variant_fields_as_unmanaged 
+            if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
+        }
+
         [CustomMarshaller(typeof(ResultConstPtrServiceOnPanicError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
@@ -6067,6 +6612,17 @@ namespace My.Company
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+            if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+    // Debug - write_type_definition_enum_variant_fields_as_unmanaged 
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -6188,6 +6744,17 @@ namespace My.Company
             return _unmanaged;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+    // Debug - write_type_definition_enum_variant_fields_as_unmanaged 
+            if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
+        }
+
         [CustomMarshaller(typeof(ResultConstPtrServiceStringsError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
@@ -6299,6 +6866,17 @@ namespace My.Company
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+            if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+    // Debug - write_type_definition_enum_variant_fields_as_unmanaged 
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -6420,6 +6998,17 @@ namespace My.Company
             return _unmanaged;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+    // Debug - write_type_definition_enum_variant_fields_as_unmanaged 
+            if (_variant == 0) _unmanaged._Ok._Ok = _Ok.ToUnmanaged();
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
+        }
+
         [CustomMarshaller(typeof(ResultNestedArrayError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
@@ -6531,6 +7120,17 @@ namespace My.Company
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
+            if (_variant == 0) _unmanaged._Ok._Ok = _Ok.ToUnmanaged();
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+    // Debug - write_type_definition_enum_variant_fields_as_unmanaged 
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok.ToUnmanaged();
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -6652,6 +7252,17 @@ namespace My.Company
             _unmanaged._variant = _variant;
     // Debug - write_type_definition_enum_variant_fields_to_unmanaged 
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok.IntoUnmanaged();
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+    // Debug - write_type_definition_enum_variant_fields_as_unmanaged 
+            if (_variant == 0) _unmanaged._Ok._Ok = _Ok.AsUnmanaged();
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
         }
@@ -8644,6 +9255,17 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Unmanaged AsUnmanaged()
+        {
+            if (_ptr == IntPtr.Zero) throw new InteropException(); // Don't use for serialization if moved already.
+            var rval = new Unmanaged();
+            rval._len = _len;
+            rval._capacity = _capacity;
+            rval._ptr = _ptr;
+            return rval;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Dispose()
         {
             if (_ptr == IntPtr.Zero) return;
@@ -8716,6 +9338,12 @@ namespace My.Company
         }
 
     }
+
+        public static class VecVec3f32Extensions
+        {
+            public static VecVec3f32 Vec(this Vec3f32[] s) { return VecVec3f32.From(s); }
+        }
+
 
 
     // Debug - write_pattern_service 

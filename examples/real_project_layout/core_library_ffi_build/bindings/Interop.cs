@@ -63,8 +63,9 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct Error
+    public partial struct Error 
     {
+
 
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
@@ -73,7 +74,7 @@ namespace My.Company
             internal uint _variant;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Error ToManaged()
+            internal Error ToManaged()
             {
                 var _managed = new Error();
                 _managed._variant = _variant;
@@ -82,10 +83,10 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
             return _unmanaged;
         }
 
@@ -134,11 +135,11 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct Vec2
+    public partial struct Vec2 
     {
         public Vec2() { }
 
-        public Unmanaged ToUnmanaged()
+        internal unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -152,7 +153,7 @@ namespace My.Company
             public float x;
             public float y;
 
-            public Vec2 ToManaged()
+            internal unsafe Vec2 ToManaged()
             {
                 var _managed = new Vec2();
                 _managed.x = x;
@@ -160,6 +161,7 @@ namespace My.Company
                 return _managed;
             }
         }
+
 
         [CustomMarshaller(typeof(Vec2), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
@@ -201,7 +203,7 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultConstPtrGameEngineError
+    public partial struct ResultConstPtrGameEngineError 
     {
         [StructLayout(LayoutKind.Sequential)]
         internal unsafe struct UnmanagedOk
@@ -219,6 +221,7 @@ namespace My.Company
 
 
 
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -232,7 +235,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultConstPtrGameEngineError ToManaged()
+            internal ResultConstPtrGameEngineError ToManaged()
             {
                 var _managed = new ResultConstPtrGameEngineError();
                 _managed._variant = _variant;
@@ -243,10 +246,10 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
             if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
@@ -307,7 +310,7 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultError
+    public partial struct ResultError 
     {
 
         [StructLayout(LayoutKind.Sequential)]
@@ -316,6 +319,7 @@ namespace My.Company
             internal uint _variant;
             internal Error.Unmanaged _Err;
         }
+
 
 
 
@@ -329,7 +333,7 @@ namespace My.Company
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultError ToManaged()
+            internal ResultError ToManaged()
             {
                 var _managed = new ResultError();
                 _managed._variant = _variant;
@@ -339,10 +343,10 @@ namespace My.Company
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
+            _unmanaged._variant = _variant;
             if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
             return _unmanaged;
         }
@@ -520,153 +524,6 @@ namespace My.Company
             public void Free() { }
         }
     }
-    public partial class Utf8String
-    {
-        IntPtr _ptr;
-        ulong _len;
-        ulong _capacity;
-    }
-
-    [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class Utf8String: IDisposable
-    {
-        private Utf8String() { }
-
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static unsafe Utf8String From(string s)
-        {
-            var rval = new Utf8String();
-            var source = s.AsSpan();
-            Span<byte> utf8Bytes = stackalloc byte[Encoding.UTF8.GetByteCount(source)];
-            var len = Encoding.UTF8.GetBytes(source, utf8Bytes);
-
-            fixed (byte* p = utf8Bytes)
-            {
-                InteropHelper.interoptopus_string_create((IntPtr) p, (ulong)len, out var native);
-                rval._ptr = native._ptr;
-                rval._len = native._len;
-                rval._capacity = native._capacity;
-            }
-
-            return rval;
-        }
-
-        public unsafe string String
-        {
-            get
-            {
-                var span = new ReadOnlySpan<byte>((byte*) _ptr, (int)_len);
-                var s = Encoding.UTF8.GetString(span);
-                return s;
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public void Dispose()
-        {
-            var _unmanaged = new Unmanaged();
-            _unmanaged._ptr = _ptr;
-            _unmanaged._len = _len;
-            _unmanaged._capacity = _capacity;
-            InteropHelper.interoptopus_string_destroy(_unmanaged);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged IntoUnmanaged()
-        {
-            var _unmanaged = new Unmanaged();
-            _unmanaged._ptr = _ptr;
-            _unmanaged._len = _len;
-            _unmanaged._capacity = _capacity;
-            _ptr = IntPtr.Zero;
-            return _unmanaged;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged AsUnmanaged()
-        {
-            var _unmanaged = new Unmanaged();
-            _unmanaged._ptr = _ptr;
-            _unmanaged._len = _len;
-            _unmanaged._capacity = _capacity;
-            return _unmanaged;
-        }
-
-        /// A highly dangerous 'use once type' that has ownership semantics!
-        /// Once passed over an FFI boundary 'the other side' is meant to own
-        /// (and free) it. Rust handles that fine, but if in C# you put this
-        /// in a struct and then call Rust multiple times with that struct
-        /// you'll free the same pointer multiple times, and get UB!
-        [StructLayout(LayoutKind.Sequential)]
-        public unsafe struct Unmanaged
-        {
-            public IntPtr _ptr;
-            public ulong _len;
-            public ulong _capacity;
-
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Utf8String IntoManaged()
-            {
-            var _managed = new Utf8String();
-            _managed._ptr = _ptr;
-            _managed._len = _len;
-            _managed._capacity = _capacity;
-            return _managed;
-            }
-
-        }
-
-        public partial class InteropHelper
-        {
-            [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_create")]
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public static partial long interoptopus_string_create(IntPtr utf8, ulong len, out Unmanaged rval);
-
-            [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_destroy")]
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public static partial long interoptopus_string_destroy(Unmanaged utf8);
-        }
-
-        [CustomMarshaller(typeof(Utf8String), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
-        public ref struct Marshaller
-        {
-            private Utf8String _managed; // Used when converting managed -> unmanaged
-            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
-
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Marshaller(Utf8String managed) { _managed = managed; }
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void FromManaged(Utf8String managed) { _managed = managed; }
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Unmanaged ToUnmanaged()
-            {
-                return _managed.IntoUnmanaged();
-            }
-
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public unsafe Utf8String ToManaged()
-            {
-                return _unmanaged.IntoManaged();
-            }
-
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
-        }
-    }
-
-        public static class StringExtensions
-        {
-            public static Utf8String Utf8(this string s) { return Utf8String.From(s); }
-        }
-
         public delegate void AsyncCallbackCommon(IntPtr data, IntPtr callback_data);
 
         [StructLayout(LayoutKind.Sequential)]
@@ -675,4 +532,161 @@ namespace My.Company
             internal IntPtr _ptr;
             internal IntPtr _ts;
         }
+        public partial class Utf8String
+        {
+            IntPtr _ptr;
+            ulong _len;
+            ulong _capacity;
+        }
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Utf8String: IDisposable
+        {
+            private Utf8String() { }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public static unsafe Utf8String From(string s)
+            {
+                var rval = new Utf8String();
+                var source = s.AsSpan();
+                Span<byte> utf8Bytes = stackalloc byte[Encoding.UTF8.GetByteCount(source)];
+                var len = Encoding.UTF8.GetBytes(source, utf8Bytes);
+
+                fixed (byte* p = utf8Bytes)
+                {
+                    InteropHelper.interoptopus_string_create((IntPtr) p, (ulong)len, out var native);
+                    rval._ptr = native._ptr;
+                    rval._len = native._len;
+                    rval._capacity = native._capacity;
+                }
+
+                return rval;
+            }
+
+            public unsafe string String
+            {
+                get
+                {
+                    var span = new ReadOnlySpan<byte>((byte*) _ptr, (int)_len);
+                    var s = Encoding.UTF8.GetString(span);
+                    return s;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void Dispose()
+            {
+                if (_ptr == IntPtr.Zero) return;
+                var _unmanaged = new Unmanaged();
+                _unmanaged._ptr = _ptr;
+                _unmanaged._len = _len;
+                _unmanaged._capacity = _capacity;
+                InteropHelper.interoptopus_string_destroy(_unmanaged);
+                _ptr = IntPtr.Zero;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Utf8String Clone()
+            {
+                var _new = new Unmanaged();
+                var _this = AsUnmanaged();
+                InteropHelper.interoptopus_string_clone(ref _this, ref _new);
+                return _new.IntoManaged();
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Unmanaged IntoUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged._ptr = _ptr;
+                _unmanaged._len = _len;
+                _unmanaged._capacity = _capacity;
+                _ptr = IntPtr.Zero;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged._ptr = _ptr;
+                _unmanaged._len = _len;
+                _unmanaged._capacity = _capacity;
+                return _unmanaged;
+            }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                public IntPtr _ptr;
+                public ulong _len;
+                public ulong _capacity;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Utf8String IntoManaged()
+                {
+                    var _managed = new Utf8String();
+                    _managed._ptr = _ptr;
+                    _managed._len = _len;
+                    _managed._capacity = _capacity;
+                    return _managed;
+                }
+
+            }
+
+            public partial class InteropHelper
+            {
+                [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_create")]
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public static partial long interoptopus_string_create(IntPtr utf8, ulong len, out Unmanaged rval);
+
+                [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_destroy")]
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public static partial long interoptopus_string_destroy(Unmanaged utf8);
+
+                [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_clone")]
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public static partial long interoptopus_string_clone(ref Unmanaged orig, ref Unmanaged cloned);
+            }
+
+            [CustomMarshaller(typeof(Utf8String), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+
+            public ref struct Marshaller
+            {
+                private Utf8String _managed; // Used when converting managed -> unmanaged
+                private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Utf8String managed) { _managed = managed; }
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Utf8String managed) { _managed = managed; }
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public unsafe Unmanaged ToUnmanaged()
+                {
+                    return _managed.IntoUnmanaged();
+                }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public unsafe Utf8String ToManaged()
+                {
+                    return _unmanaged.IntoManaged();
+                }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() { }
+            }
+        }
+
+        public static class StringExtensions
+        {
+            public static Utf8String Utf8(this string s) { return Utf8String.From(s); }
+        }
+
 }

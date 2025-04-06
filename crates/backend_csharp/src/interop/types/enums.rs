@@ -1,5 +1,5 @@
 use crate::Interop;
-use crate::converter::{field_to_managed, field_to_type, field_to_type_unmanaged, field_to_unmanaged, has_dispose, is_reusable};
+use crate::converter::{field_as_unmanaged, field_to_managed, field_to_type, field_to_type_unmanaged, field_to_unmanaged, has_dispose, is_reusable};
 use crate::interop::docs::write_documentation;
 use crate::utils::{MoveSemantics, write_common_marshaller};
 use interoptopus::backend::IndentWriter;
@@ -78,6 +78,16 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
     indented!(w, [()()], r"var _unmanaged = new Unmanaged();")?;
     indented!(w, [()()], r"_unmanaged._variant = _variant;")?;
     write_type_definition_enum_variant_fields_to_unmanaged(i, w, the_type)?;
+    indented!(w, [()()], r"return _unmanaged;")?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+
+    i.inline_hint(w, 1)?;
+    indented!(w, [()], r"internal Unmanaged AsUnmanaged()")?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"var _unmanaged = new Unmanaged();")?;
+    indented!(w, [()()], r"_unmanaged._variant = _variant;")?;
+    write_type_definition_enum_variant_fields_as_unmanaged(i, w, the_type)?;
     indented!(w, [()()], r"return _unmanaged;")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
@@ -235,6 +245,26 @@ pub fn write_type_definition_enum_variant_fields_to_unmanaged(i: &Interop, w: &m
             VariantKind::Typed(x, t) if !t.is_void() => {
                 let vname = variant.name();
                 let convert = field_to_unmanaged(&Field::new(vname.to_string(), t.to_type()));
+                indented!(w, [()()], r"if (_variant == {x}) _unmanaged._{vname}._{vname} = _{convert};")?;
+            }
+            _ => panic!("This should never happen"),
+        }
+    }
+
+    Ok(())
+}
+
+#[allow(clippy::match_wildcard_for_single_variants)]
+pub fn write_type_definition_enum_variant_fields_as_unmanaged(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
+    i.debug(w, "write_type_definition_enum_variant_fields_as_unmanaged")?;
+
+    for variant in the_type.variants() {
+        match variant.kind() {
+            VariantKind::Unit(_) => (),
+            VariantKind::Typed(_, t) if t.is_void() => (),
+            VariantKind::Typed(x, t) if !t.is_void() => {
+                let vname = variant.name();
+                let convert = field_as_unmanaged(&Field::new(vname.to_string(), t.to_type()));
                 indented!(w, [()()], r"if (_variant == {x}) _unmanaged._{vname}._{vname} = _{convert};")?;
             }
             _ => panic!("This should never happen"),

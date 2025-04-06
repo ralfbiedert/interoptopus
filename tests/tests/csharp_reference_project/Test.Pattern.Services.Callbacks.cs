@@ -28,7 +28,7 @@ public class TestPatternServicesCallbacks
     {
         var callbacks = ServiceCallbacks.New();
         var called = false;
-        var slice = SliceI32.From(new[] { 1, 2, 3 });
+        var slice = new[] { 1, 2, 3 }.Slice();
 
         callbacks.CallbackWithSlice((x, y) =>
         {
@@ -39,6 +39,7 @@ public class TestPatternServicesCallbacks
         }, slice);
 
         Assert.True(called);
+        slice.Dispose();
         callbacks.Dispose();
     }
 

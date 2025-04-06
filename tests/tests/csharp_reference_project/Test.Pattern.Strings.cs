@@ -98,6 +98,21 @@ public class TestPatternStrings
         Assert.Equal(rval.AsErr(), Error.Fail);
     }
 
+    [Fact]
+    public void pattern_string_10()
+    {
+        var s = "hello world".Utf8();
+        Interop.pattern_string_10(s);
+    }
+
+    [Fact]
+    public void pattern_string_11()
+    {
+        var s = "hello world".Utf8();
+        Interop.pattern_string_11(ref s);
+        s.Dispose();
+    }
+
 
     [Fact]
     public void string_by_ref_dont_leak()
@@ -120,4 +135,29 @@ public class TestPatternStrings
             var r2 = Interop.pattern_string_6b(ref w);
         }
     }
+
+    [Fact]
+    public void string_clones()
+    {
+        var s1 = "hello".Utf8();
+
+        for (var i = 0; i < 1000; i++)
+        {
+            var s2 = s1.Clone();
+            Assert.Equal(s1.String, s2.String);
+            s2.Dispose();
+        }
+
+        s1.Dispose();
+    }
+
+    [Fact]
+    public void string_multiple_dispose()
+    {
+        var s1 = "hello".Utf8();
+        s1.Dispose();
+        s1.Dispose();
+        s1.Dispose();
+    }
+
 }

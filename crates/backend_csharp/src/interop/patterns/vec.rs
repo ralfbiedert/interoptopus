@@ -20,7 +20,7 @@ pub fn write_pattern_fast_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) 
     i.debug(w, "write_pattern_fast_vec")?;
 
     let name = vec.rust_name();
-    let inner = param_to_type(vec.t());
+    let the_type = param_to_type(vec.t());
 
     write_pattern_vec_struct(i, w, vec)?;
 
@@ -36,7 +36,7 @@ pub fn write_pattern_fast_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) 
     w.newline()?;
 
     i.inline_hint(w, 0)?;
-    indented!(w, r"public static unsafe {name} From(Span<{inner}> _data)")?;
+    indented!(w, r"public static unsafe {name} From(Span<{the_type}> _data)")?;
     indented!(w, r"{{")?;
     indented!(w, [()], r"var rval = new {name}();")?;
     indented!(w, [()], r"fixed (void* _data_ptr = _data)")?;
@@ -56,7 +56,7 @@ pub fn write_pattern_fast_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) 
     indented!(w, [()], r"get {{ if (_ptr == IntPtr.Zero) {{ throw new InteropException(); }} else {{ return (int) _len; }} }}")?;
     indented!(w, r"}}")?;
     w.newline()?;
-    indented!(w, r"public unsafe {} this[int i]", inner)?;
+    indented!(w, r"public unsafe {} this[int i]", the_type)?;
     indented!(w, r"{{")?;
     w.indent();
     i.inline_hint(w, 0)?;
@@ -64,7 +64,7 @@ pub fn write_pattern_fast_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) 
     indented!(w, r"{{")?;
     indented!(w, [()], r"if (i >= Count) throw new IndexOutOfRangeException();")?;
     indented!(w, [()], r"if (_ptr == IntPtr.Zero) throw new InteropException();")?;
-    indented!(w, [()], r"return Marshal.PtrToStructure<{}>(new IntPtr(_ptr.ToInt64() + i * sizeof({})));", inner, inner)?;
+    indented!(w, [()], r"return Marshal.PtrToStructure<{}>(new IntPtr(_ptr.ToInt64() + i * sizeof({})));", the_type, the_type)?;
     indented!(w, r"}}")?;
     w.unindent();
     indented!(w, r"}}")?;
@@ -92,6 +92,12 @@ pub fn write_pattern_fast_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) 
     w.unindent();
     write_common_marshaller(i, w, name, MoveSemantics::Move)?;
     indented!(w, r"}}")?;
+    w.newline()?;
+    indented!(w, [()], r"public static class {name}Extensions")?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"public static {name} Vec(this {the_type}[] s) {{ return {name}.From(s); }}")?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
     Ok(())
 }
 
@@ -117,7 +123,6 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     i.inline_hint(w, 0)?;
     indented!(w, r"public static unsafe {name} From(Span<{the_type}> _data)")?;
     indented!(w, r"{{")?;
-    indented!(w, [()], r"var rval = new {name}();")?;
     indented!(w, [()], r"var _temp = new {the_type}.Unmanaged[_data.Length];")?;
     indented!(w, [()], r"for (var i = 0; i < _data.Length; ++i)")?;
     indented!(w, [()], r"{{")?;
@@ -126,11 +131,16 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     indented!(w, [()], r"fixed (void* _data_ptr = _temp)")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"InteropHelper.interoptopus_vec_create((IntPtr) _data_ptr, (ulong)_data.Length, out var _out);")?;
-    indented!(w, [()()], r"rval._len = _out._len;")?;
-    indented!(w, [()()], r"rval._capacity = _out._capacity;")?;
-    indented!(w, [()()], r"rval._ptr = _out._ptr;")?;
+    indented!(w, [()()], r"return _out.IntoManaged();")?;
     indented!(w, [()], r"}}")?;
-    indented!(w, [()], r"return rval;")?;
+    indented!(w, r"}}")?;
+    w.newline()?;
+
+    i.inline_hint(w, 0)?;
+    indented!(w, r"public static unsafe {name} Empty()")?;
+    indented!(w, r"{{")?;
+    indented!(w, [()], r"InteropHelper.interoptopus_vec_create(IntPtr.Zero, 0, out var _out);")?;
+    indented!(w, [()], r"return _out.IntoManaged();")?;
     indented!(w, r"}}")?;
     w.newline()?;
 
@@ -176,6 +186,13 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     write_common_marshaller(i, w, name, MoveSemantics::Move)?;
     w.newline()?;
     indented!(w, r"}}")?;
+    w.newline()?;
+    indented!(w, [()], r"public static class {name}Extensions")?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"public static {name} IntoVec(this {the_type}[] s) {{ return {name}.From(s); }}")?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+
     Ok(())
 }
 
@@ -266,5 +283,17 @@ pub fn write_pattern_vec_to_unmanaged(i: &Interop, w: &mut IndentWriter) -> Resu
     indented!(w, [()], r"_ptr = IntPtr.Zero; // Mark this instance as moved.")?;
     indented!(w, [()], r"return rval;")?;
     indented!(w, r"}}")?;
+    w.newline()?;
+    i.inline_hint(w, 0)?;
+    indented!(w, r"public Unmanaged AsUnmanaged()")?;
+    indented!(w, r"{{")?;
+    indented!(w, [()], r"if (_ptr == IntPtr.Zero) throw new InteropException(); // Don't use for serialization if moved already.")?;
+    indented!(w, [()], r"var rval = new Unmanaged();")?;
+    indented!(w, [()], r"rval._len = _len;")?;
+    indented!(w, [()], r"rval._capacity = _capacity;")?;
+    indented!(w, [()], r"rval._ptr = _ptr;")?;
+    indented!(w, [()], r"return rval;")?;
+    indented!(w, r"}}")?;
+
     Ok(())
 }

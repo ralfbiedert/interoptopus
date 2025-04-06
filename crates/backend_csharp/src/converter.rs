@@ -203,6 +203,20 @@ pub fn field_to_unmanaged(x: &Field) -> String {
     }
 }
 
+pub fn field_as_unmanaged(x: &Field) -> String {
+    let name = x.name();
+    match x.the_type() {
+        Type::Primitive(Primitive::Bool) => format!("(byte) ({name} ? 1 : 0)"),
+        Type::Primitive(_) => x.name().to_string(),
+        Type::ReadPointer(_) => x.name().to_string(),
+        Type::ReadWritePointer(_) => x.name().to_string(),
+        Type::Pattern(TypePattern::CStrPointer) => "IntPtr.Zero".to_string(),
+        Type::Pattern(TypePattern::NamedCallback(_)) => format!("{name}?.ToUnmanaged() ?? default"),
+        _ if is_reusable(x.the_type()) => format!("{name}.ToUnmanaged()"),
+        _ => format!("{name}.AsUnmanaged()"),
+    }
+}
+
 /// Converts the `u32` part in a Rust rval `-> u32` to a C# equivalent for synchronous calls.
 pub fn rval_to_type_sync(x: &Type) -> String {
     match &x {

@@ -1,5 +1,7 @@
 use crate::Interop;
-use crate::converter::{field_name, field_to_managed, field_to_type, field_to_type_declaration_unmanaged, field_to_unmanaged, has_dispose, is_reusable};
+use crate::converter::{
+    field_as_unmanaged, field_name, field_to_managed, field_to_type, field_to_type_declaration_unmanaged, field_to_unmanaged, has_dispose, is_reusable,
+};
 use crate::interop::docs::write_documentation;
 use crate::utils::{MoveSemantics, write_common_marshaller};
 use interoptopus::backend::{IndentWriter, WriteFor};
@@ -31,6 +33,7 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
 
     indented!(w, [()], r"public {name}() {{ }}")?;
     w.newline()?;
+    i.inline_hint(w, 1)?;
     indented!(w, [()], r"internal unsafe Unmanaged {into}Unmanaged()")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"var _unmanaged = new Unmanaged();")?;
@@ -54,6 +57,30 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
     indented!(w, [()()], r"return _unmanaged;")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
+    i.inline_hint(w, 1)?;
+    indented!(w, [()], r"internal unsafe Unmanaged AsUnmanaged()")?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"var _unmanaged = new Unmanaged();")?;
+    for field in the_type.fields() {
+        let name = field.name();
+
+        if let Type::Array(x) = field.the_type() {
+            let array_type = field_to_type(x.the_type());
+            indented!(w, [()()], "{{")?;
+            indented!(w, [()()()], r#"if ({} == null) {{ throw new InvalidOperationException("Array '{}' must not be null"); }}"#, name, name)?;
+            indented!(w, [()()()], r#"if ({}.Length != {}) {{ throw new InvalidOperationException("Array size mismatch for '{}'"); }}"#, name, x.len(), name)?;
+            indented!(w, [()()()], "var src = new ReadOnlySpan<{}>({}, 0, {});", array_type, name, x.len())?;
+            indented!(w, [()()()], "var dst = new Span<{array_type}>(_unmanaged.{name}, {});", x.len())?;
+            indented!(w, [()()()], "src.CopyTo(dst);")?;
+            indented!(w, [()()], "}}")?;
+        } else {
+            let to_unmanaged = field_as_unmanaged(field);
+            indented!(w, [()()], "_unmanaged.{name} = {to_unmanaged};")?;
+        }
+    }
+    indented!(w, [()()], r"return _unmanaged;")?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
 
     w.indent();
     write_type_definition_composite_layout_annotation(w, the_type)?;
@@ -66,6 +93,7 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
         indented!(w, [()()], r"public {field_decl};")?;
     }
     w.newline()?;
+    i.inline_hint(w, 2)?;
     indented!(w, [()()], r"internal unsafe {name} {into}Managed()")?;
     indented!(w, [()()], r"{{")?;
     indented!(w, [()()()], r"var _managed = new {name}();")?;

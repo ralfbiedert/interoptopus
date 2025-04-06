@@ -25,6 +25,7 @@ static class Benchmark {
         var tupled = new Tupled();
         var callback_huge_prealloc = new CallbackHugeVecSlice(x => x[0]);
         var serviceAsync = ServiceAsync.New();
+        var hello_world = "hello world".Utf8();
 
         MeasureResult.Calibrate(Iterations, () => {});
 
@@ -67,8 +68,14 @@ static class Benchmark {
         result = MeasureResult.Measure(Iterations, () => Interop.pattern_ascii_pointer_1("hello world"));
         writer.Add("pattern_ascii_pointer_1('hello world')", result);
 
-        result = MeasureResult.Measure(Iterations, () => Interop.pattern_string_2("hello world".Utf8()));
-        writer.Add("pattern_string_2('hello world')", result);
+        result = MeasureResult.Measure(Iterations, () => Interop.pattern_string_10("hello world".Utf8()));
+        writer.Add("pattern_string_10('hello world')", result);
+
+        result = MeasureResult.Measure(Iterations, () => Interop.pattern_string_10(hello_world.Clone()));
+        writer.Add("pattern_string_10(hello_world.Clone())", result);
+
+        result = MeasureResult.Measure(Iterations, () => Interop.pattern_string_11(ref hello_world));
+        writer.Add("pattern_string_11(ref hello_world)", result);
 
         result = MeasureResult.Measure(Iterations, () =>
         {
@@ -76,6 +83,14 @@ static class Benchmark {
             s.Dispose();
         });
         writer.Add("'hello world'.Utf8()", result);
+
+        result = MeasureResult.Measure(Iterations, () =>
+        {
+            var s = hello_world.Clone();
+            s.Dispose();
+        });
+        writer.Add("hello_world.Clone()", result);
+
 
         result = MeasureResult.Measure(Iterations, () => VecU8.From([]));
         writer.Add("new VecU8([])", result);

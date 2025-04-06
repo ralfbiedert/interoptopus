@@ -28,7 +28,7 @@ public class TestPatternOptions
         );
 
         var rval = Interop.pattern_ffi_option_3(x).AsSome().AsSome().AsOk().AsSome();
-        Assert.Equal("hello world", rval.String);
+        Assert.Equal("hello world", rval.IntoString());
     }
 
 }

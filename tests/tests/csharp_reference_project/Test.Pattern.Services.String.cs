@@ -14,12 +14,12 @@ public class TestPatternServicesString
     public void CallbackString()
     {
         var str = "Hello World";
-        var rval = Utf8String.From("");
+        var rval = string.Empty;
 
         var s = ServiceStrings.New();
-        s.CallbackString(str.Utf8(), s1 => rval = s1);
+        s.CallbackString(str.Utf8(), s1 => rval = s1.IntoString());
         s.Dispose();
 
-        Assert.Equal(str, rval.String);
+        Assert.Equal(str, rval);
     }
 }

@@ -35,8 +35,8 @@ public class TestPatternServicesAsync
         var s = ServiceAsync.New();
         var r = await s.HandleNestedString("abc".Utf8());
         s.Dispose();
-        Assert.Equal(r.s1.String, "abc");
-        Assert.Equal(r.s2.String, "abc");
+        Assert.Equal(r.s1.IntoString(), "abc");
+        Assert.Equal(r.s2.IntoString(), "abc");
     }
 
 
@@ -50,7 +50,7 @@ public class TestPatternServicesAsync
             var x = Random.Shared.Next(100, 1000);
             var ms = Random.Shared.Next(100, 1000);
             
-            var r = await s.ReturnAfterMs((ulong)x, (ulong)ms);
+            var r = await s.ReturnAfterMs((ulong) x, (ulong) ms);
             Assert.Equal((int) r, x);
         }).ToList();
         
