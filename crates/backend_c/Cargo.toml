@@ -15,6 +15,6 @@ workspace = true
 
 
 [dependencies]
-interoptopus = { path = "../core" }
+interoptopus = { path = "../core", version = "0.15.0-alpha.0" }
 heck = { workspace = true }
 derive_builder = { workspace = true }
