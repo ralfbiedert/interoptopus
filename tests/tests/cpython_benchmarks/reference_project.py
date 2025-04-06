@@ -19,6 +19,8 @@ def init_lib(path):
     c_lib.interoptopus_vec_destroy_2831836161306219799.argtypes = [VecUtf8String]
     c_lib.interoptopus_vec_create_8489828321293410959.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(VecVec3f32)]
     c_lib.interoptopus_vec_destroy_18428593021019987507.argtypes = [VecVec3f32]
+    c_lib.interoptopus_vec_create_1331377703668599412.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(VecEnumPayload)]
+    c_lib.interoptopus_vec_destroy_1871427125692259427.argtypes = [VecEnumPayload]
     c_lib.alignment_1.argtypes = [Packed1]
     c_lib.array_1.argtypes = [Array]
     c_lib.array_2.argtypes = []
@@ -76,6 +78,9 @@ def init_lib(path):
     c_lib.ref2.argtypes = [ctypes.POINTER(ctypes.c_int64)]
     c_lib.ref3.argtypes = [ctypes.POINTER(ctypes.c_int64)]
     c_lib.ref4.argtypes = [ctypes.POINTER(ctypes.c_int64)]
+    c_lib.ref5.argtypes = [ctypes.POINTER(ctypes.c_int)]
+    c_lib.ref6.argtypes = [ctypes.POINTER(TODO)]
+    c_lib.ref7.argtypes = [ctypes.POINTER(VecUtf8String)]
     c_lib.struct1.argtypes = [Tupled]
     c_lib.struct2.argtypes = [Vec3f32, ctypes.POINTER(Tupled)]
     c_lib.struct3.argtypes = [BoolField]
@@ -205,6 +210,8 @@ def init_lib(path):
     c_lib.interoptopus_vec_destroy_2831836161306219799.restype = ctypes.c_int64
     c_lib.interoptopus_vec_create_8489828321293410959.restype = ctypes.c_int64
     c_lib.interoptopus_vec_destroy_18428593021019987507.restype = ctypes.c_int64
+    c_lib.interoptopus_vec_create_1331377703668599412.restype = ctypes.c_int64
+    c_lib.interoptopus_vec_destroy_1871427125692259427.restype = ctypes.c_int64
     c_lib.alignment_1.restype = Packed2
     c_lib.array_1.restype = ctypes.c_uint8
     c_lib.array_2.restype = Array
@@ -383,6 +390,12 @@ def interoptopus_vec_create_8489828321293410959(data: ctypes.c_void_p, len: int,
 
 def interoptopus_vec_destroy_18428593021019987507(ignored) -> int:
     return c_lib.interoptopus_vec_destroy_18428593021019987507(ignored)
+
+def interoptopus_vec_create_1331377703668599412(data: ctypes.c_void_p, len: int, rval: ctypes.POINTER(VecEnumPayload)) -> int:
+    return c_lib.interoptopus_vec_create_1331377703668599412(data, len, rval)
+
+def interoptopus_vec_destroy_1871427125692259427(ignored) -> int:
+    return c_lib.interoptopus_vec_destroy_1871427125692259427(ignored)
 
 def alignment_1(a: Packed1) -> Packed2:
     return c_lib.alignment_1(a)
@@ -570,6 +583,15 @@ def ref3(x: ctypes.POINTER(ctypes.c_int64)) -> bool:
 
 def ref4(x: ctypes.POINTER(ctypes.c_int64)) -> bool:
     return c_lib.ref4(x)
+
+def ref5(x: ctypes.POINTER(ctypes.c_int)):
+    return c_lib.ref5(x)
+
+def ref6(x: ctypes.POINTER(TODO)):
+    return c_lib.ref6(x)
+
+def ref7(x: ctypes.POINTER(VecUtf8String)):
+    return c_lib.ref7(x)
 
 def struct1(x: Tupled) -> Tupled:
     return c_lib.struct1(x)

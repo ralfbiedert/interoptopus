@@ -22,9 +22,9 @@ namespace My.Company
         static Interop()
         {
             var api_version = Interop.pattern_api_guard();
-            if (api_version != 5681111033621596136ul)
+            if (api_version != 18019461227046432209ul)
             {
-                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (5681111033621596136). You probably forgot to update / copy either the bindings or the library.");
+                throw new TypeLoadException($"API reports hash {api_version} which differs from hash in bindings (18019461227046432209). You probably forgot to update / copy either the bindings or the library.");
             }
         }
 
@@ -84,6 +84,16 @@ namespace My.Company
         [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_18428593021019987507")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial long interoptopus_vec_destroy_18428593021019987507(VecVec3f32 ignored);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_1331377703668599412")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial long interoptopus_vec_create_1331377703668599412(IntPtr data, ulong len, ref VecEnumPayload rval);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_1871427125692259427")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial long interoptopus_vec_destroy_1871427125692259427(VecEnumPayload ignored);
 
 
         [LibraryImport(NativeLib, EntryPoint = "alignment_1")]
@@ -378,6 +388,21 @@ namespace My.Company
         [return: MarshalAs(UnmanagedType.U1)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial bool ref4(ref long x);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "ref5")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void ref5(ref EnumPayload x);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "ref6")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void ref6(ref OptionEnumPayload x);
+
+
+        [LibraryImport(NativeLib, EntryPoint = "ref7")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void ref7(ref VecUtf8String x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "struct1")]
@@ -11264,6 +11289,171 @@ namespace My.Company
             return (ac, tcs.Task);
         }
     }
+
+    // This must be a class because we only ever want to hold on to the
+    // same instance, as we overwrite fields when this is sent over the FFI
+    // boundary
+    public partial class VecEnumPayload
+    {
+        internal IntPtr _ptr;
+        internal ulong _len;
+        internal ulong _capacity;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial class VecEnumPayload : IDisposable
+    {
+        // An internal helper to create an empty object.
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        private VecEnumPayload() { }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static unsafe VecEnumPayload From(Span<EnumPayload> _data)
+        {
+            var rval = new VecEnumPayload();
+            fixed (void* _data_ptr = _data)
+            {
+                InteropHelper.interoptopus_vec_create((IntPtr) _data_ptr, (ulong)_data.Length, out var _out);
+                rval._len = _out._len;
+                rval._capacity = _out._capacity;
+                rval._ptr = _out._ptr;
+            }
+            return rval;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static unsafe VecEnumPayload Empty()
+        {
+            InteropHelper.interoptopus_vec_create(IntPtr.Zero, 0, out var _out);
+            return _out.IntoManaged();
+        }
+
+        public int Count
+        {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            get { if (_ptr == IntPtr.Zero) { throw new InteropException(); } else { return (int) _len; } }
+        }
+
+        public unsafe EnumPayload this[int i]
+        {
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            get
+            {
+                if (i >= Count) throw new IndexOutOfRangeException();
+                if (_ptr == IntPtr.Zero) throw new InteropException();
+                return Marshal.PtrToStructure<EnumPayload>(new IntPtr(_ptr.ToInt64() + i * sizeof(EnumPayload)));
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Unmanaged IntoUnmanaged()
+        {
+            if (_ptr == IntPtr.Zero) throw new InteropException(); // Don't use for serialization if moved already.
+            var rval = new Unmanaged();
+            rval._len = _len;
+            rval._capacity = _capacity;
+            rval._ptr = _ptr;
+            _ptr = IntPtr.Zero; // Mark this instance as moved.
+            return rval;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Unmanaged AsUnmanaged()
+        {
+            if (_ptr == IntPtr.Zero) throw new InteropException(); // Don't use for serialization if moved already.
+            var rval = new Unmanaged();
+            rval._len = _len;
+            rval._capacity = _capacity;
+            rval._ptr = _ptr;
+            return rval;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void Dispose()
+        {
+            if (_ptr == IntPtr.Zero) return;
+            var _unmanaged = new Unmanaged();
+            _unmanaged._ptr = _unmanaged._ptr;
+            _unmanaged._len = _unmanaged._len;
+            _unmanaged._capacity = _unmanaged._capacity;
+            InteropHelper.interoptopus_vec_destroy(_unmanaged);
+            _ptr = IntPtr.Zero;
+            _len = 0;
+            _capacity = 0;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "VecEnumPayload { ... }";
+        }
+
+
+        public partial class InteropHelper
+        {
+            [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_create_1331377703668599412")]
+            internal static partial long interoptopus_vec_create(IntPtr vec, ulong len, out Unmanaged rval);
+            [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_destroy_1871427125692259427")]
+            internal static partial long interoptopus_vec_destroy(Unmanaged vec);
+        }
+
+        [CustomMarshaller(typeof(VecEnumPayload), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr _ptr;
+            internal ulong _len;
+            internal ulong _capacity;
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public VecEnumPayload IntoManaged()
+            {
+                var rval = new VecEnumPayload();
+                rval._len = _len;
+                rval._capacity = _capacity;
+                rval._ptr = _ptr;
+                return rval;
+            }
+
+
+        }
+
+        public ref struct Marshaller
+        {
+            private VecEnumPayload _managed;
+            private Unmanaged _unmanaged;
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(VecEnumPayload managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void FromManaged(VecEnumPayload managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public VecEnumPayload ToManaged() { return _unmanaged.IntoManaged(); }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void Free() { }
+        }
+
+    }
+
+    public static class VecEnumPayloadExtensions
+    {
+        public static VecEnumPayload Vec(this EnumPayload[] s) { return VecEnumPayload.From(s); }
+    }
+
 
     // This must be a class because we only ever want to hold on to the
     // same instance, as we overwrite fields when this is sent over the FFI

@@ -689,6 +689,19 @@ typedef void (*fptr_fn_ConstPtrResultU64Error_ConstPtr)(const RESULTU64ERROR* x0
 
 typedef void (*fptr_fn_ConstPtrResultUtf8StringError_ConstPtr)(const RESULTUTF8STRINGERROR* x0, const void* x1);
 
+///  Vec marshalling helper.
+///  A highly dangerous 'use once type' that has ownership semantics!
+///  Once passed over an FFI boundary 'the other side' is meant to own
+///  (and free) it. Rust handles that fine, but if in C# you put this
+///  in a struct and then call Rust multiple times with that struct 
+///  you'll free the same pointer multiple times, and get UB!
+typedef struct VECENUMPAYLOAD
+    {
+    ENUMPAYLOAD* ptr;
+    uint64_t len;
+    uint64_t capacity;
+    } VECENUMPAYLOAD;
+
 typedef enum LAYER3
     {
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
@@ -760,6 +773,10 @@ typedef int64_t (*interoptopus_vec_destroy_2831836161306219799)(VECUTF8STRING);
 typedef int64_t (*interoptopus_vec_create_8489828321293410959)(const void*, uint64_t, VECVEC3F32*);
 
 typedef int64_t (*interoptopus_vec_destroy_18428593021019987507)(VECVEC3F32);
+
+typedef int64_t (*interoptopus_vec_create_1331377703668599412)(const void*, uint64_t, VECENUMPAYLOAD*);
+
+typedef int64_t (*interoptopus_vec_destroy_1871427125692259427)(VECENUMPAYLOAD);
 
 typedef PACKED2 (*alignment_1)(PACKED1);
 
@@ -878,6 +895,12 @@ typedef int64_t* (*ref2)(int64_t*);
 typedef bool (*ref3)(const int64_t*);
 
 typedef bool (*ref4)(int64_t*);
+
+typedef void (*ref5)(ENUMPAYLOAD*);
+
+typedef void (*ref6)(OPTIONENUMPAYLOAD*);
+
+typedef void (*ref7)(VECUTF8STRING*);
 
 typedef TUPLED (*struct1)(TUPLED);
 

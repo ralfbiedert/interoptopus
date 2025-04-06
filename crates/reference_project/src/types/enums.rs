@@ -19,6 +19,7 @@ pub enum EnumRenamedXYZ {
 }
 
 #[ffi_type]
+#[derive(Clone)]
 pub enum EnumPayload {
     A,
     B(Vec3f32),
