@@ -90,6 +90,14 @@ namespace My.Company
             return _unmanaged;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+            return _unmanaged;
+        }
+
         [CustomMarshaller(typeof(Error), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
@@ -139,7 +147,17 @@ namespace My.Company
     {
         public Vec2() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal unsafe Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            _unmanaged.y = y;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -153,6 +171,7 @@ namespace My.Company
             public float x;
             public float y;
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             internal unsafe Vec2 ToManaged()
             {
                 var _managed = new Vec2();
@@ -255,6 +274,16 @@ namespace My.Company
             return _unmanaged;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+            if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
+        }
+
         [CustomMarshaller(typeof(ResultConstPtrGameEngineError), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
 
@@ -344,6 +373,15 @@ namespace My.Company
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         internal Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -563,6 +601,14 @@ namespace My.Company
                 return rval;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public static unsafe Utf8String Empty()
+            {
+                InteropHelper.interoptopus_string_create(IntPtr.Zero, 0, out var _out);
+                return _out.IntoManaged();
+            }
+
+
             public unsafe string String
             {
                 get
@@ -571,6 +617,14 @@ namespace My.Company
                     var s = Encoding.UTF8.GetString(span);
                     return s;
                 }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public string IntoString()
+            {
+                var rval = String;
+                Dispose();
+                return rval;
             }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -597,6 +651,7 @@ namespace My.Company
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
             public Unmanaged IntoUnmanaged()
             {
+                if (_ptr == IntPtr.Zero) { throw new Exception(); }
                 var _unmanaged = new Unmanaged();
                 _unmanaged._ptr = _ptr;
                 _unmanaged._len = _len;

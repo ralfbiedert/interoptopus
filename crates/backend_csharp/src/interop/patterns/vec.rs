@@ -49,7 +49,13 @@ pub fn write_pattern_fast_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) 
     indented!(w, [()], r"return rval;")?;
     indented!(w, r"}}")?;
     w.newline()?;
-
+    i.inline_hint(w, 1)?;
+    indented!(w, [()], r"public static unsafe {name} Empty()")?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"InteropHelper.interoptopus_vec_create(IntPtr.Zero, 0, out var _out);")?;
+    indented!(w, [()()], r"return _out.IntoManaged();")?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
     indented!(w, r"public int Count")?;
     indented!(w, r"{{")?;
     i.inline_hint(w, 1)?;
@@ -135,7 +141,6 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     indented!(w, [()], r"}}")?;
     indented!(w, r"}}")?;
     w.newline()?;
-
     i.inline_hint(w, 0)?;
     indented!(w, r"public static unsafe {name} Empty()")?;
     indented!(w, r"{{")?;
@@ -143,7 +148,6 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     indented!(w, [()], r"return _out.IntoManaged();")?;
     indented!(w, r"}}")?;
     w.newline()?;
-
     indented!(w, r"public int Count")?;
     indented!(w, r"{{")?;
     i.inline_hint(w, 1)?;
@@ -189,6 +193,7 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     w.newline()?;
     indented!(w, [()], r"public static class {name}Extensions")?;
     indented!(w, [()], r"{{")?;
+    i.inline_hint(w, 2)?;
     indented!(w, [()()], r"public static {name} IntoVec(this {the_type}[] s) {{ return {name}.From(s); }}")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;

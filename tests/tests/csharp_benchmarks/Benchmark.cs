@@ -16,7 +16,6 @@ static class Benchmark {
         MeasureResult result;
         var writer = new MarkdownTableWriter();
 
-
         long x = 0;
         var short_vec = SliceVec3f32.From(new Vec3f32[10]);
         var short_byte = SliceU8.From(new byte[10]);
@@ -69,7 +68,7 @@ static class Benchmark {
         writer.Add("pattern_ascii_pointer_1('hello world')", result);
 
         result = MeasureResult.Measure(Iterations, () => Interop.pattern_string_10("hello world".Utf8()));
-        writer.Add("pattern_string_10('hello world')", result);
+        writer.Add("pattern_string_10('hello world'.Utf8())", result);
 
         result = MeasureResult.Measure(Iterations, () => Interop.pattern_string_10(hello_world.Clone()));
         writer.Add("pattern_string_10(hello_world.Clone())", result);
@@ -77,29 +76,20 @@ static class Benchmark {
         result = MeasureResult.Measure(Iterations, () => Interop.pattern_string_11(ref hello_world));
         writer.Add("pattern_string_11(ref hello_world)", result);
 
-        result = MeasureResult.Measure(Iterations, () =>
-        {
-            var s = "hello world".Utf8();
-            s.Dispose();
-        });
-        writer.Add("'hello world'.Utf8()", result);
+        result = MeasureResult.Measure(Iterations, () => "hello world".Utf8().Dispose());
+        writer.Add("'hello world'.Utf8().Dispose()", result);
 
-        result = MeasureResult.Measure(Iterations, () =>
-        {
-            var s = hello_world.Clone();
-            s.Dispose();
-        });
-        writer.Add("hello_world.Clone()", result);
+        result = MeasureResult.Measure(Iterations, () => hello_world.Clone().Dispose());
+        writer.Add("hello_world.Clone().Dispose()", result);
 
+        result = MeasureResult.Measure(Iterations, () => VecU8.Empty().Dispose());
+        writer.Add("VecU8.Empty().Dispose()", result);
 
-        result = MeasureResult.Measure(Iterations, () => VecU8.From([]));
-        writer.Add("new VecU8([])", result);
+        result = MeasureResult.Measure(Iterations, () => VecUtf8String.Empty().Dispose());
+        writer.Add("VecUtf8String.Empty().Dispose()", result);
 
-        result = MeasureResult.Measure(Iterations, () => VecUtf8String.From([]));
-        writer.Add("new VecUtf8String([])", result);
-
-        result = MeasureResult.Measure(Iterations, () => Interop.pattern_vec_1());
-        writer.Add("pattern_vec_u8_return()", result);
+        result = MeasureResult.Measure(Iterations, () => Interop.pattern_vec_1().Dispose());
+        writer.Add("pattern_vec_u8_return().Dispose()", result);
 
         result = MeasureResult.Measure(Iterations, async () => { await new TaskCompletionSource().Task; });
         writer.Add("await new TaskCompletionSource().Task", result);

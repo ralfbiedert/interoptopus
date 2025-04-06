@@ -35,26 +35,26 @@ profile: --release
 
 | Construct | ns per call |
 | --- | --- |
-| `primitive_void()` | 4 |
+| `primitive_void()` | 3 |
 | `primitive_u8(0)` | 3 |
 | `primitive_u16(0)` | 3 |
-| `primitive_u32(0)` | 4 |
-| `primitive_u64(0)` | 3 |
-| `pattern_ffi_option_1(OptionInner.None)` | 16 |
-| `pattern_ffi_slice_delegate(x => x[0])` | 474 |
-| `pattern_ffi_slice_delegate_huge(x => x[0])` | 918 |
-| `pattern_ffi_slice_delegate_huge(callback_huge_prealloc)` | 41 |
+| `primitive_u32(0)` | 5 |
+| `primitive_u64(0)` | 4 |
+| `pattern_ffi_option_1(OptionInner.None)` | 17 |
+| `pattern_ffi_slice_delegate(x => x[0])` | 506 |
+| `pattern_ffi_slice_delegate_huge(x => x[0])` | 953 |
+| `pattern_ffi_slice_delegate_huge(callback_huge_prealloc)` | 38 |
 | `pattern_ffi_slice_2(short_vec, 0)` | 6 |
 | `pattern_ffi_slice_2(long_vec, 0)` | 6 |
 | `pattern_ffi_slice_4(short_byte, short_byte)` | 5 |
-| `pattern_ascii_pointer_1('hello world')` | 36 |
-| `pattern_string_10('hello world')` | 62 |
-| `pattern_string_10(hello_world.Clone())` | 49 |
-| `pattern_string_11(ref hello_world)` | 11 |
-| `'hello world'.Utf8()` | 126 |
-| `hello_world.Clone()` | 49 |
-| `new VecU8([])` | 10 |
-| `new VecUtf8String([])` | 12 |
-| `pattern_vec_u8_return()` | 42 |
-| `await new TaskCompletionSource().Task` | 93 |
-| `await serviceAsync.Success()` | 432 |
+| `pattern_ascii_pointer_1('hello world')` | 30 |
+| `pattern_string_10('hello world'.Utf8())` | 69 |
+| `pattern_string_10(hello_world.Clone())` | 53 |
+| `pattern_string_11(ref hello_world)` | 14 |
+| `'hello world'.Utf8().Dispose()` | 116 |
+| `hello_world.Clone().Dispose()` | 49 |
+| `VecU8.Empty().Dispose()` | 16 |
+| `VecUtf8String.Empty().Dispose()` | 17 |
+| `pattern_vec_u8_return().Dispose()` | 41 |
+| `await new TaskCompletionSource().Task` | 97 |
+| `await serviceAsync.Success()` | 358 |
