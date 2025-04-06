@@ -98,21 +98,21 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(Error), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static Error Fail => new() { _variant = 0 };
 
         public bool IsFail => _variant == 0;
 
         public void AsFail() { if (_variant != 0) throw new InteropException(); }
 
-        public override readonly string ToString() {
-            return _variant switch {
-            0 => "Fail",
-            _ => throw new InteropException()
-            };
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Fail";
+            throw new InteropException();
         }
+
+        [CustomMarshaller(typeof(Error), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -188,6 +188,12 @@ namespace My.Company
             }
         }
 
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Vec2 { ... }";
+        }
 
         [CustomMarshaller(typeof(Vec2), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
@@ -291,9 +297,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(ResultConstPtrGameEngineError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static ResultConstPtrGameEngineError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrGameEngineError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrGameEngineError Panic => new() { _variant = 2 };
@@ -309,15 +312,18 @@ namespace My.Company
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
-        public override readonly string ToString() {
-            return _variant switch {
-            0 => "Ok",
-            1 => "Err",
-            2 => "Panic",
-            3 => "Null",
-            _ => throw new InteropException()
-            };
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return "Err(...)";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
         }
+
+        [CustomMarshaller(typeof(ResultConstPtrGameEngineError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -406,9 +412,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(ResultError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static ResultError Ok => new() { _variant = 0 };
         public static ResultError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultError Panic => new() { _variant = 2 };
@@ -424,15 +427,18 @@ namespace My.Company
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
 
-        public override readonly string ToString() {
-            return _variant switch {
-            0 => "Ok",
-            1 => "Err",
-            2 => "Panic",
-            3 => "Null",
-            _ => throw new InteropException()
-            };
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return "Err(...)";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
         }
+
+        [CustomMarshaller(typeof(ResultError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {

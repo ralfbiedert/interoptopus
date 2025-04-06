@@ -134,6 +134,13 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
     }
     w.newline()?;
 
+    i.inline_hint(w, 1)?;
+    indented!(w, [()], r"public override string ToString()")?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r#"return "{name} {{ ... }}";"#)?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+
     indented!(w, [()], r"[CustomMarshaller(typeof({}), MarshalMode.Default, typeof(Marshaller))]", name)?;
     indented!(w, [()], r"private struct MarshallerMeta {{ }}")?;
 

@@ -79,6 +79,12 @@ namespace My.Company
         }
 
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Vec2 { ... }";
+        }
+
         [CustomMarshaller(typeof(Vec2), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
         public ref struct Marshaller

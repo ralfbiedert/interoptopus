@@ -92,11 +92,11 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
     indented!(w, [()], r"}}")?;
     w.newline()?;
 
+    write_type_definition_enum_variant_utils(i, w, the_type)?;
+
     indented!(w, [()], r"[CustomMarshaller(typeof({name}), MarshalMode.Default, typeof(Marshaller))]")?;
     indented!(w, [()], r"private struct MarshallerMeta {{ }}")?;
     w.newline()?;
-
-    write_type_definition_enum_variant_utils(i, w, the_type)?;
 
     write_common_marshaller(i, w, name, move_semantics)?;
 
@@ -232,22 +232,21 @@ pub fn write_type_definition_enum_variant_utils(i: &Interop, w: &mut IndentWrite
     w.newline()?;
 
     // Somewhat of a ToString implementation.
-    indented!(w, [()], r"public override readonly string ToString() {{")?;
-    indented!(w, [()()], r"return _variant switch {{")?;
+    i.inline_hint(w, 1)?;
+    indented!(w, [()], r"public override string ToString()")?;
+    indented!(w, [()], r"{{")?;
     for variant in the_type.variants() {
-        let vname = format!(r#""{}""#, variant.name());
+        let vname = variant.name();
         match variant.kind() {
             VariantKind::Unit(x) => {
-                indented!(w, [()()], r"{x} => {vname},")?;
+                indented!(w, [()()], r#"if (_variant == {x}) return "{vname}";"#)?;
             }
             VariantKind::Typed(x, _) => {
-                indented!(w, [()()], r"{x} => {vname},")?;
+                indented!(w, [()()], r#"if (_variant == {x}) return "{vname}(...)";"#)?;
             }
         }
     }
-    let throw = "throw new InteropException()";
-    indented!(w, [()()], r"_ => {throw}")?;
-    indented!(w, [()()], r"}};")?;
+    indented!(w, [()()], "throw new InteropException();")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
 

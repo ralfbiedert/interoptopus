@@ -49,12 +49,12 @@ pub fn write_pattern_fast_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) 
     indented!(w, [()], r"return rval;")?;
     indented!(w, r"}}")?;
     w.newline()?;
-    i.inline_hint(w, 1)?;
-    indented!(w, [()], r"public static unsafe {name} Empty()")?;
-    indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"InteropHelper.interoptopus_vec_create(IntPtr.Zero, 0, out var _out);")?;
-    indented!(w, [()()], r"return _out.IntoManaged();")?;
-    indented!(w, [()], r"}}")?;
+    i.inline_hint(w, 0)?;
+    indented!(w, r"public static unsafe {name} Empty()")?;
+    indented!(w, r"{{")?;
+    indented!(w, [()], r"InteropHelper.interoptopus_vec_create(IntPtr.Zero, 0, out var _out);")?;
+    indented!(w, [()], r"return _out.IntoManaged();")?;
+    indented!(w, r"}}")?;
     w.newline()?;
     indented!(w, r"public int Count")?;
     indented!(w, r"{{")?;
@@ -77,7 +77,7 @@ pub fn write_pattern_fast_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) 
     w.newline()?;
     write_pattern_vec_to_unmanaged(i, w)?;
     w.newline()?;
-    write_pattern_vec_dispose(i, w, vec)?;
+    write_pattern_vec_helpers(i, w, vec)?;
     w.newline()?;
     write_pattern_vec_interop_helper(i, w, vec)?;
     w.newline()?;
@@ -99,10 +99,10 @@ pub fn write_pattern_fast_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) 
     write_common_marshaller(i, w, name, MoveSemantics::Move)?;
     indented!(w, r"}}")?;
     w.newline()?;
-    indented!(w, [()], r"public static class {name}Extensions")?;
-    indented!(w, [()], r"{{")?;
-    indented!(w, [()()], r"public static {name} Vec(this {the_type}[] s) {{ return {name}.From(s); }}")?;
-    indented!(w, [()], r"}}")?;
+    indented!(w, r"public static class {name}Extensions")?;
+    indented!(w, r"{{")?;
+    indented!(w, [()], r"public static {name} Vec(this {the_type}[] s) {{ return {name}.From(s); }}")?;
+    indented!(w, r"}}")?;
     w.newline()?;
     Ok(())
 }
@@ -169,7 +169,7 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     indented!(w, r"}}")?;
     write_pattern_vec_to_unmanaged(i, w)?;
     w.newline()?;
-    write_pattern_vec_dispose(i, w, vec)?;
+    write_pattern_vec_helpers(i, w, vec)?;
     w.newline()?;
     write_pattern_vec_interop_helper(i, w, vec)?;
     w.newline()?;
@@ -191,11 +191,11 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     w.newline()?;
     indented!(w, r"}}")?;
     w.newline()?;
-    indented!(w, [()], r"public static class {name}Extensions")?;
-    indented!(w, [()], r"{{")?;
-    i.inline_hint(w, 2)?;
-    indented!(w, [()()], r"public static {name} IntoVec(this {the_type}[] s) {{ return {name}.From(s); }}")?;
-    indented!(w, [()], r"}}")?;
+    indented!(w, r"public static class {name}Extensions")?;
+    indented!(w, r"{{")?;
+    i.inline_hint(w, 1)?;
+    indented!(w, [()], r"public static {name} IntoVec(this {the_type}[] s) {{ return {name}.From(s); }}")?;
+    indented!(w, r"}}")?;
     w.newline()?;
 
     Ok(())
@@ -217,7 +217,9 @@ pub fn write_pattern_vec_struct(_: &Interop, w: &mut IndentWriter, vec: &VecType
     Ok(())
 }
 
-pub fn write_pattern_vec_dispose(i: &Interop, w: &mut IndentWriter, _: &VecType) -> Result<(), Error> {
+pub fn write_pattern_vec_helpers(i: &Interop, w: &mut IndentWriter, v: &VecType) -> Result<(), Error> {
+    let name = v.rust_name();
+
     i.inline_hint(w, 0)?;
     indented!(w, r"public void Dispose()")?;
     indented!(w, r"{{")?;
@@ -231,6 +233,14 @@ pub fn write_pattern_vec_dispose(i: &Interop, w: &mut IndentWriter, _: &VecType)
     indented!(w, [()], r"_len = 0;")?;
     indented!(w, [()], r"_capacity = 0;")?;
     indented!(w, r"}}")?;
+    w.newline()?;
+    i.inline_hint(w, 0)?;
+    indented!(w, r"public override string ToString()")?;
+    indented!(w, r"{{")?;
+    indented!(w, [()], r#"return "{name} {{ ... }}";"#)?;
+    indented!(w, r"}}")?;
+    w.newline()?;
+
     Ok(())
 }
 

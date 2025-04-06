@@ -1382,9 +1382,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(EnumDocumented), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static EnumDocumented A => new() { _variant = 0 };
         public static EnumDocumented B => new() { _variant = 1 };
         public static EnumDocumented C => new() { _variant = 2 };
@@ -1396,6 +1393,18 @@ namespace My.Company
         public void AsA() { if (_variant != 0) throw new InteropException(); }
         public void AsB() { if (_variant != 1) throw new InteropException(); }
         public void AsC() { if (_variant != 2) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "A";
+            if (_variant == 1) return "B";
+            if (_variant == 2) return "C";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(EnumDocumented), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -1495,9 +1504,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(EnumPayload), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static EnumPayload A => new() { _variant = 0 };
         public static EnumPayload B(Vec3f32 value) => new() { _variant = 1, _B = value };
         public static EnumPayload C(uint value) => new() { _variant = 2, _C = value };
@@ -1509,6 +1515,18 @@ namespace My.Company
         public void AsA() { if (_variant != 0) throw new InteropException(); }
         public Vec3f32 AsB() { if (_variant != 1) { throw new InteropException(); } else { return _B; } }
         public uint AsC() { if (_variant != 2) { throw new InteropException(); } else { return _C; } }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "A";
+            if (_variant == 1) return "B(...)";
+            if (_variant == 2) return "C(...)";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(EnumPayload), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -1580,14 +1598,21 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(EnumRenamed), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static EnumRenamed X => new() { _variant = 0 };
 
         public bool IsX => _variant == 0;
 
         public void AsX() { if (_variant != 0) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "X";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(EnumRenamed), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -1659,14 +1684,21 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(Error), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static Error Fail => new() { _variant = 0 };
 
         public bool IsFail => _variant == 0;
 
         public void AsFail() { if (_variant != 0) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Fail";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(Error), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -1770,9 +1802,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(Layer3), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static Layer3 A(Layer1Utf8String value) => new() { _variant = 0, _A = value };
         public static Layer3 B(Layer2Utf8String value) => new() { _variant = 1, _B = value };
 
@@ -1781,6 +1810,17 @@ namespace My.Company
 
         public Layer1Utf8String AsA() { if (_variant != 0) { throw new InteropException(); } else { return _A; } }
         public Layer2Utf8String AsB() { if (_variant != 1) { throw new InteropException(); } else { return _B; } }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "A(...)";
+            if (_variant == 1) return "B(...)";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(Layer3), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -1870,6 +1910,12 @@ namespace My.Company
         }
 
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Array { ... }";
+        }
+
         [CustomMarshaller(typeof(Array), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
         public ref struct Marshaller
@@ -1941,6 +1987,12 @@ namespace My.Company
             }
         }
 
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "BoolField { ... }";
+        }
 
         [CustomMarshaller(typeof(BoolField), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
@@ -2060,6 +2112,12 @@ namespace My.Company
             sum_delegate_return_2.Dispose();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "CallbackTable { ... }";
+        }
+
         [CustomMarshaller(typeof(CallbackTable), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
         public ref struct Marshaller
@@ -2137,6 +2195,12 @@ namespace My.Company
         }
 
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "CharArray { ... }";
+        }
+
         [CustomMarshaller(typeof(CharArray), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
         public ref struct Marshaller
@@ -2209,6 +2273,12 @@ namespace My.Company
         }
 
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Container { ... }";
+        }
+
         [CustomMarshaller(typeof(Container), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
         public ref struct Marshaller
@@ -2280,6 +2350,12 @@ namespace My.Company
             }
         }
 
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "ExtraTypef32 { ... }";
+        }
 
         [CustomMarshaller(typeof(ExtraTypef32), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
@@ -2371,6 +2447,12 @@ namespace My.Company
         }
 
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "FixedString { ... }";
+        }
+
         [CustomMarshaller(typeof(FixedString), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
         public ref struct Marshaller
@@ -2442,6 +2524,12 @@ namespace My.Company
             }
         }
 
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Genericu32 { ... }";
+        }
 
         [CustomMarshaller(typeof(Genericu32), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
@@ -2515,6 +2603,12 @@ namespace My.Company
         }
 
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Genericu8 { ... }";
+        }
+
         [CustomMarshaller(typeof(Genericu8), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
         public ref struct Marshaller
@@ -2586,6 +2680,12 @@ namespace My.Company
             }
         }
 
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Inner { ... }";
+        }
 
         [CustomMarshaller(typeof(Inner), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
@@ -2673,6 +2773,12 @@ namespace My.Company
             maybe_1.Dispose();
             maybe_2.Dispose();
             maybe_3.Dispose();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Layer1Utf8String { ... }";
         }
 
         [CustomMarshaller(typeof(Layer1Utf8String), MarshalMode.Default, typeof(Marshaller))]
@@ -2767,6 +2873,12 @@ namespace My.Company
             strings.Dispose();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Layer2Utf8String { ... }";
+        }
+
         [CustomMarshaller(typeof(Layer2Utf8String), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
         public ref struct Marshaller
@@ -2838,6 +2950,12 @@ namespace My.Company
             }
         }
 
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Local { ... }";
+        }
 
         [CustomMarshaller(typeof(Local), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
@@ -2977,6 +3095,12 @@ namespace My.Company
         }
 
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "NestedArray { ... }";
+        }
+
         [CustomMarshaller(typeof(NestedArray), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
         public ref struct Marshaller
@@ -3053,6 +3177,12 @@ namespace My.Company
             }
         }
 
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Packed1 { ... }";
+        }
 
         [CustomMarshaller(typeof(Packed1), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
@@ -3131,6 +3261,12 @@ namespace My.Company
         }
 
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Packed2 { ... }";
+        }
+
         [CustomMarshaller(typeof(Packed2), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
         public ref struct Marshaller
@@ -3202,6 +3338,12 @@ namespace My.Company
             }
         }
 
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Phantomu8 { ... }";
+        }
 
         [CustomMarshaller(typeof(Phantomu8), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
@@ -3277,6 +3419,12 @@ namespace My.Company
         }
 
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "StructDocumented { ... }";
+        }
+
         [CustomMarshaller(typeof(StructDocumented), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
         public ref struct Marshaller
@@ -3348,6 +3496,12 @@ namespace My.Company
             }
         }
 
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "StructRenamed { ... }";
+        }
 
         [CustomMarshaller(typeof(StructRenamed), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
@@ -3421,6 +3575,12 @@ namespace My.Company
         }
 
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Tupled { ... }";
+        }
+
         [CustomMarshaller(typeof(Tupled), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
         public ref struct Marshaller
@@ -3492,6 +3652,12 @@ namespace My.Company
             }
         }
 
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "UseCStrPtr { ... }";
+        }
 
         [CustomMarshaller(typeof(UseCStrPtr), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
@@ -3573,6 +3739,12 @@ namespace My.Company
         {
             s1.Dispose();
             s2.Dispose();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "UseSliceAndVec { ... }";
         }
 
         [CustomMarshaller(typeof(UseSliceAndVec), MarshalMode.Default, typeof(Marshaller))]
@@ -3657,6 +3829,12 @@ namespace My.Company
             s2.Dispose();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "UseString { ... }";
+        }
+
         [CustomMarshaller(typeof(UseString), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
         public ref struct Marshaller
@@ -3734,6 +3912,12 @@ namespace My.Company
         }
 
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Vec1 { ... }";
+        }
+
         [CustomMarshaller(typeof(Vec1), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
         public ref struct Marshaller
@@ -3810,6 +3994,12 @@ namespace My.Company
             }
         }
 
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Vec2 { ... }";
+        }
 
         [CustomMarshaller(typeof(Vec2), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
@@ -3893,6 +4083,12 @@ namespace My.Company
         }
 
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Vec3f32 { ... }";
+        }
+
         [CustomMarshaller(typeof(Vec3f32), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
         public ref struct Marshaller
@@ -3969,6 +4165,12 @@ namespace My.Company
             }
         }
 
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Visibility1 { ... }";
+        }
 
         [CustomMarshaller(typeof(Visibility1), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
@@ -4047,6 +4249,12 @@ namespace My.Company
         }
 
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Visibility2 { ... }";
+        }
+
         [CustomMarshaller(typeof(Visibility2), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
         public ref struct Marshaller
@@ -4118,6 +4326,12 @@ namespace My.Company
             }
         }
 
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Weird1u32 { ... }";
+        }
 
         [CustomMarshaller(typeof(Weird1u32), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
@@ -4218,6 +4432,12 @@ namespace My.Company
             }
         }
 
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Weird2u8 { ... }";
+        }
 
         [CustomMarshaller(typeof(Weird2u8), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
@@ -5693,9 +5913,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(OptionEnumPayload), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static OptionEnumPayload Some(EnumPayload value) => new() { _variant = 0, _Some = value };
         public static OptionEnumPayload None => new() { _variant = 1 };
 
@@ -5704,6 +5921,17 @@ namespace My.Company
 
         public EnumPayload AsSome() { if (_variant != 0) { throw new InteropException(); } else { return _Some; } }
         public void AsNone() { if (_variant != 1) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Some(...)";
+            if (_variant == 1) return "None";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(OptionEnumPayload), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -5790,9 +6018,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(OptionInner), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static OptionInner Some(Inner value) => new() { _variant = 0, _Some = value };
         public static OptionInner None => new() { _variant = 1 };
 
@@ -5801,6 +6026,17 @@ namespace My.Company
 
         public Inner AsSome() { if (_variant != 0) { throw new InteropException(); } else { return _Some; } }
         public void AsNone() { if (_variant != 1) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Some(...)";
+            if (_variant == 1) return "None";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(OptionInner), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -5891,9 +6127,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(OptionOptionResultOptionUtf8StringError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static OptionOptionResultOptionUtf8StringError Some(OptionResultOptionUtf8StringError value) => new() { _variant = 0, _Some = value };
         public static OptionOptionResultOptionUtf8StringError None => new() { _variant = 1 };
 
@@ -5902,6 +6135,17 @@ namespace My.Company
 
         public OptionResultOptionUtf8StringError AsSome() { if (_variant != 0) { throw new InteropException(); } else { return _Some; } }
         public void AsNone() { if (_variant != 1) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Some(...)";
+            if (_variant == 1) return "None";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(OptionOptionResultOptionUtf8StringError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -5992,9 +6236,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(OptionResultOptionUtf8StringError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static OptionResultOptionUtf8StringError Some(ResultOptionUtf8StringError value) => new() { _variant = 0, _Some = value };
         public static OptionResultOptionUtf8StringError None => new() { _variant = 1 };
 
@@ -6003,6 +6244,17 @@ namespace My.Company
 
         public ResultOptionUtf8StringError AsSome() { if (_variant != 0) { throw new InteropException(); } else { return _Some; } }
         public void AsNone() { if (_variant != 1) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Some(...)";
+            if (_variant == 1) return "None";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(OptionResultOptionUtf8StringError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -6093,9 +6345,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(OptionUtf8String), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static OptionUtf8String Some(Utf8String value) => new() { _variant = 0, _Some = value };
         public static OptionUtf8String None => new() { _variant = 1 };
 
@@ -6104,6 +6353,17 @@ namespace My.Company
 
         public Utf8String AsSome() { if (_variant != 0) { throw new InteropException(); } else { return _Some; } }
         public void AsNone() { if (_variant != 1) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Some(...)";
+            if (_variant == 1) return "None";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(OptionUtf8String), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -6205,9 +6465,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(ResultConstPtrServiceAsyncError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static ResultConstPtrServiceAsyncError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceAsyncError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceAsyncError Panic => new() { _variant = 2 };
@@ -6222,6 +6479,19 @@ namespace My.Company
         public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return "Err(...)";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceAsyncError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -6323,9 +6593,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(ResultConstPtrServiceBasicError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static ResultConstPtrServiceBasicError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceBasicError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceBasicError Panic => new() { _variant = 2 };
@@ -6340,6 +6607,19 @@ namespace My.Company
         public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return "Err(...)";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceBasicError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -6441,9 +6721,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(ResultConstPtrServiceCallbacksError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static ResultConstPtrServiceCallbacksError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceCallbacksError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceCallbacksError Panic => new() { _variant = 2 };
@@ -6458,6 +6735,19 @@ namespace My.Company
         public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return "Err(...)";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceCallbacksError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -6559,9 +6849,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(ResultConstPtrServiceDependentError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static ResultConstPtrServiceDependentError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceDependentError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceDependentError Panic => new() { _variant = 2 };
@@ -6576,6 +6863,19 @@ namespace My.Company
         public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return "Err(...)";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceDependentError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -6677,9 +6977,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(ResultConstPtrServiceIgnoringMethodsError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static ResultConstPtrServiceIgnoringMethodsError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceIgnoringMethodsError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceIgnoringMethodsError Panic => new() { _variant = 2 };
@@ -6694,6 +6991,19 @@ namespace My.Company
         public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return "Err(...)";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceIgnoringMethodsError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -6795,9 +7105,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(ResultConstPtrServiceMainError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static ResultConstPtrServiceMainError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceMainError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceMainError Panic => new() { _variant = 2 };
@@ -6812,6 +7119,19 @@ namespace My.Company
         public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return "Err(...)";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceMainError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -6913,9 +7233,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(ResultConstPtrServiceMultipleCtorsError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static ResultConstPtrServiceMultipleCtorsError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceMultipleCtorsError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceMultipleCtorsError Panic => new() { _variant = 2 };
@@ -6930,6 +7247,19 @@ namespace My.Company
         public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return "Err(...)";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceMultipleCtorsError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -7031,9 +7361,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(ResultConstPtrServiceOnPanicError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static ResultConstPtrServiceOnPanicError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceOnPanicError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceOnPanicError Panic => new() { _variant = 2 };
@@ -7048,6 +7375,19 @@ namespace My.Company
         public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return "Err(...)";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceOnPanicError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -7149,9 +7489,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(ResultConstPtrServiceResultError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static ResultConstPtrServiceResultError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceResultError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceResultError Panic => new() { _variant = 2 };
@@ -7166,6 +7503,19 @@ namespace My.Company
         public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return "Err(...)";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceResultError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -7267,9 +7617,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(ResultConstPtrServiceStringsError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static ResultConstPtrServiceStringsError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceStringsError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceStringsError Panic => new() { _variant = 2 };
@@ -7284,6 +7631,19 @@ namespace My.Company
         public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return "Err(...)";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceStringsError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -7385,9 +7745,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(ResultConstPtrServiceVariousSlicesError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static ResultConstPtrServiceVariousSlicesError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
         public static ResultConstPtrServiceVariousSlicesError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultConstPtrServiceVariousSlicesError Panic => new() { _variant = 2 };
@@ -7402,6 +7759,19 @@ namespace My.Company
         public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return "Err(...)";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrServiceVariousSlicesError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -7490,9 +7860,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(ResultError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static ResultError Ok => new() { _variant = 0 };
         public static ResultError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultError Panic => new() { _variant = 2 };
@@ -7507,6 +7874,19 @@ namespace My.Company
         public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return "Err(...)";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(ResultError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -7608,9 +7988,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(ResultNestedArrayError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static ResultNestedArrayError Ok(NestedArray value) => new() { _variant = 0, _Ok = value };
         public static ResultNestedArrayError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultNestedArrayError Panic => new() { _variant = 2 };
@@ -7625,6 +8002,19 @@ namespace My.Company
         public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return "Err(...)";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(ResultNestedArrayError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -7726,9 +8116,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(ResultOptionEnumPayloadError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static ResultOptionEnumPayloadError Ok(OptionEnumPayload value) => new() { _variant = 0, _Ok = value };
         public static ResultOptionEnumPayloadError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultOptionEnumPayloadError Panic => new() { _variant = 2 };
@@ -7743,6 +8130,19 @@ namespace My.Company
         public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return "Err(...)";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(ResultOptionEnumPayloadError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -7848,9 +8248,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(ResultOptionUtf8StringError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static ResultOptionUtf8StringError Ok(OptionUtf8String value) => new() { _variant = 0, _Ok = value };
         public static ResultOptionUtf8StringError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultOptionUtf8StringError Panic => new() { _variant = 2 };
@@ -7865,6 +8262,19 @@ namespace My.Company
         public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return "Err(...)";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(ResultOptionUtf8StringError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -7966,9 +8376,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(ResultU32Error), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static ResultU32Error Ok(uint value) => new() { _variant = 0, _Ok = value };
         public static ResultU32Error Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultU32Error Panic => new() { _variant = 2 };
@@ -7983,6 +8390,19 @@ namespace My.Company
         public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return "Err(...)";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(ResultU32Error), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -8084,9 +8504,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(ResultU64Error), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static ResultU64Error Ok(ulong value) => new() { _variant = 0, _Ok = value };
         public static ResultU64Error Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultU64Error Panic => new() { _variant = 2 };
@@ -8101,6 +8518,19 @@ namespace My.Company
         public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return "Err(...)";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(ResultU64Error), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -8206,9 +8636,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(ResultUseStringError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static ResultUseStringError Ok(UseString value) => new() { _variant = 0, _Ok = value };
         public static ResultUseStringError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultUseStringError Panic => new() { _variant = 2 };
@@ -8223,6 +8650,19 @@ namespace My.Company
         public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return "Err(...)";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(ResultUseStringError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -8328,9 +8768,6 @@ namespace My.Company
             return _unmanaged;
         }
 
-        [CustomMarshaller(typeof(ResultUtf8StringError), MarshalMode.Default, typeof(Marshaller))]
-        private struct MarshallerMeta { }
-
         public static ResultUtf8StringError Ok(Utf8String value) => new() { _variant = 0, _Ok = value };
         public static ResultUtf8StringError Err(Error value) => new() { _variant = 1, _Err = value };
         public static ResultUtf8StringError Panic => new() { _variant = 2 };
@@ -8345,6 +8782,19 @@ namespace My.Company
         public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
         public void AsPanic() { if (_variant != 2) throw new InteropException(); }
         public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return "Err(...)";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(ResultUtf8StringError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
 
         public ref struct Marshaller
         {
@@ -10283,12 +10733,12 @@ namespace My.Company
             return rval;
         }
 
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public static unsafe VecU8 Empty()
-            {
-                InteropHelper.interoptopus_vec_create(IntPtr.Zero, 0, out var _out);
-                return _out.IntoManaged();
-            }
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static unsafe VecU8 Empty()
+        {
+            InteropHelper.interoptopus_vec_create(IntPtr.Zero, 0, out var _out);
+            return _out.IntoManaged();
+        }
 
         public int Count
         {
@@ -10343,6 +10793,13 @@ namespace My.Company
             _len = 0;
             _capacity = 0;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "VecU8 { ... }";
+        }
+
 
         public partial class InteropHelper
         {
@@ -10404,10 +10861,10 @@ namespace My.Company
 
     }
 
-        public static class VecU8Extensions
-        {
-            public static VecU8 Vec(this byte[] s) { return VecU8.From(s); }
-        }
+    public static class VecU8Extensions
+    {
+        public static VecU8 Vec(this byte[] s) { return VecU8.From(s); }
+    }
 
 
     // This must be a class because we only ever want to hold on to the
@@ -10503,6 +10960,13 @@ namespace My.Company
             _capacity = 0;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "VecUtf8String { ... }";
+        }
+
+
         public partial class InteropHelper
         {
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_create_1491625606766217421")]
@@ -10563,11 +11027,11 @@ namespace My.Company
 
     }
 
-        public static class VecUtf8StringExtensions
-        {
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public static VecUtf8String IntoVec(this Utf8String[] s) { return VecUtf8String.From(s); }
-        }
+    public static class VecUtf8StringExtensions
+    {
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static VecUtf8String IntoVec(this Utf8String[] s) { return VecUtf8String.From(s); }
+    }
 
 
     // This must be a class because we only ever want to hold on to the
@@ -10601,12 +11065,12 @@ namespace My.Company
             return rval;
         }
 
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public static unsafe VecVec3f32 Empty()
-            {
-                InteropHelper.interoptopus_vec_create(IntPtr.Zero, 0, out var _out);
-                return _out.IntoManaged();
-            }
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static unsafe VecVec3f32 Empty()
+        {
+            InteropHelper.interoptopus_vec_create(IntPtr.Zero, 0, out var _out);
+            return _out.IntoManaged();
+        }
 
         public int Count
         {
@@ -10661,6 +11125,13 @@ namespace My.Company
             _len = 0;
             _capacity = 0;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "VecVec3f32 { ... }";
+        }
+
 
         public partial class InteropHelper
         {
@@ -10722,10 +11193,10 @@ namespace My.Company
 
     }
 
-        public static class VecVec3f32Extensions
-        {
-            public static VecVec3f32 Vec(this Vec3f32[] s) { return VecVec3f32.From(s); }
-        }
+    public static class VecVec3f32Extensions
+    {
+        public static VecVec3f32 Vec(this Vec3f32[] s) { return VecVec3f32.From(s); }
+    }
 
 
 
