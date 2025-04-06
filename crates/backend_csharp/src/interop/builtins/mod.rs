@@ -13,8 +13,5 @@ pub fn write_builtins(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     write_interop_exception(i, w)?;
     write_async_helper(i, w)?;
     write_utf8_string(i, w)?;
-
-    // --------------------------------
-
     Ok(())
 }

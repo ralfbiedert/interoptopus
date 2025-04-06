@@ -4,7 +4,6 @@ use interoptopus::{Error, indented};
 
 pub fn write_utf8_string(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     if i.write_types.write_interoptopus_globals() {
-        w.indent();
         indented!(w, r"public partial class Utf8String")?;
         indented!(w, r"{{")?;
         indented!(w, [()], r"IntPtr _ptr;")?;
@@ -185,14 +184,13 @@ pub fn write_utf8_string(i: &Interop, w: &mut IndentWriter) -> Result<(), Error>
         indented!(w, [()], r"}}")?;
         indented!(w, r"}}")?;
         w.newline()?;
-        w.unindent();
 
         // --------------------------------
 
-        indented!(w, [()], r"public static class StringExtensions")?;
-        indented!(w, [()], r"{{")?;
-        indented!(w, [()()], r"public static Utf8String Utf8(this string s) {{ return Utf8String.From(s); }}")?;
-        indented!(w, [()], r"}}")?;
+        indented!(w, r"public static class StringExtensions")?;
+        indented!(w, r"{{")?;
+        indented!(w, [()], r"public static Utf8String Utf8(this string s) {{ return Utf8String.From(s); }}")?;
+        indented!(w, r"}}")?;
         w.newline()?;
     }
     Ok(())

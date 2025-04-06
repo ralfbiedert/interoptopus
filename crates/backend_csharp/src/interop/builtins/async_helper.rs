@@ -108,14 +108,14 @@ pub fn write_async_helper(i: &Interop, w: &mut IndentWriter) -> Result<(), Error
 
         // --------------------------------
 
-        indented!(w, [()], r"public delegate void AsyncCallbackCommon(IntPtr data, IntPtr callback_data);")?;
+        indented!(w, r"public delegate void AsyncCallbackCommon(IntPtr data, IntPtr callback_data);")?;
         w.newline()?;
-        indented!(w, [()], r"[StructLayout(LayoutKind.Sequential)]")?;
-        indented!(w, [()], r"public partial struct AsyncCallbackCommonNative")?;
-        indented!(w, [()], r"{{")?;
-        indented!(w, [()()], r"internal IntPtr _ptr;")?;
-        indented!(w, [()()], r"internal IntPtr _ts;")?;
-        indented!(w, [()], r"}}")?;
+        indented!(w, r"[StructLayout(LayoutKind.Sequential)]")?;
+        indented!(w, r"public partial struct AsyncCallbackCommonNative")?;
+        indented!(w, r"{{")?;
+        indented!(w, [()], r"internal IntPtr _ptr;")?;
+        indented!(w, [()], r"internal IntPtr _ts;")?;
+        indented!(w, r"}}")?;
     }
     Ok(())
 }

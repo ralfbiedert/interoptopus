@@ -75,7 +75,6 @@ public class TestPatternServicesAsync
         };
         var r = await s.ProcessStruct(a);
         s.Dispose();
-        
         Assert.Equal(r.field_int, 124);
     }
 
