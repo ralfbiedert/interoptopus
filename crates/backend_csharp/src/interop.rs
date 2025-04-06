@@ -50,15 +50,6 @@ pub enum WriteTypes {
     All,
 }
 
-/// How to handle generation of unsupported elements
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
-pub enum Unsupported {
-    /// Emit a panic during binding generation.
-    Panic,
-    /// Try to finish binding generation. Unsupported items may be broken and a code comment is added.
-    Comment,
-}
-
 impl WriteTypes {
     #[must_use]
     pub const fn write_interoptopus_globals(self) -> bool {
@@ -108,8 +99,6 @@ impl Default for Interop {
             write_types: WriteTypes::NamespaceAndInteroptopusGlobal,
             rename_symbols: false,
             debug: false,
-            work_around_exception_in_callback_no_reentry: true,
-            unsupported: Unsupported::Panic,
         }
     }
 }
@@ -147,13 +136,6 @@ pub struct Interop {
     pub(crate) rename_symbols: bool,
     /// Also generate markers for easier debugging
     debug: bool,
-    /// Whether we should attempt to work around issues where a callback back to C# might not
-    /// reenter Rust code when an exception happened. This requires callbacks to return
-    /// an `FFIError` type.
-    work_around_exception_in_callback_no_reentry: bool,
-    /// How to handle unsupported constructs.
-    #[builder(setter(into))]
-    unsupported: Unsupported,
     pub(crate) inventory: Inventory,
 }
 
