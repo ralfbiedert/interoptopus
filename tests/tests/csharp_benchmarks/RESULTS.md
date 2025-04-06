@@ -35,22 +35,23 @@ profile: --release
 
 | Construct | ns per call |
 | --- | --- |
-| `primitive_void()` | 4 |
+| `primitive_void()` | 3 |
 | `primitive_u8(0)` | 3 |
-| `primitive_u16(0)` | 4 |
-| `primitive_u32(0)` | 4 |
-| `primitive_u64(0)` | 4 |
-| `pattern_ffi_option_1(OptionInner.None)` | 16 |
-| `pattern_ffi_slice_delegate(x => x[0])` | 483 |
-| `pattern_ffi_slice_delegate_huge(x => x[0])` | 930 |
-| `pattern_ffi_slice_delegate_huge(callback_huge_prealloc)` | 41 |
+| `primitive_u16(0)` | 3 |
+| `primitive_u32(0)` | 3 |
+| `primitive_u64(0)` | 3 |
+| `pattern_ffi_option_1(OptionInner.None)` | 18 |
+| `pattern_ffi_slice_delegate(x => x[0])` | 464 |
+| `pattern_ffi_slice_delegate_huge(x => x[0])` | 939 |
+| `pattern_ffi_slice_delegate_huge(callback_huge_prealloc)` | 34 |
 | `pattern_ffi_slice_2(short_vec, 0)` | 6 |
 | `pattern_ffi_slice_2(long_vec, 0)` | 6 |
-| `pattern_ffi_slice_4(short_byte, short_byte)` | 5 |
-| `pattern_ascii_pointer_1('hello world')` | 29 |
-| `pattern_string_2('hello world')` | 65 |
-| `new VecU8([])` | 10 |
-| `new VecUtf8String([])` | 12 |
-| `pattern_vec_u8_return()` | 35 |
-| `await new TaskCompletionSource().Task` | 97 |
-| `await serviceAsync.Success()` | 471 |
+| `pattern_ffi_slice_4(short_byte, short_byte)` | 6 |
+| `pattern_ascii_pointer_1('hello world')` | 30 |
+| `pattern_string_2('hello world')` | 66 |
+| `'hello world'.Utf8()` | 67 |
+| `new VecU8([])` | 11 |
+| `new VecUtf8String([])` | 76 |
+| `pattern_vec_u8_return()` | 42 |
+| `await new TaskCompletionSource().Task` | 95 |
+| `await serviceAsync.Success()` | 390 |

@@ -172,7 +172,7 @@ pub fn param_to_managed(x: &Parameter) -> String {
         Type::Primitive(_) => x.name().to_string(),
         Type::ReadPointer(_) => x.name().to_string(),
         Type::ReadWritePointer(_) => x.name().to_string(),
-        _ if is_blittable(x.the_type()) => format!("{}.ToManaged()", x.name()),
+        _ if is_reusable(x.the_type()) => format!("{}.ToManaged()", x.name()),
         _ => format!("{}.IntoManaged()", x.name()),
     }
 }
@@ -184,7 +184,7 @@ pub fn field_to_managed(x: &Field) -> String {
         Type::ReadPointer(_) => x.name().to_string(),
         Type::ReadWritePointer(_) => x.name().to_string(),
         Type::Pattern(TypePattern::CStrPointer) => "string.Empty".to_string(),
-        _ if is_blittable(x.the_type()) => format!("{}.ToManaged()", x.name()),
+        _ if is_reusable(x.the_type()) => format!("{}.ToManaged()", x.name()),
         _ => format!("{}.IntoManaged()", x.name()),
     }
 }
@@ -198,7 +198,7 @@ pub fn field_to_unmanaged(x: &Field) -> String {
         Type::ReadWritePointer(_) => x.name().to_string(),
         Type::Pattern(TypePattern::CStrPointer) => "IntPtr.Zero".to_string(),
         Type::Pattern(TypePattern::NamedCallback(_)) => format!("{name}?.ToUnmanaged() ?? default"),
-        _ if is_blittable(x.the_type()) => format!("{name}.ToUnmanaged()"),
+        _ if is_reusable(x.the_type()) => format!("{name}.ToUnmanaged()"),
         _ => format!("{name}.IntoUnmanaged()"),
     }
 }
@@ -294,16 +294,23 @@ pub fn vec_t(x: &VecType) -> String {
     param_to_type(x.t())
 }
 
-/// Checks whether the type can be FFI'ed as-is, or if it needs marshalling.
-pub fn is_blittable(t: &Type) -> bool {
+/// Checks whether the managed C# original will still be valid after it has been moved to FFI.
+///
+/// Under the hood this indicates whether the type does allocations that might be freed on the
+/// native side, and whether this affects if it will have `ToUnmanaged` (copy) or `IntoUnmanaged`
+/// (move) methods,
+///
+/// It does not affect whether they type is `Dispose`, since some types can be re-usable, but still
+/// require `Dispose` to be called to free up memory.
+pub fn is_reusable(t: &Type) -> bool {
     match t {
-        Type::Array(_) => false,
-        Type::Composite(x) => x.fields().iter().all(|x| is_blittable(x.the_type())),
+        Type::Array(_) => true,
+        Type::Composite(x) => x.fields().iter().all(|x| is_reusable(x.the_type())),
         Type::Enum(e) => {
             for v in e.variants() {
                 let blittable = match v.kind() {
                     VariantKind::Unit(_) => true,
-                    VariantKind::Typed(_, t) => is_blittable(t),
+                    VariantKind::Typed(_, t) => is_reusable(t),
                 };
 
                 if !blittable {
@@ -323,13 +330,53 @@ pub fn is_blittable(t: &Type) -> bool {
             TypePattern::APIVersion => true,
             TypePattern::Slice(_) => true,
             TypePattern::SliceMut(_) => true,
-            TypePattern::Option(x) => is_blittable(&x.the_enum().to_type()),
-            TypePattern::Result(x) => is_blittable(&x.the_enum().to_type()),
+            TypePattern::Option(x) => is_reusable(&x.the_enum().to_type()),
+            TypePattern::Result(x) => is_reusable(&x.the_enum().to_type()),
             TypePattern::Bool => true,
             TypePattern::CChar => true,
             TypePattern::NamedCallback(_) => true,
             TypePattern::AsyncCallback(_) => true,
             TypePattern::Vec(_) => false,
+        },
+    }
+}
+
+/// Checks whether the managed C# original needs to be diposed in C#.
+pub fn has_dispose(t: &Type) -> bool {
+    match t {
+        Type::Array(_) => false,
+        Type::Composite(x) => x.fields().iter().any(|x| has_dispose(x.the_type())),
+        Type::Enum(e) => {
+            for v in e.variants() {
+                let disposable = match v.kind() {
+                    VariantKind::Unit(_) => false,
+                    VariantKind::Typed(_, t) => has_dispose(t),
+                };
+
+                if disposable {
+                    return true;
+                }
+            }
+            false
+        }
+        Type::FnPointer(_) => false,
+        Type::Opaque(_) => false,
+        Type::Primitive(_) => false,
+        Type::ReadPointer(_) => false,
+        Type::ReadWritePointer(_) => false,
+        Type::Pattern(p) => match p {
+            TypePattern::CStrPointer => false,
+            TypePattern::Utf8String(_) => true,
+            TypePattern::APIVersion => false,
+            TypePattern::Slice(_) => true,
+            TypePattern::SliceMut(_) => true,
+            TypePattern::Option(x) => has_dispose(&x.the_enum().to_type()),
+            TypePattern::Result(x) => has_dispose(&x.the_enum().to_type()),
+            TypePattern::Bool => false,
+            TypePattern::CChar => false,
+            TypePattern::NamedCallback(_) => true,
+            TypePattern::AsyncCallback(_) => true,
+            TypePattern::Vec(_) => true,
         },
     }
 }

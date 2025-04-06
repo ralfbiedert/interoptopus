@@ -1,5 +1,5 @@
 use crate::Interop;
-use crate::converter::{is_blittable, slice_t};
+use crate::converter::{is_reusable, slice_t};
 use crate::utils::{MoveSemantics, write_common_marshaller};
 use interoptopus::backend::IndentWriter;
 use interoptopus::pattern::slice::SliceType;
@@ -12,7 +12,7 @@ pub enum SliceKind {
 }
 
 pub fn write_pattern_slice(i: &Interop, w: &mut IndentWriter, slice: &SliceType, kind: SliceKind) -> Result<(), Error> {
-    if is_blittable(slice.t()) {
+    if is_reusable(slice.t()) {
         write_pattern_fast_slice(i, w, slice, kind)
     } else {
         write_pattern_marshalling_slice(i, w, slice)

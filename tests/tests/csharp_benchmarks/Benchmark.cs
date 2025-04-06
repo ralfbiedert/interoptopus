@@ -70,6 +70,13 @@ static class Benchmark {
         result = MeasureResult.Measure(Iterations, () => Interop.pattern_string_2("hello world".Utf8()));
         writer.Add("pattern_string_2('hello world')", result);
 
+        result = MeasureResult.Measure(Iterations, () =>
+        {
+            var s = "hello world".Utf8();
+            s.Dispose();
+        });
+        writer.Add("'hello world'.Utf8()", result);
+
         result = MeasureResult.Measure(Iterations, () => VecU8.From([]));
         writer.Add("new VecU8([])", result);
 

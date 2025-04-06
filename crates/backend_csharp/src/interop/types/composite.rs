@@ -1,5 +1,5 @@
 use crate::Interop;
-use crate::converter::{field_name, field_to_managed, field_to_type, field_to_type_declaration_unmanaged, field_to_unmanaged, is_blittable};
+use crate::converter::{field_name, field_to_managed, field_to_type, field_to_type_declaration_unmanaged, field_to_unmanaged, has_dispose, is_reusable};
 use crate::interop::docs::write_documentation;
 use crate::utils::{MoveSemantics, write_common_marshaller};
 use interoptopus::backend::{IndentWriter, WriteFor};
@@ -16,21 +16,22 @@ pub fn write_type_definition_composite(i: &Interop, w: &mut IndentWriter, the_ty
 pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWriter, the_type: &Composite) -> Result<(), Error> {
     i.debug(w, "write_type_definition_composite_marshaller")?;
     let name = the_type.rust_name();
-    let self_kind = if is_blittable(&the_type.to_type()) { "struct" } else { "class" };
-    let into = if is_blittable(&the_type.to_type()) { "To" } else { "Into" };
-    let move_semantics = if is_blittable(&the_type.to_type()) {
+    let self_kind = if is_reusable(&the_type.to_type()) { "struct" } else { "class" };
+    let into = if is_reusable(&the_type.to_type()) { "To" } else { "Into" };
+    let move_semantics = if is_reusable(&the_type.to_type()) {
         MoveSemantics::Copy
     } else {
         MoveSemantics::Move
     };
+    let idisposable = if has_dispose(&the_type.to_type()) { ": IDisposable" } else { "" };
 
     indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
-    indented!(w, r"public partial {self_kind} {}", name)?;
+    indented!(w, r"public partial {self_kind} {name} {idisposable}")?;
     indented!(w, r"{{")?;
 
     indented!(w, [()], r"public {name}() {{ }}")?;
     w.newline()?;
-    indented!(w, [()], r"public unsafe Unmanaged {into}Unmanaged()")?;
+    indented!(w, [()], r"internal unsafe Unmanaged {into}Unmanaged()")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"var _unmanaged = new Unmanaged();")?;
     for field in the_type.fields() {
@@ -65,7 +66,7 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
         indented!(w, [()()], r"public {field_decl};")?;
     }
     w.newline()?;
-    indented!(w, [()()], r"public unsafe {name} {into}Managed()")?;
+    indented!(w, [()()], r"internal unsafe {name} {into}Managed()")?;
     indented!(w, [()()], r"{{")?;
     indented!(w, [()()()], r"var _managed = new {name}();")?;
     for field in the_type.fields() {
@@ -90,6 +91,21 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
     indented!(w, [()], r"}}")?;
     w.newline()?;
 
+    if !idisposable.is_empty() {
+        indented!(w, [()], r"public void Dispose()")?;
+        indented!(w, [()], r"{{")?;
+        for field in the_type.fields() {
+            if !has_dispose(field.the_type()) {
+                continue;
+            }
+
+            let name = field.name();
+            indented!(w, [()()], r"{name}.Dispose();")?;
+        }
+        indented!(w, [()], r"}}")?;
+    }
+    w.newline()?;
+
     indented!(w, [()], r"[CustomMarshaller(typeof({}), MarshalMode.Default, typeof(Marshaller))]", name)?;
     indented!(w, [()], r"private struct MarshallerMeta {{ }}")?;
 
@@ -111,7 +127,7 @@ pub fn write_type_definition_composite_layout_annotation(w: &mut IndentWriter, t
 
 pub fn write_type_definition_composite_body(i: &Interop, w: &mut IndentWriter, the_type: &Composite, write_for: WriteFor) -> Result<(), Error> {
     let visibility = i.visibility_types.to_access_modifier();
-    let self_kind = if is_blittable(&the_type.to_type()) { "struct" } else { "class" };
+    let self_kind = if is_reusable(&the_type.to_type()) { "struct" } else { "class" };
     let rust_name = the_type.rust_name();
 
     indented!(w, r"{visibility} partial {self_kind} {rust_name}")?;

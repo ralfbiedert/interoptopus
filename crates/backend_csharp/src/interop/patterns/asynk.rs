@@ -1,5 +1,5 @@
 use crate::Interop;
-use crate::converter::{is_blittable, param_to_type, rval_to_type_sync};
+use crate::converter::{is_reusable, param_to_type, rval_to_type_sync};
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Type;
 use interoptopus::pattern::TypePattern;
@@ -10,7 +10,7 @@ pub fn write_pattern_async_trampoline(i: &Interop, w: &mut IndentWriter, asynk: 
     i.debug(w, "write_pattern_async_trampoline")?;
 
     let inner = param_to_type(asynk.t());
-    let inner_into = if is_blittable(asynk.t()) { "To" } else { "Into" };
+    let inner_into = if is_reusable(asynk.t()) { "To" } else { "Into" };
 
     let task_completion_source = match asynk.t() {
         Type::Pattern(TypePattern::Result(x)) if x.t().is_void() => "TaskCompletionSource".to_string(),

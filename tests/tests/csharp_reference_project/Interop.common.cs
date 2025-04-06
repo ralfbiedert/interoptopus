@@ -28,9 +28,10 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct EnumDocumented
+    public partial struct EnumDocumented 
     {
     // Debug - write_type_definition_enum_variant_unmanaged_types 
+
 
 
 
@@ -114,9 +115,10 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct EnumRenamed
+    public partial struct EnumRenamed 
     {
     // Debug - write_type_definition_enum_variant_unmanaged_types 
+
 
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
@@ -192,9 +194,10 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct Error
+    public partial struct Error 
     {
     // Debug - write_type_definition_enum_variant_unmanaged_types 
+
 
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
@@ -270,11 +273,11 @@ namespace My.Company.Common
 
     // Debug - write_type_definition_composite_marshaller 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct Vec
+    public partial struct Vec 
     {
         public Vec() { }
 
-        public unsafe Unmanaged ToUnmanaged()
+        internal unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -288,7 +291,7 @@ namespace My.Company.Common
             public double x;
             public double z;
 
-            public unsafe Vec ToManaged()
+            internal unsafe Vec ToManaged()
             {
                 var _managed = new Vec();
                 _managed.x = x;
@@ -296,6 +299,7 @@ namespace My.Company.Common
                 return _managed;
             }
         }
+
 
         [CustomMarshaller(typeof(Vec), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
@@ -1435,7 +1439,7 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class OptionOptionResultOptionUtf8StringError
+    public partial class OptionOptionResultOptionUtf8StringError : IDisposable
     {
     // Debug - write_type_definition_enum_variant_unmanaged_types 
         [StructLayout(LayoutKind.Sequential)]
@@ -1445,6 +1449,11 @@ namespace My.Company.Common
             internal OptionResultOptionUtf8StringError.Unmanaged _Some;
         }
 
+
+        public void Dispose()
+        {
+            if (_variant == 0) { _Some.Dispose(); }
+        }
 
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
@@ -1530,7 +1539,7 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class OptionResultOptionUtf8StringError
+    public partial class OptionResultOptionUtf8StringError : IDisposable
     {
     // Debug - write_type_definition_enum_variant_unmanaged_types 
         [StructLayout(LayoutKind.Sequential)]
@@ -1540,6 +1549,11 @@ namespace My.Company.Common
             internal ResultOptionUtf8StringError.Unmanaged _Some;
         }
 
+
+        public void Dispose()
+        {
+            if (_variant == 0) { _Some.Dispose(); }
+        }
 
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
@@ -1625,7 +1639,7 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class OptionUtf8String
+    public partial class OptionUtf8String : IDisposable
     {
     // Debug - write_type_definition_enum_variant_unmanaged_types 
         [StructLayout(LayoutKind.Sequential)]
@@ -1635,6 +1649,11 @@ namespace My.Company.Common
             internal Utf8String.Unmanaged _Some;
         }
 
+
+        public void Dispose()
+        {
+            if (_variant == 0) { _Some.Dispose(); }
+        }
 
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
@@ -1720,7 +1739,7 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct OptionVec
+    public partial struct OptionVec 
     {
     // Debug - write_type_definition_enum_variant_unmanaged_types 
         [StructLayout(LayoutKind.Sequential)]
@@ -1729,6 +1748,7 @@ namespace My.Company.Common
             internal uint _variant;
             internal Vec.Unmanaged _Some;
         }
+
 
 
         [StructLayout(LayoutKind.Explicit)]
@@ -1815,7 +1835,7 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultError
+    public partial struct ResultError 
     {
     // Debug - write_type_definition_enum_variant_unmanaged_types 
 
@@ -1825,6 +1845,7 @@ namespace My.Company.Common
             internal uint _variant;
             internal Error.Unmanaged _Err;
         }
+
 
 
 
@@ -1919,7 +1940,7 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class ResultOptionUtf8StringError
+    public partial class ResultOptionUtf8StringError : IDisposable
     {
     // Debug - write_type_definition_enum_variant_unmanaged_types 
         [StructLayout(LayoutKind.Sequential)]
@@ -1937,6 +1958,11 @@ namespace My.Company.Common
         }
 
 
+
+        public void Dispose()
+        {
+            if (_variant == 0) { _Ok.Dispose(); }
+        }
 
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
@@ -2034,7 +2060,7 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultU32Error
+    public partial struct ResultU32Error 
     {
     // Debug - write_type_definition_enum_variant_unmanaged_types 
         [StructLayout(LayoutKind.Sequential)]
@@ -2050,6 +2076,7 @@ namespace My.Company.Common
             internal uint _variant;
             internal Error.Unmanaged _Err;
         }
+
 
 
 
@@ -2149,7 +2176,7 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultU64Error
+    public partial struct ResultU64Error 
     {
     // Debug - write_type_definition_enum_variant_unmanaged_types 
         [StructLayout(LayoutKind.Sequential)]
@@ -2165,6 +2192,7 @@ namespace My.Company.Common
             internal uint _variant;
             internal Error.Unmanaged _Err;
         }
+
 
 
 
@@ -2264,7 +2292,7 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class ResultUtf8StringError
+    public partial class ResultUtf8StringError : IDisposable
     {
     // Debug - write_type_definition_enum_variant_unmanaged_types 
         [StructLayout(LayoutKind.Sequential)]
@@ -2282,6 +2310,11 @@ namespace My.Company.Common
         }
 
 
+
+        public void Dispose()
+        {
+            if (_variant == 0) { _Ok.Dispose(); }
+        }
 
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged

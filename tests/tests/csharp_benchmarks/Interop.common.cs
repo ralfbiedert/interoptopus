@@ -23,8 +23,9 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct EnumDocumented
+    public partial struct EnumDocumented 
     {
+
 
 
 
@@ -35,7 +36,7 @@ namespace My.Company.Common
             internal uint _variant;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public EnumDocumented ToManaged()
+            internal EnumDocumented ToManaged()
             {
                 var _managed = new EnumDocumented();
                 _managed._variant = _variant;
@@ -44,7 +45,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -101,8 +102,9 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct EnumRenamed
+    public partial struct EnumRenamed 
     {
+
 
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
@@ -111,7 +113,7 @@ namespace My.Company.Common
             internal uint _variant;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public EnumRenamed ToManaged()
+            internal EnumRenamed ToManaged()
             {
                 var _managed = new EnumRenamed();
                 _managed._variant = _variant;
@@ -120,7 +122,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -171,8 +173,9 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct Error
+    public partial struct Error 
     {
+
 
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
@@ -181,7 +184,7 @@ namespace My.Company.Common
             internal uint _variant;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public Error ToManaged()
+            internal Error ToManaged()
             {
                 var _managed = new Error();
                 _managed._variant = _variant;
@@ -190,7 +193,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -242,11 +245,11 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct Vec
+    public partial struct Vec 
     {
         public Vec() { }
 
-        public Unmanaged ToUnmanaged()
+        internal unsafe Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged.x = x;
@@ -260,7 +263,7 @@ namespace My.Company.Common
             public double x;
             public double z;
 
-            public Vec ToManaged()
+            internal unsafe Vec ToManaged()
             {
                 var _managed = new Vec();
                 _managed.x = x;
@@ -268,6 +271,7 @@ namespace My.Company.Common
                 return _managed;
             }
         }
+
 
         [CustomMarshaller(typeof(Vec), MarshalMode.Default, typeof(Marshaller))]
         private struct MarshallerMeta { }
@@ -1393,7 +1397,7 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class OptionOptionResultOptionUtf8StringError
+    public partial class OptionOptionResultOptionUtf8StringError : IDisposable
     {
         [StructLayout(LayoutKind.Sequential)]
         internal unsafe struct UnmanagedSome
@@ -1402,6 +1406,11 @@ namespace My.Company.Common
             internal OptionResultOptionUtf8StringError.Unmanaged _Some;
         }
 
+
+        public void Dispose()
+        {
+            if (_variant == 0) { _Some.Dispose(); }
+        }
 
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
@@ -1413,7 +1422,7 @@ namespace My.Company.Common
             internal UnmanagedSome _Some;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public OptionOptionResultOptionUtf8StringError IntoManaged()
+            internal OptionOptionResultOptionUtf8StringError IntoManaged()
             {
                 var _managed = new OptionOptionResultOptionUtf8StringError();
                 _managed._variant = _variant;
@@ -1423,7 +1432,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged IntoUnmanaged()
+        internal Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -1480,7 +1489,7 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class OptionResultOptionUtf8StringError
+    public partial class OptionResultOptionUtf8StringError : IDisposable
     {
         [StructLayout(LayoutKind.Sequential)]
         internal unsafe struct UnmanagedSome
@@ -1489,6 +1498,11 @@ namespace My.Company.Common
             internal ResultOptionUtf8StringError.Unmanaged _Some;
         }
 
+
+        public void Dispose()
+        {
+            if (_variant == 0) { _Some.Dispose(); }
+        }
 
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
@@ -1500,7 +1514,7 @@ namespace My.Company.Common
             internal UnmanagedSome _Some;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public OptionResultOptionUtf8StringError IntoManaged()
+            internal OptionResultOptionUtf8StringError IntoManaged()
             {
                 var _managed = new OptionResultOptionUtf8StringError();
                 _managed._variant = _variant;
@@ -1510,7 +1524,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged IntoUnmanaged()
+        internal Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -1567,7 +1581,7 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class OptionUtf8String
+    public partial class OptionUtf8String : IDisposable
     {
         [StructLayout(LayoutKind.Sequential)]
         internal unsafe struct UnmanagedSome
@@ -1576,6 +1590,11 @@ namespace My.Company.Common
             internal Utf8String.Unmanaged _Some;
         }
 
+
+        public void Dispose()
+        {
+            if (_variant == 0) { _Some.Dispose(); }
+        }
 
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
@@ -1587,7 +1606,7 @@ namespace My.Company.Common
             internal UnmanagedSome _Some;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public OptionUtf8String IntoManaged()
+            internal OptionUtf8String IntoManaged()
             {
                 var _managed = new OptionUtf8String();
                 _managed._variant = _variant;
@@ -1597,7 +1616,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged IntoUnmanaged()
+        internal Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -1654,7 +1673,7 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct OptionVec
+    public partial struct OptionVec 
     {
         [StructLayout(LayoutKind.Sequential)]
         internal unsafe struct UnmanagedSome
@@ -1662,6 +1681,7 @@ namespace My.Company.Common
             internal uint _variant;
             internal Vec.Unmanaged _Some;
         }
+
 
 
         [StructLayout(LayoutKind.Explicit)]
@@ -1674,7 +1694,7 @@ namespace My.Company.Common
             internal UnmanagedSome _Some;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public OptionVec ToManaged()
+            internal OptionVec ToManaged()
             {
                 var _managed = new OptionVec();
                 _managed._variant = _variant;
@@ -1684,7 +1704,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -1741,7 +1761,7 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultError
+    public partial struct ResultError 
     {
 
         [StructLayout(LayoutKind.Sequential)]
@@ -1750,6 +1770,7 @@ namespace My.Company.Common
             internal uint _variant;
             internal Error.Unmanaged _Err;
         }
+
 
 
 
@@ -1763,7 +1784,7 @@ namespace My.Company.Common
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultError ToManaged()
+            internal ResultError ToManaged()
             {
                 var _managed = new ResultError();
                 _managed._variant = _variant;
@@ -1773,7 +1794,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -1837,7 +1858,7 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class ResultOptionUtf8StringError
+    public partial class ResultOptionUtf8StringError : IDisposable
     {
         [StructLayout(LayoutKind.Sequential)]
         internal unsafe struct UnmanagedOk
@@ -1855,6 +1876,11 @@ namespace My.Company.Common
 
 
 
+        public void Dispose()
+        {
+            if (_variant == 0) { _Ok.Dispose(); }
+        }
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -1868,7 +1894,7 @@ namespace My.Company.Common
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultOptionUtf8StringError IntoManaged()
+            internal ResultOptionUtf8StringError IntoManaged()
             {
                 var _managed = new ResultOptionUtf8StringError();
                 _managed._variant = _variant;
@@ -1879,7 +1905,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged IntoUnmanaged()
+        internal Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -1944,7 +1970,7 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultU32Error
+    public partial struct ResultU32Error 
     {
         [StructLayout(LayoutKind.Sequential)]
         internal unsafe struct UnmanagedOk
@@ -1962,6 +1988,7 @@ namespace My.Company.Common
 
 
 
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -1975,7 +2002,7 @@ namespace My.Company.Common
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultU32Error ToManaged()
+            internal ResultU32Error ToManaged()
             {
                 var _managed = new ResultU32Error();
                 _managed._variant = _variant;
@@ -1986,7 +2013,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -2051,7 +2078,7 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultU64Error
+    public partial struct ResultU64Error 
     {
         [StructLayout(LayoutKind.Sequential)]
         internal unsafe struct UnmanagedOk
@@ -2069,6 +2096,7 @@ namespace My.Company.Common
 
 
 
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -2082,7 +2110,7 @@ namespace My.Company.Common
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultU64Error ToManaged()
+            internal ResultU64Error ToManaged()
             {
                 var _managed = new ResultU64Error();
                 _managed._variant = _variant;
@@ -2093,7 +2121,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged()
+        internal Unmanaged ToUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -2158,7 +2186,7 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class ResultUtf8StringError
+    public partial class ResultUtf8StringError : IDisposable
     {
         [StructLayout(LayoutKind.Sequential)]
         internal unsafe struct UnmanagedOk
@@ -2176,6 +2204,11 @@ namespace My.Company.Common
 
 
 
+        public void Dispose()
+        {
+            if (_variant == 0) { _Ok.Dispose(); }
+        }
+
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -2189,7 +2222,7 @@ namespace My.Company.Common
             internal UnmanagedErr _Err;
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public ResultUtf8StringError IntoManaged()
+            internal ResultUtf8StringError IntoManaged()
             {
                 var _managed = new ResultUtf8StringError();
                 _managed._variant = _variant;
@@ -2200,7 +2233,7 @@ namespace My.Company.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged IntoUnmanaged()
+        internal Unmanaged IntoUnmanaged()
         {
             var _unmanaged = new Unmanaged();
             _unmanaged._variant = _variant;
@@ -2765,6 +2798,11 @@ namespace My.Company.Common
     public partial class Utf8String: IDisposable
     {
         private Utf8String() { }
+
+        // ~Utf8String()
+        // {
+        //     // Dispose();
+        // }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe Utf8String From(string s)

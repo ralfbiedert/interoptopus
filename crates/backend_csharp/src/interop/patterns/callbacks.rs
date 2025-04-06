@@ -1,5 +1,5 @@
 use crate::Interop;
-use crate::converter::{is_blittable, param_to_managed, param_to_type, rval_to_type_sync, rval_to_type_unmanaged};
+use crate::converter::{is_reusable, param_to_managed, param_to_type, rval_to_type_sync, rval_to_type_unmanaged};
 use crate::interop::types::fnptrs::write_type_definition_fn_pointer_annotation;
 use crate::utils::{MoveSemantics, write_common_marshaller};
 use interoptopus::backend::IndentWriter;
@@ -68,7 +68,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     match the_type.fnpointer().signature().rval() {
         Type::Primitive(Primitive::Void) => indented!(w, [()()()], r"_managed({params_invoke});")?,
         Type::Primitive(_) => indented!(w, [()()()], r"return _managed({params_invoke});")?,
-        t if is_blittable(t) => indented!(w, [()()()], r"return _managed({params_invoke}).ToUnmanaged();")?,
+        t if is_reusable(t) => indented!(w, [()()()], r"return _managed({params_invoke}).ToUnmanaged();")?,
         t => indented!(w, [()()()], r"return _managed({params_invoke}).IntoUnmanaged();")?,
     }
     indented!(w, [()()], r"}}")?;
