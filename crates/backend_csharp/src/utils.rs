@@ -23,6 +23,7 @@ pub fn sugared_return_type(f: &Function) -> SugaredReturnType {
     }
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MoveSemantics {
     Move,
     Copy,

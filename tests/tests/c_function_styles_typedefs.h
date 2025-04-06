@@ -747,6 +747,8 @@ typedef int64_t (*interoptopus_string_create)(const void*, uint64_t, UTF8STRING*
 
 typedef int64_t (*interoptopus_string_destroy)(UTF8STRING);
 
+typedef int64_t (*interoptopus_string_clone)(const UTF8STRING*, UTF8STRING*);
+
 typedef int64_t (*interoptopus_vec_create_18289942533122229086)(const void*, uint64_t, VECU8*);
 
 typedef int64_t (*interoptopus_vec_destroy_17895994407320212994)(VECU8);
@@ -915,6 +917,10 @@ typedef RESULTUSESTRINGERROR (*pattern_string_8)(SLICEUSESTRING, uint64_t);
 
 typedef RESULTUTF8STRINGERROR (*pattern_string_9)();
 
+typedef void (*pattern_string_10)(UTF8STRING);
+
+typedef void (*pattern_string_11)(const UTF8STRING*);
+
 typedef uint32_t (*pattern_ffi_slice_1)(SLICEU32);
 
 typedef uint32_t (*pattern_ffi_slice_1b)(SLICEMUTU32);
@@ -931,6 +937,8 @@ typedef void (*pattern_ffi_slice_5)(const SLICEU8*, SLICEMUTU8*);
 typedef void (*pattern_ffi_slice_6)(const SLICEMUTU8*, CALLBACKU8);
 
 typedef void (*pattern_ffi_slice_8)(const SLICEMUTCHARARRAY*, CALLBACKCHARARRAY2);
+
+typedef UTF8STRING (*pattern_ffi_slice_9)(SLICEUSESTRING);
 
 typedef uint8_t (*pattern_ffi_slice_delegate)(CALLBACKFFISLICE);
 

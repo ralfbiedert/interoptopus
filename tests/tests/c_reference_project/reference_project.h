@@ -747,6 +747,8 @@ int64_t interoptopus_string_create(const void* UTF8, uint64_t LEN, UTF8STRING* R
 
 int64_t interoptopus_string_destroy(UTF8STRING UTF8);
 
+int64_t interoptopus_string_clone(const UTF8STRING* UTF8, UTF8STRING* RVAL);
+
 int64_t interoptopus_vec_create_18289942533122229086(const void* DATA, uint64_t LEN, VECU8* RVAL);
 
 int64_t interoptopus_vec_destroy_17895994407320212994(VECU8 IGNORED);
@@ -915,6 +917,10 @@ RESULTUSESTRINGERROR pattern_string_8(SLICEUSESTRING X, uint64_t I);
 
 RESULTUTF8STRINGERROR pattern_string_9();
 
+void pattern_string_10(UTF8STRING IGNORED);
+
+void pattern_string_11(const UTF8STRING* IGNORED);
+
 uint32_t pattern_ffi_slice_1(SLICEU32 FFI_SLICE);
 
 uint32_t pattern_ffi_slice_1b(SLICEMUTU32 FFI_SLICE);
@@ -931,6 +937,8 @@ void pattern_ffi_slice_5(const SLICEU8* SLICE, SLICEMUTU8* SLICE2);
 void pattern_ffi_slice_6(const SLICEMUTU8* SLICE, CALLBACKU8 CALLBACK);
 
 void pattern_ffi_slice_8(const SLICEMUTCHARARRAY* SLICE, CALLBACKCHARARRAY2 CALLBACK);
+
+UTF8STRING pattern_ffi_slice_9(SLICEUSESTRING SLICE);
 
 uint8_t pattern_ffi_slice_delegate(CALLBACKFFISLICE CALLBACK);
 

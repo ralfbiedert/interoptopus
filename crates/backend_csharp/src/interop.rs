@@ -293,7 +293,7 @@ impl Interop {
                 TypePattern::NamedCallback(x) => self.should_emit_by_meta(x.meta()),
                 TypePattern::AsyncCallback(x) => self.should_emit_by_meta(x.meta()),
                 TypePattern::Vec(x) => self.should_emit_by_meta(x.meta()),
-                _ => panic!("Pattern not explicitly handled"),
+                TypePattern::Utf8String(_) => false,
             },
         }
     }

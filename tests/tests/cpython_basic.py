@@ -12,6 +12,7 @@ def init_lib(path):
 
     c_lib.interoptopus_string_create.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(Utf8String)]
     c_lib.interoptopus_string_destroy.argtypes = [Utf8String]
+    c_lib.interoptopus_string_clone.argtypes = [ctypes.POINTER(Utf8String), ctypes.POINTER(Utf8String)]
     c_lib.interoptopus_vec_create_18289942533122229086.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(VecU8)]
     c_lib.interoptopus_vec_destroy_17895994407320212994.argtypes = [VecU8]
     c_lib.interoptopus_vec_create_1491625606766217421.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(VecUtf8String)]
@@ -94,6 +95,8 @@ def init_lib(path):
     c_lib.pattern_string_7.argtypes = [SliceUtf8String, ctypes.c_uint64]
     c_lib.pattern_string_8.argtypes = [SliceUseString, ctypes.c_uint64]
     c_lib.pattern_string_9.argtypes = []
+    c_lib.pattern_string_10.argtypes = [Utf8String]
+    c_lib.pattern_string_11.argtypes = [ctypes.POINTER(Utf8String)]
     c_lib.pattern_ffi_slice_1.argtypes = [SliceU32]
     c_lib.pattern_ffi_slice_1b.argtypes = [SliceMutU32]
     c_lib.pattern_ffi_slice_2.argtypes = [SliceVec3f32, ctypes.c_int32]
@@ -102,6 +105,7 @@ def init_lib(path):
     c_lib.pattern_ffi_slice_5.argtypes = [ctypes.POINTER(SliceU8), ctypes.POINTER(SliceMutU8)]
     c_lib.pattern_ffi_slice_6.argtypes = [ctypes.POINTER(SliceMutU8), ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8, ctypes.c_void_p)]
     c_lib.pattern_ffi_slice_8.argtypes = [ctypes.POINTER(SliceMutCharArray), ctypes.CFUNCTYPE(None, CharArray, ctypes.c_void_p)]
+    c_lib.pattern_ffi_slice_9.argtypes = [SliceUseString]
     c_lib.pattern_ffi_slice_delegate.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint8, SliceU8, ctypes.c_void_p)]
     c_lib.pattern_ffi_slice_delegate_huge.argtypes = [ctypes.CFUNCTYPE(Vec3f32, SliceVec3f32, ctypes.c_void_p)]
     c_lib.pattern_ffi_option_1.argtypes = [TODO]
@@ -194,6 +198,7 @@ def init_lib(path):
 
     c_lib.interoptopus_string_create.restype = ctypes.c_int64
     c_lib.interoptopus_string_destroy.restype = ctypes.c_int64
+    c_lib.interoptopus_string_clone.restype = ctypes.c_int64
     c_lib.interoptopus_vec_create_18289942533122229086.restype = ctypes.c_int64
     c_lib.interoptopus_vec_destroy_17895994407320212994.restype = ctypes.c_int64
     c_lib.interoptopus_vec_create_1491625606766217421.restype = ctypes.c_int64
@@ -270,6 +275,7 @@ def init_lib(path):
     c_lib.pattern_ffi_slice_1.restype = ctypes.c_uint32
     c_lib.pattern_ffi_slice_1b.restype = ctypes.c_uint32
     c_lib.pattern_ffi_slice_2.restype = Vec3f32
+    c_lib.pattern_ffi_slice_9.restype = Utf8String
     c_lib.pattern_ffi_slice_delegate.restype = ctypes.c_uint8
     c_lib.pattern_ffi_slice_delegate_huge.restype = Vec3f32
     c_lib.pattern_ffi_option_1.restype = TODO
@@ -356,6 +362,9 @@ def interoptopus_string_create(utf8: ctypes.c_void_p, len: int, rval: ctypes.POI
 
 def interoptopus_string_destroy(utf8) -> int:
     return c_lib.interoptopus_string_destroy(utf8)
+
+def interoptopus_string_clone(utf8: ctypes.POINTER(Utf8String), rval: ctypes.POINTER(Utf8String)) -> int:
+    return c_lib.interoptopus_string_clone(utf8, rval)
 
 def interoptopus_vec_create_18289942533122229086(data: ctypes.c_void_p, len: int, rval: ctypes.POINTER(VecU8)) -> int:
     return c_lib.interoptopus_vec_create_18289942533122229086(data, len, rval)
@@ -636,6 +645,12 @@ def pattern_string_8(x: SliceUseString | ctypes.Array[UseString], i: int):
 def pattern_string_9():
     return c_lib.pattern_string_9()
 
+def pattern_string_10(ignored):
+    return c_lib.pattern_string_10(ignored)
+
+def pattern_string_11(ignored: ctypes.POINTER(Utf8String)):
+    return c_lib.pattern_string_11(ignored)
+
 def pattern_ffi_slice_1(ffi_slice: SliceU32 | ctypes.Array[ctypes.c_uint32]) -> int:
     if hasattr(ffi_slice, "_length_") and getattr(ffi_slice, "_type_", "") == ctypes.c_uint32:
         ffi_slice = SliceU32(data=ctypes.cast(ffi_slice, ctypes.POINTER(ctypes.c_uint32)), len=len(ffi_slice))
@@ -687,6 +702,12 @@ def pattern_ffi_slice_8(slice: ctypes.POINTER(SliceMutCharArray), callback):
         callback = callbacks.fn_CharArray_ConstPtr(callback)
 
     return c_lib.pattern_ffi_slice_8(slice, callback)
+
+def pattern_ffi_slice_9(slice: SliceUseString | ctypes.Array[UseString]):
+    if hasattr(slice, "_length_") and getattr(slice, "_type_", "") == UseString:
+        slice = SliceUseString(data=ctypes.cast(slice, ctypes.POINTER(UseString)), len=len(slice))
+
+    return c_lib.pattern_ffi_slice_9(slice)
 
 def pattern_ffi_slice_delegate(callback) -> int:
     if not hasattr(callback, "__ctypes_from_outparam__"):

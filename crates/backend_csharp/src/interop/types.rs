@@ -88,7 +88,6 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type)
                 write_pattern_async_trampoline(i, w, x)?;
                 w.newline()?;
             }
-            _ => panic!("Pattern not explicitly handled"),
         },
     }
     Ok(())

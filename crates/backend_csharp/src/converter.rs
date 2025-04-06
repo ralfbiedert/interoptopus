@@ -1,5 +1,5 @@
 use crate::interop::FunctionNameFlavor;
-use heck::{ToLowerCamelCase, ToUpperCamelCase};
+use heck::ToUpperCamelCase;
 use interoptopus::backend::safe_name;
 use interoptopus::lang::{ConstantValue, Field, FnPointer, Function, Parameter, Primitive, PrimitiveValue, SugaredReturnType, Type, VariantKind};
 use interoptopus::pattern::TypePattern;
@@ -37,7 +37,7 @@ pub fn field_to_type(x: &Type) -> String {
         Type::Primitive(x) => primitive_to_type(*x),
         Type::Array(a) => format!("{}[]", field_to_type(a.the_type())),
         Type::Enum(x) => x.rust_name().to_string(),
-        Type::Opaque(x) => "IntPtr".to_string(),
+        Type::Opaque(_) => "IntPtr".to_string(),
         Type::Composite(x) => x.rust_name().to_string(),
         Type::ReadPointer(_) => "IntPtr".to_string(),
         Type::ReadWritePointer(_) => "IntPtr".to_string(),
@@ -67,7 +67,7 @@ pub fn field_to_type_unmanaged(x: &Type) -> String {
         Type::Primitive(x) => primitive_to_type(*x),
         Type::Array(x) => field_to_type(x.the_type()),
         Type::Enum(x) => format!("{}.Unmanaged", x.rust_name()),
-        Type::Opaque(x) => "TODO".to_string(),
+        Type::Opaque(_) => "TODO".to_string(),
         Type::Composite(x) => format!("{}.Unmanaged", x.rust_name()),
         Type::ReadPointer(_) => "IntPtr".to_string(),
         Type::ReadWritePointer(_) => "IntPtr".to_string(),
@@ -114,7 +114,7 @@ pub fn param_to_type(x: &Type) -> String {
         },
         Type::Array(_) => todo!(),
         Type::Enum(x) => x.rust_name().to_string(),
-        Type::Opaque(x) => "IntPtr".to_string(),
+        Type::Opaque(_) => "IntPtr".to_string(),
         Type::Composite(x) => x.rust_name().to_string(),
         Type::ReadPointer(z) => match &**z {
             Type::Opaque(_) => "IntPtr".to_string(),
@@ -146,7 +146,7 @@ pub fn param_to_type(x: &Type) -> String {
             TypePattern::Result(x) => x.the_enum().rust_name().to_string(),
             TypePattern::Vec(x) => x.composite_type().rust_name().to_string(),
             TypePattern::NamedCallback(x) => x.name().to_string(),
-            TypePattern::AsyncCallback(x) => "AsyncCallbackCommonNative".to_string(),
+            TypePattern::AsyncCallback(_) => "AsyncCallbackCommonNative".to_string(),
             TypePattern::Bool => "Bool".to_string(),
             TypePattern::CChar => "sbyte".to_string(),
             TypePattern::APIVersion => param_to_type(&x.fallback_type()),
@@ -223,7 +223,7 @@ pub fn rval_to_type_sync(x: &Type) -> String {
         Type::Primitive(x) => primitive_to_type(*x),
         Type::Array(_) => todo!(),
         Type::Enum(x) => x.rust_name().to_string(),
-        Type::Opaque(x) => "IntPtr".to_string(),
+        Type::Opaque(_) => "IntPtr".to_string(),
         Type::Composite(x) => x.rust_name().to_string(),
         Type::ReadPointer(_) => "IntPtr".to_string(),
         Type::ReadWritePointer(_) => "IntPtr".to_string(),

@@ -69,7 +69,7 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
         Type::Primitive(Primitive::Void) => indented!(w, [()()()], r"_managed({params_invoke});")?,
         Type::Primitive(_) => indented!(w, [()()()], r"return _managed({params_invoke});")?,
         t if is_reusable(t) => indented!(w, [()()()], r"return _managed({params_invoke}).ToUnmanaged();")?,
-        t => indented!(w, [()()()], r"return _managed({params_invoke}).IntoUnmanaged();")?,
+        _ => indented!(w, [()()()], r"return _managed({params_invoke}).IntoUnmanaged();")?,
     }
     indented!(w, [()()], r"}}")?;
     indented!(w, [()()], r"catch (Exception e)")?;
