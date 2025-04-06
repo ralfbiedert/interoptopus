@@ -17,7 +17,7 @@ pub fn _write_pattern_option(i: &Interop, w: &mut IndentWriter, slice: &Composit
         .the_type();
 
     let type_string = rval_to_type_sync(data_type);
-    let is_some = if i.rename_symbols { "isSome" } else { "is_some" };
+    let is_some = "is_some";
 
     indented!(w, r"{} partial struct {}", i.visibility_types.to_access_modifier(), name)?;
     indented!(w, r"{{")?;

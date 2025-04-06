@@ -46,14 +46,7 @@ pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &
     i.debug(w, "write_function_declaration")?;
 
     let rval = rval_to_type_sync(function.signature().rval());
-    let name = function_name(
-        function,
-        if i.rename_symbols {
-            FunctionNameFlavor::CSharpMethodNameWithClass
-        } else {
-            FunctionNameFlavor::RawFFIName
-        },
-    );
+    let name = function_name(function, FunctionNameFlavor::RawFFIName);
 
     let mut params = Vec::new();
 
@@ -97,14 +90,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     let mut to_wrap_name = Vec::new();
     let mut to_wrap_type = Vec::new();
 
-    let raw_name = function_name(
-        function,
-        if i.rename_symbols {
-            FunctionNameFlavor::CSharpMethodNameWithClass
-        } else {
-            FunctionNameFlavor::RawFFIName
-        },
-    );
+    let raw_name = function_name(function, FunctionNameFlavor::RawFFIName);
 
     let rval = rval_to_type_async(&sugared_return_type(function));
 
@@ -165,14 +151,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     indented!(w, [()], r"try")?;
     indented!(w, [()], r"{{")?;
 
-    let fn_name = function_name(
-        function,
-        if i.rename_symbols {
-            FunctionNameFlavor::CSharpMethodNameWithClass
-        } else {
-            FunctionNameFlavor::RawFFIName
-        },
-    );
+    let fn_name = function_name(function, FunctionNameFlavor::RawFFIName);
 
     let call = format!(r"{}({})", fn_name, to_invoke.join(", "));
 

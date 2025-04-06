@@ -72,8 +72,8 @@ pub fn write_pattern_service_method(
     let (mut names, mut types, mut to_invoke) = params(function, method_type, false);
 
     let fn_name = match method_type {
-        MethodType::Ctor => function_name(function, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix)),
-        MethodType::Regular => function_name(function, FunctionNameFlavor::CSharpMethodNameWithoutClass(&common_prefix)),
+        MethodType::Ctor => function_name(function, FunctionNameFlavor::CSharpMethodWithoutClass(&common_prefix)),
+        MethodType::Regular => function_name(function, FunctionNameFlavor::CSharpMethodWithoutClass(&common_prefix)),
         MethodType::Dtor => "Dispose".to_string(),
     };
 
@@ -106,14 +106,7 @@ pub fn write_pattern_service_method(
         }
     };
 
-    let method_to_invoke = function_name(
-        function,
-        if i.rename_symbols {
-            FunctionNameFlavor::CSharpMethodNameWithClass
-        } else {
-            FunctionNameFlavor::RawFFIName
-        },
-    );
+    let method_to_invoke = function_name(function, FunctionNameFlavor::RawFFIName);
 
     // Assemble actual function call.
     let invoke_args = match method_type {
@@ -205,7 +198,7 @@ pub fn write_service_method_overload(i: &Interop, w: &mut IndentWriter, class: &
 pub fn write_common_service_method_overload(i: &Interop, w: &mut IndentWriter, class: &ServiceDefinition, function: &Function, write_for: WriteFor) -> Result<(), Error> {
     i.debug(w, "write_common_service_method_overload")?;
 
-    let fn_name = function_name(function, FunctionNameFlavor::CSharpMethodNameWithoutClass(&class.common_prefix()));
+    let fn_name = function_name(function, FunctionNameFlavor::CSharpMethodWithoutClass(&class.common_prefix()));
     let async_rval = sugared_return_type(function);
     let (mut names, mut types, mut to_invoke) = params(function, MethodType::Regular, true);
 
@@ -232,14 +225,7 @@ pub fn write_common_service_method_overload(i: &Interop, w: &mut IndentWriter, c
         }
     };
 
-    let method_to_invoke = function_name(
-        function,
-        if i.rename_symbols {
-            FunctionNameFlavor::CSharpMethodNameWithClass
-        } else {
-            FunctionNameFlavor::RawFFIName
-        },
-    );
+    let method_to_invoke = function_name(function, FunctionNameFlavor::RawFFIName);
     let extra_args = if to_invoke.is_empty() {
         String::new()
     } else {

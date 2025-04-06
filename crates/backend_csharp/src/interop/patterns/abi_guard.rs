@@ -20,11 +20,7 @@ pub fn write_abi_guard(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         .find(|x| matches!(x.signature().rval(), Type::Pattern(TypePattern::APIVersion)))
     {
         let version = inventory_hash(&i.inventory);
-        let flavor = if i.rename_symbols {
-            FunctionNameFlavor::CSharpMethodNameWithClass
-        } else {
-            FunctionNameFlavor::RawFFIName
-        };
+        let flavor = FunctionNameFlavor::RawFFIName;
         let fn_call = function_name(api_guard, flavor);
         indented!(w, [()], r"var api_version = {}.{}();", i.class, fn_call)?;
         indented!(w, [()], r"if (api_version != {}ul)", version)?;

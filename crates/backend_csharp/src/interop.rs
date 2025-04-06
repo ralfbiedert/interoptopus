@@ -34,9 +34,9 @@ pub enum FunctionNameFlavor<'a> {
     /// Takes the name as it is written in Rust
     RawFFIName,
     /// Converts the name to camel case
-    CSharpMethodNameWithClass,
+    CSharpMethodWithClass,
     /// Converts the name to camel case and removes the class name
-    CSharpMethodNameWithoutClass(&'a str),
+    CSharpMethodWithoutClass(&'a str),
 }
 
 /// The types to write for the given recorder.
@@ -97,7 +97,6 @@ impl Default for Interop {
             namespace_id: String::new(),
             visibility_types: Visibility::AsDeclared,
             write_types: WriteTypes::NamespaceAndInteroptopusGlobal,
-            rename_symbols: false,
             debug: false,
         }
     }
@@ -132,8 +131,6 @@ pub struct Interop {
     /// Which types to write.
     #[builder(setter(into))]
     write_types: WriteTypes,
-    /// Generate functions and field names matching C# conventions, instead of mapping them 1:1 with Rust.
-    pub(crate) rename_symbols: bool,
     /// Also generate markers for easier debugging
     debug: bool,
     pub(crate) inventory: Inventory,

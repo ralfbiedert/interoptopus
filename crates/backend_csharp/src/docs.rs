@@ -59,13 +59,13 @@ impl<'a> Markdown<'a> {
             indented!(w, r" - **[{}](#{})** - {}", name, name, doc)?;
 
             for x in pattern.constructors() {
-                let func_name = function_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
+                let func_name = function_name(x, FunctionNameFlavor::CSharpMethodWithoutClass(&prefix));
                 let target = format!("{name}.{func_name}");
                 let doc = x.meta().docs().lines().first().cloned().unwrap_or_default();
                 indented!(w, r"     - **[{}](#{})** <sup>**ctor**</sup> - {}", func_name, target, doc)?;
             }
             for x in pattern.methods() {
-                let func_name = function_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
+                let func_name = function_name(x, FunctionNameFlavor::CSharpMethodWithoutClass(&prefix));
                 let target = format!("{name}.{func_name}");
                 let doc = x.meta().docs().lines().first().cloned().unwrap_or_default();
                 indented!(w, r"     - **[{}](#{})** - {}", func_name, target, doc)?;
@@ -150,7 +150,7 @@ impl<'a> Markdown<'a> {
         indented!(w, r"#### Fields ")?;
         for f in composite.fields() {
             let doc = f.docs().lines().join("\n");
-            let name = field_name(f, self.interop.rename_symbols);
+            let name = field_name(f);
             indented!(w, r"- **{}** - {} ", name, doc)?;
         }
 
@@ -251,7 +251,7 @@ impl<'a> Markdown<'a> {
             }
 
             for x in pattern.constructors() {
-                let fname = function_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
+                let fname = function_name(x, FunctionNameFlavor::CSharpMethodWithoutClass(&prefix));
                 let target = fname.to_string();
                 indented!(w, r#"### <a name="{}">**{}**</a> <sup>ctor</sup>"#, target, target)?;
 
@@ -273,7 +273,7 @@ impl<'a> Markdown<'a> {
             }
 
             for x in pattern.methods() {
-                let fname = function_name(x, FunctionNameFlavor::CSharpMethodNameWithoutClass(&prefix));
+                let fname = function_name(x, FunctionNameFlavor::CSharpMethodWithoutClass(&prefix));
                 let target = fname.to_string();
 
                 indented!(w, r#"### <a name="{}">**{}**</a>"#, target, target)?;

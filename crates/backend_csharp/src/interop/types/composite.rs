@@ -179,7 +179,7 @@ pub fn write_type_definition_composite_body(i: &Interop, w: &mut IndentWriter, t
 
 #[allow(clippy::single_match_else)]
 pub fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWriter, field: &Field, _: &Composite) -> Result<(), Error> {
-    let field_name = field_name(field, i.rename_symbols);
+    let field_name = field_name(field);
     let visibility = match field.visibility() {
         Visibility::Public => "public ",
         Visibility::Private => "",

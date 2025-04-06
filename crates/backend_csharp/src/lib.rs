@@ -123,4 +123,4 @@ pub(crate) mod interop;
 pub(crate) mod utils;
 
 pub use docs::{Markdown, MarkdownConfig};
-pub use interop::{FunctionNameFlavor, Interop, InteropBuilder, InteropBuilderError, Unsupported, Visibility, WriteTypes};
+pub use interop::{FunctionNameFlavor, Interop, InteropBuilder, InteropBuilderError, Visibility, WriteTypes};

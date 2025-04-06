@@ -288,14 +288,14 @@ pub fn const_value(value: &ConstantValue) -> String {
 pub fn function_name(function: &Function, flavor: FunctionNameFlavor) -> String {
     match flavor {
         FunctionNameFlavor::RawFFIName => function.name().to_string(),
-        FunctionNameFlavor::CSharpMethodNameWithClass => function.name().to_upper_camel_case(),
-        FunctionNameFlavor::CSharpMethodNameWithoutClass(class) => function.name().replace(class, "").to_upper_camel_case(),
+        FunctionNameFlavor::CSharpMethodWithClass => function.name().to_upper_camel_case(),
+        FunctionNameFlavor::CSharpMethodWithoutClass(class) => function.name().replace(class, "").to_upper_camel_case(),
     }
 }
 
 /// TODO: We might want to get rid of field renaming.
-pub fn field_name(field: &Field, rename_symbols: bool) -> String {
-    if rename_symbols { field.name().to_lower_camel_case() } else { field.name().into() }
+pub fn field_name(field: &Field) -> String {
+    field.name().into()
 }
 
 /// For a `Slice<u8>`, returns the `u8` as a C# type, e.g., `byte`.
