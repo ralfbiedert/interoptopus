@@ -33,6 +33,7 @@ def init_lib(path):
     c_lib.nested_array_3.argtypes = [NestedArray]
     c_lib.behavior_sleep.argtypes = [ctypes.c_uint64]
     c_lib.behavior_panics.argtypes = []
+    c_lib.behavior_panics_via_result.argtypes = []
     c_lib.enums_1.argtypes = [ctypes.c_int]
     c_lib.enums_2.argtypes = [ctypes.c_int]
     c_lib.enums_3.argtypes = [ctypes.POINTER(ctypes.c_int)]
@@ -220,6 +221,7 @@ def init_lib(path):
     c_lib.char_array_3.restype = ctypes.c_uint8
     c_lib.nested_array_1.restype = NestedArray
     c_lib.nested_array_3.restype = ctypes.c_uint8
+    c_lib.behavior_panics_via_result.restype = ResultError
     c_lib.enums_2.restype = ctypes.c_int
     c_lib.enums_3.restype = ctypes.POINTER(ctypes.c_int)
     c_lib.enums_4.restype = Utf8String
@@ -432,6 +434,9 @@ def behavior_sleep(millis: int):
 
 def behavior_panics():
     return c_lib.behavior_panics()
+
+def behavior_panics_via_result():
+    return c_lib.behavior_panics_via_result()
 
 def enums_1(ignored: TODO):
     return c_lib.enums_1(ignored)

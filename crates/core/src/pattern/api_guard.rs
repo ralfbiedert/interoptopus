@@ -1,7 +1,7 @@
 //! Ensures bindings match the used DLL.
 //!
 //! Using an API guard is as simple as defining and exporting a function `my_api_guard` returning an
-//! [`APIVersion`] as in the example below. Backends supporting API guards will automatically
+//! [`ApiVersion`] as in the example below. Backends supporting API guards will automatically
 //! generate guard code executed when the library is loaded.
 //!
 //! When developing we **highly recommend** adding API guards, as mismatching bindings are the #1
@@ -15,11 +15,11 @@
 //! ```
 //! use interoptopus::{ffi_function, function};
 //! use interoptopus::inventory::{Inventory, InventoryBuilder};
-//! use interoptopus::pattern::api_guard::APIVersion;
+//! use interoptopus::pattern::api_guard::ApiVersion;
 //!
 //! // Guard function used by backends.
 //! #[ffi_function]
-//! pub fn my_api_guard() -> APIVersion {
+//! pub fn my_api_guard() -> ApiVersion {
 //!     my_inventory().into()
 //! }
 //!
@@ -61,11 +61,11 @@ use std::hash::{Hash, Hasher};
 #[repr(transparent)]
 #[allow(dead_code)]
 #[derive(Debug, Default, PartialOrd, PartialEq, Eq, Copy, Clone)]
-pub struct APIVersion {
+pub struct ApiVersion {
     version: u64,
 }
 
-impl APIVersion {
+impl ApiVersion {
     /// Create a new API version from the given hash.
     #[must_use]
     pub const fn new(version: u64) -> Self {
@@ -75,44 +75,69 @@ impl APIVersion {
     /// Create a new API version from the given library.
     #[must_use]
     pub fn from_inventory(inventory: &Inventory) -> Self {
-        let version = inventory_hash(inventory);
+        let version = ApiHash::from(inventory).hash;
         Self { version }
     }
 }
 
-unsafe impl TypeInfo for APIVersion {
+unsafe impl TypeInfo for ApiVersion {
     fn type_info() -> Type {
         Type::Pattern(TypePattern::APIVersion)
     }
 }
 
-impl From<Inventory> for APIVersion {
+impl From<Inventory> for ApiVersion {
     fn from(i: Inventory) -> Self {
         Self::from_inventory(&i)
     }
 }
 
-/// Returns a unique hash for an inventory; used by backends.
-#[must_use]
-pub fn inventory_hash(inventory: &Inventory) -> u64 {
-    let mut hasher = DefaultHasher::new();
+/// Represents the API hash.
+pub struct ApiHash {
+    pub hash: u64,
+    pub hash_hex: String,
+}
 
-    let types = inventory.ctypes();
-    let functions = inventory.functions();
-    let constants = inventory.constants();
+impl ApiHash {
+    /// Returns a unique hash for an inventory; used by backends.
+    #[must_use]
+    pub fn from(inventory: &Inventory) -> Self {
+        let mut hasher = DefaultHasher::new();
 
-    for t in types {
-        t.hash(&mut hasher);
+        let types = inventory.ctypes();
+        let functions = inventory.functions();
+        let constants = inventory.constants();
+
+        for t in types {
+            t.hash(&mut hasher);
+        }
+
+        for f in functions {
+            f.hash(&mut hasher);
+        }
+
+        for c in constants {
+            c.name().hash(&mut hasher);
+            c.value().fucking_hash_it_already(&mut hasher);
+        }
+
+        Self::new(hasher.finish())
     }
 
-    for f in functions {
-        f.hash(&mut hasher);
+    /// Creates a new hash from the given raw hash value.
+    #[must_use]
+    pub fn new(hash: u64) -> Self {
+        let hash_hex = format!("{hash:x}");
+        Self { hash, hash_hex }
     }
 
-    for c in constants {
-        c.name().hash(&mut hasher);
-        c.value().fucking_hash_it_already(&mut hasher);
+    #[must_use]
+    pub const fn hash(&self) -> u64 {
+        self.hash
     }
 
-    hasher.finish()
+    #[must_use]
+    pub fn hash_hex(&self) -> &str {
+        self.hash_hex.as_str()
+    }
 }

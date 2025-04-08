@@ -34,6 +34,7 @@ use crate::lang::{TypeInfo, VariantKind};
 use crate::pattern::TypePattern;
 use std::any::Any;
 use std::fmt::Debug;
+use std::panic::{AssertUnwindSafe, catch_unwind};
 
 /// Extracts a string message from a panic unwind.
 pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
@@ -161,6 +162,11 @@ pub fn result_to_ffi<T: TypeInfo, E: TypeInfo>(f: impl FnOnce() -> std::result::
 /// At some point we want to get rid of these once `Try` ([try_trait_v2](https://github.com/rust-lang/rust/issues/84277)) stabilizes.
 pub async fn result_to_ffi_async<T: TypeInfo, E: TypeInfo>(f: impl std::ops::AsyncFnOnce() -> std::result::Result<T, E>) -> Result<T, E> {
     f().await.into()
+}
+
+/// Converts a panic to a [`Result::Panic`].
+pub fn panic_to_result<T: TypeInfo, E: TypeInfo>(f: impl FnOnce() -> Result<T, E>) -> Result<T, E> {
+    catch_unwind(AssertUnwindSafe(f)).unwrap_or_else(|_| Result::Panic)
 }
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]

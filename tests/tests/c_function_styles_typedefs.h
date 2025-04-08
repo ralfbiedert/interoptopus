@@ -802,6 +802,8 @@ typedef void (*behavior_sleep)(uint64_t);
 
 typedef void (*behavior_panics)();
 
+typedef RESULTERROR (*behavior_panics_via_result)();
+
 typedef void (*enums_1)(ENUMPAYLOAD);
 
 typedef ENUMPAYLOAD (*enums_2)(ENUMPAYLOAD);

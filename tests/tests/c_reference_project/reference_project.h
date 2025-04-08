@@ -802,6 +802,8 @@ void behavior_sleep(uint64_t MILLIS);
 
 void behavior_panics();
 
+RESULTERROR behavior_panics_via_result();
+
 void enums_1(ENUMPAYLOAD IGNORED);
 
 ENUMPAYLOAD enums_2(ENUMPAYLOAD X);
