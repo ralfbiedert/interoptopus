@@ -589,6 +589,17 @@ typedef enum RESULTUSESTRINGERROR
     RESULTUSESTRINGERROR_NULL = 3,
     } RESULTUSESTRINGERROR;
 
+/// Result that contains value or an error.
+typedef enum RESULTVECUTF8STRINGERROR
+    {
+    /// Element if err is `Ok`.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    /// Error value.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTVECUTF8STRINGERROR_PANIC = 2,
+    RESULTVECUTF8STRINGERROR_NULL = 3,
+    } RESULTVECUTF8STRINGERROR;
+
 typedef uint8_t (*CALLBACKFFISLICE)(SLICEU8 SLICE, const void* CALLBACK_DATA);
 
 typedef void (*CALLBACKSLICEMUT)(SLICEMUTU8 SLICE, const void* CALLBACK_DATA);
@@ -752,6 +763,8 @@ typedef enum RESULTOPTIONENUMPAYLOADERROR
 typedef void (*CALLBACKCHARARRAY2)(CHARARRAY VALUE, const void* CALLBACK_DATA);
 
 typedef void (*fptr_fn_ConstPtrResultUseStringError_ConstPtr)(const RESULTUSESTRINGERROR* x0, const void* x1);
+
+typedef void (*fptr_fn_ConstPtrResultVecUtf8StringError_ConstPtr)(const RESULTVECUTF8STRINGERROR* x0, const void* x1);
 
 typedef void (*fptr_fn_ConstPtrResultNestedArrayError_ConstPtr)(const RESULTNESTEDARRAYERROR* x0, const void* x1);
 
@@ -1038,6 +1051,8 @@ typedef RESULTERROR (*service_async_return_after_ms)(const SERVICEASYNC*, uint64
 typedef RESULTERROR (*service_async_process_struct)(const SERVICEASYNC*, NESTEDARRAY, fptr_fn_ConstPtrResultNestedArrayError_ConstPtr);
 
 typedef RESULTERROR (*service_async_handle_string)(const SERVICEASYNC*, UTF8STRING, fptr_fn_ConstPtrResultUtf8StringError_ConstPtr);
+
+typedef RESULTERROR (*service_async_handle_vec_string)(const SERVICEASYNC*, VECUTF8STRING, fptr_fn_ConstPtrResultVecUtf8StringError_ConstPtr);
 
 typedef RESULTERROR (*service_async_handle_nested_string)(const SERVICEASYNC*, UTF8STRING, fptr_fn_ConstPtrResultUseStringError_ConstPtr);
 

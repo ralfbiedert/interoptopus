@@ -25,7 +25,21 @@ public class TestPatternServicesAsync
         var s = ServiceAsync.New();
         var r = await s.HandleString("abc".Utf8());
         s.Dispose();
-        Assert.Equal(r.String, "abc");
+        Assert.Equal(r.IntoString(), "abc");
+    }
+
+    [Fact]
+    public async void HandleVecString()
+    {
+        var s = ServiceAsync.New();
+        var v = new[]
+        {
+            "abc".Utf8()
+        }.IntoVec();
+
+        var r = await s.HandleVecString(v);
+        s.Dispose();
+        Assert.Equal(r[0].IntoString(), "abc");
     }
 
 

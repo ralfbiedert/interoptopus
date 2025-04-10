@@ -48,6 +48,10 @@ impl ServiceAsync {
         ffi::Result::Ok(s)
     }
 
+    pub async fn handle_vec_string(_this: This, s: ffi::Vec<ffi::String>) -> ffi::Result<ffi::Vec<ffi::String>, Error> {
+        ffi::Result::Ok(s)
+    }
+
     pub async fn handle_nested_string(_this: This, s: ffi::String) -> ffi::Result<UseString, Error> {
         ffi::Result::Ok(UseString { s1: s.clone(), s2: s.clone() })
     }

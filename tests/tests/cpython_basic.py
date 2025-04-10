@@ -146,6 +146,7 @@ def init_lib(path):
     c_lib.service_async_return_after_ms.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint64, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultU64Error), ctypes.c_void_p)]
     c_lib.service_async_process_struct.argtypes = [ctypes.c_void_p, NestedArray, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultNestedArrayError), ctypes.c_void_p)]
     c_lib.service_async_handle_string.argtypes = [ctypes.c_void_p, Utf8String, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultUtf8StringError), ctypes.c_void_p)]
+    c_lib.service_async_handle_vec_string.argtypes = [ctypes.c_void_p, VecUtf8String, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultVecUtf8StringError), ctypes.c_void_p)]
     c_lib.service_async_handle_nested_string.argtypes = [ctypes.c_void_p, Utf8String, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultUseStringError), ctypes.c_void_p)]
     c_lib.service_async_callback_string.argtypes = [ctypes.c_void_p, Utf8String, ctypes.CFUNCTYPE(None, Utf8String, ctypes.c_void_p)]
     c_lib.service_async_success.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultError), ctypes.c_void_p)]
@@ -315,6 +316,7 @@ def init_lib(path):
     c_lib.service_async_return_after_ms.restype = ResultError
     c_lib.service_async_process_struct.restype = ResultError
     c_lib.service_async_handle_string.restype = ResultError
+    c_lib.service_async_handle_vec_string.restype = ResultError
     c_lib.service_async_handle_nested_string.restype = ResultError
     c_lib.service_async_success.restype = ResultError
     c_lib.service_async_fail.restype = ResultError
@@ -2514,6 +2516,16 @@ class ResultUseStringError:
     Null = 3
 
 
+class ResultVecUtf8StringError:
+    """Result that contains value or an error."""
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
+
+
 class CallbackTable(ctypes.Structure):
 
     # These fields represent the underlying C data layout
@@ -2942,6 +2954,10 @@ class ServiceAsync:
     def handle_string(self, s, _async_callback):
         """"""
         return c_lib.service_async_handle_string(self._ctx, s, _async_callback)
+
+    def handle_vec_string(self, s, _async_callback):
+        """"""
+        return c_lib.service_async_handle_vec_string(self._ctx, s, _async_callback)
 
     def handle_nested_string(self, s, _async_callback):
         """"""

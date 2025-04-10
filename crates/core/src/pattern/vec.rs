@@ -12,6 +12,9 @@ pub struct Vec<T> {
     capacity: u64,
 }
 
+unsafe impl<T> Send for Vec<T> where T: Send {}
+unsafe impl<T> Sync for Vec<T> where T: Sync {}
+
 impl<T> Vec<T> {
     #[must_use]
     pub fn from_vec(mut s: std::vec::Vec<T>) -> Self {
