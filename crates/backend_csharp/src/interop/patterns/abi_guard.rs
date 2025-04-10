@@ -2,9 +2,9 @@ use crate::converter::function_name;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Type;
-use interoptopus::pattern::api_guard::ApiHash;
 use interoptopus::pattern::TypePattern;
-use interoptopus::{indented, Error};
+use interoptopus::pattern::api_guard::ApiHash;
+use interoptopus::{Error, indented};
 
 #[allow(clippy::literal_string_with_formatting_args)]
 pub fn write_abi_guard(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
