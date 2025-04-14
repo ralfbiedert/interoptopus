@@ -9,6 +9,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <sys/types.h>
 
 
 
@@ -83,6 +84,13 @@ typedef struct UTF8STRING
     uint64_t capacity;
     } UTF8STRING;
 
+typedef enum ENUMNUM
+    {
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    ENUMNUM_B = 1,
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    } ENUMNUM;
+
 typedef struct BOOLFIELD
     {
     bool val;
@@ -92,6 +100,13 @@ typedef struct EXTRATYPEF32
     {
     float x;
     } EXTRATYPEF32;
+
+typedef struct IVEC3
+    {
+    ssize_t x;
+    ssize_t y;
+    ssize_t z;
+    } IVEC3;
 
 typedef struct INNER
     {
