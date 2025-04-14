@@ -962,6 +962,12 @@ class Utf8String(ctypes.Structure):
         return ctypes.Structure.__set__(self, "capacity", value)
 
 
+class EnumNum:
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    B = 1
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+
+
 class BoolField(ctypes.Structure):
 
     # These fields represent the underlying C data layout
@@ -1000,6 +1006,48 @@ class ExtraTypef32(ctypes.Structure):
     @x.setter
     def x(self, value: float):
         return ctypes.Structure.__set__(self, "x", value)
+
+
+class IVec3(ctypes.Structure):
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("x", ctypes.c_ssize_t),
+        ("y", ctypes.c_ssize_t),
+        ("z", ctypes.c_ssize_t),
+    ]
+
+    def __init__(self, x: int = None, y: int = None, z: int = None):
+        if x is not None:
+            self.x = x
+        if y is not None:
+            self.y = y
+        if z is not None:
+            self.z = z
+
+    @property
+    def x(self) -> int:
+        return ctypes.Structure.__get__(self, "x")
+
+    @x.setter
+    def x(self, value: int):
+        return ctypes.Structure.__set__(self, "x", value)
+
+    @property
+    def y(self) -> int:
+        return ctypes.Structure.__get__(self, "y")
+
+    @y.setter
+    def y(self, value: int):
+        return ctypes.Structure.__set__(self, "y", value)
+
+    @property
+    def z(self) -> int:
+        return ctypes.Structure.__get__(self, "z")
+
+    @z.setter
+    def z(self, value: int):
+        return ctypes.Structure.__set__(self, "z", value)
 
 
 class Inner(ctypes.Structure):
