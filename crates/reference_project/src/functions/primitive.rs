@@ -63,6 +63,16 @@ pub fn primitive_f64(x: f64) -> f64 {
 }
 
 #[ffi_function]
+pub fn primitive_usize(x: usize) -> usize {
+    usize::MAX - x
+}
+
+#[ffi_function]
+pub fn primitive_isize(x: isize) -> isize {
+    -x
+}
+
+#[ffi_function]
 pub fn primitive_args_5(x0: i64, x1: i64, x2: i64, x3: i64, x4: i64) -> i64 {
     x0 + x1 + x2 + x3 + x4
 }

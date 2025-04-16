@@ -903,6 +903,10 @@ uint32_t primitive_u32(uint32_t X);
 
 uint64_t primitive_u64(uint64_t X);
 
+size_t primitive_usize(size_t X);
+
+ssize_t primitive_isize(ssize_t X);
+
 uint8_t primitive_u8(uint8_t X);
 
 void primitive_void();

@@ -97,6 +97,8 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(functions::primitive::primitive_u16))
             .register(function!(functions::primitive::primitive_u32))
             .register(function!(functions::primitive::primitive_u64))
+            .register(function!(functions::primitive::primitive_usize))
+            .register(function!(functions::primitive::primitive_isize))
             .register(function!(functions::primitive::primitive_u8))
             .register(function!(functions::primitive::primitive_void))
             .register(function!(functions::primitive::primitive_void2))

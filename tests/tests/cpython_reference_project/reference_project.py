@@ -69,6 +69,8 @@ def init_lib(path):
     c_lib.primitive_u16.argtypes = [ctypes.c_uint16]
     c_lib.primitive_u32.argtypes = [ctypes.c_uint32]
     c_lib.primitive_u64.argtypes = [ctypes.c_uint64]
+    c_lib.primitive_usize.argtypes = [ctypes.c_size_t]
+    c_lib.primitive_isize.argtypes = [ctypes.c_ssize_t]
     c_lib.primitive_u8.argtypes = [ctypes.c_uint8]
     c_lib.primitive_void.argtypes = []
     c_lib.primitive_void2.argtypes = []
@@ -255,6 +257,8 @@ def init_lib(path):
     c_lib.primitive_u16.restype = ctypes.c_uint16
     c_lib.primitive_u32.restype = ctypes.c_uint32
     c_lib.primitive_u64.restype = ctypes.c_uint64
+    c_lib.primitive_usize.restype = ctypes.c_size_t
+    c_lib.primitive_isize.restype = ctypes.c_ssize_t
     c_lib.primitive_u8.restype = ctypes.c_uint8
     c_lib.ptr1.restype = ctypes.POINTER(ctypes.c_int64)
     c_lib.ptr2.restype = ctypes.POINTER(ctypes.POINTER(ctypes.c_int64))
@@ -557,6 +561,12 @@ def primitive_u32(x: int) -> int:
 
 def primitive_u64(x: int) -> int:
     return c_lib.primitive_u64(x)
+
+def primitive_usize(x: int) -> int:
+    return c_lib.primitive_usize(x)
+
+def primitive_isize(x: int) -> int:
+    return c_lib.primitive_isize(x)
 
 def primitive_u8(x: int) -> int:
     return c_lib.primitive_u8(x)

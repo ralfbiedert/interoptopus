@@ -22,4 +22,9 @@ public class TestBasics
     [Fact]
     public void primitive_f64() { Assert.Equal(-1.0, Interop.primitive_f64(1.0f)); }
 
+	[Fact]
+	public void primitive_usize() { Assert.Equal(nuint.MaxValue, Interop.primitive_usize(0)); }
+
+	[Fact]
+	public void primitive_isize() { Assert.Equal(-123, Interop.primitive_isize(123)); }
 }
