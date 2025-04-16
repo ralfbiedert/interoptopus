@@ -2,9 +2,10 @@ name: Rust
 
 on:
   push:
-    branches: [ master, test_* ]
+    branches: [master, test_*]
   pull_request:
-    branches: [ master ]
+    branches: [master]
+  workflow_call:
 
 env:
   CARGO_TERM_COLOR: always
@@ -13,7 +14,7 @@ jobs:
   Build:
     strategy:
       matrix:
-        os: [ windows-latest, ubuntu-latest ]
+        os: [windows-latest, ubuntu-latest]
         # os: [ windows-latest ]
     runs-on: ${{ matrix.os }}
     steps:
@@ -22,12 +23,12 @@ jobs:
       - name: Python - Install 3.8
         uses: actions/setup-python@v2
         with:
-          python-version: '3.8'
+          python-version: "3.8"
       - name: .NET - Install
         if: runner.os == 'Linux'
         uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: '8.x'
+          dotnet-version: "8.x"
       - name: Python - Install Dependencies
         run: |
           python -m pip install --upgrade pip
@@ -40,5 +41,3 @@ jobs:
         run: cargo clippy -- -D warnings
       - name: Rust - Test
         run: cargo test --verbose
-
-
