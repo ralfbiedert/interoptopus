@@ -2,7 +2,7 @@
 name = "interoptopus_backend_c"
 description = "Generates C bindings."
 authors = ["Ralf Biedert <rb@xr.io>"]
-version = "0.15.0-alpha.4"
+version = "0.15.0-alpha.5"
 edition = "2024"
 keywords = ["ffi", "code-generation", "bindings", "c", "headers"]
 categories = ["api-bindings", "development-tools::ffi"]
@@ -15,6 +15,6 @@ workspace = true
 
 
 [dependencies]
-interoptopus = { path = "../core", version = "0.15.0-alpha.4" }
+interoptopus = { path = "../core", version = "0.15.0-alpha.5" }
 heck = { workspace = true }
 derive_builder = { workspace = true }
