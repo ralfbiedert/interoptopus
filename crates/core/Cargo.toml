@@ -4,7 +4,7 @@ description = "The polyglot bindings generator for your library (C#, C, Python, 
 authors = ["Ralf Biedert <rb@xr.io>"]
 keywords = ["ffi", "code-generation", "bindings"]
 categories = ["api-bindings", "development-tools::ffi"]
-version = "0.15.0-alpha.4"
+version = "0.15.0-alpha.5"
 edition = "2024"
 rust-version = "1.85"
 license = "MIT"
@@ -26,4 +26,3 @@ serde = { workspace = true, features = ["derive"], optional = true }
 [package.metadata.docs.rs]
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
-
