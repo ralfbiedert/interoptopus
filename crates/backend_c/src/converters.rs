@@ -1,5 +1,5 @@
 use crate::Interop;
-use crate::interop::ToNamingStyle;
+use crate::interop::{EnumVariants, ToNamingStyle};
 use interoptopus::backend::safe_name;
 use interoptopus::lang::{Composite, Constant, ConstantValue, Enum, FnPointer, Function, Opaque, Primitive, PrimitiveValue, Type, Variant};
 use interoptopus::pattern::TypePattern;
@@ -29,7 +29,11 @@ pub fn enum_to_typename(g: &Interop, x: &Enum) -> String {
 }
 
 pub fn enum_variant_to_name(g: &Interop, the_enum: &Enum, x: &Variant) -> String {
-    format!("{}{}_{}", g.prefix, the_enum.rust_name().to_naming_style(&g.enum_variant_naming), x.name()).to_naming_style(&g.enum_variant_naming)
+    if g.enum_variant_style == EnumVariants::WithEnumName {
+        format!("{}{}_{}", g.prefix, the_enum.rust_name().to_naming_style(&g.enum_variant_naming), x.name()).to_naming_style(&g.enum_variant_naming)
+    } else {
+        format!("{}{}", g.prefix, x.name()).to_naming_style(&g.enum_variant_naming)
+    }
 }
 
 pub fn opaque_to_typename(g: &Interop, x: &Opaque) -> String {
