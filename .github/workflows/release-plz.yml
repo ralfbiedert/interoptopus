@@ -9,10 +9,13 @@ on:
     branches: [release]
 
 jobs:
+  run-tests:
+    uses: ./.github/workflows/rust.yml
   release-plz-release:
     name: Release-plz - Release unpublished packages
     runs-on: ubuntu-latest
     if: ${{ github.repository_owner == 'ralfbiedert' }}
+    needs: run-tests
     permissions:
       contents: write
     steps:
@@ -34,6 +37,7 @@ jobs:
     name: Release-plz - create changelog PR
     runs-on: ubuntu-latest
     if: ${{ github.repository_owner == 'ralfbiedert' }}
+    needs: run-tests
     permissions:
       contents: write
       pull-requests: write
