@@ -1,6 +1,2 @@
-[workspace]
-pr_branch_prefix = "release/"
-git_tag_name = "v{version}"
-
 [changelog]
 protect_breaking_commits = true
