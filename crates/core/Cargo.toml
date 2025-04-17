@@ -19,7 +19,7 @@ default = ["derive"]
 derive = ["interoptopus_proc"]
 
 [dependencies]
-interoptopus_proc = { workspace = true, optional = true }
+interoptopus_proc = { path = "../proc_macros", version = "0.15.0-alpha.6", optional = true }
 log = { workspace = true, optional = true }
 serde = { workspace = true, features = ["derive"], optional = true }
 
