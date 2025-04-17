@@ -26,4 +26,4 @@ quote.workspace = true
 darling.workspace = true
 
 [dev-dependencies]
-interoptopus = { path = "../core", version = "0.15.0-alpha.4" }
+interoptopus = { path = "../core" }
