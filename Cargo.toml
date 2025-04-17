@@ -3,7 +3,7 @@ members = [
     "crates/*",
     "examples/hello_world",
     "examples/real_project_layout/*",
-    "tests"
+    "tests",
 ]
 resolver = "2"
 
@@ -12,9 +12,11 @@ anyhow = "1.0.95"
 darling = "0.20.10"
 derive_builder = "0.20.2"
 heck = "0.5.0"
+interoptopus = { path = "crates/core", version = "0.15.0-alpha.5" }
+interoptopus_proc = { path = "crates/proc_macros", version = "0.15.0-alpha.6" }
 log = "0.4.14"
-proc-macro2 = "1.0.36"
 prettyplease = "0.2.29"
+proc-macro2 = "1.0.36"
 quote = "1.0.15"
 serde = "1.0.203"
 syn = "2.0.79"
@@ -26,10 +28,10 @@ complexity = { level = "deny", priority = -1 }
 perf = { level = "deny", priority = -1 }
 style = { level = "deny", priority = -1 }
 pedantic = { level = "deny", priority = -1 }
-nursery = { level = "deny", priority = -1 } # We might want to disable this if it causes issues.
+nursery = { level = "deny", priority = -1 }     # We might want to disable this if it causes issues.
 
-option_if_let_else = "allow" # trips up on `darling`
-match_same_arms = "allow" # too many
+option_if_let_else = "allow"               # trips up on `darling`
+match_same_arms = "allow"                  # too many
 missing_const_for_fn = "allow"
 missing_errors_doc = "allow"
 missing_panics_doc = "allow"
