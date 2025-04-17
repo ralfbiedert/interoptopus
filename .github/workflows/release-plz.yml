@@ -26,15 +26,23 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
       - name: Run release-plz
-        uses: release-plz/action@v0.5
+        id: release-plz
+        uses: release-plz/action@v0.5.104
         with:
           command: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+      - name: Cherry pick released version into master
+        if: ${{ steps.release-plz.outputs.releases_created }}
+        uses: fm1randa/github-cherry-pick-action@1.0.0
+        with:
+          #body: "chore(release): Update version"
+          branch: master
+          force: false
 
   release-plz-pr:
-    name: Release-plz - create changelog PR
+    name: Release-plz - Create changelog PR
     runs-on: ubuntu-latest
     if: ${{ github.repository_owner == 'ralfbiedert' }}
     needs: run-tests
@@ -52,7 +60,7 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
       - name: Run release-plz
-        uses: release-plz/action@v0.5
+        uses: release-plz/action@v0.5.104
         with:
           command: release-pr
         env:

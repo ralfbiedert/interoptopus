@@ -11,6 +11,7 @@ pub mod enums;
 pub mod generic;
 pub mod meta;
 pub mod namespaces;
+pub mod num;
 pub mod opaque;
 pub mod string;
 pub mod transparent;
