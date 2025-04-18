@@ -14,8 +14,13 @@ extern "C" {
 
 
 
+typedef enum COLOR
+    {
+    COLOR_RED = 0,
+    COLOR_GREEN = 1,
+    COLOR_BLUE = 2,
+    } COLOR;
 
-void sample_function();
 
 
 #ifdef __cplusplus

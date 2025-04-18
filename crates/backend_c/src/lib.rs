@@ -116,4 +116,4 @@ mod docs;
 mod interop;
 
 pub use docs::Markdown;
-pub use interop::{DocStyle, Functions, Indentation, Interop, InteropBuilder, NameCase};
+pub use interop::{DocStyle, EnumVariants, Functions, Indentation, Interop, InteropBuilder, NameCase};
