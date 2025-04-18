@@ -21,21 +21,21 @@ const int32_t COMPUTED_I32 = -2147483647;
 typedef enum ENUMDOCUMENTED
     {
     ///  Variant A.
-    ENUMDOCUMENTED_A = 0,
+    A = 0,
     ///  Variant B.
-    ENUMDOCUMENTED_B = 1,
+    B = 1,
     ///  Variant B.
-    ENUMDOCUMENTED_C = 2,
+    C = 2,
     } ENUMDOCUMENTED;
 
 typedef enum ENUMRENAMED
     {
-    ENUMRENAMED_X = 0,
+    X = 0,
     } ENUMRENAMED;
 
 typedef enum ERROR
     {
-    ERROR_FAIL = 0,
+    FAIL = 0,
     } ERROR;
 
 typedef struct GENERIC2U8 GENERIC2U8;
@@ -87,7 +87,7 @@ typedef struct UTF8STRING
 typedef enum ENUMNUM
     {
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    ENUMNUM_B = 1,
+    B = 1,
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     } ENUMNUM;
 
@@ -275,7 +275,7 @@ typedef enum OPTIONUTF8STRING
     {
     /// Element if Some().
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    OPTIONUTF8STRING_NONE = 1,
+    NONE = 1,
     } OPTIONUTF8STRING;
 
 /// Result that contains value or an error.
@@ -285,8 +285,8 @@ typedef enum RESULTERROR
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTERROR_PANIC = 2,
-    RESULTERROR_NULL = 3,
+    PANIC = 2,
+    NULL = 3,
     } RESULTERROR;
 
 /// Result that contains value or an error.
@@ -296,8 +296,8 @@ typedef enum RESULTU32ERROR
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTU32ERROR_PANIC = 2,
-    RESULTU32ERROR_NULL = 3,
+    PANIC = 2,
+    NULL = 3,
     } RESULTU32ERROR;
 
 /// Result that contains value or an error.
@@ -307,8 +307,8 @@ typedef enum RESULTU64ERROR
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTU64ERROR_PANIC = 2,
-    RESULTU64ERROR_NULL = 3,
+    PANIC = 2,
+    NULL = 3,
     } RESULTU64ERROR;
 
 /// Result that contains value or an error.
@@ -318,8 +318,8 @@ typedef enum RESULTUTF8STRINGERROR
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTUTF8STRINGERROR_PANIC = 2,
-    RESULTUTF8STRINGERROR_NULL = 3,
+    PANIC = 2,
+    NULL = 3,
     } RESULTUTF8STRINGERROR;
 
 ///  Vec marshalling helper.
@@ -350,7 +350,7 @@ typedef struct VECUTF8STRING
 
 typedef enum ENUMPAYLOAD
     {
-    ENUMPAYLOAD_A = 0,
+    A = 0,
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     } ENUMPAYLOAD;
@@ -450,7 +450,7 @@ typedef enum OPTIONINNER
     {
     /// Element if Some().
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    OPTIONINNER_NONE = 1,
+    NONE = 1,
     } OPTIONINNER;
 
 /// Option that contains Some(value) or None.
@@ -458,7 +458,7 @@ typedef enum OPTIONVEC
     {
     /// Element if Some().
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    OPTIONVEC_NONE = 1,
+    NONE = 1,
     } OPTIONVEC;
 
 /// Result that contains value or an error.
@@ -468,8 +468,8 @@ typedef enum RESULTCONSTPTRSERVICEASYNCERROR
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTCONSTPTRSERVICEASYNCERROR_PANIC = 2,
-    RESULTCONSTPTRSERVICEASYNCERROR_NULL = 3,
+    PANIC = 2,
+    NULL = 3,
     } RESULTCONSTPTRSERVICEASYNCERROR;
 
 /// Result that contains value or an error.
@@ -479,8 +479,8 @@ typedef enum RESULTCONSTPTRSERVICEBASICERROR
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTCONSTPTRSERVICEBASICERROR_PANIC = 2,
-    RESULTCONSTPTRSERVICEBASICERROR_NULL = 3,
+    PANIC = 2,
+    NULL = 3,
     } RESULTCONSTPTRSERVICEBASICERROR;
 
 /// Result that contains value or an error.
@@ -490,8 +490,8 @@ typedef enum RESULTCONSTPTRSERVICECALLBACKSERROR
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTCONSTPTRSERVICECALLBACKSERROR_PANIC = 2,
-    RESULTCONSTPTRSERVICECALLBACKSERROR_NULL = 3,
+    PANIC = 2,
+    NULL = 3,
     } RESULTCONSTPTRSERVICECALLBACKSERROR;
 
 /// Result that contains value or an error.
@@ -501,8 +501,8 @@ typedef enum RESULTCONSTPTRSERVICEDEPENDENTERROR
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTCONSTPTRSERVICEDEPENDENTERROR_PANIC = 2,
-    RESULTCONSTPTRSERVICEDEPENDENTERROR_NULL = 3,
+    PANIC = 2,
+    NULL = 3,
     } RESULTCONSTPTRSERVICEDEPENDENTERROR;
 
 /// Result that contains value or an error.
@@ -512,8 +512,8 @@ typedef enum RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR_PANIC = 2,
-    RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR_NULL = 3,
+    PANIC = 2,
+    NULL = 3,
     } RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR;
 
 /// Result that contains value or an error.
@@ -523,8 +523,8 @@ typedef enum RESULTCONSTPTRSERVICEMAINERROR
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTCONSTPTRSERVICEMAINERROR_PANIC = 2,
-    RESULTCONSTPTRSERVICEMAINERROR_NULL = 3,
+    PANIC = 2,
+    NULL = 3,
     } RESULTCONSTPTRSERVICEMAINERROR;
 
 /// Result that contains value or an error.
@@ -534,8 +534,8 @@ typedef enum RESULTCONSTPTRSERVICEMULTIPLECTORSERROR
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTCONSTPTRSERVICEMULTIPLECTORSERROR_PANIC = 2,
-    RESULTCONSTPTRSERVICEMULTIPLECTORSERROR_NULL = 3,
+    PANIC = 2,
+    NULL = 3,
     } RESULTCONSTPTRSERVICEMULTIPLECTORSERROR;
 
 /// Result that contains value or an error.
@@ -545,8 +545,8 @@ typedef enum RESULTCONSTPTRSERVICEONPANICERROR
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTCONSTPTRSERVICEONPANICERROR_PANIC = 2,
-    RESULTCONSTPTRSERVICEONPANICERROR_NULL = 3,
+    PANIC = 2,
+    NULL = 3,
     } RESULTCONSTPTRSERVICEONPANICERROR;
 
 /// Result that contains value or an error.
@@ -556,8 +556,8 @@ typedef enum RESULTCONSTPTRSERVICERESULTERROR
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTCONSTPTRSERVICERESULTERROR_PANIC = 2,
-    RESULTCONSTPTRSERVICERESULTERROR_NULL = 3,
+    PANIC = 2,
+    NULL = 3,
     } RESULTCONSTPTRSERVICERESULTERROR;
 
 /// Result that contains value or an error.
@@ -567,8 +567,8 @@ typedef enum RESULTCONSTPTRSERVICESTRINGSERROR
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTCONSTPTRSERVICESTRINGSERROR_PANIC = 2,
-    RESULTCONSTPTRSERVICESTRINGSERROR_NULL = 3,
+    PANIC = 2,
+    NULL = 3,
     } RESULTCONSTPTRSERVICESTRINGSERROR;
 
 /// Result that contains value or an error.
@@ -578,8 +578,8 @@ typedef enum RESULTCONSTPTRSERVICEVARIOUSSLICESERROR
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTCONSTPTRSERVICEVARIOUSSLICESERROR_PANIC = 2,
-    RESULTCONSTPTRSERVICEVARIOUSSLICESERROR_NULL = 3,
+    PANIC = 2,
+    NULL = 3,
     } RESULTCONSTPTRSERVICEVARIOUSSLICESERROR;
 
 /// Result that contains value or an error.
@@ -589,8 +589,8 @@ typedef enum RESULTOPTIONUTF8STRINGERROR
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTOPTIONUTF8STRINGERROR_PANIC = 2,
-    RESULTOPTIONUTF8STRINGERROR_NULL = 3,
+    PANIC = 2,
+    NULL = 3,
     } RESULTOPTIONUTF8STRINGERROR;
 
 /// Result that contains value or an error.
@@ -600,8 +600,8 @@ typedef enum RESULTUSESTRINGERROR
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTUSESTRINGERROR_PANIC = 2,
-    RESULTUSESTRINGERROR_NULL = 3,
+    PANIC = 2,
+    NULL = 3,
     } RESULTUSESTRINGERROR;
 
 /// Result that contains value or an error.
@@ -611,8 +611,8 @@ typedef enum RESULTVECUTF8STRINGERROR
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTVECUTF8STRINGERROR_PANIC = 2,
-    RESULTVECUTF8STRINGERROR_NULL = 3,
+    PANIC = 2,
+    NULL = 3,
     } RESULTVECUTF8STRINGERROR;
 
 typedef uint8_t (*CALLBACKFFISLICE)(SLICEU8 SLICE, const void* CALLBACK_DATA);
@@ -696,7 +696,7 @@ typedef enum OPTIONENUMPAYLOAD
     {
     /// Element if Some().
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    OPTIONENUMPAYLOAD_NONE = 1,
+    NONE = 1,
     } OPTIONENUMPAYLOAD;
 
 /// Option that contains Some(value) or None.
@@ -704,7 +704,7 @@ typedef enum OPTIONRESULTOPTIONUTF8STRINGERROR
     {
     /// Element if Some().
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    OPTIONRESULTOPTIONUTF8STRINGERROR_NONE = 1,
+    NONE = 1,
     } OPTIONRESULTOPTIONUTF8STRINGERROR;
 
 typedef VEC3F32 (*CALLBACKHUGEVECSLICE)(SLICEVEC3F32 SLICE, const void* CALLBACK_DATA);
@@ -750,7 +750,7 @@ typedef enum OPTIONOPTIONRESULTOPTIONUTF8STRINGERROR
     {
     /// Element if Some().
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    OPTIONOPTIONRESULTOPTIONUTF8STRINGERROR_NONE = 1,
+    NONE = 1,
     } OPTIONOPTIONRESULTOPTIONUTF8STRINGERROR;
 
 /// Result that contains value or an error.
@@ -760,8 +760,8 @@ typedef enum RESULTNESTEDARRAYERROR
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTNESTEDARRAYERROR_PANIC = 2,
-    RESULTNESTEDARRAYERROR_NULL = 3,
+    PANIC = 2,
+    NULL = 3,
     } RESULTNESTEDARRAYERROR;
 
 /// Result that contains value or an error.
@@ -771,8 +771,8 @@ typedef enum RESULTOPTIONENUMPAYLOADERROR
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTOPTIONENUMPAYLOADERROR_PANIC = 2,
-    RESULTOPTIONENUMPAYLOADERROR_NULL = 3,
+    PANIC = 2,
+    NULL = 3,
     } RESULTOPTIONENUMPAYLOADERROR;
 
 typedef void (*CALLBACKCHARARRAY2)(CHARARRAY VALUE, const void* CALLBACK_DATA);
@@ -784,304 +784,276 @@ typedef void (*fptr_fn_ConstPtrResultVecUtf8StringError_ConstPtr)(const RESULTVE
 typedef void (*fptr_fn_ConstPtrResultNestedArrayError_ConstPtr)(const RESULTNESTEDARRAYERROR* x0, const void* x1);
 
 
-typedef int64_t (*interoptopus_string_create)(const void*, uint64_t, UTF8STRING*);
+int64_t interoptopus_string_create(const void* UTF8, uint64_t LEN, UTF8STRING* RVAL);
 
-typedef int64_t (*interoptopus_string_destroy)(UTF8STRING);
+int64_t interoptopus_string_destroy(UTF8STRING UTF8);
 
-typedef int64_t (*interoptopus_string_clone)(const UTF8STRING*, UTF8STRING*);
+int64_t interoptopus_string_clone(const UTF8STRING* UTF8, UTF8STRING* RVAL);
 
-typedef int64_t (*interoptopus_vec_create_18289942533122229086)(const void*, uint64_t, VECU8*);
+int64_t interoptopus_vec_create_18289942533122229086(const void* DATA, uint64_t LEN, VECU8* RVAL);
 
-typedef int64_t (*interoptopus_vec_destroy_17895994407320212994)(VECU8);
+int64_t interoptopus_vec_destroy_17895994407320212994(VECU8 IGNORED);
 
-typedef int64_t (*interoptopus_vec_create_1491625606766217421)(const void*, uint64_t, VECUTF8STRING*);
+int64_t interoptopus_vec_create_1491625606766217421(const void* DATA, uint64_t LEN, VECUTF8STRING* RVAL);
 
-typedef int64_t (*interoptopus_vec_destroy_2831836161306219799)(VECUTF8STRING);
+int64_t interoptopus_vec_destroy_2831836161306219799(VECUTF8STRING IGNORED);
 
-typedef int64_t (*interoptopus_vec_create_8489828321293410959)(const void*, uint64_t, VECVEC3F32*);
+int64_t interoptopus_vec_create_8489828321293410959(const void* DATA, uint64_t LEN, VECVEC3F32* RVAL);
 
-typedef int64_t (*interoptopus_vec_destroy_18428593021019987507)(VECVEC3F32);
+int64_t interoptopus_vec_destroy_18428593021019987507(VECVEC3F32 IGNORED);
 
-typedef int64_t (*interoptopus_vec_create_1331377703668599412)(const void*, uint64_t, VECENUMPAYLOAD*);
+int64_t interoptopus_vec_create_1331377703668599412(const void* DATA, uint64_t LEN, VECENUMPAYLOAD* RVAL);
 
-typedef int64_t (*interoptopus_vec_destroy_1871427125692259427)(VECENUMPAYLOAD);
+int64_t interoptopus_vec_destroy_1871427125692259427(VECENUMPAYLOAD IGNORED);
 
-typedef PACKED2 (*alignment_1)(PACKED1);
+PACKED2 alignment_1(PACKED1 A);
 
-typedef uint8_t (*array_1)(ARRAY);
+uint8_t array_1(ARRAY X);
 
-typedef ARRAY (*array_2)();
+ARRAY array_2();
 
-typedef void (*array_3)(ARRAY*);
+void array_3(ARRAY* ARR);
 
-typedef CHARARRAY (*char_array_1)();
+CHARARRAY char_array_1();
 
-typedef CHARARRAY (*char_array_2)(CHARARRAY);
+CHARARRAY char_array_2(CHARARRAY ARR);
 
-typedef uint8_t (*char_array_3)(const CHARARRAY*);
+uint8_t char_array_3(const CHARARRAY* ARR);
 
-typedef NESTEDARRAY (*nested_array_1)();
+NESTEDARRAY nested_array_1();
 
-typedef void (*nested_array_2)(NESTEDARRAY*);
+void nested_array_2(NESTEDARRAY* RESULT);
 
-typedef uint8_t (*nested_array_3)(NESTEDARRAY);
+uint8_t nested_array_3(NESTEDARRAY INPUT);
 
-typedef void (*behavior_sleep)(uint64_t);
+void behavior_sleep(uint64_t MILLIS);
 
-typedef void (*behavior_panics)();
+void behavior_panics();
 
-typedef RESULTERROR (*behavior_panics_via_result)();
+RESULTERROR behavior_panics_via_result();
 
-typedef void (*enums_1)(ENUMPAYLOAD);
+void enums_1(ENUMPAYLOAD IGNORED);
 
-typedef ENUMPAYLOAD (*enums_2)(ENUMPAYLOAD);
+ENUMPAYLOAD enums_2(ENUMPAYLOAD X);
 
-typedef const ENUMPAYLOAD* (*enums_3)(ENUMPAYLOAD*);
+const ENUMPAYLOAD* enums_3(ENUMPAYLOAD* X);
 
-typedef UTF8STRING (*enums_4)(LAYER3);
+UTF8STRING enums_4(LAYER3 X);
 
-typedef uint8_t (*fnptr_1)(fptr_fn_u8_rval_u8, uint8_t);
+uint8_t fnptr_1(fptr_fn_u8_rval_u8 CALLBACK, uint8_t VALUE);
 
-typedef void (*fnptr_2)(fptr_fn_CharArray, CHARARRAY);
+void fnptr_2(fptr_fn_CharArray CALLBACK, CHARARRAY VALUE);
 
-typedef uint32_t (*generic_1a)(GENERICU32, PHANTOMU8);
+uint32_t generic_1a(GENERICU32 X, PHANTOMU8 Y);
 
-typedef uint8_t (*generic_1b)(GENERICU8, PHANTOMU8);
+uint8_t generic_1b(GENERICU8 X, PHANTOMU8 Y);
 
-typedef uint8_t (*generic_1c)(const GENERICU8*, const GENERICU8*);
+uint8_t generic_1c(const GENERICU8* X, const GENERICU8* Y);
 
-typedef uint8_t (*generic_2)(const GENERIC2U8*);
+uint8_t generic_2(const GENERIC2U8* X);
 
-typedef uint8_t (*generic_3)(const GENERIC3*);
+uint8_t generic_3(const GENERIC3* X);
 
-typedef uint8_t (*generic_4)(const GENERIC4*);
+uint8_t generic_4(const GENERIC4* X);
 
-typedef bool (*generic_5)(WEIRD1U32, WEIRD2U8);
+bool generic_5(WEIRD1U32 X, WEIRD2U8 Y);
 
-typedef VEC1 (*meta_ambiguous_1)(VEC1);
+VEC1 meta_ambiguous_1(VEC1 X);
 
-typedef VEC2 (*meta_ambiguous_2)(VEC2);
+VEC2 meta_ambiguous_2(VEC2 X);
 
-typedef bool (*meta_ambiguous_3)(VEC1, VEC2);
+bool meta_ambiguous_3(VEC1 X, VEC2 Y);
 
 ///  This function has documentation.
-typedef ENUMDOCUMENTED (*meta_documented)(STRUCTDOCUMENTED);
+ENUMDOCUMENTED meta_documented(STRUCTDOCUMENTED X);
 
-typedef void (*meta_visibility1)(VISIBILITY1, VISIBILITY2);
+void meta_visibility1(VISIBILITY1 X, VISIBILITY2 Y);
 
-typedef ENUMRENAMED (*meta_renamed)(STRUCTRENAMED);
+ENUMRENAMED meta_renamed(STRUCTRENAMED X);
 
-typedef OPTIONVEC (*namespaced_inner_option)(OPTIONVEC);
+OPTIONVEC namespaced_inner_option(OPTIONVEC X);
 
-typedef SLICEVEC (*namespaced_inner_slice)(SLICEVEC);
+SLICEVEC namespaced_inner_slice(SLICEVEC X);
 
-typedef SLICEMUTVEC (*namespaced_inner_slice_mut)(SLICEMUTVEC);
+SLICEMUTVEC namespaced_inner_slice_mut(SLICEMUTVEC X);
 
-typedef VEC (*namespaced_type)(VEC);
+VEC namespaced_type(VEC X);
 
-typedef int64_t (*primitive_args_5)(int64_t, int64_t, int64_t, int64_t, int64_t);
+int64_t primitive_args_5(int64_t X0, int64_t X1, int64_t X2, int64_t X3, int64_t X4);
 
-typedef int64_t (*primitive_args_10)(int64_t, int64_t, int64_t, int64_t, int64_t, int64_t, int64_t, int64_t, int64_t, int64_t);
+int64_t primitive_args_10(int64_t X0, int64_t X1, int64_t X2, int64_t X3, int64_t X4, int64_t X5, int64_t X6, int64_t X7, int64_t X8, int64_t X9);
 
-typedef bool (*primitive_bool)(bool);
+bool primitive_bool(bool X);
 
-typedef float (*primitive_f32)(float);
+float primitive_f32(float X);
 
-typedef double (*primitive_f64)(double);
+double primitive_f64(double X);
 
-typedef int16_t (*primitive_i16)(int16_t);
+int16_t primitive_i16(int16_t X);
 
-typedef int32_t (*primitive_i32)(int32_t);
+int32_t primitive_i32(int32_t X);
 
-typedef int64_t (*primitive_i64)(int64_t);
+int64_t primitive_i64(int64_t X);
 
-typedef int8_t (*primitive_i8)(int8_t);
+int8_t primitive_i8(int8_t X);
 
-typedef uint16_t (*primitive_u16)(uint16_t);
+uint16_t primitive_u16(uint16_t X);
 
-typedef uint32_t (*primitive_u32)(uint32_t);
+uint32_t primitive_u32(uint32_t X);
 
-typedef uint64_t (*primitive_u64)(uint64_t);
+uint64_t primitive_u64(uint64_t X);
 
-typedef size_t (*primitive_usize)(size_t);
+size_t primitive_usize(size_t X);
 
-typedef ssize_t (*primitive_isize)(ssize_t);
+ssize_t primitive_isize(ssize_t X);
 
-typedef uint8_t (*primitive_u8)(uint8_t);
+uint8_t primitive_u8(uint8_t X);
 
-typedef void (*primitive_void)();
+void primitive_void();
 
-typedef void (*primitive_void2)();
+void primitive_void2();
 
-typedef const int64_t* (*ptr1)(const int64_t*);
+const int64_t* ptr1(const int64_t* X);
 
-typedef const const int64_t** (*ptr2)(const const int64_t**);
+const const int64_t** ptr2(const const int64_t** X);
 
 ///  # Safety
 /// 
 ///  Parameter x must point to valid data.
-typedef int64_t* (*ptr3)(int64_t*);
+int64_t* ptr3(int64_t* X);
 
-typedef const int64_t* (*ref1)(const int64_t*);
+const int64_t* ref1(const int64_t* X);
 
-typedef int64_t* (*ref2)(int64_t*);
+int64_t* ref2(int64_t* X);
 
-typedef bool (*ref3)(const int64_t*);
+bool ref3(const int64_t* X);
 
-typedef bool (*ref4)(int64_t*);
+bool ref4(int64_t* X);
 
-typedef void (*ref5)(ENUMPAYLOAD*);
+void ref5(ENUMPAYLOAD* X);
 
-typedef void (*ref6)(OPTIONENUMPAYLOAD*);
+void ref6(OPTIONENUMPAYLOAD* X);
 
-typedef void (*ref7)(VECUTF8STRING*);
+void ref7(VECUTF8STRING* X);
 
-typedef TUPLED (*struct1)(TUPLED);
+TUPLED struct1(TUPLED X);
 
-typedef RESULTERROR (*struct2)(VEC3F32, const TUPLED*);
+RESULTERROR struct2(VEC3F32 A, const TUPLED* B);
 
-typedef bool (*struct3)(BOOLFIELD);
+bool struct3(BOOLFIELD X);
 
-typedef uint32_t (*pattern_ascii_pointer_1)(const char*);
+uint32_t pattern_ascii_pointer_1(const char* X);
 
-typedef const char* (*pattern_ascii_pointer_2)();
+const char* pattern_ascii_pointer_2();
 
-typedef const char* (*pattern_ascii_pointer_3)(const char*);
+const char* pattern_ascii_pointer_3(const char* X);
 
-typedef const char* (*pattern_ascii_pointer_4)(const char*, uint32_t);
+const char* pattern_ascii_pointer_4(const char* X, uint32_t L);
 
-typedef uint8_t (*pattern_ascii_pointer_5)(const char*, uint32_t);
+uint8_t pattern_ascii_pointer_5(const char* X, uint32_t I);
 
-typedef SLICEUSECSTRPTR (*pattern_ascii_pointer_return_slice)();
+SLICEUSECSTRPTR pattern_ascii_pointer_return_slice();
 
-typedef UTF8STRING (*pattern_string_1)(UTF8STRING);
+UTF8STRING pattern_string_1(UTF8STRING X);
 
-typedef uint32_t (*pattern_string_2)(UTF8STRING);
+uint32_t pattern_string_2(UTF8STRING X);
 
-typedef UTF8STRING (*pattern_string_3)();
+UTF8STRING pattern_string_3();
 
-typedef USESTRING (*pattern_string_4)(USESTRING);
+USESTRING pattern_string_4(USESTRING X);
 
-typedef RESULTUSESTRINGERROR (*pattern_string_5)(USESTRING);
+RESULTUSESTRINGERROR pattern_string_5(USESTRING X);
 
-typedef RESULTERROR (*pattern_string_6a)(const USESTRING*);
+RESULTERROR pattern_string_6a(const USESTRING* IGNORED);
 
-typedef RESULTERROR (*pattern_string_6b)(USESTRING*);
+RESULTERROR pattern_string_6b(USESTRING* Y);
 
-typedef RESULTUTF8STRINGERROR (*pattern_string_7)(SLICEUTF8STRING, uint64_t);
+RESULTUTF8STRINGERROR pattern_string_7(SLICEUTF8STRING X, uint64_t I);
 
-typedef RESULTUSESTRINGERROR (*pattern_string_8)(SLICEUSESTRING, uint64_t);
+RESULTUSESTRINGERROR pattern_string_8(SLICEUSESTRING X, uint64_t I);
 
-typedef RESULTUTF8STRINGERROR (*pattern_string_9)();
+RESULTUTF8STRINGERROR pattern_string_9();
 
-typedef void (*pattern_string_10)(UTF8STRING);
+void pattern_string_10(UTF8STRING IGNORED);
 
-typedef void (*pattern_string_11)(const UTF8STRING*);
+void pattern_string_11(const UTF8STRING* IGNORED);
 
-typedef uint32_t (*pattern_ffi_slice_1)(SLICEU32);
+uint32_t pattern_ffi_slice_1(SLICEU32 FFI_SLICE);
 
-typedef uint32_t (*pattern_ffi_slice_1b)(SLICEMUTU32);
+uint32_t pattern_ffi_slice_1b(SLICEMUTU32 FFI_SLICE);
 
-typedef VEC3F32 (*pattern_ffi_slice_2)(SLICEVEC3F32, int32_t);
+VEC3F32 pattern_ffi_slice_2(SLICEVEC3F32 FFI_SLICE, int32_t I);
 
-typedef void (*pattern_ffi_slice_3)(SLICEMUTU8, CALLBACKSLICEMUT);
+void pattern_ffi_slice_3(SLICEMUTU8 SLICE, CALLBACKSLICEMUT CALLBACK);
 
-typedef void (*pattern_ffi_slice_4)(SLICEU8, SLICEMUTU8);
+void pattern_ffi_slice_4(SLICEU8 SLICE, SLICEMUTU8 SLICE2);
 
 ///  It is (probably?) UB to call this function with the same FFI slice data at the same time.
-typedef void (*pattern_ffi_slice_5)(const SLICEU8*, SLICEMUTU8*);
+void pattern_ffi_slice_5(const SLICEU8* SLICE, SLICEMUTU8* SLICE2);
 
-typedef void (*pattern_ffi_slice_6)(const SLICEMUTU8*, CALLBACKU8);
+void pattern_ffi_slice_6(const SLICEMUTU8* SLICE, CALLBACKU8 CALLBACK);
 
-typedef void (*pattern_ffi_slice_8)(const SLICEMUTCHARARRAY*, CALLBACKCHARARRAY2);
+void pattern_ffi_slice_8(const SLICEMUTCHARARRAY* SLICE, CALLBACKCHARARRAY2 CALLBACK);
 
-typedef UTF8STRING (*pattern_ffi_slice_9)(SLICEUSESTRING);
+UTF8STRING pattern_ffi_slice_9(SLICEUSESTRING SLICE);
 
-typedef uint8_t (*pattern_ffi_slice_delegate)(CALLBACKFFISLICE);
+uint8_t pattern_ffi_slice_delegate(CALLBACKFFISLICE CALLBACK);
 
-typedef VEC3F32 (*pattern_ffi_slice_delegate_huge)(CALLBACKHUGEVECSLICE);
+VEC3F32 pattern_ffi_slice_delegate_huge(CALLBACKHUGEVECSLICE CALLBACK);
 
-typedef OPTIONINNER (*pattern_ffi_option_1)(OPTIONINNER);
+OPTIONINNER pattern_ffi_option_1(OPTIONINNER X);
 
-typedef INNER (*pattern_ffi_option_2)(OPTIONINNER);
+INNER pattern_ffi_option_2(OPTIONINNER X);
 
-typedef OPTIONOPTIONRESULTOPTIONUTF8STRINGERROR (*pattern_ffi_option_3)(OPTIONOPTIONRESULTOPTIONUTF8STRINGERROR);
+OPTIONOPTIONRESULTOPTIONUTF8STRINGERROR pattern_ffi_option_3(OPTIONOPTIONRESULTOPTIONUTF8STRINGERROR X);
 
-typedef uint8_t (*pattern_ffi_bool)(uint8_t);
+uint8_t pattern_ffi_bool(uint8_t FFI_BOOL);
 
-typedef char (*pattern_ffi_cchar)(char);
+char pattern_ffi_cchar(char FFI_CCHAR);
 
-typedef const char* (*pattern_ffi_cchar_const_pointer)(const char*);
+const char* pattern_ffi_cchar_const_pointer(const char* FFI_CCHAR);
 
-typedef char* (*pattern_ffi_cchar_mut_pointer)(char*);
+char* pattern_ffi_cchar_mut_pointer(char* FFI_CCHAR);
 
-typedef RESULTU32ERROR (*pattern_result_1)(RESULTU32ERROR);
+RESULTU32ERROR pattern_result_1(RESULTU32ERROR X);
 
-typedef RESULTERROR (*pattern_result_2)();
+RESULTERROR pattern_result_2();
 
-typedef RESULTERROR (*pattern_result_3)(RESULTERROR);
+RESULTERROR pattern_result_3(RESULTERROR X);
 
-typedef uint64_t (*pattern_api_guard)();
+uint64_t pattern_api_guard();
 
-typedef uint32_t (*pattern_callback_1)(MYCALLBACK, uint32_t);
+uint32_t pattern_callback_1(MYCALLBACK CALLBACK, uint32_t X);
 
-typedef MYCALLBACKVOID (*pattern_callback_2)(MYCALLBACKVOID);
+MYCALLBACKVOID pattern_callback_2(MYCALLBACKVOID CALLBACK);
 
-typedef uint32_t (*pattern_callback_4)(MYCALLBACKNAMESPACED, uint32_t);
+uint32_t pattern_callback_4(MYCALLBACKNAMESPACED CALLBACK, uint32_t X);
 
-typedef SUMDELEGATE1 (*pattern_callback_5)();
+SUMDELEGATE1 pattern_callback_5();
 
-typedef SUMDELEGATE2 (*pattern_callback_6)();
+SUMDELEGATE2 pattern_callback_6();
 
-typedef RESULTERROR (*pattern_callback_7)(SUMDELEGATERETURN, SUMDELEGATERETURN2, int32_t, int32_t, int32_t*);
+RESULTERROR pattern_callback_7(SUMDELEGATERETURN C1, SUMDELEGATERETURN2 C2, int32_t X, int32_t I, int32_t* O);
 
-typedef void (*pattern_callback_8)(STRINGCALLBACK, NESTEDSTRINGCALLBACK, UTF8STRING);
+void pattern_callback_8(STRINGCALLBACK CB, NESTEDSTRINGCALLBACK CB2, UTF8STRING S);
 
-typedef void (*pattern_surrogates_1)(LOCAL, CONTAINER*);
+void pattern_surrogates_1(LOCAL S, CONTAINER* C);
 
-typedef VECU8 (*pattern_vec_1)();
+VECU8 pattern_vec_1();
 
-typedef void (*pattern_vec_2)(VECU8);
+void pattern_vec_2(VECU8 IGNORED);
 
-typedef VECU8 (*pattern_vec_3)(VECU8);
+VECU8 pattern_vec_3(VECU8 V);
 
-typedef VECU8 (*pattern_vec_4)(const VECU8*);
+VECU8 pattern_vec_4(const VECU8* V);
 
-typedef VECUTF8STRING (*pattern_vec_5)(VECUTF8STRING);
+VECUTF8STRING pattern_vec_5(VECUTF8STRING V);
 
-typedef VECVEC3F32 (*pattern_vec_6)(VECVEC3F32);
+VECVEC3F32 pattern_vec_6(VECVEC3F32 V);
 
-typedef void (*pattern_vec_7)(USESLICEANDVEC);
+void pattern_vec_7(USESLICEANDVEC IGNORED);
 
-typedef USESLICEANDVEC (*pattern_vec_8)(USESLICEANDVEC);
-
-///  Destroys the given instance.
-/// 
-///  # Safety
-/// 
-///  The passed parameter MUST have been created with the corresponding init function;
-///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICEASYNCERROR (*service_async_destroy)(const SERVICEASYNC*);
-
-typedef RESULTCONSTPTRSERVICEASYNCERROR (*service_async_new)();
-
-typedef RESULTERROR (*service_async_return_after_ms)(const SERVICEASYNC*, uint64_t, uint64_t, fptr_fn_ConstPtrResultU64Error_ConstPtr);
-
-typedef RESULTERROR (*service_async_process_struct)(const SERVICEASYNC*, NESTEDARRAY, fptr_fn_ConstPtrResultNestedArrayError_ConstPtr);
-
-typedef RESULTERROR (*service_async_handle_string)(const SERVICEASYNC*, UTF8STRING, fptr_fn_ConstPtrResultUtf8StringError_ConstPtr);
-
-typedef RESULTERROR (*service_async_handle_vec_string)(const SERVICEASYNC*, VECUTF8STRING, fptr_fn_ConstPtrResultVecUtf8StringError_ConstPtr);
-
-typedef RESULTERROR (*service_async_handle_nested_string)(const SERVICEASYNC*, UTF8STRING, fptr_fn_ConstPtrResultUseStringError_ConstPtr);
-
-typedef void (*service_async_callback_string)(const SERVICEASYNC*, UTF8STRING, STRINGCALLBACK);
-
-typedef RESULTERROR (*service_async_success)(const SERVICEASYNC*, fptr_fn_ConstPtrResultError_ConstPtr);
-
-typedef RESULTERROR (*service_async_fail)(const SERVICEASYNC*, fptr_fn_ConstPtrResultError_ConstPtr);
-
-typedef void (*service_async_bad)(SERVICEASYNC*);
+USESLICEANDVEC pattern_vec_8(USESLICEANDVEC V);
 
 ///  Destroys the given instance.
 /// 
@@ -1089,31 +1061,27 @@ typedef void (*service_async_bad)(SERVICEASYNC*);
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICEBASICERROR (*service_basic_destroy)(SERVICEBASIC*);
+RESULTCONSTPTRSERVICEASYNCERROR service_async_destroy(const SERVICEASYNC* _CONTEXT);
 
-typedef RESULTCONSTPTRSERVICEBASICERROR (*service_basic_new)();
+RESULTCONSTPTRSERVICEASYNCERROR service_async_new();
 
-///  Destroys the given instance.
-/// 
-///  # Safety
-/// 
-///  The passed parameter MUST have been created with the corresponding init function;
-///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICEMAINERROR (*service_main_destroy)(SERVICEMAIN*);
+RESULTERROR service_async_return_after_ms(const SERVICEASYNC* _CONTEXT, uint64_t X, uint64_t MS, fptr_fn_ConstPtrResultU64Error_ConstPtr _ASYNC_CALLBACK);
 
-typedef RESULTCONSTPTRSERVICEMAINERROR (*service_main_new)(uint32_t);
+RESULTERROR service_async_process_struct(const SERVICEASYNC* _CONTEXT, NESTEDARRAY X, fptr_fn_ConstPtrResultNestedArrayError_ConstPtr _ASYNC_CALLBACK);
 
-///  Destroys the given instance.
-/// 
-///  # Safety
-/// 
-///  The passed parameter MUST have been created with the corresponding init function;
-///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICEDEPENDENTERROR (*service_dependent_destroy)(SERVICEDEPENDENT*);
+RESULTERROR service_async_handle_string(const SERVICEASYNC* _CONTEXT, UTF8STRING S, fptr_fn_ConstPtrResultUtf8StringError_ConstPtr _ASYNC_CALLBACK);
 
-typedef RESULTCONSTPTRSERVICEDEPENDENTERROR (*service_dependent_from_main)(const SERVICEMAIN*);
+RESULTERROR service_async_handle_vec_string(const SERVICEASYNC* _CONTEXT, VECUTF8STRING S, fptr_fn_ConstPtrResultVecUtf8StringError_ConstPtr _ASYNC_CALLBACK);
 
-typedef uint32_t (*service_dependent_get)(const SERVICEDEPENDENT*);
+RESULTERROR service_async_handle_nested_string(const SERVICEASYNC* _CONTEXT, UTF8STRING S, fptr_fn_ConstPtrResultUseStringError_ConstPtr _ASYNC_CALLBACK);
+
+void service_async_callback_string(const SERVICEASYNC* _CONTEXT, UTF8STRING S, STRINGCALLBACK CB);
+
+RESULTERROR service_async_success(const SERVICEASYNC* _CONTEXT, fptr_fn_ConstPtrResultError_ConstPtr _ASYNC_CALLBACK);
+
+RESULTERROR service_async_fail(const SERVICEASYNC* _CONTEXT, fptr_fn_ConstPtrResultError_ConstPtr _ASYNC_CALLBACK);
+
+void service_async_bad(SERVICEASYNC* _CONTEXT);
 
 ///  Destroys the given instance.
 /// 
@@ -1121,19 +1089,9 @@ typedef uint32_t (*service_dependent_get)(const SERVICEDEPENDENT*);
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICERESULTERROR (*service_result_destroy)(SERVICERESULT*);
+RESULTCONSTPTRSERVICEBASICERROR service_basic_destroy(SERVICEBASIC* _CONTEXT);
 
-typedef RESULTCONSTPTRSERVICERESULTERROR (*service_result_new)();
-
-typedef RESULTERROR (*service_result_test)(const SERVICERESULT*);
-
-typedef RESULTU32ERROR (*service_result_result_u32)(const SERVICERESULT*);
-
-typedef RESULTUTF8STRINGERROR (*service_result_result_string)(const SERVICERESULT*);
-
-typedef RESULTOPTIONENUMPAYLOADERROR (*service_result_result_option_enum)(const SERVICERESULT*);
-
-typedef RESULTU32ERROR (*service_result_result_slice)(const SERVICERESULT*, SLICEU32, uint64_t);
+RESULTCONSTPTRSERVICEBASICERROR service_basic_new();
 
 ///  Destroys the given instance.
 /// 
@@ -1141,20 +1099,62 @@ typedef RESULTU32ERROR (*service_result_result_slice)(const SERVICERESULT*, SLIC
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICEONPANICERROR (*service_on_panic_destroy)(SERVICEONPANIC*);
+RESULTCONSTPTRSERVICEMAINERROR service_main_destroy(SERVICEMAIN* _CONTEXT);
 
-typedef RESULTCONSTPTRSERVICEONPANICERROR (*service_on_panic_new)();
+RESULTCONSTPTRSERVICEMAINERROR service_main_new(uint32_t VALUE);
+
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+RESULTCONSTPTRSERVICEDEPENDENTERROR service_dependent_destroy(SERVICEDEPENDENT* _CONTEXT);
+
+RESULTCONSTPTRSERVICEDEPENDENTERROR service_dependent_from_main(const SERVICEMAIN* MAIN);
+
+uint32_t service_dependent_get(const SERVICEDEPENDENT* _CONTEXT);
+
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+RESULTCONSTPTRSERVICERESULTERROR service_result_destroy(SERVICERESULT* _CONTEXT);
+
+RESULTCONSTPTRSERVICERESULTERROR service_result_new();
+
+RESULTERROR service_result_test(const SERVICERESULT* _CONTEXT);
+
+RESULTU32ERROR service_result_result_u32(const SERVICERESULT* _CONTEXT);
+
+RESULTUTF8STRINGERROR service_result_result_string(const SERVICERESULT* _CONTEXT);
+
+RESULTOPTIONENUMPAYLOADERROR service_result_result_option_enum(const SERVICERESULT* _CONTEXT);
+
+RESULTU32ERROR service_result_result_slice(const SERVICERESULT* _CONTEXT, SLICEU32 SLICE, uint64_t I);
+
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+RESULTCONSTPTRSERVICEONPANICERROR service_on_panic_destroy(SERVICEONPANIC* _CONTEXT);
+
+RESULTCONSTPTRSERVICEONPANICERROR service_on_panic_new();
 
 ///  Methods returning a Result<(), _> are the default and do not
 ///  need annotations.
-typedef RESULTERROR (*service_on_panic_return_result)(const SERVICEONPANIC*, uint32_t);
+RESULTERROR service_on_panic_return_result(const SERVICEONPANIC* _CONTEXT, uint32_t ANON1);
 
 ///  Methods returning a value need an `on_panic` annotation.
-typedef uint32_t (*service_on_panic_return_default_value)(const SERVICEONPANIC*, uint32_t);
+uint32_t service_on_panic_return_default_value(const SERVICEONPANIC* _CONTEXT, uint32_t X);
 
 ///  This function has no panic safeguards. It will be a bit faster to
 ///  call, but if it panics your host app will abort.
-typedef const char* (*service_on_panic_return_ub_on_panic)(SERVICEONPANIC*);
+const char* service_on_panic_return_ub_on_panic(SERVICEONPANIC* _CONTEXT);
 
 ///  Destroys the given instance.
 /// 
@@ -1162,29 +1162,19 @@ typedef const char* (*service_on_panic_return_ub_on_panic)(SERVICEONPANIC*);
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICECALLBACKSERROR (*service_callbacks_destroy)(SERVICECALLBACKS*);
+RESULTCONSTPTRSERVICECALLBACKSERROR service_callbacks_destroy(SERVICECALLBACKS* _CONTEXT);
 
-typedef RESULTCONSTPTRSERVICECALLBACKSERROR (*service_callbacks_new)();
+RESULTCONSTPTRSERVICECALLBACKSERROR service_callbacks_new();
 
-typedef RESULTERROR (*service_callbacks_callback_simple)(SERVICECALLBACKS*, MYCALLBACK);
+RESULTERROR service_callbacks_callback_simple(SERVICECALLBACKS* _CONTEXT, MYCALLBACK CALLBACK);
 
-typedef RESULTERROR (*service_callbacks_callback_ffi_return)(SERVICECALLBACKS*, SUMDELEGATERETURN);
+RESULTERROR service_callbacks_callback_ffi_return(SERVICECALLBACKS* _CONTEXT, SUMDELEGATERETURN CALLBACK);
 
-typedef RESULTERROR (*service_callbacks_callback_with_slice)(SERVICECALLBACKS*, SUMDELEGATERETURN, SLICEI32);
+RESULTERROR service_callbacks_callback_with_slice(SERVICECALLBACKS* _CONTEXT, SUMDELEGATERETURN CALLBACK, SLICEI32 INPUT);
 
-typedef void (*service_callbacks_set_delegate_table)(SERVICECALLBACKS*, CALLBACKTABLE);
+void service_callbacks_set_delegate_table(SERVICECALLBACKS* _CONTEXT, CALLBACKTABLE TABLE);
 
-typedef RESULTERROR (*service_callbacks_invoke_delegates)(const SERVICECALLBACKS*);
-
-///  Destroys the given instance.
-/// 
-///  # Safety
-/// 
-///  The passed parameter MUST have been created with the corresponding init function;
-///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR (*service_ignoring_methods_destroy)(SERVICEIGNORINGMETHODS*);
-
-typedef RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR (*service_ignoring_methods_new)();
+RESULTERROR service_callbacks_invoke_delegates(const SERVICECALLBACKS* _CONTEXT);
 
 ///  Destroys the given instance.
 /// 
@@ -1192,15 +1182,9 @@ typedef RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR (*service_ignoring_methods_new
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICEMULTIPLECTORSERROR (*service_multiple_ctors_destroy)(SERVICEMULTIPLECTORS*);
+RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR service_ignoring_methods_destroy(SERVICEIGNORINGMETHODS* _CONTEXT);
 
-typedef RESULTCONSTPTRSERVICEMULTIPLECTORSERROR (*service_multiple_ctors_new_with)(uint32_t);
-
-typedef RESULTCONSTPTRSERVICEMULTIPLECTORSERROR (*service_multiple_ctors_new_without)();
-
-typedef RESULTCONSTPTRSERVICEMULTIPLECTORSERROR (*service_multiple_ctors_new_with_string)(const char*);
-
-typedef RESULTCONSTPTRSERVICEMULTIPLECTORSERROR (*service_multiple_ctors_new_failing)(uint8_t);
+RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR service_ignoring_methods_new();
 
 ///  Destroys the given instance.
 /// 
@@ -1208,32 +1192,48 @@ typedef RESULTCONSTPTRSERVICEMULTIPLECTORSERROR (*service_multiple_ctors_new_fai
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICEVARIOUSSLICESERROR (*service_various_slices_destroy)(SERVICEVARIOUSSLICES*);
+RESULTCONSTPTRSERVICEMULTIPLECTORSERROR service_multiple_ctors_destroy(SERVICEMULTIPLECTORS* _CONTEXT);
 
-typedef RESULTCONSTPTRSERVICEVARIOUSSLICESERROR (*service_various_slices_new)();
+RESULTCONSTPTRSERVICEMULTIPLECTORSERROR service_multiple_ctors_new_with(uint32_t SOME_VALUE);
 
-typedef uint8_t (*service_various_slices_mut_self)(SERVICEVARIOUSSLICES*, SLICEU8);
+RESULTCONSTPTRSERVICEMULTIPLECTORSERROR service_multiple_ctors_new_without();
+
+RESULTCONSTPTRSERVICEMULTIPLECTORSERROR service_multiple_ctors_new_with_string(const char* ANON0);
+
+RESULTCONSTPTRSERVICEMULTIPLECTORSERROR service_multiple_ctors_new_failing(uint8_t SOME_VALUE);
+
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+RESULTCONSTPTRSERVICEVARIOUSSLICESERROR service_various_slices_destroy(SERVICEVARIOUSSLICES* _CONTEXT);
+
+RESULTCONSTPTRSERVICEVARIOUSSLICESERROR service_various_slices_new();
+
+uint8_t service_various_slices_mut_self(SERVICEVARIOUSSLICES* _CONTEXT, SLICEU8 SLICE);
 
 ///  Single line.
-typedef void (*service_various_slices_mut_self_void)(SERVICEVARIOUSSLICES*, SLICEBOOL);
+void service_various_slices_mut_self_void(SERVICEVARIOUSSLICES* _CONTEXT, SLICEBOOL SLICE);
 
-typedef uint8_t (*service_various_slices_mut_self_ref)(SERVICEVARIOUSSLICES*, const uint8_t*, uint8_t*);
+uint8_t service_various_slices_mut_self_ref(SERVICEVARIOUSSLICES* _CONTEXT, const uint8_t* X, uint8_t* Y);
 
-typedef uint8_t (*service_various_slices_mut_self_ref_slice)(SERVICEVARIOUSSLICES*, const uint8_t*, uint8_t*, SLICEU8);
+uint8_t service_various_slices_mut_self_ref_slice(SERVICEVARIOUSSLICES* _CONTEXT, const uint8_t* X, uint8_t* Y, SLICEU8 SLICE);
 
-typedef uint8_t (*service_various_slices_mut_self_ref_slice_limited)(SERVICEVARIOUSSLICES*, const uint8_t*, uint8_t*, SLICEU8, SLICEU8);
+uint8_t service_various_slices_mut_self_ref_slice_limited(SERVICEVARIOUSSLICES* _CONTEXT, const uint8_t* X, uint8_t* Y, SLICEU8 SLICE, SLICEU8 SLICE2);
 
-typedef RESULTERROR (*service_various_slices_mut_self_ffi_error)(SERVICEVARIOUSSLICES*, SLICEMUTU8);
+RESULTERROR service_various_slices_mut_self_ffi_error(SERVICEVARIOUSSLICES* _CONTEXT, SLICEMUTU8 SLICE);
 
-typedef RESULTERROR (*service_various_slices_mut_self_no_error)(SERVICEVARIOUSSLICES*, SLICEMUTU8);
-
-///  Warning, you _must_ discard the returned slice object before calling into this service
-///  again, as otherwise undefined behavior might happen.
-typedef SLICEU32 (*service_various_slices_return_slice)(SERVICEVARIOUSSLICES*);
+RESULTERROR service_various_slices_mut_self_no_error(SERVICEVARIOUSSLICES* _CONTEXT, SLICEMUTU8 SLICE);
 
 ///  Warning, you _must_ discard the returned slice object before calling into this service
 ///  again, as otherwise undefined behavior might happen.
-typedef SLICEMUTU32 (*service_various_slices_return_slice_mut)(SERVICEVARIOUSSLICES*);
+SLICEU32 service_various_slices_return_slice(SERVICEVARIOUSSLICES* _CONTEXT);
+
+///  Warning, you _must_ discard the returned slice object before calling into this service
+///  again, as otherwise undefined behavior might happen.
+SLICEMUTU32 service_various_slices_return_slice_mut(SERVICEVARIOUSSLICES* _CONTEXT);
 
 ///  Destroys the given instance.
 /// 
@@ -1241,17 +1241,17 @@ typedef SLICEMUTU32 (*service_various_slices_return_slice_mut)(SERVICEVARIOUSSLI
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICESTRINGSERROR (*service_strings_destroy)(SERVICESTRINGS*);
+RESULTCONSTPTRSERVICESTRINGSERROR service_strings_destroy(SERVICESTRINGS* _CONTEXT);
 
-typedef RESULTCONSTPTRSERVICESTRINGSERROR (*service_strings_new)();
+RESULTCONSTPTRSERVICESTRINGSERROR service_strings_new();
 
-typedef RESULTCONSTPTRSERVICESTRINGSERROR (*service_strings_new_string)(UTF8STRING);
+RESULTCONSTPTRSERVICESTRINGSERROR service_strings_new_string(UTF8STRING X);
 
-typedef void (*service_strings_pass_cstr)(SERVICESTRINGS*, const char*);
+void service_strings_pass_cstr(SERVICESTRINGS* _CONTEXT, const char* ANON1);
 
-typedef const char* (*service_strings_return_cstr)(SERVICESTRINGS*);
+const char* service_strings_return_cstr(SERVICESTRINGS* _CONTEXT);
 
-typedef void (*service_strings_callback_string)(const SERVICESTRINGS*, UTF8STRING, STRINGCALLBACK);
+void service_strings_callback_string(const SERVICESTRINGS* _CONTEXT, UTF8STRING S, STRINGCALLBACK CB);
 
 
 #ifdef __cplusplus

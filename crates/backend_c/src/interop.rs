@@ -28,6 +28,14 @@ pub enum Functions {
     ForwardDeclarations,
 }
 
+/// How to name enum variants
+#[derive(Clone, Debug, PartialEq, Eq, Default)]
+pub enum EnumVariants {
+    #[default]
+    WithEnumName,
+    VariantName,
+}
+
 /// How to indent (Allman, K&R, ...)
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
 pub enum Indentation {
@@ -138,6 +146,9 @@ pub struct Interop {
     /// How to convert function parameter names
     #[builder(setter(into))]
     function_parameter_naming: NameCase,
+    /// How to emit enum variants
+    #[builder(setter(into))]
+    pub(crate) enum_variant_style: EnumVariants,
     /// How to emit functions
     #[builder(setter(into))]
     function_style: Functions,
