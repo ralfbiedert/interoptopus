@@ -225,9 +225,9 @@ pub fn write_pattern_vec_helpers(i: &Interop, w: &mut IndentWriter, v: &VecType)
     indented!(w, r"{{")?;
     indented!(w, [()], r"if (_ptr == IntPtr.Zero) return;")?;
     indented!(w, [()], r"var _unmanaged = new Unmanaged();")?;
-    indented!(w, [()], r"_unmanaged._ptr = _unmanaged._ptr;")?;
-    indented!(w, [()], r"_unmanaged._len = _unmanaged._len;")?;
-    indented!(w, [()], r"_unmanaged._capacity = _unmanaged._capacity;")?;
+    indented!(w, [()], r"_unmanaged._ptr = _ptr;")?;
+    indented!(w, [()], r"_unmanaged._len = _len;")?;
+    indented!(w, [()], r"_unmanaged._capacity = _capacity;")?;
     indented!(w, [()], r"InteropHelper.interoptopus_vec_destroy(_unmanaged);")?;
     indented!(w, [()], r"_ptr = IntPtr.Zero;")?;
     indented!(w, [()], r"_len = 0;")?;
