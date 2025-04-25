@@ -122,7 +122,7 @@ public class TestPatternDelegates
             cc1.Dispose();
             cc2.Dispose();
         }
-        catch (Exception e)
+        catch (Exception _)
         {
             // If everything works Rust code after invoking C1 and C2 is still executed,
             // setting this variable to `8`.
