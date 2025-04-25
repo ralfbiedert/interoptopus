@@ -69,6 +69,8 @@ def init_lib(path):
     c_lib.primitive_u16.argtypes = [ctypes.c_uint16]
     c_lib.primitive_u32.argtypes = [ctypes.c_uint32]
     c_lib.primitive_u64.argtypes = [ctypes.c_uint64]
+    c_lib.primitive_usize.argtypes = [ctypes.c_size_t]
+    c_lib.primitive_isize.argtypes = [ctypes.c_ssize_t]
     c_lib.primitive_u8.argtypes = [ctypes.c_uint8]
     c_lib.primitive_void.argtypes = []
     c_lib.primitive_void2.argtypes = []
@@ -255,6 +257,8 @@ def init_lib(path):
     c_lib.primitive_u16.restype = ctypes.c_uint16
     c_lib.primitive_u32.restype = ctypes.c_uint32
     c_lib.primitive_u64.restype = ctypes.c_uint64
+    c_lib.primitive_usize.restype = ctypes.c_size_t
+    c_lib.primitive_isize.restype = ctypes.c_ssize_t
     c_lib.primitive_u8.restype = ctypes.c_uint8
     c_lib.ptr1.restype = ctypes.POINTER(ctypes.c_int64)
     c_lib.ptr2.restype = ctypes.POINTER(ctypes.POINTER(ctypes.c_int64))
@@ -557,6 +561,12 @@ def primitive_u32(x: int) -> int:
 
 def primitive_u64(x: int) -> int:
     return c_lib.primitive_u64(x)
+
+def primitive_usize(x: int) -> int:
+    return c_lib.primitive_usize(x)
+
+def primitive_isize(x: int) -> int:
+    return c_lib.primitive_isize(x)
 
 def primitive_u8(x: int) -> int:
     return c_lib.primitive_u8(x)
@@ -962,6 +972,12 @@ class Utf8String(ctypes.Structure):
         return ctypes.Structure.__set__(self, "capacity", value)
 
 
+class EnumNum:
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    B = 1
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+
+
 class BoolField(ctypes.Structure):
 
     # These fields represent the underlying C data layout
@@ -1000,6 +1016,48 @@ class ExtraTypef32(ctypes.Structure):
     @x.setter
     def x(self, value: float):
         return ctypes.Structure.__set__(self, "x", value)
+
+
+class IVec3(ctypes.Structure):
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("x", ctypes.c_ssize_t),
+        ("y", ctypes.c_ssize_t),
+        ("z", ctypes.c_ssize_t),
+    ]
+
+    def __init__(self, x: int = None, y: int = None, z: int = None):
+        if x is not None:
+            self.x = x
+        if y is not None:
+            self.y = y
+        if z is not None:
+            self.z = z
+
+    @property
+    def x(self) -> int:
+        return ctypes.Structure.__get__(self, "x")
+
+    @x.setter
+    def x(self, value: int):
+        return ctypes.Structure.__set__(self, "x", value)
+
+    @property
+    def y(self) -> int:
+        return ctypes.Structure.__get__(self, "y")
+
+    @y.setter
+    def y(self, value: int):
+        return ctypes.Structure.__set__(self, "y", value)
+
+    @property
+    def z(self) -> int:
+        return ctypes.Structure.__get__(self, "z")
+
+    @z.setter
+    def z(self, value: int):
+        return ctypes.Structure.__set__(self, "z", value)
 
 
 class Inner(ctypes.Structure):
