@@ -11586,9 +11586,9 @@ namespace My.Company
         {
             if (_ptr == IntPtr.Zero) return;
             var _unmanaged = new Unmanaged();
-            _unmanaged._ptr = _unmanaged._ptr;
-            _unmanaged._len = _unmanaged._len;
-            _unmanaged._capacity = _unmanaged._capacity;
+            _unmanaged._ptr = _ptr;
+            _unmanaged._len = _len;
+            _unmanaged._capacity = _capacity;
             InteropHelper.interoptopus_vec_destroy(_unmanaged);
             _ptr = IntPtr.Zero;
             _len = 0;
@@ -11751,9 +11751,9 @@ namespace My.Company
         {
             if (_ptr == IntPtr.Zero) return;
             var _unmanaged = new Unmanaged();
-            _unmanaged._ptr = _unmanaged._ptr;
-            _unmanaged._len = _unmanaged._len;
-            _unmanaged._capacity = _unmanaged._capacity;
+            _unmanaged._ptr = _ptr;
+            _unmanaged._len = _len;
+            _unmanaged._capacity = _capacity;
             InteropHelper.interoptopus_vec_destroy(_unmanaged);
             _ptr = IntPtr.Zero;
             _len = 0;
@@ -11917,9 +11917,9 @@ namespace My.Company
         {
             if (_ptr == IntPtr.Zero) return;
             var _unmanaged = new Unmanaged();
-            _unmanaged._ptr = _unmanaged._ptr;
-            _unmanaged._len = _unmanaged._len;
-            _unmanaged._capacity = _unmanaged._capacity;
+            _unmanaged._ptr = _ptr;
+            _unmanaged._len = _len;
+            _unmanaged._capacity = _capacity;
             InteropHelper.interoptopus_vec_destroy(_unmanaged);
             _ptr = IntPtr.Zero;
             _len = 0;
@@ -12083,9 +12083,9 @@ namespace My.Company
         {
             if (_ptr == IntPtr.Zero) return;
             var _unmanaged = new Unmanaged();
-            _unmanaged._ptr = _unmanaged._ptr;
-            _unmanaged._len = _unmanaged._len;
-            _unmanaged._capacity = _unmanaged._capacity;
+            _unmanaged._ptr = _ptr;
+            _unmanaged._len = _len;
+            _unmanaged._capacity = _capacity;
             InteropHelper.interoptopus_vec_destroy(_unmanaged);
             _ptr = IntPtr.Zero;
             _len = 0;
