@@ -34,7 +34,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
       - name: Cherry pick released version into master
-        if: ${{ steps.release-plz.outputs.releases_created }}
+        if: steps.release-plz.outputs.releases != '[]'
         run: |
           git checkout master
           git cherry-pick --allow-empty -x origin/release
