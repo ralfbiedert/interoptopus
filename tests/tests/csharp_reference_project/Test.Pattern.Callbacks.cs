@@ -32,6 +32,7 @@ public class TestPatternDelegates
 
         // TODO
         // Assert.True(called);
+        var _ = called;
     }
 
 
