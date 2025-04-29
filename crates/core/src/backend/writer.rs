@@ -39,6 +39,11 @@ impl<'a> IndentWriter<'a> {
         Self { one_indent: one_indent.to_string(), current_level: 0, writer }
     }
 
+    #[must_use]
+    pub fn indent_prefix(&self) -> String {
+        self.one_indent.repeat(self.current_level)
+    }
+
     pub fn indented(&mut self, f: impl FnOnce(&mut dyn Write) -> std::io::Result<()>) -> Result<(), Error> {
         for _ in 0..self.current_level {
             write!(&mut self.writer, "{}", self.one_indent)?;
