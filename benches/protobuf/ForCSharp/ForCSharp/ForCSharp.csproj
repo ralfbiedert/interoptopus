@@ -24,11 +24,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProtoCodegen Include="..\..\models1\*.proto" />
-    <ProtoCodegen Include="..\..\models2\*.proto" />
+    <ProtoCodegen Include="..\..\models\*.proto" />
   </ItemGroup>
   <PropertyGroup>
-    <proto_path Condition=" '$(proto_path)' == '' ">..\..\models1</proto_path>
+    <proto_path Condition=" '$(proto_path)' == '' ">..\..\models</proto_path>
   </PropertyGroup>
   <PropertyGroup>
     <PkgMicrosoft_Tools_MSInternal_ProtobufCodeGenerator
