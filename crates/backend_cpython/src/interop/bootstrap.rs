@@ -1,30 +1,33 @@
 use crate::Interop;
 use crate::converter::to_ctypes_name;
+use interoptopus::Error;
 use interoptopus::backend::IndentWriter;
-use interoptopus::{Error, indented};
+use std::collections::HashMap;
+use tera::Context;
 
 pub fn write_api_load_function(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
-    indented!(w, r"c_lib = None")?;
-    w.newline()?;
-    indented!(w, r"def init_lib(path):")?;
-    indented!(w, [()], r#""""Initializes the native library. Must be called at least once before anything else.""""#)?;
-    indented!(w, [()], r"global c_lib")?;
-    indented!(w, [()], r"c_lib = ctypes.cdll.LoadLibrary(path)")?;
+    let functions = i
+        .inventory
+        .functions()
+        .into_iter()
+        .map(|f| {
+            let args = f
+                .signature()
+                .params()
+                .iter()
+                .map(|x| to_ctypes_name(x.the_type(), false))
+                .collect::<Vec<_>>()
+                .join(", ");
 
-    w.newline()?;
-    for f in i.inventory.functions() {
-        let args = f.signature().params().iter().map(|x| to_ctypes_name(x.the_type(), false)).collect::<Vec<_>>();
+            let rtype = to_ctypes_name(f.signature().rval(), false);
 
-        indented!(w, [()], r"c_lib.{}.argtypes = [{}]", f.name(), args.join(", "))?;
-    }
+            (f.name(), [("signature", args), ("restype", rtype)].into())
+        })
+        .collect::<HashMap<_, HashMap<_, _>>>();
 
-    w.newline()?;
-    for f in i.inventory.functions() {
-        let rtype = to_ctypes_name(f.signature().rval(), false);
-        if !rtype.is_empty() {
-            indented!(w, [()], r"c_lib.{}.restype = {}", f.name(), rtype)?;
-        }
-    }
-
+    //render!(w, "api_load_function.py", ("functions", &functions));
+    let mut context = Context::new();
+    context.insert("functions", &functions);
+    crate::TEMPLATES.render_to("api_load_function.py", &context, w.writer()).unwrap();
     Ok(())
 }
