@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package Models;
+option csharp_namespace = "ForCSharp.Protobuf";
+
+message Configuration
+{
+    bool is_ok_response = 1;
+    string host = 2;
+    int32 response_size = 3;
+}

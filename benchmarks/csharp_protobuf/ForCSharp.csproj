@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
+    <PackageReference
+            Include="Google.Protobuf"
+            Version="3.30.2"
+            GeneratePathProperty="True"
+        />
+    <PackageReference
+            Include="Google.Protobuf.Tools"
+            Version="3.30.2"
+            GeneratePathProperty="True"
+            PrivateAssets="All"
+        />
+    <PackageReference
+            Include="Grpc.Tools"
+            Version="2.72.0"
+            PrivateAssets="All"
+        />
+  </ItemGroup>
+  <ItemGroup>
+    <Protobuf
+            Include="models\*.proto"
+            GrpcServices="None"
+            AdditionalImportDirs="models"
+        />
+  </ItemGroup>
+    <Target Name="Rust Build" BeforeTargets="Compile">
+      <Exec Command="echo 'Configuration: $(Configuration)'"/>
+      <Exec Condition="'$(Configuration)' == 'Release'" Command="cargo b --release" WorkingDirectory="./"/>
+      <Exec Condition="'$(Configuration)' != 'Release'" Command="cargo b" WorkingDirectory="./"/>
+    </Target>
+    <ItemGroup>
+        <None Include="$(MSBuildThisFileDirectory)\target\$(Configuration)\*proto_benchy*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Visible>True</Visible>
+            <Link>%(Filename)%(Extension)</Link>
+        </None>
+    </ItemGroup>
+</Project>

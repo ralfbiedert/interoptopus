@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package Models;
+option csharp_namespace = "ForCSharp.Protobuf";
+
+message TableMetadata
+{
+    int32 RowCount = 1;
+    int32 ColumnCount = 2;
+    string Guid = 3;
+    string Prefix = 4;
+}
+
+message Table
+{
+    TableMetadata Metadata = 1;
+    bytes ByteArray = 2;
+}
