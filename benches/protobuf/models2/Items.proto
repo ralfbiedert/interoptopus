@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package Models;
+option csharp_namespace = "One.Two.ForCSharp";
+
+import "Item.proto";
+
+message Items
+{
+    repeated Item Items = 1;
+}

@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package Models;
+option csharp_namespace = "One.Two.ForCSharp";
+
+import "Response.proto";
+import "Data.proto";
+
+message Outputs
+{
+    Response Response = 1;
+
+    Data Data = 2;
+}

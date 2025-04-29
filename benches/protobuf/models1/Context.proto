@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package Models;
+option csharp_namespace = "One.Two.ForCSharp";
+
+message Context
+{
+    repeated string Things = 1;
+
+    map<string, string> Headers = 2;
+}
