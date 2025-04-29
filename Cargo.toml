@@ -12,12 +12,15 @@ anyhow = "1.0.98"
 darling = "0.20.11"
 derive_builder = "0.20.2"
 heck = "0.5.0"
+include_dir = { version = "0.7.4", features = ["glob"] }
+indent = "0.1.1"
 log = "0.4.27"
 proc-macro2 = "1.0.95"
 prettyplease = "0.2.35"
 quote = "1.0.40"
 serde = "1.0.219"
 syn = "2.0.104"
+tera = "1"
 
 [workspace.lints.clippy]
 correctness = { level = "deny", priority = -1 }
