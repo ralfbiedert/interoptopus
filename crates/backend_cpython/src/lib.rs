@@ -141,3 +141,5 @@ mod interop;
 
 pub use docs::Markdown;
 pub use interop::{Interop, InteropBuilder, InteropBuilderError};
+
+interoptopus::codegen_template_engine!("**/*.py");

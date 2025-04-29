@@ -15,3 +15,6 @@ workspace = true
 [dependencies]
 interoptopus = { path = "../core", version = "0.15.0-alpha.6" }
 derive_builder = { workspace = true }
+tera.workspace = true
+include_dir.workspace = true
+indent.workspace = true

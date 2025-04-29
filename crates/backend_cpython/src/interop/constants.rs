@@ -1,12 +1,15 @@
 use crate::Interop;
 use crate::converter::constant_value_to_value;
-use interoptopus::backend::IndentWriter;
-use interoptopus::{Error, indented};
+use interoptopus::{Error, backend::IndentWriter, render};
+use std::collections::HashMap;
 
 pub fn write_constants(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
-    for c in i.inventory.constants() {
-        indented!(w, r"{} = {}", c.name(), constant_value_to_value(c.value()))?;
-    }
+    let constants = i
+        .inventory
+        .constants()
+        .iter()
+        .map(|c| (c.name(), constant_value_to_value(c.value())))
+        .collect::<HashMap<_, _>>();
 
-    Ok(())
+    render!(w, "constants.py", ("constants", &constants))
 }

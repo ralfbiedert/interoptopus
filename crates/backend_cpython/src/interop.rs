@@ -8,7 +8,7 @@ pub mod types;
 pub mod utils;
 
 use crate::converter::to_type_hint_in;
-use crate::interop::bootstrap::write_api_load_fuction;
+use crate::interop::bootstrap::write_api_load_function;
 use crate::interop::callbacks::write_callback_helpers;
 use crate::interop::constants::write_constants;
 use crate::interop::functions::write_function_proxies;
@@ -74,7 +74,7 @@ impl Interop {
 
     fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
         write_imports(self, w)?;
-        write_api_load_fuction(self, w)?;
+        write_api_load_function(self, w)?;
         w.newline()?;
         w.newline()?;
 
