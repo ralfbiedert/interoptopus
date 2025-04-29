@@ -135,9 +135,14 @@
 
 #![allow(clippy::test_attr_in_doctest)]
 
+use std::sync::LazyLock;
+use tera::Tera;
+
 mod converter;
 mod docs;
 mod interop;
 
 pub use docs::Markdown;
 pub use interop::{Interop, InteropBuilder, InteropBuilderError};
+
+pub(crate) static TEMPLATES: LazyLock<Tera> = LazyLock::new(|| Tera::new("templates/**/*.py").unwrap());
