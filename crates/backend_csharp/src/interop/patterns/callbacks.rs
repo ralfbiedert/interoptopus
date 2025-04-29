@@ -136,7 +136,10 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     indented!(w, [()], r"}}")?;
     w.newline()?;
 
+    w.indent();
     write_common_marshaller(i, w, &name, MoveSemantics::Copy)?;
+    w.unindent();
+
     indented!(w, r"}}")?;
 
     Ok(())

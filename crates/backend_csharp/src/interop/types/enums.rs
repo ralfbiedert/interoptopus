@@ -98,7 +98,9 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
     indented!(w, [()], r"private struct MarshallerMeta {{ }}")?;
     w.newline()?;
 
+    w.indent();
     write_common_marshaller(i, w, name, move_semantics)?;
+    w.unindent();
 
     indented!(w, r"}}")?;
 

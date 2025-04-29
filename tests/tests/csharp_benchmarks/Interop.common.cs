@@ -121,9 +121,8 @@ namespace My.Company.Common
             public EnumDocumented ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
     public partial struct EnumNum
@@ -243,9 +242,8 @@ namespace My.Company.Common
             public EnumNum ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
     public partial struct EnumRenamed
@@ -329,9 +327,8 @@ namespace My.Company.Common
             public EnumRenamed ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
     public partial struct Error
@@ -415,9 +412,8 @@ namespace My.Company.Common
             public Error ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
     public partial struct Vec
@@ -498,9 +494,8 @@ namespace My.Company.Common
             public Vec ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -625,9 +620,8 @@ namespace My.Company.Common
             public SliceBool ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
         public static class SliceBoolExtensions
@@ -751,9 +745,8 @@ namespace My.Company.Common
             public SliceI32 ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
         public static class SliceI32Extensions
@@ -877,9 +870,8 @@ namespace My.Company.Common
             public SliceU32 ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
         public static class SliceU32Extensions
@@ -1003,9 +995,8 @@ namespace My.Company.Common
             public SliceU8 ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
         public static class SliceU8Extensions
@@ -1117,9 +1108,8 @@ namespace My.Company.Common
             public SliceUtf8String ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
         public static class SliceUtf8StringExtensions
@@ -1243,9 +1233,8 @@ namespace My.Company.Common
             public SliceVec ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
         public static class SliceVecExtensions
@@ -1375,9 +1364,8 @@ namespace My.Company.Common
             public SliceMutU32 ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
         public static class SliceMutU32Extensions
@@ -1507,9 +1495,8 @@ namespace My.Company.Common
             public SliceMutU8 ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
         public static class SliceMutU8Extensions
@@ -1639,9 +1626,8 @@ namespace My.Company.Common
             public SliceMutVec ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
         public static class SliceMutVecExtensions
@@ -1754,9 +1740,8 @@ namespace My.Company.Common
             public OptionOptionResultOptionUtf8StringError ToManaged() { return _unmanaged.IntoManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
     ///Option that contains Some(value) or None.
@@ -1863,9 +1848,8 @@ namespace My.Company.Common
             public OptionResultOptionUtf8StringError ToManaged() { return _unmanaged.IntoManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
     ///Option that contains Some(value) or None.
@@ -1972,9 +1956,8 @@ namespace My.Company.Common
             public OptionUtf8String ToManaged() { return _unmanaged.IntoManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
     ///Option that contains Some(value) or None.
@@ -2077,9 +2060,8 @@ namespace My.Company.Common
             public OptionVec ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
     ///Result that contains value or an error.
@@ -2192,9 +2174,8 @@ namespace My.Company.Common
             public ResultError ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
     ///Result that contains value or an error.
@@ -2324,9 +2305,8 @@ namespace My.Company.Common
             public ResultOptionUtf8StringError ToManaged() { return _unmanaged.IntoManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
     ///Result that contains value or an error.
@@ -2452,9 +2432,8 @@ namespace My.Company.Common
             public ResultU32Error ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
     ///Result that contains value or an error.
@@ -2580,9 +2559,8 @@ namespace My.Company.Common
             public ResultU64Error ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
     ///Result that contains value or an error.
@@ -2712,9 +2690,8 @@ namespace My.Company.Common
             public ResultUtf8StringError ToManaged() { return _unmanaged.IntoManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
     ///Result that contains value or an error.
@@ -2844,9 +2821,8 @@ namespace My.Company.Common
             public ResultVecUtf8StringError ToManaged() { return _unmanaged.IntoManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
     ///Result that contains value or an error.
@@ -2946,9 +2922,8 @@ namespace My.Company.Common
             public ResultVoid ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
     [Serializable]
@@ -3082,9 +3057,8 @@ namespace My.Company.Common
             public MyCallbackNamespaced ToManaged() { return _unmanaged.ToManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
     // This must be a class because we only ever want to hold on to the
@@ -3241,9 +3215,8 @@ namespace My.Company.Common
             public VecU8 ToManaged() { return _unmanaged.IntoManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
     }
 
     public static class VecU8Extensions
@@ -3406,9 +3379,8 @@ namespace My.Company.Common
             public VecUtf8String ToManaged() { return _unmanaged.IntoManaged(); }
 
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public void Free() { }
+            public void Free() {}
         }
-
 
     }
 
@@ -3421,14 +3393,12 @@ namespace My.Company.Common
 
 
 
-    public class InteropException: Exception
+    public class InteropException : Exception
     {
-
-        public InteropException(): base()
+        public InteropException() : base()
         {
         }
     }
-
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void AsyncHelperNative(IntPtr data, IntPtr callback_data);
     public delegate void AsyncHelperDelegate(IntPtr data);
@@ -3508,6 +3478,7 @@ namespace My.Company.Common
             public void Free() { }
         }
     }
+
     public delegate void AsyncCallbackCommon(IntPtr data, IntPtr callback_data);
 
     [StructLayout(LayoutKind.Sequential)]
@@ -3524,7 +3495,7 @@ namespace My.Company.Common
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class Utf8String: IDisposable
+    public partial class Utf8String : IDisposable
     {
         private Utf8String() { }
 
@@ -3538,7 +3509,7 @@ namespace My.Company.Common
 
             fixed (byte* p = utf8Bytes)
             {
-                InteropHelper.interoptopus_string_create((IntPtr) p, (ulong)len, out var native);
+                InteropHelper.interoptopus_string_create((IntPtr)p, (ulong)len, out var native);
                 rval._ptr = native._ptr;
                 rval._len = native._len;
                 rval._capacity = native._capacity;
@@ -3559,7 +3530,7 @@ namespace My.Company.Common
         {
             get
             {
-                var span = new ReadOnlySpan<byte>((byte*) _ptr, (int)_len);
+                var span = new ReadOnlySpan<byte>((byte*)_ptr, (int)_len);
                 var s = Encoding.UTF8.GetString(span);
                 return s;
             }
@@ -3689,5 +3660,4 @@ namespace My.Company.Common
     {
         public static Utf8String Utf8(this string s) { return Utf8String.From(s); }
     }
-
 }

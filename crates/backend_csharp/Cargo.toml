@@ -20,3 +20,6 @@ serde = []
 interoptopus = { path = "../core", version = "0.15.0-alpha.6" }
 heck = { workspace = true }
 derive_builder = { workspace = true }
+tera.workspace = true
+include_dir.workspace = true
+indent.workspace = true
