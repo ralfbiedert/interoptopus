@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package Models;
+option csharp_namespace = "One.Two.ForCSharp";
+
+message Error
+{
+    repeated string error_messages = 1;
+}
