@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package Models;
+option csharp_namespace = "ForCSharp.Protobuf";
+
+message Item
+{
+    enum ItemKey
+    {
+        TOTAL = 0;
+        FIRST = 1;
+        SECOND = 2;
+        THIRD = 3;
+    }
+
+    ItemKey Key = 1;
+    uint64 Value = 2;
+}

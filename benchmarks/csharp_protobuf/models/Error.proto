@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package Models;
+option csharp_namespace = "ForCSharp.Protobuf";
+
+message Error
+{
+    repeated string error_messages = 1;
+}
