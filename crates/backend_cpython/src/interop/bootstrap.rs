@@ -3,7 +3,7 @@ use crate::converter::to_ctypes_name;
 use interoptopus::backend::IndentWriter;
 use interoptopus::{Error, indented};
 
-pub fn write_api_load_fuction(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
+pub fn write_api_load_function(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     indented!(w, r"c_lib = None")?;
     w.newline()?;
     indented!(w, r"def init_lib(path):")?;
