@@ -1,12 +1,10 @@
 use crate::Interop;
+use interoptopus::Error;
 use interoptopus::backend::IndentWriter;
-use interoptopus::{Error, indented};
+use tera::Context;
 
 pub fn write_imports(_i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
-    indented!(w, r"from __future__ import annotations")?;
-    indented!(w, r"import ctypes")?;
-    indented!(w, r"import typing")?;
-    w.newline()?;
-    indented!(w, r#"T = typing.TypeVar("T")"#)?;
+    let context = Context::new();
+    crate::TEMPLATES.render_to("imports.py", &context, w.writer()).unwrap();
     Ok(())
 }
