@@ -144,7 +144,9 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
     indented!(w, [()], r"[CustomMarshaller(typeof({}), MarshalMode.Default, typeof(Marshaller))]", name)?;
     indented!(w, [()], r"private struct MarshallerMeta {{ }}")?;
 
+    w.indent();
     write_common_marshaller(i, w, name, move_semantics)?;
+    w.unindent();
 
     indented!(w, r"}}")?;
 

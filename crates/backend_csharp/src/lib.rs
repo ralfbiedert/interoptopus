@@ -124,3 +124,5 @@ pub(crate) mod utils;
 
 pub use docs::{Markdown, MarkdownConfig};
 pub use interop::{FunctionNameFlavor, Interop, InteropBuilder, InteropBuilderError, Visibility, WriteTypes};
+
+interoptopus::codegen_template_engine!("**/*.cs");

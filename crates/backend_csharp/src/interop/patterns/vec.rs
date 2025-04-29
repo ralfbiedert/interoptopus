@@ -95,8 +95,8 @@ pub fn write_pattern_fast_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) 
     w.newline()?;
     indented!(w, r"}}")?;
     w.newline()?;
-    w.unindent();
     write_common_marshaller(i, w, name, MoveSemantics::Move)?;
+    w.unindent();
     indented!(w, r"}}")?;
     w.newline()?;
     indented!(w, r"public static class {name}Extensions")?;
@@ -185,9 +185,9 @@ pub fn write_pattern_marshalling_vec(i: &Interop, w: &mut IndentWriter, vec: &Ve
     write_pattern_vec_to_managed(i, w, name)?;
     w.newline()?;
     indented!(w, r"}}")?;
-    w.unindent();
     w.newline()?;
     write_common_marshaller(i, w, name, MoveSemantics::Move)?;
+    w.unindent();
     w.newline()?;
     indented!(w, r"}}")?;
     w.newline()?;

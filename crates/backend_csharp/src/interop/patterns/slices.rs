@@ -131,8 +131,8 @@ pub fn write_pattern_fast_slice(i: &Interop, w: &mut IndentWriter, slice: &Slice
     indented!(w, [()], r"}}")?;
     indented!(w, r"}}")?;
     w.newline()?;
-    w.unindent();
     write_common_marshaller(i, w, name, MoveSemantics::Copy)?;
+    w.unindent();
     indented!(w, r"}}")?;
     w.newline()?;
 
@@ -226,8 +226,8 @@ pub fn write_pattern_marshalling_slice(i: &Interop, w: &mut IndentWriter, slice:
     write_pattern_slice_to_managed(i, w, name)?;
     indented!(w, r"}}")?;
     w.newline()?;
-    w.unindent();
     write_common_marshaller(i, w, name, MoveSemantics::Copy)?;
+    w.unindent();
     indented!(w, r"}}")?;
     w.newline()?;
     indented!(w, [()], r"public static class {name}Extensions")?;
