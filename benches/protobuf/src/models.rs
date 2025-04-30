@@ -1,3 +1,4 @@
+// Wire<Input>
 struct Input {
     context: Context,
     value: Table,
@@ -9,6 +10,7 @@ struct Context {
     headers: HashMap<String, String>,
 }
 
+#[ffi_type]
 struct TableMetadata {
     rowCount: i32,
     columnCount: i32,
@@ -26,13 +28,37 @@ struct Configuration {
     host: String,
 }
 
+// Wire<Outputs>
+#[ffi_type] for all
 struct Outputs {
     response: Response,
     data: Data,
 }
 
+// Wire type means types inside might not be a part of inventory - they are just
+// used for serializing into a buffer.
+#[ffi_function]
+fn foo(i: Wire<Input>) -> Wire<Outputs> {
+    let buf = i.wire();
+    my_rust_function(buf);
+    Wire::from(output)
+}
+
+trait Wired {
+    fn ser();
+    fn de();
+    fn max_buffer_size(self) -> usize { 4+self.item_id.len()+4; }
+}
+
+#[ffi_type(wired)] // <-- it's a Wired type
 struct Result {
-    item_id: String,
+    item_id: String, // <- not in inventory anymore, just a type to write to a buf
+    item_value: i32,
+}
+
+#[ffi_type]
+struct Some {
+    item_id: String, // <- in inventory
     item_value: i32,
 }
 
@@ -63,4 +89,14 @@ struct Item {
 
 struct Error {
     error_messages: Vec<String>,
+}
+
+#[ffi_type(wired)]
+struct Weird {
+    items: Wire<Vec<Item>>,
+}
+
+struct Wire<T> {
+    buf: Vec<u8>, // ? who owns
+    marker: PhantomData<T>
 }

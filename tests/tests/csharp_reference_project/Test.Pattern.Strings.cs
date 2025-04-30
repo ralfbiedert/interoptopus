@@ -19,7 +19,7 @@ public class TestPatternStrings
         var rval = Interop.pattern_ascii_pointer_2();
         // Assert.Equal(string.IsNullOrEmpty(rval));
     }
-    
+
     [Fact]
     public void pattern_string_1()
     {
@@ -32,6 +32,9 @@ public class TestPatternStrings
     {
         Assert.Equal(11u, Interop.pattern_string_2("hello world".Utf8()));
     }
+
+    // var buf: WireString = "hello world".Wire();
+    // var str: string = buf.into();
 
     [Fact]
     public void pattern_string_3()
