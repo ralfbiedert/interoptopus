@@ -1,10 +1,15 @@
-// Wire<Input>
+use interoptopus::{ffi, ffi_type};
+use std::collections::HashMap;
+
+// use Wire<Input> in fn args
+#[ffi_type]
 struct Input {
     context: Context,
     value: Table,
     configuration: Configuration,
 }
 
+#[ffi_type]
 struct Context {
     things: Vec<String>,
     headers: HashMap<String, String>,
@@ -18,36 +23,23 @@ struct TableMetadata {
     prefix: String,
 }
 
+#[ffi_type]
 struct Table {
     metadata: TableMetadata,
     byteArray: Vec<u8>,
 }
 
+#[ffi_type]
 struct Configuration {
     is_local_test: bool,
     host: String,
 }
 
 // Wire<Outputs>
-#[ffi_type] for all
+#[ffi_type]
 struct Outputs {
     response: Response,
     data: Data,
-}
-
-// Wire type means types inside might not be a part of inventory - they are just
-// used for serializing into a buffer.
-#[ffi_function]
-fn foo(i: Wire<Input>) -> Wire<Outputs> {
-    let buf = i.wire();
-    my_rust_function(buf);
-    Wire::from(output)
-}
-
-trait Wired {
-    fn ser();
-    fn de();
-    fn max_buffer_size(self) -> usize { 4+self.item_id.len()+4; }
 }
 
 #[ffi_type(wired)] // <-- it's a Wired type
@@ -62,19 +54,23 @@ struct Some {
     item_value: i32,
 }
 
+#[ffi_type]
 struct Response {
     results: Vec<Result>,
 }
 
+#[ffi_type]
 struct Data {
     items: Items,
     errors: Error,
 }
 
+#[ffi_type]
 struct Items {
     items: Vec<Item>,
 }
 
+#[ffi_type]
 enum ItemKey {
     TOTAL = 0,
     FIRST = 1,
@@ -82,21 +78,13 @@ enum ItemKey {
     THIRD = 3,
 }
 
+#[ffi_type]
 struct Item {
     key: ItemKey,
     value: u64,
 }
 
+#[ffi_type]
 struct Error {
     error_messages: Vec<String>,
-}
-
-#[ffi_type(wired)]
-struct Weird {
-    items: Wire<Vec<Item>>,
-}
-
-struct Wire<T> {
-    buf: Vec<u8>, // ? who owns
-    marker: PhantomData<T>
 }
