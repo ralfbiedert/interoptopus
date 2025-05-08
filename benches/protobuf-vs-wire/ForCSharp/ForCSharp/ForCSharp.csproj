@@ -19,7 +19,7 @@
         />
   </ItemGroup>
   <ItemGroup>
-     <None Include="$(EnlistmentRoot)\bin\rust_bench.dll">
+     <None Include="$(EnlistmentRoot)\bin\proto_benchy.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
