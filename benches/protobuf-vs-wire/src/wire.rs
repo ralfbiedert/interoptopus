@@ -19,3 +19,6 @@ struct Wire<T> {
     buf: Vec<u8>, // ? who owns
     marker: PhantomData<T>,
 }
+
+// TODO: this should go through the C# generated shim that would unwire the result type
+private static unsafe extern void WireRustClient(byte[] structPointer, uint structLength, void** result, uint* resultLength);
