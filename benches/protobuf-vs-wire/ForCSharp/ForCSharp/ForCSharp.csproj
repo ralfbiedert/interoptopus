@@ -7,16 +7,13 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
     <PackageReference Include="Google.Protobuf" GeneratePathProperty="True" />
-    <PackageReference
-            Include="Google.Protobuf.Tools"
-            GeneratePathProperty="True"
-            PrivateAssets="All"
-        />
-    <PackageReference
+    <PackageReference Include="Google.Protobuf.Tools" GeneratePathProperty="True" PrivateAssets="All" />
+    <!-- <PackageReference
             Include="Microsoft.Tools.MSInternal.ProtobufCodeGenerator"
             PrivateAssets="All"
-        />
+        /> -->
   </ItemGroup>
   <ItemGroup>
      <None Include="$(EnlistmentRoot)\bin\proto_benchy.dll">
@@ -30,11 +27,11 @@
     <proto_path Condition=" '$(proto_path)' == '' ">..\..\models</proto_path>
   </PropertyGroup>
   <PropertyGroup>
-    <PkgMicrosoft_Tools_MSInternal_ProtobufCodeGenerator
+    <!-- <PkgMicrosoft_Tools_MSInternal_ProtobufCodeGenerator
             Condition=" '$(PkgMicrosoft_Tools_MSInternal_ProtobufCodeGenerator)' == '' "
-        >$(NugetPackageRoot)\microsoft.tools.msinternal.protobufcodegenerator\1.3.0</PkgMicrosoft_Tools_MSInternal_ProtobufCodeGenerator>
+        >$(NugetPackageRoot)\microsoft.tools.msinternal.protobufcodegenerator\1.3.0</PkgMicrosoft_Tools_MSInternal_ProtobufCodeGenerator> -->
   </PropertyGroup>
-  <Import
+  <!-- <Import
         Project="$(PkgMicrosoft_Tools_MSInternal_ProtobufCodeGenerator)\Protobuf.targets"
-    />
+    /> -->
 </Project>
