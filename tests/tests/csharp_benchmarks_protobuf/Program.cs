@@ -144,14 +144,21 @@ public class InteropWire
 }
 
 [RPlotExporter]
-public class Benchy {
+public class Benchy
+{
     [Benchmark]
-    public void ProtobufInterop() {
+    public void ProtobufInterop()
+    {
+        // TODO: generate input based on benchmark parameters
+        // (at least two extremes: very small payload, very large payload and maybe something in-between)
         var outputs = InteropProtobuf.ExecuteRustClient(input);
     }
 
     [Benchmark]
-    public void WireInterop() {
+    public void WireInterop()
+    {
+        // TODO: generate input based on benchmark parameters
+        // (at least two extremes: very small payload, very large payload and maybe something in-between)
         var outputs = InteropWire.ExecuteRustClient(input);
     }
 }
