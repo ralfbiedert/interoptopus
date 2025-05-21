@@ -8,17 +8,33 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
-    <PackageReference Include="Google.Protobuf" Version="3.30.2" GeneratePathProperty="True" />
-    <PackageReference Include="Google.Protobuf.Tools" Version="3.30.2" GeneratePathProperty="True" PrivateAssets="All" />
-    <PackageReference Include="Grpc.Tools" Version="2.72.0" PrivateAssets="All" />
+    <PackageReference
+            Include="Google.Protobuf"
+            Version="3.30.2"
+            GeneratePathProperty="True"
+        />
+    <PackageReference
+            Include="Google.Protobuf.Tools"
+            Version="3.30.2"
+            GeneratePathProperty="True"
+            PrivateAssets="All"
+        />
+    <PackageReference
+            Include="Grpc.Tools"
+            Version="2.72.0"
+            PrivateAssets="All"
+        />
   </ItemGroup>
   <ItemGroup>
-     <!--None Include="$(EnlistmentRoot)\bin\proto_benchy.dll"-->
      <None Include="target\release\libproto_benchy.dylib">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Protobuf Include="models\*.proto" GrpcServices="None" AdditionalImportDirs="models" />
+    <Protobuf
+            Include="models\*.proto"
+            GrpcServices="None"
+            AdditionalImportDirs="models"
+        />
   </ItemGroup>
 </Project>
