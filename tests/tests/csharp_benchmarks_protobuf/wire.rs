@@ -8,10 +8,10 @@ fn foo(i: Wire<Input>) -> Wire<Outputs> {
 }
 
 trait Wired {
-    fn ser(in: &Self);
+    fn ser(&self);
     fn de() -> Self;
     fn max_buffer_size(self) -> usize { // TODO: for some types we can't calculate ahead of time
-        4 + self.item_id.len() + 4;
+0usize //        4 + self.item_id.len() + 4;
     }
 }
 
