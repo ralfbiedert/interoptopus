@@ -2,7 +2,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using System.Threading;
 
-namespace One.Two.ForCSharp;
+namespace ForCSharp;
 
 [RPlotExporter]
 public class Benchy

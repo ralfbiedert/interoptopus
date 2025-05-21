@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using Google.Protobuf;
 
-namespace One.Two.ForCSharp;
+namespace ForCSharp;
 
 public class InteropProtobuf
 {
