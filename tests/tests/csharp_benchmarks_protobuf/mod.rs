@@ -59,8 +59,8 @@ fn prerequisites() -> Result<(), Error> {
         .build()?
         .to_string()?;
 
-    validate_output!("tests/csharp_benchmarks_protobuf", "Interop.common.cs", generated_common.as_str());
-    validate_output!("tests/csharp_benchmarks_protobuf", "Interop.cs", generated_other.as_str());
+    validate_output!("./", "Interop.common.cs", generated_common.as_str());
+    validate_output!("./", "Interop.cs", generated_other.as_str());
 
     Ok(())
 }
