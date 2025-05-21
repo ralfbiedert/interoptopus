@@ -14,7 +14,7 @@
   </ItemGroup>
   <ItemGroup>
      <!--None Include="$(EnlistmentRoot)\bin\proto_benchy.dll"-->
-     <None Include="$(EnlistmentRoot)\bin\libproto_benchy.dylib">
+     <None Include="target\release\libproto_benchy.dylib">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
