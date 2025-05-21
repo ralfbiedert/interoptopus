@@ -5,13 +5,13 @@ edition = "2024"
 publish = false
 
 [lib]
-path = "src/lib.rs"
+path = "../src/lib.rs"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 prost = "0.8"
 prost-types = "0.8"
-interoptopus = { path = "../../crates/core", version = "0.15.0-alpha.6" }
+interoptopus = { path = "../../../crates/core" }
 
 [build-dependencies]
 prost-build = "0.8"
