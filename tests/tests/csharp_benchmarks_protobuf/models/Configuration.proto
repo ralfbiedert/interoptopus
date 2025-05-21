@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package Models;
-option csharp_namespace = "One.Two.ForCSharp";
+option csharp_namespace = "ForCSharp";
 
 message Configuration
 {
