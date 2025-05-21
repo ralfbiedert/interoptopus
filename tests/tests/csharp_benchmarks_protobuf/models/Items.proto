@@ -3,7 +3,7 @@ syntax = "proto3";
 package Models;
 option csharp_namespace = "One.Two.ForCSharp";
 
-import "Item.proto";
+import "models/Item.proto";
 
 message Items
 {

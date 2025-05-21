@@ -3,9 +3,9 @@ syntax = "proto3";
 package Models;
 option csharp_namespace = "One.Two.ForCSharp";
 
-import "Context.proto";
-import "Table.proto";
-import "Configuration.proto";
+import "models/Context.proto";
+import "models/Table.proto";
+import "models/Configuration.proto";
 
 message Input
 {

@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -8,12 +8,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
-    <PackageReference Include="Google.Protobuf" GeneratePathProperty="True" />
-    <PackageReference Include="Google.Protobuf.Tools" GeneratePathProperty="True" PrivateAssets="All" />
-    <!-- <PackageReference
-            Include="Microsoft.Tools.MSInternal.ProtobufCodeGenerator"
-            PrivateAssets="All"
-        /> -->
+    <PackageReference Include="Google.Protobuf" Version="3.30.2" GeneratePathProperty="True" />
+    <PackageReference Include="Google.Protobuf.Tools" Version="3.30.2" GeneratePathProperty="True" PrivateAssets="All" />
+    <PackageReference Include="Grpc.Tools" Version="2.72.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
      <None Include="$(EnlistmentRoot)\bin\proto_benchy.dll">
@@ -21,17 +18,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProtoCodegen Include=".\models\*.proto" />
+    <Protobuf Include="models\*.proto" GrpcServices="None" />
   </ItemGroup>
-  <PropertyGroup>
-    <proto_path Condition=" '$(proto_path)' == '' ">.\models</proto_path>
-  </PropertyGroup>
-  <PropertyGroup>
-    <!-- <PkgMicrosoft_Tools_MSInternal_ProtobufCodeGenerator
-            Condition=" '$(PkgMicrosoft_Tools_MSInternal_ProtobufCodeGenerator)' == '' "
-        >$(NugetPackageRoot)\microsoft.tools.msinternal.protobufcodegenerator\1.3.0</PkgMicrosoft_Tools_MSInternal_ProtobufCodeGenerator> -->
-  </PropertyGroup>
-  <!-- <Import
-        Project="$(PkgMicrosoft_Tools_MSInternal_ProtobufCodeGenerator)\Protobuf.targets"
-    /> -->
 </Project>

@@ -44,8 +44,34 @@ struct Outputs {
 
 #[ffi_type(wired)] // <-- it's a Wired type
 struct Result {
-    item_id: String, // <- not in inventory anymore, just a type to write to a buf
     item_value: i32,
+    item_id: String, // <- not in inventory anymore, just a type to write to a buf
+}
+
+class Result {
+    public int item_value;
+    public string item_id; // <- not in inventory anymore, just a type to write to a buf
+}
+
+class WireResult {
+    public static Result Deserialize() {
+        // Read i32 first.
+        
+
+        // Read String next.
+
+    }
+
+    public static WireResult Serialize() {
+
+    }
+}
+
+public static Bar() {
+    WireResult x = Foo();
+    var xx = x.Deserialize();
+
+    Foo2(xx.Serialize())
 }
 
 #[ffi_type]
