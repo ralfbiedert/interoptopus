@@ -3,8 +3,8 @@ syntax = "proto3";
 package Models;
 option csharp_namespace = "One.Two.ForCSharp";
 
-import "models/Items.proto";
-import "models/Error.proto";
+import "Items.proto";
+import "Error.proto";
 
 message Data
 {

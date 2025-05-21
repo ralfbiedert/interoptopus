@@ -6,6 +6,5 @@ option csharp_namespace = "One.Two.ForCSharp";
 message Configuration
 {
     bool is_local_test = 1;
-
     string host = 2;
 }
