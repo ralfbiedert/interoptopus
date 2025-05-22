@@ -26,15 +26,23 @@
         />
   </ItemGroup>
   <ItemGroup>
-     <None Include="target\release\libproto_benchy.dylib">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Protobuf
             Include="models\*.proto"
             GrpcServices="None"
             AdditionalImportDirs="models"
         />
   </ItemGroup>
+
+  <Target Name="Rust Build" BeforeTargets="Compile">
+    <Exec Command="echo 'Configuration: $(Configuration)'"/>
+    <Exec Condition="'$(Configuration)' == 'Release'" Command="cargo b --release" WorkingDirectory="./"/>
+    <Exec Condition="'$(Configuration)' != 'Release'" Command="cargo b" WorkingDirectory="./"/>
+  </Target>
+    <ItemGroup>
+        <None Include="$(MSBuildThisFileDirectory)\target\$(Configuration)\proto_benchy.dll">
+            <Link>proto_benchy.dll</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Visible>True</Visible>
+        </None>
+    </ItemGroup>
 </Project>
