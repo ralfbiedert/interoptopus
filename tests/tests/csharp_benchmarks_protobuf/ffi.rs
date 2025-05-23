@@ -43,9 +43,9 @@ struct Table {
 
 #[ffi_type]
 struct Configuration {
-    is_local_test: bool,
+    is_ok_response: bool,
     host: ffi::String,
-    response_size_factor: u64, // controls N in benchmarks
+    response_size: u64, // controls N in benchmarks
 }
 
 #[ffi_type]
