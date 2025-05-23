@@ -7,11 +7,7 @@ public class InteropFfi
     const string DllName = "proto_benchy.dll";
 
     [DllImport(DllName)]
-    private static extern unsafe void FfiRustClient(
-        byte[] structPointer, uint structLength, void** result, uint* resultLength);
-
-    [DllImport(DllName)]
-    private static extern unsafe void FreeRustResultMemory(byte* rustPtr, uint len);
+    private static extern unsafe Outputs FfiRustClient(Input input);
 
     /// Main benched function.
     public static Outputs ExecuteRustClient(Input input)
@@ -20,40 +16,13 @@ public class InteropFfi
         {
             unsafe
             {
-                var inputBytes = input.ToByteArray();
-
-                byte* buffer = null;
-                uint length = 0;
-
-                FfiRustClient(inputBytes, (uint)inputBytes.Length, (void**)&buffer, &length);
-
-                var result = CopyAndDeallocate(buffer, length);
-                var output = Outputs.Parser.ParseFrom(result);
-
-                return output;
+                var outputs = FfiRustClient(input);
+                return outputs;
             }
         }
         catch (Exception e)
         {
             throw new InvalidOperationException($"Unexpected error in ExecuteRustClient: {e.Message}", e);
         }
-    }
-
-    private static unsafe byte[] CopyAndDeallocate(byte* contentPtr, uint contentLength)
-    {
-        byte[] result = [];
-        if (contentPtr == null) return result;
-
-        try
-        {
-            result = new byte[contentLength];
-            Marshal.Copy((IntPtr)contentPtr, result, 0, (int)contentLength);
-        }
-        finally
-        {
-            FreeRustResultMemory(contentPtr, contentLength);
-        }
-
-        return result;
     }
 }
