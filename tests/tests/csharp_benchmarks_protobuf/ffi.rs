@@ -3,6 +3,7 @@
 //!
 use interoptopus::{ffi, ffi_function, ffi_type};
 
+/// Main benchmark Rust entry point for FFI-based ipc.
 #[ffi_function]
 pub fn FfiRustClient(_input: Input) -> Outputs {
     // TODO: use input to generate outputs
@@ -44,6 +45,7 @@ struct Table {
 struct Configuration {
     is_local_test: bool,
     host: ffi::String,
+    response_size_factor: u64, // controls N in benchmarks
 }
 
 #[ffi_type]
