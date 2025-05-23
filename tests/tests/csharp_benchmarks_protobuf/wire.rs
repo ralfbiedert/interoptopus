@@ -10,8 +10,9 @@ fn foo(i: Wire<Input>) -> Wire<Outputs> {
 trait Wired {
     fn ser(&self);
     fn de() -> Self;
-    fn max_buffer_size(self) -> usize { // TODO: for some types we can't calculate ahead of time
-0usize //        4 + self.item_id.len() + 4;
+    fn max_buffer_size(self) -> usize {
+        // TODO: for some types we can't calculate ahead of time
+        0usize //        4 + self.item_id.len() + 4;
     }
 }
 
@@ -27,102 +28,97 @@ use interoptopus::{ffi, ffi_type};
 use std::collections::HashMap;
 
 // use Wire<Input> in fn args
-#[ffi_type]
+#[ffi_type(wired)]
 struct Input {
     context: Context,
     value: Table,
     configuration: Configuration,
 }
 
-#[ffi_type]
+#[ffi_type(wired)]
 struct Context {
     things: Vec<String>,
     headers: HashMap<String, String>,
 }
 
-#[ffi_type]
+#[ffi_type(wired)]
 struct TableMetadata {
-    rowCount: i32,
-    columnCount: i32,
+    row_count: i32,
+    column_count: i32,
     guid: String,
     prefix: String,
 }
 
-#[ffi_type]
+#[ffi_type(wired)]
 struct Table {
     metadata: TableMetadata,
     byteArray: Vec<u8>,
 }
 
-#[ffi_type]
+#[ffi_type(wired)]
 struct Configuration {
-    is_local_test: bool,
+    is_ok_response: bool,
     host: String,
-    response_size_factor: u64, // controls N in benchmarks
+    response_size: u64, // controls N in benchmarks
 }
 
-// Wire<Outputs>
-#[ffi_type]
+// use Wire<Outputs> in fn args
+#[ffi_type(wired)]
 struct Outputs {
     response: Response,
     data: Data,
 }
 
+// #[ffi_type]
+// struct Result {
+//     item_id: ffi::String, // <- in inventory
+//     item_value: i32,
+// }
+
 #[ffi_type(wired)] // <-- it's a Wired type
 struct Result {
-    item_value: i32,
     item_id: String, // <- not in inventory anymore, just a type to write to a buf
-}
-
-class Result {
-    public int item_value;
-    public string item_id; // <- not in inventory anymore, just a type to write to a buf
-}
-
-class WireResult {
-    public static Result Deserialize() {
-        // Read i32 first.
-
-
-        // Read String next.
-
-    }
-
-    public static WireResult Serialize() {
-
-    }
-}
-
-public static Bar() {
-    WireResult x = Foo();
-    var xx = x.Deserialize();
-
-    Foo2(xx.Serialize())
-}
-
-#[ffi_type]
-struct Some {
-    item_id: String, // <- in inventory
     item_value: i32,
 }
 
-#[ffi_type]
+// class Result {
+//     public string item_id; // <- not in inventory anymore, just a type to write to a buf
+//     public int item_value;
+// }
+
+// class WireResult {
+//     public static Result Deserialize() {
+//         // Read String first.
+//         // Read i32 next.
+//     }
+//     public static WireResult Serialize() {
+//     }
+// }
+
+// public static Bar() {
+//     WireResult x = Foo();
+//     var xx = x.Deserialize();
+
+//     Foo2(xx.Serialize())
+// }
+
+#[ffi_type(wired)]
 struct Response {
     results: Vec<Result>,
 }
 
-#[ffi_type]
+#[ffi_type(wired)]
 struct Data {
     items: Items,
     errors: Error,
 }
 
-#[ffi_type]
+#[ffi_type(wired)]
 struct Items {
     items: Vec<Item>,
 }
 
-#[ffi_type]
+#[ffi_type(wired)]
 enum ItemKey {
     TOTAL = 0,
     FIRST = 1,
@@ -130,13 +126,13 @@ enum ItemKey {
     THIRD = 3,
 }
 
-#[ffi_type]
+#[ffi_type(wired)]
 struct Item {
     key: ItemKey,
     value: u64,
 }
 
-#[ffi_type]
+#[ffi_type(wired)]
 struct Error {
     error_messages: Vec<String>,
 }
