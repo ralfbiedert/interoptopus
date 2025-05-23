@@ -6,6 +6,52 @@ use std::collections::HashSet;
 use std::fs::File;
 use std::path::Path;
 
+const FORBIDDEN_NAMES: [&str; 43] = [
+    "new",
+    "public",
+    "private",
+    "protected",
+    "internal",
+    "static",
+    "virtual",
+    "override",
+    "abstract",
+    "sealed",
+    "partial",
+    "readonly",
+    "const",
+    "event",
+    "delegate",
+    "fixed",
+    "checked",
+    "unchecked",
+    "unsafe",
+    "class",
+    "interface",
+    "enum",
+    "struct",
+    "namespace",
+    "using",
+    "operator",
+    "implicit",
+    "explicit",
+    "this",
+    "base",
+    "void",
+    "true",
+    "false",
+    "null",
+    "typeof",
+    "sizeof",
+    "default",
+    "get",
+    "set",
+    "where",
+    "in",
+    "out",
+    "ref",
+];
+
 /// Tells the [`InventoryBuilder`] what to register.
 ///
 /// Most users won't need to touch this enum directly, as its variants are usually created via the [`function`](crate::function), [`constant`](crate::constant), [`extra_type`](crate::extra_type) and [`pattern`](crate::pattern!) macros.
@@ -107,6 +153,7 @@ impl InventoryBuilder {
     /// generation a panic will be raised.
     #[must_use]
     pub fn validate(self) -> Self {
+        // Check for opaque parameters and return values
         for x in &self.functions {
             let has_opaque_param = x.signature().params().iter().any(|x| holds_opaque_without_ref(x.the_type()));
             assert!(!has_opaque_param, "Function `{}` has a (nested) opaque parameter. This can cause UB.", x.name());
@@ -114,6 +161,8 @@ impl InventoryBuilder {
             let has_opaque_rval = holds_opaque_without_ref(x.signature().rval());
             assert!(!has_opaque_rval, "Function `{}` has a (nested) opaque return value. This can cause UB.", x.name());
         }
+
+        validate_symbol_names(&self.functions, &self.ctypes);
 
         self
     }
@@ -267,5 +316,55 @@ pub trait Bindings {
         let mut writer = IndentWriter::new(&mut vec);
         self.write_to(&mut writer)?;
         Ok(String::from_utf8(vec)?)
+    }
+}
+
+fn validate_symbol_names(functions: &[Function], ctypes: &[Type]) {
+    // Check function names and parameter names.
+    for func in functions {
+        let name = func.name().to_lowercase();
+        assert!(!FORBIDDEN_NAMES.contains(&name.as_str()), "Function `{name}` has a forbidden name that might cause issues in other languages.");
+
+        for param in func.signature().params() {
+            let param_name = param.name().to_lowercase();
+            assert!(
+                !FORBIDDEN_NAMES.contains(&param_name.as_str()),
+                "Parameter `{param_name}` in function `{name}` has a forbidden name that might cause issues in other languages."
+            );
+        }
+    }
+
+    // Check type names and field/variant names.
+    for ctype in ctypes {
+        match ctype {
+            Type::Composite(composite) => {
+                let type_name = composite.rust_name();
+                assert!(!FORBIDDEN_NAMES.contains(&type_name), "Type `{type_name}` has a forbidden name that might cause issues in other languages.");
+                for field in composite.fields() {
+                    let field_name = field.name();
+                    assert!(
+                        !FORBIDDEN_NAMES.contains(&field_name),
+                        "Field `{field_name}` in type `{type_name}` has a forbidden name that might cause issues in other languages."
+                    );
+                }
+            }
+            Type::Enum(enum_type) => {
+                let type_name = enum_type.rust_name();
+                // Inline the format parameter using Rust's string interpolation.
+                assert!(!FORBIDDEN_NAMES.contains(&type_name), "Enum `{type_name}` has a forbidden name that might cause issues in other languages.");
+                for variant in enum_type.variants() {
+                    let variant_name = variant.name();
+                    assert!(
+                        !FORBIDDEN_NAMES.contains(&variant_name),
+                        "Variant `{variant_name}` in enum `{type_name}` has a forbidden name that might cause issues in other languages."
+                    );
+                }
+            }
+            Type::Opaque(opaque) => {
+                let type_name = opaque.rust_name();
+                assert!(!FORBIDDEN_NAMES.contains(&type_name), "Opaque type `{type_name}` has a forbidden name that might cause issues in other languages.");
+            }
+            _ => {}
+        }
     }
 }
