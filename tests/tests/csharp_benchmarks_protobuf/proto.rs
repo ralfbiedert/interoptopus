@@ -1,6 +1,6 @@
-use std::{ffi::c_void, slice};
 use crate::proto_models;
 use prost::Message;
+use std::{ffi::c_void, slice};
 
 // Rust client to benchmark Protobuf based serialization/deserialization speed.
 // # Safety
@@ -31,17 +31,11 @@ pub unsafe extern "C" fn ProtoRustClient(
         }
     };
 
-
     // ==========================================================================================
     // TODO: Fill in the response payload based on some fields in the Input payload (i.e. some N)
     // ==========================================================================================
-    let response = proto_models::Response {
-        results: vec![proto_models::Result { item_id: 1.to_string(), item_value: 42 }],
-    };
-    let data = proto_models::Data {
-        items: None,
-        errors: Some(proto_models::Error { error_messages: vec![format!("Failed to deserialize input")] })
-    };
+    let response = proto_models::Response { results: vec![proto_models::Result { item_id: 1.to_string(), item_value: 42 }] };
+    let data = proto_models::Data { items: None, errors: Some(proto_models::Error { error_messages: vec![format!("Failed to deserialize input")] }) };
 
     // Create the output object
     let output = proto_models::Outputs { response: Some(response), data: Some(data) };
@@ -87,5 +81,5 @@ pub unsafe extern "C" fn FreeRustResultMemory(ptr: *mut u8, len: usize) {
     // SAFETY: Reclaim ownership
     let slice_ptr = unsafe { slice::from_raw_parts_mut(ptr, len) };
     // SAFETY: Deallocate memory
-    let _ = unsafe { Box::from_raw(slice_ptr) };
+    _ = unsafe { Box::from_raw(slice_ptr) };
 }
