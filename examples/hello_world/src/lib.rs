@@ -17,13 +17,13 @@ pub fn my_function(input: Vec2) -> Vec2 {
 #[test]
 #[rustfmt::skip]
 fn generate_bindings() {
-    use interoptopus::{function};
+    use interoptopus::function;
     use interoptopus_backend_csharp::InteropBuilder;
-    use interoptopus::inventory::{Bindings, InventoryBuilder};
+    use interoptopus::inventory::{Bindings, Inventory};
 
     // In a real project this should be a freestanding `my_inventory()` function inside
     // your FFI or build crate.
-    let inventory = InventoryBuilder::new()
+    let inventory = Inventory::builder()
         .register(function!(my_function))
         .validate()
         .build();

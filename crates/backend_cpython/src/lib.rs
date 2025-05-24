@@ -28,7 +28,7 @@
 //! }
 //!
 //! pub fn my_inventory() -> Inventory {
-//!     InventoryBuilder::new()
+//!     Inventory::builder()
 //!         .register(function!(my_function))
 //!         .build()
 //! }

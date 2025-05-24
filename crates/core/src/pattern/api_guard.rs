@@ -25,7 +25,7 @@
 //!
 //! // Inventory of our exports.
 //! pub fn my_inventory() -> Inventory {
-//!     InventoryBuilder::new()
+//!     Inventory::builder()
 //!         .register(function!(my_api_guard))
 //!         .validate()
 //!         .build()

@@ -16,9 +16,9 @@ use crate::interop::imports::write_imports;
 use crate::interop::types::write_type_definitions;
 use derive_builder::Builder;
 use heck::{ToLowerCamelCase, ToShoutySnakeCase, ToSnakeCase, ToUpperCamelCase};
-use interoptopus::Error;
 use interoptopus::backend::IndentWriter;
 use interoptopus::inventory::{Bindings, Inventory};
+use interoptopus::Error;
 
 /// How to lay out functions.
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
@@ -156,6 +156,12 @@ pub struct Interop {
 }
 
 impl Interop {
+    /// Creates a new [`InteropBuilder`].
+    #[must_use]
+    pub fn builder() -> InteropBuilder {
+        InteropBuilder::new()
+    }
+
     pub(crate) fn inventory(&self) -> &Inventory {
         &self.inventory
     }

@@ -28,7 +28,7 @@
 //! }
 //!
 //! pub fn my_inventory() -> Inventory {
-//!     InventoryBuilder::new()
+//!     Inventory::builder()
 //!         .register(function!(my_function))
 //!         .validate()
 //!         .build()
@@ -58,7 +58,7 @@
 //! fn bindings_c() -> Result<(), Error> {
 //!     use interoptopus_backend_c::{Config, Interop};
 //!
-//!     Interop::new(
+//!     Interop::builder(
 //!         Config {
 //!             ifndef: "example_library".to_string(),
 //!             ..Config::default()

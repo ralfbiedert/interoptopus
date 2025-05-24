@@ -20,7 +20,7 @@ use derive_builder::Builder;
 use interoptopus::backend::IndentWriter;
 use interoptopus::inventory::{Bindings, Inventory};
 use interoptopus::lang::Function;
-use interoptopus::{Error, indented};
+use interoptopus::{indented, Error};
 
 /// Generates Python `ctypes` files, **get this with [`InteropBuilder`]**.🐙
 #[derive(Clone, Debug, Default, Builder)]
@@ -35,6 +35,12 @@ pub struct Interop {
 
 #[allow(clippy::unused_self)]
 impl Interop {
+    /// Creates a new [`InteropBuilder`].
+    #[must_use]
+    pub fn builder() -> InteropBuilder {
+        InteropBuilder::new()
+    }
+
     fn debug(&self, w: &mut IndentWriter, marker: &str) -> Result<(), Error> {
         if !self.debug {
             return Ok(());

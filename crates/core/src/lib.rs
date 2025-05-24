@@ -40,7 +40,7 @@
 //!
 //! // List functions you want to export, types are inferred.
 //! pub fn ffi_inventory() -> Inventory {
-//!     InventoryBuilder::new()
+//!     Inventory::builder()
 //!         .register(function!(my_function))
 //!         .validate()
 //!         .build()

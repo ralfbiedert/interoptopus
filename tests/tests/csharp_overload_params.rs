@@ -1,6 +1,5 @@
 use anyhow::Error;
-use interoptopus::inventory::Bindings;
-use interoptopus::inventory::InventoryBuilder;
+use interoptopus::inventory::{Bindings, Inventory};
 use interoptopus::pattern::slice::Slice;
 use interoptopus::{callback, ffi_function, function};
 use interoptopus_backend_csharp::InteropBuilder;
@@ -14,7 +13,7 @@ fn f(_: Foo) {}
 
 #[test]
 fn can_produce_markdown() -> Result<(), Error> {
-    let inventory = InventoryBuilder::new().register(function!(f)).validate().build();
+    let inventory = Inventory::builder().register(function!(f)).validate().build();
     let _ = InteropBuilder::new()
         .debug(true)
         .inventory(inventory)
