@@ -1,7 +1,7 @@
-use crate::Error;
-use crate::backend::{IndentWriter, extract_namespaces_from_types, holds_opaque_without_ref, types_from_functions_types};
+use crate::backend::{extract_namespaces_from_types, holds_opaque_without_ref, types_from_functions_types, IndentWriter};
 use crate::lang::{Constant, Function, Type};
 use crate::pattern::LibraryPattern;
+use crate::Error;
 use std::collections::HashSet;
 use std::fs::File;
 use std::path::Path;
@@ -91,7 +91,7 @@ pub enum Symbol {
 /// // from another crate or unit test and feed the `Library` into a backend to
 /// // generate bindings for a specific language.
 /// pub fn my_inventory() -> Inventory {
-///     InventoryBuilder::new()
+///     Inventory::builder()
 ///         .register(function!(primitive_void))
 ///         .register(constant!(MY_CONSTANT))
 ///         .register(extra_type!(ExtraType<f32>))
@@ -110,7 +110,7 @@ pub struct InventoryBuilder {
 impl InventoryBuilder {
     /// Start creating a new library.
     #[must_use]
-    pub const fn new() -> Self {
+    const fn new() -> Self {
         Self { functions: Vec::new(), ctypes: Vec::new(), constants: Vec::new(), patterns: Vec::new() }
     }
 
@@ -220,6 +220,12 @@ impl Inventory {
         // constants.sort(); TODO: do sort constants (issue with Ord and float values ...)
 
         Self { functions, ctypes, constants, patterns, namespaces }
+    }
+
+    /// Returns a new [`InventoryBuilder`], start here.
+    #[must_use]
+    pub const fn builder() -> InventoryBuilder {
+        InventoryBuilder::new()
     }
 
     /// Return all functions registered.

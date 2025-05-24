@@ -1,5 +1,5 @@
 use anyhow::Error;
-use interoptopus::inventory::{Bindings, Inventory, InventoryBuilder};
+use interoptopus::inventory::{Bindings, Inventory};
 use interoptopus::{ffi_function, function};
 use interoptopus_backend_c::{Functions, InteropBuilder};
 use tests::{compile_output_c, validate_output};
@@ -8,7 +8,7 @@ use tests::{compile_output_c, validate_output};
 fn sample_function() {}
 
 fn ffi_inventory() -> Inventory {
-    InventoryBuilder::new().register(function!(sample_function)).build()
+    Inventory::builder().register(function!(sample_function)).build()
 }
 
 #[test]

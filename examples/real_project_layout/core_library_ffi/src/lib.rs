@@ -1,5 +1,5 @@
 use interoptopus::ffi::CStrPtr;
-use interoptopus::inventory::{Inventory, InventoryBuilder};
+use interoptopus::inventory::Inventory;
 use interoptopus::{ffi_function, function, pattern};
 
 pub mod engine;
@@ -16,7 +16,7 @@ pub fn start_server(server_name: CStrPtr) {
 }
 
 pub fn ffi_inventory() -> Inventory {
-    InventoryBuilder::new()
+    Inventory::builder()
         .register(function!(start_server))
         .register(pattern!(engine::GameEngine))
         .validate()

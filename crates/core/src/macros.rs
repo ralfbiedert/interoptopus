@@ -12,7 +12,7 @@
 /// pub fn my_function() { }
 ///
 /// pub fn inventory() -> Inventory {
-///     InventoryBuilder::new()
+///     Inventory::builder()
 ///         .register(function!(my_function))
 ///         .validate()
 ///         .build()
@@ -47,7 +47,7 @@ macro_rules! function {
 /// };
 ///
 /// pub fn inventory() -> Inventory {
-///     InventoryBuilder::new()
+///     Inventory::builder()
 ///         .register(extra_type!(S<f32>))
 ///         .validate()
 ///         .build()
@@ -99,7 +99,7 @@ macro_rules! extra_type {
 /// }
 ///
 /// pub fn inventory() -> Inventory {
-///     InventoryBuilder::new()
+///     Inventory::builder()
 ///         .register(pattern!(SimpleService))
 ///         .validate()
 ///         .build()
@@ -126,7 +126,7 @@ macro_rules! pattern {
 /// pub const MY_CONSTANT: u32 = 123;
 ///
 /// pub fn inventory() -> Inventory {
-///     InventoryBuilder::new()
+///     Inventory::builder()
 ///         .register(constant!(MY_CONSTANT))
 ///         .validate()
 ///         .build()

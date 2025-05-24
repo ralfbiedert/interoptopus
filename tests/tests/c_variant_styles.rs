@@ -1,5 +1,5 @@
 use anyhow::Error;
-use interoptopus::inventory::{Bindings, Inventory, InventoryBuilder};
+use interoptopus::inventory::{Bindings, Inventory};
 use interoptopus::{extra_type, ffi_type};
 use interoptopus_backend_c::{EnumVariants, InteropBuilder};
 use tests::{compile_output_c, validate_output};
@@ -13,7 +13,7 @@ enum Color {
 }
 
 fn ffi_inventory() -> Inventory {
-    InventoryBuilder::new().register(extra_type!(Color)).build()
+    Inventory::builder().register(extra_type!(Color)).build()
 }
 
 #[test]
