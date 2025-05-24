@@ -9,7 +9,9 @@ pub fn write_imports(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     indented!(w, r"using System;")?;
     indented!(w, r"using System.Text;")?;
     indented!(w, r"using System.Threading.Tasks;")?;
+    indented!(w, r"using System.Threading.Tasks.Sources;")?;
     indented!(w, r"using System.Collections;")?;
+    indented!(w, r"using System.Collections.Concurrent;")?;
     indented!(w, r"using System.Collections.Generic;")?;
     indented!(w, r"using System.Runtime.InteropServices;")?;
     indented!(w, r"using System.Runtime.InteropServices.Marshalling;")?;

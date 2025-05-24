@@ -30,12 +30,18 @@ pub fn write_pattern_async_trampoline(i: &Interop, w: &mut IndentWriter, asynk: 
     indented!(w, [()], r"private static Dictionary<ulong, {task_completion_source}> InFlight = new(1024);")?;
     indented!(w, [()], r"private AsyncCallbackCommon _delegate;")?;
     indented!(w, [()], r"private IntPtr _callback_ptr;")?;
+    indented!(w, [()], r"private IntPtr _valueTask_callback_ptr;")?;
     w.newline()?;
     i.inline_hint(w, 1)?;
     indented!(w, [()], r"internal AsyncTrampoline{inner}()")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"_delegate = Call;")?;
     indented!(w, [()()], r"_callback_ptr = Marshal.GetFunctionPointerForDelegate(_delegate);")?;
+    indented!(w, [()()], r"unsafe")?;
+    indented!(w, [()()], r"{{")?;
+    indented!(w, [()()()], r"delegate* unmanaged[Cdecl] <nint , nint, void> valueTaskCallback = &ValueTaskCallback;")?;
+    indented!(w, [()()()], r"_valueTask_callback_ptr = (IntPtr)valueTaskCallback;")?;
+    indented!(w, [()()], r"}}")?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
     i.inline_hint(w, 1)?;
@@ -75,8 +81,44 @@ pub fn write_pattern_async_trampoline(i: &Interop, w: &mut IndentWriter, asynk: 
     w.newline()?;
     indented!(w, [()()], r"return (ac, tcs.Task);")?;
     indented!(w, [()], r"}}")?;
-    indented!(w, r"}}")?;
 
+    // Start ValueTask Code
+
+    w.newline()?;
+    indented!(w, [()], r"[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]")?;
+    indented!(w, [()], r"[SkipLocalsInit]")?;
+    indented!(w, [()], r"private static void ValueTaskCallback(IntPtr data, IntPtr csPtr)")?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"var tcs = Recyclable{task_completion_source}.GetById((int) csPtr);")?;
+    indented!(w, [()()], r"")?;
+    indented!(w, [()()], r"var unmanaged = Marshal.PtrToStructure<{inner}.Unmanaged>(data);")?;
+    indented!(w, [()()], r"var managed = unmanaged.{inner_into}Managed();")?;
+    match asynk.t() {
+        Type::Pattern(TypePattern::Result(x)) => {
+            if x.t().is_void() {
+                indented!(w, [()()], r"if (managed.IsOk) {{ tcs.SetResult(); }}")?;
+            } else {
+                indented!(w, [()()], r"if (managed.IsOk) {{ tcs.SetResult(managed.AsOk()); }}")?;
+            }
+            indented!(w, [()()], r"else {{ tcs.SetException(new InteropException()); }}")?;
+        }
+        _ => indented!(w, [()()], r"tcs.SetResult(managed);")?,
+    }
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+    i.inline_hint(w, 1)?;
+    indented!(w, [()], r"internal (AsyncCallbackCommonNative, Value{task}) NewValueTaskCall()")?;
+    indented!(w, [()], r"{{")?;
+    indented!(w, [()()], r"var tcs = Recyclable{task_completion_source}.Get();")?;
+    indented!(w, [()()], r"")?;
+    indented!(w, [()()], r"var ac = new AsyncCallbackCommonNative {{")?;
+    indented!(w, [()()()], r"_ptr = _valueTask_callback_ptr,")?;
+    indented!(w, [()()()], r"_ts = (IntPtr) tcs.Id,")?;
+    indented!(w, [()()], r"}};")?;
+    indented!(w, [()()], r"return (ac, tcs.GetTask());")?;
+    indented!(w, [()], r"}}")?;
+    // End ValueTask Code
+    indented!(w, r"}}")?;
     Ok(())
 }
 
