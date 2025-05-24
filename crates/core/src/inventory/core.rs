@@ -105,13 +105,14 @@ pub struct InventoryBuilder {
     ctypes: Vec<Type>,
     constants: Vec<Constant>,
     patterns: Vec<LibraryPattern>,
+    allow_reserved_names: bool,
 }
 
 impl InventoryBuilder {
     /// Start creating a new library.
     #[must_use]
     const fn new() -> Self {
-        Self { functions: Vec::new(), ctypes: Vec::new(), constants: Vec::new(), patterns: Vec::new() }
+        Self { functions: Vec::new(), ctypes: Vec::new(), constants: Vec::new(), patterns: Vec::new(), allow_reserved_names: false }
     }
 
     /// Registers a symbol.
@@ -150,7 +151,7 @@ impl InventoryBuilder {
     /// # Panics
     ///
     /// If a function, type, or pattern is detected that doesn't make sense in interop
-    /// generation a panic will be raised.
+    /// generation, a panic will be raised.
     #[must_use]
     pub fn validate(self) -> Self {
         // Check for opaque parameters and return values
@@ -162,8 +163,23 @@ impl InventoryBuilder {
             assert!(!has_opaque_rval, "Function `{}` has a (nested) opaque return value. This can cause UB.", x.name());
         }
 
-        validate_symbol_names(&self.functions, &self.ctypes);
+        if !self.allow_reserved_names {
+            validate_symbol_names(&self.functions, &self.ctypes);
+        }
 
+        self
+    }
+
+    /// Allows reserved names for inventory items.
+    ///
+    /// When set, you may use reserved names for your functions
+    /// and fields, for example, having a field called `public`.
+    ///
+    /// When not set, [`self.validate`] may panic if it detects
+    /// such items.
+    #[must_use]
+    pub fn allow_reserved_names(mut self) -> Self {
+        self.allow_reserved_names = true;
         self
     }
 
