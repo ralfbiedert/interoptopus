@@ -10,3 +10,8 @@ fn public() {}
 fn panics_on_forbidden_names() {
     _ = Inventory::builder().register(function!(public)).validate().build();
 }
+
+#[test]
+fn accepts_forbidden_names() {
+    _ = Inventory::builder().register(function!(public)).allow_reserved_names().validate().build();
+}
