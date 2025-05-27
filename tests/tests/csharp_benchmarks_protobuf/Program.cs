@@ -80,11 +80,11 @@ public class Benchy
         return input;
     }
 
-    // Ffi.Input populateFfiInput(int n)
-    // {
-    //     var input = new Ffi.Input();
-    //     return input;
-    // }
+    Ffi.Input populateFfiInput(int n)
+    {
+        var input = new Ffi.Input();
+        return input;
+    }
 
     // Wire.Input populateWireInput(int n)
     // {
@@ -128,12 +128,12 @@ public class Benchy
         var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(LARGE));
     }
     
-    // [Benchmark]
-    // public void FfiInterop_0()
-    // {
-    //     var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(SMALL));
-    // }
-    //
+    [Benchmark]
+    public void Ffi_0_hot()
+    {
+        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(SMALL));
+    }
+    
     // [Benchmark]
     // public void FfiInterop_1k()
     // {
