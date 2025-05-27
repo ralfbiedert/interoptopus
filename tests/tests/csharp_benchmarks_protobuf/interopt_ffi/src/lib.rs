@@ -4,9 +4,9 @@
 use interoptopus::{ffi, ffi_function, ffi_type};
 
 /// Main benchmark Rust entry point for FFI-based ipc.
-#[ffi_function]
+#[ffi_function(debug)]
 pub fn FfiRustClient(_input: Input) -> Outputs {
-    // TODO: use input to generate outputs
+    // TODO: use input.response_size to generate outputs
     Outputs {
         response: Response { results: ffi::Vec::from_vec(vec![Result { item_value: 42, item_id: ffi::String::from("item1".to_string()) }]) },
         data: Data {
@@ -30,37 +30,37 @@ pub struct Outputs {
 }
 
 #[ffi_type]
-struct Context {
+pub struct Context {
     things: ffi::Vec<ffi::String>,
     // headers: HashMap<String, String>, // TODO: unsupported
 }
 
 #[ffi_type]
-struct Table {
+pub struct Table {
     metadata: TableMetadata,
     byte_array: ffi::Vec<u8>,
 }
 
 #[ffi_type]
-struct Configuration {
+pub struct Configuration {
     is_ok_response: bool,
     host: ffi::String,
     response_size: u64, // controls N in benchmarks
 }
 
 #[ffi_type]
-struct Response {
+pub struct Response {
     results: ffi::Vec<Result>,
 }
 
 #[ffi_type]
-struct Data {
+pub struct Data {
     items: Items,
     errors: Error,
 }
 
 #[ffi_type]
-struct TableMetadata {
+pub struct TableMetadata {
     row_count: i32,
     column_count: i32,
     guid: ffi::String,
@@ -68,18 +68,18 @@ struct TableMetadata {
 }
 
 #[ffi_type]
-struct Result {
+pub struct Result {
     item_value: i32,
     item_id: ffi::String,
 }
 
 #[ffi_type]
-struct Items {
+pub struct Items {
     items: ffi::Vec<Item>,
 }
 
 #[ffi_type]
-enum ItemKey {
+pub enum ItemKey {
     TOTAL = 0,
     FIRST = 1,
     SECOND = 2,
@@ -87,12 +87,12 @@ enum ItemKey {
 }
 
 #[ffi_type]
-struct Item {
+pub struct Item {
     key: ItemKey,
     value: u64,
 }
 
 #[ffi_type]
-struct Error {
+pub struct Error {
     error_messages: ffi::Vec<ffi::String>,
 }
