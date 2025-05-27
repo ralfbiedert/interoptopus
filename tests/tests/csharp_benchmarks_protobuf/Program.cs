@@ -1,6 +1,7 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using System.Threading;
+using ForCSharp.Protobuf;
 
 namespace ForCSharp;
 
