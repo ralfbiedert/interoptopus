@@ -33,9 +33,9 @@
         />
   </ItemGroup>
 
-    <!--Target Name="Interop Generate" BeforeTargets="Rust Build">
+    <Target Name="Interop Generate" BeforeTargets="Rust Build">
         <Exec Command="cargo test" WorkingDirectory="./"/>
-    </Target-->
+    </Target>
   <Target Name="Rust Build" BeforeTargets="Compile">
     <Exec Command="echo 'Configuration: $(Configuration)'"/>
     <Exec Condition="'$(Configuration)' == 'Release'" Command="cargo b --release" WorkingDirectory="./"/>
