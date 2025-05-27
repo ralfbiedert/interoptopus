@@ -28,7 +28,7 @@ fn ffi_inventory() -> Inventory {
     InventoryBuilder::new()
         .register(builtins_string!())
         .register(builtins_vec!(u8))
-        .register(function!(crate::ffi::FfiRustClient))
+        .register(function!(interopt_ffi::FfiRustClient))
         .validate()
         .build()
 }
