@@ -21,7 +21,7 @@ public class InteropProtobuf
     [DllImport(DllName)]
     private static extern unsafe void FreeRustResultMemory(byte* rustPtr, uint len);
 
-    public static Outputs ExecuteRustClient(Input input)
+    public static Protobuf.Outputs ExecuteRustClient(Protobuf.Input input)
     {
         try
         {
@@ -35,7 +35,7 @@ public class InteropProtobuf
                 ProtoRustClient(inputBytes, (uint)inputBytes.Length, (void**)&buffer, &length);
 
                 var result = CopyAndDeallocate(buffer, length);
-                var output = Outputs.Parser.ParseFrom(result);
+                var output = Protobuf.Outputs.Parser.ParseFrom(result);
 
                 return output;
             }
