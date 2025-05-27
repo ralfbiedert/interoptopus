@@ -44,28 +44,52 @@ public class Benchy
     const int MEDIUM = 1000;
     const int LARGE = 1000000;
 
-    Input populateInput(int n)
+    Protobuf.Input populateProtobufInput(int n)
     {
-        var input = new Input();
+        var input = new Protobuf.Input();
+        // input.configuration.host (String) = from "" to "verylonghostname" (4096 chars)
+        input.Configuration.Host = "127.0.0.1";
+        input.Configuration.ResponseSize = n;
+        // input.configuration.is_ok_response = true if populating Items in Outputs, false if populating Errors
+        input.Configuration.IsOkResponse = true;
+        input.Value.Metadata.Guid = new Guid().ToString();
+        input.Value.Metadata.Prefix = "ordinary_prefix_";
+        input.Value.ByteArray = Google.Protobuf.ByteString.CopyFrom(new byte[n]); // from 0 bytes to 1Mb
+        input.Value.Metadata.RowCount = 5;
+        input.Value.Metadata.ColumnCount = 7;
+        // input.context.things = from 0 strings to 1,000,000 strings "thingX"
+        for (int i = 1; i <= n; i++)
+        {
+            input.Context.Things.Add($"Thing-{i}");
+        }
+        // input.context.headers = from 0 headers to 1,000,000 "key"=>"value" pairs
+        for (int i = 1; i <= n; i++)
+        {
+            input.Context.Headers.Add($"Header-{i}", $"Value-{i}");
+        }
+
+        return input;
+    }
+
         return input;
     }
 
     [Benchmark]
     public void ProtobufInterop_0()
     {
-        var outputs = InteropProtobuf.ExecuteRustClient(populateInput(SMALL));
+        var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(SMALL));
     }
 
     [Benchmark]
-    public void ProtobufInterop_1()
+    public void ProtobufInterop_1k()
     {
-        var outputs = InteropProtobuf.ExecuteRustClient(populateInput(MEDIUM));
+        var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(MEDIUM));
     }
 
     [Benchmark]
-    public void ProtobufInterop_2()
+    public void ProtobufInterop_1kk()
     {
-        var outputs = InteropProtobuf.ExecuteRustClient(populateInput(LARGE));
+        var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(LARGE));
     }
 
     [Benchmark]
