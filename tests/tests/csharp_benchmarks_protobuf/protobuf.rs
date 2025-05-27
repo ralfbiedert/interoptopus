@@ -17,12 +17,12 @@ pub unsafe extern "C" fn ProtoRustClient(
     let byte_slice = unsafe { slice::from_raw_parts(serialized_input, serialized_input_length) };
 
     // Deserialize the byte array argument into Input
-    let _input = match proto_models::Input::decode(byte_slice) {
+    let _input = match protobuf_models::Input::decode(byte_slice) {
         Ok(input) => input,
         Err(e) => {
-            let output = proto_models::Outputs {
+            let output = protobuf_models::Outputs {
                 response: None,
-                data: Some(proto_models::Data { items: None, errors: Some(proto_models::Error { error_messages: vec![format!("Failed to deserialize input: {e}")] }) }),
+                data: Some(protobuf_models::Data { items: None, errors: Some(protobuf_models::Error { error_messages: vec![format!("Failed to deserialize input: {e}")] }) }),
             };
             unsafe {
                 write_output(output, serialized_output, serialized_output_length);
@@ -34,11 +34,11 @@ pub unsafe extern "C" fn ProtoRustClient(
     // ==========================================================================================
     // TODO: Fill in the response payload based on some fields in the Input payload (i.e. some N)
     // ==========================================================================================
-    let response = proto_models::Response { results: vec![proto_models::Result { item_id: 1.to_string(), item_value: 42 }] };
-    let data = proto_models::Data { items: None, errors: Some(proto_models::Error { error_messages: vec![format!("Failed to deserialize input")] }) };
+    let response = protobuf_models::Response { results: vec![protobuf_models::Result { item_id: 1.to_string(), item_value: 42 }] };
+    let data = protobuf_models::Data { items: None, errors: Some(protobuf_models::Error { error_messages: vec![format!("Failed to deserialize input")] }) };
 
     // Create the output object
-    let output = proto_models::Outputs { response: Some(response), data: Some(data) };
+    let output = protobuf_models::Outputs { response: Some(response), data: Some(data) };
 
     // Serialize the response
     unsafe {
@@ -46,13 +46,13 @@ pub unsafe extern "C" fn ProtoRustClient(
     }
 }
 
-unsafe fn write_output(output: proto_models::Outputs, serialized_output: *mut *mut c_void, serialized_output_length: *mut u32) {
+unsafe fn write_output(output: protobuf_models::Outputs, serialized_output: *mut *mut c_void, serialized_output_length: *mut u32) {
     let mut encoded_response = Vec::new();
     if let Err(e) = output.encode(&mut encoded_response) {
         // If we can't encode the response, try to encode an error response
-        let error_output = proto_models::Outputs {
+        let error_output = protobuf_models::Outputs {
             response: None,
-            data: Some(proto_models::Data { items: None, errors: Some(proto_models::Error { error_messages: vec![format!("Failed to serialize response: {e}")] }) }),
+            data: Some(protobuf_models::Data { items: None, errors: Some(protobuf_models::Error { error_messages: vec![format!("Failed to serialize response: {e}")] }) }),
         };
 
         if error_output.encode(&mut encoded_response).is_err() {

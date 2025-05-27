@@ -6,6 +6,6 @@
 // solely using Rust types.
 
 //mod ffi;
-mod proto;
+mod protobuf;
 mod protobuf_models;
 // mod wire;
