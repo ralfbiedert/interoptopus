@@ -7,10 +7,10 @@ public class InteropFfi
     const string DllName = "proto_benchy.dll";
 
     [DllImport(DllName)]
-    private static extern unsafe Outputs FfiRustClient(Input input);
+    private static extern unsafe Ffi.Outputs FfiRustClient(Ffi.Input input);
 
     /// Main benched function.
-    public static Outputs ExecuteRustClient(Input input)
+    public static Ffi.Outputs ExecuteRustClient(Ffi.Input input)
     {
         try
         {
@@ -22,7 +22,7 @@ public class InteropFfi
         }
         catch (Exception e)
         {
-            throw new InvalidOperationException($"Unexpected error in ExecuteRustClient: {e.Message}", e);
+            throw new InvalidOperationException($"Unexpected FFI error in ExecuteRustClient: {e.Message}", e);
         }
     }
 }
