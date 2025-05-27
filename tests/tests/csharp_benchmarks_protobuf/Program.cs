@@ -45,9 +45,17 @@ public class Benchy
     const int MEDIUM = 1000;
     const int LARGE = 1000000;
 
-    Protobuf.Input populateProtobufInput(int n)
+    private Protobuf.Input smallProtobufInput = populateProtobufInput(SMALL);
+    private Protobuf.Input mediumProtobufInput = populateProtobufInput(MEDIUM);
+    private Protobuf.Input largeProtobufInput = populateProtobufInput(LARGE);
+
+    private static Protobuf.Input populateProtobufInput(int n)
     {
         var input = new Protobuf.Input();
+        input.Configuration =  new Configuration();
+        input.Value = new Table();
+        input.Value.Metadata = new TableMetadata();
+        input.Context = new Context();
         // input.configuration.host (String) = from "" to "verylonghostname" (4096 chars)
         input.Configuration.Host = "127.0.0.1";
         input.Configuration.ResponseSize = n;
@@ -55,9 +63,9 @@ public class Benchy
         input.Configuration.IsOkResponse = true;
         input.Value.Metadata.Guid = new Guid().ToString();
         input.Value.Metadata.Prefix = "ordinary_prefix_";
-        input.Value.ByteArray = Google.Protobuf.ByteString.CopyFrom(new byte[n]); // from 0 bytes to 1Mb
         input.Value.Metadata.RowCount = 5;
         input.Value.Metadata.ColumnCount = 7;
+        input.Value.ByteArray = Google.Protobuf.ByteString.CopyFrom(new byte[n]); // from 0 bytes to 1Mb
         // input.context.things = from 0 strings to 1,000,000 strings "thingX"
         for (int i = 1; i <= n; i++)
         {
@@ -85,23 +93,41 @@ public class Benchy
     // }
 
     [Benchmark]
-    public void ProtobufInterop_0()
+    public void Protobuf_0_cold()
+    {
+        var outputs = InteropProtobuf.ExecuteRustClient(smallProtobufInput);
+    }
+
+    [Benchmark]
+    public void Protobuf_0_hot()
     {
         var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(SMALL));
     }
 
     [Benchmark]
-    public void ProtobufInterop_1k()
+    public void Protobuf_1k_cold()
+    {
+        var outputs = InteropProtobuf.ExecuteRustClient(mediumProtobufInput);
+    }
+
+    [Benchmark]
+    public void Protobuf_1k_hot()
     {
         var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(MEDIUM));
     }
 
     [Benchmark]
-    public void ProtobufInterop_1kk()
+    public void Protobuf_1kk_cold()
+    {
+        var outputs = InteropProtobuf.ExecuteRustClient(largeProtobufInput);
+    }
+
+    [Benchmark]
+    public void Protobuf_1kk_hot()
     {
         var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(LARGE));
     }
-
+    
     // [Benchmark]
     // public void FfiInterop_0()
     // {
