@@ -37,6 +37,8 @@ namespace ForCSharp;
 // outputs.data.errors.error_messages = from 0 to 1,000,000 string values
 //
 [RPlotExporter]
+[MemoryDiagnoser]
+//[NativeMemoryProfiler]
 public class Benchy
 {
     const int ITERATIONS = 100_000; // TODO: run this many iters
