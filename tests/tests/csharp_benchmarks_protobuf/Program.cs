@@ -71,6 +71,15 @@ public class Benchy
         return input;
     }
 
+    Ffi.Input populateFfiInput(int n)
+    {
+        var input = new Ffi.Input();
+        return input;
+    }
+
+    Wire.Input populateWireInput(int n)
+    {
+        var input = new WireInput();
         return input;
     }
 
@@ -95,19 +104,19 @@ public class Benchy
     [Benchmark]
     public void FfiInterop_0()
     {
-        var outputs = InteropFfi.ExecuteRustClient(populateInput(SMALL));
+        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(SMALL));
     }
 
     [Benchmark]
-    public void FfiInterop_1()
+    public void FfiInterop_1k()
     {
-        var outputs = InteropFfi.ExecuteRustClient(populateInput(MEDIUM));
+        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(MEDIUM));
     }
 
     [Benchmark]
-    public void FfiInterop_2()
+    public void FfiInterop_1kk()
     {
-        var outputs = InteropFfi.ExecuteRustClient(populateInput(LARGE));
+        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(LARGE));
     }
 
     // [Benchmark]

@@ -13,7 +13,7 @@ use interoptopus_backend_csharp::{InteropBuilder, WriteTypes};
 // use tests::backend_csharp::common_namespace_mappings;
 use interoptopus::backend::NamespaceMappings;
 pub fn common_namespace_mappings() -> NamespaceMappings {
-    NamespaceMappings::new("My.Company").add("common", "My.Company.Common")
+    NamespaceMappings::new("ForCSharp.Ffi").add("common", "ForCSharp.Ffi.Common").add("wire", "ForCSharp.Wire")
 }
 
 // use tests::validate_output;
@@ -51,6 +51,15 @@ fn prerequisites() -> Result<(), Error> {
         .build()?
         .to_string()?;
 
+    let generated_wire = InteropBuilder::new()
+        .inventory(ffi_inventory()) // FIXME: wire types are not part of inventory
+        .namespace_id("wire".to_string())
+        .namespace_mappings(common_namespace_mappings())
+        .dll_name("proto_benchy".to_string())
+        .write_types(WriteTypes::Namespace)
+        .build()?
+        .to_string()?;
+
     let generated_other = InteropBuilder::new()
         .inventory(ffi_inventory())
         .namespace_mappings(common_namespace_mappings())
@@ -60,6 +69,7 @@ fn prerequisites() -> Result<(), Error> {
         .to_string()?;
 
     validate_output!("./", "Interop.common.cs", generated_common.as_str());
+    validate_output!("./", "Interop.Wire.cs", generated_wire.as_str());
     validate_output!("./", "Interop.cs", generated_other.as_str());
 
     Ok(())
