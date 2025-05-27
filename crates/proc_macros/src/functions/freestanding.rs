@@ -163,7 +163,7 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
 
         #[allow(non_camel_case_types)]
         #[allow(clippy::redundant_pub_crate, clippy::forget_non_drop)]
-        pub(crate) struct #function_ident #generic_params { #phantom_fields }
+        pub struct #function_ident #generic_params { #phantom_fields }
 
         unsafe impl #generic_params ::interoptopus::lang::FunctionInfo for #function_ident #generic_params {
             type Signature = #signature;
