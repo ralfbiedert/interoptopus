@@ -1,4 +1,4 @@
-use crate::proto_models;
+use crate::protobuf_models;
 use prost::Message;
 use std::{ffi::c_void, slice};
 
