@@ -68,6 +68,7 @@ pub struct TableMetadata {
 }
 
 #[ffi_type]
+#[derive(Clone)]
 pub struct Result {
     item_value: i32,
     item_id: ffi::String,
@@ -79,6 +80,7 @@ pub struct Items {
 }
 
 #[ffi_type]
+#[derive(Clone)]
 pub enum ItemKey {
     TOTAL = 0,
     FIRST = 1,
@@ -87,6 +89,7 @@ pub enum ItemKey {
 }
 
 #[ffi_type]
+#[derive(Clone)]
 pub struct Item {
     key: ItemKey,
     value: u64,

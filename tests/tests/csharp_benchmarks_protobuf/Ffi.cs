@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Gen.ForCSharp;
 
 namespace ForCSharp;
 
@@ -7,10 +8,10 @@ public class InteropFfi
     const string DllName = "proto_benchy.dll";
 
     [DllImport(DllName)]
-    private static extern unsafe Ffi.Outputs FfiRustClient(Ffi.Input input);
+    private static extern unsafe Outputs FfiRustClient(Input input);
 
     /// Main benched function.
-    public static Ffi.Outputs ExecuteRustClient(Ffi.Input input)
+    public static Outputs ExecuteRustClient(Input input)
     {
         try
         {
