@@ -1,7 +1,9 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using System.Threading;
-using ForCSharp.Protobuf;
+using BenchmarkDotNet.Toolchains;
+using ForCSharp;
+using Gen.ForCSharp;
 
 namespace ForCSharp;
 
@@ -54,10 +56,10 @@ public class Benchy
     private static Protobuf.Input populateProtobufInput(int n)
     {
         var input = new Protobuf.Input();
-        input.Configuration =  new Configuration();
-        input.Value = new Table();
-        input.Value.Metadata = new TableMetadata();
-        input.Context = new Context();
+        input.Configuration =  new Protobuf.Configuration();
+        input.Value = new Protobuf.Table();
+        input.Value.Metadata = new Protobuf.TableMetadata();
+        input.Context = new Protobuf.Context();
         // input.configuration.host (String) = from "" to "verylonghostname" (4096 chars)
         input.Configuration.Host = "127.0.0.1";
         input.Configuration.ResponseSize = n;
@@ -82,9 +84,9 @@ public class Benchy
         return input;
     }
 
-    Ffi.Input populateFfiInput(int n)
+    Input populateFfiInput(int n)
     {
-        var input = new Ffi.Input();
+        var input = new Input();
         return input;
     }
 
