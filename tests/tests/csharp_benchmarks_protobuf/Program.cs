@@ -92,28 +92,31 @@ public class Benchy
 
         input.configuration = new Configuration();
         input.value = new Table();
-        input.value.Metadata = new TableMetadata();
+        input.value.metadata = new TableMetadata();
         input.context = new Context();
         // input.configuration.host (String) = from "" to "verylonghostname" (4096 chars)
-        input.configuration.Host = "127.0.0.1";
-        input.configuration.ResponseSize = n;
+        input.configuration.host = Utf8String.From("127.0.0.1");
+        input.configuration.response_size = (ulong)n;
         // input.configuration.is_ok_response = true if populating Items in Outputs, false if populating Errors
-        input.configuration.IsOkResponse = true;
-        input.value.Metadata.Guid = new Guid().ToString();
-        input.value.Metadata.Prefix = "ordinary_prefix_";
-        input.value.Metadata.RowCount = 5;
-        input.value.Metadata.ColumnCount = 7;
-        input.value.ByteArray = Google.Protobuf.ByteString.CopyFrom(new byte[n]); // from 0 bytes to 1Mb
+        input.configuration.is_ok_response = true;
+        input.value.metadata.guid = Utf8String.From(new Guid().ToString());
+        input.value.metadata.prefix = Utf8String.From("ordinary_prefix_");
+        input.value.metadata.row_count = 5;
+        input.value.metadata.column_count = 7;
+        input.value.byte_array = VecU8.From(new byte[n]); // from 0 bytes to 1Mb
         // input.context.things = from 0 strings to 1,000,000 strings "thingX"
+        var things = new Utf8String[n];
         for (int i = 1; i <= n; i++)
         {
-            input.context.things.Add($"Thing-{i}");
+            things[i] = Utf8String.From($"Thing-{i}");
         }
+        input.context.things = VecUtf8String.From(things);
+        // NB: FFI does not support HashMaps interop
         // input.context.headers = from 0 headers to 1,000,000 "key"=>"value" pairs
-        for (int i = 1; i <= n; i++)
-        {
-            input.context.headers.Add($"Header-{i}", $"Value-{i}");
-        }
+        //for (int i = 1; i <= n; i++)
+        //{
+        //    input.context.headers.Add($"Header-{i}", $"Value-{i}");
+        //}
 
         return input;
     }
