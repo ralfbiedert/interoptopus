@@ -18,65 +18,65 @@ pub fn FfiRustClient(_input: Input) -> Outputs {
 
 #[ffi_type]
 pub struct Input {
-    context: Context,
-    value: Table,
-    configuration: Configuration,
+    pub context: Context,
+    pub value: Table,
+    pub configuration: Configuration,
 }
 
 #[ffi_type]
 pub struct Outputs {
-    response: Response,
-    data: Data,
+    pub response: Response,
+    pub data: Data,
 }
 
 #[ffi_type]
 pub struct Context {
-    things: ffi::Vec<ffi::String>,
+    pub things: ffi::Vec<ffi::String>,
     // headers: HashMap<String, String>, // TODO: unsupported
 }
 
 #[ffi_type]
 pub struct Table {
-    metadata: TableMetadata,
-    byte_array: ffi::Vec<u8>,
+    pub metadata: TableMetadata,
+    pub byte_array: ffi::Vec<u8>,
 }
 
 #[ffi_type]
 pub struct Configuration {
-    is_ok_response: bool,
-    host: ffi::String,
-    response_size: u64, // controls N in benchmarks
+    pub is_ok_response: bool,
+    pub host: ffi::String,
+    pub response_size: u64, // controls N in benchmarks
 }
 
 #[ffi_type]
 pub struct Response {
-    results: ffi::Vec<Result>,
+    pub results: ffi::Vec<Result>,
 }
 
 #[ffi_type]
 pub struct Data {
-    items: Items,
-    errors: Error,
+    pub items: Items,
+    pub errors: Error,
 }
 
 #[ffi_type]
 pub struct TableMetadata {
-    row_count: i32,
-    column_count: i32,
-    guid: ffi::String,
-    prefix: ffi::String,
+    pub row_count: i32,
+    pub column_count: i32,
+    pub guid: ffi::String,
+    pub prefix: ffi::String,
 }
 
 #[ffi_type]
 #[derive(Clone)]
 pub struct Result {
-    item_value: i32,
-    item_id: ffi::String,
+    pub item_value: i32,
+    pub item_id: ffi::String,
 }
 
 #[ffi_type]
 pub struct Items {
-    items: ffi::Vec<Item>,
+    pub items: ffi::Vec<Item>,
 }
 
 #[ffi_type]
@@ -91,11 +91,11 @@ pub enum ItemKey {
 #[ffi_type]
 #[derive(Clone)]
 pub struct Item {
-    key: ItemKey,
-    value: u64,
+    pub key: ItemKey,
+    pub value: u64,
 }
 
 #[ffi_type]
 pub struct Error {
-    error_messages: ffi::Vec<ffi::String>,
+    pub error_messages: ffi::Vec<ffi::String>,
 }

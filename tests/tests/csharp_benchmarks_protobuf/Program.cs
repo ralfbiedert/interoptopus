@@ -43,8 +43,6 @@ namespace ForCSharp;
 //[NativeMemoryProfiler]
 public class Benchy
 {
-    const int ITERATIONS = 100_000; // TODO: run this many iters
-
     const int SMALL = 0;
     const int MEDIUM = 1000;
     const int LARGE = 1000000;
@@ -56,7 +54,7 @@ public class Benchy
     private static Protobuf.Input populateProtobufInput(int n)
     {
         var input = new Protobuf.Input();
-        input.Configuration =  new Protobuf.Configuration();
+        input.Configuration = new Protobuf.Configuration();
         input.Value = new Protobuf.Table();
         input.Value.Metadata = new Protobuf.TableMetadata();
         input.Context = new Protobuf.Context();
@@ -84,9 +82,39 @@ public class Benchy
         return input;
     }
 
-    Input populateFfiInput(int n)
+    private Input smallFfiInput = populateFfiInput(SMALL);
+    private Input mediumFfiInput = populateFfiInput(MEDIUM);
+    private Input largeFfiInput = populateFfiInput(LARGE);
+
+    private static Input populateFfiInput(int n)
     {
         var input = new Input();
+
+        input.configuration = new Configuration();
+        input.value = new Table();
+        input.value.Metadata = new TableMetadata();
+        input.context = new Context();
+        // input.configuration.host (String) = from "" to "verylonghostname" (4096 chars)
+        input.configuration.Host = "127.0.0.1";
+        input.configuration.ResponseSize = n;
+        // input.configuration.is_ok_response = true if populating Items in Outputs, false if populating Errors
+        input.configuration.IsOkResponse = true;
+        input.value.Metadata.Guid = new Guid().ToString();
+        input.value.Metadata.Prefix = "ordinary_prefix_";
+        input.value.Metadata.RowCount = 5;
+        input.value.Metadata.ColumnCount = 7;
+        input.value.ByteArray = Google.Protobuf.ByteString.CopyFrom(new byte[n]); // from 0 bytes to 1Mb
+        // input.context.things = from 0 strings to 1,000,000 strings "thingX"
+        for (int i = 1; i <= n; i++)
+        {
+            input.context.things.Add($"Thing-{i}");
+        }
+        // input.context.headers = from 0 headers to 1,000,000 "key"=>"value" pairs
+        for (int i = 1; i <= n; i++)
+        {
+            input.context.headers.Add($"Header-{i}", $"Value-{i}");
+        }
+
         return input;
     }
 
@@ -131,24 +159,42 @@ public class Benchy
     {
         var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(LARGE));
     }
-    
+
+    [Benchmark]
+    public void Ffi_0_cold()
+    {
+        var outputs = InteropFfi.ExecuteRustClient(smallFfiInput);
+    }
+
     [Benchmark]
     public void Ffi_0_hot()
     {
         var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(SMALL));
     }
-    
-    // [Benchmark]
-    // public void FfiInterop_1k()
-    // {
-    //     var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(MEDIUM));
-    // }
-    //
-    // [Benchmark]
-    // public void FfiInterop_1kk()
-    // {
-    //     var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(LARGE));
-    // }
+
+    [Benchmark]
+    public void Ffi_1k_cold()
+    {
+        var outputs = InteropFfi.ExecuteRustClient(mediumFfiInput);
+    }
+
+    [Benchmark]
+    public void Ffi_1k_hot()
+    {
+        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(MEDIUM));
+    }
+
+    [Benchmark]
+    public void Ffi_1kk_cold()
+    {
+        var outputs = InteropFfi.ExecuteRustClient(largeFfiInput);
+    }
+
+    [Benchmark]
+    public void Ffi_1kk_hot()
+    {
+        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(LARGE));
+    }
 
     // [Benchmark]
     // public void WireInterop_0()
