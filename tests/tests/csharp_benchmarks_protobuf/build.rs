@@ -17,10 +17,7 @@ fn compile_proto_files() {
 //=== INTEROPTOPUS ===
 //====================
 use anyhow::Error;
-use interoptopus::{
-    builtins_string, builtins_vec, function,
-    inventory::{Bindings, Inventory, InventoryBuilder},
-};
+use interoptopus::inventory::Bindings;
 use interoptopus_backend_csharp::{InteropBuilder, WriteTypes};
 
 use interoptopus::backend::NamespaceMappings;
@@ -58,7 +55,7 @@ fn generate_interopt_files() -> Result<(), Error> {
     .to_string()?;*/
 
     let generated_ffi = InteropBuilder::new()
-        .inventory(interop_ffi::ffi_inventory())
+        .inventory(interopt_ffi::ffi_inventory())
         .namespace_mappings(namespace_mappings())
         .namespace_id("interopt_ffi".to_string())
         .dll_name("proto_benchy".to_string())
@@ -67,7 +64,7 @@ fn generate_interopt_files() -> Result<(), Error> {
         .to_string()?;
 
     let generated = InteropBuilder::new()
-        .inventory(interop_ffi::ffi_inventory())
+        .inventory(interopt_ffi::ffi_inventory())
         .namespace_mappings(namespace_mappings())
         .dll_name("proto_benchy".to_string())
         .write_types(WriteTypes::NamespaceAndInteroptopusGlobal)

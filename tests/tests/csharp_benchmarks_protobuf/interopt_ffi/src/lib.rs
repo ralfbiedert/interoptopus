@@ -3,7 +3,7 @@
 //!
 use interoptopus::{
     builtins_string, builtins_vec, ffi, ffi_function, ffi_type, function,
-    inventory::{Bindings, Inventory, InventoryBuilder},
+    inventory::{Inventory, InventoryBuilder},
 };
 
 pub fn ffi_inventory() -> Inventory {
