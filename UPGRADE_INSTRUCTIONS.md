@@ -37,16 +37,14 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
 - We support async-async calls (from C#)
 - Enums can now carry data. For now only `E::A` and `E::B(T)` are supported.
 - `ffi::Result` and `ffi::Option` are now based on enums
-- Support for the old `FFIErrorEnum` style has been removed. Use `ffi::Result` instead. Error patterns are now much
-- easier to implement.
+- Support for the old `FFIErrorEnum` style has been removed. Use `ffi::Result` instead. Error patterns are now much easier to implement.
 - Likewise, `#[ffi_type(error)]` on enums has been removed.
 - Some item names (e.g., `public`) are forbidden now as they might conflict with backend language-specific keywords, and
   will be flagged when invoking `.validate()`.
 
 #### All Backends
 
-- The type structure has been greatly simplified. Each backend now only has a single entry struct `InteropBuilder` you
-  have to deal with.
+- The type structure has been greatly simplified. Each backend now only has a single entry struct `InteropBuilder` you have to deal with.
 - Documentation generators were generally renamed to `Markdown` since that's what they emit.
 
 #### C# Backend
