@@ -23,5 +23,4 @@ prost-build = "0.8"
 interopt_ffi = { path = "interopt_ffi" }
 interoptopus = { path = "../../../crates/core" }
 interoptopus_backend_csharp = { path = "../../../crates/backend_csharp" }
-interoptopus_reference_project = { path = "../../../crates/reference_project" }
 anyhow = "1"
