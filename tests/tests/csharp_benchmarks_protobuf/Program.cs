@@ -106,14 +106,14 @@ public class Benchy
         input.value.byte_array = VecU8.From(new byte[n]); // from 0 bytes to 1Mb
         // input.context.things = from 0 strings to 1,000,000 strings "thingX"
         var things = new Utf8String[n];
-        for (int i = 1; i <= n; i++)
+        for (int i = 0; i < n; i++)
         {
             things[i] = Utf8String.From($"Thing-{i}");
         }
         input.context.things = VecUtf8String.From(things);
         // NB: FFI does not support HashMaps interop
         // input.context.headers = from 0 headers to 1,000,000 "key"=>"value" pairs
-        //for (int i = 1; i <= n; i++)
+        //for (int i = 0; i < n; i++)
         //{
         //    input.context.headers.Add($"Header-{i}", $"Value-{i}");
         //}
