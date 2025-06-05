@@ -1,7 +1,22 @@
 //!
 //! Interoptopus FFI-types based ipc
 //!
-use interoptopus::{ffi, ffi_function, ffi_type};
+use interoptopus::{
+    builtins_string, builtins_vec, ffi, ffi_function, ffi_type, function,
+    inventory::{Bindings, Inventory, InventoryBuilder},
+};
+
+pub fn ffi_inventory() -> Inventory {
+    InventoryBuilder::new()
+        .register(builtins_string!())
+        .register(builtins_vec!(u8))
+        .register(builtins_vec!(ffi::String))
+        .register(function!(FfiRustClient))
+        .register(builtins_vec!(Item))
+        .register(builtins_vec!(Result))
+        .validate()
+        .build()
+}
 
 /// Main benchmark Rust entry point for FFI-based ipc.
 #[ffi_function(debug)]
