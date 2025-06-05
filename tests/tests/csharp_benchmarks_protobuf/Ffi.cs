@@ -15,11 +15,8 @@ public class InteropFfi
     {
         try
         {
-            unsafe
-            {
-                var outputs = FfiRustClient(input);
-                return outputs;
-            }
+            var outputs = FfiRustClient(input);
+            return outputs;
         }
         catch (Exception e)
         {
