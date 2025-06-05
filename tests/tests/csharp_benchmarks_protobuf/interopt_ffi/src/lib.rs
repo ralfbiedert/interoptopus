@@ -19,13 +19,23 @@ pub fn ffi_inventory() -> Inventory {
 }
 
 /// Main benchmark Rust entry point for FFI-based ipc.
-#[ffi_function(debug)]
+#[ffi_function]
 pub fn FfiRustClient(_input: Input) -> Outputs {
+    println!("PRINTLN DEBUG IS THA BEST");
+    println!("NUMBERS VALIDITY CHECK:");
+    println!("response_size = {}", _input.configuration.response_size);
+    println!("is_ok_response = {}", _input.configuration.is_ok_response);
+    println!("row_count = {}", _input.value.metadata.row_count);
+    println!("column_count = {}", _input.value.metadata.column_count);
+
+    println!("HOST RECEIVED: {:?}", _input.configuration.host);
     // TODO: use input.response_size to generate outputs
+    let results = vec![Result { item_value: 42, item_id: ffi::String::from("item1".to_string()) }];
+    let items = vec![Item { key: ItemKey::TOTAL, value: 100 }];
     Outputs {
-        response: Response { results: ffi::Vec::from_vec(vec![Result { item_value: 42, item_id: ffi::String::from("item1".to_string()) }]) },
+        response: Response { results: ffi::Vec::from_vec(results) },
         data: Data {
-            items: Items { items: ffi::Vec::from_vec(vec![Item { key: ItemKey::TOTAL, value: 100 }]) },
+            items: Items { items: ffi::Vec::from_vec(items) },
             errors: Error { error_messages: ffi::Vec::from_vec(Vec::<ffi::String>::new()) },
         },
     }
