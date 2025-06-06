@@ -1,8 +1,6 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
-using System.Threading;
-using BenchmarkDotNet.Toolchains;
-using ForCSharp;
+using System;
 using Gen.ForCSharp;
 
 namespace ForCSharp;
@@ -127,7 +125,7 @@ public class Benchy
     //     return input;
     // }
 
-/*    [Benchmark]
+    [Benchmark]
     public void Protobuf_0_cold()
     {
         var outputs = InteropProtobuf.ExecuteRustClient(smallProtobufInput);
@@ -161,14 +159,14 @@ public class Benchy
     public void Protobuf_1kk_hot()
     {
         var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(LARGE));
-    }*/
+    }
 
     [Benchmark]
     public void Ffi_0_cold()
     {
         var outputs = InteropFfi.ExecuteRustClient(smallFfiInput);
     }
-/*
+
     [Benchmark]
     public void Ffi_0_hot()
     {
@@ -197,7 +195,7 @@ public class Benchy
     public void Ffi_1kk_hot()
     {
         var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(LARGE));
-    }*/
+    }
 
     // [Benchmark]
     // public void WireInterop_0()
@@ -210,9 +208,6 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        var benchy = new Benchy();
-        benchy.Ffi_0_cold();
-        //Benchy.Ffi_0_cold();
-        //var summary = BenchmarkRunner.Run<Benchy>();
+        var summary = BenchmarkRunner.Run<Benchy>();
     }
 }
