@@ -6,7 +6,7 @@ namespace ForCSharp;
 
 public class InteropFfi
 {
-    const string DllName = "proto_benchy.dll";
+    const string DllName = "proto_benchy";
 
     [DllImport(DllName)]
     private static extern unsafe Outputs FfiRustClient(Input input);

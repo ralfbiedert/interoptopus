@@ -31,20 +31,11 @@
             AdditionalImportDirs="models"
         />
   </ItemGroup>
-
-    <!--Target Name="Interop Generate" BeforeTargets="Rust Build">
-        <Exec Command="cargo test" WorkingDirectory="./"/>
-    </Target-->
-  <!--Target Name="Rust Build" BeforeTargets="Compile">
-    <Exec Command="echo 'Configuration: $(Configuration)'"/>
-    <Exec Condition="'$(Configuration)' == 'Release'" Command="cargo b - -release" WorkingDirectory="./"/>
-    <Exec Condition="'$(Configuration)' != 'Release'" Command="cargo b" WorkingDirectory="./"/>
-  </Target-->
     <ItemGroup>
-        <None Include="$(MSBuildThisFileDirectory)\target\$(Configuration)\proto_benchy.dll">
-            <Link>proto_benchy.dll</Link>
+        <None Include="$(MSBuildThisFileDirectory)\target\$(Configuration)\*proto_benchy*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <Visible>True</Visible>
+            <Link>%(Filename)%(Extension)</Link>
         </None>
     </ItemGroup>
 </Project>
