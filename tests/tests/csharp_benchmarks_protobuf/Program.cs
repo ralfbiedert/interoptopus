@@ -93,12 +93,12 @@ public class Benchy
         input.value.metadata = new TableMetadata();
         input.context = new Context();
         // input.configuration.host (String) = from "" to "verylonghostname" (4096 chars)
-        input.configuration.host = Utf8String.From("127.0.0.1");
+        input.configuration.host = "127.0.0.1".Utf8();
         input.configuration.response_size = (ulong)n;
         // input.configuration.is_ok_response = true if populating Items in Outputs, false if populating Errors
         input.configuration.is_ok_response = true;
-        input.value.metadata.guid = Utf8String.From(new Guid().ToString());
-        input.value.metadata.prefix = Utf8String.From("ordinary_prefix_");
+        input.value.metadata.guid = new Guid().ToString().Utf8();
+        input.value.metadata.prefix = "ordinary_prefix_".Utf8();
         input.value.metadata.row_count = 5;
         input.value.metadata.column_count = 7;
         input.value.byte_array = VecU8.From(new byte[n]); // from 0 bytes to 1Mb
@@ -106,7 +106,7 @@ public class Benchy
         var things = new Utf8String[n];
         for (int i = 0; i < n; i++)
         {
-            things[i] = Utf8String.From($"Thing-{i}");
+            things[i] = $"Thing-{i}".Utf8();
         }
         input.context.things = VecUtf8String.From(things);
         // NB: FFI does not support HashMaps interop
