@@ -6,17 +6,12 @@ namespace ForCSharp;
 
 public class InteropFfi
 {
-    const string DllName = "proto_benchy";
-
-    [DllImport(DllName)]
-    private static extern unsafe Outputs FfiRustClient(Input input);
-
     /// Main benched function.
     public static Outputs ExecuteRustClient(Input input)
     {
         try
         {
-            var outputs = FfiRustClient(input);
+            var outputs = Interop.FfiRustClient(input);
             return outputs;
         }
         catch (Exception e)
