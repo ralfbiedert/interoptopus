@@ -2,10 +2,10 @@ use crate::patterns::callback::StringCallback;
 use crate::patterns::result::Error;
 use crate::types::arrays::NestedArray;
 use crate::types::string::UseString;
-use interoptopus::ffi;
+use interoptopus::ffi_type;
 use interoptopus::pattern::asynk::{AsyncRuntime, AsyncThreadLocal};
 use interoptopus::pattern::result::{result_to_ffi, result_to_ffi_async};
-use interoptopus::{ffi_service, ffi_type};
+use interoptopus::{ffi, ffi_service};
 use std::future::Future;
 use tokio::runtime::Runtime;
 
