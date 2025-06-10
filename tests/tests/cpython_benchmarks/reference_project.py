@@ -456,17 +456,17 @@ def enums_3(x: ctypes.POINTER(ctypes.c_int)) -> ctypes.POINTER(ctypes.c_int):
 def enums_4(x: TODO):
     return c_lib.enums_4(x)
 
-def fnptr_1(callback, value: int) -> int:
+def fnptr_1(callback, x: int) -> int:
     if not hasattr(callback, "__ctypes_from_outparam__"):
         callback = callbacks.fn_u8_rval_u8(callback)
 
-    return c_lib.fnptr_1(callback, value)
+    return c_lib.fnptr_1(callback, x)
 
-def fnptr_2(callback, value: CharArray):
+def fnptr_2(callback, x: CharArray):
     if not hasattr(callback, "__ctypes_from_outparam__"):
         callback = callbacks.fn_CharArray(callback)
 
-    return c_lib.fnptr_2(callback, value)
+    return c_lib.fnptr_2(callback, x)
 
 def generic_1a(x: Genericu32, y: Phantomu8) -> int:
     return c_lib.generic_1a(x, y)

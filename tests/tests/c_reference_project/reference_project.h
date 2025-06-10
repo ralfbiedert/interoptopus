@@ -840,9 +840,9 @@ const ENUMPAYLOAD* enums_3(ENUMPAYLOAD* X);
 
 UTF8STRING enums_4(LAYER3 X);
 
-uint8_t fnptr_1(fptr_fn_u8_rval_u8 CALLBACK, uint8_t VALUE);
+uint8_t fnptr_1(fptr_fn_u8_rval_u8 CALLBACK, uint8_t X);
 
-void fnptr_2(fptr_fn_CharArray CALLBACK, CHARARRAY VALUE);
+void fnptr_2(fptr_fn_CharArray CALLBACK, CHARARRAY X);
 
 uint32_t generic_1a(GENERICU32 X, PHANTOMU8 Y);
 
@@ -1101,7 +1101,7 @@ RESULTCONSTPTRSERVICEBASICERROR service_basic_new();
 ///  passing any other value results in undefined behavior.
 RESULTCONSTPTRSERVICEMAINERROR service_main_destroy(SERVICEMAIN* _CONTEXT);
 
-RESULTCONSTPTRSERVICEMAINERROR service_main_new(uint32_t VALUE);
+RESULTCONSTPTRSERVICEMAINERROR service_main_new(uint32_t X);
 
 ///  Destroys the given instance.
 /// 
