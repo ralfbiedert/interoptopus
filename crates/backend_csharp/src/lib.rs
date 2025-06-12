@@ -128,12 +128,18 @@ pub(crate) mod utils;
 pub use docs::{Markdown, MarkdownConfig};
 pub use interop::{FunctionNameFlavor, Interop, InteropBuilder, InteropBuilderError, Visibility, WriteTypes};
 
+// TODO: load templates statically at build time! or you won't be able to invoke backend generator from other crates
 static TEMPLATES: LazyLock<Tera> = LazyLock::new(|| Tera::new("templates/**/*.cs").unwrap());
 
 #[macro_export]
 macro_rules! render {
     ($writer:expr, $template:expr) => {
         {
+            let names: Vec<_> = crate::TEMPLATES.get_template_names().collect();
+            println!("Loaded templates:");
+            for name in names {
+                println!("name: {}", name);
+            }
             let context = tera::Context::new();
             crate::TEMPLATES.render_to($template, &context, $writer.writer()).map_err(|e| interoptopus::Error::Templating(e.to_string()))
         }
