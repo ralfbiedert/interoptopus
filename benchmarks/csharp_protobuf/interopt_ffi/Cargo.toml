@@ -5,4 +5,4 @@ edition = "2024"
 publish = false
 
 [dependencies]
-interoptopus = { path = "../../../../crates/core" }
+interoptopus = { path = "../../../crates/core" }

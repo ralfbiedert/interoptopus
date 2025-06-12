@@ -5,7 +5,7 @@
 // The Wire<T> version does NOT need any protobuf files, and is defined
 // solely using Rust types.
 
-mod ffi;
+pub mod ffi;
 mod protobuf;
 mod protobuf_models;
 // mod wire;
