@@ -24,6 +24,9 @@ pub enum Error {
     /// Not valid UTF-8
     FromUtf8(std::string::FromUtf8Error),
 
+    /// Template generation failed.
+    Templating(String),
+
     /// A command to test was not found.
     CommandNotFound,
 
