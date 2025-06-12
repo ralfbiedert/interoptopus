@@ -1,9 +1,8 @@
-use crate::Interop;
 use crate::converter::to_ctypes_name;
+use crate::{Interop, render};
 use interoptopus::Error;
 use interoptopus::backend::IndentWriter;
 use std::collections::HashMap;
-use tera::Context;
 
 pub fn write_api_load_function(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     let functions = i
@@ -25,9 +24,5 @@ pub fn write_api_load_function(i: &Interop, w: &mut IndentWriter) -> Result<(), 
         })
         .collect::<HashMap<_, HashMap<_, _>>>();
 
-    //render!(w, "api_load_function.py", ("functions", &functions));
-    let mut context = Context::new();
-    context.insert("functions", &functions);
-    crate::TEMPLATES.render_to("api_load_function.py", &context, w.writer()).unwrap();
-    Ok(())
+    render!(w, "api_load_function.py", ("functions", &functions))
 }
