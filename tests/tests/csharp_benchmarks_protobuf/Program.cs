@@ -72,10 +72,10 @@ public class Benchy
             input.Context.Things.Add($"Thing-{i}");
         }
         // input.context.headers = from 0 headers to 1,000,000 "key"=>"value" pairs
-        for (int i = 1; i <= n; i++)
+        /*for (int i = 1; i <= n; i++)
         {
             input.Context.Headers.Add($"Header-{i}", $"Value-{i}");
-        }
+        }*/
 
         return input;
     }
@@ -108,6 +108,7 @@ public class Benchy
         {
             things[i] = $"Thing-{i}".Utf8();
         }
+
         input.context.things = VecUtf8String.From(things);
         // NB: FFI does not support HashMaps interop
         // input.context.headers = from 0 headers to 1,000,000 "key"=>"value" pairs
@@ -124,7 +125,7 @@ public class Benchy
     //     var input = new WireInput();
     //     return input;
     // }
-
+/*
     [Benchmark]
     public void Protobuf_0_cold()
     {
@@ -164,7 +165,8 @@ public class Benchy
     [Benchmark]
     public void Ffi_0_cold()
     {
-        var outputs = InteropFfi.ExecuteRustClient(smallFfiInput);
+        var input = smallFfiInput;
+        var outputs = InteropFfi.ExecuteRustClient(input);
     }
 
     [Benchmark]
@@ -172,13 +174,13 @@ public class Benchy
     {
         var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(SMALL));
     }
-
+*/
     [Benchmark]
     public void Ffi_1k_cold()
     {
         var outputs = InteropFfi.ExecuteRustClient(mediumFfiInput);
     }
-
+/*
     [Benchmark]
     public void Ffi_1k_hot()
     {
@@ -196,7 +198,7 @@ public class Benchy
     {
         var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(LARGE));
     }
-
+*/
     // [Benchmark]
     // public void WireInterop_0()
     // {
@@ -208,6 +210,9 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        var summary = BenchmarkRunner.Run<Benchy>();
+        //var tt = new Utf8String[1];
+        //var summary = BenchmarkRunner.Run<Benchy>();
+        var benchy = new Benchy();
+        benchy.Ffi_1k_cold();
     }
 }
