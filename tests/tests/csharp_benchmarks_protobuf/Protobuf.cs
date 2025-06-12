@@ -7,19 +7,15 @@ namespace ForCSharp;
 
 public class InteropProtobuf
 {
-//#if Windows
-    const string DllName = "proto_benchy.dll";
-//#elif Linux
-//    const string DllName = "libproto_benchy.so";
-//#elif MacOS
-//    const string DllName = "libproto_benchy.dylib";
-//#endif
+    const string DllName = "proto_benchy";
 
-    [DllImport(DllName)]
+    [LibraryImport(DllName, EntryPoint = "ProtoRustClient")]
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     private static extern unsafe void ProtoRustClient(
         byte[] structPointer, uint structLength, void** result, uint* resultLength);
 
-    [DllImport(DllName)]
+    [LibraryImport(DllName, EntryPoint = "FreeRustResultMemory")]
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     private static extern unsafe void FreeRustResultMemory(byte* rustPtr, uint len);
 
     public static Protobuf.Outputs ExecuteRustClient(Protobuf.Input input)
