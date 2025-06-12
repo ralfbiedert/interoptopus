@@ -15,12 +15,12 @@ crate-type = ["cdylib", "rlib"]
 prost = "0.8"
 prost-types = "0.8"
 interopt_ffi = { path = "interopt_ffi" }
-interoptopus = { path = "../../../crates/core" }
+interoptopus = { path = "../../crates/core" }
 anyhow = "1"
 
 [build-dependencies]
 prost-build = "0.8"
 interopt_ffi = { path = "interopt_ffi" }
-interoptopus = { path = "../../../crates/core" }
-interoptopus_backend_csharp = { path = "../../../crates/backend_csharp" }
+interoptopus = { path = "../../crates/core" }
+interoptopus_backend_csharp = { path = "../../crates/backend_csharp" }
 anyhow = "1"
