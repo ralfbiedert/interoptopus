@@ -24,7 +24,8 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
         params_native.push(format!("{} {}", i.to_native_callback_typespecifier(param.the_type()), param.name()));
         params_invoke.push(param_to_managed(param));
     }
-
+    eprintln!("params_native: {params_native:?}");
+    eprintln!("rval_unsafe: {rval_unsafe}");
     params.pop();
     params_invoke.pop();
 
