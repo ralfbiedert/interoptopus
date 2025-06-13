@@ -265,6 +265,7 @@ impl Interop {
             Type::Pattern(TypePattern::SliceMut(_)) => format!("{}.Unmanaged", param_to_type(t)),
             Type::Pattern(TypePattern::Utf8String(_)) => format!("{}.Unmanaged", param_to_type(t)),
             Type::Composite(_) => format!("{}.Unmanaged", param_to_type(t)),
+            Type::Enum(_) => format!("{}.Unmanaged", param_to_type(t)),
             _ => param_to_type(t),
         }
     }
