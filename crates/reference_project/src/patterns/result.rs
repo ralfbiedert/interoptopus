@@ -23,3 +23,8 @@ pub fn pattern_result_2() -> Result<(), Error> {
 pub fn pattern_result_3(x: Result<(), Error>) -> Result<(), Error> {
     x
 }
+
+#[ffi_function]
+pub fn pattern_result_4(x: Result<(), ()>) -> Result<(), ()> {
+    x
+}

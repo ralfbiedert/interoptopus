@@ -126,6 +126,7 @@ def init_lib(path):
     c_lib.pattern_result_1.argtypes = [ResultU32Error]
     c_lib.pattern_result_2.argtypes = []
     c_lib.pattern_result_3.argtypes = [ResultError]
+    c_lib.pattern_result_4.argtypes = [ResultVoid]
     c_lib.pattern_api_guard.argtypes = []
     c_lib.pattern_callback_1.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p), ctypes.c_uint32]
     c_lib.pattern_callback_2.argtypes = [ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p)]
@@ -302,6 +303,7 @@ def init_lib(path):
     c_lib.pattern_result_1.restype = ResultU32Error
     c_lib.pattern_result_2.restype = ResultError
     c_lib.pattern_result_3.restype = ResultError
+    c_lib.pattern_result_4.restype = ResultVoid
     c_lib.pattern_api_guard.restype = ctypes.c_uint64
     c_lib.pattern_callback_1.restype = ctypes.c_uint32
     c_lib.pattern_callback_2.restype = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p)
@@ -464,7 +466,7 @@ def fnptr_1(callback, x: int) -> int:
 
 def fnptr_2(callback, x: CharArray):
     if not hasattr(callback, "__ctypes_from_outparam__"):
-        callback = callbacks.fn_CharArray(callback)
+        callback = callbacks.fn_CharArray_rval_void(callback)
 
     return c_lib.fnptr_2(callback, x)
 
@@ -713,7 +715,7 @@ def pattern_ffi_slice_3(slice: SliceMutU8 | ctypes.Array[ctypes.c_uint8], callba
         slice = SliceMutU8(data=ctypes.cast(slice, ctypes.POINTER(ctypes.c_uint8)), len=len(slice))
 
     if not hasattr(callback, "__ctypes_from_outparam__"):
-        callback = callbacks.fn_SliceMutU8_ConstPtr(callback)
+        callback = callbacks.fn_SliceMutU8_ConstPtrVoid_rval_void(callback)
 
     return c_lib.pattern_ffi_slice_3(slice, callback)
 
@@ -732,13 +734,13 @@ def pattern_ffi_slice_5(slice: ctypes.POINTER(SliceU8), slice2: ctypes.POINTER(S
 
 def pattern_ffi_slice_6(slice: ctypes.POINTER(SliceMutU8), callback):
     if not hasattr(callback, "__ctypes_from_outparam__"):
-        callback = callbacks.fn_u8_ConstPtr_rval_u8(callback)
+        callback = callbacks.fn_u8_ConstPtrVoid_rval_u8(callback)
 
     return c_lib.pattern_ffi_slice_6(slice, callback)
 
 def pattern_ffi_slice_8(slice: ctypes.POINTER(SliceMutCharArray), callback):
     if not hasattr(callback, "__ctypes_from_outparam__"):
-        callback = callbacks.fn_CharArray_ConstPtr(callback)
+        callback = callbacks.fn_CharArray_ConstPtrVoid_rval_void(callback)
 
     return c_lib.pattern_ffi_slice_8(slice, callback)
 
@@ -750,13 +752,13 @@ def pattern_ffi_slice_9(slice: SliceUseString | ctypes.Array[UseString]):
 
 def pattern_ffi_slice_delegate(callback) -> int:
     if not hasattr(callback, "__ctypes_from_outparam__"):
-        callback = callbacks.fn_SliceU8_ConstPtr_rval_u8(callback)
+        callback = callbacks.fn_SliceU8_ConstPtrVoid_rval_u8(callback)
 
     return c_lib.pattern_ffi_slice_delegate(callback)
 
 def pattern_ffi_slice_delegate_huge(callback) -> Vec3f32:
     if not hasattr(callback, "__ctypes_from_outparam__"):
-        callback = callbacks.fn_SliceVec3f32_ConstPtr_rval_Vec3f32(callback)
+        callback = callbacks.fn_SliceVec3f32_ConstPtrVoid_rval_Vec3f32(callback)
 
     return c_lib.pattern_ffi_slice_delegate_huge(callback)
 
@@ -790,24 +792,27 @@ def pattern_result_2():
 def pattern_result_3(x):
     return c_lib.pattern_result_3(x)
 
+def pattern_result_4(x):
+    return c_lib.pattern_result_4(x)
+
 def pattern_api_guard():
     return c_lib.pattern_api_guard()
 
 def pattern_callback_1(callback, x: int) -> int:
     if not hasattr(callback, "__ctypes_from_outparam__"):
-        callback = callbacks.fn_u32_ConstPtr_rval_u32(callback)
+        callback = callbacks.fn_u32_ConstPtrVoid_rval_u32(callback)
 
     return c_lib.pattern_callback_1(callback, x)
 
 def pattern_callback_2(callback):
     if not hasattr(callback, "__ctypes_from_outparam__"):
-        callback = callbacks.fn_ConstPtr_ConstPtr(callback)
+        callback = callbacks.fn_ConstPtrVoid_ConstPtrVoid_rval_void(callback)
 
     return c_lib.pattern_callback_2(callback)
 
 def pattern_callback_4(callback, x: int) -> int:
     if not hasattr(callback, "__ctypes_from_outparam__"):
-        callback = callbacks.fn_u32_ConstPtr_rval_u32(callback)
+        callback = callbacks.fn_u32_ConstPtrVoid_rval_u32(callback)
 
     return c_lib.pattern_callback_4(callback, x)
 
@@ -819,19 +824,19 @@ def pattern_callback_6():
 
 def pattern_callback_7(c1, c2, x: int, i: int, o: ctypes.POINTER(ctypes.c_int32)):
     if not hasattr(c1, "__ctypes_from_outparam__"):
-        c1 = callbacks.fn_i32_i32_ConstPtr_rval_ResultError(c1)
+        c1 = callbacks.fn_i32_i32_ConstPtrVoid_rval_ResultError(c1)
 
     if not hasattr(c2, "__ctypes_from_outparam__"):
-        c2 = callbacks.fn_i32_i32_ConstPtr(c2)
+        c2 = callbacks.fn_i32_i32_ConstPtrVoid_rval_void(c2)
 
     return c_lib.pattern_callback_7(c1, c2, x, i, o)
 
 def pattern_callback_8(cb, cb2, s):
     if not hasattr(cb, "__ctypes_from_outparam__"):
-        cb = callbacks.fn_Utf8String_ConstPtr(cb)
+        cb = callbacks.fn_Utf8String_ConstPtrVoid_rval_void(cb)
 
     if not hasattr(cb2, "__ctypes_from_outparam__"):
-        cb2 = callbacks.fn_UseString_ConstPtr(cb2)
+        cb2 = callbacks.fn_UseString_ConstPtrVoid_rval_void(cb2)
 
     return c_lib.pattern_callback_8(cb, cb2, s)
 
@@ -1948,6 +1953,16 @@ class ResultUtf8StringError:
     Null = 3
 
 
+class ResultVoid:
+    """Result that contains value or an error."""
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
+
+
 class EnumPayload:
     A = 0
 # TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
@@ -2963,22 +2978,22 @@ class ResultOptionEnumPayloadError:
 class callbacks:
     """Helpers to define callbacks."""
     fn_u8_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8)
-    fn_CharArray = ctypes.CFUNCTYPE(None, CharArray)
-    fn_CharArray_ConstPtr = ctypes.CFUNCTYPE(None, CharArray, ctypes.c_void_p)
-    fn_SliceU8_ConstPtr_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, SliceU8, ctypes.c_void_p)
-    fn_SliceVec3f32_ConstPtr_rval_Vec3f32 = ctypes.CFUNCTYPE(Vec3f32, SliceVec3f32, ctypes.c_void_p)
-    fn_SliceMutU8_ConstPtr = ctypes.CFUNCTYPE(None, SliceMutU8, ctypes.c_void_p)
-    fn_u8_ConstPtr_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8, ctypes.c_void_p)
-    fn_u32_ConstPtr_rval_u32 = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p)
-    fn_ConstPtr_u32_ConstPtr = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_uint32, ctypes.c_void_p)
-    fn_u32_ConstPtr_rval_u32 = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p)
-    fn_ConstPtr_ConstPtr = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p)
-    fn_UseString_ConstPtr = ctypes.CFUNCTYPE(None, UseString, ctypes.c_void_p)
-    fn_Utf8String_ConstPtr = ctypes.CFUNCTYPE(None, Utf8String, ctypes.c_void_p)
-    fn_ConstPtr = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
-    fn_i32_i32_ConstPtr_rval_i32 = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)
-    fn_i32_i32_ConstPtr_rval_ResultError = ctypes.CFUNCTYPE(ResultError, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)
-    fn_i32_i32_ConstPtr = ctypes.CFUNCTYPE(None, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)
+    fn_CharArray_rval_void = ctypes.CFUNCTYPE(None, CharArray)
+    fn_CharArray_ConstPtrVoid_rval_void = ctypes.CFUNCTYPE(None, CharArray, ctypes.c_void_p)
+    fn_SliceU8_ConstPtrVoid_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, SliceU8, ctypes.c_void_p)
+    fn_SliceVec3f32_ConstPtrVoid_rval_Vec3f32 = ctypes.CFUNCTYPE(Vec3f32, SliceVec3f32, ctypes.c_void_p)
+    fn_SliceMutU8_ConstPtrVoid_rval_void = ctypes.CFUNCTYPE(None, SliceMutU8, ctypes.c_void_p)
+    fn_u8_ConstPtrVoid_rval_u8 = ctypes.CFUNCTYPE(ctypes.c_uint8, ctypes.c_uint8, ctypes.c_void_p)
+    fn_u32_ConstPtrVoid_rval_u32 = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p)
+    fn_ConstPtrVoid_u32_ConstPtrVoid_rval_void = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_uint32, ctypes.c_void_p)
+    fn_u32_ConstPtrVoid_rval_u32 = ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p)
+    fn_ConstPtrVoid_ConstPtrVoid_rval_void = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p)
+    fn_UseString_ConstPtrVoid_rval_void = ctypes.CFUNCTYPE(None, UseString, ctypes.c_void_p)
+    fn_Utf8String_ConstPtrVoid_rval_void = ctypes.CFUNCTYPE(None, Utf8String, ctypes.c_void_p)
+    fn_ConstPtrVoid_rval_void = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
+    fn_i32_i32_ConstPtrVoid_rval_i32 = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)
+    fn_i32_i32_ConstPtrVoid_rval_ResultError = ctypes.CFUNCTYPE(ResultError, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)
+    fn_i32_i32_ConstPtrVoid_rval_void = ctypes.CFUNCTYPE(None, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)
 
 
 class ServiceAsync:
@@ -3024,7 +3039,7 @@ class ServiceAsync:
     def callback_string(self, s, cb):
         """"""
         if not hasattr(cb, "__ctypes_from_outparam__"):
-            cb = callbacks.fn_Utf8String_ConstPtr(cb)
+            cb = callbacks.fn_Utf8String_ConstPtrVoid_rval_void(cb)
 
         return c_lib.service_async_callback_string(self._ctx, s, cb)
 
@@ -3219,21 +3234,21 @@ class ServiceCallbacks:
     def callback_simple(self, callback):
         """"""
         if not hasattr(callback, "__ctypes_from_outparam__"):
-            callback = callbacks.fn_u32_ConstPtr_rval_u32(callback)
+            callback = callbacks.fn_u32_ConstPtrVoid_rval_u32(callback)
 
         return c_lib.service_callbacks_callback_simple(self._ctx, callback)
 
     def callback_ffi_return(self, callback):
         """"""
         if not hasattr(callback, "__ctypes_from_outparam__"):
-            callback = callbacks.fn_i32_i32_ConstPtr_rval_ResultError(callback)
+            callback = callbacks.fn_i32_i32_ConstPtrVoid_rval_ResultError(callback)
 
         return c_lib.service_callbacks_callback_ffi_return(self._ctx, callback)
 
     def callback_with_slice(self, callback, input: SliceI32 | ctypes.Array[ctypes.c_int32]):
         """"""
         if not hasattr(callback, "__ctypes_from_outparam__"):
-            callback = callbacks.fn_i32_i32_ConstPtr_rval_ResultError(callback)
+            callback = callbacks.fn_i32_i32_ConstPtrVoid_rval_ResultError(callback)
 
         if hasattr(input, "_length_") and getattr(input, "_type_", "") == ctypes.c_int32:
             input = SliceI32(data=ctypes.cast(input, ctypes.POINTER(ctypes.c_int32)), len=len(input))
@@ -3442,7 +3457,7 @@ class ServiceStrings:
     def callback_string(self, s, cb):
         """"""
         if not hasattr(cb, "__ctypes_from_outparam__"):
-            cb = callbacks.fn_Utf8String_ConstPtr(cb)
+            cb = callbacks.fn_Utf8String_ConstPtrVoid_rval_void(cb)
 
         return c_lib.service_strings_callback_string(self._ctx, s, cb)
 

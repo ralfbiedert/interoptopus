@@ -155,6 +155,7 @@ pub fn ffi_inventory() -> Inventory {
             .register(function!(patterns::result::pattern_result_1))
             .register(function!(patterns::result::pattern_result_2))
             .register(function!(patterns::result::pattern_result_3))
+            .register(function!(patterns::result::pattern_result_4))
             .register(function!(patterns::api_guard::pattern_api_guard))
             .register(function!(patterns::callback::pattern_callback_1))
             .register(function!(patterns::callback::pattern_callback_2))

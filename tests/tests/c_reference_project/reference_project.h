@@ -322,6 +322,17 @@ typedef enum RESULTUTF8STRINGERROR
     RESULTUTF8STRINGERROR_NULL = 3,
     } RESULTUTF8STRINGERROR;
 
+/// Result that contains value or an error.
+typedef enum RESULTVOID
+    {
+    /// Element if err is `Ok`.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    /// Error value.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTVOID_PANIC = 2,
+    RESULTVOID_NULL = 3,
+    } RESULTVOID;
+
 ///  Vec marshalling helper.
 ///  A highly dangerous 'use once type' that has ownership semantics!
 ///  Once passed over an FFI boundary 'the other side' is meant to own
@@ -709,11 +720,11 @@ typedef enum OPTIONRESULTOPTIONUTF8STRINGERROR
 
 typedef VEC3F32 (*CALLBACKHUGEVECSLICE)(SLICEVEC3F32 SLICE, const void* CALLBACK_DATA);
 
-typedef void (*fptr_fn_ConstPtrResultError_ConstPtr)(const RESULTERROR* x0, const void* x1);
+typedef void (*fptr_fn_ConstPtrResultError_ConstPtrVoid_rval_void)(const RESULTERROR* x0, const void* x1);
 
-typedef void (*fptr_fn_ConstPtrResultU64Error_ConstPtr)(const RESULTU64ERROR* x0, const void* x1);
+typedef void (*fptr_fn_ConstPtrResultU64Error_ConstPtrVoid_rval_void)(const RESULTU64ERROR* x0, const void* x1);
 
-typedef void (*fptr_fn_ConstPtrResultUtf8StringError_ConstPtr)(const RESULTUTF8STRINGERROR* x0, const void* x1);
+typedef void (*fptr_fn_ConstPtrResultUtf8StringError_ConstPtrVoid_rval_void)(const RESULTUTF8STRINGERROR* x0, const void* x1);
 
 ///  Vec marshalling helper.
 ///  A highly dangerous 'use once type' that has ownership semantics!
@@ -734,7 +745,7 @@ typedef enum LAYER3
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     } LAYER3;
 
-typedef void (*fptr_fn_CharArray)(CHARARRAY x0);
+typedef void (*fptr_fn_CharArray_rval_void)(CHARARRAY x0);
 
 /// A pointer to an array of data someone else owns which may be modified.
 typedef struct SLICEMUTCHARARRAY
@@ -777,11 +788,11 @@ typedef enum RESULTOPTIONENUMPAYLOADERROR
 
 typedef void (*CALLBACKCHARARRAY2)(CHARARRAY VALUE, const void* CALLBACK_DATA);
 
-typedef void (*fptr_fn_ConstPtrResultUseStringError_ConstPtr)(const RESULTUSESTRINGERROR* x0, const void* x1);
+typedef void (*fptr_fn_ConstPtrResultUseStringError_ConstPtrVoid_rval_void)(const RESULTUSESTRINGERROR* x0, const void* x1);
 
-typedef void (*fptr_fn_ConstPtrResultVecUtf8StringError_ConstPtr)(const RESULTVECUTF8STRINGERROR* x0, const void* x1);
+typedef void (*fptr_fn_ConstPtrResultVecUtf8StringError_ConstPtrVoid_rval_void)(const RESULTVECUTF8STRINGERROR* x0, const void* x1);
 
-typedef void (*fptr_fn_ConstPtrResultNestedArrayError_ConstPtr)(const RESULTNESTEDARRAYERROR* x0, const void* x1);
+typedef void (*fptr_fn_ConstPtrResultNestedArrayError_ConstPtrVoid_rval_void)(const RESULTNESTEDARRAYERROR* x0, const void* x1);
 
 
 int64_t interoptopus_string_create(const void* UTF8, uint64_t LEN, UTF8STRING* RVAL);
@@ -842,7 +853,7 @@ UTF8STRING enums_4(LAYER3 X);
 
 uint8_t fnptr_1(fptr_fn_u8_rval_u8 CALLBACK, uint8_t X);
 
-void fnptr_2(fptr_fn_CharArray CALLBACK, CHARARRAY X);
+void fnptr_2(fptr_fn_CharArray_rval_void CALLBACK, CHARARRAY X);
 
 uint32_t generic_1a(GENERICU32 X, PHANTOMU8 Y);
 
@@ -1021,6 +1032,8 @@ RESULTERROR pattern_result_2();
 
 RESULTERROR pattern_result_3(RESULTERROR X);
 
+RESULTVOID pattern_result_4(RESULTVOID X);
+
 uint64_t pattern_api_guard();
 
 uint32_t pattern_callback_1(MYCALLBACK CALLBACK, uint32_t X);
@@ -1065,21 +1078,21 @@ RESULTCONSTPTRSERVICEASYNCERROR service_async_destroy(const SERVICEASYNC* _CONTE
 
 RESULTCONSTPTRSERVICEASYNCERROR service_async_new();
 
-RESULTERROR service_async_return_after_ms(const SERVICEASYNC* _CONTEXT, uint64_t X, uint64_t MS, fptr_fn_ConstPtrResultU64Error_ConstPtr _ASYNC_CALLBACK);
+RESULTERROR service_async_return_after_ms(const SERVICEASYNC* _CONTEXT, uint64_t X, uint64_t MS, fptr_fn_ConstPtrResultU64Error_ConstPtrVoid_rval_void _ASYNC_CALLBACK);
 
-RESULTERROR service_async_process_struct(const SERVICEASYNC* _CONTEXT, NESTEDARRAY X, fptr_fn_ConstPtrResultNestedArrayError_ConstPtr _ASYNC_CALLBACK);
+RESULTERROR service_async_process_struct(const SERVICEASYNC* _CONTEXT, NESTEDARRAY X, fptr_fn_ConstPtrResultNestedArrayError_ConstPtrVoid_rval_void _ASYNC_CALLBACK);
 
-RESULTERROR service_async_handle_string(const SERVICEASYNC* _CONTEXT, UTF8STRING S, fptr_fn_ConstPtrResultUtf8StringError_ConstPtr _ASYNC_CALLBACK);
+RESULTERROR service_async_handle_string(const SERVICEASYNC* _CONTEXT, UTF8STRING S, fptr_fn_ConstPtrResultUtf8StringError_ConstPtrVoid_rval_void _ASYNC_CALLBACK);
 
-RESULTERROR service_async_handle_vec_string(const SERVICEASYNC* _CONTEXT, VECUTF8STRING S, fptr_fn_ConstPtrResultVecUtf8StringError_ConstPtr _ASYNC_CALLBACK);
+RESULTERROR service_async_handle_vec_string(const SERVICEASYNC* _CONTEXT, VECUTF8STRING S, fptr_fn_ConstPtrResultVecUtf8StringError_ConstPtrVoid_rval_void _ASYNC_CALLBACK);
 
-RESULTERROR service_async_handle_nested_string(const SERVICEASYNC* _CONTEXT, UTF8STRING S, fptr_fn_ConstPtrResultUseStringError_ConstPtr _ASYNC_CALLBACK);
+RESULTERROR service_async_handle_nested_string(const SERVICEASYNC* _CONTEXT, UTF8STRING S, fptr_fn_ConstPtrResultUseStringError_ConstPtrVoid_rval_void _ASYNC_CALLBACK);
 
 void service_async_callback_string(const SERVICEASYNC* _CONTEXT, UTF8STRING S, STRINGCALLBACK CB);
 
-RESULTERROR service_async_success(const SERVICEASYNC* _CONTEXT, fptr_fn_ConstPtrResultError_ConstPtr _ASYNC_CALLBACK);
+RESULTERROR service_async_success(const SERVICEASYNC* _CONTEXT, fptr_fn_ConstPtrResultError_ConstPtrVoid_rval_void _ASYNC_CALLBACK);
 
-RESULTERROR service_async_fail(const SERVICEASYNC* _CONTEXT, fptr_fn_ConstPtrResultError_ConstPtr _ASYNC_CALLBACK);
+RESULTERROR service_async_fail(const SERVICEASYNC* _CONTEXT, fptr_fn_ConstPtrResultError_ConstPtrVoid_rval_void _ASYNC_CALLBACK);
 
 void service_async_bad(SERVICEASYNC* _CONTEXT);
 
