@@ -1,9 +1,14 @@
 //! A protobuf-like marshaller across the rust-ffi border.<sup>🚧</sup>
 
-use std::io::{Error, ErrorKind, Read, Result, Write};
+use std::{
+    collections::HashMap,
+    io::{Error, ErrorKind, Read, Result, Write},
+};
 
 pub trait Ser {
     fn ser(&self, out: &mut impl Write) -> Result<()>;
+
+    fn estimate_storage_size(&self) -> usize;
 }
 
 pub trait De {
@@ -18,6 +23,10 @@ macro_rules! impl_primitive_wire {
         impl Ser for $ty {
             fn ser(&self, out: &mut impl Write) -> Result<()> {
                 out.write_all(&self.to_le_bytes())
+            }
+
+            fn estimate_storage_size(&self) -> usize {
+                std::mem::size_of::<$ty>()
             }
         }
 
@@ -38,6 +47,10 @@ impl_primitive_wire!(u8, u16, u32, u64, u128, usize);
 impl Ser for bool {
     fn ser(&self, out: &mut impl Write) -> Result<()> {
         out.write_all(&u8::from(*self).to_le_bytes())
+    }
+
+    fn estimate_storage_size(&self) -> usize {
+        std::mem::size_of::<bool>()
     }
 }
 
@@ -63,6 +76,10 @@ impl<T: Ser> Ser for Option<T> {
             }
         }
     }
+
+    fn estimate_storage_size(&self) -> usize {
+        std::mem::size_of::<bool>() + self.as_ref().map_or(0, |t| t.estimate_storage_size())
+    }
 }
 
 impl<T: De> De for Option<T> {
@@ -83,6 +100,10 @@ impl<T: Ser> Ser for Vec<T> {
         }
         Ok(())
     }
+
+    fn estimate_storage_size(&self) -> usize {
+        std::mem::size_of::<usize>() + self.iter().map(|item| item.estimate_storage_size()).sum::<usize>()
+    }
 }
 
 impl<T: De> De for Vec<T> {
@@ -96,10 +117,42 @@ impl<T: De> De for Vec<T> {
     }
 }
 
+impl<K: Ser, V: Ser, S> Ser for HashMap<K, V, S> {
+    fn ser(&self, out: &mut impl Write) -> Result<()> {
+        self.len().ser(out)?;
+        for item in self.iter() {
+            item.0.ser(out)?;
+            item.1.ser(out)?;
+        }
+        Ok(())
+    }
+
+    fn estimate_storage_size(&self) -> usize {
+        std::mem::size_of::<usize>() + self.iter().map(|item| item.0.estimate_storage_size() + item.1.estimate_storage_size()).sum::<usize>()
+    }
+}
+
+impl<K: De + Eq + core::hash::Hash, V: De> De for HashMap<K, V> {
+    fn de(input: &mut impl Read) -> Result<Self> {
+        let len = usize::de(input)?;
+        let mut me = HashMap::<K, V>::with_capacity(len);
+        for _ in 0..len {
+            let k = K::de(input)?;
+            let v = V::de(input)?;
+            me.insert(k, v);
+        }
+        Ok(me)
+    }
+}
+
 impl Ser for String {
     fn ser(&self, out: &mut impl Write) -> Result<()> {
         self.len().ser(out)?;
         out.write_all(self.as_bytes())
+    }
+
+    fn estimate_storage_size(&self) -> usize {
+        std::mem::size_of::<usize>() + self.len()
     }
 }
 
@@ -115,9 +168,9 @@ impl De for String {
     }
 }
 
-// String -> serialize as Vec<u8> but maybe Vec<u16> - see which is faster
+// ✅ String -> serialize as Vec<u8> but maybe Vec<u16> - see which is faster
 // ✅ Vec<T> - u32 len + this many T's
-// HashMap<T,U> - u32 len + this many (T,U)'s
+// ✅ HashMap<T,U> - u32 len + this many (T,U)'s
 // (), (T,...)
 // ✅ Option<T> - bool + maybe T
 // ✅ bool - 1u8 or 0u8
@@ -160,6 +213,12 @@ mod tests {
         w.ser(&mut cursor)?;
 
         // Check byte repr in the buffer.
+        assert_eq!(x.estimate_storage_size(), 1);
+        assert_eq!(y.estimate_storage_size(), 2);
+        assert_eq!(z.estimate_storage_size(), 4);
+        assert_eq!(u.estimate_storage_size(), 8);
+        assert_eq!(w.estimate_storage_size(), 16);
+
         cursor.seek(SeekFrom::Start(0))?;
         let mut x_repr = [0u8; 1];
         let mut y_repr = [0u8; 2];
@@ -216,6 +275,12 @@ mod tests {
         w.ser(&mut cursor)?;
 
         // Check byte repr in the buffer.
+        assert_eq!(x.estimate_storage_size(), 1);
+        assert_eq!(y.estimate_storage_size(), 2);
+        assert_eq!(z.estimate_storage_size(), 4);
+        assert_eq!(u.estimate_storage_size(), 8);
+        assert_eq!(w.estimate_storage_size(), 16);
+
         cursor.seek(SeekFrom::Start(0))?;
         let mut x_repr = [0u8; 1];
         let mut y_repr = [0u8; 2];
@@ -289,6 +354,9 @@ mod tests {
 
         cursor.seek(SeekFrom::Start(0))?;
 
+        assert_eq!(none.estimate_storage_size(), 1);
+        assert_eq!(some.estimate_storage_size(), 2);
+
         let mut none_repr = [0u8; 1];
         let mut some_repr = [0u8; 2];
         cursor.read_exact(&mut none_repr)?;
@@ -321,16 +389,27 @@ mod tests {
 
         match core::mem::size_of::<usize>() {
             8 => {
+                assert_eq!(v1.estimate_storage_size(), 8 + 3);
+                assert_eq!(v2.estimate_storage_size(), 8);
+
                 let mut v1_repr = [0u8; 8 + 3];
                 let mut v2_repr = [0u8; 8];
                 cursor.read_exact(&mut v1_repr)?;
                 cursor.read_exact(&mut v2_repr)?;
 
-                assert_seq_eq!(v1_repr, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03);
+                #[rustfmt::skip]
+                assert_seq_eq!(v1_repr,
+                    0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x01, 0x02, 0x03);
 
-                assert_seq_eq!(v2_repr, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
+                #[rustfmt::skip]
+                assert_seq_eq!(v2_repr,
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
             }
             4 => {
+                assert_eq!(v1.estimate_storage_size(), 4 + 3);
+                assert_eq!(v2.estimate_storage_size(), 4);
+
                 let mut v1_repr = [0u8; 4 + 3];
                 let mut v2_repr = [0u8; 4];
                 cursor.read_exact(&mut v1_repr)?;
@@ -368,20 +447,32 @@ mod tests {
 
         match core::mem::size_of::<usize>() {
             8 => {
+                assert_eq!(s1.estimate_storage_size(), 8 + 11);
+                assert_eq!(s2.estimate_storage_size(), 8 + 22);
+
                 let mut s1_repr = [0u8; 8 + 11];
                 let mut s2_repr = [0u8; 8 + 22];
 
                 cursor.read_exact(&mut s1_repr)?;
                 cursor.read_exact(&mut s2_repr)?;
 
-                assert_seq_eq!(s1_repr, 0x0b, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100);
+                #[rustfmt::skip]
+                assert_seq_eq!(s1_repr,
+                    0x0b, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100);
 
+                #[rustfmt::skip]
                 assert_seq_eq!(
-                    s2_repr, 0x16, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 115, 101, 108, 195, 162, 109, 32, 97, 108, 101, 121, 107, 195, 188, 109, 32, 100, 195, 188,
-                    110, 121, 97
+                    s2_repr,
+                    0x16, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    115, 101, 108, 195, 162, 109, 32, 97, 108, 101, 121, 107,
+                    195, 188, 109, 32, 100, 195, 188, 110, 121, 97
                 );
             }
             4 => {
+                assert_eq!(s1.estimate_storage_size(), 4 + 11);
+                assert_eq!(s2.estimate_storage_size(), 4 + 22);
+
                 let mut s1_repr = [0u8; 4 + 11];
                 let mut s2_repr = [0u8; 4 + 22];
 
@@ -404,6 +495,114 @@ mod tests {
 
         assert_eq!(deserialized_s1, s1);
         assert_eq!(deserialized_s2, s2);
+        Ok(())
+    }
+
+    #[test]
+    fn hashmap_roundtrip() -> Result<()> {
+        use rustc_hash::FxSeededState;
+
+        // Create maps with fixed seed so they keep ordering for serialization tests.
+        let mut h1 = HashMap::<String, u16, FxSeededState>::with_hasher(FxSeededState::with_seed(123));
+        let mut h2 = HashMap::<u16, Vec<bool>, FxSeededState>::with_hasher(FxSeededState::with_seed(123));
+
+        h1.insert("First".into(), 0x11aa);
+        h1.insert("Second".into(), 0x22bb);
+        h2.insert(0x22bb, vec![true, true, false]);
+        h2.insert(0x11aa, vec![false, true, true]);
+
+        let mut cursor = std::io::Cursor::new(Vec::new());
+        h1.ser(&mut cursor)?;
+        h2.ser(&mut cursor)?;
+
+        cursor.seek(SeekFrom::Start(0))?;
+
+        match core::mem::size_of::<usize>() {
+            8 => {
+                assert_eq!(h1.estimate_storage_size(), 8 + 8 + 5 + 2 + 8 + 6 + 2);
+                assert_eq!(h2.estimate_storage_size(), 8 + 2 + 8 + 3 + 2 + 8 + 3);
+
+                let mut h1_repr = [0u8; 8 + 8 + 5 + 2 + 8 + 6 + 2];
+                let mut h2_repr = [0u8; 8 + 2 + 8 + 3 + 2 + 8 + 3];
+
+                cursor.read_exact(&mut h1_repr)?;
+                cursor.read_exact(&mut h2_repr)?;
+
+                #[rustfmt::skip]
+                assert_seq_eq!(
+                    h1_repr,
+                    0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    70, 105, 114, 115, 116,
+                    0xaa, 0x11,
+                    0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    83, 101, 99, 111, 110, 100,
+                    0xbb, 0x22
+                );
+
+                #[rustfmt::skip]
+                assert_seq_eq!(
+                    h2_repr,
+                    0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0xaa, 0x11,
+                    0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0, 1, 1,
+                    0xbb, 0x22,
+                    0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    1, 1, 0
+                );
+            }
+            4 => {
+                assert_eq!(h1.estimate_storage_size(), 4 + 4 + 5 + 2 + 4 + 6 + 2);
+                assert_eq!(h2.estimate_storage_size(), 4 + 2 + 4 + 3 + 2 + 4 + 3);
+
+                let mut h1_repr = [0u8; 4 + 4 + 5 + 2];
+                let mut h2_repr = [0u8; 4 + 2 + 4 + 3];
+
+                cursor.read_exact(&mut h1_repr)?;
+                cursor.read_exact(&mut h2_repr)?;
+
+                #[rustfmt::skip]
+                assert_seq_eq!(
+                    h1_repr,
+                    0x02, 0x00, 0x00, 0x00,
+                    0x05, 0x00, 0x00, 0x00,
+                    70, 105, 114, 115, 116,
+                    0xaa, 0x11,
+                    0x06, 0x00, 0x00, 0x00,
+                    83, 101, 99, 111, 110, 100,
+                    0xbb, 0x22
+                );
+
+                #[rustfmt::skip]
+                assert_seq_eq!(
+                    h2_repr,
+                    0x02, 0x00, 0x00, 0x00,
+                    0xaa, 0x11,
+                    0x03, 0x00, 0x00, 0x00,
+                    0, 1, 1,
+                    0xbb, 0x22,
+                    0x03, 0x00, 0x00, 0x00,
+                    1, 1, 0
+                );
+            }
+            _ => {
+                unimplemented!("We don't know how to test this weird size of usize")
+            }
+        }
+
+        cursor.seek(SeekFrom::Start(0))?;
+
+        let deserialized_h1 = HashMap::<String, u16>::de(&mut cursor)?;
+        let mut comparable_h1 = HashMap::<String, u16, FxSeededState>::with_hasher(FxSeededState::with_seed(123));
+        comparable_h1.extend(deserialized_h1);
+
+        let deserialized_h2 = HashMap::<u16, Vec<bool>>::de(&mut cursor)?;
+        let mut comparable_h2 = HashMap::<u16, Vec<bool>, FxSeededState>::with_hasher(FxSeededState::with_seed(123));
+        comparable_h2.extend(deserialized_h2);
+
+        assert_eq!(comparable_h1, h1);
+        assert_eq!(comparable_h2, h2);
         Ok(())
     }
 }
