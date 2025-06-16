@@ -168,6 +168,54 @@ impl De for String {
     }
 }
 
+macro_rules! impl_tuple_wire {
+    ( $( $name:ident )+ ) => {
+        #[allow(non_snake_case)]
+        impl<$($name: Ser),+> Ser for ($($name,)+)
+        {
+            fn ser(&self, output: &mut impl Write) -> Result<()> {
+                let ($($name,)+) = self;
+                $(
+                    $name.ser(output)?;
+                )+
+                Ok(())
+            }
+
+            fn estimate_storage_size(&self) -> usize {
+                let ($($name,)+) = self;
+                0 $(
+                    + $name.estimate_storage_size()
+                )+
+            }
+        }
+
+        #[allow(non_snake_case)]
+        impl<$($name: De),+> De for ($($name,)+)
+        {
+            fn de(input: &mut impl Read) -> Result<Self> {
+                Ok((
+                $(
+                    $name::de(input)?,
+                )+
+                ))
+            }
+        }
+    };
+}
+
+impl_tuple_wire! { A }
+impl_tuple_wire! { A B }
+impl_tuple_wire! { A B C }
+impl_tuple_wire! { A B C D }
+impl_tuple_wire! { A B C D E }
+impl_tuple_wire! { A B C D E F }
+impl_tuple_wire! { A B C D E F G }
+impl_tuple_wire! { A B C D E F G H }
+impl_tuple_wire! { A B C D E F G H I }
+impl_tuple_wire! { A B C D E F G H I J }
+impl_tuple_wire! { A B C D E F G H I J K }
+impl_tuple_wire! { A B C D E F G H I J K L }
+
 // ✅ String -> serialize as Vec<u8> but maybe Vec<u16> - see which is faster
 // ✅ Vec<T> - u32 len + this many T's
 // ✅ HashMap<T,U> - u32 len + this many (T,U)'s
@@ -195,6 +243,29 @@ mod tests {
                 )+
             }
         };
+    }
+
+    #[test]
+    fn tuple_roundtrip() -> Result<()> {
+        let a = (8u32, "Hello world".to_string(), vec![1, 2, 3]);
+
+        let mut cursor = std::io::Cursor::new(Vec::new());
+        a.ser(&mut cursor)?;
+
+        cursor.seek(SeekFrom::Start(0))?;
+        let mut a_repr = [0u8; 43];
+
+        cursor.read_exact(&mut a_repr)?;
+
+        println!("{a_repr:?}");
+
+        cursor.seek(SeekFrom::Start(0))?;
+
+        let deserialized_a = <(u32, String, Vec<u32>)>::de(&mut cursor)?;
+
+        assert_eq!(deserialized_a, a);
+
+        Ok(())
     }
 
     #[test]
