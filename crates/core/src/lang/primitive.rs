@@ -39,7 +39,7 @@ impl Primitive {
     #[must_use]
     pub const fn rust_name(&self) -> &str {
         match self {
-            Self::Void => "()",
+            Self::Void => "void",
             Self::Bool => "bool",
             Self::U8 => "u8",
             Self::U16 => "u16",

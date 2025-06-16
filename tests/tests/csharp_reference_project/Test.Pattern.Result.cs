@@ -18,4 +18,11 @@ public class TestPatternResult
         Assert.Equal(ResultError.Ok, Interop.pattern_result_3(ResultError.Ok));
         Assert.Equal(ResultError.Null, Interop.pattern_result_3(ResultError.Null));
     }
+    
+    [Fact]
+    public void pattern_result_4()
+    {
+        Assert.True(Interop.pattern_result_4(ResultVoid.Ok).IsOk);
+    }
+
 }
