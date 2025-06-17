@@ -1,4 +1,13 @@
 //! A protobuf-like marshaller across the rust-ffi border.<sup>🚧</sup>
+// ✅ String -> serialize as Vec<u8> but maybe Vec<u16> - see which is faster
+// ✅ Vec<T> - usize len + this many T's
+// ✅ HashMap<T,U> - usize len + this many (T,U)'s
+// ✅ (), (T,...)
+// ✅ Option<T> - bool + maybe T
+// ✅ bool - 1u8 or 0u8
+// arbitrary Structs - all fields in order of declaration
+//
+// Additionally, support serializing into C#-provided buffer.
 
 use std::{
     collections::HashMap,
@@ -216,16 +225,6 @@ impl_tuple_wire! { A B C D E F G H I J }
 impl_tuple_wire! { A B C D E F G H I J K }
 impl_tuple_wire! { A B C D E F G H I J K L }
 
-// ✅ String -> serialize as Vec<u8> but maybe Vec<u16> - see which is faster
-// ✅ Vec<T> - u32 len + this many T's
-// ✅ HashMap<T,U> - u32 len + this many (T,U)'s
-// (), (T,...)
-// ✅ Option<T> - bool + maybe T
-// ✅ bool - 1u8 or 0u8
-// arbitrary Structs - all fields in order of declaration
-//
-// Additionally, support serializing into C#-provided buffer.
-
 #[cfg(test)]
 mod tests {
     use std::io::{Seek, SeekFrom};
@@ -238,34 +237,11 @@ mod tests {
             {
                 let mut counter = 0;
                 $(
-                    assert_eq!($container[counter], $seq);
+                    assert_eq!($container[counter], $seq, "mismatch in byte {counter}");
                     counter += 1;
                 )+
             }
         };
-    }
-
-    #[test]
-    fn tuple_roundtrip() -> Result<()> {
-        let a = (8u32, "Hello world".to_string(), vec![1, 2, 3]);
-
-        let mut cursor = std::io::Cursor::new(Vec::new());
-        a.ser(&mut cursor)?;
-
-        cursor.seek(SeekFrom::Start(0))?;
-        let mut a_repr = [0u8; 43];
-
-        cursor.read_exact(&mut a_repr)?;
-
-        println!("{a_repr:?}");
-
-        cursor.seek(SeekFrom::Start(0))?;
-
-        let deserialized_a = <(u32, String, Vec<u32>)>::de(&mut cursor)?;
-
-        assert_eq!(deserialized_a, a);
-
-        Ok(())
     }
 
     #[test]
@@ -371,31 +347,9 @@ mod tests {
 
         assert_seq_eq!(z_repr, 0x5c, 0xe6, 0xcc, 0x82);
 
-        assert_eq!(u_repr[0], 0x00);
-        assert_eq!(u_repr[1], 0xb0);
-        assert_eq!(u_repr[2], 0xb7);
-        assert_eq!(u_repr[3], 0x90);
-        assert_eq!(u_repr[4], 0x42);
-        assert_eq!(u_repr[5], 0xc7);
-        assert_eq!(u_repr[6], 0x52);
-        assert_eq!(u_repr[7], 0x80);
+        assert_seq_eq!(u_repr, 0x00, 0xb0, 0xb7, 0x90, 0x42, 0xc7, 0x52, 0x80);
 
-        assert_eq!(w_repr[0], 0x80);
-        assert_eq!(w_repr[1], 0x9e);
-        assert_eq!(w_repr[2], 0x03);
-        assert_eq!(w_repr[3], 0xda);
-        assert_eq!(w_repr[4], 0xdb);
-        assert_eq!(w_repr[5], 0x5e);
-        assert_eq!(w_repr[6], 0xfa);
-        assert_eq!(w_repr[7], 0xc6);
-        assert_eq!(w_repr[8], 0x09);
-        assert_eq!(w_repr[9], 0x4a);
-        assert_eq!(w_repr[10], 0xf0);
-        assert_eq!(w_repr[11], 0xfe);
-        assert_eq!(w_repr[12], 0xff);
-        assert_eq!(w_repr[13], 0xff);
-        assert_eq!(w_repr[14], 0xff);
-        assert_eq!(w_repr[15], 0xff);
+        assert_seq_eq!(w_repr, 0x80, 0x9e, 0x03, 0xda, 0xdb, 0x5e, 0xfa, 0xc6, 0x09, 0x4a, 0xf0, 0xfe, 0xff, 0xff, 0xff, 0xff);
 
         // Deserialize back.
         cursor.seek(SeekFrom::Start(0))?;
@@ -423,6 +377,7 @@ mod tests {
         none.ser(&mut cursor)?;
         some.ser(&mut cursor)?;
 
+        // Check byte repr in the buffer.
         cursor.seek(SeekFrom::Start(0))?;
 
         assert_eq!(none.estimate_storage_size(), 1);
@@ -433,10 +388,11 @@ mod tests {
         cursor.read_exact(&mut none_repr)?;
         cursor.read_exact(&mut some_repr)?;
 
-        assert_eq!(none_repr[0], 0x00);
+        assert_seq_eq!(none_repr, 0x00);
 
         assert_seq_eq!(some_repr, 0x01, 13);
 
+        // Deserialize back.
         cursor.seek(SeekFrom::Start(0))?;
 
         let deserialized_none = Option::<u8>::de(&mut cursor)?;
@@ -456,6 +412,7 @@ mod tests {
         v1.ser(&mut cursor)?;
         v2.ser(&mut cursor)?;
 
+        // Check byte repr in the buffer.
         cursor.seek(SeekFrom::Start(0))?;
 
         match core::mem::size_of::<usize>() {
@@ -495,6 +452,7 @@ mod tests {
             }
         }
 
+        // Deserialize back.
         cursor.seek(SeekFrom::Start(0))?;
 
         let deserialized_v1 = Vec::<u8>::de(&mut cursor)?;
@@ -514,6 +472,7 @@ mod tests {
         s1.ser(&mut cursor)?;
         s2.ser(&mut cursor)?;
 
+        // Check byte repr in the buffer.
         cursor.seek(SeekFrom::Start(0))?;
 
         match core::mem::size_of::<usize>() {
@@ -559,6 +518,7 @@ mod tests {
             }
         }
 
+        // Deserialize back.
         cursor.seek(SeekFrom::Start(0))?;
 
         let deserialized_s1 = String::de(&mut cursor)?;
@@ -586,6 +546,7 @@ mod tests {
         h1.ser(&mut cursor)?;
         h2.ser(&mut cursor)?;
 
+        // Check byte repr in the buffer.
         cursor.seek(SeekFrom::Start(0))?;
 
         match core::mem::size_of::<usize>() {
@@ -662,6 +623,7 @@ mod tests {
             }
         }
 
+        // Deserialize back.
         cursor.seek(SeekFrom::Start(0))?;
 
         let deserialized_h1 = HashMap::<String, u16>::de(&mut cursor)?;
@@ -674,6 +636,61 @@ mod tests {
 
         assert_eq!(comparable_h1, h1);
         assert_eq!(comparable_h2, h2);
+        Ok(())
+    }
+
+    #[test]
+    fn tuple_roundtrip() -> Result<()> {
+        let a = (8u32, "Hello world".to_string(), vec![1, 2, 3]);
+
+        let mut cursor = std::io::Cursor::new(Vec::new());
+        a.ser(&mut cursor)?;
+
+        // Check byte repr in the buffer.
+        cursor.seek(SeekFrom::Start(0))?;
+        let mut a_repr = [0u8; 43];
+
+        cursor.read_exact(&mut a_repr)?;
+
+        match core::mem::size_of::<usize>() {
+            8 => {
+                assert_eq!(a.estimate_storage_size(), 4 + 8 + 11 + 8 + 4 + 4 + 4);
+
+                #[rustfmt::skip]
+                assert_seq_eq!(a_repr,
+                    0x08, 0x00, 0x00, 0x00,
+                    0x0b, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100,
+                    0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x01, 0x00, 0x00, 0x00,
+                    0x02, 0x00, 0x00, 0x00,
+                    0x03, 0x00, 0x00, 0x00);
+            }
+            4 => {
+                assert_eq!(a.estimate_storage_size(), 4 + 4 + 11 + 4 + 4 + 4 + 4);
+
+                #[rustfmt::skip]
+                assert_seq_eq!(a_repr,
+                    0x08, 0x00, 0x00, 0x00,
+                    0x0b, 0x00, 0x00, 0x00,
+                    72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100,
+                    0x03, 0x00, 0x00, 0x00,
+                    0x01, 0x00, 0x00, 0x00,
+                    0x02, 0x00, 0x00, 0x00,
+                    0x03, 0x00, 0x00, 0x00);
+            }
+            _ => {
+                unimplemented!("We don't know how to test this weird size of usize")
+            }
+        }
+
+        // Deserialize back.
+        cursor.seek(SeekFrom::Start(0))?;
+
+        let deserialized_a = <(u32, String, Vec<u32>)>::de(&mut cursor)?;
+
+        assert_eq!(deserialized_a, a);
+
         Ok(())
     }
 }
