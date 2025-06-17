@@ -21,18 +21,18 @@ use proc_macro::TokenStream;
 ///
 /// A number of attributes are available:
 ///
-/// | Attribute | On |  Explanation |
-/// | --- | --- | ---  |
-/// | `name="X"` | `struct`,`enum` | Uses `name` as the base interop name instead of the item's Rust name.<sup>1</sup> |
-/// | `namespace="X"` | `struct`,`enum` | Determine which namespace or file item should go. <sup>2</sup>
-/// | `skip(x)` | `struct,enum` | Skip field or variant `x` in the definition, e.g., some `x` of [`PhantomData`](std::marker::PhantomData). <sup>⚠️</sup>
-/// | `opaque` | `struct` | Creates an opaque type without fields. Can only be used behind a pointer. <sup>3</sup> |
-/// | `transparent` | `struct, enum` | The struct or single variant enum will be `#[repr(transparent)]`. <sup>3</sup> |
-/// | `packed` | `struct` | The struct will be `#[repr(packed)]`. <sup>3</sup> |
-/// | `error` | `enum` | The enum will follow the `FFIError` result pattern. |
-/// | `u8`, ..., `u64` | `enum` | Creates an opaque type without fields. Can only be used behind a pointer. |
-/// | `visibility(x="v")` | `struct` | Override visibility for field `x` as `public` or `private`; `_all` means all fields. <sup>2</sup>
-/// | `debug` | * | Print generated helper code in console.
+/// | Attribute           | On              |  Explanation |
+/// | ------------------- | --------------- | ---  |
+/// | `name="X"`          | `struct`,`enum` | Uses `name` as the base interop name instead of the item's Rust name.<sup>1</sup> |
+/// | `namespace="X"`     | `struct`,`enum` | Determine which namespace or file item should go. <sup>2</sup> |
+/// | `skip(x)`           | `struct`,`enum` | Skip field or variant `x` in the definition, e.g., some `x` of [`PhantomData`](std::marker::PhantomData). <sup>⚠️</sup> |
+/// | `opaque`            | `struct`        | Creates an opaque type without fields. Can only be used behind a pointer. <sup>3</sup> |
+/// | `transparent`       | `struct`,`enum` | The struct or single variant enum will be `#[repr(transparent)]`. <sup>3</sup> |
+/// | `packed`            | `struct`        | The struct will be `#[repr(packed)]`. <sup>3</sup> |
+/// | `error`             | `enum`          | The enum will follow the `FFIError` result pattern. |
+/// | `u8`, ..., `u64`    | `enum`          | Creates an opaque type without fields. Can only be used behind a pointer. |
+/// | `visibility(x="v")` | `struct`        | Override visibility for field `x` as `public` or `private`; `_all` means all fields. <sup>2</sup> |
+/// | `debug`             | *               | Print generated helper code in console. |
 ///
 /// <sup>1</sup> While a type's name must be unique (even across modules) backends are free to further transform this name, e.g., by converting
 /// `MyVec` to `LibraryMyVec`. In other words, using `name` will change a type's name, but not using `name` is no guarantee the final name will
@@ -57,8 +57,8 @@ use proc_macro::TokenStream;
 /// Patterns allow you to write, and backends to generate more idiomatic code. The following
 /// patterns are currently supported by this annotation:
 ///
-/// | Pattern | On |  Explanation |
-/// | --- | --- | ---  |
+/// | Pattern     | On     |  Explanation |
+/// | ----------- | ------ | ---  |
 /// | `ffi_error` | `enum` | Denotes this as a [`FFIError`](https://docs.rs/interoptopus/latest/interoptopus/patterns/result/trait.FFIError.html). |
 ///
 /// # Examples
@@ -93,9 +93,9 @@ pub fn ffi_type(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// The following parameters can be provided:
 ///
-/// | Parameter |  Explanation |
-/// | --- | ---  |
-/// | `debug` | Print generated helper code in console.
+/// | Parameter | Explanation |
+/// | --------- | --- |
+/// | `debug`   | Print generated helper code in console. |
 ///
 /// # Safety
 ///
@@ -169,10 +169,10 @@ pub fn ffi_constant(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// The following parameters can be provided:
 ///
-/// | Parameter |  Explanation |
-/// | --- | ---  |
-/// | `error = "t"` | Use `t` as the [`FFIError`](https://docs.rs/interoptopus/latest/interoptopus/patterns/result/trait.FFIError.html) type, mandatory.
-/// | `prefix  = "p"` | Add `p` to all generated method names. If not given the prefix will be inferred from the type.
+/// | Parameter       | Explanation |
+/// | --------------- | --- |
+/// | `error = "t"`   | Use `t` as the [`FFIError`](https://docs.rs/interoptopus/latest/interoptopus/patterns/result/trait.FFIError.html) type, mandatory. |
+/// | `prefix  = "p"` | Add `p` to all generated method names. If not given, the prefix will be inferred from the type. |
 ///
 /// # Example
 ///
@@ -244,9 +244,9 @@ pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// The following attributes can be provided:
 ///
-/// | Parameter |  Explanation |
-/// | --- | ---  |
-/// | `ignore` | Don't emit to FFI. |
+/// | Parameter  | Explanation |
+/// | ---------- | --- |
+/// | `ignore`   | Don't emit to FFI. |
 /// | `on_panic` | Determines what will happen on a panic (`ffi_error`, `return_default`, `undefined_behavior`) and, as a side effect, _also_ determine how return values will be handled. See below. |
 ///
 ///
@@ -254,11 +254,11 @@ pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// Details what `on_panic` means:
 ///
-/// | Mode |  Explanation |
-/// | --- | ---  |
-/// | `ffi_error` | Method must return `Result<(), Error>` and maps that to an `FFIError`. Default behavior.
-/// | `return_default` | Method can return any `T: Default`. If a panic occurs [`T::default()`](Default::default) will be returned, see below.
-/// | `undefined_behavior` | Method can return any `T`. If a panic occurs undefined behavior happens. Slightly faster (nanoseconds) and mostly an escape hatch when running into lifetime issues in autogenerated code, e.g., when returning an `CStrPointer` from a service. In the long term our proc macro code gen should be fixed to handle this situation.
+/// | Mode                 | Explanation |
+/// | -------------------- | --- |
+/// | `ffi_error`          | Method must return `Result<(), Error>` and maps that to an `FFIError`. Default behavior. |
+/// | `return_default`     | Method can return any `T: Default`. If a panic occurs [`T::default()`](Default::default) will be returned, see below. |
+/// | `undefined_behavior` | Method can return any `T`. If a panic occurs undefined behavior happens. Slightly faster (nanoseconds) and mostly an escape hatch when running into lifetime issues in autogenerated code, e.g., when returning an `CStrPointer` from a service. In the long term our proc macro code gen should be fixed to handle this situation. |
 ///
 /// # Panic Behavior
 ///
