@@ -227,8 +227,8 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
 
     let wires = if attributes.wired {
         quote! {
-            impl ::interoptopus::lang::wire_helpers::Ser for #struct_ident {}
-            impl ::interoptopus::lang::wire_helpers::De for #struct_ident {}
+            impl ::interoptopus::lang::Ser for #struct_ident {}
+            impl ::interoptopus::lang::De for #struct_ident {}
         }
     } else {
         quote! {}

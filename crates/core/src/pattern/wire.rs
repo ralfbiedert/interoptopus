@@ -7,7 +7,8 @@ struct Wire<T>
 where
     T: Ser,
 {
-    inner: T,
+    buf: Cow<[u8]>,        // storage gotten from wherever -- define
+    _type: PhantomData<T>, // what we're wiring
 }
 
 impl<T: Ser> Wire<T> {
