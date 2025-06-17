@@ -6,19 +6,19 @@ using Google.Protobuf;
 
 namespace ForCSharp;
 
-public partial class InteropProtobuf
+public class InteropProtobuf
 {
     const string DllName = "proto_benchy";
 
-    [LibraryImport(DllName, EntryPoint = "ProtoRustClient")]
+    [DllImport(DllName)]
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    private static unsafe partial void ProtoRustClient(
+    private static extern unsafe void ProtoRustClient(
         byte[] structPointer, uint structLength, void** result, uint* resultLength);
 
-    [LibraryImport(DllName, EntryPoint = "FreeRustResultMemory")]
+    [DllImport(DllName)]
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    private static unsafe partial void FreeRustResultMemory(byte* rustPtr, uint len);
-
+    private static extern unsafe void FreeRustResultMemory(byte* rustPtr, uint len);
+    
     public static Protobuf.Outputs ExecuteRustClient(Protobuf.Input input)
     {
         try
