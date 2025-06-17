@@ -49,6 +49,7 @@ public class BenchyBase
         input.Value = new Protobuf.Table();
         input.Value.Metadata = new Protobuf.TableMetadata();
         input.Context = new Protobuf.Context();
+
         // input.configuration.host (String) = from "" to "verylonghostname" (4096 chars)
         input.Configuration.Host = "127.0.0.1";
         input.Configuration.ResponseSize = n;
@@ -81,6 +82,7 @@ public class BenchyBase
         input.value = new Table();
         input.value.metadata = new TableMetadata();
         input.context = new Context();
+        
         // input.configuration.host (String) = from "" to "verylonghostname" (4096 chars)
         input.configuration.host = "127.0.0.1".Utf8();
         input.configuration.response_size = (ulong)n;
