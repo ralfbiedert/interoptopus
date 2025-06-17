@@ -1,22 +1,23 @@
 using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Google.Protobuf;
 
 namespace ForCSharp;
 
-public class InteropProtobuf
+public partial class InteropProtobuf
 {
     const string DllName = "proto_benchy";
 
     [LibraryImport(DllName, EntryPoint = "ProtoRustClient")]
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    private static extern unsafe void ProtoRustClient(
+    private static unsafe partial void ProtoRustClient(
         byte[] structPointer, uint structLength, void** result, uint* resultLength);
 
     [LibraryImport(DllName, EntryPoint = "FreeRustResultMemory")]
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    private static extern unsafe void FreeRustResultMemory(byte* rustPtr, uint len);
+    private static unsafe partial void FreeRustResultMemory(byte* rustPtr, uint len);
 
     public static Protobuf.Outputs ExecuteRustClient(Protobuf.Input input)
     {
