@@ -18,6 +18,7 @@ pub use function::{Function, Parameter, Signature, SugaredReturnType};
 pub use info::{ConstantInfo, FunctionInfo, TypeInfo};
 pub use meta::{Docs, Meta, Visibility};
 pub use primitive::{Primitive, PrimitiveValue};
+pub use wire_helpers::{De, Ser};
 
 mod array;
 mod composite;
@@ -28,6 +29,7 @@ mod function;
 mod info;
 mod meta;
 mod primitive;
+mod wire_helpers;
 
 /// A type that can exist at the FFI boundary.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
