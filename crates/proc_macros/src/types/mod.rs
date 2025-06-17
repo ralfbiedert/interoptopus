@@ -52,6 +52,9 @@ pub struct Attributes {
 
     #[darling(default)]
     debug: bool,
+
+    #[darling(default)]
+    wired: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialOrd, PartialEq, Eq)]
@@ -93,7 +96,6 @@ impl Attributes {
     #[rustfmt::skip]
     const fn type_repr_align(&self) -> (TypeRepresentation, Option<usize>) {
         let mut rval = (TypeRepresentation::C, None);
-
         if self.opaque { rval.0 = TypeRepresentation::Opaque; }
         if self.transparent { rval.0 = TypeRepresentation::Transparent; }
         if self.packed { rval.0 = TypeRepresentation::Packed; }
@@ -101,7 +103,6 @@ impl Attributes {
         if self.u16 { rval.0 = TypeRepresentation::Primitive("u16"); }
         if self.u32 { rval.0 = TypeRepresentation::Primitive("u32"); }
         if self.u64 { rval.0 = TypeRepresentation::Primitive("u64"); }
-
         rval
     }
 }

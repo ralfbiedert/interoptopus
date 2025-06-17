@@ -225,6 +225,15 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
         item.attrs.push(syn::parse_quote!(#attr_repr));
     }
 
+    let wires = if attributes.wired {
+        quote! {
+            impl ::interoptopus::lang::wire_helpers::Ser for #struct_ident {}
+            impl ::interoptopus::lang::wire_helpers::De for #struct_ident {}
+        }
+    } else {
+        quote! {}
+    };
+
     match type_repr {
         TypeRepresentation::C | TypeRepresentation::Opaque | TypeRepresentation::Packed => {
             quote! {
@@ -245,6 +254,8 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
                         #rval_builder
                     }
                 }
+
+                #wires
             }
         }
         TypeRepresentation::Transparent => {
@@ -259,6 +270,8 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
                         < #first_field_type > :: type_info()
                     }
                 }
+
+                #wires
             }
         }
         TypeRepresentation::Primitive(_) => {
