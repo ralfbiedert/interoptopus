@@ -1,10 +1,10 @@
-use interoptopus::{ffi_function, ffi_type};
+/*use interoptopus::{ffi, ffi_function, ffi_type,pattern::wire::Wire};
 
 #[ffi_type(wired)]
 struct MyWiredType {
     name: String,
     values: Vec<u32>,
-    attribute: (u32, String, HashMap<String, u8>),
+    // attribute: (u32, String, HashMap<String, u8>), Interopopus does not support tuples yet
 }
 
 // input is a serialized representation, parse it to access MyWiredType.
@@ -17,3 +17,4 @@ fn perform_half_miracles(input: Wire<MyWiredType>, other: ffi::String) -> ffi::S
 
 #[ffi_function]
 fn perform_half_miracles_in_other_direction(input: ffi::String) -> Wire<MyWiredType> {}
+*/
