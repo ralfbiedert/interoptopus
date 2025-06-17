@@ -36,20 +36,13 @@ namespace ForCSharp;
 // outputs.data.items.items = from 0 to 1,000,000 "Message" key value pairs
 // outputs.data.errors.error_messages = from 0 to 1,000,000 string values
 //
-[RPlotExporter]
-[MemoryDiagnoser]
-//[NativeMemoryProfiler]
-public class Benchy
+public class BenchyBase
 {
-    const int SMALL = 0;
-    const int MEDIUM = 1000;
-    const int LARGE = 1000000;
+    protected const int SMALL = 0;
+    protected const int MEDIUM = 1000;
+    protected const int LARGE = 1000000;
 
-    private Protobuf.Input smallProtobufInput = populateProtobufInput(SMALL);
-    private Protobuf.Input mediumProtobufInput = populateProtobufInput(MEDIUM);
-    private Protobuf.Input largeProtobufInput = populateProtobufInput(LARGE);
-
-    private static Protobuf.Input populateProtobufInput(int n)
+    protected static Protobuf.Input populateProtobufInput(int n)
     {
         var input = new Protobuf.Input();
         input.Configuration = new Protobuf.Configuration();
@@ -80,11 +73,7 @@ public class Benchy
         return input;
     }
 
-    private Input smallFfiInput = populateFfiInput(SMALL);
-    private Input mediumFfiInput = populateFfiInput(MEDIUM);
-    private Input largeFfiInput = populateFfiInput(LARGE);
-
-    private static Input populateFfiInput(int n)
+    protected static Input populateFfiInput(int n)
     {
         var input = new Input();
 
@@ -125,23 +114,17 @@ public class Benchy
     //     var input = new WireInput();
     //     return input;
     // }
-/*
-    [Benchmark]
-    public void Protobuf_0_cold()
-    {
-        var outputs = InteropProtobuf.ExecuteRustClient(smallProtobufInput);
-    }
+}
 
+[RPlotExporter]
+[MemoryDiagnoser]
+//[NativeMemoryProfiler]
+public class HotBenchy : BenchyBase
+{
     [Benchmark]
     public void Protobuf_0_hot()
     {
         var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(SMALL));
-    }
-
-    [Benchmark]
-    public void Protobuf_1k_cold()
-    {
-        var outputs = InteropProtobuf.ExecuteRustClient(mediumProtobufInput);
     }
 
     [Benchmark]
@@ -151,16 +134,66 @@ public class Benchy
     }
 
     [Benchmark]
+    public void Protobuf_1kk_hot()
+    {
+        var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(LARGE));
+    }
+
+    [Benchmark]
+    public void Ffi_0_hot()
+    {
+        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(SMALL));
+    }
+
+    [Benchmark]
+    public void Ffi_1k_hot()
+    {
+        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(MEDIUM));
+    }
+
+    [Benchmark]
+    public void Ffi_1kk_hot()
+    {
+        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(LARGE));
+    }
+
+    // [Benchmark]
+    // public void WireInterop_0()
+    // {
+    //     var outputs = InteropWire.ExecuteRustClient(populateInput(SMALL));
+    // }
+}
+
+[RPlotExporter]
+[MemoryDiagnoser]
+//[NativeMemoryProfiler]
+public class ColdBenchy : BenchyBase
+{
+    private Protobuf.Input smallProtobufInput = populateProtobufInput(SMALL);
+    private Protobuf.Input mediumProtobufInput = populateProtobufInput(MEDIUM);
+    private Protobuf.Input largeProtobufInput = populateProtobufInput(LARGE);
+
+    [Benchmark]
+    public void Protobuf_0_cold()
+    {
+        var outputs = InteropProtobuf.ExecuteRustClient(smallProtobufInput);
+    }
+
+    [Benchmark]
+    public void Protobuf_1k_cold()
+    {
+        var outputs = InteropProtobuf.ExecuteRustClient(mediumProtobufInput);
+    }
+
+    [Benchmark]
     public void Protobuf_1kk_cold()
     {
         var outputs = InteropProtobuf.ExecuteRustClient(largeProtobufInput);
     }
 
-    [Benchmark]
-    public void Protobuf_1kk_hot()
-    {
-        var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(LARGE));
-    }
+    private Input smallFfiInput = populateFfiInput(SMALL);
+    private Input mediumFfiInput = populateFfiInput(MEDIUM);
+    private Input largeFfiInput = populateFfiInput(LARGE);
 
     [Benchmark]
     public void Ffi_0_cold()
@@ -170,40 +203,15 @@ public class Benchy
     }
 
     [Benchmark]
-    public void Ffi_0_hot()
-    {
-        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(SMALL));
-    }
-*/
-    [Benchmark]
     public void Ffi_1k_cold()
     {
         var outputs = InteropFfi.ExecuteRustClient(mediumFfiInput);
     }
-/*
-    [Benchmark]
-    public void Ffi_1k_hot()
-    {
-        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(MEDIUM));
-    }
-
     [Benchmark]
     public void Ffi_1kk_cold()
     {
         var outputs = InteropFfi.ExecuteRustClient(largeFfiInput);
     }
-
-    [Benchmark]
-    public void Ffi_1kk_hot()
-    {
-        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(LARGE));
-    }
-*/
-    // [Benchmark]
-    // public void WireInterop_0()
-    // {
-    //     var outputs = InteropWire.ExecuteRustClient(populateInput(SMALL));
-    // }
 }
 
 public class Program
@@ -211,8 +219,9 @@ public class Program
     public static void Main(string[] args)
     {
         //var tt = new Utf8String[1];
-        //var summary = BenchmarkRunner.Run<Benchy>();
-        var benchy = new Benchy();
-        benchy.Ffi_1k_cold();
+        var hot = BenchmarkRunner.Run<HotBenchy>();
+        //var cold = BenchmarkRunner.Run<ColdBenchy>();
+        //var benchy = new Benchy();
+        //benchy.Ffi_1k_cold();
     }
 }
