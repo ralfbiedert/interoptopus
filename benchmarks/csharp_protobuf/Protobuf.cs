@@ -11,12 +11,12 @@ public class InteropProtobuf
     const string DllName = "proto_benchy";
 
     [DllImport(DllName)]
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    //[MethodImpl(MethodImplOptions.AggressiveOptimization)]
     private static extern unsafe void ProtoRustClient(
         byte[] structPointer, uint structLength, void** result, uint* resultLength);
 
     [DllImport(DllName)]
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    //[MethodImpl(MethodImplOptions.AggressiveOptimization)]
     private static extern unsafe void FreeRustResultMemory(byte* rustPtr, uint len);
     
     public static Protobuf.Outputs ExecuteRustClient(Protobuf.Input input)
