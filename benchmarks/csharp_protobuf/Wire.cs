@@ -4,11 +4,9 @@
 //
 // public class InteropWire
 // {
-//     [DllImport("rust_bench.dll")]
 //     private static extern unsafe void WireRustClient(
 //         byte[] structPointer, uint structLength, void** result, uint* resultLength);
 //
-//     [DllImport("rust_bench.dll")]
 //     private static extern unsafe void FreeRustResultMemory(byte* rustPtr, uint len);
 //
 //     /// Main benched function.
