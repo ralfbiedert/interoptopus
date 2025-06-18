@@ -135,9 +135,6 @@
 
 #![allow(clippy::test_attr_in_doctest)]
 
-use std::sync::LazyLock;
-use tera::Tera;
-
 mod converter;
 mod docs;
 mod interop;
@@ -145,23 +142,4 @@ mod interop;
 pub use docs::Markdown;
 pub use interop::{Interop, InteropBuilder, InteropBuilderError};
 
-static TEMPLATES: LazyLock<Tera> = LazyLock::new(|| Tera::new("templates/**/*.py").unwrap());
-
-#[macro_export]
-macro_rules! render {
-    ($writer:expr, $template:expr) => {
-        {
-            let context = tera::Context::new();
-            crate::TEMPLATES.render_to($template, &context, $writer.writer()).map_err(|e| interoptopus::Error::Templating(e.to_string()))
-        }
-    };
-    ($writer:expr, $template:expr, $(($key:expr,$value:expr)),+) => {
-        {
-            let mut context = tera::Context::new();
-            $(
-                context.insert($key, $value);
-            )*
-            crate::TEMPLATES.render_to($template, &context, $writer.writer()).map_err(|e| interoptopus::Error::Templating(e.to_string()))
-        }
-    };
-}
+interoptopus::codegen_template_engine!("**/*.py");

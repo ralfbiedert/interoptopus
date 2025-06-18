@@ -117,10 +117,6 @@
 
 #![allow(clippy::test_attr_in_doctest, clippy::too_many_lines)]
 
-use include_dir::{Dir, include_dir};
-use std::sync::LazyLock;
-use tera::Tera;
-
 mod converter;
 mod docs;
 pub(crate) mod interop;
@@ -129,38 +125,4 @@ pub(crate) mod utils;
 pub use docs::{Markdown, MarkdownConfig};
 pub use interop::{FunctionNameFlavor, Interop, InteropBuilder, InteropBuilderError, Visibility, WriteTypes};
 
-static TEMPLATE_FILES: LazyLock<Dir<'_>> = LazyLock::new(|| include_dir!("$CARGO_MANIFEST_DIR/templates"));
-
-static TEMPLATES: LazyLock<Tera> = LazyLock::new(|| {
-    let mut tera = Tera::default();
-    for file in TEMPLATE_FILES.find("**/*.cs").unwrap() {
-        file.as_file().map(|template| {
-            tera.add_raw_template(&template.path().to_str().unwrap(), template.contents_utf8().unwrap()).unwrap();
-        });
-    }
-    tera
-});
-
-#[macro_export]
-macro_rules! render {
-    ($writer:expr, $template:expr) => {
-        {
-            let names: Vec<_> = crate::TEMPLATES.get_template_names().collect();
-            println!("Loaded templates:");
-            for name in names {
-                println!("name: {}", name);
-            }
-            let context = tera::Context::new();
-            crate::TEMPLATES.render_to($template, &context, $writer.writer()).map_err(|e| interoptopus::Error::Templating(e.to_string()))
-        }
-    };
-    ($writer:expr, $template:expr, $(($key:expr,$value:expr)),+) => {
-        {
-            let mut context = tera::Context::new();
-            $(
-                context.insert($key, $value);
-            )*
-            crate::TEMPLATES.render_to($template, &context, $writer.writer()).map_err(|e| interoptopus::Error::Templating(e.to_string()))
-        }
-    };
-}
+interoptopus::codegen_template_engine!("**/*.cs");

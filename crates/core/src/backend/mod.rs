@@ -1,5 +1,6 @@
 //! Utilities for backends.
 
+mod render;
 mod testing;
 mod util;
 mod writer;

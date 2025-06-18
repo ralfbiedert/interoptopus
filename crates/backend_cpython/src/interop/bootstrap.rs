@@ -1,7 +1,6 @@
+use crate::Interop;
 use crate::converter::to_ctypes_name;
-use crate::{Interop, render};
-use interoptopus::Error;
-use interoptopus::backend::IndentWriter;
+use interoptopus::{Error, backend::IndentWriter, render};
 use std::collections::HashMap;
 
 pub fn write_api_load_function(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
