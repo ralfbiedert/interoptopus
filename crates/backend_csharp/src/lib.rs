@@ -117,6 +117,7 @@
 
 #![allow(clippy::test_attr_in_doctest, clippy::too_many_lines)]
 
+use include_dir::{Dir, include_dir};
 use std::sync::LazyLock;
 use tera::Tera;
 
@@ -128,8 +129,17 @@ pub(crate) mod utils;
 pub use docs::{Markdown, MarkdownConfig};
 pub use interop::{FunctionNameFlavor, Interop, InteropBuilder, InteropBuilderError, Visibility, WriteTypes};
 
-// TODO: load templates statically at build time! or you won't be able to invoke backend generator from other crates
-static TEMPLATES: LazyLock<Tera> = LazyLock::new(|| Tera::new("templates/**/*.cs").unwrap());
+static TEMPLATE_FILES: LazyLock<Dir<'_>> = LazyLock::new(|| include_dir!("$CARGO_MANIFEST_DIR/templates"));
+
+static TEMPLATES: LazyLock<Tera> = LazyLock::new(|| {
+    let mut tera = Tera::default();
+    for file in TEMPLATE_FILES.find("**/*.cs").unwrap() {
+        file.as_file().map(|template| {
+            tera.add_raw_template(&template.path().to_str().unwrap(), template.contents_utf8().unwrap()).unwrap();
+        });
+    }
+    tera
+});
 
 #[macro_export]
 macro_rules! render {
