@@ -130,16 +130,46 @@ public class HotBenchy : BenchyBase
     }
 
     [Benchmark]
+    public void Protobuf_10_hot()
+    {
+        var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(10));
+    }
+
+    [Benchmark]
+    public void Protobuf_50_hot()
+    {
+        var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(50));
+    }
+    
+    [Benchmark]
+    public void Protobuf_100_hot()
+    {
+        var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(100));
+    }
+
+    [Benchmark]
+    public void Protobuf_500_hot()
+    {
+        var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(500));
+    }
+    
+    [Benchmark]
     public void Protobuf_1k_hot()
     {
         var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(MEDIUM));
+    }
+
+/*    [Benchmark]
+    public void Protobuf_200k_hot()
+    {
+        var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(200000));
     }
 
     [Benchmark]
     public void Protobuf_1kk_hot()
     {
         var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(LARGE));
-    }
+    }*/
 
     [Benchmark]
     public void Ffi_0_hot()
@@ -148,16 +178,46 @@ public class HotBenchy : BenchyBase
     }
 
     [Benchmark]
+    public void Ffi_10_hot()
+    {
+        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(10));
+    }
+
+    [Benchmark]
+    public void Ffi_50_hot()
+    {
+        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(50));
+    }
+
+    [Benchmark]
+    public void Ffi_100_hot()
+    {
+        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(100));
+    }
+
+    [Benchmark]
+    public void Ffi_500_hot()
+    {
+        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(500));
+    }
+
+    [Benchmark]
     public void Ffi_1k_hot()
     {
         var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(MEDIUM));
+    }
+/*
+    [Benchmark]
+    public void Ffi_200k_hot()
+    {
+        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(200000));
     }
 
     [Benchmark]
     public void Ffi_1kk_hot()
     {
         var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(LARGE));
-    }
+    }*/
 
     // [Benchmark]
     // public void WireInterop_0()
