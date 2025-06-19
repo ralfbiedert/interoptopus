@@ -1,7 +1,7 @@
 use crate::types::TypeRepresentation::Opaque;
 use crate::types::{Attributes, TypeRepresentation};
 use crate::util::extract_doc_lines;
-use proc_macro2::{Span, TokenStream};
+use proc_macro2::{Ident, Span, TokenStream};
 use quote::{ToTokens, quote};
 use syn::spanned::Spanned;
 use syn::{GenericParam, ItemStruct, Type};
@@ -55,6 +55,7 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
     let struct_ident_c = attributes.name.clone().unwrap_or(struct_ident_str);
 
     let mut field_names = Vec::new();
+    let mut field_idents = Vec::new();
     let mut field_type_info = Vec::new();
     let mut field_types = Vec::new();
     let mut field_docs = Vec::new();
@@ -122,6 +123,7 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
         let visibility = attributes.visibility_for_field(field, &name);
 
         field_names.push(name.clone());
+        field_idents.push(field.ident.clone().unwrap_or_else(|| Ident::new(&format!("x{i}"), Span::call_site())));
         field_docs.push(extract_doc_lines(&field.attrs).join("\n"));
         field_visibilities.push(visibility);
 
@@ -199,6 +201,7 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
         TypeRepresentation::Primitive(_) => quote! { compile_error!("TODO") },
     };
 
+    // @todo repr(C) is probbaly not necessary for wired structs (but doesn't hurt atm)
     let attr_repr = match type_repr {
         TypeRepresentation::C | TypeRepresentation::Opaque => quote! { #[repr(C #attr_align)] },
         TypeRepresentation::Transparent => quote! { #[repr(transparent #attr_align)] },
@@ -228,67 +231,79 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
     let wires = if attributes.wired {
         quote! {
             impl ::interoptopus::lang::Ser for #struct_ident {
-                fn ser(&self, out: &mut impl ::std::io::Write) -> ::std::io::Result<()> {
+                fn ser(&self, output: &mut impl ::std::io::Write) -> ::std::io::Result<()> {
+                    #(
+                        self.#field_idents.ser(output)?;
+                    )*
                     Ok(())
                 }
                 fn estimate_storage_size(&self) -> usize {
                     0
+                    #(
+                        + self.#field_idents.estimate_storage_size()
+                    )*
                 }
             }
             impl ::interoptopus::lang::De for #struct_ident {
                 fn de(input: &mut impl ::std::io::Read) -> ::std::io::Result<Self>
                 where
-                    Self: Sized {}
+                    Self: Sized {
+                        unimplemented!()
+                    }
             }
         }
     } else {
         quote! {}
     };
 
-    match type_repr {
-        TypeRepresentation::C | TypeRepresentation::Opaque | TypeRepresentation::Packed => {
-            quote! {
-                #item
+    let type_info = if attributes.wired {
+        quote! {}
+    } else {
+        match type_repr {
+            TypeRepresentation::C | TypeRepresentation::Opaque | TypeRepresentation::Packed => {
+                quote! {
+                    unsafe impl #param_param ::interoptopus::lang::TypeInfo for #struct_ident #param_struct #param_where {
 
-                unsafe impl #param_param ::interoptopus::lang::TypeInfo for #struct_ident #param_struct #param_where {
+                        fn type_info() -> ::interoptopus::lang::Type {
+                            let docs = ::interoptopus::lang::Docs::from_line(#doc_line);
+                            let mut meta = ::interoptopus::lang::Meta::with_module_docs(#namespace.to_string(), docs);
+                            let mut fields: ::std::vec::Vec<interoptopus::lang::Field> = ::std::vec::Vec::new();
+                            let mut generics: ::std::vec::Vec<::std::string::String> = ::std::vec::Vec::new();
 
-                    fn type_info() -> ::interoptopus::lang::Type {
-                        let docs = ::interoptopus::lang::Docs::from_line(#doc_line);
-                        let mut meta = ::interoptopus::lang::Meta::with_module_docs(#namespace.to_string(), docs);
-                        let mut fields: ::std::vec::Vec<interoptopus::lang::Field> = ::std::vec::Vec::new();
-                        let mut generics: ::std::vec::Vec<::std::string::String> = ::std::vec::Vec::new();
+                            #let_name
 
-                        #let_name
+                            #let_fields
 
-                        #let_fields
-
-                        #rval_builder
+                            #rval_builder
+                        }
                     }
                 }
-
-                #wires
             }
-        }
-        TypeRepresentation::Transparent => {
-            let first_field_type = field_types.first().expect("Transparent structs must have at least one field");
+            TypeRepresentation::Transparent => {
+                let first_field_type = field_types.first().expect("Transparent structs must have at least one field");
 
-            quote! {
-                #item
+                quote! {
+                    unsafe impl #param_param ::interoptopus::lang::TypeInfo for #struct_ident #param_struct #param_where {
 
-                unsafe impl #param_param ::interoptopus::lang::TypeInfo for #struct_ident #param_struct #param_where {
-
-                    fn type_info() -> ::interoptopus::lang::Type {
-                        < #first_field_type > :: type_info()
+                        fn type_info() -> ::interoptopus::lang::Type {
+                            < #first_field_type > :: type_info()
+                        }
                     }
                 }
+            }
+            TypeRepresentation::Primitive(_) => {
+                quote! {
+                    compile_error!("Attributes u8, ..., u64 are only allowed on enums.");
+                }
+            }
+        }
+    };
 
-                #wires
-            }
-        }
-        TypeRepresentation::Primitive(_) => {
-            quote! {
-                compile_error!("Attributes u8, ..., u64 are only allowed on enums.");
-            }
-        }
+    quote! {
+        #item
+
+        #type_info
+
+        #wires
     }
 }
