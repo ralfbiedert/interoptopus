@@ -520,14 +520,12 @@ namespace My.Company
 
 
 
-    public class InteropException: Exception
+    public class InteropException : Exception
     {
-
-        public InteropException(): base()
+        public InteropException() : base()
         {
         }
     }
-
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void AsyncHelperNative(IntPtr data, IntPtr callback_data);
     public delegate void AsyncHelperDelegate(IntPtr data);
@@ -607,6 +605,7 @@ namespace My.Company
             public void Free() { }
         }
     }
+
     public delegate void AsyncCallbackCommon(IntPtr data, IntPtr callback_data);
 
     [StructLayout(LayoutKind.Sequential)]
@@ -623,7 +622,7 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial class Utf8String: IDisposable
+    public partial class Utf8String : IDisposable
     {
         private Utf8String() { }
 
@@ -637,7 +636,7 @@ namespace My.Company
 
             fixed (byte* p = utf8Bytes)
             {
-                InteropHelper.interoptopus_string_create((IntPtr) p, (ulong)len, out var native);
+                InteropHelper.interoptopus_string_create((IntPtr)p, (ulong)len, out var native);
                 rval._ptr = native._ptr;
                 rval._len = native._len;
                 rval._capacity = native._capacity;
@@ -658,7 +657,7 @@ namespace My.Company
         {
             get
             {
-                var span = new ReadOnlySpan<byte>((byte*) _ptr, (int)_len);
+                var span = new ReadOnlySpan<byte>((byte*)_ptr, (int)_len);
                 var s = Encoding.UTF8.GetString(span);
                 return s;
             }
@@ -788,5 +787,4 @@ namespace My.Company
     {
         public static Utf8String Utf8(this string s) { return Utf8String.From(s); }
     }
-
 }
