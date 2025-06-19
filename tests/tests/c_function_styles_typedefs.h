@@ -103,9 +103,9 @@ typedef struct EXTRATYPEF32
 
 typedef struct IVEC3
     {
-    ssize_t x;
-    ssize_t y;
-    ssize_t z;
+    ptrdiff_t x;
+    ptrdiff_t y;
+    ptrdiff_t z;
     } IVEC3;
 
 typedef struct INNER
@@ -905,7 +905,7 @@ typedef uint64_t (*primitive_u64)(uint64_t);
 
 typedef size_t (*primitive_usize)(size_t);
 
-typedef ssize_t (*primitive_isize)(ssize_t);
+typedef ptrdiff_t (*primitive_isize)(ptrdiff_t);
 
 typedef uint8_t (*primitive_u8)(uint8_t);
 
