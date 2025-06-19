@@ -33,7 +33,9 @@ macro_rules! render {
             //    println!("name: {}", name);
             //}
             let context = tera::Context::new();
-            crate::TEMPLATES.render_to($template, &context, $writer.writer()).map_err(|e| interoptopus::Error::Templating(e.to_string()))
+            let template = crate::TEMPLATES.render($template, &context).map_err(|e| interoptopus::Error::Templating(e.to_string()))?;
+            let indented = indent::indent_all_with($writer.indent_prefix(), template);
+            write!($writer.writer(), "{}", indented).map_err(|e| interoptopus::Error::Templating(e.to_string()))
         }
     };
     ($writer:expr, $template:expr, $(($key:expr,$value:expr)),+) => {
@@ -42,7 +44,9 @@ macro_rules! render {
             $(
                 context.insert($key, $value);
             )*
-            crate::TEMPLATES.render_to($template, &context, $writer.writer()).map_err(|e| interoptopus::Error::Templating(e.to_string()))
+            let template = crate::TEMPLATES.render($template, &context).map_err(|e| interoptopus::Error::Templating(e.to_string()))?;
+            let indented = indent::indent_all_with($writer.indent_prefix(), template);
+            write!($writer.writer(), "{}", indented).map_err(|e| interoptopus::Error::Templating(e.to_string()))
         }
     };
 }
