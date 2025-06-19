@@ -18,7 +18,7 @@ pub fn primitive_to_typename(x: Primitive) -> String {
         Primitive::I16 => "int16_t".to_string(),
         Primitive::I32 => "int32_t".to_string(),
         Primitive::I64 => "int64_t".to_string(),
-        Primitive::Isize => "ssize_t".to_string(),
+        Primitive::Isize => "ptrdiff_t".to_string(),
         Primitive::F32 => "float".to_string(),
         Primitive::F64 => "double".to_string(),
     }
