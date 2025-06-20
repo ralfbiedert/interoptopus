@@ -53,6 +53,7 @@ macro_rules! impl_primitive_wire {
 
 impl_primitive_wire!(i8, i16, i32, i64, i128, isize);
 impl_primitive_wire!(u8, u16, u32, u64, u128, usize);
+impl_primitive_wire!(f32, f64);
 
 impl Ser for bool {
     fn ser(&self, out: &mut impl Write) -> Result<()> {
