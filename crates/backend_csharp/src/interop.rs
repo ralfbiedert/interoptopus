@@ -221,6 +221,7 @@ impl Interop {
         meta.module() == self.namespace_id
     }
 
+    // Wire is a custom marshaller, eh?
     fn is_custom_marshalled(&self, x: &Type) -> bool {
         self.should_emit_marshaller(x)
             || match x {
@@ -287,7 +288,7 @@ impl Interop {
         }
 
         match t {
-            Type::Primitive(_) => self.write_types == WriteTypes::NamespaceAndInteroptopusGlobal,
+            Type::Primitive(_) => self.write_types == WriteTypes::NamespaceAndInteroptopusGlobal, // need wire wrappers for primitives!
             Type::Array(_) => false,
             Type::Enum(x) => self.should_emit_by_meta(x.meta()),
             Type::Opaque(x) => self.should_emit_by_meta(x.meta()),
