@@ -104,6 +104,7 @@ pub fn to_ctypes_name(the_type: &Type, with_type_annotations: bool) -> String {
             TypePattern::Result(c) => c.the_enum().rust_name().to_string(),
             TypePattern::AsyncCallback(x) => fnpointer_to_typename(x.fnpointer()),
             TypePattern::Vec(c) => c.rust_name().to_string(),
+            TypePattern::Wire(_) => todo!(),
         },
     }
 }

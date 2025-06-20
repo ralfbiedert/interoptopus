@@ -308,6 +308,7 @@ impl Interop {
                 TypePattern::AsyncCallback(x) => self.should_emit_by_meta(x.meta()),
                 TypePattern::Vec(x) => self.should_emit_by_meta(x.meta()),
                 TypePattern::Utf8String(_) => false,
+                TypePattern::Wire(_) => todo!(),
             },
         }
     }
