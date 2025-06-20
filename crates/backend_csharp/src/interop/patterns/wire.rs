@@ -2,3 +2,4 @@
 // e.g. WireMyWiredStruct for #[ffi_type(wired)]struct MyWiredStruct
 // should generate MyWiredStruct too? the types there are not ffi but should only work through Wire..
 //
+// we don't have type_info for wired types - how to know which wrappers to generate?
