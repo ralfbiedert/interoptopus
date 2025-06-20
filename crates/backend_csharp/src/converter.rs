@@ -57,6 +57,7 @@ pub fn field_to_type(x: &Type) -> String {
             TypePattern::APIVersion => field_to_type(&x.fallback_type()),
             TypePattern::Vec(x) => x.composite_type().rust_name().to_string(),
             TypePattern::AsyncCallback(_) => todo!("Async callbacks not supported in fields"),
+            TypePattern::Wire(_) => todo!(),
         },
     }
 }
@@ -87,6 +88,7 @@ pub fn field_to_type_unmanaged(x: &Type) -> String {
             TypePattern::APIVersion => field_to_type(&x.fallback_type()),
             TypePattern::AsyncCallback(_) => todo!("Async callbacks not supported in fields"),
             TypePattern::Vec(x) => format!("{}.Unmanaged", x.composite_type().rust_name()),
+            TypePattern::Wire(_) => todo!(),
         },
     }
 }
@@ -152,6 +154,7 @@ pub fn param_to_type(x: &Type) -> String {
             TypePattern::Bool => "Bool".to_string(),
             TypePattern::CChar => "sbyte".to_string(),
             TypePattern::APIVersion => param_to_type(&x.fallback_type()),
+            TypePattern::Wire(_) => todo!(),
         },
     }
 }
@@ -243,6 +246,7 @@ pub fn rval_to_type_sync(x: &Type) -> String {
             TypePattern::APIVersion => rval_to_type_sync(&x.fallback_type()),
             TypePattern::Vec(x) => x.composite_type().rust_name().to_string(),
             TypePattern::AsyncCallback(_) => panic!("AsyncCallback not supported in rvals"),
+            TypePattern::Wire(_) => todo!(),
         },
     }
 }
@@ -355,6 +359,7 @@ pub fn is_reusable(t: &Type) -> bool {
             TypePattern::NamedCallback(_) => true,
             TypePattern::AsyncCallback(_) => true,
             TypePattern::Vec(_) => false,
+            TypePattern::Wire(_) => todo!(),
         },
     }
 }
@@ -395,6 +400,7 @@ pub fn has_dispose(t: &Type) -> bool {
             TypePattern::NamedCallback(_) => true,
             TypePattern::AsyncCallback(_) => true,
             TypePattern::Vec(_) => true,
+            TypePattern::Wire(_) => todo!(),
         },
     }
 }
