@@ -44,7 +44,9 @@ typedef struct GENERIC3 GENERIC3;
 
 typedef struct GENERIC4 GENERIC4;
 
-typedef struct SERVICEASYNC SERVICEASYNC;
+typedef struct SERVICEASYNCBASIC SERVICEASYNCBASIC;
+
+typedef struct SERVICEASYNCSLEEP SERVICEASYNCSLEEP;
 
 typedef struct SERVICEBASIC SERVICEBASIC;
 
@@ -473,15 +475,26 @@ typedef enum OPTIONVEC
     } OPTIONVEC;
 
 /// Result that contains value or an error.
-typedef enum RESULTCONSTPTRSERVICEASYNCERROR
+typedef enum RESULTCONSTPTRSERVICEASYNCBASICERROR
     {
     /// Element if err is `Ok`.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTCONSTPTRSERVICEASYNCERROR_PANIC = 2,
-    RESULTCONSTPTRSERVICEASYNCERROR_NULL = 3,
-    } RESULTCONSTPTRSERVICEASYNCERROR;
+    RESULTCONSTPTRSERVICEASYNCBASICERROR_PANIC = 2,
+    RESULTCONSTPTRSERVICEASYNCBASICERROR_NULL = 3,
+    } RESULTCONSTPTRSERVICEASYNCBASICERROR;
+
+/// Result that contains value or an error.
+typedef enum RESULTCONSTPTRSERVICEASYNCSLEEPERROR
+    {
+    /// Element if err is `Ok`.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    /// Error value.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTCONSTPTRSERVICEASYNCSLEEPERROR_PANIC = 2,
+    RESULTCONSTPTRSERVICEASYNCSLEEPERROR_NULL = 3,
+    } RESULTCONSTPTRSERVICEASYNCSLEEPERROR;
 
 /// Result that contains value or an error.
 typedef enum RESULTCONSTPTRSERVICEBASICERROR
@@ -615,17 +628,6 @@ typedef enum RESULTUSESTRINGERROR
     RESULTUSESTRINGERROR_NULL = 3,
     } RESULTUSESTRINGERROR;
 
-/// Result that contains value or an error.
-typedef enum RESULTVECUTF8STRINGERROR
-    {
-    /// Element if err is `Ok`.
-    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    /// Error value.
-    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTVECUTF8STRINGERROR_PANIC = 2,
-    RESULTVECUTF8STRINGERROR_NULL = 3,
-    } RESULTVECUTF8STRINGERROR;
-
 typedef uint8_t (*CALLBACKFFISLICE)(SLICEU8 SLICE, const void* CALLBACK_DATA);
 
 typedef void (*CALLBACKSLICEMUT)(SLICEMUTU8 SLICE, const void* CALLBACK_DATA);
@@ -724,8 +726,6 @@ typedef void (*fptr_fn_ConstPtrResultError_ConstPtrVoid_rval_void)(const RESULTE
 
 typedef void (*fptr_fn_ConstPtrResultU64Error_ConstPtrVoid_rval_void)(const RESULTU64ERROR* x0, const void* x1);
 
-typedef void (*fptr_fn_ConstPtrResultUtf8StringError_ConstPtrVoid_rval_void)(const RESULTUTF8STRINGERROR* x0, const void* x1);
-
 ///  Vec marshalling helper.
 ///  A highly dangerous 'use once type' that has ownership semantics!
 ///  Once passed over an FFI boundary 'the other side' is meant to own
@@ -765,17 +765,6 @@ typedef enum OPTIONOPTIONRESULTOPTIONUTF8STRINGERROR
     } OPTIONOPTIONRESULTOPTIONUTF8STRINGERROR;
 
 /// Result that contains value or an error.
-typedef enum RESULTNESTEDARRAYERROR
-    {
-    /// Element if err is `Ok`.
-    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    /// Error value.
-    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTNESTEDARRAYERROR_PANIC = 2,
-    RESULTNESTEDARRAYERROR_NULL = 3,
-    } RESULTNESTEDARRAYERROR;
-
-/// Result that contains value or an error.
 typedef enum RESULTOPTIONENUMPAYLOADERROR
     {
     /// Element if err is `Ok`.
@@ -787,12 +776,6 @@ typedef enum RESULTOPTIONENUMPAYLOADERROR
     } RESULTOPTIONENUMPAYLOADERROR;
 
 typedef void (*CALLBACKCHARARRAY2)(CHARARRAY VALUE, const void* CALLBACK_DATA);
-
-typedef void (*fptr_fn_ConstPtrResultUseStringError_ConstPtrVoid_rval_void)(const RESULTUSESTRINGERROR* x0, const void* x1);
-
-typedef void (*fptr_fn_ConstPtrResultVecUtf8StringError_ConstPtrVoid_rval_void)(const RESULTVECUTF8STRINGERROR* x0, const void* x1);
-
-typedef void (*fptr_fn_ConstPtrResultNestedArrayError_ConstPtrVoid_rval_void)(const RESULTNESTEDARRAYERROR* x0, const void* x1);
 
 
 typedef int64_t (*interoptopus_string_create)(const void*, uint64_t, UTF8STRING*);
@@ -1074,27 +1057,23 @@ typedef USESLICEANDVEC (*pattern_vec_8)(USESLICEANDVEC);
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICEASYNCERROR (*service_async_destroy)(const SERVICEASYNC*);
+typedef RESULTCONSTPTRSERVICEASYNCBASICERROR (*service_async_basic_destroy)(const SERVICEASYNCBASIC*);
 
-typedef RESULTCONSTPTRSERVICEASYNCERROR (*service_async_new)();
+typedef RESULTCONSTPTRSERVICEASYNCBASICERROR (*service_async_basic_new)();
 
-typedef RESULTERROR (*service_async_return_after_ms)(const SERVICEASYNC*, uint64_t, uint64_t, fptr_fn_ConstPtrResultU64Error_ConstPtrVoid_rval_void);
+typedef RESULTERROR (*service_async_basic_call)(const SERVICEASYNCBASIC*, fptr_fn_ConstPtrResultError_ConstPtrVoid_rval_void);
 
-typedef RESULTERROR (*service_async_process_struct)(const SERVICEASYNC*, NESTEDARRAY, fptr_fn_ConstPtrResultNestedArrayError_ConstPtrVoid_rval_void);
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+typedef RESULTCONSTPTRSERVICEASYNCSLEEPERROR (*service_async_sleep_destroy)(const SERVICEASYNCSLEEP*);
 
-typedef RESULTERROR (*service_async_handle_string)(const SERVICEASYNC*, UTF8STRING, fptr_fn_ConstPtrResultUtf8StringError_ConstPtrVoid_rval_void);
+typedef RESULTCONSTPTRSERVICEASYNCSLEEPERROR (*service_async_sleep_new)();
 
-typedef RESULTERROR (*service_async_handle_vec_string)(const SERVICEASYNC*, VECUTF8STRING, fptr_fn_ConstPtrResultVecUtf8StringError_ConstPtrVoid_rval_void);
-
-typedef RESULTERROR (*service_async_handle_nested_string)(const SERVICEASYNC*, UTF8STRING, fptr_fn_ConstPtrResultUseStringError_ConstPtrVoid_rval_void);
-
-typedef void (*service_async_callback_string)(const SERVICEASYNC*, UTF8STRING, STRINGCALLBACK);
-
-typedef RESULTERROR (*service_async_success)(const SERVICEASYNC*, fptr_fn_ConstPtrResultError_ConstPtrVoid_rval_void);
-
-typedef RESULTERROR (*service_async_fail)(const SERVICEASYNC*, fptr_fn_ConstPtrResultError_ConstPtrVoid_rval_void);
-
-typedef void (*service_async_bad)(SERVICEASYNC*);
+typedef RESULTERROR (*service_async_sleep_return_after_ms)(const SERVICEASYNCSLEEP*, uint64_t, uint64_t, fptr_fn_ConstPtrResultU64Error_ConstPtrVoid_rval_void);
 
 ///  Destroys the given instance.
 /// 

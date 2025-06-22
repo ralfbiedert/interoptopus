@@ -26,7 +26,10 @@ pub mod patterns {
     pub mod vec;
 }
 pub mod services {
-    pub mod asynk;
+    pub mod asynk {
+        pub mod basic;
+        pub mod sleep;
+    }
     pub mod basic;
     pub mod callback;
     pub mod dependent;
@@ -184,7 +187,9 @@ pub fn ffi_inventory() -> Inventory {
             .register(extra_type!(types::num::IVec3))
             .register(extra_type!(types::num::TransparentNum))
             // Services
-            .register(pattern!(services::asynk::ServiceAsync))
+            .register(pattern!(services::asynk::basic::ServiceAsyncBasic))
+            .register(pattern!(services::asynk::sleep::ServiceAsyncSleep))
+            // .register(pattern!(services::asynk::ServiceAsync))
             .register(pattern!(services::basic::ServiceBasic))
             .register(pattern!(services::dependent::ServiceMain))
             .register(pattern!(services::dependent::ServiceDependent))
