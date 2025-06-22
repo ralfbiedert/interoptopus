@@ -1192,7 +1192,7 @@ typedef RESULTERROR (*service_async_structs_process_struct)(const SERVICEASYNCST
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICEBASICERROR (*service_basic_destroy)(SERVICEBASIC*);
+typedef RESULTCONSTPTRSERVICEBASICERROR (*service_basic_destroy)(const SERVICEBASIC*);
 
 typedef RESULTCONSTPTRSERVICEBASICERROR (*service_basic_new)();
 
@@ -1202,7 +1202,7 @@ typedef RESULTCONSTPTRSERVICEBASICERROR (*service_basic_new)();
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICEMAINERROR (*service_main_destroy)(SERVICEMAIN*);
+typedef RESULTCONSTPTRSERVICEMAINERROR (*service_main_destroy)(const SERVICEMAIN*);
 
 typedef RESULTCONSTPTRSERVICEMAINERROR (*service_main_new)(uint32_t);
 
@@ -1212,7 +1212,7 @@ typedef RESULTCONSTPTRSERVICEMAINERROR (*service_main_new)(uint32_t);
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICEDEPENDENTERROR (*service_dependent_destroy)(SERVICEDEPENDENT*);
+typedef RESULTCONSTPTRSERVICEDEPENDENTERROR (*service_dependent_destroy)(const SERVICEDEPENDENT*);
 
 typedef RESULTCONSTPTRSERVICEDEPENDENTERROR (*service_dependent_from_main)(const SERVICEMAIN*);
 
@@ -1224,7 +1224,7 @@ typedef uint32_t (*service_dependent_get)(const SERVICEDEPENDENT*);
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICERESULTERROR (*service_result_destroy)(SERVICERESULT*);
+typedef RESULTCONSTPTRSERVICERESULTERROR (*service_result_destroy)(const SERVICERESULT*);
 
 typedef RESULTCONSTPTRSERVICERESULTERROR (*service_result_new)();
 
@@ -1244,7 +1244,7 @@ typedef RESULTU32ERROR (*service_result_result_slice)(const SERVICERESULT*, SLIC
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICEONPANICERROR (*service_on_panic_destroy)(SERVICEONPANIC*);
+typedef RESULTCONSTPTRSERVICEONPANICERROR (*service_on_panic_destroy)(const SERVICEONPANIC*);
 
 typedef RESULTCONSTPTRSERVICEONPANICERROR (*service_on_panic_new)();
 
@@ -1265,7 +1265,7 @@ typedef const char* (*service_on_panic_return_ub_on_panic)(SERVICEONPANIC*);
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICECALLBACKSERROR (*service_callbacks_destroy)(SERVICECALLBACKS*);
+typedef RESULTCONSTPTRSERVICECALLBACKSERROR (*service_callbacks_destroy)(const SERVICECALLBACKS*);
 
 typedef RESULTCONSTPTRSERVICECALLBACKSERROR (*service_callbacks_new)();
 
@@ -1285,7 +1285,7 @@ typedef RESULTERROR (*service_callbacks_invoke_delegates)(const SERVICECALLBACKS
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR (*service_ignoring_methods_destroy)(SERVICEIGNORINGMETHODS*);
+typedef RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR (*service_ignoring_methods_destroy)(const SERVICEIGNORINGMETHODS*);
 
 typedef RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR (*service_ignoring_methods_new)();
 
@@ -1295,7 +1295,7 @@ typedef RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR (*service_ignoring_methods_new
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICEMULTIPLECTORSERROR (*service_multiple_ctors_destroy)(SERVICEMULTIPLECTORS*);
+typedef RESULTCONSTPTRSERVICEMULTIPLECTORSERROR (*service_multiple_ctors_destroy)(const SERVICEMULTIPLECTORS*);
 
 typedef RESULTCONSTPTRSERVICEMULTIPLECTORSERROR (*service_multiple_ctors_new_with)(uint32_t);
 
@@ -1311,7 +1311,7 @@ typedef RESULTCONSTPTRSERVICEMULTIPLECTORSERROR (*service_multiple_ctors_new_fai
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICEVARIOUSSLICESERROR (*service_various_slices_destroy)(SERVICEVARIOUSSLICES*);
+typedef RESULTCONSTPTRSERVICEVARIOUSSLICESERROR (*service_various_slices_destroy)(const SERVICEVARIOUSSLICES*);
 
 typedef RESULTCONSTPTRSERVICEVARIOUSSLICESERROR (*service_various_slices_new)();
 
@@ -1344,7 +1344,7 @@ typedef SLICEMUTU32 (*service_various_slices_return_slice_mut)(SERVICEVARIOUSSLI
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-typedef RESULTCONSTPTRSERVICESTRINGSERROR (*service_strings_destroy)(SERVICESTRINGS*);
+typedef RESULTCONSTPTRSERVICESTRINGSERROR (*service_strings_destroy)(const SERVICESTRINGS*);
 
 typedef RESULTCONSTPTRSERVICESTRINGSERROR (*service_strings_new)();
 

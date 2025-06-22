@@ -338,13 +338,7 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
     let has_async = has_async_methods(impl_block);
 
     let span_service_ty = impl_block.self_ty.span();
-
-    let ptr_type = if has_async {
-        quote_spanned!(span_service_ty => *const #without_lifetimes)
-    } else {
-        quote_spanned!(span_service_ty => *mut #without_lifetimes)
-    };
-
+    let ptr_type = quote_spanned!(span_service_ty => *const #without_lifetimes);
     let ctor_result = quote_spanned! {span_service_ty => <<#without_lifetimes as ::interoptopus::pattern::service::ServiceInfo>::CtorResult as ::interoptopus::pattern::result::ResultAsPtr>::AsPtr };
 
     let object_deconstruction = if has_async {
@@ -353,7 +347,7 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
         }
     } else {
         quote_spanned! { span_service_ty =>
-            unsafe { drop(::std::boxed::Box::from_raw(__context)) };
+            unsafe { drop(::std::boxed::Box::from_raw(__context.cast_mut())) };
         }
     };
 
