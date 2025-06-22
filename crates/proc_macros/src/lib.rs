@@ -7,6 +7,7 @@ extern crate proc_macro; // Apparently needed to be imported like this.
 mod constants;
 mod functions;
 mod macros;
+mod result;
 mod service;
 mod types;
 mod util;
@@ -338,4 +339,12 @@ pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn ffi_service_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
+}
+
+/// TODO
+#[proc_macro_attribute]
+pub fn ffi_result(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let attr = proc_macro2::TokenStream::from(attr);
+    let input = proc_macro2::TokenStream::from(item);
+    result::ffi_result(attr, &input).into()
 }

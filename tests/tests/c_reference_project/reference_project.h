@@ -1238,6 +1238,12 @@ RESULTOPTIONENUMPAYLOADERROR service_result_result_option_enum(const SERVICERESU
 
 RESULTU32ERROR service_result_result_slice(const SERVICERESULT* _CONTEXT, SLICEU32 SLICE, uint64_t I);
 
+RESULTERROR service_result_result_conversion_explicit(const SERVICERESULT* _CONTEXT);
+
+RESULTERROR service_result_result_conversion_into(const SERVICERESULT* _CONTEXT);
+
+RESULTERROR service_result_result_conversion_attribute(const SERVICERESULT* _CONTEXT);
+
 ///  Destroys the given instance.
 /// 
 ///  # Safety

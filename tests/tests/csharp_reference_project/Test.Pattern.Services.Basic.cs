@@ -9,5 +9,4 @@ public class TestPatternServicesBasic
         var service = ServiceBasic.New();
         service.Dispose();
     }
-
 }

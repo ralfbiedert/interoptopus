@@ -1238,6 +1238,12 @@ typedef RESULTOPTIONENUMPAYLOADERROR (*service_result_result_option_enum)(const 
 
 typedef RESULTU32ERROR (*service_result_result_slice)(const SERVICERESULT*, SLICEU32, uint64_t);
 
+typedef RESULTERROR (*service_result_result_conversion_explicit)(const SERVICERESULT*);
+
+typedef RESULTERROR (*service_result_result_conversion_into)(const SERVICERESULT*);
+
+typedef RESULTERROR (*service_result_result_conversion_attribute)(const SERVICERESULT*);
+
 ///  Destroys the given instance.
 /// 
 ///  # Safety
