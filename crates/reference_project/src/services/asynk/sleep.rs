@@ -1,11 +1,11 @@
 use crate::patterns::result::Error;
 use interoptopus::ffi;
-use interoptopus::pattern::asynk::{AsyncRuntime, AsyncThreadLocal};
+use interoptopus::pattern::asynk::{AsyncRuntime, AsyncSelf};
 use interoptopus::pattern::result::{result_to_ffi, result_to_ffi_async};
 use interoptopus::{ffi_service, ffi_type};
 use tokio::runtime::{Builder, Runtime};
 
-type This = AsyncThreadLocal<ServiceAsyncSleep, ()>;
+type This = AsyncSelf<ServiceAsyncSleep>;
 
 #[ffi_type(opaque)]
 pub struct ServiceAsyncSleep {
