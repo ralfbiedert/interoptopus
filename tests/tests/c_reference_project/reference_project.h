@@ -1192,7 +1192,7 @@ RESULTERROR service_async_structs_process_struct(const SERVICEASYNCSTRUCTS* _CON
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-RESULTCONSTPTRSERVICEBASICERROR service_basic_destroy(SERVICEBASIC* _CONTEXT);
+RESULTCONSTPTRSERVICEBASICERROR service_basic_destroy(const SERVICEBASIC* _CONTEXT);
 
 RESULTCONSTPTRSERVICEBASICERROR service_basic_new();
 
@@ -1202,7 +1202,7 @@ RESULTCONSTPTRSERVICEBASICERROR service_basic_new();
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-RESULTCONSTPTRSERVICEMAINERROR service_main_destroy(SERVICEMAIN* _CONTEXT);
+RESULTCONSTPTRSERVICEMAINERROR service_main_destroy(const SERVICEMAIN* _CONTEXT);
 
 RESULTCONSTPTRSERVICEMAINERROR service_main_new(uint32_t X);
 
@@ -1212,7 +1212,7 @@ RESULTCONSTPTRSERVICEMAINERROR service_main_new(uint32_t X);
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-RESULTCONSTPTRSERVICEDEPENDENTERROR service_dependent_destroy(SERVICEDEPENDENT* _CONTEXT);
+RESULTCONSTPTRSERVICEDEPENDENTERROR service_dependent_destroy(const SERVICEDEPENDENT* _CONTEXT);
 
 RESULTCONSTPTRSERVICEDEPENDENTERROR service_dependent_from_main(const SERVICEMAIN* MAIN);
 
@@ -1224,7 +1224,7 @@ uint32_t service_dependent_get(const SERVICEDEPENDENT* _CONTEXT);
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-RESULTCONSTPTRSERVICERESULTERROR service_result_destroy(SERVICERESULT* _CONTEXT);
+RESULTCONSTPTRSERVICERESULTERROR service_result_destroy(const SERVICERESULT* _CONTEXT);
 
 RESULTCONSTPTRSERVICERESULTERROR service_result_new();
 
@@ -1244,7 +1244,7 @@ RESULTU32ERROR service_result_result_slice(const SERVICERESULT* _CONTEXT, SLICEU
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-RESULTCONSTPTRSERVICEONPANICERROR service_on_panic_destroy(SERVICEONPANIC* _CONTEXT);
+RESULTCONSTPTRSERVICEONPANICERROR service_on_panic_destroy(const SERVICEONPANIC* _CONTEXT);
 
 RESULTCONSTPTRSERVICEONPANICERROR service_on_panic_new();
 
@@ -1265,7 +1265,7 @@ const char* service_on_panic_return_ub_on_panic(SERVICEONPANIC* _CONTEXT);
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-RESULTCONSTPTRSERVICECALLBACKSERROR service_callbacks_destroy(SERVICECALLBACKS* _CONTEXT);
+RESULTCONSTPTRSERVICECALLBACKSERROR service_callbacks_destroy(const SERVICECALLBACKS* _CONTEXT);
 
 RESULTCONSTPTRSERVICECALLBACKSERROR service_callbacks_new();
 
@@ -1285,7 +1285,7 @@ RESULTERROR service_callbacks_invoke_delegates(const SERVICECALLBACKS* _CONTEXT)
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR service_ignoring_methods_destroy(SERVICEIGNORINGMETHODS* _CONTEXT);
+RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR service_ignoring_methods_destroy(const SERVICEIGNORINGMETHODS* _CONTEXT);
 
 RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR service_ignoring_methods_new();
 
@@ -1295,7 +1295,7 @@ RESULTCONSTPTRSERVICEIGNORINGMETHODSERROR service_ignoring_methods_new();
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-RESULTCONSTPTRSERVICEMULTIPLECTORSERROR service_multiple_ctors_destroy(SERVICEMULTIPLECTORS* _CONTEXT);
+RESULTCONSTPTRSERVICEMULTIPLECTORSERROR service_multiple_ctors_destroy(const SERVICEMULTIPLECTORS* _CONTEXT);
 
 RESULTCONSTPTRSERVICEMULTIPLECTORSERROR service_multiple_ctors_new_with(uint32_t SOME_VALUE);
 
@@ -1311,7 +1311,7 @@ RESULTCONSTPTRSERVICEMULTIPLECTORSERROR service_multiple_ctors_new_failing(uint8
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-RESULTCONSTPTRSERVICEVARIOUSSLICESERROR service_various_slices_destroy(SERVICEVARIOUSSLICES* _CONTEXT);
+RESULTCONSTPTRSERVICEVARIOUSSLICESERROR service_various_slices_destroy(const SERVICEVARIOUSSLICES* _CONTEXT);
 
 RESULTCONSTPTRSERVICEVARIOUSSLICESERROR service_various_slices_new();
 
@@ -1344,7 +1344,7 @@ SLICEMUTU32 service_various_slices_return_slice_mut(SERVICEVARIOUSSLICES* _CONTE
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-RESULTCONSTPTRSERVICESTRINGSERROR service_strings_destroy(SERVICESTRINGS* _CONTEXT);
+RESULTCONSTPTRSERVICESTRINGSERROR service_strings_destroy(const SERVICESTRINGS* _CONTEXT);
 
 RESULTCONSTPTRSERVICESTRINGSERROR service_strings_new();
 
