@@ -176,9 +176,9 @@ def init_lib(path):
     c_lib.service_result_result_string.argtypes = [ctypes.c_void_p]
     c_lib.service_result_result_option_enum.argtypes = [ctypes.c_void_p]
     c_lib.service_result_result_slice.argtypes = [ctypes.c_void_p, SliceU32, ctypes.c_uint64]
-    c_lib.service_result_result_conversion_explicit.argtypes = [ctypes.c_void_p]
-    c_lib.service_result_result_conversion_into.argtypes = [ctypes.c_void_p]
-    c_lib.service_result_result_conversion_attribute.argtypes = [ctypes.c_void_p]
+    c_lib.service_result_convert_explicit.argtypes = [ctypes.c_void_p]
+    c_lib.service_result_convert_into.argtypes = [ctypes.c_void_p]
+    c_lib.service_result_convert_attr.argtypes = [ctypes.c_void_p]
     c_lib.service_on_panic_destroy.argtypes = [ctypes.c_void_p]
     c_lib.service_on_panic_new.argtypes = []
     c_lib.service_on_panic_return_result.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
@@ -359,9 +359,9 @@ def init_lib(path):
     c_lib.service_result_result_string.restype = ResultUtf8StringError
     c_lib.service_result_result_option_enum.restype = ResultOptionEnumPayloadError
     c_lib.service_result_result_slice.restype = ResultU32Error
-    c_lib.service_result_result_conversion_explicit.restype = ResultError
-    c_lib.service_result_result_conversion_into.restype = ResultError
-    c_lib.service_result_result_conversion_attribute.restype = ResultError
+    c_lib.service_result_convert_explicit.restype = ResultError
+    c_lib.service_result_convert_into.restype = ResultError
+    c_lib.service_result_convert_attr.restype = ResultError
     c_lib.service_on_panic_destroy.restype = ResultConstPtrServiceOnPanicError
     c_lib.service_on_panic_new.restype = ResultConstPtrServiceOnPanicError
     c_lib.service_on_panic_return_result.restype = ResultError
@@ -3313,17 +3313,17 @@ class ServiceResult:
 
         return c_lib.service_result_result_slice(self._ctx, slice, i)
 
-    def result_conversion_explicit(self, ):
+    def convert_explicit(self, ):
         """"""
-        return c_lib.service_result_result_conversion_explicit(self._ctx, )
+        return c_lib.service_result_convert_explicit(self._ctx, )
 
-    def result_conversion_into(self, ):
+    def convert_into(self, ):
         """"""
-        return c_lib.service_result_result_conversion_into(self._ctx, )
+        return c_lib.service_result_convert_into(self._ctx, )
 
-    def result_conversion_attribute(self, ):
+    def convert_attr(self, ):
         """"""
-        return c_lib.service_result_result_conversion_attribute(self._ctx, )
+        return c_lib.service_result_convert_attr(self._ctx, )
 
 
 

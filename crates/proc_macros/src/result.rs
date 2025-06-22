@@ -16,16 +16,26 @@ pub fn ffi_result(attr: TokenStream, input: &TokenStream) -> TokenStream {
     let item = syn::parse2::<ItemFn>(input.clone()).expect("Must be function.");
 
     let sig = item.sig;
-    let body = &item.block;
     let stmts = &item.block.stmts;
+    if attributes.asynk {
+        quote! {
+            #sig {{
+                use ::interoptopus::pattern::result::result_to_ffi_async;
 
-    quote! {
-        #sig {{
-            use ::interoptopus::pattern::result::result_to_ffi;
+                result_to_ffi_async(async || {{
+                    #(#stmts)*
+                }}).await
+            }}
+        }
+    } else {
+        quote! {
+            #sig {{
+                use ::interoptopus::pattern::result::result_to_ffi;
 
-            result_to_ffi(|| {{
-                #(#stmts)*
-            }})
-        }}
+                result_to_ffi(|| {{
+                    #(#stmts)*
+                }})
+            }}
+        }
     }
 }
