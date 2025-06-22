@@ -48,6 +48,8 @@ typedef struct SERVICEASYNCBASIC SERVICEASYNCBASIC;
 
 typedef struct SERVICEASYNCSLEEP SERVICEASYNCSLEEP;
 
+typedef struct SERVICEASYNCVECSTRING SERVICEASYNCVECSTRING;
+
 typedef struct SERVICEBASIC SERVICEBASIC;
 
 ///  Some struct we want to expose as a class.
@@ -497,6 +499,17 @@ typedef enum RESULTCONSTPTRSERVICEASYNCSLEEPERROR
     } RESULTCONSTPTRSERVICEASYNCSLEEPERROR;
 
 /// Result that contains value or an error.
+typedef enum RESULTCONSTPTRSERVICEASYNCVECSTRINGERROR
+    {
+    /// Element if err is `Ok`.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    /// Error value.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTCONSTPTRSERVICEASYNCVECSTRINGERROR_PANIC = 2,
+    RESULTCONSTPTRSERVICEASYNCVECSTRINGERROR_NULL = 3,
+    } RESULTCONSTPTRSERVICEASYNCVECSTRINGERROR;
+
+/// Result that contains value or an error.
 typedef enum RESULTCONSTPTRSERVICEBASICERROR
     {
     /// Element if err is `Ok`.
@@ -628,6 +641,17 @@ typedef enum RESULTUSESTRINGERROR
     RESULTUSESTRINGERROR_NULL = 3,
     } RESULTUSESTRINGERROR;
 
+/// Result that contains value or an error.
+typedef enum RESULTVECUTF8STRINGERROR
+    {
+    /// Element if err is `Ok`.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    /// Error value.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTVECUTF8STRINGERROR_PANIC = 2,
+    RESULTVECUTF8STRINGERROR_NULL = 3,
+    } RESULTVECUTF8STRINGERROR;
+
 typedef uint8_t (*CALLBACKFFISLICE)(SLICEU8 SLICE, const void* CALLBACK_DATA);
 
 typedef void (*CALLBACKSLICEMUT)(SLICEMUTU8 SLICE, const void* CALLBACK_DATA);
@@ -726,6 +750,8 @@ typedef void (*fptr_fn_ConstPtrResultError_ConstPtrVoid_rval_void)(const RESULTE
 
 typedef void (*fptr_fn_ConstPtrResultU64Error_ConstPtrVoid_rval_void)(const RESULTU64ERROR* x0, const void* x1);
 
+typedef void (*fptr_fn_ConstPtrResultUtf8StringError_ConstPtrVoid_rval_void)(const RESULTUTF8STRINGERROR* x0, const void* x1);
+
 ///  Vec marshalling helper.
 ///  A highly dangerous 'use once type' that has ownership semantics!
 ///  Once passed over an FFI boundary 'the other side' is meant to own
@@ -776,6 +802,10 @@ typedef enum RESULTOPTIONENUMPAYLOADERROR
     } RESULTOPTIONENUMPAYLOADERROR;
 
 typedef void (*CALLBACKCHARARRAY2)(CHARARRAY VALUE, const void* CALLBACK_DATA);
+
+typedef void (*fptr_fn_ConstPtrResultUseStringError_ConstPtrVoid_rval_void)(const RESULTUSESTRINGERROR* x0, const void* x1);
+
+typedef void (*fptr_fn_ConstPtrResultVecUtf8StringError_ConstPtrVoid_rval_void)(const RESULTVECUTF8STRINGERROR* x0, const void* x1);
 
 
 int64_t interoptopus_string_create(const void* UTF8, uint64_t LEN, UTF8STRING* RVAL);
@@ -1074,6 +1104,22 @@ RESULTCONSTPTRSERVICEASYNCSLEEPERROR service_async_sleep_destroy(const SERVICEAS
 RESULTCONSTPTRSERVICEASYNCSLEEPERROR service_async_sleep_new();
 
 RESULTERROR service_async_sleep_return_after_ms(const SERVICEASYNCSLEEP* _CONTEXT, uint64_t X, uint64_t MS, fptr_fn_ConstPtrResultU64Error_ConstPtrVoid_rval_void _ASYNC_CALLBACK);
+
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+RESULTCONSTPTRSERVICEASYNCVECSTRINGERROR service_async_vec_string_destroy(const SERVICEASYNCVECSTRING* _CONTEXT);
+
+RESULTCONSTPTRSERVICEASYNCVECSTRINGERROR service_async_vec_string_new();
+
+RESULTERROR service_async_vec_string_handle_string(const SERVICEASYNCVECSTRING* _CONTEXT, UTF8STRING S, fptr_fn_ConstPtrResultUtf8StringError_ConstPtrVoid_rval_void _ASYNC_CALLBACK);
+
+RESULTERROR service_async_vec_string_handle_vec_string(const SERVICEASYNCVECSTRING* _CONTEXT, VECUTF8STRING S, fptr_fn_ConstPtrResultVecUtf8StringError_ConstPtrVoid_rval_void _ASYNC_CALLBACK);
+
+RESULTERROR service_async_vec_string_handle_nested_string(const SERVICEASYNCVECSTRING* _CONTEXT, UTF8STRING S, fptr_fn_ConstPtrResultUseStringError_ConstPtrVoid_rval_void _ASYNC_CALLBACK);
 
 ///  Destroys the given instance.
 /// 
