@@ -29,6 +29,7 @@ pub mod services {
     pub mod asynk {
         pub mod basic;
         pub mod sleep;
+        pub mod vecstring;
     }
     pub mod basic;
     pub mod callback;
@@ -189,7 +190,7 @@ pub fn ffi_inventory() -> Inventory {
             // Services
             .register(pattern!(services::asynk::basic::ServiceAsyncBasic))
             .register(pattern!(services::asynk::sleep::ServiceAsyncSleep))
-            // .register(pattern!(services::asynk::ServiceAsync))
+            .register(pattern!(services::asynk::vecstring::ServiceAsyncVecString))
             .register(pattern!(services::basic::ServiceBasic))
             .register(pattern!(services::dependent::ServiceMain))
             .register(pattern!(services::dependent::ServiceDependent))

@@ -150,6 +150,11 @@ def init_lib(path):
     c_lib.service_async_sleep_destroy.argtypes = [ctypes.c_void_p]
     c_lib.service_async_sleep_new.argtypes = []
     c_lib.service_async_sleep_return_after_ms.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint64, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultU64Error), ctypes.c_void_p)]
+    c_lib.service_async_vec_string_destroy.argtypes = [ctypes.c_void_p]
+    c_lib.service_async_vec_string_new.argtypes = []
+    c_lib.service_async_vec_string_handle_string.argtypes = [ctypes.c_void_p, Utf8String, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultUtf8StringError), ctypes.c_void_p)]
+    c_lib.service_async_vec_string_handle_vec_string.argtypes = [ctypes.c_void_p, VecUtf8String, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultVecUtf8StringError), ctypes.c_void_p)]
+    c_lib.service_async_vec_string_handle_nested_string.argtypes = [ctypes.c_void_p, Utf8String, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultUseStringError), ctypes.c_void_p)]
     c_lib.service_basic_destroy.argtypes = [ctypes.c_void_p]
     c_lib.service_basic_new.argtypes = []
     c_lib.service_main_destroy.argtypes = [ctypes.c_void_p]
@@ -318,6 +323,11 @@ def init_lib(path):
     c_lib.service_async_sleep_destroy.restype = ResultConstPtrServiceAsyncSleepError
     c_lib.service_async_sleep_new.restype = ResultConstPtrServiceAsyncSleepError
     c_lib.service_async_sleep_return_after_ms.restype = ResultError
+    c_lib.service_async_vec_string_destroy.restype = ResultConstPtrServiceAsyncVecStringError
+    c_lib.service_async_vec_string_new.restype = ResultConstPtrServiceAsyncVecStringError
+    c_lib.service_async_vec_string_handle_string.restype = ResultError
+    c_lib.service_async_vec_string_handle_vec_string.restype = ResultError
+    c_lib.service_async_vec_string_handle_nested_string.restype = ResultError
     c_lib.service_basic_destroy.restype = ResultConstPtrServiceBasicError
     c_lib.service_basic_new.restype = ResultConstPtrServiceBasicError
     c_lib.service_main_destroy.restype = ResultConstPtrServiceMainError
@@ -2471,6 +2481,16 @@ class ResultConstPtrServiceAsyncSleepError:
     Null = 3
 
 
+class ResultConstPtrServiceAsyncVecStringError:
+    """Result that contains value or an error."""
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
+
+
 class ResultConstPtrServiceBasicError:
     """Result that contains value or an error."""
     # Element if err is `Ok`.
@@ -2582,6 +2602,16 @@ class ResultOptionUtf8StringError:
 
 
 class ResultUseStringError:
+    """Result that contains value or an error."""
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
+
+
+class ResultVecUtf8StringError:
     """Result that contains value or an error."""
     # Element if err is `Ok`.
 # TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
@@ -3027,6 +3057,40 @@ class ServiceAsyncSleep:
     def return_after_ms(self, x: int, ms: int, _async_callback):
         """"""
         return c_lib.service_async_sleep_return_after_ms(self._ctx, x, ms, _async_callback)
+
+
+
+class ServiceAsyncVecString:
+    __api_lock = object()
+
+    def __init__(self, api_lock, ctx):
+        assert(api_lock == ServiceAsyncVecString.__api_lock), "You must create this with a static constructor." 
+        self._ctx = ctx
+
+    @property
+    def _as_parameter_(self):
+        return self._ctx
+
+    @staticmethod
+    def new() -> ServiceAsyncVecString:
+        """"""
+        ctx = c_lib.service_async_vec_string_new().t
+        self = ServiceAsyncVecString(ServiceAsyncVecString.__api_lock, ctx)
+        return self
+
+    def __del__(self):
+        c_lib.service_async_vec_string_destroy(self._ctx, )
+    def handle_string(self, s, _async_callback):
+        """"""
+        return c_lib.service_async_vec_string_handle_string(self._ctx, s, _async_callback)
+
+    def handle_vec_string(self, s, _async_callback):
+        """"""
+        return c_lib.service_async_vec_string_handle_vec_string(self._ctx, s, _async_callback)
+
+    def handle_nested_string(self, s, _async_callback):
+        """"""
+        return c_lib.service_async_vec_string_handle_nested_string(self._ctx, s, _async_callback)
 
 
 
