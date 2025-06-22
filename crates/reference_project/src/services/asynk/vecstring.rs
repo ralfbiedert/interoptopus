@@ -1,12 +1,12 @@
 use crate::patterns::result::Error;
 use crate::types::string::UseString;
 use interoptopus::ffi;
-use interoptopus::pattern::asynk::{AsyncRuntime, AsyncThreadLocal};
+use interoptopus::pattern::asynk::{AsyncRuntime, AsyncSelf};
 use interoptopus::pattern::result::result_to_ffi;
 use interoptopus::{ffi_service, ffi_type};
 use tokio::runtime::{Builder, Runtime};
 
-type This = AsyncThreadLocal<ServiceAsyncVecString, ()>;
+type This = AsyncSelf<ServiceAsyncVecString>;
 
 #[ffi_type(opaque)]
 pub struct ServiceAsyncVecString {
