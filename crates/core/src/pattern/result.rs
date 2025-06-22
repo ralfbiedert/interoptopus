@@ -34,7 +34,7 @@ use crate::lang::{TypeInfo, VariantKind};
 use crate::pattern::TypePattern;
 use std::any::Any;
 use std::fmt::Debug;
-use std::panic::{AssertUnwindSafe, catch_unwind};
+use std::panic::{catch_unwind, AssertUnwindSafe};
 
 /// Extracts a string message from a panic unwind.
 pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
@@ -153,7 +153,6 @@ impl<T, E> IntoFFIResult for Result<T, E> {
     type FFIResult = Self;
 }
 
-///
 /// At some point we want to get rid of these once `Try` ([try_trait_v2](https://github.com/rust-lang/rust/issues/84277)) stabilizes.
 pub fn result_to_ffi<T: TypeInfo, E: TypeInfo>(f: impl FnOnce() -> std::result::Result<T, E>) -> Result<T, E> {
     f().into()
@@ -201,10 +200,20 @@ impl ResultType {
     }
 }
 
+/// Internal helper trait converting `Result<T, E>` into `Result<*const T, E>`.
+///
+/// This type is mainly used from our proc macros that need to name the related
+/// type, without having access to reflection.
+#[doc(hidden)]
 pub trait ResultAsPtr {
     type AsPtr;
 }
 
+/// Internal helper trait converting `Result<T, E>` into `Result<(), E>`.
+///
+/// This type is mainly used from our proc macros that need to name the related
+/// type, without having access to reflection.
+#[doc(hidden)]
 pub trait ResultAsUnitT {
     type AsUnitT;
 }

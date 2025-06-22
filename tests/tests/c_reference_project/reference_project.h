@@ -44,7 +44,9 @@ typedef struct GENERIC3 GENERIC3;
 
 typedef struct GENERIC4 GENERIC4;
 
-typedef struct SERVICEASYNC SERVICEASYNC;
+typedef struct SERVICEASYNCBASIC SERVICEASYNCBASIC;
+
+typedef struct SERVICEASYNCSLEEP SERVICEASYNCSLEEP;
 
 typedef struct SERVICEBASIC SERVICEBASIC;
 
@@ -473,15 +475,26 @@ typedef enum OPTIONVEC
     } OPTIONVEC;
 
 /// Result that contains value or an error.
-typedef enum RESULTCONSTPTRSERVICEASYNCERROR
+typedef enum RESULTCONSTPTRSERVICEASYNCBASICERROR
     {
     /// Element if err is `Ok`.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
     /// Error value.
     // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTCONSTPTRSERVICEASYNCERROR_PANIC = 2,
-    RESULTCONSTPTRSERVICEASYNCERROR_NULL = 3,
-    } RESULTCONSTPTRSERVICEASYNCERROR;
+    RESULTCONSTPTRSERVICEASYNCBASICERROR_PANIC = 2,
+    RESULTCONSTPTRSERVICEASYNCBASICERROR_NULL = 3,
+    } RESULTCONSTPTRSERVICEASYNCBASICERROR;
+
+/// Result that contains value or an error.
+typedef enum RESULTCONSTPTRSERVICEASYNCSLEEPERROR
+    {
+    /// Element if err is `Ok`.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    /// Error value.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTCONSTPTRSERVICEASYNCSLEEPERROR_PANIC = 2,
+    RESULTCONSTPTRSERVICEASYNCSLEEPERROR_NULL = 3,
+    } RESULTCONSTPTRSERVICEASYNCSLEEPERROR;
 
 /// Result that contains value or an error.
 typedef enum RESULTCONSTPTRSERVICEBASICERROR
@@ -615,17 +628,6 @@ typedef enum RESULTUSESTRINGERROR
     RESULTUSESTRINGERROR_NULL = 3,
     } RESULTUSESTRINGERROR;
 
-/// Result that contains value or an error.
-typedef enum RESULTVECUTF8STRINGERROR
-    {
-    /// Element if err is `Ok`.
-    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    /// Error value.
-    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTVECUTF8STRINGERROR_PANIC = 2,
-    RESULTVECUTF8STRINGERROR_NULL = 3,
-    } RESULTVECUTF8STRINGERROR;
-
 typedef uint8_t (*CALLBACKFFISLICE)(SLICEU8 SLICE, const void* CALLBACK_DATA);
 
 typedef void (*CALLBACKSLICEMUT)(SLICEMUTU8 SLICE, const void* CALLBACK_DATA);
@@ -724,8 +726,6 @@ typedef void (*fptr_fn_ConstPtrResultError_ConstPtrVoid_rval_void)(const RESULTE
 
 typedef void (*fptr_fn_ConstPtrResultU64Error_ConstPtrVoid_rval_void)(const RESULTU64ERROR* x0, const void* x1);
 
-typedef void (*fptr_fn_ConstPtrResultUtf8StringError_ConstPtrVoid_rval_void)(const RESULTUTF8STRINGERROR* x0, const void* x1);
-
 ///  Vec marshalling helper.
 ///  A highly dangerous 'use once type' that has ownership semantics!
 ///  Once passed over an FFI boundary 'the other side' is meant to own
@@ -765,17 +765,6 @@ typedef enum OPTIONOPTIONRESULTOPTIONUTF8STRINGERROR
     } OPTIONOPTIONRESULTOPTIONUTF8STRINGERROR;
 
 /// Result that contains value or an error.
-typedef enum RESULTNESTEDARRAYERROR
-    {
-    /// Element if err is `Ok`.
-    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    /// Error value.
-    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
-    RESULTNESTEDARRAYERROR_PANIC = 2,
-    RESULTNESTEDARRAYERROR_NULL = 3,
-    } RESULTNESTEDARRAYERROR;
-
-/// Result that contains value or an error.
 typedef enum RESULTOPTIONENUMPAYLOADERROR
     {
     /// Element if err is `Ok`.
@@ -787,12 +776,6 @@ typedef enum RESULTOPTIONENUMPAYLOADERROR
     } RESULTOPTIONENUMPAYLOADERROR;
 
 typedef void (*CALLBACKCHARARRAY2)(CHARARRAY VALUE, const void* CALLBACK_DATA);
-
-typedef void (*fptr_fn_ConstPtrResultUseStringError_ConstPtrVoid_rval_void)(const RESULTUSESTRINGERROR* x0, const void* x1);
-
-typedef void (*fptr_fn_ConstPtrResultVecUtf8StringError_ConstPtrVoid_rval_void)(const RESULTVECUTF8STRINGERROR* x0, const void* x1);
-
-typedef void (*fptr_fn_ConstPtrResultNestedArrayError_ConstPtrVoid_rval_void)(const RESULTNESTEDARRAYERROR* x0, const void* x1);
 
 
 int64_t interoptopus_string_create(const void* UTF8, uint64_t LEN, UTF8STRING* RVAL);
@@ -1074,27 +1057,23 @@ USESLICEANDVEC pattern_vec_8(USESLICEANDVEC V);
 /// 
 ///  The passed parameter MUST have been created with the corresponding init function;
 ///  passing any other value results in undefined behavior.
-RESULTCONSTPTRSERVICEASYNCERROR service_async_destroy(const SERVICEASYNC* _CONTEXT);
+RESULTCONSTPTRSERVICEASYNCBASICERROR service_async_basic_destroy(const SERVICEASYNCBASIC* _CONTEXT);
 
-RESULTCONSTPTRSERVICEASYNCERROR service_async_new();
+RESULTCONSTPTRSERVICEASYNCBASICERROR service_async_basic_new();
 
-RESULTERROR service_async_return_after_ms(const SERVICEASYNC* _CONTEXT, uint64_t X, uint64_t MS, fptr_fn_ConstPtrResultU64Error_ConstPtrVoid_rval_void _ASYNC_CALLBACK);
+RESULTERROR service_async_basic_call(const SERVICEASYNCBASIC* _CONTEXT, fptr_fn_ConstPtrResultError_ConstPtrVoid_rval_void _ASYNC_CALLBACK);
 
-RESULTERROR service_async_process_struct(const SERVICEASYNC* _CONTEXT, NESTEDARRAY X, fptr_fn_ConstPtrResultNestedArrayError_ConstPtrVoid_rval_void _ASYNC_CALLBACK);
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+RESULTCONSTPTRSERVICEASYNCSLEEPERROR service_async_sleep_destroy(const SERVICEASYNCSLEEP* _CONTEXT);
 
-RESULTERROR service_async_handle_string(const SERVICEASYNC* _CONTEXT, UTF8STRING S, fptr_fn_ConstPtrResultUtf8StringError_ConstPtrVoid_rval_void _ASYNC_CALLBACK);
+RESULTCONSTPTRSERVICEASYNCSLEEPERROR service_async_sleep_new();
 
-RESULTERROR service_async_handle_vec_string(const SERVICEASYNC* _CONTEXT, VECUTF8STRING S, fptr_fn_ConstPtrResultVecUtf8StringError_ConstPtrVoid_rval_void _ASYNC_CALLBACK);
-
-RESULTERROR service_async_handle_nested_string(const SERVICEASYNC* _CONTEXT, UTF8STRING S, fptr_fn_ConstPtrResultUseStringError_ConstPtrVoid_rval_void _ASYNC_CALLBACK);
-
-void service_async_callback_string(const SERVICEASYNC* _CONTEXT, UTF8STRING S, STRINGCALLBACK CB);
-
-RESULTERROR service_async_success(const SERVICEASYNC* _CONTEXT, fptr_fn_ConstPtrResultError_ConstPtrVoid_rval_void _ASYNC_CALLBACK);
-
-RESULTERROR service_async_fail(const SERVICEASYNC* _CONTEXT, fptr_fn_ConstPtrResultError_ConstPtrVoid_rval_void _ASYNC_CALLBACK);
-
-void service_async_bad(SERVICEASYNC* _CONTEXT);
+RESULTERROR service_async_sleep_return_after_ms(const SERVICEASYNCSLEEP* _CONTEXT, uint64_t X, uint64_t MS, fptr_fn_ConstPtrResultU64Error_ConstPtrVoid_rval_void _ASYNC_CALLBACK);
 
 ///  Destroys the given instance.
 /// 
