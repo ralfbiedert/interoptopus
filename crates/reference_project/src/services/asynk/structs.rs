@@ -1,20 +1,20 @@
 use crate::patterns::result::Error;
-use crate::types::string::UseString;
+use crate::types::arrays::NestedArray;
 use interoptopus::ffi;
 use interoptopus::pattern::asynk::{AsyncRuntime, AsyncSelf};
 use interoptopus::pattern::result::result_to_ffi;
 use interoptopus::{ffi_service, ffi_type};
 use tokio::runtime::{Builder, Runtime};
 
-type This = AsyncSelf<ServiceAsyncVecString>;
+type This = AsyncSelf<ServiceAsyncStructs>;
 
 #[ffi_type(opaque)]
-pub struct ServiceAsyncVecString {
+pub struct ServiceAsyncStructs {
     runtime: Runtime,
 }
 
 #[ffi_service]
-impl ServiceAsyncVecString {
+impl ServiceAsyncStructs {
     pub fn new() -> ffi::Result<Self, Error> {
         result_to_ffi(|| {
             let runtime = Builder::new_multi_thread().build().map_err(|_| Error::Fail)?;
@@ -22,20 +22,13 @@ impl ServiceAsyncVecString {
         })
     }
 
-    pub async fn handle_string(_this: This, s: ffi::String) -> ffi::Result<ffi::String, Error> {
-        ffi::Result::Ok(s)
-    }
-
-    pub async fn handle_vec_string(_this: This, s: ffi::Vec<ffi::String>) -> ffi::Result<ffi::Vec<ffi::String>, Error> {
-        ffi::Result::Ok(s)
-    }
-
-    pub async fn handle_nested_string(_this: This, s: ffi::String) -> ffi::Result<UseString, Error> {
-        ffi::Result::Ok(UseString { s1: s.clone(), s2: s.clone() })
+    pub async fn process_struct(_this: This, mut x: NestedArray) -> ffi::Result<NestedArray, Error> {
+        x.field_int += 1;
+        ffi::Result::Ok(x)
     }
 }
 
-impl AsyncRuntime for ServiceAsyncVecString {
+impl AsyncRuntime for ServiceAsyncStructs {
     fn spawn<Fn, F>(&self, f: Fn)
     where
         Fn: FnOnce(()) -> F,

@@ -155,6 +155,13 @@ def init_lib(path):
     c_lib.service_async_vec_string_handle_string.argtypes = [ctypes.c_void_p, Utf8String, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultUtf8StringError), ctypes.c_void_p)]
     c_lib.service_async_vec_string_handle_vec_string.argtypes = [ctypes.c_void_p, VecUtf8String, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultVecUtf8StringError), ctypes.c_void_p)]
     c_lib.service_async_vec_string_handle_nested_string.argtypes = [ctypes.c_void_p, Utf8String, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultUseStringError), ctypes.c_void_p)]
+    c_lib.service_async_result_destroy.argtypes = [ctypes.c_void_p]
+    c_lib.service_async_result_new.argtypes = []
+    c_lib.service_async_result_success.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultError), ctypes.c_void_p)]
+    c_lib.service_async_result_fail.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultError), ctypes.c_void_p)]
+    c_lib.service_async_structs_destroy.argtypes = [ctypes.c_void_p]
+    c_lib.service_async_structs_new.argtypes = []
+    c_lib.service_async_structs_process_struct.argtypes = [ctypes.c_void_p, NestedArray, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultNestedArrayError), ctypes.c_void_p)]
     c_lib.service_basic_destroy.argtypes = [ctypes.c_void_p]
     c_lib.service_basic_new.argtypes = []
     c_lib.service_main_destroy.argtypes = [ctypes.c_void_p]
@@ -328,6 +335,13 @@ def init_lib(path):
     c_lib.service_async_vec_string_handle_string.restype = ResultError
     c_lib.service_async_vec_string_handle_vec_string.restype = ResultError
     c_lib.service_async_vec_string_handle_nested_string.restype = ResultError
+    c_lib.service_async_result_destroy.restype = ResultConstPtrServiceAsyncResultError
+    c_lib.service_async_result_new.restype = ResultConstPtrServiceAsyncResultError
+    c_lib.service_async_result_success.restype = ResultError
+    c_lib.service_async_result_fail.restype = ResultError
+    c_lib.service_async_structs_destroy.restype = ResultConstPtrServiceAsyncStructsError
+    c_lib.service_async_structs_new.restype = ResultConstPtrServiceAsyncStructsError
+    c_lib.service_async_structs_process_struct.restype = ResultError
     c_lib.service_basic_destroy.restype = ResultConstPtrServiceBasicError
     c_lib.service_basic_new.restype = ResultConstPtrServiceBasicError
     c_lib.service_main_destroy.restype = ResultConstPtrServiceMainError
@@ -2471,7 +2485,27 @@ class ResultConstPtrServiceAsyncBasicError:
     Null = 3
 
 
+class ResultConstPtrServiceAsyncResultError:
+    """Result that contains value or an error."""
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
+
+
 class ResultConstPtrServiceAsyncSleepError:
+    """Result that contains value or an error."""
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
+
+
+class ResultConstPtrServiceAsyncStructsError:
     """Result that contains value or an error."""
     # Element if err is `Ok`.
 # TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
@@ -2975,6 +3009,16 @@ class OptionOptionResultOptionUtf8StringError:
     None = 1
 
 
+class ResultNestedArrayError:
+    """Result that contains value or an error."""
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
+
+
 class ResultOptionEnumPayloadError:
     """Result that contains value or an error."""
     # Element if err is `Ok`.
@@ -3091,6 +3135,62 @@ class ServiceAsyncVecString:
     def handle_nested_string(self, s, _async_callback):
         """"""
         return c_lib.service_async_vec_string_handle_nested_string(self._ctx, s, _async_callback)
+
+
+
+class ServiceAsyncResult:
+    __api_lock = object()
+
+    def __init__(self, api_lock, ctx):
+        assert(api_lock == ServiceAsyncResult.__api_lock), "You must create this with a static constructor." 
+        self._ctx = ctx
+
+    @property
+    def _as_parameter_(self):
+        return self._ctx
+
+    @staticmethod
+    def new() -> ServiceAsyncResult:
+        """"""
+        ctx = c_lib.service_async_result_new().t
+        self = ServiceAsyncResult(ServiceAsyncResult.__api_lock, ctx)
+        return self
+
+    def __del__(self):
+        c_lib.service_async_result_destroy(self._ctx, )
+    def success(self, _async_callback):
+        """"""
+        return c_lib.service_async_result_success(self._ctx, _async_callback)
+
+    def fail(self, _async_callback):
+        """"""
+        return c_lib.service_async_result_fail(self._ctx, _async_callback)
+
+
+
+class ServiceAsyncStructs:
+    __api_lock = object()
+
+    def __init__(self, api_lock, ctx):
+        assert(api_lock == ServiceAsyncStructs.__api_lock), "You must create this with a static constructor." 
+        self._ctx = ctx
+
+    @property
+    def _as_parameter_(self):
+        return self._ctx
+
+    @staticmethod
+    def new() -> ServiceAsyncStructs:
+        """"""
+        ctx = c_lib.service_async_structs_new().t
+        self = ServiceAsyncStructs(ServiceAsyncStructs.__api_lock, ctx)
+        return self
+
+    def __del__(self):
+        c_lib.service_async_structs_destroy(self._ctx, )
+    def process_struct(self, x: NestedArray, _async_callback):
+        """"""
+        return c_lib.service_async_structs_process_struct(self._ctx, x, _async_callback)
 
 
 
