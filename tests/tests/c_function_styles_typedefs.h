@@ -46,7 +46,11 @@ typedef struct GENERIC4 GENERIC4;
 
 typedef struct SERVICEASYNCBASIC SERVICEASYNCBASIC;
 
+typedef struct SERVICEASYNCRESULT SERVICEASYNCRESULT;
+
 typedef struct SERVICEASYNCSLEEP SERVICEASYNCSLEEP;
+
+typedef struct SERVICEASYNCSTRUCTS SERVICEASYNCSTRUCTS;
 
 typedef struct SERVICEASYNCVECSTRING SERVICEASYNCVECSTRING;
 
@@ -488,6 +492,17 @@ typedef enum RESULTCONSTPTRSERVICEASYNCBASICERROR
     } RESULTCONSTPTRSERVICEASYNCBASICERROR;
 
 /// Result that contains value or an error.
+typedef enum RESULTCONSTPTRSERVICEASYNCRESULTERROR
+    {
+    /// Element if err is `Ok`.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    /// Error value.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTCONSTPTRSERVICEASYNCRESULTERROR_PANIC = 2,
+    RESULTCONSTPTRSERVICEASYNCRESULTERROR_NULL = 3,
+    } RESULTCONSTPTRSERVICEASYNCRESULTERROR;
+
+/// Result that contains value or an error.
 typedef enum RESULTCONSTPTRSERVICEASYNCSLEEPERROR
     {
     /// Element if err is `Ok`.
@@ -497,6 +512,17 @@ typedef enum RESULTCONSTPTRSERVICEASYNCSLEEPERROR
     RESULTCONSTPTRSERVICEASYNCSLEEPERROR_PANIC = 2,
     RESULTCONSTPTRSERVICEASYNCSLEEPERROR_NULL = 3,
     } RESULTCONSTPTRSERVICEASYNCSLEEPERROR;
+
+/// Result that contains value or an error.
+typedef enum RESULTCONSTPTRSERVICEASYNCSTRUCTSERROR
+    {
+    /// Element if err is `Ok`.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    /// Error value.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTCONSTPTRSERVICEASYNCSTRUCTSERROR_PANIC = 2,
+    RESULTCONSTPTRSERVICEASYNCSTRUCTSERROR_NULL = 3,
+    } RESULTCONSTPTRSERVICEASYNCSTRUCTSERROR;
 
 /// Result that contains value or an error.
 typedef enum RESULTCONSTPTRSERVICEASYNCVECSTRINGERROR
@@ -791,6 +817,17 @@ typedef enum OPTIONOPTIONRESULTOPTIONUTF8STRINGERROR
     } OPTIONOPTIONRESULTOPTIONUTF8STRINGERROR;
 
 /// Result that contains value or an error.
+typedef enum RESULTNESTEDARRAYERROR
+    {
+    /// Element if err is `Ok`.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    /// Error value.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTNESTEDARRAYERROR_PANIC = 2,
+    RESULTNESTEDARRAYERROR_NULL = 3,
+    } RESULTNESTEDARRAYERROR;
+
+/// Result that contains value or an error.
 typedef enum RESULTOPTIONENUMPAYLOADERROR
     {
     /// Element if err is `Ok`.
@@ -806,6 +843,8 @@ typedef void (*CALLBACKCHARARRAY2)(CHARARRAY VALUE, const void* CALLBACK_DATA);
 typedef void (*fptr_fn_ConstPtrResultUseStringError_ConstPtrVoid_rval_void)(const RESULTUSESTRINGERROR* x0, const void* x1);
 
 typedef void (*fptr_fn_ConstPtrResultVecUtf8StringError_ConstPtrVoid_rval_void)(const RESULTVECUTF8STRINGERROR* x0, const void* x1);
+
+typedef void (*fptr_fn_ConstPtrResultNestedArrayError_ConstPtrVoid_rval_void)(const RESULTNESTEDARRAYERROR* x0, const void* x1);
 
 
 typedef int64_t (*interoptopus_string_create)(const void*, uint64_t, UTF8STRING*);
@@ -1120,6 +1159,32 @@ typedef RESULTERROR (*service_async_vec_string_handle_string)(const SERVICEASYNC
 typedef RESULTERROR (*service_async_vec_string_handle_vec_string)(const SERVICEASYNCVECSTRING*, VECUTF8STRING, fptr_fn_ConstPtrResultVecUtf8StringError_ConstPtrVoid_rval_void);
 
 typedef RESULTERROR (*service_async_vec_string_handle_nested_string)(const SERVICEASYNCVECSTRING*, UTF8STRING, fptr_fn_ConstPtrResultUseStringError_ConstPtrVoid_rval_void);
+
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+typedef RESULTCONSTPTRSERVICEASYNCRESULTERROR (*service_async_result_destroy)(const SERVICEASYNCRESULT*);
+
+typedef RESULTCONSTPTRSERVICEASYNCRESULTERROR (*service_async_result_new)();
+
+typedef RESULTERROR (*service_async_result_success)(const SERVICEASYNCRESULT*, fptr_fn_ConstPtrResultError_ConstPtrVoid_rval_void);
+
+typedef RESULTERROR (*service_async_result_fail)(const SERVICEASYNCRESULT*, fptr_fn_ConstPtrResultError_ConstPtrVoid_rval_void);
+
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+typedef RESULTCONSTPTRSERVICEASYNCSTRUCTSERROR (*service_async_structs_destroy)(const SERVICEASYNCSTRUCTS*);
+
+typedef RESULTCONSTPTRSERVICEASYNCSTRUCTSERROR (*service_async_structs_new)();
+
+typedef RESULTERROR (*service_async_structs_process_struct)(const SERVICEASYNCSTRUCTS*, NESTEDARRAY, fptr_fn_ConstPtrResultNestedArrayError_ConstPtrVoid_rval_void);
 
 ///  Destroys the given instance.
 /// 

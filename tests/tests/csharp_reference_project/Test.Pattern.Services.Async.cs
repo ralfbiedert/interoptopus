@@ -12,42 +12,6 @@
 //
 //
 //     [Fact]
-//     public async void HandleString()
-//     {
-//         var s = ServiceAsync.New();
-//         var r = await s.HandleString("abc".Utf8());
-//         s.Dispose();
-//         Assert.Equal(r.IntoString(), "abc");
-//     }
-//
-//     [Fact]
-//     public async void HandleVecString()
-//     {
-//         var s = ServiceAsync.New();
-//         var v = new[]
-//         {
-//             "abc".Utf8()
-//         }.IntoVec();
-//
-//         var r = await s.HandleVecString(v);
-//         s.Dispose();
-//         Assert.Equal(r[0].IntoString(), "abc");
-//     }
-//
-//
-//     [Fact]
-//     public async void HandleNestedString()
-//     {
-//         var s = ServiceAsync.New();
-//         var r = await s.HandleNestedString("abc".Utf8());
-//         s.Dispose();
-//         Assert.Equal(r.s1.IntoString(), "abc");
-//         Assert.Equal(r.s2.IntoString(), "abc");
-//     }
-//
-//
-//
-//     [Fact]
 //     public async void ProcessStruct()
 //     {
 //         var s = ServiceAsync.New();
@@ -66,20 +30,4 @@
 //         Assert.Equal(r.field_int, 124);
 //     }
 //
-//     [Fact]
-//     public async void Fail()
-//     {
-//         var exceptionThrown = false;
-//         var s = ServiceAsync.New();
-//
-//         try { await s.Fail(); }
-//         catch (Exception e)
-//         {
-//             exceptionThrown = true;
-//             Assert.IsType<InteropException>(e);
-//         }
-//         s.Dispose();
-//
-//         Assert.True(exceptionThrown);
-//     }
 // }
