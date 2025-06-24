@@ -1,5 +1,6 @@
+use std::iter::RepeatWith;
 use crate::service::Attributes;
-use crate::util::{extract_doc_lines, purge_lifetimes_from_type};
+use crate::util::{extract_doc_lines, purge_lifetimes_from_type, ReplaceSelf};
 use darling::FromMeta;
 use proc_macro2::{Ident, TokenStream};
 use quote::quote_spanned;
@@ -165,6 +166,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 Pat::Ident(x) => {
                     let ty = &pat.ty;
                     let ident = &x.ident;
+                    let rewrite = ReplaceSelf::new()
                     arg_types.push(quote_spanned!(span_arg=> #ty));
 
                     // If this is the first parameter and we have `async`, the method must have

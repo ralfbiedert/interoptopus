@@ -1,35 +1,42 @@
-use darling::ToTokens;
-use proc_macro::TokenStream;
-use syn::__private::TokenStream2;
 use syn::punctuated::Punctuated;
-use syn::{Attribute, Expr, File, GenericArgument, ItemImpl, Lit, Meta, PathArguments, Type, TypePath, parse_macro_input};
+use syn::visit_mut::{visit_type_path_mut, VisitMut};
+use syn::{GenericArgument, ItemImpl, PathArguments, Type, TypePath};
 
-/// From a let of attributes to an item, extracts the ones that are documentation, as strings.
-pub fn extract_doc_lines(attributes: &[Attribute]) -> Vec<String> {
-    let mut docs = Vec::new();
+// let mut ty: syn::Type = /* your type, e.g., parsed from arg */;
+// let service_type: syn::Type = /* your concrete type */;
+// ReplaceSelf { replacement: &service_type }.visit_type_mut(&mut ty);
 
-    for attr in attributes {
-        if &attr.path().to_token_stream().to_string() != "doc" {
-            continue;
-        }
+pub struct ReplaceSelf {
+    replacement: Type,
+}
 
-        if let Meta::NameValue(x) = &attr.meta {
-            match &x.value {
-                Expr::Lit(x) => match &x.lit {
-                    Lit::Str(x) => {
-                        docs.push(x.value());
-                    }
-                    _ => panic!("Unexpected content in doc string: not a string."),
-                },
-                _ => panic!("Unexpected content in doc string: not a literal."),
+impl ReplaceSelf {
+    pub fn new(replacement: Type) -> Self {
+        Self { replacement }
+    }
+}
+
+impl VisitMut for ReplaceSelf {
+    fn visit_type_path_mut(&mut self, path: &mut TypePath) {
+        if path.qself.is_none() && path.path.segments.len() == 1 && path.path.segments[0].ident == "Self" {
+            match self.replacement.clone() {
+                Type::Path(tp) => *path = tp,
+                other => {
+                    // Create a simple path with a single segment for other types
+                    let mut segments = Punctuated::new();
+                    segments.push(syn::PathSegment { ident: syn::Ident::new("Type", proc_macro2::Span::call_site()), arguments: syn::PathArguments::None });
+                    *path = syn::TypePath { qself: None, path: syn::Path { leading_colon: None, segments } };
+                }
             }
+        } else {
+            visit_type_path_mut(self, path);
         }
     }
-
-    docs
 }
 
 /// Ugly, incomplete function to purge `'a` from a `Generic<'a, T>`.
+///
+/// TODO, should this be done by visitor as well?
 pub fn purge_lifetimes_from_type(the_type: &Type) -> Type {
     let mut rval = the_type.clone();
 
@@ -89,35 +96,4 @@ pub fn get_type_name(impl_block: &ItemImpl) -> Option<String> {
         }
         _ => None, // Handle other types accordingly
     }
-}
-
-pub fn pascal_to_snake_case(s: &str) -> String {
-    let mut result = String::new();
-    let chars: Vec<char> = s.chars().collect();
-    let len = chars.len();
-
-    for (i, &c) in chars.iter().enumerate() {
-        if c.is_uppercase() {
-            if i > 0 {
-                let prev = chars[i - 1];
-                let next = if i + 1 < len { chars[i + 1] } else { '\0' };
-                if prev.is_lowercase() || (prev.is_uppercase() && next.is_lowercase()) {
-                    result.push('_');
-                }
-            }
-            result.push(c.to_ascii_lowercase());
-        } else {
-            result.push(c);
-        }
-    }
-    result
-}
-
-pub fn prettyprint_tokenstream(tokens: &TokenStream2) -> TokenStream {
-    let rval1: proc_macro::TokenStream = tokens.clone().into();
-    let syntax_tree: File = parse_macro_input!(rval1 as File);
-    let string = prettyplease::unparse(&syntax_tree);
-    println!("---------------------------------------------------------------------------------------------------");
-    println!("{string}");
-    syntax_tree.into_token_stream().into()
 }

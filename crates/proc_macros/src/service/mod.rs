@@ -4,7 +4,7 @@ use crate::util::{get_type_name, pascal_to_snake_case, prettyprint_tokenstream};
 use darling::FromMeta;
 use function_impl::MethodType;
 use proc_macro2::TokenStream;
-use quote::{ToTokens, quote};
+use quote::{quote, ToTokens};
 use syn::{ImplItem, ItemImpl, ReturnType, Visibility};
 
 pub mod function_impl;
@@ -93,8 +93,8 @@ pub fn ffi_service(attr: TokenStream, input: &TokenStream) -> TokenStream {
                 use ::interoptopus::lang::TypeInfo;
                 use ::interoptopus::lang::FunctionInfo;
 
-                let mut methods = Vec::new();
-                let mut ctors = Vec::new();
+                let mut methods = ::std::vec::Vec::new();
+                let mut ctors = ::std::vec::Vec::new();
 
                 #(
                     {
