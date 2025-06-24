@@ -1,7 +1,7 @@
 use crate::functions::Attributes;
 use crate::util::{extract_doc_lines, purge_lifetimes_from_type};
 use proc_macro2::TokenStream;
-use quote::{quote, quote_spanned, ToTokens};
+use quote::{ToTokens, quote, quote_spanned};
 use std::hash::{DefaultHasher, Hash, Hasher};
 use syn::spanned::Spanned;
 use syn::{FnArg, GenericParam, ItemFn, Pat, ReturnType, Signature, Type};

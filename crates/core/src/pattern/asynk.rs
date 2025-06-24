@@ -103,7 +103,7 @@ impl<S, T> AsyncThreadLocal<S, T> {
         Self { s, t }
     }
 
-    pub fn slf(&self) -> &Arc<S> {
+    pub fn self_instance(&self) -> &Arc<S> {
         &self.s
     }
 }
