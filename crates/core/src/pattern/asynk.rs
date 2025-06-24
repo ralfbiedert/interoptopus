@@ -116,7 +116,7 @@ impl<S, T> Deref for AsyncThreadLocal<S, T> {
     }
 }
 
-// /// Helper to produce a `AsyncCallback` and `AsyncThreadLocal` from proc macros.
+/// Helper to produce a `AsyncCallback` and `AsyncThreadLocal` from proc macros.
 #[doc(hidden)]
 pub trait AsyncProxy<S, T> {
     fn new(s: Arc<S>, t: T) -> Self;

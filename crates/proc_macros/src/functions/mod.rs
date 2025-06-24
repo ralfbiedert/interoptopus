@@ -1,6 +1,6 @@
-use crate::functions::freestanding::ffi_function_freestanding;
 use crate::macros::darling_parse;
 use darling::FromMeta;
+use freestanding::ffi_function_freestanding;
 use proc_macro2::TokenStream;
 
 mod freestanding;
