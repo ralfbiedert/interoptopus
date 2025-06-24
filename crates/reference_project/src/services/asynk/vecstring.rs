@@ -6,8 +6,6 @@ use interoptopus::pattern::result::result_to_ffi;
 use interoptopus::{ffi_service, ffi_type};
 use tokio::runtime::{Builder, Runtime};
 
-type This = AsyncSelf<ServiceAsyncVecString>;
-
 #[ffi_type(opaque)]
 pub struct ServiceAsyncVecString {
     runtime: Runtime,
@@ -22,15 +20,15 @@ impl ServiceAsyncVecString {
         })
     }
 
-    pub async fn handle_string(_this: This, s: ffi::String) -> ffi::Result<ffi::String, Error> {
+    pub async fn handle_string(_: AsyncSelf<Self>, s: ffi::String) -> ffi::Result<ffi::String, Error> {
         ffi::Result::Ok(s)
     }
 
-    pub async fn handle_vec_string(_this: This, s: ffi::Vec<ffi::String>) -> ffi::Result<ffi::Vec<ffi::String>, Error> {
+    pub async fn handle_vec_string(_: AsyncSelf<Self>, s: ffi::Vec<ffi::String>) -> ffi::Result<ffi::Vec<ffi::String>, Error> {
         ffi::Result::Ok(s)
     }
 
-    pub async fn handle_nested_string(_this: This, s: ffi::String) -> ffi::Result<UseString, Error> {
+    pub async fn handle_nested_string(_: AsyncSelf<Self>, s: ffi::String) -> ffi::Result<UseString, Error> {
         ffi::Result::Ok(UseString { s1: s.clone(), s2: s.clone() })
     }
 }

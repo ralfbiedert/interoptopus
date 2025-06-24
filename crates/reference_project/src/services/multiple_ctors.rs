@@ -8,7 +8,7 @@ pub struct ServiceMultipleCtors {
 }
 
 // Regular implementation of methods.
-#[ffi_service(debug)]
+#[ffi_service]
 impl ServiceMultipleCtors {
     pub fn new_with(some_value: u32) -> ffi::Result<Self, Error> {
         ffi::Ok(Self { data: vec![some_value; some_value as usize] })
