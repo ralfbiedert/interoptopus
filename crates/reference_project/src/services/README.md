@@ -3,7 +3,7 @@ shows various ways to author them.
 
 | File                                     | Description                                           |
 |------------------------------------------|-------------------------------------------------------|
-| [`asynk.rs`](asynk.rs)                   | Transparent async-async calls from C# to Rust.        |
+| [`asynk/`](asynk)                        | Transparent async-async calls from C# to Rust.        |
 | [`basic.rs`](basic.rs)                   | A very simple service, start here. 🍼                 |
 | [`callback.rs`](callback.rs)             | Passing callbacks to and invoking them from services. |
 | [`dependent.rs`](dependent.rs)           | How to create services from other services.           |

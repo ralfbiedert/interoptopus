@@ -1,6 +1,6 @@
 use proc_macro2::TokenStream;
 use syn::punctuated::Punctuated;
-use syn::visit_mut::{visit_type_path_mut, VisitMut};
+use syn::visit_mut::{VisitMut, visit_type_path_mut};
 use syn::{GenericArgument, ItemImpl, PathArguments, Type, TypePath};
 
 /// A type visitor that replaces all occurrences of `Self` in type paths with a

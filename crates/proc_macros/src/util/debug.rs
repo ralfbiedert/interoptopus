@@ -1,7 +1,7 @@
 use proc_macro::TokenStream;
 use quote::ToTokens;
 use syn::__private::TokenStream2;
-use syn::{parse_macro_input, File};
+use syn::{File, parse_macro_input};
 
 pub fn prettyprint_tokenstream(tokens: &TokenStream2) -> TokenStream {
     let rval1: proc_macro::TokenStream = tokens.clone().into();

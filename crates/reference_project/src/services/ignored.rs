@@ -23,7 +23,7 @@ impl ServiceIgnoringMethods {
 
     // Service methods without `self` are not valid for code generation and must be ignored.
     #[ffi_service_method(ignore)]
-    pub fn test(&self, _test: u32) -> ffi::Result<(), Error> {
+    pub fn test(&self, _: u32) -> ffi::Result<(), Error> {
         ffi::Ok(())
     }
 }

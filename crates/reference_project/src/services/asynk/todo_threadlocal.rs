@@ -1,6 +1,6 @@
 use crate::patterns::result::Error;
 use interoptopus::ffi;
-use interoptopus::pattern::asynk::{AsyncRuntimeThreadLocal, AsyncSelf};
+use interoptopus::pattern::asynk::{AsyncRuntimeThreadLocal, AsyncSelf, AsyncThreadLocal};
 use interoptopus::pattern::result::result_to_ffi;
 use interoptopus::{ffi_service, ffi_type};
 use tokio::runtime::{Builder, Runtime};
@@ -23,7 +23,11 @@ impl ServiceAsyncThreadLocal {
         })
     }
 
-    pub async fn call(_: AsyncSelf<Self>) -> ffi::Result<(), Error> {
+    pub async fn call_async_self(_: AsyncSelf<Self>) -> ffi::Result<(), Error> {
+        ffi::Ok(())
+    }
+
+    pub async fn call_async_thread_local(_: AsyncThreadLocal<Self, ThreadLocal>) -> ffi::Result<(), Error> {
         ffi::Ok(())
     }
 }

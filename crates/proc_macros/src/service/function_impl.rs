@@ -1,5 +1,5 @@
 use crate::service::Attributes;
-use crate::util::{extract_doc_lines, purge_lifetimes_from_type, ReplaceSelf};
+use crate::util::{ReplaceSelf, extract_doc_lines, purge_lifetimes_from_type};
 use darling::FromMeta;
 use proc_macro2::{Ident, TokenStream};
 use quote::quote_spanned;
@@ -302,6 +302,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
         MethodType::Destructor => panic!("Must not happen."),
         MethodType::MethodAsync(_) => {
             let first = arg_types.first().unwrap();
+
             let block = quote_spanned! { span_body =>
                 // We need &T down below to invoke spawn but override the name, so let's save
                 // it here
