@@ -1,17 +1,16 @@
+use proc_macro2::TokenStream;
 use syn::punctuated::Punctuated;
 use syn::visit_mut::{visit_type_path_mut, VisitMut};
 use syn::{GenericArgument, ItemImpl, PathArguments, Type, TypePath};
 
-// let mut ty: syn::Type = /* your type, e.g., parsed from arg */;
-// let service_type: syn::Type = /* your concrete type */;
-// ReplaceSelf { replacement: &service_type }.visit_type_mut(&mut ty);
-
+/// A type visitor that replaces all occurrences of `Self` in type paths with a
+/// specified replacement type.
 pub struct ReplaceSelf {
-    replacement: Type,
+    replacement: TokenStream,
 }
 
 impl ReplaceSelf {
-    pub fn new(replacement: Type) -> Self {
+    pub fn new(replacement: TokenStream) -> Self {
         Self { replacement }
     }
 }
@@ -19,15 +18,9 @@ impl ReplaceSelf {
 impl VisitMut for ReplaceSelf {
     fn visit_type_path_mut(&mut self, path: &mut TypePath) {
         if path.qself.is_none() && path.path.segments.len() == 1 && path.path.segments[0].ident == "Self" {
-            match self.replacement.clone() {
-                Type::Path(tp) => *path = tp,
-                other => {
-                    // Create a simple path with a single segment for other types
-                    let mut segments = Punctuated::new();
-                    segments.push(syn::PathSegment { ident: syn::Ident::new("Type", proc_macro2::Span::call_site()), arguments: syn::PathArguments::None });
-                    *path = syn::TypePath { qself: None, path: syn::Path { leading_colon: None, segments } };
-                }
-            }
+            let ts = self.replacement.clone();
+            let type_path: TypePath = syn::parse2(ts).unwrap();
+            *path = type_path;
         } else {
             visit_type_path_mut(self, path);
         }

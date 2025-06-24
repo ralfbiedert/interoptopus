@@ -5,8 +5,6 @@ use interoptopus::pattern::result::{result_to_ffi, result_to_ffi_async};
 use interoptopus::{ffi_service, ffi_type};
 use tokio::runtime::{Builder, Runtime};
 
-type This = AsyncSelf<ServiceAsyncSleep>;
-
 #[ffi_type(opaque)]
 pub struct ServiceAsyncSleep {
     runtime: Runtime,
@@ -21,7 +19,7 @@ impl ServiceAsyncSleep {
         })
     }
 
-    pub async fn return_after_ms(_this: This, x: u64, ms: u64) -> ffi::Result<u64, Error> {
+    pub async fn return_after_ms(_: AsyncSelf<Self>, x: u64, ms: u64) -> ffi::Result<u64, Error> {
         result_to_ffi_async(async || {
             tokio::time::sleep(std::time::Duration::from_millis(ms)).await;
             Ok(x)
