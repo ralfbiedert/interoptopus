@@ -1,4 +1,3 @@
-use std::iter::RepeatWith;
 use crate::service::Attributes;
 use crate::util::{extract_doc_lines, purge_lifetimes_from_type, ReplaceSelf};
 use darling::FromMeta;
@@ -6,6 +5,7 @@ use proc_macro2::{Ident, TokenStream};
 use quote::quote_spanned;
 use std::ops::Deref;
 use syn::spanned::Spanned;
+use syn::visit_mut::VisitMut;
 use syn::{FnArg, GenericParam, ImplItem, ImplItemFn, ItemImpl, Pat, ReturnType};
 
 pub struct Descriptor {
@@ -162,34 +162,42 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 arg_names.push(quote_spanned!(span_arg=> __context));
                 arg_types.push(quote_spanned!(span_arg=> Self));
             }
-            FnArg::Typed(pat) => match pat.pat.deref() {
-                Pat::Ident(x) => {
-                    let ty = &pat.ty;
-                    let ident = &x.ident;
-                    let rewrite = ReplaceSelf::new()
-                    arg_types.push(quote_spanned!(span_arg=> #ty));
+            FnArg::Typed(pat) => {
+                let ty = &pat.ty;
+                let span_ty = ty.span();
 
-                    // If this is the first parameter and we have `async`, the method must have
-                    // requested an `Arc<T>`. In that case we generate an FFI method asking for `&T`
-                    // and then convert it to `Arc<T>` internally.
-                    if i == 0 && has_async && !matches!(method_type, MethodType::Constructor) {
-                        arg_names.push(quote_spanned!(span_arg=> __context));
-                        inputs.push(quote_spanned!(span_arg=> __context: & #service_type));
-                        continue;
+                // TODO: Maybe we should apply this transform to any type in the signature?
+                // This here allows users to write `AsyncSelf<Self>` and have `Self` be replaced by
+                // the actual service type, e.g., `MyService`.
+                let mut replace_self = ReplaceSelf::new(quote_spanned!(span_ty => #service_type));
+                let mut new_ty = ty.clone();
+                replace_self.visit_type_mut(&mut new_ty);
+
+                arg_types.push(quote_spanned!(span_arg=> #new_ty));
+
+                // If this is the first parameter and we have `async`, the method must have
+                // requested an `Arc<T>`. In that case we generate an FFI method asking for `&T`
+                // and then convert it to `Arc<T>` internally.
+                if i == 0 && has_async && !matches!(method_type, MethodType::Constructor) {
+                    arg_names.push(quote_spanned!(span_arg=> __context));
+                    inputs.push(quote_spanned!(span_arg=> __context: & #service_type));
+                    continue;
+                }
+
+                match pat.pat.deref() {
+                    Pat::Ident(x) => {
+                        let ident = &x.ident;
+                        arg_names.push(quote_spanned!(span_arg=> #ident));
+                        inputs.push(quote_spanned!(span_arg=> #arg));
                     }
-
-                    arg_names.push(quote_spanned!(span_arg=> #ident));
-                    inputs.push(quote_spanned!(span_arg=> #arg));
+                    Pat::Wild(_) => {
+                        let new_ident = Ident::new(&format!("_anon{i}"), arg.span());
+                        arg_names.push(quote_spanned!(span_arg=> #new_ident));
+                        inputs.push(quote_spanned!(span_arg=> #new_ident: #new_ty));
+                    }
+                    _ => panic!("Unknown pattern {pat:?}"),
                 }
-                Pat::Wild(_) => {
-                    let new_ident = Ident::new(&format!("_anon{i}"), arg.span());
-                    let ty = &pat.ty;
-                    arg_names.push(quote_spanned!(span_arg=> #new_ident));
-                    arg_types.push(quote_spanned!(span_arg=> #ty));
-                    inputs.push(quote_spanned!(span_arg=> #new_ident: #ty));
-                }
-                _ => panic!("Unknown pattern {pat:?}"),
-            },
+            }
         }
     }
 
