@@ -1,6 +1,6 @@
 use crate::patterns::result::Error;
 use interoptopus::ffi;
-use interoptopus::pattern::asynk::AsyncRuntime;
+use interoptopus::pattern::asynk::{AsyncRuntime, AsyncSelf};
 use interoptopus::pattern::result::result_to_ffi;
 use interoptopus::{ffi_service, ffi_type};
 use tokio::runtime::{Builder, Runtime};
@@ -19,7 +19,11 @@ impl ServiceAsyncTodoBad {
         })
     }
 
-    // TODO: This must not compile.
+    pub async fn call(_: AsyncSelf<Self>) -> ffi::Result<(), Error> {
+        ffi::Ok(())
+    }
+
+    // TODO: Once an `async fn` is present, methods accepting `&mut self` must not compile.
     pub fn bad(&mut self) {}
 }
 
