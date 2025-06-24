@@ -1,7 +1,7 @@
 use crate::patterns::result::Error;
 use interoptopus::ffi;
 use interoptopus::pattern::asynk::{AsyncRuntime, AsyncSelf};
-use interoptopus::pattern::result::{result_to_ffi, result_to_ffi_async};
+use interoptopus::pattern::result::result_to_ffi;
 use interoptopus::{ffi_service, ffi_type};
 use tokio::runtime::{Builder, Runtime};
 
@@ -20,11 +20,8 @@ impl ServiceAsyncSleep {
     }
 
     pub async fn return_after_ms(_: AsyncSelf<Self>, x: u64, ms: u64) -> ffi::Result<u64, Error> {
-        result_to_ffi_async(async || {
-            tokio::time::sleep(std::time::Duration::from_millis(ms)).await;
-            Ok(x)
-        })
-        .await
+        tokio::time::sleep(std::time::Duration::from_millis(ms)).await;
+        Ok(x).into()
     }
 }
 
