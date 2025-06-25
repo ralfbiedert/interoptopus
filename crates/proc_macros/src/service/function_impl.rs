@@ -1,5 +1,5 @@
 use crate::service::Attributes;
-use crate::util::{ReplaceSelf, extract_doc_lines, purge_lifetimes_from_type};
+use crate::util::{extract_doc_lines, purge_lifetimes_from_type, ReplaceSelf};
 use darling::FromMeta;
 use proc_macro2::{Ident, TokenStream};
 use quote::quote_spanned;
@@ -205,7 +205,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
         #[::interoptopus::ffi_function]
         #[unsafe(no_mangle)]
         #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
-        #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals, clippy::forget_non_drop, clippy::useless_conversion)]
+        #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals, clippy::forget_non_drop, clippy::useless_conversion, clippy::let_unit_value)]
         #(
             #[doc = #doc_lines]
         )*
@@ -371,7 +371,7 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
         /// passing any other value results in undefined behavior.
         #[::interoptopus::ffi_function]
         #[allow(unused_mut, unsafe_op_in_unsafe_fn, unused_unsafe)]
-        #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals)]
+        #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals, clippy::let_unit_value)]
         #[unsafe(no_mangle)]
         pub unsafe extern "C" fn #ffi_fn_ident(__context: #ptr_type) -> #ctor_result {
             // Checks the _contained_ pointer is not null, which usually means service was not initialized.
