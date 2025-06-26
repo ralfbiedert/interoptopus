@@ -1,6 +1,6 @@
 use crate::Interop;
 use interoptopus::backend::IndentWriter;
-use interoptopus::{Error, indented};
+use interoptopus::{indented, Error};
 
 pub fn write_imports(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     i.debug(w, "write_imports")?;
@@ -15,14 +15,10 @@ pub fn write_imports(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     indented!(w, r"using System.Runtime.InteropServices.Marshalling;")?;
     indented!(w, r"using System.Runtime.CompilerServices;")?;
 
-    for namespace_id in i.inventory.namespaces() {
-        let namespace = i
-            .namespace_mappings
-            .get(namespace_id)
-            .unwrap_or_else(|| panic!("Must have namespace for '{namespace_id}' ID"));
-
-        indented!(w, r"using {};", namespace)?;
+    for (_, v) in &i.namespace_mappings {
+        indented!(w, r"using {v};")?;
     }
+
     indented!(w, r"#pragma warning restore 0105")?;
 
     Ok(())

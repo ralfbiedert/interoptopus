@@ -22,6 +22,8 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using System.Runtime.CompilerServices;
 using My.Company;
+using My.Company;
+using My.Company.Common;
 #pragma warning restore 0105
 
 namespace My.Company

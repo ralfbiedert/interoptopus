@@ -159,6 +159,7 @@
 //! [rust-build-badge]: https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml/badge.svg
 //! [rust-build-url]: https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml
 
+pub use backend::NAMESPACE_COMMON;
 pub use error::Error;
 #[cfg(feature = "derive")]
 pub use interoptopus_proc::{ffi_constant, ffi_function, ffi_service, ffi_service_method, ffi_type};

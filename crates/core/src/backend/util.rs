@@ -2,8 +2,12 @@
 
 use crate::lang::{Function, Type, VariantKind};
 use crate::pattern::TypePattern;
+use std::collections::hash_map::Iter;
 use std::collections::{HashMap, HashSet};
 use std::iter::FromIterator;
+
+/// The namespace used by common types, e.g., `ffi::String`.
+pub const NAMESPACE_COMMON: &str = "_common";
 
 /// Converts an internal name like `fn() -> X` to a safe name like `fn_rval_x`
 ///
@@ -345,6 +349,20 @@ impl NamespaceMappings {
     #[must_use]
     pub fn get(&self, id: &str) -> Option<&str> {
         self.mappings.get(id).map(String::as_str)
+    }
+
+    /// Iterates over all mappings.
+    #[must_use]
+    pub fn iter(&self) -> Iter<String, String> {
+        self.mappings.iter()
+    }
+}
+
+impl<'a> IntoIterator for &'a NamespaceMappings {
+    type Item = (&'a String, &'a String);
+    type IntoIter = Iter<'a, String, String>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
     }
 }
 

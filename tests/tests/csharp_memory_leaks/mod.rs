@@ -1,4 +1,5 @@
 use anyhow::Error;
+use interoptopus::backend::NAMESPACE_COMMON;
 use interoptopus::inventory::Bindings;
 use interoptopus_backend_csharp::{InteropBuilder, WriteTypes};
 use interoptopus_reference_project::ffi_inventory;
@@ -9,7 +10,7 @@ use tests::validate_output;
 fn memory_leaks_prerequisites() -> Result<(), Error> {
     let generated_common = InteropBuilder::new()
         .inventory(ffi_inventory())
-        .namespace_id("common")
+        .namespace_id(NAMESPACE_COMMON)
         .namespace_mappings(common_namespace_mappings())
         .dll_name("interoptopus_reference_project")
         .write_types(WriteTypes::NamespaceAndInteroptopusGlobal)

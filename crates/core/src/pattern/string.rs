@@ -1,5 +1,6 @@
 //! Like a regular [`String`](std::string::String), but FFI safe.
 
+use crate::backend::NAMESPACE_COMMON;
 use crate::lang::{Composite, Docs, Field, Meta, Primitive, Representation, Type};
 use crate::lang::{Layout, TypeInfo};
 use crate::pattern::TypePattern;
@@ -94,7 +95,7 @@ unsafe impl TypeInfo for String {
             " you'll free the same pointer multiple times, and get UB!".to_string(),
         ]);
         let repr = Representation::new(Layout::C, None);
-        let meta = Meta::with_module_docs("common".to_string(), doc);
+        let meta = Meta::with_module_docs(NAMESPACE_COMMON.to_string(), doc);
         let composite = Composite::with_meta_repr("Utf8String".to_string(), fields, meta, repr);
         Type::Pattern(TypePattern::Utf8String(composite))
     }

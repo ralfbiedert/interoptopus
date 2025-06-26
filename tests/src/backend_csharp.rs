@@ -1,11 +1,11 @@
 use anyhow::anyhow;
-use interoptopus::backend::NamespaceMappings;
+use interoptopus::backend::{NamespaceMappings, NAMESPACE_COMMON};
 use std::io::ErrorKind;
 use std::path::Path;
 use std::process::Command;
 
 pub fn common_namespace_mappings() -> NamespaceMappings {
-    NamespaceMappings::new("My.Company").add("common", "My.Company.Common")
+    NamespaceMappings::new("My.Company").add(NAMESPACE_COMMON, "My.Company.Common")
 }
 
 /// If `dotnet` is installed, run the command as `dotnet command` from `path`, ignore and succeed otherwise.

@@ -1,11 +1,12 @@
 use crate::patterns::result::Error;
 use crate::types::string::UseString;
+use interoptopus::backend::NAMESPACE_COMMON;
 use interoptopus::{callback, ffi, ffi_function, ffi_type};
 use std::ffi::c_void;
 use std::ptr::null;
 
 callback!(MyCallback(value: u32) -> u32);
-callback!(MyCallbackNamespaced(value: u32) -> u32, namespace = "common");
+callback!(MyCallbackNamespaced(value: u32) -> u32, namespace = NAMESPACE_COMMON);
 callback!(MyCallbackVoid(ptr: *const c_void));
 callback!(MyCallbackContextual(context: *const c_void, value: u32));
 callback!(SumDelegate1());
@@ -89,6 +90,7 @@ pub extern "C" fn exposed_sum2(x: i32, y: i32, _: *const c_void) -> i32 {
 #[cfg(test)]
 mod tests {
     use super::{MyCallback, MyCallbackNamespaced};
+    use interoptopus::backend::NAMESPACE_COMMON;
     use interoptopus::lang::TypeInfo;
 
     #[test]
@@ -97,6 +99,6 @@ mod tests {
         let ti2 = MyCallbackNamespaced::type_info();
 
         assert_eq!(ti1.namespace(), Some(""));
-        assert_eq!(ti2.namespace(), Some("common"));
+        assert_eq!(ti2.namespace(), Some(NAMESPACE_COMMON));
     }
 }
