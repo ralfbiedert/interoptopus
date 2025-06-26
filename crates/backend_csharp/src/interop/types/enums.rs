@@ -3,7 +3,7 @@ use crate::converter::{field_as_unmanaged, field_to_managed, field_to_type, fiel
 use crate::interop::docs::write_documentation;
 use crate::utils::{MoveSemantics, write_common_marshaller};
 use interoptopus::backend::IndentWriter;
-use interoptopus::lang::{Enum, Field, VariantKind};
+use interoptopus::lang::{Enum, Field, Type, VariantKind};
 use interoptopus::{Error, indented};
 
 pub fn write_type_definition_enum(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
@@ -241,8 +241,13 @@ pub fn write_type_definition_enum_variant_utils(i: &Interop, w: &mut IndentWrite
             VariantKind::Unit(x) => {
                 indented!(w, [()()], r#"if (_variant == {x}) return "{vname}";"#)?;
             }
-            VariantKind::Typed(x, _) => {
-                indented!(w, [()()], r#"if (_variant == {x}) return "{vname}(...)";"#)?;
+            VariantKind::Typed(x, t) => {
+                if let Type::Enum(_) = &**t {
+                    let underlying = format!(r"As{}()", variant.name());
+                    indented!(w, [()()], r#"if (_variant == {x}) return $"{vname}({{{underlying}.ToString()}})";"#)?;
+                } else {
+                    indented!(w, [()()], r#"if (_variant == {x}) return "{vname}(...)";"#)?;
+                }
             }
         }
     }

@@ -328,7 +328,7 @@ namespace My.Company
         public override string ToString()
         {
             if (_variant == 0) return "Ok(...)";
-            if (_variant == 1) return "Err(...)";
+            if (_variant == 1) return $"Err({AsErr().ToString()})";
             if (_variant == 2) return "Panic";
             if (_variant == 3) return "Null";
             throw new InteropException();
@@ -443,7 +443,7 @@ namespace My.Company
         public override string ToString()
         {
             if (_variant == 0) return "Ok(...)";
-            if (_variant == 1) return "Err(...)";
+            if (_variant == 1) return $"Err({AsErr().ToString()})";
             if (_variant == 2) return "Panic";
             if (_variant == 3) return "Null";
             throw new InteropException();
