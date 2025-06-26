@@ -5,7 +5,6 @@ use interoptopus::{
     builtins_string, builtins_vec, ffi, ffi_function, ffi_type, function,
     inventory::{Inventory, InventoryBuilder},
 };
-// use interoptopus::patterns::slice::FFISlice;
 
 pub fn ffi_inventory() -> Inventory {
     InventoryBuilder::new()
@@ -22,8 +21,7 @@ pub fn ffi_inventory() -> Inventory {
 /// Main benchmark Rust entry point for FFI-based ipc.
 #[ffi_function]
 pub fn FfiRustClient(_input: Input) -> Outputs {
-    /*
-    println!("PRINTLN DEBUG IS THA BEST");
+/*    println!("PRINTLN DEBUG IS THA BEST");
     println!("NUMBERS VALIDITY CHECK:");
     println!("response_size = {}", _input.configuration.response_size);
     println!("is_ok_response = {}", _input.configuration.is_ok_response);
@@ -31,6 +29,7 @@ pub fn FfiRustClient(_input: Input) -> Outputs {
     println!("column_count = {}", _input.value.metadata.column_count);
 
     println!("HOST RECEIVED: {:?}", _input.configuration.host);*/
+
     // TODO: use input.response_size to generate outputs
     let results = vec![Result { item_value: 42, item_id: ffi::String::from("item1".to_string()) }];
     let items = vec![Item { key: ItemKey::TOTAL, value: 100 }];
