@@ -141,3 +141,23 @@ impl ApiHash {
         self.hash_hex.as_str()
     }
 }
+
+/// Creates an registers an API guard for the current DLL.
+///
+/// # Example
+/// ```rust
+///
+/// ```
+#[macro_export]
+macro_rules! api_guard {
+    ($f:tt) => {{
+        #[$crate::ffi_function]
+        pub fn __api_guard() -> $crate::pattern::api_guard::ApiVersion {
+            $f().into()
+        }
+
+        use $crate::lang::FunctionInfo;
+        let info = __api_guard::function_info();
+        $crate::inventory::Symbol::Function(info)
+    }};
+}

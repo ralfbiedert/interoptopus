@@ -1,7 +1,7 @@
 use anyhow::Error;
 use interoptopus::inventory::{Bindings, Inventory};
 use interoptopus::{extra_type, ffi_type};
-use interoptopus_backend_c::{EnumVariants, InteropBuilder};
+use interoptopus_backend_c::{EnumVariants, Interop};
 use tests::{compile_output_c, validate_output};
 
 #[ffi_type]
@@ -18,7 +18,7 @@ fn ffi_inventory() -> Inventory {
 
 #[test]
 fn with_enum_name() -> Result<(), Error> {
-    let generated = InteropBuilder::new()
+    let generated = Interop::builder()
         .inventory(ffi_inventory())
         .enum_variant_style(EnumVariants::WithEnumName)
         .build()?
@@ -32,7 +32,7 @@ fn with_enum_name() -> Result<(), Error> {
 
 #[test]
 fn variant_only() -> Result<(), Error> {
-    let generated = InteropBuilder::new()
+    let generated = Interop::builder()
         .inventory(ffi_inventory())
         .enum_variant_style(EnumVariants::VariantName)
         .build()?

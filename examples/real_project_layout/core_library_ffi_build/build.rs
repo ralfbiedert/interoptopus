@@ -1,6 +1,6 @@
 use core_library_ffi::ffi_inventory;
 use interoptopus::inventory::Bindings;
-use interoptopus_backend_csharp::InteropBuilder;
+use interoptopus_backend_csharp::Interop;
 use std::error::Error;
 
 // By adding the interop generation logic into a `build.rs` that depends on
@@ -11,7 +11,7 @@ use std::error::Error;
 // to run both `cargo build` to produce the `.dll` and `cargo test`
 // to produce the bindings (since `cargo test` does not imply `cargo build`).
 fn main() -> Result<(), Box<dyn Error>> {
-    InteropBuilder::new()
+    Interop::builder()
         .inventory(ffi_inventory())
         .dll_name("core_library")
         // You might also want to consider writing to `OUT_DIR` instead, since

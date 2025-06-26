@@ -1,13 +1,13 @@
 use anyhow::Error;
 use interoptopus::inventory::Bindings;
-use interoptopus_backend_cpython::InteropBuilder;
+use interoptopus_backend_cpython::Interop;
 use interoptopus_reference_project::ffi_inventory;
 use tests::backend_cpython::run_python_if_installed;
 use tests::validate_output;
 
 #[test]
 fn reference_tests_work() -> Result<(), Error> {
-    let generated = InteropBuilder::new().inventory(ffi_inventory()).debug(false).build()?.to_string()?;
+    let generated = Interop::builder().inventory(ffi_inventory()).debug(false).build()?.to_string()?;
 
     validate_output!("tests/cpython_reference_project", "reference_project.py", generated.as_str());
 

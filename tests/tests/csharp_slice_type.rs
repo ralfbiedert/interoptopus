@@ -3,7 +3,7 @@ use interoptopus::inventory::Bindings;
 use interoptopus::inventory::Inventory;
 use interoptopus::pattern::slice::Slice;
 use interoptopus::{ffi_function, function};
-use interoptopus_backend_csharp::InteropBuilder;
+use interoptopus_backend_csharp::Interop;
 use tests::backend_csharp::common_namespace_mappings;
 use tests::validate_output;
 
@@ -16,7 +16,7 @@ fn ffi_inventory() -> Inventory {
 
 #[test]
 fn spans_work() -> Result<(), Error> {
-    let generated = InteropBuilder::new()
+    let generated = Interop::builder()
         .inventory(ffi_inventory())
         .namespace_mappings(common_namespace_mappings())
         .build()?

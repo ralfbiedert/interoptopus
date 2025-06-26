@@ -1,7 +1,7 @@
 use anyhow::Error;
 use interoptopus::inventory::{Bindings, Inventory};
 use interoptopus::{ffi_function, function};
-use interoptopus_backend_c::{Functions, InteropBuilder};
+use interoptopus_backend_c::{Functions, Interop};
 use tests::{compile_output_c, validate_output};
 
 #[ffi_function]
@@ -13,7 +13,7 @@ fn ffi_inventory() -> Inventory {
 
 #[test]
 fn forward() -> Result<(), Error> {
-    let generated = InteropBuilder::new()
+    let generated = Interop::builder()
         .inventory(ffi_inventory())
         .function_style(Functions::ForwardDeclarations)
         .build()?
@@ -27,7 +27,7 @@ fn forward() -> Result<(), Error> {
 
 #[test]
 fn typedef() -> Result<(), Error> {
-    let generated = InteropBuilder::new()
+    let generated = Interop::builder()
         .inventory(interoptopus_reference_project::ffi_inventory())
         .function_style(Functions::Typedefs)
         .build()?

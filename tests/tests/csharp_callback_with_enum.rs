@@ -3,7 +3,7 @@ use interoptopus::extra_type;
 use interoptopus::inventory::Bindings;
 use interoptopus::inventory::Inventory;
 use interoptopus::{callback, ffi_type};
-use interoptopus_backend_csharp::InteropBuilder;
+use interoptopus_backend_csharp::Interop;
 use tests::backend_csharp::common_namespace_mappings;
 use tests::validate_output;
 
@@ -22,7 +22,7 @@ fn ffi_inventory() -> Inventory {
 
 #[test]
 fn csharp_callback_with_enum() -> Result<(), Error> {
-    let generated = InteropBuilder::new()
+    let generated = Interop::builder()
         .inventory(ffi_inventory())
         .namespace_mappings(common_namespace_mappings())
         .build()?
