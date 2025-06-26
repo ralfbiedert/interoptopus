@@ -120,15 +120,21 @@ public class BenchyBase
 
 public class JustTest : BenchyBase
 {
+    public void Ffi_0_hot()
+    {
+        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(SMALL));
+    }
     public void Ffi_10_hot()
     {
         var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(10));
     }
 }
 
-[RPlotExporter]
+//[RPlotExporter]
 [MemoryDiagnoser]
 //[NativeMemoryProfiler]
+[MinIterationCount(10)]
+[MaxIterationCount(15)]
 public class HotBenchy : BenchyBase
 {
     [Benchmark]
@@ -289,10 +295,10 @@ public class Program
     public static void Main(string[] args)
     {
         //var tt = new Utf8String[1];
-        // var hot = BenchmarkRunner.Run<HotBenchy>();
+        var hot = BenchmarkRunner.Run<HotBenchy>();
         //var cold = BenchmarkRunner.Run<ColdBenchy>();
 
-        var benchy = new JustTest();
-        benchy.Ffi_10_hot();
+        //var benchy = new JustTest();
+        //benchy.Ffi_0_hot();
     }
 }
