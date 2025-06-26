@@ -22,7 +22,6 @@ pub fn ffi_inventory() -> Inventory {
 /// Main benchmark Rust entry point for FFI-based ipc.
 #[ffi_function]
 pub fn FfiRustClient(_input: Input) -> Outputs {
-    /*
     println!("PRINTLN DEBUG IS THA BEST");
     println!("NUMBERS VALIDITY CHECK:");
     println!("response_size = {}", _input.configuration.response_size);
@@ -30,7 +29,8 @@ pub fn FfiRustClient(_input: Input) -> Outputs {
     println!("row_count = {}", _input.value.metadata.row_count);
     println!("column_count = {}", _input.value.metadata.column_count);
 
-    println!("HOST RECEIVED: {:?}", _input.configuration.host);*/
+    println!("HOST RECEIVED: {:?}", _input.configuration.host);
+
     // TODO: use input.response_size to generate outputs
     let results = vec![Result { item_value: 42, item_id: ffi::String::from("item1".to_string()) }];
     let items = vec![Item { key: ItemKey::TOTAL, value: 100 }];

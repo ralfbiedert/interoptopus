@@ -118,6 +118,14 @@ public class BenchyBase
     // }
 }
 
+public class JustTest : BenchyBase
+{
+    public void Ffi_10_hot()
+    {
+        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(10));
+    }
+}
+
 [RPlotExporter]
 [MemoryDiagnoser]
 //[NativeMemoryProfiler]
@@ -281,9 +289,10 @@ public class Program
     public static void Main(string[] args)
     {
         //var tt = new Utf8String[1];
-        var hot = BenchmarkRunner.Run<HotBenchy>();
+        // var hot = BenchmarkRunner.Run<HotBenchy>();
         //var cold = BenchmarkRunner.Run<ColdBenchy>();
-        //var benchy = new Benchy();
-        //benchy.Ffi_1k_cold();
+
+        var benchy = new JustTest();
+        benchy.Ffi_10_hot();
     }
 }
