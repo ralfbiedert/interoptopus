@@ -1,4 +1,4 @@
-//! Ensures bindings match the used DLL.
+//! Ensures bindings match the used DLL, used via [`api_guard!`](crate::api_guard).
 //!
 //! Using an API guard is as simple as defining and exporting a function `my_api_guard` returning an
 //! [`ApiVersion`] as in the example below. Backends supporting API guards will automatically
@@ -9,29 +9,20 @@
 //!
 //! # Example
 //!
-//! This will create a FFI function called `pattern_api_guard`, and backends might automatically
+//! This will create an API guard function, and backends might automatically
 //! create guards calling this function when loading the DLL.
 //!
-//! ```
-//! use interoptopus::{ffi_function, function};
-//! use interoptopus::inventory::{Inventory, InventoryBuilder};
-//! use interoptopus::pattern::api_guard::ApiVersion;
+//! ```rust
+//! use interoptopus::inventory::Inventory;
+//! use interoptopus::{api_guard, ffi_function, function};
 //!
-//! // Guard function used by backends.
-//! #[ffi_function]
-//! pub fn my_api_guard() -> ApiVersion {
-//!     my_inventory().into()
-//! }
-//!
-//! // Inventory of our exports.
-//! pub fn my_inventory() -> Inventory {
+//! fn ffi_inventory() -> Inventory {
 //!     Inventory::builder()
-//!         .register(function!(my_api_guard))
-//!         .validate()
-//!         .build()
+//!         .register(api_guard!(ffi_inventory)) // <- You must name the current function.
+//!         .validate()                          //    since it will be called at runtime
+//!         .build()                             //    but cannot be inferred.
 //! }
 //! ```
-//!
 //! In backends that support API guards an error message like this might be emitted if you try load
 //! a library with mismatching bindings:
 //!
@@ -142,11 +133,19 @@ impl ApiHash {
     }
 }
 
-/// Creates an registers an API guard for the current DLL.
+/// Creates and registers an [API guard](crate::pattern::api_guard) for the current library.
 ///
 /// # Example
 /// ```rust
+/// # use interoptopus::inventory::Inventory;
+/// # use interoptopus::{api_guard, ffi_function, function};
 ///
+/// fn ffi_inventory() -> Inventory {
+///     Inventory::builder()
+///         .register(api_guard!(ffi_inventory)) // <- You must name the current function.
+///         .validate()                          //    since it will be called at runtime
+///         .build()                             //    but cannot be inferred.
+/// }
 /// ```
 #[macro_export]
 macro_rules! api_guard {

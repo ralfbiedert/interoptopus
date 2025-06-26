@@ -1,5 +1,5 @@
 use crate::service::Attributes;
-use crate::util::{extract_doc_lines, purge_lifetimes_from_type, ReplaceSelf};
+use crate::util::{ReplaceSelf, extract_doc_lines, purge_lifetimes_from_type};
 use darling::FromMeta;
 use proc_macro2::{Ident, TokenStream};
 use quote::quote_spanned;

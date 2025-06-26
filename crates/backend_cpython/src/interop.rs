@@ -20,7 +20,7 @@ use derive_builder::Builder;
 use interoptopus::backend::IndentWriter;
 use interoptopus::inventory::{Bindings, Inventory};
 use interoptopus::lang::Function;
-use interoptopus::{indented, Error};
+use interoptopus::{Error, indented};
 
 /// Generates Python `ctypes` files, **get this with [`InteropBuilder`]**.🐙
 #[derive(Clone, Debug, Default, Builder)]
