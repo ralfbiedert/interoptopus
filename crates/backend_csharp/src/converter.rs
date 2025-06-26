@@ -56,8 +56,8 @@ pub fn field_to_type(x: &Type) -> String {
         Type::Pattern(x) => match x {
             TypePattern::CStrPointer => "string".to_string(),
             TypePattern::Utf8String(_) => "Utf8String".to_string(),
-            TypePattern::Slice(x) => format!("Slice{}", slice_t(x)),
-            TypePattern::SliceMut(x) => format!("SliceMut{}", slice_t(x)),
+            TypePattern::Slice(x) => x.composite_type().rust_name().to_string(),
+            TypePattern::SliceMut(x) => x.composite_type().rust_name().to_string(),
             TypePattern::Option(e) => e.the_enum().rust_name().to_string(),
             TypePattern::Result(e) => e.the_enum().rust_name().to_string(),
             TypePattern::NamedCallback(e) => e.name().to_string(),
@@ -88,8 +88,8 @@ pub fn field_to_type_unmanaged(x: &Type) -> String {
         Type::Pattern(x) => match x {
             TypePattern::CStrPointer => "IntPtr".to_string(),
             TypePattern::Utf8String(_) => "Utf8String.Unmanaged".to_string(),
-            TypePattern::Slice(x) => format!("Slice{}.Unmanaged", slice_t(x)),
-            TypePattern::SliceMut(x) => format!("SliceMut{}.Unmanaged", slice_t(x)),
+            TypePattern::Slice(x) => format!("{}.Unmanaged", x.composite_type().rust_name()),
+            TypePattern::SliceMut(x) => format!("{}.Unmanaged", x.composite_type().rust_name()),
             TypePattern::Option(e) => format!("{}.Unmanaged", e.the_enum().rust_name()),
             TypePattern::Result(e) => format!("{}.Unmanaged", e.the_enum().rust_name()),
             TypePattern::NamedCallback(e) => format!("{}.Unmanaged", e.name()),

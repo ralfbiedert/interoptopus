@@ -92,7 +92,7 @@ public class BenchyBase
         input.value.metadata.prefix = "ordinary_prefix_".Utf8();
         input.value.metadata.row_count = 5;
         input.value.metadata.column_count = 7;
-        input.value.byte_array = VecU8.From(new byte[n]); // from 0 bytes to 1Mb
+        input.value.byte_array = SliceU8.From(new byte[n]); // from 0 bytes to 1Mb
         // input.context.things = from 0 strings to 1,000,000 strings "thingX"
         var things = new Utf8String[n];
         for (int i = 0; i < n; i++)
@@ -100,7 +100,7 @@ public class BenchyBase
             things[i] = $"Thing-{i}".Utf8();
         }
 
-        input.context.things = VecUtf8String.From(things);
+        input.context.things = things.Slice();
         // NB: FFI does not support HashMaps interop
         // input.context.headers = from 0 headers to 1,000,000 "key"=>"value" pairs
         //for (int i = 0; i < n; i++)
