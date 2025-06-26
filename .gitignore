@@ -1,5 +1,5 @@
-/target
-**/*.rs.bk
+target
+*.rs.bk
 Cargo.lock
 node_modules
 html
@@ -13,8 +13,8 @@ dist
 obj
 bin
 *.user
-examples/complex/bindings/c/cmake-build-debug
+cmake-build-debug
 *.actual
 *.generated
 __pycache__
-**/.DS_Store
+.DS_Store
