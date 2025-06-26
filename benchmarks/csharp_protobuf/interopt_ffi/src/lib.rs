@@ -44,7 +44,7 @@ pub fn FfiRustClient(_input: Input) -> Outputs {
 pub struct Input<'l> {
     pub context: Context<'l>,
     pub value: Table<'l>,
-    pub configuration: Configuration<'l>,
+    pub configuration: Configuration,
 }
 
 #[ffi_type]
@@ -61,14 +61,14 @@ pub struct Context<'l> {
 
 #[ffi_type]
 pub struct Table<'l> {
-    pub metadata: TableMetadata<'l>,
+    pub metadata: TableMetadata,
     pub byte_array: ffi::Slice<'l, u8>,
 }
 
 #[ffi_type]
-pub struct Configuration<'l> {
+pub struct Configuration {
     pub is_ok_response: bool,
-    pub host: ffi::Slice<'l, ffi::String>,
+    pub host: ffi::String,
     pub response_size: u64, // controls N in benchmarks
 }
 
@@ -84,11 +84,11 @@ pub struct Data {
 }
 
 #[ffi_type]
-pub struct TableMetadata<'l> {
+pub struct TableMetadata {
     pub row_count: i32,
     pub column_count: i32,
-    pub guid: ffi::Slice<'l, ffi::String>,
-    pub prefix: ffi::Slice<'l, ffi::String>,
+    pub guid: ffi::String,
+    pub prefix: ffi::String,
 }
 
 #[ffi_type]
