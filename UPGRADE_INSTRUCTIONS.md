@@ -19,6 +19,7 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
 - `AsciiPointer` is now called `CStrPointer`, since it can contain non-ASCII data (e.g., when called from C#).
 - We fixed capitalization in some backends, e.g., a `Sliceu8` is now `SliceU8`.
 - When using `InventoryBuilder` you should call `.validate().inventory()` now.
+- It's now `Inventory::builder()` to create an `InventoryBuilder`.
 - To override visibility for all fields:
     - Previously you had to `#[ffi_type(visibility(_ = "public"))]`
     - Now you do `#[ffi_type(visibility(_all = "public"))]`
@@ -39,6 +40,8 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
 - Support for the old `FFIErrorEnum` style has been removed. Use `ffi::Result` instead. Error patterns are now much
 - easier to implement.
 - Likewise, `#[ffi_type(error)]` on enums has been removed.
+- Some item names (e.g., `public`) are forbidden now as they might conflict with backend language-specific keywords, and
+  will be flagged when invoking `.validate()`.
 
 #### All Backends
 
