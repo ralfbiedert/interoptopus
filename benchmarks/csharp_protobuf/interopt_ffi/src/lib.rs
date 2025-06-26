@@ -5,6 +5,7 @@ use interoptopus::{
     builtins_string, builtins_vec, ffi, ffi_function, ffi_type, function,
     inventory::{Inventory, InventoryBuilder},
 };
+// use interoptopus::patterns::slice::FFISlice;
 
 pub fn ffi_inventory() -> Inventory {
     InventoryBuilder::new()
@@ -20,7 +21,8 @@ pub fn ffi_inventory() -> Inventory {
 
 /// Main benchmark Rust entry point for FFI-based ipc.
 #[ffi_function]
-pub fn FfiRustClient(_input: Input) -> Outputs {/*
+pub fn FfiRustClient(_input: Input) -> Outputs {
+    /*
     println!("PRINTLN DEBUG IS THA BEST");
     println!("NUMBERS VALIDITY CHECK:");
     println!("response_size = {}", _input.configuration.response_size);
@@ -34,18 +36,15 @@ pub fn FfiRustClient(_input: Input) -> Outputs {/*
     let items = vec![Item { key: ItemKey::TOTAL, value: 100 }];
     Outputs {
         response: Response { results: ffi::Vec::from_vec(results) },
-        data: Data {
-            items: Items { items: ffi::Vec::from_vec(items) },
-            errors: Error { error_messages: ffi::Vec::from_vec(Vec::<ffi::String>::new()) },
-        },
+        data: Data { items: Items { items: ffi::Vec::from_vec(items) }, errors: Error { error_messages: ffi::Vec::from_vec(Vec::<ffi::String>::new()) } },
     }
 }
 
 #[ffi_type]
-pub struct Input {
-    pub context: Context,
-    pub value: Table,
-    pub configuration: Configuration,
+pub struct Input<'l> {
+    pub context: Context<'l>,
+    pub value: Table<'l>,
+    pub configuration: Configuration<'l>,
 }
 
 #[ffi_type]
@@ -55,21 +54,21 @@ pub struct Outputs {
 }
 
 #[ffi_type]
-pub struct Context {
-    pub things: ffi::Vec<ffi::String>,
+pub struct Context<'l> {
+    pub things: ffi::Slice<'l, ffi::String>,
     // headers: HashMap<String, String>, // TODO: unsupported
 }
 
 #[ffi_type]
-pub struct Table {
-    pub metadata: TableMetadata,
-    pub byte_array: ffi::Vec<u8>,
+pub struct Table<'l> {
+    pub metadata: TableMetadata<'l>,
+    pub byte_array: ffi::Slice<'l, u8>,
 }
 
 #[ffi_type]
-pub struct Configuration {
+pub struct Configuration<'l> {
     pub is_ok_response: bool,
-    pub host: ffi::String,
+    pub host: ffi::Slice<'l, ffi::String>,
     pub response_size: u64, // controls N in benchmarks
 }
 
@@ -85,11 +84,11 @@ pub struct Data {
 }
 
 #[ffi_type]
-pub struct TableMetadata {
+pub struct TableMetadata<'l> {
     pub row_count: i32,
     pub column_count: i32,
-    pub guid: ffi::String,
-    pub prefix: ffi::String,
+    pub guid: ffi::Slice<'l, ffi::String>,
+    pub prefix: ffi::Slice<'l, ffi::String>,
 }
 
 #[ffi_type]
