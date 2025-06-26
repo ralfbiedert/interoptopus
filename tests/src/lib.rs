@@ -13,9 +13,9 @@ macro_rules! validate_output {
         let file = format!("{}/{}", $folder, $file);
 
         if $crate::UPDATE_BINDINGS {
-            std::fs::write(file, $generated).unwrap();
+            ::std::fs::write(file, $generated).unwrap();
         } else {
-            let expected = std::fs::read_to_string(file.clone())?;
+            let expected = ::std::fs::read_to_string(file.clone())?;
             for (i, (actual_line, expected_line)) in $generated.lines().zip(expected.lines()).enumerate() {
                 assert_eq!(actual_line, expected_line, "Difference {}:{}", file, i);
             }

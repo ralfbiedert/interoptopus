@@ -15,7 +15,10 @@ pub fn write_imports(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     indented!(w, r"using System.Runtime.InteropServices.Marshalling;")?;
     indented!(w, r"using System.Runtime.CompilerServices;")?;
 
-    for (_, v) in &i.namespace_mappings {
+    let mut namespace_imports = i.namespace_mappings.iter().map(|x| x.1.as_str().to_string()).collect::<Vec<_>>();
+    namespace_imports.sort();
+
+    for v in namespace_imports {
         indented!(w, r"using {v};")?;
     }
 
