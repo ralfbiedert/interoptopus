@@ -31,6 +31,11 @@
             AdditionalImportDirs="models"
         />
   </ItemGroup>
+    <Target Name="Rust Build" BeforeTargets="Compile">
+      <Exec Command="echo 'Configuration: $(Configuration)'"/>
+      <Exec Condition="'$(Configuration)' == 'Release'" Command="cargo b --release" WorkingDirectory="./"/>
+      <Exec Condition="'$(Configuration)' != 'Release'" Command="cargo b" WorkingDirectory="./"/>
+    </Target>
     <ItemGroup>
         <None Include="$(MSBuildThisFileDirectory)\target\$(Configuration)\*proto_benchy*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
