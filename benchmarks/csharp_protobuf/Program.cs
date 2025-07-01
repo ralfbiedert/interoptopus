@@ -82,7 +82,7 @@ public class BenchyBase
         input.value = new Table();
         input.value.metadata = new TableMetadata();
         input.context = new Context();
-        
+
         // input.configuration.host (String) = from "" to "verylonghostname" (4096 chars)
         input.configuration.host = "127.0.0.1".Utf8();
         input.configuration.response_size = (ulong)n;
@@ -92,7 +92,10 @@ public class BenchyBase
         input.value.metadata.prefix = "ordinary_prefix_".Utf8();
         input.value.metadata.row_count = 5;
         input.value.metadata.column_count = 7;
-        input.value.byte_array = SliceU8.From(new byte[n]); // from 0 bytes to 1Mb
+        fixed (var x = new byte[n]) // try with memory pinned from the start
+        {
+            input.value.byte_array = SliceU8.From(x, x.Length); // from 0 bytes to 1Mb}
+        }
         // input.context.things = from 0 strings to 1,000,000 strings "thingX"
         var things = new Utf8String[n];
         for (int i = 0; i < n; i++)
@@ -154,7 +157,7 @@ public class HotBenchy : BenchyBase
     {
         var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(50));
     }
-    
+
     [Benchmark]
     public void Protobuf_100_hot()
     {
@@ -166,24 +169,24 @@ public class HotBenchy : BenchyBase
     {
         var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(500));
     }
-    
+
     [Benchmark]
     public void Protobuf_1k_hot()
     {
         var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(MEDIUM));
     }
 
-/*    [Benchmark]
-    public void Protobuf_200k_hot()
-    {
-        var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(200000));
-    }
+    /*    [Benchmark]
+        public void Protobuf_200k_hot()
+        {
+            var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(200000));
+        }
 
-    [Benchmark]
-    public void Protobuf_1kk_hot()
-    {
-        var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(LARGE));
-    }*/
+        [Benchmark]
+        public void Protobuf_1kk_hot()
+        {
+            var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(LARGE));
+        }*/
 
     [Benchmark]
     public void Ffi_0_hot()
@@ -220,18 +223,18 @@ public class HotBenchy : BenchyBase
     {
         var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(MEDIUM));
     }
-/*
-    [Benchmark]
-    public void Ffi_200k_hot()
-    {
-        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(200000));
-    }
+    /*
+        [Benchmark]
+        public void Ffi_200k_hot()
+        {
+            var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(200000));
+        }
 
-    [Benchmark]
-    public void Ffi_1kk_hot()
-    {
-        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(LARGE));
-    }*/
+        [Benchmark]
+        public void Ffi_1kk_hot()
+        {
+            var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(LARGE));
+        }*/
 
     // [Benchmark]
     // public void WireInterop_0()
