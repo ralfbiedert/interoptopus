@@ -31,6 +31,12 @@ mod meta;
 mod primitive;
 mod wire_helpers;
 
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub enum WireType {
+    Primitive(Primitive),
+    Composite(()),
+}
+
 /// A type that can exist at the FFI boundary.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum Type {

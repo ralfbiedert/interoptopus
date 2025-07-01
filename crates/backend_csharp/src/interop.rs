@@ -321,6 +321,7 @@ impl Interop {
         }
     }
 
+    /// Generate bindings file in C#.
     fn write_all(&self, w: &mut IndentWriter) -> Result<(), Error> {
         write_file_header_comments(self, w)?;
         w.newline()?;

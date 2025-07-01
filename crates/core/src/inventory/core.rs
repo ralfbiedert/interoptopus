@@ -157,6 +157,7 @@ pub enum Symbol {
     Constant(Constant),
     Type(Type),
     Pattern(LibraryPattern),
+    Wired(Wired), // collect metadata here
 }
 
 /// Produces a [`Inventory`] inside your inventory function, **start here**.🔥
@@ -199,6 +200,7 @@ pub enum Symbol {
 pub struct InventoryBuilder {
     functions: Vec<Function>,
     c_types: Vec<Type>,
+    wire_types: Vec<WireType>,
     constants: Vec<Constant>,
     patterns: Vec<LibraryPattern>,
     allow_reserved_names: bool,
@@ -221,6 +223,7 @@ impl InventoryBuilder {
             Symbol::Function(x) => self.functions.push(x),
             Symbol::Constant(x) => self.constants.push(x),
             Symbol::Type(x) => self.c_types.push(x),
+            Symbol::Wire(x) => self.wire_types.push(x),
             Symbol::Pattern(x) => {
                 match &x {
                     LibraryPattern::Service(x) => {
