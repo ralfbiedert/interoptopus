@@ -198,7 +198,7 @@ pub enum Symbol {
 #[derive(Default, Debug)]
 pub struct InventoryBuilder {
     functions: Vec<Function>,
-    ctypes: Vec<Type>,
+    c_types: Vec<Type>,
     constants: Vec<Constant>,
     patterns: Vec<LibraryPattern>,
     allow_reserved_names: bool,
@@ -207,8 +207,8 @@ pub struct InventoryBuilder {
 impl InventoryBuilder {
     /// Start creating a new library.
     #[must_use]
-    const fn new() -> Self {
-        Self { functions: Vec::new(), ctypes: Vec::new(), constants: Vec::new(), patterns: Vec::new(), allow_reserved_names: false }
+    pub const fn new() -> Self {
+        Self { functions: Vec::new(), c_types: Vec::new(), constants: Vec::new(), patterns: Vec::new(), allow_reserved_names: false }
     }
 
     /// Registers a symbol.
@@ -220,7 +220,7 @@ impl InventoryBuilder {
         match s {
             Symbol::Function(x) => self.functions.push(x),
             Symbol::Constant(x) => self.constants.push(x),
-            Symbol::Type(x) => self.ctypes.push(x),
+            Symbol::Type(x) => self.c_types.push(x),
             Symbol::Pattern(x) => {
                 match &x {
                     LibraryPattern::Service(x) => {
@@ -282,7 +282,7 @@ impl InventoryBuilder {
     /// Produce the [`Inventory`].
     #[must_use]
     pub fn build(self) -> Inventory {
-        Inventory::new(self.functions, self.constants, self.patterns, self.ctypes.as_slice())
+        Inventory::new(self.functions, self.constants, self.patterns, self.c_types.as_slice())
     }
 }
 
