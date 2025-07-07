@@ -115,7 +115,7 @@ fn method_type(function: &ImplItemFn) -> MethodType {
 pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, function: &ImplItemFn) -> Option<Descriptor> {
     let orig_fn_ident = &function.sig.ident;
     let service_type = &impl_block.self_ty;
-    let service_prefix = attributes.prefered_service_name(impl_block);
+    let service_prefix = attributes.preferred_service_name(impl_block);
     let has_async = has_async_methods(impl_block);
     let mut generics = function.sig.generics.clone();
     let mut inputs = Vec::new();
@@ -343,7 +343,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
 }
 
 pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> Descriptor {
-    let service_prefix = attributes.prefered_service_name(impl_block);
+    let service_prefix = attributes.preferred_service_name(impl_block);
     let ffi_fn_ident = Ident::new(&format!("{service_prefix}destroy"), impl_block.span());
     let without_lifetimes = purge_lifetimes_from_type(&impl_block.self_ty);
     let has_async = has_async_methods(impl_block);
