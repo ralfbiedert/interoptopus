@@ -1,0 +1,5 @@
+{
+  "languages": {
+    "CSharp": { "enable_language_server": false }
+  }
+}
