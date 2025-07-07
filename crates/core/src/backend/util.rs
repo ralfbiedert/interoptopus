@@ -118,7 +118,7 @@ pub fn longest_common_prefix(functions: &[Function]) -> String {
 
 /// Return all used and nested types, without duplicates.
 #[must_use]
-#[allow(clippy::redundant_pub_crate)]
+#[expect(clippy::redundant_pub_crate)]
 pub(crate) fn types_from_functions_types(functions: &[Function], extra_types: &[Type]) -> Vec<Type> {
     let mut types = HashSet::new();
 
