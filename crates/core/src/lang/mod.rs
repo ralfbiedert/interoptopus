@@ -18,7 +18,7 @@ pub use function::{Function, Parameter, Signature, SugaredReturnType};
 pub use info::{ConstantInfo, FunctionInfo, TypeInfo};
 pub use meta::{Docs, Meta, Visibility};
 pub use primitive::{Primitive, PrimitiveValue};
-pub use wire_helpers::{De, Ser};
+pub use wire_helpers::{De, Ser, WireType};
 
 mod array;
 mod composite;
@@ -30,12 +30,6 @@ mod info;
 mod meta;
 mod primitive;
 mod wire_helpers;
-
-#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub enum WireType {
-    Primitive(Primitive),
-    Composite(()),
-}
 
 /// A type that can exist at the FFI boundary.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]

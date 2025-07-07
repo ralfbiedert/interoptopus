@@ -15,6 +15,13 @@ use std::{
     io::{Error, ErrorKind, Read, Result, Write},
 };
 
+/// A descriptor for a type that can be serialized/deserialized across FFI boundary.
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub enum WireType {
+    Primitive(super::Primitive),
+    Composite(()),
+}
+
 pub trait Ser {
     fn ser(&self, out: &mut impl Write) -> Result<()>;
 

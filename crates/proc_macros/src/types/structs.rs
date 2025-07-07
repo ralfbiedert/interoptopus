@@ -229,6 +229,7 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
     }
 
     let wires = if attributes.wired {
+        // wire_types.push(this_type); // transitively pull all other types it depends on!
         quote! {
             impl ::interoptopus::lang::Ser for #struct_ident {
                 fn ser(&self, output: &mut impl ::std::io::Write) -> ::std::io::Result<()> {
