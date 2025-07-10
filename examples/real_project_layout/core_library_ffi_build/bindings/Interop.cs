@@ -79,7 +79,6 @@ namespace My.Company
     public partial struct Error 
     {
 
-
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -265,8 +264,6 @@ namespace My.Company
         }
 
 
-
-
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
         {
@@ -377,15 +374,12 @@ namespace My.Company
     [NativeMarshalling(typeof(MarshallerMeta))]
     public partial struct ResultError 
     {
-
         [StructLayout(LayoutKind.Sequential)]
         internal unsafe struct UnmanagedErr
         {
             internal uint _variant;
             internal Error.Unmanaged _Err;
         }
-
-
 
 
         [StructLayout(LayoutKind.Explicit)]

@@ -139,11 +139,10 @@ pub fn write_type_definition_enum_variant_unmanaged_types(i: &Interop, w: &mut I
                 indented!(w, [()()], r"internal uint _variant;")?;
                 indented!(w, [()()], r"internal {ty} _{vname};")?;
                 indented!(w, [()], r"}}")?;
+                w.newline()?;
             }
             VariantKind::Typed(_, _) => {}
         }
-
-        w.newline()?;
     }
 
     Ok(())
