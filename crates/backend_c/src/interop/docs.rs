@@ -9,7 +9,7 @@ pub fn write_file_header_comments(i: &Interop, w: &mut IndentWriter) -> Result<(
 
 pub fn write_documentation(w: &mut IndentWriter, documentation: &Docs) -> Result<(), Error> {
     for line in documentation.lines() {
-        indented!(w, r"/// {}", line)?;
+        indented!(w, r"///{}", line)?;
     }
 
     Ok(())
