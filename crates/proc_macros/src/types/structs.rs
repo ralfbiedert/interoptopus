@@ -264,17 +264,14 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
                 fn type_info() -> ::interoptopus::lang::Type {
                     let docs = ::interoptopus::lang::Docs::from_line(#doc_line);
                     let mut meta = ::interoptopus::lang::Meta::with_module_docs(#namespace.to_string(), docs);
+                    let mut fields: ::std::vec::Vec<interoptopus::lang::Field> = ::std::vec::Vec::new();
+                    let mut generics: ::std::vec::Vec<::std::string::String> = ::std::vec::Vec::new();
 
-                    // meta.set_visibility(::interoptopus::lang::Visibility::#visibility);
+                    #let_name
 
-                    let name = #struct_name.to_string();
-                    let fields = vec![
-                        #(
-                            ::interoptopus::lang::Field::with_documentation(#field_names.to_string(), #field_types, #field_docs),
-                        )*
-                    ];
+                    #let_fields
 
-                    let repr = #repr;
+                    let repr = ::interoptopus::lang::Representation::new(#layout, #align);
                     let rval = ::interoptopus::lang::Composite::with_meta_repr(name, fields, meta, repr);
                     ::interoptopus::lang::Type::Wired(rval)
                 }

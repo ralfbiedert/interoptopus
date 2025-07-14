@@ -52,21 +52,22 @@ impl<T: Ser + De> From<T> for Wire<T> {
     }
 }
 
-pub trait WireInfo {
-    fn wire_info() -> crate::lang::Type;
-}
+// pub trait WireInfo {
+//     fn wire_info() -> crate::lang::Type;
+// }
 
-impl<T: crate::lang::TypeInfo + Ser + De> WireInfo for T {
-    fn wire_info() -> crate::lang::Type {
-        <T as crate::lang::TypeInfo>::type_info()
-    }
-}
+// impl<T: crate::lang::TypeInfo + Ser + De> WireInfo for T {
+//     fn wire_info() -> crate::lang::Type {
+//         <T as crate::lang::TypeInfo>::type_info()
+//     }
+// }
 
-unsafe impl<T: crate::lang::TypeInfo + Ser + De> crate::lang::TypeInfo for Wire<T> {
-    fn type_info() -> crate::lang::Type {
-        <T as crate::lang::TypeInfo>::type_info()
-    }
-}
+// Not needed: generated code should extract type info directly from T.
+// unsafe impl<T: crate::lang::TypeInfo + Ser + De> crate::lang::TypeInfo for Wire<T> {
+//     fn type_info() -> crate::lang::Type {
+//         <T as crate::lang::TypeInfo>::type_info()
+//     }
+// }
 
 // Wire means:
 // On CSharp side:

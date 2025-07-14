@@ -64,7 +64,7 @@ pub fn rval_tokens(return_type: &ReturnType) -> TokenStream {
 }
 
 /// Extracts the inner type T from Wire<T> if the given TypePath is Wire<T>, otherwise returns None
-fn extract_inner_type_from_wire(type_path: &syn::TypePath) -> Option<Type> {
+fn _extract_inner_type_from_wire(type_path: &syn::TypePath) -> Option<Type> {
     if type_path.path.segments[0].ident == "Wire" {
         if let syn::PathArguments::AngleBracketed(args) = &type_path.path.segments[0].arguments {
             if let Some(syn::GenericArgument::Type(inner_type)) = args.args.first() {
@@ -152,8 +152,8 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
     let mut args_type = Vec::new();
     let mut generic_parameters = Vec::new();
     let mut generic_ident = Vec::new();
-    let mut args_type_info = Vec::new();
-    let mut args_types = Vec::new();
+    // let mut args_type_info = Vec::new();
+    // let mut args_types = Vec::new();
     let mut wire_args = Vec::new(); // Track Wire<T> arguments for preamble generation
     let mut wire_return_type: Option<String> = None; // Track Wire<T> return type
 
