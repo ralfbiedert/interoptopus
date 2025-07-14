@@ -1,9 +1,11 @@
 public partial class WireOf{{type}}
 {
-    public void Ser()
+    private fixed buf; // A pinned interop buffer...
+
+    public void Ser({{type}})
     {}
 
-    public WireOf{{type}} De()
+    public {{type}} De()
     {}
   // need to support Ser and De functions for this type...
   // needs a reference to buffer slice in these functions or in the class itself?
@@ -14,5 +16,10 @@ public partial class WireOf{{type}}
   // etc
 }
 
-// how do we wire Primitives?
+public static class WireOf{{type}}Extensions
+{
+    public static WireOf{{type}} Wire(this {{type}} t) { return WireOf{{type}}.From(t); }
+}
+
+// how do we wire Primitives? NATIVELY!
 // is Wire<u32> a thing? Most probably not, useless. Wire wraps a struct.

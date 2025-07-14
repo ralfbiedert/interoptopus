@@ -239,10 +239,12 @@ namespace My.Company
 
     public partial class WireOfReturn
     {
-        public void Ser()
+        private fixed buf; // A pinned interop buffer...
+
+        public void Ser(Return)
         {}
 
-        public WireOfReturn De()
+        public Return De()
         {}
       // need to support Ser and De functions for this type...
       // needs a reference to buffer slice in these functions or in the class itself?
@@ -253,15 +255,22 @@ namespace My.Company
       // etc
     }
 
-    // how do we wire Primitives?
+    public static class WireOfReturnExtensions
+    {
+        public static WireOfReturn Wire(this Return t) { return WireOfReturn.From(t); }
+    }
+
+    // how do we wire Primitives? NATIVELY!
     // is Wire<u32> a thing? Most probably not, useless. Wire wraps a struct.
 
     public partial class WireOfSomething
     {
-        public void Ser()
+        private fixed buf; // A pinned interop buffer...
+
+        public void Ser(Something)
         {}
 
-        public WireOfSomething De()
+        public Something De()
         {}
       // need to support Ser and De functions for this type...
       // needs a reference to buffer slice in these functions or in the class itself?
@@ -272,7 +281,12 @@ namespace My.Company
       // etc
     }
 
-    // how do we wire Primitives?
+    public static class WireOfSomethingExtensions
+    {
+        public static WireOfSomething Wire(this Something t) { return WireOfSomething.From(t); }
+    }
+
+    // how do we wire Primitives? NATIVELY!
     // is Wire<u32> a thing? Most probably not, useless. Wire wraps a struct.
 
     ///Result that contains value or an error.
