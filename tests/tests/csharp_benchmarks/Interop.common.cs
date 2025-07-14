@@ -24,6 +24,8 @@ using System.Runtime.CompilerServices;
 using My.Company;
 using My.Company;
 using My.Company.Common;
+using System.Runtime.CompilerServices;
+[assembly: DisableRuntimeMarshalling]
 #pragma warning restore 0105
 
 namespace My.Company.Common
