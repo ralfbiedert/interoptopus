@@ -20,13 +20,15 @@ use std::{
 // type T over the FFI border in a byte array package.
 // use crate::lang::Ser;
 // use std::borrow::Cow;
+use crate::ffi;
 use std::marker::PhantomData;
 
+#[repr(C)]
 pub struct Wire<T>
 where
     T: Ser + De,
 {
-    buf: Vec<u8>,          //Cow<[u8]>,        // storage gotten from wherever -- define
+    buf: ffi::Vec<u8>,     //Cow<[u8]>,        // storage gotten from wherever -- define
     _type: PhantomData<T>, // what we're wiring
 }
 
@@ -46,7 +48,7 @@ impl<T: Ser + De> Wire<T> {
 impl<T: Ser + De> From<T> for Wire<T> {
     fn from(_value: T) -> Self {
         Wire {
-            buf: Vec::new(), // TODO: serialize value into buf
+            buf: ffi::Vec::from(vec![]), // TODO: serialize value into buf
             _type: PhantomData,
         }
     }

@@ -159,7 +159,12 @@ pub(crate) fn types_from_type_recursive(start: &Type, types: &mut HashSet<Type>)
         }
         // a Wired struct knows how to serialize itself and contained types,
         // there's never a need to embed Wire<T> inside a struct
-        Type::Wired(_) => todo!(),
+        Type::Wired(inner) => {
+            for field in inner.fields() {
+                println!("TYPES_FROM_TYPE_RECURSIVE for WIRE: field {}", field.name());
+                types_from_type_recursive(field.the_type(), types);
+            }
+        }
         Type::Array(inner) => types_from_type_recursive(inner.the_type(), types),
         Type::FnPointer(inner) => {
             types_from_type_recursive(inner.signature().rval(), types);
@@ -235,7 +240,9 @@ pub(crate) fn extract_namespaces_from_types(types: &[Type], into: &mut HashSet<S
             Type::Composite(x) => {
                 into.insert(x.meta().module().to_string());
             }
-            Type::Wired(_) => todo!(),
+            Type::Wired(inner) => {
+                into.insert(inner.meta().module().to_string());
+            }
             Type::FnPointer(_) => {}
             Type::ReadPointer(_) => {}
             Type::ReadWritePointer(_) => {}
@@ -298,7 +305,7 @@ pub(crate) fn holds_opaque_without_ref(typ: &Type) -> bool {
             }
             false
         }
-        Type::Wired(_) => todo!(),
+        Type::Wired(_) => false,
         Type::FnPointer(_) => false,
         Type::ReadPointer(_) => false,
         Type::ReadWritePointer(_) => false,
@@ -427,7 +434,7 @@ pub fn is_global_type(t: &Type) -> bool {
         }
         Type::Opaque(_) => false,
         Type::Composite(_) => false,
-        Type::Wired(_) => todo!(),
+        Type::Wired(_) => false,
         Type::FnPointer(_) => false,
         Type::ReadPointer(x) => is_global_type(x),
         Type::ReadWritePointer(x) => is_global_type(x),

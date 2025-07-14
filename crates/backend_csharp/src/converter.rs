@@ -120,7 +120,7 @@ pub fn param_to_type(x: &Type) -> String {
         Type::Enum(x) => x.rust_name().to_string(),
         Type::Opaque(_) => "IntPtr".to_string(),
         Type::Composite(x) => x.rust_name().to_string(),
-        Type::Wired(_) => todo!(),
+        Type::Wired(x) => format!("WireOf{}", x.rust_name().to_string()),
         Type::ReadPointer(z) => match &**z {
             Type::Opaque(_) => "IntPtr".to_string(),
             Type::Primitive(Primitive::Void) => "IntPtr".to_string(),
@@ -230,7 +230,7 @@ pub fn rval_to_type_sync(x: &Type) -> String {
         Type::Enum(x) => x.rust_name().to_string(),
         Type::Opaque(_) => "IntPtr".to_string(),
         Type::Composite(x) => x.rust_name().to_string(),
-        Type::Wired(_) => todo!(),
+        Type::Wired(x) => format!("WireOf{}", x.rust_name().to_string()),
         Type::ReadPointer(_) => "IntPtr".to_string(),
         Type::ReadWritePointer(_) => "IntPtr".to_string(),
         Type::FnPointer(x) => fnpointer_to_type(x),

@@ -346,7 +346,7 @@ impl Interop {
             Type::Enum(x) => self.should_emit_by_meta(x.meta()),
             Type::Opaque(x) => self.should_emit_by_meta(x.meta()),
             Type::Composite(x) => self.should_emit_by_meta(x.meta()),
-            Type::Wired(_) => todo!(),
+            Type::Wired(x) => self.should_emit_by_meta(x.meta()), //TODO: really?
             Type::FnPointer(_) => true,
             Type::ReadPointer(_) => false,
             Type::ReadWritePointer(_) => false,

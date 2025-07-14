@@ -7,13 +7,13 @@ pub mod engine;
 pub mod error;
 
 #[ffi_type(wired)]
-struct Something {
+pub struct Something {
     field: u16,
     name: String,
 }
 
 #[ffi_type(wired)]
-struct Return {
+pub struct Return {
     field: u32,
 }
 

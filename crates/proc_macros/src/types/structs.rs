@@ -43,6 +43,7 @@ use syn::{GenericParam, ItemStruct, Type};
 //
 // ```
 //
+
 #[allow(clippy::too_many_lines, clippy::cognitive_complexity, clippy::useless_let_if_seq)]
 pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: ItemStruct) -> TokenStream {
     let namespace = attributes.namespace.clone().unwrap_or_default();
@@ -153,7 +154,9 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
             }
         };
 
-        field_type_info.push(quote! { < #token as ::interoptopus::lang::TypeInfo >::type_info()  });
+        if !attributes.wired {
+            field_type_info.push(quote! { < #token as ::interoptopus::lang::TypeInfo >::type_info()  });
+        }
         field_types.push(quote! { #token });
     }
 
@@ -169,6 +172,8 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
                 })*
         }
     };
+
+    let let_fields_wired = quote! {};
 
     let let_name = attributes.name.as_ref().map_or_else(
         || {
@@ -269,7 +274,7 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
 
                     #let_name
 
-                    #let_fields
+                    #let_fields_wired
 
                     let repr = ::interoptopus::lang::Representation::new(#layout, #align);
                     let rval = ::interoptopus::lang::Composite::with_meta_repr(name, fields, meta, repr);

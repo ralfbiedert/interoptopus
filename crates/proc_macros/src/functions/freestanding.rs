@@ -31,7 +31,20 @@ pub fn rval_tokens(return_type: &ReturnType) -> TokenStream {
     if let ReturnType::Type(_, x) = return_type {
         match &**x {
             Type::Path(x) => {
-                let token = x.to_token_stream();
+                let token = if x.path.segments[0].ident == "Wire" {
+                    // Extract inner type from Wire<T>
+                    if let syn::PathArguments::AngleBracketed(args) = &x.path.segments[0].arguments {
+                        if let Some(syn::GenericArgument::Type(inner_type)) = args.args.first() {
+                            inner_type.to_token_stream()
+                        } else {
+                            x.to_token_stream()
+                        }
+                    } else {
+                        x.to_token_stream()
+                    }
+                } else {
+                    x.to_token_stream()
+                };
                 quote_spanned!(span=> < #token as ::interoptopus::lang::TypeInfo>::type_info())
             }
             Type::Group(x) => {
@@ -240,13 +253,12 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
                         };
                         // Track this Wire<X> argument for preamble generation
                         wire_args.push((clean_name.to_string(), wrapped_type.clone()));
-                        // args_type_info.push(quote! { < #wrapped_type as ::interoptopus::lang::WireInfo >::wire_info()  });
-                        // args_types.push(quote! { #wrapped_type });
-                        // Strip off Wire<> wrapper in the signature
-                        // x.path.segments[0].arguments.to_token_stream()
-                    } //else {
-                    x.path.to_token_stream()
-                    // }
+                        // Return the inner type for TypeInfo generation
+                        let inner_type_tokens: TokenStream = wrapped_type.parse().expect("Failed to parse inner type");
+                        inner_type_tokens
+                    } else {
+                        x.path.to_token_stream()
+                    }
                 }
                 Type::Reference(x) => x.to_token_stream(),
                 Type::Group(x) => x.to_token_stream(),
