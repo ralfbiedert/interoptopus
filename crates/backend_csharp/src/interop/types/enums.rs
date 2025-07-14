@@ -24,7 +24,7 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
     } else {
         MoveSemantics::Move
     };
-    let idisposable = if has_dispose(&the_type.to_type()) { ": IDisposable" } else { "" };
+    let idisposable = if has_dispose(&the_type.to_type()) { " : IDisposable" } else { "" };
 
     indented!(w, r"public partial {self_kind} {name}")?;
     indented!(w, r"{{")?;
@@ -33,7 +33,7 @@ pub fn write_type_definition_enum_marshaller(i: &Interop, w: &mut IndentWriter, 
     w.newline()?;
 
     indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
-    indented!(w, r"public partial {self_kind} {name} {idisposable}")?;
+    indented!(w, r"public partial {self_kind} {name}{idisposable}")?;
     indented!(w, r"{{")?;
 
     write_type_definition_enum_variant_unmanaged_types(i, w, the_type)?;
@@ -139,11 +139,10 @@ pub fn write_type_definition_enum_variant_unmanaged_types(i: &Interop, w: &mut I
                 indented!(w, [()()], r"internal uint _variant;")?;
                 indented!(w, [()()], r"internal {ty} _{vname};")?;
                 indented!(w, [()], r"}}")?;
+                w.newline()?;
             }
             VariantKind::Typed(_, _) => {}
         }
-
-        w.newline()?;
     }
 
     Ok(())

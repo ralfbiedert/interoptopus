@@ -76,9 +76,8 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct Error 
+    public partial struct Error
     {
-
 
         [StructLayout(LayoutKind.Explicit)]
         public unsafe struct Unmanaged
@@ -163,7 +162,7 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct Vec2 
+    public partial struct Vec2
     {
         public Vec2() { }
 
@@ -248,7 +247,7 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultConstPtrGameEngineError 
+    public partial struct ResultConstPtrGameEngineError
     {
         [StructLayout(LayoutKind.Sequential)]
         internal unsafe struct UnmanagedOk
@@ -263,8 +262,6 @@ namespace My.Company
             internal uint _variant;
             internal Error.Unmanaged _Err;
         }
-
-
 
 
         [StructLayout(LayoutKind.Explicit)]
@@ -375,17 +372,14 @@ namespace My.Company
     }
 
     [NativeMarshalling(typeof(MarshallerMeta))]
-    public partial struct ResultError 
+    public partial struct ResultError
     {
-
         [StructLayout(LayoutKind.Sequential)]
         internal unsafe struct UnmanagedErr
         {
             internal uint _variant;
             internal Error.Unmanaged _Err;
         }
-
-
 
 
         [StructLayout(LayoutKind.Explicit)]
