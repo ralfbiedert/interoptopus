@@ -12,13 +12,14 @@ use crate::interop::types::bools::write_type_definition_ffibool;
 use crate::interop::types::composite::write_type_definition_composite;
 use crate::interop::types::enums::write_type_definition_enum;
 use crate::interop::types::fnptrs::write_type_definition_fn_pointer;
+use crate::interop::wires::write_type_definitions_wired;
 use interoptopus::Error;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Type;
 use interoptopus::pattern::TypePattern;
 
 pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
-    for the_type in i.inventory.ctypes() {
+    for the_type in i.inventory.c_types() {
         write_type_definition(i, w, the_type)?;
     }
 
@@ -40,6 +41,10 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type)
         Type::Opaque(_) => {}
         Type::Composite(c) => {
             write_type_definition_composite(i, w, c)?;
+            w.newline()?;
+        }
+        Type::Wired(wired) => {
+            write_type_definitions_wired(i, w, wired)?;
             w.newline()?;
         }
         Type::FnPointer(f) => {
@@ -88,7 +93,6 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type)
                 write_pattern_async_trampoline(i, w, x)?;
                 w.newline()?;
             }
-            TypePattern::Wire(_) => todo!(),
         },
     }
     Ok(())

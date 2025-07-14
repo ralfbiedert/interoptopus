@@ -137,7 +137,7 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
                         // Ok, I really don't know if this is kosher. After some debugging it seems to work,
                         // but this is probably brittle AF.
 
-                        let first = x.path.segments.first().expect("Must have last path segment.");
+                        let first = x.path.segments.first().expect("Must have first path segment.");
                         let middle = x.path.segments.iter().skip(1).rev().skip(1).rev().collect::<Vec<_>>();
                         let last = x.path.segments.last().expect("Must have last path segment.");
                         quote! { < #ty as #first #(:: #middle)*> :: #last }
@@ -238,10 +238,10 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
                     )*
                     Ok(())
                 }
-                fn estimate_storage_size(&self) -> usize {
+                fn storage_size(&self) -> usize {
                     0
                     #(
-                        + self.#field_idents.estimate_storage_size()
+                        + self.#field_idents.storage_size()
                     )*
                 }
             }
@@ -258,7 +258,28 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
     };
 
     let type_info = if attributes.wired {
-        quote! {}
+        quote! {
+            unsafe impl #param_param ::interoptopus::lang::TypeInfo for #struct_ident #param_struct #param_where {
+
+                fn type_info() -> ::interoptopus::lang::Type {
+                    let docs = ::interoptopus::lang::Docs::from_line(#doc_line);
+                    let mut meta = ::interoptopus::lang::Meta::with_module_docs(#namespace.to_string(), docs);
+
+                    // meta.set_visibility(::interoptopus::lang::Visibility::#visibility);
+
+                    let name = #struct_name.to_string();
+                    let fields = vec![
+                        #(
+                            ::interoptopus::lang::Field::with_documentation(#field_names.to_string(), #field_types, #field_docs),
+                        )*
+                    ];
+
+                    let repr = #repr;
+                    let rval = ::interoptopus::lang::Composite::with_meta_repr(name, fields, meta, repr);
+                    ::interoptopus::lang::Type::Wired(rval)
+                }
+            }
+        }
     } else {
         match type_repr {
             TypeRepresentation::C | TypeRepresentation::Opaque | TypeRepresentation::Packed => {

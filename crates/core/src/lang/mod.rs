@@ -18,7 +18,7 @@ pub use function::{Function, Parameter, Signature, SugaredReturnType};
 pub use info::{ConstantInfo, FunctionInfo, TypeInfo};
 pub use meta::{Docs, Meta, Visibility};
 pub use primitive::{Primitive, PrimitiveValue};
-pub use wire_helpers::{De, Ser, WireType};
+pub use wire::{De, Ser, Wire};
 
 mod array;
 mod composite;
@@ -29,7 +29,7 @@ mod function;
 mod info;
 mod meta;
 mod primitive;
-mod wire_helpers;
+mod wire;
 
 /// A type that can exist at the FFI boundary.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -39,6 +39,8 @@ pub enum Type {
     Enum(Enum),
     Opaque(Opaque),
     Composite(Composite),
+    /// A composite type, serialized and deserialized through the FFI boundary.
+    Wired(Composite),
     FnPointer(FnPointer),
     ReadPointer(Box<Type>),
     ReadWritePointer(Box<Type>),
@@ -106,6 +108,7 @@ impl Type {
             Self::Enum(x) => x.rust_name().to_string(),
             Self::Opaque(x) => x.rust_name().to_string(),
             Self::Composite(x) => x.rust_name().to_string(),
+            Self::Wired(x) => x.rust_name().to_string(),
             Self::FnPointer(x) => x.rust_name(),
             Self::ReadPointer(x) => format!("ConstPtr{}", capitalize_first_letter(x.name_within_lib().as_str())),
             Self::ReadWritePointer(x) => format!("MutPtr{}", capitalize_first_letter(x.name_within_lib().as_str())),
@@ -136,6 +139,7 @@ impl Type {
             Self::Enum(_) => None,
             Self::Opaque(_) => None,
             Self::Composite(_) => None,
+            Self::Wired(_) => None,
             Self::FnPointer(_) => None,
             Self::ReadPointer(x) => Some(x.as_ref()),
             Self::ReadWritePointer(x) => Some(x.as_ref()),
@@ -149,6 +153,7 @@ impl Type {
     pub const fn as_composite_type(&self) -> Option<&Composite> {
         match self {
             Self::Composite(x) => Some(x),
+            Self::Wired(x) => Some(x),
             _ => None,
         }
     }

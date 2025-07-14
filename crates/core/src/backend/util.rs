@@ -157,6 +157,9 @@ pub(crate) fn types_from_type_recursive(start: &Type, types: &mut HashSet<Type>)
                 types_from_type_recursive(field.the_type(), types);
             }
         }
+        // a Wired struct knows how to serialize itself and contained types,
+        // there's never a need to embed Wire<T> inside a struct
+        Type::Wired(_) => todo!(),
         Type::Array(inner) => types_from_type_recursive(inner.the_type(), types),
         Type::FnPointer(inner) => {
             types_from_type_recursive(inner.signature().rval(), types);
@@ -210,9 +213,6 @@ pub(crate) fn types_from_type_recursive(start: &Type, types: &mut HashSet<Type>)
             TypePattern::CChar => {}
             TypePattern::APIVersion => {}
             TypePattern::Utf8String(_) => {}
-            TypePattern::Wire(_) => {
-                todo!()
-            }
         },
     }
 }
@@ -235,6 +235,7 @@ pub(crate) fn extract_namespaces_from_types(types: &[Type], into: &mut HashSet<S
             Type::Composite(x) => {
                 into.insert(x.meta().module().to_string());
             }
+            Type::Wired(_) => todo!(),
             Type::FnPointer(_) => {}
             Type::ReadPointer(_) => {}
             Type::ReadWritePointer(_) => {}
@@ -262,9 +263,6 @@ pub(crate) fn extract_namespaces_from_types(types: &[Type], into: &mut HashSet<S
                 TypePattern::Utf8String(_) => {}
                 TypePattern::Vec(x) => {
                     into.insert(x.meta().module().to_string());
-                }
-                TypePattern::Wire(_) => {
-                    todo!()
                 }
             },
         }
@@ -300,6 +298,7 @@ pub(crate) fn holds_opaque_without_ref(typ: &Type) -> bool {
             }
             false
         }
+        Type::Wired(_) => todo!(),
         Type::FnPointer(_) => false,
         Type::ReadPointer(_) => false,
         Type::ReadWritePointer(_) => false,
@@ -316,9 +315,6 @@ pub(crate) fn holds_opaque_without_ref(typ: &Type) -> bool {
             TypePattern::NamedCallback(_) => false,
             TypePattern::AsyncCallback(_) => false,
             TypePattern::Vec(x) => holds_opaque_without_ref(x.t()),
-            TypePattern::Wire(_) => {
-                todo!()
-            }
         },
     }
 }
@@ -431,6 +427,7 @@ pub fn is_global_type(t: &Type) -> bool {
         }
         Type::Opaque(_) => false,
         Type::Composite(_) => false,
+        Type::Wired(_) => todo!(),
         Type::FnPointer(_) => false,
         Type::ReadPointer(x) => is_global_type(x),
         Type::ReadWritePointer(x) => is_global_type(x),
@@ -447,9 +444,6 @@ pub fn is_global_type(t: &Type) -> bool {
             TypePattern::AsyncCallback(_) => false,
             TypePattern::Utf8String(_) => true,
             TypePattern::Vec(x) => is_global_type(x.t()),
-            TypePattern::Wire(_) => {
-                todo!()
-            }
         },
     }
 }

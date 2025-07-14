@@ -23,7 +23,7 @@ impl<'a> Markdown<'a> {
 
         let mut known_function_pointers = vec![];
 
-        for the_type in &sort_types_by_dependencies(self.interop.inventory().ctypes().to_vec()) {
+        for the_type in &sort_types_by_dependencies(self.interop.inventory().c_types().to_vec()) {
             self.write_type_definition(w, the_type, &mut known_function_pointers)?;
         }
 
@@ -37,6 +37,7 @@ impl<'a> Markdown<'a> {
             Type::Enum(e) => e.meta(),
             Type::Opaque(o) => o.meta(),
             Type::Composite(c) => c.meta(),
+            Type::Wired(_) => todo!(),
             Type::FnPointer(_) => return Ok(()),
             Type::ReadPointer(_) => return Ok(()),
             Type::ReadWritePointer(_) => return Ok(()),

@@ -10,7 +10,7 @@ pub fn write_callback_helpers(i: &Interop, w: &mut IndentWriter) -> Result<(), E
     indented!(w, r"class {}:", i.callback_namespace)?;
     indented!(w, [()], r#""""Helpers to define callbacks.""""#)?;
 
-    for callback in i.inventory.ctypes().iter().filter_map(|x| match x {
+    for callback in i.inventory.c_types().iter().filter_map(|x| match x {
         Type::FnPointer(x) => Some(x),
         Type::Pattern(TypePattern::NamedCallback(x)) => Some(x.fnpointer()),
         _ => None,

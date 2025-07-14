@@ -1,6 +1,6 @@
 use crate::Error;
 use crate::backend::{IndentWriter, extract_namespaces_from_types, holds_opaque_without_ref, types_from_functions_types};
-use crate::lang::{Constant, Function, Type, WireType};
+use crate::lang::{Constant, Function, Type};
 use crate::pattern::LibraryPattern;
 use std::collections::HashSet;
 use std::fs::File;
@@ -157,7 +157,7 @@ pub enum Symbol {
     Constant(Constant),
     Type(Type),
     Pattern(LibraryPattern),
-    Wired(WireType), // collect metadata here
+    // Wired(WireType), // collect metadata here
 }
 
 /// Produces an [`Inventory`] inside your inventory function, **start here**.🔥
@@ -200,7 +200,7 @@ pub enum Symbol {
 pub struct InventoryBuilder {
     functions: Vec<Function>,
     c_types: Vec<Type>,
-    wire_types: Vec<WireType>,
+    // wire_types: Vec<WireType>,
     constants: Vec<Constant>,
     patterns: Vec<LibraryPattern>,
     allow_reserved_names: bool,
@@ -209,8 +209,8 @@ pub struct InventoryBuilder {
 impl InventoryBuilder {
     /// Start creating a new library.
     #[must_use]
-    pub const fn new() -> Self {
-        Self { functions: Vec::new(), c_types: Vec::new(), wire_types: Vec::new(), constants: Vec::new(), patterns: Vec::new(), allow_reserved_names: false }
+    const fn new() -> Self {
+        Self { functions: Vec::new(), c_types: Vec::new(), /*wire_types: Vec::new(),*/ constants: Vec::new(), patterns: Vec::new(), allow_reserved_names: false }
     }
 
     /// Registers a symbol.
@@ -223,7 +223,7 @@ impl InventoryBuilder {
             Symbol::Function(x) => self.functions.push(x),
             Symbol::Constant(x) => self.constants.push(x),
             Symbol::Type(x) => self.c_types.push(x),
-            Symbol::Wired(x) => self.wire_types.push(x),
+            // Symbol::Wired(x) => self.wire_types.push(x),
             Symbol::Pattern(x) => {
                 match &x {
                     LibraryPattern::Service(x) => {
@@ -263,7 +263,7 @@ impl InventoryBuilder {
         }
 
         if !self.allow_reserved_names {
-            validate_symbol_names(&self.functions, &self.ctypes);
+            validate_symbol_names(&self.functions, &self.c_types);
         }
 
         self
@@ -294,7 +294,7 @@ impl InventoryBuilder {
 pub struct Inventory {
     functions: Vec<Function>,
     c_types: Vec<Type>,
-    wire_types: Vec<WireType>,
+    // wire_types: Vec<WireType>,
     constants: Vec<Constant>,
     patterns: Vec<LibraryPattern>,
     namespaces: Vec<String>,
@@ -308,7 +308,7 @@ pub struct Inventory {
 pub enum InventoryItem<'a> {
     Function(&'a Function),
     CType(&'a Type),
-    WireType(&'a WireType),
+    // WireType(&'a WireType),
     Constant(&'a Constant),
     Pattern(&'a LibraryPattern),
     Namespace(&'a str),
@@ -336,7 +336,7 @@ impl Inventory {
         c_types.sort();
         // constants.sort(); TODO: do sort constants (issue with Ord and float values ...)
 
-        Self { functions, c_types, wire_types: Vec::new(), constants, patterns, namespaces }
+        Self { functions, c_types, /*wire_types: Vec::new(),*/ constants, patterns, namespaces }
     }
 
     /// Returns a new [`InventoryBuilder`], start here.
@@ -354,9 +354,16 @@ impl Inventory {
     /// Returns all found types; this includes types directly used in fields and parameters, and
     /// all their recursive constitutents.
     #[must_use]
-    pub fn ctypes(&self) -> &[Type] {
+    pub fn c_types(&self) -> &[Type] {
         &self.c_types
     }
+
+    /// Returns all wire types; this includes wire types directly used in function parameters, and
+    /// all their recursive constitutents.
+    // #[must_use]
+    // pub fn wire_types(&self) -> &[WireType] {
+    //     &self.wire_types
+    // }
 
     /// Return all registered constants.
     #[must_use]
@@ -401,12 +408,12 @@ impl Inventory {
     pub fn filter<P: FnMut(InventoryItem) -> bool>(&self, mut predicate: P) -> Self {
         let functions: Vec<Function> = self.functions.iter().filter(|x| predicate(InventoryItem::Function(x))).cloned().collect();
         let c_types: Vec<Type> = self.c_types.iter().filter(|x| predicate(InventoryItem::CType(x))).cloned().collect();
-        let wire_types: Vec<WireType> = self.c_types.iter().filter(|x| predicate(InventoryItem::WireType(x))).cloned().collect();
+        // let wire_types: Vec<WireType> = self.wire_types.iter().filter(|x| predicate(InventoryItem::WireType(x))).cloned().collect();
         let constants: Vec<Constant> = self.constants.iter().filter(|x| predicate(InventoryItem::Constant(x))).cloned().collect();
         let patterns: Vec<LibraryPattern> = self.patterns.iter().filter(|x| predicate(InventoryItem::Pattern(x))).cloned().collect();
         let namespaces: Vec<String> = self.namespaces.iter().filter(|x| predicate(InventoryItem::Namespace(x))).cloned().collect();
 
-        Self { functions, c_types, wire_types, constants, patterns, namespaces }
+        Self { functions, c_types, /*wire_types,*/ constants, patterns, namespaces }
     }
 }
 
@@ -443,7 +450,7 @@ pub trait Bindings {
     }
 }
 
-fn validate_symbol_names(functions: &[Function], ctypes: &[Type]) {
+fn validate_symbol_names(functions: &[Function], c_types: &[Type]) {
     // Check function names and parameter names.
     for func in functions {
         let name = func.name().to_lowercase();
@@ -459,7 +466,7 @@ fn validate_symbol_names(functions: &[Function], ctypes: &[Type]) {
     }
 
     // Check type names and field/variant names.
-    for ctype in ctypes {
+    for ctype in c_types {
         match ctype {
             Type::Composite(composite) => {
                 let type_name = composite.rust_name();

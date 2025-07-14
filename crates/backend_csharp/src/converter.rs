@@ -41,6 +41,7 @@ pub fn field_to_type(x: &Type) -> String {
         Type::Enum(x) => x.rust_name().to_string(),
         Type::Opaque(_) => "IntPtr".to_string(),
         Type::Composite(x) => x.rust_name().to_string(),
+        Type::Wired(_) => todo!(),
         Type::ReadPointer(_) => "IntPtr".to_string(),
         Type::ReadWritePointer(_) => "IntPtr".to_string(),
         Type::FnPointer(x) => fnpointer_to_type(x),
@@ -57,7 +58,6 @@ pub fn field_to_type(x: &Type) -> String {
             TypePattern::APIVersion => field_to_type(&x.fallback_type()),
             TypePattern::Vec(x) => x.composite_type().rust_name().to_string(),
             TypePattern::AsyncCallback(_) => todo!("Async callbacks not supported in fields"),
-            TypePattern::Wire(_) => todo!(),
         },
     }
 }
@@ -72,6 +72,7 @@ pub fn field_to_type_unmanaged(x: &Type) -> String {
         Type::Enum(x) => format!("{}.Unmanaged", x.rust_name()),
         Type::Opaque(_) => "TODO".to_string(),
         Type::Composite(x) => format!("{}.Unmanaged", x.rust_name()),
+        Type::Wired(_) => todo!(),
         Type::ReadPointer(_) => "IntPtr".to_string(),
         Type::ReadWritePointer(_) => "IntPtr".to_string(),
         Type::FnPointer(x) => fnpointer_to_type(x),
@@ -88,7 +89,6 @@ pub fn field_to_type_unmanaged(x: &Type) -> String {
             TypePattern::APIVersion => field_to_type(&x.fallback_type()),
             TypePattern::AsyncCallback(_) => todo!("Async callbacks not supported in fields"),
             TypePattern::Vec(x) => format!("{}.Unmanaged", x.composite_type().rust_name()),
-            TypePattern::Wire(_) => todo!(),
         },
     }
 }
@@ -120,6 +120,7 @@ pub fn param_to_type(x: &Type) -> String {
         Type::Enum(x) => x.rust_name().to_string(),
         Type::Opaque(_) => "IntPtr".to_string(),
         Type::Composite(x) => x.rust_name().to_string(),
+        Type::Wired(_) => todo!(),
         Type::ReadPointer(z) => match &**z {
             Type::Opaque(_) => "IntPtr".to_string(),
             Type::Primitive(Primitive::Void) => "IntPtr".to_string(),
@@ -154,7 +155,6 @@ pub fn param_to_type(x: &Type) -> String {
             TypePattern::Bool => "Bool".to_string(),
             TypePattern::CChar => "sbyte".to_string(),
             TypePattern::APIVersion => param_to_type(&x.fallback_type()),
-            TypePattern::Wire(_) => todo!(),
         },
     }
 }
@@ -230,6 +230,7 @@ pub fn rval_to_type_sync(x: &Type) -> String {
         Type::Enum(x) => x.rust_name().to_string(),
         Type::Opaque(_) => "IntPtr".to_string(),
         Type::Composite(x) => x.rust_name().to_string(),
+        Type::Wired(_) => todo!(),
         Type::ReadPointer(_) => "IntPtr".to_string(),
         Type::ReadWritePointer(_) => "IntPtr".to_string(),
         Type::FnPointer(x) => fnpointer_to_type(x),
@@ -246,7 +247,6 @@ pub fn rval_to_type_sync(x: &Type) -> String {
             TypePattern::APIVersion => rval_to_type_sync(&x.fallback_type()),
             TypePattern::Vec(x) => x.composite_type().rust_name().to_string(),
             TypePattern::AsyncCallback(_) => panic!("AsyncCallback not supported in rvals"),
-            TypePattern::Wire(_) => todo!(),
         },
     }
 }
@@ -328,6 +328,7 @@ pub fn is_reusable(t: &Type) -> bool {
     match t {
         Type::Array(_) => true,
         Type::Composite(x) => x.fields().iter().all(|x| is_reusable(x.the_type())),
+        Type::Wired(_) => todo!(),
         Type::Enum(e) => {
             for v in e.variants() {
                 let blittable = match v.kind() {
@@ -359,7 +360,6 @@ pub fn is_reusable(t: &Type) -> bool {
             TypePattern::NamedCallback(_) => true,
             TypePattern::AsyncCallback(_) => true,
             TypePattern::Vec(_) => false,
-            TypePattern::Wire(_) => todo!(),
         },
     }
 }
@@ -369,6 +369,7 @@ pub fn has_dispose(t: &Type) -> bool {
     match t {
         Type::Array(_) => false,
         Type::Composite(x) => x.fields().iter().any(|x| has_dispose(x.the_type())),
+        Type::Wired(_) => todo!(),
         Type::Enum(e) => {
             for v in e.variants() {
                 let disposable = match v.kind() {
@@ -400,7 +401,6 @@ pub fn has_dispose(t: &Type) -> bool {
             TypePattern::NamedCallback(_) => true,
             TypePattern::AsyncCallback(_) => true,
             TypePattern::Vec(_) => true,
-            TypePattern::Wire(_) => todo!(),
         },
     }
 }

@@ -1,3 +1,4 @@
+//! A protobuf-like marshaller across the rust-ffi border.<sup>🚧</sup>
 //! Wire<T> helpers to de-/serialize built-in types. <sup>:🚧</sup>
 //
 // ✅ String -> serialize as Vec<u8> but maybe Vec<u16> - see which is faster
@@ -15,17 +16,125 @@ use std::{
     io::{Error, ErrorKind, Read, Result, Write},
 };
 
-/// A descriptor for a type that can be serialized/deserialized across FFI boundary.
-#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub enum WireType {
-    Primitive(super::Primitive),
-    Composite(()),
+// Generate serialization code on both sides, Rust and backend's language, to transfer
+// type T over the FFI border in a byte array package.
+// use crate::lang::Ser;
+// use std::borrow::Cow;
+use std::marker::PhantomData;
+
+pub struct Wire<T>
+where
+    T: Ser + De,
+{
+    buf: Vec<u8>,          //Cow<[u8]>,        // storage gotten from wherever -- define
+    _type: PhantomData<T>, // what we're wiring
 }
+
+impl<T: Ser + De> Wire<T> {
+    pub fn serialize(&self, _value: &T) -> Result<()> {
+        // let mut cursor = Cursor::new(self.buf);
+        // t.ser(&mut cursor)
+        Ok(())
+    }
+
+    pub fn deserialize(&self) -> Result<T> {
+        unimplemented!()
+        // T::de(&mut self.buf)
+    }
+}
+
+impl<T: Ser + De> From<T> for Wire<T> {
+    fn from(_value: T) -> Self {
+        Wire {
+            buf: Vec::new(), // TODO: serialize value into buf
+            _type: PhantomData,
+        }
+    }
+}
+
+pub trait WireInfo {
+    fn wire_info() -> crate::lang::Type;
+}
+
+impl<T: crate::lang::TypeInfo + Ser + De> WireInfo for T {
+    fn wire_info() -> crate::lang::Type {
+        <T as crate::lang::TypeInfo>::type_info()
+    }
+}
+
+unsafe impl<T: crate::lang::TypeInfo + Ser + De> crate::lang::TypeInfo for Wire<T> {
+    fn type_info() -> crate::lang::Type {
+        <T as crate::lang::TypeInfo>::type_info()
+    }
+}
+
+// Wire means:
+// On CSharp side:
+// - allocate and pin buffer
+// - serialize WireOfInput to that buffer
+// - pass it over to the fn
+// On Rust side:
+// - deserializ from Wire<Input>'s buffer into Input
+// - do stuff with input
+// - allocate or borrow Wire<Output>'s buffer
+// - serialize Output into Wire buffer
+// - pass Wire<Output> over to C#
+// On CSharp side:
+// - deserialize from WireOfOutput to Output
+// - drop rust buffer
+// - unpin and drop CSharp buffer
+//
+// WireOfInput takes Input and writes it into a pinned buf
+// Wire<Input> takes buf SLICE and deserializes Input from there
+// Wire<Output> takes owned buf and serializes Output to it
+// WireOfOutput takes buf over ffi and deserializes Output from it
+
+// // @todo: make this an extension method?
+// class WireOfInput {
+//     static void serialize(Input input, byte[] buf) {
+//         // have friend access to Input and write it into buf field by field
+//         input.field1.ser(buf);
+//         input.field2.ser(buf);
+//     }
+// }
+
+// // for fn service_name(input: Wire<Input>, input2: Wire<Input>) -> Wire<Output>;
+// fixed (var buf = new byte[input.estimated_size()+input2.estimated_size()]) {
+//     WireOfInput.serialize(input, buf);
+//     WireOfInput.serialize(input2, buf+input.estimated_size());
+//     var out = service_name(buf);
+//     var output = WireOfOutput.deserialize(out);
+// }
+
+// Wire<Input>::de(buf_slice)->Input
+
+// unsafe impl<T: crate::lang::TypeInfo + Ser + De> super::TypeInfo for Wire<T> {
+//     fn type_info() -> super::Type {
+//         super::Type::Wired(T::type_info())
+//     }
+// }
+
+/// A descriptor for a type that can be serialized/deserialized across FFI boundary.
+/// NB: Probably not needed since we have Type::Wired(Composite) - we don't need wire impls for primitives really..
+// #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+// pub enum WireType {
+//     Primitive(super::Primitive),
+//     Composite(crate::lang::Composite),
+// }
+
+// impl WireType {
+//     pub fn type_name(&self) -> &str {
+//         match self {
+//             Self::Primitive(t) => t.rust_name(),
+//             Self::Composite(x) => x.rust_name(),
+//         }
+//     }
+// }
 
 pub trait Ser {
     fn ser(&self, out: &mut impl Write) -> Result<()>;
 
-    fn estimate_storage_size(&self) -> usize;
+    fn storage_size(&self) -> usize;
 }
 
 pub trait De {
@@ -42,7 +151,7 @@ macro_rules! impl_primitive_wire {
                 out.write_all(&self.to_le_bytes())
             }
 
-            fn estimate_storage_size(&self) -> usize {
+            fn storage_size(&self) -> usize {
                 std::mem::size_of::<$ty>()
             }
         }
@@ -67,7 +176,7 @@ impl Ser for bool {
         out.write_all(&u8::from(*self).to_le_bytes())
     }
 
-    fn estimate_storage_size(&self) -> usize {
+    fn storage_size(&self) -> usize {
         std::mem::size_of::<bool>()
     }
 }
@@ -95,8 +204,8 @@ impl<T: Ser> Ser for Option<T> {
         }
     }
 
-    fn estimate_storage_size(&self) -> usize {
-        std::mem::size_of::<bool>() + self.as_ref().map_or(0, |t| t.estimate_storage_size())
+    fn storage_size(&self) -> usize {
+        std::mem::size_of::<bool>() + self.as_ref().map_or(0, |t| t.storage_size())
     }
 }
 
@@ -119,8 +228,8 @@ impl<T: Ser> Ser for Vec<T> {
         Ok(())
     }
 
-    fn estimate_storage_size(&self) -> usize {
-        std::mem::size_of::<usize>() + self.iter().map(|item| item.estimate_storage_size()).sum::<usize>()
+    fn storage_size(&self) -> usize {
+        std::mem::size_of::<usize>() + self.iter().map(|item| item.storage_size()).sum::<usize>()
     }
 }
 
@@ -145,8 +254,8 @@ impl<K: Ser, V: Ser, S> Ser for HashMap<K, V, S> {
         Ok(())
     }
 
-    fn estimate_storage_size(&self) -> usize {
-        std::mem::size_of::<usize>() + self.iter().map(|item| item.0.estimate_storage_size() + item.1.estimate_storage_size()).sum::<usize>()
+    fn storage_size(&self) -> usize {
+        std::mem::size_of::<usize>() + self.iter().map(|item| item.0.storage_size() + item.1.storage_size()).sum::<usize>()
     }
 }
 
@@ -169,7 +278,7 @@ impl Ser for String {
         out.write_all(self.as_bytes())
     }
 
-    fn estimate_storage_size(&self) -> usize {
+    fn storage_size(&self) -> usize {
         std::mem::size_of::<usize>() + self.len()
     }
 }
@@ -199,10 +308,10 @@ macro_rules! impl_tuple_wire {
                 Ok(())
             }
 
-            fn estimate_storage_size(&self) -> usize {
+            fn storage_size(&self) -> usize {
                 let ($($name,)+) = self;
                 0 $(
-                    + $name.estimate_storage_size()
+                    + $name.storage_size()
                 )+
             }
         }
@@ -269,11 +378,11 @@ mod tests {
         w.ser(&mut cursor)?;
 
         // Check byte repr in the buffer.
-        assert_eq!(x.estimate_storage_size(), 1);
-        assert_eq!(y.estimate_storage_size(), 2);
-        assert_eq!(z.estimate_storage_size(), 4);
-        assert_eq!(u.estimate_storage_size(), 8);
-        assert_eq!(w.estimate_storage_size(), 16);
+        assert_eq!(x.storage_size(), 1);
+        assert_eq!(y.storage_size(), 2);
+        assert_eq!(z.storage_size(), 4);
+        assert_eq!(u.storage_size(), 8);
+        assert_eq!(w.storage_size(), 16);
 
         cursor.seek(SeekFrom::Start(0))?;
         let mut x_repr = [0u8; 1];
@@ -331,11 +440,11 @@ mod tests {
         w.ser(&mut cursor)?;
 
         // Check byte repr in the buffer.
-        assert_eq!(x.estimate_storage_size(), 1);
-        assert_eq!(y.estimate_storage_size(), 2);
-        assert_eq!(z.estimate_storage_size(), 4);
-        assert_eq!(u.estimate_storage_size(), 8);
-        assert_eq!(w.estimate_storage_size(), 16);
+        assert_eq!(x.storage_size(), 1);
+        assert_eq!(y.storage_size(), 2);
+        assert_eq!(z.storage_size(), 4);
+        assert_eq!(u.storage_size(), 8);
+        assert_eq!(w.storage_size(), 16);
 
         cursor.seek(SeekFrom::Start(0))?;
         let mut x_repr = [0u8; 1];
@@ -389,8 +498,8 @@ mod tests {
         // Check byte repr in the buffer.
         cursor.seek(SeekFrom::Start(0))?;
 
-        assert_eq!(none.estimate_storage_size(), 1);
-        assert_eq!(some.estimate_storage_size(), 2);
+        assert_eq!(none.storage_size(), 1);
+        assert_eq!(some.storage_size(), 2);
 
         let mut none_repr = [0u8; 1];
         let mut some_repr = [0u8; 2];
@@ -426,8 +535,8 @@ mod tests {
 
         match core::mem::size_of::<usize>() {
             8 => {
-                assert_eq!(v1.estimate_storage_size(), 8 + 3);
-                assert_eq!(v2.estimate_storage_size(), 8);
+                assert_eq!(v1.storage_size(), 8 + 3);
+                assert_eq!(v2.storage_size(), 8);
 
                 let mut v1_repr = [0u8; 8 + 3];
                 let mut v2_repr = [0u8; 8];
@@ -444,8 +553,8 @@ mod tests {
                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
             }
             4 => {
-                assert_eq!(v1.estimate_storage_size(), 4 + 3);
-                assert_eq!(v2.estimate_storage_size(), 4);
+                assert_eq!(v1.storage_size(), 4 + 3);
+                assert_eq!(v2.storage_size(), 4);
 
                 let mut v1_repr = [0u8; 4 + 3];
                 let mut v2_repr = [0u8; 4];
@@ -486,8 +595,8 @@ mod tests {
 
         match core::mem::size_of::<usize>() {
             8 => {
-                assert_eq!(s1.estimate_storage_size(), 8 + 11);
-                assert_eq!(s2.estimate_storage_size(), 8 + 22);
+                assert_eq!(s1.storage_size(), 8 + 11);
+                assert_eq!(s2.storage_size(), 8 + 22);
 
                 let mut s1_repr = [0u8; 8 + 11];
                 let mut s2_repr = [0u8; 8 + 22];
@@ -509,8 +618,8 @@ mod tests {
                 );
             }
             4 => {
-                assert_eq!(s1.estimate_storage_size(), 4 + 11);
-                assert_eq!(s2.estimate_storage_size(), 4 + 22);
+                assert_eq!(s1.storage_size(), 4 + 11);
+                assert_eq!(s2.storage_size(), 4 + 22);
 
                 let mut s1_repr = [0u8; 4 + 11];
                 let mut s2_repr = [0u8; 4 + 22];
@@ -560,8 +669,8 @@ mod tests {
 
         match core::mem::size_of::<usize>() {
             8 => {
-                assert_eq!(h1.estimate_storage_size(), 8 + 8 + 5 + 2 + 8 + 6 + 2);
-                assert_eq!(h2.estimate_storage_size(), 8 + 2 + 8 + 3 + 2 + 8 + 3);
+                assert_eq!(h1.storage_size(), 8 + 8 + 5 + 2 + 8 + 6 + 2);
+                assert_eq!(h2.storage_size(), 8 + 2 + 8 + 3 + 2 + 8 + 3);
 
                 let mut h1_repr = [0u8; 8 + 8 + 5 + 2 + 8 + 6 + 2];
                 let mut h2_repr = [0u8; 8 + 2 + 8 + 3 + 2 + 8 + 3];
@@ -594,8 +703,8 @@ mod tests {
                 );
             }
             4 => {
-                assert_eq!(h1.estimate_storage_size(), 4 + 4 + 5 + 2 + 4 + 6 + 2);
-                assert_eq!(h2.estimate_storage_size(), 4 + 2 + 4 + 3 + 2 + 4 + 3);
+                assert_eq!(h1.storage_size(), 4 + 4 + 5 + 2 + 4 + 6 + 2);
+                assert_eq!(h2.storage_size(), 4 + 2 + 4 + 3 + 2 + 4 + 3);
 
                 let mut h1_repr = [0u8; 4 + 4 + 5 + 2];
                 let mut h2_repr = [0u8; 4 + 2 + 4 + 3];
@@ -663,7 +772,7 @@ mod tests {
 
         match core::mem::size_of::<usize>() {
             8 => {
-                assert_eq!(a.estimate_storage_size(), 4 + 8 + 11 + 8 + 4 + 4 + 4);
+                assert_eq!(a.storage_size(), 4 + 8 + 11 + 8 + 4 + 4 + 4);
 
                 #[rustfmt::skip]
                 assert_seq_eq!(a_repr,
@@ -676,7 +785,7 @@ mod tests {
                     0x03, 0x00, 0x00, 0x00);
             }
             4 => {
-                assert_eq!(a.estimate_storage_size(), 4 + 4 + 11 + 4 + 4 + 4 + 4);
+                assert_eq!(a.storage_size(), 4 + 4 + 11 + 4 + 4 + 4 + 4);
 
                 #[rustfmt::skip]
                 assert_seq_eq!(a_repr,

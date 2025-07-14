@@ -93,7 +93,6 @@ pub mod slice;
 pub mod string;
 pub mod surrogate;
 pub mod vec;
-pub mod wire;
 
 /// A pattern on a library level, usually involving both methods and types.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -132,7 +131,7 @@ pub enum TypePattern {
     NamedCallback(NamedCallback),
     AsyncCallback(AsyncCallback),
     Vec(VecType),
-    Wire(Composite),
+    // Wire(Composite),
 }
 
 impl TypePattern {
@@ -155,7 +154,7 @@ impl TypePattern {
             Self::AsyncCallback(x) => Type::FnPointer(x.fnpointer().clone()),
             Self::Utf8String(x) => Type::Composite(x.clone()),
             Self::Vec(x) => Type::Composite(x.composite_type().clone()),
-            Self::Wire(x) => Type::Composite(x.clone()), //hm, but we'd prefer to wire it anyway
+            // Self::Wire(x) => Type::Composite(x.clone()), //hm, but we'd prefer to wire it anyway
         }
     }
 }

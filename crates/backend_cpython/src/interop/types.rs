@@ -8,7 +8,7 @@ use interoptopus::pattern::TypePattern;
 use interoptopus::{Error, indented};
 
 pub fn write_types(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
-    let all_types = i.inventory.ctypes().to_vec();
+    let all_types = i.inventory.c_types().to_vec();
     let sorted_types = sort_types_by_dependencies(all_types);
 
     for t in &sorted_types {

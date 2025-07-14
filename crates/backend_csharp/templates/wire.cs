@@ -1,5 +1,10 @@
-public partial class WireOf{{ type }}
+public partial class WireOf{{type}}
 {
+    public void Ser()
+    {}
+
+    public WireOf{{type}} De()
+    {}
   // need to support Ser and De functions for this type...
   // needs a reference to buffer slice in these functions or in the class itself?
   // e.g.

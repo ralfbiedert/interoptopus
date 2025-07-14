@@ -139,6 +139,32 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
         param_where = quote! { where #(#generic_where_tokens),*  };
     }
 
+    let wires = if attributes.wired {
+        // wire_types.push(this_type); // transitively pull all other types it depends on!
+        quote! {
+        //     impl ::interoptopus::lang::Ser for #name_ident {
+        //         fn ser(&self, output: &mut impl ::std::io::Write) -> ::std::io::Result<()> {
+        //             #(
+        //                 self.#field_idents.ser(output)?;
+        //             )*
+        //             Ok(())
+        //         }
+        //         fn storage_size(&self) -> usize {
+        //             size_of::<Self>()
+        //         }
+        //     }
+        //     impl ::interoptopus::lang::De for #name_ident {
+        //         fn de(input: &mut impl ::std::io::Read) -> ::std::io::Result<Self>
+        //         where
+        //             Self: Sized {
+        //                 unimplemented!()
+        //             }
+        //     }
+        }
+    } else {
+        quote! {}
+    };
+
     quote! {
         #item
 
@@ -157,5 +183,7 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
                 ::interoptopus::lang::Type::Enum(rval)
             }
         }
+
+        #wires
     }
 }
