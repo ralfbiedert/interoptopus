@@ -23,6 +23,8 @@ using System.Runtime.InteropServices.Marshalling;
 using System.Runtime.CompilerServices;
 using My.Company;
 using My.Company;
+using System.Runtime.CompilerServices;
+[assembly: DisableRuntimeMarshalling]
 #pragma warning restore 0105
 
 namespace My.Company

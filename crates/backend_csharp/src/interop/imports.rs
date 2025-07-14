@@ -22,6 +22,8 @@ pub fn write_imports(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"using {v};")?;
     }
 
+    indented!(w, r"using System.Runtime.CompilerServices;")?;
+    indented!(w, r"[assembly: DisableRuntimeMarshalling]")?;
     indented!(w, r"#pragma warning restore 0105")?;
 
     Ok(())
