@@ -25,10 +25,10 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
     } else {
         MoveSemantics::Move
     };
-    let idisposable = if has_dispose(&the_type.to_type()) { ": IDisposable" } else { "" };
+    let idisposable = if has_dispose(&the_type.to_type()) { " : IDisposable" } else { "" };
 
     indented!(w, r"[NativeMarshalling(typeof(MarshallerMeta))]")?;
-    indented!(w, r"public partial {self_kind} {name} {idisposable}")?;
+    indented!(w, r"public partial {self_kind} {name}{idisposable}")?;
     indented!(w, r"{{")?;
 
     indented!(w, [()], r"public {name}() {{ }}")?;
