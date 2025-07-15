@@ -64,7 +64,7 @@ impl<T> Clone for Slice<'_, T> {
 impl<T> Default for Slice<'_, T> {
     fn default() -> Self {
         const {
-            assert!(size_of::<Self>() == 16);
+            assert!(size_of::<Self>() == 16); // shouldn't it be static_assert()?
         }
 
         Self { data: null(), len: 0, _phantom: PhantomData }
