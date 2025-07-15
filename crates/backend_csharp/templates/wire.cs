@@ -23,3 +23,22 @@ public static class WireOf{{type}}Extensions
 
 // how do we wire Primitives? NATIVELY!
 // is Wire<u32> a thing? Most probably not, useless. Wire wraps a struct.
+
+
+// wired function wrapper:
+
+// [LibraryImport(NativeLib, EntryPoint = "start_server")]
+// [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+// private static partial WireOfReturn start_server(WireOfSomething server_name);
+
+// [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+// public static Return StartServer(Something s) {
+//     Span<byte> bytes = stackalloc byte[s.wire_size()];
+//     fixed (byte* p = bytes)
+//     {
+//         WireOfSomething ws = s.Wire(p);
+//         var wr_buf = start_server(ws); // returns a WireOfReturn constructed on the rs side?
+//         // might have to convert wr_buf to Managed
+//         return WireOfReturn.Unwire(wr_buf);
+//     }
+// }

@@ -7,45 +7,49 @@
 // ✅ (), (T,...)
 // ✅ Option<T> - bool + maybe T
 // ✅ bool - 1u8 or 0u8
-// arbitrary Structs - all fields in order of declaration
+// ✅ arbitrary Structs - all fields in order of declaration
 //
 // Additionally, support serializing into C#-provided buffer.
+//
+// Generate serialization code on both sides, Rust and backend's language, to transfer
+// type T over the FFI border in a byte array package.
 
+use crate::ffi;
+use std::borrow::Cow;
+use std::marker::PhantomData;
 use std::{
     collections::HashMap,
     io::{Error, ErrorKind, Read, Result, Write},
 };
 
-// Generate serialization code on both sides, Rust and backend's language, to transfer
-// type T over the FFI border in a byte array package.
-// use crate::lang::Ser;
-// use std::borrow::Cow;
-use crate::ffi;
-use std::marker::PhantomData;
-
+/// A struct that wraps a byte buffer passed through FFI boundary, assuming it
+/// contains serialized representation of a value of type T.
+///
+/// The backing storage is either a slice of foreign buffer, or an owned ffi::Vec<u8>.
 #[repr(C)]
-pub struct Wire<T>
+pub struct Wire<'my, T>
 where
     T: Ser + De,
 {
-    buf: ffi::Vec<u8>,     //Cow<[u8]>,        // storage gotten from wherever -- define
-    _type: PhantomData<T>, // what we're wiring
+    buf: Cow<'my, ffi::Slice<'my, u8>>, // storage received from wherever
+    _phantom: PhantomData<&'my T>,      // behaves like a lifetimed reference
 }
 
-impl<T: Ser + De> Wire<T> {
+impl<T: Ser + De> Wire<'_, T> {
     pub fn serialize(&self, _value: &T) -> Result<()> {
         // let mut cursor = Cursor::new(self.buf);
         // t.ser(&mut cursor)
         Ok(())
     }
 
-    pub fn deserialize(&self) -> Result<T> {
-        unimplemented!()
-        // T::de(&mut self.buf)
+    pub fn deserialize(&mut self) -> Result<T> {
+        use std::ops::Deref;
+        T::de(&self.buf.deref())
     }
 }
 
-impl<T: Ser + De> From<T> for Wire<T> {
+impl<T: Ser + De> From<T> for Wire<'_, T> {
+    // serialize value?
     fn from(_value: T) -> Self {
         Wire {
             buf: ffi::Vec::from(vec![]), // TODO: serialize value into buf
@@ -53,23 +57,6 @@ impl<T: Ser + De> From<T> for Wire<T> {
         }
     }
 }
-
-// pub trait WireInfo {
-//     fn wire_info() -> crate::lang::Type;
-// }
-
-// impl<T: crate::lang::TypeInfo + Ser + De> WireInfo for T {
-//     fn wire_info() -> crate::lang::Type {
-//         <T as crate::lang::TypeInfo>::type_info()
-//     }
-// }
-
-// Not needed: generated code should extract type info directly from T.
-// unsafe impl<T: crate::lang::TypeInfo + Ser + De> crate::lang::TypeInfo for Wire<T> {
-//     fn type_info() -> crate::lang::Type {
-//         <T as crate::lang::TypeInfo>::type_info()
-//     }
-// }
 
 // Wire means:
 // On CSharp side:
@@ -111,41 +98,22 @@ impl<T: Ser + De> From<T> for Wire<T> {
 
 // Wire<Input>::de(buf_slice)->Input
 
-// unsafe impl<T: crate::lang::TypeInfo + Ser + De> super::TypeInfo for Wire<T> {
-//     fn type_info() -> super::Type {
-//         super::Type::Wired(T::type_info())
-//     }
-// }
-
-/// A descriptor for a type that can be serialized/deserialized across FFI boundary.
-/// NB: Probably not needed since we have Type::Wired(Composite) - we don't need wire impls for primitives really..
-// #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-// pub enum WireType {
-//     Primitive(super::Primitive),
-//     Composite(crate::lang::Composite),
-// }
-
-// impl WireType {
-//     pub fn type_name(&self) -> &str {
-//         match self {
-//             Self::Primitive(t) => t.rust_name(),
-//             Self::Composite(x) => x.rust_name(),
-//         }
-//     }
-// }
-
 pub trait Ser {
+    /// Write self into the buffer addressed by `out`
     fn ser(&self, out: &mut impl Write) -> Result<()>;
 
+    /// Calculate amount of storage needed for writing self
     fn storage_size(&self) -> usize;
 }
 
 pub trait De {
+    /// Read contents of type Self from the reader `input`
     fn de(input: &mut impl Read) -> Result<Self>
     where
         Self: Sized;
 }
 
+/// Implement Ser and De for all primitive types
 macro_rules! impl_primitive_wire {
     ($($ty:ty),+) => {
         $(
