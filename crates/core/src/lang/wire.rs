@@ -15,7 +15,7 @@
 // type T over the FFI border in a byte array package.
 
 use crate::ffi;
-use std::borrow::Cow;
+// use std::borrow::Cow;
 use std::marker::PhantomData;
 use std::{
     collections::HashMap,
@@ -31,8 +31,8 @@ pub struct Wire<'my, T>
 where
     T: Ser + De,
 {
-    buf: Cow<'my, ffi::Slice<'my, u8>>, // storage received from wherever
-    _phantom: PhantomData<&'my T>,      // behaves like a lifetimed reference
+    buf: ffi::Vec<u8>,             //Cow<'my, ffi::Slice<'my, u8>>, // storage received from wherever
+    _phantom: PhantomData<&'my T>, // behaves like a lifetimed reference
 }
 
 impl<T: Ser + De> Wire<'_, T> {
@@ -43,8 +43,9 @@ impl<T: Ser + De> Wire<'_, T> {
     }
 
     pub fn deserialize(&mut self) -> Result<T> {
-        use std::ops::Deref;
-        T::de(&self.buf.deref())
+        // use std::ops::Deref;
+        // T::de(&self.buf.deref())
+        unimplemented!()
     }
 }
 
@@ -53,7 +54,7 @@ impl<T: Ser + De> From<T> for Wire<'_, T> {
     fn from(_value: T) -> Self {
         Wire {
             buf: ffi::Vec::from(vec![]), // TODO: serialize value into buf
-            _type: PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

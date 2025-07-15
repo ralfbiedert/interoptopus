@@ -19,7 +19,7 @@ pub struct Return {
 
 // As in `engine`, we create matching functions that are better suited for an FFI boundary.
 #[ffi_function(debug)]
-pub fn start_server(server_name: Wire<Something>) -> Wire<Return> {
+pub fn start_server(mut server_name: Wire<Something>) -> Wire<Return> {
     // ^^ register should traverse Wire types recursively and add them to inventory
     // TypeInfo::wire_type_info() perhaps
     // NB: will c_types and wire_types ever mingle? --
