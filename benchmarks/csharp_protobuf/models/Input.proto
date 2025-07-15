@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package Models;
+option csharp_namespace = "ForCSharp.Protobuf";
+
+import "Context.proto";
+import "Table.proto";
+import "Configuration.proto";
+
+message Input
+{
+    Context Context = 1;
+    Table Value = 2;
+    Configuration Configuration = 3;
+}
