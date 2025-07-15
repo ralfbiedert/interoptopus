@@ -23,6 +23,11 @@ interoptopus_proc = { path = "../proc_macros", version = "0.15.0-alpha.8", optio
 log = { workspace = true, optional = true }
 serde = { workspace = true, features = ["derive"], optional = true }
 tera = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+interoptopus = { path = "." }
+rustc-hash = { version = "2.1", default-features = false }
 
 [package.metadata.docs.rs]
 all-features = true

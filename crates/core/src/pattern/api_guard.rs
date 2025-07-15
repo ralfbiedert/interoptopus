@@ -95,7 +95,7 @@ impl ApiHash {
     pub fn from(inventory: &Inventory) -> Self {
         let mut hasher = DefaultHasher::new();
 
-        let types = inventory.ctypes();
+        let types = inventory.c_types();
         let functions = inventory.functions();
         let constants = inventory.constants();
 

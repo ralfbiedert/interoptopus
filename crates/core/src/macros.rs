@@ -23,7 +23,7 @@ macro_rules! function {
     ($x:ty) => {{
         use $crate::lang::FunctionInfo;
         // use $x as fnc;
-        let info = <$x>::function_info();
+        let info = <$x>::function_info(); // NB: this should include wired types too then..
         $crate::inventory::Symbol::Function(info)
     }};
 }

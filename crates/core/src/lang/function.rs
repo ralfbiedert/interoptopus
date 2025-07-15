@@ -25,12 +25,13 @@ pub struct Function {
     name: String,
     meta: Meta,
     signature: Signature,
+    wire_types: Vec<Type>,
 }
 
 impl Function {
     #[must_use]
-    pub const fn new(name: String, signature: Signature, meta: Meta) -> Self {
-        Self { name, meta, signature }
+    pub const fn new(name: String, signature: Signature, meta: Meta, wire_types: Vec<Type>) -> Self {
+        Self { name, meta, signature, wire_types }
     }
 
     #[must_use]
@@ -51,6 +52,14 @@ impl Function {
     #[must_use]
     pub fn prettifier(&self) -> Prettifier {
         Prettifier::from_rust_lower(self.name())
+    }
+
+    pub fn is_wired(&self) -> bool {
+        !self.wire_types.is_empty()
+    }
+
+    pub fn wire_types(&self) -> Vec<Type> {
+        self.wire_types.clone()
     }
 }
 

@@ -1,6 +1,6 @@
 //! Helpers for backend authors.
 
-use crate::lang::{Function, Type, VariantKind};
+use crate::lang::{DomainType, Function, Type, VariantKind};
 use crate::pattern::TypePattern;
 use std::collections::hash_map::Iter;
 use std::collections::{HashMap, HashSet};
@@ -119,15 +119,26 @@ pub fn longest_common_prefix(functions: &[Function]) -> String {
 
 /// Return all used and nested types, without duplicates.
 #[must_use]
-#[allow(clippy::redundant_pub_crate)]
+#[expect(clippy::redundant_pub_crate)]
 pub(crate) fn types_from_functions_types(functions: &[Function], extra_types: &[Type]) -> Vec<Type> {
     let mut types = HashSet::new();
 
     for function in functions {
+        // eprintln!("===== Processing function {function:?} =====");
+
         types_from_type_recursive(function.signature().rval(), &mut types);
 
         for param in function.signature().params() {
             types_from_type_recursive(param.the_type(), &mut types);
+        }
+
+        // eprintln!("======= Function.is_wired {:?}", function.is_wired());
+
+        if function.is_wired() {
+            for ty in &function.wire_types() {
+                eprintln!("======= Adding wired type {ty:?}");
+                types_from_type_recursive(ty, &mut types);
+            }
         }
     }
 
@@ -152,12 +163,45 @@ pub fn types_from_type(start: &Type) -> Vec<Type> {
 pub(crate) fn types_from_type_recursive(start: &Type, types: &mut HashSet<Type>) {
     types.insert(start.clone());
 
+    eprintln!("======= Added type {start:?}");
+
     match start {
         Type::Composite(inner) => {
             for field in inner.fields() {
                 types_from_type_recursive(field.the_type(), types);
             }
         }
+        // a Wired struct knows how to serialize itself and contained types,
+        // there's never a need to embed Wire<T> inside a struct
+        Type::Wired(inner) => {
+            for field in inner.fields() {
+                eprintln!("TYPES_FROM_TYPE_RECURSIVE for WIRE: field {}", field.name());
+                types_from_type_recursive(field.the_type(), types);
+            }
+        }
+        // Domain types are native to the backend language, but they should provide Serialize and Deserialize support.
+        Type::Domain(dom) => match dom {
+            DomainType::Composite(inner) => {
+                for field in inner.fields() {
+                    eprintln!("TYPES_FROM_TYPE_RECURSIVE for DOMAIN: field {}", field.name());
+                    types_from_type_recursive(field.the_type(), types);
+                }
+            }
+            DomainType::String => {}
+            DomainType::Enum(x) => {
+                for variant in x.variants() {
+                    match variant.kind() {
+                        VariantKind::Unit(_) => {}
+                        VariantKind::Typed(_, x) => types_from_type_recursive(x, types),
+                    }
+                }
+            }
+            DomainType::Vec(inner) => types_from_type_recursive(inner, types),
+            DomainType::Map(u, v) => {
+                types_from_type_recursive(u, types);
+                types_from_type_recursive(v, types);
+            }
+        },
         Type::Array(inner) => types_from_type_recursive(inner.the_type(), types),
         Type::FnPointer(inner) => {
             types_from_type_recursive(inner.signature().rval(), types);
@@ -215,6 +259,32 @@ pub(crate) fn types_from_type_recursive(start: &Type, types: &mut HashSet<Type>)
     }
 }
 
+/// Extract only types annotated with Wire<T>
+#[allow(clippy::redundant_pub_crate)]
+pub(crate) fn extract_wire_types_from_functions(functions: &[Function]) -> Vec<Type> {
+    let mut types = HashSet::new();
+
+    for function in functions {
+        match function.signature().rval() {
+            Type::Wired(_) => {
+                types.insert(function.signature().rval().clone());
+            }
+            _ => {}
+        }
+
+        for param in function.signature().params() {
+            match param.the_type() {
+                Type::Wired(_) => {
+                    types.insert(param.the_type().clone());
+                }
+                _ => {}
+            }
+        }
+    }
+
+    types.into_iter().collect()
+}
+
 /// Extracts annotated namespace strings.
 #[allow(clippy::implicit_hasher)]
 #[allow(clippy::redundant_pub_crate)]
@@ -233,6 +303,18 @@ pub(crate) fn extract_namespaces_from_types(types: &[Type], into: &mut HashSet<S
             Type::Composite(x) => {
                 into.insert(x.meta().module().to_string());
             }
+            Type::Wired(inner) => {
+                into.insert(inner.meta().module().to_string());
+            }
+            Type::Domain(dom) => match dom {
+                DomainType::Composite(inner) => {
+                    into.insert(inner.meta().module().to_string());
+                }
+                DomainType::String => {}
+                DomainType::Enum(_) => {}
+                DomainType::Vec(_) => {}
+                DomainType::Map(_, _) => {}
+            },
             Type::FnPointer(_) => {}
             Type::ReadPointer(_) => {}
             Type::ReadWritePointer(_) => {}
@@ -295,6 +377,14 @@ pub(crate) fn holds_opaque_without_ref(typ: &Type) -> bool {
             }
             false
         }
+        Type::Wired(_) => false,
+        Type::Domain(dom) => match dom {
+            DomainType::Composite(_) => false,
+            DomainType::String => todo!(),
+            DomainType::Enum(_) => todo!(),
+            DomainType::Vec(_) => todo!(),
+            DomainType::Map(_, _) => todo!(),
+        },
         Type::FnPointer(_) => false,
         Type::ReadPointer(_) => false,
         Type::ReadWritePointer(_) => false,
@@ -423,6 +513,14 @@ pub fn is_global_type(t: &Type) -> bool {
         }
         Type::Opaque(_) => false,
         Type::Composite(_) => false,
+        Type::Wired(_) => false,
+        Type::Domain(dom) => match dom {
+            DomainType::Composite(_) => false,
+            DomainType::Enum(_) => false,
+            DomainType::String => true,
+            DomainType::Vec(_) => true,
+            DomainType::Map(_, _) => true,
+        },
         Type::FnPointer(_) => false,
         Type::ReadPointer(x) => is_global_type(x),
         Type::ReadWritePointer(x) => is_global_type(x),

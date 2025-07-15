@@ -41,6 +41,7 @@ use crate::backend::capitalize_first_letter;
 use crate::lang::{Composite, Docs, Field, Meta, Primitive, Representation, Type, Visibility};
 use crate::lang::{Layout, TypeInfo};
 use crate::pattern::TypePattern;
+use std::io::Read;
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
 use std::ptr::{null, null_mut};
@@ -91,6 +92,20 @@ impl<'a, T> Slice<'a, T> {
             unsafe { std::slice::from_raw_parts(self.data, self.len as usize) }
         }
     }
+
+    /// Advance the slice by consuming the first `n` elements.
+    /// Returns the number of elements actually consumed.
+    #[allow(clippy::cast_possible_truncation)]
+    pub fn advance(&mut self, n: usize) -> usize {
+        let to_advance = n.min(self.len as usize);
+        if to_advance > 0 && !self.data.is_null() {
+            unsafe {
+                self.data = self.data.add(to_advance);
+            }
+            self.len -= to_advance as u64;
+        }
+        to_advance
+    }
 }
 
 impl<'a, T> From<&'a [T]> for Slice<'a, T> {
@@ -116,6 +131,20 @@ impl<T> Deref for Slice<'_, T> {
 
     fn deref(&self) -> &Self::Target {
         self.as_slice()
+    }
+}
+
+impl Read for &mut Slice<'_, u8> {
+    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+        let available = self.as_slice();
+        let to_read = buf.len().min(available.len());
+
+        if to_read > 0 {
+            buf[..to_read].copy_from_slice(&available[..to_read]);
+            self.advance(to_read);
+        }
+
+        Ok(to_read)
     }
 }
 
@@ -191,6 +220,20 @@ impl<'a, T> SliceMut<'a, T> {
             unsafe { std::slice::from_raw_parts(self.data, self.len as usize) }
         }
     }
+
+    /// Advance the slice by consuming the first `n` elements.
+    /// Returns the number of elements actually consumed.
+    #[allow(clippy::cast_possible_truncation)]
+    pub fn advance(&mut self, n: usize) -> usize {
+        let to_advance = n.min(self.len as usize);
+        if to_advance > 0 && !self.data.is_null() {
+            unsafe {
+                self.data = self.data.add(to_advance);
+            }
+            self.len -= to_advance as u64;
+        }
+        to_advance
+    }
 }
 
 impl<T> SliceMut<'_, T>
@@ -222,6 +265,20 @@ impl<T> Deref for SliceMut<'_, T> {
 impl<T> DerefMut for SliceMut<'_, T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.as_slice_mut()
+    }
+}
+
+impl Read for &mut SliceMut<'_, u8> {
+    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+        let available = self.as_slice();
+        let to_read = buf.len().min(available.len());
+
+        if to_read > 0 {
+            buf[..to_read].copy_from_slice(&available[..to_read]);
+            self.advance(to_read);
+        }
+
+        Ok(to_read)
     }
 }
 
@@ -329,5 +386,80 @@ mod test {
 
         assert_eq!(empty.as_slice(), &[] as &[u8]);
         assert_eq!(slice, &[5, 6, 2, 3, 5]);
+    }
+
+    #[test]
+    fn slice_read_implementation() {
+        use std::io::Read;
+
+        let data = [1, 2, 3, 4, 5, 6, 7, 8];
+        let mut slice = Slice::from_slice(&data);
+
+        // Test partial read
+        let mut buf = [0u8; 3];
+        let bytes_read = (&mut slice).read(&mut buf).unwrap();
+        assert_eq!(bytes_read, 3);
+        assert_eq!(buf, [1, 2, 3]);
+        assert_eq!(slice.as_slice(), &[4, 5, 6, 7, 8]);
+
+        // Test reading remaining data
+        let mut buf = [0u8; 10];
+        let bytes_read = (&mut slice).read(&mut buf).unwrap();
+        assert_eq!(bytes_read, 5);
+        assert_eq!(&buf[..5], &[4, 5, 6, 7, 8]);
+        assert_eq!(slice.as_slice(), &[] as &[u8]);
+
+        // Test reading from empty slice
+        let mut buf = [0u8; 5];
+        let bytes_read = (&mut slice).read(&mut buf).unwrap();
+        assert_eq!(bytes_read, 0);
+    }
+
+    #[test]
+    fn slice_mut_read_implementation() {
+        use std::io::Read;
+
+        let mut data = [1, 2, 3, 4, 5, 6, 7, 8];
+        let mut slice = SliceMut::from_slice(&mut data);
+
+        // Test partial read
+        let mut buf = [0u8; 3];
+        let bytes_read = (&mut slice).read(&mut buf).unwrap();
+        assert_eq!(bytes_read, 3);
+        assert_eq!(buf, [1, 2, 3]);
+        assert_eq!(slice.as_slice(), &[4, 5, 6, 7, 8]);
+
+        // Test reading remaining data
+        let mut buf = [0u8; 10];
+        let bytes_read = (&mut slice).read(&mut buf).unwrap();
+        assert_eq!(bytes_read, 5);
+        assert_eq!(&buf[..5], &[4, 5, 6, 7, 8]);
+        assert_eq!(slice.as_slice(), &[] as &[u8]);
+
+        // Test reading from empty slice
+        let mut buf = [0u8; 5];
+        let bytes_read = (&mut slice).read(&mut buf).unwrap();
+        assert_eq!(bytes_read, 0);
+    }
+
+    #[test]
+    fn slice_advance_functionality() {
+        let data = [1, 2, 3, 4, 5];
+        let mut slice = Slice::from_slice(&data);
+
+        // Test normal advance
+        let advanced = slice.advance(2);
+        assert_eq!(advanced, 2);
+        assert_eq!(slice.as_slice(), &[3, 4, 5]);
+
+        // Test advance beyond remaining length
+        let advanced = slice.advance(10);
+        assert_eq!(advanced, 3);
+        assert_eq!(slice.as_slice(), &[] as &[u8]);
+
+        // Test advance on empty slice
+        let advanced = slice.advance(5);
+        assert_eq!(advanced, 0);
+        assert_eq!(slice.as_slice(), &[] as &[u8]);
     }
 }

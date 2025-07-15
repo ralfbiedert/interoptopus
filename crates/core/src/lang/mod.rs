@@ -18,6 +18,7 @@ pub use function::{Function, Parameter, Signature, SugaredReturnType};
 pub use info::{ConstantInfo, FunctionInfo, TypeInfo};
 pub use meta::{Docs, Meta, Visibility};
 pub use primitive::{Primitive, PrimitiveValue};
+pub use wire::{De, Ser, Unwireable, Wire, WireError, WireInfo, Wireable};
 
 mod array;
 mod composite;
@@ -28,6 +29,7 @@ mod function;
 mod info;
 mod meta;
 mod primitive;
+pub mod wire;
 
 /// A type that can exist at the FFI boundary.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -37,12 +39,26 @@ pub enum Type {
     Enum(Enum),
     Opaque(Opaque),
     Composite(Composite),
+    /// A composite type, serialized and deserialized through the FFI boundary. Wire<T> on Rust side.
+    Wired(Composite),
+    /// A domain type, serialized and deserialized through the FFI boundary. These are all types used from Wire<T> but not including this type itself.
+    /// These types do not require full WireOfT framework, only to be able to serialize and deserialize themselves through a buffer.
+    Domain(DomainType),
     FnPointer(FnPointer),
     ReadPointer(Box<Type>),
     ReadWritePointer(Box<Type>),
     /// Special patterns with primitives existing on C-level but special semantics.
     /// useful to higher level languages.
     Pattern(TypePattern),
+}
+
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub enum DomainType {
+    Composite(Composite),
+    String,
+    Enum(Enum),
+    Vec(Box<Type>),
+    Map(Box<Type>, Box<Type>),
 }
 
 impl Default for Type {
@@ -104,6 +120,16 @@ impl Type {
             Self::Enum(x) => x.rust_name().to_string(),
             Self::Opaque(x) => x.rust_name().to_string(),
             Self::Composite(x) => x.rust_name().to_string(),
+            Self::Wired(x) => x.rust_name().to_string(),
+            Type::Domain(dom) => match dom {
+                DomainType::Composite(x) => x.rust_name().to_string(),
+                DomainType::String => format!("String"),
+                DomainType::Enum(_) => todo!(),
+                DomainType::Vec(x) => format!("Vec{}", capitalize_first_letter(x.name_within_lib().as_str())),
+                DomainType::Map(k, v) => {
+                    format!("Map{}To{}", capitalize_first_letter(k.name_within_lib().as_str()), capitalize_first_letter(v.name_within_lib().as_str()))
+                }
+            },
             Self::FnPointer(x) => x.rust_name(),
             Self::ReadPointer(x) => format!("ConstPtr{}", capitalize_first_letter(x.name_within_lib().as_str())),
             Self::ReadWritePointer(x) => format!("MutPtr{}", capitalize_first_letter(x.name_within_lib().as_str())),
@@ -134,6 +160,8 @@ impl Type {
             Self::Enum(_) => None,
             Self::Opaque(_) => None,
             Self::Composite(_) => None,
+            Self::Wired(_) => None,
+            Self::Domain(_) => todo!(),
             Self::FnPointer(_) => None,
             Self::ReadPointer(x) => Some(x.as_ref()),
             Self::ReadWritePointer(x) => Some(x.as_ref()),
@@ -147,6 +175,7 @@ impl Type {
     pub const fn as_composite_type(&self) -> Option<&Composite> {
         match self {
             Self::Composite(x) => Some(x),
+            Self::Wired(x) => Some(x),
             _ => None,
         }
     }
@@ -210,8 +239,16 @@ impl Type {
             Self::Enum(t) => Some(t.meta().module()),
             Self::Opaque(t) => Some(t.meta().module()),
             Self::Composite(t) => Some(t.meta().module()),
+            Self::Wired(t) => Some(t.meta().module()),
             Self::Pattern(TypePattern::NamedCallback(t)) => Some(t.meta().module()),
             _ => None,
+        }
+    }
+
+    pub fn is_wired(&self) -> bool {
+        match self {
+            Self::Wired(_) => true,
+            _ => false,
         }
     }
 }

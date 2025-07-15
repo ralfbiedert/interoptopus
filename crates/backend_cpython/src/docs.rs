@@ -71,7 +71,7 @@ impl<'a> Markdown<'a> {
         indented!(w, r"### Enums")?;
         indented!(w, r"Groups of related constants.")?;
 
-        for the_type in self.interop.inventory.ctypes().iter().filter_map(|x| match x {
+        for the_type in self.interop.inventory.c_types().iter().filter_map(|x| match x {
             Type::Enum(e) => Some(e),
             _ => None,
         }) {
@@ -83,7 +83,7 @@ impl<'a> Markdown<'a> {
         indented!(w, r"### Data Structs")?;
         indented!(w, r"Composite data used by functions and methods.")?;
 
-        for the_type in self.interop.inventory.ctypes() {
+        for the_type in self.interop.inventory.c_types() {
             match the_type {
                 Type::Composite(c) => {
                     let doc = c.meta().docs().lines().first().cloned().unwrap_or_default();
@@ -107,7 +107,7 @@ impl<'a> Markdown<'a> {
     fn write_types(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"# Types ")?;
 
-        for the_type in self.interop.inventory.ctypes() {
+        for the_type in self.interop.inventory.c_types() {
             match the_type {
                 Type::Composite(e) => self.write_composite(w, e)?,
                 Type::Pattern(p @ TypePattern::Option(_)) => self.write_composite(w, p.fallback_type().as_composite_type().unwrap())?,
@@ -155,7 +155,7 @@ impl<'a> Markdown<'a> {
     fn write_enums(&self, w: &mut IndentWriter) -> Result<(), Error> {
         indented!(w, r"# Enums ")?;
 
-        for the_type in self.interop.inventory.ctypes() {
+        for the_type in self.interop.inventory.c_types() {
             let Type::Enum(the_enum) = the_type else { continue };
             let meta = the_enum.meta();
 

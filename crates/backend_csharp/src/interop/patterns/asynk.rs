@@ -83,7 +83,7 @@ pub fn write_pattern_async_trampoline(i: &Interop, w: &mut IndentWriter, asynk: 
 pub fn write_pattern_async_trampoline_initializers(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     i.debug(w, "write_pattern_async_trampoline_initializers")?;
 
-    for the_type in i.inventory.ctypes() {
+    for the_type in i.inventory.c_types() {
         if let Type::Pattern(TypePattern::AsyncCallback(c)) = the_type {
             let inner = param_to_type(c.t());
             indented!(w, r"internal static AsyncTrampoline{inner} _trampoline{inner} = new();")?;
