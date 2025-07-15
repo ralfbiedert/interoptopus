@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package Models;
+option csharp_namespace = "ForCSharp.Protobuf";
+
+import "Items.proto";
+import "Error.proto";
+
+message Data
+{
+    Items Items = 1;
+    Error Errors = 2;
+}

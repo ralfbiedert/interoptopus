@@ -1,0 +1,25 @@
+[workspace]
+members = ["interop"]
+
+[package]
+name = "proto_benchy"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+prost = "0.8"
+prost-types = "0.8"
+interop = { path = "interop" }
+interoptopus = { path = "../../crates/core" }
+anyhow = "1"
+
+[build-dependencies]
+prost-build = "0.8"
+interop = { path = "interop" }
+interoptopus = { path = "../../crates/core" }
+interoptopus_backend_csharp = { path = "../../crates/backend_csharp" }
+anyhow = "1"
