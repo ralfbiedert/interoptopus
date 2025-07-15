@@ -52,6 +52,10 @@ impl Function {
     pub fn prettifier(&self) -> Prettifier {
         Prettifier::from_rust_lower(self.name())
     }
+
+    pub fn is_wired(&self) -> bool {
+        self.signature.rval().is_wired() || self.signature.params().iter().any(|p| p.the_type().is_wired())
+    }
 }
 
 /// Represents multiple `in` and a single `out` parameters.

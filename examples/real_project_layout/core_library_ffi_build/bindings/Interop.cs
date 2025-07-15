@@ -39,8 +39,20 @@ namespace My.Company
 
         [LibraryImport(NativeLib, EntryPoint = "start_server")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial WireOfReturn start_server(WireOfSomething server_name);
+        private static partial WireOfReturn start_server(WireOfSomething server_name);
 
+
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static Return StartServer(Something server_name) {
+            Span<byte> bytes = stackalloc byte[0+server_name.WireSize()];
+            fixed (byte* buf = bytes)
+            {
+                WireOfSomething wire_server_name = server_name.Wire(buf);
+                var wire_retbuf = start_server(wire_server_name); 
+                return WireOfReturn.Unwire(wire_retbuf);
+            }
+        }
 
         /// Destroys the given instance.
         ///
@@ -246,13 +258,13 @@ namespace My.Company
 
         public Return De()
         {}
-      // need to support Ser and De functions for this type...
-      // needs a reference to buffer slice in these functions or in the class itself?
-      // e.g.
-      // let rest = &buf;
-      // let rest = self.t.ser(rest)?;
-      // let rest = self.u.ser(rest)?;
-      // etc
+
+        public usize WireSize()
+        {
+            // Return the same value as storage_size() on rs side
+            256
+        }
+
     }
 
     public static class WireOfReturnExtensions
@@ -260,27 +272,6 @@ namespace My.Company
         public static WireOfReturn Wire(this Return t) { return WireOfReturn.From(t); }
     }
 
-    // how do we wire Primitives? NATIVELY!
-    // is Wire<u32> a thing? Most probably not, useless. Wire wraps a struct.
-
-
-    // wired function wrapper:
-
-    // [LibraryImport(NativeLib, EntryPoint = "start_server")]
-    // [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    // private static partial WireOfReturn start_server(WireOfSomething server_name);
-
-    // [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    // public static Return StartServer(Something s) {
-    //     Span<byte> bytes = stackalloc byte[s.wire_size()];
-    //     fixed (byte* p = bytes)
-    //     {
-    //         WireOfSomething ws = s.Wire(p);
-    //         var wr_buf = start_server(ws); // returns a WireOfReturn constructed on the rs side?
-    //         // might have to convert wr_buf to Managed
-    //         return WireOfReturn.Unwire(wr_buf);
-    //     }
-    // }
 
     public partial class WireOfSomething
     {
@@ -291,13 +282,13 @@ namespace My.Company
 
         public Something De()
         {}
-      // need to support Ser and De functions for this type...
-      // needs a reference to buffer slice in these functions or in the class itself?
-      // e.g.
-      // let rest = &buf;
-      // let rest = self.t.ser(rest)?;
-      // let rest = self.u.ser(rest)?;
-      // etc
+
+        public usize WireSize()
+        {
+            // Return the same value as storage_size() on rs side
+            256
+        }
+
     }
 
     public static class WireOfSomethingExtensions
@@ -305,27 +296,6 @@ namespace My.Company
         public static WireOfSomething Wire(this Something t) { return WireOfSomething.From(t); }
     }
 
-    // how do we wire Primitives? NATIVELY!
-    // is Wire<u32> a thing? Most probably not, useless. Wire wraps a struct.
-
-
-    // wired function wrapper:
-
-    // [LibraryImport(NativeLib, EntryPoint = "start_server")]
-    // [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    // private static partial WireOfReturn start_server(WireOfSomething server_name);
-
-    // [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    // public static Return StartServer(Something s) {
-    //     Span<byte> bytes = stackalloc byte[s.wire_size()];
-    //     fixed (byte* p = bytes)
-    //     {
-    //         WireOfSomething ws = s.Wire(p);
-    //         var wr_buf = start_server(ws); // returns a WireOfReturn constructed on the rs side?
-    //         // might have to convert wr_buf to Managed
-    //         return WireOfReturn.Unwire(wr_buf);
-    //     }
-    // }
 
     ///Result that contains value or an error.
     public partial struct ResultConstPtrGameEngineError

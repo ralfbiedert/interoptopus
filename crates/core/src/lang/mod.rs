@@ -221,4 +221,11 @@ impl Type {
             _ => None,
         }
     }
+
+    pub fn is_wired(&self) -> bool {
+        match self {
+            Self::Wired(_) => true,
+            _ => false,
+        }
+    }
 }

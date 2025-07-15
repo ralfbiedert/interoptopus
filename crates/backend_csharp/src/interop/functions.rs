@@ -5,7 +5,7 @@ use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Function, Primitive, SugaredReturnType, Type};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{Error, indented};
+use interoptopus::{Error, indented, render};
 use std::iter::zip;
 
 pub fn write_functions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
@@ -28,6 +28,10 @@ pub fn write_function(i: &Interop, w: &mut IndentWriter, function: &Function, wr
     write_function_declaration(i, w, function, false)?;
     w.newline()?;
     write_function_overload(i, w, function, write_for)?;
+    if function.is_wired() {
+        w.newline()?;
+        write_function_wires(i, w, function, write_for)?;
+    }
 
     Ok(())
 }
@@ -51,7 +55,7 @@ pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &
     let mut params = Vec::new();
 
     let native = i.has_custom_marshalled_delegate(function.signature());
-    let visibility = "public ";
+    let visibility = if function.is_wired() { "private " } else { "public " };
 
     for p in function.signature().params() {
         let the_type = param_to_type(p.the_type());
@@ -184,4 +188,24 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     }
 
     indented!(w, r"}}")
+}
+
+pub fn write_function_wires(i: &Interop, w: &mut IndentWriter, function: &Function, _write_for: WriteFor) -> Result<(), Error> {
+    assert!(function.is_wired());
+    i.debug(w, "write_function_wires")?;
+
+    let retval = (rval_to_type_sync(function.signature().rval()), "Return");
+    let name = function_name(function, FunctionNameFlavor::CSharpMethodWithClass);
+
+    let mut params = Vec::new();
+
+    for p in function.signature().params() {
+        let wired_type_name = param_to_type(p.the_type());
+        let unwired_type_name = "Something";
+        let name = p.name();
+
+        params.push((wired_type_name, unwired_type_name, name));
+    }
+
+    render!(w, "function_wiring.cs", ("retval", &retval), ("fname", &name), ("params", &params))
 }
