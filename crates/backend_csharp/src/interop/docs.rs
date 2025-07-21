@@ -26,5 +26,6 @@ pub fn write_documentation(w: &mut IndentWriter, documentation: &Docs) -> Result
     for line in documentation.lines() {
         indented!(w, r"///{}", line)?;
     }
+
     Ok(())
 }
