@@ -64,7 +64,7 @@ pub enum TypeRepresentation {
 }
 
 impl Attributes {
-    #[expect(clippy::useless_let_if_seq)]
+    #[allow(clippy::useless_let_if_seq)]
     pub fn visibility_for_field(&self, field: &Field, name: &str) -> TokenStream {
         let mut rval = if let Visibility::Public(_) = &field.vis {
             quote! { interoptopus::lang::Visibility::Public }
