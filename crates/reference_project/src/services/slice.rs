@@ -53,14 +53,14 @@ impl ServiceVariousSlices {
     /// Warning, you _must_ discard the returned slice object before calling into this service
     /// again, as otherwise undefined behavior might happen.
     #[ffi_service_method(on_panic = "return_default")]
-    pub fn return_slice(&mut self) -> ffi::Slice<u32> {
+    pub fn return_slice(&mut self) -> ffi::Slice<'_, u32> {
         self.data.as_slice().into()
     }
 
     /// Warning, you _must_ discard the returned slice object before calling into this service
     /// again, as otherwise undefined behavior might happen.
     #[ffi_service_method(on_panic = "return_default")]
-    pub fn return_slice_mut(&mut self) -> ffi::SliceMut<u32> {
+    pub fn return_slice_mut(&mut self) -> ffi::SliceMut<'_, u32> {
         ffi::SliceMut::from_slice(&mut self.data)
     }
 }

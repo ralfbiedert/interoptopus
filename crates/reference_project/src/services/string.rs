@@ -19,7 +19,7 @@ impl ServiceStrings {
 
     pub fn pass_cstr(&mut self, _: ffi::CStrPtr) {}
 
-    pub fn return_cstr(&mut self) -> ffi::CStrPtr {
+    pub fn return_cstr(&mut self) -> ffi::CStrPtr<'_> {
         ffi::CStrPtr::empty()
     }
 
