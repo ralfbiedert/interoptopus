@@ -1,6 +1,7 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using System;
+using System.Collections.Generic;
 using Gen.ForCSharp;
 
 namespace ForCSharp;
@@ -74,7 +75,48 @@ public class BenchyBase
         return input;
     }
 
-    protected static Input populateFfiInput(int n)
+    // protected static Input populateFfiInput(int n)
+    // {
+    //     var input = new Input();
+    //
+    //     input.configuration = new Configuration();
+    //     input.value = new Table();
+    //     input.value.metadata = new TableMetadata();
+    //     input.context = new Context();
+    //
+    //     // input.configuration.host (String) = from "" to "verylonghostname" (4096 chars)
+    //     input.configuration.host = "127.0.0.1".Utf8();
+    //     input.configuration.response_size = (ulong)n;
+    //     // input.configuration.is_ok_response = true if populating Items in Outputs, false if populating Errors
+    //     input.configuration.is_ok_response = true;
+    //     input.value.metadata.guid = new Guid().ToString().Utf8();
+    //     input.value.metadata.prefix = "ordinary_prefix_".Utf8();
+    //     input.value.metadata.row_count = 5;
+    //     input.value.metadata.column_count = 7;
+    //     var arr = new byte[n];
+    //     // fixed (var x = new byte[n]) // try with memory pinned from the start
+    //     // {
+    //         input.value.byte_array = SliceU8.From(arr); // from 0 bytes to 1Mb}
+    //     // }
+    //     // input.context.things = from 0 strings to 1,000,000 strings "thingX"
+    //     var things = new Utf8String[n];
+    //     for (var i = 0; i < n; i++)
+    //     {
+    //         things[i] = $"Thing-{i}".Utf8();
+    //     }
+    //
+    //     input.context.things = things.Slice();
+    //     // NB: FFI does not support HashMaps interop
+    //     // input.context.headers = from 0 headers to 1,000,000 "key"=>"value" pairs
+    //     //for (int i = 0; i < n; i++)
+    //     //{
+    //     //    input.context.headers.Add($"Header-{i}", $"Value-{i}");
+    //     //}
+    //
+    //     return input;
+    // }
+
+    protected static Input populateWireInput(int n)
     {
         var input = new Input();
 
@@ -84,53 +126,54 @@ public class BenchyBase
         input.context = new Context();
 
         // input.configuration.host (String) = from "" to "verylonghostname" (4096 chars)
-        input.configuration.host = "127.0.0.1".Utf8();
+        input.configuration.host = "127.0.0.1";
         input.configuration.response_size = (ulong)n;
         // input.configuration.is_ok_response = true if populating Items in Outputs, false if populating Errors
         input.configuration.is_ok_response = true;
-        input.value.metadata.guid = new Guid().ToString().Utf8();
-        input.value.metadata.prefix = "ordinary_prefix_".Utf8();
+        input.value.metadata.guid = new Guid().ToString();
+        input.value.metadata.prefix = "ordinary_prefix_";
         input.value.metadata.row_count = 5;
         input.value.metadata.column_count = 7;
-        fixed (var x = new byte[n]) // try with memory pinned from the start
-        {
-            input.value.byte_array = SliceU8.From(x, x.Length); // from 0 bytes to 1Mb}
-        }
+        input.value.byte_array = new byte[n]; // from 0 bytes to 1Mb
         // input.context.things = from 0 strings to 1,000,000 strings "thingX"
-        var things = new Utf8String[n];
-        for (int i = 0; i < n; i++)
+        var things = new String[n];
+        for (var i = 0; i < n; i++)
         {
-            things[i] = $"Thing-{i}".Utf8();
+            things[i] = $"Thing-{i}";
         }
 
-        input.context.things = things.Slice();
+        input.context.things = things;
         // NB: FFI does not support HashMaps interop
         // input.context.headers = from 0 headers to 1,000,000 "key"=>"value" pairs
-        //for (int i = 0; i < n; i++)
-        //{
-        //    input.context.headers.Add($"Header-{i}", $"Value-{i}");
-        //}
+        for (int i = 0; i < n; i++)
+        {
+            input.context.headers.Add($"Header-{i}", $"Value-{i}");
+        }
 
         return input;
     }
-
-    // Wire.Input populateWireInput(int n)
-    // {
-    //     var input = new WireInput();
-    //     return input;
-    // }
 }
 
 public class JustTest : BenchyBase
 {
-    public void Ffi_0_hot()
+    // public void Ffi_0_hot()
+    // {
+    //     var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(SMALL));
+    // }
+    // public void Ffi_10_hot()
+    // {
+    //     var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(10));
+    // }
+    public void Wire_0_hot()
     {
-        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(SMALL));
+        var outputs = InteropWire.ExecuteRustClient(populateWireInput(SMALL));
+        Console.WriteLine($"{outputs.response.results[0].item_value} and {outputs.response.results[0].item_id}");
     }
-    public void Ffi_10_hot()
+    public void Wire_10_hot()
     {
-        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(10));
+        var outputs = InteropWire.ExecuteRustClient(populateWireInput(10));
     }
+
 }
 
 //[RPlotExporter]
@@ -146,7 +189,7 @@ public class HotBenchy : BenchyBase
         var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(SMALL));
     }
 
-    [Benchmark]
+/*    [Benchmark]
     public void Protobuf_10_hot()
     {
         var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(10));
@@ -175,7 +218,7 @@ public class HotBenchy : BenchyBase
     {
         var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(MEDIUM));
     }
-
+*/
     /*    [Benchmark]
         public void Protobuf_200k_hot()
         {
@@ -188,41 +231,41 @@ public class HotBenchy : BenchyBase
             var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(LARGE));
         }*/
 
-    [Benchmark]
-    public void Ffi_0_hot()
-    {
-        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(SMALL));
-    }
-
-    [Benchmark]
-    public void Ffi_10_hot()
-    {
-        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(10));
-    }
-
-    [Benchmark]
-    public void Ffi_50_hot()
-    {
-        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(50));
-    }
-
-    [Benchmark]
-    public void Ffi_100_hot()
-    {
-        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(100));
-    }
-
-    [Benchmark]
-    public void Ffi_500_hot()
-    {
-        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(500));
-    }
-
-    [Benchmark]
-    public void Ffi_1k_hot()
-    {
-        var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(MEDIUM));
-    }
+    // [Benchmark]
+    // public void Ffi_0_hot()
+    // {
+    //     var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(SMALL));
+    // }
+    //
+    // [Benchmark]
+    // public void Ffi_10_hot()
+    // {
+    //     var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(10));
+    // }
+    //
+    // [Benchmark]
+    // public void Ffi_50_hot()
+    // {
+    //     var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(50));
+    // }
+    //
+    // [Benchmark]
+    // public void Ffi_100_hot()
+    // {
+    //     var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(100));
+    // }
+    //
+    // [Benchmark]
+    // public void Ffi_500_hot()
+    // {
+    //     var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(500));
+    // }
+    //
+    // [Benchmark]
+    // public void Ffi_1k_hot()
+    // {
+    //     var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(MEDIUM));
+    // }
     /*
         [Benchmark]
         public void Ffi_200k_hot()
@@ -236,11 +279,11 @@ public class HotBenchy : BenchyBase
             var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(LARGE));
         }*/
 
-    // [Benchmark]
-    // public void WireInterop_0()
-    // {
-    //     var outputs = InteropWire.ExecuteRustClient(populateInput(SMALL));
-    // }
+    [Benchmark]
+    public void Wire_0_hot()
+    {
+        var outputs = InteropWire.ExecuteRustClient(populateWireInput(SMALL));
+    }
 }
 
 [RPlotExporter]
@@ -270,27 +313,27 @@ public class ColdBenchy : BenchyBase
         var outputs = InteropProtobuf.ExecuteRustClient(largeProtobufInput);
     }
 
-    private Input smallFfiInput = populateFfiInput(SMALL);
-    private Input mediumFfiInput = populateFfiInput(MEDIUM);
-    private Input largeFfiInput = populateFfiInput(LARGE);
-
-    [Benchmark]
-    public void Ffi_0_cold()
-    {
-        var input = smallFfiInput;
-        var outputs = InteropFfi.ExecuteRustClient(input);
-    }
-
-    [Benchmark]
-    public void Ffi_1k_cold()
-    {
-        var outputs = InteropFfi.ExecuteRustClient(mediumFfiInput);
-    }
-    [Benchmark]
-    public void Ffi_1kk_cold()
-    {
-        var outputs = InteropFfi.ExecuteRustClient(largeFfiInput);
-    }
+    // private Input smallFfiInput = populateFfiInput(SMALL);
+    // private Input mediumFfiInput = populateFfiInput(MEDIUM);
+    // private Input largeFfiInput = populateFfiInput(LARGE);
+    //
+    // [Benchmark]
+    // public void Ffi_0_cold()
+    // {
+    //     var input = smallFfiInput;
+    //     var outputs = InteropFfi.ExecuteRustClient(input);
+    // }
+    //
+    // [Benchmark]
+    // public void Ffi_1k_cold()
+    // {
+    //     var outputs = InteropFfi.ExecuteRustClient(mediumFfiInput);
+    // }
+    // [Benchmark]
+    // public void Ffi_1kk_cold()
+    // {
+    //     var outputs = InteropFfi.ExecuteRustClient(largeFfiInput);
+    // }
 }
 
 public class Program
@@ -301,7 +344,7 @@ public class Program
         var hot = BenchmarkRunner.Run<HotBenchy>();
         //var cold = BenchmarkRunner.Run<ColdBenchy>();
 
-        //var benchy = new JustTest();
-        //benchy.Ffi_0_hot();
+        // var benchy = new JustTest();
+        // benchy.Wire_0_hot();
     }
 }

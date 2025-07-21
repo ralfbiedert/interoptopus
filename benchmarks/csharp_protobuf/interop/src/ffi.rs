@@ -1,27 +1,9 @@
-//!
-//! Interoptopus FFI-types based ipc
-//!
-use interoptopus::{
-    builtins_string, builtins_vec, ffi, ffi_function, ffi_type, function,
-    inventory::{Inventory, InventoryBuilder},
-};
+use interoptopus::{ffi, ffi_function, ffi_type};
 
-pub fn ffi_inventory() -> Inventory {
-    InventoryBuilder::new()
-        .register(builtins_string!())
-        .register(builtins_vec!(u8))
-        .register(builtins_vec!(ffi::String))
-        .register(function!(FfiRustClient))
-        .register(builtins_vec!(Item))
-        .register(builtins_vec!(Result))
-        .validate()
-        .build()
-}
-
-/// Main benchmark Rust entry point for FFI-based ipc.
+/// Main benchmark Rust entry point for FFI-based interop.
 #[ffi_function]
 pub fn FfiRustClient(_input: Input) -> Outputs {
-/*    println!("PRINTLN DEBUG IS THA BEST");
+    /*    println!("PRINTLN DEBUG IS THA BEST");
     println!("NUMBERS VALIDITY CHECK:");
     println!("response_size = {}", _input.configuration.response_size);
     println!("is_ok_response = {}", _input.configuration.is_ok_response);

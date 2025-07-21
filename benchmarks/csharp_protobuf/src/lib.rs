@@ -8,4 +8,4 @@
 pub mod ffi;
 mod protobuf;
 mod protobuf_models;
-// mod wire;
+pub mod wire;
