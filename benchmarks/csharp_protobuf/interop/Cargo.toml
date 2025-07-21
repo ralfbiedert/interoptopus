@@ -1,5 +1,5 @@
 [package]
-name = "interopt_ffi"
+name = "interop"
 version = "0.0.0"
 edition = "2024"
 publish = false

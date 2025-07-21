@@ -1,55 +1,32 @@
-﻿// using System.Runtime.InteropServices;
-//
-// namespace ForCSharp;
-//
-// public class InteropWire
-// {
-//     private static extern unsafe void WireRustClient(
-//         byte[] structPointer, uint structLength, void** result, uint* resultLength);
-//
-//     private static extern unsafe void FreeRustResultMemory(byte* rustPtr, uint len);
-//
-//     /// Main benched function.
-//     public static Outputs ExecuteRustClient(Input input)
-//     {
-//         try
-//         {
-//             unsafe
-//             {
-//                 var inputBytes = input.ToWire().ToByteArray();
-//
-//                 byte* buffer = null;
-//                 uint length = 0;
-//
-//                 WireRustClient(inputBytes, (uint)inputBytes.Length, (void**)&buffer, &length);
-//
-//                 var result = CopyAndDeallocate(buffer, length);
-//                 var output = Outputs.Parser.ParseFrom(result);
-//
-//                 return output;
-//             }
-//         }
-//         catch (Exception e)
-//         {
-//             throw new InvalidOperationException($"Unexpected error in ExecuteRustClient: {e.Message}", e);
-//         }
-//     }
-//
-//     private static unsafe byte[] CopyAndDeallocate(byte* contentPtr, uint contentLength)
-//     {
-//         byte[] result = [];
-//         if (contentPtr == null) return result;
-//
-//         try
-//         {
-//             result = new byte[contentLength];
-//             Marshal.Copy((IntPtr)contentPtr, result, 0, (int)contentLength);
-//         }
-//         finally
-//         {
-//             FreeRustResultMemory(contentPtr, contentLength);
-//         }
-//
-//         return result;
-//     }
-// }
+using System;
+using Gen.ForCSharp;
+
+namespace ForCSharp;
+
+public class InteropWire
+{
+    /// Main benched function.
+    public static unsafe Outputs ExecuteRustClient(Input input)
+    {
+        int bufferSize = input.WireSize();
+        Span<byte> buffer = stackalloc byte[bufferSize]; // Stack allocation for small data, use heap for large payloads
+
+        fixed (byte* bufferPtr = buffer)
+        {
+            var wireInput = input.WireWithBuffer(bufferPtr, bufferSize);
+            var wireOutputs = Interop.WireRustClient(wireInput); // WireOfOutputs
+            try
+            {
+                return wireOutputs.Unwire();
+            }
+            catch (Exception e)
+            {
+                throw new InvalidOperationException($"Unexpected Wire error in ExecuteRustClient: {e.Message}", e);
+            }
+            finally
+            {
+                wireOutputs.Dispose();
+            }
+        }
+    }
+}

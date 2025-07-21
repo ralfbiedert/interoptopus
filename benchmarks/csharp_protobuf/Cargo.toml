@@ -1,5 +1,5 @@
 [workspace]
-members = ["interopt_ffi"]
+members = ["interop"]
 
 [package]
 name = "proto_benchy"
@@ -8,19 +8,18 @@ edition = "2024"
 publish = false
 
 [lib]
-path = "lib.rs"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 prost = "0.8"
 prost-types = "0.8"
-interopt_ffi = { path = "interopt_ffi" }
+interop = { path = "interop" }
 interoptopus = { path = "../../crates/core" }
 anyhow = "1"
 
 [build-dependencies]
 prost-build = "0.8"
-interopt_ffi = { path = "interopt_ffi" }
+interop = { path = "interop" }
 interoptopus = { path = "../../crates/core" }
 interoptopus_backend_csharp = { path = "../../crates/backend_csharp" }
 anyhow = "1"
