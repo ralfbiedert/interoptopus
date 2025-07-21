@@ -112,6 +112,7 @@ impl Default for Interop {
             visibility_types: Visibility::AsDeclared,
             write_types: WriteTypes::NamespaceAndInteroptopusGlobal,
             debug: false,
+            doc_hints: true,
         }
     }
 }
@@ -145,8 +146,10 @@ pub struct Interop {
     /// Which types to write.
     #[builder(setter(into))]
     write_types: WriteTypes,
-    /// Also generate markers for easier debugging
+    /// Also generate markers for easier debugging.
     debug: bool,
+    /// Enrich user-provided item documentation with safety warnings and proper API use hints.
+    doc_hints: bool,
     pub(crate) inventory: Inventory,
 }
 
