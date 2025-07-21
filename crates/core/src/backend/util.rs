@@ -5,6 +5,7 @@ use crate::pattern::TypePattern;
 use std::collections::hash_map::Iter;
 use std::collections::{HashMap, HashSet};
 use std::iter::FromIterator;
+use std::slice::from_ref;
 
 /// The namespace used by common types, e.g., `ffi::String`.
 pub const NAMESPACE_COMMON: &str = "_common";
@@ -142,7 +143,7 @@ pub(crate) fn types_from_functions_types(functions: &[Function], extra_types: &[
 #[allow(clippy::redundant_pub_crate)]
 #[must_use]
 pub fn types_from_type(start: &Type) -> Vec<Type> {
-    types_from_functions_types(&[], &[start.clone()])
+    types_from_functions_types(&[], from_ref(start))
 }
 
 /// Recursively checks.
@@ -353,7 +354,7 @@ impl NamespaceMappings {
 
     /// Iterates over all mappings.
     #[must_use]
-    pub fn iter(&self) -> Iter<String, String> {
+    pub fn iter(&self) -> Iter<'_, String, String> {
         self.mappings.iter()
     }
 }

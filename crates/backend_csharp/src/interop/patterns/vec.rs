@@ -244,6 +244,7 @@ pub fn write_pattern_vec_helpers(i: &Interop, w: &mut IndentWriter, v: &VecType)
     Ok(())
 }
 
+#[expect(clippy::collapsible_if)]
 pub fn write_pattern_vec_interop_helper(i: &Interop, w: &mut IndentWriter, vec: &VecType) -> Result<(), Error> {
     indented!(w, r"public partial class InteropHelper")?;
     indented!(w, r"{{")?;
