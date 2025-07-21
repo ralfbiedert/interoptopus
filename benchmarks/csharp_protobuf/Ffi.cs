@@ -10,8 +10,9 @@ public class InteropFfi
     {
         try
         {
-            var outputs = Interop.FfiRustClient(input);
-            return outputs;
+            // var outputs = Interop.FfiRustClient(input);
+            // return outputs;
+            return null;
         }
         catch (Exception e)
         {
