@@ -202,6 +202,24 @@ impl Type {
         matches!(self, Self::Primitive(Primitive::Void))
     }
 
+    /// Checks if this is a function pointer.
+    #[must_use]
+    pub const fn is_fnptr(&self) -> bool {
+        matches!(self, Self::FnPointer(_))
+    }
+
+    /// Checks if this is a named callback.
+    #[must_use]
+    pub const fn is_named_callback(&self) -> bool {
+        matches!(self, Self::Pattern(TypePattern::NamedCallback(_)))
+    }
+
+    /// Checks if this is an async callback.
+    #[must_use]
+    pub const fn is_async_callback(&self) -> bool {
+        matches!(self, Self::Pattern(TypePattern::AsyncCallback(_)))
+    }
+
     /// Returns the namespace of the type.
     #[must_use]
     pub fn namespace(&self) -> Option<&str> {

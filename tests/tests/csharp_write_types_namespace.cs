@@ -195,11 +195,15 @@ namespace My.Company
         public static partial Utf8String enums_4(Layer3 x);
 
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "fnptr_1")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial byte fnptr_1(InteropDelegate_fn_u8_rval_u8 callback, byte x);
 
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "fnptr_2")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void fnptr_2(InteropDelegate_fn_CharArray_rval_void_native callback, CharArray x);
@@ -555,6 +559,8 @@ namespace My.Company
         public static partial Vec3f32 pattern_ffi_slice_2(SliceVec3f32 ffi_slice, int i);
 
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_3")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void pattern_ffi_slice_3(SliceMutU8 slice, CallbackSliceMut callback);
@@ -584,6 +590,8 @@ namespace My.Company
         public static partial void pattern_ffi_slice_5(ref SliceU8 slice, ref SliceMutU8 slice2);
 
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_6")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void pattern_ffi_slice_6(ref SliceMutU8 slice, CallbackU8 callback);
@@ -602,6 +610,8 @@ namespace My.Company
             }
         }
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_8")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void pattern_ffi_slice_8(ref SliceMutCharArray slice, CallbackCharArray2 callback);
@@ -625,6 +635,8 @@ namespace My.Company
         public static partial Utf8String pattern_ffi_slice_9(SliceUseString slice);
 
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_delegate")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial byte pattern_ffi_slice_delegate(CallbackFFISlice callback);
@@ -643,6 +655,8 @@ namespace My.Company
             }
         }
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_delegate_huge")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial Vec3f32 pattern_ffi_slice_delegate_huge(CallbackHugeVecSlice callback);
@@ -721,6 +735,8 @@ namespace My.Company
         public static partial ulong pattern_api_guard();
 
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_1")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial uint pattern_callback_1(MyCallback callback, uint x);
@@ -739,6 +755,8 @@ namespace My.Company
             }
         }
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_2")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial MyCallbackVoid pattern_callback_2(MyCallbackVoid callback);
@@ -757,6 +775,8 @@ namespace My.Company
             }
         }
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_4")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial uint pattern_callback_4(MyCallbackNamespaced callback, uint x);
@@ -785,6 +805,8 @@ namespace My.Company
         public static partial SumDelegate2 pattern_callback_6();
 
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_7")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, ref int o);
@@ -805,6 +827,8 @@ namespace My.Company
             }
         }
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_8")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void pattern_callback_8(StringCallback cb, NestedStringCallback cb2, Utf8String s);
@@ -886,6 +910,8 @@ namespace My.Company
         public static partial ResultConstPtrServiceAsyncBasicError service_async_basic_new();
 
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "service_async_basic_call")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_async_basic_call(IntPtr _context, AsyncCallbackCommonNative _async_callback);
@@ -921,6 +947,8 @@ namespace My.Company
         public static partial ResultConstPtrServiceAsyncSleepError service_async_sleep_new();
 
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "service_async_sleep_return_after_ms")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_async_sleep_return_after_ms(IntPtr _context, ulong x, ulong ms, AsyncCallbackCommonNative _async_callback);
@@ -956,6 +984,8 @@ namespace My.Company
         public static partial ResultConstPtrServiceAsyncVecStringError service_async_vec_string_new();
 
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_handle_string")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_async_vec_string_handle_string(IntPtr _context, Utf8String s, AsyncCallbackCommonNative _async_callback);
@@ -975,6 +1005,8 @@ namespace My.Company
             return _cs;
         }
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_handle_vec_string")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_async_vec_string_handle_vec_string(IntPtr _context, VecUtf8String s, AsyncCallbackCommonNative _async_callback);
@@ -994,6 +1026,8 @@ namespace My.Company
             return _cs;
         }
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_handle_nested_string")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_async_vec_string_handle_nested_string(IntPtr _context, Utf8String s, AsyncCallbackCommonNative _async_callback);
@@ -1029,6 +1063,8 @@ namespace My.Company
         public static partial ResultConstPtrServiceAsyncResultError service_async_result_new();
 
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "service_async_result_success")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_async_result_success(IntPtr _context, AsyncCallbackCommonNative _async_callback);
@@ -1048,6 +1084,8 @@ namespace My.Company
             return _cs;
         }
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "service_async_result_fail")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_async_result_fail(IntPtr _context, AsyncCallbackCommonNative _async_callback);
@@ -1083,6 +1121,8 @@ namespace My.Company
         public static partial ResultConstPtrServiceAsyncStructsError service_async_structs_new();
 
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "service_async_structs_process_struct")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_async_structs_process_struct(IntPtr _context, NestedArray x, AsyncCallbackCommonNative _async_callback);
@@ -1248,6 +1288,8 @@ namespace My.Company
         public static partial ResultConstPtrServiceCallbacksError service_callbacks_new();
 
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_simple")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_callbacks_callback_simple(IntPtr _context, MyCallback callback);
@@ -1266,6 +1308,8 @@ namespace My.Company
             }
         }
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_ffi_return")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturn callback);
@@ -1284,6 +1328,8 @@ namespace My.Company
             }
         }
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_with_slice")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturn callback, SliceI32 input);
@@ -1456,6 +1502,8 @@ namespace My.Company
         public static partial IntPtr service_strings_return_cstr(IntPtr _context);
 
 
+        /// # Safety Hints
+        /// - This functions accepts
         [LibraryImport(NativeLib, EntryPoint = "service_strings_callback_string")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void service_strings_callback_string(IntPtr _context, Utf8String s, StringCallback cb);

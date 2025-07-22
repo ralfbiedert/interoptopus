@@ -3,9 +3,9 @@ use crate::interop::docs::write_documentation;
 use crate::utils::sugared_return_type;
 use crate::{FunctionNameFlavor, Interop};
 use interoptopus::backend::{IndentWriter, WriteFor};
-use interoptopus::lang::{Function, Primitive, SugaredReturnType, Type};
+use interoptopus::lang::{Function, Parameter, Primitive, SugaredReturnType, Type};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{Error, indented};
+use interoptopus::{indented, render, Error};
 use std::iter::zip;
 
 pub fn write_functions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
@@ -23,11 +23,33 @@ pub fn write_function(i: &Interop, w: &mut IndentWriter, function: &Function, wr
     i.debug(w, "write_function")?;
     if write_for == WriteFor::Code {
         write_documentation(w, function.meta().docs())?;
+        write_documentation_hint(i, w, function)?;
         write_function_annotation(i, w, function)?;
     }
     write_function_declaration(i, w, function, false)?;
     w.newline()?;
     write_function_overload(i, w, function, write_for)?;
+
+    Ok(())
+}
+
+fn write_documentation_hint(i: &Interop, w: &mut IndentWriter, f: &Function) -> Result<(), Error> {
+    if !i.doc_hints {
+        return Ok(());
+    }
+
+    let has_callback = f
+        .signature()
+        .params()
+        .iter()
+        .map(Parameter::the_type)
+        .any(|x| x.is_async_callback() || x.is_named_callback() || x.is_fnptr());
+
+    if !has_callback {
+        return Ok(());
+    }
+
+    render!(w, "doc.hints/functions.cs")?;
 
     Ok(())
 }
