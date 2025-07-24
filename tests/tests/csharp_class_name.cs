@@ -11,7 +11,6 @@
 //
 // </auto-generated>
 
-
 #pragma warning disable 0105
 using System;
 using System.Text;
