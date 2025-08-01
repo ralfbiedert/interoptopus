@@ -66,11 +66,11 @@ public class BenchyBase
         {
             input.Context.Things.Add($"Thing-{i}");
         }
-        // input.context.headers = from 0 headers to 1,000,000 "key"=>"value" pairs
-        /*for (int i = 1; i <= n; i++)
+        // input.Context.headers = from 0 headers to 1,000,000 "key"=>"value" pairs
+        for (int i = 1; i <= n; i++)
         {
             input.Context.Headers.Add($"Header-{i}", $"Value-{i}");
-        }*/
+        }
 
         return input;
     }
@@ -143,6 +143,7 @@ public class BenchyBase
         }
 
         input.context.things = things;
+        input.context.headers = new Dictionary<string, string>();
         // NB: FFI does not support HashMaps interop
         // input.context.headers = from 0 headers to 1,000,000 "key"=>"value" pairs
         for (int i = 0; i < n; i++)
@@ -183,13 +184,13 @@ public class JustTest : BenchyBase
 [MaxIterationCount(15)]
 public class HotBenchy : BenchyBase
 {
-    [Benchmark]
+/*    [Benchmark]
     public void Protobuf_0_hot()
     {
         var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(SMALL));
     }
 
-/*    [Benchmark]
+    [Benchmark]
     public void Protobuf_10_hot()
     {
         var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(10));
@@ -212,13 +213,13 @@ public class HotBenchy : BenchyBase
     {
         var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(500));
     }
+*/
 
     [Benchmark]
     public void Protobuf_1k_hot()
     {
         var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(MEDIUM));
     }
-*/
     /*    [Benchmark]
         public void Protobuf_200k_hot()
         {
@@ -277,12 +278,18 @@ public class HotBenchy : BenchyBase
         public void Ffi_1kk_hot()
         {
             var outputs = InteropFfi.ExecuteRustClient(populateFfiInput(LARGE));
-        }*/
+        }
 
     [Benchmark]
     public void Wire_0_hot()
     {
         var outputs = InteropWire.ExecuteRustClient(populateWireInput(SMALL));
+    }*/
+    
+    [Benchmark]
+    public void Wire_1k_hot()
+    {
+        var outputs = InteropWire.ExecuteRustClient(populateWireInput(MEDIUM));
     }
 }
 
