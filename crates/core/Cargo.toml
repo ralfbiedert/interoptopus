@@ -22,6 +22,7 @@ derive = ["interoptopus_proc"]
 interoptopus_proc = { path = "../proc_macros", version = "0.15.0-alpha.8", optional = true }
 log = { workspace = true, optional = true }
 serde = { workspace = true, features = ["derive"], optional = true }
+tera = { workspace = true }
 
 [package.metadata.docs.rs]
 all-features = true

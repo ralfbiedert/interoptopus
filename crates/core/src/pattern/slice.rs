@@ -296,7 +296,7 @@ mod test {
         let empty = Slice::<u8>::empty();
         let some = Slice::<u8>::from_slice(slice);
 
-        assert_eq!(empty.as_slice(), &[]);
+        assert_eq!(empty.as_slice(), &[] as &[u8]);
         assert_eq!(some.as_slice(), slice);
     }
 
@@ -310,7 +310,7 @@ mod test {
         sub[0] = 6;
         some[0] = 5;
 
-        assert_eq!(empty.as_slice(), &[]);
+        assert_eq!(empty.as_slice(), &[] as &[u8]);
         assert_eq!(slice, &[5, 6, 2, 3, 5]);
     }
 
@@ -327,7 +327,7 @@ mod test {
         sub[0] = 6;
         target[0] = 5;
 
-        assert_eq!(empty.as_slice(), &[]);
+        assert_eq!(empty.as_slice(), &[] as &[u8]);
         assert_eq!(slice, &[5, 6, 2, 3, 5]);
     }
 }
