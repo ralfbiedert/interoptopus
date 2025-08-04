@@ -29,7 +29,7 @@ pub fn compile_c_app_if_installed(_app: impl AsRef<Path>) -> Result<(), Error> {
 #[macro_export]
 macro_rules! compile_output_c {
     ($generated:expr) => {{
-        if !$crate::UPDATE_BINDINGS {
+        if std::env::var($crate::UPDATE_BINDINGS).is_ok() {
             let temp_dir = $crate::tempdir()?;
             let header_file = temp_dir.path().join("header.h");
             let c_file = temp_dir.path().join("app.c");

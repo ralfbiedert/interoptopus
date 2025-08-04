@@ -4,15 +4,15 @@ pub mod backend_csharp;
 
 pub use tempfile::tempdir;
 
-/// Set this to `true` if you want to update bindings.
-pub static UPDATE_BINDINGS: bool = false;
+// Env variable, set it to any value to regenerate the bindings.
+pub const UPDATE_BINDINGS: &str = "INTEROPTOPUS_UPDATE_BINDINGS";
 
 #[macro_export]
 macro_rules! validate_output {
     ($folder:expr, $file:expr, $generated:expr) => {
         let file = format!("{}/{}", $folder, $file);
 
-        if $crate::UPDATE_BINDINGS {
+        if std::env::var($crate::UPDATE_BINDINGS).is_ok() {
             ::std::fs::write(file, $generated).unwrap();
         } else {
             let expected = ::std::fs::read_to_string(file.clone())?;
