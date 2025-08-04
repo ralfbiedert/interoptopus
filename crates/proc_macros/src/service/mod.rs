@@ -19,7 +19,7 @@ pub struct Attributes {
 }
 
 impl Attributes {
-    pub fn prefered_service_name(&self, impl_block: &ItemImpl) -> String {
+    pub fn preferred_service_name(&self, impl_block: &ItemImpl) -> String {
         if self.prefix.is_empty() {
             let service_name = get_type_name(impl_block).expect("Must have valid service name");
             format!("{}_", pascal_to_snake_case(&service_name))
