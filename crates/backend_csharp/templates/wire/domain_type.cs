@@ -34,10 +34,10 @@
         return "{{type}} { {% for field in fields %}{{field.name}} = " + {{field.name}}{% if not loop.last %} + ", {% endif %}{% endfor %} + " }";
     }
 
-    // TODO: add serialize/deserialize here
     /// <summary>
     /// Deserialize the wire data back to a managed {{type}} object
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static {{type}} Deserialize(BinaryReader reader)
     {
 {%- if fields %}
@@ -50,6 +50,7 @@
     /// <summary>
     /// Serialize a {{type}} object into this wire's buffer
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public void Serialize(BinaryWriter writer)
     {
 {%- if fields %}
@@ -60,6 +61,7 @@
     /// <summary>
     /// Calculate the size needed to serialize a {{type}} object
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public int CalculateSize()
     {
 {% if fields %}
@@ -78,8 +80,9 @@ public static class Deser{{type}}Extensions
     /// <summary>
     /// Create a Wire with owned buffer from this {{type}} instance
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static {{type}} Deserialize{{type}}(BinaryReader reader)
     {
-        return {{type}}.Deserialize(reader);
+        return {{type}}.Deserialize(reader); {# TODO: Just call this directly, without DeserExtensions wrapper? #}
     }
 }

@@ -2,6 +2,7 @@ public class WireInterop {
     #region Serialization Helpers
     #nullable disable
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static void SerializeString(BinaryWriter writer, string value)
     {
         if (value == null)
@@ -15,6 +16,7 @@ public class WireInterop {
         writer.Write(bytes);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static string DeserializeString(BinaryReader reader)
     {
         var length = reader.ReadUInt64();
@@ -26,6 +28,7 @@ public class WireInterop {
     }
 
     // TODO replace with precise serializers
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static void SerializeItem<T>(BinaryWriter writer, T item)
     {
         if (typeof(T).IsPrimitive)
@@ -43,6 +46,7 @@ public class WireInterop {
     }
 
     // TODO replace with precise deserializers
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static T DeserializeItem<T>(BinaryReader reader)
     {
         if (typeof(T).IsPrimitive)
@@ -61,6 +65,7 @@ public class WireInterop {
     }
 
     // TODO: pass itemSerializerDelegate
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static void SerializeVec<T>(BinaryWriter writer, IList<T> value)
     {
         if (value == null)
@@ -76,12 +81,14 @@ public class WireInterop {
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static byte[] DeserializeVecOfByte(BinaryReader reader)
     {
         var length = reader.ReadUInt64();
         return reader.ReadBytes((int)length);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static T[] DeserializeVec<T>(BinaryReader reader, Func<BinaryReader, T> deserializeItem)
     {
         var length = reader.ReadUInt64();
@@ -95,6 +102,7 @@ public class WireInterop {
         return result;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static void SerializeMap<K,V>(BinaryWriter writer, IDictionary<K,V> value)
     {
         if (value == null)
@@ -111,6 +119,7 @@ public class WireInterop {
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static Dictionary<K,V> DeserializeMap<K,V>(BinaryReader reader, Func<BinaryReader, K> deserializeKey, Func<BinaryReader, V> deserializeValue)
     {
         var length = reader.ReadUInt64();
@@ -126,6 +135,7 @@ public class WireInterop {
         return result;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static void SerializeOption<T>(BinaryWriter writer, T? value) where T : struct
     {
         if (value.HasValue)
@@ -139,6 +149,7 @@ public class WireInterop {
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static T? DeserializeOption<T>(BinaryReader reader) where T : struct
     {
         var hasValue = reader.ReadByte() != 0;
@@ -149,6 +160,7 @@ public class WireInterop {
         return null;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static T? DeserializeEnum<T>(BinaryReader reader) where T: System.Enum
     {
         var discriminant = reader.ReadInt32();
@@ -159,6 +171,7 @@ public class WireInterop {
         return default(T);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static void SerializePrimitive<T>(BinaryWriter writer, T value)
     {
         switch (value)
@@ -179,6 +192,7 @@ public class WireInterop {
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static object DeserializePrimitive<T>(BinaryReader reader)
     {
         return typeof(T).Name switch
@@ -198,6 +212,7 @@ public class WireInterop {
         };
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static int SizeOf<T>()
     {
         return typeof(T).Name switch
@@ -210,6 +225,7 @@ public class WireInterop {
         };
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static int CalculateMapSize<K,V>(IDictionary<K,V> value)
     {
         if (value == null) return 8; // size of length field
@@ -250,6 +266,7 @@ public class WireInterop {
         return size;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static int CalculateVecSize<T>(IList<T> value)
     {
         if (value == null) return 8; // size of length field
@@ -280,10 +297,12 @@ public class WireInterop {
 
 public static class DeserStringExtensions
 {
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static void Serialize(this String value, BinaryWriter writer) {
         WireInterop.SerializeString(writer, value);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static String DeserializeString(BinaryReader reader) {
         return WireInterop.DeserializeString(reader);
     }
@@ -291,34 +310,30 @@ public static class DeserStringExtensions
 
 public static class WireListExtensions
 {
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static void Serialize<T>(this List<T> value, BinaryWriter writer) {
         WireInterop.SerializeVec(writer, value);
     }
 }
 
-// TODO: add serialize for byte[]
-// public static class WireByteArrayExtensions
-// {
-//     public static string ToHexString(this byte[] bytes)
-//     {
-//         return BitConverter.ToString(bytes).Replace("-", "");
-//     }
-// }
-
 public static class WireDictionaryExtensions
 {
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static void Serialize<K,V>(this Dictionary<K,V> value, BinaryWriter writer) {
         WireInterop.SerializeMap(writer, value);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static void Serialize<K,V>(this IDictionary<K,V> value, BinaryWriter writer) {
         WireInterop.SerializeMap(writer, value);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static int CalculateSize<K,V>(this Dictionary<K,V> value) {
         return WireInterop.CalculateMapSize(value);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static int CalculateSize<K,V>(this IDictionary<K,V> value) {
         return WireInterop.CalculateMapSize(value);
     }
@@ -326,10 +341,12 @@ public static class WireDictionaryExtensions
 
 public static class WireArrayExtensions
 {
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static void Serialize<T>(this T[] value, BinaryWriter writer) {
         WireInterop.SerializeVec(writer, value);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static int CalculateSize<T>(this T[] value) {
         return WireInterop.CalculateVecSize(value);
     }
