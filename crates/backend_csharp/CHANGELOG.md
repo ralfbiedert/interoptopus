@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.0-alpha.8](https://github.com/ralfbiedert/interoptopus/compare/interoptopus_backend_csharp-v0.15.0-alpha.7...interoptopus_backend_csharp-v0.15.0-alpha.8)
+
+### 🐛 Bug Fixes
+
+
+- Fix const name ref - ([86188a7](https://github.com/ralfbiedert/interoptopus/commit/86188a7260baed7dab590ee44aba6741837124c8))
+
+
 ## [0.15.0-alpha.7](https://github.com/ralfbiedert/interoptopus/compare/interoptopus_backend_csharp-v0.15.0-alpha.6...interoptopus_backend_csharp-v0.15.0-alpha.7)
 
 ### 🐛 Bug Fixes
