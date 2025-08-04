@@ -25,7 +25,7 @@ pub enum Error {
     FromUtf8(std::string::FromUtf8Error),
 
     /// Template generation failed.
-    Templating(String),
+    Templating(tera::Error),
 
     /// A command to test was not found.
     CommandNotFound,
