@@ -4,7 +4,7 @@ description = "The polyglot bindings generator for your library (C#, C, Python, 
 authors = ["Ralf Biedert <rb@xr.io>"]
 keywords = ["ffi", "code-generation", "bindings"]
 categories = ["api-bindings", "development-tools::ffi"]
-version = "0.15.0-alpha.6"
+version = "0.15.0-alpha.7"
 edition = "2024"
 rust-version = "1.85"
 license = "MIT"
@@ -19,7 +19,7 @@ default = ["derive"]
 derive = ["interoptopus_proc"]
 
 [dependencies]
-interoptopus_proc = { path = "../proc_macros", version = "0.15.0-alpha.6", optional = true }
+interoptopus_proc = { path = "../proc_macros", version = "0.15.0-alpha.7", optional = true }
 log = { workspace = true, optional = true }
 serde = { workspace = true, features = ["derive"], optional = true }
 
