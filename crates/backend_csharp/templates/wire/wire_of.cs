@@ -109,6 +109,7 @@ public static class WireOf{{type}}Extensions
     /// <summary>
     /// Create a Wire with owned buffer from this {{type}} instance
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static WireOf{{type}} Wire(this {{type}} value)
     {
         return WireOf{{type}}.From(value);
@@ -117,6 +118,7 @@ public static class WireOf{{type}}Extensions
     /// <summary>
     /// Create a Wire with borrowed buffer from this {{type}} instance
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static unsafe WireOf{{type}} WireWithBuffer(this {{type}} value, byte* buffer, int bufferSize)
     {
         return WireOf{{type}}.From(value, buffer, bufferSize);
@@ -125,6 +127,7 @@ public static class WireOf{{type}}Extensions
     /// <summary>
     /// Calculate the wire size needed for this {{type}} instance
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static int WireSize(this {{type}} value)
     {
         return value.CalculateSize();
@@ -133,6 +136,7 @@ public static class WireOf{{type}}Extensions
     /// <summary>
     /// Unwire a WireOf{{type}} back to a managed {{type}} object
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static {{type}} Unwire(this WireOf{{type}} wire)
     {
         return {{type}}.Deserialize(wire.Reader());
