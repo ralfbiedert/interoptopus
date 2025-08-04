@@ -1,4 +1,5 @@
 use crate::converter::{function_name, param_to_type, param_to_type_overloaded, rval_to_type_async, rval_to_type_sync};
+use crate::interop::DecorateFn;
 use crate::interop::docs::write_documentation;
 use crate::utils::sugared_return_type;
 use crate::{FunctionNameFlavor, Interop};
@@ -32,11 +33,16 @@ pub fn write_function(i: &Interop, w: &mut IndentWriter, function: &Function, wr
     Ok(())
 }
 
-pub fn write_function_annotation(_i: &Interop, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
+pub fn write_function_annotation(i: &Interop, w: &mut IndentWriter, function: &Function) -> Result<(), Error> {
     indented!(w, r#"[LibraryImport(NativeLib, EntryPoint = "{}")]"#, function.name())?;
 
     if *function.signature().rval() == Type::Primitive(Primitive::Bool) {
         indented!(w, r"[return: MarshalAs(UnmanagedType.U1)]")?;
+    }
+
+    for decorator in &i.decorate_fn {
+        let util = DecorateFn::default();
+        indented!(w, r"{}", decorator(util))?;
     }
 
     Ok(())
