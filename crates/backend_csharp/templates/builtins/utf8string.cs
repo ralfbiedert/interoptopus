@@ -121,14 +121,17 @@ public partial class Utf8String : IDisposable
     {
         [LibraryImport({{class_name}}.NativeLib, EntryPoint = "interoptopus_string_create")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {% for decor in extra_fn_decorations %}{{ decor }}{% endfor %}
         public static partial long interoptopus_string_create(IntPtr utf8, ulong len, out Unmanaged rval);
 
         [LibraryImport({{class_name}}.NativeLib, EntryPoint = "interoptopus_string_destroy")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {% for decor in extra_fn_decorations %}{{ decor }}{% endfor %}
         public static partial long interoptopus_string_destroy(Unmanaged utf8);
 
         [LibraryImport({{class_name}}.NativeLib, EntryPoint = "interoptopus_string_clone")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {% for decor in extra_fn_decorations %}{{ decor }}{% endfor %}
         public static partial long interoptopus_string_clone(ref Unmanaged orig, ref Unmanaged cloned);
     }
 
