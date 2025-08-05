@@ -1,0 +1,15 @@
+[package]
+name = "debug_test"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "debug_test"
+path = "main.rs"
+
+[dependencies]
+anyhow = "1.0"
+interoptopus = { path = "../crates/core" }
+interoptopus_backend_csharp = { path = "../crates/backend_csharp" }
+
+[workspace]
