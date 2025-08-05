@@ -56,335 +56,401 @@ namespace My.Company
 
 
         [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_create")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial long interoptopus_string_create(IntPtr utf8, ulong len, ref Utf8String rval);
 
 
         [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_destroy")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial long interoptopus_string_destroy(Utf8String utf8);
 
 
         [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_clone")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial long interoptopus_string_clone(ref Utf8String utf8, ref Utf8String rval);
 
 
         [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_18289942533122229086")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial long interoptopus_vec_create_18289942533122229086(IntPtr data, ulong len, ref VecU8 rval);
 
 
         [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_17895994407320212994")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial long interoptopus_vec_destroy_17895994407320212994(VecU8 ignored);
 
 
         [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_1491625606766217421")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial long interoptopus_vec_create_1491625606766217421(IntPtr data, ulong len, ref VecUtf8String rval);
 
 
         [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_2831836161306219799")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial long interoptopus_vec_destroy_2831836161306219799(VecUtf8String ignored);
 
 
         [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_8489828321293410959")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial long interoptopus_vec_create_8489828321293410959(IntPtr data, ulong len, ref VecVec3f32 rval);
 
 
         [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_18428593021019987507")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial long interoptopus_vec_destroy_18428593021019987507(VecVec3f32 ignored);
 
 
         [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_1331377703668599412")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial long interoptopus_vec_create_1331377703668599412(IntPtr data, ulong len, ref VecEnumPayload rval);
 
 
         [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_1871427125692259427")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial long interoptopus_vec_destroy_1871427125692259427(VecEnumPayload ignored);
 
 
         [LibraryImport(NativeLib, EntryPoint = "alignment_1")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial Packed2 alignment_1(Packed1 a);
 
 
         [LibraryImport(NativeLib, EntryPoint = "array_1")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial byte array_1(Array x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "array_2")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial Array array_2();
 
 
         [LibraryImport(NativeLib, EntryPoint = "array_3")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void array_3(ref Array arr);
 
 
         [LibraryImport(NativeLib, EntryPoint = "char_array_1")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial CharArray char_array_1();
 
 
         [LibraryImport(NativeLib, EntryPoint = "char_array_2")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial CharArray char_array_2(CharArray arr);
 
 
         [LibraryImport(NativeLib, EntryPoint = "char_array_3")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial byte char_array_3(ref CharArray arr);
 
 
         [LibraryImport(NativeLib, EntryPoint = "nested_array_1")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial NestedArray nested_array_1();
 
 
         [LibraryImport(NativeLib, EntryPoint = "nested_array_2")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void nested_array_2(ref NestedArray result);
 
 
         [LibraryImport(NativeLib, EntryPoint = "nested_array_3")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial byte nested_array_3(NestedArray input);
 
 
         [LibraryImport(NativeLib, EntryPoint = "behavior_sleep")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void behavior_sleep(ulong millis);
 
 
         [LibraryImport(NativeLib, EntryPoint = "behavior_panics")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void behavior_panics();
 
 
         [LibraryImport(NativeLib, EntryPoint = "behavior_panics_via_result")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError behavior_panics_via_result();
 
 
         [LibraryImport(NativeLib, EntryPoint = "enums_1")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void enums_1(EnumPayload ignored);
 
 
         [LibraryImport(NativeLib, EntryPoint = "enums_2")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial EnumPayload enums_2(EnumPayload x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "enums_3")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial IntPtr enums_3(ref EnumPayload x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "enums_4")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial Utf8String enums_4(Layer3 x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "fnptr_1")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial byte fnptr_1(InteropDelegate_fn_u8_rval_u8 callback, byte x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "fnptr_2")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void fnptr_2(InteropDelegate_fn_CharArray_rval_void_native callback, CharArray x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "generic_1a")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial uint generic_1a(Genericu32 x, Phantomu8 y);
 
 
         [LibraryImport(NativeLib, EntryPoint = "generic_1b")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial byte generic_1b(Genericu8 x, Phantomu8 y);
 
 
         [LibraryImport(NativeLib, EntryPoint = "generic_1c")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial byte generic_1c(ref Genericu8 x, ref Genericu8 y);
 
 
         [LibraryImport(NativeLib, EntryPoint = "generic_2")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial byte generic_2(IntPtr x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "generic_3")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial byte generic_3(IntPtr x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "generic_4")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial byte generic_4(IntPtr x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "generic_5")]
         [return: MarshalAs(UnmanagedType.U1)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial bool generic_5(Weird1u32 x, Weird2u8 y);
 
 
         [LibraryImport(NativeLib, EntryPoint = "meta_ambiguous_1")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial Vec1 meta_ambiguous_1(Vec1 x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "meta_ambiguous_2")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial Vec2 meta_ambiguous_2(Vec2 x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "meta_ambiguous_3")]
         [return: MarshalAs(UnmanagedType.U1)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial bool meta_ambiguous_3(Vec1 x, Vec2 y);
 
 
         /// This function has documentation.
         [LibraryImport(NativeLib, EntryPoint = "meta_documented")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial EnumDocumented meta_documented(StructDocumented x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "meta_visibility1")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void meta_visibility1(Visibility1 x, Visibility2 y);
 
 
         [LibraryImport(NativeLib, EntryPoint = "meta_renamed")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial EnumRenamed meta_renamed(StructRenamed x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_option")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial OptionVec namespaced_inner_option(OptionVec x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial SliceVec namespaced_inner_slice(SliceVec x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice_mut")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial SliceMutVec namespaced_inner_slice_mut(SliceMutVec x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "namespaced_type")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial Vec namespaced_type(Vec x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "primitive_args_5")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial long primitive_args_5(long x0, long x1, long x2, long x3, long x4);
 
 
         [LibraryImport(NativeLib, EntryPoint = "primitive_args_10")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial long primitive_args_10(long x0, long x1, long x2, long x3, long x4, long x5, long x6, long x7, long x8, long x9);
 
 
         [LibraryImport(NativeLib, EntryPoint = "primitive_bool")]
         [return: MarshalAs(UnmanagedType.U1)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial bool primitive_bool([MarshalAs(UnmanagedType.U1)] bool x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "primitive_f32")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial float primitive_f32(float x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "primitive_f64")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial double primitive_f64(double x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "primitive_i16")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial short primitive_i16(short x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "primitive_i32")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial int primitive_i32(int x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "primitive_i64")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial long primitive_i64(long x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "primitive_i8")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial sbyte primitive_i8(sbyte x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "primitive_u16")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ushort primitive_u16(ushort x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "primitive_u32")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial uint primitive_u32(uint x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "primitive_u64")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ulong primitive_u64(ulong x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "primitive_usize")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial nuint primitive_usize(nuint x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "primitive_isize")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial nint primitive_isize(nint x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "primitive_u8")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial byte primitive_u8(byte x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "primitive_void")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void primitive_void();
 
 
         [LibraryImport(NativeLib, EntryPoint = "primitive_void2")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void primitive_void2();
 
 
         [LibraryImport(NativeLib, EntryPoint = "ptr1")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial IntPtr ptr1(ref long x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "ptr2")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial IntPtr ptr2(ref IntPtr x);
 
@@ -393,169 +459,202 @@ namespace My.Company
         ///
         /// Parameter x must point to valid data.
         [LibraryImport(NativeLib, EntryPoint = "ptr3")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial IntPtr ptr3(ref long x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "ref1")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial IntPtr ref1(ref long x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "ref2")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial IntPtr ref2(ref long x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "ref3")]
         [return: MarshalAs(UnmanagedType.U1)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial bool ref3(ref long x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "ref4")]
         [return: MarshalAs(UnmanagedType.U1)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial bool ref4(ref long x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "ref5")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void ref5(ref EnumPayload x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "ref6")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void ref6(ref OptionEnumPayload x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "ref7")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void ref7(ref VecUtf8String x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "struct1")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial Tupled struct1(Tupled x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "struct2")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError struct2(Vec3f32 a, ref Tupled b);
 
 
         [LibraryImport(NativeLib, EntryPoint = "struct3")]
         [return: MarshalAs(UnmanagedType.U1)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial bool struct3(BoolField x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_1")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial uint pattern_ascii_pointer_1([MarshalAs(UnmanagedType.LPStr)] string x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_2")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial IntPtr pattern_ascii_pointer_2();
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_3")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial IntPtr pattern_ascii_pointer_3([MarshalAs(UnmanagedType.LPStr)] string x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_4")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial IntPtr pattern_ascii_pointer_4([MarshalAs(UnmanagedType.LPStr)] string x, uint l);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_5")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial byte pattern_ascii_pointer_5([MarshalAs(UnmanagedType.LPStr)] string x, uint i);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_return_slice")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial SliceUseCStrPtr pattern_ascii_pointer_return_slice();
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_1")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial Utf8String pattern_string_1(Utf8String x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_2")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial uint pattern_string_2(Utf8String x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_3")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial Utf8String pattern_string_3();
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_4")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial UseString pattern_string_4(UseString x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_5")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultUseStringError pattern_string_5(UseString x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_6a")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError pattern_string_6a(ref UseString ignored);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_6b")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError pattern_string_6b(ref UseString y);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_7")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultUtf8StringError pattern_string_7(SliceUtf8String x, ulong i);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_8")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultUseStringError pattern_string_8(SliceUseString x, ulong i);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_9")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultUtf8StringError pattern_string_9();
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_10")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void pattern_string_10(Utf8String ignored);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_11")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void pattern_string_11(ref Utf8String ignored);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial uint pattern_ffi_slice_1(SliceU32 ffi_slice);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1b")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial uint pattern_ffi_slice_1b(SliceMutU32 ffi_slice);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_2")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial Vec3f32 pattern_ffi_slice_2(SliceVec3f32 ffi_slice, int i);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_3")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void pattern_ffi_slice_3(SliceMutU8 slice, CallbackSliceMut callback);
 
@@ -574,17 +673,20 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_4")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void pattern_ffi_slice_4(SliceU8 slice, SliceMutU8 slice2);
 
 
         /// It is (probably?) UB to call this function with the same FFI slice data at the same time.
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_5")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void pattern_ffi_slice_5(ref SliceU8 slice, ref SliceMutU8 slice2);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_6")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void pattern_ffi_slice_6(ref SliceMutU8 slice, CallbackU8 callback);
 
@@ -603,6 +705,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_8")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void pattern_ffi_slice_8(ref SliceMutCharArray slice, CallbackCharArray2 callback);
 
@@ -621,11 +724,13 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_9")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial Utf8String pattern_ffi_slice_9(SliceUseString slice);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_delegate")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial byte pattern_ffi_slice_delegate(CallbackFFISlice callback);
 
@@ -644,6 +749,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_delegate_huge")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial Vec3f32 pattern_ffi_slice_delegate_huge(CallbackHugeVecSlice callback);
 
@@ -662,66 +768,79 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_1")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial OptionInner pattern_ffi_option_1(OptionInner x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_2")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial Inner pattern_ffi_option_2(OptionInner x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_3")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial OptionOptionResultOptionUtf8StringError pattern_ffi_option_3(OptionOptionResultOptionUtf8StringError x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_bool")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial Bool pattern_ffi_bool(Bool ffi_bool);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_cchar")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial sbyte pattern_ffi_cchar(sbyte ffi_cchar);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_cchar_const_pointer")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial IntPtr pattern_ffi_cchar_const_pointer(IntPtr ffi_cchar);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_cchar_mut_pointer")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial IntPtr pattern_ffi_cchar_mut_pointer(IntPtr ffi_cchar);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_result_1")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultU32Error pattern_result_1(ResultU32Error x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_result_2")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError pattern_result_2();
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_result_3")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError pattern_result_3(ResultError x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_result_4")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultVoid pattern_result_4(ResultVoid x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_api_guard")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ulong pattern_api_guard();
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_1")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial uint pattern_callback_1(MyCallback callback, uint x);
 
@@ -740,6 +859,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_2")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial MyCallbackVoid pattern_callback_2(MyCallbackVoid callback);
 
@@ -758,6 +878,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_4")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial uint pattern_callback_4(MyCallbackNamespaced callback, uint x);
 
@@ -776,16 +897,19 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_5")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial SumDelegate1 pattern_callback_5();
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_6")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial SumDelegate2 pattern_callback_6();
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_7")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, ref int o);
 
@@ -806,6 +930,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_8")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void pattern_callback_8(StringCallback cb, NestedStringCallback cb2, Utf8String s);
 
@@ -826,46 +951,55 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_surrogates_1")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void pattern_surrogates_1(Local s, ref Container c);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_vec_1")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial VecU8 pattern_vec_1();
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_vec_2")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void pattern_vec_2(VecU8 ignored);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_vec_3")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial VecU8 pattern_vec_3(VecU8 v);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_vec_4")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial VecU8 pattern_vec_4(ref VecU8 v);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_vec_5")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial VecUtf8String pattern_vec_5(VecUtf8String v);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_vec_6")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial VecVec3f32 pattern_vec_6(VecVec3f32 v);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_vec_7")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void pattern_vec_7(UseSliceAndVec ignored);
 
 
         [LibraryImport(NativeLib, EntryPoint = "pattern_vec_8")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial UseSliceAndVec pattern_vec_8(UseSliceAndVec v);
 
@@ -877,16 +1011,19 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_async_basic_destroy")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceAsyncBasicError service_async_basic_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_basic_new")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceAsyncBasicError service_async_basic_new();
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_basic_call")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_async_basic_call(IntPtr _context, AsyncCallbackCommonNative _async_callback);
 
@@ -912,16 +1049,19 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_async_sleep_destroy")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceAsyncSleepError service_async_sleep_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_sleep_new")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceAsyncSleepError service_async_sleep_new();
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_sleep_return_after_ms")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_async_sleep_return_after_ms(IntPtr _context, ulong x, ulong ms, AsyncCallbackCommonNative _async_callback);
 
@@ -947,16 +1087,19 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_destroy")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceAsyncVecStringError service_async_vec_string_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_new")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceAsyncVecStringError service_async_vec_string_new();
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_handle_string")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_async_vec_string_handle_string(IntPtr _context, Utf8String s, AsyncCallbackCommonNative _async_callback);
 
@@ -976,6 +1119,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_handle_vec_string")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_async_vec_string_handle_vec_string(IntPtr _context, VecUtf8String s, AsyncCallbackCommonNative _async_callback);
 
@@ -995,6 +1139,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_handle_nested_string")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_async_vec_string_handle_nested_string(IntPtr _context, Utf8String s, AsyncCallbackCommonNative _async_callback);
 
@@ -1020,16 +1165,19 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_async_result_destroy")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceAsyncResultError service_async_result_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_result_new")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceAsyncResultError service_async_result_new();
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_result_success")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_async_result_success(IntPtr _context, AsyncCallbackCommonNative _async_callback);
 
@@ -1049,6 +1197,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_result_fail")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_async_result_fail(IntPtr _context, AsyncCallbackCommonNative _async_callback);
 
@@ -1074,16 +1223,19 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_async_structs_destroy")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceAsyncStructsError service_async_structs_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_structs_new")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceAsyncStructsError service_async_structs_new();
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_async_structs_process_struct")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_async_structs_process_struct(IntPtr _context, NestedArray x, AsyncCallbackCommonNative _async_callback);
 
@@ -1109,11 +1261,13 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_basic_destroy")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceBasicError service_basic_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_basic_new")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceBasicError service_basic_new();
 
@@ -1125,11 +1279,13 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_main_destroy")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceMainError service_main_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_main_new")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceMainError service_main_new(uint x);
 
@@ -1141,16 +1297,19 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_dependent_destroy")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceDependentError service_dependent_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_dependent_from_main")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceDependentError service_dependent_from_main(IntPtr main);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_dependent_get")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial uint service_dependent_get(IntPtr _context);
 
@@ -1162,36 +1321,43 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_result_destroy")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceResultError service_result_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_result_new")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceResultError service_result_new();
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_result_test")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_result_test(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_result_result_u32")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultU32Error service_result_result_u32(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_result_result_string")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultUtf8StringError service_result_result_string(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_result_result_option_enum")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultOptionEnumPayloadError service_result_result_option_enum(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_result_result_slice")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultU32Error service_result_result_slice(IntPtr _context, SliceU32 slice, ulong i);
 
@@ -1203,11 +1369,13 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_destroy")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceOnPanicError service_on_panic_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_new")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceOnPanicError service_on_panic_new();
 
@@ -1215,12 +1383,14 @@ namespace My.Company
         /// Methods returning a Result<(), _> are the default and do not
         /// need annotations.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_result")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_on_panic_return_result(IntPtr _context, uint anon1);
 
 
         /// Methods returning a value need an `on_panic` annotation.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_default_value")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial uint service_on_panic_return_default_value(IntPtr _context, uint x);
 
@@ -1228,6 +1398,7 @@ namespace My.Company
         /// This function has no panic safeguards. It will be a bit faster to
         /// call, but if it panics your host app will abort.
         [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_ub_on_panic")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial IntPtr service_on_panic_return_ub_on_panic(IntPtr _context);
 
@@ -1239,16 +1410,19 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_destroy")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceCallbacksError service_callbacks_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_new")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceCallbacksError service_callbacks_new();
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_simple")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_callbacks_callback_simple(IntPtr _context, MyCallback callback);
 
@@ -1267,6 +1441,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_ffi_return")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_callbacks_callback_ffi_return(IntPtr _context, SumDelegateReturn callback);
 
@@ -1285,6 +1460,7 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_with_slice")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_callbacks_callback_with_slice(IntPtr _context, SumDelegateReturn callback, SliceI32 input);
 
@@ -1303,11 +1479,13 @@ namespace My.Company
         }
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_set_delegate_table")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void service_callbacks_set_delegate_table(IntPtr _context, CallbackTable table);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_invoke_delegates")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_callbacks_invoke_delegates(IntPtr _context);
 
@@ -1319,11 +1497,13 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_destroy")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceIgnoringMethodsError service_ignoring_methods_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_new")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceIgnoringMethodsError service_ignoring_methods_new();
 
@@ -1335,26 +1515,31 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_destroy")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_new_with(uint some_value);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_without")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_new_without();
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with_string")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_new_with_string([MarshalAs(UnmanagedType.LPStr)] string anon0);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_failing")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceMultipleCtorsError service_multiple_ctors_new_failing(byte some_value);
 
@@ -1366,47 +1551,56 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_destroy")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceVariousSlicesError service_various_slices_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_new")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceVariousSlicesError service_various_slices_new();
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial byte service_various_slices_mut_self(IntPtr _context, SliceU8 slice);
 
 
         /// Single line.
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_void")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void service_various_slices_mut_self_void(IntPtr _context, SliceBool slice);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial byte service_various_slices_mut_self_ref(IntPtr _context, ref byte x, ref byte y);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial byte service_various_slices_mut_self_ref_slice(IntPtr _context, ref byte x, ref byte y, SliceU8 slice);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice_limited")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial byte service_various_slices_mut_self_ref_slice_limited(IntPtr _context, ref byte x, ref byte y, SliceU8 slice, SliceU8 slice2);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ffi_error")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_various_slices_mut_self_ffi_error(IntPtr _context, SliceMutU8 slice);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_no_error")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultError service_various_slices_mut_self_no_error(IntPtr _context, SliceMutU8 slice);
 
@@ -1414,6 +1608,7 @@ namespace My.Company
         /// Warning, you _must_ discard the returned slice object before calling into this service
         /// again, as otherwise undefined behavior might happen.
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_return_slice")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial SliceU32 service_various_slices_return_slice(IntPtr _context);
 
@@ -1421,6 +1616,7 @@ namespace My.Company
         /// Warning, you _must_ discard the returned slice object before calling into this service
         /// again, as otherwise undefined behavior might happen.
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_return_slice_mut")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial SliceMutU32 service_various_slices_return_slice_mut(IntPtr _context);
 
@@ -1432,31 +1628,37 @@ namespace My.Company
         /// The passed parameter MUST have been created with the corresponding init function;
         /// passing any other value results in undefined behavior.
         [LibraryImport(NativeLib, EntryPoint = "service_strings_destroy")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceStringsError service_strings_destroy(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_new")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceStringsError service_strings_new();
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_new_string")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultConstPtrServiceStringsError service_strings_new_string(Utf8String x);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_pass_cstr")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void service_strings_pass_cstr(IntPtr _context, [MarshalAs(UnmanagedType.LPStr)] string anon1);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_return_cstr")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial IntPtr service_strings_return_cstr(IntPtr _context);
 
 
         [LibraryImport(NativeLib, EntryPoint = "service_strings_callback_string")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void service_strings_callback_string(IntPtr _context, Utf8String s, StringCallback cb);
 
@@ -11850,8 +12052,10 @@ namespace My.Company
         public partial class InteropHelper
         {
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_create_1331377703668599412")]
+            [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
             internal static partial long interoptopus_vec_create(IntPtr vec, ulong len, out Unmanaged rval);
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_destroy_1871427125692259427")]
+            [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
             internal static partial long interoptopus_vec_destroy(Unmanaged vec);
         }
 
@@ -12014,8 +12218,10 @@ namespace My.Company
         public partial class InteropHelper
         {
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_create_18289942533122229086")]
+            [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
             internal static partial long interoptopus_vec_create(IntPtr vec, ulong len, out Unmanaged rval);
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_destroy_17895994407320212994")]
+            [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
             internal static partial long interoptopus_vec_destroy(Unmanaged vec);
         }
 
@@ -12179,8 +12385,10 @@ namespace My.Company
         public partial class InteropHelper
         {
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_create_1491625606766217421")]
+            [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
             internal static partial long interoptopus_vec_create(IntPtr vec, ulong len, out Unmanaged rval);
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_destroy_2831836161306219799")]
+            [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
             internal static partial long interoptopus_vec_destroy(Unmanaged vec);
         }
 
@@ -12344,8 +12552,10 @@ namespace My.Company
         public partial class InteropHelper
         {
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_create_8489828321293410959")]
+            [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
             internal static partial long interoptopus_vec_create(IntPtr vec, ulong len, out Unmanaged rval);
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_vec_destroy_18428593021019987507")]
+            [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
             internal static partial long interoptopus_vec_destroy(Unmanaged vec);
         }
 
@@ -13275,17 +13485,17 @@ namespace My.Company
         {
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_create")]
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            
+            [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
             public static partial long interoptopus_string_create(IntPtr utf8, ulong len, out Unmanaged rval);
 
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_destroy")]
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            
+            [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
             public static partial long interoptopus_string_destroy(Unmanaged utf8);
 
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_clone")]
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            
+            [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
             public static partial long interoptopus_string_clone(ref Unmanaged orig, ref Unmanaged cloned);
         }
 

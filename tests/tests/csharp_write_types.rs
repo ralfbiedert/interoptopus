@@ -38,6 +38,7 @@ fn namespace_and_global() -> Result<(), Error> {
     let generated = Interop::builder()
         .inventory(ffi_inventory())
         .namespace_mappings(common_namespace_mappings())
+        .decorate_fn(|_| "[DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]".to_string())
         .write_types(WriteTypes::NamespaceAndInteroptopusGlobal)
         .build()?
         .to_string()?;
