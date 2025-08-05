@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.0-alpha.8](https://github.com/ralfbiedert/interoptopus/compare/interoptopus-v0.15.0-alpha.7...interoptopus-v0.15.0-alpha.8)
+
+### ⚙️ Miscellaneous
+
+
+- Updated the following local packages: interoptopus_proc - ([0000000](https://github.com/ralfbiedert/interoptopus/commit/0000000))
+
+
 ## [0.15.0-alpha.5](https://github.com/ralfbiedert/interoptopus/compare/interoptopus-v0.15.0-alpha.4...interoptopus-v0.15.0-alpha.5) - 2025-04-16
 
 ### Other
