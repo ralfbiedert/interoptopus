@@ -279,14 +279,17 @@ namespace My.Company
         {
             [LibraryImport(MyClass.NativeLib, EntryPoint = "interoptopus_string_create")]
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            
             public static partial long interoptopus_string_create(IntPtr utf8, ulong len, out Unmanaged rval);
 
             [LibraryImport(MyClass.NativeLib, EntryPoint = "interoptopus_string_destroy")]
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            
             public static partial long interoptopus_string_destroy(Unmanaged utf8);
 
             [LibraryImport(MyClass.NativeLib, EntryPoint = "interoptopus_string_clone")]
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            
             public static partial long interoptopus_string_clone(ref Unmanaged orig, ref Unmanaged cloned);
         }
 

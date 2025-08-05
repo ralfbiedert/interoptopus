@@ -265,14 +265,17 @@ namespace My.Company
         {
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_create")]
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
             public static partial long interoptopus_string_create(IntPtr utf8, ulong len, out Unmanaged rval);
 
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_destroy")]
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
             public static partial long interoptopus_string_destroy(Unmanaged utf8);
 
             [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_clone")]
             [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
             public static partial long interoptopus_string_clone(ref Unmanaged orig, ref Unmanaged cloned);
         }
 
