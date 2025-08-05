@@ -252,12 +252,16 @@ pub fn write_pattern_vec_interop_helper(i: &Interop, w: &mut IndentWriter, vec: 
         let first_param = f.signature().params().first().map(Parameter::the_type).cloned();
         let last_param = f.signature().params().last().map(Parameter::the_type).cloned();
         let name = f.name();
+        let extra_fn_decorations = i.fn_decorations();
 
         if name.starts_with("interoptopus_vec_create") {
             if let Some(Type::ReadWritePointer(x)) = last_param {
                 if let Type::Pattern(TypePattern::Vec(x)) = x.as_ref() {
                     if x == vec {
                         indented!(w, [()], r#"[LibraryImport(Interop.NativeLib, EntryPoint = "{name}")]"#)?;
+                        for decor in &extra_fn_decorations {
+                            indented!(w, [()], "{}", decor)?;
+                        }
                         indented!(w, [()], r"internal static partial long interoptopus_vec_create(IntPtr vec, ulong len, out Unmanaged rval);")?;
                     }
                 }
@@ -266,6 +270,9 @@ pub fn write_pattern_vec_interop_helper(i: &Interop, w: &mut IndentWriter, vec: 
 
         if name.starts_with("interoptopus_vec_destroy") && first_param == Some(Type::Pattern(TypePattern::Vec(vec.clone()))) {
             indented!(w, [()], r#"[LibraryImport(Interop.NativeLib, EntryPoint = "{name}")]"#)?;
+            for decor in &extra_fn_decorations {
+                indented!(w, [()], "{}", decor)?;
+            }
             indented!(w, [()], r"internal static partial long interoptopus_vec_destroy(Unmanaged vec);")?;
         }
     }

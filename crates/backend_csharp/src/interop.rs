@@ -429,6 +429,17 @@ impl Interop {
 
         Ok(())
     }
+
+    #[must_use]
+    pub fn fn_decorations(&self) -> Vec<String> {
+        self.decorate_fn
+            .iter()
+            .map(|decorator| {
+                let util = DecorateFn::default();
+                decorator(util)
+            })
+            .collect()
+    }
 }
 
 impl Bindings for Interop {
