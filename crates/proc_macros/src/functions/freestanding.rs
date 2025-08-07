@@ -31,21 +31,7 @@ pub fn rval_tokens(return_type: &ReturnType) -> TokenStream {
     if let ReturnType::Type(_, x) = return_type {
         match &**x {
             Type::Path(x) => {
-                // NB: type_info() is applicable only to Wire<T>
-                let token = /*if x.path.segments[0].ident == "Wire" {
-                    // Extract inner type from Wire<T>
-                    if let syn::PathArguments::AngleBracketed(args) = &x.path.segments[0].arguments {
-                        if let Some(syn::GenericArgument::Type(inner_type)) = args.args.first() {
-                            inner_type.to_token_stream()
-                        } else {
-                            x.to_token_stream()
-                        }
-                    } else {
-                        x.to_token_stream()
-                    }
-                } else {*/
-                    x.to_token_stream()
-                /* }*/;
+                let token = x.to_token_stream();
                 quote_spanned!(span=> < #token as ::interoptopus::lang::TypeInfo>::type_info())
             }
             Type::Group(x) => {
@@ -77,88 +63,9 @@ pub fn rval_tokens(return_type: &ReturnType) -> TokenStream {
     }
 }
 
-/// Extracts the inner type T from Wire<T> if the given TypePath is Wire<T>, otherwise returns None
-// fn _extract_inner_type_from_wire(type_path: &syn::TypePath) -> Option<Type> {
-//     if type_path.path.segments[0].ident == "Wire" {
-//         if let syn::PathArguments::AngleBracketed(args) = &type_path.path.segments[0].arguments {
-//             if let Some(syn::GenericArgument::Type(inner_type)) = args.args.first() {
-//                 return Some(inner_type.clone());
-//             }
-//         }
-//     }
-//     None
-// }
-
-/// Recursively wraps return statements in Wire<T>::from() calls
-// fn wrap_return_statements(stmts: &mut Vec<syn::Stmt>, inner_type: &TokenStream) {
-//     let stmts_len = stmts.len();
-//     for (i, stmt) in stmts.iter_mut().enumerate() {
-//         match stmt {
-//             syn::Stmt::Expr(expr, semi) => {
-//                 // If this is the last statement and has no semicolon, it's an implicit return
-//                 if i == stmts_len - 1 && semi.is_none() {
-//                     let wrapped = syn::parse_quote! {
-//                         Wire::<#inner_type>::from(#expr)
-//                     };
-//                     *expr = wrapped;
-//                 } else {
-//                     wrap_return_in_expr(expr, inner_type);
-//                 }
-//             }
-//             syn::Stmt::Local(local) => {
-//                 if let Some(init) = &mut local.init {
-//                     wrap_return_in_expr(&mut init.expr, inner_type);
-//                 }
-//             }
-//             syn::Stmt::Item(_) => {}
-//             syn::Stmt::Macro(_) => {}
-//         }
-//     }
-// }
-
-/// Recursively processes expressions to wrap return statements
-// fn wrap_return_in_expr(expr: &mut syn::Expr, inner_type: &TokenStream) {
-//     match expr {
-//         syn::Expr::Return(ret_expr) => {
-//             if let Some(return_value) = &mut ret_expr.expr {
-//                 let wrapped = syn::parse_quote! {
-//                     Wire::<#inner_type>::from(#return_value)
-//                 };
-//                 *return_value = Box::new(wrapped);
-//             }
-//         }
-//         syn::Expr::Block(block_expr) => {
-//             wrap_return_statements(&mut block_expr.block.stmts, inner_type);
-//         }
-//         syn::Expr::If(if_expr) => {
-//             wrap_return_statements(&mut if_expr.then_branch.stmts, inner_type);
-//             if let Some((_, else_branch)) = &mut if_expr.else_branch {
-//                 wrap_return_in_expr(else_branch, inner_type);
-//             }
-//         }
-//         syn::Expr::Match(match_expr) => {
-//             for arm in &mut match_expr.arms {
-//                 wrap_return_in_expr(&mut arm.body, inner_type);
-//             }
-//         }
-//         syn::Expr::Loop(loop_expr) => {
-//             wrap_return_statements(&mut loop_expr.body.stmts, inner_type);
-//         }
-//         syn::Expr::While(while_expr) => {
-//             wrap_return_statements(&mut while_expr.body.stmts, inner_type);
-//         }
-//         syn::Expr::ForLoop(for_expr) => {
-//             wrap_return_statements(&mut for_expr.body.stmts, inner_type);
-//         }
-//         syn::Expr::Closure(closure_expr) => {
-//             wrap_return_in_expr(&mut closure_expr.body, inner_type);
-//         }
-//         _ => {}
-//     }
-// }
-
 #[allow(clippy::equatable_if_let, clippy::useless_let_if_seq, clippy::too_many_lines)]
 pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream) -> TokenStream {
+    let namespace = ffi_attributes.namespace.clone().unwrap_or_default();
     let mut item_fn = syn::parse2::<ItemFn>(input).expect("Must be a function.");
     let docs = extract_doc_lines(&item_fn.attrs);
 
@@ -166,7 +73,7 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
     let mut args_type = Vec::new();
     let mut generic_parameters = Vec::new();
     let mut generic_ident = Vec::new();
-    let mut wire_types = Vec::new();
+    let mut domain_types = Vec::new();
 
     let signature = fn_signature_type(&item_fn.sig);
     let rval = rval_tokens(&item_fn.sig.output);
@@ -179,7 +86,7 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
                     // Extract the inner type string for tracking
                     if let syn::PathArguments::AngleBracketed(args) = &x.path.segments[0].arguments {
                         if let Some(syn::GenericArgument::Type(inner_type)) = args.args.first() {
-                            wire_types.push(quote! { < #inner_type as ::interoptopus::lang::WireInfo>::wire_info() });
+                            domain_types.push(quote! { < #inner_type as ::interoptopus::lang::WireInfo>::wire_info() });
                         }
                     }
                 }
@@ -237,8 +144,6 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
                 }
             };
 
-            // is this type Wire<T>? if so, add it to wired types list (probably via interoptopus::lang::Function::new?)
-
             let clean_name = name.strip_prefix('_').unwrap_or(&name);
             args_name.push(clean_name.to_string());
 
@@ -249,8 +154,8 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
                             syn::PathArguments::AngleBracketed(a) => &a.args[0].to_token_stream(),
                             _ => unimplemented!(),
                         };
-                        // Track this Wire<X> argument for type generation
-                        wire_types.push(quote! { < #wrapped_type as ::interoptopus::lang::WireInfo>::wire_info() });
+                        // For this Wire<X> argument track inner domain type X for type generation
+                        domain_types.push(quote! { < #wrapped_type as ::interoptopus::lang::WireInfo>::wire_info() });
                     }
                     x.path.to_token_stream()
                 }
@@ -264,7 +169,6 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
                 }
             };
 
-            // this makes a Wire<T> type_info here
             args_type.push(quote! { < #token as ::interoptopus::lang::TypeInfo>::type_info() });
         } else {
             panic!("Does not support methods.")
@@ -281,31 +185,6 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
     }
 
     item_fn.attrs.push(syn::parse_quote!(#[unsafe(export_name = #export_name)]));
-
-    // Generate preamble code for Wire<T> deserialization
-    // if !wire_args.is_empty() {
-    //     let mut preamble_stmts = Vec::new();
-
-    //     for (arg_name, inner_type) in &wire_args {
-    //         let arg_ident = syn::Ident::new(arg_name, proc_macro2::Span::call_site());
-    //         let inner_type_tokens: TokenStream = inner_type.parse().expect("Failed to parse inner type");
-
-    //         preamble_stmts.push(syn::parse_quote! {
-    //             let #arg_ident: #inner_type_tokens = #arg_ident.deserialize().unwrap();
-    //         });
-    //     }
-
-    //     // Prepend preamble statements to the function body
-    //     let mut new_stmts = preamble_stmts;
-    //     new_stmts.extend(item_fn.block.stmts.clone());
-    //     item_fn.block.stmts = new_stmts;
-    // }
-
-    // Process return statements for Wire<T> wrapping
-    // if let Some(inner_type_str) = &wire_return_type {
-    //     let inner_type_tokens: TokenStream = inner_type_str.parse().expect("Failed to parse return inner type");
-    //     wrap_return_statements(&mut item_fn.block.stmts, &inner_type_tokens);
-    // }
 
     let rval = quote! {
         #item_fn
@@ -332,13 +211,13 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
 
                 let sig = ::interoptopus::lang::Signature::new(params, #rval);
                 let docs = ::interoptopus::lang::Docs::from_lines(doc_lines);
-                let meta = ::interoptopus::lang::Meta::with_docs(docs);
+                let meta = ::interoptopus::lang::Meta::with_module_docs(#namespace.to_string(), docs);
 
-                let wire_types = vec![
-                    #(#wire_types,)*
+                let domain_types = vec![
+                    #(#domain_types,)*
                 ];
 
-                ::interoptopus::lang::Function::new(#export_name.to_string(), sig, meta, wire_types)
+                ::interoptopus::lang::Function::new(#export_name.to_string(), sig, meta, domain_types)
             }
 
             // #wire_info

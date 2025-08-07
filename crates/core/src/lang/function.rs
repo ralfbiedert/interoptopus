@@ -25,13 +25,14 @@ pub struct Function {
     name: String,
     meta: Meta,
     signature: Signature,
-    wire_types: Vec<Type>,
+    /// Domain types extracted from Wire<T> arguments or return value, if any.
+    domain_types: Vec<Type>,
 }
 
 impl Function {
     #[must_use]
-    pub const fn new(name: String, signature: Signature, meta: Meta, wire_types: Vec<Type>) -> Self {
-        Self { name, meta, signature, wire_types }
+    pub const fn new(name: String, signature: Signature, meta: Meta, domain_types: Vec<Type>) -> Self {
+        Self { name, meta, signature, domain_types: domain_types }
     }
 
     #[must_use]
@@ -55,11 +56,11 @@ impl Function {
     }
 
     pub fn is_wired(&self) -> bool {
-        !self.wire_types.is_empty()
+        !self.domain_types.is_empty()
     }
 
-    pub fn wire_types(&self) -> Vec<Type> {
-        self.wire_types.clone()
+    pub fn domain_types(&self) -> Vec<Type> {
+        self.domain_types.clone()
     }
 }
 

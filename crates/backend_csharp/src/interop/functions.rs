@@ -11,6 +11,7 @@ use std::iter::zip;
 
 pub fn write_functions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     for function in i.inventory.functions() {
+        // eprintln!("🚧 should_emit function: {} 🚧", function.name());
         if i.should_emit_by_meta(function.meta()) {
             write_function(i, w, function, WriteFor::Code)?;
             w.newline()?;
@@ -29,10 +30,6 @@ pub fn write_function(i: &Interop, w: &mut IndentWriter, function: &Function, wr
     write_function_declaration(i, w, function, false)?;
     w.newline()?;
     write_function_overload(i, w, function, write_for)?;
-    if function.is_wired() {
-        w.newline()?;
-        write_function_wires(i, w, function, write_for)?;
-    }
 
     Ok(())
 }
@@ -61,7 +58,7 @@ pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &
     let mut params = Vec::new();
 
     let native = i.has_custom_marshalled_delegate(function.signature());
-    let visibility = /*if function.is_wired() { "private " } else {*/ "public "; // };
+    let visibility = "public ";
 
     for p in function.signature().params() {
         let the_type = param_to_type(p.the_type());
@@ -194,36 +191,4 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
     }
 
     indented!(w, r"}}")
-}
-
-pub fn write_function_wires(i: &Interop, w: &mut IndentWriter, function: &Function, _write_for: WriteFor) -> Result<(), Error> {
-    assert!(function.is_wired());
-    i.debug(w, "write_function_wires")?;
-
-    let retval_wired_type = rval_to_type_sync(function.signature().rval());
-    let retval_unwired_type = extract_unwired_type_name(function.signature().rval());
-    let retval = (retval_wired_type, retval_unwired_type);
-    let name = function_name(function, FunctionNameFlavor::CSharpMethodWithClass);
-
-    let mut params = Vec::new();
-
-    for p in function.signature().params() {
-        let wired_type_name = param_to_type(p.the_type());
-        let unwired_type_name = extract_unwired_type_name(p.the_type());
-        let param_name = p.name();
-
-        params.push((wired_type_name, unwired_type_name, param_name));
-    }
-
-    render!(w, "function_wiring.cs", ("retval", &retval), ("fname", &name), ("params", &params))
-}
-
-fn extract_unwired_type_name(t: &Type) -> String {
-    match t {
-        Type::Wired(composite) => composite.rust_name().to_string(),
-        Type::Composite(composite) => composite.rust_name().to_string(),
-        Type::Enum(e) => e.rust_name().to_string(),
-        Type::Primitive(p) => p.rust_name().to_string(),
-        _ => "object".to_string(),
-    }
 }

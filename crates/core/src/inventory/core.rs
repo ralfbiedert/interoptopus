@@ -200,7 +200,6 @@ pub enum Symbol {
 pub struct InventoryBuilder {
     functions: Vec<Function>,
     c_types: Vec<Type>,
-    // wire_types: Vec<WireType>,
     constants: Vec<Constant>,
     patterns: Vec<LibraryPattern>,
     allow_reserved_names: bool,
@@ -222,6 +221,7 @@ impl InventoryBuilder {
         match s {
             Symbol::Function(x) => {
                 self.functions.push(x);
+                // TODO: fix here!
                 // if x.is_wired() {
                 //     self.c_types.extend(x.wire_types());
                 // }
@@ -297,11 +297,14 @@ impl InventoryBuilder {
 #[derive(Clone, Debug, PartialOrd, PartialEq, Default)]
 pub struct Inventory {
     functions: Vec<Function>,
+    /// FFI types and Domain types.
     c_types: Vec<Type>,
-    // These are the types explicitly marked as Wire<T> in function declarations, we extract them here so we can
-    // rebuild the chain of custody and generate all appropriate types.
-    // Other wired types contained within these listed ones are already added to c_types as `Composite`s.
+    /// These are the types explicitly marked as Wire<T> in function declarations, we extract them here so we can
+    /// rebuild the chain of custody and generate all appropriate types.
+    /// Other wired types contained within these listed ones are already added to c_types as `Domain` types.
     wire_types: Vec<Type>,
+    // Map from a type to corresponding Wire type, if any.
+    // wire_rev_match: HashMap<Type, Type>,
     constants: Vec<Constant>,
     patterns: Vec<LibraryPattern>,
     namespaces: Vec<String>,
@@ -323,6 +326,12 @@ pub enum InventoryItem<'a> {
 
 fn dedup<T: std::hash::Hash + Eq>(v: Vec<T>) -> Vec<T> {
     v.into_iter().collect::<HashSet<T>>().into_iter().collect::<Vec<T>>()
+}
+
+fn dedup_sort<T: Ord>(mut v: Vec<T>) -> Vec<T> {
+    v.sort();
+    v.dedup();
+    v
 }
 
 impl Inventory {
@@ -352,6 +361,34 @@ impl Inventory {
         Self { functions, c_types, wire_types, constants, patterns, namespaces }
     }
 
+    pub fn debug(&self) {
+        eprintln!("✅ Inventory check");
+        for ns in &self.namespaces {
+            eprintln!("💳 {ns}");
+        }
+        for cs in &self.constants {
+            eprintln!("👮🏼‍♀️ {}", cs.name());
+        }
+        for f in &self.functions {
+            eprintln!(
+                "🧵 {}.{}({}) -> {}",
+                f.meta().module(),
+                f.name(),
+                f.signature().params().iter().map(|p| p.the_type().name_within_lib()).collect::<Vec::<_>>().join(","),
+                f.signature().rval().name_within_lib()
+            );
+        }
+        for c in &self.c_types {
+            eprintln!("🎉 {}", c.name_within_lib());
+        }
+        for w in &self.wire_types {
+            eprintln!("🔧 {}", w.name_within_lib());
+        }
+        // for p in &self.patterns {
+        //     eprintln!("🧵 {}", p.fallback_type().name_within_lib());
+        // }
+    }
+
     /// Returns a new [`InventoryBuilder`], start here.
     #[must_use]
     pub const fn builder() -> InventoryBuilder {
@@ -372,7 +409,7 @@ impl Inventory {
     }
 
     /// Returns initial wire types; this includes wire types directly used in function parameters.
-    /// To find all transitively wired types, look for `wire_transitive_types()`
+    /// To find all transitively wired types, look for `wire_domain_types()`
     #[must_use]
     pub fn wire_types(&self) -> &[Type] {
         &self.wire_types
@@ -391,7 +428,7 @@ impl Inventory {
                     .filter(|&f| matches!(f.the_type(), Type::Composite(_)))
                     .map(|f| f.the_type())
                     .filter(|ty| self.c_types.contains(ty)),
-                _ => panic!("What's a non-wired type doing here"),
+                _ => panic!("What's a non-wired type doing here?"),
             })
             .cloned()
             .collect::<HashSet<Type>>();

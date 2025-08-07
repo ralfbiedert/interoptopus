@@ -47,7 +47,7 @@ use syn::{GenericParam, ItemStruct, Type};
 #[allow(clippy::too_many_lines, clippy::cognitive_complexity, clippy::useless_let_if_seq)]
 pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: ItemStruct) -> TokenStream {
     let namespace = attributes.namespace.clone().unwrap_or_default();
-    eprintln!("🚧🚧🚧 Namespace: {namespace:?} 🚧🚧🚧");
+    // eprintln!("🚧🚧🚧 Namespace: {namespace:?} 🚧🚧🚧");
     let doc_line = extract_doc_lines(&item.attrs).join("\n");
 
     let (type_repr, align) = attributes.type_repr_align();

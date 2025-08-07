@@ -285,12 +285,6 @@ impl Interop {
         types.iter().any(|x| self.should_emit_marshaller(x))
     }
 
-    //NB: wire_types ALWAYS have emittable marshallers
-    // #[allow(dead_code)]
-    // fn has_emittable_serializers(&self, wire_types: &[WireType]) -> bool {
-    //     wire_types.len() > 0
-    // }
-
     fn has_emittable_functions(&self, functions: &[Function]) -> bool {
         functions.iter().any(|x| self.should_emit_by_meta(x.meta()))
     }
@@ -303,13 +297,36 @@ impl Interop {
     #[must_use]
     fn has_emittable_wired_types(&self) -> bool {
         self.inventory
-            .c_types()
+            .wire_types()
             .iter()
             .any(|t| matches!(t, Type::Wired(w) if self.should_emit_by_meta(w.meta())))
     }
 
+    /// Given a Domain type in c_types, look up a corresponding Wire type in wire_types and return it if it exists.
+    #[must_use]
+    fn wired_counterpart(&self, kind: &Type) -> Option<Type> {
+        let kind_name = kind.name_within_lib();
+        // eprintln!("❌ Looking for {kind:?} in 🎉 and 🔧");
+
+        // self.inventory.debug();
+
+        if self.inventory.c_types().iter().find(|t| t.name_within_lib() == kind_name).is_none() {
+            // eprintln!("❌ The type is not even in c_types!");
+            return None;
+        }
+
+        self.inventory
+            .wire_types()
+            .iter()
+            .find(|t| matches!(t, Type::Wired(composite) if composite.rust_name() == kind_name))
+            .cloned()
+    }
+
     #[must_use]
     fn should_emit_by_meta(&self, meta: &Meta) -> bool {
+        // if meta.module() == self.namespace_id {
+        //     eprintln!("🚧🚧🚧 should_emit_by_meta true: type module '{}' / current ns '{}' 🚧🚧🚧", meta.module(), self.namespace_id,);
+        // }
         meta.module() == self.namespace_id
     }
 
@@ -371,6 +388,8 @@ impl Interop {
     /// Checks whether for the given type and the current file a type definition should be emitted.
     #[must_use]
     fn should_emit_by_type(&self, t: &Type) -> bool {
+        eprintln!("🚧 should_emit_by_type: {t:?} 🚧");
+
         if self.write_types == WriteTypes::All {
             return true;
         }
@@ -411,6 +430,17 @@ impl Interop {
                 TypePattern::Utf8String(_) => false,
             },
         }
+    }
+
+    #[must_use]
+    pub fn fn_decorations(&self) -> Vec<String> {
+        self.decorate_fn
+            .iter()
+            .map(|decorator| {
+                let util = DecorateFn::default();
+                decorator(util)
+            })
+            .collect()
     }
 
     /// Generate bindings file in C#.
@@ -484,17 +514,6 @@ impl Interop {
         })?;
 
         Ok(())
-    }
-
-    #[must_use]
-    pub fn fn_decorations(&self) -> Vec<String> {
-        self.decorate_fn
-            .iter()
-            .map(|decorator| {
-                let util = DecorateFn::default();
-                decorator(util)
-            })
-            .collect()
     }
 }
 

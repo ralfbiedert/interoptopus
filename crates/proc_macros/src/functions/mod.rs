@@ -15,6 +15,9 @@ pub struct Attributes {
 
     #[darling(default)]
     export_as: String,
+
+    #[darling(default)]
+    namespace: Option<String>,
 }
 
 pub fn ffi_function(attr: TokenStream, input: TokenStream) -> TokenStream {

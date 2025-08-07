@@ -19,21 +19,7 @@ use interoptopus::lang::{DomainType, Type};
 use interoptopus::pattern::TypePattern;
 
 pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
-    // First, collect all inner types from wired types that need to be generated as regular composites
-    let mut _wired_inner_types = i.inventory.wire_domain_types();
-
-    // Generate the inner types first as regular composite types
-    // ???? this is done in wires.rs!
-
-    // Then generate all the regular types (including wired types)
     for the_type in i.inventory.c_types() {
-        // Skip composite types that we already generated as inner types
-        if let Type::Composite(_c) = the_type {
-            // if wired_inner_types.contains(c.rust_name()) {
-            //     continue;
-            // }
-        }
-
         write_type_definition(i, w, the_type)?;
     }
 
@@ -41,9 +27,12 @@ pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), E
 }
 
 pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type) -> Result<(), Error> {
+    eprintln!("🤡 Will {}write_type_definition {}", if i.should_emit_by_type(the_type) { "" } else { "NOT " }, the_type.name_within_lib());
     if !i.should_emit_by_type(the_type) {
         return Ok(());
     }
+
+    eprintln!("🤡 write_type_definition {the_type:?}");
 
     match the_type {
         Type::Primitive(_) => {}
@@ -57,19 +46,26 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type)
             write_type_definition_composite(i, w, c)?;
             w.newline()?;
         }
-        Type::Wired(wired) => {
-            write_type_definitions_wired(i, w, wired)?;
-            w.newline()?;
-        }
+        Type::Wired(_) => panic!("Wired is emitted without counterpart"),
         Type::Domain(dom) => match dom {
             DomainType::Composite(wired) => {
                 write_type_definitions_domain_wired(i, w, wired)?;
                 w.newline()?;
+                let wire_counterpart = i.wired_counterpart(&Type::Composite(wired.clone()));
+                eprintln!("✅ Wire counterpart for {} is {:?} ✅", wired.rust_name(), wire_counterpart);
+                if let Some(Type::Wired(wire)) = wire_counterpart {
+                    write_type_definitions_wired(i, w, &wire)?;
+                    w.newline()?;
+                }
             }
             DomainType::String => {} // nothing todo!(),
             DomainType::Enum(e) => {
                 write_type_definition_wired_enum(i, w, e)?;
                 w.newline()?;
+                if let Some(Type::Wired(wire)) = i.wired_counterpart(&Type::Enum(e.clone())) {
+                    write_type_definitions_wired(i, w, &wire)?;
+                    w.newline()?;
+                }
             }
             DomainType::Vec(_) => {}    // nothing todo!(),
             DomainType::Map(_, _) => {} // nothing todo!(),
