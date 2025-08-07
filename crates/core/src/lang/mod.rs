@@ -124,7 +124,7 @@ impl Type {
             Type::Domain(dom) => match dom {
                 DomainType::Composite(x) => x.rust_name().to_string(),
                 DomainType::String => format!("String"),
-                DomainType::Enum(_) => todo!(),
+                DomainType::Enum(x) => x.rust_name().to_string(),
                 DomainType::Vec(x) => format!("Vec{}", capitalize_first_letter(x.name_within_lib().as_str())),
                 DomainType::Map(k, v) => {
                     format!("Map{}To{}", capitalize_first_letter(k.name_within_lib().as_str()), capitalize_first_letter(v.name_within_lib().as_str()))

@@ -124,19 +124,18 @@ pub(crate) fn types_from_functions_types(functions: &[Function], extra_types: &[
     let mut types = HashSet::new();
 
     for function in functions {
-        // eprintln!("===== Processing function {function:?} =====");
+        // Add only non-Wired types from function arguments and return value.
+        // These will be ffi types. Domain types are added separately below.
 
-        types_from_type_recursive(function.signature().rval(), &mut types);
+        types_from_type_nowire_recursive(function.signature().rval(), &mut types);
 
         for param in function.signature().params() {
-            types_from_type_recursive(param.the_type(), &mut types);
+            types_from_type_nowire_recursive(param.the_type(), &mut types);
         }
 
-        // eprintln!("======= Function.is_wired {:?}", function.is_wired());
-
         if function.is_wired() {
-            for ty in &function.wire_types() {
-                eprintln!("======= Adding wired type {ty:?}");
+            for ty in &function.domain_types() {
+                eprintln!("Function domain type: {}", ty.name_within_lib());
                 types_from_type_recursive(ty, &mut types);
             }
         }
@@ -157,13 +156,30 @@ pub fn types_from_type(start: &Type) -> Vec<Type> {
     types_from_functions_types(&[], from_ref(start))
 }
 
+#[derive(PartialEq)]
+enum TypeChoice {
+    IncludeWire,
+    DontIncludeWire,
+}
+
+/// Extract all types, without skipping Wire<T>
+pub(crate) fn types_from_type_recursive(start: &Type, types: &mut HashSet<Type>) {
+    types_from_type_recursive_inner(start, types, TypeChoice::IncludeWire);
+}
+
+/// Skip Wire<T> at the root, extracting only Domain types
+pub(crate) fn types_from_type_nowire_recursive(start: &Type, types: &mut HashSet<Type>) {
+    types_from_type_recursive_inner(start, types, TypeChoice::DontIncludeWire);
+}
+
 /// Recursively checks.
 #[allow(clippy::implicit_hasher)]
 #[allow(clippy::redundant_pub_crate)]
-pub(crate) fn types_from_type_recursive(start: &Type, types: &mut HashSet<Type>) {
-    types.insert(start.clone());
-
-    eprintln!("======= Added type {start:?}");
+fn types_from_type_recursive_inner(start: &Type, types: &mut HashSet<Type>, choice: TypeChoice) {
+    if choice == TypeChoice::IncludeWire || !matches!(start, Type::Wired(_)) {
+        types.insert(start.clone());
+        // eprintln!("✅ Added type {start:?}");
+    }
 
     match start {
         Type::Composite(inner) => {
@@ -175,7 +191,7 @@ pub(crate) fn types_from_type_recursive(start: &Type, types: &mut HashSet<Type>)
         // there's never a need to embed Wire<T> inside a struct
         Type::Wired(inner) => {
             for field in inner.fields() {
-                eprintln!("TYPES_FROM_TYPE_RECURSIVE for WIRE: field {}", field.name());
+                // Wire only contains a WireBuffer as the only field, but we need to extract it to provide a helper.
                 types_from_type_recursive(field.the_type(), types);
             }
         }
@@ -183,7 +199,7 @@ pub(crate) fn types_from_type_recursive(start: &Type, types: &mut HashSet<Type>)
         Type::Domain(dom) => match dom {
             DomainType::Composite(inner) => {
                 for field in inner.fields() {
-                    eprintln!("TYPES_FROM_TYPE_RECURSIVE for DOMAIN: field {}", field.name());
+                    // eprintln!("TYPES_FROM_TYPE_RECURSIVE for DOMAIN: field {}", field.name());
                     types_from_type_recursive(field.the_type(), types);
                 }
             }
