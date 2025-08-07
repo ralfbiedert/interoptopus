@@ -23,6 +23,7 @@ use std::{
     io::{/*Error, ErrorKind,*/ Read, Write},
 };
 
+// @todo play with implementing it as a struct?
 #[derive(thiserror::Error, Debug)]
 pub enum WireError {
     #[error("I/O error {0}")]
