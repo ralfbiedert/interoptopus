@@ -1,5 +1,6 @@
 using System;
-using Gen.ForCSharp;
+using Gen.Wire;
+using Gen.ForCSharp; // @todo
 
 namespace ForCSharp;
 
@@ -14,7 +15,7 @@ public class InteropWire
         fixed (byte* bufferPtr = buffer)
         {
             var wireInput = input.WireWithBuffer(bufferPtr, bufferSize);
-            var wireOutputs = Interop.WireRustClient(wireInput); // WireOfOutputs
+            var wireOutputs = Gen.Wire.Interop.WireRustClient(wireInput); // WireOfOutputs
             try
             {
                 return wireOutputs.Unwire();

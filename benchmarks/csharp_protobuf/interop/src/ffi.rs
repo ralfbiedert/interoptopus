@@ -1,7 +1,7 @@
 use interoptopus::{ffi, ffi_function, ffi_type};
 
 /// Main benchmark Rust entry point for FFI-based interop.
-#[ffi_function]
+#[ffi_function(namespace = "ffi")]
 pub fn FfiRustClient(_input: Input) -> Outputs {
     /*    println!("PRINTLN DEBUG IS THA BEST");
     println!("NUMBERS VALIDITY CHECK:");
@@ -21,50 +21,50 @@ pub fn FfiRustClient(_input: Input) -> Outputs {
     }
 }
 
-#[ffi_type]
+#[ffi_type(namespace = "ffi")]
 pub struct Input<'l> {
     pub context: Context<'l>,
     pub value: Table<'l>,
     pub configuration: Configuration,
 }
 
-#[ffi_type]
+#[ffi_type(namespace = "ffi")]
 pub struct Outputs {
     pub response: Response,
     pub data: Data,
 }
 
-#[ffi_type]
+#[ffi_type(namespace = "ffi")]
 pub struct Context<'l> {
     pub things: ffi::Slice<'l, ffi::String>,
     // headers: HashMap<String, String>, // TODO: unsupported
 }
 
-#[ffi_type]
+#[ffi_type(namespace = "ffi")]
 pub struct Table<'l> {
     pub metadata: TableMetadata,
     pub byte_array: ffi::Slice<'l, u8>,
 }
 
-#[ffi_type]
+#[ffi_type(namespace = "ffi")]
 pub struct Configuration {
     pub is_ok_response: bool,
     pub host: ffi::String,
     pub response_size: u64, // controls N in benchmarks
 }
 
-#[ffi_type]
+#[ffi_type(namespace = "ffi")]
 pub struct Response {
     pub results: ffi::Vec<Result>,
 }
 
-#[ffi_type]
+#[ffi_type(namespace = "ffi")]
 pub struct Data {
     pub items: Items,
     pub errors: Error,
 }
 
-#[ffi_type]
+#[ffi_type(namespace = "ffi")]
 pub struct TableMetadata {
     pub row_count: i32,
     pub column_count: i32,
@@ -72,19 +72,19 @@ pub struct TableMetadata {
     pub prefix: ffi::String,
 }
 
-#[ffi_type]
+#[ffi_type(namespace = "ffi")]
 #[derive(Clone)]
 pub struct Result {
     pub item_value: i32,
     pub item_id: ffi::String,
 }
 
-#[ffi_type]
+#[ffi_type(namespace = "ffi")]
 pub struct Items {
     pub items: ffi::Vec<Item>,
 }
 
-#[ffi_type]
+#[ffi_type(namespace = "ffi")]
 #[derive(Clone)]
 pub enum ItemKey {
     TOTAL = 0,
@@ -93,14 +93,14 @@ pub enum ItemKey {
     THIRD = 3,
 }
 
-#[ffi_type]
+#[ffi_type(namespace = "ffi")]
 #[derive(Clone)]
 pub struct Item {
     pub key: ItemKey,
     pub value: u64,
 }
 
-#[ffi_type]
+#[ffi_type(namespace = "ffi")]
 pub struct Error {
     pub error_messages: ffi::Vec<ffi::String>,
 }
