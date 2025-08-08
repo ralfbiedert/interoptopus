@@ -3,6 +3,8 @@ using BenchmarkDotNet.Running;
 using System;
 using System.Collections.Generic;
 using Gen.ForCSharp;
+using Gen.Wire;
+using Gen.Ffi;
 
 namespace ForCSharp;
 
@@ -75,55 +77,55 @@ public class BenchyBase
         return input;
     }
 
-    // protected static Input populateFfiInput(int n)
-    // {
-    //     var input = new Input();
-    //
-    //     input.configuration = new Configuration();
-    //     input.value = new Table();
-    //     input.value.metadata = new TableMetadata();
-    //     input.context = new Context();
-    //
-    //     // input.configuration.host (String) = from "" to "verylonghostname" (4096 chars)
-    //     input.configuration.host = "127.0.0.1".Utf8();
-    //     input.configuration.response_size = (ulong)n;
-    //     // input.configuration.is_ok_response = true if populating Items in Outputs, false if populating Errors
-    //     input.configuration.is_ok_response = true;
-    //     input.value.metadata.guid = new Guid().ToString().Utf8();
-    //     input.value.metadata.prefix = "ordinary_prefix_".Utf8();
-    //     input.value.metadata.row_count = 5;
-    //     input.value.metadata.column_count = 7;
-    //     var arr = new byte[n];
-    //     // fixed (var x = new byte[n]) // try with memory pinned from the start
-    //     // {
-    //         input.value.byte_array = SliceU8.From(arr); // from 0 bytes to 1Mb}
-    //     // }
-    //     // input.context.things = from 0 strings to 1,000,000 strings "thingX"
-    //     var things = new Utf8String[n];
-    //     for (var i = 0; i < n; i++)
-    //     {
-    //         things[i] = $"Thing-{i}".Utf8();
-    //     }
-    //
-    //     input.context.things = things.Slice();
-    //     // NB: FFI does not support HashMaps interop
-    //     // input.context.headers = from 0 headers to 1,000,000 "key"=>"value" pairs
-    //     //for (int i = 0; i < n; i++)
-    //     //{
-    //     //    input.context.headers.Add($"Header-{i}", $"Value-{i}");
-    //     //}
-    //
-    //     return input;
-    // }
-
-    protected static Input populateWireInput(int n)
+    protected static FInput populateFfiInput(int n)
     {
-        var input = new Input();
+        var input = new FInput();
+    
+        input.configuration = new FConfiguration();
+        input.value = new FTable();
+        input.value.metadata = new FTableMetadata();
+        input.context = new FContext();
+    
+        // input.configuration.host (String) = from "" to "verylonghostname" (4096 chars)
+        input.configuration.host = "127.0.0.1".Utf8();
+        input.configuration.response_size = (ulong)n;
+        // input.configuration.is_ok_response = true if populating Items in Outputs, false if populating Errors
+        input.configuration.is_ok_response = true;
+        input.value.metadata.guid = new Guid().ToString().Utf8();
+        input.value.metadata.prefix = "ordinary_prefix_".Utf8();
+        input.value.metadata.row_count = 5;
+        input.value.metadata.column_count = 7;
+        var arr = new byte[n];
+        // fixed (var x = new byte[n]) // try with memory pinned from the start
+        // {
+            input.value.byte_array = SliceU8.From(arr); // from 0 bytes to 1Mb}
+        // }
+        // input.context.things = from 0 strings to 1,000,000 strings "thingX"
+        var things = new Utf8String[n];
+        for (var i = 0; i < n; i++)
+        {
+            things[i] = $"Thing-{i}".Utf8();
+        }
+    
+        input.context.things = things.Slice();
+        // NB: FFI does not support HashMaps interop
+        // input.context.headers = from 0 headers to 1,000,000 "key"=>"value" pairs
+        //for (int i = 0; i < n; i++)
+        //{
+        //    input.context.headers.Add($"Header-{i}", $"Value-{i}");
+        //}
+    
+        return input;
+    }
 
-        input.configuration = new Configuration();
-        input.value = new Table();
-        input.value.metadata = new TableMetadata();
-        input.context = new Context();
+    protected static WInput populateWireInput(int n)
+    {
+        var input = new WInput();
+
+        input.configuration = new WConfiguration();
+        input.value = new WTable();
+        input.value.metadata = new WTableMetadata();
+        input.context = new WContext();
 
         // input.configuration.host (String) = from "" to "verylonghostname" (4096 chars)
         input.configuration.host = "127.0.0.1";

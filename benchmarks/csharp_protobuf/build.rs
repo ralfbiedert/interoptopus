@@ -33,7 +33,7 @@ use interoptopus_backend_csharp::{Interop, WriteTypes};
 
 use interoptopus::backend::NamespaceMappings;
 pub fn namespace_mappings() -> NamespaceMappings {
-    NamespaceMappings::new("Gen.ForCSharp") //.add("ffi", "Gen.FFI").add("wire", "Gen.Wire")
+    NamespaceMappings::new("Gen.ForCSharp").add("wire", "Gen.Wire").add("ffi", "Gen.Ffi")
 }
 
 fn generate_interop_files() -> Result<(), Error> {
@@ -45,6 +45,28 @@ fn generate_interop_files() -> Result<(), Error> {
         .build()?
         .write_file("./Interop.cs")?;
 
+    Interop::builder()
+        .inventory(interop::ffi_inventory())
+        .namespace_mappings(namespace_mappings())
+        .dll_name("proto_benchy".to_string())
+        .write_types(WriteTypes::Namespace)
+        .namespace_id("wire")
+        .build()?
+        .write_file("./Interop.Wire.cs")?;
+
+    Interop::builder()
+        .inventory(interop::ffi_inventory())
+        .namespace_mappings(namespace_mappings())
+        .dll_name("proto_benchy".to_string())
+        .write_types(WriteTypes::Namespace)
+        .namespace_id("ffi")
+        .build()?
+        .write_file("./Interop.Ffi.cs")?;
+
+    // Force rerun when interop generated files change
+    println!("cargo:rerun-if-changed=Interop.cs");
+    println!("cargo:rerun-if-changed=Interop.Ffi.cs");
+    println!("cargo:rerun-if-changed=Interop.Wire.cs");
     // Force rerun when interop source files change
     println!("cargo:rerun-if-changed=interop/src/wire.rs");
 

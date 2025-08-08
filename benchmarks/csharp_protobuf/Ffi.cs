@@ -1,18 +1,17 @@
 using System;
-using Gen.ForCSharp;
+using Gen.Ffi;
 
 namespace ForCSharp;
 
 public class InteropFfi
 {
     /// Main benched function.
-    public static Outputs ExecuteRustClient(Input input)
+    public static FOutputs ExecuteRustClient(FInput input)
     {
         try
         {
-            // var outputs = Interop.FfiRustClient(input);
-            // return outputs;
-            return null;
+            var outputs = Interop.FfiRustClient(input);
+            return outputs;
         }
         catch (Exception e)
         {
