@@ -1,5 +1,5 @@
 using System;
-using Gen.ForCSharp;
+using Gen.Ffi;
 
 namespace ForCSharp;
 
