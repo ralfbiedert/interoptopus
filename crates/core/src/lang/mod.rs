@@ -57,6 +57,7 @@ pub enum DomainType {
     Composite(Composite),
     String,
     Enum(Enum),
+    Option(Box<Type>),
     Vec(Box<Type>),
     Map(Box<Type>, Box<Type>),
 }
@@ -125,6 +126,7 @@ impl Type {
                 DomainType::Composite(x) => x.rust_name().to_string(),
                 DomainType::String => format!("String"),
                 DomainType::Enum(x) => x.rust_name().to_string(),
+                DomainType::Option(x) => format!("Option{}", capitalize_first_letter(x.name_within_lib().as_str())),
                 DomainType::Vec(x) => format!("Vec{}", capitalize_first_letter(x.name_within_lib().as_str())),
                 DomainType::Map(k, v) => {
                     format!("Map{}To{}", capitalize_first_letter(k.name_within_lib().as_str()), capitalize_first_letter(v.name_within_lib().as_str()))
@@ -240,6 +242,14 @@ impl Type {
             Self::Opaque(t) => Some(t.meta().module()),
             Self::Composite(t) => Some(t.meta().module()),
             Self::Wired(t) => Some(t.meta().module()),
+            Self::Domain(d) => match d {
+                DomainType::Composite(t) => Some(t.meta().module()),
+                DomainType::String => None,
+                DomainType::Enum(t) => Some(t.meta().module()),
+                DomainType::Option(t) => t.namespace(),
+                DomainType::Vec(t) => t.namespace(),
+                DomainType::Map(_, _) => todo!(),
+            },
             Self::Pattern(TypePattern::NamedCallback(t)) => Some(t.meta().module()),
             _ => None,
         }

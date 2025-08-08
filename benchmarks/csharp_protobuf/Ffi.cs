@@ -6,7 +6,7 @@ namespace ForCSharp;
 public class InteropFfi
 {
     /// Main benched function.
-    public static Outputs ExecuteRustClient(Input input)
+    public static FOutputs ExecuteRustClient(FInput input)
     {
         try
         {

@@ -296,10 +296,15 @@ impl Interop {
 
     #[must_use]
     fn has_emittable_wired_types(&self) -> bool {
-        self.inventory
-            .wire_types()
-            .iter()
-            .any(|t| matches!(t, Type::Wired(w) if self.should_emit_by_meta(w.meta())))
+        self.inventory.wire_types().iter().any(|t| match t {
+            Type::Wired(w) => {
+                if w.meta().module() == self.namespace_id {
+                    eprintln!("🚧🚧🚧 has emittable wired types in ns {}", self.namespace_id);
+                }
+                matches!(t, Type::Wired(w) if self.should_emit_by_meta(w.meta()))
+            }
+            _ => false,
+        })
     }
 
     /// Given a Domain type in c_types, look up a corresponding Wire type in wire_types and return it if it exists.
@@ -324,9 +329,6 @@ impl Interop {
 
     #[must_use]
     fn should_emit_by_meta(&self, meta: &Meta) -> bool {
-        // if meta.module() == self.namespace_id {
-        //     eprintln!("🚧🚧🚧 should_emit_by_meta true: type module '{}' / current ns '{}' 🚧🚧🚧", meta.module(), self.namespace_id,);
-        // }
         meta.module() == self.namespace_id
     }
 
@@ -388,7 +390,7 @@ impl Interop {
     /// Checks whether for the given type and the current file a type definition should be emitted.
     #[must_use]
     fn should_emit_by_type(&self, t: &Type) -> bool {
-        eprintln!("🚧 should_emit_by_type: {t:?} 🚧");
+        // eprintln!("🚧 should_emit_by_type: {t:?} 🚧");
 
         if self.write_types == WriteTypes::All {
             return true;
@@ -409,7 +411,8 @@ impl Interop {
                 DomainType::Composite(x) => self.should_emit_by_meta(x.meta()),
                 DomainType::Enum(x) => self.should_emit_by_meta(x.meta()),
                 DomainType::String => todo!(),
-                DomainType::Vec(_) => todo!(),
+                DomainType::Vec(x) => self.should_emit_by_type(x),
+                DomainType::Option(x) => self.should_emit_by_type(x),
                 DomainType::Map(_, _) => todo!(),
             },
             Type::FnPointer(_) => true,

@@ -178,7 +178,6 @@ pub(crate) fn types_from_type_nowire_recursive(start: &Type, types: &mut HashSet
 fn types_from_type_recursive_inner(start: &Type, types: &mut HashSet<Type>, choice: TypeChoice) {
     if choice == TypeChoice::IncludeWire || !matches!(start, Type::Wired(_)) {
         types.insert(start.clone());
-        // eprintln!("✅ Added type {start:?}");
     }
 
     match start {
@@ -212,6 +211,7 @@ fn types_from_type_recursive_inner(start: &Type, types: &mut HashSet<Type>, choi
                     }
                 }
             }
+            DomainType::Option(inner) => types_from_type_recursive(inner, types),
             DomainType::Vec(inner) => types_from_type_recursive(inner, types),
             DomainType::Map(u, v) => {
                 types_from_type_recursive(u, types);
@@ -328,6 +328,7 @@ pub(crate) fn extract_namespaces_from_types(types: &[Type], into: &mut HashSet<S
                 }
                 DomainType::String => {}
                 DomainType::Enum(_) => {}
+                DomainType::Option(_) => {}
                 DomainType::Vec(_) => {}
                 DomainType::Map(_, _) => {}
             },
@@ -398,6 +399,7 @@ pub(crate) fn holds_opaque_without_ref(typ: &Type) -> bool {
             DomainType::Composite(_) => false,
             DomainType::String => todo!(),
             DomainType::Enum(_) => todo!(),
+            DomainType::Option(_) => todo!(),
             DomainType::Vec(_) => todo!(),
             DomainType::Map(_, _) => todo!(),
         },
@@ -533,6 +535,7 @@ pub fn is_global_type(t: &Type) -> bool {
         Type::Domain(dom) => match dom {
             DomainType::Composite(_) => false,
             DomainType::Enum(_) => false,
+            DomainType::Option(_) => false,
             DomainType::String => true,
             DomainType::Vec(_) => true,
             DomainType::Map(_, _) => true,

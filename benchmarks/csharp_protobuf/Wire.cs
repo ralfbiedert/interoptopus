@@ -7,7 +7,7 @@ namespace ForCSharp;
 public class InteropWire
 {
     /// Main benched function.
-    public static unsafe Outputs ExecuteRustClient(Input input)
+    public static unsafe WOutputs ExecuteRustClient(WInput input)
     {
         int bufferSize = input.WireSize();
         Span<byte> buffer = stackalloc byte[bufferSize]; // Stack allocation for small data, use heap for large payloads

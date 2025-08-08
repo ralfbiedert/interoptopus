@@ -27,12 +27,12 @@ pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), E
 }
 
 pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type) -> Result<(), Error> {
-    eprintln!("🤡 Will {}write_type_definition {}", if i.should_emit_by_type(the_type) { "" } else { "NOT " }, the_type.name_within_lib());
+    // eprintln!("🤡 Will {}write_type_definition {}", if i.should_emit_by_type(the_type) { "" } else { "NOT " }, the_type.name_within_lib());
     if !i.should_emit_by_type(the_type) {
         return Ok(());
     }
 
-    eprintln!("🤡 write_type_definition {the_type:?}");
+    // eprintln!("🤡 write_type_definition {the_type:?}");
 
     match the_type {
         Type::Primitive(_) => {}
@@ -67,6 +67,7 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type)
                     w.newline()?;
                 }
             }
+            DomainType::Option(_) => {} // nothing todo!(),
             DomainType::Vec(_) => {}    // nothing todo!(),
             DomainType::Map(_, _) => {} // nothing todo!(),
         },

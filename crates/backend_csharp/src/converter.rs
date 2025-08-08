@@ -46,6 +46,7 @@ pub fn field_to_type(x: &Type) -> String {
             DomainType::Composite(x) => x.rust_name().to_string(),
             DomainType::String => "String".to_string(),
             DomainType::Enum(x) => x.rust_name().to_string(),
+            DomainType::Option(x) => format!("{}?", field_to_type(x)),
             DomainType::Vec(x) => format!("{}[]", field_to_type(x)),
             DomainType::Map(k, v) => format!("Dictionary<{}, {}>", field_to_type(k), field_to_type(v)),
         },
@@ -386,6 +387,7 @@ pub fn has_dispose(t: &Type) -> bool {
             DomainType::Composite(_) => false, // Domain types are plain C# classes
             DomainType::String => todo!(),
             DomainType::Enum(_) => todo!(),
+            DomainType::Option(_) => todo!(),
             DomainType::Vec(_) => todo!(),
             DomainType::Map(_, _) => todo!(),
         },

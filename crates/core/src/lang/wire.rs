@@ -126,6 +126,18 @@ where
     }
 }
 
+impl<T: WireInfo> WireInfo for Option<T>
+where
+    T: WireInfo,
+{
+    fn name() -> &'static str {
+        "Option<T>" // @todo
+    }
+    fn wire_info() -> Type {
+        Type::Domain(DomainType::Option(Box::new(T::wire_info())))
+    }
+}
+
 impl<T, U> WireInfo for HashMap<T, U>
 where
     T: WireInfo,
@@ -558,7 +570,8 @@ where
         let fields = vec![Field::new("buf".to_string(), WireBuffer::type_info())];
 
         let docs = Docs::from_lines(vec!["Wired data FFI wrapper".to_string()]);
-        let composite = Composite::with_meta(T::name().to_string(), fields, Meta::with_docs(docs));
+
+        let composite = Composite::with_meta(T::name().to_string(), fields, Meta::with_module_docs(T::wire_info().namespace().unwrap_or_default().to_string(), docs));
 
         // The root Wire<T> types are Wired, this makes backend generate WireOfT handling code.
         // All nested Composite types are Domain types.

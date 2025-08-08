@@ -382,7 +382,7 @@ impl Inventory {
             eprintln!("🎉 {}", c.name_within_lib());
         }
         for w in &self.wire_types {
-            eprintln!("🔧 {}", w.name_within_lib());
+            eprintln!("🔧 {} '{}'", w.name_within_lib(), w.namespace().unwrap_or_default());
         }
         // for p in &self.patterns {
         //     eprintln!("🧵 {}", p.fallback_type().name_within_lib());

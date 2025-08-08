@@ -139,8 +139,8 @@ impl From<&Type> for Kind {
             Type::Domain(DomainType::Vec(_)) => Kind::Vec,
             Type::Domain(DomainType::Map(_, _)) => Kind::Map,
             Type::Domain(DomainType::Enum(_)) => Kind::Enum,
+            Type::Domain(DomainType::Option(_)) => Kind::Optional,
             Type::Domain(DomainType::Composite(_)) => Kind::Composite,
-            Type::Pattern(TypePattern::Option(_)) => Kind::Optional,
             _ => panic!("Unsupported domain type kind {value:?}"),
         }
     }
