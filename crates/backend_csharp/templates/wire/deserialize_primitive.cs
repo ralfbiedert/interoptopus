@@ -1,24 +1,24 @@
-{% if field.deser_type == "bool" %}
+{% if field.inner_type == "bool" %}
 {{field.name}} = reader.ReadByte() != 0,
-{% elif field.deser_type == "sbyte" %}
+{% elif field.inner_type == "sbyte" %}
 {{field.name}} = reader.ReadSByte(),
-{% elif field.deser_type == "byte" %}
+{% elif field.inner_type == "byte" %}
 {{field.name}} = reader.ReadByte(),
-{% elif field.deser_type == "short" %}
+{% elif field.inner_type == "short" %}
 {{field.name}} = reader.ReadInt16(),
-{% elif field.deser_type == "ushort" %}
+{% elif field.inner_type == "ushort" %}
 {{field.name}} = reader.ReadUInt16(),
-{% elif field.deser_type == "int" %}
+{% elif field.inner_type == "int" %}
 {{field.name}} = reader.ReadInt32(),
-{% elif field.deser_type == "uint" %}
+{% elif field.inner_type == "uint" %}
 {{field.name}} = reader.ReadUInt32(),
-{% elif field.deser_type == "long" %}
+{% elif field.inner_type == "long" %}
 {{field.name}} = reader.ReadInt64(),
-{% elif field.deser_type == "ulong" %}
+{% elif field.inner_type == "ulong" %}
 {{field.name}} = reader.ReadUInt64(),
-{% elif field.deser_type == "float" %}
+{% elif field.inner_type == "float" %}
 {{field.name}} = reader.ReadSingle(),
-{% elif field.deser_type == "double" %}
+{% elif field.inner_type == "double" %}
 {{field.name}} = reader.ReadDouble(),
 {% else %}
 {{field.name}} = reader.ReadBytes(1)[0],

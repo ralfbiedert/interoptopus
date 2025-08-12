@@ -6,7 +6,7 @@ WireInterop.SerializeVec(writer, this.{{field.name}}); /* {{field.kind}} */
 {%- elif field.kind == "map" %}
 WireInterop.SerializeMap(writer, this.{{field.name}}); /* {{field.kind}} */
 {%- elif field.kind == "optional" %}
-WireInterop.SerializeOptional(writer, this.{{field.name}});  /* {{field.kind}} */
+WireInterop.SerializeOptional<{{field.inner_type}}>(writer, this.{{field.name}});  /* {{field.kind}} */
 {%- elif field.kind == "primitive" %}
 {% include "wire/serialize_primitive.cs" %}
 {%- else %}

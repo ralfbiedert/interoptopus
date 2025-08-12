@@ -24,7 +24,6 @@ use crate::converter::{field_name, field_to_type};
 use crate::interop::FfiTransType;
 use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Composite, DomainType, Enum, Type, VariantKind, Visibility};
-use interoptopus::pattern::TypePattern;
 use interoptopus::{Error, render};
 
 pub fn write_wire_helpers(_i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
@@ -96,7 +95,7 @@ pub fn write_type_definitions_domain_wired(i: &Interop, w: &mut IndentWriter, wi
             let field_type_name = field_to_type(field.the_type());
             let field_name_str = field_name(field);
 
-            eprintln!("{}: generating type {} for {:?}", field_name_str, field_type_name, field.the_type());
+            eprintln!("{}: ➡️ generating type {} for {:?}", field_name_str, field_type_name, field.the_type());
 
             FieldDesc { docs: field_docs, visibility: field_visibility.to_string(), type_name: field_type_name, name: field_name_str.to_string() }
         })
@@ -150,8 +149,7 @@ impl From<&Type> for Kind {
 struct FieldDesc {
     kind: Kind,
     name: String,
-    deser_type: String,    // ser/deser - rename to csharp_type
-    inner_type: String,    // calc_size
+    inner_type: String,
     primitive_size: usize, // calc_size
 }
 
@@ -168,7 +166,7 @@ fn generate_serialization_code(w: &mut IndentWriter, composite: &Composite) -> R
             let field_type = field.the_type();
             let csharp_type = field_to_type(field_type);
 
-            FieldDesc { kind: field_type.into(), name: field_name.to_string(), deser_type: csharp_type, ..Default::default() }
+            FieldDesc { kind: field_type.into(), name: field_name.to_string(), inner_type: csharp_type, ..Default::default() }
         })
         .collect::<Vec<_>>();
 
@@ -194,11 +192,11 @@ fn generate_deserialization_code(w: &mut IndentWriter, composite: &Composite) ->
             FieldDesc {
                 kind: kind,
                 name: field_name.to_string(),
-                deser_type: match kind {
-                    Kind::Vec => extract_vec_inner_type(&field_type).to_string(),
-                    Kind::Optional => extract_option_inner_type(&field_type).to_string(),
+                inner_type: match kind {
+                    Kind::Vec => extract_inner_type(&field_type),
+                    Kind::Optional => extract_inner_type(&field_type),
                     Kind::Primitive => csharp_type,
-                    Kind::Map => extract_map_keyvalue_types(&field_type).to_string(),
+                    Kind::Map => extract_inner_type(&field_type),
                     _ => csharp_type,
                 },
                 ..Default::default()
@@ -226,13 +224,7 @@ fn generate_size_calculation(w: &mut IndentWriter, composite: &Composite) -> Res
             FieldDesc {
                 kind: field_type.into(),
                 name: field_name.to_string(),
-                inner_type: if is_vec_type(field_type) {
-                    extract_vec_inner_type(&field_type).to_string()
-                } else if is_optional_type(field_type) {
-                    extract_option_inner_type(&field_type).to_string()
-                } else {
-                    "".into()
-                },
+                inner_type: extract_inner_type(&field_type),
                 primitive_size: if matches!(field_type, Type::Primitive(_)) {
                     get_primitive_size(&csharp_type)
                 } else {
@@ -247,14 +239,6 @@ fn generate_size_calculation(w: &mut IndentWriter, composite: &Composite) -> Res
     Ok(String::from_utf8(buf)?)
 }
 
-fn is_vec_type(t: &Type) -> bool {
-    matches!(t, Type::Domain(DomainType::Vec(_)))
-}
-
-fn is_optional_type(t: &Type) -> bool {
-    matches!(t, Type::Pattern(TypePattern::Option(_)))
-}
-
 fn get_primitive_size(csharp_type: &str) -> usize {
     match csharp_type {
         "bool" | "sbyte" | "byte" => 1,
@@ -265,26 +249,16 @@ fn get_primitive_size(csharp_type: &str) -> usize {
     }
 }
 
-fn extract_vec_inner_type(vec_type: &Type) -> String {
-    match vec_type {
-        Type::Domain(DomainType::Vec(t)) => field_to_type(t),
-        _ => "object".to_string(),
-    }
-}
-
-fn extract_option_inner_type(option_type: &Type) -> String {
-    match option_type {
-        Type::Pattern(TypePattern::Option(dom)) => field_to_type(dom.t()),
-        _ => "object".to_string(),
-    }
-}
-
-fn extract_map_keyvalue_types(the_type: &Type) -> String {
-    match the_type {
+fn extract_inner_type(a_type: &Type) -> String {
+    match a_type {
         Type::Domain(dom) => match dom {
-            DomainType::Map(u, v) => format!("{}, {}", field_to_type(u), field_to_type(v)),
-            _ => "".into(),
+            DomainType::Vec(t) => field_to_type(t),
+            DomainType::Option(o) => field_to_type(o),
+            DomainType::Map(k, v) => format!("{}, {}", field_to_type(k), field_to_type(v)),
+            DomainType::Composite(_c) => "?ask-me-how-we-got-here?".into(),
+            DomainType::String => "".into(),
+            DomainType::Enum(_e) => "!ask-me-how-we-got-here!".into(),
         },
-        _ => "".into(),
+        _ => "object".to_string(),
     }
 }

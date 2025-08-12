@@ -180,7 +180,7 @@ namespace Gen.Wire
                 things = WireInterop.DeserializeVec<String>(reader, DeserStringExtensions.DeserializeString), /* vec */
                 
                 
-                headers = WireInterop.DeserializeMap<String, String>(reader, DeserStringExtensions.DeserializeString, DeserStringExtensions.DeserializeString), /* map */
+                    headers = WireInterop.DeserializeMap<String, String>(reader, DeserStringExtensions.DeserializeString, DeserStringExtensions.DeserializeString), /* map */
             };
 
         }
@@ -261,7 +261,7 @@ namespace Gen.Wire
         {
             return new WData {
                 items = DeserWItemsExtensions.DeserializeWItems(reader), /* composite */
-                errors = WireInterop.DeserializeOption(reader, DeserobjectExtensions.Deserializeobject), /* optional */
+                errors = WireInterop.DeserializeOptional(reader, DeserWErrorExtensions.DeserializeWError), /* optional */
             };
 
         }
@@ -274,7 +274,7 @@ namespace Gen.Wire
         {
 
             this.items.Serialize(writer); /* composite */
-            WireInterop.SerializeOptional(writer, this.errors);  /* optional */
+            WireInterop.SerializeOptional<WError>(writer, this.errors);  /* optional */
 
         }
 
@@ -287,7 +287,7 @@ namespace Gen.Wire
 
             int size = 0;
             size += this.items.CalculateSize(); /* composite */
-            size += 1 + (this.errors.HasValue ? Marshal.SizeOf<>() : 0); /* optional */
+            size += 1 + (this.errors != null ? Marshal.SizeOf<WError>() : 0); /* optional */
 
             return size;
 
@@ -1381,7 +1381,7 @@ namespace Gen.Wire
 
     public class WireInterop {
         #region Serialization Helpers
-        #nullable disable
+        #nullable enable
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static void SerializeString(BinaryWriter writer, string value)
@@ -1517,7 +1517,7 @@ namespace Gen.Wire
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static void SerializeOption<T>(BinaryWriter writer, T? value) where T : struct
+        public static void SerializeOptional<T>(BinaryWriter writer, T? value) where T : struct
         {
             if (value.HasValue)
             {
@@ -1531,12 +1531,12 @@ namespace Gen.Wire
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static T? DeserializeOption<T>(BinaryReader reader) where T : struct
+        public static T? DeserializeOptional<T>(BinaryReader reader, Func<BinaryReader, T> deserializeValue) where T : struct
         {
             var hasValue = reader.ReadByte() != 0;
             if (hasValue)
             {
-                return WireInterop.DeserializeItem<T>(reader);
+                return deserializeValue(reader);
             }
             return null;
         }

@@ -35,12 +35,12 @@
         <Exec Command="echo 'Configuration: $(Configuration)'" />
         <Exec
             Condition="'$(Configuration)' == 'Release'"
-            Command="cargo b --release"
+            Command="cargo build --release"
             WorkingDirectory="./"
         />
         <Exec
             Condition="'$(Configuration)' != 'Release'"
-            Command="cargo b"
+            Command="cargo build"
             WorkingDirectory="./"
         />
     </Target>

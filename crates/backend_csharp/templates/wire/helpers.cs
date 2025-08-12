@@ -1,6 +1,6 @@
 public class WireInterop {
     #region Serialization Helpers
-    #nullable disable
+    #nullable enable
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static void SerializeString(BinaryWriter writer, string value)
@@ -136,7 +136,7 @@ public class WireInterop {
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    public static void SerializeOption<T>(BinaryWriter writer, T? value) where T : struct
+    public static void SerializeOptional<T>(BinaryWriter writer, T? value) where T : struct
     {
         if (value.HasValue)
         {
@@ -150,12 +150,12 @@ public class WireInterop {
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    public static T? DeserializeOption<T>(BinaryReader reader) where T : struct
+    public static T? DeserializeOptional<T>(BinaryReader reader, Func<BinaryReader, T> deserializeValue) where T : struct
     {
         var hasValue = reader.ReadByte() != 0;
         if (hasValue)
         {
-            return WireInterop.DeserializeItem<T>(reader);
+            return deserializeValue(reader);
         }
         return null;
     }
