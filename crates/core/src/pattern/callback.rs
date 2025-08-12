@@ -243,7 +243,7 @@ macro_rules! callback {
     };
 
     ($name:ident($($param:ident: $ty:ty),*) -> $rval:ty $(, namespace = $ns:expr)?) => {
-        #[derive(Clone, Copy)]
+        #[derive(Default, Clone, Copy)]
         #[repr(C)]
         pub struct $name(::std::option::Option<extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval>, *const ::std::ffi::c_void);
 
@@ -285,6 +285,7 @@ macro_rules! callback {
             }
         }
 
+        #[allow(unused_mut)]
         unsafe impl $crate::lang::TypeInfo for $name {
             fn type_info() -> $crate::lang::Type {
                 use $crate::lang::{TypeInfo, Type, Meta, Docs, Primitive, Parameter, Signature, FnPointer};
@@ -312,4 +313,13 @@ macro_rules! callback {
             }
         }
     };
+}
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn callback_default() {
+        callback!(MyCallback());
+        MyCallback::default();
+    }
 }
