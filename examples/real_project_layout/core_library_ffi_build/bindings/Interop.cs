@@ -324,3 +324,1372 @@ namespace My.Company
         }
     }
 
+    /// <summary>
+    /// Domain type that is sent across FFI boundary in a Wire.
+    /// </summary>
+    public partial class Return
+    {
+        /// 
+        uint field;
+
+        /// <summary>Empty constructor</summary>
+        public Return() { }
+
+        /// <summary>Member-wise initializing constructor</summary>
+        public Return(uint field)
+        {
+            this.field = field;
+        }
+
+        public override string ToString()
+        {
+            return "Return { field = " + field + " }";
+        }
+
+        /// <summary>
+        /// Deserialize the wire data back to a managed Return object
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static Return Deserialize(BinaryReader reader)
+        {
+            return new Return {
+                
+            field = reader.ReadUInt32(),
+
+
+            };
+
+        }
+
+        /// <summary>
+        /// Serialize a Return object into this wire's buffer
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void Serialize(BinaryWriter writer)
+        {
+
+
+            writer.Write(this.field);
+
+
+
+        }
+
+        /// <summary>
+        /// Calculate the size needed to serialize a Return object
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public int CalculateSize()
+        {
+
+            int size = 0;
+            size += 
+            4; /* primitive */
+            ;
+
+            return size;
+
+        }
+    }
+
+    /// <summary>
+    /// Extension methods for Return to Deserialize instances
+    /// </summary>
+    public static class DeserReturnExtensions
+    {
+        /// <summary>
+        /// Create a Wire with owned buffer from this Return instance
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static Return DeserializeReturn(BinaryReader reader)
+        {
+            return Return.Deserialize(reader); 
+        }
+    }
+
+    /// <summary>
+    /// FFI-safe wire representation for Return.
+    /// Mirrors the Rust Wire&lt;Return&gt; structure layout.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public unsafe struct WireOfReturn
+    {
+        /// <summary>Pointer to buffer data</summary>
+        public byte* Data;
+
+        /// <summary>Length of valid data in buffer</summary>
+        public long Length;
+
+        /// <summary>Capacity of buffer (0 for borrowed buffers)</summary>
+        public long Capacity;
+
+        /// <summary>
+        /// Create a Wire from a managed Return object with owned buffer
+        /// </summary>
+        public static WireOfReturn From(Return value)
+        {
+            var size = value.CalculateSize();
+            var buffer = Marshal.AllocHGlobal(size);
+            var wire = new WireOfReturn
+            {
+                Data = (byte*)buffer,
+                Length = (long)size,
+                Capacity = (long)size
+            };
+
+            try
+            {
+                value.Serialize(wire.Writer());
+                return wire;
+            }
+            catch
+            {
+                Marshal.FreeHGlobal(buffer);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Create a Wire from a managed Return object using provided buffer
+        /// </summary>
+        public static WireOfReturn From(Return value, byte* buffer, int bufferSize)
+        {
+            var wire = new WireOfReturn
+            {
+                Data = buffer,
+                Length = 0,
+                Capacity = 0 // Indicates borrowed buffer
+            };
+
+            var size = value.CalculateSize();
+            if (size > bufferSize)
+                throw new ArgumentException($"Buffer size {bufferSize} is too small for data size {size} when serializing Return");
+
+            wire.Length = (long)size;
+            value.Serialize(wire.Writer());
+            return wire;
+        }
+
+        public BinaryReader Reader()
+        {
+            // UIntPtr Ptr = (UIntPtr)Data;
+            // throw new ArgumentException($"Creating a reader for wire with {Length} bytes in it, {Ptr} ptr and {Capacity} capacity");
+            var reader = new BinaryReader(new UnmanagedMemoryStream(Data, Length));
+            return reader;
+        }
+
+        public BinaryWriter Writer()
+        {
+            var writer = new BinaryWriter(new UnmanagedMemoryStream(Data, Length, Length, FileAccess.Write));
+            return writer;
+        }
+
+        /// <summary>
+        /// Free the buffer if this wire owns it
+        /// </summary>
+        public void Dispose()
+        {
+            if (Data != null && IsOwned)
+            {
+                Marshal.FreeHGlobal((IntPtr)Data);
+                Data = null;
+                Length = 0;
+                Capacity = 0;
+            }
+        }
+
+        /// <summary>
+        /// Check if this wire owns its buffer
+        /// </summary>
+        public bool IsOwned => Capacity > 0;
+
+        /// <summary>
+        /// Check if the wire buffer is empty
+        /// </summary>
+        public bool IsEmpty => Length == 0;
+
+    }
+
+    /// <summary>
+    /// Extension methods for Return to create Wire instances
+    /// </summary>
+    public static class WireOfReturnExtensions
+    {
+        /// <summary>
+        /// Create a Wire with owned buffer from this Return instance
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static WireOfReturn Wire(this Return value)
+        {
+            return WireOfReturn.From(value);
+        }
+
+        /// <summary>
+        /// Create a Wire with borrowed buffer from this Return instance
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static unsafe WireOfReturn WireWithBuffer(this Return value, byte* buffer, int bufferSize)
+        {
+            return WireOfReturn.From(value, buffer, bufferSize);
+        }
+
+        /// <summary>
+        /// Calculate the wire size needed for this Return instance
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static int WireSize(this Return value)
+        {
+            return value.CalculateSize();
+        }
+
+        /// <summary>
+        /// Unwire a WireOfReturn back to a managed Return object
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static Return Unwire(this WireOfReturn wire)
+        {
+            return Return.Deserialize(wire.Reader());
+        }
+    }
+
+    /// <summary>
+    /// Domain type that is sent across FFI boundary in a Wire.
+    /// </summary>
+    public partial class Something
+    {
+        /// 
+        ushort field;
+        /// 
+        String name;
+
+        /// <summary>Empty constructor</summary>
+        public Something() { }
+
+        /// <summary>Member-wise initializing constructor</summary>
+        public Something(ushort field, String name)
+        {
+            this.field = field;
+            this.name = name;
+        }
+
+        public override string ToString()
+        {
+            return "Something { field = " + field + ", name = " + name + " }";
+        }
+
+        /// <summary>
+        /// Deserialize the wire data back to a managed Something object
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static Something Deserialize(BinaryReader reader)
+        {
+            return new Something {
+                
+            field = reader.ReadUInt16(),
+
+
+                name = WireInterop.DeserializeString(reader), /* string */
+            };
+
+        }
+
+        /// <summary>
+        /// Serialize a Something object into this wire's buffer
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void Serialize(BinaryWriter writer)
+        {
+
+
+            writer.Write(this.field);
+
+
+            this.name.Serialize(writer); /* string */
+
+        }
+
+        /// <summary>
+        /// Calculate the size needed to serialize a Something object
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public int CalculateSize()
+        {
+
+            int size = 0;
+            size += 
+            2; /* primitive */
+            ;
+            size += 
+            8 + System.Text.Encoding.UTF8.GetByteCount(this.name ?? ""); /* string */
+            ;
+
+            return size;
+
+        }
+    }
+
+    /// <summary>
+    /// Extension methods for Something to Deserialize instances
+    /// </summary>
+    public static class DeserSomethingExtensions
+    {
+        /// <summary>
+        /// Create a Wire with owned buffer from this Something instance
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static Something DeserializeSomething(BinaryReader reader)
+        {
+            return Something.Deserialize(reader); 
+        }
+    }
+
+    /// <summary>
+    /// FFI-safe wire representation for Something.
+    /// Mirrors the Rust Wire&lt;Something&gt; structure layout.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public unsafe struct WireOfSomething
+    {
+        /// <summary>Pointer to buffer data</summary>
+        public byte* Data;
+
+        /// <summary>Length of valid data in buffer</summary>
+        public long Length;
+
+        /// <summary>Capacity of buffer (0 for borrowed buffers)</summary>
+        public long Capacity;
+
+        /// <summary>
+        /// Create a Wire from a managed Something object with owned buffer
+        /// </summary>
+        public static WireOfSomething From(Something value)
+        {
+            var size = value.CalculateSize();
+            var buffer = Marshal.AllocHGlobal(size);
+            var wire = new WireOfSomething
+            {
+                Data = (byte*)buffer,
+                Length = (long)size,
+                Capacity = (long)size
+            };
+
+            try
+            {
+                value.Serialize(wire.Writer());
+                return wire;
+            }
+            catch
+            {
+                Marshal.FreeHGlobal(buffer);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Create a Wire from a managed Something object using provided buffer
+        /// </summary>
+        public static WireOfSomething From(Something value, byte* buffer, int bufferSize)
+        {
+            var wire = new WireOfSomething
+            {
+                Data = buffer,
+                Length = 0,
+                Capacity = 0 // Indicates borrowed buffer
+            };
+
+            var size = value.CalculateSize();
+            if (size > bufferSize)
+                throw new ArgumentException($"Buffer size {bufferSize} is too small for data size {size} when serializing Something");
+
+            wire.Length = (long)size;
+            value.Serialize(wire.Writer());
+            return wire;
+        }
+
+        public BinaryReader Reader()
+        {
+            // UIntPtr Ptr = (UIntPtr)Data;
+            // throw new ArgumentException($"Creating a reader for wire with {Length} bytes in it, {Ptr} ptr and {Capacity} capacity");
+            var reader = new BinaryReader(new UnmanagedMemoryStream(Data, Length));
+            return reader;
+        }
+
+        public BinaryWriter Writer()
+        {
+            var writer = new BinaryWriter(new UnmanagedMemoryStream(Data, Length, Length, FileAccess.Write));
+            return writer;
+        }
+
+        /// <summary>
+        /// Free the buffer if this wire owns it
+        /// </summary>
+        public void Dispose()
+        {
+            if (Data != null && IsOwned)
+            {
+                Marshal.FreeHGlobal((IntPtr)Data);
+                Data = null;
+                Length = 0;
+                Capacity = 0;
+            }
+        }
+
+        /// <summary>
+        /// Check if this wire owns its buffer
+        /// </summary>
+        public bool IsOwned => Capacity > 0;
+
+        /// <summary>
+        /// Check if the wire buffer is empty
+        /// </summary>
+        public bool IsEmpty => Length == 0;
+
+    }
+
+    /// <summary>
+    /// Extension methods for Something to create Wire instances
+    /// </summary>
+    public static class WireOfSomethingExtensions
+    {
+        /// <summary>
+        /// Create a Wire with owned buffer from this Something instance
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static WireOfSomething Wire(this Something value)
+        {
+            return WireOfSomething.From(value);
+        }
+
+        /// <summary>
+        /// Create a Wire with borrowed buffer from this Something instance
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static unsafe WireOfSomething WireWithBuffer(this Something value, byte* buffer, int bufferSize)
+        {
+            return WireOfSomething.From(value, buffer, bufferSize);
+        }
+
+        /// <summary>
+        /// Calculate the wire size needed for this Something instance
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static int WireSize(this Something value)
+        {
+            return value.CalculateSize();
+        }
+
+        /// <summary>
+        /// Unwire a WireOfSomething back to a managed Something object
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static Something Unwire(this WireOfSomething wire)
+        {
+            return Something.Deserialize(wire.Reader());
+        }
+    }
+
+    ///Result that contains value or an error.
+    public partial struct ResultConstPtrGameEngineError
+    {
+        uint _variant;
+        IntPtr _Ok;
+        Error _Err;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct ResultConstPtrGameEngineError 
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedOk
+        {
+            internal uint _variant;
+            internal IntPtr _Ok;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
+
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(0)]
+            internal UnmanagedOk _Ok;
+
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal ResultConstPtrGameEngineError ToManaged()
+            {
+                var _managed = new ResultConstPtrGameEngineError();
+                _managed._variant = _variant;
+                if (_variant == 0) _managed._Ok = _Ok._Ok;
+                if (_variant == 1) _managed._Err = _Err._Err.ToManaged();
+                return _managed;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+            if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+            if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
+        }
+
+        public static ResultConstPtrGameEngineError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
+        public static ResultConstPtrGameEngineError Err(Error value) => new() { _variant = 1, _Err = value };
+        public static ResultConstPtrGameEngineError Panic => new() { _variant = 2 };
+        public static ResultConstPtrGameEngineError Null => new() { _variant = 3 };
+
+        public bool IsOk => _variant == 0;
+        public bool IsErr => _variant == 1;
+        public bool IsPanic => _variant == 2;
+        public bool IsNull => _variant == 3;
+
+        public IntPtr AsOk() { if (_variant != 0) { throw new InteropException(); } else { return _Ok; } }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return $"Err({AsErr().ToString()})";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(ResultConstPtrGameEngineError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private ResultConstPtrGameEngineError _managed;
+            private Unmanaged _unmanaged;
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(ResultConstPtrGameEngineError managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void FromManaged(ResultConstPtrGameEngineError managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public ResultConstPtrGameEngineError ToManaged() { return _unmanaged.ToManaged(); }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void Free() {}
+        }
+    }
+
+    ///Result that contains value or an error.
+    public partial struct ResultError
+    {
+        uint _variant;
+        Error _Err;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct ResultError 
+    {
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedErr
+        {
+            internal uint _variant;
+            internal Error.Unmanaged _Err;
+        }
+
+
+
+
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(0)]
+            internal UnmanagedErr _Err;
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal ResultError ToManaged()
+            {
+                var _managed = new ResultError();
+                _managed._variant = _variant;
+                if (_variant == 1) _managed._Err = _Err._Err.ToManaged();
+                return _managed;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+            if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+            return _unmanaged;
+        }
+
+        public static ResultError Ok => new() { _variant = 0 };
+        public static ResultError Err(Error value) => new() { _variant = 1, _Err = value };
+        public static ResultError Panic => new() { _variant = 2 };
+        public static ResultError Null => new() { _variant = 3 };
+
+        public bool IsOk => _variant == 0;
+        public bool IsErr => _variant == 1;
+        public bool IsPanic => _variant == 2;
+        public bool IsNull => _variant == 3;
+
+        public void AsOk() { if (_variant != 0) throw new InteropException(); }
+        public Error AsErr() { if (_variant != 1) { throw new InteropException(); } else { return _Err; } }
+        public void AsPanic() { if (_variant != 2) throw new InteropException(); }
+        public void AsNull() { if (_variant != 3) throw new InteropException(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "Ok(...)";
+            if (_variant == 1) return $"Err({AsErr().ToString()})";
+            if (_variant == 2) return "Panic";
+            if (_variant == 3) return "Null";
+            throw new InteropException();
+        }
+
+        [CustomMarshaller(typeof(ResultError), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private ResultError _managed;
+            private Unmanaged _unmanaged;
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(ResultError managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void FromManaged(ResultError managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public ResultError ToManaged() { return _unmanaged.ToManaged(); }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void Free() {}
+        }
+    }
+
+
+    public partial class GameEngine : IDisposable
+    {
+        private IntPtr _context;
+
+        private GameEngine() {}
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static GameEngine New()
+        {
+            var self = new GameEngine();
+            self._context = Interop.game_engine_new().AsOk();
+            return self;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void Dispose()
+        {
+            Interop.game_engine_destroy(_context).AsOk();
+            _context = IntPtr.Zero;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void PlaceObject([MarshalAs(UnmanagedType.LPStr)] string name, Vec2 position)
+        {
+            Interop.game_engine_place_object(_context, name, position).AsOk();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public uint NumObjects()
+        {
+            return Interop.game_engine_num_objects(_context);
+        }
+
+        public IntPtr Context => _context;
+    }
+
+
+
+    public class InteropException : Exception
+    {
+        public InteropException() : base()
+        {
+        }
+    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void AsyncHelperNative(IntPtr data, IntPtr callback_data);
+    public delegate void AsyncHelperDelegate(IntPtr data);
+
+    public partial struct AsyncHelper
+    {
+        private AsyncHelperDelegate _managed;
+        private AsyncHelperNative _native;
+        private IntPtr _ptr;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial struct AsyncHelper : IDisposable
+    {
+        public AsyncHelper() { }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public AsyncHelper(AsyncHelperDelegate managed)
+        {
+            _managed = managed;
+            _native = Call;
+            _ptr = Marshal.GetFunctionPointerForDelegate(_native);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        void Call(IntPtr data, IntPtr _)
+        {
+            _managed(data);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void Dispose()
+        {
+            if (_ptr == IntPtr.Zero) return;
+            Marshal.FreeHGlobal(_ptr);
+            _ptr = IntPtr.Zero;
+        }
+
+        [CustomMarshaller(typeof(AsyncHelper), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Unmanaged
+        {
+            internal IntPtr Callback;
+            internal IntPtr Data;
+        }
+
+        public ref struct Marshaller
+        {
+            private AsyncHelper _managed;
+            private Unmanaged _unmanaged;
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void FromManaged(AsyncHelper managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Unmanaged ToUnmanaged()
+            {
+                _unmanaged = new Unmanaged();
+                _unmanaged.Callback = _managed._ptr;
+                _unmanaged.Data = IntPtr.Zero;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public AsyncHelper ToManaged()
+            {
+                _managed = new AsyncHelper();
+                _managed._ptr = _unmanaged.Callback;
+                return _managed;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void Free() { }
+        }
+    }
+
+    public delegate void AsyncCallbackCommon(IntPtr data, IntPtr callback_data);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct AsyncCallbackCommonNative
+    {
+        internal IntPtr _ptr;
+        internal IntPtr _ts;
+    }
+    public partial class Utf8String
+    {
+        IntPtr _ptr;
+        ulong _len;
+        ulong _capacity;
+    }
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial class Utf8String : IDisposable
+    {
+        private Utf8String() { }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static unsafe Utf8String From(string s)
+        {
+            var rval = new Utf8String();
+            var source = s.AsSpan();
+            Span<byte> utf8Bytes = stackalloc byte[Encoding.UTF8.GetByteCount(source)];
+            var len = Encoding.UTF8.GetBytes(source, utf8Bytes);
+
+            fixed (byte* p = utf8Bytes)
+            {
+                InteropHelper.interoptopus_string_create((IntPtr)p, (ulong)len, out var native);
+                rval._ptr = native._ptr;
+                rval._len = native._len;
+                rval._capacity = native._capacity;
+            }
+
+            return rval;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static unsafe Utf8String Empty()
+        {
+            InteropHelper.interoptopus_string_create(IntPtr.Zero, 0, out var _out);
+            return _out.IntoManaged();
+        }
+
+
+        public unsafe string String
+        {
+            get
+            {
+                var span = new ReadOnlySpan<byte>((byte*)_ptr, (int)_len);
+                var s = Encoding.UTF8.GetString(span);
+                return s;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public string IntoString()
+        {
+            var rval = String;
+            Dispose();
+            return rval;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void Dispose()
+        {
+            if (_ptr == IntPtr.Zero) return;
+            var _unmanaged = new Unmanaged();
+            _unmanaged._ptr = _ptr;
+            _unmanaged._len = _len;
+            _unmanaged._capacity = _capacity;
+            InteropHelper.interoptopus_string_destroy(_unmanaged);
+            _ptr = IntPtr.Zero;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Utf8String Clone()
+        {
+            var _new = new Unmanaged();
+            var _this = AsUnmanaged();
+            InteropHelper.interoptopus_string_clone(ref _this, ref _new);
+            return _new.IntoManaged();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Unmanaged IntoUnmanaged()
+        {
+            if (_ptr == IntPtr.Zero) { throw new Exception(); }
+            var _unmanaged = new Unmanaged();
+            _unmanaged._ptr = _ptr;
+            _unmanaged._len = _len;
+            _unmanaged._capacity = _capacity;
+            _ptr = IntPtr.Zero;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._ptr = _ptr;
+            _unmanaged._len = _len;
+            _unmanaged._capacity = _capacity;
+            return _unmanaged;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            public IntPtr _ptr;
+            public ulong _len;
+            public ulong _capacity;
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Utf8String IntoManaged()
+            {
+                var _managed = new Utf8String();
+                _managed._ptr = _ptr;
+                _managed._len = _len;
+                _managed._capacity = _capacity;
+                return _managed;
+            }
+
+        }
+
+        public partial class InteropHelper
+        {
+            [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_create")]
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            
+            public static partial long interoptopus_string_create(IntPtr utf8, ulong len, out Unmanaged rval);
+
+            [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_destroy")]
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            
+            public static partial long interoptopus_string_destroy(Unmanaged utf8);
+
+            [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_clone")]
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            
+            public static partial long interoptopus_string_clone(ref Unmanaged orig, ref Unmanaged cloned);
+        }
+
+        [CustomMarshaller(typeof(Utf8String), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private Utf8String _managed; // Used when converting managed -> unmanaged
+            private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Utf8String managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void FromManaged(Utf8String managed) { _managed = managed; }
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public unsafe Unmanaged ToUnmanaged()
+            {
+                return _managed.IntoUnmanaged();
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public unsafe Utf8String ToManaged()
+            {
+                return _unmanaged.IntoManaged();
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void Free() { }
+        }
+    }
+
+    public static class StringExtensions
+    {
+        public static Utf8String Utf8(this string s) { return Utf8String.From(s); }
+    }
+
+    public class WireInterop {
+        #region Serialization Helpers
+        #nullable enable
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static void SerializeString(BinaryWriter writer, string value)
+        {
+            if (value == null)
+            {
+                writer.Write((ulong)0);
+                return;
+            }
+
+            var bytes = Encoding.UTF8.GetBytes(value);
+            writer.Write((ulong)bytes.Length);
+            writer.Write(bytes);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static string DeserializeString(BinaryReader reader)
+        {
+            var length = reader.ReadUInt64();
+            if (length == 0)
+                return string.Empty;
+
+            var bytes = reader.ReadBytes((int)length);
+            return Encoding.UTF8.GetString(bytes);
+        }
+
+        // TODO replace with precise serializers
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static void SerializeItem<T>(BinaryWriter writer, T item)
+        {
+            if (typeof(T).IsPrimitive)
+            {
+                SerializePrimitive(writer, item);
+            }
+            else if (typeof(T) == typeof(string))
+            {
+                SerializeString(writer, item as string);
+            }
+            else
+            {
+                ((dynamic)item).Serialize(writer);
+            }
+        }
+
+        // TODO replace with precise deserializers
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static T DeserializeItem<T>(BinaryReader reader)
+        {
+            if (typeof(T).IsPrimitive)
+            {
+                return (T)DeserializePrimitive<T>(reader);
+            }
+            else if (typeof(T) == typeof(string))
+            {
+                return (T)(object)DeserializeString(reader);
+            }
+            else
+            {
+                // For other types, try dynamic dispatch
+                return ((dynamic)typeof(T)).Deserialize(reader);
+            }
+        }
+
+        // TODO: pass itemSerializerDelegate
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static void SerializeVec<T>(BinaryWriter writer, IList<T> value)
+        {
+            if (value == null)
+            {
+                writer.Write((ulong)0);
+                return;
+            }
+
+            writer.Write((ulong)value.Count);
+            foreach (var item in value)
+            {
+                SerializeItem(writer, item);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static byte[] DeserializeVecOfByte(BinaryReader reader)
+        {
+            var length = reader.ReadUInt64();
+            return reader.ReadBytes((int)length);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static T[] DeserializeVec<T>(BinaryReader reader, Func<BinaryReader, T> deserializeItem)
+        {
+            var length = reader.ReadUInt64();
+            var result = new T[(int)length];
+
+            for (ulong i = 0; i < length; i++)
+            {
+                result[i] = deserializeItem(reader);
+            }
+
+            return result;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static void SerializeMap<K,V>(BinaryWriter writer, IDictionary<K,V> value)
+        {
+            if (value == null)
+            {
+                writer.Write((ulong)0);
+                return;
+            }
+
+            writer.Write((ulong)value.Count);
+            foreach (var item in value)
+            {
+                WireInterop.SerializeItem(writer, item.Key);
+                WireInterop.SerializeItem(writer, item.Value);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static Dictionary<K,V> DeserializeMap<K,V>(BinaryReader reader, Func<BinaryReader, K> deserializeKey, Func<BinaryReader, V> deserializeValue)
+        {
+            var length = reader.ReadUInt64();
+            var result = new Dictionary<K,V>((int)length);
+
+            for (ulong i = 0; i < length; i++)
+            {
+                var k = deserializeKey(reader);
+                var v = deserializeValue(reader);
+                result.Add(k, v);
+            }
+
+            return result;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static void SerializeOptional<T>(BinaryWriter writer, T? value) where T : struct
+        {
+            if (value.HasValue)
+            {
+                writer.Write((byte)1);
+                SerializeItem<T>(writer, value.Value);
+            }
+            else
+            {
+                writer.Write((byte)0);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static T? DeserializeOptional<T>(BinaryReader reader, Func<BinaryReader, T> deserializeValue) where T : struct
+        {
+            var hasValue = reader.ReadByte() != 0;
+            if (hasValue)
+            {
+                return deserializeValue(reader);
+            }
+            return null;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static T? DeserializeEnum<T>(BinaryReader reader) where T: System.Enum
+        {
+            var discriminant = reader.ReadInt32();
+            if (Enum.IsDefined(typeof(T), discriminant))
+            {
+                return (T)Enum.ToObject(typeof(T), discriminant);
+            }
+            return default(T);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static void SerializePrimitive<T>(BinaryWriter writer, T value)
+        {
+            switch (value)
+            {
+
+                case bool b: writer.Write((byte)(b ? 1 : 0)); break;
+                case sbyte sb: writer.Write(sb); break;
+                case byte b: writer.Write(b); break;
+                case short s: writer.Write(s); break;
+                case ushort us: writer.Write(us); break;
+                case int i: writer.Write(i); break;
+                case uint ui: writer.Write(ui); break;
+                case long l: writer.Write(l); break;
+                case ulong ul: writer.Write(ul); break;
+                case float f: writer.Write(f); break;
+                case double d: writer.Write(d); break;
+                default: throw new NotSupportedException($"Primitive type {typeof(T)} not supported");
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static object DeserializePrimitive<T>(BinaryReader reader)
+        {
+            return typeof(T).Name switch
+            {
+                "Boolean" => reader.ReadByte() != 0,
+                "SByte" => reader.ReadSByte(),
+                "Byte" => reader.ReadByte(),
+                "Int16" => reader.ReadInt16(),
+                "UInt16" => reader.ReadUInt16(),
+                "Int32" => reader.ReadInt32(),
+                "UInt32" => reader.ReadUInt32(),
+                "Int64" => reader.ReadInt64(),
+                "UInt64" => reader.ReadUInt64(),
+                "Single" => reader.ReadSingle(),
+                "Double" => reader.ReadDouble(),
+                _ => throw new NotSupportedException($"Primitive type {typeof(T)} not supported")
+            };
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static int SizeOf<T>()
+        {
+            return typeof(T).Name switch
+            {
+                "Boolean" or "SByte" or "Byte" => 1,
+                "Int16" or "UInt16" => 2,
+                "Int32" or "UInt32" or "Single" => 4,
+                "Int64" or "UInt64" or "Double" => 8,
+                _ => Marshal.SizeOf<T>()
+            };
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static int CalculateMapSize<K,V>(IDictionary<K,V> value)
+        {
+            if (value == null) return 8; // size of length field
+
+            int size = 8; // length field
+            foreach (var item in value)
+            {
+                // Calculate key size
+                if (typeof(K).IsPrimitive)
+                {
+                    size += SizeOf<K>();
+                }
+                else if (typeof(K) == typeof(string))
+                {
+                    var keyStr = item.Key as string;
+                    size += 8 + (keyStr != null ? Encoding.UTF8.GetByteCount(keyStr) : 0);
+                }
+                else
+                {
+                    size += ((dynamic)item.Key).CalculateSize();
+                }
+
+                // Calculate value size
+                if (typeof(V).IsPrimitive)
+                {
+                    size += SizeOf<V>();
+                }
+                else if (typeof(V) == typeof(string))
+                {
+                    var valueStr = item.Value as string;
+                    size += 8 + (valueStr != null ? Encoding.UTF8.GetByteCount(valueStr) : 0);
+                }
+                else
+                {
+                    size += ((dynamic)item.Value).CalculateSize();
+                }
+            }
+            return size;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static int CalculateVecSize<T>(IList<T> value)
+        {
+            if (value == null) return 8; // size of length field
+
+            int size = 8; // length field
+            foreach (var item in value)
+            {
+                if (typeof(T).IsPrimitive)
+                {
+                    size += SizeOf<T>();
+                }
+                else if (typeof(T) == typeof(string))
+                {
+                    var str = item as string;
+                    size += 8 + (str != null ? Encoding.UTF8.GetByteCount(str) : 0);
+                }
+                else
+                {
+                    size += ((dynamic)item).CalculateSize();
+                }
+            }
+            return size;
+        }
+
+        #nullable restore
+        #endregion
+    }
+
+    public static class DeserStringExtensions
+    {
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static void Serialize(this String value, BinaryWriter writer) {
+            WireInterop.SerializeString(writer, value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static String DeserializeString(BinaryReader reader) {
+            return WireInterop.DeserializeString(reader);
+        }
+    }
+
+    public static class WireListExtensions
+    {
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static void Serialize<T>(this List<T> value, BinaryWriter writer) {
+            WireInterop.SerializeVec(writer, value);
+        }
+    }
+
+    public static class WireDictionaryExtensions
+    {
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static void Serialize<K,V>(this Dictionary<K,V> value, BinaryWriter writer) {
+            WireInterop.SerializeMap(writer, value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static void Serialize<K,V>(this IDictionary<K,V> value, BinaryWriter writer) {
+            WireInterop.SerializeMap(writer, value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static int CalculateSize<K,V>(this Dictionary<K,V> value) {
+            return WireInterop.CalculateMapSize(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static int CalculateSize<K,V>(this IDictionary<K,V> value) {
+            return WireInterop.CalculateMapSize(value);
+        }
+    }
+
+    public static class WireArrayExtensions
+    {
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static void Serialize<T>(this T[] value, BinaryWriter writer) {
+            WireInterop.SerializeVec(writer, value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static int CalculateSize<T>(this T[] value) {
+            return WireInterop.CalculateVecSize(value);
+        }
+    }
+}

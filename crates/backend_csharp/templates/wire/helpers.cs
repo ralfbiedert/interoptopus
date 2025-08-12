@@ -136,12 +136,12 @@ public class WireInterop {
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    public static void SerializeOptional<T>(BinaryWriter writer, T? value) where T : struct
+    public static void SerializeOptional<T>(BinaryWriter writer, T? value)
     {
-        if (value.HasValue)
+        if (value != null)
         {
             writer.Write((byte)1);
-            SerializeItem<T>(writer, value.Value);
+            SerializeItem<T>(writer, value); // FIXME: this is too generic, need more specific
         }
         else
         {
@@ -149,16 +149,18 @@ public class WireInterop {
         }
     }
 
+    #nullable enable
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    public static T? DeserializeOptional<T>(BinaryReader reader, Func<BinaryReader, T> deserializeValue) where T : struct
+    public static T? DeserializeOptional<T>(BinaryReader reader, Func<BinaryReader, T> deserializeValue)
     {
         var hasValue = reader.ReadByte() != 0;
         if (hasValue)
         {
             return deserializeValue(reader);
         }
-        return null;
+        return default;
     }
+    #nullable restore
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static T? DeserializeEnum<T>(BinaryReader reader) where T: System.Enum

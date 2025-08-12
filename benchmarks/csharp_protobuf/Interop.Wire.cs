@@ -102,12 +102,12 @@ namespace Gen.Wire
         {
 
 
-            writer.Write((byte)(this.is_ok_response ? 1 : 0));
+            writer.Write(this.is_ok_response);
 
 
             this.host.Serialize(writer); /* string */
 
-            writer.Write((ulong)this.response_size);
+            writer.Write(this.response_size);
 
 
 
@@ -121,9 +121,15 @@ namespace Gen.Wire
         {
 
             int size = 0;
-            size += 1; /* primitive */
-            size += 8 + System.Text.Encoding.UTF8.GetByteCount(this.host ?? ""); /* string */
-            size += 8; /* primitive */
+            size += 
+            1; /* primitive */
+            ;
+            size += 
+            8 + System.Text.Encoding.UTF8.GetByteCount(this.host ?? ""); /* string */
+            ;
+            size += 
+            8; /* primitive */
+            ;
 
             return size;
 
@@ -205,8 +211,12 @@ namespace Gen.Wire
         {
 
             int size = 0;
-            size += WireInterop.CalculateVecSize(this.things); /* vec */
-            size += this.headers.CalculateSize(); /* map */
+            size += 
+            WireInterop.CalculateVecSize(this.things); /* vec */
+            ;
+            size += 
+            this.headers.CalculateSize(); /* map */
+            ;
 
             return size;
 
@@ -286,8 +296,12 @@ namespace Gen.Wire
         {
 
             int size = 0;
-            size += this.items.CalculateSize(); /* composite */
-            size += 1 + (this.errors != null ? Marshal.SizeOf<WError>() : 0); /* optional */
+            size += 
+            this.items.CalculateSize(); /* composite */
+            ;
+            size += 
+            1 + (this.errors != null ? Marshal.SizeOf<WError>() : 0); /* optional */
+            ;
 
             return size;
 
@@ -363,7 +377,9 @@ namespace Gen.Wire
         {
 
             int size = 0;
-            size += WireInterop.CalculateVecSize(this.error_messages); /* vec */
+            size += 
+            WireInterop.CalculateVecSize(this.error_messages); /* vec */
+            ;
 
             return size;
 
@@ -448,9 +464,15 @@ namespace Gen.Wire
         {
 
             int size = 0;
-            size += this.context.CalculateSize(); /* composite */
-            size += this.value.CalculateSize(); /* composite */
-            size += this.configuration.CalculateSize(); /* composite */
+            size += 
+            this.context.CalculateSize(); /* composite */
+            ;
+            size += 
+            this.value.CalculateSize(); /* composite */
+            ;
+            size += 
+            this.configuration.CalculateSize(); /* composite */
+            ;
 
             return size;
 
@@ -667,7 +689,7 @@ namespace Gen.Wire
 
             this.key.Serialize(writer); /* enum */
 
-            writer.Write((ulong)this.value);
+            writer.Write(this.value);
 
 
 
@@ -681,8 +703,12 @@ namespace Gen.Wire
         {
 
             int size = 0;
-            size += 8; /* enum */
-            size += 8; /* primitive */
+            size += 
+            8; /* enum */
+            ;
+            size += 
+            8; /* primitive */
+            ;
 
             return size;
 
@@ -758,7 +784,9 @@ namespace Gen.Wire
         {
 
             int size = 0;
-            size += WireInterop.CalculateVecSize(this.items); /* vec */
+            size += 
+            WireInterop.CalculateVecSize(this.items); /* vec */
+            ;
 
             return size;
 
@@ -838,8 +866,12 @@ namespace Gen.Wire
         {
 
             int size = 0;
-            size += this.response.CalculateSize(); /* composite */
-            size += this.data.CalculateSize(); /* composite */
+            size += 
+            this.response.CalculateSize(); /* composite */
+            ;
+            size += 
+            this.data.CalculateSize(); /* composite */
+            ;
 
             return size;
 
@@ -1060,7 +1092,9 @@ namespace Gen.Wire
         {
 
             int size = 0;
-            size += WireInterop.CalculateVecSize(this.results); /* vec */
+            size += 
+            WireInterop.CalculateVecSize(this.results); /* vec */
+            ;
 
             return size;
 
@@ -1132,7 +1166,7 @@ namespace Gen.Wire
 
             this.item_id.Serialize(writer); /* string */
 
-            writer.Write((int)this.item_value);
+            writer.Write(this.item_value);
 
 
 
@@ -1146,8 +1180,12 @@ namespace Gen.Wire
         {
 
             int size = 0;
-            size += 8 + System.Text.Encoding.UTF8.GetByteCount(this.item_id ?? ""); /* string */
-            size += 4; /* primitive */
+            size += 
+            8 + System.Text.Encoding.UTF8.GetByteCount(this.item_id ?? ""); /* string */
+            ;
+            size += 
+            4; /* primitive */
+            ;
 
             return size;
 
@@ -1227,8 +1265,12 @@ namespace Gen.Wire
         {
 
             int size = 0;
-            size += this.metadata.CalculateSize(); /* composite */
-            size += WireInterop.CalculateVecSize(this.byte_array); /* vec */
+            size += 
+            this.metadata.CalculateSize(); /* composite */
+            ;
+            size += 
+            WireInterop.CalculateVecSize(this.byte_array); /* vec */
+            ;
 
             return size;
 
@@ -1310,11 +1352,11 @@ namespace Gen.Wire
         {
 
 
-            writer.Write((int)this.row_count);
+            writer.Write(this.row_count);
 
 
 
-            writer.Write((int)this.column_count);
+            writer.Write(this.column_count);
 
 
             this.guid.Serialize(writer); /* string */
@@ -1330,10 +1372,18 @@ namespace Gen.Wire
         {
 
             int size = 0;
-            size += 4; /* primitive */
-            size += 4; /* primitive */
-            size += 8 + System.Text.Encoding.UTF8.GetByteCount(this.guid ?? ""); /* string */
-            size += 8 + System.Text.Encoding.UTF8.GetByteCount(this.prefix ?? ""); /* string */
+            size += 
+            4; /* primitive */
+            ;
+            size += 
+            4; /* primitive */
+            ;
+            size += 
+            8 + System.Text.Encoding.UTF8.GetByteCount(this.guid ?? ""); /* string */
+            ;
+            size += 
+            8 + System.Text.Encoding.UTF8.GetByteCount(this.prefix ?? ""); /* string */
+            ;
 
             return size;
 
@@ -1517,12 +1567,12 @@ namespace Gen.Wire
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static void SerializeOptional<T>(BinaryWriter writer, T? value) where T : struct
+        public static void SerializeOptional<T>(BinaryWriter writer, T? value)
         {
-            if (value.HasValue)
+            if (value != null)
             {
                 writer.Write((byte)1);
-                SerializeItem<T>(writer, value.Value);
+                SerializeItem<T>(writer, value); // FIXME: this is too generic, need more specific
             }
             else
             {
@@ -1530,16 +1580,18 @@ namespace Gen.Wire
             }
         }
 
+        #nullable enable
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static T? DeserializeOptional<T>(BinaryReader reader, Func<BinaryReader, T> deserializeValue) where T : struct
+        public static T? DeserializeOptional<T>(BinaryReader reader, Func<BinaryReader, T> deserializeValue)
         {
             var hasValue = reader.ReadByte() != 0;
             if (hasValue)
             {
                 return deserializeValue(reader);
             }
-            return null;
+            return default;
         }
+        #nullable restore
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static T? DeserializeEnum<T>(BinaryReader reader) where T: System.Enum

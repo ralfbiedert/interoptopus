@@ -164,9 +164,10 @@ fn generate_serialization_code(w: &mut IndentWriter, composite: &Composite) -> R
         .map(|field| {
             let field_name = field.name();
             let field_type = field.the_type();
-            let csharp_type = field_to_type(field_type);
+            // let csharp_type = field_to_type(field_type);
+            // ^^  that's uints and ulongs and other such shit?
 
-            FieldDesc { kind: field_type.into(), name: field_name.to_string(), inner_type: csharp_type, ..Default::default() }
+            FieldDesc { kind: field_type.into(), name: field_name.to_string(), inner_type: extract_inner_type(&field_type), ..Default::default() }
         })
         .collect::<Vec<_>>();
 
@@ -235,7 +236,7 @@ fn generate_size_calculation(w: &mut IndentWriter, composite: &Composite) -> Res
         })
         .collect::<Vec<_>>();
 
-    render!(writer, "wire/size_calculation.cs", ("fields", &fields))?;
+    render!(writer, "wire/calculate_size_body.cs", ("fields", &fields))?;
     Ok(String::from_utf8(buf)?)
 }
 
