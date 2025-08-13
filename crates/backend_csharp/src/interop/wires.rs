@@ -145,10 +145,17 @@ impl From<&Type> for Kind {
     }
 }
 
+impl From<&Box<Type>> for Kind {
+    fn from(value: &Box<Type>) -> Self {
+        Self::from(&**value)
+    }
+}
+
 #[derive(serde::Serialize, Default)]
 struct FieldDesc {
     kind: Kind,
     name: String,
+    inner_kind: Kind,
     inner_type: String,
     primitive_size: usize, // calc_size
 }
@@ -166,8 +173,9 @@ fn generate_serialization_code(w: &mut IndentWriter, composite: &Composite) -> R
             let field_type = field.the_type();
             // let csharp_type = field_to_type(field_type);
             // ^^  that's uints and ulongs and other such shit?
+            let (inner_kind, inner_type) = extract_inner_type(&field_type);
 
-            FieldDesc { kind: field_type.into(), name: field_name.to_string(), inner_type: extract_inner_type(&field_type), ..Default::default() }
+            FieldDesc { kind: field_type.into(), name: field_name.to_string(), inner_kind, inner_type, ..Default::default() }
         })
         .collect::<Vec<_>>();
 
@@ -189,19 +197,15 @@ fn generate_deserialization_code(w: &mut IndentWriter, composite: &Composite) ->
             let field_type = field.the_type();
             let csharp_type = field_to_type(field_type);
             let kind: Kind = field_type.into();
+            let (inner_kind, inner_type) = match kind {
+                Kind::Vec => extract_inner_type(&field_type),
+                Kind::Optional => extract_inner_type(&field_type),
+                Kind::Primitive => (Kind::Primitive, csharp_type), // placeholder kind
+                Kind::Map => extract_inner_type(&field_type),
+                _ => (Kind::Primitive, csharp_type), // we do need a placeholder kind...
+            };
 
-            FieldDesc {
-                kind: kind,
-                name: field_name.to_string(),
-                inner_type: match kind {
-                    Kind::Vec => extract_inner_type(&field_type),
-                    Kind::Optional => extract_inner_type(&field_type),
-                    Kind::Primitive => csharp_type,
-                    Kind::Map => extract_inner_type(&field_type),
-                    _ => csharp_type,
-                },
-                ..Default::default()
-            }
+            FieldDesc { kind: kind, name: field_name.to_string(), inner_kind, inner_type, ..Default::default() }
         })
         .collect::<Vec<_>>();
 
@@ -221,11 +225,13 @@ fn generate_size_calculation(w: &mut IndentWriter, composite: &Composite) -> Res
             let field_name = field.name();
             let field_type = field.the_type();
             let csharp_type = field_to_type(field_type);
+            let (inner_kind, inner_type) = extract_inner_type(&field_type);
 
             FieldDesc {
                 kind: field_type.into(),
                 name: field_name.to_string(),
-                inner_type: extract_inner_type(&field_type),
+                inner_kind,
+                inner_type,
                 primitive_size: if matches!(field_type, Type::Primitive(_)) {
                     get_primitive_size(&csharp_type)
                 } else {
@@ -250,16 +256,16 @@ fn get_primitive_size(csharp_type: &str) -> usize {
     }
 }
 
-fn extract_inner_type(a_type: &Type) -> String {
+fn extract_inner_type(a_type: &Type) -> (Kind, String) {
     match a_type {
         Type::Domain(dom) => match dom {
-            DomainType::Vec(t) => field_to_type(t),
-            DomainType::Option(o) => field_to_type(o),
-            DomainType::Map(k, v) => format!("{}, {}", field_to_type(k), field_to_type(v)),
-            DomainType::Composite(_c) => "?ask-me-how-we-got-here?".into(),
-            DomainType::String => "".into(),
-            DomainType::Enum(_e) => "!ask-me-how-we-got-here!".into(),
+            DomainType::Vec(t) => (t.into(), field_to_type(t)),
+            DomainType::Option(o) => (o.into(), field_to_type(o)),
+            DomainType::Map(k, v) => (Kind::Map, format!("{}, {}", field_to_type(k), field_to_type(v))), // must be Kind::MapPair?
+            DomainType::Composite(_c) => (Kind::Composite, "?ask-me-how-we-got-here?".into()),
+            DomainType::String => (Kind::String, "".into()),
+            DomainType::Enum(_e) => (Kind::Enum, "!ask-me-how-we-got-here!".into()),
         },
-        _ => "object".to_string(),
+        _ => (Kind::Primitive, "object".to_string()), // ??? do we need a placeholder kind?
     }
 }

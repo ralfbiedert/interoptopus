@@ -35,13 +35,20 @@ pub enum WireError {
 }
 
 pub trait WireInfo {
+    /// Provide a rust-side name of the type. Backends can convert it to their corresponding types.
     fn name() -> &'static str;
+    /// Is this type layout fixed, or has variable elements. Useful for optimizing collection size calculations.
+    fn is_fixed_size_element() -> bool;
+    /// Provide a Type description, this is used to collect type hierarchy of wire types.
     fn wire_info() -> Type;
 }
 
 impl WireInfo for bool {
     fn name() -> &'static str {
         "bool"
+    }
+    fn is_fixed_size_element() -> bool {
+        true
     }
     fn wire_info() -> Type {
         Type::Primitive(Primitive::Bool)
@@ -52,6 +59,9 @@ impl WireInfo for i8 {
     fn name() -> &'static str {
         "i8"
     }
+    fn is_fixed_size_element() -> bool {
+        true
+    }
     fn wire_info() -> Type {
         Type::Primitive(Primitive::I8)
     }
@@ -59,6 +69,9 @@ impl WireInfo for i8 {
 impl WireInfo for i16 {
     fn name() -> &'static str {
         "i16"
+    }
+    fn is_fixed_size_element() -> bool {
+        true
     }
     fn wire_info() -> Type {
         Type::Primitive(Primitive::I16)
@@ -68,6 +81,9 @@ impl WireInfo for i32 {
     fn name() -> &'static str {
         "i32"
     }
+    fn is_fixed_size_element() -> bool {
+        true
+    }
     fn wire_info() -> Type {
         Type::Primitive(Primitive::I32)
     }
@@ -75,6 +91,9 @@ impl WireInfo for i32 {
 impl WireInfo for i64 {
     fn name() -> &'static str {
         "i64"
+    }
+    fn is_fixed_size_element() -> bool {
+        true
     }
     fn wire_info() -> Type {
         Type::Primitive(Primitive::I64)
@@ -85,6 +104,9 @@ impl WireInfo for u8 {
     fn name() -> &'static str {
         "u8"
     }
+    fn is_fixed_size_element() -> bool {
+        true
+    }
     fn wire_info() -> Type {
         Type::Primitive(Primitive::U8)
     }
@@ -92,6 +114,9 @@ impl WireInfo for u8 {
 impl WireInfo for u16 {
     fn name() -> &'static str {
         "u16"
+    }
+    fn is_fixed_size_element() -> bool {
+        true
     }
     fn wire_info() -> Type {
         Type::Primitive(Primitive::U16)
@@ -101,6 +126,9 @@ impl WireInfo for u32 {
     fn name() -> &'static str {
         "u32"
     }
+    fn is_fixed_size_element() -> bool {
+        true
+    }
     fn wire_info() -> Type {
         Type::Primitive(Primitive::U32)
     }
@@ -108,6 +136,9 @@ impl WireInfo for u32 {
 impl WireInfo for u64 {
     fn name() -> &'static str {
         "u64"
+    }
+    fn is_fixed_size_element() -> bool {
+        true
     }
     fn wire_info() -> Type {
         Type::Primitive(Primitive::U64)
@@ -121,6 +152,9 @@ where
     fn name() -> &'static str {
         "Vec<T>" // @todo
     }
+    fn is_fixed_size_element() -> bool {
+        false
+    }
     fn wire_info() -> Type {
         Type::Domain(DomainType::Vec(Box::new(T::wire_info())))
     }
@@ -132,6 +166,9 @@ where
 {
     fn name() -> &'static str {
         "Option<T>" // @todo
+    }
+    fn is_fixed_size_element() -> bool {
+        false
     }
     fn wire_info() -> Type {
         Type::Domain(DomainType::Option(Box::new(T::wire_info())))
@@ -146,6 +183,9 @@ where
     fn name() -> &'static str {
         "HashMap<T,U>" // @todo
     }
+    fn is_fixed_size_element() -> bool {
+        false
+    }
     fn wire_info() -> Type {
         Type::Domain(DomainType::Map(Box::new(T::wire_info()), Box::new(U::wire_info())))
     }
@@ -154,6 +194,9 @@ where
 impl WireInfo for String {
     fn name() -> &'static str {
         "String"
+    }
+    fn is_fixed_size_element() -> bool {
+        false
     }
     fn wire_info() -> Type {
         Type::Domain(DomainType::String)

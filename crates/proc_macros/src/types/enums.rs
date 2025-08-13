@@ -204,6 +204,9 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
             impl #param_param ::interoptopus::lang::WireInfo for #name_ident #param_struct #param_where {
                 fn name() -> &'static str { #name_str }
 
+                // For enum, ALL variants must have the same size.
+                fn is_fixed_size_element() -> bool { todo!() }
+
                 fn wire_info() -> ::interoptopus::lang::Type {
                     let mut variants = ::std::vec::Vec::new();
                     let docs = ::interoptopus::lang::Docs::from_line(#doc_line);

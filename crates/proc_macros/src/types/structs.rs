@@ -60,6 +60,7 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
     let mut field_names = Vec::new();
     let mut field_idents = Vec::new();
     let mut field_type_info = Vec::new();
+    let mut field_size_info = Vec::new();
     let mut field_types = Vec::new();
     let mut field_wire_de_types = Vec::new();
     let mut field_docs = Vec::new();
@@ -161,6 +162,7 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
             field_type_info.push(quote! { < #token as ::interoptopus::lang::TypeInfo >::type_info()  });
         } else {
             field_type_info.push(quote! { < #token as ::interoptopus::lang::WireInfo >::wire_info()  });
+            field_size_info.push(quote! { < #token as ::interoptopus::lang::WireInfo >::is_fixed_size_element()  });
         }
         field_types.push(quote! { #token });
 
@@ -328,6 +330,13 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
             impl #param_param ::interoptopus::lang::WireInfo for #struct_ident #param_struct #param_where {
                 fn name() -> &'static str {
                     #struct_ident_lit
+                }
+
+                fn is_fixed_size_element() -> bool {
+                    true
+                        #(
+                        && #field_size_info
+                        )*
                 }
 
                 fn wire_info() -> ::interoptopus::lang::Type {
