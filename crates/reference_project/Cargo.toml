@@ -1,15 +1,15 @@
 [package]
 name = "interoptopus_reference_project"
 description = "A reference project for Interoptopus backends to test interop generation."
-authors = ["Ralf Biedert <rb@xr.io>"]
+authors.workspace = true
 version = "0.14.25"
-edition = "2024"
+edition.workspace = true
 rust-version.workspace = true
-license = "MIT"
+license.workspace = true
 keywords = ["ffi"]
 categories = ["api-bindings", "development-tools::ffi"]
 documentation = "https://docs.rs/interoptopus_reference_project/"
-repository = "https://github.com/ralfbiedert/interoptopus"
+repository.workspace = true
 publish = false
 
 [lib]

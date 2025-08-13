@@ -1,14 +1,15 @@
 [package]
 name = "interoptopus_backend_cpython"
 description = "Generates CPython bindings."
+authors.workspace = true
 version = "0.15.0-alpha.8"
-edition = "2024"
+edition.workspace = true
 rust-version.workspace = true
-license = "MIT"
+license.workspace = true
 keywords = ["ffi", "code-generation", "bindings", "python"]
 categories = ["api-bindings", "development-tools::ffi"]
 documentation = "https://docs.rs/interoptopus_backend_cpython/"
-repository = "https://github.com/ralfbiedert/interoptopus"
+repository.workspace = true
 
 [lints]
 workspace = true

@@ -8,6 +8,10 @@ members = [
 resolver = "2"
 
 [workspace.package]
+authors = ["Ralf Biedert <rb@xr.io>"]
+edition = "2024"
+license = "MIT"
+repository = "https://github.com/ralfbiedert/interoptopus"
 rust-version = "1.88"
 
 [workspace.dependencies]
