@@ -4,6 +4,7 @@ description = "Generates C# bindings."
 authors = ["Ralf Biedert <rb@xr.io>"]
 version = "0.15.0-alpha.10"
 edition = "2024"
+rust-version.workspace = true
 license = "MIT"
 keywords = ["ffi", "code-generation", "bindings", "csharp", "dotnet"]
 categories = ["api-bindings", "development-tools::ffi"]

@@ -3,6 +3,7 @@ name = "interoptopus_backend_cpython"
 description = "Generates CPython bindings."
 version = "0.15.0-alpha.8"
 edition = "2024"
+rust-version.workspace = true
 license = "MIT"
 keywords = ["ffi", "code-generation", "bindings", "python"]
 categories = ["api-bindings", "development-tools::ffi"]

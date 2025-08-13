@@ -7,6 +7,9 @@ members = [
 ]
 resolver = "2"
 
+[workspace.package]
+rust-version = "1.88"
+
 [workspace.dependencies]
 anyhow = "1.0.98"
 darling = "0.20.11"
