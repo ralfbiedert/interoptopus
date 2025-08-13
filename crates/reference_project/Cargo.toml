@@ -4,6 +4,7 @@ description = "A reference project for Interoptopus backends to test interop gen
 authors = ["Ralf Biedert <rb@xr.io>"]
 version = "0.14.25"
 edition = "2024"
+rust-version.workspace = true
 license = "MIT"
 keywords = ["ffi"]
 categories = ["api-bindings", "development-tools::ffi"]

@@ -4,6 +4,7 @@ description = "Generates C bindings."
 authors = ["Ralf Biedert <rb@xr.io>"]
 version = "0.15.0-alpha.9"
 edition = "2024"
+rust-version.workspace = true
 keywords = ["ffi", "code-generation", "bindings", "c", "headers"]
 categories = ["api-bindings", "development-tools::ffi"]
 license = "MIT"
