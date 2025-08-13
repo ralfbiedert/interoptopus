@@ -1,15 +1,15 @@
 [package]
 name = "interoptopus"
 description = "The polyglot bindings generator for your library (C#, C, Python, ...). 🐙"
-authors = ["Ralf Biedert <rb@xr.io>"]
+authors.workspace = true
 keywords = ["ffi", "code-generation", "bindings"]
 categories = ["api-bindings", "development-tools::ffi"]
 version = "0.15.0-alpha.9"
-edition = "2024"
+edition.workspace = true
 rust-version.workspace = true
-license = "MIT"
+license.workspace = true
 documentation = "https://docs.rs/interoptopus/"
-repository = "https://github.com/ralfbiedert/interoptopus"
+repository.workspace = true
 
 [lints]
 workspace = true
