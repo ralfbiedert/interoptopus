@@ -2,7 +2,7 @@
 name = "interoptopus_proc"
 description = "Macros to produce Interoptopus item info."
 authors.workspace = true
-version = "0.15.0-alpha.8"
+version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true

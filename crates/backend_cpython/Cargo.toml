@@ -2,7 +2,7 @@
 name = "interoptopus_backend_cpython"
 description = "Generates CPython bindings."
 authors.workspace = true
-version = "0.15.0-alpha.8"
+version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -15,7 +15,7 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
-interoptopus = { path = "../core", version = "0.15.0-alpha.9" }
+interoptopus = { path = "../core", version = "0.15.0-alpha.11" }
 derive_builder = { workspace = true }
 tera.workspace = true
 include_dir.workspace = true

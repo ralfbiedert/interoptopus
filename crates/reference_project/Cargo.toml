@@ -2,7 +2,7 @@
 name = "interoptopus_reference_project"
 description = "A reference project for Interoptopus backends to test interop generation."
 authors.workspace = true
-version = "0.14.25"
+version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -17,5 +17,5 @@ path = "src/lib.rs"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-interoptopus = { path = "../core", version = "0.15.0-alpha.9" }
+interoptopus = { path = "../core", version = "0.15.0-alpha.11" }
 tokio = { version = "1", features = ["full"] }
