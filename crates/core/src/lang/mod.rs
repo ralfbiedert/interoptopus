@@ -18,7 +18,7 @@ pub use function::{Function, Parameter, Signature, SugaredReturnType};
 pub use info::{ConstantInfo, FunctionInfo, TypeInfo};
 pub use meta::{Docs, Meta, Visibility};
 pub use primitive::{Primitive, PrimitiveValue};
-pub use wire::{De, Ser, Unwireable, Wire, WireError, WireInfo, Wireable};
+pub use wire::{Unwireable, Wire, WireError, WireInfo, Wireable};
 
 mod array;
 mod composite;

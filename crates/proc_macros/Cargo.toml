@@ -25,5 +25,5 @@ syn = { workspace = true, features = ["full", "visit-mut"] }
 quote.workspace = true
 darling.workspace = true
 
-[dev-dependencies]
-interoptopus = { path = "../core" }
+# [dev-dependencies]
+# interoptopus = { path = "../core" }

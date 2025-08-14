@@ -292,7 +292,7 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
 
     let wires = if attributes.wired {
         quote! {
-            impl ::interoptopus::lang::Ser for #struct_ident {
+            impl ::interoptopus::lang::wire::Ser for #struct_ident {
                 fn ser(&self, output: &mut impl ::std::io::Write) -> ::std::result::Result<(), ::interoptopus::lang::wire::WireError> {
                     #(
                         self.#field_idents.ser(output)?;
@@ -306,7 +306,7 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
                     )*
                 }
             }
-            impl ::interoptopus::lang::De for #struct_ident {
+            impl ::interoptopus::lang::wire::De for #struct_ident {
                 fn de(input: &mut impl ::std::io::Read) -> ::std::result::Result<Self, ::interoptopus::lang::wire::WireError>
                 where
                     Self: Sized {

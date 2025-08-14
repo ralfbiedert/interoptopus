@@ -504,25 +504,25 @@ impl<'a, T: Ser + De> Wire<'a, T> {
         value.ser(&mut self.buf.writer())
     }
 
-    // TODO: Consume self?
+    // FIXME: Consume self?
     pub fn unwire(&mut self) -> Result<T, WireError> {
         T::de(&mut self.buf.reader())
     }
 
-    /// Get a pointer to the buffer data (FFI-safe)
-    pub fn as_ptr(&self) -> *const u8 {
-        self.buf.data as *const u8
-    }
+    // /// Get a pointer to the buffer data
+    // pub fn as_ptr(&self) -> *const u8 {
+    //     self.buf.data as *const u8
+    // }
 
-    /// Get the length of the buffer (FFI-safe)
-    pub fn len(&self) -> u64 {
-        self.buf.len
-    }
+    // /// Get the length of the buffer
+    // pub fn len(&self) -> u64 {
+    //     self.buf.len
+    // }
 
-    /// Get the capacity of the buffer (FFI-safe)
-    pub fn capacity(&self) -> u64 {
-        self.buf.capacity
-    }
+    // /// Get the capacity of the buffer
+    // pub fn capacity(&self) -> u64 {
+    //     self.buf.capacity
+    // }
 
     /// Check if this Wire owns its buffer data
     pub fn is_owned(&self) -> bool {
@@ -535,26 +535,20 @@ impl<'a, T: Ser + De> Wire<'a, T> {
     }
 }
 
-// impl<'a, T: Ser + De> From<T> for Wire<'a, T> {
-//     fn from(value: T) -> Self {
-//         value.wire() // todo: .wire() should consume self?
-//     }
-// }
-
 impl<T> Wireable for T
 where
     T: Ser + De + 'static,
 {
     fn wire<'my>(&self) -> Wire<'my, Self> {
         let size = self.storage_size();
-        let mut wire = Wire::with_size(size); // TEMP!
-        wire.serialize(self).expect("Failed to serialize");
+        let mut wire = Wire::with_size(size);
+        wire.serialize(self).expect("Failed to serialize"); // TODO: return Result here
         wire
     }
 
     fn wire_with_buffer<'a>(&self, buf: &'a mut [u8]) -> Wire<'a, Self> {
         let mut wire = Wire::new_with_buffer(buf);
-        wire.serialize(self).expect("Failed to serialize");
+        wire.serialize(self).expect("Failed to serialize"); // TODO: return Result here
         wire
     }
 }
@@ -571,7 +565,7 @@ where
         let composite = Composite::with_meta(T::name().to_string(), fields, Meta::with_module_docs(T::wire_info().namespace().unwrap_or_default().to_string(), docs));
 
         // The root Wire<T> types are Wired, this makes backend generate WireOfT handling code.
-        // All nested Composite types are Domain types.
+        // All inner types are Domain types.
         Type::Wired(composite)
     }
 }
@@ -590,21 +584,12 @@ where
 // On CSharp side:
 // - deserialize from WireOfOutput to Output
 // - drop rust buffer
-// - unpin and drop CSharp buffer
+// - unpin and drop CSharp buffer for WireOfInput
 //
 // WireOfInput takes Input and writes it into a pinned buf
 // Wire<Input> takes buf SLICE and deserializes Input from there
 // Wire<Output> takes owned buf and serializes Output to it
 // WireOfOutput takes buf over ffi and deserializes Output from it
-
-// // @todo: make this an extension method?
-// class WireOfInput {
-//     static void serialize(Input input, byte[] buf) {
-//         // have friend access to Input and write it into buf field by field
-//         input.field1.ser(buf);
-//         input.field2.ser(buf);
-//     }
-// }
 
 // // for fn service_name(input: Wire<Input>, input2: Wire<Input>) -> Wire<Output>;
 // fixed (var buf = new byte[input.estimated_size()+input2.estimated_size()]) {
@@ -616,6 +601,7 @@ where
 
 // Wire<Input>::de(buf_slice)->Input
 
+/// A trait that domain types should implement (via ffi wired attribute) to be able to send itself in a Wire.
 pub trait Ser {
     /// Write self into the buffer addressed by `out`
     fn ser(&self, out: &mut impl Write) -> Result<(), WireError>;
@@ -624,6 +610,8 @@ pub trait Ser {
     fn storage_size(&self) -> usize;
 }
 
+/// A trait that domain types should implement (via ffi wired attribute) to be able to receive itself from a Wire.
+/// This is not zerocopy!
 pub trait De {
     /// Read contents of type Self from the reader `input`
     fn de(input: &mut impl Read) -> Result<Self, WireError>
@@ -635,7 +623,7 @@ pub trait De {
 macro_rules! impl_primitive_wire {
     ($($ty:ty),+) => {
         $(
-        impl Ser for $ty {
+        impl $crate::lang::wire::Ser for $ty {
             fn ser(&self, out: &mut impl Write) -> Result<(), WireError> {
                 out.write_all(&self.to_le_bytes()).map_err(WireError::Io)
             }
@@ -645,7 +633,7 @@ macro_rules! impl_primitive_wire {
             }
         }
 
-        impl De for $ty {
+        impl $crate::lang::wire::De for $ty {
             fn de(input: &mut impl Read) -> Result<Self, WireError> {
                 let mut bytes = [0; std::mem::size_of::<$ty>()];
                 input.read_exact(&mut bytes)?;
@@ -774,12 +762,11 @@ impl Ser for String {
 
 // don't need a Read but a Cursor - we need to make sure a sufficient sized slice exist and create string from it directly
 // i.e. ensure_readable(len); String::from_utf8(&buf[..len])
-//read.take(len).read_to_string() ?
 impl De for String {
     fn de(input: &mut impl Read) -> Result<Self, WireError> {
         let len = usize::de(input)?;
         let mut s = String::with_capacity(len);
-        input.take(len as u64).read_to_string(&mut s)?; // ensure read result equals len
+        input.take(len as u64).read_to_string(&mut s)?; // TODO: ensure read result equals len
         Ok(s)
     }
 }
@@ -787,7 +774,7 @@ impl De for String {
 macro_rules! impl_tuple_wire {
     ( $( $name:ident )+ ) => {
         #[allow(non_snake_case)]
-        impl<$($name: Ser),+> Ser for ($($name,)+)
+        impl<$($name: Ser),+> crate::lang::wire::Ser for ($($name,)+)
         {
             fn ser(&self, output: &mut impl Write) -> Result<(), WireError> {
                 let ($($name,)+) = self;
@@ -806,7 +793,7 @@ macro_rules! impl_tuple_wire {
         }
 
         #[allow(non_snake_case)]
-        impl<$($name: De),+> De for ($($name,)+)
+        impl<$($name: De),+> crate::lang::wire::De for ($($name,)+)
         {
             fn de(input: &mut impl Read) -> Result<Self, WireError> {
                 Ok((
@@ -1302,61 +1289,56 @@ mod tests {
     }
 
     #[test]
-    fn wire_through() {
-        // Test that Wire can be used in FFI contexts as ptr+size pairs
-
+    fn wire_ownership() {
         // Create Wire with owned data
         let owned_wire: Wire<String> = Wire::with_size(64);
         assert!(owned_wire.is_owned());
-        assert_eq!(owned_wire.capacity(), 64);
-        assert_eq!(owned_wire.len(), 64);
 
         // Create Wire with borrowed data
         let mut buffer = vec![0; 64];
         let borrowed_wire: Wire<String> = Wire::new_with_buffer(&mut buffer);
         assert!(!borrowed_wire.is_owned());
-        assert_eq!(borrowed_wire.capacity(), 0); // borrowed buffers have 0 capacity
-        assert_eq!(borrowed_wire.len(), 64);
+    }
 
-        // Demonstrate FFI-safe interface - these methods return FFI-safe types
-        let _ptr: *const u8 = borrowed_wire.as_ptr();
-        let _len: u64 = borrowed_wire.len();
-        let _cap: u64 = borrowed_wire.capacity();
-
-        // This function signature demonstrates FFI safety
-        extern "C" fn ffi_function(_wire: Wire<String>) -> Wire<String> {
-            Wire::with_size(64)
+    #[test]
+    fn simple_wire_roundtrip() {
+        extern "C" fn ffi_function(mut wire: Wire<String>) -> Wire<String> {
+            let s = wire.unwire().unwrap();
+            s.wire()
         }
 
         // The function can be called with our Wire types
-        let test_wire = Wire::with_size(64);
-        let _result = ffi_function(test_wire);
+        let test_wire = "hello world".to_string().wire();
+        assert_eq!(ffi_function(test_wire).unwire().unwrap(), "hello world".to_string());
     }
 
-    /*    #[test]
-    fn wire_type_name_generation() {
-        // Test that Wire<T> generates correct type names for C# binding
+    // TODO: move to real project perhaps, this needs deps
+    // #[test]
+    // fn wire_type_name_generation() {
+    //     // Test that Wire<T> generates correct type names for C# binding
 
-        // Create a test struct
-        use crate::{ffi_type, lang::Type};
+    //     // Create a test struct
+    //     use crate::{ffi_type, lang::Type};
 
-        #[ffi_type(wired)]
-        struct TestStruct;
+    //     #[ffi_type(wired)]
+    //     struct TestStruct {
+    //         field: u32,
+    //     }
 
-        // Get type info for Wire<TestStruct>
-        let wire_type_info = <Wire<TestStruct> as WireInfo>::wire_info();
+    //     // Get type info for Wire<TestStruct>
+    //     let wire_type_info = <Wire<TestStruct> as TypeInfo>::type_info();
 
-        // Should be Type::Wired containing TestStruct's composite info
-        match wire_type_info {
-            Type::Wired(composite) => {
-                // The composite name should be "TestStruct", not "WireTestStruct"
-                assert_eq!(composite.rust_name(), "TestStruct");
-            }
-            _ => panic!("Expected Type::Wired for Wire<TestStruct>"),
-        }
+    //     // Should be Type::Wired containing TestStruct's composite info
+    //     match wire_type_info {
+    //         Type::Wired(composite) => {
+    //             // The composite name should be "TestStruct", not "WireTestStruct"
+    //             assert_eq!(composite.rust_name(), "TestStruct");
+    //         }
+    //         _ => panic!("Expected Type::Wired for Wire<TestStruct>"),
+    //     }
 
-        // This ensures C# backend will generate "WireOfTestStruct" not "WireOfWireTestStruct"
-    } */
+    //     // This ensures C# backend will generate "WireOfTestStruct" not "WireOfWireTestStruct"
+    // }
 
     #[test]
     fn wire_buffer_reader_test() {

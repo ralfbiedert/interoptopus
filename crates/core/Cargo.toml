@@ -26,7 +26,7 @@ tera = { workspace = true }
 thiserror = { workspace = true }
 
 [dev-dependencies]
-interoptopus = { path = "." }
+# interoptopus = { path = "." }
 rustc-hash = { version = "2.1", default-features = false }
 
 [package.metadata.docs.rs]
