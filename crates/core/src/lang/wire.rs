@@ -9,15 +9,13 @@
 // ✅ bool - 1u8 or 0u8
 // ✅ arbitrary Structs - all fields in order of declaration
 //
-// Additionally, support serializing into C#-provided buffer.
+// Additionally, support serializing externally provided buffer (hopefully from C#).
 //
 // Generate serialization code on both sides, Rust and backend's language, to transfer
 // type T over the FFI border in a byte array package.
 
-// use crate::ffi;
 use crate::lang::{Composite, Docs, DomainType, Field, Meta, Primitive, Type, TypeInfo};
 use std::marker::PhantomData;
-use std::mem::forget;
 use std::{
     collections::HashMap,
     io::{/*Error, ErrorKind,*/ Read, Write},
@@ -203,12 +201,12 @@ impl WireInfo for String {
     }
 }
 
-/// FFI-safe buffer that can represent both owned and borrowed data
+/// FFI buffer that can represent both owned and borrowed data
 #[repr(C)]
 pub struct WireBuffer<'a> {
     data: *mut u8,
-    len: u64,
-    capacity: u64, // 0 if borrowed, actual capacity if owned
+    len: u64,      // FIXME: reduce this to u32
+    capacity: u64, // 0 if borrowed, actual capacity if owned // FIXME: reduce this to u32
     _phantom: PhantomData<&'a [u8]>,
 }
 
@@ -221,7 +219,9 @@ impl<'a> WireBuffer<'a> {
         let data = vec.as_mut_ptr();
         let len = vec.len() as u64;
         let capacity = vec.capacity() as u64;
-        forget(vec);
+
+        std::mem::forget(vec); // LEAKS the vec here, must use deallocate() to free it
+
         WireBuffer { data, len, capacity, _phantom: PhantomData }
     }
 
@@ -236,20 +236,14 @@ impl<'a> WireBuffer<'a> {
     }
 
     /// Create an empty owned buffer with capacity
-    pub fn with_size(capacity: usize) -> WireBuffer<'static> {
-        // TODO: support pushing into buf up until capacity
-        WireBuffer::from_vec(vec![0u8; capacity])
+    pub fn with_size(size: usize) -> WireBuffer<'static> {
+        WireBuffer::from_vec(vec![0u8; size])
     }
 
     /// Get length of the buffer
     #[allow(clippy::cast_possible_truncation)]
     pub const fn len(&self) -> usize {
         self.len as usize
-    }
-
-    /// Check if buffer is empty
-    pub const fn is_empty(&self) -> bool {
-        self.len == 0
     }
 
     /// Check if this buffer owns its data
@@ -284,6 +278,7 @@ impl<'a> WireBuffer<'a> {
     }
 }
 
+/// Allows serializing types into a wire buffer storage.
 struct WireBufferWriter<'a, 'b> {
     buf: &'a mut WireBuffer<'b>,
     pos: usize,
@@ -297,7 +292,6 @@ impl<'a, 'b> WireBufferWriter<'a, 'b> {
 
 impl<'a, 'b> std::io::Write for WireBufferWriter<'a, 'b> {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-        // println!("jj  bytes to wire buffer at pos {}", buf.len(), self.pos);
         let data = self.buf.as_slice_mut();
         let remaining = data.len().saturating_sub(self.pos);
         let to_copy = std::cmp::min(remaining, buf.len());
@@ -315,6 +309,8 @@ impl<'a, 'b> std::io::Write for WireBufferWriter<'a, 'b> {
     }
 }
 
+/// Allows deserializing types from a wire buffer storage.
+/// This is NOT a zerocopy implementation.
 struct WireBufferReader<'a> {
     buf: &'a WireBuffer<'a>,
     pos: usize,
@@ -343,18 +339,20 @@ impl<'a> std::io::Read for WireBufferReader<'a> {
 
 impl<'a> Drop for WireBuffer<'a> {
     fn drop(&mut self) {
+        // FIXME: if we allocate owned buffer on Rust side and then pass it to C#, Drop should NOT deallocate anything here.
+        // We'll easily see the double-free here when C# calls deallocate_wire_buffer_storage() ;)
         if self.is_owned() && !self.data.is_null() {
-            unsafe {
-                let _ = Vec::from_raw_parts(self.data as *mut u8, self.len(), self.capacity as usize);
-            }
+            unsafe { deallocate_wire_buffer_storage(self.data as *mut u8, self.len(), self.capacity as usize) }
         }
     }
 }
 
-impl<'a> Default for WireBuffer<'a> {
-    fn default() -> Self {
-        WireBuffer { data: std::ptr::null_mut(), len: 0, capacity: 0, _phantom: PhantomData }
-    }
+// TODO: this must be exposed to C# to deallocate memory from C# side (in WireOfT Dispose).
+#[unsafe(no_mangle)]
+pub unsafe fn deallocate_wire_buffer_storage(data: *mut u8, len: usize, capacity: usize) {
+    let _ = unsafe {
+        Vec::from_raw_parts(data, len, capacity);
+    };
 }
 
 unsafe impl TypeInfo for WireBuffer<'_> {
@@ -365,13 +363,14 @@ unsafe impl TypeInfo for WireBuffer<'_> {
             Field::new("capacity".to_string(), Type::Primitive(Primitive::U64)),
         ];
 
-        let docs = Docs::from_lines(vec!["FFI-safe buffer for Wire data transfer".to_string()]);
+        let docs = Docs::from_lines(vec!["FFI buffer for Wire data transfer".to_string()]);
         let composite = Composite::with_meta("WireBuffer".to_string(), fields, Meta::with_docs(docs));
 
         Type::Composite(composite)
     }
 }
 
+/// Create a Wire from a type, either by allocating or by taking an external buffer.
 pub trait Wireable
 where
     Self: Ser + De,
@@ -381,11 +380,13 @@ where
     fn wire_with_buffer<'a>(&self, buf: &'a mut [u8]) -> Wire<'a, Self>;
 }
 
+/// Unwire into the original Base type.
 pub trait Unwireable {
     type Base;
     fn unwire(&mut self) -> Result<Self::Base, WireError>;
 }
 
+/// Blanket implementation to let any Wire<T> to be unwireable back to T.
 impl<'my, T> Unwireable for Wire<'my, T>
 where
     T: Ser + De,
@@ -397,20 +398,9 @@ where
     }
 }
 
-/// A struct that wraps a byte buffer passed through FFI boundary, assuming it
-/// contains serialized representation of a value of type T.
-/// Wire<T> is an FFI-safe data structure that allows serialization across the FFI boundary.
+/// A struct that wraps a byte buffer passed through FFI boundary, allows serialization of a value of type T.
 ///
 /// The backing storage uses a ptr+size representation that can safely cross FFI boundaries.
-/// It supports both owned and borrowed buffer scenarios.
-///
-/// # FFI Safety
-///
-/// Wire<T> is designed to be FFI-safe with `#[repr(C)]` and uses raw pointers internally.
-/// It can be passed directly across FFI boundaries as a struct containing:
-/// - `data: *const u8` - pointer to buffer data
-/// - `len: u64` - length of valid data
-/// - `capacity: u64` - capacity (0 for borrowed buffers)
 ///
 /// # Examples
 ///
@@ -419,13 +409,8 @@ where
 /// use interoptopus::lang::Wire;
 ///
 /// // Pre-allocated owned buffer
-/// let wire: Wire<String> = Wire::with_capacity(1024);
+/// let wire: Wire<String> = Wire::with_size(1024);
 /// assert!(wire.is_owned());
-/// assert_eq!(wire.capacity(), 1024);
-///
-/// // Empty owned buffer (note: may not be owned if Vec has 0 capacity)
-/// let wire: Wire<String> = Wire::new();
-/// assert_eq!(wire.len(), 0);
 /// ```
 ///
 /// ## Creating borrowed Wire (uses external buffer):
@@ -442,21 +427,18 @@ where
 /// ```rust
 /// use interoptopus::lang::Wire;
 ///
-/// // This function is FFI-safe
 /// extern "C" fn process_data(input: Wire<String>) -> Wire<String> {
-///     // Access FFI-safe interface
-///     let ptr = input.as_ptr();
-///     let len = input.len();
+///     let string = input.unwire();
 ///
 ///     // Process and return new Wire
-///     Wire::with_capacity(100)
+///     "reply".wire()
 /// }
 /// ```
 ///
 /// ## Complete C# Integration Example
 ///
 /// When using the C# backend, the following Rust code:
-/// ```text
+/// ```rust,ignore
 /// #[ffi_type(wired)]
 /// pub struct UserData {
 ///     pub name: String,
@@ -468,44 +450,27 @@ where
 /// pub fn process_user(user: Wire<UserData>) -> Wire<UserData> {
 ///     let mut data = user.unwire().unwrap();
 ///     data.age += 1;
+///     data.active = true;
 ///     data.wire()
 /// }
 /// ```
 ///
-/// Generates the following C# code:
-/// ```text
-/// [StructLayout(LayoutKind.Sequential)]
-/// public unsafe struct WireOfUserData
-/// {
-///     public byte* Data;
-///     public ulong Length;
-///     public ulong Capacity;
-///
-///     public static WireOfUserData From(UserData value) { /* ... */ }
-///     public UserData Deserialize() { /* ... */ }
-///     public void Dispose() { /* ... */ }
-/// }
-///
-/// public static class UserDataWireExtensions
-/// {
-///     public static WireOfUserData Wire(this UserData value) { /* ... */ }
-///     public static int WireSize(this UserData value) { /* ... */ }
-/// }
-///
-/// // High-level wrapper that manages buffer allocation
+/// Can be used from C# code:
+/// ```csharp
 /// public static UserData ProcessUser(UserData user)
 /// {
 ///     int bufferSize = user.WireSize();
 ///     Span<byte> buffer = stackalloc byte[bufferSize];
 ///
+///     // Pin the GC memory so it is not moved while calling Rust.
 ///     fixed (byte* bufferPtr = buffer)
 ///     {
 ///         var wireInput = WireOfUserData.From(user, bufferPtr, bufferSize);
-///         var wireResult = ProcessUserNative(wireInput);
+///         var wireResult = process_user(wireInput);
 ///
 ///         try
 ///         {
-///             return wireResult.Deserialize();
+///             return wireResult.Unwire();
 ///         }
 ///         finally
 ///         {
@@ -515,12 +480,6 @@ where
 /// }
 /// ```
 ///
-/// This provides:
-/// - **FFI-safe struct layout** with `#[repr(C)]` and raw pointers
-/// - **Automatic buffer management** with stack allocation for small data
-/// - **Type-safe serialization/deserialization** matching Rust's wire format
-/// - **Memory safety** with proper disposal of owned buffers
-/// - **Zero-copy for borrowed buffers** when data comes from external sources
 #[repr(C)]
 pub struct Wire<'my, T>
 where
@@ -563,11 +522,6 @@ impl<'a, T: Ser + De> Wire<'a, T> {
     /// Get the capacity of the buffer (FFI-safe)
     pub fn capacity(&self) -> u64 {
         self.buf.capacity
-    }
-
-    /// Check if the buffer is empty
-    pub fn is_empty(&self) -> bool {
-        self.buf.is_empty()
     }
 
     /// Check if this Wire owns its buffer data

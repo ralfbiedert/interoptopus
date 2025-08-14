@@ -45,18 +45,17 @@ public unsafe struct WireOf{{type}}
     /// </summary>
     public static WireOf{{type}} From({{type}} value, byte* buffer, int bufferSize)
     {
-        var wire = new WireOf{{type}}
-        {
-            Data = buffer,
-            Length = 0,
-            Capacity = 0 // Indicates borrowed buffer
-        };
-
         var size = value.CalculateSize();
         if (size > bufferSize)
             throw new ArgumentException($"Buffer size {bufferSize} is too small for data size {size} when serializing {{type}}");
 
-        wire.Length = (long)size;
+        var wire = new WireOf{{type}}
+        {
+            Data = buffer,
+            Length = (long)size,
+            Capacity = 0 // Indicates borrowed buffer
+        };
+
         value.Serialize(wire.Writer());
         return wire;
     }
