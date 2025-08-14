@@ -13,6 +13,7 @@ edition = "2024"
 license = "MIT"
 repository = "https://github.com/ralfbiedert/interoptopus"
 rust-version = "1.88"
+version = "0.15.0-alpha.11"
 
 [workspace.dependencies]
 anyhow = "1.0.98"
