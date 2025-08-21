@@ -1,16 +1,20 @@
 use anyhow::Error;
 use interoptopus::inventory::{Bindings, Inventory};
-use interoptopus::{ffi_function, function};
+use interoptopus::{builtins_string, builtins_vec, ffi, ffi_function, function};
 use interoptopus_backend_csharp::{Interop, WriteTypes};
 use tests::backend_csharp::common_namespace_mappings;
 use tests::validate_output;
 
 #[ffi_function]
-fn sample_function() {}
+fn sample_function(_: ffi::Vec<u8>) {}
 
 #[test]
 fn decorates() -> Result<(), Error> {
-    let inventory = Inventory::builder().register(function!(sample_function)).build();
+    let inventory = Inventory::builder()
+        .register(function!(sample_function))
+        .register(builtins_string!())
+        .register(builtins_vec!(u8))
+        .build();
 
     let generated = Interop::builder()
         .inventory(inventory)
