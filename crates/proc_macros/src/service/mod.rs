@@ -38,19 +38,18 @@ pub fn ffi_service(attr: TokenStream, input: &TokenStream) -> TokenStream {
     let mut rval = None;
 
     for impl_item in &item.items {
-        if let ImplItem::Fn(method) = impl_item {
-            if let Visibility::Public(_) = &method.vis {
-                if let Some(descriptor) = generate_service_method(&attributes, &item, method) {
-                    if matches!(descriptor.method_type, MethodType::Constructor) {
-                        let rval_type = match &method.sig.output {
-                            ReturnType::Type(_, b) => b.to_token_stream(),
-                            _ => panic!("Must have return value"),
-                        };
-                        rval = Some(rval_type);
-                    }
-                    function_descriptors.push(descriptor);
-                }
+        if let ImplItem::Fn(method) = impl_item
+            && let Visibility::Public(_) = &method.vis
+            && let Some(descriptor) = generate_service_method(&attributes, &item, method)
+        {
+            if matches!(descriptor.method_type, MethodType::Constructor) {
+                let rval_type = match &method.sig.output {
+                    ReturnType::Type(_, b) => b.to_token_stream(),
+                    _ => panic!("Must have return value"),
+                };
+                rval = Some(rval_type);
             }
+            function_descriptors.push(descriptor);
         }
     }
 
