@@ -18,7 +18,7 @@ workspace = true
 serde = []
 
 [dependencies]
-interoptopus = { path = "../core", version = "0.15.0-alpha.11" }
+interoptopus = { path = "../core", version = "0.15.0-alpha.12" }
 heck = { workspace = true }
 derive_builder = { workspace = true }
 tera.workspace = true
