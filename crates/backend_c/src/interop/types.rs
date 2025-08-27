@@ -36,6 +36,8 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type,
             write_type_definition_composite(i, w, c)?;
             w.newline()?;
         }
+        Type::Wired(_) => todo!(),
+        Type::Domain(_) => todo!(),
         Type::FnPointer(f) => {
             write_type_definition_fn_pointer(i, w, f, known_function_pointers)?;
             w.newline()?;
