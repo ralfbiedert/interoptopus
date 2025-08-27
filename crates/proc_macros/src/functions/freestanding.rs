@@ -52,6 +52,7 @@ pub fn rval_tokens(return_type: &ReturnType) -> TokenStream {
             }
             Type::Array(x) => {
                 let token = x.to_token_stream();
+
                 quote_spanned!(span=> < #token as ::interoptopus::lang::TypeInfo>::type_info())
             }
             _ => {
@@ -63,20 +64,31 @@ pub fn rval_tokens(return_type: &ReturnType) -> TokenStream {
     }
 }
 
-#[allow(clippy::equatable_if_let, clippy::useless_let_if_seq, clippy::too_many_lines)]
-pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream) -> TokenStream {
-    let mut item_fn = syn::parse2::<ItemFn>(input).expect("Must be a function.");
-    let docs = extract_doc_lines(&item_fn.attrs);
+/// Extract domain types from Wire<T> return type
+fn process_return_type_domain_types(return_type: &ReturnType) -> Vec<TokenStream> {
+    let mut domain_types = Vec::new();
 
-    let mut args_name = Vec::new();
-    let mut args_type = Vec::new();
+    if let ReturnType::Type(_arrow, return_type) = return_type
+        && let Type::Path(x) = purge_lifetimes_from_type(return_type.as_ref())
+        && x.path.segments[0].ident == "Wire"
+    {
+        // Extract the inner type string for tracking
+        if let syn::PathArguments::AngleBracketed(args) = &x.path.segments[0].arguments
+            && let Some(syn::GenericArgument::Type(inner_type)) = args.args.first()
+        {
+            domain_types.push(quote! { < #inner_type as ::interoptopus::lang::WireInfo>::wire_info() });
+        }
+    }
+
+    domain_types
+}
+
+/// Process generic parameters and return the necessary token streams
+fn process_generic_parameters(generics: &syn::Generics) -> (Vec<TokenStream>, Vec<syn::Ident>, TokenStream, TokenStream) {
     let mut generic_parameters = Vec::new();
     let mut generic_ident = Vec::new();
 
-    let signature = fn_signature_type(&item_fn.sig);
-    let rval = rval_tokens(&item_fn.sig.output);
-
-    for generic in &item_fn.sig.generics.params {
+    for generic in &generics.params {
         match generic {
             GenericParam::Type(_) => panic!("Generic types not supported in FFI functions."),
             GenericParam::Const(_) => panic!("Generic consts not supported in FFI functions."),
@@ -87,15 +99,32 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
         }
     }
 
-    let function_ident = item_fn.sig.ident.clone();
-    let mut generic_params = quote! {};
-    let mut phantom_fields = quote! {};
+    let generic_params = if generic_parameters.is_empty() {
+        quote! {}
+    } else {
+        quote! { < #(#generic_parameters,)* > }
+    };
 
-    let export_name = if !ffi_attributes.export_as.is_empty() {
+    let phantom_fields = if generic_parameters.is_empty() {
+        quote! {}
+    } else {
+        quote! {
+            #(
+                #generic_ident: ::std::marker::PhantomData<& #generic_parameters ()>,
+            )*
+        }
+    };
+
+    (generic_parameters, generic_ident, generic_params, phantom_fields)
+}
+
+/// Determine the export name based on attributes
+fn determine_export_name(ffi_attributes: &Attributes, function_ident: &syn::Ident, sig: &Signature) -> String {
+    if !ffi_attributes.export_as.is_empty() {
         ffi_attributes.export_as.clone()
     } else if ffi_attributes.export_unique {
-        let signature_tokens = quote::quote! { #item_fn.sig };
-        let original_name = item_fn.sig.ident.to_string();
+        let signature_tokens = quote::quote! { #sig };
+        let original_name = function_ident.to_string();
         let mut hasher = DefaultHasher::new();
 
         signature_tokens.to_string().hash(&mut hasher);
@@ -104,49 +133,71 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
         format!("{original_name}_{hash}")
     } else {
         function_ident.to_string()
+    }
+}
+
+/// Process a single function argument and return name, type token, and domain types
+fn process_single_argument(pat: &syn::PatType) -> (String, TokenStream, Vec<TokenStream>) {
+    let name = match pat.pat.as_ref() {
+        Pat::Ident(ident) => ident.ident.to_string(),
+        Pat::Wild(_) => "_ignored".to_string(),
+        _ => {
+            panic!("Only supports normal identifiers for parameters, e.g., `x: ...`");
+        }
     };
 
-    if !generic_parameters.is_empty() {
-        generic_params = quote! { < #(#generic_parameters,)* > };
-        phantom_fields = quote! {
-            #(
-                #generic_ident: ::std::marker::PhantomData<& #generic_parameters ()>,
-            )*
-        };
-    }
+    let clean_name = name.strip_prefix('_').unwrap_or(&name);
+    let mut domain_types = Vec::new();
 
-    for arg in &item_fn.sig.inputs {
+    let token = match purge_lifetimes_from_type(pat.ty.as_ref()) {
+        Type::Path(x) => {
+            if x.path.segments[0].ident == "Wire" {
+                let wrapped_type = match &x.path.segments[0].arguments {
+                    syn::PathArguments::AngleBracketed(a) => &a.args[0].to_token_stream(),
+                    _ => unimplemented!(),
+                };
+                // For this Wire<X> argument track inner domain type X for type generation
+                domain_types.push(quote! { < #wrapped_type as ::interoptopus::lang::WireInfo>::wire_info() });
+            }
+            x.path.to_token_stream()
+        }
+        Type::Reference(x) => x.to_token_stream(),
+        Type::Group(x) => x.to_token_stream(),
+        Type::Ptr(x) => x.to_token_stream(),
+        Type::Array(x) => x.to_token_stream(),
+        Type::BareFn(x) => x.to_token_stream(),
+        _ => {
+            panic!("Unsupported type at interface boundary found for parameter: {:?}.", pat.ty)
+        }
+    };
+
+    let type_info = quote! { < #token as ::interoptopus::lang::TypeInfo>::type_info() };
+
+    (clean_name.to_string(), type_info, domain_types)
+}
+
+/// Process function arguments and return parameter names, types, and domain types
+fn process_function_arguments(inputs: &syn::punctuated::Punctuated<FnArg, syn::Token![,]>) -> (Vec<String>, Vec<TokenStream>, Vec<TokenStream>) {
+    let mut args_name = Vec::new();
+    let mut args_type = Vec::new();
+    let mut domain_types = Vec::new();
+
+    for arg in inputs {
         if let FnArg::Typed(pat) = arg {
-            let name = match pat.pat.as_ref() {
-                Pat::Ident(ident) => ident.ident.to_string(),
-                Pat::Wild(_) => "_ignored".to_string(),
-                _ => {
-                    panic!("Only supports normal identifiers for parameters, e.g., `x: ...`");
-                }
-            };
-
-            let clean_name = name.strip_prefix('_').unwrap_or(&name);
-            args_name.push(clean_name.to_string());
-
-            let token = match purge_lifetimes_from_type(pat.ty.as_ref()) {
-                Type::Path(x) => x.path.to_token_stream(),
-                Type::Reference(x) => x.to_token_stream(),
-                Type::Group(x) => x.to_token_stream(),
-                Type::Ptr(x) => x.to_token_stream(),
-                Type::Array(x) => x.to_token_stream(),
-                Type::BareFn(x) => x.to_token_stream(),
-                _ => {
-                    panic!("Unsupported type at interface boundary found for parameter: {:?}.", pat.ty)
-                }
-            };
-
-            args_type.push(quote! { < #token as ::interoptopus::lang::TypeInfo>::type_info() });
+            let (name, type_token, arg_domain_types) = process_single_argument(pat);
+            args_name.push(name);
+            args_type.push(type_token);
+            domain_types.extend(arg_domain_types);
         } else {
             panic!("Does not support methods.")
         }
     }
 
-    // Ensure we have the right attributes
+    (args_name, args_type, domain_types)
+}
+
+/// Ensure the function has the proper FFI attributes
+fn ensure_ffi_attributes(item_fn: &mut ItemFn, export_name: &str) {
     if item_fn.sig.abi.is_none() {
         item_fn.sig.abi = Some(syn::parse_quote!(extern "C"));
     }
@@ -156,8 +207,36 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
     }
 
     item_fn.attrs.push(syn::parse_quote!(#[unsafe(export_name = #export_name)]));
+}
 
-    let rval = quote! {
+pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream) -> TokenStream {
+    let namespace = ffi_attributes.namespace.clone().unwrap_or_default();
+    let mut item_fn = syn::parse2::<ItemFn>(input).expect("Must be a function.");
+    let docs = extract_doc_lines(&item_fn.attrs);
+
+    let signature = fn_signature_type(&item_fn.sig);
+    let rval = rval_tokens(&item_fn.sig.output);
+
+    // Process return type for Wire<T> domain types
+    let mut domain_types = process_return_type_domain_types(&item_fn.sig.output);
+
+    // Process generic parameters
+    let (_generic_parameters, _generic_ident, generic_params, phantom_fields) = process_generic_parameters(&item_fn.sig.generics);
+
+    let function_ident = item_fn.sig.ident.clone();
+
+    // Determine export name
+    let export_name = determine_export_name(ffi_attributes, &function_ident, &item_fn.sig);
+
+    // Process function arguments
+    let (args_name, args_type, arg_domain_types) = process_function_arguments(&item_fn.sig.inputs);
+    domain_types.extend(arg_domain_types);
+
+    // Ensure proper FFI attributes
+    ensure_ffi_attributes(&mut item_fn, &export_name);
+
+    // Generate the final token stream
+    quote! {
         #item_fn
 
         #[allow(non_camel_case_types)]
@@ -182,12 +261,16 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
 
                 let sig = ::interoptopus::lang::Signature::new(params, #rval);
                 let docs = ::interoptopus::lang::Docs::from_lines(doc_lines);
-                let meta = ::interoptopus::lang::Meta::with_docs(docs);
+                let meta = ::interoptopus::lang::Meta::with_module_docs(#namespace.to_string(), docs);
 
-                ::interoptopus::lang::Function::new(#export_name.to_string(), sig, meta)
+                let domain_types = vec![
+                    #(#domain_types,)*
+                ];
+
+                ::interoptopus::lang::Function::new(#export_name.to_string(), sig, meta, domain_types)
             }
-        }
-    };
 
-    rval
+            // #wire_info
+        }
+    }
 }

@@ -52,6 +52,9 @@ pub struct Attributes {
 
     #[darling(default)]
     debug: bool,
+
+    #[darling(default)]
+    wired: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialOrd, PartialEq, Eq)]
