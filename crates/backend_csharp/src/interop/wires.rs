@@ -122,6 +122,7 @@ enum Kind {
     String,
     Vec,
     Map,
+    // MapPair(Kind, Kind),
     Optional,
     Enum,
     Composite,
@@ -261,7 +262,7 @@ fn extract_inner_type(a_type: &Type) -> (Kind, String) {
         Type::Domain(dom) => match dom {
             DomainType::Vec(t) => (t.into(), field_to_type(t)),
             DomainType::Option(o) => (o.into(), field_to_type(o)),
-            DomainType::Map(k, v) => (Kind::Map, format!("{}, {}", field_to_type(k), field_to_type(v))), // must be Kind::MapPair?
+            DomainType::Map(k, v) => (Kind::Map /*Pair(k.into(), v.into())*/, format!("{}, {}", field_to_type(k), field_to_type(v))), // must be Kind::MapPair?
             DomainType::Composite(_c) => (Kind::Composite, "?ask-me-how-we-got-here?".into()),
             DomainType::String => (Kind::String, "".into()),
             DomainType::Enum(_e) => (Kind::Enum, "!ask-me-how-we-got-here!".into()),
