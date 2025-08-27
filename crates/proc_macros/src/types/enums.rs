@@ -93,6 +93,14 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
             Fields::Unit => VariantKind::Unit(discriminant),
             Fields::Unnamed(x) => {
                 let field_ty = x.unnamed.next().expect("Must have one unnamed field");
+
+                // let nested_type_names = super::nested_types::extract_wire_type_names(&field_ty.first().unwrap().ty);
+                // for type_name in nested_type_names {
+                //     wire_types.push(quote! {
+                //         ::interoptopus::lang::WireType { name: #type_name.to_string() }
+                //     });
+                // }
+
                 VariantKind::Typed(discriminant, field_ty.to_token_stream())
             }
             Fields::Named(_) => panic!("Named variants are not supported."),
