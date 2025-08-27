@@ -1,7 +1,7 @@
 //! Convenience patterns like [services](crate::pattern::service), [strings](crate::pattern::string), [results](crate::pattern::result::Result) and [options](crate::pattern::option::Option).
 //!
 //! Patterns are optional types and constructs you can use. Most patterns are automatically applied
-//! once you use their corresponding type.  
+//! once you use their corresponding type.
 //!
 //! Backends which support a pattern will then generate _additional_ language-specific helpers
 //! and bindings  for it. In any case, regardless whether a pattern is supported by a backend or not,
