@@ -70,13 +70,9 @@ impl<T> Option<T> {
     /// Panics if the value is `None`.
     #[track_caller]
     pub fn unwrap(self) -> T {
-        if self.is_some() {
-            match self {
-                Self::Some(t) => t,
-                Self::None => unreachable!(),
-            }
-        } else {
-            panic!("Trying to unwrap None value");
+        match self {
+            Self::Some(t) => t,
+            Self::None => panic!("Trying to unwrap None value"),
         }
     }
 
@@ -87,13 +83,9 @@ impl<T> Option<T> {
     /// Panics if the value is `None`.
     #[track_caller]
     pub fn unwrap_as_mut(&mut self) -> &mut T {
-        if self.is_some() {
-            match self {
-                Self::Some(t) => t,
-                Self::None => unreachable!(),
-            }
-        } else {
-            panic!("Trying to unwrap None value");
+        match self {
+            Self::Some(t) => t,
+            Self::None => panic!("Trying to unwrap None value"),
         }
     }
 }
