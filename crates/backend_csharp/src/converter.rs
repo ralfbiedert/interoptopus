@@ -1,7 +1,7 @@
 use crate::interop::FunctionNameFlavor;
 use heck::ToUpperCamelCase;
 use interoptopus::backend::safe_name;
-use interoptopus::lang::{ConstantValue, Field, FnPointer, Function, Parameter, Primitive, PrimitiveValue, SugaredReturnType, Type, VariantKind};
+use interoptopus::lang::{ConstantValue, DomainType, Field, FnPointer, Function, Parameter, Primitive, PrimitiveValue, SugaredReturnType, Type, VariantKind};
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::slice::SliceType;
 use interoptopus::pattern::vec::VecType;
@@ -41,6 +41,15 @@ pub fn field_to_type(x: &Type) -> String {
         Type::Enum(x) => x.rust_name().to_string(),
         Type::Opaque(_) => "IntPtr".to_string(),
         Type::Composite(x) => x.rust_name().to_string(),
+        Type::Wired(x) => x.rust_name().to_string(),
+        Type::Domain(dom) => match dom {
+            DomainType::Composite(x) => x.rust_name().to_string(),
+            DomainType::String => "String".to_string(),
+            DomainType::Enum(x) => x.rust_name().to_string(),
+            DomainType::Option(x) => format!("{}?", field_to_type(x)),
+            DomainType::Vec(x) => format!("{}[]", field_to_type(x)),
+            DomainType::Map(k, v) => format!("Dictionary<{}, {}>", field_to_type(k), field_to_type(v)),
+        },
         Type::ReadPointer(_) => "IntPtr".to_string(),
         Type::ReadWritePointer(_) => "IntPtr".to_string(),
         Type::FnPointer(x) => fnpointer_to_type(x),
@@ -71,6 +80,8 @@ pub fn field_to_type_unmanaged(x: &Type) -> String {
         Type::Enum(x) => format!("{}.Unmanaged", x.rust_name()),
         Type::Opaque(_) => "TODO".to_string(),
         Type::Composite(x) => format!("{}.Unmanaged", x.rust_name()),
+        Type::Wired(x) => format!("WireOf{}", x.rust_name()),
+        Type::Domain(_) => todo!(),
         Type::ReadPointer(_) => "IntPtr".to_string(),
         Type::ReadWritePointer(_) => "IntPtr".to_string(),
         Type::FnPointer(x) => fnpointer_to_type(x),
@@ -118,6 +129,8 @@ pub fn param_to_type(x: &Type) -> String {
         Type::Enum(x) => x.rust_name().to_string(),
         Type::Opaque(_) => "IntPtr".to_string(),
         Type::Composite(x) => x.rust_name().to_string(),
+        Type::Wired(x) => format!("WireOf{}", x.rust_name()),
+        Type::Domain(_) => todo!(),
         Type::ReadPointer(z) => match &**z {
             Type::Opaque(_) => "IntPtr".to_string(),
             Type::Primitive(Primitive::Void) => "IntPtr".to_string(),
@@ -214,6 +227,7 @@ pub fn field_as_unmanaged(x: &Field) -> String {
         Type::ReadWritePointer(_) => x.name().to_string(),
         Type::Pattern(TypePattern::CStrPointer) => "IntPtr.Zero".to_string(),
         Type::Pattern(TypePattern::NamedCallback(_)) => format!("{name}?.ToUnmanaged() ?? default"),
+        Type::Domain(_) => todo!(),
         _ if is_reusable(x.the_type()) => format!("{name}.ToUnmanaged()"),
         _ => format!("{name}.AsUnmanaged()"),
     }
@@ -227,6 +241,8 @@ pub fn rval_to_type_sync(x: &Type) -> String {
         Type::Enum(x) => x.rust_name().to_string(),
         Type::Opaque(_) => "IntPtr".to_string(),
         Type::Composite(x) => x.rust_name().to_string(),
+        Type::Wired(x) => format!("WireOf{}", x.rust_name()),
+        Type::Domain(_) => todo!(),
         Type::ReadPointer(_) => "IntPtr".to_string(),
         Type::ReadWritePointer(_) => "IntPtr".to_string(),
         Type::FnPointer(x) => fnpointer_to_type(x),
@@ -324,6 +340,8 @@ pub fn is_reusable(t: &Type) -> bool {
     match t {
         Type::Array(_) => true,
         Type::Composite(x) => x.fields().iter().all(|x| is_reusable(x.the_type())),
+        Type::Wired(_) => false, // Wired types contain pointers and are not reusable
+        Type::Domain(_) => todo!(),
         Type::Enum(e) => {
             for v in e.variants() {
                 let blittable = match v.kind() {
@@ -364,6 +382,15 @@ pub fn has_dispose(t: &Type) -> bool {
     match t {
         Type::Array(_) => false,
         Type::Composite(x) => x.fields().iter().any(|x| has_dispose(x.the_type())),
+        Type::Wired(_) => true, // Wired types may own native memory and need disposal
+        Type::Domain(dom) => match dom {
+            DomainType::Composite(_) => false, // Domain types are plain C# classes
+            DomainType::String => todo!(),
+            DomainType::Enum(_) => todo!(),
+            DomainType::Option(_) => todo!(),
+            DomainType::Vec(_) => todo!(),
+            DomainType::Map(_, _) => todo!(),
+        },
         Type::Enum(e) => {
             for v in e.variants() {
                 let disposable = match v.kind() {

@@ -1,5 +1,8 @@
 #pragma warning disable 0105
 using System;
+{%- if is_wired %}
+using System.IO;
+{%- endif %}
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections;
