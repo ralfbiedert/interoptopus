@@ -159,7 +159,7 @@ pub enum Symbol {
     Pattern(LibraryPattern),
 }
 
-/// Produces a [`Inventory`] inside your inventory function, **start here**.🔥
+/// Produces an [`Inventory`] inside your inventory function, **start here**.🔥
 ///
 /// # Example
 ///
