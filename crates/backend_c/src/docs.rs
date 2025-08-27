@@ -37,6 +37,8 @@ impl<'a> Markdown<'a> {
             Type::Enum(e) => e.meta(),
             Type::Opaque(o) => o.meta(),
             Type::Composite(c) => c.meta(),
+            Type::Wired(_) => todo!(),
+            Type::Domain(_) => todo!(),
             Type::FnPointer(_) => return Ok(()),
             Type::ReadPointer(_) => return Ok(()),
             Type::ReadWritePointer(_) => return Ok(()),
