@@ -14,9 +14,6 @@ repository.workspace = true
 [lints]
 workspace = true
 
-[features]
-serde = []
-
 [dependencies]
 interoptopus = { path = "../core", version = "0.15.0-alpha.12" }
 heck = { workspace = true }
@@ -24,3 +21,4 @@ derive_builder = { workspace = true }
 tera.workspace = true
 include_dir.workspace = true
 indent.workspace = true
+serde = { workspace = true, features = ["derive"] }

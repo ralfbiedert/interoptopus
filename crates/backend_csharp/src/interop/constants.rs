@@ -7,6 +7,7 @@ use interoptopus::{Error, indented};
 
 pub fn write_constants(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     for constant in i.inventory.constants() {
+        eprintln!("🚧 should_emit constant: {} 🚧", constant.name());
         if i.should_emit_by_meta(constant.meta()) {
             write_constant(i, w, constant)?;
             w.newline()?;
