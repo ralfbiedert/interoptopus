@@ -6,6 +6,7 @@ public partial class WireInterop {
     #region Serialization Helpers
     #nullable enable
 
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public static void SerializeString(BinaryWriter writer, string value)
     {
         if (value == null)
@@ -19,6 +20,7 @@ public partial class WireInterop {
         writer.Write(bytes);
     }
 
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public static string DeserializeString(BinaryReader reader)
     {
         var length = reader.ReadUInt64();
@@ -29,12 +31,14 @@ public partial class WireInterop {
         return Encoding.UTF8.GetString(bytes);
     }
 
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public static void SerializeVecOfByte(BinaryWriter writer, byte[] vec)
     {
         writer.Write((ulong)vec.Length);
         writer.Write(vec);
     }
 
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public static void SerializeVec<T>(BinaryWriter writer, IList<T> value, Action<BinaryWriter, T> serializeItem)
     {
         if (value == null)
@@ -50,12 +54,14 @@ public partial class WireInterop {
         }
     }
 
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public static byte[] DeserializeVecOfByte(BinaryReader reader)
     {
         var length = reader.ReadUInt64();
         return reader.ReadBytes((int)length);
     }
 
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public static T[] DeserializeVec<T>(BinaryReader reader, Func<BinaryReader, T> deserializeItem)
     {
         var length = reader.ReadUInt64();
@@ -69,6 +75,7 @@ public partial class WireInterop {
         return result;
     }
 
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public static void SerializeMap<K,V>(BinaryWriter writer, IDictionary<K,V> value, Action<BinaryWriter, K> serializeKey, Action<BinaryWriter, V> serializeValue)
     {
         if (value == null)
@@ -85,6 +92,7 @@ public partial class WireInterop {
         }
     }
 
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public static Dictionary<K,V> DeserializeMap<K,V>(BinaryReader reader, Func<BinaryReader, K> deserializeKey, Func<BinaryReader, V> deserializeValue)
     {
         var length = reader.ReadUInt64();
@@ -100,6 +108,7 @@ public partial class WireInterop {
         return result;
     }
 
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public static void SerializeOptional<T>(BinaryWriter writer, T? value, Action<BinaryWriter, T> serializeItem)
     {
         if (value != null)
@@ -114,6 +123,7 @@ public partial class WireInterop {
     }
 
     #nullable enable
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public static T? DeserializeOptional<T>(BinaryReader reader, Func<BinaryReader, T> deserializeValue)
     {
         var hasValue = reader.ReadByte() != 0;
@@ -125,6 +135,7 @@ public partial class WireInterop {
     }
     #nullable restore
 
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public static T? DeserializeEnum<T>(BinaryReader reader) where T: System.Enum
     {
         var discriminant = reader.ReadInt32();
@@ -135,6 +146,7 @@ public partial class WireInterop {
         return default(T);
     }
 
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public static int CalculateVariableMapSize<K,V>(IDictionary<K,V> value, Func<K, int> calculateKeySize, Func<V, int> calculateValueSize)
     {
         int size = Marshal.SizeOf<ulong>(); // length field
@@ -162,6 +174,7 @@ public partial class WireInterop {
     }
 
     /// This method is called only for non-primitive inner types which require size calculations.
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public static int CalculateVariableVecSize<T>(IList<T> value, Func<T, int> calculateItemSize)
     {
         int size = Marshal.SizeOf<ulong>(); // length field
@@ -187,14 +200,17 @@ public partial class WireInterop {
 
 public static class SerdeStringExtensions
 {
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public static void Serialize(this String value, BinaryWriter writer) {
         WireInterop.SerializeString(writer, value);
     }
 
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public static String DeserializeString(BinaryReader reader) {
         return WireInterop.DeserializeString(reader);
     }
 
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public static int CalculateSize(String value) {
         return Marshal.SizeOf<ulong>() + System.Text.Encoding.UTF8.GetByteCount(value ?? "");
     }

@@ -34,10 +34,10 @@
         return "{{type}} { {% for field in fields %}{{field.name}} = " + {{field.name}}{% if not loop.last %} + ", {% endif %}{% endfor %} + " }";
     }
 
-    // TODO: add serialize/deserialize here
     /// <summary>
     /// Deserialize the wire data back to a managed {{type}} object
     /// </summary>
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public static {{type}} Deserialize(BinaryReader reader)
     {
 {%- if fields %}
@@ -50,6 +50,7 @@
     /// <summary>
     /// Serialize a {{type}} object into this wire's buffer
     /// </summary>
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public void Serialize(BinaryWriter writer)
     {
 {%- if fields %}
@@ -60,6 +61,7 @@
     /// <summary>
     /// Calculate the size needed to serialize a {{type}} object
     /// </summary>
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public int CalculateSize()
     {
 {% if fields %}
@@ -75,16 +77,19 @@
 /// </summary>
 public static class Serde{{type}}Extensions
 {
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public static void Serialize{{type}}(BinaryWriter writer, {{type}} item)
     {
         item.Serialize(writer); {# This is used as a callback Func #}
     }
 
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public static {{type}} Deserialize{{type}}(BinaryReader reader)
     {
         return {{type}}.Deserialize(reader); {# This is used as a callback Func #}
     }
 
+    {# this makes code slower, do NOT enable [MethodImpl(MethodImplOptions.AggressiveOptimization)] -#}
     public static int CalculateSize({{type}} value)
     {
         return value.CalculateSize(); {# This is used as a callback Func #}
