@@ -118,6 +118,7 @@ enum Kind {
     String,
     Vec,
     Map,
+    // MapPair(Kind, Kind),
     Optional,
     Enum,
     Composite,
@@ -257,7 +258,7 @@ fn extract_inner_type(a_type: &Type) -> (Kind, String) {
         Type::WirePayload(dom) => match dom {
             WirePayload::Vec(t) => (t.into(), field_to_type(t)),
             WirePayload::Option(o) => (o.into(), field_to_type(o)),
-            WirePayload::Map(k, v) => (Kind::Map, format!("{}, {}", field_to_type(k), field_to_type(v))), // must be Kind::MapPair?
+            WirePayload::Map(k, v) => (Kind::Map /*Pair(k.into(), v.into())*/, format!("{}, {}", field_to_type(k), field_to_type(v))), // must be Kind::MapPair?
             WirePayload::Composite(_c) => (Kind::Composite, "?ask-me-how-we-got-here?".into()),
             WirePayload::String => (Kind::String, String::new()),
             WirePayload::Enum(_e) => (Kind::Enum, "!ask-me-how-we-got-here!".into()),
