@@ -8,6 +8,7 @@ use std::collections::HashMap;
 use syn::{Field, ItemEnum, ItemStruct, ItemType, Visibility};
 
 mod enums;
+mod nested_types;
 mod structs;
 
 #[derive(Debug, FromMeta, Clone)]
