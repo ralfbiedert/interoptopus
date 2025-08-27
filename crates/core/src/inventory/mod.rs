@@ -64,7 +64,7 @@ pub fn merge_inventories(inventories: &[Inventory]) -> Inventory {
         functions.extend_from_slice(inventory.functions());
         constants.extend_from_slice(inventory.constants());
         patterns.extend_from_slice(inventory.patterns());
-        types.extend_from_slice(inventory.ctypes());
+        types.extend_from_slice(inventory.c_types());
     }
 
     Inventory::new(functions, constants, patterns, types.as_slice())
