@@ -3,7 +3,7 @@ members = [
     "crates/*",
     "examples/hello_world",
     "examples/real_project_layout/*",
-    "tests"
+    "tests",
 ]
 resolver = "2"
 
@@ -29,6 +29,7 @@ quote = "1.0.40"
 serde = "1.0.219"
 syn = "2.0.104"
 tera = "1"
+thiserror = "2"
 
 [workspace.lints.clippy]
 correctness = { level = "deny", priority = -1 }
@@ -37,10 +38,10 @@ complexity = { level = "deny", priority = -1 }
 perf = { level = "deny", priority = -1 }
 style = { level = "deny", priority = -1 }
 pedantic = { level = "deny", priority = -1 }
-nursery = { level = "deny", priority = -1 } # We might want to disable this if it causes issues.
+nursery = { level = "deny", priority = -1 }     # We might want to disable this if it causes issues.
 
-option_if_let_else = "allow" # trips up on `darling`
-match_same_arms = "allow" # too many
+option_if_let_else = "allow"               # trips up on `darling`
+match_same_arms = "allow"                  # too many
 missing_const_for_fn = "allow"
 missing_errors_doc = "allow"
 missing_panics_doc = "allow"
