@@ -14,7 +14,7 @@ use interoptopus::{Error, indented};
 pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     let mut known_function_pointers = vec![];
 
-    for the_type in &sort_types_by_dependencies(i.inventory.ctypes().to_vec()) {
+    for the_type in &sort_types_by_dependencies(i.inventory.c_types().to_vec()) {
         write_type_definition(i, w, the_type, &mut known_function_pointers)?;
     }
 

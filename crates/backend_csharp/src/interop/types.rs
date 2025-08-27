@@ -18,7 +18,7 @@ use interoptopus::lang::Type;
 use interoptopus::pattern::TypePattern;
 
 pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
-    for the_type in i.inventory.ctypes() {
+    for the_type in i.inventory.c_types() {
         write_type_definition(i, w, the_type)?;
     }
 
