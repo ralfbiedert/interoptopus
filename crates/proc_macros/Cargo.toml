@@ -26,4 +26,4 @@ quote.workspace = true
 darling.workspace = true
 
 [dev-dependencies]
-interoptopus = { path = "../core" }
+interoptopus = { path = "../core" } # only for macros doc-tests

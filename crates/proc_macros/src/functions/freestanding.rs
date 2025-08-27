@@ -65,6 +65,7 @@ pub fn rval_tokens(return_type: &ReturnType) -> TokenStream {
 
 #[allow(clippy::equatable_if_let, clippy::useless_let_if_seq, clippy::too_many_lines)]
 pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream) -> TokenStream {
+    let namespace = ffi_attributes.namespace.clone().unwrap_or_default();
     let mut item_fn = syn::parse2::<ItemFn>(input).expect("Must be a function.");
     let docs = extract_doc_lines(&item_fn.attrs);
 
@@ -72,9 +73,27 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
     let mut args_type = Vec::new();
     let mut generic_parameters = Vec::new();
     let mut generic_ident = Vec::new();
+    let mut domain_types = Vec::new();
 
     let signature = fn_signature_type(&item_fn.sig);
     let rval = rval_tokens(&item_fn.sig.output);
+
+    // Handle return type - track Wire<T> types but don't modify signature
+    if let ReturnType::Type(_arrow, return_type) = &item_fn.sig.output {
+        match purge_lifetimes_from_type(return_type.as_ref()) {
+            Type::Path(x) => {
+                if x.path.segments[0].ident == "Wire" {
+                    // Extract the inner type string for tracking
+                    if let syn::PathArguments::AngleBracketed(args) = &x.path.segments[0].arguments {
+                        if let Some(syn::GenericArgument::Type(inner_type)) = args.args.first() {
+                            domain_types.push(quote! { < #inner_type as ::interoptopus::lang::WireInfo>::wire_info() });
+                        }
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
 
     for generic in &item_fn.sig.generics.params {
         match generic {
@@ -129,7 +148,17 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
             args_name.push(clean_name.to_string());
 
             let token = match purge_lifetimes_from_type(pat.ty.as_ref()) {
-                Type::Path(x) => x.path.to_token_stream(),
+                Type::Path(x) => {
+                    if x.path.segments[0].ident == "Wire" {
+                        let wrapped_type = match &x.path.segments[0].arguments {
+                            syn::PathArguments::AngleBracketed(a) => &a.args[0].to_token_stream(),
+                            _ => unimplemented!(),
+                        };
+                        // For this Wire<X> argument track inner domain type X for type generation
+                        domain_types.push(quote! { < #wrapped_type as ::interoptopus::lang::WireInfo>::wire_info() });
+                    }
+                    x.path.to_token_stream()
+                }
                 Type::Reference(x) => x.to_token_stream(),
                 Type::Group(x) => x.to_token_stream(),
                 Type::Ptr(x) => x.to_token_stream(),
@@ -182,10 +211,16 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
 
                 let sig = ::interoptopus::lang::Signature::new(params, #rval);
                 let docs = ::interoptopus::lang::Docs::from_lines(doc_lines);
-                let meta = ::interoptopus::lang::Meta::with_docs(docs);
+                let meta = ::interoptopus::lang::Meta::with_module_docs(#namespace.to_string(), docs);
 
-                ::interoptopus::lang::Function::new(#export_name.to_string(), sig, meta)
+                let domain_types = vec![
+                    #(#domain_types,)*
+                ];
+
+                ::interoptopus::lang::Function::new(#export_name.to_string(), sig, meta, domain_types)
             }
+
+            // #wire_info
         }
     };
 

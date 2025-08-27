@@ -32,6 +32,7 @@ use proc_macro::TokenStream;
 /// | `error`             | `enum`          | The enum will follow the `FFIError` result pattern. |
 /// | `u8`, ..., `u64`    | `enum`          | Creates an opaque type without fields. Can only be used behind a pointer. |
 /// | `visibility(x="v")` | `struct`        | Override visibility for field `x` as `public` or `private`; `_all` means all fields. <sup>2</sup> |
+/// | `wired`             | `struct`,`enum` | Generate Wire<T> wrappers for serializing non-FFI types easily. |
 /// | `debug`             | *               | Print generated helper code in console. |
 ///
 /// <sup>1</sup> While a type's name must be unique (even across modules) backends are free to further transform this name, e.g., by converting

@@ -21,6 +21,7 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
     let name = item.ident.to_string();
     let ffi_name = attributes.name.clone().unwrap_or_else(|| name.clone());
     let name_ident = syn::Ident::new(&name, span);
+    let name_str = syn::LitStr::new(&name, span);
     let namespace = attributes.namespace.clone().unwrap_or_default();
     let mut variants = Vec::new();
 
@@ -60,8 +61,14 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
         has_generics = true;
     }
 
+    // Wired Ser/De match arms
+    let mut ser_arms = Vec::new();
+    let mut de_arms = Vec::new();
+    let mut storage_arms = Vec::new();
+
     for variant in &item.variants {
         let ident = variant.ident.to_string();
+        let ident_tok = &variant.ident;
         let variant_doc_line = extract_doc_lines(&variant.attrs).join("\n");
 
         let discriminant = if let Some((_, e)) = &variant.discriminant {
@@ -100,16 +107,61 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
                     variants.push(variant);
                 });
                 variants.push(tokens);
+
+                if attributes.wired {
+                    ser_arms.push(quote! {
+                        #name_ident::#ident_tok => {
+                            #x.ser(output)?;
+                        }
+                    });
+
+                    de_arms.push(quote! {
+                        #x => Ok(#name_ident::#ident_tok),
+                    });
+
+                    storage_arms.push(quote! {
+                        #name_ident::#ident_tok => 0usize.storage_size(), // size of discriminant
+                    });
+                }
             }
             VariantKind::Typed(x, ts) => {
-                let tokens = quote_spanned!(variant.ident.span() => {
-                    let docs = ::interoptopus::lang::Docs::from_line(#variant_doc_line);
-                    let ty = ::std::boxed::Box::new(<#ts as ::interoptopus::lang::TypeInfo>::type_info());
-                    let kind = ::interoptopus::lang::VariantKind::Typed(#x, ty);
-                    let variant = ::interoptopus::lang::Variant::new(#ident.to_string(), kind, docs);
-                    variants.push(variant);
-                });
-                variants.push(tokens);
+                if !attributes.wired {
+                    let tokens = quote_spanned!(variant.ident.span() => {
+                        let docs = ::interoptopus::lang::Docs::from_line(#variant_doc_line);
+                        let ty = ::std::boxed::Box::new(<#ts as ::interoptopus::lang::TypeInfo>::type_info());
+                        let kind = ::interoptopus::lang::VariantKind::Typed(#x, ty);
+                        let variant = ::interoptopus::lang::Variant::new(#ident.to_string(), kind, docs);
+                        variants.push(variant);
+                    });
+                    variants.push(tokens);
+                } else {
+                    let tokens = quote_spanned!(variant.ident.span() => {
+                        let docs = ::interoptopus::lang::Docs::from_line(#variant_doc_line);
+                        let ty = ::std::boxed::Box::new(<#ts as ::interoptopus::lang::WireInfo>::wire_info());
+                        let kind = ::interoptopus::lang::VariantKind::Typed(#x, ty);
+                        let variant = ::interoptopus::lang::Variant::new(#ident.to_string(), kind, docs);
+                        variants.push(variant);
+                    });
+                    variants.push(tokens);
+
+                    ser_arms.push(quote! {
+                        #name_ident::#ident_tok(data) => {
+                            #x.ser(output)?;
+                            data.ser(output)?;
+                        }
+                    });
+
+                    de_arms.push(quote! {
+                        #x => {
+                            let data = ::interoptopus::lang::wire::De::de(input)?;
+                            Ok(#name_ident::#ident_tok(data))
+                        }
+                    });
+
+                    storage_arms.push(quote! {
+                        #name_ident::#ident_tok(data) => 4 + data.storage_size(),
+                    });
+                }
             }
         }
     }
@@ -139,23 +191,88 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
         param_where = quote! { where #(#generic_where_tokens),*  };
     }
 
+    let type_info = if attributes.wired {
+        quote! {
+            impl #param_param ::interoptopus::lang::WireInfo for #name_ident #param_struct #param_where {
+                fn name() -> &'static str { #name_str }
+
+                // For enum, ALL variants must have the same size.
+                fn is_fixed_size_element() -> bool { todo!() }
+
+                fn wire_info() -> ::interoptopus::lang::Type {
+                    let mut variants = ::std::vec::Vec::new();
+                    let docs = ::interoptopus::lang::Docs::from_line(#doc_line);
+                    let mut meta = ::interoptopus::lang::Meta::with_module_docs(#namespace.to_string(), docs);
+
+                    #({
+                        #variants
+                    })*
+
+                    let repr = ::interoptopus::lang::Representation::new(#layout, None);
+                    let rval = ::interoptopus::lang::Enum::new(#ffi_name.to_string(), variants, meta, repr);
+                    ::interoptopus::lang::Type::Domain(::interoptopus::lang::DomainType::Enum(rval))
+                }
+            }
+        }
+    } else {
+        quote! {
+            unsafe impl #param_param  ::interoptopus::lang::TypeInfo for #name_ident #param_struct #param_where {
+                fn type_info() -> ::interoptopus::lang::Type {
+                    let mut variants = ::std::vec::Vec::new();
+                    let docs = ::interoptopus::lang::Docs::from_line(#doc_line);
+                    let mut meta = ::interoptopus::lang::Meta::with_module_docs(#namespace.to_string(), docs);
+
+                    #({
+                        #variants
+                    })*
+
+                    let repr = ::interoptopus::lang::Representation::new(#layout, None);
+                    let rval = ::interoptopus::lang::Enum::new(#ffi_name.to_string(), variants, meta, repr);
+                    ::interoptopus::lang::Type::Enum(rval)
+                }
+            }
+        }
+    };
+
+    let wires = if attributes.wired {
+        quote! {
+            impl #param_param ::interoptopus::lang::wire::Ser for #name_ident #param_struct #param_where {
+                fn ser(&self, output: &mut impl ::std::io::Write) -> ::std::result::Result<(), ::interoptopus::lang::wire::WireError> {
+                    match self {
+                        #(#ser_arms)*
+                    }
+                    Ok(())
+                }
+
+                fn storage_size(&self) -> usize {
+                    match self {
+                        #(#storage_arms)*
+                    }
+                }
+            }
+
+            impl #param_param ::interoptopus::lang::wire::De for #name_ident #param_struct #param_where {
+                fn de(input: &mut impl ::std::io::Read) -> ::std::result::Result<Self, ::interoptopus::lang::wire::WireError>
+                where
+                    Self: Sized
+                {
+                    let discriminant: usize = ::interoptopus::lang::wire::De::de(input)?;
+                    match discriminant {
+                        #(#de_arms)*
+                        _ => Err(::interoptopus::lang::wire::WireError::InvalidDiscriminant(#name.to_string(), discriminant)),
+                    }
+                }
+            }
+        }
+    } else {
+        quote! {}
+    };
+
     quote! {
         #item
 
-        unsafe impl #param_param  ::interoptopus::lang::TypeInfo for #name_ident #param_struct #param_where {
-            fn type_info() -> ::interoptopus::lang::Type {
-                let mut variants = ::std::vec::Vec::new();
-                let docs = ::interoptopus::lang::Docs::from_line(#doc_line);
-                let mut meta = ::interoptopus::lang::Meta::with_module_docs(#namespace.to_string(), docs);
+        #type_info
 
-                #({
-                    #variants
-                })*
-
-                let repr = ::interoptopus::lang::Representation::new(#layout, None);
-                let rval = ::interoptopus::lang::Enum::new(#ffi_name.to_string(), variants, meta, repr);
-                ::interoptopus::lang::Type::Enum(rval)
-            }
-        }
+        #wires
     }
 }
