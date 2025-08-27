@@ -853,21 +853,21 @@ int64_t interoptopus_string_destroy(UTF8STRING UTF8);
 
 int64_t interoptopus_string_clone(const UTF8STRING* UTF8, UTF8STRING* RVAL);
 
-int64_t interoptopus_vec_create_18289942533122229086(const void* DATA, uint64_t LEN, VECU8* RVAL);
+int64_t interoptopus_vec_create_6849152863081469284(const void* DATA, uint64_t LEN, VECU8* RVAL);
 
-int64_t interoptopus_vec_destroy_17895994407320212994(VECU8 IGNORED);
+int64_t interoptopus_vec_destroy_9353420175730321243(VECU8 IGNORED);
 
-int64_t interoptopus_vec_create_1491625606766217421(const void* DATA, uint64_t LEN, VECUTF8STRING* RVAL);
+int64_t interoptopus_vec_create_17163327104750939811(const void* DATA, uint64_t LEN, VECUTF8STRING* RVAL);
 
-int64_t interoptopus_vec_destroy_2831836161306219799(VECUTF8STRING IGNORED);
+int64_t interoptopus_vec_destroy_13145557392013674812(VECUTF8STRING IGNORED);
 
-int64_t interoptopus_vec_create_8489828321293410959(const void* DATA, uint64_t LEN, VECVEC3F32* RVAL);
+int64_t interoptopus_vec_create_1781563852271199874(const void* DATA, uint64_t LEN, VECVEC3F32* RVAL);
 
-int64_t interoptopus_vec_destroy_18428593021019987507(VECVEC3F32 IGNORED);
+int64_t interoptopus_vec_destroy_12107015372467426116(VECVEC3F32 IGNORED);
 
-int64_t interoptopus_vec_create_1331377703668599412(const void* DATA, uint64_t LEN, VECENUMPAYLOAD* RVAL);
+int64_t interoptopus_vec_create_12058709700293828778(const void* DATA, uint64_t LEN, VECENUMPAYLOAD* RVAL);
 
-int64_t interoptopus_vec_destroy_1871427125692259427(VECENUMPAYLOAD IGNORED);
+int64_t interoptopus_vec_destroy_4854562680055612543(VECENUMPAYLOAD IGNORED);
 
 PACKED2 alignment_1(PACKED1 A);
 

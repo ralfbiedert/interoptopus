@@ -35,14 +35,14 @@ def init_lib(path):
     c_lib.interoptopus_string_clone.argtypes = [ctypes.POINTER(Utf8String), ctypes.POINTER(Utf8String)]
     c_lib.interoptopus_string_create.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(Utf8String)]
     c_lib.interoptopus_string_destroy.argtypes = [Utf8String]
-    c_lib.interoptopus_vec_create_1331377703668599412.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(VecEnumPayload)]
-    c_lib.interoptopus_vec_create_1491625606766217421.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(VecUtf8String)]
-    c_lib.interoptopus_vec_create_18289942533122229086.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(VecU8)]
-    c_lib.interoptopus_vec_create_8489828321293410959.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(VecVec3f32)]
-    c_lib.interoptopus_vec_destroy_17895994407320212994.argtypes = [VecU8]
-    c_lib.interoptopus_vec_destroy_18428593021019987507.argtypes = [VecVec3f32]
-    c_lib.interoptopus_vec_destroy_1871427125692259427.argtypes = [VecEnumPayload]
-    c_lib.interoptopus_vec_destroy_2831836161306219799.argtypes = [VecUtf8String]
+    c_lib.interoptopus_vec_create_12058709700293828778.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(VecEnumPayload)]
+    c_lib.interoptopus_vec_create_17163327104750939811.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(VecUtf8String)]
+    c_lib.interoptopus_vec_create_1781563852271199874.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(VecVec3f32)]
+    c_lib.interoptopus_vec_create_6849152863081469284.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(VecU8)]
+    c_lib.interoptopus_vec_destroy_12107015372467426116.argtypes = [VecVec3f32]
+    c_lib.interoptopus_vec_destroy_13145557392013674812.argtypes = [VecUtf8String]
+    c_lib.interoptopus_vec_destroy_4854562680055612543.argtypes = [VecEnumPayload]
+    c_lib.interoptopus_vec_destroy_9353420175730321243.argtypes = [VecU8]
     c_lib.meta_ambiguous_1.argtypes = [Vec1]
     c_lib.meta_ambiguous_2.argtypes = [Vec2]
     c_lib.meta_ambiguous_3.argtypes = [Vec1, Vec2]
@@ -237,14 +237,14 @@ def init_lib(path):
     c_lib.interoptopus_string_clone.restype = ctypes.c_int64
     c_lib.interoptopus_string_create.restype = ctypes.c_int64
     c_lib.interoptopus_string_destroy.restype = ctypes.c_int64
-    c_lib.interoptopus_vec_create_1331377703668599412.restype = ctypes.c_int64
-    c_lib.interoptopus_vec_create_1491625606766217421.restype = ctypes.c_int64
-    c_lib.interoptopus_vec_create_18289942533122229086.restype = ctypes.c_int64
-    c_lib.interoptopus_vec_create_8489828321293410959.restype = ctypes.c_int64
-    c_lib.interoptopus_vec_destroy_17895994407320212994.restype = ctypes.c_int64
-    c_lib.interoptopus_vec_destroy_18428593021019987507.restype = ctypes.c_int64
-    c_lib.interoptopus_vec_destroy_1871427125692259427.restype = ctypes.c_int64
-    c_lib.interoptopus_vec_destroy_2831836161306219799.restype = ctypes.c_int64
+    c_lib.interoptopus_vec_create_12058709700293828778.restype = ctypes.c_int64
+    c_lib.interoptopus_vec_create_17163327104750939811.restype = ctypes.c_int64
+    c_lib.interoptopus_vec_create_1781563852271199874.restype = ctypes.c_int64
+    c_lib.interoptopus_vec_create_6849152863081469284.restype = ctypes.c_int64
+    c_lib.interoptopus_vec_destroy_12107015372467426116.restype = ctypes.c_int64
+    c_lib.interoptopus_vec_destroy_13145557392013674812.restype = ctypes.c_int64
+    c_lib.interoptopus_vec_destroy_4854562680055612543.restype = ctypes.c_int64
+    c_lib.interoptopus_vec_destroy_9353420175730321243.restype = ctypes.c_int64
     c_lib.meta_ambiguous_1.restype = Vec1
     c_lib.meta_ambiguous_2.restype = Vec2
     c_lib.meta_ambiguous_3.restype = ctypes.c_bool
@@ -424,29 +424,29 @@ def interoptopus_string_destroy(utf8) -> int:
 def interoptopus_string_clone(utf8: ctypes.POINTER(Utf8String), rval: ctypes.POINTER(Utf8String)) -> int:
     return c_lib.interoptopus_string_clone(utf8, rval)
 
-def interoptopus_vec_create_18289942533122229086(data: ctypes.c_void_p, len: int, rval: ctypes.POINTER(VecU8)) -> int:
-    return c_lib.interoptopus_vec_create_18289942533122229086(data, len, rval)
+def interoptopus_vec_create_6849152863081469284(data: ctypes.c_void_p, len: int, rval: ctypes.POINTER(VecU8)) -> int:
+    return c_lib.interoptopus_vec_create_6849152863081469284(data, len, rval)
 
-def interoptopus_vec_destroy_17895994407320212994(ignored) -> int:
-    return c_lib.interoptopus_vec_destroy_17895994407320212994(ignored)
+def interoptopus_vec_destroy_9353420175730321243(ignored) -> int:
+    return c_lib.interoptopus_vec_destroy_9353420175730321243(ignored)
 
-def interoptopus_vec_create_1491625606766217421(data: ctypes.c_void_p, len: int, rval: ctypes.POINTER(VecUtf8String)) -> int:
-    return c_lib.interoptopus_vec_create_1491625606766217421(data, len, rval)
+def interoptopus_vec_create_17163327104750939811(data: ctypes.c_void_p, len: int, rval: ctypes.POINTER(VecUtf8String)) -> int:
+    return c_lib.interoptopus_vec_create_17163327104750939811(data, len, rval)
 
-def interoptopus_vec_destroy_2831836161306219799(ignored) -> int:
-    return c_lib.interoptopus_vec_destroy_2831836161306219799(ignored)
+def interoptopus_vec_destroy_13145557392013674812(ignored) -> int:
+    return c_lib.interoptopus_vec_destroy_13145557392013674812(ignored)
 
-def interoptopus_vec_create_8489828321293410959(data: ctypes.c_void_p, len: int, rval: ctypes.POINTER(VecVec3f32)) -> int:
-    return c_lib.interoptopus_vec_create_8489828321293410959(data, len, rval)
+def interoptopus_vec_create_1781563852271199874(data: ctypes.c_void_p, len: int, rval: ctypes.POINTER(VecVec3f32)) -> int:
+    return c_lib.interoptopus_vec_create_1781563852271199874(data, len, rval)
 
-def interoptopus_vec_destroy_18428593021019987507(ignored) -> int:
-    return c_lib.interoptopus_vec_destroy_18428593021019987507(ignored)
+def interoptopus_vec_destroy_12107015372467426116(ignored) -> int:
+    return c_lib.interoptopus_vec_destroy_12107015372467426116(ignored)
 
-def interoptopus_vec_create_1331377703668599412(data: ctypes.c_void_p, len: int, rval: ctypes.POINTER(VecEnumPayload)) -> int:
-    return c_lib.interoptopus_vec_create_1331377703668599412(data, len, rval)
+def interoptopus_vec_create_12058709700293828778(data: ctypes.c_void_p, len: int, rval: ctypes.POINTER(VecEnumPayload)) -> int:
+    return c_lib.interoptopus_vec_create_12058709700293828778(data, len, rval)
 
-def interoptopus_vec_destroy_1871427125692259427(ignored) -> int:
-    return c_lib.interoptopus_vec_destroy_1871427125692259427(ignored)
+def interoptopus_vec_destroy_4854562680055612543(ignored) -> int:
+    return c_lib.interoptopus_vec_destroy_4854562680055612543(ignored)
 
 def alignment_1(a: Packed1) -> Packed2:
     return c_lib.alignment_1(a)
