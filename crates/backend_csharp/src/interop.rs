@@ -7,6 +7,7 @@ pub mod imports;
 pub mod namespace;
 pub mod patterns;
 pub mod types;
+pub mod wires;
 
 use crate::converter::param_to_type;
 use crate::interop::builtins::write_builtins;
@@ -20,16 +21,58 @@ use crate::interop::patterns::abi_guard::write_abi_guard;
 use crate::interop::patterns::asynk::write_pattern_async_trampoline_initializers;
 use crate::interop::patterns::write_patterns;
 use crate::interop::types::write_type_definitions;
+use crate::interop::wires::write_wire_helpers;
 use derive_builder::Builder;
 use interoptopus::backend::IndentWriter;
 use interoptopus::backend::{NamespaceMappings, is_global_type};
 use interoptopus::inventory::{Bindings, Inventory};
-use interoptopus::lang::{Constant, Function, Meta, Signature, Type};
+use interoptopus::lang::{Constant, DomainType, Function, Meta, Primitive, Signature, Type};
 use interoptopus::pattern::TypePattern;
 use interoptopus::{Error, indented};
 use std::marker::PhantomData;
 
-/// How to convert from Rust function names to C#
+pub trait FfiTransType {
+    /// A C# name for the ffi'd Rust type (backend's name for a `rust_type()`)
+    fn trans_type_name(&self) -> &str;
+}
+
+impl FfiTransType for Primitive {
+    fn trans_type_name(&self) -> &str {
+        match self {
+            Self::Void => "Void",
+            Self::Bool => "Bool",
+            Self::I8 => "sbyte",
+            Self::I16 => "short",
+            Self::I32 => "int",
+            Self::I64 => "long",
+            Self::U8 => "U8",
+            Self::U16 => "U16",
+            Self::U32 => "U32",
+            Self::U64 => "U64",
+            Self::F32 => "F32",
+            Self::F64 => "F64",
+            Self::Usize => "Usize",
+            Self::Isize => "Isize",
+        }
+    }
+}
+
+// impl FfiTransType for WireType {
+//     fn trans_type_name(&self) -> &str {
+//         match self {
+//             Self::Primitive(t) => t.trans_type_name(), // we don't really want to have WireOfU8 as a separate class!
+//             Self::Composite(_) => "composite",         // but we do want to custom-serialize composite types
+//         }
+//     }
+// }
+
+impl FfiTransType for interoptopus::lang::Composite {
+    fn trans_type_name(&self) -> &str {
+        self.rust_name() // @todo: trans_type_name()!
+    }
+}
+
+/// How to convert function names from Rust to C#
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum FunctionNameFlavor<'a> {
     /// Takes the name as it is written in Rust
@@ -54,11 +97,7 @@ pub enum WriteTypes {
 impl WriteTypes {
     #[must_use]
     pub const fn write_interoptopus_globals(self) -> bool {
-        match self {
-            Self::Namespace => false,
-            Self::NamespaceAndInteroptopusGlobal => true,
-            Self::All => true,
-        }
+        !matches!(self, Self::Namespace)
     }
 }
 
@@ -110,7 +149,7 @@ pub struct DecorateFn<'a> {
     _phantom: PhantomData<&'a ()>,
 }
 
-/// Generates C# interop files, **get this with [`InteropBuilder`]**.🐙
+/// Generates C# interop files, **get this with [`Interop::builder()`]**.🐙
 #[derive(Builder)]
 #[builder(pattern = "owned", default)]
 #[allow(clippy::struct_excessive_bools)]
@@ -253,6 +292,38 @@ impl Interop {
     }
 
     #[must_use]
+    fn has_emittable_wired_types(&self) -> bool {
+        self.inventory.wire_types().iter().any(|t| match t {
+            Type::Wired(w) => {
+                if w.meta().module() == self.namespace_id {
+                    eprintln!("🚧🚧🚧 has emittable wired types in ns {}", self.namespace_id);
+                }
+                matches!(t, Type::Wired(w) if self.should_emit_by_meta(w.meta()))
+            }
+            _ => false,
+        })
+    }
+
+    /// Given a Domain type in `c_types`, look up a corresponding Wire type in `wire_types` and return it if it exists.
+    #[must_use]
+    fn wired_counterpart(&self, kind: &Type) -> Option<Type> {
+        let kind_name = kind.name_within_lib();
+        // eprintln!("❌ Looking for {kind:?} in 🎉 and 🔧");
+
+        // self.inventory.debug();
+
+        if !self.inventory.c_types().iter().any(|t| t.name_within_lib() == kind_name) {
+            return None;
+        }
+
+        self.inventory
+            .wire_types()
+            .iter()
+            .find(|t| matches!(t, Type::Wired(composite) if composite.rust_name() == kind_name))
+            .cloned()
+    }
+
+    #[must_use]
     fn should_emit_by_meta(&self, meta: &Meta) -> bool {
         meta.module() == self.namespace_id
     }
@@ -315,6 +386,8 @@ impl Interop {
     /// Checks whether for the given type and the current file a type definition should be emitted.
     #[must_use]
     fn should_emit_by_type(&self, t: &Type) -> bool {
+        // eprintln!("🚧 should_emit_by_type: {t:?} 🚧");
+
         if self.write_types == WriteTypes::All {
             return true;
         }
@@ -324,11 +397,20 @@ impl Interop {
         }
 
         match t {
-            Type::Primitive(_) => self.write_types == WriteTypes::NamespaceAndInteroptopusGlobal,
+            Type::Primitive(_) => self.write_types == WriteTypes::NamespaceAndInteroptopusGlobal, // need wire wrappers for primitives!
             Type::Array(_) => false,
             Type::Enum(x) => self.should_emit_by_meta(x.meta()),
             Type::Opaque(x) => self.should_emit_by_meta(x.meta()),
             Type::Composite(x) => self.should_emit_by_meta(x.meta()),
+            Type::Wired(x) => self.should_emit_by_meta(x.meta()),
+            Type::Domain(dom) => match dom {
+                DomainType::Composite(x) => self.should_emit_by_meta(x.meta()),
+                DomainType::Enum(x) => self.should_emit_by_meta(x.meta()),
+                DomainType::String => todo!(),
+                DomainType::Vec(x) => self.should_emit_by_type(x),
+                DomainType::Option(x) => self.should_emit_by_type(x),
+                DomainType::Map(_, _) => todo!(),
+            },
             Type::FnPointer(_) => true,
             Type::ReadPointer(_) => false,
             Type::ReadWritePointer(_) => false,
@@ -349,6 +431,18 @@ impl Interop {
         }
     }
 
+    #[must_use]
+    pub fn fn_decorations(&self) -> Vec<String> {
+        self.decorate_fn
+            .iter()
+            .map(|decorator| {
+                let util = DecorateFn::default();
+                decorator(util)
+            })
+            .collect()
+    }
+
+    /// Generate bindings file in C#.
     fn write_all(&self, w: &mut IndentWriter) -> Result<(), Error> {
         write_file_header_comments(self, w)?;
         w.newline()?;
@@ -410,21 +504,15 @@ impl Interop {
             w.newline()?;
             write_builtins(self, w)?;
 
+            if self.has_emittable_wired_types() {
+                w.newline()?;
+                write_wire_helpers(self, w)?;
+            }
+
             Ok(())
         })?;
 
         Ok(())
-    }
-
-    #[must_use]
-    pub fn fn_decorations(&self) -> Vec<String> {
-        self.decorate_fn
-            .iter()
-            .map(|decorator| {
-                let util = DecorateFn::default();
-                decorator(util)
-            })
-            .collect()
     }
 }
 

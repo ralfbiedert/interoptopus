@@ -11,6 +11,7 @@ use std::iter::zip;
 
 pub fn write_functions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     for function in i.inventory.functions() {
+        // eprintln!("🚧 should_emit function: {} 🚧", function.name());
         if i.should_emit_by_meta(function.meta()) {
             write_function(i, w, function, WriteFor::Code)?;
             w.newline()?;
