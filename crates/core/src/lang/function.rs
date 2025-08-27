@@ -25,12 +25,14 @@ pub struct Function {
     name: String,
     meta: Meta,
     signature: Signature,
+    /// Domain types extracted from Wire<T> arguments or return value, if any.
+    domain_types: Vec<Type>,
 }
 
 impl Function {
     #[must_use]
-    pub const fn new(name: String, signature: Signature, meta: Meta) -> Self {
-        Self { name, meta, signature }
+    pub const fn new(name: String, signature: Signature, meta: Meta, domain_types: Vec<Type>) -> Self {
+        Self { name, meta, signature, domain_types }
     }
 
     #[must_use]
@@ -51,6 +53,16 @@ impl Function {
     #[must_use]
     pub fn prettifier(&self) -> Prettifier {
         Prettifier::from_rust_lower(self.name())
+    }
+
+    #[must_use]
+    pub fn is_wired(&self) -> bool {
+        !self.domain_types.is_empty()
+    }
+
+    #[must_use]
+    pub fn domain_types(&self) -> Vec<Type> {
+        self.domain_types.clone()
     }
 }
 
