@@ -39,6 +39,10 @@ impl<'a> IndentWriter<'a> {
         Self { one_indent: one_indent.to_string(), current_level: 0, writer }
     }
 
+    pub fn with_same_indent_as(indent_writer: &'a IndentWriter, writer: &'a mut dyn Write) -> Self {
+        Self { one_indent: indent_writer.one_indent.clone(), current_level: indent_writer.current_level, writer }
+    }
+
     #[must_use]
     pub fn indent_prefix(&self) -> String {
         self.one_indent.repeat(self.current_level)
