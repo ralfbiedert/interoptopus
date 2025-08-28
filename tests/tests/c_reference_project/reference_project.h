@@ -406,12 +406,6 @@ typedef struct LAYER1UTF8STRING
     UTF8STRING maybe_3;
     } LAYER1UTF8STRING;
 
-typedef struct USESLICEANDVEC
-    {
-    SLICEUTF8STRING s1;
-    VECUTF8STRING s2;
-    } USESLICEANDVEC;
-
 typedef struct WEIRD2U8
     {
     uint8_t t;
@@ -718,6 +712,19 @@ typedef void (*SUMDELEGATERETURN2)(int32_t X, int32_t Y, const void* CALLBACK_DA
 ///  (and free) it. Rust handles that fine, but if in C# you put this
 ///  in a struct and then call Rust multiple times with that struct 
 ///  you'll free the same pointer multiple times, and get UB!
+typedef struct VECSLICEU8
+    {
+    SLICEU8* ptr;
+    uint64_t len;
+    uint64_t capacity;
+    } VECSLICEU8;
+
+///  Vec marshalling helper.
+///  A highly dangerous 'use once type' that has ownership semantics!
+///  Once passed over an FFI boundary 'the other side' is meant to own
+///  (and free) it. Rust handles that fine, but if in C# you put this
+///  in a struct and then call Rust multiple times with that struct 
+///  you'll free the same pointer multiple times, and get UB!
 typedef struct VECVEC3F32
     {
     VEC3F32* ptr;
@@ -761,6 +768,14 @@ typedef struct NESTEDARRAY
     uint16_t field_array_2[5];
     ARRAY field_struct;
     } NESTEDARRAY;
+
+typedef struct USESLICEANDVEC
+    {
+    SLICEUTF8STRING s1;
+    VECUTF8STRING s2;
+    VECSLICEU8 s3;
+    SLICEU8 s4;
+    } USESLICEANDVEC;
 
 /// Option that contains Some(value) or None.
 typedef enum OPTIONENUMPAYLOAD

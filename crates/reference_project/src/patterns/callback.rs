@@ -5,6 +5,13 @@ use interoptopus::{callback, ffi, ffi_function, ffi_type};
 use std::ffi::c_void;
 use std::ptr::null;
 
+#[ffi_type]
+pub struct SliceCallbackStruct<'a> {
+    slice: ffi::Slice<'a, u8>,
+}
+
+callback!(MySliceCallback(value: SliceCallbackStruct));
+
 callback!(MyCallback(value: u32) -> u32);
 callback!(MyCallbackNamespaced(value: u32) -> u32, namespace = NAMESPACE_COMMON);
 callback!(MyCallbackVoid(ptr: *const c_void));

@@ -2163,37 +2163,6 @@ class Layer1Utf8String(ctypes.Structure):
         return ctypes.Structure.__set__(self, "maybe_3", value)
 
 
-class UseSliceAndVec(ctypes.Structure):
-
-    # These fields represent the underlying C data layout
-    _fields_ = [
-        ("s1", SliceUtf8String),
-        ("s2", VecUtf8String),
-    ]
-
-    def __init__(self, s1: SliceUtf8String = None, s2 = None):
-        if s1 is not None:
-            self.s1 = s1
-        if s2 is not None:
-            self.s2 = s2
-
-    @property
-    def s1(self) -> SliceUtf8String:
-        return ctypes.Structure.__get__(self, "s1")
-
-    @s1.setter
-    def s1(self, value: SliceUtf8String):
-        return ctypes.Structure.__set__(self, "s1", value)
-
-    @property
-    def s2(self):
-        return ctypes.Structure.__get__(self, "s2")
-
-    @s2.setter
-    def s2(self, value):
-        return ctypes.Structure.__set__(self, "s2", value)
-
-
 class Weird2u8(ctypes.Structure):
 
     # These fields represent the underlying C data layout
@@ -2999,6 +2968,59 @@ class NestedArray(ctypes.Structure):
     @field_struct.setter
     def field_struct(self, value: Array):
         return ctypes.Structure.__set__(self, "field_struct", value)
+
+
+class UseSliceAndVec(ctypes.Structure):
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("s1", SliceUtf8String),
+        ("s2", VecUtf8String),
+        ("s3", VecSliceU8),
+        ("s4", SliceU8),
+    ]
+
+    def __init__(self, s1: SliceUtf8String = None, s2 = None, s3 = None, s4: SliceU8 = None):
+        if s1 is not None:
+            self.s1 = s1
+        if s2 is not None:
+            self.s2 = s2
+        if s3 is not None:
+            self.s3 = s3
+        if s4 is not None:
+            self.s4 = s4
+
+    @property
+    def s1(self) -> SliceUtf8String:
+        return ctypes.Structure.__get__(self, "s1")
+
+    @s1.setter
+    def s1(self, value: SliceUtf8String):
+        return ctypes.Structure.__set__(self, "s1", value)
+
+    @property
+    def s2(self):
+        return ctypes.Structure.__get__(self, "s2")
+
+    @s2.setter
+    def s2(self, value):
+        return ctypes.Structure.__set__(self, "s2", value)
+
+    @property
+    def s3(self):
+        return ctypes.Structure.__get__(self, "s3")
+
+    @s3.setter
+    def s3(self, value):
+        return ctypes.Structure.__set__(self, "s3", value)
+
+    @property
+    def s4(self) -> SliceU8:
+        return ctypes.Structure.__get__(self, "s4")
+
+    @s4.setter
+    def s4(self, value: SliceU8):
+        return ctypes.Structure.__set__(self, "s4", value)
 
 
 class OptionEnumPayload:
