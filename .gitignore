@@ -18,3 +18,7 @@ cmake-build-debug
 *.generated
 __pycache__
 .DS_Store
+.claude
+.zed
+.wakatime-project
+.run
