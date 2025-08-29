@@ -2,7 +2,6 @@
 
 mod buffer;
 mod error;
-mod ffi;
 mod serde;
 
 pub use buffer::WireBuffer;
