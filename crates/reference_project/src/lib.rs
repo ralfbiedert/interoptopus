@@ -47,6 +47,7 @@ pub mod services {
 }
 
 pub mod types;
+mod wire;
 
 pub fn ffi_inventory() -> Inventory {
     Inventory::builder()
@@ -181,6 +182,10 @@ pub fn ffi_inventory() -> Inventory {
         .register(function!(patterns::vec::pattern_vec_6))
         .register(function!(patterns::vec::pattern_vec_7))
         .register(function!(patterns::vec::pattern_vec_8))
+        // TODO
+        // .register(function!(wire::basic::perform_miracles))
+        // .register(function!(wire::basic::perform_half_miracles))
+        // .register(function!(wire::basic::perform_half_miracles_in_other_direction))
         // Constants
         .register(constant!(constants::U8))
         .register(constant!(constants::F32_MIN_POSITIVE))
