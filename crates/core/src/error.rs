@@ -1,13 +1,12 @@
 use std::fmt::{Display, Formatter};
 
+// TODO: Split this into more error types
+
 /// Can be observed if something goes wrong.
 #[derive(Debug)]
 pub enum Error {
     /// A null pointer was observed where it wasn't expected.
     Null,
-
-    /// An operation was requested that is not supported.
-    Unsupported,
 
     /// Given string is not nul terminated.
     NulTerminated,
@@ -15,26 +14,11 @@ pub enum Error {
     /// Formatting a string failed.
     Format(std::fmt::Error),
 
-    /// Writing output failed.
-    IO(std::io::Error),
-
     /// Not valid UTF-8
-    UTF8(std::str::Utf8Error),
+    Utf8(std::str::Utf8Error),
 
     /// Not valid UTF-8
     FromUtf8(std::string::FromUtf8Error),
-
-    /// Template generation failed.
-    Templating(tera::Error),
-
-    /// A command to test was not found.
-    CommandNotFound,
-
-    /// A test failed to execute.
-    TestFailed(String, String),
-
-    /// A specified file was not found.
-    FileNotFound,
 }
 
 impl From<std::fmt::Error> for Error {
@@ -43,15 +27,9 @@ impl From<std::fmt::Error> for Error {
     }
 }
 
-impl From<std::io::Error> for Error {
-    fn from(e: std::io::Error) -> Self {
-        Self::IO(e)
-    }
-}
-
 impl From<std::str::Utf8Error> for Error {
     fn from(e: std::str::Utf8Error) -> Self {
-        Self::UTF8(e)
+        Self::Utf8(e)
     }
 }
 

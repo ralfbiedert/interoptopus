@@ -1,4 +1,4 @@
-use crate::backend::Prettifier;
+use crate::lang::util::Prettifier;
 use crate::lang::{Meta, Type};
 
 /// Indicates the final desired return type in FFI'ed user code.
@@ -25,7 +25,7 @@ pub struct Function {
     name: String,
     meta: Meta,
     signature: Signature,
-    /// Domain types extracted from Wire<T> arguments or return value, if any.
+    /// Domain types extracted from `Wire<T>` arguments or return value, if any.
     domain_types: Vec<Type>,
 }
 

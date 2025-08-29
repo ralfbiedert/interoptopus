@@ -1,6 +1,5 @@
 use anyhow::Error;
 use interoptopus::extra_type;
-use interoptopus::inventory::Bindings;
 use interoptopus::inventory::Inventory;
 use interoptopus::{callback, ffi_type};
 use interoptopus_backend_csharp::Interop;

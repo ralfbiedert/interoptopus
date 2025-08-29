@@ -1,11 +1,10 @@
 use crate::Interop;
 use crate::converter::{is_reusable, param_to_type, vec_t};
 use crate::utils::{MoveSemantics, write_common_marshaller};
-use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Parameter, Type};
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::vec::VecType;
-use interoptopus::{Error, indented};
+use interoptopus_backend_utils::{Error, IndentWriter, indented};
 
 pub fn write_pattern_vec(i: &Interop, w: &mut IndentWriter, vec: &VecType) -> Result<(), Error> {
     i.debug(w, "write_pattern_vec")?;

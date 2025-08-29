@@ -78,8 +78,8 @@ pub fn to_ctypes_name(the_type: &Type, with_type_annotations: bool) -> String {
         },
         Type::Enum(_) => "ctypes.c_int".to_string(), // is this correct?
         Type::Composite(x) => x.rust_name().to_string(),
-        Type::Wired(_) => todo!(),
-        Type::Domain(_) => todo!(),
+        Type::Wire(_) => todo!(),
+        Type::WirePayload(_) => todo!(),
         Type::Array(x) => format!("{} * {}", to_ctypes_name(x.the_type(), with_type_annotations), x.len()),
         Type::Opaque(_) => "ERROR".to_string(),
         Type::FnPointer(x) => fnpointer_to_typename(x),

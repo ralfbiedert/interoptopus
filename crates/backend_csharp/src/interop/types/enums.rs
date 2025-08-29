@@ -2,9 +2,8 @@ use crate::Interop;
 use crate::converter::{field_as_unmanaged, field_to_managed, field_to_type, field_to_type_unmanaged, field_to_unmanaged, has_dispose, is_reusable};
 use crate::interop::docs::write_documentation;
 use crate::utils::{MoveSemantics, write_common_marshaller};
-use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Enum, Field, Type, VariantKind};
-use interoptopus::{Error, indented};
+use interoptopus_backend_utils::{Error, IndentWriter, indented};
 
 pub fn write_type_definition_enum(i: &Interop, w: &mut IndentWriter, the_type: &Enum) -> Result<(), Error> {
     i.debug(w, "write_type_definition_enum")?;

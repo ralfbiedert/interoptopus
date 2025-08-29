@@ -1,12 +1,16 @@
-//! Create a templated codegen engine, utilising templates stored in
-//! `$CARGO_MANIFEST_DIR/templates` directory
-//! with glob pattern matching `template_glob`. Use a render!() macro.
-//! Typical usage
-//! ```nocompile
-//! codegen_template_engine("**/*.py");
-//! ```
+/// Create a templated codegen engine for backends.
+///
+/// This utilizes templates stored in the `$CARGO_MANIFEST_DIR/templates` directory
+/// with glob pattern matching `template_glob`. Use the `render!()` macro to render
+/// templates.
+///
+/// # Example
+///
+/// ```ignore
+/// codegen_template_engine("**/*.py");
+/// ```
 #[macro_export]
-macro_rules! codegen_template_engine {
+macro_rules! template_engine {
     ($template_glob:literal) => {
         static TEMPLATE_FILES: std::sync::LazyLock<include_dir::Dir<'_>> = std::sync::LazyLock::new(|| include_dir::include_dir!("$CARGO_MANIFEST_DIR/templates"));
 
@@ -23,15 +27,16 @@ macro_rules! codegen_template_engine {
     };
 }
 
+/// Renders a template.
 #[allow(clippy::crate_in_macro_def, reason = "We do want to access one of backend crates' templates, not this one")]
 #[macro_export]
 macro_rules! render {
     ($writer:expr, $template:expr) => {
         {
             let context = tera::Context::new();
-            let template = crate::TEMPLATES.render($template, &context).map_err(interoptopus::Error::Templating)?;
+            let template = crate::TEMPLATES.render($template, &context).map_err($crate::Error::Templating)?;
             let indented = indent::indent_all_with($writer.indent_prefix(), template);
-            write!($writer.writer(), "{}", indented).map_err(interoptopus::Error::IO)
+            write!($writer.writer(), "{}", indented).map_err($crate::Error::Io)
         }
     };
     ($writer:expr, $template:expr, $(($key:expr,$value:expr)),+) => {
@@ -40,9 +45,9 @@ macro_rules! render {
             $(
                 context.insert($key, $value);
             )*
-            let template = crate::TEMPLATES.render($template, &context).map_err(interoptopus::Error::Templating)?;
+            let template = crate::TEMPLATES.render($template, &context).map_err($crate::Error::Templating)?;
             let indented = indent::indent_all_with($writer.indent_prefix(), template);
-            write!($writer.writer(), "{}", indented).map_err(interoptopus::Error::IO)
+            write!($writer.writer(), "{}", indented).map_err($crate::Error::Io)
         }
     };
 }

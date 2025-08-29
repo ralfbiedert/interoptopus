@@ -1,5 +1,5 @@
 use anyhow::Error;
-use interoptopus::inventory::{Bindings, Inventory};
+use interoptopus::inventory::Inventory;
 use interoptopus::{builtins_string, builtins_vec, ffi, ffi_function, function};
 use interoptopus_backend_csharp::{Interop, WriteTypes};
 use tests::backend_csharp::common_namespace_mappings;

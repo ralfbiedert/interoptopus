@@ -1,8 +1,7 @@
 use crate::Interop;
 use crate::converter::{fnpointer_to_type, param_to_type, rval_to_type_sync};
-use interoptopus::backend::IndentWriter;
 use interoptopus::lang::FnPointer;
-use interoptopus::{Error, indented};
+use interoptopus_backend_utils::{Error, IndentWriter, indented};
 
 pub fn write_type_definition_fn_pointer(i: &Interop, w: &mut IndentWriter, the_type: &FnPointer) -> Result<(), Error> {
     i.debug(w, "write_type_definition_fn_pointer")?;
@@ -12,7 +11,8 @@ pub fn write_type_definition_fn_pointer(i: &Interop, w: &mut IndentWriter, the_t
 }
 
 pub fn write_type_definition_fn_pointer_annotation(w: &mut IndentWriter, _the_type: &FnPointer) -> Result<(), Error> {
-    indented!(w, r"[UnmanagedFunctionPointer(CallingConvention.Cdecl)]")
+    indented!(w, r"[UnmanagedFunctionPointer(CallingConvention.Cdecl)]")?;
+    Ok(())
 }
 
 pub fn write_type_definition_fn_pointer_body(i: &Interop, w: &mut IndentWriter, the_type: &FnPointer) -> Result<(), Error> {

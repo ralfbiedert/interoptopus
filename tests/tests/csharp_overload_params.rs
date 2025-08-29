@@ -1,5 +1,5 @@
 use anyhow::Error;
-use interoptopus::inventory::{Bindings, Inventory};
+use interoptopus::inventory::Inventory;
 use interoptopus::pattern::slice::Slice;
 use interoptopus::{callback, ffi_function, function};
 use interoptopus_backend_csharp::Interop;

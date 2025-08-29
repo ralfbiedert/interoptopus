@@ -51,7 +51,6 @@
 //! with `cargo test`. In real projects you might want to add this code to another crate instead:
 //!
 //! ```
-//! use interoptopus::backend::NamespaceMappings;
 //! use interoptopus::Error;
 //!
 //! #[test]
@@ -76,7 +75,7 @@
 //!
 //! ### Generated Output
 //!
-//! The output below is what this backend might generate. Have a look at the [`Config`] struct
+//! The output below is what this backend might generate. Have a look at the [`Interop`](crate::Interop) struct
 //! if you want to customize something. If you really don't like how something is generated it is
 //! easy to [**create your own**](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md#new-backends).
 //!

@@ -1,6 +1,6 @@
 // use interoptopus::ffi::CStrPtr;
 use interoptopus::inventory::Inventory;
-use interoptopus::lang::{Wire, Wireable};
+use interoptopus::wire::{Wire, Wireable};
 use interoptopus::{ffi_function, ffi_type, function, pattern};
 
 pub mod engine;
@@ -26,7 +26,7 @@ pub struct Return {
 // }
 
 // As in `engine`, we create matching functions that are better suited for an FFI boundary.
-#[ffi_function(debug)]
+#[ffi_function]
 pub fn start_server(mut server_name: Wire<Something>) -> Wire<Return> {
     // ^^ @todo: register should traverse Wire types recursively and add them to inventory
     let server_name = server_name.unwire().unwrap();

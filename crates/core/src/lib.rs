@@ -1,4 +1,4 @@
-#![cfg_attr(docsrs, feature(doc_cfg))] // does this work?
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
 //!
 //! [![crates.io-badge]][crates.io-url]
 //! [![docs.rs-badge]][docs.rs-url]
@@ -158,16 +158,16 @@
 //! [rust-version-url]: https://github.com/ralfbiedert/interoptopus
 //! [rust-build-badge]: https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml/badge.svg
 //! [rust-build-url]: https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml
+//!
 
-pub use backend::NAMESPACE_COMMON;
 pub use error::Error;
 #[cfg(feature = "derive")]
 pub use interoptopus_proc::{ffi_constant, ffi_function, ffi_service, ffi_service_method, ffi_type};
 
-pub mod backend;
 mod error;
 pub mod ffi;
 pub mod inventory;
 pub mod lang;
 mod macros;
 pub mod pattern;
+pub mod wire;

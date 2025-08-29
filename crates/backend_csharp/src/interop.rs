@@ -23,54 +23,14 @@ use crate::interop::patterns::write_patterns;
 use crate::interop::types::write_type_definitions;
 use crate::interop::wires::write_wire_helpers;
 use derive_builder::Builder;
-use interoptopus::backend::IndentWriter;
-use interoptopus::backend::{NamespaceMappings, is_global_type};
-use interoptopus::inventory::{Bindings, Inventory};
-use interoptopus::lang::{Constant, DomainType, Function, Meta, Primitive, Signature, Type};
+use interoptopus::inventory::Inventory;
+use interoptopus::lang::util::is_global_type;
+use interoptopus::lang::{Constant, Function, Meta, NamespaceMappings, Signature, Type, WirePayload};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{Error, indented};
+use interoptopus_backend_utils::{Error, IndentWriter, indented};
+use std::fs::File;
 use std::marker::PhantomData;
-
-pub trait FfiTransType {
-    /// A C# name for the ffi'd Rust type (backend's name for a `rust_type()`)
-    fn trans_type_name(&self) -> &str;
-}
-
-impl FfiTransType for Primitive {
-    fn trans_type_name(&self) -> &str {
-        match self {
-            Self::Void => "Void",
-            Self::Bool => "Bool",
-            Self::I8 => "sbyte",
-            Self::I16 => "short",
-            Self::I32 => "int",
-            Self::I64 => "long",
-            Self::U8 => "U8",
-            Self::U16 => "U16",
-            Self::U32 => "U32",
-            Self::U64 => "U64",
-            Self::F32 => "F32",
-            Self::F64 => "F64",
-            Self::Usize => "Usize",
-            Self::Isize => "Isize",
-        }
-    }
-}
-
-// impl FfiTransType for WireType {
-//     fn trans_type_name(&self) -> &str {
-//         match self {
-//             Self::Primitive(t) => t.trans_type_name(), // we don't really want to have WireOfU8 as a separate class!
-//             Self::Composite(_) => "composite",         // but we do want to custom-serialize composite types
-//         }
-//     }
-// }
-
-impl FfiTransType for interoptopus::lang::Composite {
-    fn trans_type_name(&self) -> &str {
-        self.rust_name() // @todo: trans_type_name()!
-    }
-}
+use std::path::Path;
 
 /// How to convert function names from Rust to C#
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
@@ -232,7 +192,9 @@ impl Interop {
             return Ok(());
         }
 
-        indented!(w, r"// Debug - {} ", marker)
+        indented!(w, r"// Debug - {} ", marker)?;
+
+        Ok(())
     }
 
     #[must_use]
@@ -294,11 +256,8 @@ impl Interop {
     #[must_use]
     fn has_emittable_wired_types(&self) -> bool {
         self.inventory.wire_types().iter().any(|t| match t {
-            Type::Wired(w) => {
-                if w.meta().module() == self.namespace_id {
-                    eprintln!("🚧🚧🚧 has emittable wired types in ns {}", self.namespace_id);
-                }
-                matches!(t, Type::Wired(w) if self.should_emit_by_meta(w.meta()))
+            Type::Wire(_) => {
+                matches!(t, Type::Wire(w) if self.should_emit_by_meta(w.meta()))
             }
             _ => false,
         })
@@ -308,10 +267,6 @@ impl Interop {
     #[must_use]
     fn wired_counterpart(&self, kind: &Type) -> Option<Type> {
         let kind_name = kind.name_within_lib();
-        // eprintln!("❌ Looking for {kind:?} in 🎉 and 🔧");
-
-        // self.inventory.debug();
-
         if !self.inventory.c_types().iter().any(|t| t.name_within_lib() == kind_name) {
             return None;
         }
@@ -319,7 +274,7 @@ impl Interop {
         self.inventory
             .wire_types()
             .iter()
-            .find(|t| matches!(t, Type::Wired(composite) if composite.rust_name() == kind_name))
+            .find(|t| matches!(t, Type::Wire(composite) if composite.rust_name() == kind_name))
             .cloned()
     }
 
@@ -386,8 +341,6 @@ impl Interop {
     /// Checks whether for the given type and the current file a type definition should be emitted.
     #[must_use]
     fn should_emit_by_type(&self, t: &Type) -> bool {
-        // eprintln!("🚧 should_emit_by_type: {t:?} 🚧");
-
         if self.write_types == WriteTypes::All {
             return true;
         }
@@ -402,14 +355,14 @@ impl Interop {
             Type::Enum(x) => self.should_emit_by_meta(x.meta()),
             Type::Opaque(x) => self.should_emit_by_meta(x.meta()),
             Type::Composite(x) => self.should_emit_by_meta(x.meta()),
-            Type::Wired(x) => self.should_emit_by_meta(x.meta()),
-            Type::Domain(dom) => match dom {
-                DomainType::Composite(x) => self.should_emit_by_meta(x.meta()),
-                DomainType::Enum(x) => self.should_emit_by_meta(x.meta()),
-                DomainType::String => todo!(),
-                DomainType::Vec(x) => self.should_emit_by_type(x),
-                DomainType::Option(x) => self.should_emit_by_type(x),
-                DomainType::Map(_, _) => todo!(),
+            Type::Wire(x) => self.should_emit_by_meta(x.meta()),
+            Type::WirePayload(dom) => match dom {
+                WirePayload::Composite(x) => self.should_emit_by_meta(x.meta()),
+                WirePayload::Enum(x) => self.should_emit_by_meta(x.meta()),
+                WirePayload::String => todo!(),
+                WirePayload::Vec(x) => self.should_emit_by_type(x),
+                WirePayload::Option(x) => self.should_emit_by_type(x),
+                WirePayload::Map(_, _) => todo!(),
             },
             Type::FnPointer(_) => true,
             Type::ReadPointer(_) => false,
@@ -442,8 +395,11 @@ impl Interop {
             .collect()
     }
 
-    /// Generate bindings file in C#.
-    fn write_all(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    /// Generates FFI binding code and writes them to the [`IndentWriter`].
+    ///
+    /// # Errors
+    /// Can result in an error if I/O failed.
+    pub fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
         write_file_header_comments(self, w)?;
         w.newline()?;
 
@@ -514,11 +470,27 @@ impl Interop {
 
         Ok(())
     }
-}
 
-impl Bindings for Interop {
-    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        self.write_all(w)
+    /// Convenience method to write FFI bindings to the specified file with default indentation.
+    ///
+    /// # Errors
+    /// Can result in an error if I/O failed.
+    pub fn write_file<P: AsRef<Path>>(&self, file_name: P) -> Result<(), Error> {
+        let mut file = File::create(file_name)?;
+        let mut writer = IndentWriter::new(&mut file);
+
+        self.write_to(&mut writer)
+    }
+
+    /// Convenience method to write FFI bindings to a string.
+    ///
+    /// # Errors
+    /// Can result in an error if I/O failed.
+    pub fn to_string(&self) -> Result<String, Error> {
+        let mut vec = Vec::new();
+        let mut writer = IndentWriter::new(&mut vec);
+        self.write_to(&mut writer)?;
+        Ok(String::from_utf8(vec)?)
     }
 }
 

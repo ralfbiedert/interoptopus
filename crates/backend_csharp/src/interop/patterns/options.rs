@@ -1,8 +1,7 @@
 use crate::Interop;
 use crate::converter::rval_to_type_sync;
-use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Composite;
-use interoptopus::{Error, indented};
+use interoptopus_backend_utils::{Error, IndentWriter, indented};
 
 // TODO: Write helpers for options
 pub fn _write_pattern_option(i: &Interop, w: &mut IndentWriter, slice: &Composite) -> Result<(), Error> {

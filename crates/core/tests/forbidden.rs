@@ -1,3 +1,5 @@
+mod wire;
+
 use interoptopus::function;
 use interoptopus::inventory::Inventory;
 use interoptopus_proc::ffi_function;

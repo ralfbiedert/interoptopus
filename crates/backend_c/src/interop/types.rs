@@ -4,12 +4,11 @@ use crate::converters::{
 use crate::interop::ToNamingStyle;
 use crate::interop::docs::write_documentation;
 use crate::{DocStyle, Indentation, Interop};
-use interoptopus::backend::IndentWriter;
-use interoptopus::backend::sort_types_by_dependencies;
+use interoptopus::lang::util::sort_types_by_dependencies;
 use interoptopus::lang::{Composite, Enum, Field, FnPointer, Opaque, Type, Variant, VariantKind};
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::NamedCallback;
-use interoptopus::{Error, indented};
+use interoptopus_backend_utils::{Error, IndentWriter, indented};
 
 pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     let mut known_function_pointers = vec![];
@@ -36,8 +35,8 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type,
             write_type_definition_composite(i, w, c)?;
             w.newline()?;
         }
-        Type::Wired(_) => todo!(),
-        Type::Domain(_) => todo!(),
+        Type::Wire(_) => todo!(),
+        Type::WirePayload(_) => todo!(),
         Type::FnPointer(f) => {
             write_type_definition_fn_pointer(i, w, f, known_function_pointers)?;
             w.newline()?;
@@ -152,9 +151,10 @@ fn write_type_definition_enum_variant(i: &Interop, w: &mut IndentWriter, variant
     }
 
     match variant_kind {
-        VariantKind::Unit(variant_value) => indented!(w, r"{} = {},", variant_name, variant_value),
-        VariantKind::Typed(_, _) => indented!(w, r"// TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN"),
+        VariantKind::Unit(variant_value) => indented!(w, r"{} = {},", variant_name, variant_value)?,
+        VariantKind::Typed(_, _) => indented!(w, r"// TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN")?,
     }
+    Ok(())
 }
 
 fn write_type_definition_opaque(i: &Interop, w: &mut IndentWriter, the_type: &Opaque) -> Result<(), Error> {
@@ -173,7 +173,8 @@ fn write_type_definition_opaque(i: &Interop, w: &mut IndentWriter, the_type: &Op
 
 fn write_type_definition_opaque_body(i: &Interop, w: &mut IndentWriter, the_type: &Opaque) -> Result<(), Error> {
     let name = opaque_to_typename(i, the_type);
-    indented!(w, r"typedef struct {} {};", name, name)
+    indented!(w, r"typedef struct {} {};", name, name)?;
+    Ok(())
 }
 
 fn write_type_definition_composite(i: &Interop, w: &mut IndentWriter, the_type: &Composite) -> Result<(), Error> {
@@ -223,12 +224,13 @@ fn write_type_definition_composite_body_field(i: &Interop, w: &mut IndentWriter,
 
     if let Type::Array(x) = field.the_type() {
         let type_name = to_type_specifier(i, x.the_type());
-        indented!(w, r"{} {}[{}];", type_name, field_name, x.len())
+        indented!(w, r"{} {}[{}];", type_name, field_name, x.len())?;
     } else {
         let field_name = field.name();
         let type_name = to_type_specifier(i, field.the_type());
-        indented!(w, r"{} {};", type_name, field_name)
+        indented!(w, r"{} {};", type_name, field_name)?;
     }
+    Ok(())
 }
 
 fn write_braced_declaration_opening(i: &Interop, w: &mut IndentWriter, definition: &str) -> Result<(), Error> {

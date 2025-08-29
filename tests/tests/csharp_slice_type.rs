@@ -1,5 +1,4 @@
 use anyhow::Error;
-use interoptopus::inventory::Bindings;
 use interoptopus::inventory::Inventory;
 use interoptopus::pattern::slice::Slice;
 use interoptopus::{ffi_function, function};

@@ -1,10 +1,9 @@
 use crate::Interop;
 use crate::converter::fnpointer_to_typename;
-use interoptopus::backend::IndentWriter;
-use interoptopus::backend::safe_name;
 use interoptopus::lang::Type;
+use interoptopus::lang::util::safe_name;
 use interoptopus::pattern::TypePattern;
-use interoptopus::{Error, indented};
+use interoptopus_backend_utils::{Error, IndentWriter, indented};
 
 pub fn write_callback_helpers(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     indented!(w, r"class {}:", i.callback_namespace)?;

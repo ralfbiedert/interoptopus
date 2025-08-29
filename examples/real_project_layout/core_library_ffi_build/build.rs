@@ -1,5 +1,4 @@
 use core_library_ffi::ffi_inventory;
-use interoptopus::inventory::Bindings;
 use interoptopus_backend_csharp::Interop;
 use std::error::Error;
 

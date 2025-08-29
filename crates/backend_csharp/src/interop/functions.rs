@@ -3,15 +3,13 @@ use crate::interop::DecorateFn;
 use crate::interop::docs::write_documentation;
 use crate::utils::sugared_return_type;
 use crate::{FunctionNameFlavor, Interop};
-use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Function, Primitive, SugaredReturnType, Type};
 use interoptopus::pattern::TypePattern;
-use interoptopus::{Error, indented};
+use interoptopus_backend_utils::{Error, IndentWriter, WriteFor, indented};
 use std::iter::zip;
 
 pub fn write_functions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     for function in i.inventory.functions() {
-        // eprintln!("🚧 should_emit function: {} 🚧", function.name());
         if i.should_emit_by_meta(function.meta()) {
             write_function(i, w, function, WriteFor::Code)?;
             w.newline()?;
@@ -76,7 +74,8 @@ pub fn write_function_declaration(i: &Interop, w: &mut IndentWriter, function: &
     let partial = if has_body { "" } else { "partial " };
 
     i.inline_hint(w, 0)?;
-    indented!(w, r"{}static {}{} {}({}){}", visibility, partial, rval, name, params.join(", "), line_ending)
+    indented!(w, r"{}static {}{} {}({}){}", visibility, partial, rval, name, params.join(", "), line_ending)?;
+    Ok(())
 }
 
 #[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
@@ -190,5 +189,7 @@ pub fn write_function_overload(i: &Interop, w: &mut IndentWriter, function: &Fun
         indented!(w, [()], r"return _cs;")?;
     }
 
-    indented!(w, r"}}")
+    indented!(w, r"}}")?;
+
+    Ok(())
 }

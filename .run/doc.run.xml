@@ -1,14 +1,17 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="build (release)" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
-    <option name="command" value="build --release" />
+  <configuration default="false" name="doc" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+    <option name="command" value="doc" />
     <option name="workingDirectory" value="file://$PROJECT_DIR$" />
-    <option name="channel" value="DEFAULT" />
+    <envs>
+      <env name="RUSTDOCFLAGS" value="--cfg docsrs" />
+    </envs>
+    <option name="emulateTerminal" value="true" />
+    <option name="channel" value="NIGHTLY" />
     <option name="requiredFeatures" value="true" />
-    <option name="allFeatures" value="false" />
-    <option name="emulateTerminal" value="false" />
+    <option name="allFeatures" value="true" />
     <option name="withSudo" value="false" />
+    <option name="buildTarget" value="REMOTE" />
     <option name="backtrace" value="SHORT" />
-    <envs />
     <option name="isRedirectInput" value="false" />
     <option name="redirectInputPath" value="" />
     <method v="2">

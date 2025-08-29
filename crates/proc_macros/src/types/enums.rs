@@ -170,7 +170,7 @@ fn process_typed_variant(
             }),
             Some(quote! {
                 #discriminant => {
-                    let data = ::interoptopus::lang::wire::De::de(input)?;
+                    let data = ::interoptopus::wire::De::de(input)?;
                     Ok(#name_ident::#ident_tok(data))
                 }
             }),
@@ -301,7 +301,7 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
 
                     let repr = ::interoptopus::lang::Representation::new(#layout, None);
                     let rval = ::interoptopus::lang::Enum::new(#ffi_name.to_string(), variants, meta, repr);
-                    ::interoptopus::lang::Type::Domain(::interoptopus::lang::DomainType::Enum(rval))
+                    ::interoptopus::lang::Type::WirePayload(::interoptopus::lang::WirePayload::Enum(rval))
                 }
             }
         }

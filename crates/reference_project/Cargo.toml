@@ -17,5 +17,5 @@ path = "src/lib.rs"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-interoptopus = { path = "../core", version = "0.15.0-alpha.12" }
+interoptopus.workspace = true
 tokio = { version = "1", features = ["full"] }

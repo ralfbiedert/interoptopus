@@ -17,10 +17,11 @@ use crate::interop::patterns::write_patterns;
 use crate::interop::types::write_types;
 use crate::interop::utils::write_utils;
 use derive_builder::Builder;
-use interoptopus::backend::IndentWriter;
-use interoptopus::inventory::{Bindings, Inventory};
+use interoptopus::inventory::Inventory;
 use interoptopus::lang::Function;
-use interoptopus::{Error, indented};
+use interoptopus_backend_utils::{Error, IndentWriter, indented};
+use std::fs::File;
+use std::path::Path;
 
 /// Generates Python `ctypes` files, **get this with [`InteropBuilder`]**.🐙
 #[derive(Clone, Debug, Default, Builder)]
@@ -46,7 +47,9 @@ impl Interop {
             return Ok(());
         }
 
-        indented!(w, r"# Debug - {} ", marker)
+        indented!(w, r"# Debug - {} ", marker)?;
+
+        Ok(())
     }
 
     #[must_use]
@@ -72,7 +75,11 @@ impl Interop {
         args
     }
 
-    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    /// Generates FFI binding code and writes them to the [`IndentWriter`].
+    ///
+    /// # Errors
+    /// Can result in an error if I/O failed.
+    pub fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
         write_imports(self, w)?;
         write_api_load_function(self, w)?;
         w.newline()?;
@@ -99,11 +106,27 @@ impl Interop {
 
         Ok(())
     }
-}
 
-impl Bindings for Interop {
-    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        self.write_to(w)
+    /// Convenience method to write FFI bindings to the specified file with default indentation.
+    ///
+    /// # Errors
+    /// Can result in an error if I/O failed.
+    pub fn write_file<P: AsRef<Path>>(&self, file_name: P) -> Result<(), Error> {
+        let mut file = File::create(file_name)?;
+        let mut writer = IndentWriter::new(&mut file);
+
+        self.write_to(&mut writer)
+    }
+
+    /// Convenience method to write FFI bindings to a string.
+    ///
+    /// # Errors
+    /// Can result in an error if I/O failed.
+    pub fn to_string(&self) -> Result<String, Error> {
+        let mut vec = Vec::new();
+        let mut writer = IndentWriter::new(&mut vec);
+        self.write_to(&mut writer)?;
+        Ok(String::from_utf8(vec)?)
     }
 }
 

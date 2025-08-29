@@ -1,11 +1,10 @@
 use crate::Interop;
 use crate::interop::{write_function_declaration, write_type_definition};
-use interoptopus::Error;
-use interoptopus::backend::IndentWriter;
-use interoptopus::backend::sort_types_by_dependencies;
-use interoptopus::indented;
-use interoptopus::inventory::Bindings;
+use interoptopus::lang::util::sort_types_by_dependencies;
 use interoptopus::lang::{Function, Type};
+use interoptopus_backend_utils::{Error, IndentWriter, indented};
+use std::fs::File;
+use std::path::Path;
 
 /// Produces C API documentation.
 pub struct Markdown<'a> {
@@ -37,8 +36,8 @@ impl<'a> Markdown<'a> {
             Type::Enum(e) => e.meta(),
             Type::Opaque(o) => o.meta(),
             Type::Composite(c) => c.meta(),
-            Type::Wired(_) => todo!(),
-            Type::Domain(_) => todo!(),
+            Type::Wire(_) => todo!(),
+            Type::WirePayload(_) => todo!(),
             Type::FnPointer(_) => return Ok(()),
             Type::ReadPointer(_) => return Ok(()),
             Type::ReadWritePointer(_) => return Ok(()),
@@ -93,7 +92,11 @@ impl<'a> Markdown<'a> {
         Ok(())
     }
 
-    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    /// Generates FFI binding code and writes them to the [`IndentWriter`].
+    ///
+    /// # Errors
+    /// Can result in an error if I/O failed.
+    pub fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
         self.write_types(w)?;
         self.write_functions(w)?;
 
@@ -101,10 +104,26 @@ impl<'a> Markdown<'a> {
 
         Ok(())
     }
-}
 
-impl Bindings for Markdown<'_> {
-    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        self.write_to(w)
+    /// Convenience method to write FFI bindings to the specified file with default indentation.
+    ///
+    /// # Errors
+    /// Can result in an error if I/O failed.
+    pub fn write_file<P: AsRef<Path>>(&self, file_name: P) -> Result<(), Error> {
+        let mut file = File::create(file_name)?;
+        let mut writer = IndentWriter::new(&mut file);
+
+        self.write_to(&mut writer)
+    }
+
+    /// Convenience method to write FFI bindings to a string.
+    ///
+    /// # Errors
+    /// Can result in an error if I/O failed.
+    pub fn to_string(&self) -> Result<String, Error> {
+        let mut vec = Vec::new();
+        let mut writer = IndentWriter::new(&mut vec);
+        self.write_to(&mut writer)?;
+        Ok(String::from_utf8(vec)?)
     }
 }

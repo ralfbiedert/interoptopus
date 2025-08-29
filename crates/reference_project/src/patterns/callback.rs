@@ -1,6 +1,6 @@
 use crate::patterns::result::Error;
 use crate::types::string::UseString;
-use interoptopus::backend::NAMESPACE_COMMON;
+use interoptopus::lang::NAMESPACE_COMMON;
 use interoptopus::{callback, ffi, ffi_function, ffi_type};
 use std::ffi::c_void;
 use std::ptr::null;
@@ -90,8 +90,7 @@ pub extern "C" fn exposed_sum2(x: i32, y: i32, _: *const c_void) -> i32 {
 #[cfg(test)]
 mod tests {
     use super::{MyCallback, MyCallbackNamespaced};
-    use interoptopus::backend::NAMESPACE_COMMON;
-    use interoptopus::lang::TypeInfo;
+    use interoptopus::lang::{NAMESPACE_COMMON, TypeInfo};
 
     #[test]
     fn namespaces_assigned_correctly() {

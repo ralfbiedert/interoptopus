@@ -2,10 +2,9 @@ use crate::Interop;
 use crate::converter::{is_reusable, param_to_managed, param_to_type, rval_to_type_sync, rval_to_type_unmanaged};
 use crate::interop::types::fnptrs::write_type_definition_fn_pointer_annotation;
 use crate::utils::{MoveSemantics, write_common_marshaller};
-use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Primitive, Type};
 use interoptopus::pattern::callback::NamedCallback;
-use interoptopus::{Error, indented};
+use interoptopus_backend_utils::{Error, IndentWriter, indented};
 
 pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
     i.debug(w, "write_type_definition_named_callback")?;

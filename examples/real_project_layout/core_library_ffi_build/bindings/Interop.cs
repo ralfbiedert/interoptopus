@@ -346,7 +346,6 @@ namespace My.Company
             return "Return { field = " + field + " }";
         }
 
-        // TODO: add serialize/deserialize here
         /// <summary>
         /// Deserialize the wire data back to a managed Return object
         /// </summary>
@@ -582,7 +581,6 @@ namespace My.Company
             return "Something { field = " + field + ", name = " + name + " }";
         }
 
-        // TODO: add serialize/deserialize here
         /// <summary>
         /// Deserialize the wire data back to a managed Something object
         /// </summary>

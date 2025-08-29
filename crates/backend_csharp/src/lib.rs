@@ -54,11 +54,10 @@
 //! with `cargo test`. In real projects you might want to add this code to another crate instead:
 //!
 //!```
-//! use interoptopus::backend::NamespaceMappings;
 //! use interoptopus::Error;
-//! use interoptopus::inventory::Bindings;
+//! use interoptopus::lang::NamespaceMappings;
 //!
-//! #[test]
+//!  #[test]
 //! fn bindings_csharp() -> Result<(), Error> {
 //!     use interoptopus_backend_csharp::{Config, Generate};
 //!
@@ -82,7 +81,7 @@
 //!
 //! ### Generated Output
 //!
-//! The output below is what this backend might generate. Have a look at the [`Config`] struct
+//! The output below is what this backend might generate. Have a look at the [`Interop`](crate::Interop) struct
 //! if you want to customize something. If you really don't like how something is generated it is
 //! easy to [**create your own**](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md#new-backends).
 //!
@@ -124,5 +123,6 @@ pub(crate) mod utils;
 
 pub use docs::{Markdown, MarkdownConfig};
 pub use interop::{FunctionNameFlavor, Interop, InteropBuilder, InteropBuilderError, Visibility, WriteTypes};
+use interoptopus_backend_utils::template_engine;
 
-interoptopus::codegen_template_engine!("**/*.cs");
+template_engine!("**/*.cs");
