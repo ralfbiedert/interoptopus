@@ -1,6 +1,6 @@
 use crate::Interop;
 use crate::interop::{EnumVariants, ToNamingStyle};
-use interoptopus::backend::safe_name;
+use interoptopus::lang::util::safe_name;
 use interoptopus::lang::{Composite, Constant, ConstantValue, Enum, FnPointer, Function, Opaque, Primitive, PrimitiveValue, Type, Variant};
 use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::callback::NamedCallback;
@@ -59,8 +59,8 @@ pub fn to_type_specifier(g: &Interop, x: &Type) -> String {
         Type::Enum(x) => enum_to_typename(g, x),
         Type::Opaque(x) => opaque_to_typename(g, x),
         Type::Composite(x) => composite_to_typename(g, x),
-        Type::Wired(_) => todo!(),
-        Type::Domain(_) => todo!(),
+        Type::Wire(_) => todo!(),
+        Type::WirePayload(_) => todo!(),
         Type::ReadPointer(x) => format!("const {}*", to_type_specifier(g, x)),
         Type::ReadWritePointer(x) => format!("{}*", to_type_specifier(g, x)),
         Type::FnPointer(x) => fnpointer_to_typename(g, x),

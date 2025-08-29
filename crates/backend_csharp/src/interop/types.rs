@@ -13,10 +13,9 @@ use crate::interop::types::composite::write_type_definition_composite;
 use crate::interop::types::enums::write_type_definition_enum;
 use crate::interop::types::fnptrs::write_type_definition_fn_pointer;
 use crate::interop::wires::{write_type_definition_wired_enum, write_type_definitions_domain_wired, write_type_definitions_wired};
-use interoptopus::Error;
-use interoptopus::backend::IndentWriter;
-use interoptopus::lang::{DomainType, Type};
+use interoptopus::lang::{Type, WirePayload};
 use interoptopus::pattern::TypePattern;
+use interoptopus_backend_utils::{Error, IndentWriter};
 
 pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     for the_type in i.inventory.c_types() {
@@ -27,12 +26,9 @@ pub fn write_type_definitions(i: &Interop, w: &mut IndentWriter) -> Result<(), E
 }
 
 pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type) -> Result<(), Error> {
-    // eprintln!("🤡 Will {}write_type_definition {}", if i.should_emit_by_type(the_type) { "" } else { "NOT " }, the_type.name_within_lib());
     if !i.should_emit_by_type(the_type) {
         return Ok(());
     }
-
-    // eprintln!("🤡 write_type_definition {the_type:?}");
 
     match the_type {
         Type::Primitive(_) => {}
@@ -46,30 +42,29 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type)
             write_type_definition_composite(i, w, c)?;
             w.newline()?;
         }
-        Type::Wired(_) => panic!("Wired is emitted without counterpart"),
-        Type::Domain(dom) => match dom {
-            DomainType::Composite(wired) => {
+        Type::Wire(_) => panic!("Wired is emitted without counterpart"),
+        Type::WirePayload(dom) => match dom {
+            WirePayload::Composite(wired) => {
                 write_type_definitions_domain_wired(i, w, wired)?;
                 w.newline()?;
                 let wire_counterpart = i.wired_counterpart(&Type::Composite(wired.clone()));
-                eprintln!("✅ Wire counterpart for {} is {:?} ✅", wired.rust_name(), wire_counterpart);
-                if let Some(Type::Wired(wire)) = wire_counterpart {
+                if let Some(Type::Wire(wire)) = wire_counterpart {
                     write_type_definitions_wired(i, w, &wire)?;
                     w.newline()?;
                 }
             }
-            DomainType::String => {} // nothing todo!(),
-            DomainType::Enum(e) => {
+            WirePayload::String => {} // nothing todo!(),
+            WirePayload::Enum(e) => {
                 write_type_definition_wired_enum(i, w, e)?;
                 w.newline()?;
-                if let Some(Type::Wired(wire)) = i.wired_counterpart(&Type::Enum(e.clone())) {
+                if let Some(Type::Wire(wire)) = i.wired_counterpart(&Type::Enum(e.clone())) {
                     write_type_definitions_wired(i, w, &wire)?;
                     w.newline()?;
                 }
             }
-            DomainType::Option(_) => {} // nothing todo!(),
-            DomainType::Vec(_) => {}    // nothing todo!(),
-            DomainType::Map(_, _) => {} // nothing todo!(),
+            WirePayload::Option(_) => {} // nothing todo!(),
+            WirePayload::Vec(_) => {}    // nothing todo!(),
+            WirePayload::Map(_, _) => {} // nothing todo!(),
         },
         Type::FnPointer(f) => {
             write_type_definition_fn_pointer(i, w, f)?;

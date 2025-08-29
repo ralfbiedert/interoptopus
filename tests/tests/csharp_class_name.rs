@@ -1,5 +1,4 @@
 use anyhow::Error;
-use interoptopus::inventory::Bindings;
 use interoptopus::inventory::Inventory;
 use interoptopus::{builtins_string, ffi_function, function};
 use interoptopus_backend_csharp::Interop;

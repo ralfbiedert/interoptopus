@@ -1,8 +1,7 @@
 use crate::Interop;
-use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Function, SugaredReturnType};
 use interoptopus::pattern::callback::AsyncCallback;
-use interoptopus::{Error, render};
+use interoptopus_backend_utils::{Error, IndentWriter, render};
 
 /// Indicates the return type of a method from user code.
 ///
@@ -35,5 +34,6 @@ pub fn write_common_marshaller(_i: &Interop, w: &mut IndentWriter, managed: &str
         MoveSemantics::Copy => "To",
     };
 
-    render!(w, "marshaller.cs", ("managed", managed), ("in_to", prefix))
+    render!(w, "marshaller.cs", ("managed", managed), ("in_to", prefix))?;
+    Ok(())
 }

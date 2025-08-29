@@ -1,0 +1,21 @@
+[package]
+name = "interoptopus_backend_utils"
+description = "Utilities for backend authors"
+authors.workspace = true
+keywords = ["ffi", "code-generation", "bindings"]
+categories = ["api-bindings", "development-tools::ffi"]
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+documentation = "https://docs.rs/interoptopus/"
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+interoptopus.workspace = true
+tera = { workspace = true }
+
+

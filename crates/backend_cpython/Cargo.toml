@@ -15,7 +15,8 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
-interoptopus = { path = "../core", version = "0.15.0-alpha.12" }
+interoptopus.workspace = true
+interoptopus_backend_utils.workspace = true
 derive_builder = { workspace = true }
 tera.workspace = true
 include_dir.workspace = true

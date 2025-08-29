@@ -1,9 +1,9 @@
 use crate::Interop;
-use interoptopus::backend::IndentWriter;
-use interoptopus::{Error, indented};
+use interoptopus_backend_utils::{Error, IndentWriter, indented};
 
 pub fn write_custom_defines(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
-    indented!(w, "{}", i.custom_defines)
+    indented!(w, "{}", i.custom_defines)?;
+    Ok(())
 }
 
 pub fn write_ifndef(i: &Interop, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) -> Result<(), Error> {

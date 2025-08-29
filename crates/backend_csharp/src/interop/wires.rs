@@ -20,11 +20,9 @@
 //!    get wire wrappers).
 
 use crate::Interop;
-use crate::converter::{field_name, field_to_type};
-use crate::interop::FfiTransType;
-use interoptopus::backend::IndentWriter;
-use interoptopus::lang::{Composite, DomainType, Enum, Type, VariantKind, Visibility};
-use interoptopus::{Error, render};
+use crate::converter::{field_name, field_to_type, wire_suffix};
+use interoptopus::lang::{Composite, Enum, Type, VariantKind, Visibility, WirePayload};
+use interoptopus_backend_utils::{Error, IndentWriter, render};
 
 pub fn write_wire_helpers(_i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     // Add single copy of shared serialization helpers.
@@ -32,9 +30,8 @@ pub fn write_wire_helpers(_i: &Interop, w: &mut IndentWriter) -> Result<(), Erro
 }
 
 /// Generate a `WireOfT` definition
-pub fn write_type_definitions_wired(_i: &Interop, w: &mut IndentWriter, wired: &Composite) -> Result<(), Error> {
-    let type_name = wired.trans_type_name();
-
+pub fn write_type_definitions_wired(_i: &Interop, w: &mut IndentWriter, the_type: &Composite) -> Result<(), Error> {
+    let type_name = wire_suffix(the_type);
     render!(w, "wire/wire_of.cs", ("type", type_name))
 }
 
@@ -133,12 +130,12 @@ impl From<&Type> for Kind {
         match value {
             Type::Primitive(_) => Self::Primitive,
             Type::Enum(_) => Self::Enum,
-            Type::Domain(DomainType::String) => Self::String,
-            Type::Domain(DomainType::Vec(_)) => Self::Vec,
-            Type::Domain(DomainType::Map(_, _)) => Self::Map,
-            Type::Domain(DomainType::Enum(_)) => Self::Enum,
-            Type::Domain(DomainType::Option(_)) => Self::Optional,
-            Type::Domain(DomainType::Composite(_)) => Self::Composite,
+            Type::WirePayload(WirePayload::String) => Self::String,
+            Type::WirePayload(WirePayload::Vec(_)) => Self::Vec,
+            Type::WirePayload(WirePayload::Map(_, _)) => Self::Map,
+            Type::WirePayload(WirePayload::Enum(_)) => Self::Enum,
+            Type::WirePayload(WirePayload::Option(_)) => Self::Optional,
+            Type::WirePayload(WirePayload::Composite(_)) => Self::Composite,
             _ => panic!("Unsupported domain type kind {value:?}"),
         }
     }
@@ -256,13 +253,13 @@ fn get_primitive_size(csharp_type: &str) -> usize {
 
 fn extract_inner_type(a_type: &Type) -> (Kind, String) {
     match a_type {
-        Type::Domain(dom) => match dom {
-            DomainType::Vec(t) => (t.into(), field_to_type(t)),
-            DomainType::Option(o) => (o.into(), field_to_type(o)),
-            DomainType::Map(k, v) => (Kind::Map, format!("{}, {}", field_to_type(k), field_to_type(v))), // must be Kind::MapPair?
-            DomainType::Composite(_c) => (Kind::Composite, "?ask-me-how-we-got-here?".into()),
-            DomainType::String => (Kind::String, String::new()),
-            DomainType::Enum(_e) => (Kind::Enum, "!ask-me-how-we-got-here!".into()),
+        Type::WirePayload(dom) => match dom {
+            WirePayload::Vec(t) => (t.into(), field_to_type(t)),
+            WirePayload::Option(o) => (o.into(), field_to_type(o)),
+            WirePayload::Map(k, v) => (Kind::Map, format!("{}, {}", field_to_type(k), field_to_type(v))), // must be Kind::MapPair?
+            WirePayload::Composite(_c) => (Kind::Composite, "?ask-me-how-we-got-here?".into()),
+            WirePayload::String => (Kind::String, String::new()),
+            WirePayload::Enum(_e) => (Kind::Enum, "!ask-me-how-we-got-here!".into()),
         },
         _ => (Kind::Primitive, "object".to_string()), // ??? do we need a placeholder kind?
     }

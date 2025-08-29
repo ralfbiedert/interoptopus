@@ -1,8 +1,7 @@
 use crate::Interop;
-use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Docs;
 use interoptopus::pattern::api_guard::ApiHash;
-use interoptopus::{Error, indented, render};
+use interoptopus_backend_utils::{Error, IndentWriter, indented, render};
 
 const INTEROPTOPUS_CRATE: &str = env!("CARGO_PKG_NAME");
 const INTEROPTOPUS_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -19,7 +18,8 @@ pub fn write_file_header_comments(i: &Interop, w: &mut IndentWriter) -> Result<(
         context.insert("INTEROPTOPUS_CRATE", INTEROPTOPUS_CRATE);
         context.insert("INTEROPTOPUS_VERSION", INTEROPTOPUS_VERSION);
         let rendered = tera::Tera::one_off(header, &context, true).map_err(Error::Templating)?;
-        indented!(w, "{}", rendered)
+        indented!(w, "{}", rendered)?;
+        Ok(())
     } else {
         render!(
             w,

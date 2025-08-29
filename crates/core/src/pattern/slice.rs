@@ -37,7 +37,7 @@
 //! ```
 //!
 
-use crate::backend::capitalize_first_letter;
+use crate::lang::util::capitalize_first_letter;
 use crate::lang::{Composite, Docs, Field, Meta, Primitive, Representation, Type, Visibility};
 use crate::lang::{Layout, TypeInfo};
 use crate::pattern::TypePattern;

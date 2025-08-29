@@ -16,6 +16,16 @@ rust-version = "1.88"
 version = "0.15.0-alpha.12"
 
 [workspace.dependencies]
+# Internal
+interoptopus = { path = "crates/core", version = "0.15.0-alpha.12" }
+interoptopus_proc = { path = "crates/proc_macros", version = "0.15.0-alpha.12" }
+interoptopus_backend_c = { path = "crates/backend_c", version = "0.15.0-alpha.12" }
+interoptopus_backend_cpython = { path = "crates/backend_cpython", version = "0.15.0-alpha.12" }
+interoptopus_backend_csharp = { path = "crates/backend_csharp", version = "0.15.0-alpha.12" }
+interoptopus_backend_utils = { path = "crates/backend_utils", version = "0.15.0-alpha.12" }
+interoptopus_reference_project = { path = "crates/reference_project", version = "0.15.0-alpha.12" }
+
+# External
 anyhow = "1.0.98"
 darling = "0.20.11"
 derive_builder = "0.20.2"
@@ -29,7 +39,6 @@ quote = "1.0.40"
 serde = "1.0.219"
 syn = "2.0.104"
 tera = "1"
-thiserror = "2"
 
 [workspace.lints.clippy]
 correctness = { level = "deny", priority = -1 }

@@ -1,5 +1,5 @@
 //! Like a regular [`Vec`](std::vec::Vec), but FFI safe.<sup>🚧</sup>
-use crate::backend::capitalize_first_letter;
+use crate::lang::util::capitalize_first_letter;
 use crate::lang::{Composite, Docs, Field, Layout, Meta, Primitive, Representation, Type, TypeInfo};
 use crate::pattern::TypePattern;
 use std::mem::forget;

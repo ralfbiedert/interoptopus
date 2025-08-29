@@ -1,9 +1,7 @@
-use interoptopus::{
-    ffi, ffi_function, ffi_type,
-    lang::{Wire, Wireable},
-};
+use interoptopus::wire::{Wire, Wireable};
+use interoptopus::{ffi, ffi_function, ffi_type};
 
-#[ffi_type(wired, debug)]
+#[ffi_type(wired)]
 pub struct MyWiredType {
     name: String,
     values: Vec<u32>,

@@ -1,13 +1,11 @@
 use crate::Interop;
 use crate::converter::{const_value, rval_to_type_sync};
 use crate::interop::docs::write_documentation;
-use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Constant;
-use interoptopus::{Error, indented};
+use interoptopus_backend_utils::{Error, IndentWriter, indented};
 
 pub fn write_constants(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     for constant in i.inventory.constants() {
-        eprintln!("🚧 should_emit constant: {} 🚧", constant.name());
         if i.should_emit_by_meta(constant.meta()) {
             write_constant(i, w, constant)?;
             w.newline()?;
@@ -24,5 +22,6 @@ pub fn write_constant(i: &Interop, w: &mut IndentWriter, constant: &Constant) ->
     let value = const_value(constant.value());
 
     write_documentation(w, constant.meta().docs())?;
-    indented!(w, r"public const {} {} = ({}) {};", rval, name, rval, value)
+    indented!(w, r"public const {} {} = ({}) {};", rval, name, rval, value)?;
+    Ok(())
 }

@@ -28,7 +28,7 @@
 //! }
 //! ```
 
-use crate::backend::capitalize_first_letter;
+use crate::lang::util::capitalize_first_letter;
 use crate::lang::{Docs, Enum, Layout, Meta, Primitive, Representation, Type, Variant};
 use crate::lang::{TypeInfo, VariantKind};
 use crate::pattern::TypePattern;

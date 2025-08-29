@@ -86,7 +86,7 @@
 //! ```
 //!
 
-use crate::backend::longest_common_prefix;
+use crate::lang::util::longest_common_prefix;
 use crate::lang::{Function, Opaque};
 use crate::pattern::result::ResultAsPtr;
 use std::fmt::Debug;

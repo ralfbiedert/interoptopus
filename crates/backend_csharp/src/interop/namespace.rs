@@ -1,6 +1,5 @@
 use crate::Interop;
-use interoptopus::backend::IndentWriter;
-use interoptopus::{Error, indented};
+use interoptopus_backend_utils::{Error, IndentWriter, indented};
 
 pub fn write_namespace_context(i: &Interop, w: &mut IndentWriter, f: impl FnOnce(&mut IndentWriter) -> Result<(), Error>) -> Result<(), Error> {
     i.debug(w, "write_namespace_context")?;
@@ -12,5 +11,6 @@ pub fn write_namespace_context(i: &Interop, w: &mut IndentWriter, f: impl FnOnce
 
     w.unindent();
 
-    indented!(w, r"}}")
+    indented!(w, r"}}")?;
+    Ok(())
 }

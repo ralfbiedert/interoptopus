@@ -4,9 +4,8 @@ use crate::converter::{
 };
 use crate::interop::docs::write_documentation;
 use crate::utils::{MoveSemantics, write_common_marshaller};
-use interoptopus::backend::{IndentWriter, WriteFor};
 use interoptopus::lang::{Composite, Field, Layout, Type, Visibility};
-use interoptopus::{Error, indented};
+use interoptopus_backend_utils::{Error, IndentWriter, WriteFor, indented};
 
 pub fn write_type_definition_composite(i: &Interop, w: &mut IndentWriter, the_type: &Composite) -> Result<(), Error> {
     i.debug(w, "write_type_definition_composite")?;
@@ -156,10 +155,12 @@ pub fn write_type_definition_composite_marshaller(i: &Interop, w: &mut IndentWri
 #[allow(clippy::unused_self)]
 pub fn write_type_definition_composite_layout_annotation(w: &mut IndentWriter, the_type: &Composite) -> Result<(), Error> {
     match the_type.repr().layout() {
-        Layout::C | Layout::Transparent | Layout::Opaque => indented!(w, r"[StructLayout(LayoutKind.Sequential)]"),
-        Layout::Packed => indented!(w, r"[StructLayout(LayoutKind.Sequential, Pack = 1)]"),
+        Layout::C | Layout::Transparent | Layout::Opaque => indented!(w, r"[StructLayout(LayoutKind.Sequential)]")?,
+        Layout::Packed => indented!(w, r"[StructLayout(LayoutKind.Sequential, Pack = 1)]")?,
         Layout::Primitive(_) => panic!("Primitive layout not supported for structs."),
     }
+
+    Ok(())
 }
 
 pub fn write_type_definition_composite_body(i: &Interop, w: &mut IndentWriter, the_type: &Composite, write_for: WriteFor) -> Result<(), Error> {

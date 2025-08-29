@@ -1,5 +1,5 @@
 use anyhow::Error;
-use interoptopus::inventory::{Bindings, Inventory};
+use interoptopus::inventory::Inventory;
 use interoptopus::{extra_type, ffi_type};
 use interoptopus_backend_c::{EnumVariants, Interop};
 use tests::{compile_output_c, validate_output};

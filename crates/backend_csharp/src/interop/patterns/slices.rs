@@ -1,9 +1,8 @@
 use crate::Interop;
 use crate::converter::{is_reusable, slice_t};
 use crate::utils::{MoveSemantics, write_common_marshaller};
-use interoptopus::backend::IndentWriter;
 use interoptopus::pattern::slice::SliceType;
-use interoptopus::{Error, indented};
+use interoptopus_backend_utils::{Error, IndentWriter, indented};
 
 #[derive(PartialEq, Eq, Debug, Clone, Copy)]
 pub enum SliceKind {

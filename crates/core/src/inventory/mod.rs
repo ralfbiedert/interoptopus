@@ -4,9 +4,10 @@
 use crate::pattern::LibraryPattern;
 
 pub(crate) mod core;
+pub(crate) mod forbidden;
 
 use crate::lang::Function;
-pub use core::{Bindings, Inventory, InventoryBuilder, InventoryItem, Symbol};
+pub use core::{Inventory, InventoryBuilder, InventoryItem, Symbol};
 
 /// Returns all functions not belonging to a [`service`](crate::pattern::service) pattern.
 ///

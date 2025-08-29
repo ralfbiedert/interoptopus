@@ -6,11 +6,12 @@ rust-version.workspace = true
 publish = false
 
 [dependencies]
-interoptopus_backend_csharp = { path = "../crates/backend_csharp" }
-interoptopus_backend_c = { path = "../crates/backend_c" }
-interoptopus_backend_cpython = { path = "../crates/backend_cpython" }
-interoptopus_reference_project = { path = "../crates/reference_project" }
-interoptopus = { path = "../crates/core" }
+interoptopus_backend_csharp.workspace = true
+interoptopus_backend_c.workspace = true
+interoptopus_backend_cpython.workspace = true
+interoptopus_reference_project.workspace = true
+interoptopus.workspace = true
+interoptopus_backend_utils.workspace = true
 anyhow = "1.0.98"
 cc = "1.2.27"
 tempfile = "3.20.0"

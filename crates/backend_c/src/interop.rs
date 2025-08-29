@@ -6,6 +6,8 @@ mod imports;
 mod types;
 
 pub use functions::write_function_declaration;
+use std::fs::File;
+use std::path::Path;
 pub use types::write_type_definition;
 
 use crate::interop::constants::write_constants;
@@ -16,9 +18,8 @@ use crate::interop::imports::write_imports;
 use crate::interop::types::write_type_definitions;
 use derive_builder::Builder;
 use heck::{ToLowerCamelCase, ToShoutySnakeCase, ToSnakeCase, ToUpperCamelCase};
-use interoptopus::Error;
-use interoptopus::backend::IndentWriter;
-use interoptopus::inventory::{Bindings, Inventory};
+use interoptopus::inventory::Inventory;
+use interoptopus_backend_utils::{Error, IndentWriter};
 
 /// How to lay out functions.
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
@@ -166,7 +167,11 @@ impl Interop {
         &self.inventory
     }
 
-    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
+    /// Generates FFI binding code and writes them to the [`IndentWriter`].
+    ///
+    /// # Errors
+    /// Can result in an error if I/O failed.
+    pub fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
         write_file_header_comments(self, w)?;
         w.newline()?;
 
@@ -196,11 +201,27 @@ impl Interop {
 
         Ok(())
     }
-}
 
-impl Bindings for Interop {
-    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error> {
-        self.write_to(w)
+    /// Convenience method to write FFI bindings to the specified file with default indentation.
+    ///
+    /// # Errors
+    /// Can result in an error if I/O failed.
+    pub fn write_file<P: AsRef<Path>>(&self, file_name: P) -> Result<(), Error> {
+        let mut file = File::create(file_name)?;
+        let mut writer = IndentWriter::new(&mut file);
+
+        self.write_to(&mut writer)
+    }
+
+    /// Convenience method to write FFI bindings to a string.
+    ///
+    /// # Errors
+    /// Can result in an error if I/O failed.
+    pub fn to_string(&self) -> Result<String, Error> {
+        let mut vec = Vec::new();
+        let mut writer = IndentWriter::new(&mut vec);
+        self.write_to(&mut writer)?;
+        Ok(String::from_utf8(vec)?)
     }
 }
 

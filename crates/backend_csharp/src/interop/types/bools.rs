@@ -1,9 +1,8 @@
 use crate::Interop;
 use crate::converter::param_to_type;
-use interoptopus::backend::IndentWriter;
 use interoptopus::lang::Type;
 use interoptopus::pattern::TypePattern;
-use interoptopus::{Error, indented};
+use interoptopus_backend_utils::{Error, IndentWriter, indented};
 
 pub fn write_type_definition_ffibool(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     i.debug(w, "write_type_definition_ffibool")?;

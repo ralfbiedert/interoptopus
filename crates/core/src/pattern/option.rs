@@ -15,7 +15,7 @@
 //! ```
 //!
 
-use crate::backend::capitalize_first_letter;
+use crate::lang::util::capitalize_first_letter;
 use crate::lang::{Docs, Enum, Meta, Representation, Type, Variant, VariantKind};
 use crate::lang::{Layout, TypeInfo};
 use crate::pattern::TypePattern;

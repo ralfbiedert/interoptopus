@@ -1,5 +1,4 @@
 use anyhow::Error;
-use interoptopus::inventory::Bindings;
 use interoptopus_backend_csharp::Interop;
 use interoptopus_reference_project::ffi_inventory;
 use tests::backend_csharp::common_namespace_mappings;

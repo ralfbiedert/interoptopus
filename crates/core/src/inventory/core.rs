@@ -1,152 +1,8 @@
-use crate::Error;
-use crate::backend::{IndentWriter, extract_namespaces_from_types, extract_wire_types_from_functions, holds_opaque_without_ref, types_from_functions_types};
+use crate::inventory::forbidden::FORBIDDEN_NAMES;
+use crate::lang::util::{extract_namespaces_from_types, extract_wire_types_from_functions, holds_opaque_without_ref, types_from_functions_types};
 use crate::lang::{Constant, Function, Type};
 use crate::pattern::LibraryPattern;
 use std::collections::HashSet;
-use std::fs::File;
-use std::path::Path;
-
-const FORBIDDEN_NAMES: [&str; 139] = [
-    "abstract",
-    "add",
-    "alias",
-    "allows",
-    "and",
-    "args",
-    "as",
-    "ascending",
-    "assert",
-    "async",
-    "await",
-    "base",
-    "bool",
-    "break",
-    "by",
-    "byte",
-    "case",
-    "catch",
-    "char",
-    "checked",
-    "class",
-    "const",
-    "continue",
-    "decimal",
-    "def",
-    "default",
-    "del",
-    "delegate",
-    "descending",
-    "do",
-    "double",
-    "dynamic",
-    "elif",
-    "else",
-    "enum",
-    "equals",
-    "event",
-    "except",
-    "explicit",
-    "extension",
-    "extern",
-    "false",
-    "False",
-    "field",
-    "file",
-    "finally",
-    "fixed",
-    "float",
-    "for",
-    "foreach",
-    "from",
-    "get",
-    "global",
-    "goto",
-    "group",
-    "if",
-    "implicit",
-    "import",
-    "in",
-    "init",
-    "int",
-    "interface",
-    "internal",
-    "into",
-    "is",
-    "join",
-    "lambda",
-    "let",
-    "lock",
-    "long",
-    "managed",
-    "nameof",
-    "namespace",
-    "new",
-    "nint",
-    "None",
-    "nonlocal",
-    "not",
-    "notnull",
-    "nuint",
-    "null",
-    "object",
-    "on",
-    "operator",
-    "or",
-    "orderby",
-    "out",
-    "override",
-    "params",
-    "partial",
-    "pass",
-    "private",
-    "protected",
-    "public",
-    "raise",
-    "readonly",
-    "record",
-    "ref",
-    "remove",
-    "required",
-    "return",
-    "sbyte",
-    "scoped",
-    "sealed",
-    "select",
-    "set",
-    "short",
-    "signed",
-    "sizeof",
-    "stackalloc",
-    "static",
-    "string",
-    "struct",
-    "switch",
-    "this",
-    "throw",
-    "true",
-    "True",
-    "try",
-    "typedef",
-    "typeof",
-    "uint",
-    "ulong",
-    "unchecked",
-    "unmanaged",
-    "unsafe",
-    "unsigned",
-    "ushort",
-    "using",
-    "value",
-    "var",
-    "virtual",
-    "void",
-    "volatile",
-    "when",
-    "where",
-    "while",
-    "with",
-    "yield",
-];
 
 /// Tells the [`InventoryBuilder`] what to register.
 ///
@@ -292,7 +148,7 @@ pub struct Inventory {
     functions: Vec<Function>,
     /// FFI types and Domain types.
     c_types: Vec<Type>,
-    /// These are the types explicitly marked as Wire<T> in function declarations, we extract them here so we can
+    /// These are the types explicitly marked as `Wire<T>` in function declarations, we extract them here so we can
     /// rebuild the chain of custody and generate all appropriate types.
     /// Other wired types contained within these listed ones are already added to `c_types` as `Domain` types.
     wire_types: Vec<Type>,
@@ -352,6 +208,7 @@ impl Inventory {
         Self { functions, c_types, wire_types, constants, patterns, namespaces }
     }
 
+    /// Helper to debug the inventory.
     pub fn debug(&self) {
         eprintln!("✅ Inventory check");
         for ns in &self.namespaces {
@@ -393,7 +250,7 @@ impl Inventory {
     }
 
     /// Returns all found types; this includes types directly used in fields and parameters, and
-    /// all their recursive constitutents.
+    /// all their recursive constituents.
     #[must_use]
     pub fn c_types(&self) -> &[Type] {
         &self.c_types
@@ -406,7 +263,7 @@ impl Inventory {
         &self.wire_types
     }
 
-    /// Returns domain wire types; this includes types T directly and indirectly used in Wire<T> function parameters.
+    /// Returns domain wire types; this includes types `T` directly and indirectly used in `Wire<T>` function parameters.
     #[must_use]
     #[allow(clippy::redundant_closure_for_method_calls)]
     pub fn wire_domain_types(&self) -> Vec<Type> {
@@ -414,7 +271,7 @@ impl Inventory {
             .wire_types
             .iter()
             .flat_map(|wt| match wt {
-                Type::Wired(w) => w
+                Type::Wire(w) => w
                     .fields()
                     .iter()
                     .filter(|&f| matches!(f.the_type(), Type::Composite(_)))
@@ -476,39 +333,6 @@ impl Inventory {
         let namespaces: Vec<String> = self.namespaces.iter().filter(|x| predicate(InventoryItem::Namespace(x))).cloned().collect();
 
         Self { functions, c_types, wire_types, constants, patterns, namespaces }
-    }
-}
-
-/// Main entry point for backends to generate language bindings.
-///
-/// This trait will be implemented by each backend and is the main way to interface with a generator.
-pub trait Bindings {
-    /// Generates FFI binding code and writes them to the [`IndentWriter`].
-    ///
-    /// # Errors
-    /// Can result in an error if I/O failed.
-    fn write_to(&self, w: &mut IndentWriter) -> Result<(), Error>;
-
-    /// Convenience method to write FFI bindings to the specified file with default indentation.
-    ///
-    /// # Errors
-    /// Can result in an error if I/O failed.
-    fn write_file<P: AsRef<Path>>(&self, file_name: P) -> Result<(), Error> {
-        let mut file = File::create(file_name)?;
-        let mut writer = IndentWriter::new(&mut file);
-
-        self.write_to(&mut writer)
-    }
-
-    /// Convenience method to write FFI bindings to a string.
-    ///
-    /// # Errors
-    /// Can result in an error if I/O failed.
-    fn to_string(&self) -> Result<String, Error> {
-        let mut vec = Vec::new();
-        let mut writer = IndentWriter::new(&mut vec);
-        self.write_to(&mut writer)?;
-        Ok(String::from_utf8(vec)?)
     }
 }
 

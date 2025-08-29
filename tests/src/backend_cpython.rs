@@ -1,16 +1,16 @@
-use interoptopus::Error;
+use interoptopus_backend_utils::Error;
 use std::io::ErrorKind;
 use std::path::Path;
 use std::process::Command;
 
 /// If `python` is installed, run the given file from `path`, ignore and succeed otherwise.
-pub fn run_python_if_installed<P: AsRef<Path>>(path: P, file: &str) -> Result<String, Error> {
+pub fn run_python_if_installed<P: AsRef<Path>>(path: P, file: &str) -> Result<String, interoptopus_backend_utils::Error> {
     let child = match Command::new("/c/Users/rb/.miniconda3/python").arg(file).current_dir(path).spawn() {
         Ok(x) => x,
         Err(x @ std::io::Error { .. }) if x.kind() == ErrorKind::NotFound => {
             return Ok("Python not found, skipped".to_string());
         }
-        Err(x) => return Err(Error::IO(x)),
+        Err(x) => return Err(Error::Io(x)),
     };
 
     let output = child.wait_with_output()?;

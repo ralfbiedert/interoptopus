@@ -1,5 +1,5 @@
 use anyhow::Error;
-use interoptopus::inventory::{Bindings, Inventory};
+use interoptopus::inventory::Inventory;
 use interoptopus::{ffi_function, function};
 use interoptopus_backend_c::{DocStyle, Interop};
 use tests::{compile_output_c, validate_output};

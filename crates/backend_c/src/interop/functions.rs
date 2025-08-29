@@ -2,9 +2,8 @@ use crate::converters::{function_name_to_c_name, to_type_specifier};
 use crate::interop::ToNamingStyle;
 use crate::interop::docs::write_documentation;
 use crate::{DocStyle, Functions, Interop};
-use interoptopus::backend::IndentWriter;
 use interoptopus::lang::{Function, Type};
-use interoptopus::{Error, indented};
+use interoptopus_backend_utils::{Error, IndentWriter, indented};
 
 pub fn write_functions(i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     for function in i.inventory.functions() {

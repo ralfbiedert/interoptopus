@@ -3,10 +3,10 @@
 //! Normal users of Interoptopus probably won't have to concern
 //! themselves with any of the items in this module.
 
-use crate::backend::{capitalize_first_letter, types_from_type_recursive};
 use crate::pattern::TypePattern;
 use std::collections::HashSet;
 
+use crate::lang::util::{capitalize_first_letter, types_from_type_recursive};
 use crate::pattern::callback::AsyncCallback;
 use crate::pattern::result::ResultType;
 pub use array::Array;
@@ -17,8 +17,9 @@ pub use fnpointer::FnPointer;
 pub use function::{Function, Parameter, Signature, SugaredReturnType};
 pub use info::{ConstantInfo, FunctionInfo, TypeInfo};
 pub use meta::{Docs, Meta, Visibility};
+pub use namespace::NamespaceMappings;
 pub use primitive::{Primitive, PrimitiveValue};
-pub use wire::{Unwireable, Wire, WireError, WireInfo, Wireable};
+pub use wire::WireInfo;
 
 mod array;
 mod composite;
@@ -28,8 +29,13 @@ mod fnpointer;
 mod function;
 mod info;
 mod meta;
+mod namespace;
 mod primitive;
-pub mod wire;
+pub mod util;
+mod wire;
+
+/// The namespace used by common types, e.g., `ffi::String`.
+pub const NAMESPACE_COMMON: &str = "_common";
 
 /// A type that can exist at the FFI boundary.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -39,11 +45,12 @@ pub enum Type {
     Enum(Enum),
     Opaque(Opaque),
     Composite(Composite),
-    /// A composite type, serialized and deserialized through the FFI boundary. Wire<T> on Rust side.
-    Wired(Composite),
-    /// A domain type, serialized and deserialized through the FFI boundary. These are all types used from Wire<T> but not including this type itself.
-    /// These types do not require full `Wire<T>` framework, only to be able to serialize and deserialize themselves through a buffer.
-    Domain(DomainType),
+    /// A composite type, serialized and deserialized through the FFI boundary. `Wire<T>` on Rust side.
+    Wire(Composite), // TODO: is this a Pattern?
+    /// A type, serialized and deserialized through the FFI boundary. These are all types used from
+    /// `Wire<T>` but not including this type itself. These types do not require full `Wire<T>` framework,
+    /// only to be able to serialize and deserialize themselves through a buffer.
+    WirePayload(WirePayload),
     FnPointer(FnPointer),
     ReadPointer(Box<Type>),
     ReadWritePointer(Box<Type>),
@@ -52,8 +59,9 @@ pub enum Type {
     Pattern(TypePattern),
 }
 
+/// The type contained inside a [`Wire`](crate::wire::Wire).
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub enum DomainType {
+pub enum WirePayload {
     Composite(Composite),
     String,
     Enum(Enum),
@@ -121,14 +129,14 @@ impl Type {
             Self::Enum(x) => x.rust_name().to_string(),
             Self::Opaque(x) => x.rust_name().to_string(),
             Self::Composite(x) => x.rust_name().to_string(),
-            Self::Wired(x) => x.rust_name().to_string(),
-            Self::Domain(dom) => match dom {
-                DomainType::Composite(x) => x.rust_name().to_string(),
-                DomainType::String => "String".to_string(),
-                DomainType::Enum(x) => x.rust_name().to_string(),
-                DomainType::Option(x) => format!("Option{}", capitalize_first_letter(x.name_within_lib().as_str())),
-                DomainType::Vec(x) => format!("Vec{}", capitalize_first_letter(x.name_within_lib().as_str())),
-                DomainType::Map(k, v) => {
+            Self::Wire(x) => x.rust_name().to_string(),
+            Self::WirePayload(dom) => match dom {
+                WirePayload::Composite(x) => x.rust_name().to_string(),
+                WirePayload::String => "String".to_string(),
+                WirePayload::Enum(x) => x.rust_name().to_string(),
+                WirePayload::Option(x) => format!("Option{}", capitalize_first_letter(x.name_within_lib().as_str())),
+                WirePayload::Vec(x) => format!("Vec{}", capitalize_first_letter(x.name_within_lib().as_str())),
+                WirePayload::Map(k, v) => {
                     format!("Map{}To{}", capitalize_first_letter(k.name_within_lib().as_str()), capitalize_first_letter(v.name_within_lib().as_str()))
                 }
             },
@@ -162,8 +170,8 @@ impl Type {
             Self::Enum(_) => None,
             Self::Opaque(_) => None,
             Self::Composite(_) => None,
-            Self::Wired(_) => None,
-            Self::Domain(_) => todo!(),
+            Self::Wire(_) => None,
+            Self::WirePayload(_) => todo!(),
             Self::FnPointer(_) => None,
             Self::ReadPointer(x) => Some(x.as_ref()),
             Self::ReadWritePointer(x) => Some(x.as_ref()),
@@ -177,7 +185,7 @@ impl Type {
     pub const fn as_composite_type(&self) -> Option<&Composite> {
         match self {
             Self::Composite(x) => Some(x),
-            Self::Wired(x) => Some(x),
+            Self::Wire(x) => Some(x),
             _ => None,
         }
     }
@@ -241,14 +249,14 @@ impl Type {
             Self::Enum(t) => Some(t.meta().module()),
             Self::Opaque(t) => Some(t.meta().module()),
             Self::Composite(t) => Some(t.meta().module()),
-            Self::Wired(t) => Some(t.meta().module()),
-            Self::Domain(d) => match d {
-                DomainType::Composite(t) => Some(t.meta().module()),
-                DomainType::String => None,
-                DomainType::Enum(t) => Some(t.meta().module()),
-                DomainType::Option(t) => t.namespace(),
-                DomainType::Vec(t) => t.namespace(),
-                DomainType::Map(_, _) => todo!(),
+            Self::Wire(t) => Some(t.meta().module()),
+            Self::WirePayload(d) => match d {
+                WirePayload::Composite(t) => Some(t.meta().module()),
+                WirePayload::String => None,
+                WirePayload::Enum(t) => Some(t.meta().module()),
+                WirePayload::Option(t) => t.namespace(),
+                WirePayload::Vec(t) => t.namespace(),
+                WirePayload::Map(_, _) => todo!(),
             },
             Self::Pattern(TypePattern::NamedCallback(t)) => Some(t.meta().module()),
             _ => None,
@@ -257,6 +265,6 @@ impl Type {
 
     #[must_use]
     pub fn is_wired(&self) -> bool {
-        matches!(self, Self::Wired(_))
+        matches!(self, Self::Wire(_))
     }
 }
