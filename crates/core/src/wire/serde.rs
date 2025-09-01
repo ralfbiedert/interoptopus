@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use crate::wire::WireError;
+use std::collections::HashMap;
 use std::io::{Read, Write};
 
 /// Implemented via the ffi wired attribute to be usable inside [`Wire`](crate::wire::Wire).
@@ -28,8 +28,8 @@ macro_rules! impl_primitive_wire {
     ($($ty:ty),+) => {
         $(
         impl $crate::wire::Ser for $ty {
-            fn ser(&self, out: &mut impl Write) -> Result<(), WireError> {
-                out.write_all(&self.to_le_bytes()).map_err(WireError::Io)
+            fn ser(&self, out: &mut impl ::std::io::Write) -> ::std::result::Result<(), $crate::wire::WireError> {
+                out.write_all(&self.to_le_bytes()).map_err($crate::wire::WireError::Io)
             }
 
             fn storage_size(&self) -> usize {
@@ -38,7 +38,7 @@ macro_rules! impl_primitive_wire {
         }
 
         impl $crate::wire::De for $ty {
-            fn de(input: &mut impl Read) -> Result<Self, WireError> {
+            fn de(input: &mut impl ::std::io::Read) -> ::std::result::Result<Self, $crate::wire::WireError> {
                 let mut bytes = [0; ::std::mem::size_of::<$ty>()];
                 input.read_exact(&mut bytes)?;
                 Ok(<$ty>::from_le_bytes(bytes))
@@ -58,7 +58,7 @@ impl Ser for bool {
     }
 
     fn storage_size(&self) -> usize {
-        std::mem::size_of::<Self>()
+        size_of::<Self>()
     }
 }
 
@@ -86,7 +86,7 @@ impl<T: Ser> Ser for Option<T> {
     }
 
     fn storage_size(&self) -> usize {
-        std::mem::size_of::<bool>() + self.as_ref().map_or(0, Ser::storage_size)
+        size_of::<bool>() + self.as_ref().map_or(0, Ser::storage_size)
     }
 }
 
@@ -111,7 +111,7 @@ impl<T: Ser> Ser for Vec<T> {
     }
 
     fn storage_size(&self) -> usize {
-        std::mem::size_of::<usize>() + self.iter().map(Ser::storage_size).sum::<usize>()
+        size_of::<usize>() + self.iter().map(Ser::storage_size).sum::<usize>()
     }
 }
 
@@ -181,7 +181,7 @@ macro_rules! impl_tuple_wire {
         #[allow(non_snake_case)]
         impl<$($name: Ser),+> crate::wire::Ser for ($($name,)+)
         {
-            fn ser(&self, output: &mut impl Write) -> Result<(), WireError> {
+            fn ser(&self, output: &mut impl ::std::io::Write) -> ::std::result::Result<(), $crate::wire::WireError> {
                 let ($($name,)+) = self;
                 $(
                     $name.ser(output)?;
@@ -200,7 +200,7 @@ macro_rules! impl_tuple_wire {
         #[allow(non_snake_case)]
         impl<$($name: De),+> crate::wire::De for ($($name,)+)
         {
-            fn de(input: &mut impl Read) -> Result<Self, WireError> {
+            fn de(input: &mut impl ::std::io::Read) -> ::std::result::Result<Self, $crate::wire::WireError> {
                 Ok((
                 $(
                     $name::de(input)?,
