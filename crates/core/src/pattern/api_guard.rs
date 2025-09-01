@@ -72,6 +72,7 @@ impl ApiVersion {
 }
 
 unsafe impl TypeInfo for ApiVersion {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         Type::Pattern(TypePattern::APIVersion)
     }

@@ -36,6 +36,7 @@ impl Bool {
 }
 
 unsafe impl TypeInfo for Bool {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         Type::Pattern(TypePattern::Bool)
     }
@@ -77,6 +78,7 @@ impl CChar {
 }
 
 unsafe impl TypeInfo for CChar {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         Type::Pattern(TypePattern::CChar)
     }

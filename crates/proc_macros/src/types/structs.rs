@@ -2,7 +2,7 @@ use crate::types::TypeRepresentation::Opaque;
 use crate::types::{Attributes, TypeRepresentation};
 use crate::util::extract_doc_lines;
 use proc_macro2::{Ident, Span, TokenStream};
-use quote::{ToTokens, quote};
+use quote::{quote, ToTokens};
 use syn::spanned::Spanned;
 use syn::{GenericParam, ItemStruct, Type};
 
@@ -357,6 +357,7 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
             TypeRepresentation::C | TypeRepresentation::Opaque | TypeRepresentation::Packed => {
                 quote! {
                     unsafe impl #param_param ::interoptopus::lang::TypeInfo for #struct_ident #param_struct #param_where {
+                        const RAW_SAFE: bool = true;
 
                         fn type_info() -> ::interoptopus::lang::Type {
                             let docs = ::interoptopus::lang::Docs::from_line(#doc_line);
@@ -378,6 +379,7 @@ pub fn ffi_type_struct(attributes: &Attributes, _input: TokenStream, mut item: I
 
                 quote! {
                     unsafe impl #param_param ::interoptopus::lang::TypeInfo for #struct_ident #param_struct #param_where {
+                        const RAW_SAFE: bool = true;
 
                         fn type_info() -> ::interoptopus::lang::Type {
                             < #first_field_type > :: type_info()

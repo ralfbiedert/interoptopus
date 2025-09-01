@@ -25,10 +25,10 @@
 //! void call_with_string(uint8_t* s);
 //! ```
 //!
-use crate::Error;
 use crate::lang::Type;
 use crate::lang::TypeInfo;
 use crate::pattern::TypePattern;
+use crate::Error;
 use std::ffi::CStr;
 use std::marker::PhantomData;
 use std::option::Option::None;
@@ -122,6 +122,7 @@ impl<'a> CStrPtr<'a> {
 }
 
 unsafe impl TypeInfo for CStrPtr<'_> {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         Type::Pattern(TypePattern::CStrPointer)
     }

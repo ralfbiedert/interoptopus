@@ -83,6 +83,8 @@ unsafe impl<T> TypeInfo for Vec<T>
 where
     T: TypeInfo,
 {
+    const RAW_SAFE: bool = T::RAW_SAFE;
+
     #[rustfmt::skip]
     fn type_info() -> Type {
         let fields = vec![

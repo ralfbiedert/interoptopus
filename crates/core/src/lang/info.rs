@@ -22,6 +22,8 @@ pub unsafe trait ConstantInfo {
 /// This trait must be implemented correctly, or else the generated bindings disagree in
 /// their type layout from the actual Rust type, leading to immediate UB upon function invocation.
 pub unsafe trait TypeInfo {
+    const RAW_SAFE: bool;
+
     fn type_info() -> Type;
 }
 
@@ -49,6 +51,7 @@ macro_rules! impl_ctype_primitive {
         $primitive:expr
     ) => {
         unsafe impl crate::lang::TypeInfo for $rust_type {
+            const RAW_SAFE: bool = true;
             fn type_info() -> Type {
                 Type::Primitive($primitive)
             }
@@ -123,6 +126,7 @@ unsafe impl<T> TypeInfo for NonNull<T>
 where
     T: TypeInfo,
 {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         Type::ReadWritePointer(Box::new(T::type_info()))
     }
@@ -132,6 +136,7 @@ unsafe impl<T> TypeInfo for &'_ T
 where
     T: TypeInfo + Sized + 'static,
 {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         Type::ReadPointer(Box::new(T::type_info()))
     }
@@ -141,6 +146,7 @@ unsafe impl<T> TypeInfo for &'_ mut T
 where
     T: TypeInfo + Sized + 'static,
 {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         Type::ReadWritePointer(Box::new(T::type_info()))
     }
@@ -150,6 +156,7 @@ unsafe impl<T> TypeInfo for *const T
 where
     T: TypeInfo + Sized + 'static,
 {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         Type::ReadPointer(Box::new(T::type_info()))
     }
@@ -159,6 +166,7 @@ unsafe impl<T> TypeInfo for *mut T
 where
     T: TypeInfo + Sized + 'static,
 {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         Type::ReadWritePointer(Box::new(T::type_info()))
     }
@@ -168,6 +176,7 @@ unsafe impl<T> TypeInfo for Option<&'_ T>
 where
     T: TypeInfo + Sized + 'static,
 {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         Type::ReadPointer(Box::new(T::type_info()))
     }
@@ -177,6 +186,7 @@ unsafe impl<T> TypeInfo for Option<&'_ mut T>
 where
     T: TypeInfo + Sized + 'static,
 {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         Type::ReadWritePointer(Box::new(T::type_info()))
     }
@@ -186,6 +196,7 @@ unsafe impl<R> TypeInfo for extern "C" fn() -> R
 where
     R: TypeInfo,
 {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         let sig = Signature::new(vec![], R::type_info());
         Type::FnPointer(FnPointer::new(sig))
@@ -196,6 +207,7 @@ unsafe impl<R> TypeInfo for Option<extern "C" fn() -> R>
 where
     R: TypeInfo,
 {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         let sig = Signature::new(vec![], R::type_info());
         Type::FnPointer(FnPointer::new(sig))
@@ -207,6 +219,7 @@ where
     T1: TypeInfo,
     R: TypeInfo,
 {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         let sig = Signature::new(vec![Parameter::new("x0".to_string(), T1::type_info())], R::type_info());
         Type::FnPointer(FnPointer::new(sig))
@@ -218,6 +231,7 @@ where
     T1: TypeInfo,
     R: TypeInfo,
 {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         let sig = Signature::new(vec![Parameter::new("x0".to_string(), T1::type_info())], R::type_info());
         Type::FnPointer(FnPointer::new(sig))
@@ -230,6 +244,7 @@ where
     T2: TypeInfo,
     R: TypeInfo,
 {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         let sig = Signature::new(vec![Parameter::new("x0".to_string(), T1::type_info()), Parameter::new("x1".to_string(), T2::type_info())], R::type_info());
         Type::FnPointer(FnPointer::new(sig))
@@ -242,6 +257,7 @@ where
     T2: TypeInfo,
     R: TypeInfo,
 {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         let sig = Signature::new(vec![Parameter::new("x0".to_string(), T1::type_info()), Parameter::new("x1".to_string(), T2::type_info())], R::type_info());
         Type::FnPointer(FnPointer::new(sig))
@@ -255,6 +271,7 @@ where
     T3: TypeInfo,
     R: TypeInfo,
 {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         let sig = Signature::new(
             vec![
@@ -275,6 +292,7 @@ where
     T3: TypeInfo,
     R: TypeInfo,
 {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         let sig = Signature::new(
             vec![
@@ -296,6 +314,7 @@ where
     T4: TypeInfo,
     R: TypeInfo,
 {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         let sig = Signature::new(
             vec![
@@ -318,6 +337,7 @@ where
     T4: TypeInfo,
     R: TypeInfo,
 {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         let sig = Signature::new(
             vec![
@@ -341,6 +361,7 @@ where
     T5: TypeInfo,
     R: TypeInfo,
 {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         let sig = Signature::new(
             vec![
@@ -365,6 +386,7 @@ where
     T5: TypeInfo,
     R: TypeInfo,
 {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         let sig = Signature::new(
             vec![
@@ -384,6 +406,7 @@ unsafe impl<T, const N: usize> TypeInfo for [T; N]
 where
     T: TypeInfo,
 {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         Type::Array(Array::new(T::type_info(), N))
     }
@@ -393,6 +416,7 @@ unsafe impl<T> TypeInfo for MaybeUninit<T>
 where
     T: TypeInfo,
 {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         T::type_info()
     }

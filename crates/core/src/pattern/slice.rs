@@ -123,6 +123,8 @@ unsafe impl<T> TypeInfo for Slice<'_, T>
 where
     T: TypeInfo,
 {
+    const RAW_SAFE: bool = T::RAW_SAFE;
+
     #[rustfmt::skip]
     fn type_info() -> Type {
         let doc_data = Docs::from_line("Pointer to start of immutable data.");
@@ -229,6 +231,8 @@ unsafe impl<T> TypeInfo for SliceMut<'_, T>
 where
     T: TypeInfo,
 {
+    const RAW_SAFE: bool = T::RAW_SAFE;
+
     #[rustfmt::skip]
     fn type_info() -> Type {
         let doc_data = Docs::from_line("Pointer to start of mutable data.");

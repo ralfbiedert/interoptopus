@@ -287,6 +287,7 @@ macro_rules! callback {
 
         #[allow(unused_mut)]
         unsafe impl $crate::lang::TypeInfo for $name {
+            const RAW_SAFE: bool = true;
             fn type_info() -> $crate::lang::Type {
                 use $crate::lang::{TypeInfo, Type, Meta, Docs, Primitive, Parameter, Signature, FnPointer};
 

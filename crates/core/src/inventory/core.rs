@@ -164,7 +164,7 @@ pub struct Inventory {
 #[derive(Clone, Debug, PartialEq)]
 pub enum InventoryItem<'a> {
     Function(&'a Function),
-    CType(&'a Type),
+    Type(&'a Type),
     WireType(&'a Type),
     Constant(&'a Constant),
     Pattern(&'a LibraryPattern),
@@ -318,7 +318,7 @@ impl Inventory {
     /// #
     /// let filtered = inventory.filter(|x| {
     ///     match x {
-    ///         InventoryItem::CType(_) => true,
+    ///         InventoryItem::Type(_) => true,
     ///         _ => false,
     ///     }
     /// });
@@ -326,7 +326,7 @@ impl Inventory {
     #[must_use]
     pub fn filter<P: FnMut(InventoryItem) -> bool>(&self, mut predicate: P) -> Self {
         let functions: Vec<Function> = self.functions.iter().filter(|x| predicate(InventoryItem::Function(x))).cloned().collect();
-        let c_types: Vec<Type> = self.c_types.iter().filter(|x| predicate(InventoryItem::CType(x))).cloned().collect();
+        let c_types: Vec<Type> = self.c_types.iter().filter(|x| predicate(InventoryItem::Type(x))).cloned().collect();
         let wire_types: Vec<Type> = self.wire_types.iter().filter(|x| predicate(InventoryItem::WireType(x))).cloned().collect();
         let constants: Vec<Constant> = self.constants.iter().filter(|x| predicate(InventoryItem::Constant(x))).cloned().collect();
         let patterns: Vec<LibraryPattern> = self.patterns.iter().filter(|x| predicate(InventoryItem::Pattern(x))).cloned().collect();

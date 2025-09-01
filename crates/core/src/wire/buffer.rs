@@ -158,6 +158,8 @@ impl Drop for WireBuffer<'_> {
 }
 
 unsafe impl TypeInfo for WireBuffer<'_> {
+    const RAW_SAFE: bool = true;
+
     fn type_info() -> Type {
         let fields = vec![
             Field::new("data".to_string(), Type::ReadPointer(Box::new(Type::Primitive(Primitive::U8)))),

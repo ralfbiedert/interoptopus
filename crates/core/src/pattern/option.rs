@@ -112,6 +112,7 @@ unsafe impl<T> TypeInfo for Option<T>
 where
     T: TypeInfo,
 {
+    const RAW_SAFE: bool = T::RAW_SAFE;
     fn type_info() -> Type {
         let doc_t = Docs::from_line("Element if Some().");
 

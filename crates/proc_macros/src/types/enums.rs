@@ -2,7 +2,7 @@ use crate::types::{Attributes, TypeRepresentation};
 use crate::util::extract_doc_lines;
 use proc_macro2::TokenStream;
 use quote::__private::ext::RepToTokensExt;
-use quote::{ToTokens, quote, quote_spanned};
+use quote::{quote, quote_spanned, ToTokens};
 use syn::spanned::Spanned;
 use syn::{Expr, Fields, GenericParam, ItemEnum, Lit};
 
@@ -308,6 +308,8 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
     } else {
         quote! {
             unsafe impl #param_param  ::interoptopus::lang::TypeInfo for #name_ident #param_struct #param_where {
+                const RAW_SAFE: bool = true;
+
                 fn type_info() -> ::interoptopus::lang::Type {
                     let mut variants = ::std::vec::Vec::new();
                     let docs = ::interoptopus::lang::Docs::from_line(#doc_line);

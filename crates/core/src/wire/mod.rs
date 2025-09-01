@@ -202,6 +202,8 @@ unsafe impl<T> TypeInfo for Wire<'_, T>
 where
     T: Ser + De + WireInfo,
 {
+    const RAW_SAFE: bool = false;
+
     fn type_info() -> Type {
         let fields = vec![Field::new("buf".to_string(), WireBuffer::type_info())];
 

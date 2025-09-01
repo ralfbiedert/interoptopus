@@ -55,6 +55,7 @@ impl<T: TypeInfo> From<AsyncCallback<T>> for Option<extern "C" fn(&T, *const c_v
 }
 
 unsafe impl<T: TypeInfo> TypeInfo for AsyncCallback<T> {
+    const RAW_SAFE: bool = true;
     fn type_info() -> Type {
         let rval = <() as TypeInfo>::type_info();
 

@@ -34,7 +34,7 @@ use crate::lang::{TypeInfo, VariantKind};
 use crate::pattern::TypePattern;
 use std::any::Any;
 use std::fmt::Debug;
-use std::panic::{AssertUnwindSafe, catch_unwind};
+use std::panic::{catch_unwind, AssertUnwindSafe};
 
 /// Extracts a string message from a panic unwind.
 pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
@@ -119,6 +119,8 @@ where
     T: TypeInfo,
     E: TypeInfo,
 {
+    const RAW_SAFE: bool = T::RAW_SAFE && E::RAW_SAFE;
+
     fn type_info() -> Type {
         let doc_t = Docs::from_line("Element if err is `Ok`.");
         let doc_err = Docs::from_line("Error value.");

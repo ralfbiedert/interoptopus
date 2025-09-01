@@ -49,7 +49,7 @@
 use crate::lang::Type;
 use crate::lang::TypeInfo;
 use std::marker::PhantomData;
-use std::mem::{ManuallyDrop, transmute};
+use std::mem::{transmute, ManuallyDrop};
 
 /// A marker trait for types that are surrogates for other types.
 ///
@@ -70,6 +70,8 @@ pub struct Surrogate<T, L: TypeInfo> {
 }
 
 unsafe impl<T, L: TypeInfo + CorrectSurrogate<T>> TypeInfo for Surrogate<T, L> {
+    const RAW_SAFE: bool = true;
+
     fn type_info() -> Type {
         assert_eq!(size_of::<T>(), size_of::<L>());
         L::type_info()
