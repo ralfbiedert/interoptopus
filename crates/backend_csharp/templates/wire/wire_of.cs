@@ -3,19 +3,26 @@
 /// Mirrors the Rust Wire&lt;{{type}}&gt; structure layout.
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct WireOf{{type}}
+public unsafe partial struct WireOf{{type}}
 {
     /// <summary>Pointer to buffer data</summary>
-    public byte* Data;
+    byte* Data;
 
     /// <summary>Length of valid data in buffer</summary>
-    public int Length;
+    int Length;
 
     /// <summary>
     /// Encoded capacity: 0=borrowed, >0=Rust-allocated, <0=C#-allocated (abs value = actual capacity)
     /// </summary>
-    public int Capacity;
+    int Capacity;
+}
 
+/// <summary>
+/// FFI-safe wire representation for {{type}}.
+/// Mirrors the Rust Wire&lt;{{type}}&gt; structure layout.
+/// </summary>
+public unsafe partial struct WireOf{{type}}
+{
     /// <summary>
     /// Create a Wire from a managed {{type}} object with owned buffer
     /// </summary>
@@ -85,7 +92,7 @@ public unsafe struct WireOf{{type}}
         {
             if (IsOwned) {
                 if (Capacity > 0) {
-                    WireInterop.deallocate_wire_buffer_storage((IntPtr)Data, Length, Capacity);
+                    WireInterop.interoptopus_wire_destroy((IntPtr)Data, Length, Capacity);
                 } else {
                     Marshal.FreeHGlobal((IntPtr)Data);
                 }

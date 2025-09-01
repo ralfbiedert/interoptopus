@@ -1,7 +1,7 @@
 public partial class WireInterop {
-    [LibraryImport(Interop.NativeLib, EntryPoint = "deallocate_wire_buffer_storage")]
+    [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_wire_destroy")]
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    public static partial void deallocate_wire_buffer_storage(IntPtr data, int len, int capacity);
+    public static partial void interoptopus_wire_destroy(IntPtr data, int len, int capacity);
 
     #region Serialization Helpers
     #nullable enable

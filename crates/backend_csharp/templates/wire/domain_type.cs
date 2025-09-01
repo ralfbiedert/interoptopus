@@ -1,6 +1,3 @@
-/// <summary>
-/// Domain type that is sent across FFI boundary in a Wire.
-/// </summary>
 {%- if docs %}
 ///
 {%- for line in docs %}
@@ -14,7 +11,10 @@
     /// {{field.docs}}
     {{field.visibility}}{{field.type_name}} {{field.name}};
 {%- endfor %}
+}
 
+{{visibility}} {{self_kind}} {{type}}
+{
     /// <summary>Empty constructor</summary>
     public {{type}}() { }
 
