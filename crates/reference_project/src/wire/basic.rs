@@ -1,28 +1,14 @@
-use interoptopus::wire::{Wire, Wireable};
-use interoptopus::{ffi, ffi_function, ffi_type};
+use interoptopus::wire::Wire;
+use interoptopus::{ffi_function, ffi_type};
+
+// TODO: This fails to codegen on C#
+#[ffi_function]
+fn wire_accept_string_1(_input: Wire<String>) {}
 
 #[ffi_type(wired)]
-pub struct MyWiredType {
-    name: String,
-    values: Vec<u32>,
-}
-
-// input is a serialized representation, parse it to access MyWiredType.
-// serialize resulting MyWiredType into a buffer and return it as WireOfMyWiredType on C# side
-#[ffi_function]
-fn perform_miracles(mut input: Wire<MyWiredType>) -> Wire<MyWiredType> {
-    let w = input.unwire().expect("Something went wrong");
-    w.wire()
+pub struct MyString {
+    pub x: String,
 }
 
 #[ffi_function]
-fn perform_half_miracles(mut input: Wire<MyWiredType>, other: ffi::String) -> ffi::String {
-    let w = input.unwire().expect("Something went wrong");
-    let result = format!("{} {}", w.name, other.as_str());
-    result.into()
-}
-
-#[ffi_function]
-fn perform_half_miracles_in_other_direction(input: ffi::String) -> Wire<'static, MyWiredType> {
-    MyWiredType { name: input.as_str().to_owned(), values: vec![] }.wire()
-}
+fn wire_accept_string_2(_input: Wire<MyString>) {}

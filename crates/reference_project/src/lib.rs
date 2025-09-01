@@ -8,7 +8,7 @@
 //! is generated is part of the test.
 
 use interoptopus::inventory::Inventory;
-use interoptopus::{builtins_string, builtins_vec, constant, extra_type, ffi, function, pattern};
+use interoptopus::{builtins_string, builtins_vec, builtins_wire, constant, extra_type, ffi, function, pattern};
 
 pub mod constants;
 pub mod functions;
@@ -53,6 +53,7 @@ pub fn ffi_inventory() -> Inventory {
     Inventory::builder()
         // Functions
         .register(builtins_string!())
+        .register(builtins_wire!())
         .register(builtins_vec!(u8))
         .register(builtins_vec!(ffi::String))
         .register(builtins_vec!(types::basic::Vec3f32))
@@ -183,9 +184,12 @@ pub fn ffi_inventory() -> Inventory {
         .register(function!(patterns::vec::pattern_vec_7))
         .register(function!(patterns::vec::pattern_vec_8))
         // TODO
-        // .register(function!(wire::basic::perform_miracles))
-        // .register(function!(wire::basic::perform_half_miracles))
-        // .register(function!(wire::basic::perform_half_miracles_in_other_direction))
+        // .register(function!(wire::basic::wire_accept_string_1))
+        .register(function!(wire::basic::wire_accept_string_2))
+        // TODO
+        // .register(function!(wire::miracles::perform_miracles))
+        // .register(function!(wire::miracles::perform_half_miracles))
+        // .register(function!(wire::miracles::perform_half_miracles_in_other_direction))
         // Constants
         .register(constant!(constants::U8))
         .register(constant!(constants::F32_MIN_POSITIVE))
