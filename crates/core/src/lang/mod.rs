@@ -267,4 +267,12 @@ impl Type {
     pub fn is_wired(&self) -> bool {
         matches!(self, Self::Wire(_))
     }
+
+    // TODO: actually we want this instead of T::RAW_SAFE?
+    pub fn is_raw_safe(&self) -> bool {
+        match self {
+            Self::Primitive(p) => true,
+            _ => todo!(),
+        }
+    }
 }
