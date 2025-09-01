@@ -324,14 +324,15 @@ namespace My.Company
         }
     }
 
-    /// <summary>
-    /// Domain type that is sent across FFI boundary in a Wire.
-    /// </summary>
+
     public partial class Return
     {
         /// 
         uint field;
+    }
 
+    public partial class Return
+    {
         /// <summary>Empty constructor</summary>
         public Return() { }
 
@@ -563,16 +564,17 @@ namespace My.Company
         }
     }
 
-    /// <summary>
-    /// Domain type that is sent across FFI boundary in a Wire.
-    /// </summary>
+
     public partial class Something
     {
         /// 
         ushort field;
         /// 
         String name;
+    }
 
+    public partial class Something
+    {
         /// <summary>Empty constructor</summary>
         public Something() { }
 

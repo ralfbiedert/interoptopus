@@ -19,10 +19,10 @@
 //!    nested custom types (e.g., if `MyStruct` contains `AnotherCustomType`, both
 //!    get wire wrappers).
 
-use crate::converter::{field_name, field_to_type, wire_suffix};
 use crate::Interop;
+use crate::converter::{field_name, field_to_type, wire_suffix};
 use interoptopus::lang::{Composite, Enum, Type, VariantKind, Visibility, WirePayload};
-use interoptopus_backend_utils::{render, Error, IndentWriter};
+use interoptopus_backend_utils::{Error, IndentWriter, render};
 
 pub fn write_wire_helpers(_i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     // Add single copy of shared serialization helpers.
